@@ -81,6 +81,8 @@
 
 **File created:** `docs/CURSOR_AGENT_REQUIREMENTS_GAPS_AND_SOLUTIONS.md`
 
+**Current status (agent setup complete):** `.cursorrules`, `AGENT.md`, `docs/CURSOR_SETUP.md` present. Agent uses `.venv`; Git credentials stored. See `docs/CURSOR_SETUP.md` for Cursor permissions and venv details.
+
 **Done in this pass:**  
 - Added **`.cursorrules`** at repo root (auto-loaded by Cursor: Angel-only, no live trading, safe mode, key paths, verification commands).  
 - Added **`AGENT.md`** at repo root (entry point: phase docs, master instruction, venv, verification).  
