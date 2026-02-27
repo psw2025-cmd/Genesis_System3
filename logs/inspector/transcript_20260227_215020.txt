@@ -3015,3 +3015,416 @@ PS C:\Genesis_System3> git add .gitignore   # and any other files you changed
 
 PS C:\Genesis_System3> git commit -m "Ignore virtual environment and remove tracked venv files"
 
+PS C:\Genesis_System3> PS C:\Genesis_System3> git config --global user.name "psw2025-cmd"
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument 'git'."
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git config --global user.name "psw2025-cmd"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git config --global user.name "psw2025-cmd"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetPro
+   cessCommand
+
+PS C:\Genesis_System3> PS C:\Genesis_System3> git config --global user.email "warghade2012@gmail.com"
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument 'git'."
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git config --global user.email "warghade2012@g ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git config --global user.email "warghade2012@g ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetPro
+   cessCommand
+
+PS C:\Genesis_System3> PS C:\Genesis_System3> git add .gitignore   # and any other files you changed
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument 'git'."
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git add .gitignore   # and any other files you ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git add .gitignore   # and any other files you ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetPro
+   cessCommand
+
+PS C:\Genesis_System3> warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touc
+warning: : The term 'warning:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ warning: in the working copy of '.gitignore', LF will be replaced by  ...
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (warning::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+warning: : The term 'warning:' is not recognized as the name of a cmdlet, function, script
+file, or operable program. Check the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ warning: in the working copy of '.gitignore', LF will be replaced by  ...
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (warning::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> hes it
+hes : The term 'hes' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the 
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ hes it
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (hes:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+hes : The term 'hes' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:1
++ hes it
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (hes:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> PS C:\Genesis_System3> git commit -m "Ignore virtual environment and remove tracked venv files"
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument 'git'."
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git commit -m "Ignore virtual environment and  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that accepts argument 'git'.
+At line:1 char:1
++ PS C:\Genesis_System3> git commit -m "Ignore virtual environment and  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetPro
+   cessCommand
+
+PS C:\Genesis_System3> Auto packing the repository for optimum performance.
+Auto : The term 'Auto' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the 
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Auto packing the repository for optimum performance.
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (Auto:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Auto : The term 'Auto' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:1
++ Auto packing the repository for optimum performance.
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (Auto:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> See "git help gc" for manual housekeeping.
+See : The term 'See' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the 
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ See "git help gc" for manual housekeeping.
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (See:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+See : The term 'See' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:1
++ See "git help gc" for manual housekeeping.
++ ~~~
+    + CategoryInfo          : ObjectNotFound: (See:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Enumerating objects: 3, done.
+Enumerating : The term 'Enumerating' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Enumerating objects: 3, done.
++ ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Enumerating:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Enumerating : The term 'Enumerating' is not recognized as the name of a cmdlet, function,
+script file, or operable program. Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Enumerating objects: 3, done.
++ ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Enumerating:String) [], CommandNotFoundExceptio
+   n
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Counting objects: 100% (3/3), done.
+Counting : The term 'Counting' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Counting objects: 100% (3/3), done.
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Counting:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Counting : The term 'Counting' is not recognized as the name of a cmdlet, function, script
+file, or operable program. Check the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Counting objects: 100% (3/3), done.
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Counting:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Delta compression using up to 4 threads
+Delta : The term 'Delta' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Delta compression using up to 4 threads
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Delta:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Delta : The term 'Delta' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:1
++ Delta compression using up to 4 threads
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Delta:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Compressing objects: 100% (2/2), done.
+Compressing : The term 'Compressing' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Compressing objects: 100% (2/2), done.
++ ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Compressing:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Compressing : The term 'Compressing' is not recognized as the name of a cmdlet, function,
+script file, or operable program. Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Compressing objects: 100% (2/2), done.
++ ~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Compressing:String) [], CommandNotFoundExceptio
+   n
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Writing objects: 100% (3/3), done.
+Writing : The term 'Writing' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Writing objects: 100% (3/3), done.
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Writing:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Writing : The term 'Writing' is not recognized as the name of a cmdlet, function, script file,
+or operable program. Check the spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Writing objects: 100% (3/3), done.
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Writing:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+delta : The term 'delta' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:10
++ Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
++          ~~~~~
+    + CategoryInfo          : ObjectNotFound: (delta:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+delta : The term 'delta' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:10
++ Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
++          ~~~~~
+    + CategoryInfo          : ObjectNotFound: (delta:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Checking connectivity: 29529, done.
+Checking : The term 'Checking' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Checking connectivity: 29529, done.
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Checking:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Checking : The term 'Checking' is not recognized as the name of a cmdlet, function, script
+file, or operable program. Check the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Checking connectivity: 29529, done.
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Checking:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> warning: There are too many unreachable loose objects; run 'git prune' to remove them.
+warning: : The term 'warning:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ warning: There are too many unreachable loose objects; run 'git prune ...
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (warning::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+warning: : The term 'warning:' is not recognized as the name of a cmdlet, function, script
+file, or operable program. Check the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ warning: There are too many unreachable loose objects; run 'git prune ...
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (warning::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+run : The term 'run' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the 
+spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:56
++ warning: There are too many unreachable loose objects; run 'git prune ...
++                                                        ~~~
+    + CategoryInfo          : ObjectNotFound: (run:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+run : The term 'run' is not recognized as the name of a cmdlet, function, script file, or
+operable program. Check the spelling of the name, or if a path was included, verify that the
+path is correct and try again.
+At line:1 char:56
++ warning: There are too many unreachable loose objects; run 'git prune ...
++                                                        ~~~
+    + CategoryInfo          : ObjectNotFound: (run:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> [main (root-commit) b3ba11d] Ignore virtual environment and remove tracked venv files
+At line:1 char:8
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++        ~
+Missing closing ')' in expression.
+
+At line:1 char:1
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++ ~~~~~~~
+Unexpected attribute 'main'.
+
+At line:1 char:12
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++            ~~~~~~~
+Unexpected token '-commit' in expression or statement.
+
+At line:1 char:19
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++                   ~
+Unexpected token ')' in expression or statement.
+At line:1 char:8
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++        ~
+Missing closing ')' in expression.
+
+At line:1 char:1
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++ ~~~~~~~
+Unexpected attribute 'main'.
+
+At line:1 char:12
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++            ~~~~~~~
+Unexpected token '-commit' in expression or statement.
+
+At line:1 char:19
++ [main (root-commit) b3ba11d] Ignore virtual environment and remove tr ...
++                   ~
+Unexpected token ')' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : MissingEndParenthesisInExpression
+
+PS C:\Genesis_System3>  1 file changed, 10 insertions(+)
+At line:1 char:4
++  1 file changed, 10 insertions(+)
++    ~~~~
+Unexpected token 'file' in expression or statement.
+
+At line:1 char:33
++  1 file changed, 10 insertions(+)
++                                 ~
+Missing expression after unary operator '+'.
+At line:1 char:4
++  1 file changed, 10 insertions(+)
++    ~~~~
+Unexpected token 'file' in expression or statement.
+
+At line:1 char:33
++  1 file changed, 10 insertions(+)
++                                 ~
+Missing expression after unary operator '+'.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+PS C:\Genesis_System3>  create mode 100644 .gitignore
+create : The term 'create' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:2
++  create mode 100644 .gitignore
++  ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (create:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+create : The term 'create' is not recognized as the name of a cmdlet, function, script file,
+or operable program. Check the spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:2
++  create mode 100644 .gitignore
++  ~~~~~~
+    + CategoryInfo          : ObjectNotFound: (create:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> PS C:\Genesis_System3>
+PS : Cannot find a process with the name "C:\Genesis_System3>". Verify the process name and call the cmdlet again.
+At line:1 char:1
++ PS C:\Genesis_System3>
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Genesis_System3>:String) [Get-Process], ProcessCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenName,Microsoft.PowerShell.Commands.GetProcessCommand
+PS : Cannot find a process with the name "C:\Genesis_System3>". Verify the process name and
+call the cmdlet again.
+At line:1 char:1
++ PS C:\Genesis_System3>
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Genesis_System3>:String) [Get-Process], Proc
+   essCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenName,Microsoft.PowerShell.Commands.GetProc
+   essCommand
+
+PS C:\Genesis_System3> git config --global user.name "psw2025-cmd"
+
+PS C:\Genesis_System3> git rm -r --cached storage/ 2>$null; git rm -r --cached tools/logs/ 2>$null; git rm -r --cached logs/ 2>$null
+
+
+git : error: the following file has staged content different from both the
+At line:1 char:78
++ ...  rm -r --cached tools/logs/ 2>$null; git rm -r --cached logs/ 2>$null
++                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: the foll...t from both the:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+file and the HEAD:
+    logs/inspector/transcript_20260227_215020.txt
+(use -f to force removal)
+
+PS C:\Genesis_System3> git add .
+
+PS C:\Genesis_System3> git commit -m "Ignore generated snapshots, storage, and logs; update .gitignore"
+
+PS C:\Genesis_System3> git add .
+
+PS C:\Genesis_System3> git commit -m "Ignore generated snapshots, storage, and logs; update .gitignore"
+
+PS C:\Genesis_System3> git push -u origin main
+
+PS C:\Genesis_System3> git push -u origin main
+
+PS C:\Genesis_System3> git push -f origin main
+
