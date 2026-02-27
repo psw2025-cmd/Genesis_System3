@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis System3 Ultra Dashboard</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="dashboard">
+            <!-- Sidebar Navigation -->
+            <div class="sidebar">
+                <div class="logo">
+                    <h1>System3</h1>
+                    <div class="status-indicator" :class="systemStatus.toLowerCase()"></div>
+                </div>
+                <nav class="nav-tabs">
+                    <div 
+                        v-for="tab in tabs" 
+                        :key="tab.id"
+                        class="tab" 
+                        :class="{active: activeTab === tab.id}" 
+                        @click="activeTab = tab.id"
+                    >
+                        <span class="tab-icon">{{ tab.icon }}</span>
+                        <span class="tab-label">{{ tab.label }}</span>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content">
+                <!-- Overview Tab -->
+                <div v-if="activeTab === 'overview'" class="tab-content">
+                    <h2>System Overview</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card" :class="getPnLClass()">
+                            <div class="metric-label">Total PnL</div>
+                            <div class="metric-value">₹{{ formatNumber(metrics.pnl) }}</div>
+                            <div class="metric-change">{{ metrics.pnlChange >= 0 ? '+' : '' }}{{ metrics.pnlChange.toFixed(2) }}%</div>
+                        </div>
+                        <div class="metric-card" :class="getPerfClass()">
+                            <div class="metric-label">Cycle Duration</div>
+                            <div class="metric-value">{{ metrics.cycleDuration }}s</div>
+                            <div class="metric-change">{{ metrics.cycleDuration < 3 ? 'GREEN' : metrics.cycleDuration < 10 ? 'YELLOW' : 'RED' }}</div>
+                        </div>
+                        <div class="metric-card green">
+                            <div class="metric-label">Trades Executed</div>
+                            <div class="metric-value">{{ metrics.tradesExecuted }}</div>
+                            <div class="metric-change">Open: {{ metrics.openPositions }}</div>
+                        </div>
+                        <div class="metric-card" :class="getGreeksClass()">
+                            <div class="metric-label">Greeks Success</div>
+                            <div class="metric-value">{{ metrics.greeksSuccess }}%</div>
+                            <div class="metric-change">Fallback: {{ metrics.greeksFallback }}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h3>System Status</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="status-label">Mode:</span>
+                                <span class="status-value">{{ systemStatus }}</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Last Fetch:</span>
+                                <span class="status-value">{{ formatTime(metrics.lastFetch) }}</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Data Success Rate:</span>
+                                <span class="status-value">{{ metrics.dataSuccessRate }}%</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Signal Success Rate:</span>
+                                <span class="status-value">{{ metrics.signalSuccessRate }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latency Tab -->
+                <div v-if="activeTab === 'latency'" class="tab-content">
+                    <h2>Latency Metrics</h2>
+                    <div class="panel">
+                        <div class="latency-grid">
+                            <div class="latency-item" :class="getLatencyClass(metrics.fetchDuration)">
+                                <div class="latency-label">Fetch Duration</div>
+                                <div class="latency-value">{{ metrics.fetchDuration }}s</div>
+                                <div class="latency-sla">{{ metrics.fetchDuration < 3 ? 'PASS' : 'FAIL' }}</div>
+                            </div>
+                            <div class="latency-item" :class="getLatencyClass(metrics.strategyDuration)">
+                                <div class="latency-label">Strategy Duration</div>
+                                <div class="latency-value">{{ metrics.strategyDuration }}s</div>
+                                <div class="latency-sla">{{ metrics.strategyDuration < 1 ? 'PASS' : 'FAIL' }}</div>
+                            </div>
+                            <div class="latency-item" :class="getLatencyClass(metrics.cycleDuration)">
+                                <div class="latency-label">Total Cycle</div>
+                                <div class="latency-value">{{ metrics.cycleDuration }}s</div>
+                                <div class="latency-sla">{{ metrics.cycleDuration < 10 ? 'PASS' : 'FAIL' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Tab -->
+                <div v-if="activeTab === 'risk'" class="tab-content">
+                    <h2>Risk Management</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card" :class="getRiskClass(metrics.maxDrawdown)">
+                            <div class="metric-label">Max Drawdown</div>
+                            <div class="metric-value">{{ metrics.maxDrawdown }}%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Win Rate</div>
+                            <div class="metric-value">{{ metrics.winRate }}%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Total Trades</div>
+                            <div class="metric-value">{{ metrics.totalTrades }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Winning Trades</div>
+                            <div class="metric-value">{{ metrics.winningTrades }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Greeks Tab -->
+                <div v-if="activeTab === 'greeks'" class="tab-content">
+                    <h2>Greeks Status</h2>
+                    
+                    <!-- Underlying Selector -->
+                    <div class="underlying-selector">
+                        <button 
+                            v-for="u in underlyings" 
+                            :key="u"
+                            class="underlying-btn"
+                            :class="{active: selectedUnderlying === u}"
+                            @click="selectedUnderlying = u; fetchChainData(u)"
+                        >
+                            {{ u }}
+                        </button>
+                    </div>
+                    
+                    <div class="metric-grid">
+                        <div class="metric-card" :class="getGreeksClass()">
+                            <div class="metric-label">API Success Rate</div>
+                            <div class="metric-value">{{ metrics.greeksSuccess.toFixed(1) }}%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Black-Scholes Fallback</div>
+                            <div class="metric-value">{{ metrics.greeksFallback }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Unavailable</div>
+                            <div class="metric-value">{{ metrics.greeksUnavailable }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Total Contracts</div>
+                            <div class="metric-value">{{ chainData.totalContracts }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel">
+                        <h3>Greeks Distribution</h3>
+                        <div class="greeks-status">
+                            <div class="status-row">
+                                <span>Contracts with Full Greeks (Delta, Gamma, Vega, Theta):</span>
+                                <span class="green">{{ Math.round(chainData.totalContracts * metrics.greeksSuccess / 100) }}</span>
+                            </div>
+                            <div class="status-row">
+                                <span>Contracts with Partial Greeks:</span>
+                                <span class="yellow">{{ metrics.greeksFallback }}</span>
+                            </div>
+                            <div class="status-row">
+                                <span>Contracts without Greeks:</span>
+                                <span class="red">{{ metrics.greeksUnavailable }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Option Chain Tab -->
+                <div v-if="activeTab === 'options'" class="tab-content">
+                    <h2>Option Chain Analytics</h2>
+                    
+                    <!-- Underlying Selector -->
+                    <div class="underlying-selector">
+                        <button 
+                            v-for="u in underlyings" 
+                            :key="u"
+                            class="underlying-btn"
+                            :class="{active: selectedUnderlying === u}"
+                            @click="selectedUnderlying = u; fetchChainData(u)"
+                        >
+                            {{ u }}
+                        </button>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Spot Price</div>
+                            <div class="metric-value">₹{{ formatNumber(chainData.spot) }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Put-Call Ratio</div>
+                            <div class="metric-value">{{ chainData.pcr?.toFixed(2) || 'N/A' }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Total Contracts</div>
+                            <div class="metric-value">{{ chainData.totalContracts || 0 }}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Filtered</div>
+                            <div class="metric-value">{{ filteredContracts.length }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Chain Table -->
+                    <div class="panel">
+                        <div class="table-container">
+                            <table class="chain-table">
+                                <thead>
+                                    <tr>
+                                        <th>Strike</th>
+                                        <th>Type</th>
+                                        <th>LTP</th>
+                                        <th>OI</th>
+                                        <th>Volume</th>
+                                        <th>IV</th>
+                                        <th>Delta</th>
+                                        <th>Gamma</th>
+                                        <th>Vega</th>
+                                        <th>Theta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(contract, idx) in filteredContracts.slice(0, 100)" :key="idx">
+                                        <td>{{ contract.strike }}</td>
+                                        <td>{{ contract.option_type }}</td>
+                                        <td>₹{{ contract.ltp?.toFixed(2) || 'N/A' }}</td>
+                                        <td>{{ formatNumber(contract.oi) }}</td>
+                                        <td>{{ formatNumber(contract.volume) }}</td>
+                                        <td>{{ contract.iv ? (contract.iv * 100).toFixed(2) + '%' : 'N/A' }}</td>
+                                        <td>{{ contract.delta?.toFixed(3) || 'N/A' }}</td>
+                                        <td>{{ contract.gamma?.toFixed(4) || 'N/A' }}</td>
+                                        <td>{{ contract.vega?.toFixed(2) || 'N/A' }}</td>
+                                        <td>{{ contract.theta?.toFixed(2) || 'N/A' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Trades Tab -->
+                <div v-if="activeTab === 'trades'" class="tab-content">
+                    <h2>Live Trades</h2>
+                    <div class="panel">
+                        <div class="trades-list">
+                            <div v-for="trade in liveTrades" :key="trade.id" class="trade-item">
+                                <div class="trade-symbol">{{ trade.symbol }}</div>
+                                <div class="trade-details">
+                                    <span>Entry: ₹{{ trade.entryPrice }}</span>
+                                    <span>Current: ₹{{ trade.currentPrice }}</span>
+                                    <span :class="trade.pnl >= 0 ? 'green' : 'red'">
+                                        PnL: ₹{{ trade.pnl.toFixed(2) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-if="liveTrades.length === 0" class="no-trades">
+                                No active trades
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

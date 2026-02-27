@@ -1,0 +1,59 @@
+# Genesis System3 – Cursor Agent Rules
+
+You are the Genesis System3 agent. Root: C:\Genesis_System3. Python venv: .venv (use .venv\Scripts\python or activate .venv before running scripts). Prefer Python 3.10 for this project.
+
+## Response standard (production-grade answers always)
+- Give **production-grade** answers: clear, actionable, and complete. No vague or half-done guidance.
+- **Actionable**: Provide exact commands, paths, and steps the user or agent can run. No "you might try" without a concrete command.
+- **Complete**: Include success criteria, failure handling (what to check, where logs go), and next steps. If something can fail, say how to detect and fix it.
+- **Structured**: Use short lists, tables, or sections when it helps. Prefer copy-paste-ready code or commands.
+- **Strict by default**: Prefer fail-fast, explicit checks, and proof artifacts over silent or best-effort behavior. When in doubt, document the failure mode and remediation.
+
+## Absolute rules
+- NEVER enable live trading: do not change LIVE_TRADING_ENABLED, USE_LIVE_EXECUTION_ENGINE, AUTO_EXECUTE_TRADES, or auto_execute_trades. They must stay False unless the user explicitly changes them.
+- Angel One only: do not add Binance modules, configs, or endpoints.
+- Do not hide errors: if a command fails or prints ERROR/Traceback, treat as FAILED; capture full error and propose concrete fixes.
+- Read before changing: open and understand purpose, callers, and read/write paths before editing any .py or .md.
+- Minimal, targeted changes: fix specific bugs or add clearly requested pieces; avoid large rewrites or renaming without need.
+- Safe outputs only: new code may write only under storage/, logs/, reports/; never call real broker APIs except in DRY-RUN test harnesses.
+
+## Repo layout (key paths)
+- Main script: run_system3.py
+- Engine: core/engine/
+- Storage: storage/, storage/live/, storage/archive/, storage/learning/
+- Logs: logs/
+- Reports: reports/
+- Proof: proof/, proof/archive/
+- Phase docs: docs/MASTER PLAN — PHASE-WISE INSTRUCTIONS FOR CURSOR AGENT.txt, docs/system3_phase7_9_next_steps_for_cursor_agent.md, docs/cursor_agent_batch4_instructions.md
+
+## Verification (what the agent should run by itself)
+- **After any non-trivial code changes**:  
+  The agent should **first attempt** to run (in this order, by itself):
+  1. `Run-All.bat` (env, Governance, QA, start backend/dashboard, git/Docker).  
+     - If this fails, read `proof/archive/RUN_ALL_FAIL_*.json` and try to fix automatically where possible.
+  2. `python scripts/run_dashboard_full_test.py` (production-grade dashboard test).  
+     - On failure, read `proof/archive/DASHBOARD_FULL_TEST_*.json` and attempt automatic fixes (code, config) before asking the user.
+  3. `python scripts/run_phase_orchestrator.py [--start START --end END]` (production-grade phases 201–310).  
+     - On failure, read `proof/archive/PHASE_ORCHESTRATOR_FAIL_*.json` and attempt automatic fixes in the phase modules.
+- **Dashboard – visual only (Playwright, no screenshots from user)**:  
+  When visual checks are needed, the agent should run `python tools/playwright_dashboard_verification.py`, then read `proof/archive/dashboard_verification_*.json` and summarize. See `docs/AGENT_DASHBOARD_VERIFICATION_PLAYWRIGHT.md`.
+- **Phases 231–260 (targeted proof)**:  
+  For legacy/targeted proof, the agent can run `python proof/run_231_260_proof.py` as needed.
+
+## When automation cannot proceed (user action required)
+- If you (the agent) **fail to complete the same action multiple times** (e.g. repeated tool errors, sandbox limits, missing external prerequisites), do **not** keep retrying blindly.
+- Instead, construct a clear **User Action Plan** and stop:
+  - **What**: list the specific manual steps the user must perform (commands, scripts, UI actions).
+  - **Why**: explain briefly why each step is needed and what it unblocks.
+  - **How**: give exact commands/paths/URLs where possible, and where to find logs or artifacts.
+  - **Then next**: state exactly which script/command you will run **after** the user confirms those actions are done (e.g. “after you finish steps 1–3, I will run `python scripts/run_dashboard_full_test.py` again”).
+- Always tie user actions back to the production-grade sequence (Run-All → dashboard full test → phase orchestrator) so there is **no gap** between what the user does and what you do next.
+
+## Governance watchdog (SYSTEM3_OMEGA_ULTRA)
+- Enforce production-grade dependency management and QA per `.cursor/rules/governance-watchdog.mdc`.
+- Dual requirements: edit `.in` files; regenerate `.txt` with `pip-compile`; never install from `.in`. Run Black, Flake8, Bandit, Safety, Pytest, Pip-Audit; emit proof artifacts to `logs/inspector/`. Fail fast on conflicts with reason and remediation.
+
+## Full instructions
+For full workflow, editing policy, and phase-wise instructions, see docs/GENESIS_VSCODE_AGENT_MASTER_INSTRUCTION.md and docs/MASTER PLAN — PHASE-WISE INSTRUCTIONS FOR CURSOR AGENT.txt.
+- **Best recommendation (what user needs once, run order, readiness):** docs/BEST_RECOMMENDATION_AGENT_RUN.md.
+- **Dual requirements and pip-compile:** docs/GOVERNANCE_DUAL_REQUIREMENTS.md.

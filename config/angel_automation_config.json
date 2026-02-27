@@ -1,0 +1,8 @@
+{
+  "auto_execute_trades": false,
+  "auto_simulate_pnl": false,
+  "pnl_sim_interval": 10,
+  "max_trades_per_day": 20,
+  "max_trades_per_underlying_per_day": 5
+}
+

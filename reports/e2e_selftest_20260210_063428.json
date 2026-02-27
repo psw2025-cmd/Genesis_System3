@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-02-10T06:34:28.327753",
+  "summary": {
+    "total": 7,
+    "passed": 6,
+    "failed": 0,
+    "warned": 1,
+    "overall": "PASS"
+  },
+  "results": {
+    "api_health": {
+      "status": "PASS",
+      "data": {
+        "status": "ok",
+        "mode": "LIVE",
+        "broker_status": "connected",
+        "market_status": "closed",
+        "data_source": "synthetic",
+        "cycle_count": 10,
+        "refresh_interval": 5,
+        "last_fetch": "2026-02-10T06:34:20.606561+05:30",
+        "qc_status": "PASS",
+        "qc_failures": [],
+        "trades_executed": 10,
+        "open_positions": 4,
+        "total_pnl": 2285.38,
+        "daily_pnl": 2285.38,
+        "performance_sla": {
+          "cycle_duration_sec": 0.5,
+          "fetch_duration_sec": 0.1,
+          "strategy_duration_sec": 0.2,
+          "sla_pass": true
+        }
+      }
+    },
+    "broker_login": {
+      "status": "WARN",
+      "message": "Broker disconnected (expected if no credentials)"
+    },
+    "state_consistency": {
+      "status": "PASS",
+      "data": {
+        "state_version": 6076,
+        "data_source": "SYNTHETIC",
+        "positions_count": 0,
+        "qc_status": "PASS"
+      }
+    },
+    "qc_consistency": {
+      "status": "PASS",
+      "data": {
+        "qc_status": "PASS"
+      }
+    },
+    "position_reconciliation": {
+      "status": "PASS",
+      "data": {
+        "positions_count": 0,
+        "positions_source": "UNKNOWN",
+        "reconciliation_status": "OK"
+      }
+    },
+    "alert_timestamps": {
+      "status": "PASS",
+      "data": {
+        "alerts_count": 0
+      }
+    },
+    "greeks_availability": {
+      "status": "PASS",
+      "data": {
+        "delta": 0,
+        "gamma": 0,
+        "theta": 0,
+        "vega": 0
+      }
+    }
+  }
+}

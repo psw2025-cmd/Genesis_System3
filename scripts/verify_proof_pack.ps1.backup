@@ -1,0 +1,208 @@
+# scripts/verify_proof_pack.ps1
+# Automated proof pack verifier
+# Usage: powershell -ExecutionPolicy Bypass -File scripts\verify_proof_pack.ps1
+
+$ErrorActionPreference = "Stop"
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
+Write-Host "================================================================================"
+Write-Host "GENESIS SYSTEM3 - PROOF PACK VERIFIER"
+Write-Host "================================================================================"
+Write-Host ""
+
+# Change to project root
+Set-Location $PSScriptRoot\..
+$projectRoot = Get-Location
+
+$proofPackDir = ".\outputs\proof_pack"
+$trendUpDir = "$proofPackDir\TREND_UP"
+$dataErrorsDir = "$proofPackDir\DATA_ERRORS"
+
+$allPassed = $true
+$failures = @()
+
+# Check TREND_UP scenario
+Write-Host "[VERIFY] Checking TREND_UP scenario..."
+if (-not (Test-Path $trendUpDir)) {
+    $allPassed = $false
+    $failures += "TREND_UP directory missing"
+    Write-Host "[FAIL] TREND_UP directory not found"
+} else {
+    # Check QC report
+    $qcPath = "$trendUpDir\qc_report_live.json"
+    if (-not (Test-Path $qcPath)) {
+        $allPassed = $false
+        $failures += "TREND_UP qc_report_live.json missing"
+        Write-Host "[FAIL] TREND_UP qc_report_live.json not found"
+    } else {
+        try {
+            $qc = Get-Content $qcPath | ConvertFrom-Json
+            if ($qc.status -ne "PASS" -or $qc.qc_passed -ne $true) {
+                $allPassed = $false
+                $failures += "TREND_UP QC failed: status=$($qc.status), qc_passed=$($qc.qc_passed)"
+                Write-Host "[FAIL] TREND_UP QC not PASS"
+            } else {
+                Write-Host "[OK] TREND_UP QC: PASS"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "TREND_UP qc_report_live.json invalid JSON"
+            Write-Host "[FAIL] TREND_UP qc_report_live.json invalid: $_"
+        }
+    }
+    
+    # Check top trade signal
+    $signalPath = "$trendUpDir\top_trade_signal.json"
+    if (-not (Test-Path $signalPath)) {
+        $allPassed = $false
+        $failures += "TREND_UP top_trade_signal.json missing"
+        Write-Host "[FAIL] TREND_UP top_trade_signal.json not found"
+    } else {
+        try {
+            $signal = Get-Content $signalPath | ConvertFrom-Json
+            if ($signal.action -ne "TRADE") {
+                $allPassed = $false
+                $failures += "TREND_UP top signal not TRADE: action=$($signal.action)"
+                Write-Host "[FAIL] TREND_UP top signal: action=$($signal.action) (expected TRADE)"
+            } elseif ($signal.confidence -le 0.75) {
+                $allPassed = $false
+                $failures += "TREND_UP confidence too low: confidence=$($signal.confidence) (need >0.75)"
+                Write-Host "[FAIL] TREND_UP confidence too low: $($signal.confidence) (need >0.75)"
+            } else {
+                Write-Host "[OK] TREND_UP top signal: TRADE, confidence=$($signal.confidence)"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "TREND_UP top_trade_signal.json invalid JSON"
+            Write-Host "[FAIL] TREND_UP top_trade_signal.json invalid: $_"
+        }
+    }
+    
+    # Check health
+    $healthPath = "$trendUpDir\health.json"
+    if (-not (Test-Path $healthPath)) {
+        $allPassed = $false
+        $failures += "TREND_UP health.json missing"
+        Write-Host "[FAIL] TREND_UP health.json not found"
+    } else {
+        try {
+            $health = Get-Content $healthPath | ConvertFrom-Json
+            if ($health.trades_executed -lt 1) {
+                $allPassed = $false
+                $failures += "TREND_UP trades_executed=$($health.trades_executed) (need >=1)"
+                Write-Host "[FAIL] TREND_UP trades_executed=$($health.trades_executed) (need >=1)"
+            } elseif ($health.current_positions -lt 1) {
+                $allPassed = $false
+                $failures += "TREND_UP current_positions=$($health.current_positions) (need >=1)"
+                Write-Host "[FAIL] TREND_UP current_positions=$($health.current_positions) (need >=1)"
+            } else {
+                Write-Host "[OK] TREND_UP health: trades_executed=$($health.trades_executed), positions=$($health.current_positions)"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "TREND_UP health.json invalid JSON"
+            Write-Host "[FAIL] TREND_UP health.json invalid: $_"
+        }
+    }
+}
+
+Write-Host ""
+
+# Check DATA_ERRORS scenario
+Write-Host "[VERIFY] Checking DATA_ERRORS scenario..."
+if (-not (Test-Path $dataErrorsDir)) {
+    $allPassed = $false
+    $failures += "DATA_ERRORS directory missing"
+    Write-Host "[FAIL] DATA_ERRORS directory not found"
+} else {
+    # Check QC report
+    $qcPath = "$dataErrorsDir\qc_report_live.json"
+    if (-not (Test-Path $qcPath)) {
+        $allPassed = $false
+        $failures += "DATA_ERRORS qc_report_live.json missing"
+        Write-Host "[FAIL] DATA_ERRORS qc_report_live.json not found"
+    } else {
+        try {
+            $qc = Get-Content $qcPath | ConvertFrom-Json
+            if ($qc.status -ne "FAIL" -or $qc.qc_passed -ne $false) {
+                $allPassed = $false
+                $failures += "DATA_ERRORS QC not FAIL: status=$($qc.status), qc_passed=$($qc.qc_passed)"
+                Write-Host "[FAIL] DATA_ERRORS QC not FAIL"
+            } else {
+                Write-Host "[OK] DATA_ERRORS QC: FAIL (expected)"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "DATA_ERRORS qc_report_live.json invalid JSON"
+            Write-Host "[FAIL] DATA_ERRORS qc_report_live.json invalid: $_"
+        }
+    }
+    
+    # Check top trade signal
+    $signalPath = "$dataErrorsDir\top_trade_signal.json"
+    if (-not (Test-Path $signalPath)) {
+        $allPassed = $false
+        $failures += "DATA_ERRORS top_trade_signal.json missing"
+        Write-Host "[FAIL] DATA_ERRORS top_trade_signal.json not found"
+    } else {
+        try {
+            $signal = Get-Content $signalPath | ConvertFrom-Json
+            if ($signal.action -ne "NO_TRADE") {
+                $allPassed = $false
+                $failures += "DATA_ERRORS top signal not NO_TRADE: action=$($signal.action)"
+                Write-Host "[FAIL] DATA_ERRORS top signal: action=$($signal.action) (expected NO_TRADE)"
+            } else {
+                Write-Host "[OK] DATA_ERRORS top signal: NO_TRADE (expected)"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "DATA_ERRORS top_trade_signal.json invalid JSON"
+            Write-Host "[FAIL] DATA_ERRORS top_trade_signal.json invalid: $_"
+        }
+    }
+    
+    # Check health
+    $healthPath = "$dataErrorsDir\health.json"
+    if (-not (Test-Path $healthPath)) {
+        $allPassed = $false
+        $failures += "DATA_ERRORS health.json missing"
+        Write-Host "[FAIL] DATA_ERRORS health.json not found"
+    } else {
+        try {
+            $health = Get-Content $healthPath | ConvertFrom-Json
+            if ($health.trades_executed -ne 0) {
+                $allPassed = $false
+                $failures += "DATA_ERRORS trades_executed=$($health.trades_executed) (need 0)"
+                Write-Host "[FAIL] DATA_ERRORS trades_executed=$($health.trades_executed) (need 0)"
+            } elseif ($health.current_positions -ne 0) {
+                $allPassed = $false
+                $failures += "DATA_ERRORS current_positions=$($health.current_positions) (need 0)"
+                Write-Host "[FAIL] DATA_ERRORS current_positions=$($health.current_positions) (need 0)"
+            } else {
+                Write-Host "[OK] DATA_ERRORS health: trades_executed=0, positions=0 (expected)"
+            }
+        } catch {
+            $allPassed = $false
+            $failures += "DATA_ERRORS health.json invalid JSON"
+            Write-Host "[FAIL] DATA_ERRORS health.json invalid: $_"
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "================================================================================"
+
+if ($allPassed) {
+    Write-Host "PROOF_STATUS=PASS"
+    Write-Host "================================================================================"
+    exit 0
+} else {
+    Write-Host "PROOF_STATUS=FAIL"
+    Write-Host ""
+    Write-Host "Failures:"
+    foreach ($failure in $failures) {
+        Write-Host "  - $failure"
+    }
+    Write-Host "================================================================================"
+    exit 1
+}

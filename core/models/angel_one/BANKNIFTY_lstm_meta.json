@@ -1,0 +1,20 @@
+{
+  "underlying": "BANKNIFTY",
+  "training_date": "2026-02-23T17:47:06.052334",
+  "model_version": "lstm_v1",
+  "model_type": "LSTM",
+  "shadow_model": true,
+  "training_data_source": "phase_221_forward_returns",
+  "train_rows": 335,
+  "test_rows": 84,
+  "sequence_length": 20,
+  "feature_count": 10,
+  "accuracy": 0.8214285714285714,
+  "validation_split": 0.2,
+  "epochs": 10,
+  "online_learning_count": 1,
+  "last_burst_timestamp": "2026-02-23T23:17:19.765298",
+  "last_burst_samples": 334,
+  "last_burst_loss": 0.5526856105952036,
+  "last_row_processed": 2415
+}

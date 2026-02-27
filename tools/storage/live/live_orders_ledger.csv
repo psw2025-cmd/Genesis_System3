@@ -1,0 +1,2 @@
+local_order_id,timestamp,status,underlying,strike,option_type,entry_price,qty,broker_status,last_update_ts
+TEST-PLANNED-1,2025-12-05T20:50:36.599174,PLANNED,NIFTY,18000,CE,100.0,1,PLANNED,2025-12-05T20:50:36.599174

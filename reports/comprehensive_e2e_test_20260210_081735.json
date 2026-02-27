@@ -1,0 +1,698 @@
+{
+  "timestamp": "2026-02-10T08:16:49.402329",
+  "tabs": {
+    "Overview": {
+      "name": "Overview",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/health",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Health Check",
+          "response_preview": "{'status': 'ok', 'mode': 'LIVE', 'broker_status': 'connected', 'market_status': 'closed', 'data_source': 'synthetic', 'cycle_count': 11, 'refresh_interval': 5, 'last_fetch': '2026-02-10T08:16:54.04444"
+        },
+        {
+          "endpoint": "/api/perf",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Performance Metrics",
+          "response_preview": "{'status': 'OK', 'current': {'cycle_duration': 1.069, 'fetch_duration': 0.337, 'strategy_duration': 0.741, 'data_source': 'synthetic', 'timestamp': '2026-02-10T08:16:55.166978+05:30'}, 'history': [], "
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Chain Analytics": {
+      "name": "Chain Analytics",
+      "endpoints": [
+        {
+          "endpoint": "/api/chain/NIFTY",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "NIFTY Chain",
+          "response_preview": "{'underlying': 'NIFTY', 'spot': 24000.0, 'pcr': 1.0041858603244989, 'contracts': [{'underlying': 'NIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 23000.0, 'option_type': 'CE', 's"
+        },
+        {
+          "endpoint": "/api/chain/BANKNIFTY",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "BANKNIFTY Chain",
+          "response_preview": "{'underlying': 'BANKNIFTY', 'spot': 52000.0, 'pcr': 1.0139774303027347, 'contracts': [{'underlying': 'BANKNIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 50000.0, 'option_type': "
+        },
+        {
+          "endpoint": "/api/chain/FINNIFTY",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "FINNIFTY Chain",
+          "response_preview": "{'underlying': 'FINNIFTY', 'spot': 22000.0, 'pcr': 0.9960009851939033, 'contracts': [{'underlying': 'FINNIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 21000.0, 'option_type': 'C"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Signals": {
+      "name": "Signals",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State (signals)",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/signal/top",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Top Signal",
+          "response_preview": "{'action': 'BUY', 'underlying': 'NIFTY', 'strike': 24000, 'option_type': 'CE', 'confidence': 0.75, 'data_source': 'synthetic'}"
+        },
+        {
+          "endpoint": "/api/qc",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "QC Status",
+          "response_preview": "{'status': 'PASS', 'checks': {'data_freshness': 'OK', 'price_consistency': 'OK', 'oi_consistency': 'OK', 'volume_consistency': 'OK'}, 'warnings': [], 'data_source': 'synthetic', 'timestamp': '2026-02-"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Paper Trading": {
+      "name": "Paper Trading",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State (positions)",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/positions",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Positions",
+          "response_preview": "{'positions': [], 'open_count': 0, 'message': 'Positions file not found'}"
+        },
+        {
+          "endpoint": "/api/pnl",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "PnL Data",
+          "response_preview": "{'history': [], 'summary': {'total_trades': 0, 'winning_trades': 0, 'losing_trades': 0, 'win_rate': 0.0, 'total_realized_pnl': 0.0, 'total_unrealized_pnl': 0.0, 'total_pnl': 0.0, 'open_positions': 0}}"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Alerts": {
+      "name": "Alerts",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State (alerts)",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/alerts/recent",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Recent Alerts",
+          "response_preview": "{'status': 'ok', 'alerts': [], 'count': 0}"
+        },
+        {
+          "endpoint": "/api/alerts/unread",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Unread Count",
+          "response_preview": "{'status': 'ok', 'alerts': [], 'count': 0}"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Risk Dashboard": {
+      "name": "Risk Dashboard",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State (risk)",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/risk/portfolio",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Portfolio Risk",
+          "response_preview": "{'status': 'ok', 'risk_metrics': {'total_exposure': 0.0, 'total_pnl': 0.0, 'var': 0.0, 'expected_shortfall': 0.0, 'max_drawdown': 0.0, 'concentration_risk': 0.0}}"
+        },
+        {
+          "endpoint": "/api/risk/check-limits",
+          "method": "POST",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Check Risk Limits",
+          "response_preview": "{'status': 'ok', 'limit_check': {'status': 'PASS', 'breaches': [], 'warnings': [], 'portfolio_risk': {'total_exposure': 0.0, 'total_pnl': 0.0, 'var': 0.0, 'expected_shortfall': 0.0, 'max_drawdown': 0."
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Advanced Charts": {
+      "name": "Advanced Charts",
+      "endpoints": [
+        {
+          "endpoint": "/api/charting/heatmap/NIFTY?metric=oi",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Heatmap (OI)",
+          "response_preview": "{'status': 'ok', 'heatmap': {'heatmap': [{'expiry': '05MAR2026', 'values': [253227, 292920, 314674, 385721, 362877, 443653, 467332, 544130, 608133, 691650, 628003, 859518, 993865, 938409, 980329, 1235"
+        },
+        {
+          "endpoint": "/api/charting/iv-surface/NIFTY",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "IV Surface",
+          "response_preview": "{'status': 'ok', 'surface': {'surface': [{'expiry': '05MAR2026', 'iv_values': [11.545, 11.565000000000001, 11.415, 11.325, 11.2, 11.024999999999999, 10.91, 10.555, 10.690000000000001, 10.2950000000000"
+        },
+        {
+          "endpoint": "/api/charting/greeks/NIFTY?greek=delta",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Greeks Chart",
+          "response_preview": "{'status': 'ok', 'greeks': {'greek': 'delta', 'strikes': [23000.0, 23050.0, 23100.0, 23150.0, 23200.0, 23250.0, 23300.0, 23350.0, 23400.0, 23450.0, 23500.0, 23550.0, 23600.0, 23650.0, 23700.0, 23750.0"
+        },
+        {
+          "endpoint": "/api/charting/pcr/NIFTY",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "PCR Chart",
+          "response_preview": "{'status': 'ok', 'pcr': {'pcr_data': [0.960451048223974, 0.9188789715858175, 0.9864958192349949, 0.958815602992645, 1.0947185389546525, 1.0930095288236188, 1.0685548294915115, 0.8439975641385433, 0.95"
+        }
+      ],
+      "passed": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "ML Performance": {
+      "name": "ML Performance",
+      "endpoints": [
+        {
+          "endpoint": "/api/state",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "SSOT State (model)",
+          "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+        },
+        {
+          "endpoint": "/api/ml/performance",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "ML Performance",
+          "response_preview": "{'status': 'ok', 'performance': {'status': 'ok', 'models': {}}}"
+        },
+        {
+          "endpoint": "/api/ml/compare",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Model Comparison",
+          "response_preview": "{'status': 'ok', 'comparison': {'status': 'ERROR', 'message': 'No models found'}}"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Model Behavior": {
+      "name": "Model Behavior",
+      "endpoints": [
+        {
+          "endpoint": "/api/logs/tail?lines=50",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Runtime Logs",
+          "response_preview": "{'logs': [], 'message': 'No log files found'}"
+        },
+        {
+          "endpoint": "/api/audit/secrets",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Security Audit",
+          "response_preview": "{'secrets_found': 0, 'scanned_files': [], 'status': 'PASS'}"
+        },
+        {
+          "endpoint": "/api/qc",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "QC Status",
+          "response_preview": "{'status': 'PASS', 'checks': {'data_freshness': 'OK', 'price_consistency': 'OK', 'oi_consistency': 'OK', 'volume_consistency': 'OK'}, 'warnings': [], 'data_source': 'synthetic', 'timestamp': '2026-02-"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Control Plane": {
+      "name": "Control Plane",
+      "endpoints": [
+        {
+          "endpoint": "/api/learning/status",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Learning Status",
+          "response_preview": "{'status': 'inactive', 'message': 'Learning system not started yet', 'last_update': None, 'total_cycles': 0, 'latest_insights': {}, 'updated_at': '2026-02-10T08:17:21.771522+05:30'}"
+        },
+        {
+          "endpoint": "/api/learning/insights",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Learning Insights",
+          "response_preview": "{'status': 'ok', 'message': 'Learning insights not available yet', 'win_rate': 0.0, 'total_trades': 0, 'profitable_trades': 0, 'best_strategy': None, 'best_underlying': None, 'updated_at': '2026-02-10"
+        },
+        {
+          "endpoint": "/api/forensic/report",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Forensic Report",
+          "response_preview": "{'status': 'ok', 'message': 'Forensic report not available yet', 'timestamp': '2026-02-10T08:17:24.246879+05:30', 'signal_accuracy': {'accuracy': 0.0, 'total_trades': 0}, 'data_integrity': {'issues': "
+        },
+        {
+          "endpoint": "/api/validation/status",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Validation Status",
+          "response_preview": "{'status': 'not_run', 'message': 'Run production_grade_validation.py to generate report', 'results': {'tests_passed': 0, 'total_tests': 0, 'success_rate': 0.0}, 'updated_at': '2026-02-10T08:17:25.2550"
+        }
+      ],
+      "passed": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Agent Console": {
+      "name": "Agent Console",
+      "endpoints": [
+        {
+          "endpoint": "/api/agent/status",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Agent Status",
+          "response_preview": "{'status': 'ok', 'available': True, 'paused': False, 'has_memory': False, 'has_plan': False, 'timestamp': '2026-02-10T08:17:26.260570+05:30'}"
+        },
+        {
+          "endpoint": "/api/agent/memory",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Agent Memory",
+          "response_preview": "{'status': 'ok', 'tasks': [], 'run_id': 'NONE'}"
+        },
+        {
+          "endpoint": "/api/agent/issues",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": false,
+          "description": "Detected Issues",
+          "response_preview": "{'error': 'Request timeout'}"
+        },
+        {
+          "endpoint": "/api/agent/upgrade-plan",
+          "method": "GET",
+          "expected_status": 200,
+          "actual_status": null,
+          "success": true,
+          "description": "Upgrade Plan",
+          "response_preview": "{'status': 'none', 'message': 'No pending upgrade plan'}"
+        }
+      ],
+      "passed": 3,
+      "failed": 1,
+      "status": "FAIL"
+    }
+  },
+  "apis": {
+    "/api/state": {
+      "endpoint": "/api/state",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "SSOT State (model)",
+      "response_preview": "{'state_version': 2, 'timestamp_utc': '2026-02-10T02:25:22.835271Z', 'timestamp_ist': '2026-02-10T07:55:22.835273+05:30', 'mode': 'PAPER', 'data_source': 'SYNTHETIC', 'market': {'is_open': False, 'rea"
+    },
+    "/api/health": {
+      "endpoint": "/api/health",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Health Check",
+      "response_preview": "{'status': 'ok', 'mode': 'LIVE', 'broker_status': 'connected', 'market_status': 'closed', 'data_source': 'synthetic', 'cycle_count': 11, 'refresh_interval': 5, 'last_fetch': '2026-02-10T08:16:54.04444"
+    },
+    "/api/perf": {
+      "endpoint": "/api/perf",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Performance Metrics",
+      "response_preview": "{'status': 'OK', 'current': {'cycle_duration': 1.069, 'fetch_duration': 0.337, 'strategy_duration': 0.741, 'data_source': 'synthetic', 'timestamp': '2026-02-10T08:16:55.166978+05:30'}, 'history': [], "
+    },
+    "/api/chain/NIFTY": {
+      "endpoint": "/api/chain/NIFTY",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "NIFTY Chain",
+      "response_preview": "{'underlying': 'NIFTY', 'spot': 24000.0, 'pcr': 1.0041858603244989, 'contracts': [{'underlying': 'NIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 23000.0, 'option_type': 'CE', 's"
+    },
+    "/api/chain/BANKNIFTY": {
+      "endpoint": "/api/chain/BANKNIFTY",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "BANKNIFTY Chain",
+      "response_preview": "{'underlying': 'BANKNIFTY', 'spot': 52000.0, 'pcr': 1.0139774303027347, 'contracts': [{'underlying': 'BANKNIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 50000.0, 'option_type': "
+    },
+    "/api/chain/FINNIFTY": {
+      "endpoint": "/api/chain/FINNIFTY",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "FINNIFTY Chain",
+      "response_preview": "{'underlying': 'FINNIFTY', 'spot': 22000.0, 'pcr': 0.9960009851939033, 'contracts': [{'underlying': 'FINNIFTY', 'instrument_type': 'OPTIDX', 'expiry': '12FEB2026', 'strike': 21000.0, 'option_type': 'C"
+    },
+    "/api/signal/top": {
+      "endpoint": "/api/signal/top",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Top Signal",
+      "response_preview": "{'action': 'BUY', 'underlying': 'NIFTY', 'strike': 24000, 'option_type': 'CE', 'confidence': 0.75, 'data_source': 'synthetic'}"
+    },
+    "/api/qc": {
+      "endpoint": "/api/qc",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "QC Status",
+      "response_preview": "{'status': 'PASS', 'checks': {'data_freshness': 'OK', 'price_consistency': 'OK', 'oi_consistency': 'OK', 'volume_consistency': 'OK'}, 'warnings': [], 'data_source': 'synthetic', 'timestamp': '2026-02-"
+    },
+    "/api/positions": {
+      "endpoint": "/api/positions",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Positions",
+      "response_preview": "{'positions': [], 'open_count': 0, 'message': 'Positions file not found'}"
+    },
+    "/api/pnl": {
+      "endpoint": "/api/pnl",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "PnL Data",
+      "response_preview": "{'history': [], 'summary': {'total_trades': 0, 'winning_trades': 0, 'losing_trades': 0, 'win_rate': 0.0, 'total_realized_pnl': 0.0, 'total_unrealized_pnl': 0.0, 'total_pnl': 0.0, 'open_positions': 0}}"
+    },
+    "/api/alerts/recent": {
+      "endpoint": "/api/alerts/recent",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Recent Alerts",
+      "response_preview": "{'status': 'ok', 'alerts': [], 'count': 0}"
+    },
+    "/api/alerts/unread": {
+      "endpoint": "/api/alerts/unread",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Unread Count",
+      "response_preview": "{'status': 'ok', 'alerts': [], 'count': 0}"
+    },
+    "/api/risk/portfolio": {
+      "endpoint": "/api/risk/portfolio",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Portfolio Risk",
+      "response_preview": "{'status': 'ok', 'risk_metrics': {'total_exposure': 0.0, 'total_pnl': 0.0, 'var': 0.0, 'expected_shortfall': 0.0, 'max_drawdown': 0.0, 'concentration_risk': 0.0}}"
+    },
+    "/api/risk/check-limits": {
+      "endpoint": "/api/risk/check-limits",
+      "method": "POST",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Check Risk Limits",
+      "response_preview": "{'status': 'ok', 'limit_check': {'status': 'PASS', 'breaches': [], 'warnings': [], 'portfolio_risk': {'total_exposure': 0.0, 'total_pnl': 0.0, 'var': 0.0, 'expected_shortfall': 0.0, 'max_drawdown': 0."
+    },
+    "/api/charting/heatmap/NIFTY?metric=oi": {
+      "endpoint": "/api/charting/heatmap/NIFTY?metric=oi",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Heatmap (OI)",
+      "response_preview": "{'status': 'ok', 'heatmap': {'heatmap': [{'expiry': '05MAR2026', 'values': [253227, 292920, 314674, 385721, 362877, 443653, 467332, 544130, 608133, 691650, 628003, 859518, 993865, 938409, 980329, 1235"
+    },
+    "/api/charting/iv-surface/NIFTY": {
+      "endpoint": "/api/charting/iv-surface/NIFTY",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "IV Surface",
+      "response_preview": "{'status': 'ok', 'surface': {'surface': [{'expiry': '05MAR2026', 'iv_values': [11.545, 11.565000000000001, 11.415, 11.325, 11.2, 11.024999999999999, 10.91, 10.555, 10.690000000000001, 10.2950000000000"
+    },
+    "/api/charting/greeks/NIFTY?greek=delta": {
+      "endpoint": "/api/charting/greeks/NIFTY?greek=delta",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Greeks Chart",
+      "response_preview": "{'status': 'ok', 'greeks': {'greek': 'delta', 'strikes': [23000.0, 23050.0, 23100.0, 23150.0, 23200.0, 23250.0, 23300.0, 23350.0, 23400.0, 23450.0, 23500.0, 23550.0, 23600.0, 23650.0, 23700.0, 23750.0"
+    },
+    "/api/charting/pcr/NIFTY": {
+      "endpoint": "/api/charting/pcr/NIFTY",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "PCR Chart",
+      "response_preview": "{'status': 'ok', 'pcr': {'pcr_data': [0.960451048223974, 0.9188789715858175, 0.9864958192349949, 0.958815602992645, 1.0947185389546525, 1.0930095288236188, 1.0685548294915115, 0.8439975641385433, 0.95"
+    },
+    "/api/ml/performance": {
+      "endpoint": "/api/ml/performance",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "ML Performance",
+      "response_preview": "{'status': 'ok', 'performance': {'status': 'ok', 'models': {}}}"
+    },
+    "/api/ml/compare": {
+      "endpoint": "/api/ml/compare",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Model Comparison",
+      "response_preview": "{'status': 'ok', 'comparison': {'status': 'ERROR', 'message': 'No models found'}}"
+    },
+    "/api/logs/tail?lines=50": {
+      "endpoint": "/api/logs/tail?lines=50",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Runtime Logs",
+      "response_preview": "{'logs': [], 'message': 'No log files found'}"
+    },
+    "/api/audit/secrets": {
+      "endpoint": "/api/audit/secrets",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Security Audit",
+      "response_preview": "{'secrets_found': 0, 'scanned_files': [], 'status': 'PASS'}"
+    },
+    "/api/learning/status": {
+      "endpoint": "/api/learning/status",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Learning Status",
+      "response_preview": "{'status': 'inactive', 'message': 'Learning system not started yet', 'last_update': None, 'total_cycles': 0, 'latest_insights': {}, 'updated_at': '2026-02-10T08:17:21.771522+05:30'}"
+    },
+    "/api/learning/insights": {
+      "endpoint": "/api/learning/insights",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Learning Insights",
+      "response_preview": "{'status': 'ok', 'message': 'Learning insights not available yet', 'win_rate': 0.0, 'total_trades': 0, 'profitable_trades': 0, 'best_strategy': None, 'best_underlying': None, 'updated_at': '2026-02-10"
+    },
+    "/api/forensic/report": {
+      "endpoint": "/api/forensic/report",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Forensic Report",
+      "response_preview": "{'status': 'ok', 'message': 'Forensic report not available yet', 'timestamp': '2026-02-10T08:17:24.246879+05:30', 'signal_accuracy': {'accuracy': 0.0, 'total_trades': 0}, 'data_integrity': {'issues': "
+    },
+    "/api/validation/status": {
+      "endpoint": "/api/validation/status",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Validation Status",
+      "response_preview": "{'status': 'not_run', 'message': 'Run production_grade_validation.py to generate report', 'results': {'tests_passed': 0, 'total_tests': 0, 'success_rate': 0.0}, 'updated_at': '2026-02-10T08:17:25.2550"
+    },
+    "/api/agent/status": {
+      "endpoint": "/api/agent/status",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Agent Status",
+      "response_preview": "{'status': 'ok', 'available': True, 'paused': False, 'has_memory': False, 'has_plan': False, 'timestamp': '2026-02-10T08:17:26.260570+05:30'}"
+    },
+    "/api/agent/memory": {
+      "endpoint": "/api/agent/memory",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Agent Memory",
+      "response_preview": "{'status': 'ok', 'tasks': [], 'run_id': 'NONE'}"
+    },
+    "/api/agent/issues": {
+      "endpoint": "/api/agent/issues",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": false,
+      "description": "Detected Issues",
+      "response_preview": "{'error': 'Request timeout'}"
+    },
+    "/api/agent/upgrade-plan": {
+      "endpoint": "/api/agent/upgrade-plan",
+      "method": "GET",
+      "expected_status": 200,
+      "actual_status": null,
+      "success": true,
+      "description": "Upgrade Plan",
+      "response_preview": "{'status': 'none', 'message': 'No pending upgrade plan'}"
+    }
+  },
+  "summary": {
+    "total_tabs": 11,
+    "tabs_passed": 10,
+    "tabs_failed": 1,
+    "total_apis": 36,
+    "apis_passed": 35,
+    "apis_failed": 1,
+    "overall": "PASS"
+  }
+}

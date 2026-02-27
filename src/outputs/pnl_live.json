@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-02-01T21:31:56.210449+05:30",
+  "timestamp_ist": "2026-02-01 21:32:04 IST",
+  "total_trades": 9,
+  "winning_trades": 3,
+  "losing_trades": 6,
+  "win_rate": 33.33333333333333,
+  "total_realized_pnl": -1806.0727624800056,
+  "total_unrealized_pnl": 0.0,
+  "total_pnl": -1806.0727624800056,
+  "avg_pnl_per_trade": -200.67475138666728,
+  "max_profit": 0.0,
+  "max_drawdown": 1237683.6376718103,
+  "open_positions": 0,
+  "session_duration_minutes": 3.528833016666667
+}

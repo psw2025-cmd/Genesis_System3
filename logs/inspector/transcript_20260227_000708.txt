@@ -1,0 +1,75 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260227000708
+Username: DESKTOP-PQQ1T9K\ADMIN
+RunAs User: DESKTOP-PQQ1T9K\ADMIN
+Configuration Name: 
+Machine: DESKTOP-PQQ1T9K (Microsoft Windows NT 10.0.17134.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File Run-FullQA.ps1
+Process ID: 10056
+PSVersion: 5.1.17134.858
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.17134.858
+BuildVersion: 10.0.17134.858
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Genesis_System3\logs\inspector\transcript_20260227_000708.txt
+PS>CommandInvocation(Run-FullQA.ps1): "Run-FullQA.ps1"
+=== QA Guardian (STRICT) ===
+Repo: C:\Genesis_System3
+
+[Env: python --version]
+OK (1.074128s) -> C:\Genesis_System3\logs\inspector\python_version.txt
+
+[Env: pip check]
+OK (30.2886731s) -> C:\Genesis_System3\logs\inspector\pip_check.txt
+
+[Runtime: imports]
+
+OK - lightgbm
+
+OK - xgboost
+python : 2026-02-27 00:09:45.169312: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see 
+slightly different numerical results due to floating-point round-off errors from different computation orders. To turn 
+them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+At C:\Genesis_System3\Run-FullQA.ps1:75 char:5
++     python -c "import $dep" 2>$null
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-02-27 00:0...ONEDNN_OPTS=0`.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+WARNING:tensorflow:From C:\Genesis_System3\.venv\lib\site-packages\keras\src\losses.py:2976: The name 
+tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy 
+instead.
+
+OK - tensorflow
+
+OK - torch
+
+OK - sklearn
+
+OK - plotly
+
+OK - altair
+
+OK - dash
+
+OK - streamlit
+
+[Lint: flake8]
+FAIL (67.4679551s) -> C:\Genesis_System3\logs\inspector\flake8_report.txt
+PS>TerminatingError(): "ExitCode=1"
+>> TerminatingError(): "ExitCode=1"
+ExitCode=1
+At C:\Genesis_System3\Run-FullQA.ps1:24 char:28
++         if ($exit -ne 0) { throw "ExitCode=$exit" }
++                            ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (ExitCode=1:String) [], RuntimeException
+    + FullyQualifiedErrorId : ExitCode=1
+
+**********************
+Windows PowerShell transcript end
+End time: 20260227001541
+**********************

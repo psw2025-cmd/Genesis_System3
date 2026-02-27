@@ -1,0 +1,659 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260226213028
+Username: DESKTOP-PQQ1T9K\ADMIN
+RunAs User: DESKTOP-PQQ1T9K\ADMIN
+Configuration Name: 
+Machine: DESKTOP-PQQ1T9K (Microsoft Windows NT 10.0.17134.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process ID: 5392
+PSVersion: 5.1.17134.858
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.17134.858
+BuildVersion: 10.0.17134.858
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Genesis_System3\logs\inspector\transcript_20260226_213028.txt
+PS C:\Genesis_System3>    python -m pip show packaging
+Name: packaging
+Version: 25.0
+Summary: Core utilities for Python packages
+Home-page:
+Author:
+Author-email: Donald Stufft <donald@stufft.io>
+License:
+Location: C:\Python314\Lib\site-packages
+Requires:
+Required-by: altair, dparse, safety, safety-schemas, statsmodels,
+ streamlit, tensorboard, wheel
+PS C:\Genesis_System3> Transcript started, output file is C:\Genesis_System3\logs\inspec
+Transcript : The term 'Transcript' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Transcript started, output file is C:\Genesis_System3\logs\inspec
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Transcript:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Transcript : The term 'Transcript' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Transcript started, output file is
+C:\Genesis_System3\logs\inspec
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Transcript:Strin
+   g) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> tor\transcript_20260226_213028.txt
+tor\transcript_20260226_213028.txt : The module 'tor' could not be loaded. For more information, run 'Import-Module 
+tor'.
+At line:1 char:1
++ tor\transcript_20260226_213028.txt
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (tor\transcript_20260226_213028.txt:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CouldNotAutoLoadModule
+tor\transcript_20260226_213028.txt : The module 'tor' could not
+be loaded. For more information, run 'Import-Module tor'.
+At line:1 char:1
++ tor\transcript_20260226_213028.txt
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (tor\transcript_2
+   0260226_213028.txt:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CouldNotAutoLoadModule
+
+PS C:\Genesis_System3> Loading personal and system profiles took 660ms.
+Loading : The term 'Loading' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Loading personal and system profiles took 660ms.
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Loading:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Loading : The term 'Loading' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Loading personal and system profiles took 660ms.
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Loading:String)
+   [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> PS C:\Genesis_System3>    python -m pip show packaging
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument 'python'."
+Get-Process : A positional parameter cannot be found that accepts argument 'python'.
+At line:1 char:1
++ PS C:\Genesis_System3>    python -m pip show packaging
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that
+accepts argument 'python'.
+At line:1 char:1
++ PS C:\Genesis_System3>    python -m pip show packaging
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process
+   ], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Micro
+   soft.PowerShell.Commands.GetProcessCommand
+
+PS C:\Genesis_System3> Name: packaging
+Name: : The term 'Name:' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Name: packaging
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Name::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Name: : The term 'Name:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Name: packaging
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Name::String) []
+   , CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Version: 25.0
+Version: : The term 'Version:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Version: 25.0
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Version::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Version: : The term 'Version:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Version: 25.0
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Version::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Summary: Core utilities for Python packages
+Summary: : The term 'Summary:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Summary: Core utilities for Python packages
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Summary::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Summary: : The term 'Summary:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Summary: Core utilities for Python packages
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Summary::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Home-page:
+Home-page: : The term 'Home-page:' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Home-page:
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Home-page::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Home-page: : The term 'Home-page:' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Home-page:
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Home-page::Strin
+   g) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Author:
+Author: : The term 'Author:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Author:
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Author::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Author: : The term 'Author:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Author:
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Author::String)
+   [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Author-email: Donald Stufft <donald@stufft.io>
+At line:1 char:29
++ Author-email: Donald Stufft <donald@stufft.io>
++                             ~
+The '<' operator is reserved for future use.
+At line:1 char:29
++ Author-email: Donald Stufft <donald@stufft.io>
++                             ~
+The '<' operator is reserved for future use.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : RedirectionNotSupported
+
+PS C:\Genesis_System3> License:
+License: : The term 'License:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ License:
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (License::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+License: : The term 'License:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ License:
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (License::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Location: C:\Python314\Lib\site-packages
+Location: : The term 'Location:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Location: C:\Python314\Lib\site-packages
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Location::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Location: : The term 'Location:' is not recognized as the name
+of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Location: C:\Python314\Lib\site-packages
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Location::String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Requires:
+Requires: : The term 'Requires:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Requires:
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Requires::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Requires: : The term 'Requires:' is not recognized as the name
+of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Requires:
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Requires::String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> Required-by: altair, dparse, safety, safety-schemas, statsmodels,
+ streamlit, tensorboard, wheel
+Required-by: : The term 'Required-by:' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Required-by: altair, dparse, safety, safety-schemas, statsmodels,
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Required-by::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Required-by: : The term 'Required-by:' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Required-by: altair, dparse, safety, safety-schemas,
+statsmodels,
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Required-by::Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3> PS C:\Genesis_System3>
+PS : Cannot find a process with the name "C:\Genesis_System3>". Verify the process name and call the cmdlet again.
+At line:1 char:1
++ PS C:\Genesis_System3>
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Genesis_System3>:String) [Get-Process], ProcessCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenName,Microsoft.PowerShell.Commands.GetProcessCommand
+PS : Cannot find a process with the name "C:\Genesis_System3>".
+Verify the process name and call the cmdlet again.
+At line:1 char:1
++ PS C:\Genesis_System3>
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Genesis_Syste
+   m3>:String) [Get-Process], ProcessCommandException
+    + FullyQualifiedErrorId : NoProcessFoundForGivenName,Micros
+   oft.PowerShell.Commands.GetProcessCommand
+
+PS C:\Genesis_System3>    .\.venv\Scripts\activate.ps1
+PS C:\Genesis_System3>
+(.venv)    python -m pip show packaging
+Name: packaging
+Version: 25.0
+Summary: Core utilities for Python packages
+Home-page:
+Author:
+Author-email: Donald Stufft <donald@stufft.io>
+License:
+Location: c:\genesis_system3\.venv\lib\site-packages
+Requires:
+Required-by: black, dparse, great-expectations, ipykernel, jupyte
+r-events, jupyter_server, jupyterlab, jupyterlab_server, kombu, m
+arshmallow, matplotlib, mkdocs, nbconvert, pip-requirements-parse
+r, pip_audit, plotly, pytest, safety, safety-schemas, Sphinx, str
+eamlit, tensorflow-intel, wheel
+PS C:\Genesis_System3>
+(.venv) PS C:\Genesis_System3>    .\.venv\Scripts\activate.ps1
+>> TerminatingError(Get-Process): "A positional parameter cannot be found that accepts argument '.\.venv\Scripts\activate.ps1'."
+Get-Process : A positional parameter cannot be found that accepts argument '.\.venv\Scripts\activate.ps1'.
+At line:1 char:1
++ PS C:\Genesis_System3>    .\.venv\Scripts\activate.ps1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.GetProcessCommand
+Get-Process : A positional parameter cannot be found that
+accepts argument '.\.venv\Scripts\activate.ps1'.
+At line:1 char:1
++ PS C:\Genesis_System3>    .\.venv\Scripts\activate.ps1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Process
+   ], ParameterBindingException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Micro
+   soft.PowerShell.Commands.GetProcessCommand
+
+PS C:\Genesis_System3>
+(.venv) (.venv) PS C:\Genesis_System3>    python -m pip show packaging
+At line:1 char:9
++ (.venv) PS C:\Genesis_System3>    python -m pip show packaging
++         ~~
+Unexpected token 'PS' in expression or statement.
+At line:1 char:9
++ (.venv) PS C:\Genesis_System3>    python -m pip show packaging
++         ~~
+Unexpected token 'PS' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+PS C:\Genesis_System3>
+(.venv) Name: packaging
+Name: : The term 'Name:' is not recognized as the name of a cmdlet, function, script file, or operable program. Check 
+the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Name: packaging
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Name::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Name: : The term 'Name:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Name: packaging
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (Name::String) []
+   , CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Version: 25.0
+Version: : The term 'Version:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Version: 25.0
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Version::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Version: : The term 'Version:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Version: 25.0
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Version::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Summary: Core utilities for Python packages
+Summary: : The term 'Summary:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Summary: Core utilities for Python packages
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Summary::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Summary: : The term 'Summary:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Summary: Core utilities for Python packages
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Summary::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Home-page:
+Home-page: : The term 'Home-page:' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Home-page:
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Home-page::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Home-page: : The term 'Home-page:' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Home-page:
++ ~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Home-page::Strin
+   g) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Author:
+Author: : The term 'Author:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Author:
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Author::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Author: : The term 'Author:' is not recognized as the name of a
+cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ Author:
++ ~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Author::String)
+   [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Author-email: Donald Stufft <donald@stufft.io>
+At line:1 char:29
++ Author-email: Donald Stufft <donald@stufft.io>
++                             ~
+The '<' operator is reserved for future use.
+At line:1 char:29
++ Author-email: Donald Stufft <donald@stufft.io>
++                             ~
+The '<' operator is reserved for future use.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : RedirectionNotSupported
+
+PS C:\Genesis_System3>
+(.venv) License:
+License: : The term 'License:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ License:
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (License::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+License: : The term 'License:' is not recognized as the name of
+a cmdlet, function, script file, or operable program. Check the
+spelling of the name, or if a path was included, verify that
+the path is correct and try again.
+At line:1 char:1
++ License:
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (License::String)
+    [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Location: c:\genesis_system3\.venv\lib\site-packages
+Location: : The term 'Location:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Location: c:\genesis_system3\.venv\lib\site-packages
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Location::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Location: : The term 'Location:' is not recognized as the name
+of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Location: c:\genesis_system3\.venv\lib\site-packages
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Location::String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Requires:
+Requires: : The term 'Requires:' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Requires:
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Requires::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Requires: : The term 'Requires:' is not recognized as the name
+of a cmdlet, function, script file, or operable program. Check
+the spelling of the name, or if a path was included, verify
+that the path is correct and try again.
+At line:1 char:1
++ Requires:
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Requires::String
+   ) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) Required-by: black, dparse, great-expectations, ipykernel, jupyte
+Required-by: : The term 'Required-by:' is not recognized as the name of a cmdlet, function, script file, or operable 
+program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Required-by: black, dparse, great-expectations, ipykernel, jupyte
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Required-by::String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+Required-by: : The term 'Required-by:' is not recognized as the
+name of a cmdlet, function, script file, or operable program.
+Check the spelling of the name, or if a path was included,
+verify that the path is correct and try again.
+At line:1 char:1
++ Required-by: black, dparse, great-expectations, ipykernel,
+jupyte
++ ~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (Required-by::Str
+   ing) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+PS C:\Genesis_System3>
+(.venv) r-events, jupyter_server, jupyterlab, jupyterlab_server, kombu, m
+At line:1 char:9
++ r-events, jupyter_server, jupyterlab, jupyterlab_server, kombu, m
++         ~
+Missing argument in parameter list.
+At line:1 char:9
++ r-events, jupyter_server, jupyterlab, jupyterlab_server,
+kombu, m
++         ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+PS C:\Genesis_System3>
+(.venv) arshmallow, matplotlib, mkdocs, nbconvert, pip-requirements-parse
+At line:1 char:11
++ arshmallow, matplotlib, mkdocs, nbconvert, pip-requirements-parse
++           ~
+Missing argument in parameter list.
+At line:1 char:11
++ arshmallow, matplotlib, mkdocs, nbconvert,
+pip-requirements-parse
++           ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+PS C:\Genesis_System3>
+(.venv) r, pip_audit, plotly, pytest, safety, safety-schemas, Sphinx, str
+At line:1 char:2
++ r, pip_audit, plotly, pytest, safety, safety-schemas, Sphinx, str
++  ~
+Missing argument in parameter list.
+At line:1 char:2
++ r, pip_audit, plotly, pytest, safety, safety-schemas, Sphinx,
+str
++  ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+PS C:\Genesis_System3>
+(.venv) eamlit, tensorflow-intel, wheel
+At line:1 char:7
++ eamlit, tensorflow-intel, wheel
++       ~
+Missing argument in parameter list.
+At line:1 char:7
++ eamlit, tensorflow-intel, wheel
++       ~
+Missing argument in parameter list.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : MissingArgument
+
+PS C:\Genesis_System3>
+(.venv) (.venv) PS C:\Genesis_System3>
+At line:1 char:9
++ (.venv) PS C:\Genesis_System3>
++         ~~
+Unexpected token 'PS' in expression or statement.
+At line:1 char:9
++ (.venv) PS C:\Genesis_System3>
++         ~~
+Unexpected token 'PS' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [], ParentContai
+   nsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+PS C:\Genesis_System3>
+(.venv) pip install "packaging==23.2"
+Collecting packaging==23.2
+  Using cached packaging-23.2-py3-none-any.whl.metadata (3.2 kB)
+Using cached packaging-23.2-py3-none-any.whl (53 kB)
+Installing collected packages: packaging
+  Attempting uninstall: packaging
+    Found existing installation: packaging 25.0
+    Uninstalling packaging-25.0:
+      Successfully uninstalled packaging-25.0
+ERROR: pip's dependency resolver does not currently take into acc
+ount all the packages that are installed. This behaviour is the s
+ource of the following dependency conflicts.
+wheel 0.46.2 requires packaging>=24.0, but you have packaging 23.
+2 which is incompatible.
+Successfully installed packaging-23.2
+PS C:\Genesis_System3>
+(.venv) python -m pip show packaging
+Name: packaging
+Version: 23.2
+Summary: Core utilities for Python packages
+Home-page:
+Author:
+Author-email: Donald Stufft <donald@stufft.io>
+License:
+Location: c:\genesis_system3\.venv\lib\site-packages
+Requires:
+Required-by: black, dparse, great-expectations, ipykernel, jupyte
+r-events, jupyter_server, jupyterlab, jupyterlab_server, kombu, m
+arshmallow, matplotlib, mkdocs, nbconvert, pip-requirements-parse
+r, pip_audit, plotly, pytest, safety, safety-schemas, Sphinx, str
+eamlit, tensorflow-intel, wheel
+PS C:\Genesis_System3>

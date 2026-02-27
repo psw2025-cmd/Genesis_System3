@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-02-10T07:25:26.073061",
+  "tests": {
+    "Health Check": {
+      "success": false,
+      "endpoint": "/api/health"
+    },
+    "SSOT State": {
+      "success": false,
+      "endpoint": "/api/state"
+    },
+    "QC Status": {
+      "success": false,
+      "endpoint": "/api/qc"
+    },
+    "Chain Data": {
+      "success": false,
+      "endpoint": "/api/chain/NIFTY"
+    },
+    "Signals": {
+      "success": false,
+      "endpoint": "/api/signal/top"
+    },
+    "Positions": {
+      "success": true,
+      "endpoint": "/api/positions"
+    },
+    "PnL": {
+      "success": true,
+      "endpoint": "/api/pnl"
+    },
+    "Risk": {
+      "success": true,
+      "endpoint": "/api/risk/portfolio"
+    },
+    "Learning": {
+      "success": true,
+      "endpoint": "/api/learning/status"
+    },
+    "Forensic": {
+      "success": true,
+      "endpoint": "/api/forensic/report"
+    },
+    "Validation": {
+      "success": true,
+      "endpoint": "/api/validation/status"
+    },
+    "ML Performance": {
+      "success": true,
+      "endpoint": "/api/ml/performance"
+    },
+    "Audit": {
+      "success": true,
+      "endpoint": "/api/audit/comprehensive"
+    }
+  },
+  "summary": {
+    "total": 13,
+    "passed": 8,
+    "failed": 5
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "underlying": "BANKNIFTY",
+  "n_samples": 671,
+  "n_train": 536,
+  "n_test": 135,
+  "n_features": 129,
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "per_class_metrics": {
+    "BUY": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 15
+    },
+    "HOLD": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 46
+    },
+    "SELL": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 74
+    }
+  },
+  "confusion_matrix": [
+    [
+      15,
+      0,
+      0
+    ],
+    [
+      0,
+      46,
+      0
+    ],
+    [
+      0,
+      0,
+      74
+    ]
+  ],
+  "label_mapping": {
+    "0": "BUY",
+    "1": "HOLD",
+    "2": "SELL"
+  }
+}

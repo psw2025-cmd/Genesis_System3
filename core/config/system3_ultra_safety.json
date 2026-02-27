@@ -1,0 +1,8 @@
+{
+  "AUTO_EXECUTE_TRADES": false,
+  "AUTO_UPDATE_THRESHOLDS": false,
+  "AUTO_RETRAIN_MODELS": false,
+  "AUTO_PROMOTE_MODELS": false,
+  "AUTO_WRITE_CONFIG": false
+}
+

@@ -1,0 +1,26 @@
+{
+  "underlying": "NIFTY",
+  "created_at": "2025-12-07T14:19:11.740614",
+  "features": [
+    "moneyness",
+    "ce_pe_ratio",
+    "atm_dist_pct",
+    "atm_dist_abs",
+    "ltp",
+    "strike",
+    "ce_pe_diff",
+    "spot",
+    "spot_chg_1_pct",
+    "ltp_chg_1_pct",
+    "spot_roll_std_5",
+    "ltp_roll_std_5"
+  ],
+  "classes": [
+    "BUY_CE",
+    "BUY_PE",
+    "HOLD"
+  ],
+  "train_samples": 480,
+  "test_samples": 120,
+  "test_accuracy": 1.0
+}

@@ -1,0 +1,23 @@
+
+C:\Genesis_System3>ping -n 2 127.0.0.1  1>nul 2>&1 
+
+================================================================================
+
+================================================
+SYSTEM3 AUTORUN + WATCHDOG
+================================================
+One-click start | Fully autonomous | DRY-RUN enforced
+================================================
+
+================================================
+PHASE 1: ENVIRONMENT VALIDATION AND AUTO-REPAIR
+================================================
+
+OK Virtual environment located
+OK Virtual environment activated
+OK Python environment ready
+OK psutil present
+OK pandas present
+OK numpy present
+OK joblib present
+OK python-dotenv present

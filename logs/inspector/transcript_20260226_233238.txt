@@ -1,0 +1,53 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260226233238
+Username: DESKTOP-PQQ1T9K\ADMIN
+RunAs User: DESKTOP-PQQ1T9K\ADMIN
+Configuration Name: 
+Machine: DESKTOP-PQQ1T9K (Microsoft Windows NT 10.0.17134.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File Run-FullQA.ps1
+Process ID: 15908
+PSVersion: 5.1.17134.858
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.17134.858
+BuildVersion: 10.0.17134.858
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Genesis_System3\logs\inspector\transcript_20260226_233238.txt
+PS>CommandInvocation(Run-FullQA.ps1): "Run-FullQA.ps1"
+=== QA Guardian (STRICT) ===
+Repo: C:\Genesis_System3
+
+[Env: python --version]
+Python 3.10.11
+OK (0.1934851s) -> C:\Genesis_System3\logs\inspector\python_version.txt
+True
+
+[Env: pip check]
+No broken requirements found.
+OK (13.9390564s) -> C:\Genesis_System3\logs\inspector\pip_check.txt
+True
+
+[Runtime: imports]
+
+OK - lightgbm
+
+OK - xgboost
+
+>> TerminatingError(python.exe): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: 2026-02-26 23:33:25.263227: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`."
+FAIL - tensorflow missing
+PS>TerminatingError(): "Missing runtime import: tensorflow"
+Missing runtime import: tensorflow
+At C:\Genesis_System3\Run-FullQA.ps1:65 char:9
++         throw "Missing runtime import: $dep"
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Missing runtime import: tensorflow:String) [], RuntimeException
+    + FullyQualifiedErrorId : Missing runtime import: tensorflow
+
+**********************
+Windows PowerShell transcript end
+End time: 20260226233346
+**********************

@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-12-10T07:50:35.550671",
+  "overall_status": "OK",
+  "missing_critical": false,
+  "interpreter_ok": true,
+  "interpreter_message": "Interpreter OK: C:\\Genesis_System3\\venv\\Scripts\\python.exe",
+  "actual_interpreter": "C:\\Genesis_System3\\venv\\Scripts\\python.exe",
+  "expected_interpreter": "C:\\Genesis_System3\\venv\\Scripts\\python.exe",
+  "site_packages_ok": true,
+  "site_packages_message": "Venv site-packages accessible (verified via imports)",
+  "site_packages_path": "C:\\Genesis_System3\\venv\\Lib\\site-packages",
+  "critical_deps": {
+    "pandas": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\pandas\\__init__.py"
+    },
+    "numpy": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\numpy\\__init__.py"
+    },
+    "psutil": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\psutil\\__init__.py"
+    }
+  },
+  "optional_deps": {
+    "xgboost": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\xgboost\\__init__.py"
+    },
+    "joblib": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\joblib\\__init__.py"
+    },
+    "sklearn": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\sklearn\\__init__.py"
+    },
+    "tensorflow": {
+      "ok": true,
+      "message": "OK",
+      "path": "C:\\Genesis_System3\\venv\\lib\\site-packages\\tensorflow\\__init__.py"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "recommendations": [
+    // 🔹 Core Data Handling
+    "mechatroner.rainbow-csv",
+    "GrapeCity.gc-excelviewer",
+    "eriklynd.json-tools",
+    "IBM.output-colorizer",
+
+    // 🔹 API & Connectivity
+    "humao.rest-client",
+    "ms-vscode.vscode-websocket-client",
+    "rangav.vscode-thunder-client",
+
+    // 🔹 Config & Governance
+    "redhat.vscode-yaml",
+    "vscode-json-schema-validator",
+    "philoserf.semantic-commit-messages",
+    "GitHub.vscode-pull-request-github",
+    "eamodio.gitlens",
+
+    // 🔹 CI/CD & Infrastructure
+    "ms-azuretools.vscode-docker",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-vscode.powershell",
+    "ms-vscode.vscode-typescript-next",
+    "hashicorp.terraform",
+    "ms-vscode.vscode-github-actions",
+
+    // 🔹 AI & Modeling
+    "ms-toolsai.jupyter",
+    "ms-python.python",
+    "ms-toolsai.tensorboard",
+    "ms-vscode.pylance",
+    "ms-vscode.vscode-scikit-learn",
+    "ms-vscode.vscode-pytorch",
+    "ms-vscode.vscode-tensorflow",
+    "ms-vscode.vscode-intelli-code",
+
+    // 🔹 Advanced Charting & Visualization
+    "bierner.markdown-preview-enhanced",
+    "ms-vscode.vscode-html-preview",
+    "ms-vscode.vscode-svgviewer",
+    "ms-vscode.vscode-d3",
+    "ms-vscode.vscode-plotly",
+    "ms-vscode.vscode-vega",
+    "ms-vscode.chartjs",
+    "tradingview.charting-library",
+    "tradingview.lightweight-charts",
+    "ms-vscode.vscode-highcharts",
+    "ms-vscode.vscode-echarts",
+
+    // 🔹 Productivity & Debugging
+    "ms-vscode.vscode-js-debug",
+    "ritwickdey.liveserver",
+    "ms-vscode.live-server",
+    "ms-vscode.vscode-react-native",
+    "ms-vscode.test-adapter-converter",
+    "ms-vscode.vscode-icons",
+    "shd101wyy.markdown-preview-enhanced",
+    "formulahendry.code-runner",
+
+    // 🔹 Performance & Speed
+    "ms-vscode.vscode-profiles",
+    "ms-vscode.vscode-performance-profiler",
+    "ms-vscode.vscode-taskrunner",
+
+    // 🔹 Multi‑thinking & Automation
+    "ms-vscode.vscode-multi-cursor-enhanced",
+    "ms-vscode.vscode-snippets",
+    "ms-vscode.vscode-auto-rename-tag",
+    "ms-vscode.vscode-auto-import",
+    "ms-vscode.vscode-error-lens",
+
+    // 🔹 Human Requirement Understanding
+    "ms-vscode.vscode-peacock",
+    "ms-vscode.vscode-explain",
+
+    // 🔹 Self‑Healing & Auto‑Correction
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.vscode-linter-pack",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-auto-fix",
+
+    // 🔹 Fast Workflow & Multi‑handling
+    "ms-vscode.vscode-workspace-manager",
+    "ms-vscode.vscode-terminal-manager",
+    "ms-vscode.vscode-live-share",
+    "ms-vscode.remote-containers",
+    "ms-vscode.remote-ssh",
+    "ms-vscode.remote-wsl",
+
+    // 🔹 Project Understanding & Architecture Mapping
+    "alefragnani.project-manager",
+    "alefragnani.bookmarks",
+    "vscode-dependency-cruiser",
+    "vscode-code-outline",
+
+    // 🔹 Gap Detection & Deep Analysis
+    "SonarSource.sonarlint-vscode",
+    "deepscan.vscode-deepscan",
+    "github.vscode-codeql",
+
+    // 🔹 Live Online Support & Guidance
+    "tabnine.tabnine-vscode",
+    "github.copilot-chat",
+    "vsls-contrib.codetour",
+
+    // 🔹 API Governance
+    "42crunch.vscode-openapi"
+  ]
+}

@@ -1,0 +1,108 @@
+@echo off
+echo ========================================
+echo RESTARTING FULL DASHBOARD SYSTEM
+echo ========================================
+echo.
+
+REM Kill existing processes
+echo [1/4] Killing existing processes...
+echo.
+
+REM Kill Python processes on port 8000 (Backend)
+echo Checking for backend on port 8000...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING') do (
+    echo Killing process %%a (Backend)
+    taskkill /F /PID %%a >nul 2>&1
+)
+
+REM Kill Node processes on port 3000 (Frontend)
+echo Checking for frontend on port 3000...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3000 ^| findstr LISTENING') do (
+    echo Killing process %%a (Frontend)
+    taskkill /F /PID %%a >nul 2>&1
+)
+
+REM Kill any remaining Python uvicorn processes
+echo Killing any remaining uvicorn processes...
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *uvicorn*" >nul 2>&1
+taskkill /F /IM pythonw.exe /FI "WINDOWTITLE eq *uvicorn*" >nul 2>&1
+
+REM Kill any remaining Node processes
+echo Killing any remaining Node processes...
+taskkill /F /IM node.exe >nul 2>&1
+
+echo.
+echo Waiting 3 seconds for processes to terminate...
+timeout /t 3 /nobreak >nul
+echo.
+
+REM Activate virtual environment
+echo [2/4] Activating virtual environment...
+if exist "venv\Scripts\activate.bat" (
+    call venv\Scripts\activate.bat
+    echo Virtual environment activated.
+) else (
+    echo ERROR: Virtual environment not found!
+    echo Please create it first: python -m venv venv
+    pause
+    exit /b 1
+)
+echo.
+
+REM Start Backend
+echo [3/4] Starting Backend (Port 8000)...
+cd dashboard\backend
+start "Dashboard Backend" cmd /k "cd /d %~dp0..\.. && call venv\Scripts\activate.bat && cd dashboard\backend && python -m uvicorn app:app --host 0.0.0.0 --port 8000"
+cd ..\..
+echo Backend starting in new window...
+echo.
+
+REM Wait for backend to start
+echo Waiting 5 seconds for backend to initialize...
+timeout /t 5 /nobreak >nul
+
+REM Verify backend is running
+echo Verifying backend...
+timeout /t 2 /nobreak >nul
+curl -s http://localhost:8000/api/health >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [OK] Backend is running on http://localhost:8000
+) else (
+    echo [WARN] Backend may still be starting...
+)
+echo.
+
+REM Start Frontend
+echo [4/4] Starting Frontend (Port 3000)...
+cd dashboard\frontend
+if exist "node_modules" (
+    echo Node modules found.
+) else (
+    echo Installing node modules...
+    call npm install
+)
+start "Dashboard Frontend" cmd /k "cd /d %~dp0 && npm run dev"
+cd ..\..
+echo Frontend starting in new window...
+echo.
+
+REM Wait for frontend to start
+echo Waiting 8 seconds for frontend to initialize...
+timeout /t 8 /nobreak >nul
+
+echo.
+echo ========================================
+echo DASHBOARD RESTART COMPLETE!
+echo ========================================
+echo.
+echo Backend:  http://localhost:8000
+echo Frontend: http://localhost:3000
+echo.
+echo Two new windows have been opened:
+echo   1. Dashboard Backend (Port 8000)
+echo   2. Dashboard Frontend (Port 3000)
+echo.
+echo Please check both windows for any errors.
+echo.
+echo Press any key to exit...
+pause >nul

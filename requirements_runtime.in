@@ -1,0 +1,81 @@
+# Editable source for runtime deps. Regenerate .txt with:
+#   pip install pip-tools && pip-compile requirements_runtime.in -o requirements_runtime.txt
+# Never install from this file; always install from requirements_runtime.txt
+
+# Core backend
+fastapi>=0.104,<0.105
+uvicorn[standard]>=0.24,<0.25
+
+# Data processing
+pandas>=2.1,<2.2
+numpy>=1.26,<2
+scikit-learn>=1.4,<1.5
+scipy>=1.12,<2
+
+# Pin for streamlit 1.31 (requires packaging<24)
+packaging>=16.8,<24
+
+# Validation & parsing
+pydantic>=2.12,<2.13
+pydantic-core>=2.41,<2.42
+python-multipart>=0.0.6
+marshmallow>=3.20,<4
+
+# File system monitoring
+watchdog>=3.0
+
+# ML / AI stack (CPU builds for Python 3.10)
+lightgbm>=4.3
+xgboost>=2.0,<2.1
+torch>=2.2,<2.3
+tensorflow>=2.15,<2.16
+protobuf>=4.25,<5
+
+# Visualization & dashboards
+matplotlib>=3.8,<4
+seaborn>=0.13,<0.14
+altair>=4.2,<5
+plotly>=5.18,<6
+dash>=2.14,<3
+streamlit>=1.31,<1.32
+
+# CSV / Excel / Parquet
+openpyxl>=3.1,<4
+xlrd>=2.0,<3
+pyarrow>=14.0,<15
+
+# Data ingestion / APIs
+requests>=2.31,<3
+aiohttp>=3.9,<4
+httpx>=0.27,<0.28
+websockets>=12,<13
+
+# Database & caching
+SQLAlchemy>=2.0,<2.1
+psycopg2-binary>=2.9
+redis>=5.0,<6
+sqlite-utils>=3.36
+duckdb>=0.9,<0.10
+
+# Scheduling & background tasks
+apscheduler>=3.10,<4
+celery>=5.3,<6
+
+# Security & config
+cryptography>=41.0,<42
+passlib[bcrypt]>=1.7
+python-dotenv>=1.0,<2
+PyYAML>=6.0,<7
+
+# libmagic handling (Windows-safe; preserve for cross-platform)
+python-magic>=0.4.27; platform_system != "Windows"
+python-magic-bin>=0.4.14; platform_system == "Windows"
+
+# Locale & timezone
+pytz>=2025.2
+tzlocal>=5.2
+
+# Editor agent support
+rich>=13.7,<14
+typer>=0.24,<0.25
+loguru>=0.7,<0.8

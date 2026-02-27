@@ -1,0 +1,189 @@
+{
+  "md_analysis": {
+    "docs/SYSTEM3_PREMARKET_CHECKLIST_FINAL.md": {
+      "exists": true,
+      "size": 7114,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": true,
+      "status": "WARN"
+    },
+    "docs/VERIFY_EXPECTED_FAILURES_PROOF.md": {
+      "exists": true,
+      "size": 14340,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": false,
+      "status": "UNKNOWN"
+    },
+    "docs/SYSTEM3_CORE_STABLE_CONFIRMED.md": {
+      "exists": true,
+      "size": 48,
+      "has_pass": true,
+      "has_fail": false,
+      "has_warn": false,
+      "status": "PASS"
+    },
+    "docs/SYSTEM3_FULL_FORENSIC_SUMMARY.md": {
+      "exists": true,
+      "size": 7341,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": true,
+      "status": "WARN"
+    },
+    "docs/SYSTEM3_PHASES_301_310_STATUS.md": {
+      "exists": true,
+      "size": 9444,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": true,
+      "status": "WARN"
+    },
+    "docs/CSV_PARSING_FIXES_APPLIED.md": {
+      "exists": true,
+      "size": 5577,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": true,
+      "status": "WARN"
+    },
+    "docs/SYSTEM3_FORENSIC_FIX_AND_VALIDATION_REPORT.md": {
+      "exists": true,
+      "size": 15982,
+      "has_pass": true,
+      "has_fail": true,
+      "has_warn": true,
+      "status": "WARN"
+    }
+  },
+  "phase_validation": {
+    "diagnostic_scripts": {
+      "system3_phase_201_230_diagnostics.py": {
+        "exists": true,
+        "has_phase_modules": true
+      },
+      "system3_phase_231_260_diagnostics.py": {
+        "exists": true,
+        "has_phase_modules": true
+      },
+      "system3_phase_261_300_diagnostics.py": {
+        "exists": true,
+        "has_phase_modules": true
+      },
+      "system3_phases_301_310_diagnostics.py": {
+        "exists": true,
+        "has_phase_modules": true
+      }
+    },
+    "autorun_loading": {
+      "201-230": true,
+      "231-260": true,
+      "261-300": true,
+      "301-310": true,
+      "all_loaded": true
+    },
+    "phase_files": {
+      "count": 219,
+      "exists": true
+    }
+  },
+  "batch_file_validation": {
+    "exists": true,
+    "has_cd": true,
+    "has_venv_activate": true,
+    "has_watchdog_start": true,
+    "has_master_start": true,
+    "has_start_command": true,
+    "all_valid": true
+  },
+  "autorun_validation": {
+    "master": {
+      "exists": true,
+      "has_safety_checks": true,
+      "has_heartbeat": true,
+      "has_shutdown_flag": true,
+      "has_market_hours": true,
+      "has_retry_logic": true,
+      "all_valid": true
+    },
+    "watchdog": {
+      "exists": true,
+      "has_market_hours": true,
+      "has_shutdown_check": true,
+      "has_heartbeat_check": true,
+      "has_restart_logic": true,
+      "all_valid": true
+    },
+    "autopilot": {
+      "exists": true,
+      "has_safety_checks": true,
+      "has_encoding_fix": true,
+      "has_smartapi_fix": true,
+      "all_valid": true
+    }
+  },
+  "final_verdict": {
+    "overall_status": "FAIL",
+    "checks": [
+      [
+        "MD Files Analysis",
+        false
+      ],
+      [
+        "Phase Loading",
+        true
+      ],
+      [
+        "Batch File",
+        true
+      ],
+      [
+        "Autorun Components",
+        true
+      ],
+      [
+        "Critical Files",
+        true
+      ],
+      [
+        "Market Hours",
+        true
+      ]
+    ],
+    "pass_count": 5,
+    "fail_count": 1,
+    "total_checks": 6
+  },
+  "file_validation": {
+    "system3_autorun_master.py": {
+      "exists": true
+    },
+    "system3_watchdog.py": {
+      "exists": true
+    },
+    "system3_live_day_autopilot.py": {
+      "exists": true
+    },
+    "START_AUTORUN_AND_WATCHDOG.bat": {
+      "exists": true
+    },
+    "venv/Scripts/python.exe": {
+      "exists": true
+    },
+    "storage/live/angel_index_ai_signals.csv": {
+      "exists": true
+    },
+    "system3_daily_heartbeat.json": {
+      "exists": true
+    },
+    "system3_shutdown_flag.json": {
+      "exists": true
+    }
+  },
+  "market_hours_validation": {
+    "open": "09:15",
+    "close": "15:30",
+    "is_ist_correct": true
+  }
+}

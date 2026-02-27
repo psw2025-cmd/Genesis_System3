@@ -1,0 +1,167 @@
+"""
+System3 Watchdog - Monitors and Restarts Autorun Master
+
+Checks if system3_autorun_master.py is running every 60 seconds.
+If not running, restarts it automatically.
+"""
+
+import sys
+import os
+import time
+import subprocess
+try:
+    import psutil
+except ImportError:
+    logger.error("psutil not installed. Install with: pip install psutil")
+    sys.exit(1)
+from pathlib import Path
+from datetime import datetime, time as dt_time
+import logging
+
+# Ensure project root is in path
+ROOT_DIR = Path(__file__).parent.absolute()
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+# Setup logging
+LOGS_DIR = ROOT_DIR / "logs"
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOGS_DIR / f"system3_watchdog_{datetime.now().strftime('%Y%m%d')}.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
+)
+
+logger = logging.getLogger(__name__)
+
+MASTER_SCRIPT = ROOT_DIR / "system3_autorun_master.py"
+BAT_SCRIPT = ROOT_DIR / "start_system3_autorun.bat"
+
+
+def is_market_hours() -> bool:
+    """Check if current time is during market hours (9:15-16:00) on weekday."""
+    now = datetime.now()
+    if now.weekday() >= 5:  # Saturday=5, Sunday=6
+        return False
+    current_time = now.time()
+    market_open = dt_time(9, 15)
+    market_close = dt_time(16, 0)
+    return market_open <= current_time <= market_close
+
+
+def is_master_running() -> bool:
+    """Check if system3_autorun_master.py is running."""
+    try:
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                cmdline = proc.info.get('cmdline', [])
+                if cmdline:
+                    cmdline_str = ' '.join(cmdline)
+                    if 'system3_autorun_master.py' in cmdline_str:
+                        logger.debug(f"Found master process: PID {proc.info['pid']}")
+                        return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        return False
+    except Exception as e:
+        logger.error(f"Error checking processes: {e}")
+        return False
+
+
+def start_master() -> bool:
+    """Start the autorun master script."""
+    try:
+        logger.info("Starting system3_autorun_master.py...")
+        
+        # Use the batch file to start (ensures venv activation)
+        if BAT_SCRIPT.exists():
+            process = subprocess.Popen(
+                [str(BAT_SCRIPT)],
+                cwd=str(ROOT_DIR),
+                creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0,
+            )
+            logger.info(f"Master started via batch file (PID: {process.pid})")
+            return True
+        elif MASTER_SCRIPT.exists():
+            # Fallback: start Python directly
+            process = subprocess.Popen(
+                [sys.executable, str(MASTER_SCRIPT)],
+                cwd=str(ROOT_DIR),
+                creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0,
+            )
+            logger.info(f"Master started directly (PID: {process.pid})")
+            return True
+        else:
+            logger.error(f"Master script not found: {MASTER_SCRIPT}")
+            return False
+    except Exception as e:
+        logger.error(f"Failed to start master: {e}")
+        return False
+
+
+def main():
+    """Main watchdog loop."""
+    logger.info("=" * 70)
+    logger.info("SYSTEM3 WATCHDOG - STARTING")
+    logger.info("=" * 70)
+    logger.info(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info(f"Monitoring: {MASTER_SCRIPT}")
+    logger.info("=" * 70)
+    
+    consecutive_failures = 0
+    max_failures = 5
+    
+    try:
+        while True:
+            # Only restart master during market hours (9:15 AM - 4:00 PM) on weekdays
+            if is_market_hours():
+                if is_master_running():
+                    logger.debug("Master is running - OK")
+                    consecutive_failures = 0
+                else:
+                    logger.warning("Master is NOT running - attempting restart...")
+                    consecutive_failures += 1
+                    
+                    if consecutive_failures <= max_failures:
+                        if start_master():
+                            logger.info("Master restart successful")
+                            consecutive_failures = 0
+                            # Wait a bit before checking again
+                            time.sleep(30)
+                        else:
+                            logger.error(f"Master restart failed (attempt {consecutive_failures}/{max_failures})")
+                    else:
+                        logger.error(f"Max restart attempts reached ({max_failures}). Stopping watchdog.")
+                        break
+            else:
+                # Outside market hours - don't restart master
+                if is_master_running():
+                    logger.debug("Master is running (outside market hours) - OK")
+                else:
+                    logger.info("Outside market hours - Master not running (expected). Not restarting.")
+                    consecutive_failures = 0  # Reset counter
+            
+            # Check every 60 seconds
+            time.sleep(60)
+    
+    except KeyboardInterrupt:
+        logger.info("\n[INFO] Watchdog interrupted by user (Ctrl+C).")
+    except Exception as e:
+        logger.error(f"\n[ERROR] Fatal error: {e}", exc_info=True)
+        return 1
+    
+    logger.info("=" * 70)
+    logger.info("SYSTEM3 WATCHDOG - SHUTDOWN")
+    logger.info("=" * 70)
+    
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

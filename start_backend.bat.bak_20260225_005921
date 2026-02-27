@@ -1,0 +1,39 @@
+@echo off
+title System3 Backend - Port 8000
+cd /d C:\Genesis_System3\dashboard\backend
+
+REM CRITICAL: Enforce REAL_ONLY mode
+set SYSTEM3_REAL_ONLY=1
+echo ========================================
+echo System3 Backend Starting...
+echo ========================================
+echo Directory: %CD%
+echo Log file: C:\Genesis_System3\outputs\backend.log
+echo REAL_ONLY mode: ENABLED (SYSTEM3_REAL_ONLY=1)
+echo Synthetic data generation: DISABLED
+echo ========================================
+echo.
+
+REM Create outputs directory if it doesn't exist
+if not exist "C:\Genesis_System3\outputs" mkdir "C:\Genesis_System3\outputs"
+
+REM Run backend and log output, keep window open on error
+python -m uvicorn app:app --host 0.0.0.0 --port 8000 > C:\Genesis_System3\outputs\backend.log 2>&1
+
+REM If we get here, backend crashed
+if errorlevel 1 (
+    echo.
+    echo ========================================
+    echo ERROR: Backend crashed!
+    echo ========================================
+    echo Check the log file: C:\Genesis_System3\outputs\backend.log
+    echo ========================================
+    echo.
+    echo Last 20 lines of log:
+    echo ========================================
+    powershell -Command "Get-Content 'C:\Genesis_System3\outputs\backend.log' -Tail 20"
+    echo ========================================
+    echo.
+    echo Press any key to close this window...
+    pause >nul
+)

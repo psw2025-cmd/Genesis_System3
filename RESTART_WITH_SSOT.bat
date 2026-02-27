@@ -1,0 +1,71 @@
+@echo off
+REM Restart Backend with SSOT Implementation
+echo ========================================
+echo Restarting Backend with SSOT
+echo ========================================
+echo.
+
+REM Get the script directory (project root)
+cd /d "%~dp0"
+echo Current directory: %CD%
+echo.
+
+REM Kill existing backend processes
+echo Killing existing backend processes...
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *uvicorn*" >nul 2>&1
+timeout /t 2 >nul
+
+REM Check if port 8000 is in use
+netstat -ano | findstr :8000 >nul
+if not errorlevel 1 (
+    echo Port 8000 is still in use. Finding process...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8000 ^| findstr LISTENING') do (
+        echo Killing process %%a...
+        taskkill /F /PID %%a >nul 2>&1
+    )
+    timeout /t 2 >nul
+)
+
+REM Verify backend directory exists
+if not exist "dashboard\backend\app.py" (
+    echo ERROR: dashboard\backend\app.py not found!
+    echo Current directory: %CD%
+    echo Please run this script from the project root directory.
+    pause
+    exit /b 1
+)
+
+REM Start backend
+echo Starting backend with SSOT...
+pushd dashboard\backend
+set BACKEND_DIR=%CD%
+echo Backend directory: %BACKEND_DIR%
+
+REM Start uvicorn in the backend directory
+start "Backend (SSOT)" cmd /k "cd /d "%BACKEND_DIR%" && python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload"
+popd
+
+echo.
+echo Backend is starting...
+echo Waiting for backend to initialize...
+timeout /t 5 >nul
+
+REM Check if backend started
+curl -s http://localhost:8000/api/health >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Backend failed to start!
+    pause
+    exit /b 1
+)
+
+echo.
+echo ✅ Backend started successfully!
+echo.
+echo SSOT endpoint: http://localhost:8000/api/state
+echo API docs: http://localhost:8000/docs
+echo.
+echo You can now:
+echo   1. Test SSOT: python scripts\test_ssot_implementation.py
+echo   2. Open dashboard: http://localhost:3000
+echo.
+pause

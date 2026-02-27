@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-02-10T02:30:41.235430+05:30",
+  "signal_accuracy": {
+    "total_signals": 9,
+    "signals_executed": 9,
+    "profitable_executions": 3,
+    "accuracy": 0.3333333333333333,
+    "signal_types": {

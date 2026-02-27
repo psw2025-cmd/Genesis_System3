@@ -1,0 +1,40 @@
+@echo off
+echo ======================================================================
+echo RESTARTING BACKEND WITH ALL FIXES APPLIED
+echo ======================================================================
+echo.
+
+cd /d "%~dp0"
+
+echo [1] Killing existing backend processes...
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *uvicorn*" 2>nul
+taskkill /F /IM python.exe /FI "COMMANDLINE eq *app.py*" 2>nul
+timeout /t 2 /nobreak >nul
+
+echo [2] Starting backend with fixes...
+cd dashboard\backend
+start "Dashboard Backend" cmd /k "python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload"
+timeout /t 5 /nobreak >nul
+
+echo [3] Verifying backend...
+cd ..\..
+timeout /t 3 /nobreak >nul
+curl -s http://localhost:8000/api/health >nul 2>&1
+if %errorlevel% equ 0 (
+    echo    Backend is running and responding
+) else (
+    echo    Backend may still be starting... check manually
+)
+
+echo.
+echo ======================================================================
+echo BACKEND RESTART COMPLETE
+echo ======================================================================
+echo.
+echo New endpoints available:
+echo   - GET /api/trades/today
+echo   - GET /api/trades/history?date=YYYY-MM-DD^&start_time=HH:MM^&end_time=HH:MM
+echo.
+echo Backend URL: http://localhost:8000
+echo.
+pause

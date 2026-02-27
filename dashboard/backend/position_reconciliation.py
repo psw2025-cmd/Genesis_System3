@@ -1,0 +1,119 @@
+"""
+Position Reconciliation Module
+Reconciles broker positions, internal ledger, and UI state
+"""
+
+import json
+from pathlib import Path
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+import pytz
+
+IST = pytz.timezone("Asia/Kolkata")
+
+
+class PositionReconciliation:
+    """
+    Reconciles positions from multiple sources:
+    - Broker positions (truth when connected)
+    - Internal ledger (paper/live)
+    - UI state
+    """
+
+    def __init__(self, outputs_dir: Path):
+        self.outputs_dir = Path(outputs_dir)
+
+    def get_broker_positions(self) -> List[Dict[str, Any]]:
+        """Get positions from broker (when connected)"""
+        # TODO: Implement broker position fetch
+        # For now, return empty list
+        return []
+
+    def get_internal_positions(self) -> List[Dict[str, Any]]:
+        """Get positions from internal ledger"""
+        positions_file = self.outputs_dir / "positions_live.json"
+        if not positions_file.exists():
+            return []
+
+        try:
+            data = json.loads(positions_file.read_text())
+            if isinstance(data, dict):
+                return data.get("positions", [])
+            elif isinstance(data, list):
+                return data
+            return []
+        except Exception as e:
+            print(f"Error reading internal positions: {e}")
+            return []
+
+    def reconcile(self, broker_connected: bool, broker_positions: Optional[List[Dict]] = None) -> Dict[str, Any]:
+        """
+        Reconcile positions and return reconciliation result
+
+        Returns:
+            {
+                "positions": [...],  # Final reconciled positions
+                "positions_source": "BROKER" | "INTERNAL_VERIFIED" | "INTERNAL_UNVERIFIED",
+                "mismatches": [...],  # List of mismatches if any
+                "reconciliation_status": "OK" | "MISMATCH" | "ERROR",
+                "timestamp": "..."
+            }
+        """
+        if broker_positions is None:
+            broker_positions = self.get_broker_positions() if broker_connected else []
+
+        internal_positions = self.get_internal_positions()
+
+        result = {
+            "positions": [],
+            "positions_source": "INTERNAL_UNVERIFIED",
+            "mismatches": [],
+            "reconciliation_status": "OK",
+            "timestamp": datetime.now(IST).isoformat(),
+        }
+
+        if broker_connected and broker_positions:
+            # Broker is truth
+            result["positions"] = broker_positions
+            result["positions_source"] = "BROKER"
+
+            # Check for mismatches
+            broker_ids = {p.get("position_id") or p.get("symbol"): p for p in broker_positions}
+            internal_ids = {p.get("position_id"): p for p in internal_positions}
+
+            # Find mismatches
+            for bid, bpos in broker_ids.items():
+                if bid not in internal_ids:
+                    result["mismatches"].append(
+                        {"type": "BROKER_ONLY", "position_id": bid, "broker": bpos, "internal": None}
+                    )
+                else:
+                    # Compare key fields
+                    ipos = internal_ids[bid]
+                    if abs(bpos.get("qty", 0) - ipos.get("qty", 0)) > 0.01:
+                        result["mismatches"].append(
+                            {
+                                "type": "QTY_MISMATCH",
+                                "position_id": bid,
+                                "broker_qty": bpos.get("qty"),
+                                "internal_qty": ipos.get("qty"),
+                            }
+                        )
+
+            for iid, ipos in internal_ids.items():
+                if iid not in broker_ids:
+                    result["mismatches"].append(
+                        {"type": "INTERNAL_ONLY", "position_id": iid, "broker": None, "internal": ipos}
+                    )
+
+            if result["mismatches"]:
+                result["reconciliation_status"] = "MISMATCH"
+        else:
+            # Use internal positions, but mark as unverified
+            result["positions"] = internal_positions
+            if broker_connected:
+                result["positions_source"] = "INTERNAL_VERIFIED"  # Broker connected but no positions
+            else:
+                result["positions_source"] = "INTERNAL_UNVERIFIED"  # Broker disconnected
+
+        return result

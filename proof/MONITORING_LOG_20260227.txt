@@ -1,0 +1,16 @@
+
+---
+2026-02-27T06:00:03.803639
+Backend: http://localhost:8000
+  /api/health: OK mode=PAPER broker_connected=False live_allowed=False
+  live_blockers=['Broker not connected - real data unavailable']
+  [OK] LIVE gating: mode not LIVE when broker disconnected
+  /api/state: OK
+
+---
+2026-02-27T08:00:01.417639
+Backend: http://localhost:8000
+  /api/health: OK mode=PAPER broker_connected=False live_allowed=False
+  live_blockers=['Broker not connected - real data unavailable']
+  [OK] LIVE gating: mode not LIVE when broker disconnected
+  /api/state: OK

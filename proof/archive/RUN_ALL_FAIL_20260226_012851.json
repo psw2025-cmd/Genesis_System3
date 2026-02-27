@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-02-26T01:28:51.261744",
+  "failed_step": "Step 6: Install runtime requirements",
+  "reason": "pip install -r requirements_runtime.txt failed",
+  "impact": "Backend and dashboard will not run; missing fastapi, pandas, etc.",
+  "next_actions": [
+    "Check requirements_runtime.txt and fix broken or missing packages",
+    "Run: pip install -r requirements_runtime.txt",
+    "Rerun Run-All.bat"
+  ]
+}

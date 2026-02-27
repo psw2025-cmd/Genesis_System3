@@ -1,0 +1,120 @@
+import os
+import re
+import requests
+from pathlib import Path
+
+ROOT = Path(r"C:\Genesis_System3\desktop_app\dist\win-unpacked\resources")
+
+FRONTEND = ROOT / "frontend"
+BACKEND = ROOT / "backend"
+
+BASE_URL = "http://127.0.0.1:8000"
+
+
+print("="*60)
+print("SYSTEM3 TAB → CODE → API FORENSIC SCAN")
+print("="*60)
+
+
+# ---------------------------------------------------
+# 1. FIND ALL API CALLS USED BY FRONTEND
+# ---------------------------------------------------
+print("\n[1] SCANNING FRONTEND API CALLS...")
+
+api_calls = set()
+
+for file in FRONTEND.rglob("*.js"):
+    text = file.read_text(errors="ignore")
+
+    matches = re.findall(r'["\'](/api/[^"\']+)', text)
+    for m in matches:
+        api_calls.add(m)
+
+print(f"Found {len(api_calls)} frontend API calls\n")
+
+
+# ---------------------------------------------------
+# 2. FIND ALL BACKEND ROUTES
+# ---------------------------------------------------
+print("[2] SCANNING BACKEND ROUTES...")
+
+backend_routes = set()
+
+for file in BACKEND.rglob("*.py"):
+    text = file.read_text(errors="ignore")
+
+    matches = re.findall(r'@app\.(get|post|put|delete)\("([^"]+)"', text)
+    for method, route in matches:
+        backend_routes.add(route)
+
+print(f"Found {len(backend_routes)} backend routes\n")
+
+
+# ---------------------------------------------------
+# 3. MATCH FRONTEND vs BACKEND
+# ---------------------------------------------------
+print("[3] MATCHING ROUTES...\n")
+
+missing_routes = []
+working_routes = []
+error_routes = []
+
+for route in sorted(api_calls):
+
+    if route not in backend_routes:
+        missing_routes.append(route)
+        continue
+
+    try:
+        r = requests.get(BASE_URL + route, timeout=3)
+        if r.status_code == 200:
+            working_routes.append(route)
+        else:
+            error_routes.append((route, r.status_code))
+    except:
+        error_routes.append((route, "NO RESPONSE"))
+
+
+# ---------------------------------------------------
+# 4. REPORT
+# ---------------------------------------------------
+print("="*60)
+print("WORKING ROUTES")
+print("="*60)
+for r in working_routes:
+    print(r)
+
+
+print("\n" + "="*60)
+print("ERROR ROUTES")
+print("="*60)
+for r,code in error_routes:
+    print(r, "->", code)
+
+
+print("\n" + "="*60)
+print("MISSING BACKEND ROUTES (TAB BROKEN)")
+print("="*60)
+for r in missing_routes:
+    print(r)
+
+
+# ---------------------------------------------------
+# 5. SYNTHETIC DATA DETECTION
+# ---------------------------------------------------
+print("\n" + "="*60)
+print("CHECKING SYNTHETIC DATA")
+print("="*60)
+
+try:
+    r = requests.get(BASE_URL + "/api/state").json(timeout=5)
+
+    if "synthetic" in str(r).lower():
+        print("SYSTEM USING SYNTHETIC DATA")
+    else:
+        print("REAL DATA")
+except:
+    print("STATE CHECK FAILED")
+
+
+print("\nSCAN COMPLETE")

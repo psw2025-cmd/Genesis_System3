@@ -1,0 +1,96 @@
+{
+  "timestamp": "2026-02-10T07:03:53.504706",
+  "tests": {
+    "Production Grade Zero Errors Validation": {
+      "script": "production_grade_zero_errors_validation.py",
+      "success": false,
+      "output": "Timeout",
+      "timestamp": "2026-02-10T07:08:54.546463"
+    },
+    "Comprehensive Pre-Build Validation": {
+      "script": "comprehensive_pre_build_validation.py",
+      "success": false,
+      "output": "Timeout",
+      "timestamp": "2026-02-10T07:13:54.571537"
+    },
+    "E2E Self Test": {
+      "script": "e2e_selftest.py",
+      "success": true,
+      "output": "\u001b[94m[INFO]\u001b[0m 07:13:55 - ================================================================================\n\u001b[94m[INFO]\u001b[0m 07:13:55 - E2E SELF-TEST - System3 Ultra\n\u001b[94m[INFO]\u001b[0m 07:13:55 - ================================================================================\n\u001b[94m[INFO]\u001b[0m 07:13:55 - \n[1/7] Testing API Health...\n\u001b[92m[OK]\u001b[0m 07:14:01 - API Health: PASS\n\u001b[94m[INFO]\u001b[0m 07:14:01 - \n[2/7] Testing Broker Login...\n[OK] 07:14:06 - Broker Login: PASS\n[INFO] 07:14:06 - \n[3/7] Testing State Consistency (SSOT)...\n[OK] 07:14:07 - State Consistency: PASS\n[INFO] 07:14:07 - \n[4/7] Testing QC Consistency...\n[OK] 07:14:09 - QC Consistency: PASS\n[INFO] 07:14:09 - \n[5/7] Testing Position Reconciliation...\n[OK] 07:14:10 - Position Reconciliation: PASS\n[INFO] 07:14:10 - \n[6/7] Testing Alert Timestamps...\n[OK] 07:14:11 - Alert Timestamps: PASS\n[INFO] 07:14:11 - \n[7/7] Testing Greeks Availability...\n[OK] 07:14:12 - Greeks Availability: PASS\n[INFO] 07:14:12 - \n================================",
+      "timestamp": "2026-02-10T07:14:12.988298"
+    },
+    "Comprehensive E2E Test (All Tabs)": {
+      "script": "comprehensive_e2e_test_all_tabs.py",
+      "success": true,
+      "output": "\n\u001b[1m======================================================================\u001b[0m\n\u001b[1mCOMPREHENSIVE DASHBOARD E2E TEST\u001b[0m\n\u001b[1m======================================================================\u001b[0m\n\n\u001b[94mChecking backend health...\u001b[0m\n\u001b[92mBackend is healthy!\u001b[0m\n\n\n\u001b[1m======================================================================\u001b[0m\n\u001b[1mTesting Tab: Overview\u001b[0m\n\u001b[1m======================================================================\u001b[0m\n\n  Testing: SSOT State\n    GET /api/state\n    \u001b[92m[PASS]\u001b[0m\n  Testing: Health Check\n    GET /api/health\n    \u001b[92m[PASS]\u001b[0m\n  Testing: Performance Metrics\n    GET /api/perf\n    \u001b[92m[PASS]\u001b[0m\n\n  \u001b[1mTab Result: PASS (3/3 endpoints)\u001b[0m\n\n\u001b[1m======================================================================\u001b[0m\n\u001b[1mTesting Tab: Chain Analytics\u001b[0m\n\u001b[1m======================================================================\u001b[0m\n\n  Testing: NIFTY Chain\n    GET /api/chain/NIFTY\n    \u001b[92m[PASS]\u001b[0m\n  Testing: BANKNIFTY Chain\n    GET /api/",
+      "timestamp": "2026-02-10T07:14:58.716707"
+    },
+    "Comprehensive QC Audit": {
+      "script": "comprehensive_qc_audit.py",
+      "success": true,
+      "output": "\n================================================================================\nSYSTEM3 COMPREHENSIVE QC AUDIT\nTime: 2026-02-10 07:15:00\n================================================================================\n\n================================================================================\nAUDIT: CONFIGURATION\n================================================================================\n[OK] .env file exists\n\nCritical Safety Flags:\n  [OK] LIVE_TRADING_ENABLED=False\n  [OK] PAPER_TRADING_MODE=True\n  [OK] DRY_RUN_MODE=True\n\n================================================================================\nAUDIT: SYSTEM HEARTBEAT\n================================================================================\n[OK] Heartbeat file exists\n  - File size: 7,804 bytes\n\n================================================================================\nAUDIT: SIGNALS CSV FILE\n================================================================================\n[OK] File exists: c:\\Genesis_Sys",
+      "timestamp": "2026-02-10T07:15:00.937640"
+    },
+    "Multi-Validation Audit": {
+      "endpoint": "/api/audit/comprehensive",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-10T07:15:02.891470"
+    },
+    "Performance Test": {
+      "success": true,
+      "results": [
+        {
+          "endpoint": "/api/health",
+          "status": 200,
+          "time_ms": 1026.3283252716064,
+          "success": true
+        },
+        {
+          "endpoint": "/api/state",
+          "status": 200,
+          "time_ms": 1801.0120391845703,
+          "success": true
+        },
+        {
+          "endpoint": "/api/chain/NIFTY",
+          "status": 200,
+          "time_ms": 1052.8995990753174,
+          "success": true
+        },
+        {
+          "endpoint": "/api/signal/top",
+          "status": 200,
+          "time_ms": 1014.8715972900391,
+          "success": true
+        },
+        {
+          "endpoint": "/api/positions",
+          "status": 200,
+          "time_ms": 1014.9452686309814,
+          "success": true
+        },
+        {
+          "endpoint": "/api/pnl",
+          "status": 200,
+          "time_ms": 1017.331600189209,
+          "success": true
+        }
+      ],
+      "average_time_ms": 1154.5647382736206,
+      "timestamp": "2026-02-10T07:15:09.820616"
+    },
+    "Comprehensive Dashboard Validation": {
+      "script": "scripts\\comprehensive_dashboard_validation.py",
+      "success": false,
+      "output": "Timeout",
+      "timestamp": "2026-02-10T07:20:09.859853"
+    }
+  },
+  "summary": {
+    "total": 8,
+    "passed": 5,
+    "failed": 3,
+    "warnings": 1
+  }
+}

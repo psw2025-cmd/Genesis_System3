@@ -1,0 +1,8 @@
+{
+    "market": "NSE",
+    "live_mode": false,
+    "log_level": "INFO",
+    "data_folder": "storage/history",
+    "live_data_folder": "storage/live",
+    "update_interval_sec": 5
+}

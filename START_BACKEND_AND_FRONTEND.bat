@@ -1,0 +1,47 @@
+@echo off
+echo ======================================================================
+echo STARTING BACKEND AND FRONTEND WITH ALL FIXES
+echo ======================================================================
+echo.
+
+cd /d "%~dp0"
+
+echo [1] Stopping existing processes...
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *uvicorn*" 2>nul
+taskkill /F /IM node.exe /FI "WINDOWTITLE eq *vite*" 2>nul
+timeout /t 2 /nobreak >nul
+
+echo [2] Starting backend with fixes...
+cd dashboard\backend
+start "Dashboard Backend" cmd /k "python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload"
+timeout /t 5 /nobreak >nul
+
+echo [3] Starting frontend...
+cd ..\frontend
+if not exist "node_modules" (
+    echo    Installing dependencies...
+    call npm install
+)
+start "Dashboard Frontend" cmd /k "npm run dev -- --host 127.0.0.1"
+timeout /t 3 /nobreak >nul
+
+echo [4] Verifying services...
+cd ..\..
+timeout /t 5 /nobreak >nul
+
+echo.
+echo ======================================================================
+echo SERVICES STARTED
+echo ======================================================================
+echo.
+echo Backend:  http://localhost:8000
+echo Frontend: http://localhost:3000
+echo.
+echo API Endpoints:
+echo   - GET /api/health
+echo   - GET /api/trades/today
+echo   - GET /api/trades/history?date=YYYY-MM-DD^&start_time=HH:MM^&end_time=HH:MM
+echo.
+echo Check the windows for any errors.
+echo.
+pause

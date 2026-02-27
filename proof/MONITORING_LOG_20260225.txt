@@ -1,0 +1,10 @@
+
+---
+2026-02-25T06:00:00.840038
+Backend: http://localhost:8000
+  ERROR: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/health (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+
+---
+2026-02-25T08:00:01.354853
+Backend: http://localhost:8000
+  ERROR: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/health (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8000): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))

@@ -1,0 +1,51 @@
+{
+  "underlying": "MIDCPNIFTY",
+  "n_samples": 673,
+  "n_train": 538,
+  "n_test": 135,
+  "n_features": 129,
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "per_class_metrics": {
+    "BUY": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 78
+    },
+    "HOLD": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 53
+    },
+    "SELL": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 4
+    }
+  },
+  "confusion_matrix": [
+    [
+      78,
+      0,
+      0
+    ],
+    [
+      0,
+      53,
+      0
+    ],
+    [
+      0,
+      0,
+      4
+    ]
+  ],
+  "label_mapping": {
+    "0": "BUY",
+    "1": "HOLD",
+    "2": "SELL"
+  }
+}

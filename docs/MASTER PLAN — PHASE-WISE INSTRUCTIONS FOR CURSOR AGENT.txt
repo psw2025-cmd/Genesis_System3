@@ -1,0 +1,412 @@
+System3 Ultra – Phase-Wise Agent Implementation Manual (SAFE MODE)
+Master Instruction Document
+
+Author: Pritam
+Purpose: Full step-by-step instructions for Cursor Agent
+Mode: SAFE, READ-ONLY, ADDITIVE-ONLY
+Baseline: FROZEN
+Automation: DISABLED
+
+PHASE 1 — REAL-MARKET PREPARATION (SAFE MODE)
+Agent Instructions
+
+Implement the following additive-only modules (no overwrites):
+
+market_warmup_scanner.py
+
+Pre-market diagnostics
+
+Validate directories, check model presence
+
+No changes, no execution
+
+signal_record_buffer.py
+
+Temporary buffer for storing Monday signals
+
+Does NOT touch existing signals file
+
+env_consistency_checker.py
+
+Python package check
+
+Directory structure check
+
+Config flags check
+
+No auto-fix, reporting only
+
+real_data_capture_starter.py
+
+Logs Monday start-time
+
+Creates minimal recorder
+
+Safety Rules
+
+Baseline frozen
+
+Read-only
+
+No config changes
+
+No trade execution
+
+No auto-PnL
+
+No model update
+
+Additive-only
+
+New menu options: 48–51
+
+Expected Outputs
+
+4 new modules in core/engine/
+
+docs/system3_phase1_real_market_prep.md
+
+Menu updated with 48–51
+
+Verification Questions (ask agent after completion)
+
+Provide the full file list created.
+
+Show new menu options (48–51).
+
+Provide warm-up diagnostic sample output.
+
+Confirm no baseline file was modified.
+
+Confirm automation is OFF.
+
+Confirm no config was changed.
+
+PHASE 2 — REAL-DATA LEARNING CYCLE: COLLECTION STAGE
+Agent Instructions
+
+Implement:
+
+real_signal_collector_v2.py
+
+Stores all Monday signals
+
+Writes ONLY to new file: learning/real_signals_raw.csv
+
+outcome_placeholder_generator.py
+
+Writes placeholders for Monday outcomes
+
+No scoring, no PnL
+
+market_regime_recorder.py
+
+Logs volatility, microtrend, regime classification
+
+Output: learning/market_regime_log.csv
+
+Safety Rules
+
+Read-only
+
+No training
+
+No auto-learning
+
+No overwrite
+
+Only new modules
+
+Menu options: 52–54
+
+Expected Outputs
+
+3 new modules
+
+docs/system3_phase2_real_learning_cycle.md
+
+3 new learning files
+
+Menu updated
+
+Verification Questions
+
+List all new learning files created.
+
+Show menu 52–54.
+
+Provide first 3 sample rows of real_signals_raw.csv.
+
+Confirm no training triggered.
+
+Confirm no baseline modification.
+
+Confirm automation OFF.
+
+PHASE 3 — OUTCOME LOGGER + MISFIRE CLASSIFIER
+Agent Instructions
+
+Implement:
+
+unified_outcome_logger_v3.py
+
+Logs real outcomes after market close
+
+Output: learning/real_outcomes.csv
+
+misfire_classifier_v2.py
+
+Classifies:
+
+Wrong Direction
+
+Weak Move
+
+Low Confidence
+
+Generates report only
+
+daily_learning_digest.py
+
+Daily report in /reports/real_learning_daily/
+
+Safety Rules
+
+No threshold changes
+
+No config changes
+
+No training
+
+Read-only
+
+Menu: 55–57
+
+Expected Outputs
+
+3 new engine modules
+
+New docs
+
+Report directory populated
+
+Verification Questions
+
+Show sample entries from real_outcomes.csv.
+
+Provide 3 examples of misfire classification.
+
+Provide sample of daily digest.
+
+Confirm no threshold modifications.
+
+Confirm no model touched.
+
+Confirm SAFE MODE active.
+
+PHASE 4 — SUGGESTION-ONLY OPTIMIZATION (NO CHANGE APPLIED)
+Agent Instructions
+
+Implement:
+
+real_threshold_reco_v3.py
+
+Suggest-only threshold recommendations
+
+Must NOT apply them
+
+risk_profile_optimizer_v3.py
+
+Suggests ideal risk ranges
+
+Reports only
+
+feature_drift_analyzer.py
+
+Detects feature drift
+
+No model update
+
+performance_consistency_checker.py
+
+Evaluates consistency of signals
+
+Heatmap & stats
+
+Safety Rules
+
+Read-only
+
+Add-only
+
+No threshold application
+
+No position-size change
+
+No learning
+
+Menu: 58–61
+
+Expected Outputs
+
+4 modules
+
+/reports/threshold_reco/
+
+/reports/nlp_drift/
+
+New MD documentation
+
+Verification Questions
+
+Show threshold recommendation output sample.
+
+Show risk profile suggestion sample.
+
+Show drift analysis sample.
+
+Provide consistency heatmap JSON/table.
+
+Confirm no changes applied.
+
+Confirm SAFE MODE active.
+
+PHASE 5 — BLENDED MODEL PREPARATION (DRY-RUN ONLY)
+Agent Instructions
+
+Implement:
+
+dataset_merger_real_synth_v1.py
+
+Merges real + synthetic data
+
+Does NOT train
+
+blended_training_orchestrator_dryrun.py
+
+Creates training plan
+
+Skip training, dry-run only
+
+ultra_mode_readiness_report.py
+
+Only lists requirements
+
+Does NOT enable Ultra-Mode
+
+Safety Rules
+
+NO training
+
+NO model changes
+
+Read-only
+
+Menu: 62–64
+
+Expected Outputs
+
+3 new modules
+
+MD documentation
+
+Dry-run logs
+
+No new model files
+
+Verification Questions
+
+Show dataset shape preview.
+
+Show training plan (dry-run).
+
+Provide Ultra-Mode readiness summary.
+
+Confirm no models created.
+
+Confirm no training triggered.
+
+Confirm SAFE MODE active.
+
+PHASE 6 — SYSTEM3 ULTRA OBSERVABILITY LAYER (READ-ONLY)
+Agent Instructions
+
+Implement:
+
+ultra_health_tree.py
+
+System dependency + health map
+
+latency_drift_observatory.py
+
+Latency / drift detection
+
+Plots or JSON outputs
+
+failure_point_predictor.py
+
+Predict weak points in pipeline
+
+execution_readiness_auditor.py
+
+Validates if system is safe to start (read-only)
+
+ultra_dashboard_readonly.py
+
+Mini dashboard with summaries
+
+Safety Rules
+
+Read-only
+
+No training
+
+No automation
+
+Menu: 65–69
+
+Expected Outputs
+
+5 modules
+
+/reports/ultra_obs/ populated
+
+MD documentation
+
+Verification Questions
+
+Show health tree JSON/image.
+
+Show latency/drift output.
+
+Show failure-point predictor table.
+
+Show auditor summary.
+
+Show sample dashboard output.
+
+Confirm no automation enabled.
+
+FINAL CONFIRMATION REQUEST (AFTER ALL PHASES)
+
+After all phases are complete, ask the agent:
+
+**“Confirm System3 Ultra Readiness (SAFE MODE ONLY):
+
+No automation enabled
+
+No training triggered
+
+No overwrite done
+
+Only additive modules created
+
+Baseline fully preserved
+
+System3 Ultra Observability active
+
+Real-Data Learning Cycle operational
+
+Everything in SAFE MODE.”**
+
+✔ End of Document

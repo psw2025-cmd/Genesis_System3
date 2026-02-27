@@ -1,0 +1,47 @@
+# Editable source for dev deps. Regenerate .txt with:
+#   pip install pip-tools && pip-compile requirements-dev.in -o requirements-dev.txt
+# Never install from this file; always install from requirements-dev.txt.
+# Dev stack builds on runtime; install requirements_runtime.txt first.
+
+-r requirements_runtime.txt
+
+# Code formatting & linting
+black>=24.3,<25
+flake8>=7.0,<8
+isort>=5.13,<6
+
+# Testing frameworks
+pytest>=8.0,<9
+pytest-cov>=4.1,<5
+responses>=0.23,<0.24
+
+# Type checking
+mypy>=1.8,<2
+types-requests>=2.31
+
+# Security scanning
+bandit>=1.7,<2
+safety>=3.7        # ensure latest vulnerability coverage
+pip-audit>=2.7    # keep for automated audit
+
+# Browser automation (agent dashboard verification – Playwright)
+playwright>=1.49   # run: playwright install chromium
+
+# Packaging helpers (keep compatible with streamlit<24 requirement)
+packaging>=16.8,<24
+setuptools>=78.1   # patched from 69.2.0
+wheel>=0.45,<0.46   # 0.46+ needs packaging>=24; streamlit needs packaging<24
+
+# Data quality enforcement
+great-expectations>=0.18,<0.19
+
+# Pre-commit automation
+pre-commit>=3.6,<4
+
+# Documentation automation
+sphinx>=7.2,<8
+mkdocs>=1.5,<2
+
+# Editor integration
+jupyterlab>=4.4,<5   # patched from 4.1.2
+ipython>=8.21,<9

@@ -1,0 +1,156 @@
+ROOT: C:\Genesis_System3
+MODE: PREVIEW
+STAMP: 20260225_004254
+
+WOULD MODIFY: C:\Genesis_System3\ALL_FIXES_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\AUTO_MARKET_DETECTION_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\auto_security_patch.py
+ - Patched shell=True command: 'python script.py' -> ['python', 'script.py']
+
+WOULD MODIFY: C:\Genesis_System3\BACKEND_RESTART_COMMANDS.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\BUILD_DESKTOP_APP.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\COMPLETE_FIXES_SUMMARY.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\CORS_FIX_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (3 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\DASHBOARD_QUICK_START.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\DASHBOARD_VERIFICATION_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\DASHBOARD_VISIBILITY_VERIFICATION.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\EVERYTHING_INTEGRATED_TO_APP.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FINAL_COMPLETE_SOLUTION.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FINAL_COMPLETION_SUMMARY.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FINAL_INTEGRATION_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FINAL_VALIDATION_REPORT.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FIX_BACKEND_START.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FIX_BLANK_DASHBOARD.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FIX_PORT_AND_START.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FIX_UVICORN_AND_START.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FULL_IMPLEMENTATION_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\NEXT_STEPS.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\PRODUCTION_RESTART_GUIDE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\QUICK_FIX_BACKEND.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\QUICK_START.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\QUICK_START_DASHBOARD.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\QUICK_START_WITH_FIXES.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\REBUILD_AND_TEST.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_BACKEND.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\restart_backend.ps1
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_BACKEND_FOR_NEW_ENDPOINTS.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_BACKEND_WITH_FIXES.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_DASHBOARD.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_WITH_SSOT.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RUN_AND_TRACK_ALL.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\SSOT_FIXES_COMPLETE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_ALL_SERVICES.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\start_backend.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_BACKEND_AND_FRONTEND.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_BACKEND_FOR_TESTING.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_DASHBOARD.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_EVERYTHING_AUTO.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_FRONTEND_ONLY.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_FULL_DASHBOARD_SYSTEM.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\system3_tab_forensic_scan.py
+ - Added timeout=5 to requests call (single-line).
+
+WOULD MODIFY: C:\Genesis_System3\TEST_AND_VERIFY.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\TRADER_USER_TEST_GUIDE.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\VALIDATE_SSOT_IMPLEMENTATION.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\VERIFICATION_STATUS_AND_INSTRUCTIONS.md
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\scripts\run_local.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\scripts\start_backend.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+SUMMARY
+Preview completed.

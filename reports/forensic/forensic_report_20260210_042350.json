@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-02-10T04:23:50.052823+05:30",
+  "signal_accuracy": {
+    "total_signals": 9,
+    "signals_executed": 9,
+    "profitable_executions": 3,
+    "accuracy": 0.3333333333333333,
+    "signal_types": {}
+  },
+  "data_integrity": {
+    "chain_data": {
+      "rows": 1,
+      "columns": 5,
+      "null_percentage": 0.0,
+      "duplicates": "0"
+    },
+    "signal_data": {
+      "has_action": true,
+      "has_underlying": false,
+      "timestamp": "2026-02-05T23:41:46.714569+05:30"
+    },
+    "position_data": {
+      "open_positions": 5,
+      "has_required_fields": true
+    },
+    "pnl_data": {},
+    "issues": []
+  },
+  "performance_metrics": {
+    "total_trades": 9,
+    "win_rate": 0.3333333333333333,
+    "total_pnl": -1806.0727624799474,
+    "avg_pnl_per_trade": -200.67475138666083,
+    "max_drawdown": 1084131.4666955913,
+    "sharpe_ratio": 0.0
+  }
+}

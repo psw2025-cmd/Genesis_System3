@@ -8,3 +8,11 @@ node_modules
 
 # Python virtual environments
 .venv/
+
+# Generated state snapshots (not source)
+outputs/state_snapshots/
+
+# Generated reports, training data, and logs
+storage/
+tools/logs/
+logs/

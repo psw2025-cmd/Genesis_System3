@@ -1,0 +1,513 @@
+# System3 Phase 379 - Edge Case Handler Report
+
+**Generated:** 2025-12-09T21:06:02.654487
+
+## Executive Summary
+
+This report identifies unusual signal patterns, data anomalies, and market extremes
+that could cause unexpected system behavior.
+
+## Unusual Signal Patterns
+
+## Data Quality Anomalies
+
+### Missing Data
+- **angel_index_ai_signals_curated.csv** - ts: 32.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - delta: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - gamma: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - theta: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - vega: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - moneyness: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv_estimate: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv_percentile: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv_rank: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv_change_rate: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - iv_spike: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - rsi: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - macd: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - macd_signal: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - macd_histogram: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - sma_5: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - sma_10: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - sma_20: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - supertrend: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - supertrend_direction: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - vwap: 32.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - price_vs_vwap: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - multi_tf_trend_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_strength: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_1m: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_3m: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_5m: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trend_15m: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - momentum_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - breakout_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - roc_1: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - roc_3: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - roc_5: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - roc_10: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - acceleration: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - momentum_strength: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - momentum_direction: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - volatility_regime: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - volatility_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - regime_transition: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - ml_prediction: 32.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - ml_probability: 32.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - ai_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - prob_BUY_CE: 22.6% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - prob_BUY_PE: 22.6% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - prob_HOLD: 22.6% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - greeks_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - final_score: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - signal: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - signal_strength: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - entry_buy: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - entry_sell: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - entry_hold: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - entry_confidence: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - entry_price: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - stop_loss: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - target_price: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - risk_amount: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - trailing_sl: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - exit_sl_hit: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - exit_target_hit: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - exit_signal: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - time_to_expiry: 10.4% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - ce_pe_ratio: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - atm_dist_pct: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - atm_dist_abs: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - ce_pe_diff: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - spot_chg_1_pct: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - ltp_chg_1_pct: 19.2% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_curated.csv** - index_exch: 67.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - opt_exch: 67.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - expiry: 33.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - token: 67.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - pred_label: 33.7% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - expected_move_score: 67.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - pred_confidence: 67.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - spot_roll_std_5: 86.5% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - ltp_roll_std_5: 86.5% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_moneyness_sq: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_moneyness_cube: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_moneyness_sqrt: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_momentum_1: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_momentum_3: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_momentum_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_momentum_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_momentum_1: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_momentum_3: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_momentum_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_momentum_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_momentum_ratio_1_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_vol_short: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_vol_long: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_vol_ratio: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_vol_short: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_vol_long: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_spot_vol_ratio: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_regime_high_vol: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_regime_low_vol: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_hour: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_minute: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - confidence: 63.0% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_moneyness_x_score: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_moneyness_x_conf: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_score_x_conf: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_is_win: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_rolling_win_rate_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_rolling_win_rate_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - u_ltp_percentile: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - timestamp: 66.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - score: 66.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - pred_proba: 66.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - rho: 66.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_curated.csv** - data_source: 66.3% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - delta: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - gamma: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - theta: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - vega: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - moneyness: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv_estimate: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv_percentile: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv_rank: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv_change_rate: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - iv_spike: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - rsi: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - macd: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - macd_signal: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - macd_histogram: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - sma_5: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - sma_10: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - sma_20: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - supertrend: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - supertrend_direction: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - vwap: 32.4% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - price_vs_vwap: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - multi_tf_trend_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_strength: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_1m: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_3m: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_5m: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trend_15m: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - momentum_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - breakout_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - roc_1: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - roc_3: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - roc_5: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - roc_10: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - acceleration: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - momentum_strength: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - momentum_direction: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - volatility_regime: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - volatility_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - regime_transition: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - ml_prediction: 32.4% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - ml_probability: 32.4% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - ai_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - prob_BUY_CE: 22.3% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - prob_BUY_PE: 22.3% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - prob_HOLD: 22.3% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - greeks_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - final_score: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - signal: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - signal_strength: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - entry_buy: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - entry_sell: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - entry_hold: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - entry_confidence: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - entry_price: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - stop_loss: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - target_price: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - risk_amount: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - trailing_sl: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - exit_sl_hit: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - exit_target_hit: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - exit_signal: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - time_to_expiry: 10.1% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - ce_pe_ratio: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - atm_dist_pct: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - atm_dist_abs: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - ce_pe_diff: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - spot_chg_1_pct: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - ltp_chg_1_pct: 18.9% missing
+  - Severity: MEDIUM
+- **angel_index_ai_signals_with_forward.csv** - index_exch: 67.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - opt_exch: 67.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - token: 67.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - pred_label: 33.8% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - expected_move_score: 67.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - pred_confidence: 67.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - spot_roll_std_5: 86.5% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - ltp_roll_std_5: 86.5% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_moneyness_sq: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_moneyness_cube: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_moneyness_sqrt: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_momentum_1: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_momentum_3: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_momentum_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_momentum_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_momentum_1: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_momentum_3: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_momentum_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_momentum_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_momentum_ratio_1_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_vol_short: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_vol_long: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_vol_ratio: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_vol_short: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_vol_long: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_spot_vol_ratio: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_regime_high_vol: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_regime_low_vol: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_hour: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_minute: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - confidence: 62.8% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_moneyness_x_score: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_moneyness_x_conf: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_score_x_conf: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_is_win: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_rolling_win_rate_5: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_rolling_win_rate_10: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - u_ltp_percentile: 96.6% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - timestamp: 66.2% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - score: 66.2% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - pred_proba: 66.2% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - rho: 66.2% missing
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv** - data_source: 66.2% missing
+  - Severity: HIGH
+
+### Duplicate Signals
+- **angel_index_ai_signals_curated.csv**: 290 duplicates (97.6%)
+  - Severity: HIGH
+- **angel_index_ai_signals_with_forward.csv**: 289 duplicates (97.6%)
+  - Severity: HIGH
+
+## Market Extremes & Constraints
+
+## Recommended Edge Case Handlers
+
+### Extreme Market Volatility
+- **Detection:** price_change > 5% in 1 minute
+- **Primary Handler:** `reduce_position_size(current_size * 0.5)`
+- **Fallback:** `skip_trade()`
+
+### Signal Contradiction
+- **Detection:** multiple_buy_and_sell_signals in same symbol
+- **Primary Handler:** `wait_for_confirmation(next_signal_count >= 2)`
+- **Fallback:** `hold_position()`
+
+### Missing Data
+- **Detection:** null_values > 10% in critical columns
+- **Primary Handler:** `use_forward_fill() or skip_signal()`
+- **Fallback:** `skip_analysis()`
+
+### High API Latency
+- **Detection:** api_latency_ms > 500
+- **Primary Handler:** `increase_timeout() + reduce_frequency()`
+- **Fallback:** `defer_to_next_cycle()`
+
+### Data Duplication
+- **Detection:** signal_timestamp duplicates > 5%
+- **Primary Handler:** `deduplicate_by_timestamp() + verify_uniqueness()`
+- **Fallback:** `manual_review()`
+
+## Conclusion & Action Items
+
+1. **Monitor signal patterns** for unusual concentrations
+2. **Implement duplicate detection** on all signal imports
+3. **Add latency monitoring** to broker API calls
+4. **Implement edge case handlers** for detected anomalies
+5. **Regular audits** of data quality and signal patterns

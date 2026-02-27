@@ -1,0 +1,127 @@
+# scripts/proof_run.ps1
+# PowerShell script to run complete proof verification
+# Usage: powershell -ExecutionPolicy Bypass -File scripts\proof_run.ps1
+
+$ErrorActionPreference = "Stop"
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
+Write-Host "================================================================================"
+Write-Host "GENESIS SYSTEM3 - COMPLETE PROOF VERIFICATION"
+Write-Host "================================================================================"
+Write-Host ""
+
+# Change to project root
+Set-Location $PSScriptRoot\..
+$projectRoot = Get-Location
+
+Write-Host "[STEP 1] Cleaning outputs and creating proof pack directory..."
+Remove-Item -Force -ErrorAction SilentlyContinue .\outputs\health.json,.\outputs\top_trade_signal.json,.\outputs\qc_report_live.json
+Remove-Item -Recurse -Force -ErrorAction SilentlyContinue .\outputs\proof_pack
+New-Item -ItemType Directory -Force .\outputs\proof_pack | Out-Null
+Write-Host "[OK] Cleanup complete"
+Write-Host ""
+
+# Start transcript
+$transcriptPath = ".\logs\inspector\transcript_FINAL_PROOF.txt"
+New-Item -ItemType Directory -Force -Path ".\logs\inspector" | Out-Null
+Start-Transcript -Path $transcriptPath -Force
+Write-Host "Transcript started: $transcriptPath"
+Write-Host ""
+
+# B2: Validation
+Write-Host "[STEP 2] Running system validation..."
+python validate_option_chain_system.py
+if ($LASTEXITCODE -ne 0) {
+    Stop-Transcript
+    throw "Validation failed"
+}
+Copy-Item -Force outputs\validation_results.json outputs\proof_pack\ -ErrorAction SilentlyContinue
+Write-Host "[OK] Validation complete"
+Write-Host ""
+
+# B3: Expiry selector
+Write-Host "[STEP 3] Running expiry selector test..."
+python scripts\test_expiry_selector.py
+if ($LASTEXITCODE -ne 0) {
+    Stop-Transcript
+    throw "Expiry selector test failed"
+}
+Write-Host "[OK] Expiry selector test complete"
+Write-Host ""
+
+# B4: Unit tests (5 times)
+Write-Host "[STEP 4] Running unit tests (5 times for repeatability)..."
+$testPassed = $true
+1..5 | ForEach-Object {
+    Write-Host "================ TEST RUN $_ ================"
+    python test_option_chain_automation.py
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[FAIL] Tests failed on run $_"
+        $testPassed = $false
+    } else {
+        Write-Host "[OK] Test run $_ passed"
+    }
+}
+if (-not $testPassed) {
+    Stop-Transcript
+    throw "Unit tests failed on one or more runs"
+}
+Copy-Item -Force outputs\test_report.json outputs\proof_pack\ -ErrorAction SilentlyContinue
+Write-Host "[OK] All 5 test runs passed"
+Write-Host ""
+
+# B5: TREND_UP simulation
+Write-Host "[STEP 5] Running TREND_UP simulation..."
+Remove-Item -Force -ErrorAction SilentlyContinue .\outputs\health.json,.\outputs\top_trade_signal.json,.\outputs\qc_report_live.json
+New-Item -ItemType Directory -Force .\outputs\proof_pack\TREND_UP | Out-Null
+python option_chain_automation_master.py --sim --refresh 5 --duration 2 --scenario TREND_UP
+if ($LASTEXITCODE -ne 0) {
+    Stop-Transcript
+    throw "TREND_UP simulation failed"
+}
+powershell -ExecutionPolicy Bypass -File scripts\print_proof.ps1 | Out-Null
+Copy-Item -Force outputs\health.json,outputs\top_trade_signal.json,outputs\qc_report_live.json,outputs\chain_raw_live.csv,outputs\underlying_rank_live.csv outputs\proof_pack\TREND_UP\ -ErrorAction SilentlyContinue
+Write-Host "[OK] TREND_UP simulation complete"
+Write-Host ""
+
+# B6: DATA_ERRORS simulation
+Write-Host "[STEP 6] Running DATA_ERRORS simulation..."
+Remove-Item -Force -ErrorAction SilentlyContinue .\outputs\health.json,.\outputs\top_trade_signal.json,.\outputs\qc_report_live.json
+New-Item -ItemType Directory -Force .\outputs\proof_pack\DATA_ERRORS | Out-Null
+python option_chain_automation_master.py --sim --refresh 5 --duration 2 --scenario DATA_ERRORS
+if ($LASTEXITCODE -ne 0) {
+    Stop-Transcript
+    throw "DATA_ERRORS simulation failed"
+}
+powershell -ExecutionPolicy Bypass -File scripts\print_proof.ps1 | Out-Null
+Copy-Item -Force outputs\health.json,outputs\top_trade_signal.json,outputs\qc_report_live.json,outputs\chain_raw_live.csv,outputs\underlying_rank_live.csv outputs\proof_pack\DATA_ERRORS\ -ErrorAction SilentlyContinue
+Write-Host "[OK] DATA_ERRORS simulation complete"
+Write-Host ""
+
+# Copy transcript
+Write-Host "[STEP 7] Copying transcript..."
+Copy-Item -Force $transcriptPath .\outputs\proof_pack\latest_transcript.txt -ErrorAction SilentlyContinue
+Write-Host "[OK] Transcript copied"
+Write-Host ""
+
+# Stop transcript
+Stop-Transcript
+
+# Verify proof pack
+Write-Host "[STEP 8] Verifying proof pack..."
+powershell -ExecutionPolicy Bypass -File scripts\verify_proof_pack.ps1
+$verifyExitCode = $LASTEXITCODE
+if ($verifyExitCode -ne 0) {
+    Write-Host "[FAIL] Proof pack verification failed"
+    throw "Proof pack verification failed"
+}
+Write-Host "[OK] Proof pack verification passed"
+Write-Host ""
+
+Write-Host "================================================================================"
+Write-Host "PROOF VERIFICATION COMPLETE"
+Write-Host "================================================================================"
+Write-Host ""
+Write-Host "Proof pack created in: outputs\proof_pack\"
+Get-ChildItem outputs\proof_pack | Select-Object Name,Length,LastWriteTime | Format-Table -AutoSize
+Write-Host ""

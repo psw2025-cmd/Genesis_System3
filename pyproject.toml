@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+force-exclude = "core[\\\\/]engine[\\\\/]ultra_models_loader\\.py"
+extend-exclude = '''
+(
+  \.git
+  | \.venv
+  | \.pytest_cache
+  | node_modules
+  | tests/auto/system3_generated_tests
+  | desktop_app/dist
+  | dashboard/frontend/dist
+)
+'''
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "*_test.py"]
+testpaths = ["core", "tools", "phases", "dashboard", "tests"]
+addopts = "-q --disable-warnings"
+

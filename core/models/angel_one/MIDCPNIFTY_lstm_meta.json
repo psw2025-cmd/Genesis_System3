@@ -1,0 +1,20 @@
+{
+  "underlying": "MIDCPNIFTY",
+  "training_date": "2026-02-23T17:47:10.834392",
+  "model_version": "lstm_v1",
+  "model_type": "LSTM",
+  "shadow_model": true,
+  "training_data_source": "phase_221_forward_returns",
+  "train_rows": 362,
+  "test_rows": 91,
+  "sequence_length": 20,
+  "feature_count": 10,
+  "accuracy": 0.37362637362637363,
+  "validation_split": 0.2,
+  "epochs": 10,
+  "online_learning_count": 1,
+  "last_burst_timestamp": "2026-02-23T23:17:18.467401",
+  "last_burst_samples": 370,
+  "last_burst_loss": 0.6830276089409988,
+  "last_row_processed": 2415
+}

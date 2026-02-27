@@ -1,0 +1,76 @@
+@echo off
+echo ======================================================================
+echo STARTING FULL SYSTEM - AUTOMATIC MODE
+echo ======================================================================
+echo.
+
+cd /d "%~dp0"
+
+echo [1] Stopping all existing processes...
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *uvicorn*" 2>nul
+taskkill /F /IM python.exe /FI "WINDOWTITLE eq *backend*" 2>nul
+taskkill /F /IM node.exe /FI "WINDOWTITLE eq *vite*" 2>nul
+taskkill /F /IM node.exe /FI "WINDOWTITLE eq *frontend*" 2>nul
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING"') do (
+    taskkill /F /PID %%a >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000.*LISTENING"') do (
+    taskkill /F /PID %%a >nul 2>&1
+)
+timeout /t 2 /nobreak >nul
+echo    ✅ All processes stopped
+
+echo [2] Installing/verifying dependencies...
+python -m pip install uvicorn[standard] fastapi --quiet >nul 2>&1
+echo    ✅ Dependencies ready
+
+echo [3] Starting backend...
+cd dashboard\backend
+start "Dashboard Backend" cmd /k "title Dashboard Backend && echo Starting Backend... && python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload"
+timeout /t 8 /nobreak >nul
+
+echo [4] Verifying backend...
+cd ..\..
+timeout /t 5 /nobreak >nul
+curl -s http://localhost:8000/api/health >nul 2>&1
+if %errorlevel% equ 0 (
+    echo    ✅ Backend is running
+) else (
+    echo    ⚠️ Backend may still be starting...
+)
+
+echo [5] Starting frontend...
+cd dashboard\frontend
+if not exist "node_modules" (
+    echo    Installing dependencies (this may take a minute)...
+    call npm install --quiet
+    timeout /t 5 /nobreak >nul
+)
+start "Dashboard Frontend" cmd /k "title Dashboard Frontend && echo Starting Frontend... && npm run dev -- --host 127.0.0.1"
+timeout /t 12 /nobreak >nul
+
+echo [6] Final verification...
+cd ..\..
+timeout /t 5 /nobreak >nul
+curl -s http://localhost:3000 >nul 2>&1
+if %errorlevel% equ 0 (
+    echo    ✅ Frontend is running
+) else (
+    echo    ⚠️ Frontend may still be starting (takes 15-20 seconds)...
+)
+
+echo.
+echo ======================================================================
+echo SYSTEM STARTED
+echo ======================================================================
+echo.
+echo ✅✅✅ OPEN IN GOOGLE CHROME:
+echo.
+echo    http://localhost:3000
+echo.
+echo Backend:  http://localhost:8000
+echo Frontend: http://localhost:3000
+echo.
+echo If dashboard doesn't load, wait 30 seconds and refresh.
+echo.
+pause

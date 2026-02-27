@@ -1,0 +1,108 @@
+{
+  "level1_code_verification": {
+    "angel_pnl_simulator": {
+      "status": "PASSED",
+      "checks": {
+        "has_engine_python": true,
+        "has_on_bad_lines": true,
+        "has_try_except": true,
+        "has_error_handling": true
+      },
+      "issues": []
+    },
+    "angel_trade_decision": {
+      "status": "PASSED",
+      "checks": {
+        "has_engine_python": true,
+        "has_on_bad_lines": true,
+        "has_try_except": true,
+        "has_error_handling": true
+      },
+      "issues": []
+    },
+    "angel_real_data_extractor": {
+      "status": "PASSED",
+      "checks": {
+        "has_engine_python": true,
+        "has_on_bad_lines": true,
+        "has_try_except": true,
+        "has_error_handling": true
+      },
+      "issues": []
+    },
+    "phase222": {
+      "status": "PASSED",
+      "checks": {
+        "has_engine_python": true,
+        "has_on_bad_lines": true,
+        "has_try_except": true,
+        "has_error_handling": true
+      },
+      "issues": []
+    },
+    "phase263": {
+      "status": "PASSED",
+      "checks": {
+        "has_engine_python": true,
+        "has_on_bad_lines": true,
+        "has_try_except": true,
+        "has_error_handling": true
+      },
+      "issues": []
+    }
+  },
+  "level2_functional_tests": {
+    "pnl_simulator": {
+      "status": "PASSED",
+      "signals_rows": 30,
+      "trades_rows": 3
+    },
+    "trade_decision": {
+      "status": "PASSED",
+      "rows": 30
+    },
+    "data_extractor": {
+      "status": "PASSED",
+      "rows": 0
+    }
+  },
+  "level3_integration_tests": {
+    "pnl_simulation": {
+      "status": "PASSED",
+      "trades": 3
+    }
+  },
+  "level4_phase_tests": {
+    "phase_222": {
+      "status": "WARN",
+      "details": "Created 0 EV tables",
+      "errors": []
+    },
+    "phase_225": {
+      "status": "OK",
+      "details": "Reconciled 30 rows, 1 discrepancies found",
+      "errors": []
+    },
+    "phase_263": {
+      "status": "WARN",
+      "details": "Required input files not found",
+      "errors": []
+    }
+  },
+  "level5_error_scan": {
+    "csv_parsing_errors_in_logs": {
+      "status": "FOUND",
+      "files": [
+        "C:\\Genesis_System3\\logs\\2025-12-01.log",
+        "C:\\Genesis_System3\\logs\\live_day_autopilot_20251201.log",
+        "C:\\Genesis_System3\\logs\\live_day_autopilot_20251203.log",
+        "C:\\Genesis_System3\\logs\\system3_autorun_master_20251202.log"
+      ]
+    },
+    "csv_file_check": {
+      "status": "PASSED",
+      "rows": 30,
+      "columns": 72
+    }
+  }
+}

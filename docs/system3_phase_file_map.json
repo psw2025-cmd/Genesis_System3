@@ -1,0 +1,408 @@
+{
+  "phase_10": {
+    "description": "Ultra Shadow Data Engine",
+    "script": "core/engine/ultra_shadow_data_engine.py",
+    "function": "main",
+    "outputs": [
+      "storage/learning_ultra/angel_ultra_shadow_master.parquet",
+      "storage/learning_ultra/angel_ultra_shadow_master.csv"
+    ],
+    "logs": []
+  },
+  "phase_11": {
+    "description": "Ultra Feature Expander",
+    "script": "core/engine/ultra_feature_engineering.py",
+    "function": "main",
+    "outputs": [
+      "storage/training/angel_ultra_training.parquet",
+      "storage/training/angel_ultra_training.csv"
+    ],
+    "logs": []
+  },
+  "phase_12": {
+    "description": "Train Ultra Shadow Models",
+    "script": "core/engine/ultra_train_models.py",
+    "function": "main",
+    "outputs": [
+      "core/models/angel_one_ultra/*.pkl",
+      "core/models/angel_one_ultra/*_meta.json"
+    ],
+    "logs": []
+  },
+  "phase_13": {
+    "description": "Ultra Hyperparameter Explorer",
+    "script": "core/engine/ultra_hparam_explorer.py",
+    "function": "main",
+    "outputs": [
+      "storage/reports_ultra/ultra_hparam_results_{underlying}.csv"
+    ],
+    "logs": []
+  },
+  "phase_14": {
+    "description": "Ultra Risk Regime Classifier",
+    "script": "core/engine/ultra_regime_classifier.py",
+    "function": "main",
+    "outputs": [
+      "storage/training/angel_ultra_training_with_regime.parquet",
+      "storage/reports_ultra/ultra_regime_summary.csv"
+    ],
+    "logs": []
+  },
+  "phase_15": {
+    "description": "Ultra Multi-Consensus Analyzer",
+    "script": "core/engine/ultra_multi_consensus.py",
+    "function": "main",
+    "outputs": [
+      "storage/reports_ultra/ultra_consensus_sample.csv"
+    ],
+    "logs": []
+  },
+  "phase_16": {
+    "description": "Ultra Threshold Lab",
+    "script": "core/engine/ultra_threshold_lab.py",
+    "function": "main",
+    "outputs": [
+      "storage/reports_ultra/ultra_threshold_grid_search.csv"
+    ],
+    "logs": []
+  },
+  "phase_17": {
+    "description": "Ultra Live Signals (Shadow)",
+    "script": "core/engine/ultra_live_signals_shadow.py",
+    "function": "main",
+    "outputs": [
+      "storage/ultra/angel_ultra_live_shadow_signals.csv"
+    ],
+    "logs": []
+  },
+  "phase_18": {
+    "description": "Ultra Trade Simulator",
+    "script": "core/engine/ultra_trade_simulator.py",
+    "function": "main",
+    "outputs": [
+      "storage/ultra/angel_ultra_trade_plan_sim.csv",
+      "storage/ultra/angel_ultra_pnl_sim.csv",
+      "storage/reports_ultra/ultra_trade_sim_summary.csv"
+    ],
+    "logs": []
+  },
+  "phase_19": {
+    "description": "Ultra PnL Analyzer",
+    "script": "core/engine/ultra_pnl_analyzer.py",
+    "function": "main",
+    "outputs": [
+      "storage/reports_ultra/ultra_pnl_report.csv"
+    ],
+    "logs": []
+  },
+  "phase_20": {
+    "description": "Ultra Promotion Manager",
+    "script": "core/engine/ultra_promotion_manager.py",
+    "function": "main",
+    "outputs": [
+      "storage/reports_ultra/ultra_promotion_report.json"
+    ],
+    "logs": []
+  },
+  "phase_21": {
+    "description": "Adaptive Risk Engine (ARE)",
+    "script": "core/ultra/phase21_adaptive_risk_engine.py",
+    "function": "run_phase21_adaptive_risk",
+    "outputs": [
+      "storage/reports_ultra/phase21_risk_evaluations.csv"
+    ],
+    "logs": []
+  },
+  "phase_22": {
+    "description": "Dynamic Position Sizing Engine",
+    "script": "core/ultra/phase22_position_sizing.py",
+    "function": "run_phase22_position_sizing",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_23": {
+    "description": "Volatility Regime Impact Engine",
+    "script": "core/ultra/phase23_volatility_impact.py",
+    "function": "run_phase23_volatility_impact",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_24": {
+    "description": "Confidence Drift Analyzer",
+    "script": "core/ultra/phase24_confidence_drift.py",
+    "function": "run_phase24_confidence_drift",
+    "outputs": [
+      "storage/reports_ultra/phase24_confidence_drift_report.json"
+    ],
+    "logs": []
+  },
+  "phase_25": {
+    "description": "Adaptive Stoploss Engine (ASE)",
+    "script": "core/ultra/phase25_stoploss_engine.py",
+    "function": "run_phase25_stoploss_engine",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_26": {
+    "description": "Adaptive Target Engine (ATE)",
+    "script": "core/ultra/phase26_target_engine.py",
+    "function": "run_phase26_target_engine",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_27": {
+    "description": "Risk-Reward Balancer",
+    "script": "core/ultra/phase27_rr_balancer.py",
+    "function": "run_phase27_rr_balancer",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_28": {
+    "description": "Failure-Mode Auto-Corrector",
+    "script": "core/ultra/phase28_auto_corrector.py",
+    "function": "run_phase28_auto_corrector",
+    "outputs": [
+      "storage/reports_ultra/phase28_auto_correction_report.json"
+    ],
+    "logs": []
+  },
+  "phase_29": {
+    "description": "Sensitivity Analyzer",
+    "script": "core/ultra/phase29_sensitivity.py",
+    "function": "run_phase29_sensitivity",
+    "outputs": [
+      "storage/reports_ultra/phase29_sensitivity_analysis.csv",
+      "storage/reports_ultra/phase29_sensitivity_summary.json"
+    ],
+    "logs": []
+  },
+  "phase_30": {
+    "description": "Real-Time Calibration Engine (RTCE)",
+    "script": "core/ultra/phase30_calibration_engine.py",
+    "function": "run_phase30_calibration",
+    "outputs": [
+      "storage/reports_ultra/phase30_calibration_results.csv"
+    ],
+    "logs": []
+  },
+  "phase_31": {
+    "description": "Ultra Decision Fusion Layer",
+    "script": "core/engine/system3_phase31_ultra_fusion.py",
+    "function": "run_phase31_fusion",
+    "outputs": [
+      "storage/ultra/phase31_ultra_fused_decisions.csv",
+      "storage/ultra/phase31_ultra_fused_decisions_summary.json"
+    ],
+    "logs": []
+  },
+  "phase_32": {
+    "description": "Ultra vs Baseline Comparator",
+    "script": "core/engine/system3_phase32_ultra_vs_baseline.py",
+    "function": "run_phase32_comparison",
+    "outputs": [
+      "storage/ultra/phase32_ultra_vs_baseline_comparison.csv",
+      "storage/ultra/phase32_ultra_vs_baseline_summary.md"
+    ],
+    "logs": []
+  },
+  "phase_33": {
+    "description": "Ultra Promotion Planner",
+    "script": "core/engine/system3_phase33_promotion_planner.py",
+    "function": "run_phase33_promotion_planner",
+    "outputs": [
+      "storage/ultra/phase33_promotion_plan.json",
+      "storage/ultra/phase33_promotion_plan.md"
+    ],
+    "logs": []
+  },
+  "phase_34": {
+    "description": "Ultra Live Shadow Comparison",
+    "script": "core/engine/system3_phase34_ultra_shadow_exec.py",
+    "function": "run_phase34_shadow_once",
+    "outputs": [
+      "storage/live/angel_index_ai_ultra_trades_shadow.csv"
+    ],
+    "logs": []
+  },
+  "phase_35": {
+    "description": "Ultra Decision Auditor",
+    "script": "core/engine/system3_phase35_ultra_auditor.py",
+    "function": "run_phase35_audit",
+    "outputs": [
+      "storage/ultra/phase35_decision_audit.csv",
+      "storage/ultra/phase35_decision_audit_report.md"
+    ],
+    "logs": []
+  },
+  "phase_36": {
+    "description": "Ultra Continuous Learning Cycle (CULL)",
+    "script": "core/engine/system3_phase36_cull_orchestrator.py",
+    "function": "run_phase36_cull_full_cycle",
+    "outputs": [
+      "storage/ultra/phase36_cull_execution_log.md"
+    ],
+    "logs": []
+  },
+  "phase_37": {
+    "description": "Ultra Policy & Risk Monitor",
+    "script": "core/engine/system3_phase37_policy_risk_monitor.py",
+    "function": "run_phase37_policy_risk_dashboard",
+    "outputs": [
+      "storage/ultra/phase37_policy_risk_dashboard.md"
+    ],
+    "logs": []
+  },
+  "phase_38": {
+    "description": "Ultra Governance Summary",
+    "script": "core/engine/system3_phase38_governance_summary.py",
+    "function": "run_phase38_governance_summary",
+    "outputs": [
+      "storage/ultra/phase38_governance_summary.md"
+    ],
+    "logs": []
+  },
+  "phase_39": {
+    "description": "Ultra Shadow Campaign Manager",
+    "script": "core/engine/system3_phase39_shadow_campaign.py",
+    "function": "run_phase39_shadow_campaign",
+    "outputs": [
+      "storage/live/angel_index_ai_ultra_trades_shadow.csv"
+    ],
+    "logs": [
+      "storage/logs_ultra/system3_phases_39_45.log"
+    ]
+  },
+  "phase_40": {
+    "description": "Weekly Ultra vs Baseline Governance Pack",
+    "script": "core/engine/system3_phase40_weekly_governance_pack.py",
+    "function": "run_phase40_weekly_pack",
+    "outputs": [
+      "storage/ultra/weekly_governance_pack_*.md"
+    ],
+    "logs": []
+  },
+  "phase_41": {
+    "description": "Ultra Promotion Execution Framework",
+    "script": "core/engine/system3_phase41_promotion_executor.py",
+    "function": "run_phase41_promotion_executor",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_42": {
+    "description": "Model Snapshot & Rollback Manager",
+    "script": "core/engine/system3_phase42_snapshot_manager.py",
+    "function": "run_phase42_snapshot_create",
+    "outputs": [
+      "storage/snapshots/YYYYMMDD_HHMMSS/"
+    ],
+    "logs": []
+  },
+  "phase_43": {
+    "description": "Environment & Broker Guard",
+    "script": "core/engine/system3_phase43_env_guard.py",
+    "function": "run_phase43_env_guard",
+    "outputs": [],
+    "logs": []
+  },
+  "phase_46": {
+    "description": "Ultra Meta Fusion Model",
+    "script": "core/ultra/phase46_meta_fusion.py",
+    "function": "run_phase46_meta_fusion",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase46_meta_fusion_predictions.csv",
+      "storage/ultra/ph46_ph55/phase46_meta_fusion_weights.json"
+    ],
+    "logs": []
+  },
+  "phase_47": {
+    "description": "7D Confidence Vector Engine",
+    "script": "core/ultra/phase47_confidence_vector.py",
+    "function": "run_phase47_confidence_vector",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase47_confidence_vector_7d.csv",
+      "storage/ultra/ph46_ph55/phase47_confidence_trends.json"
+    ],
+    "logs": []
+  },
+  "phase_48": {
+    "description": "Real Market Error Scanner",
+    "script": "core/ultra/phase48_error_scanner.py",
+    "function": "run_phase48_error_scanner",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase48_error_scan_report.csv",
+      "storage/ultra/ph46_ph55/phase48_error_patterns.json"
+    ],
+    "logs": []
+  },
+  "phase_49": {
+    "description": "Smart Risk Regulator (AI Suggestions Only)",
+    "script": "core/ultra/phase49_risk_regulator.py",
+    "function": "run_phase49_risk_regulator",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase49_risk_suggestions.json",
+      "storage/ultra/ph46_ph55/phase49_risk_analysis.md"
+    ],
+    "logs": []
+  },
+  "phase_50": {
+    "description": "Ultra Prediction Explainer",
+    "script": "core/ultra/phase50_prediction_explainer.py",
+    "function": "run_phase50_prediction_explainer",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase50_prediction_explanations.csv",
+      "storage/ultra/ph46_ph55/phase50_feature_importance.json"
+    ],
+    "logs": []
+  },
+  "phase_51": {
+    "description": "Real-Time Probability Engine",
+    "script": "core/ultra/phase51_probability_engine.py",
+    "function": "run_phase51_probability_engine",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase51_probability_distributions.csv",
+      "storage/ultra/ph46_ph55/phase51_probability_forecasts.json"
+    ],
+    "logs": []
+  },
+  "phase_52": {
+    "description": "Multi-Broker Abstraction (Shadow-Only)",
+    "script": "core/ultra/phase52_multi_broker.py",
+    "function": "run_phase52_multi_broker",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase52_broker_abstraction_test.json",
+      "storage/ultra/ph46_ph55/phase52_broker_compatibility.md"
+    ],
+    "logs": []
+  },
+  "phase_53": {
+    "description": "Ultra Monitoring AI Agent",
+    "script": "core/ultra/phase53_monitoring_agent.py",
+    "function": "run_phase53_monitoring_agent",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase53_monitoring_report.md",
+      "storage/ultra/ph46_ph55/phase53_agent_suggestions.json"
+    ],
+    "logs": []
+  },
+  "phase_54": {
+    "description": "Real Outcome Back-Reconstruction",
+    "script": "core/ultra/phase54_back_reconstruction.py",
+    "function": "run_phase54_back_reconstruction",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase54_reconstruction_report.csv",
+      "storage/ultra/ph46_ph55/phase54_what_if_analysis.json"
+    ],
+    "logs": []
+  },
+  "phase_55": {
+    "description": "Ultra Intelligence Dashboard",
+    "script": "core/ultra/phase55_intelligence_dashboard.py",
+    "function": "run_phase55_intelligence_dashboard",
+    "outputs": [
+      "storage/ultra/ph46_ph55/phase55_intelligence_dashboard.md",
+      "storage/ultra/ph46_ph55/phase55_dashboard_data.json"
+    ],
+    "logs": []
+  }
+}
+

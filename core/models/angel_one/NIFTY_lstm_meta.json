@@ -1,0 +1,20 @@
+{
+  "underlying": "NIFTY",
+  "training_date": "2026-02-23T17:47:03.881319",
+  "model_version": "lstm_v1",
+  "model_type": "LSTM",
+  "shadow_model": true,
+  "training_data_source": "phase_221_forward_returns",
+  "train_rows": 337,
+  "test_rows": 85,
+  "sequence_length": 20,
+  "feature_count": 10,
+  "accuracy": 0.8,
+  "validation_split": 0.2,
+  "epochs": 10,
+  "online_learning_count": 1,
+  "last_burst_timestamp": "2026-02-23T23:17:14.841054",
+  "last_burst_samples": 422,
+  "last_burst_loss": 0.5151018389949092,
+  "last_row_processed": 2415
+}

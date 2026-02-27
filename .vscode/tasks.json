@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open Streamlit Dashboard (in default browser)",
+      "type": "shell",
+      "command": "start",
+      "args": ["http://127.0.0.1:8501"],
+      "windows": { "command": "start", "args": ["http://127.0.0.1:8501"] },
+      "osx": { "command": "open", "args": ["http://127.0.0.1:8501"] },
+      "linux": { "command": "xdg-open", "args": ["http://127.0.0.1:8501"] },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Open Backend API Docs (in default browser)",
+      "type": "shell",
+      "command": "start",
+      "args": ["http://127.0.0.1:8000/docs"],
+      "windows": { "command": "start", "args": ["http://127.0.0.1:8000/docs"] },
+      "osx": { "command": "open", "args": ["http://127.0.0.1:8000/docs"] },
+      "linux": { "command": "xdg-open", "args": ["http://127.0.0.1:8000/docs"] },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Open all live URLs (Streamlit + API docs)",
+      "dependsOn": ["Open Streamlit Dashboard (in default browser)", "Open Backend API Docs (in default browser)"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

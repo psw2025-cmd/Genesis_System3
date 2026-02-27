@@ -1,0 +1,69 @@
+{
+  "name": "system3-ultra-desktop",
+  "version": "1.0.0",
+  "description": "System3 Ultra Dashboard - Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "dev": "electron . --dev",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.system3.ultra",
+    "productName": "System3 Ultra",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "sign": null,
+      "verifyUpdateCodeSignature": false,
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false,
+      "allowElevation": true
+    },
+    "files": [
+      "main.js",
+      "preload.js"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "extraResources": [
+      {
+        "from": "../dashboard/backend",
+        "to": "backend",
+        "filter": ["**/*", "!**/__pycache__", "!**/*.pyc", "!**/desktop.ini"]
+      },
+      {
+        "from": "../dashboard/frontend/dist",
+        "to": "frontend",
+        "filter": ["**/*", "!**/desktop.ini"]
+      },
+      {
+        "from": "../agent_memory",
+        "to": "agent_memory",
+        "filter": ["**/*", "!**/desktop.ini"]
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "author": "System3 Ultra",
+  "description": "System3 Ultra Dashboard - Desktop Application"
+}

@@ -1,0 +1,610 @@
+{
+  "total_phases": 297,
+  "syntax_errors": [],
+  "import_errors": [],
+  "naming_errors": [
+    {
+      "file": "system3_phases_331_360_registry.py",
+      "issue": "does_not_match_naming_convention"
+    },
+    {
+      "file": "system3_phases_346_350_hardening_pack.py",
+      "issue": "does_not_match_naming_convention"
+    },
+    {
+      "file": "system3_phases_351_360_safety_automation.py",
+      "issue": "does_not_match_naming_convention"
+    },
+    {
+      "file": "system3_phases_361_380_registry.py",
+      "issue": "does_not_match_naming_convention"
+    }
+  ],
+  "missing_main": [
+    {
+      "file": "system3_phase161_170_analysis_stubs.py",
+      "available_functions": [
+        "create_phase_file"
+      ]
+    },
+    {
+      "file": "system3_phase176_195_infra_stubs.py",
+      "available_functions": [
+        "create_infra_phase_file"
+      ]
+    },
+    {
+      "file": "system3_phase331_signal_integrity.py",
+      "available_functions": [
+        "check_file_integrity",
+        "run_phase331_signal_integrity",
+        "run_phase_331"
+      ]
+    },
+    {
+      "file": "system3_phase332_signal_volume_coverage.py",
+      "available_functions": [
+        "run_phase332_signal_volume_coverage",
+        "run_phase_332"
+      ]
+    },
+    {
+      "file": "system3_phase333_signal_consistency.py",
+      "available_functions": [
+        "run_phase333_signal_consistency",
+        "run_phase_333"
+      ]
+    },
+    {
+      "file": "system3_phase334_model_drift_snapshot.py",
+      "available_functions": [
+        "compute_hit_rate",
+        "run_phase334_model_drift_snapshot",
+        "run_phase_334"
+      ]
+    },
+    {
+      "file": "system3_phase335_model_drift_analyzer.py",
+      "available_functions": [
+        "run_phase335_model_drift_analyzer",
+        "run_phase_335"
+      ]
+    },
+    {
+      "file": "system3_phase336_safe_mode_suggestor.py",
+      "available_functions": [
+        "run_phase336_safe_mode_suggestor",
+        "run_phase_336"
+      ]
+    },
+    {
+      "file": "system3_phase337_forward_return_quality_tracker.py",
+      "available_functions": [
+        "run_phase337_forward_return_quality_tracker",
+        "run_phase_337"
+      ]
+    },
+    {
+      "file": "system3_phase338_signal_outcome_correlation.py",
+      "available_functions": [
+        "run_phase338_signal_outcome_correlation",
+        "run_phase_338"
+      ]
+    },
+    {
+      "file": "system3_phase339_daily_signal_pipeline_summary.py",
+      "available_functions": [
+        "load_diagnostic_file",
+        "run_phase339_daily_signal_pipeline_summary",
+        "run_phase_339"
+      ]
+    },
+    {
+      "file": "system3_phase340_signal_pipeline_regression_guard.py",
+      "available_functions": [
+        "_read_live_flag",
+        "run_phase340_signal_pipeline_regression_guard",
+        "run_phase_340"
+      ]
+    },
+    {
+      "file": "system3_phase341_model_drift_detector_v2.py",
+      "available_functions": [
+        "compute_kl_divergence",
+        "compute_drift_score",
+        "run_phase_341_model_drift_detector_v2"
+      ]
+    },
+    {
+      "file": "system3_phase342_live_performance_estimator.py",
+      "available_functions": [
+        "run_phase_342_live_performance_estimator"
+      ]
+    },
+    {
+      "file": "system3_phase343_signals_freshness_enforcer.py",
+      "available_functions": [
+        "run_phase_343_signals_freshness_enforcer"
+      ]
+    },
+    {
+      "file": "system3_phase344_pipeline_schema_guard.py",
+      "available_functions": [
+        "run_phase_344_pipeline_schema_guard"
+      ]
+    },
+    {
+      "file": "system3_phase345_warn_root_cause_tracker.py",
+      "available_functions": [
+        "run_phase_345_warn_root_cause_tracker"
+      ]
+    },
+    {
+      "file": "system3_phases_331_360_registry.py",
+      "available_functions": [
+        "load_phase_callables",
+        "get_phase_callable",
+        "get_phases_by_mode",
+        "get_phases_by_category"
+      ]
+    },
+    {
+      "file": "system3_phases_346_350_hardening_pack.py",
+      "available_functions": [
+        "run_phase_346_live_data_integrity_checker",
+        "run_phase_347_historical_cache_sanity",
+        "run_phase_348_virtual_orders_guard",
+        "run_phase_349_phase_dependency_guard",
+        "run_phase_350_warn_task_converter"
+      ]
+    },
+    {
+      "file": "system3_phases_351_360_safety_automation.py",
+      "available_functions": [
+        "run_phase_351_trading_mode_audit",
+        "run_phase_352_risk_limits_snapshot",
+        "run_phase_353_broker_connectivity_monitor",
+        "run_phase_354_virtual_fill_realism_checker",
+        "run_phase_355_paper_trading_audit_trail"
+      ]
+    },
+    {
+      "file": "system3_phases_361_380_registry.py",
+      "available_functions": [
+        "load_phase_callables",
+        "get_phase_callable",
+        "get_phases_by_mode",
+        "get_phases_by_category",
+        "get_phase_info"
+      ]
+    }
+  ],
+  "duplicate_phases": [],
+  "dependency_issues": [],
+  "phase_gaps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    231,
+    232,
+    233,
+    234,
+    235,
+    236,
+    237,
+    238,
+    239,
+    240,
+    241,
+    242,
+    243,
+    244,
+    245,
+    246,
+    247,
+    248,
+    256,
+    257,
+    258,
+    259,
+    260,
+    346,
+    347,
+    348,
+    349,
+    350,
+    351,
+    352,
+    353,
+    354,
+    355,
+    356,
+    357,
+    358,
+    359,
+    360
+  ],
+  "coverage": {
+    "phases_with_files": [
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      300,
+      301,
+      302,
+      303,
+      304,
+      305,
+      306,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319,
+      320,
+      321,
+      322,
+      323,
+      324,
+      325,
+      326,
+      327,
+      328,
+      329,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      340,
+      341,
+      342,
+      343,
+      344,
+      345,
+      361,
+      362,
+      363,
+      364,
+      365,
+      366,
+      367,
+      368,
+      369,
+      370,
+      371,
+      372,
+      373,
+      374,
+      375,
+      376,
+      377,
+      378,
+      379,
+      380
+    ],
+    "total_present": 280,
+    "total_expected": 380,
+    "coverage_percentage": 73.7
+  },
+  "registries": {
+    "system3_phase207_hotfix_registry.py": {
+      "functions": [
+        "run_phase207",
+        "main"
+      ],
+      "count": 2
+    },
+    "system3_phase312_phase_registry_self_check.py": {
+      "functions": [
+        "load_registry",
+        "find_phase_implementations",
+        "check_phase_callable",
+        "run_phase312"
+      ],
+      "count": 4
+    },
+    "system3_phases_331_360_registry.py": {
+      "functions": [
+        "load_phase_callables",
+        "get_phase_callable",
+        "get_phases_by_mode",
+        "get_phases_by_category"
+      ],
+      "count": 4
+    },
+    "system3_phases_361_380_registry.py": {
+      "functions": [
+        "load_phase_callables",
+        "get_phase_callable",
+        "get_phases_by_mode",
+        "get_phases_by_category",
+        "get_phase_info"
+      ],
+      "count": 5
+    }
+  }
+}

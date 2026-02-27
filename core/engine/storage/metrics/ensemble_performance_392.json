@@ -1,0 +1,19 @@
+{
+  "status": "ok",
+  "phase": 392,
+  "timestamp": "2025-12-09T21:00:26.640412",
+  "test_samples": 10,
+  "ensemble_methods": {
+    "weighted_average": 10
+  },
+  "avg_score": -0.036108554702387496,
+  "score_std": 0.2169671287372648,
+  "score_range": [
+    -0.3,
+    0.24817327324968294
+  ],
+  "models_available": {
+    "ultra": 0,
+    "xgboost": 0
+  }
+}

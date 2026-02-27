@@ -1,0 +1,40 @@
+# Code formatting & linting
+black==24.3.0        # patched from 24.2.0
+flake8==7.0.0
+isort==5.13.2
+
+# Testing frameworks
+pytest==8.0.2
+pytest-cov==4.1.0
+responses==0.23.3
+
+# Type checking
+mypy==1.8.0
+types-requests==2.31.0.20240218
+
+# Security scanning
+bandit==1.7.9
+safety==3.7.0        # ensure latest vulnerability coverage
+pip-audit==2.7.3     # keep for automated audit
+
+# Browser automation (agent dashboard verification – Playwright)
+playwright==1.49.0   # run: playwright install chromium
+
+# Packaging helpers (keep compatible with streamlit<24 requirement)
+packaging==23.2
+setuptools==78.1.1   # patched from 69.2.0
+wheel==0.45.1        # 0.46.x requires packaging>=24; streamlit needs packaging<24
+
+# Data quality enforcement
+great-expectations==0.18.19
+
+# Pre-commit automation
+pre-commit==3.6.0
+
+# Documentation automation
+sphinx==7.2.6
+mkdocs==1.5.3
+
+# Editor integration
+jupyterlab==4.4.8    # patched from 4.1.2
+ipython==8.21.0
