@@ -7,6 +7,10 @@ node_modules/
 # Python virtual environments
 .venv/
 
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+
 # Generated state snapshots and runtime outputs (not source)
 outputs/
 
