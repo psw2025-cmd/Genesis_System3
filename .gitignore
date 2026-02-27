@@ -1,0 +1,10 @@
+
+
+# Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+
+# Node modules
+node_modules
+
+# Python virtual environments
+.venv/
