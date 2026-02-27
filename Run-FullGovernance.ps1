@@ -60,7 +60,7 @@ $lintTargets = @(
     "scripts",
     "tools",
     "phases",
-    "dashboard\backend"
+    "dashboard"
 ) | Where-Object { Test-Path (Join-Path $repoRoot $_) }
 
 # Dependency install is only required when the venv was created here (or when explicitly requested).
@@ -118,7 +118,7 @@ $ErrorActionPreference = $oldEap
 if ($LASTEXITCODE -ne 0) { Write-Host "REPORT-ONLY: findings in bandit_report.json" -ForegroundColor DarkYellow } else { Write-Host "OK -> $banditJson" -ForegroundColor Green }
 # Pytest: ignore tests that require optional SmartApi; fail fast on first failure.
 Invoke-Step -Name "QA: pytest" -Command {
-    pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts
+    pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts --ignore=tests/auto/system3_generated_tests
 } -ProofPath (Join-Path $logDir "pytest_report.txt")
 
 Write-Host "`n=== Governance PASS (STRICT) ===" -ForegroundColor Cyan

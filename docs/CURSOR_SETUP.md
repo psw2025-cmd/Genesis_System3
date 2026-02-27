@@ -14,6 +14,22 @@
 
 These are usually **on by default**. If the agent cannot run commands or edit files, verify these in Cursor.
 
+### How to enable Cursor terminal/file permissions
+
+1. Open **Cursor**.
+2. Press `Ctrl+Shift+J` (or **File → Preferences → Settings**).
+3. In the search box, type **agent** or **terminal**.
+4. Find **Features → Agent** (or **Cursor → Agent**).
+5. Ensure these are **enabled**:
+   - **Allow agent to run terminal commands**
+   - **Allow agent to edit files**
+6. If you use the JSON settings, add or verify:
+   ```json
+   "cursor.agent.allowTerminalCommands": true,
+   "cursor.agent.allowFileEdits": true
+   ```
+7. Restart Cursor if you changed anything.
+
 ---
 
 ## 2. Project Environment
@@ -26,7 +42,35 @@ These are usually **on by default**. If the agent cannot run commands or edit fi
 | **Activate (cmd)** | `call .venv\Scripts\activate.bat` |
 | **Direct run (no activate)** | `.venv\Scripts\python.exe -m pytest ...` |
 
-**Note:** Many legacy `.bat` files reference `venv`. The project standard is `.venv`. Run `Run-All.bat` to create `.venv`. For scripts that use `venv`, either update them to `.venv` or create a symlink: `mklink /D venv .venv` (admin cmd).
+**Note:** Many legacy `.bat` files reference `venv`. The project standard is `.venv`. See below for how to fix this if you run those `.bat` files manually.
+
+### How to fix venv vs .venv (for legacy .bat files)
+
+**When to do this:** Only if you run `.bat` files like `DIAGNOSE_AND_RUN.bat`, `START_PRODUCTION.bat`, `run_trading_engine.bat`, etc., and they fail with "venv not found".
+
+**Option A – Create a symlink (recommended, one command)**
+
+1. Open **Command Prompt as Administrator** (right‑click Start → Command Prompt (Admin) or Windows Terminal (Admin)).
+2. Go to the project root:
+   ```cmd
+   cd C:\Genesis_System3
+   ```
+3. Create a directory symlink so `venv` points to `.venv`:
+   ```cmd
+   mklink /D venv .venv
+   ```
+4. Confirm: `dir venv` should show the same contents as `.venv`.
+5. Legacy `.bat` files that use `venv` will now work.
+
+**Option B – Ensure .venv exists (no symlink)**
+
+1. Run `Run-All.bat` once to create `.venv` and install dependencies.
+2. Legacy `.bat` files that use `venv` will still fail unless you use Option A or C.
+
+**Option C – Update .bat files to use .venv**
+
+- Replace `venv` with `.venv` in each `.bat` file you use.
+- The agent and `Run-All.bat` already use `.venv`; no change needed for them.
 
 ---
 

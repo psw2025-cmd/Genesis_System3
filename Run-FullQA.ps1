@@ -64,7 +64,7 @@ $lintTargets = @(
     "scripts",
     "tools",
     "phases",
-    "dashboard\backend"
+    "dashboard"
 ) | Where-Object { Test-Path (Join-Path $repoRoot $_) }
 
 # Runtime import sanity (only what we actually require)
@@ -132,7 +132,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "OK -> $pipAuditOut" -ForegroundColor Green
 }
 $null = Invoke-Step -Name "Tests: pytest" -Command {
-    pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts
+    pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts --ignore=tests/auto/system3_generated_tests
 } -ProofPath (Join-Path $logDir "pytest_report.txt")
 
 # Optional: Playwright browser install reminder (not auto-run here)

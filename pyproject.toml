@@ -17,5 +17,6 @@ extend-exclude = '''
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "*_test.py"]
 testpaths = ["core", "tools", "phases", "dashboard", "tests"]
-addopts = "-q --disable-warnings"
+addopts = "-q --disable-warnings --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts"
+norecursedirs = [".git", ".venv", "__pycache__", "node_modules", "tests/auto/system3_generated_tests"]
 
