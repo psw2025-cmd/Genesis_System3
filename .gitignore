@@ -16,3 +16,6 @@ outputs/state_snapshots/
 storage/
 tools/logs/
 logs/
+
+# Desktop app build output (large binaries; exceed GitHub limits)
+desktop_app/dist/
