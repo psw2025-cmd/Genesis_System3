@@ -498,23 +498,12 @@ class AngelOneBroker:
     ):
         """
         Fetch option Greeks (delta, gamma, theta, vega, rho, IV) for an option.
-
-        Args:
-            exchange: Exchange code (e.g., 'NFO')
-            tradingsymbol: Trading symbol
-            symboltoken: Symbol token
-            strike_price: Strike price
-            expiry_date: Expiry date (format: DDMMMYYYY or DD-MMM-YYYY)
-            option_type: 'CE' or 'PE'
-
-        Returns:
-            dict with Greeks data in format: {'status': True, 'data': {...}} or None on error
+        Includes rate-limit awareness to prevent flooding logs on 'Access denied'.
         """
         try:
             # Use optionGreek method (correct SmartAPI method)
             if hasattr(self.smart, "optionGreek"):
-                # Extract underlying name from tradingsymbol (e.g., 'NIFTY24FEB2625000CE' -> 'NIFTY')
-                # Try to extract underlying name
+                # Extract underlying name from tradingsymbol
                 underlying_name = None
                 for name in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]:
                     if name in tradingsymbol.upper():
@@ -522,13 +511,11 @@ class AngelOneBroker:
                         break
 
                 if not underlying_name:
-                    # Fallback: try to extract from symbol
                     underlying_name = tradingsymbol.split("2")[0] if "2" in tradingsymbol else tradingsymbol[:5]
 
-                # Normalize expiry date format (try multiple formats)
+                # Normalize expiry date format
                 expiry_normalized = expiry_date.replace("-", "").upper()
                 if len(expiry_normalized) == 8 and expiry_normalized.isdigit():
-                    # DDMMYYYY -> DDMMMYYYY
                     day = expiry_normalized[:2]
                     month = expiry_normalized[2:4]
                     year = expiry_normalized[4:8]
@@ -539,17 +526,27 @@ class AngelOneBroker:
                     except:
                         pass
 
-                # Call optionGreek API with underlying name and expiry
+                # Call optionGreek API
                 params = {"name": underlying_name, "expirydate": expiry_normalized}
-
-                response = self.smart.optionGreek(params)
+                
+                try:
+                    response = self.smart.optionGreek(params)
+                except Exception as api_err:
+                    err_msg = str(api_err).lower()
+                    if "access denied" in err_msg or "exceeding access rate" in err_msg:
+                        # Graceful handling of rate limits
+                        logger.warning(f"Rate limit hit in optionGreek for {underlying_name}. Pausing 1s...")
+                        time.sleep(1)
+                        # Optional: single retry
+                        try:
+                            response = self.smart.optionGreek(params)
+                        except:
+                            return {"status": False, "message": "Rate limited", "data": {}}
+                    else:
+                        raise api_err
 
                 if response and response.get("status"):
-                    # Response contains Greeks for all strikes of this expiry
-                    # Extract data for our specific strike and option type
                     greeks_data = response.get("data", {})
-
-                    # Handle different response structures
                     option_data = None
 
                     # Case 1: Response is a list of option objects
@@ -557,10 +554,8 @@ class AngelOneBroker:
                         strike_key = int(strike_price)
                         for item in greeks_data:
                             if isinstance(item, dict):
-                                # Check if this matches our strike and option type
                                 item_strike = item.get("strikePrice") or item.get("strike")
                                 item_type = item.get("optionType") or item.get("option_type")
-
                                 if item_strike == strike_key or (
                                     isinstance(item_strike, (int, float)) and abs(item_strike - strike_key) < 1
                                 ):
@@ -571,17 +566,12 @@ class AngelOneBroker:
                     # Case 2: Response is a dict organized by strike
                     elif isinstance(greeks_data, dict):
                         strike_key = str(int(strike_price))
-
-                        # Get strike data (may have both CE and PE)
                         strike_data = greeks_data.get(strike_key, {})
-
-                        # Get option type specific data
                         if option_type == "CE":
                             option_data = strike_data.get("CE", {}) or strike_data.get("ce", {}) or strike_data
                         else:
                             option_data = strike_data.get("PE", {}) or strike_data.get("pe", {}) or strike_data
 
-                    # If we found option data, return it
                     if option_data:
                         return {
                             "status": True,
@@ -598,19 +588,17 @@ class AngelOneBroker:
                                 "pVolume": option_data.get("pVolume"),
                             },
                         }
-                    else:
-                        logger.debug(f"Could not find Greeks data for strike {strike_price}, type {option_type}")
-                        return {"status": False, "data": {}}
-                else:
-                    logger.warning(f"optionGreek API returned no data for {underlying_name} {expiry_normalized}")
                     return {"status": False, "data": {}}
+                return {"status": False, "data": {}}
 
-            else:
-                logger.warning("optionGreek method not available in SmartAPI")
-                return None
+            return None
 
         except Exception as e:
-            logger.error(f"getOptionGreek failed for {tradingsymbol}: {e}", exc_info=True)
+            err_str = str(e)
+            if "Access denied" in err_str or "exceeding access rate" in err_str:
+                logger.debug(f"Rate limited in getOptionGreek for {tradingsymbol}")
+            else:
+                logger.error(f"getOptionGreek failed for {tradingsymbol}: {e}")
             return None
 
     def getOptionGreeks(self, name: str, expirydate: str):
@@ -1005,6 +993,7 @@ class AngelOneBroker:
                     print(f"  Processing: {idx}/{total_options} options...", flush=True)
 
                 # Initialize option data dict with instrument master data
+                # All market data fields default to None to prevent KeyErrors downstream
                 opt_data = {
                     "underlying": underlying_name,
                     "exchange": exchange,
@@ -1022,6 +1011,11 @@ class AngelOneBroker:
                     "spot_price": spot_price,
                     "timestamp_ist": timestamp_ist,
                     "timestamp_epoch": timestamp_epoch,
+                    "ltp": None, "open": None, "high": None, "low": None, "close": None,
+                    "volume": None, "oi": None, "change": None, "pChange": None,
+                    "bidPrice": None, "bidQty": None, "offerPrice": None, "offerQty": None,
+                    "pTime": None, "delta": None, "gamma": None, "theta": None, "vega": None,
+                    "rho": None, "iv": None, "pOI": None, "pVolume": None
                 }
 
                 # Use pre-fetched market data instead of individual API call

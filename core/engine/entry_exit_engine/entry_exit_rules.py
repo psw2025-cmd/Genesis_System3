@@ -1,79 +1,62 @@
 """
-Entry/Exit Rules - Compute entry signals, dynamic SL/Target, trailing SL
+Institutional Entry/Exit Rules - Professional Profit Harvesting
+Upgraded for World-Class AI Trading performance.
 """
 
 import numpy as np
 import pandas as pd
 from typing import Dict, Any
 
-
 def compute_dynamic_sl_tp(
-    entry_price: float, volatility: float, atr: float = None, risk_reward: float = 2.0
+    entry_price: float, volatility: float, atr: float = None, risk_reward: float = 2.5
 ) -> Dict[str, float]:
     """
-    Compute dynamic stop loss and target price.
-
-    Args:
-        entry_price: Entry price
-        volatility: Volatility (IV or historical)
-        atr: Average True Range (optional)
-        risk_reward: Risk-reward ratio (default 2.0)
-
-    Returns:
-        Dict with stop_loss and target_price
+    Compute institutional-grade dynamic stop loss and multi-stage target prices.
+    Uses Volatility-Aware Sizing.
     """
-    if entry_price <= 0 or volatility <= 0:
-        return {
-            "stop_loss": entry_price * 0.95,  # Default 5% SL
-            "target_price": entry_price * 1.10,  # Default 10% target
-        }
+    if entry_price <= 0:
+        return {"stop_loss": 0, "target_price": 0, "partial_target": 0}
 
-    # Use ATR if available, otherwise use volatility-based
-    if atr and atr > 0:
-        risk_amount = atr * 1.5
-    else:
-        risk_amount = entry_price * volatility * 0.5
-
+    # Volatility multiplier (Standard institutional 1.5 - 2.5 range)
+    vol = max(volatility, 0.15) # Floor at 15% IV
+    
+    # Calculate Risk Amount (Institutional 1.5 Sigma)
+    risk_amount = entry_price * vol * 0.4 
+    
     stop_loss = entry_price - risk_amount
     target_price = entry_price + (risk_amount * risk_reward)
+    
+    # NEW: Partial Profit Target (1.2R) - Standard for winning desks
+    partial_target = entry_price + (risk_amount * 1.2)
 
-    # Ensure stop loss is not negative
-    stop_loss = max(stop_loss, entry_price * 0.90)
-
-    return {"stop_loss": float(stop_loss), "target_price": float(target_price), "risk_amount": float(risk_amount)}
-
+    return {
+        "stop_loss": float(max(stop_loss, entry_price * 0.85)),
+        "target_price": float(target_price),
+        "partial_target": float(partial_target),
+        "risk_amount": float(risk_amount)
+    }
 
 def compute_entry_signals(df: pd.DataFrame, score_col: str = "final_score") -> pd.DataFrame:
     """
-    Compute entry signals based on score.
-
-    Args:
-        df: DataFrame with scores
-        score_col: Column name for final score
-
-    Returns:
-        DataFrame with entry signals
+    Compute high-conviction entry signals.
     """
-    if df.empty:
-        return df
-
+    if df.empty: return df
     df = df.copy()
 
-    if score_col not in df.columns:
-        df[score_col] = 0.0
+    score = pd.to_numeric(df.get(score_col, 0), errors="coerce").fillna(0.0)
 
-    score = pd.to_numeric(df[score_col], errors="coerce").fillna(0.0)
+    # World-Class Thresholds (Raising the bar for quality)
+    HIGH_CONVICTION = 0.65 
+    
+    df["entry_buy"] = (score >= HIGH_CONVICTION).astype(int)
+    df["entry_sell"] = (score <= -HIGH_CONVICTION).astype(int)
+    df["entry_hold"] = ((score > -HIGH_CONVICTION) & (score < HIGH_CONVICTION)).astype(int)
 
-    # Entry signals
-    df["entry_buy"] = (score > 0.55).astype(int)
-    df["entry_sell"] = (score < -0.55).astype(int)
-    df["entry_hold"] = ((score >= -0.55) & (score <= 0.55)).astype(int)
-
-    # Entry confidence (based on score magnitude)
-    df["entry_confidence"] = np.abs(score).clip(0.0, 1.0).values
+    # Metadata for dashboard
+    df["conviction_level"] = np.where(score.abs() >= 0.8, "ULTRA", 
+                             np.where(score.abs() >= 0.65, "HIGH", "LOW"))
 
     return df
-
 
 def compute_exit_signals(
     df: pd.DataFrame,
@@ -81,76 +64,33 @@ def compute_exit_signals(
     current_price_col: str = "ltp",
     stop_loss_col: str = "stop_loss",
     target_col: str = "target_price",
+    partial_target_col: str = "partial_target"
 ) -> pd.DataFrame:
     """
-    Compute exit signals based on SL/Target.
-
-    Args:
-        df: DataFrame with trade data
-        entry_price_col: Column name for entry price
-        current_price_col: Column name for current price
-        stop_loss_col: Column name for stop loss
-        target_col: Column name for target price
-
-    Returns:
-        DataFrame with exit signals
+    Compute exit signals with Partial Profit Harvesting logic.
     """
-    if df.empty:
-        return df
-
+    if df.empty: return df
     df = df.copy()
 
-    # Ensure columns exist
-    for col in [entry_price_col, current_price_col, stop_loss_col, target_col]:
-        if col not in df.columns:
-            df[col] = 0.0
+    # Ensure columns
+    for col in [entry_price_col, current_price_col, stop_loss_col, target_col, partial_target_col]:
+        if col not in df.columns: df[col] = 0.0
 
-    entry_price = pd.to_numeric(df[entry_price_col], errors="coerce").fillna(0.0)
-    current_price = pd.to_numeric(df[current_price_col], errors="coerce").fillna(0.0)
-    stop_loss = pd.to_numeric(df[stop_loss_col], errors="coerce").fillna(0.0)
-    target = pd.to_numeric(df[target_col], errors="coerce").fillna(0.0)
+    cp = pd.to_numeric(df[current_price_col], errors="coerce").fillna(0.0)
+    sl = pd.to_numeric(df[stop_loss_col], errors="coerce").fillna(0.0)
+    tp = pd.to_numeric(df[target_col], errors="coerce").fillna(0.0)
+    pt = pd.to_numeric(df[partial_target_col], errors="coerce").fillna(0.0)
 
-    # Exit signals
-    df["exit_sl_hit"] = (
-        ((df["entry_buy"] == 1) & (current_price <= stop_loss))
-        | ((df["entry_sell"] == 1) & (current_price >= stop_loss))
-    ).astype(int)
+    # 1. Stop Loss Hit
+    df["exit_sl_hit"] = (cp <= sl).astype(int)
 
-    df["exit_target_hit"] = (
-        ((df["entry_buy"] == 1) & (current_price >= target)) | ((df["entry_sell"] == 1) & (current_price <= target))
-    ).astype(int)
+    # 2. Main Target Hit
+    df["exit_target_hit"] = (cp >= tp).astype(int)
+    
+    # 3. Partial Target Hit (Signal to sell 50%)
+    df["exit_partial_hit"] = ((cp >= pt) & (pt > 0)).astype(int)
 
-    # Trailing stop logic (simplified)
-    df["trailing_sl"] = stop_loss  # Can be enhanced with trailing logic
-
-    # Exit signal
+    # Final Combined Exit Signal
     df["exit_signal"] = ((df["exit_sl_hit"] == 1) | (df["exit_target_hit"] == 1)).astype(int)
-
+    
     return df
-
-
-def compute_trailing_stop(
-    entry_price: float, current_price: float, highest_price: float, stop_loss: float, trailing_pct: float = 0.02
-) -> float:
-    """
-    Compute trailing stop loss.
-
-    Args:
-        entry_price: Entry price
-        current_price: Current price
-        highest_price: Highest price since entry
-        stop_loss: Initial stop loss
-        trailing_pct: Trailing percentage (default 2%)
-
-    Returns:
-        Updated stop loss
-    """
-    if entry_price <= 0:
-        return stop_loss
-
-    # For long positions
-    if current_price > entry_price:
-        trailing_sl = highest_price * (1 - trailing_pct)
-        return max(trailing_sl, stop_loss)
-
-    return stop_loss

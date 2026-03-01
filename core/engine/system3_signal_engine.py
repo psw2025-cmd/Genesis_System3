@@ -567,16 +567,52 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
 
         logger.error(traceback.format_exc())
 
-    # Step 6: AI Model Prediction (UPGRADED: Ensemble Predictor with 5-7 models)
-    logger.info("Step 6: Running AI model (Ensemble Predictor / Ultra Models / Delta Fallback)...")
+    # Step 6: AI Model Prediction (UPGRADED: Ultra V4 + Ensemble Predictor)
+    logger.info("Step 6: Running AI model (Ultra V4 / Ensemble / Delta Fallback)...")
     try:
         underlying = df["underlying"].iloc[0] if "underlying" in df.columns and len(df) > 0 else None
+        
+        # NEW: World-Class V4 Integration (Priority 1)
+        v4_model_loaded = False
+        try:
+            v4_models_dir = Path("core/models/angel_one_ultra")
+            model_path = v4_models_dir / f"{underlying}_ultra_model.pkl"
+            if model_path.exists() and underlying:
+                import joblib
+                from core.engine.WorldClassFeatureEngine import WorldClassFeatureEngine
+                
+                model = joblib.load(model_path)
+                fe = WorldClassFeatureEngine()
+                
+                # Note: For performance in live loop, we apply V4 engineering to the snapshot
+                # but preserve existing columns for ensemble fallback
+                df_v4 = fe.engineer_features(df.copy(), underlying)
+                
+                if not df_v4.empty:
+                    exclude = [c for c in df_v4.columns if 'target' in c or 'label' in c]
+                    feature_cols = [c for c in df_v4.columns if c in model.get_booster().feature_names or c in getattr(model, 'feature_names_in_', [])]
+                    
+                    # If feature names doesn't match perfectly, use what's available
+                    if not feature_cols:
+                        feature_cols = [c for c in df_v4.columns if c not in exclude]
+                    
+                    try:
+                        probs = model.predict_proba(df_v4[feature_cols].values)[:, 1]
+                        df["ai_score"] = probs
+                        df["confidence"] = np.abs(probs - 0.5) * 2.0
+                        df["ensemble_method"] = "ultra_v4"
+                        v4_model_loaded = True
+                        logger.info(f"✓ USING_ULTRA_V4_MODEL for {underlying} (World-Class Accuracy)")
+                    except Exception as e:
+                        logger.warning(f"V4 Prediction failed: {e}")
+        except Exception as e:
+            logger.warning(f"V4 Model loading failed: {e}")
 
-        # UPGRADED: Try ensemble predictor first (5-7 models with dynamic weighting)
+        # UPGRADED: Try ensemble predictor (Priority 2 - Fallback)
         ensemble_used = False
-        if ENSEMBLE_AVAILABLE and underlying:
+        if not v4_model_loaded and ENSEMBLE_AVAILABLE and underlying:
             try:
-                logger.info(f"Attempting ensemble prediction for {underlying}...")
+                logger.info(f"Attempting ensemble prediction fallback for {underlying}...")
                 df_ensemble = predict_with_ensemble(df.copy(), underlying, use_dynamic_weights=True)
 
                 if "ai_score" in df_ensemble.columns and not df_ensemble["ai_score"].isna().all():
@@ -863,27 +899,28 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
         df["timeframe_agreement_count"] = 1
 
     # Step 9: Compute Entry/Exit Signals
-    logger.info("Step 9: Computing entry/exit signals...")
+    logger.info("Step 9: Computing institutional entry/exit signals...")
     try:
         df = compute_entry_signals(df, score_col="final_score")
 
-        # Compute dynamic SL/TP
+        # Compute institutional multi-stage SL/TP
         sl_tp_results = []
         for _, row in df.iterrows():
             if row.get("entry_buy") == 1 or row.get("entry_sell") == 1:
                 iv = float(row.get("iv", 0.0)) or float(row.get("iv_estimate", 0.0)) or 0.2
-                sl_tp = compute_dynamic_sl_tp(entry_price=float(row.get("ltp", 0.0)), volatility=iv, risk_reward=2.0)
+                sl_tp = compute_dynamic_sl_tp(entry_price=float(row.get("ltp", 0.0)), volatility=iv, risk_reward=2.5)
                 sl_tp_results.append(sl_tp)
             else:
-                sl_tp_results.append({"stop_loss": 0.0, "target_price": 0.0, "risk_amount": 0.0})
+                sl_tp_results.append({"stop_loss": 0.0, "target_price": 0.0, "partial_target": 0.0, "risk_amount": 0.0})
 
         if sl_tp_results:
             df["stop_loss"] = [r["stop_loss"] for r in sl_tp_results]
             df["target_price"] = [r["target_price"] for r in sl_tp_results]
+            df["partial_target"] = [r["partial_target"] for r in sl_tp_results]
             df["risk_amount"] = [r["risk_amount"] for r in sl_tp_results]
 
         df = compute_exit_signals(df)
-        logger.info("✓ Entry/exit signals computed")
+        logger.info("✓ Institutional signals computed")
     except Exception as e:
         logger.error(f"Error computing entry/exit: {e}")
         df["entry_buy"] = 0

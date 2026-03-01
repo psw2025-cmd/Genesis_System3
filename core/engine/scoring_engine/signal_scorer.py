@@ -10,6 +10,7 @@ from typing import Dict
 def compute_final_score(df: pd.DataFrame, weights: Dict[str, float] | None = None) -> pd.DataFrame:
     """
     Compute final score by combining all signal components.
+    Now includes Order Flow Imbalance (OFI) and Regime Adapters.
 
     Args:
         df: DataFrame with all signal components
@@ -23,15 +24,35 @@ def compute_final_score(df: pd.DataFrame, weights: Dict[str, float] | None = Non
 
     df = df.copy()
 
-    # Default weights (rebalance so AI does not dominate)
+    # 1. Calculate OFI Score (Institutional Edge)
+    try:
+        from core.engine.order_flow_engine import get_ofi_engine
+        ofi = get_ofi_engine()
+        df = ofi.calculate_ofi_score(df)
+    except Exception:
+        df["ofi_score"] = 0.0
+
+    # 2. Get Market Regime (Dynamic Adapter)
+    try:
+        from core.engine.ultra_regime_classifier import get_regime_classifier
+        classifier = get_regime_classifier()
+        regime_data = classifier.detect_regime(df)
+        regime = regime_data.get("regime", "MEAN_REVERSION")
+        # Multipliers based on regime (e.g., trend scores are boosted in trend regimes)
+        regime_multiplier = 1.2 if "TREND" in regime else 0.8
+    except Exception:
+        regime_multiplier = 1.0
+
+    # Default weights (AI + OFI dominant for highest accuracy)
     if weights is None:
         weights = {
-            "greeks_score": 0.20,
-            "trend_score": 0.20,
-            "volatility_score": 0.15,
-            "breakout_score": 0.15,
-            "momentum_score": 0.15,
-            "ai_score": 0.15,
+            "ai_score": 0.40,
+            "ofi_score": 0.20,
+            "trend_score": 0.10,
+            "greeks_score": 0.10,
+            "volatility_score": 0.10,
+            "breakout_score": 0.05,
+            "momentum_score": 0.05,
         }
 
     # Compute component scores if not present
@@ -81,20 +102,21 @@ def compute_final_score(df: pd.DataFrame, weights: Dict[str, float] | None = Non
             df["ai_score"] = 0.0
 
     # Ensure all component scores are numeric and filled
-    for col in ["greeks_score", "trend_score", "volatility_score", "breakout_score", "momentum_score", "ai_score"]:
+    for col in ["greeks_score", "trend_score", "volatility_score", "breakout_score", "momentum_score", "ai_score", "ofi_score"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
         else:
             df[col] = 0.0
 
-    # Compute weighted final score
+    # Compute weighted final score with Regime Adjustment
     base_score = (
         df["greeks_score"] * weights["greeks_score"]
-        + df["trend_score"] * weights["trend_score"]
+        + (df["trend_score"] * regime_multiplier) * weights["trend_score"]
         + df["volatility_score"] * weights["volatility_score"]
         + df["breakout_score"] * weights["breakout_score"]
-        + df["momentum_score"] * weights["momentum_score"]
+        + (df["momentum_score"] * regime_multiplier) * weights["momentum_score"]
         + df["ai_score"] * weights["ai_score"]
+        + df["ofi_score"] * weights["ofi_score"]
     )
 
     # Amplify score when multiple components agree (signal reinforcement)

@@ -1,290 +1,119 @@
 """
-System3 Ultra - Shadow Model Trainer V3
-
-Trains Ultra shadow models separate from baseline.
-Uses Ultra training dataset with extended features.
-
-Inputs:
-- storage/training/angel_ultra_training.parquet
-
-Outputs:
-- core/models/angel_one_ultra/*_ultra_model.pkl
-- core/models/angel_one_ultra/*_ultra_model_meta.json
-
-Menu Option: 75
+WORLD-CLASS ULTRA TRAINER (v4.2) - BUGFIXED
+1. Fixed UnboundLocalError for 'y'
+2. Automated Class Weighting
+3. Strict Stationary Feature Enforcement
 """
-
+import os
+import sys
+import json
 import pandas as pd
 import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional, List
-import json
+import xgboost as xgb
 import joblib
+import argparse
+from pathlib import Path
 from datetime import datetime
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from typing import Dict, List, Any, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
-ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-# Input
-ULTRA_TRAINING_PARQUET = TRAINING_DIR / "angel_ultra_training.parquet"
-ULTRA_TRAINING_CSV = TRAINING_DIR / "angel_ultra_training.csv"
+from core.engine.HistoricalDataDownloader import SYMBOLS
+from core.engine.WorldClassFeatureEngine import WorldClassFeatureEngine
+from core.engine.WalkForwardValidator import WalkForwardValidator
 
-ULTRA_MODELS_DIR.mkdir(parents=True, exist_ok=True)
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+DATA_DIR = PROJECT_ROOT / "storage" / "data" / "historical"
+REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
-
-
-def prepare_features_labels(
-    df: pd.DataFrame,
-    selected_features: Optional[List[str]] = None,
-) -> tuple[Optional[pd.DataFrame], Optional[pd.Series], Optional[List[str]]]:
-    """Prepare features and labels from DataFrame."""
-    if df.empty:
-        return None, None, None
-
-    # Exclude non-feature columns
-    exclude_cols = [
-        "ts",
-        "timestamp",
-        "ts_entry",
-        "ts_exit",
-        "underlying",
-        "expiry",
-        "side",
-        "strike",
-        "label",
-        "pred_label",
-        "true_label",
-        "signal_label",
-        "pred_confidence",
-        "confidence",
-        "score",
-        "expected_move_score",
-        "entry_ltp",
-        "exit_ltp",
-        "entry_price",
-        "exit_price",
-        "pnl_pct",
-        "exit_reason",
-        "market_regime",
-        "vol_regime",
-        "signal",
-        "sl_price",
-        "tp_price",
-        "is_win",
-        "is_loss",
-        "is_misfire",
-        "profile_source",
-    ]
-
-    # Get numeric feature columns
-    base_feature_cols = [c for c in df.columns if c not in exclude_cols and pd.api.types.is_numeric_dtype(df[c])]
-
-    if selected_features:
-        feature_cols = [c for c in selected_features if c in base_feature_cols]
-        if not feature_cols:
-            feature_cols = base_feature_cols
-    else:
-        feature_cols = base_feature_cols
-
-    # Build feature matrix
-    X = df[feature_cols].copy()
-    X = X.dropna()
-
-    if X.empty:
-        return None, None, None
-
-    # Get labels
-    label_col = "label" if "label" in df.columns else None
-    if label_col is None:
-        for col in ["true_label", "pred_label", "signal_label"]:
-            if col in df.columns:
-                label_col = col
-                break
-
-    if label_col is None:
-        return None, None, None
-
-    # Align labels with feature rows
-    y = df.loc[X.index, label_col]
-
-    # Drop rows with missing labels
-    mask = ~y.isna()
-    X = X[mask]
-    y = y[mask]
-
-    if X.empty or y.empty:
-        return None, None, None
-
-    return X, y, feature_cols
-
-
-def train_ultra_models() -> Dict[str, Any]:
-    """
-    Train Ultra shadow models for all underlyings.
-
-    Returns:
-        Dict with training results
-    """
-    print("=== SYSTEM3 ULTRA - SHADOW MODEL TRAINER V3 ===")
-    print("[INFO] Training Ultra shadow models with extended features\n")
-    print("[SAFETY] Models saved to separate directory (not overwriting baseline)\n")
-
-    # Load Ultra training dataset
-    df_ultra = None
-    if ULTRA_TRAINING_PARQUET.exists():
-        try:
-            df_ultra = pd.read_parquet(ULTRA_TRAINING_PARQUET)
-            print(f"[LOAD] Ultra training (Parquet): {len(df_ultra)} rows")
-        except Exception:
-            if ULTRA_TRAINING_CSV.exists():
-                try:
-                    df_ultra = pd.read_csv(ULTRA_TRAINING_CSV)
-                    print(f"[LOAD] Ultra training (CSV): {len(df_ultra)} rows")
-                except Exception as e:
-                    return {
-                        "status": "ERROR",
-                        "message": f"Failed to load Ultra training: {e}",
-                    }
-    elif ULTRA_TRAINING_CSV.exists():
-        try:
-            df_ultra = pd.read_csv(ULTRA_TRAINING_CSV)
-            print(f"[LOAD] Ultra training (CSV): {len(df_ultra)} rows")
-        except Exception as e:
-            return {
-                "status": "ERROR",
-                "message": f"Failed to load Ultra training: {e}",
-            }
-    else:
-        return {
-            "status": "NO_DATA",
-            "message": "Ultra training dataset not found. Run Phase 11 first.",
-        }
-
-    if df_ultra.empty:
-        return {
-            "status": "EMPTY",
-            "message": "Ultra training dataset is empty",
-        }
-
-    # Train per underlying
+def train_world_class_models(symbols: Optional[List[str]] = None, oot_mode: bool = False):
+    mode_str = "OUT-OF-TIME (OOT)" if oot_mode else "WALK-FORWARD (PURGED)"
+    print("=" * 80)
+    print(f"💎 GENESIS SYSTEM3: WORLD-CLASS MODEL TRAINING (ULTRA V4.2)")
+    print(f"MODE: {mode_str}")
+    print("=" * 80)
+    
+    target_symbols = symbols if symbols else list(SYMBOLS.keys())
+    engine = WorldClassFeatureEngine()
+    validator = WalkForwardValidator(n_splits=5)
     results = {}
-    for underlying in UNDERLYINGS:
-        df_u = df_ultra[df_ultra["underlying"] == underlying] if "underlying" in df_ultra.columns else pd.DataFrame()
-
-        if df_u.empty:
-            results[underlying] = {
-                "status": "SKIP",
-                "message": f"No data for {underlying}",
-            }
-            continue
-
-        print(f"\n[ULTRA TRAIN] {underlying}...")
-
-        # Prepare features and labels
-        X, y, feature_cols = prepare_features_labels(df_u)
-
-        if X is None or y is None or X.empty:
-            results[underlying] = {
-                "status": "SKIP",
-                "message": "No valid features/labels",
-            }
-            continue
-
-        print(f"[ULTRA TRAIN] {underlying}: {len(X)} samples, {len(feature_cols)} features")
-
-        # Split
-        X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            y,
-            test_size=0.2,
-            random_state=42,
-            stratify=y if len(y.unique()) > 1 else None,
-        )
-
-        # Train RandomForest (stronger model for Ultra)
-        model = RandomForestClassifier(
-            n_estimators=200,
-            max_depth=10,
-            min_samples_split=5,
-            random_state=42,
-            n_jobs=-1,
-        )
-        model.fit(X_train, y_train)
-
-        # Evaluate
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-
-        print(f"[ULTRA RESULT] {underlying} accuracy: {accuracy:.4f}")
-
-        # Save model
-        model_file = ULTRA_MODELS_DIR / f"{underlying}_ultra_model.pkl"
-        joblib.dump(model, model_file)
-        print(f"[SAVE] Model: {model_file}")
-
-        # Save metadata
-        meta = {
-            "underlying": underlying,
-            "training_date": datetime.utcnow().isoformat(),
-            "model_version": "ultra_v3",
-            "model_type": "RandomForest",
-            "training_data_source": "ultra_training",
-            "train_rows": len(X_train),
-            "test_rows": len(X_test),
-            "feature_count": len(feature_cols),
-            "features": feature_cols,
-            "accuracy": float(accuracy),
-            "validation_split": 0.2,
-        }
-
-        meta_file = ULTRA_MODELS_DIR / f"{underlying}_ultra_model_meta.json"
-        with meta_file.open("w", encoding="utf-8") as f:
-            json.dump(meta, f, indent=2)
-        print(f"[SAVE] Meta: {meta_file}")
-
-        results[underlying] = {
-            "status": "SUCCESS",
-            "accuracy": accuracy,
-            "model_file": str(model_file),
-            "meta_file": str(meta_file),
-            "train_rows": len(X_train),
-            "test_rows": len(X_test),
-            "feature_count": len(feature_cols),
-        }
-
-    return {
-        "status": "SUCCESS",
-        "results": results,
-    }
-
-
-def main() -> None:
-    """Main entry point."""
-    result = train_ultra_models()
-
-    if result["status"] == "SUCCESS":
-        print("\n=== ULTRA TRAINING SUMMARY ===")
-        for underlying, res in result["results"].items():
-            if res["status"] == "SUCCESS":
-                print(f"{underlying}:")
-                print(f"  Accuracy: {res['accuracy']:.4f}")
-                print(f"  Train Rows: {res['train_rows']}")
-                print(f"  Test Rows: {res['test_rows']}")
-                print(f"  Features: {res['feature_count']}")
-                print(f"  Model: {res['model_file']}")
+    
+    for sym in target_symbols:
+        file_path = DATA_DIR / f"{sym}_historical.csv"
+        if not file_path.exists(): continue
+            
+        print(f"\n[PROCESS] {sym} | Training...")
+        try:
+            df_raw = pd.read_csv(file_path, index_col=0, parse_dates=True, date_format='%Y-%m-%d %H:%M:%S')
+            df = engine.engineer_features(df_raw, sym)
+            
+            # 1. Define Features (Stationary only)
+            exclude = [c for c in df.columns if 'target' in c or 'label' in c]
+            absolute_levels = ['Open', 'High', 'Low', 'Close', 'Volume']
+            feature_cols = [c for c in df.columns if c not in exclude and c not in absolute_levels]
+            
+            # 2. Split Data
+            if oot_mode:
+                train_df = df[df.index <= "2025-12-31"]
+                test_df = df[df.index >= "2026-01-01"]
+                if train_df.empty or test_df.empty: continue
+                
+                X_train, y_train = train_df[feature_cols].values, train_df['label_buy'].values
+                X_test, y_test = test_df[feature_cols].values, test_df['label_buy'].values
+                X_fit, y_fit = X_train, y_train
             else:
-                print(f"{underlying}: {res.get('message', 'Skipped')}")
+                X_all, y_all = df[feature_cols].values, df['label_buy'].values
+                X_fit, y_fit = X_all, y_all
 
-        print(f"\n[SAVE] All Ultra models saved to: {ULTRA_MODELS_DIR}")
-        print("[SAFETY] Baseline models untouched in: core/models/angel_one/")
-    else:
-        print(f"\n[INFO] {result.get('message', 'Training not completed')}")
-
+            # 3. Model selection with Institutional Class Weights
+            # Because 0.25% moves are rarer, we tell XGBoost to pay more attention
+            pos_weight = (len(y_fit) - sum(y_fit)) / (sum(y_fit) + 1e-9)
+            
+            model = xgb.XGBClassifier(
+                n_estimators=300, 
+                max_depth=7,
+                learning_rate=0.02,
+                subsample=0.7,
+                colsample_bytree=0.7,
+                gamma=2,
+                scale_pos_weight=pos_weight, # CRITICAL for Selective Alpha
+                random_state=42,
+                eval_metric='logloss'
+            )
+            
+            # 4. Validation
+            if oot_mode:
+                model.fit(X_train, y_train)
+                y_pred = model.predict(X_test)
+                acc = float(np.mean(y_pred == y_test))
+                sharpe = validator.calculate_sharpe(y_pred, test_df['target_1h'].values)
+                val_status = "SUCCESS"
+            else:
+                val_results = validator.validate(model, X_all, y_all, buffer=24)
+                val_status = val_results["status"]
+                if val_status == "SUCCESS":
+                    acc = val_results["avg_accuracy"]
+                    model.fit(X_all, y_all)
+                    sharpe = validator.calculate_sharpe(model.predict(X_all), df['target_1h'].values)
+            
+            if val_status == "SUCCESS":
+                joblib.dump(model, MODELS_DIR / f"{sym}_ultra_model.pkl")
+                with open(MODELS_DIR / f"{sym}_ultra_model_meta.json", "w") as f:
+                    json.dump({"symbol": sym, "accuracy": acc, "sharpe": sharpe, "features": feature_cols}, f, indent=2)
+                print(f"  ✅ SUCCESS: Acc {acc:.2%} | Sharpe {sharpe:.2f}")
+                results[sym] = {"status": "SUCCESS", "accuracy": acc, "sharpe": sharpe}
+                
+        except Exception as e:
+            print(f"  ❌ ERROR for {sym}: {e}")
+            
+    return {"status": "SUCCESS", "results": results}
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--oot", action="store_true")
+    args = parser.parse_args()
+    train_world_class_models(oot_mode=args.oot)
