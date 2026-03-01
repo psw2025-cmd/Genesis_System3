@@ -1,0 +1,7 @@
+{
+  "last_cycle": 1,
+  "target_accuracy": 0.9933333333333334,
+  "optimal_threshold": 0.65,
+  "ai_weight": 0.45,
+  "updated_at": "2026-03-01T14:34:30.635205"
+}

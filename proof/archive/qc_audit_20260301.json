@@ -1,0 +1,30 @@
+{
+  "critical": 0,
+  "warning": 2,
+  "info": 0,
+  "findings": {
+    "CRITICAL": [],
+    "WARNING": [
+      {
+        "code": "SIG-001",
+        "timestamp": "2026-03-01T09:00:04.176279",
+        "message": "Missing critical columns in signals",
+        "details": "Missing: ['ai_score', 'final_score', 'signal']"
+      },
+      {
+        "code": "SIG-005",
+        "timestamp": "2026-03-01T09:00:04.180177",
+        "message": "Some expected underlyings missing",
+        "details": "Missing: ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']"
+      }
+    ],
+    "INFO": []
+  },
+  "stats": {
+    "signals_total_rows": 30,
+    "signals_columns": 11,
+    "orders_total_rows": 10,
+    "orders_columns": 12,
+    "pnl_total_rows": 3
+  }
+}

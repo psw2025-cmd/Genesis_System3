@@ -1,0 +1,5 @@
+QC audit archive 20260301
+  critical=0 warning=2 info=0
+  source=C:\Genesis_System3\QC_AUDIT_REPORT_DETAILED.json
+  exit_code=0
+  Monitor warnings.
