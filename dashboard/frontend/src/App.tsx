@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, HashRouter, Routes, Route, Link } from 'react-router-dom'
+import { useStateSnapshot } from './hooks/useStateSnapshot'
 import Overview from './components/Overview'
 import ChainAnalytics from './components/ChainAnalytics'
 import Signals from './components/Signals'
@@ -17,6 +18,7 @@ import './App.css'
 
 function App() {
   const [darkMode, setDarkMode] = useState(true)
+  const { version } = useStateSnapshot({ pollInterval: 5000 })
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
@@ -30,7 +32,14 @@ function App() {
       <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
         <nav className={`${darkMode ? 'bg-gray-800' : 'bg-white'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} px-6 py-4`}>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">System3 Ultra Dashboard</h1>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              System3 Ultra Dashboard
+              {version > 0 && (
+                <span className="text-xs font-normal opacity-70" title="SSOT state version">
+                  v{version}
+                </span>
+              )}
+            </h1>
             <div className="flex items-center gap-2 flex-wrap">
               <Link to="/" className="px-3 py-1 hover:underline text-sm">Overview</Link>
               <Link to="/chain" className="px-3 py-1 hover:underline text-sm">Chain</Link>
@@ -46,6 +55,7 @@ function App() {
               <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="px-3 py-1 border rounded text-sm"
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {darkMode ? '☀️' : '🌙'}
               </button>

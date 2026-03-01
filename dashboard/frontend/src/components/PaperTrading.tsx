@@ -142,12 +142,12 @@ export default function PaperTrading() {
                   )
                   await Promise.all(closePromises)
                   
-                  // Refresh data
-                  const [posRes, pnlRes] = await Promise.all([
-                    axios.get(`${API_BASE}/api/positions`),
+                  // Refresh data (positions come from state; refetch state + pnl)
+                  const [stateRes, pnlRes] = await Promise.all([
+                    axios.get(`${API_BASE}/api/state`),
                     axios.get(`${API_BASE}/api/pnl`)
                   ])
-                  setPositions(posRes.data.positions || [])
+                  setState(stateRes.data)
                   setPnl(pnlRes.data)
                   alert('All positions closed successfully')
                 } catch (error) {
@@ -157,6 +157,7 @@ export default function PaperTrading() {
               }
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-bold"
+            aria-label="Close all positions (emergency)"
           >
             Close All (Emergency)
           </button>
@@ -232,11 +233,11 @@ export default function PaperTrading() {
                             try {
                               await axios.post(`${API_BASE}/api/positions/${pos.position_id}/close`)
                               // Refresh data
-                              const [posRes, pnlRes] = await Promise.all([
-                                axios.get(`${API_BASE}/api/positions`),
+                              const [stateRes, pnlRes] = await Promise.all([
+                                axios.get(`${API_BASE}/api/state`),
                                 axios.get(`${API_BASE}/api/pnl`)
                               ])
-                              setPositions(posRes.data.positions || [])
+                              setState(stateRes.data)
                               setPnl(pnlRes.data)
                             } catch (error) {
                               console.error('Error closing position:', error)
@@ -245,6 +246,7 @@ export default function PaperTrading() {
                           }
                         }}
                         className="px-2 py-1 bg-red-600 rounded hover:bg-red-700 text-xs"
+                        aria-label={`Close position ${pos.position_id}`}
                       >
                         Close
                       </button>

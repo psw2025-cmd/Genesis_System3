@@ -14,9 +14,12 @@ export default function AdvancedCharts() {
   const [selectedMetric, setSelectedMetric] = useState('oi')
   const [selectedGreek, setSelectedGreek] = useState('delta')
 
+  const [chartError, setChartError] = useState<string | null>(null)
+
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        setChartError(null)
         const [heatmapRes, ivRes, greeksRes, pcrRes] = await Promise.all([
           axios.get(`${API_BASE}/api/charting/heatmap/${selectedUnderlying}?metric=${selectedMetric}`),
           axios.get(`${API_BASE}/api/charting/iv-surface/${selectedUnderlying}`),
@@ -27,30 +30,31 @@ export default function AdvancedCharts() {
         if (heatmapRes.data.status === 'ok') {
           setHeatmapData(heatmapRes.data.heatmap)
         } else {
-          console.warn('Heatmap status not ok:', heatmapRes.data)
+          setHeatmapData(null)
+          setChartError(heatmapRes.data.message || 'Charting unavailable')
         }
         if (ivRes.data.status === 'ok') {
           setIvSurface(ivRes.data.surface)
         } else {
-          console.warn('IV Surface status not ok:', ivRes.data)
+          setIvSurface(null)
         }
         if (greeksRes.data.status === 'ok') {
           setGreeksData(greeksRes.data.greeks)
         } else {
-          console.warn('Greeks status not ok:', greeksRes.data)
+          setGreeksData(null)
         }
         if (pcrRes.data.status === 'ok') {
           setPcrData(pcrRes.data.pcr)
         } else {
-          console.warn('PCR status not ok:', pcrRes.data)
+          setPcrData(null)
         }
       } catch (error: any) {
         console.error('Error fetching chart data:', error)
-        // Set empty data on error to prevent infinite loading
-        if (!heatmapData) setHeatmapData(null)
-        if (!ivSurface) setIvSurface(null)
-        if (!greeksData) setGreeksData(null)
-        if (!pcrData) setPcrData(null)
+        setChartError(error.response?.data?.message || error.message || 'Failed to load chart data')
+        setHeatmapData(null)
+        setIvSurface(null)
+        setGreeksData(null)
+        setPcrData(null)
       }
     }
 
@@ -62,9 +66,17 @@ export default function AdvancedCharts() {
 
   return (
     <div className="space-y-6">
+      {chartError && (
+        <div className="bg-yellow-900 border border-yellow-600 rounded-lg p-4">
+          <div className="font-bold">Charting Notice</div>
+          <div className="text-sm text-gray-300">{chartError}</div>
+          <div className="text-xs text-gray-400 mt-1">Charts require option chain data. Run the trading system during market hours or ensure chain_raw_live.csv exists.</div>
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold">Advanced Charts</h2>
         <select
+          aria-label="Select underlying index"
           value={selectedUnderlying}
           onChange={(e) => setSelectedUnderlying(e.target.value)}
           className="bg-gray-700 text-white px-4 py-2 rounded"
@@ -80,6 +92,7 @@ export default function AdvancedCharts() {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold">Option Chain Heatmap</h3>
           <select
+            aria-label="Select heatmap metric"
             value={selectedMetric}
             onChange={(e) => setSelectedMetric(e.target.value)}
             className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
@@ -131,8 +144,14 @@ export default function AdvancedCharts() {
                 </div>
               </div>
             )}
-            <p className="text-sm text-green-400 mt-2">✓ Heatmap data loaded successfully</p>
+            {(!heatmapData.heatmap || heatmapData.heatmap.length === 0) ? (
+              <p className="text-sm text-yellow-400 mt-2">No chain data available. Run trading system during market hours.</p>
+            ) : (
+              <p className="text-sm text-green-400 mt-2">✓ Heatmap data loaded successfully</p>
+            )}
           </div>
+        ) : chartError ? (
+          <div className="text-gray-400">{chartError}</div>
         ) : (
           <div className="text-gray-400">Loading heatmap data...</div>
         )}
@@ -169,6 +188,7 @@ export default function AdvancedCharts() {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold">Greeks Chart</h3>
           <select
+            aria-label="Select Greeks metric"
             value={selectedGreek}
             onChange={(e) => setSelectedGreek(e.target.value)}
             className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
@@ -216,6 +236,8 @@ export default function AdvancedCharts() {
             )}
             <p className="text-sm text-green-400 mt-2">✓ Greeks data loaded successfully</p>
           </div>
+        ) : chartError ? (
+          <div className="text-gray-400">{chartError}</div>
         ) : (
           <div className="text-gray-400">Loading Greeks data...</div>
         )}
@@ -271,6 +293,8 @@ export default function AdvancedCharts() {
             )}
             <p className="text-sm text-green-400 mt-2">✓ PCR data loaded successfully</p>
           </div>
+        ) : chartError ? (
+          <div className="text-gray-400">{chartError}</div>
         ) : (
           <div className="text-gray-400">Loading PCR data...</div>
         )}

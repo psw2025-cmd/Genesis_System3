@@ -223,18 +223,24 @@ class RuntimeStateStore:
         return self._state_version
 
     def _save_state(self):
-        """Save state to file for persistence"""
+        """Save state to file for persistence (atomic write: temp then rename)"""
         try:
             state_file = self.outputs_dir / "runtime_state.json"
-            with open(state_file, "w") as f:
-                json.dump(self._state, f, indent=2)
+            content = json.dumps(self._state, indent=2)
+            # Atomic write: write to temp, then rename
+            tmp_file = state_file.with_suffix(".json.tmp")
+            tmp_file.write_text(content, encoding="utf-8")
+            tmp_file.replace(state_file)
 
-            # Also save to state_snapshots for history
+            # Also save to state_snapshots for history (atomic)
             snapshots_dir = self.outputs_dir / "state_snapshots"
             snapshots_dir.mkdir(exist_ok=True)
             snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-            with open(snapshot_file, "w") as f:
-                json.dump(self._state, f, indent=2)
+            tmp_snapshot = snapshots_dir / f"state_{self._state_version}.json.tmp"
+            tmp_snapshot.write_text(content, encoding="utf-8")
+            if snapshot_file.exists():
+                snapshot_file.unlink()
+            tmp_snapshot.rename(snapshot_file)
 
             # Keep only last 1000 snapshots
             snapshot_files = sorted(

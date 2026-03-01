@@ -120,19 +120,36 @@ def get_market_status(now_ist: Optional[datetime] = None) -> dict:
         now_ist: Current time in IST
     
     Returns:
-        Dict with status information
+        Dict with status information including market_mode: live|closed|preopen
     """
+    if now_ist is None:
+        now_ist = datetime.now(IST)
+    elif now_ist.tzinfo is None:
+        now_ist = IST.localize(now_ist)
+    else:
+        now_ist = now_ist.astimezone(IST)
+
     is_open, reason = is_market_open(now_ist)
-    
+    current_time = now_ist.time()
+
+    # market_mode: live (9:15-15:30), preopen (9:00-9:15), closed (otherwise)
+    if MARKET_OPEN <= current_time <= MARKET_CLOSE:
+        market_mode = "live"
+    elif PRE_MARKET_START <= current_time < MARKET_OPEN:
+        market_mode = "preopen"
+    else:
+        market_mode = "closed"
+
     result = {
         "is_open": is_open,
         "reason": reason,
-        "current_time_ist": now_ist.strftime('%Y-%m-%d %H:%M:%S IST') if now_ist else None
+        "market_mode": market_mode,
+        "current_time_ist": now_ist.strftime('%Y-%m-%d %H:%M:%S IST'),
     }
-    
+
     if not is_open:
         next_open = get_next_market_open(now_ist)
         result["next_open"] = next_open.strftime('%Y-%m-%d %H:%M:%S IST')
-        result["seconds_until_open"] = (next_open - now_ist).total_seconds() if now_ist else None
-    
+        result["seconds_until_open"] = (next_open - now_ist).total_seconds()
+
     return result

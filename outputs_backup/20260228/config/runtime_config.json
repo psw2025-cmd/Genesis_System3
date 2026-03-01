@@ -1,0 +1,15 @@
+{
+  "chain_strike_band_mode": "NEAR_ATM",
+  "near_atm_strikes_each_side": 10,
+  "near_atm_percent_band": 0.02,
+  "deep_fetch_enabled": true,
+  "fetch_parallel_workers": 8,
+  "fetch_batch_size": 50,
+  "fetch_timeout_sec": 5,
+  "fetch_retry_backoff_sec": 0.2,
+  "cycle_sla_sec": 30,
+  "underlying_sla_sec": 3,
+  "greeks_source_preference": ["API", "BS_APPROX", "NONE"],
+  "log_sanitization_enabled": true,
+  "secrets_scan_enabled": true
+}

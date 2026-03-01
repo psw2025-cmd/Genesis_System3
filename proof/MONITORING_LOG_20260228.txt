@@ -1,0 +1,14 @@
+
+---
+2026-02-28T06:00:00.502740
+Backend: http://localhost:8000
+  /api/health: OK mode=PAPER broker_connected=True live_allowed=False
+  live_blockers=['data_source is not_ready', 'market is closed']
+  /api/state: OK
+
+---
+2026-02-28T08:00:01.235002
+Backend: http://localhost:8000
+  /api/health: OK mode=PAPER broker_connected=True live_allowed=False
+  live_blockers=['data_source is not_ready', 'market is closed']
+  /api/state: OK

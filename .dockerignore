@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+
+# Node
+node_modules
+dashboard/frontend/dist
+
+# Outputs and logs (mounted as volumes)
+outputs
+logs
+
+# IDE and OS
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docs and misc
+*.md
+!README.md
+
+# Desktop app (not needed for dashboard)
+desktop_app

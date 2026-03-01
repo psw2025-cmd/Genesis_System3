@@ -3,7 +3,8 @@
 
 $ErrorActionPreference = "Continue"
 $ROOT_DIR = Split-Path -Parent $PSScriptRoot
-$VENV_DIR = Join-Path $ROOT_DIR "venv"
+# Prefer .venv over venv (modern convention)
+$VENV_DIR = if (Test-Path (Join-Path $ROOT_DIR ".venv")) { Join-Path $ROOT_DIR ".venv" } else { Join-Path $ROOT_DIR "venv" }
 $BACKEND_DIR = Join-Path $ROOT_DIR "dashboard\backend"
 $FRONTEND_DIR = Join-Path $ROOT_DIR "dashboard\frontend"
 $OUTPUTS_DIR = Join-Path $ROOT_DIR "outputs"

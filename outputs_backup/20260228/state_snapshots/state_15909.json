@@ -1,0 +1,775 @@
+{
+  "state_version": 4,
+  "timestamp_utc": "2026-02-26T21:32:37.879140Z",
+  "timestamp_ist": "2026-02-27T03:02:37.879140+05:30",
+  "mode": "PAPER",
+  "data_source": "not_ready",
+  "market": {
+    "is_open": false,
+    "reason": "Market closed",
+    "next_open": null,
+    "current_time_ist": "2026-02-25T03:17:28.896214+05:30"
+  },
+  "broker": {
+    "connected": false,
+    "name": "AngelOne",
+    "status": "disconnected",
+    "error": null,
+    "latency_ms": null,
+    "last_ok": null
+  },
+  "qc": {
+    "status": "PASS",
+    "reasons": [],
+    "contracts_total": 0,
+    "underlyings": 0,
+    "failures": []
+  },
+  "signals": {
+    "status": "NO_TRADE",
+    "underlying": null,
+    "confidence": 0,
+    "reason": "No signal generated",
+    "last_signal": null
+  },
+  "positions": [],
+  "pnl": {
+    "unrealized": 0.0,
+    "realized": 0.0,
+    "total": 0.0,
+    "day_total": 0.0
+  },
+  "risk": {
+    "var95": 0.0,
+    "es95": 0.0,
+    "exposure": 0.0,
+    "concentration": 0.0,
+    "greeks": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "theta": 0.0,
+      "vega": 0.0
+    },
+    "limits": {
+      "status": "PASS",
+      "breaches": []
+    }
+  },
+  "model": {
+    "active": null,
+    "type": null,
+    "fallback_used": false,
+    "metrics": {}
+  },
+  "alerts": [
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:39.034218+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:34.002259+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:28.985901+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:23.968418+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:18.953071+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:13.639717+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:08.624631+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:34:03.600059+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:58.575156+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:53.534791+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:48.514519+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:43.242758+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:38.204725+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:33.194749+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:28.165369+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:23.132878+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:18.104416+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:12.810916+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:07.779722+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:33:02.748968+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:57.724304+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:52.673397+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:47.659807+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:42.372473+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:37.345529+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:32.319354+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:27.277692+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:22.255483+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:17.226745+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:12.010406+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:06.970610+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:32:01.923946+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:56.908284+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:51.884648+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:46.852995+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:41.808596+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:36.768401+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:31.742254+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:26.648819+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:21.611124+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:16.584413+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:11.196440+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:06.155022+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:31:01.124946+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:56.015978+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:50.960811+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:45.932702+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:40.702957+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:35.682730+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:30.653450+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:25.594296+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:20.577636+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:15.556613+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:10.450533+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:05.413964+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:30:00.358574+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:55.324336+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:50.299426+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:45.284772+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:40.022572+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:34.999858+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:29.991363+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:24.935246+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:19.905109+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:14.894295+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:09.728561+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:29:04.701002+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:59.636843+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:54.608930+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:49.586050+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:44.566438+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:39.343749+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:34.329673+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:29.300762+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:24.274679+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:19.240593+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:14.216289+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:08.938690+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:28:03.924935+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:58.902722+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:53.878693+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:48.843577+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:43.800472+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:38.528845+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:33.499546+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:28.467710+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:23.449774+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:18.427926+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:13.400556+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:08.144114+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:27:03.127649+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:58.106253+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:53.083314+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:48.068669+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:43.043746+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:37.725225+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:32.688626+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:27.654573+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:22.622258+05:30",
+      "read": false
+    },
+    {
+      "level": "WARN",
+      "code": "BROKER_DISCONNECTED",
+      "message": "Broker connection lost",
+      "ts": "2026-02-28T01:26:17.569367+05:30",
+      "read": false
+    }
+  ],
+  "cycle_count": 0,
+  "last_cycle_ts_iso": null,
+  "last_fetch_ts_iso": "2026-02-27T03:02:37.879140+05:30",
+  "positions_source": "INTERNAL_UNVERIFIED",
+  "reconciliation": {
+    "status": "OK",
+    "mismatches": [],
+    "timestamp": "2026-02-27T03:02:37.879140+05:30"
+  }
+}

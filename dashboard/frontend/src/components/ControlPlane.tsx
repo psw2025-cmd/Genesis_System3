@@ -12,6 +12,7 @@ export default function ControlPlane() {
   const [learningInsights, setLearningInsights] = useState<any>(null)
   const [forensicReport, setForensicReport] = useState<any>(null)
   const [validationStatus, setValidationStatus] = useState<any>(null)
+  const [dataValidityMetrics, setDataValidityMetrics] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<Array<{endpoint: string, status?: number, message: string}>>([])
@@ -24,12 +25,13 @@ export default function ControlPlane() {
 
   const fetchAllData = async () => {
     try {
-      const [runnerStatusRes, learningStatusRes, learningInsightsRes, forensicRes, validationRes] = await Promise.allSettled([
+      const [runnerStatusRes, learningStatusRes, learningInsightsRes, forensicRes, validationRes, metricsRes] = await Promise.allSettled([
         axios.get(`${API_BASE}/api/runner/status`),
         axios.get(`${API_BASE}/api/learning/status`),
         axios.get(`${API_BASE}/api/learning/insights`),
         axios.get(`${API_BASE}/api/forensic/report`),
-        axios.get(`${API_BASE}/api/validation/status`)
+        axios.get(`${API_BASE}/api/validation/status`),
+        axios.get(`${API_BASE}/api/validate/metrics`)
       ])
 
       const newErrors: Array<{endpoint: string, status?: number, message: string}> = []
@@ -93,7 +95,11 @@ export default function ControlPlane() {
         })
         console.error('Error fetching validation status:', reason)
       }
-      
+
+      if (metricsRes.status === 'fulfilled') {
+        setDataValidityMetrics(metricsRes.value.data)
+      }
+
       setErrors(newErrors)
     } catch (error) {
       console.error('Error fetching control data:', error)
@@ -226,6 +232,48 @@ export default function ControlPlane() {
         />
       )}
 
+      {/* Data Validity Metrics */}
+      {dataValidityMetrics && (
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h3 className="text-xl font-bold mb-4">Data Validity Metrics</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <span className="text-gray-400">Freshness:</span>
+              <span className={`ml-2 font-bold ${
+                dataValidityMetrics.freshness === 'live' ? 'text-green-400' :
+                dataValidityMetrics.freshness === 'recent' ? 'text-yellow-400' :
+                dataValidityMetrics.freshness === 'stale' ? 'text-orange-400' :
+                'text-red-400'
+              }`}>
+                {dataValidityMetrics.freshness?.toUpperCase() || 'N/A'}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Data Age:</span>
+              <span className="ml-2 font-bold text-white">
+                {dataValidityMetrics.data_age_seconds != null
+                  ? `${dataValidityMetrics.data_age_seconds}s`
+                  : 'N/A'}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Source:</span>
+              <span className="ml-2 font-bold text-white">
+                {dataValidityMetrics.data_source || 'N/A'}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-400">Last Data:</span>
+              <span className="ml-2 text-white text-xs">
+                {dataValidityMetrics.last_data_time
+                  ? new Date(dataValidityMetrics.last_data_time).toLocaleString()
+                  : 'N/A'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">System Controls</h3>
         <div className="space-y-4">
@@ -275,6 +323,7 @@ export default function ControlPlane() {
               onClick={handleStart}
               disabled={loading || (runnerStatus?.runner === 'RUNNING')}
               className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Start trading runner"
             >
               {loading ? 'Starting...' : 'Start Runner'}
             </button>
@@ -282,6 +331,7 @@ export default function ControlPlane() {
               onClick={handleStop}
               disabled={loading || (runnerStatus?.runner === 'STOPPED')}
               className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Stop trading runner"
             >
               {loading ? 'Stopping...' : 'Stop Runner'}
             </button>
@@ -325,6 +375,7 @@ export default function ControlPlane() {
             alert('Proof pack generation not implemented in UI - use scripts/verify_dashboard.ps1')
           }}
           className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+          aria-label="Download proof pack"
         >
           Download Proof Pack
         </button>
@@ -375,6 +426,7 @@ export default function ControlPlane() {
             onClick={handleRunLearning}
             disabled={loading}
             className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
+            aria-label="Run continuous learning cycle"
           >
             {loading ? 'Running...' : 'Run Learning Cycle'}
           </button>
@@ -397,6 +449,7 @@ export default function ControlPlane() {
             onClick={handleRunForensic}
             disabled={loading}
             className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700 disabled:opacity-50"
+            aria-label="Run forensic analysis"
           >
             {loading ? 'Running...' : 'Run Forensic Analysis'}
           </button>
@@ -440,6 +493,7 @@ export default function ControlPlane() {
             onClick={handleRunValidation}
             disabled={loading}
             className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+            aria-label="Run validation tests"
           >
             {loading ? 'Running...' : 'Run Validation'}
           </button>

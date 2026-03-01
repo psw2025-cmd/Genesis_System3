@@ -185,6 +185,10 @@ def generate_synthetic_chain_data(underlying: str, spot_price: Optional[float] =
             call_volume = int(base_volume * volume_factor * random.uniform(0.5, 1.5))
             put_volume = int(base_volume * volume_factor * random.uniform(0.5, 1.5))
 
+            # OI Change (Angel OI BuildUp field) - % change from previous session
+            call_oi_change = round(random.uniform(-5, 15), 2)
+            put_oi_change = round(random.uniform(-5, 15), 2)
+
             # Generate bid/ask spreads (typically 0.1-0.5% of premium)
             call_spread = call_premium * random.uniform(0.001, 0.005)
             put_spread = put_premium * random.uniform(0.001, 0.005)
@@ -208,7 +212,7 @@ def generate_synthetic_chain_data(underlying: str, spot_price: Optional[float] =
             # Vega: volatility sensitivity (realistic bounds: 0-50)
             vega = min(50.0, max(0.0, call_premium * 0.1))
 
-            # Create CALL contract
+            # Create CALL contract (Angel schema: ltp, bid, ask, oi, oi_change, volume, iv, delta, gamma, theta, vega)
             contracts.append(
                 {
                     "underlying": underlying_upper,
@@ -221,6 +225,7 @@ def generate_synthetic_chain_data(underlying: str, spot_price: Optional[float] =
                     "bid": round(call_bid, 2),
                     "ask": round(call_ask, 2),
                     "oi": call_oi,
+                    "oi_change": call_oi_change,
                     "volume": call_volume,
                     "change": round(random.uniform(-2, 2), 2),
                     "change_percent": round(random.uniform(-1, 1), 2),
@@ -249,6 +254,7 @@ def generate_synthetic_chain_data(underlying: str, spot_price: Optional[float] =
                     "bid": round(put_bid, 2),
                     "ask": round(put_ask, 2),
                     "oi": put_oi,
+                    "oi_change": put_oi_change,
                     "volume": put_volume,
                     "change": round(random.uniform(-2, 2), 2),
                     "change_percent": round(random.uniform(-1, 1), 2),

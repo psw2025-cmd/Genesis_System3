@@ -7,9 +7,7 @@ const getApiBase = (): string => {
   
   // In Electron or file:// protocol, ALWAYS use localhost:8000 for backend
   if (isElectron || window.location.protocol === 'file:') {
-    const apiBase = 'http://localhost:8000'
-    console.log('Electron detected - using API_BASE:', apiBase)
-    return apiBase
+    return 'http://localhost:8000'
   }
   
   // Use the same hostname as the frontend for backend
@@ -27,14 +25,13 @@ const getApiBase = (): string => {
   }
   
   // Fallback: always use localhost:8000
-  console.warn('Unknown protocol, defaulting to localhost:8000')
   return 'http://localhost:8000'
 }
 
 export const API_BASE = getApiBase()
 
-// Log for debugging
-console.log('API_BASE configured as:', API_BASE)
-console.log('Window location:', window.location.href)
-console.log('Protocol:', window.location.protocol)
-console.log('Running in Electron:', window.location.protocol === 'file:' || (window as any).electronAPI !== undefined)
+// Debug logs (suppress in production via VITE_DEBUG=0)
+export const DEBUG = import.meta.env.VITE_DEBUG !== '0'
+if (DEBUG) {
+  console.log('API_BASE:', API_BASE)
+}

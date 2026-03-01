@@ -27,9 +27,16 @@ class MLPerformanceTracker:
         """Load performance data"""
         if self.data_file.exists():
             try:
-                with open(self.data_file, "r") as f:
+                with open(self.data_file, "r", encoding="utf-8-sig") as f:
                     self.data = json.load(f)
-            except:
+                self.data.setdefault("models", {})
+                self.data.setdefault("predictions", [])
+                # Ensure underlyings is list (JSON may have loaded set as list)
+                for name, stats in self.data["models"].items():
+                    if isinstance(stats.get("underlyings"), set):
+                        stats["underlyings"] = list(stats["underlyings"])
+                    stats.setdefault("underlyings", [])
+            except Exception:
                 self.data = {"models": {}, "predictions": []}
         else:
             self.data = {"models": {}, "predictions": []}
@@ -72,12 +79,15 @@ class MLPerformanceTracker:
                 "total_predictions": 0,
                 "total_accuracy": 0.0,
                 "avg_confidence": 0.0,
-                "underlyings": set(),
+                "underlyings": [],
             }
 
         model_stats = self.data["models"][model_name]
         model_stats["total_predictions"] += 1
-        model_stats["underlyings"].add(underlying)
+        underlyings_list = list(model_stats.get("underlyings", []))
+        if underlying not in underlyings_list:
+            underlyings_list.append(underlying)
+        model_stats["underlyings"] = underlyings_list
 
         if prediction_record["accuracy"] is not None:
             model_stats["total_accuracy"] += prediction_record["accuracy"]
@@ -85,9 +95,6 @@ class MLPerformanceTracker:
         # Update average confidence
         all_confidences = [p["confidence"] for p in self.data["predictions"] if p["model_name"] == model_name]
         model_stats["avg_confidence"] = sum(all_confidences) / len(all_confidences) if all_confidences else 0.0
-
-        # Convert set to list for JSON
-        model_stats["underlyings"] = list(model_stats["underlyings"])
 
         self._save_data()
 
@@ -153,11 +160,16 @@ class MLPerformanceTracker:
         return predictions[-limit:]
 
     def compare_models(self) -> Dict[str, Any]:
-        """Compare all models"""
-        models = list(self.data["models"].keys())
+        """Compare all models. Returns consistent structure even when empty."""
+        models = list(self.data.get("models", {}).keys())
 
         if not models:
-            return {"status": "ERROR", "message": "No models found"}
+            return {
+                "status": "ok",
+                "models": {},
+                "best_model": None,
+                "message": "No models trained yet. Run the trading system to record predictions.",
+            }
 
         comparison = {}
         for model_name in models:
@@ -170,8 +182,13 @@ class MLPerformanceTracker:
                     "total_predictions": perf["total_predictions"],
                 }
 
-        # Find best model
-        best_model = max(comparison.items(), key=lambda x: x[1]["avg_accuracy"]) if comparison else None
+        # Find best model (only if at least one has predictions)
+        models_with_data = {k: v for k, v in comparison.items() if (v.get("total_predictions") or 0) > 0}
+        best_model = (
+            max(models_with_data.items(), key=lambda x: x[1]["avg_accuracy"])
+            if models_with_data
+            else None
+        )
 
         return {
             "status": "ok",

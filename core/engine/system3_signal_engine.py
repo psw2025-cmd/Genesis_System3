@@ -960,6 +960,32 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
         logger.error(f"❌ Error appending signals to CSV: {e}")
 
 
+def _get_execution_state() -> tuple:
+    """Get open_positions and pending_signals from outputs/execution state."""
+    import json
+
+    try:
+        outputs_dir = ROOT_DIR / "outputs"
+        positions_file = outputs_dir / "positions_live.json"
+        open_pos = 0
+        if positions_file.exists():
+            data = json.loads(positions_file.read_text())
+            if isinstance(data, dict):
+                open_pos = data.get("open_count", len(data.get("positions", [])))
+            elif isinstance(data, list):
+                open_pos = len(data)
+        pending_sig = 0
+        vo_file = outputs_dir / "virtual_orders.jsonl"
+        if vo_file.exists():
+            try:
+                pending_sig = sum(1 for _ in open(vo_file, encoding="utf-8"))
+            except Exception:
+                pass
+        return (open_pos, min(pending_sig, 100))
+    except Exception:
+        return (0, 0)
+
+
 def run_signal_engine(df_snap: pd.DataFrame, enable_safety_checks: bool = True) -> pd.DataFrame:
     """
     Main entry point: Process snapshot and append to CSV.
@@ -996,12 +1022,13 @@ def run_signal_engine(df_snap: pd.DataFrame, enable_safety_checks: bool = True) 
                     total_signals = buy_signals + sell_signals
 
                     if total_signals > 0:
-                        # Check safety (open_positions and pending_signals would come from execution engine)
+                        # Get open_positions and pending_signals from outputs/execution state
+                        open_pos, pending_sig = _get_execution_state()
                         is_safe, error = check_signal_safety(
                             underlying=str(underlying),
                             signal_count=total_signals,
-                            open_positions=0,  # TODO: Get from execution engine
-                            pending_signals=0,  # TODO: Get from execution engine
+                            open_positions=open_pos,
+                            pending_signals=pending_sig,
                         )
 
                         if not is_safe:

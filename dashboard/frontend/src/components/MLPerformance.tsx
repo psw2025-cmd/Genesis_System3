@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 import { API_BASE } from '../config'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import EmptyState from './EmptyState'
 
 export default function MLPerformance() {
   const [performance, setPerformance] = useState<any>(null)
@@ -112,8 +114,10 @@ export default function MLPerformance() {
               <div key={name} className="bg-gray-700 p-4 rounded">
                 <div className="font-bold mb-2">{name}</div>
                 <div className="text-sm space-y-1">
-                  <div>Accuracy: {metrics?.avg_accuracy ? (metrics.avg_accuracy * 100).toFixed(2) + '%' : 'N/A'}</div>
-                  <div>Confidence: {metrics?.avg_confidence ? (metrics.avg_confidence * 100).toFixed(2) + '%' : 'N/A'}</div>
+                  <div>Accuracy: {(metrics?.total_predictions || 0) > 0 && metrics?.avg_accuracy != null
+                    ? (metrics.avg_accuracy * 100).toFixed(2) + '%'
+                    : 'Awaiting data'}</div>
+                  <div>Confidence: {metrics?.avg_confidence != null ? (metrics.avg_confidence * 100).toFixed(2) + '%' : '—'}</div>
                   <div>Predictions: {metrics?.total_predictions || 0}</div>
                 </div>
               </div>
@@ -123,9 +127,19 @@ export default function MLPerformance() {
       ) : (
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">Model Comparison</h3>
-          <div className="text-gray-400">
-            No model comparison data available. Models will appear here once training data is available.
-          </div>
+          <EmptyState
+            title="No model data yet"
+            reason={comparison?.message || "Models will appear after the trading system records predictions. Run a training cycle or start the live/paper trading system."}
+            icon="📊"
+            actions={
+              <div className="flex gap-2 justify-center flex-wrap items-center">
+                <Link to="/control" className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 text-sm">
+                  Open Control Plane
+                </Link>
+                <span className="text-gray-500 text-sm">Run Learning Cycle or start Runner</span>
+              </div>
+            }
+          />
         </div>
       )}
 

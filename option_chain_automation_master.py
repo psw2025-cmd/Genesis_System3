@@ -1097,19 +1097,10 @@ class OptionChainAutomationMaster:
             rank_file = self.config.output_dir / "underlying_rank_live.csv"
             rank_df.to_csv(rank_file, index=False)
             
-            # 4. chain_raw_live.csv - status row
-            chain_data = {
-                "status": "MARKET_CLOSED",
-                "mode": "MARKET_CLOSED",
-                "timestamp": timestamp,
-                "reason": reason,
-                "cycle": self.status.total_cycles
-            }
-            chain_df = pd.DataFrame([chain_data])
-            chain_file = self.config.output_dir / "chain_raw_live.csv"
-            chain_df.to_csv(chain_file, index=False)
-            
-            # Update status
+            # 4. Preserve chain_raw_live.csv - do NOT overwrite with status row.
+            # Dashboard uses it as cached data when market closed (data_source=cached).
+
+            # Update status (for health.json)
             self.status.last_data_fetch = now
             
             logger.debug(f"Market-closed outputs generated: {reason}")
@@ -1711,6 +1702,16 @@ class OptionChainAutomationMaster:
             
             chain_file = self.config.output_dir / "chain_raw_live.csv"
             combined_df.to_csv(chain_file, index=False, encoding='utf-8')
+            # Update last_known cache for dashboard data_source state machine
+            try:
+                from dashboard.backend.data_source_state import write_last_known
+                write_last_known(self.config.output_dir, datetime.now(self.tz))
+            except ImportError:
+                try:
+                    from data_source_state import write_last_known
+                    write_last_known(self.config.output_dir, datetime.now(self.tz))
+                except ImportError:
+                    pass
         except Exception as e:
             logger.error(f"Failed to save chain data: {e}")
             # Create minimal fallback
@@ -1862,10 +1863,13 @@ class OptionChainAutomationMaster:
                     except:
                         pass
             
+            # data_source: real when connected and data fetched; not_ready otherwise
+            data_source_val = "real" if (self.status.is_connected and self.status.last_data_fetch) else "not_ready"
             health = {
                 'timestamp': cycle_start.isoformat(),
                 'is_running': self.status.is_running,
                 'is_connected': self.status.is_connected,
+                'data_source': data_source_val,
                 'last_data_fetch': self.status.last_data_fetch.isoformat() if self.status.last_data_fetch else None,
                 'total_cycles': self.status.total_cycles,
                 'successful_fetches': self.status.successful_fetches,

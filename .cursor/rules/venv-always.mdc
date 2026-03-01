@@ -1,0 +1,46 @@
+---
+description: Always run Python/pip commands in project .venv
+alwaysApply: true
+---
+
+# Venv Environment – Always Use
+
+**Project standard:** All Python and pip commands MUST run in the project's `.venv` environment.
+
+## Rule
+
+When running any Python-related command (python, pip, pytest, streamlit, uvicorn, etc.):
+
+- **DO** use the venv Python directly: `c:\Genesis_System3\.venv\Scripts\python.exe` or `.venv\Scripts\python.exe` (from project root)
+- **DO** use `.venv\Scripts\pip.exe` for pip
+- **DO** use `.venv\Scripts\python.exe -m <module>` for modules (e.g. `python -m pytest`, `python -m uvicorn`)
+- **DON'T** assume the shell is already activated
+- **DON'T** use system Python or a different venv
+
+## Examples
+
+```powershell
+# ✅ GOOD – explicit venv path
+.venv\Scripts\python.exe -m pytest
+.venv\Scripts\python.exe -c "import requests; print(requests.get('http://127.0.0.1:8000/api/health'))"
+.venv\Scripts\pip.exe install -r requirements_runtime.txt
+
+# ✅ GOOD – from project root with full path
+cd c:\Genesis_System3
+.venv\Scripts\python.exe -m uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+```powershell
+# ❌ BAD – assumes activation
+python -m pytest
+pip install foo
+```
+
+## Project Root
+
+- **Windows:** `c:\Genesis_System3` or `C:\Genesis_System3`
+- Venv path: `c:\Genesis_System3\.venv\Scripts\`
+
+## Future-Proof
+
+This rule applies to all future sessions. The agent must always use the project venv for Python commands.

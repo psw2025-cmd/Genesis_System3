@@ -1,0 +1,20 @@
+# System3 Ultra Dashboard Backend
+# Python 3.10, FastAPI + uvicorn
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install runtime deps (minimal for backend)
+COPY requirements_runtime.txt .
+RUN pip install --no-cache-dir -r requirements_runtime.txt
+
+# Copy application
+COPY . .
+
+# Backend reads from outputs/, logs/, config/
+ENV PYTHONUNBUFFERED=1
+EXPOSE 8000
+
+# TODO: Run as non-root when host volumes (outputs/, logs/) are chowned to match appuser UID
+# Run from project root; app module is dashboard.backend.app
+CMD ["python", "-m", "uvicorn", "dashboard.backend.app:app", "--host", "0.0.0.0", "--port", "8000"]

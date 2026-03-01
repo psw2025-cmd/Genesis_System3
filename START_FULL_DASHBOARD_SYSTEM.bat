@@ -13,17 +13,24 @@ REM ====================================================================
 
 setlocal enabledelayedexpansion
 
+REM Flags: --no-pause = skip pause at end (for automation), --with-trading = start trading system
+set NO_PAUSE=0
+if "%1"=="--no-pause" set NO_PAUSE=1
+if "%2"=="--no-pause" set NO_PAUSE=1
+
 REM Configuration
 set SCRIPT_DIR=%~dp0
-set VENV_DIR=%SCRIPT_DIR%venv
+set VENV_DIR=%SCRIPT_DIR%.venv
+if not exist "%VENV_DIR%\Scripts\python.exe" set VENV_DIR=%SCRIPT_DIR%venv
 set BACKEND_DIR=%SCRIPT_DIR%dashboard\backend
 set FRONTEND_DIR=%SCRIPT_DIR%dashboard\frontend
 set LOG_DIR=%SCRIPT_DIR%logs
 set OUTPUT_DIR=%SCRIPT_DIR%outputs
 
-REM Create log file
-for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /value') do set datetime=%%I
-set TIMESTAMP=%datetime:~0,8%_%datetime:~8,6%
+REM Create log file (wmic can fail on some systems - use PowerShell fallback)
+set TIMESTAMP=%date:~-4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%
+set TIMESTAMP=%TIMESTAMP: =0%
+for /f "tokens=*" %%I in ('powershell -NoProfile -Command "Get-Date -Format 'yyyyMMdd_HHmmss'" 2^>nul') do set TIMESTAMP=%%I
 set LOG_FILE=%LOG_DIR%\dashboard_startup_%TIMESTAMP%.log
 
 REM Initialize
@@ -80,7 +87,7 @@ node --version
 echo   [OK] Node.js found
 echo [%date% %time%] [OK] Node.js found >> "%LOG_FILE%"
 
-REM Check npm
+REM Check npm (skip "npm --version" - it can hang in some environments)
 where npm >nul 2>&1
 if errorlevel 1 (
     echo   [FAIL] npm not found
@@ -88,7 +95,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-npm --version
 echo   [OK] npm found
 echo [%date% %time%] [OK] npm found >> "%LOG_FILE%"
 
@@ -127,12 +133,21 @@ call "%VENV_DIR%\Scripts\activate.bat" >nul 2>&1
 
 REM Upgrade pip first
 echo   Upgrading pip...
-"%VENV_DIR%\Scripts\pip.exe" install --quiet --upgrade pip >nul 2>&1
+"%VENV_DIR%\Scripts\pip.exe" install --quiet --upgrade pip >> "%LOG_FILE%" 2>&1
 
-REM Install backend requirements
-if exist "%BACKEND_DIR%\requirements.txt" (
+REM Install backend requirements (use root requirements_runtime.txt)
+if exist "%SCRIPT_DIR%requirements_runtime.txt" (
+    echo   Installing backend packages from requirements_runtime.txt...
+    "%VENV_DIR%\Scripts\pip.exe" install --quiet -r "%SCRIPT_DIR%requirements_runtime.txt" >> "%LOG_FILE%" 2>&1
+    if errorlevel 1 (
+        echo   [WARN] Some packages may have issues, continuing...
+    ) else (
+        echo   [OK] Backend dependencies installed
+        echo [%date% %time%] [OK] Backend deps installed >> "%LOG_FILE%"
+    )
+) else if exist "%BACKEND_DIR%\requirements.txt" (
     echo   Installing backend packages...
-    "%VENV_DIR%\Scripts\pip.exe" install --quiet -r "%BACKEND_DIR%\requirements.txt" 2>&1 | findstr /V /C:"Requirement already satisfied" >nul
+    "%VENV_DIR%\Scripts\pip.exe" install --quiet -r "%BACKEND_DIR%\requirements.txt" >> "%LOG_FILE%" 2>&1
     if errorlevel 1 (
         echo   [WARN] Some packages may have issues, continuing...
     ) else (
@@ -145,7 +160,7 @@ if exist "%BACKEND_DIR%\requirements.txt" (
 
 REM Install critical packages
 echo   Installing critical packages...
-"%VENV_DIR%\Scripts\pip.exe" install --quiet --prefer-binary pandas numpy scipy scikit-learn uvicorn[standard] fastapi requests aiohttp >nul 2>&1
+"%VENV_DIR%\Scripts\pip.exe" install --quiet --prefer-binary pandas numpy scipy scikit-learn "uvicorn[standard]" fastapi requests aiohttp >> "%LOG_FILE%" 2>&1
 echo   [OK] Critical packages installed
 
 REM ====================================================================
@@ -157,8 +172,8 @@ echo [%date% %time%] [INSTALL] Frontend dependencies >> "%LOG_FILE%"
 
 pushd "%FRONTEND_DIR%"
 if not exist "node_modules" (
-    echo   Installing frontend packages (this may take a minute)...
-    call npm install --silent >nul 2>&1
+    echo   Installing frontend packages - this may take a minute...
+    cmd /c "npm install --silent" >> "%LOG_FILE%" 2>&1
     if errorlevel 1 (
         echo   [WARN] npm install had issues, but continuing...
     ) else (
@@ -177,6 +192,11 @@ REM ====================================================================
 echo.
 echo [5/8] Running pre-checks and auto-fixes...
 echo [%date% %time%] [FIX] Pre-checks >> "%LOG_FILE%"
+
+REM Bootstrap outputs dirs and health.json/positions_live.json (cold start)
+if exist "%SCRIPT_DIR%scripts\ensure_dirs_and_bootstrap.ps1" (
+    powershell -ExecutionPolicy Bypass -File "%SCRIPT_DIR%scripts\ensure_dirs_and_bootstrap.ps1" >> "%LOG_FILE%" 2>&1
+)
 
 REM Run auto-fix script
 if exist "%SCRIPT_DIR%scripts\auto_fix_and_update_dashboard.ps1" (
@@ -234,8 +254,8 @@ if not errorlevel 1 (
     echo [%date% %time%] [INFO] Backend already running >> "%LOG_FILE%"
 ) else (
     echo   Starting backend API server...
-    start "Dashboard Backend" /MIN cmd /c "cd /d %BACKEND_DIR% && call %VENV_DIR%\Scripts\activate.bat && python -m uvicorn app:app --host 127.0.0.1 --port 8000 >> %LOG_FILE% 2>&1"
-    echo   [OK] Backend starting (check minimized window)
+    start "Dashboard Backend" /MIN cmd /c "cd /d %SCRIPT_DIR% && call %VENV_DIR%\Scripts\activate.bat && python -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000 >> %LOG_FILE% 2>&1"
+    echo   [OK] Backend starting - check minimized window
     echo [%date% %time%] [OK] Backend started >> "%LOG_FILE%"
     timeout /t 8 /nobreak >nul
 )
@@ -277,7 +297,7 @@ if not errorlevel 1 (
     pushd "%FRONTEND_DIR%"
     start "Dashboard Frontend" /MIN cmd /c "cd /d %FRONTEND_DIR% && call npm run dev -- --host 127.0.0.1 --port 3000 >> %LOG_FILE% 2>&1"
     popd
-    echo   [OK] Frontend starting (check minimized window)
+    echo   [OK] Frontend starting - check minimized window
     echo [%date% %time%] [OK] Frontend started >> "%LOG_FILE%"
     timeout /t 10 /nobreak >nul
 )
@@ -318,7 +338,7 @@ if "%START_TRADING%"=="1" (
     echo   [OK] Trading system started
     echo [%date% %time%] [OK] Trading system started >> "%LOG_FILE%"
 ) else (
-    echo   [INFO] Trading system not started (use --with-trading flag to start)
+    echo   [INFO] Trading system not started - use --with-trading flag to start
     echo   [INFO] You can start it manually if needed
     echo [%date% %time%] [INFO] Trading system skipped >> "%LOG_FILE%"
 )
@@ -346,7 +366,7 @@ echo   Dashboard: http://localhost:3000
 echo   Backend API: http://localhost:8000
 echo   API Docs: http://localhost:8000/docs
 echo.
-echo   Network Access (if on same network):
+echo   Network Access - if on same network:
 echo   Dashboard: http://192.168.1.4:3000
 echo   Backend API: http://192.168.1.4:8000
 echo.
@@ -381,14 +401,18 @@ echo ====================================================================
 echo.
 echo   All services are starting in minimized windows.
 echo   Check the taskbar for:
-echo     - Dashboard Backend (port 8000)
-echo     - Dashboard Frontend (port 3000)
-echo     - Trading System (if started)
+echo     - Dashboard Backend - port 8000
+echo     - Dashboard Frontend - port 3000
+echo     - Trading System - if started
 echo.
 echo   Logs are being written to: %LOG_FILE%
 echo.
-echo   Press any key to exit (services will continue running)...
-pause >nul
+if !NO_PAUSE!==1 (
+    echo   [--no-pause] Skipping pause - exiting immediately.
+) else (
+    echo   Press any key to exit - services will continue running...
+    pause >nul
+)
 
 echo.
 echo [%date% %time%] [COMPLETE] Startup finished >> "%LOG_FILE%"

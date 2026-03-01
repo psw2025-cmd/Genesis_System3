@@ -122,8 +122,25 @@ export default function ChainAnalytics() {
         ))}
       </div>
 
-      {/* Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Market Mode Banner - Angel parity: LIVE / MARKET CLOSED / PRE-OPEN */}
+      {(chainData.market_mode === 'closed' || chainData.status === 'MARKET_CLOSED') && (
+        <div className="bg-amber-900/40 border border-amber-600 px-4 py-3 rounded-lg font-bold">
+          🔒 MARKET CLOSED — Showing last session / synthetic data (Off-Market mode)
+        </div>
+      )}
+      {chainData.market_mode === 'preopen' && (
+        <div className="bg-blue-900/40 border border-blue-600 px-4 py-3 rounded-lg font-bold">
+          ⏳ PRE-MARKET (9:00–9:15 AM) — Market opens at 9:15 AM IST
+        </div>
+      )}
+      {chainData.market_mode === 'live' && (chainData.data_source === 'real' || chainData.data_source === 'live') && (
+        <div className="bg-green-900/40 border border-green-600 px-4 py-3 rounded-lg font-bold">
+          ✅ LIVE — Real-time market data
+        </div>
+      )}
+
+      {/* Metrics - Angel parity: Spot, PCR, Max Pain, Total Contracts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Spot Price</div>
           <div className="text-2xl font-bold">₹{spot.toFixed(2)}</div>
@@ -133,11 +150,15 @@ export default function ChainAnalytics() {
           <div className="text-2xl font-bold">{chainData.pcr?.toFixed(2) || 'N/A'}</div>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="text-sm text-gray-400">Max Pain</div>
+          <div className="text-2xl font-bold">{chainData.max_pain != null ? `₹${chainData.max_pain.toFixed(0)}` : 'N/A'}</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Total Contracts</div>
           <div className="text-2xl font-bold">{chainData.total_contracts || 0}</div>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="text-sm text-gray-400">Filtered Contracts</div>
+          <div className="text-sm text-gray-400">Filtered</div>
           <div className="text-2xl font-bold">{filteredContracts.length}</div>
         </div>
       </div>
@@ -206,7 +227,10 @@ export default function ChainAnalytics() {
               <th className="text-left p-2">Strike</th>
               <th className="text-left p-2">Type</th>
               <th className="text-right p-2">LTP</th>
+              <th className="text-right p-2">Bid</th>
+              <th className="text-right p-2">Ask</th>
               <th className="text-right p-2">OI</th>
+              <th className="text-right p-2">OI Chg%</th>
               <th className="text-right p-2">Volume</th>
               <th className="text-right p-2">IV</th>
               <th className="text-right p-2">Delta</th>
@@ -222,10 +246,13 @@ export default function ChainAnalytics() {
                 <td className="p-2">{contract.strike || 'N/A'}</td>
                 <td className="p-2">{contract.option_type || 'N/A'}</td>
                 <td className="text-right p-2">₹{contract.ltp?.toFixed(2) || 'N/A'}</td>
+                <td className="text-right p-2">₹{contract.bid?.toFixed(2) ?? 'N/A'}</td>
+                <td className="text-right p-2">₹{contract.ask?.toFixed(2) ?? 'N/A'}</td>
                 <td className="text-right p-2">{contract.oi?.toLocaleString() || 'N/A'}</td>
+                <td className="text-right p-2">{contract.oi_change != null ? `${contract.oi_change > 0 ? '+' : ''}${contract.oi_change}%` : 'N/A'}</td>
                 <td className="text-right p-2">{contract.volume?.toLocaleString() || 'N/A'}</td>
                 <td className="text-right p-2">{contract.iv ? (contract.iv * 100).toFixed(2) + '%' : 'N/A'}</td>
-                <td className="text-right p-2">{contract.delta ? contract.delta.toFixed(3) : 'N/A'}</td>
+                <td className="text-right p-2">{contract.delta != null ? contract.delta.toFixed(3) : 'N/A'}</td>
                 <td className="text-right p-2">{contract.gamma ? contract.gamma.toFixed(4) : 'N/A'}</td>
                 <td className="text-right p-2">{contract.vega ? contract.vega.toFixed(2) : 'N/A'}</td>
                 <td className="text-right p-2">{contract.theta ? contract.theta.toFixed(2) : 'N/A'}</td>

@@ -11,13 +11,18 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    // Ensure relative paths in built files
+    sourcemap: false,
     rollupOptions: {
       output: {
-        // Use relative paths for assets
         assetFileNames: 'assets/[name][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js'
+        entryFileNames: 'assets/[name]-[hash].js',
+        // P2.6: Code-splitting - keep chunks under 500KB
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-charts': ['recharts'],
+          'vendor-utils': ['axios', 'lucide-react']
+        }
       }
     }
   }

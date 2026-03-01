@@ -21,6 +21,7 @@ export default function AgentConsole() {
   const [upgradePlan, setUpgradePlan] = useState<any>(null)
   const [testResults, setTestResults] = useState<any>(null)
   const [issues, setIssues] = useState<any[]>([])
+  const [activityLog, setActivityLog] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -160,6 +161,23 @@ export default function AgentConsole() {
           </button>
         </div>
       </div>
+
+      {/* Agent Activity Log - CYCLE_COMPLETE, ANGEL_PARITY_CHECK, etc. */}
+      {activityLog.length > 0 && (
+        <div className="bg-gray-800 p-6 rounded-lg">
+          <h3 className="text-xl font-bold mb-4">Activity Log</h3>
+          <div className="space-y-2 max-h-48 overflow-y-auto font-mono text-xs">
+            {activityLog.map((entry: any, idx: number) => (
+              <div key={idx} className="p-2 bg-gray-700 rounded">
+                <span className="text-gray-400">{entry.ts}</span>{' '}
+                <span className="font-bold text-green-400">{entry.event}</span>{' '}
+                {entry.detail && <span className="text-gray-300">{entry.detail}</span>}
+                {entry.contracts != null && <span className="text-blue-400"> ({entry.contracts} contracts)</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Current Version */}
       <div className="bg-gray-800 p-6 rounded-lg">

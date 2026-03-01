@@ -94,6 +94,11 @@ foreach ($dep in $runtimeImports) {
 
 # Required QA tools (we pin these in requirements-dev.txt)
 $null = Invoke-Step -Name "Lint: flake8" -Command { flake8 @lintTargets } -ProofPath (Join-Path $logDir "flake8_report.txt")
+# black_diff.txt: capture formatting changes for proof (run before check)
+$blackDiff = Join-Path $logDir "black_diff.txt"
+$oldEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+$diffOut = & black --diff @lintTargets 2>&1; $diffOut | Set-Content -Path $blackDiff
+$ErrorActionPreference = $oldEap
 $null = Invoke-Step -Name "Format: black --check" -Command { black --check @lintTargets } -ProofPath (Join-Path $logDir "black_report.txt")
 # Bandit: report-only (findings in bandit_report.json).
 $banditJson = Join-Path $logDir "bandit_report.json"
@@ -104,12 +109,20 @@ bandit -r core -f json -o $banditJson 2>&1
 $ErrorActionPreference = $oldEap
 "bandit (report-only). ExitCode=$LASTEXITCODE. See bandit_report.json." | Out-File (Join-Path $logDir "bandit_report.txt")
 if ($LASTEXITCODE -ne 0) { Write-Host "REPORT-ONLY: findings in bandit_report.json" -ForegroundColor DarkYellow } else { Write-Host "OK -> $banditJson" -ForegroundColor Green }
-# Safety: report-only (vulns logged to safety_report.txt).
+# Safety: report-only. Prefer 'safety scan' (check deprecated Jun 2024). Auto-install if missing.
 Write-Host "`n[Security: safety (report-only)]" -ForegroundColor Yellow
 $safetyProof = Join-Path $logDir "safety_report.txt"
 $oldEap = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
-safety check --full-report 2>&1 | Tee-Object -FilePath $safetyProof
+if (!(Get-Command safety -ErrorAction SilentlyContinue)) {
+    pip install safety -q 2>$null
+}
+if (Get-Command safety -ErrorAction SilentlyContinue) {
+    $safetyOut = & safety scan 2>&1; if ($LASTEXITCODE -ne 0) { $safetyOut = & safety check --full-report 2>&1 }
+    $safetyOut | Tee-Object -FilePath $safetyProof
+} else {
+    "safety not installed (pip install safety failed)" | Out-File $safetyProof
+}
 $ErrorActionPreference = $oldEap
 if ($LASTEXITCODE -ne 0) {
     "Safety reported vulnerabilities (report-only). ExitCode=$LASTEXITCODE" | Add-Content $safetyProof
@@ -117,22 +130,27 @@ if ($LASTEXITCODE -ne 0) {
 } else {
     Write-Host "OK -> $safetyProof" -ForegroundColor Green
 }
-# pip-audit: report-only (vulns logged to pip_audit.json; see docs/FULL_ACTION_PLAN_AND_CHECKLIST.md)
-Write-Host "`n[Security: pip-audit (report-only)]" -ForegroundColor Yellow
+# pip-audit: vulns logged to pip_audit.json. Fail if PIP_AUDIT_STRICT=1 and vulns found.
+Write-Host "`n[Security: pip-audit]" -ForegroundColor Yellow
 $pipAuditOut = Join-Path $logDir "pip_audit_stdout.txt"
 $pipAuditJson = Join-Path $logDir "pip_audit.json"
 $oldEap = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
 pip-audit -f json -o $pipAuditJson 2>&1 | Tee-Object -FilePath $pipAuditOut
+$pipAuditExit = $LASTEXITCODE
 $ErrorActionPreference = $oldEap
-if ($LASTEXITCODE -ne 0) {
-    "pip-audit reported vulnerabilities (report-only; see pip_audit.json). ExitCode=$LASTEXITCODE" | Add-Content $pipAuditOut
+if ($pipAuditExit -ne 0) {
+    "pip-audit reported vulnerabilities. ExitCode=$pipAuditExit" | Add-Content $pipAuditOut
+    if ($env:PIP_AUDIT_STRICT -eq "1") {
+        Write-Host "FAIL (PIP_AUDIT_STRICT=1): vulnerabilities block QA" -ForegroundColor Red
+        throw "pip-audit found vulnerabilities; set PIP_AUDIT_STRICT=0 for report-only"
+    }
     Write-Host "REPORT-ONLY: vulnerabilities logged to pip_audit.json" -ForegroundColor DarkYellow
 } else {
     Write-Host "OK -> $pipAuditOut" -ForegroundColor Green
 }
 $null = Invoke-Step -Name "Tests: pytest" -Command {
-    pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts --ignore=tests/auto/system3_generated_tests
+    pytest --maxfail=1 --disable-warnings -q --cov=core --cov=dashboard --cov-report=term --cov-fail-under=1 --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts --ignore=tests/auto/system3_generated_tests
 } -ProofPath (Join-Path $logDir "pytest_report.txt")
 
 # Optional: Playwright browser install reminder (not auto-run here)
@@ -176,7 +194,11 @@ if (Test-Path (Join-Path $frontendDir "package.json")) {
     if (Command-Exists "npm") {
         Push-Location $frontendDir
         try {
-            $null = Invoke-Step -Name "Frontend: npm ci" -Command { npm ci } -ProofPath (Join-Path $logDir "npm_ci.txt") -Optional:$true
+            $ciOk = Invoke-Step -Name "Frontend: npm ci" -Command { npm ci } -ProofPath (Join-Path $logDir "npm_ci.txt") -Optional:$true
+            if (!$ciOk) {
+                # EPERM/file-in-use fallback: npm install instead of npm ci
+                $null = Invoke-Step -Name "Frontend: npm install (fallback)" -Command { npm install } -ProofPath (Join-Path $logDir "npm_install.txt") -Optional:$true
+            }
             $null = Invoke-Step -Name "Frontend: npm run build" -Command { npm run build } -ProofPath (Join-Path $logDir "npm_build.txt") -Optional:$true
         } finally {
             Pop-Location

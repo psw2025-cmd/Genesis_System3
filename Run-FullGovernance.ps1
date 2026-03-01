@@ -69,7 +69,7 @@ if ($createdVenv -or $env:GOVERNANCE_REINSTALL_DEPS -eq "1") {
     Invoke-Step -Name "Install: runtime requirements" -Command { pip install -r requirements_runtime.txt } -ProofPath (Join-Path $logDir "governance_install_runtime.txt")
     Invoke-Step -Name "Install: dev requirements" -Command { pip install -r requirements-dev.txt } -ProofPath (Join-Path $logDir "governance_install_dev.txt")
 } else {
-    "SKIP: deps already installed by Run-All Step 6 (set GOVENANCE_REINSTALL_DEPS=1 to force reinstall)" | Out-File (Join-Path $logDir "governance_install_skipped.txt")
+    "SKIP: deps already installed by Run-All Step 6 (set GOVERNANCE_REINSTALL_DEPS=1 to force reinstall)" | Out-File (Join-Path $logDir "governance_install_skipped.txt")
     Write-Host "SKIP: dependency reinstall (already handled by Run-All Step 6)" -ForegroundColor DarkYellow
 }
 
@@ -90,12 +90,16 @@ if ($LASTEXITCODE -ne 0) {
 } else {
     Write-Host "OK -> $pipAuditOut" -ForegroundColor Green
 }
-# Safety: report-only (vulns logged to safety_report.txt; remediation in docs/FULL_ACTION_PLAN_AND_CHECKLIST.md).
+# Safety: report-only. Prefer 'safety scan' (check deprecated Jun 2024). Auto-install if missing.
 Write-Host "`n[Security: safety (report-only)]" -ForegroundColor Yellow
 $safetyProof = Join-Path $logDir "safety_report.txt"
 $oldEap = $ErrorActionPreference
 $ErrorActionPreference = "Continue"
-safety check --full-report 2>&1 | Tee-Object -FilePath $safetyProof
+if (!(Get-Command safety -ErrorAction SilentlyContinue)) { pip install safety -q 2>$null }
+if (Get-Command safety -ErrorAction SilentlyContinue) {
+    $safetyOut = & safety scan 2>&1; if ($LASTEXITCODE -ne 0) { $safetyOut = & safety check --full-report 2>&1 }
+    $safetyOut | Tee-Object -FilePath $safetyProof
+} else { "safety not installed" | Out-File $safetyProof }
 $ErrorActionPreference = $oldEap
 if ($LASTEXITCODE -ne 0) {
     "Safety reported vulnerabilities (report-only; see safety_report.txt). ExitCode=$LASTEXITCODE" | Add-Content $safetyProof
@@ -104,6 +108,11 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "OK -> $safetyProof" -ForegroundColor Green
 }
 
+# black_diff.txt: proof artifact for formatting changes
+$blackDiff = Join-Path $logDir "black_diff.txt"
+$oldEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+$diffOut = & black --diff @lintTargets 2>&1; $diffOut | Set-Content -Path $blackDiff
+$ErrorActionPreference = $oldEap
 # QA required tools (fail-fast on non-zero exit)
 Invoke-Step -Name "QA: black --check" -Command { black --check @lintTargets } -ProofPath (Join-Path $logDir "black_report.txt")
 Invoke-Step -Name "QA: flake8" -Command { flake8 @lintTargets } -ProofPath (Join-Path $logDir "flake8_report.txt")

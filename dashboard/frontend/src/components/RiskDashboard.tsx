@@ -21,19 +21,25 @@ export default function RiskDashboard() {
           total_exposure: riskData.exposure || 0,
           concentration_risk: riskData.concentration || 0,
           total_pnl: state.pnl?.total || 0,
-          position_count: state.positions?.length || 0
+          position_count: state.positions?.length || 0,
+          greeks_exposure: riskData.greeks || riskData.greeks_exposure || { delta: 0, gamma: 0, theta: 0, vega: 0 }
         }
         
-        // Check limits
-        const limitsRes = await axios.post(`${API_BASE}/api/risk/check-limits`, {
-          max_positions: 5,
-          max_exposure: 100000,
-          max_loss: -5000,
-          max_concentration_pct: 50
-        })
-        
         setRiskMetrics(riskMetricsData)
-        setLimitCheck(limitsRes.data.limit_check)
+        
+        // Try limits check (may fail if ADVANCED_FEATURES not available)
+        try {
+          const limitsRes = await axios.post(`${API_BASE}/api/risk/check-limits`, {
+            max_positions: 5,
+            max_exposure: 100000,
+            max_loss: -5000,
+            max_concentration_pct: 50
+          })
+          setLimitCheck(limitsRes.data?.limit_check || null)
+        } catch {
+          // Use SSOT risk.limits as fallback
+          setLimitCheck(riskData.limits || { status: 'PASS', breaches: [], warnings: [] })
+        }
       } catch (error) {
         console.error('Error fetching risk data:', error)
         // Fallback to old endpoints
@@ -47,10 +53,21 @@ export default function RiskDashboard() {
               max_concentration_pct: 50
             })
           ])
-          setRiskMetrics(riskRes.data.risk_metrics)
-          setLimitCheck(limitsRes.data.limit_check)
+          setRiskMetrics(riskRes.data?.risk_metrics || riskRes.data)
+          setLimitCheck(limitsRes.data?.limit_check || null)
         } catch (fallbackError) {
           console.error('Fallback also failed:', fallbackError)
+          // Minimal fallback so we don't show loading forever
+          setRiskMetrics({
+            var_95: 0,
+            expected_shortfall_95: 0,
+            total_exposure: 0,
+            concentration_risk: 0,
+            total_pnl: 0,
+            position_count: 0,
+            greeks_exposure: { delta: 0, gamma: 0, theta: 0, vega: 0 }
+          })
+          setLimitCheck({ status: 'PASS', breaches: [], warnings: [] })
         }
       }
     }

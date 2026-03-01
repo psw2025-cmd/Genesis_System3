@@ -27,10 +27,10 @@ pip-audit>=2.7    # keep for automated audit
 # Browser automation (agent dashboard verification – Playwright)
 playwright>=1.49   # run: playwright install chromium
 
-# Packaging helpers (keep compatible with streamlit<24 requirement)
-packaging>=16.8,<24
+# Packaging helpers (P1: streamlit 1.37 + wheel 0.46.2 require packaging>=24)
+packaging>=24,<25
 setuptools>=78.1   # patched from 69.2.0
-wheel>=0.45,<0.46   # 0.46+ needs packaging>=24; streamlit needs packaging<24
+wheel>=0.46.2      # P1: path traversal fix
 
 # Data quality enforcement
 great-expectations>=0.18,<0.19

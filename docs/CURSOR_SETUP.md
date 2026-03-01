@@ -42,6 +42,8 @@ These are usually **on by default**. If the agent cannot run commands or edit fi
 | **Activate (cmd)** | `call .venv\Scripts\activate.bat` |
 | **Direct run (no activate)** | `.venv\Scripts\python.exe -m pytest ...` |
 
+**Agent rule:** The Cursor agent MUST always use `.venv\Scripts\python.exe` (or `.venv\Scripts\pip.exe`) for Python commands—never assume the shell is activated. See `.cursor/rules/venv-always.mdc`.
+
 **Note:** Many legacy `.bat` files reference `venv`. The project standard is `.venv`. See below for how to fix this if you run those `.bat` files manually.
 
 ### How to fix venv vs .venv (for legacy .bat files)

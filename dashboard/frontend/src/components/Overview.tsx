@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import axios from 'axios'
-import { API_BASE } from '../config'
+import { API_BASE, DEBUG } from '../config'
 import { useWebSocket } from '../hooks/useWebSocket'
 import AppSelfTest from './AppSelfTest'
 import EmptyState from './EmptyState'
@@ -14,6 +14,8 @@ interface HealthData {
   broker_status: string
   market_status: string
   data_source?: string
+  last_data_time?: string | null
+  data_age_seconds?: number | null
   cycle_count: number
   refresh_interval: number
   last_fetch: string
@@ -54,7 +56,7 @@ export default function Overview() {
       clearTimeout(timeoutId)
       return response.ok
     } catch (err) {
-      console.log('Backend not ready yet:', err)
+      if (DEBUG) console.log('Backend not ready yet:', err)
       return false
     }
   }
@@ -101,9 +103,11 @@ export default function Overview() {
           broker_status: stateData.broker?.connected ? 'connected' : 'disconnected',
           market_status: stateData.market?.is_open ? 'open' : 'closed',
           data_source: stateData.data_source || 'unknown',
+          last_data_time: stateData.last_data_time ?? stateData.last_fetch_ts_iso ?? null,
+          data_age_seconds: stateData.data_age_seconds ?? null,
           cycle_count: stateData.cycle_count || 0,
           refresh_interval: 5,
-          last_fetch: stateData.timestamp_ist || new Date().toISOString(),
+          last_fetch: stateData.last_data_time || stateData.last_fetch_ts_iso || stateData.timestamp_ist || new Date().toISOString(),
           qc_status: stateData.qc?.status || 'PASS',
           qc_failures: stateData.qc?.failures || [],
           trades_executed: stateData.pnl?.day_total ? Math.abs(stateData.pnl.day_total) > 0 ? 1 : 0 : 0,
@@ -221,7 +225,7 @@ export default function Overview() {
           status={errorDetails.status}
           message={errorDetails.message}
           onRetry={() => {
-            console.log('[Overview] Retry button clicked')
+            if (DEBUG) console.log('[Overview] Retry button clicked')
             setBackendReady(false)
             setError(null)
             setErrorDetails(null)
@@ -297,6 +301,8 @@ export default function Overview() {
         dataSource={dataSource}
         brokerConnected={brokerConnected}
         mode={mode}
+        lastDataTime={health?.last_data_time ?? health?.last_fetch}
+        dataAgeSeconds={health?.data_age_seconds}
       />
 
       {/* Top Cards */}
@@ -322,11 +328,13 @@ export default function Overview() {
           <div className="text-2xl font-bold">{health?.market_status || 'UNKNOWN'}</div>
           <div className="mt-2">
             <div className={`inline-block px-2 py-1 rounded text-xs ${
-              health?.data_source === 'not_ready' || health?.data_source === 'synthetic'
-                ? 'bg-yellow-500 text-black' 
-                : 'bg-green-500 text-white'
+              health?.data_source === 'live'
+                ? 'bg-green-500 text-white'
+                : health?.data_source === 'cached'
+                ? 'bg-amber-500 text-black'
+                : 'bg-yellow-500 text-black'
             }`}>
-              {health?.data_source === 'not_ready' || health?.data_source === 'synthetic' ? '⚠️ NOT READY' : '✅ LIVE DATA'}
+              {health?.data_source === 'live' ? '🟢 LIVE' : health?.data_source === 'cached' ? '📦 CACHED' : '⚠️ NOT READY'}
             </div>
           </div>
           <div className="text-sm text-gray-400 mt-2">Last Fetch: {health?.last_fetch ? new Date(health.last_fetch).toLocaleTimeString() : 'N/A'}</div>
@@ -374,7 +382,7 @@ export default function Overview() {
             ₹{(health?.total_pnl || 0).toFixed(2)}
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            {(health?.open_positions || 0) > 0 ? `${health.open_positions} open` : 'No positions'}
+            {(health?.open_positions || 0) > 0 ? `${health?.open_positions} open` : 'No positions'}
           </div>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">

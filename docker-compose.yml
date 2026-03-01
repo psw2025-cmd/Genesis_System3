@@ -1,0 +1,60 @@
+# Genesis System3 - Startup Orchestration (P2.1)
+# Backend + Frontend (production build)
+#
+# Usage:
+#   docker compose up -d              # Start backend + frontend
+#   docker compose down               # Stop all
+#
+# Backend:  http://localhost:8000
+# Frontend: http://localhost:3000     (serves built static files)
+# Health:   http://localhost:8000/api/health
+#
+# Frontend calls API at localhost:8000 (see dashboard/frontend/src/config.ts)
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+    environment:
+      - SYSTEM3_REAL_ONLY=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Optional: Trading system (option chain automation)
+  # Uncomment and run: docker compose up -d trading
+  # trading:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.backend
+  #   command: ["python", "option_chain_automation_master.py", "--sim", "--refresh", "5"]
+  #   volumes:
+  #     - ./outputs:/app/outputs
+  #     - ./logs:/app/logs
+  #     - ./config:/app/config:ro
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   restart: unless-stopped

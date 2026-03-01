@@ -238,6 +238,31 @@ class AngelOneBroker:
         """
         return self._safe_get_profile(max_retries=3)
 
+    def get_positions(self):
+        """
+        Fetch open/closed positions from broker.
+        Returns list of position dicts or empty list on error.
+        """
+        try:
+            if hasattr(self.smart, "position"):
+                resp = self.smart.position()
+            elif hasattr(self.smart, "getPosition"):
+                resp = self.smart.getPosition()
+            else:
+                logger.warning("Broker has no position() or getPosition() method")
+                return []
+            if not resp or not resp.get("status"):
+                return []
+            data = resp.get("data", [])
+            if isinstance(data, list):
+                return data
+            if isinstance(data, dict):
+                return data.get("net", data.get("position", []))
+            return []
+        except Exception as e:
+            logger.warning(f"get_positions failed: {e}")
+            return []
+
     def get_ltp(self, exchange: str, tradingsymbol: str, symboltoken: str):
         """
         Fetch LTP for a given symbol.

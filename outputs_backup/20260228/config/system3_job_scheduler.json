@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "id": "daily_status",
+      "name": "Daily Status Check",
+      "module": "core.engine.check_system3_status",
+      "enabled": true,
+      "type": "daily"
+    }
+  ]
+}
+

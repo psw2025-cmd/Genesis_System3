@@ -5,6 +5,12 @@ VaR, Expected Shortfall, Risk Metrics
 
 import numpy as np
 from typing import Dict, List, Optional, Any
+
+try:
+    from scipy.stats import norm
+    SCIPY_AVAILABLE = True
+except ImportError:
+    SCIPY_AVAILABLE = False
 from datetime import datetime, timedelta
 import pytz
 
@@ -35,12 +41,18 @@ class RiskManagement:
         # Historical VaR
         var_historical = np.percentile(returns_array, (1 - confidence_level) * 100)
 
-        # Parametric VaR (assuming normal distribution)
+        # Parametric VaR (assuming normal distribution) - use scipy norm.ppf for deterministic result
         mean_return = np.mean(returns_array)
         std_return = np.std(returns_array)
-        var_parametric = mean_return - std_return * np.abs(
-            np.percentile(np.random.normal(0, 1, 10000), (1 - confidence_level) * 100)
-        )
+        if std_return <= 0:
+            var_parametric = var_historical
+        elif SCIPY_AVAILABLE:
+            z = norm.ppf(1 - confidence_level)  # e.g. -1.645 for 95%
+            var_parametric = mean_return - std_return * abs(z)
+        else:
+            # Fallback: approximate z for 95% = 1.645
+            z_approx = 1.645 if confidence_level >= 0.95 else 1.28
+            var_parametric = mean_return - std_return * z_approx
 
         return {
             "var_historical": float(var_historical),
@@ -228,6 +240,22 @@ class RiskManagement:
                 }
             )
 
+        # VaR breach (VaR as positive loss amount)
+        max_var = risk_limits.get("max_var", float("inf"))
+        var_95 = abs(portfolio_risk.get("var_95", 0))
+        if max_var < float("inf") and var_95 > max_var:
+            breaches.append(
+                {"limit": "max_var", "value": var_95, "limit_value": max_var, "severity": "error"}
+            )
+
+        # Expected Shortfall breach
+        max_es = risk_limits.get("max_es", float("inf"))
+        es_95 = abs(portfolio_risk.get("expected_shortfall_95", 0))
+        if max_es < float("inf") and es_95 > max_es:
+            breaches.append(
+                {"limit": "max_es", "value": es_95, "limit_value": max_es, "severity": "error"}
+            )
+
         # Concentration risk
         max_concentration = risk_limits.get("max_concentration_pct", 50)
         if portfolio_risk["concentration_risk"] > max_concentration:
@@ -249,11 +277,15 @@ class RiskManagement:
                 }
             )
 
+        # Risk lock: when breaches exist, trading is blocked
+        risk_lock = len(breaches) > 0
+
         return {
             "status": "PASS" if not breaches else "FAIL",
             "breaches": breaches,
             "warnings": warnings,
             "portfolio_risk": portfolio_risk,
+            "risk_lock": risk_lock,
             "timestamp": datetime.now(IST).isoformat(),
         }
 

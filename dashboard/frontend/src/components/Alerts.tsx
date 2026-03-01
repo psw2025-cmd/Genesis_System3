@@ -14,7 +14,7 @@ export default function Alerts() {
         if (stateRes && stateRes.data && stateRes.data.alerts) {
           const ssotAlerts = stateRes.data.alerts || []
           setAlerts(ssotAlerts)
-          setUnreadCount(ssotAlerts.filter((a: any) => !a.read).length)
+          setUnreadCount(ssotAlerts.filter((a: any) => !(a.read ?? false)).length)
         } else {
           // Fallback to alerts endpoints
           const [recentRes, unreadRes] = await Promise.all([
@@ -47,9 +47,11 @@ export default function Alerts() {
   }, [])
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
+    const s = (severity || '').toLowerCase()
+    switch (s) {
       case 'critical': return 'bg-red-600'
       case 'error': return 'bg-red-500'
+      case 'warn':
       case 'warning': return 'bg-yellow-500'
       case 'info': return 'bg-blue-500'
       default: return 'bg-gray-500'
@@ -57,15 +59,25 @@ export default function Alerts() {
   }
 
   const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'price_alert': return '💰'
-      case 'position_alert': return '📊'
-      case 'system_alert': return '⚙️'
-      case 'pnl_alert': return '💵'
-      case 'risk_alert': return '⚠️'
-      default: return '📢'
-    }
+    const t = (type || '').toLowerCase()
+    if (t.includes('price')) return '💰'
+    if (t.includes('position')) return '📊'
+    if (t.includes('system') || t.includes('broker')) return '⚙️'
+    if (t.includes('pnl')) return '💵'
+    if (t.includes('risk')) return '⚠️'
+    return '📢'
   }
+
+  // Normalize alert format (SSOT uses level/code/ts; legacy uses severity/type/title/timestamp)
+  const normalizeAlert = (a: any) => ({
+    id: a.id || a.code || a.ts,
+    severity: a.severity || a.level || 'info',
+    type: a.type || a.code || 'system_alert',
+    title: a.title || a.code || (a.level ? `${a.level} Alert` : 'Alert'),
+    message: a.message || '',
+    timestamp: a.timestamp || a.ts,
+    read: a.read ?? false
+  })
 
   return (
     <div className="space-y-6">
@@ -80,33 +92,35 @@ export default function Alerts() {
 
       {alerts.length > 0 ? (
         <div className="space-y-3">
-          {alerts.map((alert, idx) => (
+          {alerts.map((alert, idx) => {
+            const a = normalizeAlert(alert)
+            return (
             <div
-              key={alert.id || idx}
+              key={a.id || idx}
               className={`bg-gray-800 p-4 rounded-lg border-l-4 ${
-                getSeverityColor(alert.severity)
+                getSeverityColor(a.severity)
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{getTypeIcon(alert.type)}</span>
-                    <h3 className="text-lg font-bold">{alert.title}</h3>
-                    <span className={`px-2 py-1 rounded text-xs ${getSeverityColor(alert.severity)}`}>
-                      {(alert.severity || 'UNKNOWN').toUpperCase()}
+                    <span className="text-2xl">{getTypeIcon(a.type)}</span>
+                    <h3 className="text-lg font-bold">{a.title}</h3>
+                    <span className={`px-2 py-1 rounded text-xs ${getSeverityColor(a.severity)}`}>
+                      {(a.severity || 'UNKNOWN').toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-gray-300 mb-2">{alert.message}</p>
+                  <p className="text-gray-300 mb-2">{a.message}</p>
                   <div className="text-xs text-gray-400">
-                    {new Date(alert.timestamp).toLocaleString()}
+                    {a.timestamp ? new Date(a.timestamp).toLocaleString() : ''}
                   </div>
                 </div>
-                {!alert.read && (
+                {!a.read && (
                   <span className="w-3 h-3 bg-red-500 rounded-full"></span>
                 )}
               </div>
             </div>
-          ))}
+          )})}
         </div>
       ) : (
         <div className="text-gray-400 text-center py-12">

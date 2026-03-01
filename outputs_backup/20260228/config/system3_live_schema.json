@@ -1,0 +1,50 @@
+{
+  "angel_index_ai_signals.csv": [
+    "underlying",
+    "symbol",
+    "signal",
+    "final_score",
+    "ts"
+  ],
+  "angel_index_ai_signals_curated.csv": [
+    "underlying",
+    "symbol",
+    "signal",
+    "final_score",
+    "ts"
+  ],
+  "angel_virtual_orders.csv": [
+    "ts",
+    "underlying",
+    "strike",
+    "option_type",
+    "side",
+    "expiry",
+    "ltp",
+    "final_score",
+    "ai_score",
+    "lots",
+    "approved",
+    "adjusted_lots",
+    "risk_reason",
+    "risk_flags_json",
+    "snapshot_id"
+  ],
+  "angel_index_ai_pnl_log.csv": [
+    "ts",
+    "underlying",
+    "strike",
+    "side",
+    "entry_price",
+    "target_price",
+    "sl_price",
+    "pred_label",
+    "pred_confidence",
+    "expected_move_score",
+    "result",
+    "exit_price",
+    "pnl_pct",
+    "max_fav_pct",
+    "max_adv_pct"
+  ]
+}

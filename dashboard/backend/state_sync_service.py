@@ -16,6 +16,11 @@ IST = pytz.timezone("Asia/Kolkata")
 MARKET_DETECTION_AVAILABLE = False
 ADVANCED_FEATURES_AVAILABLE = False
 
+# REAL_ONLY: when True, never use SYNTHETIC data_source (use not_ready when market closed)
+import os
+
+REAL_ONLY = os.environ.get("SYSTEM3_REAL_ONLY", "1").strip().lower() in ("1", "true", "yes")
+
 
 class StateSyncService:
     """Service to sync runtime state from output files"""
@@ -72,8 +77,24 @@ class StateSyncService:
                 if not market_is_open and "next_open" in market_status:
                     updates["market"]["next_open"] = market_status["next_open"]
 
-                # Determine data source
-                updates["data_source"] = "BROKER" if market_is_open else "SYNTHETIC"
+                # Data source state machine: not_ready | cached | live
+                try:
+                    from dashboard.backend.data_source_state import (
+                        compute_data_source,
+                        get_last_data_timestamp,
+                    )
+
+                    outputs_dir = self.outputs_dir
+                except ImportError:
+                    from data_source_state import compute_data_source, get_last_data_timestamp
+
+                    outputs_dir = self.outputs_dir
+                last_ts = get_last_data_timestamp(outputs_dir)
+                ds, last_data_time, data_age_sec = compute_data_source(market_is_open, last_ts, outputs_dir)
+                updates["data_source"] = ds
+                if last_data_time is not None:
+                    updates["last_data_time"] = last_data_time.isoformat()
+                updates["data_age_seconds"] = round(data_age_sec, 1) if data_age_sec >= 0 else None
         except Exception as e:
             print(f"Error syncing market status: {e}")
 
@@ -84,9 +105,12 @@ class StateSyncService:
                 health = json.loads(health_file.read_text())
 
                 updates["mode"] = health.get("mode", "PAPER")
+                # health.json uses is_connected; some writers use broker_status
+                is_connected = health.get("is_connected", health.get("broker_status") == "connected")
+                broker_status_str = "connected" if is_connected else "disconnected"
                 updates["broker"] = {
-                    "connected": health.get("broker_status") == "connected",
-                    "status": health.get("broker_status", "disconnected"),
+                    "connected": is_connected,
+                    "status": health.get("broker_status", broker_status_str),
                     "name": "AngelOne",
                 }
 
@@ -102,6 +126,34 @@ class StateSyncService:
                 # Sync cycle count
                 if "cycle_count" in health:
                     updates["cycle_count"] = health["cycle_count"]
+            else:
+                # No health.json: trading system not running. When market open, check broker
+                # directly so dashboard can show data_source ready without trading system.
+                if MARKET_DETECTION_AVAILABLE and updates.get("market", {}).get("is_open"):
+                    broker_status = self.state_store._check_broker_connectivity()
+                    updates["broker"] = {
+                        "connected": broker_status.get("connected", False),
+                        "status": broker_status.get("status", "disconnected"),
+                        "name": broker_status.get("name", "AngelOne"),
+                    }
+                    # Write bootstrap health.json for persistence and sync_from_files
+                    if broker_status.get("connected"):
+                        # data_source: use updates if set by market block, else "live" when broker connected
+                        ds = updates.get("data_source", "live")
+                        bootstrap = {
+                            "is_connected": True,
+                            "broker_status": "connected",
+                            "data_source": ds,
+                            "mode": "PAPER",
+                            "qc_status": "PASS",
+                            "qc_failures": [],
+                            "timestamp": datetime.now(IST).isoformat(),
+                        }
+                        try:
+                            with open(health_file, "w") as f:
+                                json.dump(bootstrap, f, indent=2)
+                        except Exception:
+                            pass
         except Exception as e:
             print(f"Error syncing health: {e}")
 

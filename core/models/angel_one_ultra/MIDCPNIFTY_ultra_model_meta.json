@@ -1,6 +1,6 @@
 {
   "underlying": "MIDCPNIFTY",
-  "training_date": "2026-02-02T16:07:44.763920",
+  "training_date": "2026-02-28T04:53:03.202052",
   "model_version": "ultra_v3",
   "model_type": "RandomForest",
   "training_data_source": "ultra_training",

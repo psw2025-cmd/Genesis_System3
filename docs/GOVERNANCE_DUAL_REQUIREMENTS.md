@@ -43,7 +43,7 @@ This installs `pip-tools`, then runs `pip-compile` for both runtime and dev.
 
 ## Governance constraints (keep in .in)
 
-- **Streamlit**: `packaging>=16.8,<24` (streamlit 1.31 requires `packaging<24`).
+- **Streamlit 1.37 + wheel 0.46.2**: `packaging>=24,<25` (P1 security fixes).
 - **Playwright**: comment reminder `# run: playwright install chromium`.
 - **libmagic**: `python-magic` on non-Windows, `python-magic-bin` on Windows.
 - **Patch notes**: keep comments for any version patched for compatibility (e.g. setuptools, wheel).

@@ -1,0 +1,69 @@
+ROOT: C:\Genesis_System3
+MODE: PREVIEW
+STAMP: 20260225_005555
+
+WOULD MODIFY: C:\Genesis_System3\auto_security_patch.py
+ - Patched shell=True command: 'python script.py' -> ['python', 'script.py']
+
+WOULD MODIFY: C:\Genesis_System3\FIX_PORT_AND_START.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\FIX_UVICORN_AND_START.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_BACKEND.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\restart_backend.ps1
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_BACKEND_WITH_FIXES.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_DASHBOARD.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RESTART_WITH_SSOT.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\RUN_AND_TRACK_ALL.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_ALL_SERVICES.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\start_backend.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_BACKEND_AND_FRONTEND.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_BACKEND_FOR_TESTING.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_DASHBOARD.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_EVERYTHING_AUTO.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_FRONTEND_ONLY.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\START_FULL_DASHBOARD_SYSTEM.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\system3_tab_forensic_scan.py
+ - Added timeout=5 to requests call (single-line).
+
+WOULD MODIFY: C:\Genesis_System3\VALIDATE_SSOT_IMPLEMENTATION.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\scripts\run_local.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (2 occurrences).
+
+WOULD MODIFY: C:\Genesis_System3\scripts\start_backend.bat
+ - Replaced --host 0.0.0.0 with --host 127.0.0.1 (1 occurrences).
+
+SUMMARY
+Preview completed.

@@ -25,9 +25,43 @@ class PositionReconciliation:
 
     def get_broker_positions(self) -> List[Dict[str, Any]]:
         """Get positions from broker (when connected)"""
-        # TODO: Implement broker position fetch
-        # For now, return empty list
-        return []
+        try:
+            from core.brokers.angel_one.broker import AngelOneBroker
+
+            broker = AngelOneBroker(allow_data_only=True)
+            raw = broker.get_positions()
+            # Normalize to expected format: [{symbol, qty, entry_price, ...}]
+            out = []
+            for p in raw if isinstance(raw, list) else []:
+                if isinstance(p, dict):
+                    out.append(
+                        {
+                            "symbol": p.get("tradingsymbol", p.get("symbol", "")),
+                            "qty": int(p.get("quantity", p.get("qty", 0))),
+                            "entry_price": float(p.get("avgprice", p.get("entry_price", 0))),
+                            "current_price": float(p.get("ltp", p.get("current_price", 0))),
+                            "unrealized_pnl": float(p.get("pnl", p.get("unrealized_pnl", 0))),
+                            **{
+                                k: v
+                                for k, v in p.items()
+                                if k
+                                not in (
+                                    "tradingsymbol",
+                                    "quantity",
+                                    "qty",
+                                    "avgprice",
+                                    "entry_price",
+                                    "ltp",
+                                    "current_price",
+                                    "pnl",
+                                    "unrealized_pnl",
+                                )
+                            },
+                        }
+                    )
+            return out
+        except Exception:
+            return []
 
     def get_internal_positions(self) -> List[Dict[str, Any]]:
         """Get positions from internal ledger"""
