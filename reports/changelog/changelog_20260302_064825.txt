@@ -1,0 +1,8 @@
+GENESIS SYSTEM3 GOVERNANCE CHANGELOG
+Run: 20260302_064825
+============================================================
+
+  - MODEL_CORRUPT: xgboost_model
+  - MODEL_CORRUPT: ensemble_model
+
+Total changes: 2
