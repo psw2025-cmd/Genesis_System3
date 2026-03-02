@@ -522,12 +522,12 @@ def phase_generate_proof():
 
     # Proof summary text
     proof_path = PROOF_DIR / f"governance_proof_{TS}.txt"
-    with open(proof_path, "w") as f:
+    with open(proof_path, "w", encoding="utf-8") as f:
         f.write(f"GENESIS SYSTEM3 GOVERNANCE PROOF\nRun ID: {TS}\n{'='*60}\n\n")
         f.write("PHASE RESULTS:\n")
         for phase, data in REPORT["phases"].items():
             st = data.get("status", "?")
-            icon = "✅" if st == "PASS" else "⚠️" if st == "WARN" else "❌"
+            icon = "[PASS]" if st == "PASS" else "[WARN]" if st == "WARN" else "[FAIL]"
             f.write(f"  {icon} {phase}: {st}\n")
         f.write(f"\nSUMMARY:\n")
         f.write(f"  Passed:   {REPORT['summary']['passed']}\n")

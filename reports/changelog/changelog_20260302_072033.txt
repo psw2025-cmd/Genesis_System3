@@ -1,0 +1,7 @@
+GENESIS SYSTEM3 GOVERNANCE CHANGELOG
+Run: 20260302_072033
+============================================================
+
+  - MODEL_CORRUPT: ensemble_model
+
+Total changes: 1

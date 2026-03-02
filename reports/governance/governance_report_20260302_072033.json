@@ -1,0 +1,385 @@
+{
+  "timestamp": "2026-03-02T07:20:33.290153",
+  "governance_run_id": "20260302_072033",
+  "phases": {
+    "venv_diagnosis": {
+      "status": "PASS",
+      "details": {
+        "python_version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+        "python_executable": "C:\\Genesis_System3\\.venv\\Scripts\\python.exe",
+        "venv_prefix": "C:\\Genesis_System3\\.venv",
+        "in_venv": true,
+        "packages": {
+          "pandas": {
+            "status": "OK",
+            "version": "2.1.3"
+          },
+          "numpy": {
+            "status": "OK",
+            "version": "1.26.4"
+          },
+          "sklearn": {
+            "status": "OK",
+            "version": "1.7.2"
+          },
+          "xgboost": {
+            "status": "OK",
+            "version": "2.0.3"
+          },
+          "joblib": {
+            "status": "OK",
+            "version": "1.5.3"
+          },
+          "requests": {
+            "status": "OK",
+            "version": "2.32.4"
+          },
+          "flask": {
+            "status": "OK",
+            "version": "3.0.3"
+          },
+          "shap": {
+            "status": "OK",
+            "version": "0.49.1"
+          },
+          "imblearn": {
+            "status": "OK",
+            "version": "0.14.1"
+          },
+          "pyotp": {
+            "status": "OK",
+            "version": "unknown"
+          },
+          "fastapi": {
+            "status": "OK",
+            "version": "0.134.0"
+          }
+        },
+        "missing_critical": []
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:02.239354"
+    },
+    "broker_validation": {
+      "status": "PASS",
+      "details": {
+        "config_files": {
+          "angel_config.json": "EXISTS",
+          "live_trade_config.py": "EXISTS",
+          ".env": "EXISTS"
+        },
+        "broker_module": "EXISTS",
+        "broker_syntax": "VALID",
+        "kill_switch": {
+          "kill_switch_activated": false,
+          "emergency_stop": false,
+          "trading_paused": false,
+          "system_shutdown": false,
+          "last_updated": "2025-12-09T09:00:00Z",
+          "reason": "System operating normally",
+          "auto_resume_enabled": true,
+          "manual_override": false,
+          "version": "3.0.0"
+        },
+        "runtime_flags": {
+          "system_enabled": true,
+          "trading_enabled": true,
+          "live_trading": false,
+          "dry_run_mode": true,
+          "risk_management_enabled": true,
+          "max_daily_loss": 50000,
+          "max_single_trade_loss": 5000,
+          "max_positions": 10,
+          "max_lots_per_symbol": 5,
+          "auto_restart_enabled": true,
+          "monitoring_enabled": true,
+          "alerts_enabled": true,
+          "data_validation_enabled": true,
+          "model_validation_enabled": true,
+          "performance_tracking_enabled": true,
+          "last_updated": "2025-12-09T09:00:00Z",
+          "version": "3.0.0"
+        },
+        "autonomous_params": {
+          "last_cycle": 1,
+          "target_accuracy": 0.9933333333333334,
+          "optimal_threshold": 0.65,
+          "ai_weight": 0.45,
+          "updated_at": "2026-03-01T14:34:30.635205"
+        }
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:02.330221"
+    },
+    "model_health": {
+      "status": "PASS",
+      "details": {
+        "models": {
+          "xgboost_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 404.4
+          },
+          "ensemble_model": {
+            "status": "CORRUPT",
+            "error": "Can't get attribute 'EnsembleModel' on <module '__main__' from 'C:\\\\Genesis_System3\\\\GENESIS_GOVERNANCE_ORCHESTRATOR.py'>"
+          },
+          "ADANIENT_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 874.6
+          },
+          "AXISBANK_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 835.4
+          },
+          "BANKNIFTY_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 853.6
+          },
+          "BHARTIARTL_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 892.8
+          },
+          "FINNIFTY_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 835.3
+          },
+          "HDFCBANK_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 798.3
+          },
+          "ICICIBANK_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 877.6
+          },
+          "INFY_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 803.2
+          },
+          "KOTAKBANK_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 843.9
+          },
+          "LT_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 837.3
+          },
+          "MIDCPNIFTY_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 840.2
+          },
+          "NIFTY_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 816.2
+          },
+          "RELIANCE_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 861.4
+          },
+          "SBIN_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 853.6
+          },
+          "SENSEX_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 813.7
+          },
+          "TCS_ultra_model": {
+            "status": "LOADED",
+            "type": "XGBClassifier",
+            "size_kb": 830.5
+          }
+        },
+        "load_rate": "17/18",
+        "retrain_needed": [
+          "ensemble_model"
+        ],
+        "meta_files_count": 16
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:03.099948"
+    },
+    "qc_audit": {
+      "status": "PASS",
+      "details": {
+        "data_quality": {
+          "signals_production": {
+            "status": "OK",
+            "rows": 196,
+            "cols": 24,
+            "null_pct": 33.04,
+            "columns": [
+              "symbol",
+              "underlying",
+              "signal",
+              "spot",
+              "expiry",
+              "strike",
+              "ltp",
+              "iv"
+            ]
+          },
+          "pnl_log_production": {
+            "status": "OK",
+            "rows": 3,
+            "cols": 15,
+            "null_pct": 0.0,
+            "columns": [
+              "ts",
+              "underlying",
+              "strike",
+              "side",
+              "entry_price",
+              "target_price",
+              "sl_price",
+              "pred_label"
+            ]
+          },
+          "virtual_orders_production": {
+            "status": "OK",
+            "rows": 0,
+            "cols": 28,
+            "null_pct": NaN,
+            "columns": [
+              "timestamp",
+              "order_id",
+              "symbol",
+              "side",
+              "quantity",
+              "price",
+              "order_type",
+              "status"
+            ]
+          },
+          "forward_returns": {
+            "status": "OK",
+            "rows": 650,
+            "cols": 129,
+            "null_pct": 41.18,
+            "columns": [
+              "underlying",
+              "index_exch",
+              "opt_exch",
+              "spot",
+              "expiry",
+              "strike",
+              "side",
+              "symbol"
+            ]
+          }
+        },
+        "signal_integrity": {
+          "rows": 196,
+          "missing_required_cols": [],
+          "status": "OK"
+        }
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:03.264398"
+    },
+    "dashboard_validation": {
+      "status": "PASS",
+      "details": {
+        "backend_syntax": "VALID",
+        "backend_endpoints_count": 104,
+        "frontend_dist": {
+          "status": "EXISTS",
+          "file_count": 7,
+          "has_index_html": true
+        },
+        "frontend_components": [
+          "AdvancedCharts.tsx",
+          "AgentConsole.tsx",
+          "Alerts.tsx",
+          "AppSelfTest.tsx",
+          "BackendConnectivityBanner.tsx",
+          "ChainAnalytics.tsx",
+          "ControlPlane.tsx",
+          "DataSourceWarning.tsx",
+          "EmptyState.tsx",
+          "ErrorBanner.tsx",
+          "ErrorBoundary.tsx",
+          "MLPerformance.tsx",
+          "ModelBehavior.tsx",
+          "Overview.tsx",
+          "PaperTrading.tsx",
+          "RiskDashboard.tsx",
+          "Signals.tsx",
+          "TopPredictions.tsx"
+        ]
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:03.537883"
+    },
+    "pipeline_integrity": {
+      "status": "PASS",
+      "details": {
+        "phase_files": {
+          "phase220_aggregation": "VALID",
+          "phase304_forward_returns": "VALID",
+          "phase305_reconciliation": "VALID",
+          "merge_key_normalizer": "VALID",
+          "timestamp_parser": "VALID",
+          "continuous_validators": "VALID",
+          "signal_engine": "VALID",
+          "ensemble_predictor": "VALID"
+        },
+        "valid_phases": "8/8"
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:03.715972"
+    },
+    "risk_safety": {
+      "status": "PASS",
+      "details": {
+        "kill_switch_active": false,
+        "kill_switch": {
+          "kill_switch_activated": false,
+          "emergency_stop": false,
+          "trading_paused": false,
+          "system_shutdown": false,
+          "last_updated": "2025-12-09T09:00:00Z",
+          "reason": "System operating normally",
+          "auto_resume_enabled": true,
+          "manual_override": false,
+          "version": "3.0.0"
+        },
+        "risk_limits": {
+          "max_positions": 5,
+          "max_exposure": 50000,
+          "max_loss": -2000,
+          "max_concentration_pct": 40,
+          "max_var_95": 5000,
+          "auto_kill_switch": true,
+          "emergency_contact": "+919172645866",
+          "mode": "PAPER",
+          "real_money_locked": true
+        },
+        "safety_guardrail": "EXISTS"
+      },
+      "error": null,
+      "timestamp": "2026-03-02T07:21:03.982884"
+    }
+  },
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "warnings": 0
+  },
+  "overall_status": "PASS"
+}
