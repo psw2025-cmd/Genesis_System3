@@ -27,15 +27,15 @@ jobs:
 
       - name: Build & Push Backend Image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/genesis-backend:latest -f backend/Dockerfile .
-          docker push ghcr.io/${{ github.repository }}/genesis-backend:latest
+          docker build -t ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest -f backend/Dockerfile .
+          docker push ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest
 
       - name: Deploy Backend to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: genesis-backend-app
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
-          images: ghcr.io/${{ github.repository }}/genesis-backend:latest
+          images: ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest
 
   deploy-dashboard:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -57,12 +57,12 @@ jobs:
 
       - name: Build & Push Dashboard Image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/genesis-dashboard:latest -f dashboard/Dockerfile .
-          docker push ghcr.io/${{ github.repository }}/genesis-dashboard:latest
+          docker build -t ghcr.io/psw2025-cmd/genesis_system3/genesis-dashboard:latest -f dashboard/Dockerfile .
+          docker push ghcr.io/psw2025-cmd/genesis_system3/genesis-dashboard:latest
 
       - name: Deploy Dashboard to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: genesis-dashboard-app
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DASHBOARD }}
-          images: ghcr.io/${{ github.repository }}/genesis-dashboard:latest
+          images: ghcr.io/psw2025-cmd/genesis_system3/genesis-dashboard:latest
