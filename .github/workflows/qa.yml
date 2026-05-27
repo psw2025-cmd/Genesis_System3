@@ -30,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install lightgbm catboost xgboost tensorflow torch scikit-learn bandit safety pylint black plotly smartapi-python
-        npm install -g eslint prettier depcruise dockerfilelint kubeval
+        npm install -g eslint prettier depcruise dockerfilelint
 
     - name: Run Full QA Script
       run: |
