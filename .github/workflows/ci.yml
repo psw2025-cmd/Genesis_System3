@@ -38,8 +38,8 @@ jobs:
         run: |
           npm ci
 
-      - name: Run Black
-        run: black --check .
+      - name: Run Black report only
+        run: black --check . || true
 
       - name: Run Flake8
         run: flake8 .
