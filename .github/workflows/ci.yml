@@ -2,7 +2,7 @@ name: CI - Governance & QA Guardian
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, fix/ci-syntax-errors-2026-05-27 ]
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
