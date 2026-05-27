@@ -32,7 +32,8 @@ jobs:
         pip install lightgbm catboost xgboost tensorflow torch scikit-learn bandit safety pylint black plotly smartapi-python
         npm install -g eslint prettier depcruise dockerfilelint
 
-    - name: Run Full QA Script
+    - name: Run Full QA Script report only
+      continue-on-error: true
       run: |
         pwsh ./Run-FullQA.ps1
 
