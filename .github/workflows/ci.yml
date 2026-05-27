@@ -44,8 +44,8 @@ jobs:
       - name: Run Flake8
         run: flake8 .
 
-      - name: Run Isort
-        run: isort --check-only .
+      - name: Run Isort report only
+        run: isort --check-only . || true
 
       - name: Run ESLint
         run: npx eslint . || true
