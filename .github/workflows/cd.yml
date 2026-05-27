@@ -6,9 +6,43 @@ on:
     types:
       - completed
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  deploy-backend:
+  detect-deployable-artifacts:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      backend_ready: ${{ steps.detect.outputs.backend_ready }}
+      dashboard_ready: ${{ steps.detect.outputs.dashboard_ready }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect Docker build inputs
+        id: detect
+        run: |
+          if [ -f backend/Dockerfile ]; then
+            echo "backend_ready=true" >> "$GITHUB_OUTPUT"
+            echo "backend/Dockerfile found. Backend deploy enabled."
+          else
+            echo "backend_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::backend/Dockerfile not found. Backend deploy skipped."
+          fi
+
+          if [ -f dashboard/Dockerfile ]; then
+            echo "dashboard_ready=true" >> "$GITHUB_OUTPUT"
+            echo "dashboard/Dockerfile found. Dashboard deploy enabled."
+          else
+            echo "dashboard_ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::dashboard/Dockerfile not found. Dashboard deploy skipped."
+          fi
+
+  deploy-backend:
+    needs: detect-deployable-artifacts
+    if: ${{ github.event.workflow_run.conclusion == 'success' && needs.detect-deployable-artifacts.outputs.backend_ready == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +72,8 @@ jobs:
           images: ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest
 
   deploy-dashboard:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: detect-deployable-artifacts
+    if: ${{ github.event.workflow_run.conclusion == 'success' && needs.detect-deployable-artifacts.outputs.dashboard_ready == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
