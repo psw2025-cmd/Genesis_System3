@@ -1,0 +1,83 @@
+name: Temporary E999 Fixer
+
+on:
+  push:
+    branches:
+      - fix/ci-syntax-errors-2026-05-27
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/fix/ci-syntax-errors-2026-05-27'
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/ci-syntax-errors-2026-05-27
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply exact indentation fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('system3_master_pipeline_repair_final.py')
+          text = path.read_text(encoding='utf-8')
+
+          old = """                    # Identify new matches (where forward columns now have values)
+                    stage2_matched = 0
+                    for idx, row in merged_s2.iterrows():
+                        orig_idx = unmatched_idx[idx]
+                        for col in forward_cols:
+                            merge_col = col + '_match' if col + '_match' in merged_s2.columns else col
+                            if pd.notna(merged_s2.loc[idx, merge_col]):
+                                enrich_orders.loc[orig_idx, col] = merged_s2.loc[idx, merge_col]
+                                stage2_matched += 1
+                                break  # Count each row only once
+                    
+                    total_matched += stage2_matched
+                    stage_results['asof_2s'] = stage2_matched
+                    print(f\"  Matched: {stage2_matched}\")
+                except Exception as e:
+"""
+
+          new = """                        # Identify new matches (where forward columns now have values)
+                        stage2_matched = 0
+                        for idx, row in merged_s2.iterrows():
+                            orig_idx = unmatched_idx[idx]
+                            for col in forward_cols:
+                                merge_col = col + '_match' if col + '_match' in merged_s2.columns else col
+                                if pd.notna(merged_s2.loc[idx, merge_col]):
+                                    enrich_orders.loc[orig_idx, col] = merged_s2.loc[idx, merge_col]
+                                    stage2_matched += 1
+                                    break  # Count each row only once
+                        
+                        total_matched += stage2_matched
+                        stage_results['asof_2s'] = stage2_matched
+                        print(f\"  Matched: {stage2_matched}\")
+                    except Exception as e:
+"""
+
+          count = text.count(old)
+          if count != 1:
+              raise SystemExit(f'Expected exactly one target block, found {count}')
+
+          fixed = text.replace(old, new, 1)
+          path.write_text(fixed, encoding='utf-8')
+          PY
+
+      - name: Verify syntax
+        run: python -m py_compile system3_master_pipeline_repair_final.py
+
+      - name: Remove temporary workflow and commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/auto-fix-ci-syntax-e999.yml
+          git add system3_master_pipeline_repair_final.py
+          git commit -m "fix: indent Stage 2 merge_asof block inside try statement to resolve E999 SyntaxError"
+          git push origin fix/ci-syntax-errors-2026-05-27
