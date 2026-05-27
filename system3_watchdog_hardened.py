@@ -21,6 +21,7 @@ except ImportError:
     sys.exit(1)
 from pathlib import Path
 from datetime import datetime, time as dt_time, timedelta
+from typing import Optional
 import logging
 
 # Ensure project root is in path
@@ -267,4 +268,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

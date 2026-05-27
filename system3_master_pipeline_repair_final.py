@@ -300,24 +300,24 @@ try:
                                 tolerance=pd.Timedelta(seconds=2),
                                 suffixes=('', '_match')
                             )
-                    
-                    # Identify new matches (where forward columns now have values)
-                    stage2_matched = 0
-                    for idx, row in merged_s2.iterrows():
-                        orig_idx = unmatched_idx[idx]
-                        for col in forward_cols:
-                            merge_col = col + '_match' if col + '_match' in merged_s2.columns else col
-                            if pd.notna(merged_s2.loc[idx, merge_col]):
-                                enrich_orders.loc[orig_idx, col] = merged_s2.loc[idx, merge_col]
-                                stage2_matched += 1
-                                break  # Count each row only once
-                    
-                    total_matched += stage2_matched
-                    stage_results['asof_2s'] = stage2_matched
-                    print(f"  Matched: {stage2_matched}")
-                except Exception as e:
-                    print(f"  [ERROR] {str(e)[:80]}")
-                    stage_results['asof_2s'] = 0
+                        
+                        # Identify new matches (where forward columns now have values)
+                        stage2_matched = 0
+                        for idx, row in merged_s2.iterrows():
+                            orig_idx = unmatched_idx[idx]
+                            for col in forward_cols:
+                                merge_col = col + '_match' if col + '_match' in merged_s2.columns else col
+                                if pd.notna(merged_s2.loc[idx, merge_col]):
+                                    enrich_orders.loc[orig_idx, col] = merged_s2.loc[idx, merge_col]
+                                    stage2_matched += 1
+                                    break  # Count each row only once
+                        
+                        total_matched += stage2_matched
+                        stage_results['asof_2s'] = stage2_matched
+                        print(f"  Matched: {stage2_matched}")
+                    except Exception as e:
+                        print(f"  [ERROR] {str(e)[:80]}")
+                        stage_results['asof_2s'] = 0
             else:
                 print(f"  Skipped (no unmatched rows)")
                 stage_results['asof_2s'] = 0
@@ -371,7 +371,7 @@ try:
             stage_results['date_only'] = 0
         
         # STAGE 4: Nearest timestamp fallback (±5 seconds, underlying + side only)
-        print(f"\n[STAGE 4] Nearest Timestamp Fallback (±5 seconds, underlying + side)")
+        print(f"\n[STAGE 4] Nearest Timestamp Fallback (±5 seconds, underlying + side only)")
         try:
             unmatched = enrich_orders[enrich_orders[forward_cols[0]].isna()].copy()
             if len(unmatched) > 0:
