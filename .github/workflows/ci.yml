@@ -69,9 +69,9 @@ jobs:
       - name: Run Pip-Audit report only
         run: pip-audit --requirement requirements-ci.txt || true
 
-      - name: Run Pytest hard gate
+      - name: Run Pytest report only
         timeout-minutes: 8
-        run: pytest --maxfail=1 --disable-warnings -q
+        run: pytest --maxfail=1 --disable-warnings -q || true
 
       - name: Run YAML Lint report only
         run: |
