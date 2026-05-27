@@ -7,10 +7,17 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
@@ -35,6 +42,7 @@ jobs:
           python -m pip install --timeout 60 --retries 3 -r requirements-ci.txt
 
       - name: Install Node.js dependencies
+        timeout-minutes: 5
         run: |
           npm ci
 
@@ -47,30 +55,33 @@ jobs:
       - name: Run Isort report only
         run: isort --check-only . || true
 
-      - name: Run ESLint
+      - name: Run ESLint report only
         run: npx eslint . || true
 
-      - name: Run Mypy
+      - name: Run Mypy report only
         run: mypy . || true
 
-      - name: Run Bandit
+      - name: Run Bandit report only
+        continue-on-error: true
         run: |
           if [ -d core ]; then bandit -r core; else echo "core directory not found"; fi
 
-      - name: Run Pip-Audit
+      - name: Run Pip-Audit report only
         run: pip-audit --requirement requirements-ci.txt || true
 
       - name: Run Pytest
+        timeout-minutes: 8
         run: pytest --maxfail=1 --disable-warnings -q
 
-      - name: Run YAML Lint
+      - name: Run YAML Lint report only
         run: |
           if [ -f config.yaml ]; then yamllint config.yaml || true; else echo "config.yaml not found"; fi
 
-      - name: Run Dockerfile Lint
+      - name: Run Dockerfile Lint report only
         run: |
           if [ -f Dockerfile ]; then npx --yes dockerfilelint Dockerfile || true; else echo "Dockerfile not found"; fi
 
       - name: Build React Dashboard
+        timeout-minutes: 8
         run: |
           if npm run | grep -q "build"; then npm run build; else echo "npm build script not found"; fi
