@@ -1,0 +1,280 @@
+{
+  "generated_at_utc": "2026-05-28T16:19:46.502126+00:00",
+  "scope": "Model Benchmark Leaderboard Dashboard; report-only; no trading logic changed.",
+  "training_csv": {
+    "path": "storage/training/angel_index_options_training.csv",
+    "exists": false,
+    "size_bytes": 0,
+    "mtime_utc": null
+  },
+  "training_profile": {
+    "exists": false,
+    "rows_scanned": 0,
+    "columns": [],
+    "underlyings": {},
+    "labels": {},
+    "freshness_utc_min": null,
+    "freshness_utc_max": null,
+    "status": "missing"
+  },
+  "models_dir": {
+    "path": "core/models/angel_one",
+    "exists": true,
+    "size_bytes": 4096,
+    "mtime_utc": "2026-05-28T12:49:35.133580+00:00"
+  },
+  "model_artifacts": [
+    {
+      "underlying": "NIFTY",
+      "model": {
+        "path": "core/models/angel_one/NIFTY_model.pkl",
+        "exists": true,
+        "size_bytes": 279081,
+        "mtime_utc": "2026-05-28T12:49:35.102580+00:00"
+      },
+      "meta": {
+        "path": "core/models/angel_one/NIFTY_model_meta.json",
+        "exists": true,
+        "size_bytes": 442,
+        "mtime_utc": "2026-05-28T12:49:35.102580+00:00"
+      },
+      "meta_json": {
+        "underlying": "NIFTY",
+        "created_at": "2025-12-07T14:19:11.740614",
+        "features": [
+          "moneyness",
+          "ce_pe_ratio",
+          "atm_dist_pct",
+          "atm_dist_abs",
+          "ltp",
+          "strike",
+          "ce_pe_diff",
+          "spot",
+          "spot_chg_1_pct",
+          "ltp_chg_1_pct",
+          "spot_roll_std_5",
+          "ltp_roll_std_5"
+        ],
+        "classes": [
+          "BUY_CE",
+          "BUY_PE",
+          "HOLD"
+        ],
+        "train_samples": 480,
+        "test_samples": 120,
+        "test_accuracy": 1.0
+      },
+      "artifact_pair_ok": true,
+      "test_accuracy": 1.0,
+      "train_samples": 480,
+      "test_samples": 120,
+      "features_count": 12
+    },
+    {
+      "underlying": "BANKNIFTY",
+      "model": {
+        "path": "core/models/angel_one/BANKNIFTY_model.pkl",
+        "exists": true,
+        "size_bytes": 274329,
+        "mtime_utc": "2026-05-28T12:49:35.037580+00:00"
+      },
+      "meta": {
+        "path": "core/models/angel_one/BANKNIFTY_model_meta.json",
+        "exists": true,
+        "size_bytes": 461,
+        "mtime_utc": "2026-05-28T12:49:35.037580+00:00"
+      },
+      "meta_json": {
+        "underlying": "BANKNIFTY",
+        "created_at": "2025-12-07T14:19:13.010002",
+        "features": [
+          "moneyness",
+          "ce_pe_ratio",
+          "atm_dist_pct",
+          "atm_dist_abs",
+          "strike",
+          "spot",
+          "ltp",
+          "ltp_chg_1_pct",
+          "spot_chg_1_pct",
+          "spot_roll_std_5",
+          "ltp_roll_std_5",
+          "ce_pe_diff"
+        ],
+        "classes": [
+          "BUY_CE",
+          "BUY_PE",
+          "HOLD"
+        ],
+        "train_samples": 480,
+        "test_samples": 120,
+        "test_accuracy": 0.9833333333333333
+      },
+      "artifact_pair_ok": true,
+      "test_accuracy": 0.9833333333333333,
+      "train_samples": 480,
+      "test_samples": 120,
+      "features_count": 12
+    },
+    {
+      "underlying": "FINNIFTY",
+      "model": {
+        "path": "core/models/angel_one/FINNIFTY_model.pkl",
+        "exists": true,
+        "size_bytes": 216569,
+        "mtime_utc": "2026-05-28T12:49:35.075580+00:00"
+      },
+      "meta": {
+        "path": "core/models/angel_one/FINNIFTY_model_meta.json",
+        "exists": true,
+        "size_bytes": 460,
+        "mtime_utc": "2026-05-28T12:49:35.075580+00:00"
+      },
+      "meta_json": {
+        "underlying": "FINNIFTY",
+        "created_at": "2025-12-07T14:19:14.076109",
+        "features": [
+          "moneyness",
+          "ce_pe_ratio",
+          "atm_dist_pct",
+          "atm_dist_abs",
+          "ltp",
+          "strike",
+          "ltp_roll_std_5",
+          "ce_pe_diff",
+          "spot",
+          "ltp_chg_1_pct",
+          "spot_chg_1_pct",
+          "spot_roll_std_5"
+        ],
+        "classes": [
+          "BUY_CE",
+          "BUY_PE",
+          "HOLD"
+        ],
+        "train_samples": 480,
+        "test_samples": 120,
+        "test_accuracy": 0.9916666666666667
+      },
+      "artifact_pair_ok": true,
+      "test_accuracy": 0.9916666666666667,
+      "train_samples": 480,
+      "test_samples": 120,
+      "features_count": 12
+    },
+    {
+      "underlying": "MIDCPNIFTY",
+      "model": {
+        "path": "core/models/angel_one/MIDCPNIFTY_model.pkl",
+        "exists": true,
+        "size_bytes": 285705,
+        "mtime_utc": "2026-05-28T12:49:35.096580+00:00"
+      },
+      "meta": {
+        "path": "core/models/angel_one/MIDCPNIFTY_model_meta.json",
+        "exists": true,
+        "size_bytes": 462,
+        "mtime_utc": "2026-05-28T12:49:35.096580+00:00"
+      },
+      "meta_json": {
+        "underlying": "MIDCPNIFTY",
+        "created_at": "2025-12-07T14:19:15.391635",
+        "features": [
+          "moneyness",
+          "ce_pe_ratio",
+          "atm_dist_pct",
+          "atm_dist_abs",
+          "ltp",
+          "strike",
+          "ltp_chg_1_pct",
+          "spot",
+          "spot_chg_1_pct",
+          "ltp_roll_std_5",
+          "spot_roll_std_5",
+          "ce_pe_diff"
+        ],
+        "classes": [
+          "BUY_CE",
+          "BUY_PE",
+          "HOLD"
+        ],
+        "train_samples": 480,
+        "test_samples": 120,
+        "test_accuracy": 0.9833333333333333
+      },
+      "artifact_pair_ok": true,
+      "test_accuracy": 0.9833333333333333,
+      "train_samples": 480,
+      "test_samples": 120,
+      "features_count": 12
+    },
+    {
+      "underlying": "SENSEX",
+      "model": {
+        "path": "core/models/angel_one/SENSEX_model.pkl",
+        "exists": true,
+        "size_bytes": 213977,
+        "mtime_utc": "2026-05-28T12:49:35.121580+00:00"
+      },
+      "meta": {
+        "path": "core/models/angel_one/SENSEX_model_meta.json",
+        "exists": true,
+        "size_bytes": 458,
+        "mtime_utc": "2026-05-28T12:49:35.121580+00:00"
+      },
+      "meta_json": {
+        "underlying": "SENSEX",
+        "created_at": "2025-12-07T14:19:16.456142",
+        "features": [
+          "moneyness",
+          "ce_pe_ratio",
+          "atm_dist_pct",
+          "atm_dist_abs",
+          "strike",
+          "ltp_roll_std_5",
+          "spot",
+          "spot_roll_std_5",
+          "spot_chg_1_pct",
+          "ltp",
+          "ltp_chg_1_pct",
+          "ce_pe_diff"
+        ],
+        "classes": [
+          "BUY_CE",
+          "BUY_PE",
+          "HOLD"
+        ],
+        "train_samples": 480,
+        "test_samples": 120,
+        "test_accuracy": 0.9916666666666667
+      },
+      "artifact_pair_ok": true,
+      "test_accuracy": 0.9916666666666667,
+      "train_samples": 480,
+      "test_samples": 120,
+      "features_count": 12
+    }
+  ],
+  "authority_map_present": true,
+  "readiness": {
+    "score": 30,
+    "max_score": 100,
+    "percent": 30.0,
+    "reasons": [
+      "training data missing/empty",
+      "not enough underlying diversity proven",
+      "not enough label diversity proven",
+      "walk-forward benchmark not yet implemented",
+      "cost/slippage P&L benchmark not yet implemented",
+      "dashboard runtime model-version API not yet proven",
+      "promotion gate not yet implemented"
+    ]
+  },
+  "next_required": [
+    "Implement walk-forward validation runner",
+    "Implement model comparison: baseline, gradient boosting, ensemble-ready slots",
+    "Implement cost/slippage/spread-aware P&L benchmark",
+    "Expose model version + benchmark score in dashboard backend",
+    "Block promotion if benchmark proof missing"
+  ]
+}
