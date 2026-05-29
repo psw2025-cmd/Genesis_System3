@@ -194,7 +194,14 @@ def check_trading_safety_text() -> dict:
         "place_order(",
         "smartapi.placeOrder",
     ]
+    gate_script = ".github/scripts/root_architecture_gate.py"
     for f in files:
+        # Do not scan this gate script for its own safety-pattern strings.
+        # The script intentionally contains terms like place_order and TRADING_MODE=live
+        # as detection patterns, not as runtime trading enablement.
+        if f == gate_script:
+            continue
+
         path = ROOT / f
         if not path.exists() or path.is_dir():
             continue
