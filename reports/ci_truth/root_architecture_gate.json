@@ -1,0 +1,61 @@
+{
+  "generated_at_utc": "2026-05-29T05:54:03.271546+00:00",
+  "policy": "Architecture and trading safety must be FULL PASS. Legacy cleanup may remain report-only temporarily.",
+  "blocking": true,
+  "changed_files": [
+    "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
+    "reports/model_benchmark_dashboard/ultra.html",
+    "tools/build_ultra_intelligence_dashboard.py"
+  ],
+  "checks": [
+    {
+      "name": "required_files_and_dirs",
+      "status": "PASS",
+      "missing_files": [],
+      "missing_dirs": []
+    },
+    {
+      "name": "critical_python_compile",
+      "status": "PASS",
+      "files_checked": [
+        "run_system3.py",
+        ".github/scripts/root_architecture_gate.py"
+      ],
+      "failures": []
+    },
+    {
+      "name": "protected_runtime_paths_not_changed",
+      "status": "PASS",
+      "changed_files": [
+        "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
+        "reports/model_benchmark_dashboard/ultra.html",
+        "tools/build_ultra_intelligence_dashboard.py"
+      ],
+      "violations": []
+    },
+    {
+      "name": "no_env_db_model_artifacts_changed",
+      "status": "PASS",
+      "blocked_files": []
+    },
+    {
+      "name": "no_secret_like_values_in_changed_files",
+      "status": "PASS",
+      "findings": []
+    },
+    {
+      "name": "no_obvious_live_trading_enablement_in_changed_files",
+      "status": "PASS",
+      "findings": []
+    }
+  ],
+  "status": "PASS",
+  "failed_count": 0,
+  "protected_scope": {
+    "trading_logic_changed": false,
+    "broker_config_changed": false,
+    "env_changed": false,
+    "database_changed": false,
+    "model_artifacts_changed": false
+  }
+}
