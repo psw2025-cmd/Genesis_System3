@@ -1,4 +1,4 @@
-name: Deploy Backend Image
+name: Backend Docker Build Proof
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
   build-and-push-backend:
     name: Build and push backend image
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
 
     steps:
       - name: Checkout repository
