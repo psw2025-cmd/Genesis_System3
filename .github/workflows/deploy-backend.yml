@@ -1,0 +1,53 @@
+name: Backend Docker Build Proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest
+
+jobs:
+  build-and-push-backend:
+    name: Build and push backend image
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Backend path proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "repo=$(pwd)"
+          test ! -d backend
+          test ! -f backend/Dockerfile
+          test -d dashboard/backend
+          test -f dashboard/backend/Dockerfile
+          test -f .dockerignore
+          echo "Backend Docker path proof PASS"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: psw2025-cmd
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dashboard/backend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}
+          provenance: false
+          sbom: false
