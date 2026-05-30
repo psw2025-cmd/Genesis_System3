@@ -24,12 +24,12 @@ jobs:
       - name: Detect Docker build inputs
         id: detect
         run: |
-          if [ -f dashboard/dashboard/backend/Dockerfile ]; then
+          if [ -f dashboard/backend/Dockerfile ]; then
             echo "backend_ready=true" >> "$GITHUB_OUTPUT"
-            echo "dashboard/dashboard/backend/Dockerfile found. Backend deploy enabled."
+            echo "dashboard/backend/Dockerfile found. Backend deploy enabled."
           else
             echo "backend_ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::dashboard/dashboard/backend/Dockerfile not found. Backend deploy skipped."
+            echo "::warning::dashboard/backend/Dockerfile not found. Backend deploy skipped."
           fi
 
           if [ -f dashboard/Dockerfile ]; then
@@ -61,7 +61,7 @@ jobs:
 
       - name: Build & Push Backend Image
         run: |
-          docker build -t ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest -f dashboard/dashboard/backend/Dockerfile .
+          docker build -t ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest -f dashboard/backend/Dockerfile .
           docker push ghcr.io/psw2025-cmd/genesis_system3/genesis-backend:latest
 
       - name: Deploy Backend to Azure Web App

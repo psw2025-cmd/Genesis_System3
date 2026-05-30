@@ -152,12 +152,12 @@ if exist .git (
 REM --- Step 14: Build Docker Images (only if Dockerfiles exist)
 if exist backend\Dockerfile (
   echo Building backend Docker image...
-  docker build -t ghcr.io/%USERNAME%/genesis-backend:latest -f dashboard/dashboard/backend/Dockerfile .
+  docker build -t ghcr.io/%USERNAME%/genesis-backend:latest -f dashboard/backend/Dockerfile .
   if errorlevel 1 (
     set RUN_ALL_FAIL_STEP=Step 14: Docker build backend
     set RUN_ALL_FAIL_REASON=docker build for backend failed
     set RUN_ALL_FAIL_IMPACT=Backend image not built; push will skip
-    set RUN_ALL_FAIL_NEXT=Fix dashboard/dashboard/backend/Dockerfile and build context; Run: docker build -t ghcr.io/%%USERNAME%%/genesis-backend:latest -f dashboard/dashboard/backend/Dockerfile .; Then Rerun Run-All.bat
+    set RUN_ALL_FAIL_NEXT=Fix dashboard/backend/Dockerfile and build context; Run: docker build -t ghcr.io/%%USERNAME%%/genesis-backend:latest -f dashboard/backend/Dockerfile .; Then Rerun Run-All.bat
     python scripts\run_all_report_fail.py
     exit /b 1
   )
