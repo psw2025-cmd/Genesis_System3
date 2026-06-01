@@ -1,0 +1,71 @@
+{
+  "report": "system3_autonomous_gap_matrix",
+  "target": "institutional_autonomous_indian_options_system",
+  "mode": "architecture_gap_analysis_only",
+  "no_runtime_change": true,
+  "pillars": {
+    "data_ingestion": {
+      "current": "not_proven_complete_nightly_pipeline",
+      "target": "post_market_full_data_ingestion_with_validation_and_lineage",
+      "severity": "critical",
+      "first_pr": 21
+    },
+    "feature_store": {
+      "current": "not_proven_authoritative",
+      "target": "offline_online_feature_versioning_and_parity_tests",
+      "severity": "critical",
+      "first_pr": 23
+    },
+    "backtesting": {
+      "current": "not_proven_nightly_replay_engine",
+      "target": "automated_daily_replay_with_costs_and_lifecycle_truth",
+      "severity": "critical",
+      "first_pr": 24
+    },
+    "model_registry": {
+      "current": "not_proven",
+      "target": "MLflow_active_candidate_registry_with_rollback",
+      "severity": "critical",
+      "first_pr": 26
+    },
+    "model_promotion": {
+      "current": "not_proven",
+      "target": "gated_candidate_promotion_after_validation_and_paper_proof",
+      "severity": "critical",
+      "first_pr": 27
+    },
+    "optimization": {
+      "current": "not_proven",
+      "target": "Optuna_and_Ray_Tune_with_overfit_guards",
+      "severity": "high",
+      "first_pr": 28
+    },
+    "regime_detection": {
+      "current": "not_proven_authoritative_runtime_router",
+      "target": "real_time_regime_classifier_and_strategy_router",
+      "severity": "high",
+      "first_pr": 30
+    },
+    "execution": {
+      "current": "not_proven_non_blocking_low_latency_pipeline",
+      "target": "async_event_bus_risk_gate_broker_adapter_non_blocking_persistence",
+      "severity": "high",
+      "first_pr": 32
+    },
+    "dashboard_truth": {
+      "current": "shell_and_static_proof_components_exist",
+      "target": "live_truth_dashboard_with_provenance_latency_and_model_state",
+      "severity": "high",
+      "first_pr": 34
+    },
+    "deployment": {
+      "current": "GCP_manual_proof_path_started",
+      "target": "production_backend_container_and_manual_gated_cloud_deploy",
+      "severity": "medium",
+      "first_pr": 36
+    }
+  },
+  "next_required_pr": 20,
+  "next_required_pr_title": "Authoritative runtime and data map",
+  "live_trading_allowed": false
+}
