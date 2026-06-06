@@ -1,0 +1,21 @@
+# Render Blueprint for Genesis System3
+# Safe backend-only deployment.
+# Live trading is disabled by default.
+
+services:
+  - type: web
+    name: genesis-system3-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./dashboard/backend/Dockerfile
+    dockerContext: .
+    autoDeploy: false
+    envVars:
+      - key: SYSTEM3_DEPLOY_TARGET
+        value: render
+      - key: SYSTEM3_MODE
+        value: analyzer
+      - key: ANALYZE_MODE
+        value: "1"
+      - key: LIVE_TRADING_ENABLED
+        value: "0"
