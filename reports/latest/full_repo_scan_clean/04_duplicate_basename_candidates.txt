@@ -1,0 +1,115 @@
+# Duplicate basename candidates - review only
+00_summary.md (3)
+  reports/latest/full_trading_pipeline_readiness/00_summary.md
+  reports/latest/model_backtest_readiness/00_summary.md
+  reports/latest/repo_cleanliness/00_summary.md
+
+COMPLETE_VALIDATION_REPORT.md (2)
+  COMPLETE_VALIDATION_REPORT.md
+  docs/COMPLETE_VALIDATION_REPORT.md
+
+README.md (6)
+  README.md
+  dashboard/README.md
+  docs/ultra_micro/README.md
+  reports/ci_truth/README.md
+  reports/latest/entrypoint_classification/README.md
+  reports/latest/render_endpoint_proof/README.md
+
+__init__.py (23)
+  config/__init__.py
+  core/__init__.py
+  core/broker/__init__.py
+  core/brokers/__init__.py
+  core/brokers/angel_one/__init__.py
+  core/data/__init__.py
+  core/engine/__init__.py
+  core/engine/ai_model/__init__.py
+  core/engine/breakout_model/__init__.py
+  core/engine/entry_exit_engine/__init__.py
+  core/engine/greeks_engine/__init__.py
+  core/engine/momentum_model/__init__.py
+  core/engine/scoring_engine/__init__.py
+  core/engine/trend_model/__init__.py
+  core/engine/volatility_model/__init__.py
+  core/execution/__init__.py
+  core/geni/__init__.py
+  core/models/__init__.py
+  core/monitoring/__init__.py
+  core/tools/__init__.py
+  core/ultra/__init__.py
+  core/utils/__init__.py
+  core/validation/__init__.py
+
+app.py (2)
+  dashboard/app.py
+  dashboard/backend/app.py
+
+ensemble_predictor.py (2)
+  core/engine/ensemble_predictor.py
+  src/ml/ensemble_predictor.py
+
+greeks_calculator.py (2)
+  core/engine/greeks_engine/greeks_calculator.py
+  dashboard/backend/greeks_calculator.py
+
+index.css (2)
+  dashboard/frontend/dist/assets/index.css
+  dashboard/frontend/src/index.css
+
+index.html (4)
+  dashboard/frontend/dist/index.html
+  dashboard/frontend/index.html
+  dashboard/index.html
+  reports/model_benchmark_dashboard/index.html
+
+kill_switch.json (2)
+  config/kill_switch.json
+  kill_switch.json
+
+package-lock.json (3)
+  dashboard/frontend/package-lock.json
+  desktop_app/package-lock.json
+  package-lock.json
+
+package.json (3)
+  dashboard/frontend/package.json
+  desktop_app/package.json
+  package.json
+
+performance_metrics.py (2)
+  scripts/performance_metrics.py
+  src/analytics/performance_metrics.py
+
+runtime_flags.json (2)
+  config/runtime_flags.json
+  runtime_flags.json
+
+settings.json (2)
+  .cursor/settings.json
+  .vscode/settings.json
+
+start_backend.bat (2)
+  scripts/start_backend.bat
+  start_backend.bat
+
+start_backend.bat.bak_20260225_005921 (2)
+  scripts/start_backend.bat.bak_20260225_005921
+  start_backend.bat.bak_20260225_005921
+
+system3_config.json (2)
+  config/system3_config.json
+  core/engine/config/system3_config.json
+
+system3_phase331_signal_integrity.py (2)
+  core/engine/system3_phase331_signal_integrity.py
+  system3_phase331_signal_integrity.py
+
+tasks.json (2)
+  .vscode/tasks.json
+  agent_memory/tasks.json
+
+test_phases_261_300.py (2)
+  test_phases_261_300.py
+  tests/auto/system3_generated_tests/test_phases_261_300.py
+

@@ -1,0 +1,25 @@
+# Full tracked file inventory summary
+Tracked file count: 3102
+
+Top directories:
+  1078 <root>
+   597 core
+   493 docs
+   270 reports
+   233 tests
+   208 scripts
+    64 dashboard
+    36 tools
+    32 src
+    24 .github
+    16 config
+    11 models
+     9 proof
+     6 desktop_app
+     6 runtime_reports
+     5 state
+     4 agent_memory
+     4 "docs
+     3 .cursor
+     2 .vscode
+     1 .scripts
