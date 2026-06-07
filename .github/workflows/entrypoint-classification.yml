@@ -1,0 +1,146 @@
+name: Entrypoint Classification Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/entrypoint-classification.yml
+      - core/**
+      - scripts/**
+      - tools/**
+      - run_system3.py
+      - system3_ultra.py
+
+permissions:
+  contents: write
+
+jobs:
+  entrypoint-classification:
+    name: Classify training/backtest entrypoints
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/entrypoint_classification"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          python - <<'PY'
+          import ast, json, os, re, subprocess
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          py_files = [p for p in files if p.endswith('.py') and Path(p).exists()]
+
+          train_rx = re.compile(r'(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|xgboost|lstm)', re.I)
+          backtest_rx = re.compile(r'(backtest|walk.?forward|strategy|pnl|performance|validation)', re.I)
+          broker_rx = re.compile(r'(SmartApi|generateSession|placeOrder|modifyOrder|cancelOrder|live trading|SYSTEM3_LIVE_TRADING_ALLOWED|AngelOneBroker)', re.I)
+          safe_cli_rx = re.compile(r'(dry.?run|read.?only|analyzer|paper|no.?broker|mock|sample|help|argparse|click)', re.I)
+
+          def inspect(path):
+              txt = Path(path).read_text(encoding='utf-8', errors='replace')
+              try:
+                  tree = ast.parse(txt)
+                  syntax_ok = True
+              except Exception as exc:
+                  tree = None
+                  syntax_ok = False
+              imports = []
+              funcs = []
+              classes = []
+              has_main = False
+              if tree:
+                  for node in ast.walk(tree):
+                      if isinstance(node, ast.Import):
+                          imports.extend(alias.name for alias in node.names)
+                      elif isinstance(node, ast.ImportFrom):
+                          imports.append(node.module or '')
+                      elif isinstance(node, ast.FunctionDef):
+                          funcs.append(node.name)
+                      elif isinstance(node, ast.ClassDef):
+                          classes.append(node.name)
+                      elif isinstance(node, ast.If):
+                          try:
+                              src = ast.unparse(node.test)
+                          except Exception:
+                              src = ''
+                          if "__name__" in src and "__main__" in src:
+                              has_main = True
+              score = 0
+              reasons = []
+              if syntax_ok: score += 2; reasons.append('syntax_ok')
+              if has_main: score += 3; reasons.append('has_main')
+              if safe_cli_rx.search(txt): score += 2; reasons.append('safe_cli_or_dryrun_markers')
+              if 'argparse' in txt: score += 1; reasons.append('argparse')
+              if broker_rx.search(txt): score -= 4; reasons.append('broker_or_live_markers')
+              if re.search(r'if\s+not\s+.*LIVE|raise RuntimeError\(.*LIVE', txt, re.I): score += 1; reasons.append('live_guard_marker')
+              if 'reports/' in txt or 'outputs/' in txt or 'json' in txt.lower(): score += 1; reasons.append('output_report_markers')
+              return {
+                  'path': path,
+                  'syntax_ok': syntax_ok,
+                  'has_main': has_main,
+                  'imports_top': sorted(set(imports))[:40],
+                  'function_count': len(funcs),
+                  'class_count': len(classes),
+                  'broker_or_live_markers': bool(broker_rx.search(txt)),
+                  'safe_cli_or_dryrun_markers': bool(safe_cli_rx.search(txt)),
+                  'score': score,
+                  'reasons': reasons,
+              }
+
+          train_candidates = [inspect(p) for p in py_files if train_rx.search(p)]
+          backtest_candidates = [inspect(p) for p in py_files if backtest_rx.search(p)]
+          train_candidates.sort(key=lambda x: x['score'], reverse=True)
+          backtest_candidates.sort(key=lambda x: x['score'], reverse=True)
+
+          out = Path('reports/latest/entrypoint_classification')
+          out.mkdir(parents=True, exist_ok=True)
+          (out/'training_entrypoint_candidates.json').write_text(json.dumps(train_candidates[:100], indent=2, sort_keys=True), encoding='utf-8')
+          (out/'backtest_entrypoint_candidates.json').write_text(json.dumps(backtest_candidates[:100], indent=2, sort_keys=True), encoding='utf-8')
+
+          summary = {
+              'generated_utc': datetime.now(timezone.utc).isoformat(),
+              'training_candidate_count': len(train_candidates),
+              'backtest_candidate_count': len(backtest_candidates),
+              'top_training_candidates': train_candidates[:10],
+              'top_backtest_candidates': backtest_candidates[:10],
+              'recommendation': 'Use top candidates only as next proof targets; execute only dry-run/read-only/analyzer modes first.'
+          }
+          (out/'entrypoint_classification_summary.json').write_text(json.dumps(summary, indent=2, sort_keys=True), encoding='utf-8')
+
+          md = ['# Entrypoint Classification Proof', '', f"Generated UTC: {summary['generated_utc']}", '', '## Top training candidates', '']
+          for c in train_candidates[:10]:
+              md.append(f"- `{c['path']}` — score `{c['score']}` — {', '.join(c['reasons'])}")
+          md += ['', '## Top backtest candidates', '']
+          for c in backtest_candidates[:10]:
+              md.append(f"- `{c['path']}` — score `{c['score']}` — {', '.join(c['reasons'])}")
+          md += ['', '## Rule', '', 'Do not execute broker/live actions. First run top candidates only in dry-run/read-only/analyzer mode.']
+          (out/'README.md').write_text('\n'.join(md)+'\n', encoding='utf-8')
+          PY
+
+          cat "$OUT/README.md"
+
+      - name: Commit entrypoint classification proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/entrypoint_classification
+          if git diff --cached --quiet; then
+            echo "No entrypoint classification changes to commit."
+          else
+            git commit -m "audit: publish latest entrypoint classification proof"
+            git push
+          fi
