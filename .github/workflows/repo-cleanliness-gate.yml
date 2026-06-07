@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: repo-cleanliness-proof-main
+  cancel-in-progress: false
+
 jobs:
   repo-cleanliness-gate:
     name: Check repo cleanliness and publish proof
@@ -96,7 +100,8 @@ jobs:
           git add reports/latest/repo_cleanliness
           if git diff --cached --quiet; then
             echo "No cleanliness proof changes to commit."
-          else
-            git commit -m "audit: publish latest repo cleanliness proof"
-            git push
+            exit 0
           fi
+          git commit -m "audit: publish latest repo cleanliness proof"
+          git pull --rebase origin main
+          git push origin HEAD:main
