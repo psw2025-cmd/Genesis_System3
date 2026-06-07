@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: system3-auto-verifier-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   auto-verifier:
     name: System3 auto verification proof
@@ -33,6 +37,7 @@ jobs:
           OUT="audit_artifacts/system3_auto_verifier_$(date -u +%Y%m%dT%H%M%SZ)"
           mkdir -p "$OUT"
           echo "OUT=$OUT" >> "$GITHUB_ENV"
+          VERIFIER_FAILED=0
 
           {
             echo "# System3 Auto Verifier"
@@ -57,7 +62,10 @@ jobs:
 
           {
             echo "# Forbidden tracked files"
-            git ls-files | grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|(^|/)__pycache__/|\.pyc$|(^|/)audit_artifacts/' || true
+            git ls-files \
+              | grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|(^|/)__pycache__/|\.pyc$|(^|/)audit_artifacts/' \
+              | grep -vE '(^|/)\.env\.example$|(^|/)config/\.env\.example$' \
+              || true
           } > "$OUT/03_forbidden_tracked_files.txt"
 
           {
@@ -69,11 +77,24 @@ jobs:
           python - <<'PY' > "$OUT/05_pass_fail_summary.json"
           import json, subprocess, os
           files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
-          forbidden = [p for p in files if p == '.env' or p.startswith('.env.') or p == 'config/.env' or p.startswith('config/.env.') or '/__pycache__/' in p or p.endswith('.pyc') or p.startswith('audit_artifacts/')]
+          allowlist = {'.env.example', 'config/.env.example'}
+          forbidden = [
+              p for p in files
+              if p not in allowlist and (
+                  p == '.env'
+                  or p.startswith('.env.')
+                  or p == 'config/.env'
+                  or p.startswith('config/.env.')
+                  or '/__pycache__/' in p
+                  or p.endswith('.pyc')
+                  or p.startswith('audit_artifacts/')
+              )
+          ]
           qa_text = open('Run-FullQA.ps1', encoding='utf-8', errors='replace').read() if os.path.exists('Run-FullQA.ps1') else ''
           render_text = open('render.yaml', encoding='utf-8', errors='replace').read() if os.path.exists('render.yaml') else ''
           result = {
             'forbidden_tracked_files': forbidden,
+            'allowed_template_files': sorted(list(allowlist.intersection(files))),
             'run_fullqa_has_portable_workspace_logic': 'GITHUB_WORKSPACE' in qa_text and 'Get-RepoRoot' in qa_text,
             'render_live_trading_disabled': 'LIVE_TRADING_ENABLED' in render_text and '"0"' in render_text,
           }
@@ -86,17 +107,28 @@ jobs:
           else
             echo "SYSTEM3_AUTO_VERIFIER_FAIL" | tee "$OUT/06_verdict.txt"
             cat "$OUT/05_pass_fail_summary.json"
-            exit 1
+            VERIFIER_FAILED=1
           fi
 
           (cd audit_artifacts && zip -r "$(basename "$OUT").zip" "$(basename "$OUT")")
           echo "ZIP_PATH=audit_artifacts/$(basename "$OUT").zip" >> "$GITHUB_ENV"
+          echo "VERIFIER_FAILED=$VERIFIER_FAILED" >> "$GITHUB_ENV"
 
       - name: Upload verifier artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: system3-auto-verifier
-          path: ${{ env.ZIP_PATH }}
+          path: audit_artifacts/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Fail if verifier failed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${VERIFIER_FAILED:-0}" = "1" ]; then
+            echo "SYSTEM3_AUTO_VERIFIER_FAIL"
+            exit 1
+          fi
+          echo "SYSTEM3_AUTO_VERIFIER_PASS"
