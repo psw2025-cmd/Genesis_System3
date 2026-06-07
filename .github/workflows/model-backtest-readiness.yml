@@ -1,0 +1,134 @@
+name: Model Backtest Readiness Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/model-backtest-readiness.yml
+      - core/**
+      - scripts/**
+      - run_system3.py
+      - system3_ultra.py
+      - dashboard/backend/**
+
+permissions:
+  contents: write
+
+jobs:
+  model-backtest-readiness:
+    name: Verify model/backtest readiness without broker login
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build model/backtest readiness proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/model_backtest_readiness"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          {
+            echo "# Model Backtest Readiness Proof"
+            echo "Generated UTC: $(date -u --iso-8601=seconds)"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Mode: proof-only; no broker login; no orders; no live trading"
+          } > "$OUT/00_summary.md"
+
+          git ls-files > /tmp/files.txt
+
+          {
+            echo "# Candidate training/model files"
+            grep -Ei '(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|lstm|xgboost|lightgbm|catboost)' /tmp/files.txt | sort || true
+          } > "$OUT/01_model_training_candidates.txt"
+
+          {
+            echo "# Candidate data/history files"
+            grep -Ei '(data|histor|ohlc|candle|option|chain|nse|bse|angel|binance|duckdb|sqlite|csv|parquet)' /tmp/files.txt | sort || true
+          } > "$OUT/02_data_history_candidates.txt"
+
+          {
+            echo "# Candidate backtest/walk-forward files"
+            grep -Ei '(backtest|walk.?forward|strategy|pnl|performance|validation)' /tmp/files.txt | sort || true
+          } > "$OUT/03_backtest_candidates.txt"
+
+          {
+            echo "# Python compile smoke for model/backtest candidates"
+            python --version
+            grep -Ei '(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|backtest|strategy|validation).*\.py$' /tmp/files.txt | sort | head -300 > /tmp/py_candidates.txt || true
+            while IFS= read -r f; do
+              [ -z "$f" ] && continue
+              if python -m py_compile "$f"; then
+                echo "PY_COMPILE_PASS $f"
+              else
+                echo "PY_COMPILE_FAIL $f"
+              fi
+            done < /tmp/py_candidates.txt
+          } > "$OUT/04_compile_smoke.txt" 2>&1 || true
+
+          {
+            echo "# Requirement/dependency hints"
+            for f in requirements.txt dashboard/backend/requirements.txt pyproject.toml setup.py; do
+              if [ -f "$f" ]; then
+                echo "## $f"
+                sed -n '1,220p' "$f"
+                echo
+              fi
+            done
+          } > "$OUT/05_dependency_hints.txt"
+
+          python - <<'PY' > "$OUT/06_model_backtest_summary.json"
+          import json, re, subprocess
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          def count(pattern):
+              rx = re.compile(pattern, re.I)
+              return len([p for p in files if rx.search(p)])
+          model_files = [p for p in files if re.search(r'(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|lstm|xgboost|lightgbm|catboost)', p, re.I)]
+          data_files = [p for p in files if re.search(r'(data|histor|ohlc|candle|option|chain|nse|bse|angel|binance|duckdb|sqlite|csv|parquet)', p, re.I)]
+          backtest_files = [p for p in files if re.search(r'(backtest|walk.?forward|strategy|pnl|performance|validation)', p, re.I)]
+          result = {
+            'model_training_candidate_count': len(model_files),
+            'data_history_candidate_count': len(data_files),
+            'backtest_candidate_count': len(backtest_files),
+            'fresh_training_execution_proven': False,
+            'fresh_training_accuracy_metric_proven': False,
+            'recent_backtest_execution_proven': False,
+            'walk_forward_cost_slippage_proven': False,
+            'live_market_prediction_feed_proven': False,
+            'verdict': 'INVENTORY_ONLY_NOT_READY_FOR_TRADE_DECISION',
+            'next_required': [
+              'identify authoritative training entrypoint',
+              'run no-broker training/load proof with metrics',
+              'identify authoritative backtest entrypoint',
+              'run recent backtest or walk-forward with costs/slippage',
+              'publish predictions to dashboard/state endpoint'
+            ]
+          }
+          print(json.dumps(result, indent=2, sort_keys=True))
+          PY
+
+          cat "$OUT/06_model_backtest_summary.json"
+
+      - name: Commit model/backtest proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/model_backtest_readiness
+          if git diff --cached --quiet; then
+            echo "No model/backtest proof changes to commit."
+          else
+            git commit -m "audit: publish latest model backtest readiness proof"
+            git push
+          fi
