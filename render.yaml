@@ -1,6 +1,7 @@
 # Render Blueprint for Genesis System3
 # Safe backend-only deployment.
 # Live trading is disabled by default.
+# Render CLI deployment enabled via GitHub Actions.
 
 services:
   - type: web
