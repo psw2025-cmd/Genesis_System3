@@ -1,0 +1,75 @@
+=== SYSTEM3 DATA SCHEMA PREVIEW ===
+
+--- src/outputs/chain_raw_live.csv ---
+timestamp_ist,timestamp_epoch,underlying,exchange,token,symbol,strike,option_type,expiry,spot_price,ltp,oi,volume,bidPrice,offerPrice,mid_price,bid_ask_spread,bid_ask_spread_pct,intrinsic_value,extrinsic_value,intrinsic_pct,atm_distance,atm_distance_pct,delta,gamma,theta,vega,rho,iv,dOI,dVolume,dMid,dLTP,oi_buildup,days_to_expiry,time_to_expiry,volume_oi_ratio,premium_pct_of_strike,premium_pct_of_spot
+2026-02-01 18:28:58 IST,1769950738.903485,NIFTY,NFO,64794,NIFTY24FEB2624150CE,24150.0,CE,24FEB2026,24825.45,785.2,1820.0,3120.0,774.6,849.55,812.075,74.94999999999993,9.229443093310339,675.4500000000007,109.74999999999932,86.02266938359662,675.4500000000007,2.720796601874289,0.8658087711407894,0.00030465038804153207,-6.856407063318379,13.237928678881254,12.578460079316887,0.11592829933034438,0.0,0.0,0.0,0.0,Neutral,22,0.06027397260273973,1.7142857142857142,3.251345755693582,3.162883250857487
+
+--- src/outputs/paper_trades_live.csv ---
+position_id,action,timestamp,time_ist,underlying,strike,option_type,price,qty,strategy,exit_reason,realized_pnl,realized_pnl_pct,entry_price,exit_price
+POS_0001,OPEN,2026-02-01T21:28:33.130912+05:30,2026-02-01 21:28:39 IST,NIFTY,24850.0,PE,177.65720296865635,2080,BUY_PE,,,,,
+
+--- src/outputs/test_export.csv ---
+underlying,exchange,token,symbol,strike,option_type,expiry,ltp,oi,volume,bidPrice,offerPrice,mid_price,intrinsic_value,extrinsic_value,delta,gamma,theta,vega,iv,timestamp_ist,timestamp_epoch
+,,,,,,,,,,,,,,,,,,,,2026-02-01 18:33:31 IST,1769951011.014348
+
+--- src/outputs/underlying_rank_live.csv ---
+timestamp_ist,timestamp_epoch
+
+--- src/outputs/pnl_live.json ---
+{
+  "timestamp": "2026-02-01T21:31:56.210449+05:30",
+  "timestamp_ist": "2026-02-01 21:32:04 IST",
+  "total_trades": 9,
+  "winning_trades": 3,
+  "losing_trades": 6,
+  "win_rate": 33.33333333333333,
+  "total_realized_pnl": -1806.0727624800056,
+  "total_unrealized_pnl": 0.0,
+  "total_pnl": -1806.0727624800056,
+  "avg_pnl_per_trade": -200.67475138666728,
+  "max_profit": 0.0,
+  "max_drawdown": 1237683.6376718103,
+  "open_positions": 0,
+  "session_duration_minutes": 3.528833016666667
+
+--- src/outputs/positions_live.json ---
+{
+  "timestamp_ist": "2026-02-01 21:32:04 IST",
+  "open_positions": [],
+  "summary": {
+    "open_count": 0,
+    "closed_count": 9,
+    "total_unrealized_pnl": 0.0,
+    "total_realized_pnl": -1806.0727624800056,
+    "total_pnl": -1806.0727624800056,
+    "open_positions": [],
+    "closed_positions": [
+      {
+        "position_id": "POS_0001",
+        "action": "CLOSE",
+        "timestamp": "2026-02-01T21:28:44.440857+05:30",
+
+--- src/outputs/qc_report_live.json ---
+{
+  "overall_passed": false,
+  "underlying_results": {
+    "NIFTY": {
+      "passed": false,
+      "reasons": [
+        "45 contracts have spread > 10.0%"
+      ],
+      "contract_count": 142
+    },
+    "BANKNIFTY": {
+      "passed": false,
+      "reasons": [
+        "71 contracts have spread > 10.0%"
+      ],
+
+--- src/outputs/top_trade_signal.json ---
+{
+  "action": "NO TRADE",
+  "reason": "QC failed",
+  "timestamp_ist": "2026-02-01 18:30:52 IST",
+  "timestamp_epoch": 1769950852.901745
+}
