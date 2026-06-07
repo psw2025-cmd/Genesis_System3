@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: repo-cleanliness-proof-main
+  group: repo-cleanliness-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -95,13 +95,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main
+          git rebase origin/main
+
           git add reports/latest/repo_cleanliness
+
           if git diff --cached --quiet; then
             echo "No cleanliness proof changes to commit."
             exit 0
           fi
+
           git commit -m "audit: publish latest repo cleanliness proof"
-          git pull --rebase origin main
-          git push origin HEAD:main
+
+          for i in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              echo "Push successful."
+              exit 0
+            fi
+            echo "Push failed, retry $i/3 after remote update..."
+            sleep 3
+          done
+
+          echo "Push failed after retries."
+          exit 1
