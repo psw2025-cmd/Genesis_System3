@@ -33,7 +33,7 @@
 ./analyze_csv_status.py
 ./analyze_data.py
 ./analyze_ev_ready_csv.py
-./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/02_data_history_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111801Z/02_data_history_inventory.txt
 ./clean_csv_consistency.py
 ./config/angel_automation_config.json
 ./core/broker/angel_live_order_wrapper.py

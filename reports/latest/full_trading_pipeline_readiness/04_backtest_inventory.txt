@@ -56,7 +56,7 @@
 ./VALIDATION_FIXES_AND_STATUS.md
 ./VALIDATION_REPORT.md
 ./ZERO_ERRORS_VALIDATION_COMPLETE.md
-./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/04_backtest_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111801Z/04_backtest_inventory.txt
 ./complete_end_to_end_validation.py
 ./comprehensive_pre_build_validation.py
 ./comprehensive_production_validation.py
