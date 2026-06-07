@@ -1,0 +1,90 @@
+name: Render CLI Deploy Backend
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_wait:
+        description: Wait for Render deploy to finish
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+  push:
+    branches:
+      - main
+    paths:
+      - render.yaml
+      - dashboard/backend/**
+      - .github/workflows/render-cli-deploy.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-cli-deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy-render-backend:
+    name: Deploy backend via Render CLI
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${{ secrets.RENDER_API_KEY }}" || (echo "Missing GitHub secret: RENDER_API_KEY" && exit 1)
+          test -n "${{ secrets.RENDER_SERVICE_ID }}" || (echo "Missing GitHub secret: RENDER_SERVICE_ID" && exit 1)
+          echo "Render secrets presence check PASS"
+
+      - name: Install Render CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/render-oss/cli/refs/heads/main/bin/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Render CLI version
+        shell: bash
+        run: |
+          set -euo pipefail
+          render --version
+
+      - name: Validate render.yaml
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OUTPUT: json
+          CI: true
+        run: |
+          set -euo pipefail
+          render blueprints validate render.yaml --output json --confirm
+
+      - name: Trigger Render deploy
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OUTPUT: json
+          CI: true
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.deploy_wait || 'true' }}" = "true" ]; then
+            render deploys create "${{ secrets.RENDER_SERVICE_ID }}" --wait --output json --confirm
+          else
+            render deploys create "${{ secrets.RENDER_SERVICE_ID }}" --output json --confirm
+          fi
+
+      - name: Render deployment proof URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Backend root: https://genesis-system3-backend.onrender.com/"
+          echo "Backend docs: https://genesis-system3-backend.onrender.com/docs"
+          echo "Backend health: https://genesis-system3-backend.onrender.com/api/health"
+          echo "Backend state: https://genesis-system3-backend.onrender.com/api/state"
