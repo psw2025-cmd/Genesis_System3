@@ -1,6 +1,6 @@
 # System3 Master Status
 
-Generated UTC: 2026-06-07T11:13:17.117083+00:00
+Generated UTC: 2026-06-07T12:38:50.488879+00:00
 
 ## Current verified status
 
@@ -11,10 +11,10 @@ Generated UTC: 2026-06-07T11:13:17.117083+00:00
 - Runtime backend present: `True`
 - Render live trading disabled: `True`
 - SmartAPI dependency present: `True`
-- Data/history candidates: `169`
-- Model/training candidates: `174`
-- Backtest candidates: `215`
-- Paper/analyzer candidates: `123`
+- Data/history candidates: `170`
+- Model/training candidates: `175`
+- Backtest candidates: `216`
+- Paper/analyzer candidates: `124`
 - Dashboard candidates: `64`
 
 Open blockers:
@@ -26,7 +26,7 @@ Open blockers:
 ### Repo cleanliness
 
 - Pass: `True`
-- Tracked files: `3080`
+- Tracked files: `3114`
 - Auto-removable generated files: `0`
 - Forbidden secret-style files: `0`
 - Old/backup/copy review candidates: `12`
