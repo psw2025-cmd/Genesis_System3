@@ -1,5 +1,6 @@
 # Duplicate basename candidates - review only
-00_summary.md (3)
+00_summary.md (4)
+  reports/latest/full_repo_scan_clean/00_summary.md
   reports/latest/full_trading_pipeline_readiness/00_summary.md
   reports/latest/model_backtest_readiness/00_summary.md
   reports/latest/repo_cleanliness/00_summary.md
