@@ -1,10 +1,12 @@
 name: CD - Deploy Backend & Dashboard to Azure
 
 on:
-  workflow_run:
-    workflows: ["CI - Governance & QA Guardian"]
-    types:
-      - completed
+  workflow_dispatch:
+    inputs:
+      confirm_azure_deploy:
+        description: Type YES to run legacy Azure deploy manually
+        required: true
+        default: "NO"
 
 permissions:
   contents: read
@@ -12,7 +14,7 @@ permissions:
 
 jobs:
   detect-deployable-artifacts:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.inputs.confirm_azure_deploy == 'YES' }}
     runs-on: ubuntu-latest
     outputs:
       backend_ready: ${{ steps.detect.outputs.backend_ready }}
@@ -24,6 +26,7 @@ jobs:
       - name: Detect Docker build inputs
         id: detect
         run: |
+          echo "Azure auto-deploy is disabled. Render is the active deployment target."
           if [ -f dashboard/backend/Dockerfile ]; then
             echo "backend_ready=true" >> "$GITHUB_OUTPUT"
             echo "dashboard/backend/Dockerfile found. Backend deploy enabled."
@@ -42,7 +45,7 @@ jobs:
 
   deploy-backend:
     needs: detect-deployable-artifacts
-    if: ${{ github.event.workflow_run.conclusion == 'success' && needs.detect-deployable-artifacts.outputs.backend_ready == 'true' }}
+    if: ${{ github.event.inputs.confirm_azure_deploy == 'YES' && needs.detect-deployable-artifacts.outputs.backend_ready == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -73,7 +76,7 @@ jobs:
 
   deploy-dashboard:
     needs: detect-deployable-artifacts
-    if: ${{ github.event.workflow_run.conclusion == 'success' && needs.detect-deployable-artifacts.outputs.dashboard_ready == 'true' }}
+    if: ${{ github.event.inputs.confirm_azure_deploy == 'YES' && needs.detect-deployable-artifacts.outputs.dashboard_ready == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
