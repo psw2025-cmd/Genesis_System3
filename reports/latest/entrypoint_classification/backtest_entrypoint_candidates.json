@@ -1,0 +1,1841 @@
+[
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "config.system3_config",
+      "datetime",
+      "json",
+      "os",
+      "pathlib",
+      "sys"
+    ],
+    "path": "final_system_validation_test.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "live_guard_marker",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 9,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 18,
+    "has_main": true,
+    "imports_top": [
+      "concurrent.futures",
+      "dashboard.backend.multi_validation_audit",
+      "datetime",
+      "json",
+      "os",
+      "pandas",
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys",
+      "time",
+      "traceback",
+      "typing"
+    ],
+    "path": "production_grade_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "live_guard_marker",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 9,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "config.live_trade_config",
+      "datetime",
+      "json",
+      "logging",
+      "pathlib",
+      "subprocess",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "path": "system3_pre_autorun_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "live_guard_marker",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 9,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "argparse",
+      "collections",
+      "csv",
+      "datetime",
+      "json",
+      "pathlib"
+    ],
+    "path": "tools/compute_mark_to_market_pnl.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "argparse",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 9,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 16,
+    "has_main": true,
+    "imports_top": [
+      "concurrent.futures",
+      "datetime",
+      "json",
+      "pathlib",
+      "requests",
+      "src.utils.market_hours",
+      "subprocess",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "path": "complete_end_to_end_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_unified_outcome_logger_v3",
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_performance_consistency_checker.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase342_live_performance_estimator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase366_strategy_ensemble_evaluator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "os",
+      "pandas",
+      "pathlib",
+      "sys",
+      "traceback",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase378_performance_optimizer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/validation/pre_market_signal_dryrun.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 9,
+    "has_main": true,
+    "imports_top": [
+      "asyncio",
+      "concurrent.futures",
+      "datetime",
+      "json",
+      "os",
+      "pytz",
+      "requests",
+      "sys",
+      "time",
+      "traceback",
+      "typing"
+    ],
+    "path": "scripts/comprehensive_dashboard_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 9,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "functools",
+      "itertools",
+      "json",
+      "multiprocessing",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "sys",
+      "typing"
+    ],
+    "path": "scripts/comprehensive_performance_analysis.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "dashboard.backend.trade_logger",
+      "datetime",
+      "json",
+      "pathlib",
+      "pytz",
+      "requests",
+      "sys"
+    ],
+    "path": "scripts/comprehensive_validation_and_test.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "pytz",
+      "sys"
+    ],
+    "path": "scripts/investigate_pnl_discrepancy.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "path": "scripts/performance_metrics.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "config.live_trade_config",
+      "datetime",
+      "json",
+      "os",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "scripts.run_live_chain",
+      "sys"
+    ],
+    "path": "scripts/pre_trading_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "pytz",
+      "requests",
+      "sys"
+    ],
+    "path": "scripts/test_trade_logging_and_pnl.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_automation_config",
+      "core.engine.system3_phase31_ultra_fusion",
+      "core.engine.system3_phase35_ultra_auditor",
+      "core.engine.system3_phase37_policy_risk_monitor",
+      "core.engine.system3_phase38_governance_summary",
+      "core.engine.system3_phase39_shadow_campaign",
+      "core.engine.system3_phase40_weekly_governance_pack",
+      "core.engine.system3_phase42_snapshot_manager",
+      "core.engine.ultra_safety",
+      "datetime",
+      "pathlib",
+      "sys",
+      "system3_ultra",
+      "typing"
+    ],
+    "path": "system3_ultra_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "os",
+      "pandas",
+      "pathlib"
+    ],
+    "path": "core/engine/angel_intraday_pnl_monitor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase144_pnl_vs_execution_scenario.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/ultra_pnl_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "os",
+      "pandas"
+    ],
+    "path": "pnl_detailed_analysis.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys",
+      "time"
+    ],
+    "path": "production_grade_zero_errors_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "subprocess",
+      "sys"
+    ],
+    "path": "run_validation_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 17,
+    "has_main": true,
+    "imports_top": [
+      "json",
+      "pathlib",
+      "requests",
+      "src.utils.market_hours",
+      "subprocess",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "path": "comprehensive_pre_build_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 11,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "os",
+      "pandas",
+      "warnings"
+    ],
+    "path": "comprehensive_production_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "os",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_strategy_optimizer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_live_ai_signals",
+      "core.engine.angel_trade_config",
+      "core.engine.train_angel_models",
+      "datetime",
+      "joblib",
+      "json",
+      "math",
+      "numpy",
+      "os",
+      "pandas",
+      "pathlib",
+      "time"
+    ],
+    "path": "core/engine/angel_synthetic_backtester.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase281_realtime_performance_monitor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_phases_361_380_registry",
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "traceback",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase377_validation_report_generator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/validation/post_close_signal_audit.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/validation/validate_live_thresholds.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 10,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "os",
+      "pathlib",
+      "psutil",
+      "requests",
+      "subprocess",
+      "sys",
+      "time",
+      "traceback"
+    ],
+    "path": "full_validation_with_auto_improvement.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 2,
+    "function_count": 14,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys",
+      "time",
+      "traceback"
+    ],
+    "path": "master_full_validation_suite.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "requests",
+      "sys",
+      "time",
+      "traceback"
+    ],
+    "path": "quick_validation_and_improvement.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "os",
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys",
+      "time",
+      "traceback"
+    ],
+    "path": "run_complete_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "scripts/final_best_strategy_selector.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "concurrent.futures",
+      "datetime",
+      "json",
+      "os",
+      "pytz",
+      "requests",
+      "sys",
+      "time",
+      "traceback"
+    ],
+    "path": "scripts/future_proof_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "sys"
+    ],
+    "path": "scripts/monitor_optionchain_performance.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "requests"
+    ],
+    "path": "scripts/test_performance_prediction.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.train_angel_models",
+      "pandas",
+      "pathlib"
+    ],
+    "path": "core/engine/angel_pnl_dummy_seed.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.train_angel_models",
+      "dataclasses",
+      "numpy",
+      "os",
+      "pandas",
+      "pathlib",
+      "sys"
+    ],
+    "path": "core/engine/angel_pnl_simulator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase118_daily_live_pnl_snapshot.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase166_underlying_performance.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase166_underlying_performance_comparison.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase177_performance_trends.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase183_model_performance_tracking.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase188_underlying_performance_trends.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase263_advanced_pnl_attribution.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase270_regime_performance_comparison.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase280_strategy_backtester.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase286_performance_degradation_detector.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase291_daily_performance_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase294_strategy_performance_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase296_model_performance_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "collections",
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/validation/live_safety_guard.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 2,
+    "function_count": 13,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "requests",
+      "typing"
+    ],
+    "path": "dashboard/backend/multi_validation_audit.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "__future__",
+      "csv",
+      "pathlib",
+      "typing"
+    ],
+    "path": "enforce_pnl_log_schema.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys"
+    ],
+    "path": "final_validation_and_build.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys"
+    ],
+    "path": "quick_validation_before_build.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "os",
+      "pathlib",
+      "requests",
+      "subprocess",
+      "sys",
+      "time"
+    ],
+    "path": "scripts/run_three_validation_cycles.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 2,
+    "has_main": false,
+    "imports_top": [
+      "core.utils.logger",
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "sys",
+      "typing"
+    ],
+    "path": "src/trading/pnl_tracker.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "pathlib",
+      "requests",
+      "sys",
+      "time"
+    ],
+    "path": "wait_and_complete_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.ai_model",
+      "core.engine.ultra_models_loader",
+      "core.utils.logger",
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys"
+    ],
+    "path": "core/engine/system3_phase383_ultra_backtest_sampler.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 1,
+    "function_count": 9,
+    "has_main": true,
+    "imports_top": [
+      "argparse",
+      "core.brokers.angel_one.broker",
+      "core.utils.logger",
+      "datetime",
+      "os",
+      "pandas",
+      "pathlib",
+      "sys",
+      "time",
+      "typing"
+    ],
+    "path": "core/validation/option_chain_validator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "argparse",
+      "broker_or_live_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "core.utils.logger",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "src/selector/strategy_engine.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 3,
+    "has_main": false,
+    "imports_top": [
+      "core.utils.logger",
+      "datetime",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "sys",
+      "typing"
+    ],
+    "path": "src/validation/qc_validator.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": false,
+    "imports_top": [
+      "collections",
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys"
+    ],
+    "path": "system3_csv_deep_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "pandas"
+    ],
+    "path": "temp_analyze_pnl.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase302_regime_performance.py",
+    "reasons": [
+      "syntax_ok",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 3,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "typing"
+    ],
+    "path": "dashboard/backend/backtesting.py",
+    "reasons": [
+      "syntax_ok",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 3,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 8,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "pytz",
+      "typing"
+    ],
+    "path": "dashboard/backend/ml_performance_tracking.py",
+    "reasons": [
+      "syntax_ok",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 3,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "os",
+      "pandas"
+    ],
+    "path": "core/engine/angel_daily_pnl_summary.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "live_guard_marker"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase255_model_performance_logger.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [],
+    "path": "core/validation/__init__.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 9,
+    "has_main": false,
+    "imports_top": [
+      "core.utils.logger",
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "src/analytics/performance_metrics.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "core.validation.option_chain_validator",
+      "pandas",
+      "sys",
+      "traceback"
+    ],
+    "path": "test_validation.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "ast",
+      "datetime",
+      "json",
+      "pathlib",
+      "re",
+      "subprocess",
+      "sys",
+      "typing"
+    ],
+    "path": "system3_comprehensive_validation.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 1,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 1,
+    "function_count": 11,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "math",
+      "pathlib",
+      "pytz",
+      "typing"
+    ],
+    "path": "dashboard/backend/performance_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": -1,
+    "syntax_ok": true
+  }
+]

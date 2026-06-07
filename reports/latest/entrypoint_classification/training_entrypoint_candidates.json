@@ -1,0 +1,2049 @@
+[
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "sys",
+      "typing"
+    ],
+    "path": "advanced_prediction_enhancer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 9,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/ai_model/feature_engineering_v2.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "imblearn.over_sampling",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/ai_model/smote_balancer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "joblib",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "typing",
+      "xgboost"
+    ],
+    "path": "core/engine/ai_model/xgboost_trainer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_blended_training_orchestrator_dryrun.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "joblib",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.ensemble",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "typing"
+    ],
+    "path": "core/engine/angel_blended_training_v3.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 10,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_confidence_calibrator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_automation_config",
+      "datetime",
+      "json",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_failure_point_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_feature_drift_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "live_guard_marker"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_latency_drift_observatory.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_trade_config",
+      "joblib",
+      "json",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_model_selector.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 14,
+    "has_main": true,
+    "imports_top": [
+      "catboost",
+      "collections",
+      "datetime",
+      "joblib",
+      "json",
+      "lightgbm",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.ensemble",
+      "torch",
+      "typing"
+    ],
+    "path": "core/engine/ensemble_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase334_model_drift_snapshot.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase335_model_drift_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 2,
+    "function_count": 10,
+    "has_main": true,
+    "imports_top": [
+      "collections",
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "scipy.spatial",
+      "scipy.stats",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase341_model_drift_detector_v2.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase362_forward_calibrator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "model_training_v2",
+      "os",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase391_xgboost_training.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_phase31_ultra_fusion",
+      "core.engine.system3_phase34_ultra_shadow_exec",
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "time",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase39_shadow_campaign.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_multi_resolution_labels",
+      "core.utils.logger",
+      "datetime",
+      "joblib",
+      "json",
+      "os",
+      "pandas",
+      "sklearn.ensemble",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "sys"
+    ],
+    "path": "core/engine/train_angel_models.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "joblib",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.ensemble",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "typing"
+    ],
+    "path": "core/engine/ultra_train_models.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/ultra/phase24_confidence_drift.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "core.ultra.phase21_adaptive_risk_engine",
+      "core.ultra.phase22_position_sizing",
+      "core.ultra.phase23_volatility_impact",
+      "core.ultra.phase24_confidence_drift",
+      "core.ultra.phase25_stoploss_engine",
+      "core.ultra.phase26_target_engine",
+      "core.ultra.phase27_rr_balancer",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/ultra/phase30_calibration_engine.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/ultra/phase50_prediction_explainer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_phase249_model_loader",
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "torch",
+      "typing"
+    ],
+    "path": "evaluate_phase249_models.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "core.utils.logger",
+      "datetime",
+      "joblib",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "sys",
+      "xgboost"
+    ],
+    "path": "fix_ultra_model_feature_mismatch.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "dataclasses",
+      "json",
+      "logging",
+      "numpy",
+      "os",
+      "pandas",
+      "pathlib",
+      "pickle",
+      "sklearn.ensemble",
+      "sklearn.metrics",
+      "sklearn.model_selection",
+      "sklearn.preprocessing",
+      "typing",
+      "xgboost"
+    ],
+    "path": "model_training_v2.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 13,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "openpyxl",
+      "openpyxl.chart",
+      "openpyxl.styles",
+      "openpyxl.utils",
+      "pandas",
+      "pathlib",
+      "src.analytics.performance_metrics",
+      "src.ml.ensemble_predictor",
+      "src.selector.strategy_engine",
+      "src.selector.top_symbol_selector",
+      "src.trading.advanced_position_sizing",
+      "src.trading.dynamic_risk_management",
+      "sys",
+      "typing"
+    ],
+    "path": "scripts/build_advanced_excel_with_ai_predictions.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "openpyxl",
+      "openpyxl.chart",
+      "openpyxl.chart.series",
+      "openpyxl.styles",
+      "openpyxl.utils",
+      "pandas",
+      "pathlib",
+      "pytz",
+      "scripts.build_production_optionchain_master",
+      "shutil",
+      "src.ml.ensemble_predictor",
+      "src.selector.strategy_engine",
+      "src.selector.top_symbol_selector",
+      "sys",
+      "traceback"
+    ],
+    "path": "scripts/enhance_optionchain_with_predictions.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "argparse",
+      "pathlib"
+    ],
+    "path": "tools/inspect_training_csv.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "argparse"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_phase391_xgboost_training",
+      "json",
+      "os",
+      "pathlib",
+      "sys"
+    ],
+    "path": "tools/run_phase_391_xgboost_test.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 8,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.build_angel_training_from_log",
+      "os",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/angel_blended_model_trainer.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase34_ultra_shadow_exec.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.ai_model.ml_predictor",
+      "pandas",
+      "pathlib"
+    ],
+    "path": "system3_inspect_training_data.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 7,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.train_angel_models",
+      "datetime",
+      "joblib",
+      "json",
+      "pandas",
+      "pathlib",
+      "shutil",
+      "typing"
+    ],
+    "path": "core/engine/angel_blended_model_trainer_v2.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "core.utils.logger",
+      "datetime",
+      "os",
+      "pandas",
+      "sys"
+    ],
+    "path": "core/engine/build_angel_training_dataset.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "live_guard_marker"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "pickle",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase206_model_compatibility.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase213_training_window.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase273_model_ensemble_builder.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase327_predictive_failure_scout.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase363_model_drift_checker.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing",
+      "warnings"
+    ],
+    "path": "core/engine/system3_phase365_accuracy_tracker.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "requests"
+    ],
+    "path": "scripts/test_performance_prediction.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 6,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/angel_breakout_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "collections",
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/angel_multi_model_agreement.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.angel_features",
+      "datetime",
+      "numpy",
+      "os",
+      "pandas",
+      "pathlib"
+    ],
+    "path": "core/engine/generate_synthetic_angel_training.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "glob",
+      "json",
+      "logging",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_lstm_utils.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase159_threshold_drift.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase169_confidence_calibration.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase169_confidence_calibration_analysis.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase181_config_drift_detection.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase183_model_performance_tracking.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase192_model_comparison_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase211_feature_drift.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "pathlib",
+      "torch",
+      "torch.nn",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase249_model_loader.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase283_drift_monitor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase296_model_performance_report.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "joblib",
+      "logging",
+      "os",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/ultra_models_loader.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/ultra_shadow_data_engine.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "csv",
+      "datetime",
+      "html",
+      "json",
+      "os",
+      "pathlib"
+    ],
+    "path": "tools/model_benchmark_leaderboard.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 5,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": false,
+    "imports_top": [
+      "imblearn.over_sampling",
+      "logging",
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/ai_model/data_balancing_v2.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": false,
+    "imports_top": [
+      "collections",
+      "core.utils.logger",
+      "datetime",
+      "joblib",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sklearn.ensemble",
+      "typing",
+      "xgboost"
+    ],
+    "path": "core/engine/ai_model/ml_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "momentum_analyzer"
+    ],
+    "path": "core/engine/momentum_model/__init__.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": false,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/momentum_model/momentum_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": false,
+    "imports_top": [
+      "pandas",
+      "pathlib",
+      "typing"
+    ],
+    "path": "core/engine/scoring_engine/threshold_calibrator.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 1,
+    "function_count": 7,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys",
+      "torch",
+      "torch.nn",
+      "torch.optim",
+      "torch.utils.data",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase249_lstm_forward_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_lstm_utils",
+      "datetime",
+      "json",
+      "logging",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase251_model_drift_tracker.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 1,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.ultra_models_loader",
+      "core.utils.logger",
+      "datetime",
+      "json",
+      "pathlib",
+      "sys"
+    ],
+    "path": "core/engine/system3_phase381_ultra_models_scanner.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.ai_model",
+      "core.engine.ultra_models_loader",
+      "core.utils.logger",
+      "datetime",
+      "json",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "sys"
+    ],
+    "path": "core/engine/system3_phase382_ultra_models_validator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "safe_cli_or_dryrun_markers",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "trend_analyzer"
+    ],
+    "path": "core/engine/trend_model/__init__.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": false,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/trend_model/trend_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "volatility_analyzer"
+    ],
+    "path": "core/engine/volatility_model/__init__.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/volatility_model/volatility_analyzer.py",
+    "reasons": [
+      "syntax_ok",
+      "safe_cli_or_dryrun_markers"
+    ],
+    "safe_cli_or_dryrun_markers": true,
+    "score": 4,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 2,
+    "function_count": 17,
+    "has_main": false,
+    "imports_top": [
+      "catboost",
+      "collections",
+      "core.utils.logger",
+      "datetime",
+      "json",
+      "lightgbm",
+      "logging",
+      "numpy",
+      "pandas",
+      "pathlib",
+      "pickle",
+      "sklearn.ensemble",
+      "sys",
+      "torch",
+      "typing",
+      "xgboost"
+    ],
+    "path": "src/ml/ensemble_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 3,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "ml_predictor"
+    ],
+    "path": "core/engine/ai_model/__init__.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "breakout_detector"
+    ],
+    "path": "core/engine/breakout_model/__init__.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 6,
+    "has_main": false,
+    "imports_top": [
+      "numpy",
+      "pandas",
+      "typing"
+    ],
+    "path": "core/engine/breakout_model/breakout_detector.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 4,
+    "has_main": true,
+    "imports_top": [
+      "core.engine.system3_lstm_utils",
+      "datetime",
+      "json",
+      "logging",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase252_model_retraining_scheduler.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 8,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pathlib",
+      "sys",
+      "torch",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase253_shadow_model_validator.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "pathlib",
+      "shutil",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase254_production_model_switcher.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "datetime",
+      "json",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/system3_phase255_model_performance_logger.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 0,
+    "function_count": 3,
+    "has_main": true,
+    "imports_top": [
+      "core.brokers.angel_one.broker",
+      "core.engine.angel_features",
+      "core.engine.angel_options_watch_loop",
+      "datetime",
+      "joblib",
+      "json",
+      "numpy",
+      "os",
+      "pandas",
+      "pathlib",
+      "sys",
+      "typing"
+    ],
+    "path": "core/engine/ultra_live_signals_shadow.py",
+    "reasons": [
+      "syntax_ok",
+      "has_main",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 2,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "dataclasses",
+      "typing"
+    ],
+    "path": "core/execution/order_models.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [],
+    "path": "core/models/__init__.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 1,
+    "function_count": 5,
+    "has_main": false,
+    "imports_top": [
+      "torch",
+      "torch.nn",
+      "typing"
+    ],
+    "path": "src/lstm_forecast.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "numpy",
+      "pandas"
+    ],
+    "path": "system3_model_fitness_audit.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 2,
+    "has_main": false,
+    "imports_top": [
+      "os",
+      "pandas"
+    ],
+    "path": "system3_model_lab.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": false,
+    "class_count": 0,
+    "function_count": 0,
+    "has_main": false,
+    "imports_top": [
+      "pandas",
+      "pathlib",
+      "shutil",
+      "sys"
+    ],
+    "path": "tools/clean_training_csv.py",
+    "reasons": [
+      "syntax_ok"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": 2,
+    "syntax_ok": true
+  },
+  {
+    "broker_or_live_markers": true,
+    "class_count": 1,
+    "function_count": 11,
+    "has_main": false,
+    "imports_top": [
+      "datetime",
+      "json",
+      "math",
+      "pathlib",
+      "pytz",
+      "typing"
+    ],
+    "path": "dashboard/backend/performance_predictor.py",
+    "reasons": [
+      "syntax_ok",
+      "broker_or_live_markers",
+      "output_report_markers"
+    ],
+    "safe_cli_or_dryrun_markers": false,
+    "score": -1,
+    "syntax_ok": true
+  }
+]
