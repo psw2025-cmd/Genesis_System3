@@ -21,3 +21,4 @@ logs/
 
 # Desktop app build output (large binaries; exceed GitHub limits)
 desktop_app/dist/
+google-cloud-sdk/
