@@ -1,0 +1,337 @@
+{
+  "blockers": [
+    {
+      "area": "repo",
+      "check": "old/backup/copy files classified",
+      "fix": "classify 12 review candidates with runtime map before delete/archive",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "data",
+      "check": "Yahoo fallback data proof published",
+      "fix": "run external Yahoo data proof",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "data",
+      "check": "Yahoo fallback symbols OK",
+      "fix": "fix external public data fallback",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "data",
+      "check": "broker/analyzer market data proven",
+      "fix": "connect broker in analyzer mode and prove paper lifecycle",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "model",
+      "check": "fresh model training proven",
+      "fix": "run authoritative training/load proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "model",
+      "check": "fresh training accuracy metric proven",
+      "fix": "publish accuracy metrics with dataset/date",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "backtest",
+      "check": "recent backtest proven",
+      "fix": "run recent backtest",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "backtest",
+      "check": "walk-forward cost/slippage proven",
+      "fix": "run walk-forward with costs/slippage",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "backtest",
+      "check": "safe dry-run validation execution proof published",
+      "fix": "run safe dry-run validation workflow",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "backtest",
+      "check": "safe dry-run commands passed",
+      "fix": "fix dry-run failures",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "paper_lifecycle",
+      "check": "live-market analyzer paper trade today proven",
+      "fix": "prove BUY/SELL/fill/exit/PnL lifecycle in analyzer mode",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "full dashboard proof published",
+      "fix": "run ultra dashboard readiness proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "dashboard endpoint coverage published",
+      "fix": "run dashboard endpoint coverage proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "full dashboard ready proven",
+      "fix": "fix frontend build/UI/API wiring and browser proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "backend endpoint coverage core ok",
+      "fix": "fix failing read-only endpoint coverage",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "browser visual proof completed",
+      "fix": "run browser/UI screenshot smoke proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "production",
+      "check": "overall trading pipeline trade_ready",
+      "fix": "clear all pipeline blockers first",
+      "ok": false,
+      "severity": "critical"
+    }
+  ],
+  "checks": [
+    {
+      "area": "repo",
+      "check": "no forbidden secret-style files",
+      "fix": "remove tracked secrets and rotate credentials",
+      "ok": true,
+      "severity": "critical"
+    },
+    {
+      "area": "repo",
+      "check": "no generated files pending removal",
+      "fix": "run full repo scan clean",
+      "ok": true,
+      "severity": "medium"
+    },
+    {
+      "area": "repo",
+      "check": "no large tracked files >5MB",
+      "fix": "move large runtime artifacts out of git",
+      "ok": true,
+      "severity": "medium"
+    },
+    {
+      "area": "repo",
+      "check": "old/backup/copy files classified",
+      "fix": "classify 12 review candidates with runtime map before delete/archive",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "runtime",
+      "check": "backend runtime present",
+      "fix": "fix Render/backend runtime",
+      "ok": true,
+      "severity": "critical"
+    },
+    {
+      "area": "runtime",
+      "check": "SmartAPI dependency present",
+      "fix": "fix backend requirements",
+      "ok": true,
+      "severity": "critical"
+    },
+    {
+      "area": "runtime",
+      "check": "live trading disabled",
+      "fix": "force analyzer/paper mode only",
+      "ok": true,
+      "severity": "critical"
+    },
+    {
+      "area": "runtime",
+      "check": "render endpoint proof published",
+      "fix": "run Render endpoint proof",
+      "ok": true,
+      "severity": "critical"
+    },
+    {
+      "area": "data",
+      "check": "Yahoo fallback data proof published",
+      "fix": "run external Yahoo data proof",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "data",
+      "check": "Yahoo fallback symbols OK",
+      "fix": "fix external public data fallback",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "data",
+      "check": "broker/analyzer market data proven",
+      "fix": "connect broker in analyzer mode and prove paper lifecycle",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "model",
+      "check": "fresh model training proven",
+      "fix": "run authoritative training/load proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "model",
+      "check": "fresh training accuracy metric proven",
+      "fix": "publish accuracy metrics with dataset/date",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "model",
+      "check": "entrypoint classification published",
+      "fix": "run entrypoint classification",
+      "ok": true,
+      "severity": "medium"
+    },
+    {
+      "area": "backtest",
+      "check": "recent backtest proven",
+      "fix": "run recent backtest",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "backtest",
+      "check": "walk-forward cost/slippage proven",
+      "fix": "run walk-forward with costs/slippage",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "backtest",
+      "check": "safe dry-run validation execution proof published",
+      "fix": "run safe dry-run validation workflow",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "backtest",
+      "check": "safe dry-run commands passed",
+      "fix": "fix dry-run failures",
+      "ok": false,
+      "severity": "medium"
+    },
+    {
+      "area": "paper_lifecycle",
+      "check": "live-market analyzer paper trade today proven",
+      "fix": "prove BUY/SELL/fill/exit/PnL lifecycle in analyzer mode",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "paper_lifecycle",
+      "check": "trade ready flag false until proof complete",
+      "fix": "keep trade_ready false until all blockers clear",
+      "ok": true,
+      "severity": "safety"
+    },
+    {
+      "area": "dashboard",
+      "check": "full dashboard proof published",
+      "fix": "run ultra dashboard readiness proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "dashboard endpoint coverage published",
+      "fix": "run dashboard endpoint coverage proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "full dashboard ready proven",
+      "fix": "fix frontend build/UI/API wiring and browser proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "backend endpoint coverage core ok",
+      "fix": "fix failing read-only endpoint coverage",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "dashboard",
+      "check": "browser visual proof completed",
+      "fix": "run browser/UI screenshot smoke proof",
+      "ok": false,
+      "severity": "critical"
+    },
+    {
+      "area": "production",
+      "check": "overall trading pipeline trade_ready",
+      "fix": "clear all pipeline blockers first",
+      "ok": false,
+      "severity": "critical"
+    }
+  ],
+  "checks_failed": 17,
+  "checks_passed": 9,
+  "checks_total": 26,
+  "critical_blocker_count": 12,
+  "generated_utc": "2026-06-07T13:20:52.206996+00:00",
+  "medium_blocker_count": 5,
+  "mode": "Analyzer/Paper only; live trading disabled",
+  "next_fix_queue": [
+    "connect broker in analyzer mode and prove paper lifecycle",
+    "run authoritative training/load proof",
+    "publish accuracy metrics with dataset/date",
+    "run recent backtest",
+    "run walk-forward with costs/slippage",
+    "prove BUY/SELL/fill/exit/PnL lifecycle in analyzer mode",
+    "run ultra dashboard readiness proof",
+    "run dashboard endpoint coverage proof",
+    "fix frontend build/UI/API wiring and browser proof",
+    "fix failing read-only endpoint coverage",
+    "run browser/UI screenshot smoke proof",
+    "clear all pipeline blockers first",
+    "classify 12 review candidates with runtime map before delete/archive",
+    "run external Yahoo data proof",
+    "fix external public data fallback",
+    "run safe dry-run validation workflow",
+    "fix dry-run failures"
+  ],
+  "production_grade_ready": false,
+  "safety_blocker_count": 0,
+  "trade_ready": false,
+  "verdict": "NOT_PRODUCTION_GRADE_READY"
+}
