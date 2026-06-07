@@ -33,7 +33,7 @@
 ./analyze_csv_status.py
 ./analyze_data.py
 ./analyze_ev_ready_csv.py
-./audit_artifacts/full_trading_pipeline_readiness_20260607T110604Z/02_data_history_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/02_data_history_inventory.txt
 ./clean_csv_consistency.py
 ./config/angel_automation_config.json
 ./core/broker/angel_live_order_wrapper.py
@@ -282,6 +282,7 @@
 ./option_chain_automation_master.py
 ./reports/DATA_QUALITY_SUMMARY_375.md
 ./reports/STRATEGY_ENSEMBLE_366.md
+./reports/latest/full_trading_pipeline_readiness/02_data_history_inventory.txt
 ./reports/readiness_audit/MODEL_DATA_BACKTEST_DASHBOARD_READINESS.md
 ./reports/readiness_audit/model_data_backtest_dashboard_readiness.json
 ./run_csv_audit.bat

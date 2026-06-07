@@ -56,7 +56,7 @@
 ./VALIDATION_FIXES_AND_STATUS.md
 ./VALIDATION_REPORT.md
 ./ZERO_ERRORS_VALIDATION_COMPLETE.md
-./audit_artifacts/full_trading_pipeline_readiness_20260607T110604Z/04_backtest_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/04_backtest_inventory.txt
 ./complete_end_to_end_validation.py
 ./comprehensive_pre_build_validation.py
 ./comprehensive_production_validation.py
@@ -160,6 +160,7 @@
 ./reports/full_validation_20260210_073117.json
 ./reports/full_validation_20260210_073137.json
 ./reports/full_validation_20260210_073307.json
+./reports/latest/full_trading_pipeline_readiness/04_backtest_inventory.txt
 ./reports/master_validation_20260210_071913.json
 ./reports/master_validation_20260210_071913.md
 ./reports/master_validation_20260210_072009.json

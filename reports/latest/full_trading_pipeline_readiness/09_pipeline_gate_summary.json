@@ -1,5 +1,5 @@
 {
-  "backtest_candidate_count": 215,
+  "backtest_candidate_count": 216,
   "blockers": [
     "fresh_training_not_proven",
     "recent_backtest_not_proven",
@@ -7,9 +7,9 @@
     "full_working_dashboard_not_proven"
   ],
   "dashboard_candidate_count": 64,
-  "data_history_candidate_count": 169,
-  "model_training_candidate_count": 174,
-  "paper_analyzer_candidate_count": 123,
+  "data_history_candidate_count": 170,
+  "model_training_candidate_count": 175,
+  "paper_analyzer_candidate_count": 124,
   "proven_backtest_recent": false,
   "proven_dashboard_full_ui_live": false,
   "proven_live_market_paper_trade_today": false,

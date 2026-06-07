@@ -27,7 +27,7 @@
 ./TRADER_USER_GUIDE.md
 ./TRADER_USER_TEST_GUIDE.md
 ./TRADE_TIMING_ANALYSIS.md
-./audit_artifacts/full_trading_pipeline_readiness_20260607T110604Z/05_paper_analyzer_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/05_paper_analyzer_inventory.txt
 ./comprehensive_multi_trader_test.py
 ./config/angel_automation_config.json
 ./config/live_trade_config.json
@@ -243,6 +243,7 @@
 ./paper_pnl_summary.json
 ./paper_trading_smoke_test.py
 ./reports/BROKER_LATENCY_368.md
+./reports/latest/full_trading_pipeline_readiness/05_paper_analyzer_inventory.txt
 ./reports/trader_test_20260210_075042.json
 ./reports/trader_test_20260210_075042.md
 ./reports/trader_test_20260210_075209.json

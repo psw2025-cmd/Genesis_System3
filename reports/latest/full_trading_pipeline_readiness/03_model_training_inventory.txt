@@ -11,7 +11,7 @@
 ./SYSTEM3_PHASES_361_365_HEALTH_AND_ACCURACY_REPORT.md
 ./ULTRA_MODEL_FEATURE_FIX_SUMMARY.md
 ./advanced_prediction_enhancer.py
-./audit_artifacts/full_trading_pipeline_readiness_20260607T110604Z/03_model_training_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260607T111658Z/03_model_training_inventory.txt
 ./core/engine/ai_model/__init__.py
 ./core/engine/ai_model/data_balancing_v2.py
 ./core/engine/ai_model/feature_engineering_v2.py
@@ -160,6 +160,7 @@
 ./reports/ULTRA_MODELS_INVENTORY_381.md
 ./reports/ULTRA_MODELS_VALIDATION_382.md
 ./reports/ULTRA_MODEL_HEALTH_384.md
+./reports/latest/full_trading_pipeline_readiness/03_model_training_inventory.txt
 ./reports/model_benchmark_dashboard/index.html
 ./reports/model_benchmark_dashboard/model_benchmark_leaderboard.json
 ./reports/model_benchmark_dashboard/ultra.html
