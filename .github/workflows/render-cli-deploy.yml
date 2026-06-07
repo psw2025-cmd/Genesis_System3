@@ -56,6 +56,28 @@ jobs:
           set -euo pipefail
           render --version
 
+      - name: Set Render workspace automatically
+        shell: bash
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_OUTPUT: json
+          CI: true
+        run: |
+          set -euo pipefail
+          render workspaces --output json --confirm > /tmp/render_workspaces.json
+          python - <<'PY'
+          import json
+          data=json.load(open('/tmp/render_workspaces.json'))
+          print(data[0].get('id') or data[0].get('name'))
+          PY
+          WORKSPACE="$(python - <<'PY'
+          import json
+          data=json.load(open('/tmp/render_workspaces.json'))
+          print(data[0].get('id') or data[0].get('name'))
+          PY
+          )"
+          render workspace set "$WORKSPACE" --output json --confirm
+
       - name: Validate render.yaml
         shell: bash
         env:
