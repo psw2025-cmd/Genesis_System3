@@ -75,7 +75,10 @@
   ./package-lock.json
   ./package.json
   ./reports/ci_truth/README.md
+  ./reports/latest/entrypoint_classification/README.md
+  ./reports/latest/full_repo_scan_clean/00_summary.md
   ./reports/latest/full_trading_pipeline_readiness/00_summary.md
+  ./reports/latest/model_backtest_readiness/00_summary.md
   ./reports/latest/render_endpoint_proof/README.md
   ./reports/latest/repo_cleanliness/00_summary.md
   ./reports/model_benchmark_dashboard/index.html
@@ -90,9 +93,9 @@
   ./system3_phase331_signal_integrity.py
   ./test_phases_261_300.py
   ./tests/auto/system3_generated_tests/test_phases_261_300.py
-00_summary.md (2)
+00_summary.md (4)
 COMPLETE_VALIDATION_REPORT.md (2)
-README.md (5)
+README.md (6)
 __init__.py (23)
 app.py (2)
 ensemble_predictor.py (2)
