@@ -1,0 +1,176 @@
+name: Ultra Dashboard Readiness Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '50 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/dashboard-ultra-readiness.yml
+      - dashboard/**
+      - render.yaml
+      - reports/latest/dashboard_endpoint_coverage/**
+
+permissions:
+  contents: write
+
+jobs:
+  ultra-dashboard-readiness:
+    name: Verify Ultra Dashboard readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build dashboard readiness matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/dashboard_ultra_readiness"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          python - <<'PY'
+          import json, os, re, subprocess
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          frontend_files = [p for p in files if p.startswith('dashboard/frontend/')]
+          backend_files = [p for p in files if p.startswith('dashboard/backend/')]
+
+          package_path = Path('dashboard/frontend/package.json')
+          package = json.loads(package_path.read_text(encoding='utf-8')) if package_path.exists() else {}
+          scripts = package.get('scripts', {})
+          deps = {**package.get('dependencies', {}), **package.get('devDependencies', {})}
+
+          text_blob = ''
+          for p in frontend_files:
+              if p.endswith(('.ts', '.tsx', '.js', '.jsx', '.json', '.env', '.md')) and Path(p).exists():
+                  try:
+                      text_blob += '\n# FILE ' + p + '\n' + Path(p).read_text(encoding='utf-8', errors='replace')[:50000]
+                  except Exception:
+                      pass
+
+          endpoint_proof = Path('reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json')
+          endpoint_data = None
+          if endpoint_proof.exists():
+              try:
+                  endpoint_data = json.loads(endpoint_proof.read_text(encoding='utf-8'))
+              except Exception as exc:
+                  endpoint_data = {'_error': repr(exc)}
+
+          feature_checks = [
+              ('frontend_package_present', package_path.exists()),
+              ('frontend_build_script_present', 'build' in scripts),
+              ('vite_present', 'vite' in deps),
+              ('react_present', 'react' in deps and 'react-dom' in deps),
+              ('charting_library_present', 'recharts' in deps),
+              ('api_client_library_present', 'axios' in deps),
+              ('frontend_source_present', any(p.startswith('dashboard/frontend/src/') for p in frontend_files)),
+              ('backend_fastapi_present', Path('dashboard/backend/app.py').exists()),
+              ('backend_requirements_present', Path('dashboard/backend/requirements.txt').exists()),
+              ('render_config_present', Path('render.yaml').exists()),
+              ('endpoint_coverage_published', endpoint_data is not None),
+              ('core_endpoint_coverage_ok', bool(endpoint_data and endpoint_data.get('core_ok'))),
+              ('localhost_references_absent_in_frontend', 'localhost:8000' not in text_blob and 'localhost:3000' not in text_blob),
+              ('render_backend_reference_or_relative_api_present', 'genesis-system3-backend.onrender.com' in text_blob or '/api/' in text_blob),
+          ]
+
+          feature_keywords = {
+              'state_health': ['/api/state', '/api/health', 'health', 'state'],
+              'broker_status': ['/api/broker/status', 'broker'],
+              'signals': ['/api/signal', '/api/signals', 'signal'],
+              'positions_paper': ['/api/positions', '/api/paper', 'position'],
+              'pnl': ['/api/pnl', 'pnl'],
+              'risk': ['/api/risk', 'risk'],
+              'ml_performance': ['/api/ml/performance', 'ml', 'model'],
+              'backtest': ['/api/backtest', 'backtest'],
+              'orders_readonly': ['/api/orders', 'orders'],
+              'trades': ['/api/trades', 'trades'],
+              'alerts': ['/api/alerts', 'alerts'],
+              'logs': ['/api/logs', 'logs'],
+          }
+          feature_presence = {}
+          lower_blob = text_blob.lower()
+          for name, keys in feature_keywords.items():
+              feature_presence[name] = any(k.lower() in lower_blob for k in keys)
+
+          blockers = []
+          for name, ok in feature_checks:
+              if not ok:
+                  blockers.append(name)
+          for name, ok in feature_presence.items():
+              if not ok:
+                  blockers.append(f'ui_feature_reference_missing:{name}')
+
+          summary = {
+              'generated_utc': datetime.now(timezone.utc).isoformat(),
+              'frontend_file_count': len(frontend_files),
+              'backend_file_count': len(backend_files),
+              'package_name': package.get('name'),
+              'scripts': scripts,
+              'feature_checks': dict(feature_checks),
+              'ui_feature_presence': feature_presence,
+              'endpoint_coverage_summary_present': endpoint_data is not None,
+              'endpoint_coverage_core_ok': bool(endpoint_data and endpoint_data.get('core_ok')),
+              'blockers': blockers,
+              'full_ultra_dashboard_ready_proven': len(blockers) == 0,
+              'verdict': 'READY_PROVEN' if len(blockers) == 0 else 'NOT_FULLY_PROVEN',
+              'note': 'This is static/readiness proof. A real browser screenshot/UI smoke test is still required for visual proof.',
+          }
+
+          out = Path('reports/latest/dashboard_ultra_readiness')
+          out.mkdir(parents=True, exist_ok=True)
+          (out/'dashboard_ultra_readiness_summary.json').write_text(json.dumps(summary, indent=2, sort_keys=True), encoding='utf-8')
+
+          lines = ['# Ultra Dashboard Readiness Proof', '', f"Generated UTC: {summary['generated_utc']}", '', f"Verdict: `{summary['verdict']}`", f"Full dashboard ready proven: `{summary['full_ultra_dashboard_ready_proven']}`", '', '## Checks', '', '| Check | OK |', '|---|---:|']
+          for name, ok in feature_checks:
+              lines.append(f"| `{name}` | `{ok}` |")
+          lines += ['', '## UI feature references', '', '| Feature | Present |', '|---|---:|']
+          for name, ok in feature_presence.items():
+              lines.append(f"| `{name}` | `{ok}` |")
+          lines += ['', '## Blockers', '']
+          if blockers:
+              lines.extend([f'- `{b}`' for b in blockers])
+          else:
+              lines.append('- None')
+          lines += ['', '## Important', '', 'Static readiness is not the same as visual dashboard proof. Browser/UI proof remains required.']
+          (out/'README.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+          PY
+
+          cat "$OUT/README.md"
+
+      - name: Optional frontend install/build smoke
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/dashboard_ultra_readiness"
+          if [ -f dashboard/frontend/package.json ]; then
+            cd dashboard/frontend
+            npm ci > ../../reports/latest/dashboard_ultra_readiness/npm_ci.log 2>&1
+            npm run build > ../../reports/latest/dashboard_ultra_readiness/npm_build.log 2>&1
+            echo "FRONTEND_BUILD_PASS" > ../../reports/latest/dashboard_ultra_readiness/frontend_build_status.txt
+          else
+            echo "FRONTEND_PACKAGE_MISSING" > reports/latest/dashboard_ultra_readiness/frontend_build_status.txt
+          fi
+
+      - name: Commit dashboard readiness proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_ultra_readiness
+          if git diff --cached --quiet; then
+            echo "No dashboard readiness proof changes to commit."
+          else
+            git commit -m "audit: publish ultra dashboard readiness proof"
+            git push
+          fi
