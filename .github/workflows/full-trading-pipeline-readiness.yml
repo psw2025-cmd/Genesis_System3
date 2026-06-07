@@ -1,0 +1,172 @@
+name: Full Trading Pipeline Readiness Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/full-trading-pipeline-readiness.yml
+      - dashboard/backend/**
+      - core/**
+      - scripts/**
+      - run_system3.py
+      - system3_ultra.py
+
+permissions:
+  contents: read
+
+jobs:
+  full-trading-pipeline-readiness:
+    name: Verify full AI trading pipeline readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build full pipeline readiness proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="audit_artifacts/full_trading_pipeline_readiness_$(date -u +%Y%m%dT%H%M%SZ)"
+          mkdir -p "$OUT"
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+          {
+            echo "# Full Trading Pipeline Readiness Gate"
+            echo "Generated UTC: $(date -u --iso-8601=seconds)"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Mode: proof-only; no broker login; no orders; no live trading"
+          } > "$OUT/00_summary.md"
+
+          {
+            echo "# Authoritative runtime"
+            echo "Render config: render.yaml"
+            echo "Backend Dockerfile: dashboard/backend/Dockerfile"
+            echo "Backend entry: dashboard/backend/app.py"
+            echo
+            sed -n '1,120p' render.yaml 2>/dev/null || true
+            echo
+            sed -n '1,120p' dashboard/backend/Dockerfile 2>/dev/null || true
+          } > "$OUT/01_authoritative_runtime.txt"
+
+          {
+            echo "# Data/history candidates"
+            echo "## data-like directories/files"
+            find . -path ./.git -prune -o -type f | grep -Ei '(data|histor|ohlc|candle|option|chain|nse|bse|angel|binance|duckdb|sqlite|csv|parquet)' | sort | head -1500 || true
+          } > "$OUT/02_data_history_inventory.txt"
+
+          {
+            echo "# Model/training candidates"
+            find . -path ./.git -prune -o -type f | grep -Ei '(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|lstm|xgboost|lightgbm|catboost)' | sort | head -1500 || true
+          } > "$OUT/03_model_training_inventory.txt"
+
+          {
+            echo "# Backtest candidates"
+            find . -path ./.git -prune -o -type f | grep -Ei '(backtest|walk.?forward|strategy|pnl|performance|validation)' | sort | head -1500 || true
+          } > "$OUT/04_backtest_inventory.txt"
+
+          {
+            echo "# Paper/analyzer/trade candidates"
+            find . -path ./.git -prune -o -type f | grep -Ei '(paper|analy[sz]er|sandbox|order|trade|position|broker|angel)' | sort | head -1500 || true
+          } > "$OUT/05_paper_analyzer_inventory.txt"
+
+          {
+            echo "# Dashboard candidates"
+            find dashboard -type f | sort 2>/dev/null || true
+          } > "$OUT/06_dashboard_inventory.txt"
+
+          {
+            echo "# Safety checks"
+            echo "## Render env safety"
+            grep -nE 'SYSTEM3_MODE|ANALYZE_MODE|LIVE_TRADING_ENABLED|SYSTEM3_LIVE_TRADING_ALLOWED' render.yaml || true
+            echo
+            echo "## Broker live guard"
+            grep -RInE 'SYSTEM3_LIVE_TRADING_ALLOWED|LIVE TRADING BLOCKED|allow_data_only|place_order|modify_order|cancel_order' core dashboard/backend 2>/dev/null | head -1500 || true
+          } > "$OUT/07_safety_checks.txt"
+
+          {
+            echo "# Compile smoke for likely runtime files"
+            python --version
+            for f in dashboard/backend/app.py dashboard/backend/backtesting.py core/brokers/angel_one/broker.py run_system3.py system3_ultra.py; do
+              if [ -f "$f" ]; then
+                python -m py_compile "$f" && echo "PY_COMPILE_PASS $f" || echo "PY_COMPILE_FAIL $f"
+              else
+                echo "MISSING $f"
+              fi
+            done
+          } > "$OUT/08_compile_smoke.txt" 2>&1 || true
+
+          python - <<'PY' > "$OUT/09_pipeline_gate_summary.json"
+          import json, os, subprocess
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          def has_any(words):
+              return [p for p in files if any(w.lower() in p.lower() for w in words)]
+          render_text = open('render.yaml', encoding='utf-8', errors='replace').read() if os.path.exists('render.yaml') else ''
+          app_exists = os.path.exists('dashboard/backend/app.py')
+          docker_exists = os.path.exists('dashboard/backend/Dockerfile')
+          req_exists = os.path.exists('dashboard/backend/requirements.txt')
+          smartapi_dep = False
+          if req_exists:
+              smartapi_dep = 'smartapi-python' in open('dashboard/backend/requirements.txt', encoding='utf-8', errors='replace').read().lower()
+          result = {
+              'runtime_backend_present': app_exists and docker_exists,
+              'render_live_trading_disabled': 'LIVE_TRADING_ENABLED' in render_text and '"0"' in render_text,
+              'smartapi_dependency_present': smartapi_dep,
+              'data_history_candidate_count': len(has_any(['data','histor','ohlc','candle','option','chain','csv','parquet','duckdb','sqlite'])),
+              'model_training_candidate_count': len(has_any(['train','retrain','model','predict','accuracy','calibrat','drift','shadow','kronos','wavelet'])),
+              'backtest_candidate_count': len(has_any(['backtest','strategy','pnl','performance','validation'])),
+              'paper_analyzer_candidate_count': len(has_any(['paper','analyzer','sandbox','order','trade','position','broker'])),
+              'dashboard_candidate_count': len([p for p in files if p.startswith('dashboard/')]),
+              'proven_live_market_paper_trade_today': False,
+              'proven_model_training_fresh': False,
+              'proven_backtest_recent': False,
+              'proven_dashboard_full_ui_live': False,
+          }
+          blockers = []
+          if not result['runtime_backend_present']:
+              blockers.append('backend_runtime_not_present')
+          if not result['render_live_trading_disabled']:
+              blockers.append('live_trading_safety_not_proven_disabled')
+          if not result['smartapi_dependency_present']:
+              blockers.append('smartapi_dependency_missing')
+          if not result['proven_model_training_fresh']:
+              blockers.append('fresh_training_not_proven')
+          if not result['proven_backtest_recent']:
+              blockers.append('recent_backtest_not_proven')
+          if not result['proven_live_market_paper_trade_today']:
+              blockers.append('live_market_analyzer_paper_trade_not_proven')
+          if not result['proven_dashboard_full_ui_live']:
+              blockers.append('full_working_dashboard_not_proven')
+          result['blockers'] = blockers
+          result['trade_ready'] = False
+          result['verdict'] = 'NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR'
+          print(json.dumps(result, indent=2, sort_keys=True))
+          PY
+
+          {
+            echo "# Recommendation"
+            echo "Current verified status: NOT TRADE READY for real money. Analyzer/Paper proof still required."
+            echo
+            echo "Required next proofs:"
+            echo "1. Fresh historical/live data collection proof."
+            echo "2. Fresh model training or model-load proof with accuracy metrics."
+            echo "3. Backtest/walk-forward proof with costs/slippage."
+            echo "4. Analyzer-mode paper trade lifecycle proof: signal -> order -> fill/sim fill -> exit -> PnL."
+            echo "5. Full dashboard UI proof: state, health, broker status, predictions, paper positions, PnL, logs."
+          } > "$OUT/10_recommendation.md"
+
+          (cd audit_artifacts && zip -r "$(basename "$OUT").zip" "$(basename "$OUT")")
+          echo "ZIP_PATH=audit_artifacts/$(basename "$OUT").zip" >> "$GITHUB_ENV"
+
+      - name: Upload full pipeline readiness artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-trading-pipeline-readiness
+          path: ${{ env.ZIP_PATH }}
+          if-no-files-found: error
+          retention-days: 14
