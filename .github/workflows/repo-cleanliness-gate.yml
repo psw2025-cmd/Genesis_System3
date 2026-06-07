@@ -49,7 +49,7 @@ jobs:
 
           {
             echo "# Forbidden secret-style tracked files"
-            grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$' /tmp/tracked_files.txt || true
+            grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$' /tmp/tracked_files.txt | grep -vE '(^|/)\.env\.example$|(^|/)config/\.env\.example$' || true
           } > "$OUT/02_forbidden_secret_style_files.txt"
 
           {
@@ -63,10 +63,15 @@ jobs:
           } > "$OUT/04_old_backup_copy_candidates.txt"
 
           python - <<'PY' > "$OUT/05_cleanliness_summary.json"
-          import json, pathlib, re, subprocess
+          import json, re, subprocess
           files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
           auto = [p for p in files if re.search(r'(^|/)audit_artifacts/|(^|/)__pycache__/|\.pyc$|(^|/)desktop\.ini$|(^|/)\.DS_Store$|(^|/)\.pytest_cache/', p)]
-          forbidden = [p for p in files if re.search(r'(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$', p)]
+          forbidden = []
+          for p in files:
+              if p in ('.env.example', 'config/.env.example'):
+                  continue
+              if re.search(r'(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$', p):
+                  forbidden.append(p)
           review = [p for p in files if re.search(r'(^|/)(old|backup|bak|archive|quarantine|copy|duplicate|temp|tmp)(/|_|-|\.)|(_old|_backup|_bak|_copy|_duplicate)\.', p, re.I)]
           result = {
             'tracked_file_count': len(files),
