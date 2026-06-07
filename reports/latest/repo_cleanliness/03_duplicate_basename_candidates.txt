@@ -79,6 +79,8 @@
   ./reports/latest/full_repo_scan_clean/00_summary.md
   ./reports/latest/full_trading_pipeline_readiness/00_summary.md
   ./reports/latest/model_backtest_readiness/00_summary.md
+  ./reports/latest/production_grade_readiness/README.md
+  ./reports/latest/proof_status_matrix/README.md
   ./reports/latest/render_endpoint_proof/README.md
   ./reports/latest/repo_cleanliness/00_summary.md
   ./reports/model_benchmark_dashboard/index.html
@@ -95,7 +97,7 @@
   ./tests/auto/system3_generated_tests/test_phases_261_300.py
 00_summary.md (4)
 COMPLETE_VALIDATION_REPORT.md (2)
-README.md (6)
+README.md (8)
 __init__.py (23)
 app.py (2)
 ensemble_predictor.py (2)
