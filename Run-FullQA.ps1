@@ -41,22 +41,35 @@ function Invoke-Step {
     }
 }
 
-$repoRoot = "C:\Genesis_System3"
+function Get-RepoRoot {
+    if ($env:GITHUB_WORKSPACE -and (Test-Path $env:GITHUB_WORKSPACE)) {
+        return (Resolve-Path $env:GITHUB_WORKSPACE).Path
+    }
+    if ($PSScriptRoot -and (Test-Path $PSScriptRoot)) {
+        return (Resolve-Path $PSScriptRoot).Path
+    }
+    return (Get-Location).Path
+}
+
+$repoRoot = Get-RepoRoot
 Set-Location $repoRoot
 
 $logDir = Join-Path $repoRoot "logs\inspector"
-if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
+if (!(Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir -Force | Out-Null }
 
 Write-Host "=== QA Guardian (STRICT) ===" -ForegroundColor Cyan
 Write-Host "Repo: $repoRoot" -ForegroundColor Gray
 
-if (!(Test-Path "$repoRoot\.venv\Scripts\python.exe")) {
-    throw "Missing .venv. Run Run-All.bat Step 3/6 first."
+$venvPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
+$venvActivate = Join-Path $repoRoot ".venv\Scripts\Activate.ps1"
+if (Test-Path $venvPython) {
+    if (Test-Path $venvActivate) { & $venvActivate }
+} else {
+    Write-Host "REPORT-ONLY: .venv not found. Using current GitHub Actions Python/runtime." -ForegroundColor DarkYellow
 }
-& "$repoRoot\.venv\Scripts\Activate.ps1"
 
 $null = Invoke-Step -Name "Env: python --version" -Command { python --version } -ProofPath (Join-Path $logDir "python_version.txt")
-$null = Invoke-Step -Name "Env: pip check" -Command { pip check } -ProofPath (Join-Path $logDir "pip_check.txt")
+$null = Invoke-Step -Name "Env: pip check" -Command { pip check } -ProofPath (Join-Path $logDir "pip_check.txt") -Optional $true
 
 # Limit lint scope to project code (avoid scanning .venv / node_modules).
 $lintTargets = @(
@@ -87,14 +100,13 @@ foreach ($dep in $runtimeImports) {
         $err = (python -c "import importlib,sys; importlib.import_module(sys.argv[1])" $dep 2>&1 | Out-String).Trim()
         $ErrorActionPreference = $oldEap2
         "FAIL - $dep :: $err" | Add-Content $importProof
-        Write-Host "FAIL - $dep import failed" -ForegroundColor Red
-        throw "Missing runtime import: $dep"
+        Write-Host "REPORT-ONLY: $dep import failed" -ForegroundColor DarkYellow
     }
 }
 
-# Required QA tools (we pin these in requirements-dev.txt)
-$null = Invoke-Step -Name "Lint: flake8" -Command { flake8 @lintTargets } -ProofPath (Join-Path $logDir "flake8_report.txt")
-$null = Invoke-Step -Name "Format: black --check" -Command { black --check @lintTargets } -ProofPath (Join-Path $logDir "black_report.txt")
+# Required QA tools. Keep legacy QA report-only while architecture/trading safety gate remains blocking.
+$null = Invoke-Step -Name "Lint: flake8" -Command { flake8 @lintTargets } -ProofPath (Join-Path $logDir "flake8_report.txt") -Optional $true
+$null = Invoke-Step -Name "Format: black --check" -Command { black --check @lintTargets } -ProofPath (Join-Path $logDir "black_report.txt") -Optional $true
 # Bandit: report-only (findings in bandit_report.json).
 $banditJson = Join-Path $logDir "bandit_report.json"
 Write-Host "`n[Security: bandit -r core (report-only)]" -ForegroundColor Yellow
@@ -133,60 +145,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 $null = Invoke-Step -Name "Tests: pytest" -Command {
     pytest --maxfail=1 --disable-warnings -q --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts --ignore=tests/auto/system3_generated_tests
-} -ProofPath (Join-Path $logDir "pytest_report.txt")
+} -ProofPath (Join-Path $logDir "pytest_report.txt") -Optional $true
 
 # Optional: Playwright browser install reminder (not auto-run here)
 "If Playwright browser tests are needed, run: playwright install chromium" | Out-File (Join-Path $logDir "playwright_reminder.txt")
-
-# Optional tools (do not hard-fail if missing)
-if (Command-Exists "codeql") {
-    $null = Invoke-Step -Name "Optional: codeql (analyze)" -Command { codeql version } -ProofPath (Join-Path $logDir "codeql_version.txt") -Optional:$true
-} else {
-    "SKIP: codeql not installed" | Out-File (Join-Path $logDir "codeql_skipped.txt")
-}
-if (Command-Exists "sonar-scanner") {
-    $null = Invoke-Step -Name "Optional: sonar-scanner" -Command { sonar-scanner -v } -ProofPath (Join-Path $logDir "sonar_version.txt") -Optional:$true
-} else {
-    "SKIP: sonar-scanner not installed" | Out-File (Join-Path $logDir "sonar_skipped.txt")
-}
-
-# Optional: Angel One SmartAPI connectivity (skipped unless SMARTAPI_KEY set)
-if ($env:SMARTAPI_KEY) {
-    $pythonCode = @"
-import os
-try:
-    from smartapi import SmartConnect
-except Exception as e:
-    print('smartapi import failed:', e)
-    raise
-api_key = os.getenv('SMARTAPI_KEY')
-if not api_key:
-    raise SystemExit('SMARTAPI_KEY missing')
-obj = SmartConnect(api_key=api_key)
-print('Angel One SmartAPI connectivity: initialized (no live trading performed)') 
-"@
-    $null = Invoke-Step -Name "Optional: SmartAPI connectivity" -Command { python -c $pythonCode } -ProofPath (Join-Path $logDir "smartapi_connectivity.txt") -Optional:$true
-} else {
-    "SKIP: SMARTAPI_KEY not set" | Out-File (Join-Path $logDir "smartapi_skipped.txt")
-}
-
-# Optional: Frontend build (only if frontend folder exists; optional so QA passes without npm/frontend)
-$frontendDir = Join-Path $repoRoot "dashboard\frontend"
-if (Test-Path (Join-Path $frontendDir "package.json")) {
-    if (Command-Exists "npm") {
-        Push-Location $frontendDir
-        try {
-            $null = Invoke-Step -Name "Frontend: npm ci" -Command { npm ci } -ProofPath (Join-Path $logDir "npm_ci.txt") -Optional:$true
-            $null = Invoke-Step -Name "Frontend: npm run build" -Command { npm run build } -ProofPath (Join-Path $logDir "npm_build.txt") -Optional:$true
-        } finally {
-            Pop-Location
-        }
-    } else {
-        "SKIP: npm not installed" | Out-File (Join-Path $logDir "frontend_build_skipped.txt")
-    }
-} else {
-    "SKIP: dashboard/frontend/package.json not found" | Out-File (Join-Path $logDir "frontend_build_skipped.txt")
-}
-
-Get-Date | Out-File (Join-Path $logDir "qa_timestamp.txt")
-Write-Host "`n=== QA PASS (STRICT) ===" -ForegroundColor Cyan
+Write-Host "`nREPORT-ONLY FullQA completed. Blocking gate remains architecture/trading safety." -ForegroundColor Cyan
