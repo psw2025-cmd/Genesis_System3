@@ -1,0 +1,220 @@
+name: Phase 2 Authoritative Runtime Map
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/phase2-runtime-map.yml
+
+permissions:
+  contents: read
+
+jobs:
+  phase2-runtime-map:
+    name: Build authoritative runtime map
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build runtime map proof pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="audit_artifacts/phase2_runtime_map_$(date -u +%Y%m%dT%H%M%SZ)"
+          mkdir -p "$OUT"
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+          {
+            echo "# Phase 2 Authoritative Runtime Map"
+            echo "Generated UTC: $(date -u --iso-8601=seconds)"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Branch: ${GITHUB_REF_NAME:-unknown}"
+            echo
+            echo "Safety: read-only audit. No broker login. No order placement. No live trading."
+          } > "$OUT/00_summary.md"
+
+          {
+            echo "# Authoritative deployment chain"
+            echo
+            echo "## render.yaml"
+            sed -n '1,220p' render.yaml 2>/dev/null || true
+            echo
+            echo "## dashboard/backend/Dockerfile"
+            sed -n '1,220p' dashboard/backend/Dockerfile 2>/dev/null || true
+            echo
+            echo "## dashboard/backend/requirements.txt"
+            sed -n '1,220p' dashboard/backend/requirements.txt 2>/dev/null || true
+            echo
+            echo "## Render deploy workflow"
+            sed -n '1,240p' .github/workflows/render-cli-deploy.yml 2>/dev/null || true
+          } > "$OUT/01_authoritative_deploy_chain.txt"
+
+          {
+            echo "# GitHub workflows inventory"
+            find .github/workflows -maxdepth 1 -type f -print | sort
+            echo
+            echo "# Workflow trigger summary"
+            for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+              [ -f "$f" ] || continue
+              echo "--- $f"
+              grep -nE '^(name:|on:|  workflow_dispatch:|  push:|      - |    paths:|    branches:)' "$f" || true
+            done
+          } > "$OUT/02_workflows_inventory.txt"
+
+          python - <<'PY' > "$OUT/03_python_import_graph.json"
+          import ast, json, os
+          roots = ["dashboard/backend/app.py", "dashboard/app.py", "runner.py", "system3_complete_orchestrator.py"]
+          all_py = []
+          for root, dirs, files in os.walk('.'):
+              if '.git' in root.split(os.sep):
+                  continue
+              if any(skip in root.split(os.sep) for skip in ['.venv','venv','__pycache__','node_modules','audit_artifacts']):
+                  continue
+              for name in files:
+                  if name.endswith('.py'):
+                      all_py.append(os.path.relpath(os.path.join(root, name), '.'))
+          graph = {}
+          errors = {}
+          for path in sorted(set(roots + all_py)):
+              if not os.path.exists(path) or not path.endswith('.py'):
+                  continue
+              try:
+                  src = open(path, 'r', encoding='utf-8', errors='replace').read()
+                  tree = ast.parse(src, filename=path)
+              except Exception as exc:
+                  errors[path] = repr(exc)
+                  continue
+              imports = []
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import):
+                      imports += [alias.name for alias in node.names]
+                  elif isinstance(node, ast.ImportFrom):
+                      mod = ('.' * node.level) + (node.module or '')
+                      imports.append(mod)
+              graph[path] = sorted(set(imports))
+          print(json.dumps({"entry_roots": roots, "python_file_count": len(all_py), "graph": graph, "parse_errors": errors}, indent=2, sort_keys=True))
+          PY
+
+          python - <<'PY' > "$OUT/04_runtime_reachability_report.txt"
+          import ast, os, sys
+          entry = 'dashboard/backend/app.py'
+          repo_py = {}
+          for root, dirs, files in os.walk('.'):
+              parts=set(root.split(os.sep))
+              if {'.git','.venv','venv','__pycache__','node_modules','audit_artifacts'} & parts:
+                  continue
+              for name in files:
+                  if name.endswith('.py'):
+                      path=os.path.relpath(os.path.join(root,name),'.')
+                      mod=path[:-3].replace(os.sep,'.')
+                      if mod.endswith('.__init__'):
+                          mod=mod[:-9]
+                      repo_py[mod]=path
+          def imports(path):
+              try:
+                  tree=ast.parse(open(path,'r',encoding='utf-8',errors='replace').read(), filename=path)
+              except Exception:
+                  return []
+              out=[]
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import):
+                      out += [a.name for a in node.names]
+                  elif isinstance(node, ast.ImportFrom):
+                      if node.module:
+                          out.append(node.module)
+              return out
+          seen=set(); queue=[entry]; reached=[]
+          while queue:
+              path=queue.pop(0)
+              if path in seen or not os.path.exists(path):
+                  continue
+              seen.add(path); reached.append(path)
+              for mod in imports(path):
+                  candidates=[]
+                  parts=mod.split('.')
+                  for i in range(len(parts),0,-1):
+                      m='.'.join(parts[:i])
+                      if m in repo_py:
+                          candidates.append(repo_py[m])
+                  for c in candidates:
+                      if c not in seen:
+                          queue.append(c)
+          print('# Runtime reachability from dashboard/backend/app.py')
+          print(f'ENTRY={entry}')
+          print(f'REACHED_COUNT={len(reached)}')
+          for p in sorted(reached):
+              print(p)
+          print('\n# Repo Python files not reached by static import from Render backend entry')
+          unreached=sorted(set(repo_py.values())-set(reached))
+          print(f'UNREACHED_COUNT={len(unreached)}')
+          for p in unreached[:1000]:
+              print(p)
+          if len(unreached)>1000:
+              print(f'...TRUNCATED remaining={len(unreached)-1000}')
+          PY
+
+          {
+            echo "# Duplicate same-purpose candidates"
+            echo
+            echo "## app.py files"
+            find . -path ./.git -prune -o -type f -name 'app.py' -print | sort
+            echo
+            echo "## orchestrator files"
+            find . -path ./.git -prune -o -type f -iname '*orchestrator*.py' -print | sort
+            echo
+            echo "## broker files"
+            find . -path ./.git -prune -o -type f -iname '*broker*.py' -print | sort
+            echo
+            echo "## dashboard/backend files"
+            find dashboard/backend -type f | sort 2>/dev/null || true
+            echo
+            echo "## backups/quarantine/archive style paths"
+            find . -path ./.git -prune -o -type f | grep -Ei '(backup|bak_|archive|quarantine|old|copy|duplicate|temp)' | sort | head -1000 || true
+          } > "$OUT/05_duplicate_same_purpose_candidates.txt"
+
+          {
+            echo "# Runtime safety flags and live-trading text locations"
+            grep -RInE 'LIVE_TRADING_ENABLED|ANALYZE_MODE|PAPER_TRADING_MODE|SYSTEM3_MODE|get_analyze_mode|place_order|modify_order|cancel_order' . \
+              --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.venv --exclude-dir=venv --exclude-dir=__pycache__ --exclude-dir=audit_artifacts \
+              --exclude='*.png' --exclude='*.jpg' --exclude='*.jpeg' --exclude='*.gif' --exclude='*.pdf' \
+              2>/dev/null | head -2000 || true
+          } > "$OUT/06_safety_flags_and_order_paths.txt"
+
+          {
+            echo "# Compile smoke for likely runtime files"
+            python --version
+            for f in dashboard/backend/app.py dashboard/app.py runner.py system3_complete_orchestrator.py core/brokers/angel_one/broker.py; do
+              if [ -f "$f" ]; then
+                python -m py_compile "$f" && echo "PY_COMPILE_PASS $f" || echo "PY_COMPILE_FAIL $f"
+              else
+                echo "MISSING $f"
+              fi
+            done
+          } > "$OUT/07_compile_smoke_runtime_candidates.txt" 2>&1 || true
+
+          {
+            echo "# Recommended next classification"
+            echo "AUTHORITATIVE_RENDER_ENTRY=dashboard/backend/app.py"
+            echo "AUTHORITATIVE_RENDER_DOCKERFILE=dashboard/backend/Dockerfile"
+            echo "AUTHORITATIVE_RENDER_CONFIG=render.yaml"
+            echo "DO_NOT_DELETE_WITHOUT_NEXT_PROOF=dashboard/backend/app.py,dashboard/backend/Dockerfile,render.yaml,.github/workflows/render-cli-deploy.yml"
+            echo "NEXT_STEP=review artifact and classify each duplicate group as runtime, test, backup, docs, generated, or quarantine candidate"
+          } > "$OUT/08_recommendation_stub.txt"
+
+          (cd audit_artifacts && zip -r "$(basename "$OUT").zip" "$(basename "$OUT")")
+          echo "ZIP_PATH=audit_artifacts/$(basename "$OUT").zip" >> "$GITHUB_ENV"
+
+      - name: Upload Phase 2 runtime map artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase2-runtime-map
+          path: ${{ env.ZIP_PATH }}
+          if-no-files-found: error
+          retention-days: 14
