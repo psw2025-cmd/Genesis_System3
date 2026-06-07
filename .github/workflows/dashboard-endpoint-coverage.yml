@@ -1,0 +1,159 @@
+name: Dashboard Endpoint Coverage Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 3 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/dashboard-endpoint-coverage.yml
+      - dashboard/backend/**
+      - render.yaml
+
+permissions:
+  contents: write
+
+jobs:
+  dashboard-endpoint-coverage:
+    name: Verify read-only dashboard endpoint coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Probe read-only endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/dashboard_endpoint_coverage"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          python - <<'PY'
+          import json, time, urllib.request, urllib.error
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          base = 'https://genesis-system3-backend.onrender.com'
+          endpoints = [
+              ('core', '/'),
+              ('core', '/docs'),
+              ('core', '/openapi.json'),
+              ('core', '/api/health'),
+              ('core', '/api/state'),
+              ('core', '/api/status'),
+              ('broker', '/api/broker/status'),
+              ('broker', '/api/broker/deps'),
+              ('data', '/api/underlyings'),
+              ('signals', '/api/signal/top'),
+              ('signals', '/api/signals'),
+              ('signals', '/api/signals/enhanced'),
+              ('paper', '/api/positions'),
+              ('paper', '/api/pnl'),
+              ('paper', '/api/paper'),
+              ('paper', '/api/orders'),
+              ('paper', '/api/orders/history'),
+              ('paper', '/api/trades/today'),
+              ('risk', '/api/risk'),
+              ('risk', '/api/risk/portfolio'),
+              ('ml', '/api/ml/performance'),
+              ('ml', '/api/ml/compare'),
+              ('ml', '/api/model/behavior'),
+              ('prediction', '/api/predict/portfolio'),
+              ('prediction', '/api/predict/performance'),
+              ('validation', '/api/validate/status'),
+              ('validation', '/api/validation/status'),
+              ('learning', '/api/learning/status'),
+              ('learning', '/api/learning/insights'),
+              ('agent', '/api/agent/status'),
+              ('agent', '/api/agent/memory'),
+              ('agent', '/api/agent/issues'),
+              ('agent', '/api/agent/upgrade-plan'),
+              ('runner', '/api/runner/test'),
+              ('runner', '/api/runner/status'),
+              ('forensic', '/api/forensic/report'),
+              ('proof', '/api/proof-pack'),
+              ('logs', '/api/logs/tail?lines=40'),
+              ('security', '/api/audit/secrets'),
+          ]
+
+          results = []
+          for category, path in endpoints:
+              url = base + path
+              started = time.time()
+              item = {'category': category, 'path': path, 'url': url}
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent': 'System3DashboardEndpointCoverage/1.0'})
+                  with urllib.request.urlopen(req, timeout=35) as resp:
+                      body = resp.read(4000).decode('utf-8', errors='replace')
+                      item.update({
+                          'status_code': resp.status,
+                          'elapsed_ms': int((time.time() - started) * 1000),
+                          'ok': 200 <= resp.status < 400,
+                          'body_preview': body[:1200],
+                      })
+              except urllib.error.HTTPError as exc:
+                  body = exc.read(1500).decode('utf-8', errors='replace') if exc.fp else ''
+                  item.update({'status_code': exc.code, 'elapsed_ms': int((time.time() - started) * 1000), 'ok': False, 'error': str(exc), 'body_preview': body})
+              except Exception as exc:
+                  item.update({'status_code': None, 'elapsed_ms': int((time.time() - started) * 1000), 'ok': False, 'error': repr(exc), 'body_preview': ''})
+              results.append(item)
+
+          by_category = {}
+          for r in results:
+              cat = r['category']
+              by_category.setdefault(cat, {'total': 0, 'ok': 0, 'failed': []})
+              by_category[cat]['total'] += 1
+              if r['ok']:
+                  by_category[cat]['ok'] += 1
+              else:
+                  by_category[cat]['failed'].append(r['path'])
+
+          summary = {
+              'generated_utc': datetime.now(timezone.utc).isoformat(),
+              'base_url': base,
+              'total_endpoints_tested': len(results),
+              'ok_count': sum(1 for r in results if r['ok']),
+              'fail_count': sum(1 for r in results if not r['ok']),
+              'core_ok': all(r['ok'] for r in results if r['category'] == 'core'),
+              'by_category': by_category,
+              'results': results,
+              'note': 'This workflow probes GET/read-only endpoints only. POST endpoints that can mutate state are not executed.',
+          }
+
+          out = Path('reports/latest/dashboard_endpoint_coverage')
+          out.mkdir(parents=True, exist_ok=True)
+          (out / 'endpoint_coverage_summary.json').write_text(json.dumps(summary, indent=2, sort_keys=True), encoding='utf-8')
+
+          lines = ['# Dashboard Endpoint Coverage Proof', '', f"Generated UTC: {summary['generated_utc']}", '', f"Base URL: `{base}`", '', f"Endpoints tested: `{summary['total_endpoints_tested']}`", f"OK: `{summary['ok_count']}`", f"Failed: `{summary['fail_count']}`", '', '## Category summary', '', '| Category | OK | Total | Failed |', '|---|---:|---:|---|']
+          for cat in sorted(by_category):
+              v = by_category[cat]
+              lines.append(f"| `{cat}` | `{v['ok']}` | `{v['total']}` | `{', '.join(v['failed']) if v['failed'] else '-'}` |")
+          lines += ['', '## Endpoint table', '', '| Category | Path | HTTP | OK | ms |', '|---|---|---:|---:|---:|']
+          for r in results:
+              lines.append(f"| `{r['category']}` | `{r['path']}` | `{r.get('status_code')}` | `{r.get('ok')}` | `{r.get('elapsed_ms')}` |")
+          lines.append('')
+          lines.append('POST/mutating endpoints are intentionally not called.')
+          (out / 'README.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+
+          cat "$OUT/README.md"
+
+      - name: Commit dashboard endpoint coverage proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_endpoint_coverage
+          if git diff --cached --quiet; then
+            echo "No dashboard endpoint coverage proof changes to commit."
+          else
+            git commit -m "audit: publish dashboard endpoint coverage proof"
+            git push
+          fi
