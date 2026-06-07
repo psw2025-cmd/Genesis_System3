@@ -1,9 +1,9 @@
 {
   "auto_delete_allowed_for_generated_only": true,
   "auto_removable_generated_count": 0,
-  "forbidden_secret_style_count": 1,
+  "forbidden_secret_style_count": 0,
   "old_backup_copy_review_candidate_count": 12,
-  "pass": false,
+  "pass": true,
   "source_delete_requires_runtime_proof": true,
-  "tracked_file_count": 3074
+  "tracked_file_count": 3080
 }

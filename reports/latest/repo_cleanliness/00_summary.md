@@ -1,5 +1,5 @@
 # Repo Cleanliness Gate
-Generated UTC: 2026-06-07T11:08:20+00:00
+Generated UTC: 2026-06-07T11:10:56+00:00
 Repository: psw2025-cmd/Genesis_System3
-Commit: 38bf7c67b768b036ebaad58263cd16fd79a7f696
+Commit: b4d5058ce6f0dc3cc75c81a98ea875f86376405f
 Rule: delete generated/unsafe files automatically; source duplicates require proof-first classification.
