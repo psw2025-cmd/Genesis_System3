@@ -1,16 +1,7 @@
-name: Render CLI Deploy Backend
+name: Render Deploy Backend
 
 on:
   workflow_dispatch:
-    inputs:
-      deploy_wait:
-        description: Wait for Render deploy to finish
-        required: true
-        default: "true"
-        type: choice
-        options:
-          - "true"
-          - "false"
   push:
     branches:
       - main
@@ -23,14 +14,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: render-cli-deploy-backend
+  group: render-deploy-backend
   cancel-in-progress: false
 
 jobs:
   deploy-render-backend:
-    name: Deploy backend via Render CLI
+    name: Deploy backend on Render
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,63 +34,23 @@ jobs:
           test -n "${{ secrets.RENDER_SERVICE_ID }}" || (echo "Missing GitHub secret: RENDER_SERVICE_ID" && exit 1)
           echo "Render secrets presence check PASS"
 
-      - name: Install Render CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsSL https://raw.githubusercontent.com/render-oss/cli/refs/heads/main/bin/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Render CLI version
-        shell: bash
-        run: |
-          set -euo pipefail
-          render --version
-
-      - name: Set Render workspace automatically
+      - name: Trigger Render deploy through REST API
         shell: bash
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_OUTPUT: json
-          CI: true
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
           set -euo pipefail
-          render workspaces --output json --confirm > /tmp/render_workspaces.json
-          python - <<'PY'
-          import json
-          data=json.load(open('/tmp/render_workspaces.json'))
-          print(data[0].get('id') or data[0].get('name'))
-          PY
-          WORKSPACE="$(python - <<'PY'
-          import json
-          data=json.load(open('/tmp/render_workspaces.json'))
-          print(data[0].get('id') or data[0].get('name'))
-          PY
-          )"
-          render workspace set "$WORKSPACE" --output json --confirm
-
-      - name: Validate render.yaml
-        shell: bash
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_OUTPUT: json
-          CI: true
-        run: |
-          set -euo pipefail
-          render blueprints validate render.yaml --output json --confirm
-
-      - name: Trigger Render deploy
-        shell: bash
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_OUTPUT: json
-          CI: true
-        run: |
-          set -euo pipefail
-          if [ "${{ inputs.deploy_wait || 'true' }}" = "true" ]; then
-            render deploys create "${{ secrets.RENDER_SERVICE_ID }}" --wait --output json --confirm
-          else
-            render deploys create "${{ secrets.RENDER_SERVICE_ID }}" --output json --confirm
+          http_code=$(curl -sS -o /tmp/render_deploy_response.json -w "%{http_code}" \
+            -X POST "https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "HTTP_STATUS=$http_code"
+          cat /tmp/render_deploy_response.json
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            exit 1
           fi
 
       - name: Render deployment proof URLs
