@@ -26,11 +26,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git rm -r --ignore-unmatch --cached audit_artifacts || true
-          git rm -r --ignore-unmatch **/__pycache__ || true
-          git rm --ignore-unmatch $(git ls-files '*.pyc' 2>/dev/null) || true
-          git rm --ignore-unmatch $(git ls-files 'desktop.ini' '**/desktop.ini' 2>/dev/null) || true
-          git rm --ignore-unmatch $(git ls-files '.DS_Store' '**/.DS_Store' 2>/dev/null) || true
+          git ls-files > /tmp/tracked_files.txt
+          grep -E '(^|/)audit_artifacts/' /tmp/tracked_files.txt > /tmp/remove_files.txt || true
+          grep -E '(^|/)__pycache__/' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
+          grep -E '\.pyc$' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
+          grep -E '(^|/)desktop\.ini$' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
+          grep -E '(^|/)\.DS_Store$' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
+          sort -u /tmp/remove_files.txt -o /tmp/remove_files.txt
+          echo "Files selected for generated-file removal:"
+          cat /tmp/remove_files.txt || true
+          if [ -s /tmp/remove_files.txt ]; then
+            xargs -a /tmp/remove_files.txt -r git rm --cached --ignore-unmatch --
+          fi
 
       - name: Commit cleanup if needed
         shell: bash
@@ -50,7 +57,5 @@ jobs:
         run: |
           set -euo pipefail
           echo "Generated cleanup completed."
-          echo "Remaining tracked pyc files:"
-          git ls-files '*.pyc' || true
-          echo "Remaining tracked desktop.ini files:"
-          git ls-files 'desktop.ini' '**/desktop.ini' || true
+          echo "Remaining tracked generated files:"
+          git ls-files | grep -E '(^|/)audit_artifacts/|(^|/)__pycache__/|\.pyc$|(^|/)desktop\.ini$|(^|/)\.DS_Store$' || true
