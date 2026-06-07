@@ -1,0 +1,85 @@
+name: System3 Master Proof Control Plane
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/system3-master-proof-control-plane.yml
+      - scripts/system3_master_proof_orchestrator.py
+      - dashboard/**
+      - core/**
+      - src/**
+      - config/**
+      - render.yaml
+      - docs/project_control/**
+      - reports/latest/**
+
+permissions:
+  contents: write
+
+concurrency:
+  group: system3-master-proof-control-plane
+  cancel-in-progress: false
+
+jobs:
+  master-proof-control-plane:
+    name: Run master proof control plane
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SYSTEM3_MODE: analyze
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Run proof orchestrator
+        shell: bash
+        run: |
+          set -euo pipefail
+          python --version
+          python scripts/system3_master_proof_orchestrator.py --auto-fix
+
+      - name: Show final control-plane status
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat reports/latest/system3_master_control_plane/README.md
+          echo
+          cat reports/latest/auto_recovery_blockers/README.md
+
+      - name: Commit proof reports and status
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest docs/project_control/SYSTEM3_MASTER_STATUS.md
+          if git diff --cached --quiet; then
+            echo "No proof/status changes to commit."
+          else
+            git commit -m "audit: run System3 master proof control plane"
+            git push
+          fi
+
+      - name: Upload master proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: system3-master-proof-control-plane
+          path: |
+            reports/latest/system3_master_control_plane/**
+            reports/latest/proof_status_matrix/**
+            reports/latest/auto_recovery_blockers/**
+            docs/project_control/SYSTEM3_MASTER_STATUS.md
+          if-no-files-found: error
+          retention-days: 14
