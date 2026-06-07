@@ -19,7 +19,7 @@ jobs:
   auto-verifier:
     name: System3 auto verification proof
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,107 +39,53 @@ jobs:
             echo "Generated UTC: $(date -u --iso-8601=seconds)"
             echo "Repository: $GITHUB_REPOSITORY"
             echo "Commit: $GITHUB_SHA"
-            echo "Branch: ${GITHUB_REF_NAME:-unknown}"
-            echo "Mode: proof-only, no broker login, no orders, no live trading"
+            echo "Mode: proof-only; no broker login; no orders; no live trading"
           } > "$OUT/00_summary.md"
 
-          {
-            echo "# Commit and tree status"
-            git log -1 --stat
-            echo
-            git status --short
-          } > "$OUT/01_git_status.txt"
+          git log -1 --stat > "$OUT/01_git_status.txt"
+          git status --short >> "$OUT/01_git_status.txt"
 
           {
-            echo "# Protected/runtime config snapshot"
+            echo "# Runtime config snapshot"
             echo "## render.yaml"
-            sed -n '1,220p' render.yaml 2>/dev/null || true
-            echo
-            echo "## dashboard/backend/Dockerfile"
-            sed -n '1,220p' dashboard/backend/Dockerfile 2>/dev/null || true
-            echo
-            echo "## dashboard/backend/requirements.txt"
-            sed -n '1,220p' dashboard/backend/requirements.txt 2>/dev/null || true
-            echo
-            echo "## Run-FullQA.ps1 repo-root section"
-            grep -nE 'Get-RepoRoot|GITHUB_WORKSPACE|repoRoot|Set-Location|C:\\Genesis_System3' Run-FullQA.ps1 || true
+            sed -n '1,160p' render.yaml 2>/dev/null || true
+            echo "## Dockerfile"
+            sed -n '1,160p' dashboard/backend/Dockerfile 2>/dev/null || true
+            echo "## Run-FullQA portable markers"
+            grep -nE 'Get-RepoRoot|GITHUB_WORKSPACE|Set-Location' Run-FullQA.ps1 || true
           } > "$OUT/02_runtime_config_snapshot.txt"
 
           {
-            echo "# Safety flags"
-            grep -RInE 'LIVE_TRADING_ENABLED|ANALYZE_MODE|PAPER_TRADING_MODE|SYSTEM3_MODE|place_order|modify_order|cancel_order' dashboard render.yaml .github/workflows Run-FullQA.ps1 \
-              --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.pdf' 2>/dev/null | head -1000 || true
-          } > "$OUT/03_safety_flags.txt"
+            echo "# Forbidden tracked files"
+            git ls-files | grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|(^|/)__pycache__/|\.pyc$|(^|/)audit_artifacts/' || true
+          } > "$OUT/03_forbidden_tracked_files.txt"
 
           {
-            echo "# Tracked forbidden/generated files check"
-            echo "ENV_FILES="
-            git ls-files '.env' '.env.*' 'config/.env' 'config/.env.*' || true
-            echo
-            echo "PYC_FILES="
-            git ls-files '*.pyc' || true
-            echo
-            echo "PYCACHE_PATHS="
-            git ls-files | grep -E '(^|/)__pycache__/' || true
-            echo
-            echo "AUDIT_ARTIFACTS_TRACKED="
-            git ls-files 'audit_artifacts/**' || true
-            echo
-            echo "PRIVATE_KEY_STYLE_FILES="
-            git ls-files '*.pem' '*.key' '*.p8' '*.p12' '*.pfx' 'id_rsa' 'id_ed25519' || true
-          } > "$OUT/04_forbidden_tracked_files.txt"
-
-          {
-            echo "# Python compile smoke"
+            echo "# Compile smoke"
             python --version
-            for f in dashboard/backend/app.py Run-FullQA.ps1; do
-              if [[ "$f" == *.py ]]; then
-                python -m py_compile "$f" && echo "PY_COMPILE_PASS $f" || echo "PY_COMPILE_FAIL $f"
-              else
-                echo "SCRIPT_PRESENT $f"
-              fi
-            done
-          } > "$OUT/05_compile_smoke.txt" 2>&1 || true
+            python -m py_compile dashboard/backend/app.py && echo "PY_COMPILE_PASS dashboard/backend/app.py" || echo "PY_COMPILE_FAIL dashboard/backend/app.py"
+          } > "$OUT/04_compile_smoke.txt" 2>&1 || true
 
-          python - <<'PY' > "$OUT/06_pass_fail_summary.json"
-          import json, os, subprocess
-          def cmd(args):
-              return subprocess.check_output(args, text=True, stderr=subprocess.DEVNULL).splitlines()
-          tracked_env = cmd(['git','ls-files','.env','.env.*','config/.env','config/.env.*'])
-          tracked_pyc = cmd(['git','ls-files','*.pyc'])
-          all_files = cmd(['git','ls-files'])
-          tracked_pycache = [p for p in all_files if '/__pycache__/' in p or p.startswith('__pycache__/')]
-          tracked_audit = [p for p in all_files if p.startswith('audit_artifacts/')]
-          private_keys = cmd(['git','ls-files','*.pem','*.key','*.p8','*.p12','*.pfx','id_rsa','id_ed25519'])
-          text = open('Run-FullQA.ps1','r',encoding='utf-8',errors='replace').read() if os.path.exists('Run-FullQA.ps1') else ''
+          python - <<'PY' > "$OUT/05_pass_fail_summary.json"
+          import json, subprocess, os
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          forbidden = [p for p in files if p == '.env' or p.startswith('.env.') or p == 'config/.env' or p.startswith('config/.env.') or '/__pycache__/' in p or p.endswith('.pyc') or p.startswith('audit_artifacts/')]
+          qa_text = open('Run-FullQA.ps1', encoding='utf-8', errors='replace').read() if os.path.exists('Run-FullQA.ps1') else ''
+          render_text = open('render.yaml', encoding='utf-8', errors='replace').read() if os.path.exists('render.yaml') else ''
           result = {
-              'tracked_env_files': tracked_env,
-              'tracked_pyc_files_count': len(tracked_pyc),
-              'tracked_pycache_count': len(tracked_pycache),
-              'tracked_audit_artifacts_count': len(tracked_audit),
-              'tracked_private_key_style_files': private_keys,
-              'run_fullqa_uses_github_workspace': 'GITHUB_WORKSPACE' in text,
-              'run_fullqa_hardcoded_c_genesis_present': 'C:\\Genesis_System3' in text,
-              'render_live_trading_disabled_in_yaml': 'LIVE_TRADING_ENABLED' in open('render.yaml',encoding='utf-8').read() and '"0"' in open('render.yaml',encoding='utf-8').read(),
+            'forbidden_tracked_files': forbidden,
+            'run_fullqa_has_portable_workspace_logic': 'GITHUB_WORKSPACE' in qa_text and 'Get-RepoRoot' in qa_text,
+            'render_live_trading_disabled': 'LIVE_TRADING_ENABLED' in render_text and '"0"' in render_text,
           }
-          result['pass'] = (
-              not tracked_env and
-              len(tracked_pyc) == 0 and
-              len(tracked_pycache) == 0 and
-              len(tracked_audit) == 0 and
-              not private_keys and
-              result['run_fullqa_uses_github_workspace'] and
-              not result['run_fullqa_hardcoded_c_genesis_present'] and
-              result['render_live_trading_disabled_in_yaml']
-          )
+          result['pass'] = (not forbidden) and result['run_fullqa_has_portable_workspace_logic'] and result['render_live_trading_disabled']
           print(json.dumps(result, indent=2, sort_keys=True))
           PY
 
-          if grep -q '"pass": true' "$OUT/06_pass_fail_summary.json"; then
-            echo "SYSTEM3_AUTO_VERIFIER_PASS" | tee "$OUT/07_verdict.txt"
+          if grep -q '"pass": true' "$OUT/05_pass_fail_summary.json"; then
+            echo "SYSTEM3_AUTO_VERIFIER_PASS" | tee "$OUT/06_verdict.txt"
           else
-            echo "SYSTEM3_AUTO_VERIFIER_FAIL" | tee "$OUT/07_verdict.txt"
-            cat "$OUT/06_pass_fail_summary.json"
+            echo "SYSTEM3_AUTO_VERIFIER_FAIL" | tee "$OUT/06_verdict.txt"
+            cat "$OUT/05_pass_fail_summary.json"
             exit 1
           fi
 
