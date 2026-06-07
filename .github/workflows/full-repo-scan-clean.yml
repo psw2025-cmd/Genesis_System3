@@ -1,0 +1,157 @@
+name: Full Repo Scan Clean
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/full-repo-scan-clean.yml
+      - .gitignore
+      - '**/*.py'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.md'
+
+permissions:
+  contents: write
+
+jobs:
+  scan-clean:
+    name: Scan full repo and clean proven generated files
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan and remove proven generated files
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/full_repo_scan_clean"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+
+          git ls-files > /tmp/tracked_files.txt
+
+          {
+            echo "# Full Repo Scan Clean"
+            echo "Generated UTC: $(date -u --iso-8601=seconds)"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Commit: $GITHUB_SHA"
+            echo "Rule: auto-remove generated junk only; source/delete decisions require runtime proof."
+          } > "$OUT/00_summary.md"
+
+          {
+            echo "# Full tracked file inventory summary"
+            echo "Tracked file count: $(wc -l < /tmp/tracked_files.txt)"
+            echo
+            echo "Top directories:"
+            awk -F/ '{print $1}' /tmp/tracked_files.txt | sort | uniq -c | sort -nr | head -100
+          } > "$OUT/01_inventory_summary.txt"
+
+          grep -E '(^|/)audit_artifacts/|(^|/)__pycache__/|\.pyc$|(^|/)desktop\.ini$|(^|/)\.DS_Store$|(^|/)\.pytest_cache/' /tmp/tracked_files.txt | sort > /tmp/generated_remove.txt || true
+
+          {
+            echo "# Generated files selected for automatic removal"
+            cat /tmp/generated_remove.txt || true
+          } > "$OUT/02_generated_auto_remove_list.txt"
+
+          if [ -s /tmp/generated_remove.txt ]; then
+            xargs -a /tmp/generated_remove.txt -r git rm --cached --ignore-unmatch --
+          fi
+
+          {
+            echo "# Forbidden secret-style tracked files"
+            grep -E '(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$|\.key$' /tmp/tracked_files.txt | grep -vE '(^|/)\.env\.example$|(^|/)config/\.env\.example$' || true
+          } > "$OUT/03_forbidden_secret_style_files.txt"
+
+          {
+            echo "# Duplicate basename candidates - review only"
+            python - <<'PY'
+          from collections import defaultdict
+          import subprocess
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          groups = defaultdict(list)
+          for p in files:
+              groups[p.rsplit('/', 1)[-1]].append(p)
+          for name in sorted(groups):
+              vals = groups[name]
+              if len(vals) > 1:
+                  print(f'{name} ({len(vals)})')
+                  for v in vals[:25]:
+                      print(f'  {v}')
+                  if len(vals) > 25:
+                      print(f'  ... {len(vals)-25} more')
+                  print()
+          PY
+          } > "$OUT/04_duplicate_basename_candidates.txt"
+
+          {
+            echo "# Old/backup/copy-like source review candidates - not auto-delete"
+            grep -Ei '(^|/)(old|backup|bak|archive|quarantine|copy|duplicate|temp|tmp)(/|_|-|\.)|(_old|_backup|_bak|_copy|_duplicate)\.' /tmp/tracked_files.txt | sort || true
+          } > "$OUT/05_old_backup_copy_review_candidates.txt"
+
+          {
+            echo "# Large tracked files over 5 MB"
+            while IFS= read -r f; do
+              if [ -f "$f" ]; then
+                size=$(wc -c < "$f" | tr -d ' ')
+                if [ "$size" -gt 5242880 ]; then
+                  echo "$size $f"
+                fi
+              fi
+            done < /tmp/tracked_files.txt | sort -nr || true
+          } > "$OUT/06_large_files_over_5mb.txt"
+
+          python - <<'PY' > "$OUT/07_scan_clean_summary.json"
+          import json, re, subprocess, pathlib, os
+          files = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          auto = [p for p in files if re.search(r'(^|/)audit_artifacts/|(^|/)__pycache__/|\.pyc$|(^|/)desktop\.ini$|(^|/)\.DS_Store$|(^|/)\.pytest_cache/', p)]
+          forbidden = []
+          for p in files:
+              if p in ('.env.example', 'config/.env.example'):
+                  continue
+              if re.search(r'(^|/)\.env($|\.)|(^|/)config/\.env($|\.)|\.pem$|\.p8$|\.p12$|\.pfx$|(^|/)id_rsa$|(^|/)id_ed25519$|\.key$', p):
+                  forbidden.append(p)
+          review = [p for p in files if re.search(r'(^|/)(old|backup|bak|archive|quarantine|copy|duplicate|temp|tmp)(/|_|-|\.)|(_old|_backup|_bak|_copy|_duplicate)\.', p, re.I)]
+          large = []
+          for p in files:
+              try:
+                  if os.path.isfile(p) and os.path.getsize(p) > 5242880:
+                      large.append({'path': p, 'bytes': os.path.getsize(p)})
+              except OSError:
+                  pass
+          result = {
+            'tracked_file_count': len(files),
+            'generated_auto_remove_count_before_cleanup': len(auto),
+            'forbidden_secret_style_count': len(forbidden),
+            'old_backup_copy_review_candidate_count': len(review),
+            'large_tracked_file_count_over_5mb': len(large),
+            'pass_after_cleanup_expected': len(forbidden) == 0,
+            'source_deletion_policy': 'proof_first_only',
+          }
+          print(json.dumps(result, indent=2, sort_keys=True))
+          PY
+
+          cat "$OUT/07_scan_clean_summary.json"
+
+      - name: Commit cleanup and proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/full_repo_scan_clean
+          git add -u
+          if git diff --cached --quiet; then
+            echo "No scan/cleanup changes to commit."
+          else
+            git commit -m "audit: publish full repo scan clean proof"
+            git push
+          fi
