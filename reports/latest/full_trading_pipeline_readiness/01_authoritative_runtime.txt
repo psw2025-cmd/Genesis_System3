@@ -1,0 +1,55 @@
+# Authoritative runtime
+Render config: render.yaml
+Backend Dockerfile: dashboard/backend/Dockerfile
+Backend entry: dashboard/backend/app.py
+
+# Render Blueprint for Genesis System3
+# Safe backend-only deployment.
+# Live trading is disabled by default.
+# Render CLI deployment enabled via GitHub Actions.
+
+services:
+  - type: web
+    name: genesis-system3-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./dashboard/backend/Dockerfile
+    dockerContext: .
+    autoDeploy: false
+    envVars:
+      - key: SYSTEM3_DEPLOY_TARGET
+        value: render
+      - key: SYSTEM3_MODE
+        value: analyzer
+      - key: ANALYZE_MODE
+        value: "1"
+      - key: LIVE_TRADING_ENABLED
+        value: "0"
+
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy the repository so dashboard/backend/app.py can import project modules from /app.
+COPY . /app/
+
+RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
+      python -m pip install --upgrade pip && \
+      pip install --no-cache-dir -r /app/dashboard/backend/requirements.txt ; \
+    else \
+      echo "No dashboard/backend/requirements.txt found; skipping pip install"; \
+    fi
+
+WORKDIR /app
+
+EXPOSE 8000
+
+CMD ["uvicorn", "dashboard.backend.app:app", "--host", "0.0.0.0", "--port", "8000"]

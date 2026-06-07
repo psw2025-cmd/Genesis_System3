@@ -1,0 +1,37 @@
+# Safety checks
+## Render env safety
+17:      - key: SYSTEM3_MODE
+19:      - key: ANALYZE_MODE
+21:      - key: LIVE_TRADING_ENABLED
+
+## Broker live guard
+core/validation/option_chain_validator.py:181:                self.broker = AngelOneBroker(allow_data_only=True)
+core/broker/angel_live_order_wrapper.py:75:    def cancel_order(self, broker_order_id: str) -> dict:
+core/brokers/angel_one/broker.py:19:    flag = os.getenv("SYSTEM3_LIVE_TRADING_ALLOWED", "").strip().lower()
+core/brokers/angel_one/broker.py:22:        msg = "LIVE TRADING BLOCKED BY ENV GUARD (SYSTEM3_LIVE_TRADING_ALLOWED not enabled)"
+core/brokers/angel_one/broker.py:28:    def __init__(self, allow_data_only: bool = False):
+core/brokers/angel_one/broker.py:33:            allow_data_only: If True, allows data fetching without live trading guard.
+core/brokers/angel_one/broker.py:34:                            If False, requires SYSTEM3_LIVE_TRADING_ALLOWED for any operation.
+core/brokers/angel_one/broker.py:39:        if not allow_data_only:
+core/brokers/angel_one/broker.py:710:        flag = os.getenv("SYSTEM3_LIVE_TRADING_ALLOWED", "").strip().lower()
+core/brokers/angel_one/broker.py:713:            msg = f"LIVE TRADING BLOCKED: {operation} requires SYSTEM3_LIVE_TRADING_ALLOWED to be enabled"
+core/engine/fetch_all_indices_option_chain.py:67:        broker = AngelOneBroker(allow_data_only=True)
+core/engine/system3_phase380_final_sign_off.py:184:        dangerous_patterns = ["execute_live_trade", "place_live_order", "live_execution", "angel_broker.place_order"]
+core/engine/angel_monday_diagnostic.py:92:        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+core/engine/ultra_live_signals_shadow.py:85:        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+core/engine/angel_executor_live_prep.py:110:        # response = broker.place_order(payload)
+core/engine/test_angelone_api.py:17:        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+core/engine/test_angelone_option_chain.py:236:        # Initialize broker (allow_data_only=True for data fetching without live trading permission)
+core/engine/test_angelone_option_chain.py:238:        broker = AngelOneBroker(allow_data_only=True)
+core/engine/angel_options_watch_loop.py:219:    broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+core/engine/system3_phase205_broker_selftest.py:77:                            allow_data_only=True
+core/engine/system3_phase376_self_test_suite.py:194:        "angel_broker.place_order",
+core/engine/auto_fetch_option_chain_hourly.py:160:        broker = AngelOneBroker(allow_data_only=True)
+core/engine/angel_options_watch.py:183:    broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+core/ultra/phase52_multi_broker.py:50:    def place_order(self, order: Dict[str, Any]) -> Dict[str, Any]:
+core/ultra/phase52_multi_broker.py:83:        order_result = broker.place_order(
+dashboard/backend/app.py:332:        broker = broker_class(allow_data_only=True)
+dashboard/backend/app.py:3208:async def cancel_order(order_id: str):
+dashboard/backend/app.py:3215:        success = order_mgmt.cancel_order(order_id)
+dashboard/backend/runtime_state_store.py:65:            broker = AngelOneBroker(allow_data_only=True)
+dashboard/backend/order_management.py:121:    def cancel_order(self, order_id: str) -> bool:
