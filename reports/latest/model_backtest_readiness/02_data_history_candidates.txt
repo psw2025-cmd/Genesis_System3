@@ -1,5 +1,6 @@
 # Candidate data/history files
 "docs/Phases 311\342\200\223330 = Integrity + Anti-corruption + Observability layer for System3.md"
+.github/workflows/external-data-yahoo-proof.yml
 CHANGELOG.md
 COMPREHENSIVE_CSV_VERIFICATION_REPORT.md
 CSV_DATA_STATUS_REPORT_20251208.md
@@ -229,6 +230,7 @@ core/validation/option_chain_validator.py
 dashboard/backend/synthetic_data_generator.py
 dashboard/frontend/src/components/ChainAnalytics.tsx
 dashboard/frontend/src/components/DataSourceWarning.tsx
+data_schema.txt
 docs/ALL_INDICES_OPTION_CHAIN_FETCH.md
 docs/ANGEL_BROKER_API_AND_TOTP_ANALYSIS.md
 docs/CSV_ADDITIONAL_COLUMNS_RECOMMENDATION.md
@@ -281,6 +283,7 @@ option_chain_automation_master.py
 reports/DATA_QUALITY_SUMMARY_375.md
 reports/STRATEGY_ENSEMBLE_366.md
 reports/latest/full_trading_pipeline_readiness/02_data_history_inventory.txt
+reports/latest/model_backtest_readiness/02_data_history_candidates.txt
 reports/readiness_audit/MODEL_DATA_BACKTEST_DASHBOARD_READINESS.md
 reports/readiness_audit/model_data_backtest_dashboard_readiness.json
 run_csv_audit.bat

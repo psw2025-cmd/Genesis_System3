@@ -1,6 +1,7 @@
 # Candidate backtest/walk-forward files
 "docs/System3 Phases 10\342\200\22320 \342\200\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md"
 .github/workflows/model-backtest-readiness.yml
+.github/workflows/safe-dryrun-validation-execution.yml
 ANALYSIS_COMPLETE_PHASE239_VALIDATION.md
 BACKTEST_SKIP_FIX.md
 BATCH_FILE_BACKTEST_FIX.md
@@ -160,7 +161,15 @@ reports/full_validation_20260210_072811.json
 reports/full_validation_20260210_073117.json
 reports/full_validation_20260210_073137.json
 reports/full_validation_20260210_073307.json
+reports/latest/entrypoint_classification/backtest_entrypoint_candidates.json
 reports/latest/full_trading_pipeline_readiness/04_backtest_inventory.txt
+reports/latest/model_backtest_readiness/00_summary.md
+reports/latest/model_backtest_readiness/01_model_training_candidates.txt
+reports/latest/model_backtest_readiness/02_data_history_candidates.txt
+reports/latest/model_backtest_readiness/03_backtest_candidates.txt
+reports/latest/model_backtest_readiness/04_compile_smoke.txt
+reports/latest/model_backtest_readiness/05_dependency_hints.txt
+reports/latest/model_backtest_readiness/06_model_backtest_summary.json
 reports/master_validation_20260210_071913.json
 reports/master_validation_20260210_071913.md
 reports/master_validation_20260210_072009.json
