@@ -9,12 +9,13 @@ COMPLETE_VALIDATION_REPORT.md (2)
   COMPLETE_VALIDATION_REPORT.md
   docs/COMPLETE_VALIDATION_REPORT.md
 
-README.md (8)
+README.md (9)
   README.md
   dashboard/README.md
   docs/ultra_micro/README.md
   reports/ci_truth/README.md
   reports/latest/entrypoint_classification/README.md
+  reports/latest/full_repo_verification/README.md
   reports/latest/production_grade_readiness/README.md
   reports/latest/proof_status_matrix/README.md
   reports/latest/render_endpoint_proof/README.md
