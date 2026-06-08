@@ -1,0 +1,122 @@
+{
+  "actual_candidates": [
+    {
+      "file": "tools/fix_csv_skip_bad.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/replay_market_dryrun_simulator.py",
+      "hit": "content"
+    }
+  ],
+  "prediction_candidates": [
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_201_230.py",
+      "hit": "content"
+    },
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_261_300.py",
+      "hit": "content"
+    },
+    {
+      "file": "tests/test_forward_signal_integrity.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tmp_profile_signals.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/build_ultra_intelligence_dashboard.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/model_benchmark_leaderboard.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/quick_inspector.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/replay_market_dryrun_simulator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_paper_trading_e2e_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_phase_392_ensemble_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_phases_331_360_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_phases_389_400_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_dry_run_launcher.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_runtime_verification.py",
+      "hit": "content"
+    },
+    {
+      "file": "update_phase_registry_311_330.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_core_commands.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_csv_fixes_and_system3.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_integrity_tests.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_pipeline_consistency.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_signal_files.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "verify_all_warnings.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_fixes.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_phase392_readiness.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_phase_391_inputs.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_phases_331_360_implementation.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_ultra_features.py",
+      "hit": "content"
+    },
+    {
+      "file": "world_class_enhancement_system.py",
+      "hit": "content"
+    }
+  ]
+}

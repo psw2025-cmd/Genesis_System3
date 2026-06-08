@@ -1,0 +1,117 @@
+{
+  "dashboard": [
+    {
+      "file": "tests/auto/system3_generated_tests/test_phase_280.py",
+      "hit": "content"
+    },
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_261_300.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/playwright_dashboard_verification.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_phases_381_388_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_dry_run_launcher.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_dashboard_fix.js",
+      "hit": "content"
+    },
+    {
+      "file": "wait_and_complete_validation.py",
+      "hit": "content"
+    },
+    {
+      "file": "world_class_enhancement_system.py",
+      "hit": "content"
+    }
+  ],
+  "lifecycle": [
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_201_230.py",
+      "hit": "content"
+    },
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_261_300.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/build_ultra_intelligence_dashboard.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/check_outputs.ps1",
+      "hit": "content"
+    },
+    {
+      "file": "tools/replay_market_dryrun_simulator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_paper_trading_e2e_test.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/run_phases_389_400_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_runtime_verification.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_cursor_agent_bugs.py",
+      "hit": "content"
+    },
+    {
+      "file": "update_phase_registry_311_330.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_option_chain_system.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_signal_files.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_system3_tomorrow_readiness.py",
+      "hit": "content"
+    },
+    {
+      "file": "world_class_enhancement_system.py",
+      "hit": "content"
+    }
+  ],
+  "prediction_benchmark": [],
+  "repo_authority": [
+    {
+      "file": "tests/auto/system3_generated_tests/test_phases_201_230.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_cursor_agent_bugs.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_integrity_tests.py",
+      "hit": "content"
+    },
+    {
+      "file": "validate_pipeline_consistency.py",
+      "hit": "content"
+    },
+    {
+      "file": "verify_phases_integrity.py",
+      "hit": "content"
+    }
+  ]
+}

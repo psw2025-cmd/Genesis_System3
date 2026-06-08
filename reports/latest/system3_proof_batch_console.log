@@ -1,0 +1,93 @@
+{
+  "status": "COMPLETE_WITH_BLOCKERS",
+  "zip": "reports/latest/system3_proof_pack_20260608_081021.zip",
+  "statuses": [
+    {
+      "phase": "global_search",
+      "issue": "#25",
+      "status": "PASS",
+      "reason": "Global search completed.",
+      "outputs": [
+        "reports/latest/implementation_batch/search_findings.md",
+        "reports/latest/implementation_batch/search_findings.json"
+      ],
+      "blockers": [],
+      "warnings": []
+    },
+    {
+      "phase": "repo_authority",
+      "issue": "#28",
+      "status": "PASS",
+      "reason": "Repo authority proof pack created. No deletion performed.",
+      "outputs": [
+        "reports/latest/repo_authority/stale_backup_candidates.csv",
+        "reports/latest/repo_authority/runtime_authority_map.md",
+        "reports/latest/repo_authority/cleanup_summary.json",
+        "reports/latest/repo_authority/file_inventory.csv",
+        "reports/latest/repo_authority/quarantine_plan.md",
+        "reports/latest/repo_authority/file_hashes.csv",
+        "reports/latest/repo_authority/duplicate_candidates.csv",
+        "reports/latest/repo_authority/dependency_trace.md"
+      ],
+      "blockers": [],
+      "warnings": [
+        "deep dependency trace still needs enhancement"
+      ]
+    },
+    {
+      "phase": "prediction_benchmark",
+      "issue": "#26",
+      "status": "PARTIAL",
+      "reason": "Benchmark source discovery completed; no fake metrics generated.",
+      "outputs": [
+        "reports/latest/performance_benchmark/prediction_vs_actual.csv",
+        "reports/latest/performance_benchmark/source_manifest.json",
+        "reports/latest/performance_benchmark/missed_opportunities.md",
+        "reports/latest/performance_benchmark/status.json",
+        "reports/latest/performance_benchmark/top_mover_match.csv",
+        "reports/latest/performance_benchmark/benchmark_summary.md"
+      ],
+      "blockers": [],
+      "warnings": []
+    },
+    {
+      "phase": "lifecycle_reconciliation",
+      "issue": "#27",
+      "status": "PARTIAL",
+      "reason": "Lifecycle source discovery completed; no inferred fills used.",
+      "outputs": [
+        "reports/latest/lifecycle_reconciliation/signal_order_trade_join.csv",
+        "reports/latest/lifecycle_reconciliation/mismatch_report.md",
+        "reports/latest/lifecycle_reconciliation/open_closed_positions.csv",
+        "reports/latest/lifecycle_reconciliation/lifecycle_summary.md",
+        "reports/latest/lifecycle_reconciliation/source_manifest.json",
+        "reports/latest/lifecycle_reconciliation/status.json",
+        "reports/latest/lifecycle_reconciliation/pnl_reconciliation.csv"
+      ],
+      "blockers": [],
+      "warnings": []
+    },
+    {
+      "phase": "dashboard_browser_api",
+      "issue": "#24",
+      "status": "BLOCKED",
+      "reason": "Static dashboard scan completed; browser/API proof remains blocked until local run.",
+      "outputs": [
+        "reports/latest/dashboard_browser_api_proof/localhost_reference_scan.txt",
+        "reports/latest/dashboard_browser_api_proof/dashboard_browser_api_summary.md",
+        "reports/latest/dashboard_browser_api_proof/backtest_ui_proof.md",
+        "reports/latest/dashboard_browser_api_proof/screenshot_manifest.json",
+        "reports/latest/dashboard_browser_api_proof/status.json",
+        "reports/latest/dashboard_browser_api_proof/npm_audit_summary.md",
+        "reports/latest/dashboard_browser_api_proof/api_smoke_results.json",
+        "reports/latest/dashboard_browser_api_proof/frontend_build.log"
+      ],
+      "blockers": [
+        "browser_screenshot_not_generated_in_github_static_run",
+        "local_backend_frontend_run_not_proven",
+        "backtest_ui_reference_not_found"
+      ],
+      "warnings": []
+    }
+  ]
+}
