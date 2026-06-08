@@ -1,0 +1,57 @@
+name: Genesis System3 Main Validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - requirements.txt
+      - .github/workflows/main.yml
+      - scripts/**
+      - dashboard/backend/**
+      - core/**
+      - src/**
+
+permissions:
+  contents: read
+
+jobs:
+  validate-python:
+    name: Validate Python dependencies and core scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SYSTEM3_MODE: analyze
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Load secrets
+        run: |
+          if [ -n "${{ secrets.ANGEL_API_KEY }}" ]; then
+            echo "ANGEL_API_KEY=${{ secrets.ANGEL_API_KEY }}" >> "$GITHUB_ENV"
+            echo "ANGEL_API_KEY is configured."
+          else
+            echo "ANGEL_API_KEY is not configured; continuing analyzer-only validation."
+          fi
+
+      - name: Run script
+        run: |
+          python -m py_compile scripts/system3_full_repo_verification.py
+          python -m py_compile scripts/system3_master_proof_orchestrator.py
+          python scripts/system3_master_proof_orchestrator.py --auto-fix
