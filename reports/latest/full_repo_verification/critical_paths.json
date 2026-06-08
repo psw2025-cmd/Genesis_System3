@@ -1,0 +1,57 @@
+[
+  {
+    "bytes": 568,
+    "exists": true,
+    "path": "render.yaml"
+  },
+  {
+    "bytes": 7083,
+    "exists": true,
+    "path": "Run-FullQA.ps1"
+  },
+  {
+    "bytes": 149407,
+    "exists": true,
+    "path": "dashboard/backend/app.py"
+  },
+  {
+    "bytes": 726,
+    "exists": true,
+    "path": "dashboard/backend/Dockerfile"
+  },
+  {
+    "bytes": 212,
+    "exists": true,
+    "path": "dashboard/backend/requirements.txt"
+  },
+  {
+    "bytes": 641,
+    "exists": true,
+    "path": "dashboard/frontend/package.json"
+  },
+  {
+    "bytes": 695,
+    "exists": true,
+    "path": "core/utils/env_loader.py"
+  },
+  {
+    "bytes": 37345,
+    "exists": true,
+    "path": "scripts/system3_master_proof_orchestrator.py"
+  },
+  {
+    "bytes": 5085,
+    "exists": true,
+    "path": ".github/workflows/system3-auto-verifier.yml"
+  },
+  {
+    "bytes": 2411,
+    "exists": true,
+    "path": ".github/workflows/system3-master-proof-control-plane.yml"
+  },
+  {
+    "bytes": 4890,
+    "exists": true,
+    "path": ".github/workflows/repo-cleanliness-gate.yml"
+  }
+]

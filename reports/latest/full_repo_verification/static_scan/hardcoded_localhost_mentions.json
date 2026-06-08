@@ -1,0 +1,656 @@
+[
+  {
+    "path": ".github/workflows/dashboard-ultra-readiness.yml"
+  },
+  {
+    "path": ".github/workflows/patch-render-root-and-smartapi.yml"
+  },
+  {
+    "path": ".vscode/tasks.json"
+  },
+  {
+    "path": "AGENT.md"
+  },
+  {
+    "path": "AGENT_PROMPT_DASHBOARD_FIX.md"
+  },
+  {
+    "path": "ALL_FIXES_COMPLETE.md"
+  },
+  {
+    "path": "ALL_TODOS_COMPLETE_SUMMARY.md"
+  },
+  {
+    "path": "APP_VERIFICATION_AND_FIXES_SUMMARY.md"
+  },
+  {
+    "path": "AUTO_MARKET_DETECTION_COMPLETE.md"
+  },
+  {
+    "path": "BACKEND_RESTART_COMMANDS.md"
+  },
+  {
+    "path": "BROKER_CREDENTIALS_VALIDATION_COMPLETE.md"
+  },
+  {
+    "path": "CHECK_AND_START_DASHBOARD.ps1"
+  },
+  {
+    "path": "CLEANUP_AND_START.ps1"
+  },
+  {
+    "path": "COMPLETE_DIAGNOSTIC_SCRIPT.js"
+  },
+  {
+    "path": "COMPLETE_FIXES_APPLIED.md"
+  },
+  {
+    "path": "COMPLETE_FIXES_SUMMARY.md"
+  },
+  {
+    "path": "COMPLETE_FIX_SUMMARY.md"
+  },
+  {
+    "path": "CORS_FIX_COMPLETE.md"
+  },
+  {
+    "path": "DASHBOARD_24HR_MONITORING_GUIDE.md"
+  },
+  {
+    "path": "DASHBOARD_FIXES_APPLIED.md"
+  },
+  {
+    "path": "DASHBOARD_PRODUCTION_GRADE_COMPLETE.md"
+  },
+  {
+    "path": "DASHBOARD_QUICK_START.md"
+  },
+  {
+    "path": "DASHBOARD_SYSTEM_COMPLETE.md"
+  },
+  {
+    "path": "DASHBOARD_VERIFICATION_COMPLETE.md"
+  },
+  {
+    "path": "DASHBOARD_VISIBILITY_VERIFICATION.md"
+  },
+  {
+    "path": "DEBUG_INSTRUCTIONS.md"
+  },
+  {
+    "path": "DEPENDENCY_INSTALLATION_COMPLETE.md"
+  },
+  {
+    "path": "DEPENDENCY_INSTALLATION_SUMMARY.md"
+  },
+  {
+    "path": "FINAL_COMPLETE_SOLUTION.md"
+  },
+  {
+    "path": "FINAL_DASHBOARD_FIX.md"
+  },
+  {
+    "path": "FINAL_FIX_AND_INSTRUCTIONS.md"
+  },
+  {
+    "path": "FINAL_PRODUCTION_READY_SUMMARY.md"
+  },
+  {
+    "path": "FINAL_STATUS.md"
+  },
+  {
+    "path": "FINAL_VALIDATION_CONFIRMATION.md"
+  },
+  {
+    "path": "FINAL_VALIDATION_REPORT.md"
+  },
+  {
+    "path": "FIX_BACKEND_START.md"
+  },
+  {
+    "path": "FIX_BLANK_DASHBOARD.md"
+  },
+  {
+    "path": "FIX_PORT_AND_START.bat"
+  },
+  {
+    "path": "FIX_UVICORN_AND_START.bat"
+  },
+  {
+    "path": "FULL_DASHBOARD_VERIFICATION_REPORT.md"
+  },
+  {
+    "path": "FULL_DEPENDENCY_ANALYSIS.md"
+  },
+  {
+    "path": "FULL_IMPLEMENTATION_COMPLETE.md"
+  },
+  {
+    "path": "IMMEDIATE_DEBUG_STEPS.md"
+  },
+  {
+    "path": "INSTALLATION_FIX_INSTRUCTIONS.md"
+  },
+  {
+    "path": "INSTALLATION_TEST_RESULTS.md"
+  },
+  {
+    "path": "LOG_ANALYSIS_FIXES.md"
+  },
+  {
+    "path": "MANUAL_TEST_IN_CONSOLE.md"
+  },
+  {
+    "path": "NEXT_STEPS.md"
+  },
+  {
+    "path": "ONE_LINE_TESTS.js"
+  },
+  {
+    "path": "PAPER_TRADING_SMOKE_TEST_RESULTS.md"
+  },
+  {
+    "path": "PERFORMANCE_IMPROVEMENTS_SUMMARY.md"
+  },
+  {
+    "path": "PERFORMANCE_PREDICTION_IMPROVEMENTS.md"
+  },
+  {
+    "path": "PHASE_BY_PHASE_VERIFICATION_SUMMARY.md"
+  },
+  {
+    "path": "POLLING_OPTIMIZATION_COMPLETE.md"
+  },
+  {
+    "path": "POST_VALIDATION_BUILD_PLAN.md"
+  },
+  {
+    "path": "PRODUCTION_FIXES_COMPLETE.md"
+  },
+  {
+    "path": "PRODUCTION_READY_STATUS.md"
+  },
+  {
+    "path": "PRODUCTION_RESTART_GUIDE.md"
+  },
+  {
+    "path": "PRODUCTION_VALIDATION_COMPLETE.md"
+  },
+  {
+    "path": "PRODUCTION_VALIDATION_GUIDE.md"
+  },
+  {
+    "path": "QUICK_FIX_BACKEND.md"
+  },
+  {
+    "path": "QUICK_FIX_CONSOLE.js"
+  },
+  {
+    "path": "QUICK_START.md"
+  },
+  {
+    "path": "QUICK_START_DASHBOARD.md"
+  },
+  {
+    "path": "QUICK_START_NOW.md"
+  },
+  {
+    "path": "QUICK_START_WITH_FIXES.md"
+  },
+  {
+    "path": "READY_TO_TEST.md"
+  },
+  {
+    "path": "REBUILD_AND_TEST.md"
+  },
+  {
+    "path": "RESTART_BACKEND.bat"
+  },
+  {
+    "path": "RESTART_BACKEND_WITH_FIXES.bat"
+  },
+  {
+    "path": "RESTART_DASHBOARD.bat"
+  },
+  {
+    "path": "RESTART_WITH_SSOT.bat"
+  },
+  {
+    "path": "RUNNER_IMPLEMENTATION_PROOF.md"
+  },
+  {
+    "path": "RUN_AND_TRACK_ALL.bat"
+  },
+  {
+    "path": "RUN_THESE_TESTS_NOW.md"
+  },
+  {
+    "path": "Run-All.bat"
+  },
+  {
+    "path": "SIMPLE_CONSOLE_COMMANDS.md"
+  },
+  {
+    "path": "SIMPLE_START_GUIDE.md"
+  },
+  {
+    "path": "SSOT_FIXES_COMPLETE.md"
+  },
+  {
+    "path": "START_ALL_SERVICES.bat"
+  },
+  {
+    "path": "START_AUTORUN_AND_WATCHDOG.bat"
+  },
+  {
+    "path": "START_BACKEND_AND_FRONTEND.bat"
+  },
+  {
+    "path": "START_BACKEND_FOR_TESTING.bat"
+  },
+  {
+    "path": "START_DASHBOARD.bat"
+  },
+  {
+    "path": "START_DASHBOARD_MANUAL.ps1"
+  },
+  {
+    "path": "START_EVERYTHING_AUTO.bat"
+  },
+  {
+    "path": "START_FRONTEND_ONLY.bat"
+  },
+  {
+    "path": "START_FULL_DASHBOARD_SYSTEM.bat"
+  },
+  {
+    "path": "START_FULL_SYSTEM_WITH_DASHBOARD.ps1"
+  },
+  {
+    "path": "SYSTEM_STATUS_REPORT.md"
+  },
+  {
+    "path": "TEST_AND_VERIFY.md"
+  },
+  {
+    "path": "TRADER_USER_GUIDE.md"
+  },
+  {
+    "path": "TRADER_USER_TEST_GUIDE.md"
+  },
+  {
+    "path": "USER_ACTION_REQUIRED.md"
+  },
+  {
+    "path": "VALIDATE_SSOT_IMPLEMENTATION.bat"
+  },
+  {
+    "path": "VALIDATION_FIXES_AND_STATUS.md"
+  },
+  {
+    "path": "VERIFICATION_STATUS_AND_INSTRUCTIONS.md"
+  },
+  {
+    "path": "VERIFY_DASHBOARD.bat"
+  },
+  {
+    "path": "WATCHDOG_RESTART_STATUS.md"
+  },
+  {
+    "path": "auto_security_patch.py"
+  },
+  {
+    "path": "batch_execution_log.txt"
+  },
+  {
+    "path": "batch_test2.txt"
+  },
+  {
+    "path": "complete_end_to_end_validation.py"
+  },
+  {
+    "path": "comprehensive_app_verification_and_fix.py"
+  },
+  {
+    "path": "comprehensive_e2e_test_all_tabs.py"
+  },
+  {
+    "path": "comprehensive_electron_app_verification.py"
+  },
+  {
+    "path": "comprehensive_multi_trader_test.py"
+  },
+  {
+    "path": "comprehensive_pre_build_validation.py"
+  },
+  {
+    "path": "continuous_improvement_loop.py"
+  },
+  {
+    "path": "dashboard/README.md"
+  },
+  {
+    "path": "dashboard/app.js"
+  },
+  {
+    "path": "dashboard/app.py"
+  },
+  {
+    "path": "dashboard/backend/app.py"
+  },
+  {
+    "path": "dashboard/backend/upgrade_agent.py"
+  },
+  {
+    "path": "dashboard/deploy.bat"
+  },
+  {
+    "path": "dashboard/e2e/electron_visual_verify.py"
+  },
+  {
+    "path": "dashboard/frontend/dist/assets/index-D39Quml5.js"
+  },
+  {
+    "path": "dashboard/frontend/src/config.ts"
+  },
+  {
+    "path": "desktop_app/main.js"
+  },
+  {
+    "path": "diagnose_and_fix_app.py"
+  },
+  {
+    "path": "diagnose_dashboard_blank.js"
+  },
+  {
+    "path": "docker-compose.oracle.yml"
+  },
+  {
+    "path": "docs/AGENT_DASHBOARD_VERIFICATION_PLAYWRIGHT.md"
+  },
+  {
+    "path": "docs/RECOMMENDATIONS_AFTER_FULL_FOLDER_ANALYSIS.md"
+  },
+  {
+    "path": "docs/VIEW_CHARTS_DASHBOARDS_IN_EDITOR_AND_CHROME.md"
+  },
+  {
+    "path": "e2e_selftest.py"
+  },
+  {
+    "path": "electron_app_connectivity_test.js"
+  },
+  {
+    "path": "exe_preflight_selftest.py"
+  },
+  {
+    "path": "final_validation_and_build.py"
+  },
+  {
+    "path": "fix_all_endpoints_and_validate.py"
+  },
+  {
+    "path": "fix_and_test_app.bat"
+  },
+  {
+    "path": "fix_backend_and_validate_then_build.py"
+  },
+  {
+    "path": "full_validation_with_auto_improvement.py"
+  },
+  {
+    "path": "integrate_all_systems_to_app.py"
+  },
+  {
+    "path": "master_full_validation_suite.py"
+  },
+  {
+    "path": "paper_trading_smoke_test.py"
+  },
+  {
+    "path": "production_grade_validation.py"
+  },
+  {
+    "path": "production_grade_zero_errors_validation.py"
+  },
+  {
+    "path": "proof/MONITORING_LOG_20260225.txt"
+  },
+  {
+    "path": "proof/MONITORING_LOG_20260226.txt"
+  },
+  {
+    "path": "proof/MONITORING_LOG_20260227.txt"
+  },
+  {
+    "path": "qa_checklist.md"
+  },
+  {
+    "path": "quick_validation_and_improvement.py"
+  },
+  {
+    "path": "quick_validation_before_build.py"
+  },
+  {
+    "path": "reports/latest/render_endpoint_proof/endpoint_summary.json"
+  },
+  {
+    "path": "restart_backend.ps1"
+  },
+  {
+    "path": "restart_backend_and_test.py"
+  },
+  {
+    "path": "restart_backend_and_validate.py"
+  },
+  {
+    "path": "run_complete_validation.py"
+  },
+  {
+    "path": "scripts/INSTALLATION_TRACKING_REPORT.txt"
+  },
+  {
+    "path": "scripts/PRODUCTION_DASHBOARD_TEST.ps1"
+  },
+  {
+    "path": "scripts/analyze_dashboard_content.py"
+  },
+  {
+    "path": "scripts/auto_monitor_and_improve.py"
+  },
+  {
+    "path": "scripts/combined_auto_system.py"
+  },
+  {
+    "path": "scripts/combined_auto_system_fixed.py"
+  },
+  {
+    "path": "scripts/complete_verification.py"
+  },
+  {
+    "path": "scripts/comprehensive_dashboard_test.py"
+  },
+  {
+    "path": "scripts/comprehensive_dashboard_validation.py"
+  },
+  {
+    "path": "scripts/comprehensive_dashboard_verification.py"
+  },
+  {
+    "path": "scripts/comprehensive_feature_test.py"
+  },
+  {
+    "path": "scripts/comprehensive_validation_and_test.py"
+  },
+  {
+    "path": "scripts/continuous_auto_agent.py"
+  },
+  {
+    "path": "scripts/dashboard_24hr_monitor.py"
+  },
+  {
+    "path": "scripts/dashboard_content_analysis.py"
+  },
+  {
+    "path": "scripts/dashboard_data_validator.py"
+  },
+  {
+    "path": "scripts/dashboard_monitor.ps1"
+  },
+  {
+    "path": "scripts/dashboard_online_verifier.py"
+  },
+  {
+    "path": "scripts/doctor.py"
+  },
+  {
+    "path": "scripts/full_dashboard_test_and_analyze.py"
+  },
+  {
+    "path": "scripts/future_proof_validation.py"
+  },
+  {
+    "path": "scripts/get_todays_trading_report.py"
+  },
+  {
+    "path": "scripts/market_scenario_test.py"
+  },
+  {
+    "path": "scripts/master_auto_system.py"
+  },
+  {
+    "path": "scripts/micro_level_audit.ps1"
+  },
+  {
+    "path": "scripts/monitor_desktop_app.py"
+  },
+  {
+    "path": "scripts/monitor_health.py"
+  },
+  {
+    "path": "scripts/multi_user_dashboard_test.py"
+  },
+  {
+    "path": "scripts/multi_user_dashboard_verification.py"
+  },
+  {
+    "path": "scripts/oracle_healthcheck.sh"
+  },
+  {
+    "path": "scripts/patch_backend_root_urls.py"
+  },
+  {
+    "path": "scripts/restart_backend_with_fixes.py"
+  },
+  {
+    "path": "scripts/run_all_3_steps.bat"
+  },
+  {
+    "path": "scripts/run_dashboard.ps1"
+  },
+  {
+    "path": "scripts/run_full_test.py"
+  },
+  {
+    "path": "scripts/run_local.bat"
+  },
+  {
+    "path": "scripts/run_local.sh"
+  },
+  {
+    "path": "scripts/run_three_validation_cycles.py"
+  },
+  {
+    "path": "scripts/self_activate_analyze_improve.py"
+  },
+  {
+    "path": "scripts/smoke_test.py"
+  },
+  {
+    "path": "scripts/start_autonomous_trading.ps1"
+  },
+  {
+    "path": "scripts/start_backend.bat"
+  },
+  {
+    "path": "scripts/start_dashboard_complete.ps1"
+  },
+  {
+    "path": "scripts/start_dashboard_live.ps1"
+  },
+  {
+    "path": "scripts/start_full_system_with_dashboard.ps1"
+  },
+  {
+    "path": "scripts/system3_full_repo_verification.py"
+  },
+  {
+    "path": "scripts/system3_master_proof_orchestrator.py"
+  },
+  {
+    "path": "scripts/test_all_dashboard_tabs.py"
+  },
+  {
+    "path": "scripts/test_all_features.py"
+  },
+  {
+    "path": "scripts/test_all_system.py"
+  },
+  {
+    "path": "scripts/test_performance_prediction.py"
+  },
+  {
+    "path": "scripts/test_ssot_implementation.py"
+  },
+  {
+    "path": "scripts/test_trade_logging_and_pnl.py"
+  },
+  {
+    "path": "scripts/track_desktop_app.py"
+  },
+  {
+    "path": "scripts/validate_all.py"
+  },
+  {
+    "path": "scripts/verify_all_3_steps.py"
+  },
+  {
+    "path": "scripts/verify_dashboard.ps1"
+  },
+  {
+    "path": "scripts/verify_dashboard_complete.py"
+  },
+  {
+    "path": "scripts/verify_secrets.ps1"
+  },
+  {
+    "path": "scripts/visible_auto_monitor.py"
+  },
+  {
+    "path": "start_backend.bat"
+  },
+  {
+    "path": "system3_tab_forensic_scan.py"
+  },
+  {
+    "path": "test_api_endpoints.py"
+  },
+  {
+    "path": "test_built_app_trader_perspective.py"
+  },
+  {
+    "path": "test_production_app.py"
+  },
+  {
+    "path": "tools/playwright_dashboard_verification.py"
+  },
+  {
+    "path": "verify_dashboard_fix.js"
+  },
+  {
+    "path": "wait_and_complete_validation.py"
+  },
+  {
+    "path": "world_class_enhancement_system.py"
+  }
+]

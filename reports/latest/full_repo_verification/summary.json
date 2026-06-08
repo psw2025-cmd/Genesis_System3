@@ -1,0 +1,28 @@
+{
+  "blockers": [
+    "workflow_push_without_rebase_detected"
+  ],
+  "command_summary": {
+    "failed": 0,
+    "passed": 214,
+    "timed_out": 0,
+    "total": 214
+  },
+  "critical_missing_count": 0,
+  "generated_utc": "2026-06-08T04:45:16.870426+00:00",
+  "mode": "Analyzer/Paper only; live trading disabled",
+  "runner": {
+    "cwd": "/home/runner/work/Genesis_System3/Genesis_System3",
+    "platform": "Linux-6.17.0-1015-azure-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]"
+  },
+  "static_scan_counts": {
+    "hardcoded_localhost_mentions": 218,
+    "live_mode_mentions": 523,
+    "todo_fixme_mentions": 37,
+    "workflow_push_without_rebase": 17
+  },
+  "tracked_file_count": 3145,
+  "trade_ready": false,
+  "verdict": "FULL_REPO_VERIFICATION_COMPLETE_WITH_BLOCKERS"
+}

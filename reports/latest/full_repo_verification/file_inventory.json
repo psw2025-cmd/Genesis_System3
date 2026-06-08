@@ -1,0 +1,158 @@
+{
+  "duplicate_basename_group_count": 21,
+  "duplicate_basename_sample": {
+    "00_summary.md": [
+      "reports/latest/full_repo_scan_clean/00_summary.md",
+      "reports/latest/full_trading_pipeline_readiness/00_summary.md",
+      "reports/latest/model_backtest_readiness/00_summary.md",
+      "reports/latest/repo_cleanliness/00_summary.md"
+    ],
+    "app.py": [
+      "dashboard/app.py",
+      "dashboard/backend/app.py"
+    ],
+    "complete_validation_report.md": [
+      "COMPLETE_VALIDATION_REPORT.md",
+      "docs/COMPLETE_VALIDATION_REPORT.md"
+    ],
+    "ensemble_predictor.py": [
+      "core/engine/ensemble_predictor.py",
+      "src/ml/ensemble_predictor.py"
+    ],
+    "greeks_calculator.py": [
+      "core/engine/greeks_engine/greeks_calculator.py",
+      "dashboard/backend/greeks_calculator.py"
+    ],
+    "index.css": [
+      "dashboard/frontend/dist/assets/index.css",
+      "dashboard/frontend/src/index.css"
+    ],
+    "index.html": [
+      "dashboard/frontend/dist/index.html",
+      "dashboard/frontend/index.html",
+      "dashboard/index.html",
+      "reports/model_benchmark_dashboard/index.html"
+    ],
+    "kill_switch.json": [
+      "config/kill_switch.json",
+      "kill_switch.json"
+    ],
+    "package-lock.json": [
+      "dashboard/frontend/package-lock.json",
+      "desktop_app/package-lock.json",
+      "package-lock.json"
+    ],
+    "package.json": [
+      "dashboard/frontend/package.json",
+      "desktop_app/package.json",
+      "package.json"
+    ],
+    "performance_metrics.py": [
+      "scripts/performance_metrics.py",
+      "src/analytics/performance_metrics.py"
+    ],
+    "run_monitor_10min.bat": [
+      "RUN_MONITOR_10MIN.bat",
+      "scripts/run_monitor_10min.bat"
+    ],
+    "runtime_flags.json": [
+      "config/runtime_flags.json",
+      "runtime_flags.json"
+    ],
+    "settings.json": [
+      ".cursor/settings.json",
+      ".vscode/settings.json"
+    ],
+    "start_backend.bat": [
+      "scripts/start_backend.bat",
+      "start_backend.bat"
+    ],
+    "start_backend.bat.bak_20260225_005921": [
+      "scripts/start_backend.bat.bak_20260225_005921",
+      "start_backend.bat.bak_20260225_005921"
+    ],
+    "start_full_system_with_dashboard.ps1": [
+      "START_FULL_SYSTEM_WITH_DASHBOARD.ps1",
+      "scripts/start_full_system_with_dashboard.ps1"
+    ],
+    "system3_config.json": [
+      "config/system3_config.json",
+      "core/engine/config/system3_config.json"
+    ],
+    "system3_phase331_signal_integrity.py": [
+      "core/engine/system3_phase331_signal_integrity.py",
+      "system3_phase331_signal_integrity.py"
+    ],
+    "tasks.json": [
+      ".vscode/tasks.json",
+      "agent_memory/tasks.json"
+    ],
+    "test_phases_261_300.py": [
+      "test_phases_261_300.py",
+      "tests/auto/system3_generated_tests/test_phases_261_300.py"
+    ]
+  },
+  "large_tracked_files_over_5mb": [],
+  "suffix_counts": {
+    ".0": 1,
+    ".backup": 4,
+    ".bak": 1,
+    ".bak_20260225_005921": 21,
+    ".bat": 163,
+    ".cjs": 1,
+    ".cmd": 1,
+    ".css": 4,
+    ".csv": 6,
+    ".db": 1,
+    ".example": 1,
+    ".html": 5,
+    ".in": 2,
+    ".js": 12,
+    ".json": 276,
+    ".md": 1128,
+    ".md\"": 3,
+    ".mdc": 1,
+    ".pid": 2,
+    ".pkl": 26,
+    ".ps1": 53,
+    ".pth": 5,
+    ".py": 1256,
+    ".sh": 4,
+    ".toml": 1,
+    ".ts": 4,
+    ".tsx": 20,
+    ".txt": 93,
+    ".txt\"": 1,
+    ".vbs": 1,
+    ".xlsx": 1,
+    ".yaml": 2,
+    ".yml": 36,
+    ".zip": 3,
+    "[no_ext]": 6
+  },
+  "top_level_counts": {
+    "\"docs": 4,
+    ".": 1080,
+    ".cursor": 3,
+    ".github": 32,
+    ".scripts": 1,
+    ".vscode": 2,
+    "AI_AGENT_RUNS": 14,
+    "agent_memory": 4,
+    "config": 16,
+    "core": 597,
+    "dashboard": 65,
+    "desktop_app": 6,
+    "docs": 496,
+    "models": 11,
+    "proof": 9,
+    "reports": 283,
+    "runtime_reports": 6,
+    "scripts": 210,
+    "src": 32,
+    "state": 5,
+    "tests": 233,
+    "tools": 36
+  },
+  "tracked_file_count": 3145
+}

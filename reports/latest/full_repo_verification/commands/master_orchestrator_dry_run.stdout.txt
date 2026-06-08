@@ -1,0 +1,17 @@
+{
+  "blocker_count": 2,
+  "fail_count": 1,
+  "gate_count": 8,
+  "generated_utc": "2026-06-08T04:45:04.640363+00:00",
+  "live_trading_enabled": false,
+  "pass_count": 7,
+  "reports": [
+    "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+    "reports/latest/proof_status_matrix/proof_status_matrix.json",
+    "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
+    "docs/project_control/SYSTEM3_MASTER_STATUS.md"
+  ],
+  "trade_ready": false,
+  "verdict": "TRADE_READY_BLOCKED",
+  "warning_count": 11
+}

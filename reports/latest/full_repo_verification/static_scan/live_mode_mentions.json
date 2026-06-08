@@ -1,0 +1,1502 @@
+[
+  {
+    "path": ".github/scripts/root_architecture_gate.py"
+  },
+  {
+    "path": ".github/workflows/entrypoint-classification.yml"
+  },
+  {
+    "path": ".github/workflows/external-data-yahoo-proof.yml"
+  },
+  {
+    "path": ".github/workflows/full-trading-pipeline-readiness.yml"
+  },
+  {
+    "path": ".github/workflows/phase2-runtime-map.yml"
+  },
+  {
+    "path": ".github/workflows/safe-dryrun-validation-execution.yml"
+  },
+  {
+    "path": ".github/workflows/system3-auto-verifier.yml"
+  },
+  {
+    "path": ".github/workflows/system3-full-repo-verification.yml"
+  },
+  {
+    "path": ".github/workflows/system3-master-proof-control-plane.yml"
+  },
+  {
+    "path": "ALL_AUTO_TRIGGERS_INTEGRATION_COMPLETE.md"
+  },
+  {
+    "path": "ANALYSIS_AND_BEST_SOLUTION_PATH.md"
+  },
+  {
+    "path": "ANALYSIS_COMPLETE_PHASE239_VALIDATION.md"
+  },
+  {
+    "path": "AUTOMATED_REMEDIATION_FLOW.md"
+  },
+  {
+    "path": "AUTORUN_AUTOMATION_COMPLETE.md"
+  },
+  {
+    "path": "AUTO_TRADING_BATCH_GUIDE_20251208.md"
+  },
+  {
+    "path": "BATCH_FILES_ANALYSIS_COMPLETE.md"
+  },
+  {
+    "path": "BATCH_FILES_DOCUMENTATION_INDEX.md"
+  },
+  {
+    "path": "BATCH_FILES_MICRO_ANALYSIS.md"
+  },
+  {
+    "path": "BATCH_FILES_QUICK_REFERENCE.md"
+  },
+  {
+    "path": "BATCH_FILES_TECHNICAL_REFERENCE.md"
+  },
+  {
+    "path": "BATCH_FILES_VISUAL_SUMMARY.md"
+  },
+  {
+    "path": "BAT_FILE_OPTIMIZATION_COMPLETE.md"
+  },
+  {
+    "path": "BAT_FILE_UPGRADE_DETAILS.md"
+  },
+  {
+    "path": "CHANGES_MADE_PAPER_TRADING_SETUP.md"
+  },
+  {
+    "path": "COMPLETE_AUTO_TRADING_SETUP_20251208.md"
+  },
+  {
+    "path": "COMPLETE_AUTO_TRIGGER_DOCUMENTATION.md"
+  },
+  {
+    "path": "COMPLETE_FOLDER_ANALYSIS_20251208.md"
+  },
+  {
+    "path": "COMPLETE_SOLUTION_SUMMARY.md"
+  },
+  {
+    "path": "COMPLETE_SYSTEM_IMPLEMENTATION_SUMMARY.md"
+  },
+  {
+    "path": "COMPREHENSIVE_VALIDATION_TEST_RESULTS.md"
+  },
+  {
+    "path": "DELIVERABLES_INDEX.md"
+  },
+  {
+    "path": "DELIVERY_COMPLETE_CONFIRMATION.md"
+  },
+  {
+    "path": "DELIVERY_PACKAGE_INDEX.md"
+  },
+  {
+    "path": "DELIVERY_SUMMARY_PHASES_311_330.md"
+  },
+  {
+    "path": "DEMO_EXECUTION_RESULTS.md"
+  },
+  {
+    "path": "DEPLOYMENT_ACTION_CARD.txt"
+  },
+  {
+    "path": "DEPLOYMENT_STATUS_DASHBOARD.txt"
+  },
+  {
+    "path": "DIAGNOSTIC_PHASES_1_200_DATA.json"
+  },
+  {
+    "path": "DOCUMENTATION_INDEX_PRODUCTION_VALIDATION.md"
+  },
+  {
+    "path": "END_TO_END_ANALYSIS_20251208.md"
+  },
+  {
+    "path": "FINAL_COMPREHENSIVE_TEST_REPORT.txt"
+  },
+  {
+    "path": "FINAL_PNL_PIPELINE_HEALTH_REPORT.md"
+  },
+  {
+    "path": "FINAL_PRODUCTION_INTEGRATION_PROOF.md"
+  },
+  {
+    "path": "FINAL_STATUS_CHECK.md"
+  },
+  {
+    "path": "FINAL_SUMMARY_DEPLOYMENT_COMPLETE.md"
+  },
+  {
+    "path": "FINAL_SYSTEM3_REALITY_PROOF.md"
+  },
+  {
+    "path": "FINAL_TEST_EXECUTION_LOG_AND_OUTPUT.md"
+  },
+  {
+    "path": "FINAL_VALIDATION_SUMMARY_AND_RESULTS.txt"
+  },
+  {
+    "path": "FULL_READINESS_REHEARSAL_SUMMARY.md"
+  },
+  {
+    "path": "GENESIS_VALIDATION_CONTROLLER_SUMMARY.md"
+  },
+  {
+    "path": "GUARDIAN_ENGINEER_WORK_COMPLETE.md"
+  },
+  {
+    "path": "IMPLEMENTATION_COMPLETE_PHASES_331_360.md"
+  },
+  {
+    "path": "LIVE_DRY_RUN_DAY_PLAN.md"
+  },
+  {
+    "path": "LIVE_DRY_RUN_DAY_TEMPLATE.md"
+  },
+  {
+    "path": "LIVE_DRY_RUN_EXECUTION_PLAN.md"
+  },
+  {
+    "path": "LIVE_DRY_RUN_LAUNCHER_GUIDE.md"
+  },
+  {
+    "path": "LIVE_PAPER_TRADING_GUIDE.md"
+  },
+  {
+    "path": "MASTER_DEPLOYMENT_INDEX.txt"
+  },
+  {
+    "path": "MONDAY_DEC08_ANALYSIS_INDEX.md"
+  },
+  {
+    "path": "MONDAY_DEC08_DEEP_ANALYSIS_5_TABLES_AND_FIXES.md"
+  },
+  {
+    "path": "MONDAY_DEC08_EXECUTIVE_BRIEF.md"
+  },
+  {
+    "path": "MONDAY_DEC08_QUICK_REFERENCE.md"
+  },
+  {
+    "path": "MONDAY_PREP_CHECKLIST_2025_12_08.md"
+  },
+  {
+    "path": "MULTI_SNAPSHOT_SIMULATION_RESULTS.md"
+  },
+  {
+    "path": "OPERATOR_CHEAT_SHEET.md"
+  },
+  {
+    "path": "OPTIMIZATION_RESULTS_FINAL.md"
+  },
+  {
+    "path": "PAPER_TRADING_ACTIVATION_GUIDE.md"
+  },
+  {
+    "path": "PAPER_TRADING_COMPLETE_SUMMARY.md"
+  },
+  {
+    "path": "PAPER_TRADING_DOCUMENTATION_INDEX.md"
+  },
+  {
+    "path": "PAPER_TRADING_IMPLEMENTATION_COMPLETE.md"
+  },
+  {
+    "path": "PAPER_TRADING_LIVE_MARKET_HOURS_GUIDE.md"
+  },
+  {
+    "path": "PAPER_TRADING_ONE_PAGER.md"
+  },
+  {
+    "path": "PAPER_TRADING_QUICK_START.md"
+  },
+  {
+    "path": "PAPER_TRADING_SETUP_VALIDATION.md"
+  },
+  {
+    "path": "PAPER_TRADING_SMOKE_TEST_RESULTS.md"
+  },
+  {
+    "path": "PATH_B_EXECUTION_SUMMARY.txt"
+  },
+  {
+    "path": "PHASE201_AUTO_TRIGGER_INTEGRATION.md"
+  },
+  {
+    "path": "PHASE239_DEEP_ANALYSIS_DETAILED_FINDINGS.md"
+  },
+  {
+    "path": "PHASE239_HARDENING_COMPLETE_EXECUTIVE_SUMMARY.md"
+  },
+  {
+    "path": "PHASES_311_330_AUTORUN_INTEGRATION_GUIDE.md"
+  },
+  {
+    "path": "PHASES_331_360_FINAL_DELIVERY_SUMMARY.md"
+  },
+  {
+    "path": "PHASES_331_360_QUICK_REFERENCE.md"
+  },
+  {
+    "path": "PHASES_361_380_COMPLETE_FINAL_REPORT.md"
+  },
+  {
+    "path": "PHASES_361_380_QUICK_REFERENCE.md"
+  },
+  {
+    "path": "PHASE_1_COMPLETION_REPORT.md"
+  },
+  {
+    "path": "PHASE_381_388_IMPLEMENTATION_SUMMARY.md"
+  },
+  {
+    "path": "PHASE_381_388_ULTRA_MODELS_PLAN.md"
+  },
+  {
+    "path": "PHASE_381_400_ENTRY_GATE_VERIFICATION.md"
+  },
+  {
+    "path": "PHASE_381_ENTRY_GATE_VERIFICATION_FINAL.md"
+  },
+  {
+    "path": "PHASE_389_400_IMPLEMENTATION_SUMMARY.md"
+  },
+  {
+    "path": "PHASE_389_400_MASTER_PLAN.md"
+  },
+  {
+    "path": "PHASE_389_FEATURE_ENGINEERING.md"
+  },
+  {
+    "path": "PHASE_390_SMOTE_BALANCING.md"
+  },
+  {
+    "path": "PHASE_391_IMPLEMENTATION_SUMMARY.md"
+  },
+  {
+    "path": "PHASE_391_XGBOOST_TRAINING.md"
+  },
+  {
+    "path": "PHASE_392_COMPLETION_SUMMARY.md"
+  },
+  {
+    "path": "PHASE_392_ENSEMBLE_INTEGRATION.md"
+  },
+  {
+    "path": "PHASE_392_READINESS_REPORT.md"
+  },
+  {
+    "path": "PRE_381_LIVE_DRY_RUN_READINESS_SUMMARY.md"
+  },
+  {
+    "path": "PRE_MARKET_READINESS_VERIFICATION.md"
+  },
+  {
+    "path": "PROOF_ALL_EVIDENCE.md"
+  },
+  {
+    "path": "QC_AUDIT_COMPLETION_SUMMARY.txt"
+  },
+  {
+    "path": "QC_AUDIT_EXECUTIVE_BRIEF.md"
+  },
+  {
+    "path": "QC_AUDIT_VISUAL_MATRICES.md"
+  },
+  {
+    "path": "QUICK_REFERENCE_CARD_PHASES_311_330.txt"
+  },
+  {
+    "path": "QUICK_START_DEPLOYMENT.txt"
+  },
+  {
+    "path": "READINESS_REHEARSAL_INDEX.md"
+  },
+  {
+    "path": "README_PAPER_TRADING_SETUP.md"
+  },
+  {
+    "path": "README_START_HERE_TEST_RESULTS.txt"
+  },
+  {
+    "path": "REGISTRY_INTEGRATION_361_380_COMPLETE.md"
+  },
+  {
+    "path": "RUNNER_IMPLEMENTATION_PROOF.md"
+  },
+  {
+    "path": "RUNTIME_RECOVERY_STATUS.md"
+  },
+  {
+    "path": "SIMULATE_LIVE_MARKET_DEMO.bat"
+  },
+  {
+    "path": "SOLUTION_GUIDE_17OK_2WARN_1ERROR.md"
+  },
+  {
+    "path": "START_AUTORUN_AND_WATCHDOG.bat"
+  },
+  {
+    "path": "START_HERE_PAPER_TRADING.md"
+  },
+  {
+    "path": "SUNDAY_DRY_RUN_COMPLETE_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_AUTORUN_REALITY_PROOF_20251208_140510.md"
+  },
+  {
+    "path": "SYSTEM3_AUTORUN_WATCHDOG_FULL_VERIFICATION.md"
+  },
+  {
+    "path": "SYSTEM3_CODE_INDEX.md"
+  },
+  {
+    "path": "SYSTEM3_COMPLETE_PRODUCTION_HEALTH_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_COMPREHENSIVE_PRODUCTION_VALIDATION_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_COMPREHENSIVE_QC_AUDIT_FINAL.md"
+  },
+  {
+    "path": "SYSTEM3_CONFIG_CONSISTENCY_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_DAILY_START.bat"
+  },
+  {
+    "path": "SYSTEM3_DATA_REALITY_REVIEW.md"
+  },
+  {
+    "path": "SYSTEM3_DRY_RUN_READINESS_SIMULATION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_DRY_RUN_SESSION_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_FINAL_PHASE239_VALIDATION.md"
+  },
+  {
+    "path": "SYSTEM3_FINAL_RUNTIME_VALIDATION.md"
+  },
+  {
+    "path": "SYSTEM3_FREEZE_SNAPSHOT.md"
+  },
+  {
+    "path": "SYSTEM3_FULL_INTEGRITY_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_FULL_REALITY_PROOF.md"
+  },
+  {
+    "path": "SYSTEM3_FULL_RESTART_VERIFICATION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_FULL_VALIDATION_REPORT_20251206.md"
+  },
+  {
+    "path": "SYSTEM3_GUARDIAN_IMPLEMENTATION_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_GUARDIAN_QUICK_START_INDEX.md"
+  },
+  {
+    "path": "SYSTEM3_LIVE_DRY_RUN_REHEARSAL_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_LIVE_ENV_GUARD_DESIGN.md"
+  },
+  {
+    "path": "SYSTEM3_MASTER_COMPLETION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_MASTER_VALIDATION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_MASTER_VALIDATOR_FINAL_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_1_360_HEALTH_SNAPSHOT.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_1_380_PRE_381_GATE_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_311_330_IMPLEMENTATION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_331_360_BLOCK_HEALTH.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_361_365_HEALTH_AND_ACCURACY_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_361_380_IMPLEMENTATION_STATUS.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_361_380_WARN_EXPLANATION.md"
+  },
+  {
+    "path": "SYSTEM3_PHASES_366_369_STATUS.md"
+  },
+  {
+    "path": "SYSTEM3_PHASE_1_380_FINAL_INTEGRITY.md"
+  },
+  {
+    "path": "SYSTEM3_PNL_RUNTIME_VALIDATION_TODAY.md"
+  },
+  {
+    "path": "SYSTEM3_PREMARKET_VALIDATION_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_PRE_380_HARDENING_QUICK_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_PRE_380_REGRESSION_COMPLETION_SUMMARY.md"
+  },
+  {
+    "path": "SYSTEM3_READY_FOR_NEXT_TRADING_DAY.md"
+  },
+  {
+    "path": "SYSTEM3_REAL_MONEY_READINESS_HARDENING_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_SAFETY_AUDIT.md"
+  },
+  {
+    "path": "SYSTEM3_TOMORROW_READINESS_REPORT.md"
+  },
+  {
+    "path": "SYSTEM3_VALIDATION_CONSOLE_OUTPUT.txt"
+  },
+  {
+    "path": "SYSTEM_FULLY_OPERATIONAL.md"
+  },
+  {
+    "path": "TEST_RESULTS_DOCUMENTATION_INDEX.md"
+  },
+  {
+    "path": "ULTIMATE_AI_CONTROLLER_IMPLEMENTATION.md"
+  },
+  {
+    "path": "analyze_phases_1_200.py"
+  },
+  {
+    "path": "analyze_today_run.py"
+  },
+  {
+    "path": "comprehensive_qc_audit.py"
+  },
+  {
+    "path": "config/live_trade_config.json"
+  },
+  {
+    "path": "config/live_trade_config.py"
+  },
+  {
+    "path": "config/system3_global_config.yml"
+  },
+  {
+    "path": "core/brokers/angel_one/broker.py"
+  },
+  {
+    "path": "core/config/live_trade_config_loader.py"
+  },
+  {
+    "path": "core/engine/system3_phase101_live_trade_config_check.py"
+  },
+  {
+    "path": "core/engine/system3_phase107_live_execution_engine.py"
+  },
+  {
+    "path": "core/engine/system3_phase119_live_safety_audit.py"
+  },
+  {
+    "path": "core/engine/system3_phase120_eod_live_summary_pack.py"
+  },
+  {
+    "path": "core/engine/system3_phase131_master_session_config.py"
+  },
+  {
+    "path": "core/engine/system3_phase133_master_safety_guard.py"
+  },
+  {
+    "path": "core/engine/system3_phase199_live_mode_guard_stub.py"
+  },
+  {
+    "path": "core/engine/system3_phase200_master_status_snapshot.py"
+  },
+  {
+    "path": "core/engine/system3_phase203_config_consistency.py"
+  },
+  {
+    "path": "core/engine/system3_phase313_config_consistency_auditor.py"
+  },
+  {
+    "path": "core/engine/system3_phase340_signal_pipeline_regression_guard.py"
+  },
+  {
+    "path": "core/engine/system3_phase367_safety_guardrail_recommender.py"
+  },
+  {
+    "path": "core/engine/system3_phase376_self_test_suite.py"
+  },
+  {
+    "path": "core/engine/system3_phase377_validation_report_generator.py"
+  },
+  {
+    "path": "core/engine/system3_phase380_final_sign_off.py"
+  },
+  {
+    "path": "core/engine/system3_phase388_health_gate.py"
+  },
+  {
+    "path": "core/engine/system3_phase390_smote_balancing.py"
+  },
+  {
+    "path": "core/engine/system3_phase391_xgboost_training.py"
+  },
+  {
+    "path": "core/engine/system3_phase392_ensemble_integration.py"
+  },
+  {
+    "path": "core/engine/system3_phases_351_360_safety_automation.py"
+  },
+  {
+    "path": "core/engine/system3_phases_393_400.py"
+  },
+  {
+    "path": "core/execution/risk_guard.py"
+  },
+  {
+    "path": "core/tools/system3_auto_test_generator.py"
+  },
+  {
+    "path": "create_yaml_configs.py"
+  },
+  {
+    "path": "docker-compose.oracle.yml"
+  },
+  {
+    "path": "docs/ANGEL_BROKER_API_AND_TOTP_ANALYSIS.md"
+  },
+  {
+    "path": "docs/BUY_DECISION_DIAGNOSTIC.md"
+  },
+  {
+    "path": "docs/GENESIS_VSCODE_AGENT_MASTER_INSTRUCTION.md"
+  },
+  {
+    "path": "docs/OPTION_CHAIN_FIX_SUMMARY.md"
+  },
+  {
+    "path": "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_REPORT.md"
+  },
+  {
+    "path": "docs/SYSTEM3_DEEP_AUDIT_FORENSIC_REPORT_20251203.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PHASES_331_360_IMPLEMENTATION.md.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PHASES_361_380_IMPLEMENTATION.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PREFLIGHT_CHECK_REPORT.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PREMARKET_CHECKLIST_EXECUTION_GUIDE.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PREMARKET_CHECKLIST_FINAL.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PREMARKET_HEALTH_CHECK_ANALYSIS.md"
+  },
+  {
+    "path": "docs/SYSTEM3_PREMARKET_HEALTH_CHECK_IMPLEMENTATION.md"
+  },
+  {
+    "path": "docs/SYSTEM3_RECOMMENDATIONS_AND_IMPROVEMENTS.md"
+  },
+  {
+    "path": "docs/SYSTEM3_STARTUP_GUIDE_7AM.md"
+  },
+  {
+    "path": "docs/SYSTEM3_THRESHOLDS_SAFETY_CHECK.md"
+  },
+  {
+    "path": "docs/System3_Phases_231_260_FullPass.md"
+  },
+  {
+    "path": "docs/project_audit/oracle_runner_setup_guide.md"
+  },
+  {
+    "path": "docs/system3_20251203_analysis_report.md"
+  },
+  {
+    "path": "docs/system3_20251203_health_and_safety_report.md"
+  },
+  {
+    "path": "docs/system3_autophase_engine_final_analysis.md"
+  },
+  {
+    "path": "docs/system3_autorun_implementation_summary.md"
+  },
+  {
+    "path": "docs/system3_autorun_setup_guide.md"
+  },
+  {
+    "path": "docs/system3_autorun_test_results.md"
+  },
+  {
+    "path": "docs/system3_live_day_autopilot_README.md"
+  },
+  {
+    "path": "docs/system3_phase_registry_complete_status.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_analysis_and_review.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_angelone_full_auto_plan.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_complete_output_analysis.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_final_status.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_final_test_results - Copy.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_final_test_results.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_implementation_summary.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_test_results.md"
+  },
+  {
+    "path": "docs/system3_phases_101_130_verification_checklist.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_complete_analysis.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_final_status.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_implementation_status.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_ultra_master_angel.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_validation_rerun_analysis.md"
+  },
+  {
+    "path": "docs/system3_phases_131_200_warnings_detailed_analysis.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_analysis.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_complete_summary.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_final_status.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_implementation_status.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_implementation_summary.md"
+  },
+  {
+    "path": "docs/system3_phases_231_260_success_report.md"
+  },
+  {
+    "path": "docs/system3_thresholds_upgrade_implementation_summary.md"
+  },
+  {
+    "path": "docs/ultra_micro/00_PROJECT_OVERVIEW.md"
+  },
+  {
+    "path": "final_system_validation_test.py"
+  },
+  {
+    "path": "generate_phase_1_200_reports.py"
+  },
+  {
+    "path": "paper_trading_smoke_test.py"
+  },
+  {
+    "path": "proof_pre_trading.txt"
+  },
+  {
+    "path": "render.yaml"
+  },
+  {
+    "path": "reports/PHASE_376_SELF_TEST_REPORT.md"
+  },
+  {
+    "path": "reports/PHASE_380_FINAL_SIGN_OFF.md"
+  },
+  {
+    "path": "reports/PRODUCTION_SIGN_OFF_CERTIFICATE.txt"
+  },
+  {
+    "path": "reports/SAFETY_GUARDRAILS_367.md"
+  },
+  {
+    "path": "reports/SYSTEM3_PHASES_1_200_CODE_INTEGRITY_AUDIT.md"
+  },
+  {
+    "path": "reports/latest/full_trading_pipeline_readiness/01_authoritative_runtime.txt"
+  },
+  {
+    "path": "reports/latest/full_trading_pipeline_readiness/07_safety_checks.txt"
+  },
+  {
+    "path": "reports/master_validation_20260210_071913.json"
+  },
+  {
+    "path": "reports/master_validation_20260210_072009.json"
+  },
+  {
+    "path": "runner.py"
+  },
+  {
+    "path": "runtime_reports/AUTORUN_PROOF.md"
+  },
+  {
+    "path": "runtime_reports/SYSTEM3_RUNTIME_HEALTH.md"
+  },
+  {
+    "path": "scripts/pre_trading_validation.py"
+  },
+  {
+    "path": "scripts/system3_full_repo_verification.py"
+  },
+  {
+    "path": "scripts/system3_master_proof_orchestrator.py"
+  },
+  {
+    "path": "system3_autophase_validation.md"
+  },
+  {
+    "path": "system3_autorun_master.py"
+  },
+  {
+    "path": "system3_autorun_master_hardened.py"
+  },
+  {
+    "path": "system3_comprehensive_validation.py"
+  },
+  {
+    "path": "system3_global_health_scan.py"
+  },
+  {
+    "path": "system3_live_day_autopilot.py"
+  },
+  {
+    "path": "system3_magic_folder_report.py"
+  },
+  {
+    "path": "system3_master_inspector.py"
+  },
+  {
+    "path": "system3_monday_premarket_sequence.py"
+  },
+  {
+    "path": "system3_phase_231_260_diagnostics.py"
+  },
+  {
+    "path": "system3_phase_execution_map.md"
+  },
+  {
+    "path": "system3_pre_autorun_validation.py"
+  },
+  {
+    "path": "system3_preflight_check.py"
+  },
+  {
+    "path": "system3_premarket_health_check.py"
+  },
+  {
+    "path": "system3_premarket_validator.py"
+  },
+  {
+    "path": "system3_runtime_reports.py"
+  },
+  {
+    "path": "system3_startup_verification.py"
+  },
+  {
+    "path": "system3_tomorrow_readiness_check.py"
+  },
+  {
+    "path": "system3_ultra_micro_documentation_generator.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_021.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_022.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_023.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_024.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_025.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_026.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_027.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_028.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_029.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_030.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_031.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_032.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_033.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_034.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_035.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_036.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_037.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_038.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_039.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_040.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_041.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_042.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_043.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_046.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_047.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_048.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_049.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_050.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_051.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_052.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_053.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_054.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_055.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_076.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_077.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_078.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_079.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_080.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_081.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_082.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_083.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_084.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_085.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_086.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_087.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_088.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_089.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_090.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_091.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_092.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_093.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_094.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_095.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_096.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_097.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_098.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_099.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_100.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_101.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_102.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_104.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_105.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_106.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_107.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_108.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_109.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_110.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_111.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_112.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_113.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_114.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_115.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_116.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_117.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_118.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_119.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_120.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_121.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_122.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_123.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_124.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_125.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_126.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_127.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_128.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_129.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_130.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_131.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_132.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_133.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_134.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_135.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_136.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_137.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_138.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_139.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_140.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_141.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_142.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_143.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_144.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_145.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_146.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_147.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_148.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_149.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_150.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_151.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_152.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_153.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_154.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_155.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_156.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_157.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_158.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_159.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_160.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_161.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_162.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_163.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_164.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_165.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_166.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_167.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_168.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_169.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_170.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_171.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_172.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_173.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_174.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_175.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_176.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_177.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_178.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_179.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_180.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_181.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_182.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_183.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_184.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_185.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_186.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_187.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_188.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_189.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_190.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_191.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_192.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_193.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_194.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_195.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_196.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_197.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_198.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_199.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_200.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_201.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_202.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_203.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_204.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_205.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_206.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_207.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_208.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_209.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_210.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_211.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_212.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_213.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_214.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_215.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_216.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_217.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_218.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_219.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_220.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_221.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_222.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_223.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_224.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_225.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_226.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_227.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_228.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_229.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_230.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_231.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_261.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_262.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_263.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_264.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_265.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_266.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_267.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_268.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_269.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_270.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_271.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_272.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_273.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_274.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_275.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_276.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_277.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_278.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_279.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_280.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_281.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_282.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_283.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_284.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_285.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_286.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_287.py"
+  },
+  {
+    "path": "tests/auto/system3_generated_tests/test_phase_288.py"
+  }
+]
