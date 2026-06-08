@@ -9,16 +9,29 @@ COMPLETE_VALIDATION_REPORT.md (2)
   COMPLETE_VALIDATION_REPORT.md
   docs/COMPLETE_VALIDATION_REPORT.md
 
-README.md (9)
+README.md (22)
   README.md
   dashboard/README.md
   docs/ultra_micro/README.md
   reports/ci_truth/README.md
+  reports/latest/analyzer_paper_lifecycle_proof/README.md
+  reports/latest/auto_recovery_blockers/README.md
+  reports/latest/dashboard_endpoint_coverage/README.md
+  reports/latest/dashboard_truth_proof/README.md
+  reports/latest/dashboard_ultra_readiness/README.md
+  reports/latest/deployment_and_endpoint_proof/README.md
   reports/latest/entrypoint_classification/README.md
+  reports/latest/external_data_yahoo/README.md
+  reports/latest/fresh_data_automation_proof/README.md
   reports/latest/full_repo_verification/README.md
+  reports/latest/model_training_load_proof/README.md
   reports/latest/production_grade_readiness/README.md
   reports/latest/proof_status_matrix/README.md
+  reports/latest/recent_backtest_walkforward_proof/README.md
   reports/latest/render_endpoint_proof/README.md
+  reports/latest/repo_authority_and_duplicate_control/README.md
+  reports/latest/safety_and_secrets/README.md
+  reports/latest/system3_master_control_plane/README.md
 
 __init__.py (23)
   config/__init__.py
@@ -100,6 +113,17 @@ start_backend.bat (2)
 start_backend.bat.bak_20260225_005921 (2)
   scripts/start_backend.bat.bak_20260225_005921
   start_backend.bat.bak_20260225_005921
+
+summary.json (9)
+  reports/latest/analyzer_paper_lifecycle_proof/summary.json
+  reports/latest/dashboard_truth_proof/summary.json
+  reports/latest/deployment_and_endpoint_proof/summary.json
+  reports/latest/fresh_data_automation_proof/summary.json
+  reports/latest/full_repo_verification/summary.json
+  reports/latest/model_training_load_proof/summary.json
+  reports/latest/recent_backtest_walkforward_proof/summary.json
+  reports/latest/repo_authority_and_duplicate_control/summary.json
+  reports/latest/safety_and_secrets/summary.json
 
 system3_config.json (2)
   config/system3_config.json

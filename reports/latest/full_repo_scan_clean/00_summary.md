@@ -1,5 +1,5 @@
 # Full Repo Scan Clean
-Generated UTC: 2026-06-08T04:47:37+00:00
+Generated UTC: 2026-06-08T08:06:39+00:00
 Repository: psw2025-cmd/Genesis_System3
-Commit: 8db4252e41e1942b1d82a9263fa5e29dc8c85f94
+Commit: 2325188d76c1f55171ca0c3a2a22826908a673b1
 Rule: auto-remove generated junk only; source/delete decisions require runtime proof.
