@@ -1,16 +1,16 @@
 # Full tracked file inventory summary
-Tracked file count: 3615
+Tracked file count: 3693
 
 Top directories:
-  1080 <root>
-   752 reports
+  1081 <root>
+   827 reports
    597 core
    496 docs
    233 tests
    211 scripts
     65 dashboard
     36 tools
-    32 .github
+    34 .github
     32 src
     16 config
     14 AI_AGENT_RUNS
