@@ -1,156 +1,105 @@
 {
-  "generated_utc": "2026-06-07T13:13:15.798551+00:00",
+  "generated_utc": "2026-06-08T04:56:39.418927+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
-  "optional_missing_count": 3,
-  "pending_count": 3,
-  "published_count": 7,
+  "optional_missing_count": 0,
+  "pending_count": 0,
+  "published_count": 8,
   "required_missing_count": 0,
   "rows": [
     {
-      "bytes": 1552,
-      "exists": true,
-      "name": "master_status",
-      "path": "docs/project_control/SYSTEM3_MASTER_STATUS.md",
+      "blockers": [
+        "forbidden_secret_style_files_tracked",
+        "possible_secret_like_content_in_tracked_text"
+      ],
+      "name": "safety_and_secrets",
+      "pass": false,
+      "path": "reports/latest/safety_and_secrets/summary.json",
       "required": true,
-      "status": "PUBLISHED"
+      "status": "FAIL",
+      "warnings": []
     },
     {
-      "bytes": 737,
-      "exists": true,
-      "json_keys": [
-        "backtest_candidate_count",
-        "blockers",
-        "dashboard_candidate_count",
-        "data_history_candidate_count",
-        "model_training_candidate_count",
-        "paper_analyzer_candidate_count",
-        "proven_backtest_recent",
-        "proven_dashboard_full_ui_live",
-        "proven_live_market_paper_trade_today",
-        "proven_model_training_fresh",
-        "render_live_trading_disabled",
-        "runtime_backend_present",
-        "smartapi_dependency_present",
-        "trade_ready",
-        "verdict"
-      ],
-      "name": "full_trading_pipeline_readiness",
-      "path": "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json",
-      "required": true,
-      "status": "PUBLISHED",
-      "trade_ready": false,
-      "verdict": "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR"
-    },
-    {
-      "bytes": 271,
-      "exists": true,
-      "json_keys": [
-        "auto_delete_allowed_for_generated_only",
-        "auto_removable_generated_count",
-        "forbidden_secret_style_count",
-        "old_backup_copy_review_candidate_count",
-        "pass",
-        "source_delete_requires_runtime_proof",
-        "tracked_file_count"
-      ],
-      "name": "repo_cleanliness",
+      "blockers": [],
+      "name": "repo_authority_and_duplicate_control",
       "pass": true,
-      "path": "reports/latest/repo_cleanliness/05_cleanliness_summary.json",
+      "path": "reports/latest/repo_authority_and_duplicate_control/summary.json",
       "required": true,
-      "status": "PUBLISHED"
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "duplicate_basename_candidates_need_runtime_classification"
+      ]
     },
     {
-      "bytes": 298,
-      "exists": true,
-      "json_keys": [
-        "forbidden_secret_style_count",
-        "generated_auto_remove_count_before_cleanup",
-        "large_tracked_file_count_over_5mb",
-        "old_backup_copy_review_candidate_count",
-        "pass_after_cleanup_expected",
-        "source_deletion_policy",
-        "tracked_file_count"
-      ],
-      "name": "full_repo_scan_clean",
-      "path": "reports/latest/full_repo_scan_clean/07_scan_clean_summary.json",
+      "blockers": [],
+      "name": "deployment_and_endpoint_proof",
+      "pass": true,
+      "path": "reports/latest/deployment_and_endpoint_proof/summary.json",
       "required": true,
-      "status": "PUBLISHED"
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "public_backend_url_not_configured_endpoint_live_probe_skipped"
+      ]
     },
     {
-      "bytes": 12260,
-      "exists": true,
-      "json_keys": [
-        "backtest_candidate_count",
-        "generated_utc",
-        "recommendation",
-        "top_backtest_candidates",
-        "top_training_candidates",
-        "training_candidate_count"
-      ],
-      "name": "entrypoint_classification",
-      "path": "reports/latest/entrypoint_classification/entrypoint_classification_summary.json",
+      "blockers": [],
+      "name": "fresh_data_automation_proof",
+      "pass": true,
+      "path": "reports/latest/fresh_data_automation_proof/summary.json",
       "required": true,
-      "status": "PUBLISHED"
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "binance_crypto_data_candidates_not_proven",
+        "external_yahoo_fallback_proof_missing",
+        "angel_broker_secrets_not_available_to_ci_data_live_probe_skipped"
+      ]
     },
     {
-      "bytes": 707,
-      "exists": true,
-      "json_keys": [
-        "backtest_candidate_count",
-        "data_history_candidate_count",
-        "fresh_training_accuracy_metric_proven",
-        "fresh_training_execution_proven",
-        "live_market_prediction_feed_proven",
-        "model_training_candidate_count",
-        "next_required",
-        "recent_backtest_execution_proven",
-        "verdict",
-        "walk_forward_cost_slippage_proven"
-      ],
-      "name": "model_backtest_readiness",
-      "path": "reports/latest/model_backtest_readiness/06_model_backtest_summary.json",
+      "blockers": [],
+      "name": "model_training_load_proof",
+      "pass": true,
+      "path": "reports/latest/model_training_load_proof/summary.json",
       "required": true,
-      "status": "PUBLISHED",
-      "verdict": "INVENTORY_ONLY_NOT_READY_FOR_TRADE_DECISION"
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "fresh_training_accuracy_metrics_not_proven",
+        "model_promotion_remains_blocked_without_policy"
+      ]
     },
     {
-      "bytes": 5195,
-      "exists": true,
-      "json_keys": [
-        "all_core_endpoints_ok",
-        "base_url",
-        "broker_status_endpoint_ok",
-        "generated_utc",
-        "results"
-      ],
-      "name": "render_endpoint_proof",
-      "path": "reports/latest/render_endpoint_proof/endpoint_summary.json",
+      "blockers": [],
+      "name": "recent_backtest_walkforward_proof",
+      "pass": true,
+      "path": "reports/latest/recent_backtest_walkforward_proof/summary.json",
       "required": true,
-      "status": "PUBLISHED"
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "recent_costed_walkforward_result_not_proven"
+      ]
     },
     {
-      "bytes": 0,
-      "exists": false,
-      "name": "dashboard_endpoint_coverage",
-      "path": "reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json",
-      "required": false,
-      "status": "PENDING"
+      "blockers": [],
+      "name": "analyzer_paper_lifecycle_proof",
+      "pass": true,
+      "path": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "full_signal_to_exit_pnl_lifecycle_not_proven"
+      ]
     },
     {
-      "bytes": 0,
-      "exists": false,
-      "name": "external_data_yahoo",
-      "path": "reports/latest/external_data_yahoo/yahoo_data_summary.json",
-      "required": false,
-      "status": "PENDING"
-    },
-    {
-      "bytes": 0,
-      "exists": false,
-      "name": "safe_dryrun_validation_execution",
-      "path": "reports/latest/safe_dryrun_validation_execution/02_execution_summary.json",
-      "required": false,
-      "status": "PENDING"
+      "blockers": [],
+      "name": "dashboard_truth_proof",
+      "pass": true,
+      "path": "reports/latest/dashboard_truth_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "dashboard_endpoint_coverage_report_missing",
+        "browser_screenshot_truth_not_proven_in_ci"
+      ]
     }
-  ]
+  ],
+  "trade_ready": false,
+  "verdict": "TRADE_READY_BLOCKED"
 }

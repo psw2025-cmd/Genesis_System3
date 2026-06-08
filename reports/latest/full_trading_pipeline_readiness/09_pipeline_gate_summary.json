@@ -1,15 +1,14 @@
 {
-  "backtest_candidate_count": 216,
   "blockers": [
     "fresh_training_not_proven",
     "recent_backtest_not_proven",
     "live_market_analyzer_paper_trade_not_proven",
     "full_working_dashboard_not_proven"
   ],
-  "dashboard_candidate_count": 64,
-  "data_history_candidate_count": 170,
-  "model_training_candidate_count": 175,
-  "paper_analyzer_candidate_count": 124,
+  "generated_utc": "2026-06-08T04:56:39.419218+00:00",
+  "logzero_dependency_present": true,
+  "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+  "master_control_plane_verdict": "TRADE_READY_BLOCKED",
   "proven_backtest_recent": false,
   "proven_dashboard_full_ui_live": false,
   "proven_live_market_paper_trade_today": false,

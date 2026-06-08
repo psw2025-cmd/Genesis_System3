@@ -1,0 +1,47 @@
+{
+  "auto_repair_allowed": false,
+  "blockers": [
+    "forbidden_secret_style_files_tracked",
+    "possible_secret_like_content_in_tracked_text"
+  ],
+  "evidence": {
+    "render_safety": {
+      "live_trading_default_zero_or_false": true,
+      "mentions_live_trading_enabled": true,
+      "mentions_public_backend_url": false,
+      "mentions_system3_mode": true,
+      "render_yaml_exists": true
+    },
+    "requirements_contains_logzero": true,
+    "requirements_contains_smartapi_python": true,
+    "secret_content_finding_count": 4,
+    "secret_content_findings": [
+      {
+        "file": "config/.env.example",
+        "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\\s*[:=]\\"
+      },
+      {
+        "file": "core/brokers/angel_one/broker.py",
+        "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\\s*[:=]\\"
+      },
+      {
+        "file": "dashboard/frontend/dist/assets/index-D39Quml5.js",
+        "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\\s*[:=]\\"
+      },
+      {
+        "file": "docs/ANGEL_BROKER_API_AND_TOTP_ANALYSIS.md",
+        "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\\s*[:=]\\"
+      }
+    ],
+    "secret_style_filename_count": 1,
+    "secret_style_filenames": [
+      "config/.env.example"
+    ],
+    "tracked_file_count": 3584
+  },
+  "gate": "safety_and_secrets",
+  "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
+  "pass": false,
+  "status": "FAIL",
+  "warnings": []
+}
