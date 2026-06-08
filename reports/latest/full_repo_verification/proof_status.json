@@ -46,7 +46,7 @@
     "verdict": null
   },
   {
-    "bytes": 3141,
+    "bytes": 3038,
     "exists": true,
     "keys": [
       "generated_utc",
@@ -65,7 +65,7 @@
     "verdict": "TRADE_READY_BLOCKED"
   },
   {
-    "bytes": 80316,
+    "bytes": 106952,
     "exists": true,
     "keys": [
       "blockers",

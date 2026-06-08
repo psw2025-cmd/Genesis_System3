@@ -1,8 +1,5 @@
 [
   {
-    "path": ".github/workflows/cleanup-generated-files.yml"
-  },
-  {
     "path": ".github/workflows/dashboard-endpoint-coverage.yml"
   },
   {
@@ -49,5 +46,8 @@
   },
   {
     "path": ".github/workflows/system3-master-status-publisher.yml"
+  },
+  {
+    "path": ".github/workflows/system3-proof-batch.yml"
   }
 ]

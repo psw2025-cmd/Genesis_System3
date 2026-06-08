@@ -1,5 +1,5 @@
 {
-  "duplicate_basename_group_count": 21,
+  "duplicate_basename_group_count": 57,
   "duplicate_basename_sample": {
     "00_summary.md": [
       "reports/latest/full_repo_scan_clean/00_summary.md",
@@ -7,21 +7,78 @@
       "reports/latest/model_backtest_readiness/00_summary.md",
       "reports/latest/repo_cleanliness/00_summary.md"
     ],
+    "api_smoke_results.json": [
+      "reports/archive/dashboard_browser_api_proof/20260608/api_smoke_results.json",
+      "reports/latest/dashboard_browser_api_proof/api_smoke_results.json"
+    ],
     "app.py": [
       "dashboard/app.py",
       "dashboard/backend/app.py"
+    ],
+    "backtest_ui_proof.md": [
+      "reports/archive/dashboard_browser_api_proof/20260608/backtest_ui_proof.md",
+      "reports/latest/dashboard_browser_api_proof/backtest_ui_proof.md"
+    ],
+    "benchmark_summary.md": [
+      "reports/archive/performance_benchmark/20260608/benchmark_summary.md",
+      "reports/latest/performance_benchmark/benchmark_summary.md"
+    ],
+    "cleanup_summary.json": [
+      "reports/archive/repo_authority/20260608/cleanup_summary.json",
+      "reports/latest/repo_authority/cleanup_summary.json"
+    ],
+    "commands_run.md": [
+      "reports/archive/implementation_batch/20260608/commands_run.md",
+      "reports/latest/implementation_batch/commands_run.md"
     ],
     "complete_validation_report.md": [
       "COMPLETE_VALIDATION_REPORT.md",
       "docs/COMPLETE_VALIDATION_REPORT.md"
     ],
+    "dashboard_browser_api_summary.md": [
+      "reports/archive/dashboard_browser_api_proof/20260608/dashboard_browser_api_summary.md",
+      "reports/latest/dashboard_browser_api_proof/dashboard_browser_api_summary.md"
+    ],
+    "dependency_trace.md": [
+      "reports/archive/repo_authority/20260608/dependency_trace.md",
+      "reports/latest/repo_authority/dependency_trace.md"
+    ],
+    "duplicate_candidates.csv": [
+      "reports/archive/repo_authority/20260608/duplicate_candidates.csv",
+      "reports/latest/repo_authority/duplicate_candidates.csv"
+    ],
     "ensemble_predictor.py": [
       "core/engine/ensemble_predictor.py",
       "src/ml/ensemble_predictor.py"
     ],
+    "evidence_manifest.json": [
+      "reports/archive/implementation_batch/20260608/evidence_manifest.json",
+      "reports/latest/implementation_batch/evidence_manifest.json"
+    ],
+    "file_hashes.csv": [
+      "reports/archive/repo_authority/20260608/file_hashes.csv",
+      "reports/latest/repo_authority/file_hashes.csv"
+    ],
+    "file_inventory.csv": [
+      "reports/archive/repo_authority/20260608/file_inventory.csv",
+      "reports/latest/repo_authority/file_inventory.csv"
+    ],
+    "files_changed.md": [
+      "reports/archive/implementation_batch/20260608/files_changed.md",
+      "reports/latest/implementation_batch/files_changed.md"
+    ],
+    "frontend_build.log": [
+      "reports/archive/dashboard_browser_api_proof/20260608/frontend_build.log",
+      "reports/latest/dashboard_browser_api_proof/frontend_build.log"
+    ],
     "greeks_calculator.py": [
       "core/engine/greeks_engine/greeks_calculator.py",
       "dashboard/backend/greeks_calculator.py"
+    ],
+    "implementation_summary.md": [
+      "docs/IMPLEMENTATION_SUMMARY.md",
+      "reports/archive/implementation_batch/20260608/implementation_summary.md",
+      "reports/latest/implementation_batch/implementation_summary.md"
     ],
     "index.css": [
       "dashboard/frontend/dist/assets/index.css",
@@ -37,6 +94,30 @@
       "config/kill_switch.json",
       "kill_switch.json"
     ],
+    "lifecycle_summary.md": [
+      "reports/archive/lifecycle_reconciliation/20260608/lifecycle_summary.md",
+      "reports/latest/lifecycle_reconciliation/lifecycle_summary.md"
+    ],
+    "localhost_reference_scan.txt": [
+      "reports/archive/dashboard_browser_api_proof/20260608/localhost_reference_scan.txt",
+      "reports/latest/dashboard_browser_api_proof/localhost_reference_scan.txt"
+    ],
+    "mismatch_report.md": [
+      "reports/archive/lifecycle_reconciliation/20260608/mismatch_report.md",
+      "reports/latest/lifecycle_reconciliation/mismatch_report.md"
+    ],
+    "missed_opportunities.md": [
+      "reports/archive/performance_benchmark/20260608/missed_opportunities.md",
+      "reports/latest/performance_benchmark/missed_opportunities.md"
+    ],
+    "npm_audit_summary.md": [
+      "reports/archive/dashboard_browser_api_proof/20260608/npm_audit_summary.md",
+      "reports/latest/dashboard_browser_api_proof/npm_audit_summary.md"
+    ],
+    "open_closed_positions.csv": [
+      "reports/archive/lifecycle_reconciliation/20260608/open_closed_positions.csv",
+      "reports/latest/lifecycle_reconciliation/open_closed_positions.csv"
+    ],
     "package-lock.json": [
       "dashboard/frontend/package-lock.json",
       "desktop_app/package-lock.json",
@@ -51,17 +132,63 @@
       "scripts/performance_metrics.py",
       "src/analytics/performance_metrics.py"
     ],
+    "pnl_reconciliation.csv": [
+      "reports/archive/lifecycle_reconciliation/20260608/pnl_reconciliation.csv",
+      "reports/latest/lifecycle_reconciliation/pnl_reconciliation.csv"
+    ],
+    "prediction_vs_actual.csv": [
+      "reports/archive/performance_benchmark/20260608/prediction_vs_actual.csv",
+      "reports/latest/performance_benchmark/prediction_vs_actual.csv"
+    ],
+    "quarantine_plan.md": [
+      "reports/archive/repo_authority/20260608/quarantine_plan.md",
+      "reports/latest/repo_authority/quarantine_plan.md"
+    ],
+    "requirements.txt": [
+      "dashboard/backend/requirements.txt",
+      "requirements.txt"
+    ],
     "run_monitor_10min.bat": [
       "RUN_MONITOR_10MIN.bat",
       "scripts/run_monitor_10min.bat"
+    ],
+    "runtime_authority_map.md": [
+      "reports/archive/repo_authority/20260608/runtime_authority_map.md",
+      "reports/latest/repo_authority/runtime_authority_map.md"
     ],
     "runtime_flags.json": [
       "config/runtime_flags.json",
       "runtime_flags.json"
     ],
+    "screenshot_manifest.json": [
+      "reports/archive/dashboard_browser_api_proof/20260608/screenshot_manifest.json",
+      "reports/latest/dashboard_browser_api_proof/screenshot_manifest.json"
+    ],
+    "search_findings.json": [
+      "reports/archive/implementation_batch/20260608/search_findings.json",
+      "reports/latest/implementation_batch/search_findings.json"
+    ],
+    "search_findings.md": [
+      "reports/archive/implementation_batch/20260608/search_findings.md",
+      "reports/latest/implementation_batch/search_findings.md"
+    ],
     "settings.json": [
       ".cursor/settings.json",
       ".vscode/settings.json"
+    ],
+    "signal_order_trade_join.csv": [
+      "reports/archive/lifecycle_reconciliation/20260608/signal_order_trade_join.csv",
+      "reports/latest/lifecycle_reconciliation/signal_order_trade_join.csv"
+    ],
+    "source_manifest.json": [
+      "reports/archive/lifecycle_reconciliation/20260608/source_manifest.json",
+      "reports/archive/performance_benchmark/20260608/source_manifest.json",
+      "reports/latest/lifecycle_reconciliation/source_manifest.json",
+      "reports/latest/performance_benchmark/source_manifest.json"
+    ],
+    "stale_backup_candidates.csv": [
+      "reports/archive/repo_authority/20260608/stale_backup_candidates.csv",
+      "reports/latest/repo_authority/stale_backup_candidates.csv"
     ],
     "start_backend.bat": [
       "scripts/start_backend.bat",
@@ -74,6 +201,29 @@
     "start_full_system_with_dashboard.ps1": [
       "START_FULL_SYSTEM_WITH_DASHBOARD.ps1",
       "scripts/start_full_system_with_dashboard.ps1"
+    ],
+    "status.json": [
+      "reports/archive/dashboard_browser_api_proof/20260608/status.json",
+      "reports/archive/lifecycle_reconciliation/20260608/status.json",
+      "reports/archive/performance_benchmark/20260608/status.json",
+      "reports/latest/dashboard_browser_api_proof/status.json",
+      "reports/latest/lifecycle_reconciliation/status.json",
+      "reports/latest/performance_benchmark/status.json"
+    ],
+    "status_matrix.json": [
+      "reports/archive/implementation_batch/20260608/status_matrix.json",
+      "reports/latest/implementation_batch/status_matrix.json"
+    ],
+    "summary.json": [
+      "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+      "reports/latest/dashboard_truth_proof/summary.json",
+      "reports/latest/deployment_and_endpoint_proof/summary.json",
+      "reports/latest/fresh_data_automation_proof/summary.json",
+      "reports/latest/full_repo_verification/summary.json",
+      "reports/latest/model_training_load_proof/summary.json",
+      "reports/latest/recent_backtest_walkforward_proof/summary.json",
+      "reports/latest/repo_authority_and_duplicate_control/summary.json",
+      "reports/latest/safety_and_secrets/summary.json"
     ],
     "system3_config.json": [
       "config/system3_config.json",
@@ -90,6 +240,14 @@
     "test_phases_261_300.py": [
       "test_phases_261_300.py",
       "tests/auto/system3_generated_tests/test_phases_261_300.py"
+    ],
+    "top_mover_match.csv": [
+      "reports/archive/performance_benchmark/20260608/top_mover_match.csv",
+      "reports/latest/performance_benchmark/top_mover_match.csv"
+    ],
+    "unresolved_blockers.md": [
+      "reports/archive/implementation_batch/20260608/unresolved_blockers.md",
+      "reports/latest/implementation_batch/unresolved_blockers.md"
     ]
   },
   "large_tracked_files_over_5mb": [],
@@ -102,39 +260,40 @@
     ".cjs": 1,
     ".cmd": 1,
     ".css": 4,
-    ".csv": 6,
+    ".csv": 25,
     ".db": 1,
     ".example": 1,
     ".html": 5,
     ".in": 2,
     ".js": 12,
-    ".json": 276,
-    ".md": 1128,
+    ".json": 321,
+    ".log": 5,
+    ".md": 1172,
     ".md\"": 3,
     ".mdc": 1,
     ".pid": 2,
     ".pkl": 26,
     ".ps1": 53,
     ".pth": 5,
-    ".py": 1256,
+    ".py": 1257,
     ".sh": 4,
     ".toml": 1,
     ".ts": 4,
     ".tsx": 20,
-    ".txt": 93,
+    ".txt": 525,
     ".txt\"": 1,
     ".vbs": 1,
     ".xlsx": 1,
     ".yaml": 2,
-    ".yml": 36,
+    ".yml": 37,
     ".zip": 3,
     "[no_ext]": 6
   },
   "top_level_counts": {
     "\"docs": 4,
-    ".": 1080,
+    ".": 1081,
     ".cursor": 3,
-    ".github": 32,
+    ".github": 33,
     ".scripts": 1,
     ".vscode": 2,
     "AI_AGENT_RUNS": 14,
@@ -146,13 +305,13 @@
     "docs": 496,
     "models": 11,
     "proof": 9,
-    "reports": 283,
+    "reports": 827,
     "runtime_reports": 6,
-    "scripts": 210,
+    "scripts": 211,
     "src": 32,
     "state": 5,
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3145
+  "tracked_file_count": 3692
 }

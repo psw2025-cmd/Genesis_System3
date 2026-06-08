@@ -1,8 +1,8 @@
-commit 0695a607a7e76aa398449042ec1829fa4da58a00
+commit c3303c394352eaff666fe55608182fc6415d8ef7
 Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Mon Jun 8 10:14:37 2026 +0530
+Date:   Mon Jun 8 13:42:31 2026 +0530
 
-    ci: fix full repo verification report publish rebase
+    deps: add Python CI requirements
 
- .github/workflows/system3-full-repo-verification.yml | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ requirements.txt | 11 +++++++++++
+ 1 file changed, 11 insertions(+)

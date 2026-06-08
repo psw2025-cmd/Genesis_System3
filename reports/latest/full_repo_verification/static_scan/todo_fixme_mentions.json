@@ -99,6 +99,9 @@
     "path": "reports/authority_inventory/root_runtime_authority_inventory.json"
   },
   {
+    "path": "reports/latest/full_repo_verification/commands/git_status_short.stdout.txt"
+  },
+  {
     "path": "reports/readiness_audit/MODEL_DATA_BACKTEST_DASHBOARD_READINESS.md"
   },
   {

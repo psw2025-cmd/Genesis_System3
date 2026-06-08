@@ -432,7 +432,49 @@
     "path": "quick_validation_before_build.py"
   },
   {
+    "path": "reports/archive/dashboard_browser_api_proof/20260608/localhost_reference_scan.txt"
+  },
+  {
+    "path": "reports/archive/dashboard_browser_api_proof/20260608/status.json"
+  },
+  {
+    "path": "reports/archive/implementation_batch/20260608/evidence_manifest.json"
+  },
+  {
+    "path": "reports/archive/implementation_batch/20260608/status_matrix.json"
+  },
+  {
+    "path": "reports/latest/dashboard_browser_api_proof/localhost_reference_scan.txt"
+  },
+  {
+    "path": "reports/latest/dashboard_browser_api_proof/status.json"
+  },
+  {
+    "path": "reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json"
+  },
+  {
+    "path": "reports/latest/dashboard_ultra_readiness/README.md"
+  },
+  {
+    "path": "reports/latest/dashboard_ultra_readiness/dashboard_ultra_readiness_summary.json"
+  },
+  {
+    "path": "reports/latest/full_repo_verification/commands/git_status_short.stdout.txt"
+  },
+  {
+    "path": "reports/latest/implementation_batch/evidence_manifest.json"
+  },
+  {
+    "path": "reports/latest/implementation_batch/status_matrix.json"
+  },
+  {
     "path": "reports/latest/render_endpoint_proof/endpoint_summary.json"
+  },
+  {
+    "path": "reports/latest/repo_authority_and_duplicate_control/summary.json"
+  },
+  {
+    "path": "reports/latest/system3_master_control_plane/system3_master_control_plane.json"
   },
   {
     "path": "restart_backend.ps1"
@@ -583,6 +625,9 @@
   },
   {
     "path": "scripts/system3_full_repo_verification.py"
+  },
+  {
+    "path": "scripts/system3_issue_24_26_27_28_proof_batch.py"
   },
   {
     "path": "scripts/system3_master_proof_orchestrator.py"

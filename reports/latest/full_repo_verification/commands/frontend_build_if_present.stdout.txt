@@ -10,4 +10,4 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                [39m[1m[2m  0.46 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex.css          [39m[1m[2m 14.78 kB[22m[1m[22m[2m │ gzip:   3.40 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-D39Quml5.js  [39m[1m[33m705.47 kB[39m[22m[2m │ gzip: 197.37 kB[22m
-[32m✓ built in 3.79s[39m
+[32m✓ built in 4.00s[39m

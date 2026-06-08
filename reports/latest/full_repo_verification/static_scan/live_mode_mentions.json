@@ -765,10 +765,25 @@
     "path": "reports/SYSTEM3_PHASES_1_200_CODE_INTEGRITY_AUDIT.md"
   },
   {
+    "path": "reports/latest/external_data_yahoo/yahoo_data_summary.json"
+  },
+  {
+    "path": "reports/latest/fresh_data_automation_proof/summary.json"
+  },
+  {
+    "path": "reports/latest/full_repo_verification/commands/master_orchestrator_dry_run.stdout.txt"
+  },
+  {
     "path": "reports/latest/full_trading_pipeline_readiness/01_authoritative_runtime.txt"
   },
   {
     "path": "reports/latest/full_trading_pipeline_readiness/07_safety_checks.txt"
+  },
+  {
+    "path": "reports/latest/safety_and_secrets/summary.json"
+  },
+  {
+    "path": "reports/latest/system3_master_control_plane/system3_master_control_plane.json"
   },
   {
     "path": "reports/master_validation_20260210_071913.json"
@@ -1483,20 +1498,5 @@
   },
   {
     "path": "tests/auto/system3_generated_tests/test_phase_283.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_284.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_285.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_286.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_287.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_288.py"
   }
 ]
