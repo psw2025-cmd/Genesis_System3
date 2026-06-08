@@ -1,0 +1,50 @@
+{
+  "backend_file_count": 23,
+  "blockers": [
+    "localhost_references_absent_in_frontend",
+    "ui_feature_reference_missing:backtest"
+  ],
+  "endpoint_coverage_core_ok": true,
+  "endpoint_coverage_summary_present": true,
+  "feature_checks": {
+    "api_client_library_present": true,
+    "backend_fastapi_present": true,
+    "backend_requirements_present": true,
+    "charting_library_present": true,
+    "core_endpoint_coverage_ok": true,
+    "endpoint_coverage_published": true,
+    "frontend_build_script_present": true,
+    "frontend_package_present": true,
+    "frontend_source_present": true,
+    "localhost_references_absent_in_frontend": false,
+    "react_present": true,
+    "render_backend_reference_or_relative_api_present": true,
+    "render_config_present": true,
+    "vite_present": true
+  },
+  "frontend_file_count": 35,
+  "full_ultra_dashboard_ready_proven": false,
+  "generated_utc": "2026-06-08T05:20:41.639359+00:00",
+  "note": "This is static/readiness proof. A real browser screenshot/UI smoke test is still required for visual proof.",
+  "package_name": "system3-ultra-dashboard",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "ui_feature_presence": {
+    "alerts": true,
+    "backtest": false,
+    "broker_status": true,
+    "logs": true,
+    "ml_performance": true,
+    "orders_readonly": true,
+    "pnl": true,
+    "positions_paper": true,
+    "risk": true,
+    "signals": true,
+    "state_health": true,
+    "trades": true
+  },
+  "verdict": "NOT_FULLY_PROVEN"
+}
