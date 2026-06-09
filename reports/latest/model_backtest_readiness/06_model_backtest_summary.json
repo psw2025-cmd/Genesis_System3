@@ -1,10 +1,10 @@
 {
-  "backtest_candidate_count": 226,
-  "data_history_candidate_count": 344,
+  "backtest_candidate_count": 264,
+  "data_history_candidate_count": 589,
   "fresh_training_accuracy_metric_proven": false,
   "fresh_training_execution_proven": false,
   "live_market_prediction_feed_proven": false,
-  "model_training_candidate_count": 187,
+  "model_training_candidate_count": 229,
   "next_required": [
     "identify authoritative training entrypoint",
     "run no-broker training/load proof with metrics",

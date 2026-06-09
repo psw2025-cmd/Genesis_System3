@@ -1,4 +1,17 @@
 # Requirement/dependency hints
+## requirements.txt
+# pandas: dataframe, CSV, backtest, and analysis support
+pandas==2.2.3
+
+# numpy: numerical arrays and vectorized calculations for indicators/backtests
+numpy==1.26.4
+
+# python-dotenv: local .env loading while keeping GitHub Actions secrets separate
+python-dotenv==1.0.1
+
+# requests: HTTP API calls for OpenAlgo / broker gateway integrations
+requests==2.32.3
+
 ## dashboard/backend/requirements.txt
 fastapi>=0.104.1
 uvicorn[standard]>=0.24.0

@@ -1,5 +1,5 @@
 # Model Backtest Readiness Proof
-Generated UTC: 2026-06-08T04:31:12+00:00
+Generated UTC: 2026-06-09T04:25:23+00:00
 Repository: psw2025-cmd/Genesis_System3
-Commit: 49a056138e930053a849963314a90049c3465ee5
+Commit: abfe295c1060534565aed65b3835639e64cdbdaf
 Mode: proof-only; no broker login; no orders; no live trading
