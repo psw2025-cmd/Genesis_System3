@@ -84,14 +84,14 @@
   },
   "core_ok": true,
   "fail_count": 0,
-  "generated_utc": "2026-06-08T05:00:11.850717+00:00",
+  "generated_utc": "2026-06-09T04:49:00.608845+00:00",
   "note": "This workflow probes GET/read-only endpoints only. POST endpoints that can mutate state are not executed.",
   "ok_count": 39,
   "results": [
     {
       "body_preview": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"https://genesis-system3-backend.onrender.com\",\"dashboard_url\":\"https://genesis-system3-backend.onrender.com\",\"api_docs\":\"https://genesis-system3-backend.onrender.com/docs\",\"health\":\"https://genesis-system3-backend.onrender.com/api/health\",\"state\":\"https://genesis-system3-backend.onrender.com/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\"}}",
       "category": "core",
-      "elapsed_ms": 21276,
+      "elapsed_ms": 21440,
       "ok": true,
       "path": "/",
       "status_code": 200,
@@ -100,7 +100,7 @@
     {
       "body_preview": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Ultra Dashboard API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\noauth2RedirectUrl: window.location.origin + '/docs/oauth2-redirect',\n    presets: [\n        SwaggerUIBundle.presets.apis,\n        SwaggerUIBundle.SwaggerUIStandalonePreset\n        ],\n    })\n    </script>\n    </body>\n    </html>\n    ",
       "category": "core",
-      "elapsed_ms": 156,
+      "elapsed_ms": 398,
       "ok": true,
       "path": "/docs",
       "status_code": 200,
@@ -109,7 +109,7 @@
     {
       "body_preview": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"System3 Ultra Dashboard API\",\"version\":\"0.1.0\"},\"paths\":{\"/\":{\"get\":{\"summary\":\"Root\",\"operationId\":\"root__get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}}}}},\"/api/state\":{\"get\":{\"summary\":\"Get State\",\"description\":\"Get unified runtime state (SSOT).\\nAll pages should read from this endpoint for consistency.\\nPRODUCTION: Never expose mode=LIVE when broker disconnected or data synthetic.\",\"operationId\":\"get_state_api_state_get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}}}}},\"/api/state/history\":{\"get\":{\"summary\":\"Get State History\",\"description\":\"Get SSOT state history (time series).\\nUseful for tracking state changes over time.\",\"operationId\":\"get_state_history_api_state_history_get\",\"parameters\":[{\"name\":\"limit\",\"in\":\"query\",\"required\":false,\"schema\":{\"type\":\"integer\",\"default\":100,\"title\":\"Limit\"}}],\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}},\"422\":{\"description\":\"Validation Error\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/HTTPValidationError\"}}}",
       "category": "core",
-      "elapsed_ms": 270,
+      "elapsed_ms": 273,
       "ok": true,
       "path": "/openapi.json",
       "status_code": 200,
@@ -118,25 +118,25 @@
     {
       "body_preview": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
       "category": "core",
-      "elapsed_ms": 160,
+      "elapsed_ms": 239,
       "ok": true,
       "path": "/api/health",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/health"
     },
     {
-      "body_preview": "{\"state_version\":2,\"timestamp_utc\":\"2026-06-08T04:59:52.785768Z\",\"timestamp_ist\":\"2026-06-08T10:29:52.785768+05:30\",\"mode\":\"PAPER\",\"data_source\":\"not_ready\",\"market\":{\"is_open\":false,\"reason\":\"Market closed\",\"next_open\":null,\"current_time_ist\":\"2026-06-08T10:29:52.784165+05:30\"},\"broker\":{\"connected\":false,\"name\":\"AngelOne\",\"status\":\"disconnected\",\"error\":null,\"latency_ms\":null,\"last_ok\":null},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,\"es95\":0.0,\"exposure\":0.0,\"concentration\":0.0,\"greeks\":{\"delta\":0.0,\"gamma\":0.0,\"theta\":0.0,\"vega\":0.0},\"limits\":{\"status\":\"PASS\",\"breaches\":[]}},\"model\":{\"active\":null,\"type\":null,\"fallback_used\":false,\"metrics\":{}},\"alerts\":[{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-08T10:29:59.097517+05:30\",\"read\":false},{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-08T10:29:54.096111+05:30\",\"read\":false}],\"cy",
+      "body_preview": "{\"state_version\":2,\"timestamp_utc\":\"2026-06-09T04:48:39.026024Z\",\"timestamp_ist\":\"2026-06-09T10:18:39.026025+05:30\",\"mode\":\"PAPER\",\"data_source\":\"not_ready\",\"market\":{\"is_open\":false,\"reason\":\"Market closed\",\"next_open\":null,\"current_time_ist\":\"2026-06-09T10:18:39.024338+05:30\"},\"broker\":{\"connected\":false,\"name\":\"AngelOne\",\"status\":\"disconnected\",\"error\":null,\"latency_ms\":null,\"last_ok\":null},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,\"es95\":0.0,\"exposure\":0.0,\"concentration\":0.0,\"greeks\":{\"delta\":0.0,\"gamma\":0.0,\"theta\":0.0,\"vega\":0.0},\"limits\":{\"status\":\"PASS\",\"breaches\":[]}},\"model\":{\"active\":null,\"type\":null,\"fallback_used\":false,\"metrics\":{}},\"alerts\":[{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-09T10:18:45.262993+05:30\",\"read\":false},{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-09T10:18:40.260731+05:30\",\"read\":false}],\"cy",
       "category": "core",
-      "elapsed_ms": 174,
+      "elapsed_ms": 239,
       "ok": true,
       "path": "/api/state",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/state"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"timestamp\":\"2026-06-08T10:30:00.780619+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"unknown\",\"market_status\":\"unknown\",\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
+      "body_preview": "{\"status\":\"ok\",\"timestamp\":\"2026-06-09T10:18:47.565840+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"unknown\",\"market_status\":\"unknown\",\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
       "category": "core",
-      "elapsed_ms": 171,
+      "elapsed_ms": 367,
       "ok": true,
       "path": "/api/status",
       "status_code": 200,
@@ -145,7 +145,7 @@
     {
       "body_preview": "{\"connected\":false,\"name\":\"AngelOne\",\"status\":\"not_available\",\"error\":\"Broker module import failed: No module named 'websocket'\",\"error_type\":\"MODULE_NOT_AVAILABLE\",\"latency_ms\":null,\"last_ok\":null}",
       "category": "broker",
-      "elapsed_ms": 193,
+      "elapsed_ms": 237,
       "ok": true,
       "path": "/api/broker/status",
       "status_code": 200,
@@ -154,7 +154,7 @@
     {
       "body_preview": "{\"smartapi_installed\":false,\"smartapi_version\":null,\"python_path\":\"/usr/local/bin/python\",\"pip_freeze_hit\":true,\"broker_module_available\":false}",
       "category": "broker",
-      "elapsed_ms": 4597,
+      "elapsed_ms": 4510,
       "ok": true,
       "path": "/api/broker/deps",
       "status_code": 200,
@@ -163,7 +163,7 @@
     {
       "body_preview": "{\"underlyings\":[\"NIFTY\",\"BANKNIFTY\",\"FINNIFTY\"]}",
       "category": "data",
-      "elapsed_ms": 152,
+      "elapsed_ms": 213,
       "ok": true,
       "path": "/api/underlyings",
       "status_code": 200,
@@ -172,7 +172,7 @@
     {
       "body_preview": "{\"action\":\"NO_TRADE\",\"reason\":\"BROKER_NOT_READY - Real signal data unavailable\",\"data_source\":\"live\",\"confidence\":0}",
       "category": "signals",
-      "elapsed_ms": 158,
+      "elapsed_ms": 242,
       "ok": true,
       "path": "/api/signal/top",
       "status_code": 200,
@@ -181,7 +181,7 @@
     {
       "body_preview": "{\"action\":\"NO_TRADE\",\"reason\":\"BROKER_NOT_READY - Real signal data unavailable\",\"data_source\":\"live\",\"confidence\":0}",
       "category": "signals",
-      "elapsed_ms": 192,
+      "elapsed_ms": 217,
       "ok": true,
       "path": "/api/signals",
       "status_code": 200,
@@ -190,7 +190,7 @@
     {
       "body_preview": "{\"signals\":[],\"count\":0,\"message\":\"Signal CSV not found\",\"data_source\":\"real\"}",
       "category": "signals",
-      "elapsed_ms": 155,
+      "elapsed_ms": 207,
       "ok": true,
       "path": "/api/signals/enhanced",
       "status_code": 200,
@@ -199,7 +199,7 @@
     {
       "body_preview": "{\"positions\":[],\"open_count\":0,\"message\":\"Positions file not found\"}",
       "category": "paper",
-      "elapsed_ms": 148,
+      "elapsed_ms": 200,
       "ok": true,
       "path": "/api/positions",
       "status_code": 200,
@@ -208,7 +208,7 @@
     {
       "body_preview": "{\"history\":[],\"summary\":{\"total_trades\":0,\"winning_trades\":0,\"losing_trades\":0,\"win_rate\":0.0,\"total_realized_pnl\":0.0,\"total_unrealized_pnl\":0.0,\"total_pnl\":0.0,\"open_positions\":0}}",
       "category": "paper",
-      "elapsed_ms": 152,
+      "elapsed_ms": 365,
       "ok": true,
       "path": "/api/pnl",
       "status_code": 200,
@@ -217,7 +217,7 @@
     {
       "body_preview": "{\"positions\":{\"positions\":[],\"open_count\":0,\"message\":\"Positions file not found\"},\"pnl\":{\"history\":[],\"summary\":{\"total_trades\":0,\"winning_trades\":0,\"losing_trades\":0,\"win_rate\":0.0,\"total_realized_pnl\":0.0,\"total_unrealized_pnl\":0.0,\"total_pnl\":0.0,\"open_positions\":0}}}",
       "category": "paper",
-      "elapsed_ms": 148,
+      "elapsed_ms": 210,
       "ok": true,
       "path": "/api/paper",
       "status_code": 200,
@@ -226,7 +226,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"orders\":[],\"count\":0}",
       "category": "paper",
-      "elapsed_ms": 208,
+      "elapsed_ms": 215,
       "ok": true,
       "path": "/api/orders",
       "status_code": 200,
@@ -235,16 +235,16 @@
     {
       "body_preview": "{\"status\":\"ok\",\"history\":[],\"count\":0}",
       "category": "paper",
-      "elapsed_ms": 160,
+      "elapsed_ms": 208,
       "ok": true,
       "path": "/api/orders/history",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/orders/history"
     },
     {
-      "body_preview": "{\"date\":\"2026-06-08\",\"market_hours\":\"09:15 - 15:30 IST\",\"total_trades\":0,\"entries\":[],\"exits\":[],\"count\":0}",
+      "body_preview": "{\"date\":\"2026-06-09\",\"market_hours\":\"09:15 - 15:30 IST\",\"total_trades\":0,\"entries\":[],\"exits\":[],\"count\":0}",
       "category": "paper",
-      "elapsed_ms": 157,
+      "elapsed_ms": 212,
       "ok": true,
       "path": "/api/trades/today",
       "status_code": 200,
@@ -253,7 +253,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"risk_metrics\":{\"total_exposure\":0.0,\"total_pnl\":0.0,\"var\":0.0,\"expected_shortfall\":0.0,\"max_drawdown\":0.0,\"concentration_risk\":0.0}}",
       "category": "risk",
-      "elapsed_ms": 148,
+      "elapsed_ms": 220,
       "ok": true,
       "path": "/api/risk",
       "status_code": 200,
@@ -262,7 +262,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"risk_metrics\":{\"total_exposure\":0.0,\"total_pnl\":0.0,\"var\":0.0,\"expected_shortfall\":0.0,\"max_drawdown\":0.0,\"concentration_risk\":0.0}}",
       "category": "risk",
-      "elapsed_ms": 150,
+      "elapsed_ms": 237,
       "ok": true,
       "path": "/api/risk/portfolio",
       "status_code": 200,
@@ -271,7 +271,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"performance\":{\"status\":\"ok\",\"models\":{}}}",
       "category": "ml",
-      "elapsed_ms": 146,
+      "elapsed_ms": 240,
       "ok": true,
       "path": "/api/ml/performance",
       "status_code": 200,
@@ -280,16 +280,16 @@
     {
       "body_preview": "{\"status\":\"ok\",\"comparison\":{\"status\":\"ERROR\",\"message\":\"No models found\"}}",
       "category": "ml",
-      "elapsed_ms": 150,
+      "elapsed_ms": 230,
       "ok": true,
       "path": "/api/ml/compare",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/ml/compare"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"data\":{\"active_models\":{},\"fallback_used\":false,\"metrics\":{},\"timestamp\":\"2026-06-08T10:30:07.952042+05:30\"}}",
+      "body_preview": "{\"status\":\"ok\",\"data\":{\"active_models\":{},\"fallback_used\":false,\"metrics\":{},\"timestamp\":\"2026-06-09T10:18:55.754720+05:30\"}}",
       "category": "ml",
-      "elapsed_ms": 149,
+      "elapsed_ms": 216,
       "ok": true,
       "path": "/api/model/behavior",
       "status_code": 200,
@@ -298,16 +298,16 @@
     {
       "body_preview": "{\"status\":\"NO_DATA\",\"message\":\"No open positions\"}",
       "category": "prediction",
-      "elapsed_ms": 155,
+      "elapsed_ms": 236,
       "ok": true,
       "path": "/api/predict/portfolio",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/predict/portfolio"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"current_performance\":{\"total_pnl\":0.0,\"total_trades\":0,\"win_rate\":0.0,\"open_positions\":0},\"predicted_performance\":{\"projected_pnl\":0.0,\"projected_win_rate\":0.0,\"confidence\":0.5},\"portfolio_prediction\":{\"portfolio_prediction\":{\"total_exposure\":0,\"predicted_pnl\":0.0,\"pnl_percentage\":0,\"average_confidence\":0.0,\"position_count\":0},\"position_predictions\":[],\"timestamp\":\"2026-06-08T10:30:08.256677+05:30\"},\"timestamp\":\"2026-06-08T10:30:08.256713+05:30\"}",
+      "body_preview": "{\"status\":\"ok\",\"current_performance\":{\"total_pnl\":0.0,\"total_trades\":0,\"win_rate\":0.0,\"open_positions\":0},\"predicted_performance\":{\"projected_pnl\":0.0,\"projected_win_rate\":0.0,\"confidence\":0.5},\"portfolio_prediction\":{\"portfolio_prediction\":{\"total_exposure\":0,\"predicted_pnl\":0.0,\"pnl_percentage\":0,\"average_confidence\":0.0,\"position_count\":0},\"position_predictions\":[],\"timestamp\":\"2026-06-09T10:18:56.213736+05:30\"},\"timestamp\":\"2026-06-09T10:18:56.213782+05:30\"}",
       "category": "prediction",
-      "elapsed_ms": 149,
+      "elapsed_ms": 224,
       "ok": true,
       "path": "/api/predict/performance",
       "status_code": 200,
@@ -316,43 +316,43 @@
     {
       "body_preview": "{\"status\":\"NO_DATA\",\"message\":\"No validation reports found\"}",
       "category": "validation",
-      "elapsed_ms": 145,
+      "elapsed_ms": 215,
       "ok": true,
       "path": "/api/validate/status",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/validate/status"
     },
     {
-      "body_preview": "{\"status\":\"not_run\",\"message\":\"Run production_grade_validation.py to generate report\",\"results\":{\"tests_passed\":0,\"total_tests\":0,\"success_rate\":0.0},\"updated_at\":\"2026-06-08T10:30:08.600400+05:30\"}",
+      "body_preview": "{\"status\":\"not_run\",\"message\":\"Run production_grade_validation.py to generate report\",\"results\":{\"tests_passed\":0,\"total_tests\":0,\"success_rate\":0.0},\"updated_at\":\"2026-06-09T10:18:56.658191+05:30\"}",
       "category": "validation",
-      "elapsed_ms": 198,
+      "elapsed_ms": 223,
       "ok": true,
       "path": "/api/validation/status",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/validation/status"
     },
     {
-      "body_preview": "{\"status\":\"inactive\",\"message\":\"Learning system not started yet\",\"last_update\":null,\"total_cycles\":0,\"latest_insights\":{},\"updated_at\":\"2026-06-08T10:30:08.746608+05:30\"}",
+      "body_preview": "{\"status\":\"inactive\",\"message\":\"Learning system not started yet\",\"last_update\":null,\"total_cycles\":0,\"latest_insights\":{},\"updated_at\":\"2026-06-09T10:18:56.881856+05:30\"}",
       "category": "learning",
-      "elapsed_ms": 145,
+      "elapsed_ms": 227,
       "ok": true,
       "path": "/api/learning/status",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/learning/status"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"message\":\"Learning insights not available yet\",\"win_rate\":0.0,\"total_trades\":0,\"profitable_trades\":0,\"best_strategy\":null,\"best_underlying\":null,\"updated_at\":\"2026-06-08T10:30:08.912116+05:30\"}",
+      "body_preview": "{\"status\":\"ok\",\"message\":\"Learning insights not available yet\",\"win_rate\":0.0,\"total_trades\":0,\"profitable_trades\":0,\"best_strategy\":null,\"best_underlying\":null,\"updated_at\":\"2026-06-09T10:18:57.101609+05:30\"}",
       "category": "learning",
-      "elapsed_ms": 166,
+      "elapsed_ms": 216,
       "ok": true,
       "path": "/api/learning/insights",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/learning/insights"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"available\":true,\"paused\":false,\"has_memory\":false,\"has_plan\":false,\"timestamp\":\"2026-06-08T10:30:09.082229+05:30\"}",
+      "body_preview": "{\"status\":\"ok\",\"available\":true,\"paused\":false,\"has_memory\":false,\"has_plan\":false,\"timestamp\":\"2026-06-09T10:18:57.322324+05:30\"}",
       "category": "agent",
-      "elapsed_ms": 171,
+      "elapsed_ms": 229,
       "ok": true,
       "path": "/api/agent/status",
       "status_code": 200,
@@ -361,7 +361,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"tasks\":[],\"run_id\":\"NONE\"}",
       "category": "agent",
-      "elapsed_ms": 197,
+      "elapsed_ms": 417,
       "ok": true,
       "path": "/api/agent/memory",
       "status_code": 200,
@@ -370,7 +370,7 @@
     {
       "body_preview": "{\"status\":\"ok\",\"issues\":[]}",
       "category": "agent",
-      "elapsed_ms": 148,
+      "elapsed_ms": 212,
       "ok": true,
       "path": "/api/agent/issues",
       "status_code": 200,
@@ -379,7 +379,7 @@
     {
       "body_preview": "{\"status\":\"none\",\"message\":\"No pending upgrade plan\"}",
       "category": "agent",
-      "elapsed_ms": 151,
+      "elapsed_ms": 211,
       "ok": true,
       "path": "/api/agent/upgrade-plan",
       "status_code": 200,
@@ -388,34 +388,34 @@
     {
       "body_preview": "{\"status\":\"ok\",\"message\":\"Runner endpoints are working\"}",
       "category": "runner",
-      "elapsed_ms": 156,
+      "elapsed_ms": 206,
       "ok": true,
       "path": "/api/runner/test",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/runner/test"
     },
     {
-      "body_preview": "{\"runner\":\"STOPPED\",\"pid\":null,\"mode\":\"FULLY_AUTONOMOUS\",\"uptime_seconds\":28155,\"heartbeat_age_seconds\":56362,\"autopilot_running\":false,\"market_status\":\"POST_MARKET\",\"cycle_count\":394,\"health_score\":87.5}",
+      "body_preview": "{\"runner\":\"STOPPED\",\"pid\":null,\"mode\":\"FULLY_AUTONOMOUS\",\"uptime_seconds\":28155,\"heartbeat_age_seconds\":142090,\"autopilot_running\":false,\"market_status\":\"POST_MARKET\",\"cycle_count\":394,\"health_score\":87.5}",
       "category": "runner",
-      "elapsed_ms": 1442,
+      "elapsed_ms": 1342,
       "ok": true,
       "path": "/api/runner/status",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/runner/status"
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"message\":\"Forensic report not available yet\",\"timestamp\":\"2026-06-08T10:30:11.333801+05:30\",\"signal_accuracy\":{\"accuracy\":0.0,\"total_trades\":0},\"data_integrity\":{\"issues\":[]},\"performance_metrics\":{\"total_trades\":0,\"win_rate\":0.0,\"total_pnl\":0.0},\"updated_at\":\"2026-06-08T10:30:11.333831+05:30\"}",
+      "body_preview": "{\"status\":\"ok\",\"message\":\"Forensic report not available yet\",\"timestamp\":\"2026-06-09T10:18:59.930565+05:30\",\"signal_accuracy\":{\"accuracy\":0.0,\"total_trades\":0},\"data_integrity\":{\"issues\":[]},\"performance_metrics\":{\"total_trades\":0,\"win_rate\":0.0,\"total_pnl\":0.0},\"updated_at\":\"2026-06-09T10:18:59.930596+05:30\"}",
       "category": "forensic",
-      "elapsed_ms": 152,
+      "elapsed_ms": 207,
       "ok": true,
       "path": "/api/forensic/report",
       "status_code": 200,
       "url": "https://genesis-system3-backend.onrender.com/api/forensic/report"
     },
     {
-      "body_preview": "PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000\u0005(\ufffd\\3\ufffd0\u0004\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u0012\u0000\u0000\u0000ssot_snapshot.json\ufffdV\ufffdn\ufffd0\f}\ufffdW\u0018~]\u0017\ufffdN\ufffd\ufffd[\ufffdf@\ufffd\ufffd)\ufffdl\u0003V\f\ufffd*3\ufffd\u0010Y\ufffd$9hV\ufffd\ufffd'\ufffd&\ufffd\ufffd\ufffd\u0015\b\u0002\ufffd\ufffd4\u000fI\ufffd\ufffdO\ufffd<\u03d7\n)H\u000f $\ufffd\u031fz\u0445A\u0015\ufffdA[\ufffd}Z(\ufffdQ?\n\ufffd\ufffd@\ufffd\ufffd\ufffd`0\ufffd'\ufffd8\ufffd\ufffd\ufffdh8\ufffd\ufffdw\"\ufffdT\ufffd\ufffd0\ufffdFN\ufffd\ufffd \ufffd\ufffd\ufffd*,\ufffd\u0019\u0018\ufffd\ufffd\ufffd|UA\u0019R(\ufffd\ufffd\u0010\ufffd\ufffd0\ufffdR\u0001(;\ufffd\u0001H\ufffd\ufffd$x\ufffdO\ufffd\ufffd\u0214\ufffd\ufffd0\ufffd *\ufffdBu\ufffd,\ufffd\ufffd\ufffd\u001e\ufffd\\B\ufffd\ufffdf\u0006\ufffd\ufffd\tc\u0005\ufffd5\ufffd\u000b!\ufffd\ufffd\ufffd\ufffd\ufffdz\u0019\ufffdp\u0018\ufffde\ufffd\ufffd\ufffd\u067d\ufffd;\u0010\ufffd\u0019\ufffd\u0001V:\ufffd)7\ufffd\ufffd\u0019\ufffd\u0002]2hH\ufffdI\u0014\ufffdX2\"mpm\u0005!\ufffd8\ufffdK\ufffd\ufffd\u0018>\ufffd\ufffd\ufffd\ufffdRW\ufffd\ufffd\ufffd\ufffd\ufffd/l\ufffd\ufffd\\7\ufffd\ufffd[\ufffd\ufffdk\u0006\ufffd\ufffdy\ufffd\u0016\ufffd\u0004\ufffdJ\ufffd\ufffd+D\ufffd)\ufffd-\u0005\ufffd@\ufffd#a[\ufffd\u001bDh!\ufffdzG\ufffdZ\ufffd-\ufffd\u001dx)\u007f\ufffdL\u05eb\ufffd\ufffd\ufffd?{mg6\ufffdmH\ufffd\ufffd\u0005'\ufffd\u001ds\u00bd*\ufffd\ufffd\u0005\u0006\u00029\ufffd+\ufffdQ\u0019\ufffd-\ufffdsI\u0014qK\ufffd\ufffd\ufffdZ\ufffd\u0005\ufffd\u0019(\ufffd]\ufffd0\ufffd9i\ufffd\ufffd\ufffd?-\ufffd\ufffdc\ufffdmVA\ufffd\ufffd\ufffd8 1\ufffdO\ufffd@v\ufffdGMTw\ufffd\u0004\ufffd\r\ufffd`\ufffd\ufffd\ufffd\u0175\ufffd\ufffd\u0000\ufffd\ufffdf\u001b&@\u0015r}\ufffd\u0017\ufffd\ufffd.\ufffd\u001e\ufffd\ufffd\ufffd\u0000[\ufffd\u0016P\ufffd`\ufffdJr\ufffdN\ufffd\ufffdx\ufffd\u02bd\u0000\ufffd\u001f\ufffd\ufffd\ufffdh[a\ufffd\ufffd\ufffd>h\ufffd\u0000\ufffd\ufffdW\ufffd}\u0007\ufffd\ufffdD\ufffd\u0011\u07a5\ufffd<[\ufffd\u001c\ufffd \ufffd\ufffde\ufffd \n\ufffd\ufffdzW:\ufffd\ufffd)\u001c\ufffd\ufffd\ufffd\ufffd\ufffd*\ufffd\ufffdq\ufffdI\u001fW\ufffd\ufffd\ufffd*\ufffdZ\ufffd^.\ufffdd~\ufffd\ufffd_Y'\ufffdv\u0012m+\ufffdr\ufffdze\ufffd4<-6\u02ba\ufffd\ufffd;B\ufffd\u000f\ufffda\ufffd\u000bG\ufffd\ufffd8r\ufffd\ufffd9^mYn\ufffd\ufffd\u0013\ufffdA\ufffd\u001b\ufffd\ufffd~\ufffd\u007fK\ufffd\ufffdpOz\ufffdd\u0014\ufffd\ufffd\ufffd\ufffd{\ufffdy\u000f\ufffd0\ufffd7o\ufffd_\ufffd\u0018>b\n)\ufffd\u0005S\ufffd\\V:X\u0019\ufffd\ufffd\u0013\u025d\ufffd\ufffd\ufffd\u001bP\ufffd\ufffd\u001a\ufffdz\ufffd\ufffd\u0013\ufffd\noE\u0539\ufffd\u0017\ufffdz\ufffdJf\ufffd\u04ef\u0277\ufffdj\ufffdiQ\ufffdDs6\ufffdE(id\ufffd\ufffdBX^7\u009d\u0013\ufffd#\ufffdJG\ufffd\u0007\u0347\ufffdk\f\ufffd\ufffds;\ufffd{\ufffd\u0003PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000\u0005(\ufffd\\3\ufffd0\u0004\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u001a\u0000\u0000\u0000state_history/state_6.json\ufffdV\ufffdn\ufffd0\f}\ufffdW\u0018~]\u0017\ufffdN\ufffd\ufffd[\ufffdf@\ufffd\ufffd)\ufffdl\u0003V\f\ufffd*3\ufffd\u0010Y\ufffd$9hV\ufffd\ufffd'\ufffd&\ufffd\ufffd\ufffd\u0015\b\u0002\ufffd\ufffd4\u000fI\ufffd\ufffdO\ufffd<\u03d7\n)H\u000f $\ufffd\u031fz\u0445A\u0015\ufffdA[\ufffd}Z(\ufffdQ?\n\ufffd\ufffd@\ufffd\ufffd\ufffd`0\ufffd'\ufffd8\ufffd\ufffd\ufffdh8\ufffd\ufffdw\"\ufffdT\ufffd\ufffd0\ufffdFN\ufffd\ufffd \ufffd\ufffd\ufffd*,\ufffd\u0019\u0018\ufffd\ufffd\ufffd|UA\u0019R(\ufffd\ufffd\u0010\ufffd\ufffd0\ufffdR\u0001(;\ufffd\u0001H\ufffd\ufffd$x\ufffdO\ufffd\ufffd\u0214\ufffd\ufffd0\ufffd *\ufffdBu\ufffd,\ufffd\ufffd\ufffd\u001e\ufffd\\B\ufffd\ufffdf\u0006\ufffd\ufffd\tc\u0005\ufffd5\ufffd\u000b!\ufffd\ufffd\ufffd\ufffd\ufffdz\u0019\ufffdp\u0018\ufffde\ufffd\ufffd\ufffd\u067d\ufffd;\u0010\ufffd\u0019\ufffd\u0001V:\ufffd)7\ufffd\ufffd\u0019\ufffd\u0002]2hH\ufffdI\u0014\ufffdX2\"mpm\u0005!\ufffd8\ufffdK\ufffd\ufffd\u0018>\ufffd\ufffd\ufffd\ufffdRW\ufffd\ufffd\ufffd\ufffd\ufffd/l\ufffd\ufffd\\7\ufffd\ufffd[\ufffd\ufffdk\u0006\ufffd\ufffdy\ufffd\u0016\ufffd\u0004\ufffdJ\ufffd\ufffd+D\ufffd)\ufffd-\u0005\ufffd@\ufffd#a[\ufffd\u001bDh!\ufffdzG\ufffdZ\ufffd-\ufffd\u001dx)\u007f\ufffdL\u05eb\ufffd\ufffd\ufffd?{mg6\ufffdmH\ufffd\ufffd\u0005'\ufffd\u001ds\u00bd*\ufffd\ufffd\u0005\u0006\u00029\ufffd+\ufffdQ\u0019\ufffd-\ufffdsI\u0014qK\ufffd\ufffd\ufffdZ\ufffd\u0005\ufffd\u0019(\ufffd]\ufffd0\ufffd9i\ufffd\ufffd\ufffd?-\ufffd\ufffdc\ufffdmVA\ufffd\ufffd\ufffd8 1\ufffdO\ufffd@v\ufffdGMTw\ufffd\u0004\ufffd\r\ufffd`\ufffd\ufffd\ufffd",
+      "body_preview": "PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000\u001c&\ufffd\\\u000b\ufffdp\ufffd\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u0012\u0000\u0000\u0000ssot_snapshot.json\ufffdVmo\ufffd0\u0010\ufffd\ufffd_\ufffd\ufffd\ufffd.\"\u0010\ufffd\ufffdoY\u02e4\ufffd\u001b\ufffdh\ufffdI\ufffd&\ufffd\u000b\ufffdb\ufffd\ufffd6Q\u04ea\ufffd}\ufffd\ufffd@\ufffd\ufffd\ufffd*E\ufffdx\ufffd{\ufffd\ufffd\ufffd\ufffd\ufffd3\u02f2\ufffdB\n\ufffd\u0003\bI8\ufffd\u0017\ufffd{^\ufffd\ufffdd\ufffd-\ufffd>\ufffd\u0015\u05a8\ufffd:\ufffd\ufffdGG\ufffd\ufffd\u001bg\ufffd\ufffd\ufffd\u0016\ufffd|\ufffd!\u01dd\ufffd\ufffd\u0007\u0011D\ufffdA\ufffd\ufffdY\ufffdM\ufffd\ufffd\ufffd\ufffd\u0017\ufffdS\ufffde<\ufffd\ufffd\ufffdfy\u0013D\u0015\ufffd \ufffdb\ufffds\ufffdK\u000b\ufffd*\u0016\ufffd\ufffdc\u001d\ufffd\ufffd\u000e\ufffd\u0004\ufffd\ufffdI?\u0013\u0019\ufffd=\u0014\u0337\ufffdJ8\ufffdP\u001d \ufffdr\ucbe5\ufffd\ufffd)\ufffd\ufffd\u0635\ufffd\ufffd\ufffdj\ufffdXNi\r\ufffd\\\b`*.j\ufffd{\u0019\u0013\u03db\ufffde\ufffd\u0417\ufffd\u067d\ufffd;\u0010\ufffd\u0019\ufffd\u0001V:k\ufffd\u001bCYY\u0612\ufffd@\ufffd\f\u001aR\ufffd$rYX\u0012\"Mpm\u0005!\ufffd\ufffd\u04e5zr\f\u001f\ufffdL\u000eq\ufffd\ufffd\ufffd\ufffd`\ufffd\ufffd76\ufffdL\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdZ\u0001\ufffd\ufffd:o\ufffdP\u0002a%c\ufffd\u0015\ufffd\ufffd\ufffd\u0516\ufffd% \u8470Tv\ufffd-\"4\u0017P\ufffd\ufffdM-I\ufffdt\u0007^\ufffd\u001f\ufffd\ufffdM\ufffd\ufffd\n\ufffd\ufffd\u000ef\ufffd\u0656$\ufffd^\ufffdd3c\u000e\ufffdU%\ufffdR` P\ufffdse;*\ufffd%{.\ufffd\"\u0752\ufffd=\ufffd\ufffdf\ufffdt\u0006J\ufffd\ufffd\u0019:\ufffdN\ufffdS\ufffd\ufffdO\ufffd$\ufffd\u0018w\ufffd6\ufffd rgr\u001c\ufffd\ufffd\ufffd\ufffd8\ufffdC\ufffdQ\u0013\ufffd]\ud07a!\u0018\ufffd\ufffdjq\ufffd%\u0015\u0000;\ufffd\ufffd\tP\ufffd\ufffd>\ufffd\u0017\u02b2!\ufffd\u001e\ufffd\ufffd\ufffd\u0000)j\u000b\ufffdK(\ufffdJ2\ufffdzI^=S\ufffd^\u0000\ufffd\u000f\ufffdH\ufffdw\ufffd\ufffd(\u05bf\ufffdo}\ufffd\ufffd\u0001\ufffd\ufffdW\ufffd\ufffd\u0000\ufffd\ufffdD\ufffd\u0011\ufffd\u0179<Y\ufffd\f\ufffd \ufffd\ufffde\ufffd \n\ufffd\ufffdzW:\ufffd\ufffd)\u001c\ufffd\ufffd\ufffd\ufffde\u0014\u001a\u00b8\u05a4O\ufffd\ufffd:\ufffd\ufffd\ufffd\ufffd\ufffd:\f\ufffd\ufffdMpe\ufffd\ufffd\ufffdI\ufffdV~\ufffd\ufffd[\ufffd\ufffd\ufffdiXZl\ufffdq-S\ufffd\n\ufffd?\u001dy\ufffd\ufffdO'\u001d=l\ufffdW[V\ufffd\ufffd\ufffd\u000bow\ufffdz\ufffd?\ufffd\ufffd3\ufffd\u0013\u007f\ufffd^\ufffd\ufffd\ufffd\ufffdx;\ufffd\ufffd3\ufffd\ufffd\ufffd\ufffd\ufffd+\u0015\ufffdGL!\ufffd<g\ufffd\ufffd\ufffdJ\u0007+\ufffd\ufffds\"yg\ufffd*\ufffd\u0016\u0014~0\ufffd7\ufffd\ufffdq\ufffd\noE\ufffdsi\ufffd\ufffdM\u0010\ufffd\ufffd/\ufffd\ufffd{\u0010\ufffd>\ufffd\ufffdh\u0385n\u0011J\u001a\ufffd:\ufffd\u0010\ufffd\u05cdpgDfH\ufffd\ufffd\ufffd\ufffdA\ufffd\ufffd6C\u007f>\u001bwn\u7cd7?PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000\u001c&\ufffd\\\u000b\ufffdp\ufffd\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u001a\u0000\u0000\u0000state_history/state_6.json\ufffdVmo\ufffd0\u0010\ufffd\ufffd_\ufffd\ufffd\ufffd.\"\u0010\ufffd\ufffdoY\u02e4\ufffd\u001b\ufffdh\ufffdI\ufffd&\ufffd\u000b\ufffdb\ufffd\ufffd6Q\u04ea\ufffd}\ufffd\ufffd@\ufffd\ufffd\ufffd*E\ufffdx\ufffd{\ufffd\ufffd\ufffd\ufffd\ufffd3\u02f2\ufffdB\n\ufffd\u0003\bI8\ufffd\u0017\ufffd{^\ufffd\ufffdd\ufffd-\ufffd>\ufffd\u0015\u05a8\ufffd:\ufffd\ufffdGG\ufffd\ufffd\u001bg\ufffd\ufffd\ufffd\u0016\ufffd|\ufffd!\u01dd\ufffd\ufffd\u0007\u0011D\ufffdA\ufffd\ufffdY\ufffdM\ufffd\ufffd\ufffd\ufffd\u0017\ufffdS\ufffde<\ufffd\ufffd\ufffdfy\u0013D\u0015\ufffd \ufffdb\ufffds\ufffdK\u000b\ufffd*\u0016\ufffd\ufffdc\u001d\ufffd\ufffd\u000e\ufffd\u0004\ufffd\ufffdI?\u0013\u0019\ufffd=\u0014\u0337\ufffdJ8\ufffdP\u001d \ufffdr\ucbe5\ufffd\ufffd)\ufffd\ufffd\u0635\ufffd\ufffd\ufffdj\ufffdXNi\r\ufffd\\\b`*.j\ufffd{\u0019\u0013\u03db\ufffde\ufffd\u0417\ufffd\u067d\ufffd;\u0010\ufffd\u0019\ufffd\u0001V:k\ufffd\u001bCYY\u0612\ufffd@\ufffd\f\u001aR\ufffd$rYX\u0012\"Mpm\u0005!\ufffd\ufffd\u04e5zr\f\u001f\ufffdL\u000eq\ufffd\ufffd\ufffd\ufffd`\ufffd\ufffd76\ufffdL\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdZ\u0001\ufffd\ufffd:o\ufffdP\u0002a%c\ufffd\u0015\ufffd\ufffd\ufffd\u0516\ufffd% \u8470Tv\ufffd-\"4\u0017P\ufffd\ufffdM-I\ufffdt\u0007^\ufffd\u001f\ufffd\ufffdM\ufffd\ufffd\n\ufffd\ufffd\u000ef\ufffd\u0656$\ufffd^\ufffdd3c\u000e\ufffdU%\ufffdR` P\ufffdse;*\ufffd%{.\ufffd\"\u0752\ufffd=\ufffd\ufffdf\ufffdt\u0006J\ufffd\ufffd\u0019:\ufffdN\ufffdS\ufffd\ufffdO\ufffd$\ufffd\u0018w\ufffd6\ufffd rgr\u001c\ufffd\ufffd\ufffd\ufffd8\ufffdC\ufffdQ\u0013\ufffd]\ud07a!\u0018\ufffd\ufffdjq\ufffd%\u0015\u0000;\ufffd\ufffd\tP\ufffd\ufffd>\ufffd\u0017\u02b2!\ufffd\u001e\ufffd\ufffd\ufffd",
       "category": "proof",
-      "elapsed_ms": 200,
+      "elapsed_ms": 208,
       "ok": true,
       "path": "/api/proof-pack",
       "status_code": 200,
@@ -424,7 +424,7 @@
     {
       "body_preview": "{\"logs\":[],\"message\":\"No log files found\"}",
       "category": "logs",
-      "elapsed_ms": 151,
+      "elapsed_ms": 206,
       "ok": true,
       "path": "/api/logs/tail?lines=40",
       "status_code": 200,
@@ -433,7 +433,7 @@
     {
       "body_preview": "{\"secrets_found\":0,\"scanned_files\":[],\"status\":\"PASS\"}",
       "category": "security",
-      "elapsed_ms": 151,
+      "elapsed_ms": 225,
       "ok": true,
       "path": "/api/audit/secrets",
       "status_code": 200,
