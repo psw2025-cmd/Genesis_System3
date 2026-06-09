@@ -1,40 +1,18 @@
-// API Configuration - Auto-detect backend URL
+const normalizeApiBase = (value: string): string => value.replace(/\/+$/, '')
+
 const getApiBase = (): string => {
-  // Check if running in Electron (file:// protocol)
-  const isElectron = window.location.protocol === 'file:' || 
-                     (window as any).electronAPI !== undefined ||
-                     navigator.userAgent.includes('Electron')
-  
-  // In Electron or file:// protocol, ALWAYS use localhost:8000 for backend
-  if (isElectron || window.location.protocol === 'file:') {
-    const apiBase = 'http://localhost:8000'
-    console.log('Electron detected - using API_BASE:', apiBase)
-    return apiBase
+  const configuredBase = import.meta.env.VITE_API_BASE_URL
+
+  if (configuredBase && configuredBase.trim()) {
+    return normalizeApiBase(configuredBase.trim())
   }
-  
-  // Use the same hostname as the frontend for backend
-  const hostname = window.location.hostname
-  const protocol = window.location.protocol
-  
-  // If localhost, use localhost for backend
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || !hostname || hostname === '') {
-    return 'http://localhost:8000'
+
+  if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+    return ''
   }
-  
-  // If network IP, use same IP for backend (but ensure http:// protocol)
-  if (protocol === 'http:' || protocol === 'https:') {
-    return `${protocol}//${hostname}:8000`
-  }
-  
-  // Fallback: always use localhost:8000
-  console.warn('Unknown protocol, defaulting to localhost:8000')
-  return 'http://localhost:8000'
+
+  return [window.location.protocol.replace(':', ''), '//', window.location.hostname || '127.0.0.1', ':8000'].join('')
 }
 
 export const API_BASE = getApiBase()
-
-// Log for debugging
-console.log('API_BASE configured as:', API_BASE)
-console.log('Window location:', window.location.href)
-console.log('Protocol:', window.location.protocol)
-console.log('Running in Electron:', window.location.protocol === 'file:' || (window as any).electronAPI !== undefined)
+console.log('API_BASE configured as:', API_BASE || '(relative origin)')
