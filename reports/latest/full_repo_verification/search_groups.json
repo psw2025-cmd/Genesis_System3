@@ -1088,7 +1088,7 @@
     ]
   },
   "workflows": {
-    "count": 31,
+    "count": 32,
     "sample": [
       ".github/workflows/cd.yml",
       ".github/workflows/ci.yml",
@@ -1102,6 +1102,7 @@
       ".github/workflows/full-repo-scan-clean.yml",
       ".github/workflows/full-trading-pipeline-readiness.yml",
       ".github/workflows/gcp-cloud-run-backend-proof.yml",
+      ".github/workflows/main.yml",
       ".github/workflows/model-backtest-readiness.yml",
       ".github/workflows/oracle-selfhosted-deploy.yml",
       ".github/workflows/patch-render-root-and-smartapi.yml",

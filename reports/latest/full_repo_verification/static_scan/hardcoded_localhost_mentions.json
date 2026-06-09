@@ -459,6 +459,12 @@
     "path": "reports/latest/dashboard_ultra_readiness/dashboard_ultra_readiness_summary.json"
   },
   {
+    "path": "reports/latest/full_repo_scan_clean/04_duplicate_basename_candidates.txt"
+  },
+  {
+    "path": "reports/latest/full_repo_scan_clean/05_old_backup_copy_review_candidates.txt"
+  },
+  {
     "path": "reports/latest/full_repo_verification/commands/git_status_short.stdout.txt"
   },
   {

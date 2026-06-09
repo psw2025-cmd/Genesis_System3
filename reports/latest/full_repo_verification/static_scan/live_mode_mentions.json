@@ -12,6 +12,9 @@
     "path": ".github/workflows/full-trading-pipeline-readiness.yml"
   },
   {
+    "path": ".github/workflows/main.yml"
+  },
+  {
     "path": ".github/workflows/phase2-runtime-map.yml"
   },
   {
@@ -1495,8 +1498,5 @@
   },
   {
     "path": "tests/auto/system3_generated_tests/test_phase_282.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_283.py"
   }
 ]
