@@ -279,7 +279,7 @@
     ".sh": 4,
     ".toml": 1,
     ".ts": 4,
-    ".tsx": 20,
+    ".tsx": 21,
     ".txt": 525,
     ".txt\"": 1,
     ".vbs": 1,
@@ -300,7 +300,7 @@
     "agent_memory": 4,
     "config": 16,
     "core": 597,
-    "dashboard": 65,
+    "dashboard": 66,
     "desktop_app": 6,
     "docs": 496,
     "models": 11,
@@ -313,5 +313,5 @@
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3693
+  "tracked_file_count": 3694
 }

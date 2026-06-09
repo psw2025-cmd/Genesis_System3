@@ -50,7 +50,7 @@
     ]
   },
   "backtest": {
-    "count": 264,
+    "count": 265,
     "sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       ".github/workflows/model-backtest-readiness.yml",
@@ -156,6 +156,7 @@
       "dashboard/backend/ml_performance_tracking.py",
       "dashboard/backend/multi_validation_audit.py",
       "dashboard/backend/performance_predictor.py",
+      "dashboard/frontend/src/components/Backtest.tsx",
       "dashboard/frontend/src/components/MLPerformance.tsx",
       "docs/COMPLETE_VALIDATION_REPORT.md",
       "docs/CSV_VALIDATION_AND_IMPROVEMENTS.md",
@@ -250,12 +251,11 @@
       "reports/latest/model_backtest_readiness/01_model_training_candidates.txt",
       "reports/latest/model_backtest_readiness/02_data_history_candidates.txt",
       "reports/latest/model_backtest_readiness/03_backtest_candidates.txt",
-      "reports/latest/model_backtest_readiness/04_compile_smoke.txt",
-      "reports/latest/model_backtest_readiness/05_dependency_hints.txt"
+      "reports/latest/model_backtest_readiness/04_compile_smoke.txt"
     ]
   },
   "dashboard": {
-    "count": 405,
+    "count": 406,
     "sample": [
       ".github/workflows/dashboard-endpoint-coverage.yml",
       ".github/workflows/dashboard-ultra-readiness.yml",
@@ -451,12 +451,12 @@
       "dashboard/frontend/src/components/Alerts.tsx",
       "dashboard/frontend/src/components/AppSelfTest.tsx",
       "dashboard/frontend/src/components/BackendConnectivityBanner.tsx",
+      "dashboard/frontend/src/components/Backtest.tsx",
       "dashboard/frontend/src/components/ChainAnalytics.tsx",
       "dashboard/frontend/src/components/ControlPlane.tsx",
       "dashboard/frontend/src/components/DataSourceWarning.tsx",
       "dashboard/frontend/src/components/EmptyState.tsx",
-      "dashboard/frontend/src/components/ErrorBanner.tsx",
-      "dashboard/frontend/src/components/ErrorBoundary.tsx"
+      "dashboard/frontend/src/components/ErrorBanner.tsx"
     ]
   },
   "data_history": {
@@ -665,7 +665,7 @@
     ]
   },
   "frontend": {
-    "count": 38,
+    "count": 39,
     "sample": [
       "app_self_test_component.tsx",
       "dashboard/frontend/dist/assets/index-D39Quml5.js",
@@ -682,6 +682,7 @@
       "dashboard/frontend/src/components/Alerts.tsx",
       "dashboard/frontend/src/components/AppSelfTest.tsx",
       "dashboard/frontend/src/components/BackendConnectivityBanner.tsx",
+      "dashboard/frontend/src/components/Backtest.tsx",
       "dashboard/frontend/src/components/ChainAnalytics.tsx",
       "dashboard/frontend/src/components/ControlPlane.tsx",
       "dashboard/frontend/src/components/DataSourceWarning.tsx",

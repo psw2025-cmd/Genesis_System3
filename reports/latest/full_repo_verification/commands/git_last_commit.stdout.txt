@@ -1,9 +1,8 @@
-commit fa1d0b309bac19ef1ebb58a7ba94e4804189d58a
-Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-Date:   Tue Jun 9 05:35:46 2026 +0000
+commit c2c8cad45d5da7756846a6aaf812b0d9135d7f59
+Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
+Date:   Tue Jun 9 11:06:26 2026 +0530
 
-    audit: publish production grade readiness gate
+    feat: add dashboard backtest proof panel
 
- reports/latest/production_grade_readiness/README.md                     | 2 +-
- .../production_grade_readiness/production_grade_readiness_summary.json  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ dashboard/frontend/src/components/Backtest.tsx | 114 +++++++++++++++++++++++++
+ 1 file changed, 114 insertions(+)

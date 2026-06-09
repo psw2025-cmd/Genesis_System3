@@ -9,7 +9,7 @@
     "total": 214
   },
   "critical_missing_count": 0,
-  "generated_utc": "2026-06-09T05:36:11.491642+00:00",
+  "generated_utc": "2026-06-09T05:37:04.270275+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "runner": {
     "cwd": "/home/runner/work/Genesis_System3/Genesis_System3",
@@ -22,7 +22,7 @@
     "todo_fixme_mentions": 38,
     "workflow_push_without_rebase": 17
   },
-  "tracked_file_count": 3693,
+  "tracked_file_count": 3694,
   "trade_ready": false,
   "verdict": "FULL_REPO_VERIFICATION_COMPLETE_WITH_BLOCKERS"
 }
