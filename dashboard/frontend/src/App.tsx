@@ -11,6 +11,7 @@ import RiskDashboard from './components/RiskDashboard'
 import AdvancedCharts from './components/AdvancedCharts'
 import MLPerformance from './components/MLPerformance'
 import AgentConsole from './components/AgentConsole'
+import Backtest from './components/Backtest'
 import ErrorBoundary from './components/ErrorBoundary'
 import BackendConnectivityBanner from './components/BackendConnectivityBanner'
 import './App.css'
@@ -36,6 +37,7 @@ function App() {
               <Link to="/chain" className="px-3 py-1 hover:underline text-sm">Chain</Link>
               <Link to="/signals" className="px-3 py-1 hover:underline text-sm">Signals</Link>
               <Link to="/trading" className="px-3 py-1 hover:underline text-sm">Trading</Link>
+              <Link to="/backtest" className="px-3 py-1 hover:underline text-sm">Backtest</Link>
               <Link to="/alerts" className="px-3 py-1 hover:underline text-sm">Alerts</Link>
               <Link to="/risk" className="px-3 py-1 hover:underline text-sm">Risk</Link>
               <Link to="/charts" className="px-3 py-1 hover:underline text-sm">Charts</Link>
@@ -61,6 +63,7 @@ function App() {
               <Route path="/chain" element={<ErrorBoundary><ChainAnalytics /></ErrorBoundary>} />
               <Route path="/signals" element={<ErrorBoundary><Signals /></ErrorBoundary>} />
               <Route path="/trading" element={<ErrorBoundary><PaperTrading /></ErrorBoundary>} />
+              <Route path="/backtest" element={<ErrorBoundary><Backtest /></ErrorBoundary>} />
               <Route path="/alerts" element={<ErrorBoundary><Alerts /></ErrorBoundary>} />
               <Route path="/risk" element={<ErrorBoundary><RiskDashboard /></ErrorBoundary>} />
               <Route path="/charts" element={<ErrorBoundary><AdvancedCharts /></ErrorBoundary>} />
