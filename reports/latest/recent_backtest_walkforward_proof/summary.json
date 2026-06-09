@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 261,
+    "candidate_count": 279,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       ".github/workflows/model-backtest-readiness.yml",

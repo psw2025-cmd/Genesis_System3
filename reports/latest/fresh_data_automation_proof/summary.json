@@ -2,7 +2,7 @@
   "auto_repair_allowed": true,
   "blockers": [],
   "evidence": {
-    "angel_india_candidate_count": 406,
+    "angel_india_candidate_count": 392,
     "angel_india_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       "CHANGELOG.md",
@@ -210,8 +210,19 @@
       "core/engine/angel_report_scheduler.py",
       "core/engine/angel_risk_event_scanner.py"
     ],
-    "fallback_yahoo_report_keys": [],
-    "fallback_yahoo_report_present": false,
+    "fallback_yahoo_report_keys": [
+      "analyzer_only",
+      "generated_utc",
+      "live_trading_enabled",
+      "purpose",
+      "results",
+      "rows_total",
+      "source",
+      "symbols_failed",
+      "symbols_ok",
+      "symbols_requested"
+    ],
+    "fallback_yahoo_report_present": true,
     "fresh_broker_live_data_proven": false,
     "reason_fresh_broker_live_data_not_proven": "CI proof avoids broker login and has no broker secrets/session by default."
   },
@@ -221,7 +232,6 @@
   "status": "PASS_WITH_WARNINGS",
   "warnings": [
     "binance_crypto_data_candidates_not_proven",
-    "external_yahoo_fallback_proof_missing",
     "angel_broker_secrets_not_available_to_ci_data_live_probe_skipped"
   ]
 }

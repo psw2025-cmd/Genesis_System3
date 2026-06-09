@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-08T04:56:39.418927+00:00",
+  "generated_utc": "2026-06-09T04:44:30.857866+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "optional_missing_count": 0,
   "pending_count": 0,
@@ -49,7 +49,6 @@
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
         "binance_crypto_data_candidates_not_proven",
-        "external_yahoo_fallback_proof_missing",
         "angel_broker_secrets_not_available_to_ci_data_live_probe_skipped"
       ]
     },
@@ -95,7 +94,6 @@
       "required": true,
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
-        "dashboard_endpoint_coverage_report_missing",
         "browser_screenshot_truth_not_proven_in_ci"
       ]
     }

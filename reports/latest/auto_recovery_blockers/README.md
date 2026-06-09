@@ -1,6 +1,6 @@
 # Auto-Recovery Blocker Classification
 
-Generated UTC: 2026-06-08T04:56:39.419560+00:00
+Generated UTC: 2026-06-09T04:44:30.858791+00:00
 
 - Verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
@@ -39,14 +39,12 @@ Generated UTC: 2026-06-08T04:56:39.419560+00:00
 
 ### DASHBOARD_TRUTH_FAIL
 
-- `dashboard_truth_proof:dashboard_endpoint_coverage_report_missing`
 - `dashboard_truth_proof:browser_screenshot_truth_not_proven_in_ci`
 
 ### PROOF_REQUIRED
 
 - `deployment_and_endpoint_proof:public_backend_url_not_configured_endpoint_live_probe_skipped`
 - `fresh_data_automation_proof:binance_crypto_data_candidates_not_proven`
-- `fresh_data_automation_proof:external_yahoo_fallback_proof_missing`
 - `model_training_load_proof:fresh_training_accuracy_metrics_not_proven`
 - `model_training_load_proof:model_promotion_remains_blocked_without_policy`
 - `recent_backtest_walkforward_proof:recent_costed_walkforward_result_not_proven`

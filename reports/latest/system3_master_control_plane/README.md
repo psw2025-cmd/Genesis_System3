@@ -1,6 +1,6 @@
 # System3 Master Control Plane
 
-Generated UTC: 2026-06-08T04:56:39.417893+00:00
+Generated UTC: 2026-06-09T04:44:30.856479+00:00
 
 - Verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
@@ -14,11 +14,11 @@ Generated UTC: 2026-06-08T04:56:39.417893+00:00
 | `safety_and_secrets` | `FAIL` | `False` | `2` | `0` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `deployment_and_endpoint_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
-| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `3` |
+| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
 | `recent_backtest_walkforward_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
-| `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
+| `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 
 ## Active blockers
 

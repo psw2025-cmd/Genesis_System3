@@ -41,11 +41,12 @@
             "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\\s*[:=]\\"
           }
         ],
-        "secret_style_filename_count": 1,
+        "secret_style_filename_count": 2,
         "secret_style_filenames": [
-          "config/.env.example"
+          "config/.env.example",
+          "reports/latest/safety_and_secrets/summary.json"
         ],
-        "tracked_file_count": 3584
+        "tracked_file_count": 3693
       },
       "gate": "safety_and_secrets",
       "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
@@ -119,6 +120,15 @@
             "reports/PHASE_378_PERFORMANCE_OPTIMIZATION.md",
             "reports/STRATEGY_ENSEMBLE_366.md",
             "reports/ULTRA_VS_DELTA_BACKTEST_383.md",
+            "reports/archive/dashboard_browser_api_proof/20260608/backtest_ui_proof.md",
+            "reports/archive/lifecycle_reconciliation/20260608/pnl_reconciliation.csv",
+            "reports/archive/performance_benchmark/20260608/benchmark_summary.md",
+            "reports/archive/performance_benchmark/20260608/missed_opportunities.md",
+            "reports/archive/performance_benchmark/20260608/prediction_vs_actual.csv",
+            "reports/archive/performance_benchmark/20260608/source_manifest.json",
+            "reports/archive/performance_benchmark/20260608/status.json",
+            "reports/archive/performance_benchmark/20260608/top_mover_match.csv",
+            "reports/latest/dashboard_browser_api_proof/backtest_ui_proof.md",
             "reports/latest/entrypoint_classification/backtest_entrypoint_candidates.json",
             "reports/latest/full_repo_verification/commands/py_compile_080_angel_daily_pnl_summary.stderr.txt",
             "reports/latest/full_repo_verification/commands/py_compile_080_angel_daily_pnl_summary.stdout.txt",
@@ -135,6 +145,7 @@
             "reports/latest/full_repo_verification/commands/py_compile_144_angel_synthetic_backtester.stderr.txt",
             "reports/latest/full_repo_verification/commands/py_compile_144_angel_synthetic_backtester.stdout.txt",
             "reports/latest/full_trading_pipeline_readiness/04_backtest_inventory.txt",
+            "reports/latest/lifecycle_reconciliation/pnl_reconciliation.csv",
             "reports/latest/model_backtest_readiness/00_summary.md",
             "reports/latest/model_backtest_readiness/01_model_training_candidates.txt",
             "reports/latest/model_backtest_readiness/02_data_history_candidates.txt",
@@ -142,6 +153,14 @@
             "reports/latest/model_backtest_readiness/04_compile_smoke.txt",
             "reports/latest/model_backtest_readiness/05_dependency_hints.txt",
             "reports/latest/model_backtest_readiness/06_model_backtest_summary.json",
+            "reports/latest/performance_benchmark/benchmark_summary.md",
+            "reports/latest/performance_benchmark/missed_opportunities.md",
+            "reports/latest/performance_benchmark/prediction_vs_actual.csv",
+            "reports/latest/performance_benchmark/source_manifest.json",
+            "reports/latest/performance_benchmark/status.json",
+            "reports/latest/performance_benchmark/top_mover_match.csv",
+            "reports/latest/recent_backtest_walkforward_proof/README.md",
+            "reports/latest/recent_backtest_walkforward_proof/summary.json",
             "reports/readiness_audit/MODEL_DATA_BACKTEST_DASHBOARD_READINESS.md",
             "reports/readiness_audit/model_data_backtest_dashboard_readiness.json",
             "run_pnl_simulator.bat",
@@ -573,6 +592,7 @@
             "reports/ULTRA_MODELS_INVENTORY_381.md",
             "reports/ULTRA_MODELS_VALIDATION_382.md",
             "reports/ULTRA_MODEL_HEALTH_384.md",
+            "reports/archive/performance_benchmark/20260608/prediction_vs_actual.csv",
             "reports/latest/entrypoint_classification/training_entrypoint_candidates.json",
             "reports/latest/full_repo_verification/commands/py_compile_003_advanced_prediction_enhancer.stderr.txt",
             "reports/latest/full_repo_verification/commands/py_compile_003_advanced_prediction_enhancer.stdout.txt",
@@ -610,6 +630,9 @@
             "reports/latest/model_backtest_readiness/04_compile_smoke.txt",
             "reports/latest/model_backtest_readiness/05_dependency_hints.txt",
             "reports/latest/model_backtest_readiness/06_model_backtest_summary.json",
+            "reports/latest/model_training_load_proof/README.md",
+            "reports/latest/model_training_load_proof/summary.json",
+            "reports/latest/performance_benchmark/prediction_vs_actual.csv",
             "reports/model_benchmark_dashboard/index.html",
             "reports/model_benchmark_dashboard/model_benchmark_leaderboard.json",
             "reports/model_benchmark_dashboard/ultra.html",
@@ -709,6 +732,10 @@
             "inspect_enriched_and_orders.py",
             "paper_pnl_summary.json",
             "paper_trading_smoke_test.py",
+            "reports/archive/lifecycle_reconciliation/20260608/open_closed_positions.csv",
+            "reports/archive/lifecycle_reconciliation/20260608/signal_order_trade_join.csv",
+            "reports/latest/analyzer_paper_lifecycle_proof/README.md",
+            "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
             "reports/latest/full_repo_verification/commands/py_compile_031_comprehensive_multi_trader_test.stderr.txt",
             "reports/latest/full_repo_verification/commands/py_compile_031_comprehensive_multi_trader_test.stdout.txt",
             "reports/latest/full_repo_verification/commands/py_compile_037_live_trade_config.stderr.txt",
@@ -752,6 +779,8 @@
             "reports/latest/full_repo_verification/commands/py_compile_191_system3_phase108_order_status_refresher.stderr.txt",
             "reports/latest/full_repo_verification/commands/py_compile_191_system3_phase108_order_status_refresher.stdout.txt",
             "reports/latest/full_trading_pipeline_readiness/05_paper_analyzer_inventory.txt",
+            "reports/latest/lifecycle_reconciliation/open_closed_positions.csv",
+            "reports/latest/lifecycle_reconciliation/signal_order_trade_join.csv",
             "reports/trader_test_20260210_075042.json",
             "reports/trader_test_20260210_075042.md",
             "reports/trader_test_20260210_075209.json",
@@ -788,23 +817,80 @@
             "system3_autorun_master.py"
           ]
         },
-        "duplicate_basename_candidate_count": 20,
+        "duplicate_basename_candidate_count": 55,
         "duplicate_basename_candidates_sample": {
+          "api_smoke_results.json": [
+            "reports/archive/dashboard_browser_api_proof/20260608/api_smoke_results.json",
+            "reports/latest/dashboard_browser_api_proof/api_smoke_results.json"
+          ],
           "app.py": [
             "dashboard/app.py",
             "dashboard/backend/app.py"
+          ],
+          "backtest_ui_proof.md": [
+            "reports/archive/dashboard_browser_api_proof/20260608/backtest_ui_proof.md",
+            "reports/latest/dashboard_browser_api_proof/backtest_ui_proof.md"
+          ],
+          "benchmark_summary.md": [
+            "reports/archive/performance_benchmark/20260608/benchmark_summary.md",
+            "reports/latest/performance_benchmark/benchmark_summary.md"
+          ],
+          "cleanup_summary.json": [
+            "reports/archive/repo_authority/20260608/cleanup_summary.json",
+            "reports/latest/repo_authority/cleanup_summary.json"
+          ],
+          "commands_run.md": [
+            "reports/archive/implementation_batch/20260608/commands_run.md",
+            "reports/latest/implementation_batch/commands_run.md"
           ],
           "complete_validation_report.md": [
             "COMPLETE_VALIDATION_REPORT.md",
             "docs/COMPLETE_VALIDATION_REPORT.md"
           ],
+          "dashboard_browser_api_summary.md": [
+            "reports/archive/dashboard_browser_api_proof/20260608/dashboard_browser_api_summary.md",
+            "reports/latest/dashboard_browser_api_proof/dashboard_browser_api_summary.md"
+          ],
+          "dependency_trace.md": [
+            "reports/archive/repo_authority/20260608/dependency_trace.md",
+            "reports/latest/repo_authority/dependency_trace.md"
+          ],
+          "duplicate_candidates.csv": [
+            "reports/archive/repo_authority/20260608/duplicate_candidates.csv",
+            "reports/latest/repo_authority/duplicate_candidates.csv"
+          ],
           "ensemble_predictor.py": [
             "core/engine/ensemble_predictor.py",
             "src/ml/ensemble_predictor.py"
           ],
+          "evidence_manifest.json": [
+            "reports/archive/implementation_batch/20260608/evidence_manifest.json",
+            "reports/latest/implementation_batch/evidence_manifest.json"
+          ],
+          "file_hashes.csv": [
+            "reports/archive/repo_authority/20260608/file_hashes.csv",
+            "reports/latest/repo_authority/file_hashes.csv"
+          ],
+          "file_inventory.csv": [
+            "reports/archive/repo_authority/20260608/file_inventory.csv",
+            "reports/latest/repo_authority/file_inventory.csv"
+          ],
+          "files_changed.md": [
+            "reports/archive/implementation_batch/20260608/files_changed.md",
+            "reports/latest/implementation_batch/files_changed.md"
+          ],
+          "frontend_build.log": [
+            "reports/archive/dashboard_browser_api_proof/20260608/frontend_build.log",
+            "reports/latest/dashboard_browser_api_proof/frontend_build.log"
+          ],
           "greeks_calculator.py": [
             "core/engine/greeks_engine/greeks_calculator.py",
             "dashboard/backend/greeks_calculator.py"
+          ],
+          "implementation_summary.md": [
+            "docs/IMPLEMENTATION_SUMMARY.md",
+            "reports/archive/implementation_batch/20260608/implementation_summary.md",
+            "reports/latest/implementation_batch/implementation_summary.md"
           ],
           "index.css": [
             "dashboard/frontend/dist/assets/index.css",
@@ -820,6 +906,30 @@
             "config/kill_switch.json",
             "kill_switch.json"
           ],
+          "lifecycle_summary.md": [
+            "reports/archive/lifecycle_reconciliation/20260608/lifecycle_summary.md",
+            "reports/latest/lifecycle_reconciliation/lifecycle_summary.md"
+          ],
+          "localhost_reference_scan.txt": [
+            "reports/archive/dashboard_browser_api_proof/20260608/localhost_reference_scan.txt",
+            "reports/latest/dashboard_browser_api_proof/localhost_reference_scan.txt"
+          ],
+          "mismatch_report.md": [
+            "reports/archive/lifecycle_reconciliation/20260608/mismatch_report.md",
+            "reports/latest/lifecycle_reconciliation/mismatch_report.md"
+          ],
+          "missed_opportunities.md": [
+            "reports/archive/performance_benchmark/20260608/missed_opportunities.md",
+            "reports/latest/performance_benchmark/missed_opportunities.md"
+          ],
+          "npm_audit_summary.md": [
+            "reports/archive/dashboard_browser_api_proof/20260608/npm_audit_summary.md",
+            "reports/latest/dashboard_browser_api_proof/npm_audit_summary.md"
+          ],
+          "open_closed_positions.csv": [
+            "reports/archive/lifecycle_reconciliation/20260608/open_closed_positions.csv",
+            "reports/latest/lifecycle_reconciliation/open_closed_positions.csv"
+          ],
           "package-lock.json": [
             "dashboard/frontend/package-lock.json",
             "desktop_app/package-lock.json",
@@ -834,17 +944,63 @@
             "scripts/performance_metrics.py",
             "src/analytics/performance_metrics.py"
           ],
+          "pnl_reconciliation.csv": [
+            "reports/archive/lifecycle_reconciliation/20260608/pnl_reconciliation.csv",
+            "reports/latest/lifecycle_reconciliation/pnl_reconciliation.csv"
+          ],
+          "prediction_vs_actual.csv": [
+            "reports/archive/performance_benchmark/20260608/prediction_vs_actual.csv",
+            "reports/latest/performance_benchmark/prediction_vs_actual.csv"
+          ],
+          "quarantine_plan.md": [
+            "reports/archive/repo_authority/20260608/quarantine_plan.md",
+            "reports/latest/repo_authority/quarantine_plan.md"
+          ],
+          "requirements.txt": [
+            "dashboard/backend/requirements.txt",
+            "requirements.txt"
+          ],
           "run_monitor_10min.bat": [
             "RUN_MONITOR_10MIN.bat",
             "scripts/run_monitor_10min.bat"
+          ],
+          "runtime_authority_map.md": [
+            "reports/archive/repo_authority/20260608/runtime_authority_map.md",
+            "reports/latest/repo_authority/runtime_authority_map.md"
           ],
           "runtime_flags.json": [
             "config/runtime_flags.json",
             "runtime_flags.json"
           ],
+          "screenshot_manifest.json": [
+            "reports/archive/dashboard_browser_api_proof/20260608/screenshot_manifest.json",
+            "reports/latest/dashboard_browser_api_proof/screenshot_manifest.json"
+          ],
+          "search_findings.json": [
+            "reports/archive/implementation_batch/20260608/search_findings.json",
+            "reports/latest/implementation_batch/search_findings.json"
+          ],
+          "search_findings.md": [
+            "reports/archive/implementation_batch/20260608/search_findings.md",
+            "reports/latest/implementation_batch/search_findings.md"
+          ],
           "settings.json": [
             ".cursor/settings.json",
             ".vscode/settings.json"
+          ],
+          "signal_order_trade_join.csv": [
+            "reports/archive/lifecycle_reconciliation/20260608/signal_order_trade_join.csv",
+            "reports/latest/lifecycle_reconciliation/signal_order_trade_join.csv"
+          ],
+          "source_manifest.json": [
+            "reports/archive/lifecycle_reconciliation/20260608/source_manifest.json",
+            "reports/archive/performance_benchmark/20260608/source_manifest.json",
+            "reports/latest/lifecycle_reconciliation/source_manifest.json",
+            "reports/latest/performance_benchmark/source_manifest.json"
+          ],
+          "stale_backup_candidates.csv": [
+            "reports/archive/repo_authority/20260608/stale_backup_candidates.csv",
+            "reports/latest/repo_authority/stale_backup_candidates.csv"
           ],
           "start_backend.bat": [
             "scripts/start_backend.bat",
@@ -857,6 +1013,18 @@
           "start_full_system_with_dashboard.ps1": [
             "START_FULL_SYSTEM_WITH_DASHBOARD.ps1",
             "scripts/start_full_system_with_dashboard.ps1"
+          ],
+          "status.json": [
+            "reports/archive/dashboard_browser_api_proof/20260608/status.json",
+            "reports/archive/lifecycle_reconciliation/20260608/status.json",
+            "reports/archive/performance_benchmark/20260608/status.json",
+            "reports/latest/dashboard_browser_api_proof/status.json",
+            "reports/latest/lifecycle_reconciliation/status.json",
+            "reports/latest/performance_benchmark/status.json"
+          ],
+          "status_matrix.json": [
+            "reports/archive/implementation_batch/20260608/status_matrix.json",
+            "reports/latest/implementation_batch/status_matrix.json"
           ],
           "system3_config.json": [
             "config/system3_config.json",
@@ -873,6 +1041,14 @@
           "test_phases_261_300.py": [
             "test_phases_261_300.py",
             "tests/auto/system3_generated_tests/test_phases_261_300.py"
+          ],
+          "top_mover_match.csv": [
+            "reports/archive/performance_benchmark/20260608/top_mover_match.csv",
+            "reports/latest/performance_benchmark/top_mover_match.csv"
+          ],
+          "unresolved_blockers.md": [
+            "reports/archive/implementation_batch/20260608/unresolved_blockers.md",
+            "reports/latest/implementation_batch/unresolved_blockers.md"
           ]
         }
       },
@@ -910,7 +1086,7 @@
       "auto_repair_allowed": true,
       "blockers": [],
       "evidence": {
-        "angel_india_candidate_count": 406,
+        "angel_india_candidate_count": 392,
         "angel_india_candidates_sample": [
           "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
           "CHANGELOG.md",
@@ -1118,8 +1294,19 @@
           "core/engine/angel_report_scheduler.py",
           "core/engine/angel_risk_event_scanner.py"
         ],
-        "fallback_yahoo_report_keys": [],
-        "fallback_yahoo_report_present": false,
+        "fallback_yahoo_report_keys": [
+          "analyzer_only",
+          "generated_utc",
+          "live_trading_enabled",
+          "purpose",
+          "results",
+          "rows_total",
+          "source",
+          "symbols_failed",
+          "symbols_ok",
+          "symbols_requested"
+        ],
+        "fallback_yahoo_report_present": true,
         "fresh_broker_live_data_proven": false,
         "reason_fresh_broker_live_data_not_proven": "CI proof avoids broker login and has no broker secrets/session by default."
       },
@@ -1129,7 +1316,6 @@
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
         "binance_crypto_data_candidates_not_proven",
-        "external_yahoo_fallback_proof_missing",
         "angel_broker_secrets_not_available_to_ci_data_live_probe_skipped"
       ]
     },
@@ -1137,7 +1323,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 221,
+        "candidate_count": 225,
         "candidates_sample": [
           ".github/workflows/model-backtest-readiness.yml",
           "ACTION_PLAN_ML_TRAINING.md",
@@ -1309,7 +1495,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 261,
+        "candidate_count": 279,
         "candidates_sample": [
           "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
           ".github/workflows/model-backtest-readiness.yml",
@@ -1455,7 +1641,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 154,
+        "candidate_count": 170,
         "candidates_sample": [
           "AUTOMATED_PAPER_TRADING_COMPLETE_ANALYSIS.md",
           "CHANGES_MADE_PAPER_TRADING_SETUP.md",
@@ -1538,6 +1724,15 @@
           "inspect_enriched_and_orders.py",
           "paper_pnl_summary.json",
           "paper_trading_smoke_test.py",
+          "reports/archive/lifecycle_reconciliation/20260608/lifecycle_summary.md",
+          "reports/archive/lifecycle_reconciliation/20260608/mismatch_report.md",
+          "reports/archive/lifecycle_reconciliation/20260608/open_closed_positions.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/pnl_reconciliation.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/signal_order_trade_join.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/source_manifest.json",
+          "reports/archive/lifecycle_reconciliation/20260608/status.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/README.md",
+          "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
           "reports/latest/full_repo_verification/commands/py_compile_031_comprehensive_multi_trader_test.stderr.txt",
           "reports/latest/full_repo_verification/commands/py_compile_031_comprehensive_multi_trader_test.stdout.txt",
           "reports/latest/full_repo_verification/commands/py_compile_037_live_trade_config.stderr.txt",
@@ -1567,21 +1762,28 @@
           "reports/latest/full_repo_verification/commands/py_compile_150_angel_trade_rules.stderr.txt",
           "reports/latest/full_repo_verification/commands/py_compile_150_angel_trade_rules.stdout.txt",
           "reports/latest/full_repo_verification/commands/py_compile_151_angel_trade_validator_v2.stderr.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_151_angel_trade_validator_v2.stdout.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_175_momentum_analyzer.stderr.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_175_momentum_analyzer.stdout.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_184_system3_phase101_live_trade_config_check.stderr.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_184_system3_phase101_live_trade_config_check.stdout.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_185_system3_phase102_order_ledger_schema.stderr.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_185_system3_phase102_order_ledger_schema.stdout.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_186_system3_phase103_order_ledger_support.stderr.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_186_system3_phase103_order_ledger_support.stdout.txt",
-          "reports/latest/full_repo_verification/commands/py_compile_187_system3_phase104_tradeplan_to_orders.stderr.txt"
+          "reports/latest/full_repo_verification/commands/py_compile_151_angel_trade_validator_v2.stdout.txt"
         ],
         "existing_lifecycle_report_candidates": [
+          "reports/archive/lifecycle_reconciliation/20260608/lifecycle_summary.md",
+          "reports/archive/lifecycle_reconciliation/20260608/mismatch_report.md",
+          "reports/archive/lifecycle_reconciliation/20260608/open_closed_positions.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/pnl_reconciliation.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/signal_order_trade_join.csv",
+          "reports/archive/lifecycle_reconciliation/20260608/source_manifest.json",
+          "reports/archive/lifecycle_reconciliation/20260608/status.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/README.md",
+          "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
           "reports/latest/full_repo_verification/commands/py_compile_149_angel_trade_lifecycle_logger.stderr.txt",
           "reports/latest/full_repo_verification/commands/py_compile_149_angel_trade_lifecycle_logger.stdout.txt",
-          "reports/latest/full_trading_pipeline_readiness/05_paper_analyzer_inventory.txt"
+          "reports/latest/full_trading_pipeline_readiness/05_paper_analyzer_inventory.txt",
+          "reports/latest/lifecycle_reconciliation/lifecycle_summary.md",
+          "reports/latest/lifecycle_reconciliation/mismatch_report.md",
+          "reports/latest/lifecycle_reconciliation/open_closed_positions.csv",
+          "reports/latest/lifecycle_reconciliation/pnl_reconciliation.csv",
+          "reports/latest/lifecycle_reconciliation/signal_order_trade_join.csv",
+          "reports/latest/lifecycle_reconciliation/source_manifest.json",
+          "reports/latest/lifecycle_reconciliation/status.json"
         ],
         "full_lifecycle_proven": false,
         "mandatory_lifecycle_fields": [
@@ -1634,8 +1836,18 @@
             "file": "dashboard/backend/backtesting.py"
           }
         ],
-        "dashboard_endpoint_coverage_keys": [],
-        "dashboard_endpoint_coverage_report_present": false,
+        "dashboard_endpoint_coverage_keys": [
+          "base_url",
+          "by_category",
+          "core_ok",
+          "fail_count",
+          "generated_utc",
+          "note",
+          "ok_count",
+          "results",
+          "total_endpoints_tested"
+        ],
+        "dashboard_endpoint_coverage_report_present": true,
         "dashboard_file_count": 65,
         "frontend_file_count": 35
       },
@@ -1644,12 +1856,11 @@
       "pass": true,
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
-        "dashboard_endpoint_coverage_report_missing",
         "browser_screenshot_truth_not_proven_in_ci"
       ]
     }
   ],
-  "generated_utc": "2026-06-08T04:56:39.417893+00:00",
+  "generated_utc": "2026-06-09T04:44:30.856479+00:00",
   "live_trading_enabled": false,
   "manual_only_items": [
     "broker OTP/manual login/session renewal when required",
@@ -1673,18 +1884,16 @@
   },
   "trade_ready": false,
   "verdict": "TRADE_READY_BLOCKED",
-  "warning_count": 11,
+  "warning_count": 9,
   "warnings": [
     "repo_authority_and_duplicate_control:duplicate_basename_candidates_need_runtime_classification",
     "deployment_and_endpoint_proof:public_backend_url_not_configured_endpoint_live_probe_skipped",
     "fresh_data_automation_proof:binance_crypto_data_candidates_not_proven",
-    "fresh_data_automation_proof:external_yahoo_fallback_proof_missing",
     "fresh_data_automation_proof:angel_broker_secrets_not_available_to_ci_data_live_probe_skipped",
     "model_training_load_proof:fresh_training_accuracy_metrics_not_proven",
     "model_training_load_proof:model_promotion_remains_blocked_without_policy",
     "recent_backtest_walkforward_proof:recent_costed_walkforward_result_not_proven",
     "analyzer_paper_lifecycle_proof:full_signal_to_exit_pnl_lifecycle_not_proven",
-    "dashboard_truth_proof:dashboard_endpoint_coverage_report_missing",
     "dashboard_truth_proof:browser_screenshot_truth_not_proven_in_ci"
   ]
 }

@@ -1,6 +1,6 @@
 # fresh_data_automation_proof
 
-Generated UTC: 2026-06-08T04:56:39.417023+00:00
+Generated UTC: 2026-06-09T04:44:30.854728+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -13,7 +13,6 @@ Generated UTC: 2026-06-08T04:56:39.417023+00:00
 ## Warnings
 
 - `binance_crypto_data_candidates_not_proven`
-- `external_yahoo_fallback_proof_missing`
 - `angel_broker_secrets_not_available_to_ci_data_live_probe_skipped`
 
 ## Next action

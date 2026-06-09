@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 221,
+    "candidate_count": 225,
     "candidates_sample": [
       ".github/workflows/model-backtest-readiness.yml",
       "ACTION_PLAN_ML_TRAINING.md",

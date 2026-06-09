@@ -19,8 +19,18 @@
         "file": "dashboard/backend/backtesting.py"
       }
     ],
-    "dashboard_endpoint_coverage_keys": [],
-    "dashboard_endpoint_coverage_report_present": false,
+    "dashboard_endpoint_coverage_keys": [
+      "base_url",
+      "by_category",
+      "core_ok",
+      "fail_count",
+      "generated_utc",
+      "note",
+      "ok_count",
+      "results",
+      "total_endpoints_tested"
+    ],
+    "dashboard_endpoint_coverage_report_present": true,
     "dashboard_file_count": 65,
     "frontend_file_count": 35
   },
@@ -29,7 +39,6 @@
   "pass": true,
   "status": "PASS_WITH_WARNINGS",
   "warnings": [
-    "dashboard_endpoint_coverage_report_missing",
     "browser_screenshot_truth_not_proven_in_ci"
   ]
 }

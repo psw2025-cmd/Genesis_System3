@@ -1,6 +1,6 @@
 # dashboard_truth_proof
 
-Generated UTC: 2026-06-08T04:56:39.417832+00:00
+Generated UTC: 2026-06-09T04:44:30.856321+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -12,7 +12,6 @@ Generated UTC: 2026-06-08T04:56:39.417832+00:00
 
 ## Warnings
 
-- `dashboard_endpoint_coverage_report_missing`
 - `browser_screenshot_truth_not_proven_in_ci`
 
 ## Next action
