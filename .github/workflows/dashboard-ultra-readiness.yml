@@ -15,19 +15,20 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   ultra-dashboard-readiness:
     name: Verify Ultra Dashboard readiness
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Build dashboard readiness matrix
+      - name: Build static dashboard readiness matrix
         shell: bash
         run: |
           set -euo pipefail
@@ -36,7 +37,7 @@ jobs:
           mkdir -p "$OUT"
 
           python - <<'PY'
-          import json, os, re, subprocess
+          import json, subprocess
           from pathlib import Path
           from datetime import datetime, timezone
 
@@ -68,6 +69,7 @@ jobs:
           feature_checks = [
               ('frontend_package_present', package_path.exists()),
               ('frontend_build_script_present', 'build' in scripts),
+              ('frontend_preview_script_present', 'preview' in scripts),
               ('vite_present', 'vite' in deps),
               ('react_present', 'react' in deps and 'react-dom' in deps),
               ('charting_library_present', 'recharts' in deps),
@@ -101,13 +103,13 @@ jobs:
           for name, keys in feature_keywords.items():
               feature_presence[name] = any(k.lower() in lower_blob for k in keys)
 
-          blockers = []
+          static_blockers = []
           for name, ok in feature_checks:
               if not ok:
-                  blockers.append(name)
+                  static_blockers.append(name)
           for name, ok in feature_presence.items():
               if not ok:
-                  blockers.append(f'ui_feature_reference_missing:{name}')
+                  static_blockers.append(f'ui_feature_reference_missing:{name}')
 
           summary = {
               'generated_utc': datetime.now(timezone.utc).isoformat(),
@@ -119,47 +121,227 @@ jobs:
               'ui_feature_presence': feature_presence,
               'endpoint_coverage_summary_present': endpoint_data is not None,
               'endpoint_coverage_core_ok': bool(endpoint_data and endpoint_data.get('core_ok')),
-              'blockers': blockers,
-              'full_ultra_dashboard_ready_proven': len(blockers) == 0,
-              'verdict': 'READY_PROVEN' if len(blockers) == 0 else 'NOT_FULLY_PROVEN',
-              'note': 'This is static/readiness proof. A real browser screenshot/UI smoke test is still required for visual proof.',
+              'static_blockers': static_blockers,
+              'browser_smoke': {'status': 'NOT_RUN'},
+              'blockers': static_blockers + ['browser_smoke_not_run'],
+              'browser_visual_proof': False,
+              'full_ultra_dashboard_ready_proven': False,
+              'verdict': 'NOT_FULLY_PROVEN',
+              'note': 'Static/readiness matrix generated. Cloud browser screenshot/UI smoke test will finalize this proof later in the workflow.',
           }
 
           out = Path('reports/latest/dashboard_ultra_readiness')
           out.mkdir(parents=True, exist_ok=True)
           (out/'dashboard_ultra_readiness_summary.json').write_text(json.dumps(summary, indent=2, sort_keys=True), encoding='utf-8')
+          PY
 
-          lines = ['# Ultra Dashboard Readiness Proof', '', f"Generated UTC: {summary['generated_utc']}", '', f"Verdict: `{summary['verdict']}`", f"Full dashboard ready proven: `{summary['full_ultra_dashboard_ready_proven']}`", '', '## Checks', '', '| Check | OK |', '|---|---:|']
-          for name, ok in feature_checks:
+      - name: Frontend install and build proof
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          OUT="$GITHUB_WORKSPACE/reports/latest/dashboard_ultra_readiness"
+          mkdir -p "$OUT"
+          if [ -f dashboard/frontend/package.json ]; then
+            cd dashboard/frontend
+            if npm ci > "$OUT/npm_ci.log" 2>&1; then
+              echo "NPM_CI_PASS" > "$OUT/npm_ci_status.txt"
+            else
+              echo "NPM_CI_FAIL" > "$OUT/npm_ci_status.txt"
+            fi
+            if npm run build > "$OUT/npm_build.log" 2>&1; then
+              echo "FRONTEND_BUILD_PASS" > "$OUT/frontend_build_status.txt"
+            else
+              echo "FRONTEND_BUILD_FAIL" > "$OUT/frontend_build_status.txt"
+            fi
+          else
+            echo "FRONTEND_PACKAGE_MISSING" > "$OUT/frontend_build_status.txt"
+          fi
+
+      - name: Cloud browser UI smoke proof
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          OUT="$GITHUB_WORKSPACE/reports/latest/dashboard_ultra_readiness"
+          mkdir -p "$OUT"
+          STATUS_JSON="$OUT/browser_smoke_summary.json"
+
+          if [ ! -f dashboard/frontend/package.json ]; then
+            printf '{"status":"FAIL","reason":"dashboard/frontend/package.json missing","browser_visual_proof":false}\n' > "$STATUS_JSON"
+            exit 0
+          fi
+
+          cd dashboard/frontend
+
+          if [ ! -d node_modules ]; then
+            npm ci >> "$OUT/npm_ci.log" 2>&1 || true
+          fi
+
+          npm install --no-save playwright > "$OUT/npm_playwright_install.log" 2>&1 || {
+            printf '{"status":"FAIL","reason":"playwright npm install failed","browser_visual_proof":false}\n' > "$STATUS_JSON"
+            exit 0
+          }
+
+          npx playwright install --with-deps chromium > "$OUT/playwright_browser_install.log" 2>&1 || {
+            printf '{"status":"FAIL","reason":"playwright chromium install failed","browser_visual_proof":false}\n' > "$STATUS_JSON"
+            exit 0
+          }
+
+          npm run build >> "$OUT/npm_build.log" 2>&1 || {
+            printf '{"status":"FAIL","reason":"frontend build failed before browser smoke","browser_visual_proof":false}\n' > "$STATUS_JSON"
+            exit 0
+          }
+
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > "$OUT/vite_preview.log" 2>&1 &
+          PREVIEW_PID=$!
+          echo "$PREVIEW_PID" > "$OUT/vite_preview.pid"
+
+          READY=0
+          for i in $(seq 1 40); do
+            if curl -fsS "http://127.0.0.1:4173" > "$OUT/browser_smoke_home.html" 2> "$OUT/browser_smoke_curl.err"; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$READY" != "1" ]; then
+            kill "$PREVIEW_PID" 2>/dev/null || true
+            printf '{"status":"FAIL","reason":"vite preview did not respond on http://127.0.0.1:4173","browser_visual_proof":false}\n' > "$STATUS_JSON"
+            exit 0
+          fi
+
+          OUT_DIR="$OUT" SMOKE_URL="http://127.0.0.1:4173" node --input-type=module <<'NODE'
+          import fs from 'fs';
+          import path from 'path';
+          import { chromium } from 'playwright';
+
+          const out = process.env.OUT_DIR;
+          const url = process.env.SMOKE_URL;
+          const statusPath = path.join(out, 'browser_smoke_summary.json');
+          const screenshotPath = path.join(out, 'dashboard_browser_smoke.png');
+
+          const write = (data) => fs.writeFileSync(statusPath, JSON.stringify(data, null, 2));
+
+          let browser;
+          try {
+            browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+            const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+            await page.screenshot({ path: screenshotPath, fullPage: true });
+            const title = await page.title();
+            const bodyText = (await page.locator('body').innerText({ timeout: 10000 })).slice(0, 2000);
+            const hasRootText = bodyText.trim().length > 0;
+            const httpStatus = response ? response.status() : null;
+            write({
+              status: httpStatus && httpStatus < 400 && hasRootText ? 'PASS' : 'WARN',
+              url,
+              http_status: httpStatus,
+              title,
+              body_text_sample: bodyText,
+              screenshot: 'dashboard_browser_smoke.png',
+              browser_visual_proof: fs.existsSync(screenshotPath),
+              reason: httpStatus && httpStatus < 400 && hasRootText ? 'cloud browser opened dashboard and screenshot was captured' : 'browser opened but page evidence was weak'
+            });
+          } catch (error) {
+            write({ status: 'FAIL', reason: String(error), browser_visual_proof: false });
+          } finally {
+            if (browser) await browser.close();
+          }
+          NODE
+
+          kill "$PREVIEW_PID" 2>/dev/null || true
+
+      - name: Finalize dashboard readiness verdict
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          out = Path('reports/latest/dashboard_ultra_readiness')
+          summary_path = out / 'dashboard_ultra_readiness_summary.json'
+          smoke_path = out / 'browser_smoke_summary.json'
+          summary = json.loads(summary_path.read_text(encoding='utf-8'))
+          smoke = json.loads(smoke_path.read_text(encoding='utf-8')) if smoke_path.exists() else {'status': 'NOT_RUN', 'browser_visual_proof': False, 'reason': 'browser smoke file missing'}
+
+          static_blockers = summary.get('static_blockers', [])
+          blockers = list(static_blockers)
+
+          build_status = (out / 'frontend_build_status.txt').read_text(encoding='utf-8', errors='replace').strip() if (out / 'frontend_build_status.txt').exists() else 'FRONTEND_BUILD_STATUS_MISSING'
+          ci_status = (out / 'npm_ci_status.txt').read_text(encoding='utf-8', errors='replace').strip() if (out / 'npm_ci_status.txt').exists() else 'NPM_CI_STATUS_MISSING'
+
+          if ci_status != 'NPM_CI_PASS':
+              blockers.append('npm_ci_not_passed')
+          if build_status != 'FRONTEND_BUILD_PASS':
+              blockers.append('frontend_build_not_passed')
+          if smoke.get('status') != 'PASS':
+              blockers.append('browser_smoke_not_passed')
+          if not smoke.get('browser_visual_proof'):
+              blockers.append('browser_screenshot_missing')
+
+          full_ready = len(blockers) == 0
+          summary.update({
+              'generated_utc': datetime.now(timezone.utc).isoformat(),
+              'npm_ci_status': ci_status,
+              'frontend_build_status': build_status,
+              'browser_smoke': smoke,
+              'browser_visual_proof': bool(smoke.get('browser_visual_proof')),
+              'blockers': blockers,
+              'full_ultra_dashboard_ready_proven': full_ready,
+              'verdict': 'FULL_BROWSER_READY_PROVEN' if full_ready else 'NOT_FULLY_PROVEN',
+              'note': 'Cloud browser smoke test executed in GitHub Actions. FULL pass requires static checks, npm ci/build, HTTP browser open, body evidence, and committed screenshot proof.'
+          })
+          summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True), encoding='utf-8')
+
+          lines = [
+              '# Ultra Dashboard Readiness Proof',
+              '',
+              f"Generated UTC: {summary['generated_utc']}",
+              '',
+              f"Verdict: `{summary['verdict']}`",
+              f"Full dashboard ready proven: `{summary['full_ultra_dashboard_ready_proven']}`",
+              f"Browser visual proof: `{summary['browser_visual_proof']}`",
+              f"npm ci status: `{ci_status}`",
+              f"frontend build status: `{build_status}`",
+              f"browser smoke status: `{smoke.get('status')}`",
+              '',
+              '## Checks',
+              '',
+              '| Check | OK |',
+              '|---|---:|',
+          ]
+          for name, ok in summary.get('feature_checks', {}).items():
               lines.append(f"| `{name}` | `{ok}` |")
           lines += ['', '## UI feature references', '', '| Feature | Present |', '|---|---:|']
-          for name, ok in feature_presence.items():
+          for name, ok in summary.get('ui_feature_presence', {}).items():
               lines.append(f"| `{name}` | `{ok}` |")
+          lines += ['', '## Cloud browser smoke proof', '', '| Item | Value |', '|---|---|']
+          lines.append(f"| Status | `{smoke.get('status')}` |")
+          lines.append(f"| URL | `{smoke.get('url', '')}` |")
+          lines.append(f"| HTTP status | `{smoke.get('http_status', '')}` |")
+          lines.append(f"| Screenshot | `{smoke.get('screenshot', '')}` |")
+          lines.append(f"| Reason | `{smoke.get('reason', '')}` |")
           lines += ['', '## Blockers', '']
           if blockers:
               lines.extend([f'- `{b}`' for b in blockers])
           else:
               lines.append('- None')
-          lines += ['', '## Important', '', 'Static readiness is not the same as visual dashboard proof. Browser/UI proof remains required.']
-          (out/'README.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+          lines += ['', '## Important', '', 'This proof is generated in GitHub Actions cloud. It is safer than local-only claims because the browser smoke test runs on a clean Ubuntu runner and captures screenshot evidence.']
+          (out / 'README.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
           PY
 
-          cat "$OUT/README.md"
+          cat reports/latest/dashboard_ultra_readiness/README.md
 
-      - name: Optional frontend install/build smoke
-        shell: bash
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          OUT="reports/latest/dashboard_ultra_readiness"
-          if [ -f dashboard/frontend/package.json ]; then
-            cd dashboard/frontend
-            npm ci > ../../reports/latest/dashboard_ultra_readiness/npm_ci.log 2>&1
-            npm run build > ../../reports/latest/dashboard_ultra_readiness/npm_build.log 2>&1
-            echo "FRONTEND_BUILD_PASS" > ../../reports/latest/dashboard_ultra_readiness/frontend_build_status.txt
-          else
-            echo "FRONTEND_PACKAGE_MISSING" > reports/latest/dashboard_ultra_readiness/frontend_build_status.txt
-          fi
+      - name: Upload dashboard readiness proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-ultra-readiness-proof
+          path: reports/latest/dashboard_ultra_readiness
+          if-no-files-found: error
 
       - name: Commit dashboard readiness proof
         shell: bash
@@ -171,6 +353,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No dashboard readiness proof changes to commit."
           else
-            git commit -m "audit: publish ultra dashboard readiness proof"
+            git commit -m "audit: publish ultra dashboard browser proof"
             git push
           fi
