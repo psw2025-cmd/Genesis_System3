@@ -348,9 +348,6 @@
     "path": "dashboard/e2e/electron_visual_verify.py"
   },
   {
-    "path": "dashboard/frontend/dist/assets/index-D39Quml5.js"
-  },
-  {
     "path": "dashboard/frontend/src/config.ts"
   },
   {
