@@ -1,9 +1,9 @@
 # Full tracked file inventory summary
-Tracked file count: 3695
+Tracked file count: 3696
 
 Top directories:
   1081 <root>
-   827 reports
+   828 reports
    597 core
    496 docs
    233 tests
