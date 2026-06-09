@@ -1,8 +1,16 @@
-commit c2c8cad45d5da7756846a6aaf812b0d9135d7f59
-Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Tue Jun 9 11:06:26 2026 +0530
+commit 11a55c94ad75ff430ddfd19f97c9d3afa8048e82
+Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+Date:   Tue Jun 9 05:37:04 2026 +0000
 
-    feat: add dashboard backtest proof panel
+    audit: publish full repo verification report [skip ci]
 
- dashboard/frontend/src/components/Backtest.tsx | 114 +++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
+ reports/latest/full_repo_verification/README.md    |   2 +-
+ .../commands/frontend_build_if_present.stdout.txt  |   4 +-
+ .../commands/git_last_commit.stdout.txt            |  13 +-
+ .../master_orchestrator_dry_run.stdout.txt         |   2 +-
+ .../full_repo_verification/commands_index.json     | 856 ++++++++++-----------
+ .../full_repo_verification/file_inventory.json     |   6 +-
+ .../full_repo_verification/proof_status.json       |   2 +-
+ .../full_repo_verification/search_groups.json      |  15 +-
+ reports/latest/full_repo_verification/summary.json |   4 +-
+ 9 files changed, 452 insertions(+), 452 deletions(-)
