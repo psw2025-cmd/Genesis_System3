@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "url": "http://127.0.0.1:4173",
+  "http_status": 200,
+  "title": "System3 Ultra Dashboard",
+  "body_text_sample": "System3 Ultra Dashboard\nOverview\nChain\nSignals\nTrading\nBacktest\nAlerts\nRisk\nCharts\nML\nModel\nControl\nAgent\n☀️\nSystem Overview\nState Version: 0\nSystem Self-Test ✅\nRe-test\n✅\nBackend Connection:\nBackend is running and responding\n✅\nLearning System:\nLearning system available (inactive)\n✅\nForensic System:\nForensic analysis available\n✅\nValidation System:\nValidation system available\n✅\nChain Data:\nData available\n✅\nSignal Data:\nData available\n✅\nPosition Data:\nData available\n✅\nPnL Data:\nData available\n📊\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Disconnected\nTrading Mode\nPAPER\n📊 Paper Trading Mode\nBroker:\nDISCONNECTED\nMarket Status\nclosed\n✅ LIVE DATA\nLast Fetch: 5:18:09 AM\n✓ Fresh (0.0 min old)\nQC Status\n:\nPASS\nCycles\n0\nRefresh: 5s\nTrades Executed\n0\nOpen Positions\n0\nTotal PnL\n₹0.00\nNo positions\nDaily PnL\n₹0.00\nRealized only\nPerformance SLA\nCycle Duration\n0.500s\nSLA: ≤60s\nFetch Duration\n0.100s\nStrategy Duration\n0.200s",
+  "screenshot": "dashboard_browser_smoke.png",
+  "browser_visual_proof": true,
+  "reason": "cloud browser opened dashboard and screenshot was captured"
+}
