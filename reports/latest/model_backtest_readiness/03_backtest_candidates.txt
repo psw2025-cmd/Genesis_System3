@@ -103,6 +103,7 @@ dashboard/backend/backtesting.py
 dashboard/backend/ml_performance_tracking.py
 dashboard/backend/multi_validation_audit.py
 dashboard/backend/performance_predictor.py
+dashboard/frontend/src/components/Backtest.tsx
 dashboard/frontend/src/components/MLPerformance.tsx
 docs/COMPLETE_VALIDATION_REPORT.md
 docs/CSV_VALIDATION_AND_IMPROVEMENTS.md
