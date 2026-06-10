@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 279,
+    "candidate_count": 280,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       ".github/workflows/model-backtest-readiness.yml",
@@ -116,14 +116,14 @@
       "dashboard/backend/ml_performance_tracking.py",
       "dashboard/backend/multi_validation_audit.py",
       "dashboard/backend/performance_predictor.py",
+      "dashboard/frontend/src/components/Backtest.tsx",
       "dashboard/frontend/src/components/MLPerformance.tsx",
       "docs/COMPLETE_VALIDATION_REPORT.md",
       "docs/CSV_VALIDATION_AND_IMPROVEMENTS.md",
       "docs/SYSTEM3_AUTORUN_MULTI_VALIDATION.md",
       "docs/SYSTEM3_AUTORUN_VALIDATION_CHECKLIST.md",
       "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_REPORT.md",
-      "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_RESULTS.json",
-      "docs/SYSTEM3_CSV_CLEAN_VALIDATION_SUMMARY.md"
+      "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_RESULTS.json"
     ],
     "compile_results": [
       {

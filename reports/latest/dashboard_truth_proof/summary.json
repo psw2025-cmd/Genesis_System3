@@ -31,8 +31,8 @@
       "total_endpoints_tested"
     ],
     "dashboard_endpoint_coverage_report_present": true,
-    "dashboard_file_count": 65,
-    "frontend_file_count": 35
+    "dashboard_file_count": 66,
+    "frontend_file_count": 36
   },
   "gate": "dashboard_truth_proof",
   "next_action": "Run dashboard endpoint coverage plus browser screenshot proof; dashboard must show blockers and never claim ready until gates pass.",

@@ -46,7 +46,7 @@
           "config/.env.example",
           "reports/latest/safety_and_secrets/summary.json"
         ],
-        "tracked_file_count": 3693
+        "tracked_file_count": 3696
       },
       "gate": "safety_and_secrets",
       "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
@@ -112,6 +112,7 @@
             "dashboard/backend/backtesting.py",
             "dashboard/backend/ml_performance_tracking.py",
             "dashboard/backend/performance_predictor.py",
+            "dashboard/frontend/src/components/Backtest.tsx",
             "dashboard/frontend/src/components/MLPerformance.tsx",
             "docs/system3_autorun_performance_analysis.md",
             "enforce_pnl_log_schema.py",
@@ -424,6 +425,7 @@
             "dashboard/frontend/src/components/Alerts.tsx",
             "dashboard/frontend/src/components/AppSelfTest.tsx",
             "dashboard/frontend/src/components/BackendConnectivityBanner.tsx",
+            "dashboard/frontend/src/components/Backtest.tsx",
             "dashboard/frontend/src/components/ChainAnalytics.tsx",
             "dashboard/frontend/src/components/ControlPlane.tsx",
             "dashboard/frontend/src/components/DataSourceWarning.tsx",
@@ -1495,7 +1497,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 279,
+        "candidate_count": 280,
         "candidates_sample": [
           "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
           ".github/workflows/model-backtest-readiness.yml",
@@ -1609,14 +1611,14 @@
           "dashboard/backend/ml_performance_tracking.py",
           "dashboard/backend/multi_validation_audit.py",
           "dashboard/backend/performance_predictor.py",
+          "dashboard/frontend/src/components/Backtest.tsx",
           "dashboard/frontend/src/components/MLPerformance.tsx",
           "docs/COMPLETE_VALIDATION_REPORT.md",
           "docs/CSV_VALIDATION_AND_IMPROVEMENTS.md",
           "docs/SYSTEM3_AUTORUN_MULTI_VALIDATION.md",
           "docs/SYSTEM3_AUTORUN_VALIDATION_CHECKLIST.md",
           "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_REPORT.md",
-          "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_RESULTS.json",
-          "docs/SYSTEM3_CSV_CLEAN_VALIDATION_SUMMARY.md"
+          "docs/SYSTEM3_COMPREHENSIVE_VALIDATION_RESULTS.json"
         ],
         "compile_results": [
           {
@@ -1848,8 +1850,8 @@
           "total_endpoints_tested"
         ],
         "dashboard_endpoint_coverage_report_present": true,
-        "dashboard_file_count": 65,
-        "frontend_file_count": 35
+        "dashboard_file_count": 66,
+        "frontend_file_count": 36
       },
       "gate": "dashboard_truth_proof",
       "next_action": "Run dashboard endpoint coverage plus browser screenshot proof; dashboard must show blockers and never claim ready until gates pass.",
@@ -1860,7 +1862,7 @@
       ]
     }
   ],
-  "generated_utc": "2026-06-09T04:44:30.856479+00:00",
+  "generated_utc": "2026-06-10T04:50:11.111188+00:00",
   "live_trading_enabled": false,
   "manual_only_items": [
     "broker OTP/manual login/session renewal when required",

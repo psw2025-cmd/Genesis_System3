@@ -38,7 +38,7 @@
       "config/.env.example",
       "reports/latest/safety_and_secrets/summary.json"
     ],
-    "tracked_file_count": 3693
+    "tracked_file_count": 3696
   },
   "gate": "safety_and_secrets",
   "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",

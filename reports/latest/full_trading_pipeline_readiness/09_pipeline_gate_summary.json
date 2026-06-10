@@ -5,7 +5,7 @@
     "live_market_analyzer_paper_trade_not_proven",
     "full_working_dashboard_not_proven"
   ],
-  "generated_utc": "2026-06-09T04:44:30.858261+00:00",
+  "generated_utc": "2026-06-10T04:50:11.112967+00:00",
   "logzero_dependency_present": true,
   "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
   "master_control_plane_verdict": "TRADE_READY_BLOCKED",
