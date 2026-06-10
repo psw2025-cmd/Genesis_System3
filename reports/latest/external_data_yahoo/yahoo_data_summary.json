@@ -1,46 +1,46 @@
 {
   "analyzer_only": true,
-  "generated_utc": "2026-06-09T05:01:29.604566+00:00",
+  "generated_utc": "2026-06-10T05:07:22.678367+00:00",
   "live_trading_enabled": false,
   "purpose": "secondary public OHLC fallback proof; not authoritative for options execution",
   "results": [
     {
       "last_row": {
-        "('Adj Close', '^NSEI')": 23162.099609375,
-        "('Close', '^NSEI')": 23162.099609375,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', '^NSEI')": 23259.44921875,
-        "('Low', '^NSEI')": 23148.69921875,
-        "('Open', '^NSEI')": 23259.05078125,
+        "('Adj Close', '^NSEI')": 23349.099609375,
+        "('Close', '^NSEI')": 23349.099609375,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', '^NSEI')": 23384.44921875,
+        "('Low', '^NSEI')": 23217.30078125,
+        "('Open', '^NSEI')": 23233.94921875,
         "('Volume', '^NSEI')": 0.0
       },
       "ok": true,
-      "rows": 9,
+      "rows": 8,
       "symbol": "^NSEI"
     },
     {
       "last_row": {
-        "('Adj Close', '^NSEBANK')": 54701.5,
-        "('Close', '^NSEBANK')": 54701.5,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', '^NSEBANK')": 54799.94921875,
-        "('Low', '^NSEBANK')": 54242.30078125,
-        "('Open', '^NSEBANK')": 54265.0,
+        "('Adj Close', '^NSEBANK')": 55368.6484375,
+        "('Close', '^NSEBANK')": 55368.6484375,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', '^NSEBANK')": 55397.69921875,
+        "('Low', '^NSEBANK')": 55086.8515625,
+        "('Open', '^NSEBANK')": 55110.5,
         "('Volume', '^NSEBANK')": 0.0
       },
       "ok": true,
-      "rows": 9,
+      "rows": 8,
       "symbol": "^NSEBANK"
     },
     {
       "last_row": {
-        "('Adj Close', 'RELIANCE.NS')": 1268.199951171875,
-        "('Close', 'RELIANCE.NS')": 1268.199951171875,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'RELIANCE.NS')": 1274.199951171875,
-        "('Low', 'RELIANCE.NS')": 1265.0999755859375,
-        "('Open', 'RELIANCE.NS')": 1269.0,
-        "('Volume', 'RELIANCE.NS')": 2404340.0
+        "('Adj Close', 'RELIANCE.NS')": 1283.0,
+        "('Close', 'RELIANCE.NS')": 1283.0,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'RELIANCE.NS')": 1300.5,
+        "('Low', 'RELIANCE.NS')": 1275.0,
+        "('Open', 'RELIANCE.NS')": 1275.0,
+        "('Volume', 'RELIANCE.NS')": 5087653.0
       },
       "ok": true,
       "rows": 10,
@@ -48,13 +48,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'TCS.NS')": 2147.60009765625,
-        "('Close', 'TCS.NS')": 2147.60009765625,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'TCS.NS')": 2174.0,
-        "('Low', 'TCS.NS')": 2144.0,
-        "('Open', 'TCS.NS')": 2174.0,
-        "('Volume', 'TCS.NS')": 1178695.0
+        "('Adj Close', 'TCS.NS')": 2167.800048828125,
+        "('Close', 'TCS.NS')": 2167.800048828125,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'TCS.NS')": 2180.800048828125,
+        "('Low', 'TCS.NS')": 2145.89990234375,
+        "('Open', 'TCS.NS')": 2151.300048828125,
+        "('Volume', 'TCS.NS')": 1025391.0
       },
       "ok": true,
       "rows": 10,
@@ -62,13 +62,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'HDFCBANK.NS')": 736.6500244140625,
-        "('Close', 'HDFCBANK.NS')": 736.6500244140625,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'HDFCBANK.NS')": 743.9500122070312,
-        "('Low', 'HDFCBANK.NS')": 736.2000122070312,
-        "('Open', 'HDFCBANK.NS')": 739.4500122070312,
-        "('Volume', 'HDFCBANK.NS')": 6518010.0
+        "('Adj Close', 'HDFCBANK.NS')": 739.0,
+        "('Close', 'HDFCBANK.NS')": 739.0,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'HDFCBANK.NS')": 745.5,
+        "('Low', 'HDFCBANK.NS')": 736.4000244140625,
+        "('Open', 'HDFCBANK.NS')": 736.5,
+        "('Volume', 'HDFCBANK.NS')": 12679301.0
       },
       "ok": true,
       "rows": 10,
@@ -76,13 +76,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'ICICIBANK.NS')": 1269.0999755859375,
-        "('Close', 'ICICIBANK.NS')": 1269.0999755859375,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'ICICIBANK.NS')": 1273.4000244140625,
-        "('Low', 'ICICIBANK.NS')": 1252.699951171875,
-        "('Open', 'ICICIBANK.NS')": 1255.0,
-        "('Volume', 'ICICIBANK.NS')": 3578340.0
+        "('Adj Close', 'ICICIBANK.NS')": 1290.0,
+        "('Close', 'ICICIBANK.NS')": 1290.0,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'ICICIBANK.NS')": 1290.9000244140625,
+        "('Low', 'ICICIBANK.NS')": 1271.300048828125,
+        "('Open', 'ICICIBANK.NS')": 1271.300048828125,
+        "('Volume', 'ICICIBANK.NS')": 6539277.0
       },
       "ok": true,
       "rows": 10,
@@ -90,13 +90,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'INFY.NS')": 1170.800048828125,
-        "('Close', 'INFY.NS')": 1170.800048828125,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'INFY.NS')": 1193.5999755859375,
-        "('Low', 'INFY.NS')": 1167.300048828125,
-        "('Open', 'INFY.NS')": 1193.5999755859375,
-        "('Volume', 'INFY.NS')": 2915219.0
+        "('Adj Close', 'INFY.NS')": 1159.5,
+        "('Close', 'INFY.NS')": 1159.5,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'INFY.NS')": 1171.4000244140625,
+        "('Low', 'INFY.NS')": 1158.5,
+        "('Open', 'INFY.NS')": 1160.0999755859375,
+        "('Volume', 'INFY.NS')": 2678759.0
       },
       "ok": true,
       "rows": 10,
@@ -104,13 +104,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'SBIN.NS')": 988.2000122070312,
-        "('Close', 'SBIN.NS')": 988.2000122070312,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'SBIN.NS')": 990.5,
-        "('Low', 'SBIN.NS')": 983.0,
-        "('Open', 'SBIN.NS')": 985.0,
-        "('Volume', 'SBIN.NS')": 3738942.0
+        "('Adj Close', 'SBIN.NS')": 1009.7000122070312,
+        "('Close', 'SBIN.NS')": 1009.7000122070312,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'SBIN.NS')": 1011.7999877929688,
+        "('Low', 'SBIN.NS')": 1000.8499755859375,
+        "('Open', 'SBIN.NS')": 1002.7000122070312,
+        "('Volume', 'SBIN.NS')": 4986424.0
       },
       "ok": true,
       "rows": 10,
@@ -118,13 +118,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'AXISBANK.NS')": 1277.0,
-        "('Close', 'AXISBANK.NS')": 1277.0,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'AXISBANK.NS')": 1292.9000244140625,
-        "('Low', 'AXISBANK.NS')": 1271.5,
-        "('Open', 'AXISBANK.NS')": 1275.9000244140625,
-        "('Volume', 'AXISBANK.NS')": 1279168.0
+        "('Adj Close', 'AXISBANK.NS')": 1303.5,
+        "('Close', 'AXISBANK.NS')": 1303.5,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'AXISBANK.NS')": 1305.800048828125,
+        "('Low', 'AXISBANK.NS')": 1283.5,
+        "('Open', 'AXISBANK.NS')": 1283.5,
+        "('Volume', 'AXISBANK.NS')": 2302261.0
       },
       "ok": true,
       "rows": 10,
@@ -132,13 +132,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'LT.NS')": 3894.89990234375,
-        "('Close', 'LT.NS')": 3894.89990234375,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'LT.NS')": 3924.89990234375,
-        "('Low', 'LT.NS')": 3885.0,
-        "('Open', 'LT.NS')": 3924.89990234375,
-        "('Volume', 'LT.NS')": 291663.0
+        "('Adj Close', 'LT.NS')": 3931.89990234375,
+        "('Close', 'LT.NS')": 3931.89990234375,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'LT.NS')": 3932.0,
+        "('Low', 'LT.NS')": 3900.0,
+        "('Open', 'LT.NS')": 3904.0,
+        "('Volume', 'LT.NS')": 374957.0
       },
       "ok": true,
       "rows": 10,
@@ -146,13 +146,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'BHARTIARTL.NS')": 1809.4000244140625,
-        "('Close', 'BHARTIARTL.NS')": 1809.4000244140625,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'BHARTIARTL.NS')": 1837.0,
-        "('Low', 'BHARTIARTL.NS')": 1806.9000244140625,
-        "('Open', 'BHARTIARTL.NS')": 1837.0,
-        "('Volume', 'BHARTIARTL.NS')": 2493326.0
+        "('Adj Close', 'BHARTIARTL.NS')": 1791.5,
+        "('Close', 'BHARTIARTL.NS')": 1791.5,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'BHARTIARTL.NS')": 1807.699951171875,
+        "('Low', 'BHARTIARTL.NS')": 1786.699951171875,
+        "('Open', 'BHARTIARTL.NS')": 1799.0,
+        "('Volume', 'BHARTIARTL.NS')": 1807692.0
       },
       "ok": true,
       "rows": 10,
@@ -160,13 +160,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'KOTAKBANK.NS')": 381.5,
-        "('Close', 'KOTAKBANK.NS')": 381.5,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'KOTAKBANK.NS')": 382.3500061035156,
-        "('Low', 'KOTAKBANK.NS')": 377.29998779296875,
-        "('Open', 'KOTAKBANK.NS')": 379.70001220703125,
-        "('Volume', 'KOTAKBANK.NS')": 2472069.0
+        "('Adj Close', 'KOTAKBANK.NS')": 387.70001220703125,
+        "('Close', 'KOTAKBANK.NS')": 387.70001220703125,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'KOTAKBANK.NS')": 387.70001220703125,
+        "('Low', 'KOTAKBANK.NS')": 380.5,
+        "('Open', 'KOTAKBANK.NS')": 380.5,
+        "('Volume', 'KOTAKBANK.NS')": 3450864.0
       },
       "ok": true,
       "rows": 10,
@@ -174,13 +174,13 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'ADANIENT.NS')": 2961.199951171875,
-        "('Close', 'ADANIENT.NS')": 2961.199951171875,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'ADANIENT.NS')": 2992.0,
-        "('Low', 'ADANIENT.NS')": 2951.10009765625,
-        "('Open', 'ADANIENT.NS')": 2985.89990234375,
-        "('Volume', 'ADANIENT.NS')": 573549.0
+        "('Adj Close', 'ADANIENT.NS')": 2984.0,
+        "('Close', 'ADANIENT.NS')": 2984.0,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'ADANIENT.NS')": 2985.39990234375,
+        "('Low', 'ADANIENT.NS')": 2936.5,
+        "('Open', 'ADANIENT.NS')": 2977.0,
+        "('Volume', 'ADANIENT.NS')": 496043.0
       },
       "ok": true,
       "rows": 10,
@@ -194,20 +194,20 @@
     },
     {
       "last_row": {
-        "('Adj Close', 'BPCL.NS')": 287.04998779296875,
-        "('Close', 'BPCL.NS')": 287.04998779296875,
-        "('Date', '')": "2026-06-09T00:00:00",
-        "('High', 'BPCL.NS')": 288.75,
-        "('Low', 'BPCL.NS')": 285.70001220703125,
-        "('Open', 'BPCL.NS')": 288.75,
-        "('Volume', 'BPCL.NS')": 1332940.0
+        "('Adj Close', 'BPCL.NS')": 288.1499938964844,
+        "('Close', 'BPCL.NS')": 288.1499938964844,
+        "('Date', '')": "2026-06-10T00:00:00",
+        "('High', 'BPCL.NS')": 290.20001220703125,
+        "('Low', 'BPCL.NS')": 287.29998779296875,
+        "('Open', 'BPCL.NS')": 289.0,
+        "('Volume', 'BPCL.NS')": 1354408.0
       },
       "ok": true,
       "rows": 10,
       "symbol": "BPCL.NS"
     }
   ],
-  "rows_total": 138,
+  "rows_total": 136,
   "source": "Yahoo Finance via yfinance",
   "symbols_failed": 1,
   "symbols_ok": 14,
