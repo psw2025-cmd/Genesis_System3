@@ -1,13 +1,13 @@
 # Production Grade Readiness Gate
 
-Generated UTC: 2026-06-09T05:36:42.842098+00:00
+Generated UTC: 2026-06-10T05:44:14.714009+00:00
 
 Verdict: `NOT_PRODUCTION_GRADE_READY`
 Production-grade ready: `False`
 Trade ready: `False`
 
-Checks passed: `13/26`
-Critical blockers: `9`
+Checks passed: `14/26`
+Critical blockers: `8`
 Medium blockers: `4`
 
 ## Blockers
@@ -24,7 +24,6 @@ Medium blockers: `4`
 | `backtest` | `safe dry-run validation execution proof published` | `medium` | run safe dry-run validation workflow |
 | `backtest` | `safe dry-run commands passed` | `medium` | fix dry-run failures |
 | `paper_lifecycle` | `live-market analyzer paper trade today proven` | `critical` | prove BUY/SELL/fill/exit/PnL lifecycle in analyzer mode |
-| `dashboard` | `full dashboard ready proven` | `critical` | fix frontend build/UI/API wiring and browser proof |
 | `dashboard` | `browser visual proof completed` | `critical` | run browser/UI screenshot smoke proof |
 | `production` | `overall trading pipeline trade_ready` | `critical` | clear all pipeline blockers first |
 
@@ -36,12 +35,11 @@ Medium blockers: `4`
 4. run recent backtest
 5. run walk-forward with costs/slippage
 6. prove BUY/SELL/fill/exit/PnL lifecycle in analyzer mode
-7. fix frontend build/UI/API wiring and browser proof
-8. run browser/UI screenshot smoke proof
-9. clear all pipeline blockers first
-10. classify 12 review candidates with runtime map before delete/archive
-11. fix external public data fallback
-12. run safe dry-run validation workflow
-13. fix dry-run failures
+7. run browser/UI screenshot smoke proof
+8. clear all pipeline blockers first
+9. classify 12 review candidates with runtime map before delete/archive
+10. fix external public data fallback
+11. run safe dry-run validation workflow
+12. fix dry-run failures
 
 Analyzer/Paper only. Live trading disabled.
