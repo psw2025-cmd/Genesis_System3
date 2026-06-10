@@ -268,7 +268,7 @@
     ".js": 12,
     ".json": 321,
     ".log": 5,
-    ".md": 1172,
+    ".md": 1173,
     ".md\"": 3,
     ".mdc": 1,
     ".pid": 2,
@@ -285,7 +285,7 @@
     ".vbs": 1,
     ".xlsx": 1,
     ".yaml": 2,
-    ".yml": 38,
+    ".yml": 39,
     ".zip": 3,
     "[no_ext]": 6
   },
@@ -293,7 +293,7 @@
     "\"docs": 4,
     ".": 1081,
     ".cursor": 3,
-    ".github": 34,
+    ".github": 35,
     ".scripts": 1,
     ".vscode": 2,
     "AI_AGENT_RUNS": 14,
@@ -305,7 +305,7 @@
     "docs": 496,
     "models": 11,
     "proof": 9,
-    "reports": 827,
+    "reports": 828,
     "runtime_reports": 6,
     "scripts": 211,
     "src": 32,
@@ -313,5 +313,5 @@
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3694
+  "tracked_file_count": 3696
 }

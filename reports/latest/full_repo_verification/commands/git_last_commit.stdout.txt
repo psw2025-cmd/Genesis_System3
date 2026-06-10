@@ -1,16 +1,8 @@
-commit 11a55c94ad75ff430ddfd19f97c9d3afa8048e82
+commit 57b12f128c48a99783058eeba8f620192eecfce3
 Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-Date:   Tue Jun 9 05:37:04 2026 +0000
+Date:   Wed Jun 10 03:46:00 2026 +0000
 
-    audit: publish full repo verification report [skip ci]
+    audit: publish full repo scan clean proof
 
- reports/latest/full_repo_verification/README.md    |   2 +-
- .../commands/frontend_build_if_present.stdout.txt  |   4 +-
- .../commands/git_last_commit.stdout.txt            |  13 +-
- .../master_orchestrator_dry_run.stdout.txt         |   2 +-
- .../full_repo_verification/commands_index.json     | 856 ++++++++++-----------
- .../full_repo_verification/file_inventory.json     |   6 +-
- .../full_repo_verification/proof_status.json       |   2 +-
- .../full_repo_verification/search_groups.json      |  15 +-
- reports/latest/full_repo_verification/summary.json |   4 +-
- 9 files changed, 452 insertions(+), 452 deletions(-)
+ reports/latest/full_repo_scan_clean/00_summary.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
