@@ -2,13 +2,6 @@ name: Repo Cleanliness Gate
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/repo-cleanliness-gate.yml
-      - .gitignore
-      - docs/project_control/**
 
 permissions:
   contents: write
