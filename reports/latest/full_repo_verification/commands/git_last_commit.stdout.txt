@@ -1,8 +1,9 @@
-commit 9738491d364e57f18ff992b3c6bc0f61a8fc1ae1
+commit a0ebb3635fb1d21bd5210a9871fe7e27309eb2ac
 Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Thu Jun 11 19:38:25 2026 +0000
+Date:   Thu Jun 11 19:55:04 2026 +0000
 
-    fix: use Dhan broker at /api/broker/status when DHAN_CLIENT_ID is set
+    fix: Dhan broker in health/MODE_GATE, broker/status; reduce polling to 5s with overlap guard
 
- dashboard/backend/app.py | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ dashboard/app.js         | 15 +++++----
+ dashboard/backend/app.py | 84 +++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 77 insertions(+), 22 deletions(-)
