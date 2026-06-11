@@ -14,3 +14,4 @@ Triggered: 2026-06-11T19:15:00Z — inject Dhan broker credentials into Render e
 Triggered: 2026-06-11T20:15:00Z — deploy a0ebb363: Dhan-first broker/status and health/MODE_GATE fix
 Triggered: 2026-06-11T20:17:50Z — fix inject workflow 202 empty-body handling; retrigger deploy
 Triggered: 2026-06-11T20:29:00Z — run endpoint proof after queued deploy
+Proof-trigger: 2026-06-11T20:32:00Z
