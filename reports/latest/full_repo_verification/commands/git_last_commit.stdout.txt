@@ -1,8 +1,8 @@
-commit d9031ae636cdb49c0956ff1e05994c79cb127711
-Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-Date:   Thu Jun 11 19:35:07 2026 +0000
+commit 9738491d364e57f18ff992b3c6bc0f61a8fc1ae1
+Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
+Date:   Thu Jun 11 19:38:25 2026 +0000
 
-    audit: publish full repo scan clean proof
+    fix: use Dhan broker at /api/broker/status when DHAN_CLIENT_ID is set
 
- reports/latest/full_repo_scan_clean/00_summary.md | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ dashboard/backend/app.py | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
