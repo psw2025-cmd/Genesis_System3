@@ -2,11 +2,6 @@ name: Phase 2 Authoritative Runtime Map
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/phase2-runtime-map.yml
 
 permissions:
   contents: read
