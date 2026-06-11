@@ -33,11 +33,9 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+          DHAN_CLIENT_ID: "1106583741"
         run: |
           set -euo pipefail
-
-          # DHAN_CLIENT_ID is a non-secret account identifier (like a username)
-          DHAN_CLIENT_ID="1106583741"
 
           echo "Fetching current Render env vars..."
           http_code=$(curl -sS -o /tmp/render_env_current.json -w "%{http_code}" \
