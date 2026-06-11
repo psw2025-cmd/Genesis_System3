@@ -1,8 +1,8 @@
-commit 9713f2945ecd373cf40228e957c78bbca97b6bfb
+commit 0f9eb52ed566dfee745941fb05e680e056a4226b
 Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Thu Jun 11 16:56:59 2026 +0000
+Date:   Thu Jun 11 17:20:41 2026 +0000
 
-    fix: load Render secret env file
+    chore: trigger backend deploy refresh after env loader fix
 
- core/utils/env_loader.py | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ dashboard/backend/DEPLOY_REFRESH_TRIGGER.md | 2 ++
+ 1 file changed, 2 insertions(+)
