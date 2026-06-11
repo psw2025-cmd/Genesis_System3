@@ -2,12 +2,6 @@ name: System3 Proof Batch
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "scripts/system3_issue_24_26_27_28_proof_batch.py"
-      - ".github/workflows/system3-proof-batch.yml"
 
 permissions:
   contents: write
