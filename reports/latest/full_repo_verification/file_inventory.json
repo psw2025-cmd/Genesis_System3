@@ -287,7 +287,7 @@
     ".vbs": 1,
     ".xlsx": 1,
     ".yaml": 2,
-    ".yml": 39,
+    ".yml": 40,
     ".zip": 3,
     "[no_ext]": 6
   },
@@ -295,7 +295,7 @@
     "\"docs": 4,
     ".": 1081,
     ".cursor": 3,
-    ".github": 35,
+    ".github": 36,
     ".scripts": 1,
     ".vscode": 2,
     "AI_AGENT_RUNS": 14,
@@ -315,5 +315,5 @@
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3708
+  "tracked_file_count": 3709
 }

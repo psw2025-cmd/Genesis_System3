@@ -2,7 +2,7 @@
   "blocker_count": 2,
   "fail_count": 1,
   "gate_count": 8,
-  "generated_utc": "2026-06-11T18:59:46.261296+00:00",
+  "generated_utc": "2026-06-11T19:09:33.426159+00:00",
   "live_trading_enabled": false,
   "pass_count": 7,
   "reports": [
