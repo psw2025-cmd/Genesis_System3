@@ -2,16 +2,6 @@ name: Safe Dryrun Validation Execution Proof
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/safe-dryrun-validation-execution.yml
-      - reports/latest/entrypoint_classification/**
-      - final_system_validation_test.py
-      - production_grade_validation.py
-      - system3_pre_autorun_validation.py
-      - complete_end_to_end_validation.py
 
 permissions:
   contents: write
