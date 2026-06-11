@@ -27,7 +27,7 @@
 ./TRADER_USER_GUIDE.md
 ./TRADER_USER_TEST_GUIDE.md
 ./TRADE_TIMING_ANALYSIS.md
-./audit_artifacts/full_trading_pipeline_readiness_20260611T195532Z/05_paper_analyzer_inventory.txt
+./audit_artifacts/full_trading_pipeline_readiness_20260611T201824Z/05_paper_analyzer_inventory.txt
 ./comprehensive_multi_trader_test.py
 ./config/angel_automation_config.json
 ./config/live_trade_config.json
