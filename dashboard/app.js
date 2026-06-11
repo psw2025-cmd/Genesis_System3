@@ -1,7 +1,7 @@
 // Genesis System3 Dashboard - Vue3 Application
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://genesis-system3-backend.onrender.com';
 
 createApp({
     setup() {

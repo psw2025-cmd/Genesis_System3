@@ -45,6 +45,7 @@ except Exception as e:
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:
@@ -232,6 +233,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# Serve the dashboard UI at /ui (index.html + app.js + style.css)
+_DASHBOARD_DIR = ROOT_DIR / "dashboard"
+if _DASHBOARD_DIR.exists():
+    app.mount("/ui", StaticFiles(directory=str(_DASHBOARD_DIR), html=True), name="dashboard-ui")
 
 # Root route - helpful message
 @app.get("/")
