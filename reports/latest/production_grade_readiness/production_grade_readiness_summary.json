@@ -273,7 +273,7 @@
   "checks_passed": 14,
   "checks_total": 26,
   "critical_blocker_count": 8,
-  "generated_utc": "2026-06-11T18:59:30.537202+00:00",
+  "generated_utc": "2026-06-11T19:21:04.587713+00:00",
   "medium_blocker_count": 4,
   "mode": "Analyzer/Paper only; live trading disabled",
   "next_fix_queue": [
