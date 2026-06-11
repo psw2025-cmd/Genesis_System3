@@ -2,11 +2,6 @@ name: Patch Render Root URLs and Dhan Dependency
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/patch-render-root-and-smartapi.yml
 
 permissions:
   contents: write
@@ -46,6 +41,3 @@ jobs:
         run: |
           set -euo pipefail
           python -m py_compile dashboard/backend/app.py
-          echo "app.py compile: PASS"
-          grep -n "dhanhq" dashboard/backend/requirements.txt
-          echo "dhanhq dependency: PRESENT"
