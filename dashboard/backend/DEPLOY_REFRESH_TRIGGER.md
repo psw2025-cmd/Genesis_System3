@@ -15,3 +15,4 @@ Triggered: 2026-06-11T20:15:00Z — deploy a0ebb363: Dhan-first broker/status an
 Triggered: 2026-06-11T20:17:50Z — fix inject workflow 202 empty-body handling; retrigger deploy
 Triggered: 2026-06-11T20:29:00Z — run endpoint proof after queued deploy
 Proof-trigger: 2026-06-11T20:32:00Z
+Triggered: 2026-06-11T20:35:21Z — cancel stuck deploys + fresh deploy trigger
