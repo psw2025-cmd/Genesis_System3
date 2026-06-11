@@ -1,8 +1,15 @@
-commit 01d26374102cbe015935e99dc75a549ca847a97c
+commit 1fa7e32c16039b8ed8a9a7baa2d530db0059b83b
 Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Thu Jun 11 20:14:08 2026 +0000
+Date:   Thu Jun 11 20:17:56 2026 +0000
 
-    chore: trigger Render deploy of a0ebb363 Dhan broker/status + health fix
+    fix: handle Render 202 empty-body in inject workflow; retrigger deploy
+    
+    When Render returns HTTP 202 with an empty body (deploy already in
+    progress), fall back to polling the latest deploy from the list
+    instead of failing on JSONDecodeError.
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
- dashboard/backend/DEPLOY_REFRESH_TRIGGER.md | 1 +
- 1 file changed, 1 insertion(+)
+ .github/workflows/render-inject-dhan-env.yml | 56 +++++++++++++++++++---------
+ dashboard/backend/DEPLOY_REFRESH_TRIGGER.md  |  1 +
+ 2 files changed, 39 insertions(+), 18 deletions(-)
