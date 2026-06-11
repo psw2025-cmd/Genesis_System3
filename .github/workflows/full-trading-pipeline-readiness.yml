@@ -2,16 +2,6 @@ name: Full Trading Pipeline Readiness Gate
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/full-trading-pipeline-readiness.yml
-      - dashboard/backend/**
-      - core/**
-      - scripts/**
-      - run_system3.py
-      - system3_ultra.py
 
 permissions:
   contents: write
@@ -116,7 +106,7 @@ jobs:
           result = {
               'runtime_backend_present': app_exists and docker_exists,
               'render_live_trading_disabled': 'LIVE_TRADING_ENABLED' in render_text and '"0"' in render_text,
-              'smartapi_dependency_present': dhanhq_dep,
+              'dhanhq_dependency_present': dhanhq_dep,
               'data_history_candidate_count': len(has_any(['data','histor','ohlc','candle','option','chain','csv','parquet','duckdb','sqlite'])),
               'model_training_candidate_count': len(has_any(['train','retrain','model','predict','accuracy','calibrat','drift','shadow','kronos','wavelet'])),
               'backtest_candidate_count': len(has_any(['backtest','strategy','pnl','performance','validation'])),
@@ -132,7 +122,7 @@ jobs:
               blockers.append('backend_runtime_not_present')
           if not result['render_live_trading_disabled']:
               blockers.append('live_trading_safety_not_proven_disabled')
-          if not result['smartapi_dependency_present']:
+          if not result['dhanhq_dependency_present']:
               blockers.append('dhanhq_dependency_missing')
           if not result['proven_model_training_fresh']:
               blockers.append('fresh_training_not_proven')
