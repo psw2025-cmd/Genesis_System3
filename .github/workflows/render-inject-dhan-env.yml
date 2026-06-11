@@ -2,12 +2,12 @@ name: Render Inject Dhan Env Vars
 
 # Triggered by push to the fallback trigger file (same pattern as render-cli-deploy.yml)
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
       - dashboard/backend/DEPLOY_REFRESH_TRIGGER.md
-      - .github/workflows/render-inject-dhan-env.yml
 
 permissions:
   contents: read
