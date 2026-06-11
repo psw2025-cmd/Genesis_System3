@@ -343,8 +343,18 @@ async def get_state_history(limit: int = 100):
 
 @app.get("/api/broker/status")
 async def get_broker_status():
-    """Get broker connection status with detailed error reporting"""
-    # Try to import broker if module-level import failed
+    """Get broker connection status. Uses Dhan if configured, falls back to AngelOne."""
+    # If Dhan credentials are present, use Dhan (read-only, analyzer mode)
+    dhan_client_id = os.getenv("DHAN_CLIENT_ID", "").strip()
+    dhan_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+    if dhan_client_id and dhan_token:
+        try:
+            from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            return _dhan_status()
+        except Exception as _e:
+            pass  # fall through to AngelOne
+
+    # Try AngelOne
     broker_class = AngelOneBroker if BROKER_AVAILABLE and AngelOneBroker is not None else None
     if broker_class is None:
         try:
