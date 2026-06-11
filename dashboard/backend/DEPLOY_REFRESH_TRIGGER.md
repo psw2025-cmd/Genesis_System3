@@ -10,3 +10,4 @@ Expected follow-up:
 - Keep analyzer/paper safety mode.
 
 Triggered: 2026-06-11T17:20:24Z — env loader fix deploy refresh
+Triggered: 2026-06-11T19:15:00Z — inject Dhan broker credentials into Render env vars
