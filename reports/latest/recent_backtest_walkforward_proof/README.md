@@ -1,6 +1,6 @@
 # recent_backtest_walkforward_proof
 
-Generated UTC: 2026-06-11T04:55:17.041469+00:00
+Generated UTC: 2026-06-11T17:10:55.739290+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
