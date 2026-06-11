@@ -3,10 +3,15 @@ from dotenv import load_dotenv
 
 # Project root: .../Genesis_System3
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-ENV_PATH = os.path.join(ROOT_DIR, "config", ".env")
+ENV_PATHS = [
+    os.path.join(ROOT_DIR, "config", ".env"),
+    os.getenv("SYSTEM3_ENV_FILE", ""),
+    "/etc/secrets/.env",
+]
 
-if os.path.exists(ENV_PATH):
-    load_dotenv(ENV_PATH)
+for env_path in ENV_PATHS:
+    if env_path and os.path.exists(env_path):
+        load_dotenv(env_path, override=False)
 
 
 def get_angelone_credentials():
