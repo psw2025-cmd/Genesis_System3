@@ -2,6 +2,7 @@
 dashboard/README.md
 dashboard/app.js
 dashboard/app.py
+dashboard/backend/DEPLOY_REFRESH_TRIGGER.md
 dashboard/backend/Dockerfile
 dashboard/backend/advanced_charting.py
 dashboard/backend/advanced_filtering.py
@@ -40,6 +41,7 @@ dashboard/frontend/src/components/AgentConsole.tsx
 dashboard/frontend/src/components/Alerts.tsx
 dashboard/frontend/src/components/AppSelfTest.tsx
 dashboard/frontend/src/components/BackendConnectivityBanner.tsx
+dashboard/frontend/src/components/Backtest.tsx
 dashboard/frontend/src/components/ChainAnalytics.tsx
 dashboard/frontend/src/components/ControlPlane.tsx
 dashboard/frontend/src/components/DataSourceWarning.tsx
