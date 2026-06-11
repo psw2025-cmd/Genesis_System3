@@ -4,17 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '10 4 * * *'
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/production-grade-readiness.yml
-      - reports/latest/**
-      - docs/project_control/**
-      - dashboard/**
-      - core/**
-      - scripts/**
-      - render.yaml
 
 permissions:
   contents: write
@@ -85,7 +74,7 @@ jobs:
           add('repo', 'old/backup/copy files classified', scan.get('old_backup_copy_review_candidate_count', 999) == 0, 'medium', 'classify 12 review candidates with runtime map before delete/archive')
 
           add('runtime', 'backend runtime present', tp.get('runtime_backend_present') is True, 'critical', 'fix Render/backend runtime')
-          add('runtime', 'DhanHQ dependency present', tp.get('smartapi_dependency_present') is True, 'critical', 'fix backend requirements (dhanhq>=2.2.0)')
+          add('runtime', 'DhanHQ dependency present', tp.get('dhanhq_dependency_present') is True, 'critical', 'fix backend requirements (dhanhq>=2.2.0)')
           add('runtime', 'live trading disabled', tp.get('render_live_trading_disabled') is True, 'critical', 'force analyzer/paper mode only')
           add('runtime', 'render endpoint proof published', proofs['render_endpoint'] is not None, 'critical', 'run Render endpoint proof')
 
