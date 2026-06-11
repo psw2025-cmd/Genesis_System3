@@ -453,6 +453,9 @@
     "path": "reports/latest/dashboard_ultra_readiness/README.md"
   },
   {
+    "path": "reports/latest/dashboard_ultra_readiness/browser_smoke_summary.json"
+  },
+  {
     "path": "reports/latest/dashboard_ultra_readiness/dashboard_ultra_readiness_summary.json"
   },
   {

@@ -255,7 +255,7 @@
     ]
   },
   "dashboard": {
-    "count": 408,
+    "count": 417,
     "sample": [
       ".github/workflows/dashboard-endpoint-coverage.yml",
       ".github/workflows/dashboard-ultra-readiness.yml",
@@ -665,7 +665,7 @@
     ]
   },
   "frontend": {
-    "count": 39,
+    "count": 41,
     "sample": [
       "app_self_test_component.tsx",
       "dashboard/frontend/dist/assets/index-D39Quml5.js",
@@ -705,7 +705,9 @@
       "dashboard/frontend/tsconfig.node.json",
       "dashboard/frontend/vite.config.ts",
       "desktop_app/package.json",
-      "package.json"
+      "package.json",
+      "reports/latest/dashboard_ultra_readiness/vite_preview.log",
+      "reports/latest/dashboard_ultra_readiness/vite_preview.pid"
     ]
   },
   "model_training": {
