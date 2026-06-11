@@ -7,6 +7,8 @@ ENV_PATHS = [
     os.path.join(ROOT_DIR, "config", ".env"),
     os.getenv("SYSTEM3_ENV_FILE", ""),
     "/etc/secrets/.env",
+    # Dhan-specific local secret file (git-excluded)
+    os.path.join(ROOT_DIR, ".secrets", "dhan.env"),
 ]
 
 for env_path in ENV_PATHS:
@@ -24,4 +26,16 @@ def get_angelone_credentials():
         "pin": os.getenv("ANGELONE_PIN", "").strip(),
         "password": os.getenv("ANGELONE_PASSWORD", "").strip(),
         "totp_secret": os.getenv("ANGELONE_TOTP", "").strip(),
+    }
+
+
+def get_dhan_credentials():
+    """
+    Returns Dhan credentials (read-only / analyzer-only).
+    Access token only — no API key or password needed for read ops.
+    Never logs or returns the raw token in user-facing output.
+    """
+    return {
+        "client_id": os.getenv("DHAN_CLIENT_ID", "").strip(),
+        "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip(),
     }

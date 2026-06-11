@@ -10,3 +10,4 @@ pytz>=2024.1
 pyotp>=2.9.0
 logzero>=1.7.0
 smartapi-python>=1.5.5
+dhanhq>=2.2.0

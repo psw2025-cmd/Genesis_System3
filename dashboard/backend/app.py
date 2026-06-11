@@ -397,6 +397,34 @@ async def get_broker_status():
         }
 
 
+@app.get("/api/broker/dhan/status")
+async def get_dhan_broker_status():
+    """Dhan read-only broker status. Never returns access token. No live trading."""
+    try:
+        from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
+        return dhan_get_status()
+    except ImportError as exc:
+        return {
+            "broker": "dhan",
+            "mode": "ANALYZER",
+            "connected": False,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "credentials_present": False,
+            "error": f"MODULE_NOT_AVAILABLE: {str(exc)[:200]}",
+        }
+    except Exception as exc:
+        return {
+            "broker": "dhan",
+            "mode": "ANALYZER",
+            "connected": False,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "credentials_present": False,
+            "error": str(exc)[:200],
+        }
+
+
 @app.get("/api/broker/deps")
 async def get_broker_deps():
     """Get broker dependency installation status"""

@@ -1,5 +1,5 @@
 {
-  "python.defaultInterpreterPath": "c:/Genesis_System3/venv/Scripts/python.exe",
+  "python.defaultInterpreterPath": "/home/codespace/.python/current/bin/python3",
   "python.terminal.activateEnvironment": true,
   "terminal.integrated.shellIntegration.environmentReporting": true,
   "terminal.integrated.suggest.enabled": true,
