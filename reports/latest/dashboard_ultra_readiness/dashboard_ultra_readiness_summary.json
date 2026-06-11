@@ -2,7 +2,7 @@
   "backend_file_count": 23,
   "blockers": [],
   "browser_smoke": {
-    "body_text_sample": "System3 Ultra Dashboard\nOverview\nChain\nSignals\nTrading\nBacktest\nAlerts\nRisk\nCharts\nML\nModel\nControl\nAgent\n\u2600\ufe0f\nSystem Overview\nState Version: 0\nSystem Self-Test \u2705\nRe-test\n\u2705\nBackend Connection:\nBackend is running and responding\n\u2705\nLearning System:\nLearning system available (inactive)\n\u2705\nForensic System:\nForensic analysis available\n\u2705\nValidation System:\nValidation system available\n\u2705\nChain Data:\nData available\n\u2705\nSignal Data:\nData available\n\u2705\nPosition Data:\nData available\n\u2705\nPnL Data:\nData available\n\ud83d\udcca\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Disconnected\nTrading Mode\nPAPER\n\ud83d\udcca Paper Trading Mode\nBroker:\nDISCONNECTED\nMarket Status\nclosed\n\u2705 LIVE DATA\nLast Fetch: 5:18:09 AM\n\u2713 Fresh (0.0 min old)\nQC Status\n:\nPASS\nCycles\n0\nRefresh: 5s\nTrades Executed\n0\nOpen Positions\n0\nTotal PnL\n\u20b90.00\nNo positions\nDaily PnL\n\u20b90.00\nRealized only\nPerformance SLA\nCycle Duration\n0.500s\nSLA: \u226460s\nFetch Duration\n0.100s\nStrategy Duration\n0.200s",
+    "body_text_sample": "System3 Ultra Dashboard\nOverview\nChain\nSignals\nTrading\nBacktest\nAlerts\nRisk\nCharts\nML\nModel\nControl\nAgent\n\u2600\ufe0f\nSystem Overview\nState Version: 0\nSystem Self-Test \u2705\nRe-test\n\u2705\nBackend Connection:\nBackend is running and responding\n\u2705\nLearning System:\nLearning system available (inactive)\n\u2705\nForensic System:\nForensic analysis available\n\u2705\nValidation System:\nValidation system available\n\u2705\nChain Data:\nData available\n\u2705\nSignal Data:\nData available\n\u2705\nPosition Data:\nData available\n\u2705\nPnL Data:\nData available\n\ud83d\udcca\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Disconnected\nTrading Mode\nPAPER\n\ud83d\udcca Paper Trading Mode\nBroker:\nDISCONNECTED\nMarket Status\nclosed\n\u2705 LIVE DATA\nLast Fetch: 5:20:03 AM\n\u2713 Fresh (0.0 min old)\nQC Status\n:\nPASS\nCycles\n0\nRefresh: 5s\nTrades Executed\n0\nOpen Positions\n0\nTotal PnL\n\u20b90.00\nNo positions\nDaily PnL\n\u20b90.00\nRealized only\nPerformance SLA\nCycle Duration\n0.500s\nSLA: \u226460s\nFetch Duration\n0.100s\nStrategy Duration\n0.200s",
     "browser_visual_proof": true,
     "http_status": 200,
     "reason": "cloud browser opened dashboard and screenshot was captured",
@@ -34,7 +34,7 @@
   "frontend_build_status": "FRONTEND_BUILD_PASS",
   "frontend_file_count": 36,
   "full_ultra_dashboard_ready_proven": true,
-  "generated_utc": "2026-06-10T05:18:10.292274+00:00",
+  "generated_utc": "2026-06-11T05:20:04.172108+00:00",
   "note": "Cloud browser smoke test executed in GitHub Actions. FULL pass requires static checks, npm ci/build, HTTP browser open, body evidence, and committed screenshot proof.",
   "npm_ci_status": "NPM_CI_PASS",
   "package_name": "system3-ultra-dashboard",
