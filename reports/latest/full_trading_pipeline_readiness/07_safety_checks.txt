@@ -20,6 +20,9 @@ core/engine/system3_phase376_self_test_suite.py:194:        "angel_broker.place_
 core/engine/angel_monday_diagnostic.py:92:        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
 core/broker/angel_live_order_wrapper.py:75:    def cancel_order(self, broker_order_id: str) -> dict:
 core/validation/option_chain_validator.py:181:                self.broker = AngelOneBroker(allow_data_only=True)
+core/brokers/dhan/dhan_readonly.py:341:    def place_order(self, *args, **kwargs):
+core/brokers/dhan/dhan_readonly.py:344:    def modify_order(self, *args, **kwargs):
+core/brokers/dhan/dhan_readonly.py:347:    def cancel_order(self, *args, **kwargs):
 core/brokers/angel_one/broker.py:19:    flag = os.getenv("SYSTEM3_LIVE_TRADING_ALLOWED", "").strip().lower()
 core/brokers/angel_one/broker.py:22:        msg = "LIVE TRADING BLOCKED BY ENV GUARD (SYSTEM3_LIVE_TRADING_ALLOWED not enabled)"
 core/brokers/angel_one/broker.py:28:    def __init__(self, allow_data_only: bool = False):
@@ -30,8 +33,8 @@ core/brokers/angel_one/broker.py:710:        flag = os.getenv("SYSTEM3_LIVE_TRAD
 core/brokers/angel_one/broker.py:713:            msg = f"LIVE TRADING BLOCKED: {operation} requires SYSTEM3_LIVE_TRADING_ALLOWED to be enabled"
 core/ultra/phase52_multi_broker.py:50:    def place_order(self, order: Dict[str, Any]) -> Dict[str, Any]:
 core/ultra/phase52_multi_broker.py:83:        order_result = broker.place_order(
-dashboard/backend/app.py:341:        broker = broker_class(allow_data_only=True)
-dashboard/backend/app.py:3217:async def cancel_order(order_id: str):
-dashboard/backend/app.py:3224:        success = order_mgmt.cancel_order(order_id)
+dashboard/backend/app.py:379:        broker = broker_class(allow_data_only=True)
+dashboard/backend/app.py:3335:async def cancel_order(order_id: str):
+dashboard/backend/app.py:3342:        success = order_mgmt.cancel_order(order_id)
 dashboard/backend/order_management.py:121:    def cancel_order(self, order_id: str) -> bool:
 dashboard/backend/runtime_state_store.py:65:            broker = AngelOneBroker(allow_data_only=True)
