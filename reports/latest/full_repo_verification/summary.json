@@ -9,7 +9,7 @@
     "total": 214
   },
   "critical_missing_count": 0,
-  "generated_utc": "2026-06-11T19:55:52.048840+00:00",
+  "generated_utc": "2026-06-11T20:14:59.943711+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "runner": {
     "cwd": "/home/runner/work/Genesis_System3/Genesis_System3",
@@ -18,11 +18,11 @@
   },
   "static_scan_counts": {
     "hardcoded_localhost_mentions": 234,
-    "live_mode_mentions": 532,
+    "live_mode_mentions": 533,
     "todo_fixme_mentions": 38,
-    "workflow_push_without_rebase": 17
+    "workflow_push_without_rebase": 16
   },
-  "tracked_file_count": 3709,
+  "tracked_file_count": 3711,
   "trade_ready": false,
   "verdict": "FULL_REPO_VERIFICATION_COMPLETE_WITH_BLOCKERS"
 }

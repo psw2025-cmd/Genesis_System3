@@ -30,9 +30,6 @@
     "path": ".github/workflows/proof-status-matrix.yml"
   },
   {
-    "path": ".github/workflows/render-endpoint-proof.yml"
-  },
-  {
     "path": ".github/workflows/restore-backend-app-once.yml"
   },
   {

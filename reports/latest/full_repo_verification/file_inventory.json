@@ -269,7 +269,7 @@
     ".js": 12,
     ".json": 322,
     ".log": 8,
-    ".md": 1173,
+    ".md": 1175,
     ".md\"": 3,
     ".mdc": 1,
     ".pid": 3,
@@ -304,7 +304,7 @@
     "core": 599,
     "dashboard": 66,
     "desktop_app": 6,
-    "docs": 496,
+    "docs": 498,
     "models": 11,
     "proof": 9,
     "reports": 837,
@@ -315,5 +315,5 @@
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3709
+  "tracked_file_count": 3711
 }
