@@ -8,3 +8,5 @@ Expected follow-up:
 - Confirm root endpoint production links.
 - Confirm backend health/state responses.
 - Keep analyzer/paper safety mode.
+
+Triggered: 2026-06-11T17:20:24Z — env loader fix deploy refresh
