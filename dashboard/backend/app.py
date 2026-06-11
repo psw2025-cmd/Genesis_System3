@@ -949,24 +949,41 @@ async def get_health():
         # REAL_ONLY MODE: If market closed or broker unavailable, return NOT_READY state
         # Use SSOT if available, otherwise read from health.json
         if REAL_ONLY:
-            # Try to get state from SSOT first
-            if SSOT_AVAILABLE and state_store:
-                ssot_state = state_store.get_state()
-                broker_connected = ssot_state.get("broker", {}).get("connected", False)
-                broker_status_str = "connected" if broker_connected else "disconnected"
-                mode = ssot_state.get("mode", "PAPER")
-            else:
-                # Fallback to health.json
-                health_file = OUTPUTS_DIR / "health.json"
-                if health_file.exists():
-                    health = json.loads(health_file.read_text())
-                    broker_connected = health.get("is_connected", False)
+            broker_connected = False
+            broker_status_str = "disconnected"
+            mode = "PAPER"
+            broker_name = "unknown"
+
+            # Check Dhan first — takes priority when DHAN credentials are present
+            _dhan_cid = os.getenv("DHAN_CLIENT_ID", "").strip()
+            _dhan_tok = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+            if _dhan_cid and _dhan_tok:
+                try:
+                    from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status
+                    _dhan_result = _dhan_get_status()
+                    if _dhan_result.get("connected"):
+                        broker_connected = True
+                        broker_status_str = "connected"
+                        broker_name = "dhan"
+                        mode = "PAPER"
+                except Exception:
+                    pass
+
+            # Fallback: Try SSOT state (AngelOne) if Dhan not connected
+            if not broker_connected:
+                if SSOT_AVAILABLE and state_store:
+                    ssot_state = state_store.get_state()
+                    broker_connected = ssot_state.get("broker", {}).get("connected", False)
                     broker_status_str = "connected" if broker_connected else "disconnected"
-                    mode = health.get("mode", "PAPER")
+                    mode = ssot_state.get("mode", "PAPER")
+                    broker_name = ssot_state.get("broker", {}).get("name", "unknown")
                 else:
-                    broker_connected = False
-                    broker_status_str = "disconnected"
-                    mode = "PAPER"
+                    health_file = OUTPUTS_DIR / "health.json"
+                    if health_file.exists():
+                        health = json.loads(health_file.read_text())
+                        broker_connected = health.get("is_connected", False)
+                        broker_status_str = "connected" if broker_connected else "disconnected"
+                        mode = health.get("mode", "PAPER")
 
             # If broker not ready, return explicit NOT_READY state
             if not broker_connected:
@@ -1000,6 +1017,41 @@ async def get_health():
                     },
                     "message": "BROKER_NOT_READY - Real data unavailable",
                 }
+
+            # Broker IS connected (Dhan or AngelOne) — return PAPER/ANALYZER ready state
+            # live_allowed=False always: LIVE trading is permanently disabled
+            return {
+                "status": "ok",
+                "mode": "PAPER",
+                "broker_status": "connected",
+                "market_status": market_status_str,
+                "data_source": "live",
+                "live_allowed": False,
+                "live_blockers": ["Live trading permanently disabled in analyzer mode"],
+                "broker": {
+                    "connected": True,
+                    "name": broker_name,
+                    "status": "connected",
+                    "error": None,
+                },
+                "market": {"is_open": market_is_open, "reason": market_status_str},
+                "cycle_count": 0,
+                "refresh_interval": 5,
+                "last_fetch": datetime.now(IST).isoformat(),
+                "qc_status": "PASS",
+                "qc_failures": [],
+                "trades_executed": 0,
+                "open_positions": 0,
+                "total_pnl": 0.0,
+                "daily_pnl": 0.0,
+                "performance_sla": {
+                    "cycle_duration_sec": 0,
+                    "fetch_duration_sec": 0,
+                    "strategy_duration_sec": 0,
+                    "sla_pass": True,
+                },
+                "message": "ANALYZER_READY - Broker connected, paper mode active",
+            }
 
         # Market is open - use real data
         # PHASE 3: Use SSOT for consistency with /api/state

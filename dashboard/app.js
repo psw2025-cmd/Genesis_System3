@@ -250,8 +250,11 @@ createApp({
             }
         };
 
-        // Update all data
+        // Update all data — overlap guard prevents concurrent fetches
+        let _updating = false;
         const updateAll = async () => {
+            if (_updating) return;
+            _updating = true;
             try {
                 await Promise.all([
                     fetchHealth(),
@@ -259,13 +262,13 @@ createApp({
                     fetchPnL(),
                     fetchPositions()
                 ]);
-                
-                // Always fetch chain data if on options or greeks tab
                 if (activeTab.value === 'options' || activeTab.value === 'greeks') {
                     await fetchChainData(selectedUnderlying.value);
                 }
             } catch (error) {
                 console.error('Error updating data:', error);
+            } finally {
+                _updating = false;
             }
         };
 
@@ -275,9 +278,9 @@ createApp({
         onMounted(() => {
             // Initial data load
             updateAll();
-            
-            // Set up auto-refresh
-            updateInterval = setInterval(updateAll, 2000); // Update every 2 seconds
+
+            // Poll every 5 seconds — no overlapping requests
+            updateInterval = setInterval(updateAll, 5000);
             
             // Watch for tab changes to load tab-specific data
             Vue.watch(() => activeTab.value, async (newTab) => {
