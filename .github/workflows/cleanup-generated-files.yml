@@ -2,11 +2,6 @@ name: Cleanup Generated Files
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/cleanup-generated-files.yml
 
 permissions:
   contents: write
@@ -33,30 +28,24 @@ jobs:
           grep -E '(^|/)desktop\.ini$' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
           grep -E '(^|/)\.DS_Store$' /tmp/tracked_files.txt >> /tmp/remove_files.txt || true
           sort -u /tmp/remove_files.txt -o /tmp/remove_files.txt
-          echo "Files selected for generated-file removal:"
-          cat /tmp/remove_files.txt || true
-          if [ -s /tmp/remove_files.txt ]; then
-            xargs -a /tmp/remove_files.txt -r git rm --cached --ignore-unmatch --
+
+          if [ ! -s /tmp/remove_files.txt ]; then
+            echo "No tracked generated files found."
+            exit 0
           fi
+
+          cat /tmp/remove_files.txt
+          xargs -a /tmp/remove_files.txt git rm -f --
 
       - name: Commit cleanup if needed
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --cached --quiet; then
-            echo "No tracked generated files found."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "cleanup: remove tracked generated files [skip ci]"
-          git pull --rebase --autostash origin main
-          git push origin HEAD:main
-
-      - name: Cleanup proof
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Generated cleanup completed."
-          echo "Remaining tracked generated files:"
-          git ls-files | grep -E '(^|/)audit_artifacts/|(^|/)__pycache__/|\.pyc$|(^|/)desktop\.ini$|(^|/)\.DS_Store$' || true
+          if git diff --cached --quiet; then
+            echo "No cleanup changes to commit."
+          else
+            git commit -m "chore: remove tracked generated files"
+            git push
+          fi
