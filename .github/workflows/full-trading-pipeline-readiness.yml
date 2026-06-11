@@ -92,7 +92,7 @@ jobs:
           {
             echo "# Compile smoke for likely runtime files"
             python --version
-            for f in dashboard/backend/app.py dashboard/backend/backtesting.py core/brokers/angel_one/broker.py run_system3.py system3_ultra.py; do
+            for f in dashboard/backend/app.py dashboard/backend/backtesting.py core/brokers/dhan/dhan_readonly.py run_system3.py system3_ultra.py; do
               if [ -f "$f" ]; then
                 python -m py_compile "$f" && echo "PY_COMPILE_PASS $f" || echo "PY_COMPILE_FAIL $f"
               else
@@ -110,13 +110,13 @@ jobs:
           app_exists = os.path.exists('dashboard/backend/app.py')
           docker_exists = os.path.exists('dashboard/backend/Dockerfile')
           req_exists = os.path.exists('dashboard/backend/requirements.txt')
-          smartapi_dep = False
+          dhanhq_dep = False
           if req_exists:
-              smartapi_dep = 'smartapi-python' in open('dashboard/backend/requirements.txt', encoding='utf-8', errors='replace').read().lower()
+              dhanhq_dep = 'dhanhq' in open('dashboard/backend/requirements.txt', encoding='utf-8', errors='replace').read().lower()
           result = {
               'runtime_backend_present': app_exists and docker_exists,
               'render_live_trading_disabled': 'LIVE_TRADING_ENABLED' in render_text and '"0"' in render_text,
-              'smartapi_dependency_present': smartapi_dep,
+              'smartapi_dependency_present': dhanhq_dep,
               'data_history_candidate_count': len(has_any(['data','histor','ohlc','candle','option','chain','csv','parquet','duckdb','sqlite'])),
               'model_training_candidate_count': len(has_any(['train','retrain','model','predict','accuracy','calibrat','drift','shadow','kronos','wavelet'])),
               'backtest_candidate_count': len(has_any(['backtest','strategy','pnl','performance','validation'])),
@@ -133,7 +133,7 @@ jobs:
           if not result['render_live_trading_disabled']:
               blockers.append('live_trading_safety_not_proven_disabled')
           if not result['smartapi_dependency_present']:
-              blockers.append('smartapi_dependency_missing')
+              blockers.append('dhanhq_dependency_missing')
           if not result['proven_model_training_fresh']:
               blockers.append('fresh_training_not_proven')
           if not result['proven_backtest_recent']:

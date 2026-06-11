@@ -18,7 +18,7 @@ import pytz
 IST = pytz.timezone("Asia/Kolkata")
 
 # CRITICAL: Add project root to Python path FIRST, before any core module imports
-# This allows the backend to import core.brokers.angel_one.broker and other core modules
+# This allows the backend to import core.brokers.dhan.dhan_readonly and other core modules
 ROOT_DIR = Path(__file__).parent.parent.parent.resolve()  # Use resolve() to get absolute path
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -26,21 +26,16 @@ if str(ROOT_DIR) not in sys.path:
 if str(ROOT_DIR / "src") not in sys.path:
     sys.path.insert(0, str(ROOT_DIR / "src"))
 
-# Try to import broker module at module level (with error handling)
-# This ensures the import path is correct and module is available
-BROKER_AVAILABLE = False
-AngelOneBroker = None
+# Broker: Dhan (read-only, analyzer mode)
+DHAN_AVAILABLE = False
 try:
-    from core.brokers.angel_one.broker import AngelOneBroker
-
-    BROKER_AVAILABLE = True
-    print(f"[Backend] Broker module imported successfully from {ROOT_DIR}")
+    from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status_probe
+    DHAN_AVAILABLE = True
+    print(f"[Backend] Dhan broker module imported successfully from {ROOT_DIR}")
 except ImportError as e:
-    print(f"[Backend] Warning: Could not import broker module: {e}")
-    print(f"[Backend] ROOT_DIR: {ROOT_DIR}")
-    print(f"[Backend] sys.path[0:3]: {sys.path[0:3]}")
+    print(f"[Backend] Warning: Could not import Dhan broker module: {e}")
 except Exception as e:
-    print(f"[Backend] Warning: Error importing broker module: {e}")
+    print(f"[Backend] Warning: Error importing Dhan broker module: {e}")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -389,43 +384,39 @@ async def get_dhan_broker_status():
 
 @app.get("/api/broker/deps")
 async def get_broker_deps():
-    """Get broker dependency installation status"""
+    """Get broker dependency installation status (Dhan)"""
     try:
-        import sys
         import subprocess
 
-        # Check if SmartAPI is installed
-        smartapi_installed = False
+        dhanhq_installed = False
+        dhanhq_version = None
         try:
-            import smartapi
-
-            smartapi_installed = True
-            smartapi_version = getattr(smartapi, "__version__", "unknown")
+            import dhanhq
+            dhanhq_installed = True
+            dhanhq_version = getattr(dhanhq, "__version__", "unknown")
         except ImportError:
-            smartapi_version = None
+            pass
 
-        # Get Python path
         python_path = sys.executable
 
-        # Check pip freeze for smartapi
         pip_freeze_hit = False
         try:
             result = subprocess.run([python_path, "-m", "pip", "freeze"], capture_output=True, text=True, timeout=5)
-            if "smartapi" in result.stdout.lower():
+            if "dhanhq" in result.stdout.lower():
                 pip_freeze_hit = True
         except:
             pass
 
         return {
-            "smartapi_installed": smartapi_installed,
-            "smartapi_version": smartapi_version,
+            "dhanhq_installed": dhanhq_installed,
+            "dhanhq_version": dhanhq_version,
             "python_path": python_path,
             "pip_freeze_hit": pip_freeze_hit,
-            "broker_module_available": BROKER_AVAILABLE,
+            "broker_module_available": DHAN_AVAILABLE,
         }
     except Exception as e:
         return {
-            "smartapi_installed": False,
+            "dhanhq_installed": False,
             "error": str(e)[:200],
             "python_path": sys.executable if "sys" in locals() else "unknown",
         }

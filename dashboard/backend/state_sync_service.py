@@ -87,7 +87,7 @@ class StateSyncService:
                 updates["broker"] = {
                     "connected": health.get("broker_status") == "connected",
                     "status": health.get("broker_status", "disconnected"),
-                    "name": "AngelOne",
+                    "name": "dhan",
                 }
 
                 # Sync QC

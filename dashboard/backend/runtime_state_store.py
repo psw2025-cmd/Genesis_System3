@@ -38,82 +38,15 @@ class RuntimeStateStore:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         # First try to read from health.json (same source as /api/health)
         try:
-            health_file = self.outputs_dir / "health.json"
-            if health_file.exists():
-                health = json.loads(health_file.read_text())
-                # health.json has 'is_connected' field, not 'broker_status'
-                is_connected = health.get("is_connected", False)
-                broker_status_str = "connected" if is_connected else "disconnected"
-
-                return {
-                    "connected": is_connected,
-                    "name": "AngelOne",
-                    "status": broker_status_str,  # Match /api/health format
-                    "latency_ms": health.get("broker_latency_ms"),
-                    "last_ok": datetime.now(IST).isoformat() if is_connected else None,
-                }
+            from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            result = _dhan_status()
+            return result
         except Exception as e:
-            print(f"Warning: Failed to read broker status from health.json: {e}")
-
-        # Fallback: try actual broker connection (but don't fail on ImportError)
-        try:
-            from core.brokers.angel_one.broker import AngelOneBroker
-            import time
-
-            start_time = time.time()
-
-            broker = AngelOneBroker(allow_data_only=True)
-            # Test with profile fetch to ensure connection is real
-            profile = broker.get_profile()
-
-            latency_ms = int((time.time() - start_time) * 1000)
-
-            if profile and profile.get("status"):
-                return {
-                    "connected": True,
-                    "name": "AngelOne",
-                    "status": "connected",
-                    "latency_ms": latency_ms,
-                    "last_ok": datetime.now(IST).isoformat(),
-                    "client_code": profile.get("data", {}).get("clientcode", "N/A"),
-                }
-            else:
-                return {
-                    "connected": False,
-                    "name": "AngelOne",
-                    "status": "disconnected",
-                    "error": "Profile fetch failed",
-                    "latency_ms": latency_ms,
-                    "last_ok": None,
-                }
-        except ImportError:
-            # SmartApi not installed - return disconnected but don't show error
             return {
                 "connected": False,
-                "name": "AngelOne",
-                "status": "disconnected",
-                "error": None,  # Don't show "SmartApi not installed" error
-                "latency_ms": None,
-                "last_ok": None,
-            }
-        except Exception as e:
-            error_msg = str(e)
-            # Extract specific error details
-            if "Missing" in error_msg or "credentials" in error_msg.lower():
-                error_type = "NO_CREDENTIALS"
-            elif "TOTP" in error_msg or "totp" in error_msg.lower():
-                error_type = "TOTP_ERROR"
-            elif "login" in error_msg.lower() or "session" in error_msg.lower():
-                error_type = "LOGIN_FAILED"
-            else:
-                error_type = "CONNECTION_ERROR"
-
-            return {
-                "connected": False,
-                "name": "AngelOne",
-                "status": "disconnected",
-                "error": error_msg[:200],
-                "error_type": error_type,
+                "name": "dhan",
+                "status": "error",
+                "error": str(e)[:200],
                 "latency_ms": None,
                 "last_ok": None,
             }
@@ -124,7 +57,7 @@ class RuntimeStateStore:
         # This ensures consistency with /api/health endpoint
         broker_status = {
             "connected": False,
-            "name": "AngelOne",
+            "name": "dhan",
             "status": "disconnected",
             "error": None,
             "latency_ms": None,
@@ -286,7 +219,7 @@ class RuntimeStateStore:
 
                 updates["broker"] = {
                     "connected": is_connected,
-                    "name": "AngelOne",
+                    "name": "dhan",
                     "status": broker_status_str,  # Match /api/health format
                     "error": None,
                     "latency_ms": health.get("broker_latency_ms"),
