@@ -36,6 +36,9 @@ logs/
 
 # Local audit artifacts
 audit_artifacts/
+ai_scan.txt
+repomix-output.xml
+FETCH_HEAD
 
 # Desktop app build output (large binaries; exceed GitHub limits)
 desktop_app/dist/
