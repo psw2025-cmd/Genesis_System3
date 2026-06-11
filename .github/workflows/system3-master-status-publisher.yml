@@ -2,13 +2,6 @@ name: System3 Master Status Publisher
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - reports/latest/**
-      - .github/workflows/system3-master-status-publisher.yml
-      - docs/project_control/SYSTEM3_CURRENT_CONTROL_PLANE.md
 
 permissions:
   contents: write
@@ -59,67 +52,42 @@ jobs:
           if pipeline:
               lines.append('### Full trading pipeline readiness')
               lines.append('')
-              lines.append(f'- Verdict: `{pipeline.get("verdict", "UNKNOWN")}`')
-              lines.append(f'- Trade ready: `{pipeline.get("trade_ready", False)}`')
-              lines.append(f'- Runtime backend present: `{pipeline.get("runtime_backend_present")}`')
-              lines.append(f'- Render live trading disabled: `{pipeline.get("render_live_trading_disabled")}`')
-              lines.append(f'- DhanHQ dependency present: `{pipeline.get("dhanhq_dependency_present")}`')
-              lines.append(f'- Data/history candidates: `{pipeline.get("data_history_candidate_count")}`')
-              lines.append(f'- Model/training candidates: `{pipeline.get("model_training_candidate_count")}`')
-              lines.append(f'- Backtest candidates: `{pipeline.get("backtest_candidate_count")}`')
-              lines.append(f'- Paper/analyzer candidates: `{pipeline.get("paper_analyzer_candidate_count")}`')
-              lines.append(f'- Dashboard candidates: `{pipeline.get("dashboard_candidate_count")}`')
+              lines.append(f"- Verdict: `{pipeline.get('verdict', 'UNKNOWN')}`")
+              lines.append(f"- Trade ready: `{pipeline.get('trade_ready', False)}`")
+              lines.append(f"- DhanHQ dependency present: `{pipeline.get('dhanhq_dependency_present', pipeline.get('smartapi_dependency_present', 'UNKNOWN'))}`")
               blockers = pipeline.get('blockers', [])
-              lines.append('')
-              lines.append('Open blockers:')
-              if blockers:
-                  for b in blockers:
-                      lines.append(f'- `{b}`')
-              else:
-                  lines.append('- None reported')
+              lines.append(f"- Blockers: `{len(blockers)}`")
+              for b in blockers:
+                  lines.append(f"  - `{b}`")
               lines.append('')
           else:
-              lines.append('- Full trading pipeline proof not yet published.')
+              lines.append('- Full trading pipeline readiness proof: `MISSING`')
               lines.append('')
 
           if clean:
               lines.append('### Repo cleanliness')
               lines.append('')
-              lines.append(f'- Pass: `{clean.get("pass")}`')
-              lines.append(f'- Tracked files: `{clean.get("tracked_file_count")}`')
-              lines.append(f'- Auto-removable generated files: `{clean.get("auto_removable_generated_count")}`')
-              lines.append(f'- Forbidden secret-style files: `{clean.get("forbidden_secret_style_count")}`')
-              lines.append(f'- Old/backup/copy review candidates: `{clean.get("old_backup_copy_review_candidate_count")}`')
+              lines.append(f"- Pass: `{clean.get('pass', False)}`")
+              lines.append(f"- Forbidden secret-style files: `{clean.get('forbidden_secret_style_count', 'UNKNOWN')}`")
+              lines.append(f"- Generated files pending cleanup: `{clean.get('auto_removable_generated_count', 'UNKNOWN')}`")
               lines.append('')
           else:
-              lines.append('- Repo cleanliness proof not yet published.')
+              lines.append('- Repo cleanliness proof: `MISSING`')
               lines.append('')
 
-          lines.append('## Operating rule')
+          lines.append('## Safety mode')
           lines.append('')
-          lines.append('- Analyzer/Paper mode only.')
-          lines.append('- Live trading remains disabled.')
-          lines.append('- Do not commit private keys, broker credentials, `.env`, OTP, TOTP, PIN, or passwords.')
-          lines.append('- Delete generated/unsafe files automatically; source duplicates require proof-first classification.')
-          lines.append('')
-
-          lines.append('## Next automatic work queue')
-          lines.append('')
-          lines.append('1. Keep Render/backend deployment proof clean.')
-          lines.append('2. Prove dashboard root/docs/health/state endpoints after each deploy.')
-          lines.append('3. Build fresh-data collection proof.')
-          lines.append('4. Build model-load/training proof with accuracy metrics.')
-          lines.append('5. Build recent backtest/walk-forward proof with costs/slippage.')
-          lines.append('6. Build analyzer-mode paper lifecycle proof: signal → order → fill/sim-fill → exit → P&L.')
-          lines.append('7. Build full dashboard UI truth proof.')
+          lines.append('- Broker mode: `Dhan-only`')
+          lines.append('- Live trading: `disabled unless separately proven and explicitly enabled`')
+          lines.append('- Current recommendation: `Analyzer/Paper only`')
           lines.append('')
 
-          Path('docs/project_control/SYSTEM3_MASTER_STATUS.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          Path('docs/project_control/SYSTEM3_MASTER_STATUS.md').write_text('\n'.join(lines), encoding='utf-8')
           PY
 
           cat "$OUT"
 
-      - name: Commit master status if changed
+      - name: Commit master status
         shell: bash
         run: |
           set -euo pipefail
@@ -129,6 +97,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No master status changes to commit."
           else
-            git commit -m "audit: publish System3 master status"
+            git commit -m "docs: publish System3 master status"
             git push
           fi
