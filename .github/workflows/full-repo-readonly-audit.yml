@@ -2,11 +2,6 @@ name: Full Repo Read-Only Audit
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/full-repo-readonly-audit.yml
 
 permissions:
   contents: read
