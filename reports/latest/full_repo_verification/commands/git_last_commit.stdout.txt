@@ -1,10 +1,8 @@
-commit f946b5acfdb85d953e37cdb00987697ab779ca24
-Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-Date:   Thu Jun 11 03:46:27 2026 +0000
+commit 9713f2945ecd373cf40228e957c78bbca97b6bfb
+Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
+Date:   Thu Jun 11 16:56:59 2026 +0000
 
-    audit: publish full repo scan clean proof
+    fix: load Render secret env file
 
- reports/latest/full_repo_scan_clean/00_summary.md              | 4 ++--
- reports/latest/full_repo_scan_clean/01_inventory_summary.txt   | 4 ++--
- reports/latest/full_repo_scan_clean/07_scan_clean_summary.json | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ core/utils/env_loader.py | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)

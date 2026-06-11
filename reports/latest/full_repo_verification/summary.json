@@ -9,11 +9,11 @@
     "total": 214
   },
   "critical_missing_count": 0,
-  "generated_utc": "2026-06-11T04:03:19.561150+00:00",
+  "generated_utc": "2026-06-11T17:11:15.419948+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "runner": {
     "cwd": "/home/runner/work/Genesis_System3/Genesis_System3",
-    "platform": "Linux-6.17.0-1015-azure-x86_64-with-glibc2.39",
+    "platform": "Linux-6.17.0-1018-azure-x86_64-with-glibc2.39",
     "python": "3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0]"
   },
   "static_scan_counts": {

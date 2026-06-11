@@ -30,7 +30,7 @@
     "path": "dashboard/frontend/package.json"
   },
   {
-    "bytes": 695,
+    "bytes": 833,
     "exists": true,
     "path": "core/utils/env_loader.py"
   },
