@@ -16,79 +16,112 @@ declare global {
   }
 }
 
+function asArray(value: any): any[] {
+  return Array.isArray(value) ? value : []
+}
+
+function safeText(value: any, fallback = 'N/A'): string {
+  if (value === null || value === undefined || value === '') return fallback
+  return String(value)
+}
+
 export default function AgentConsole() {
   const [agentMemory, setAgentMemory] = useState<any>(null)
   const [upgradePlan, setUpgradePlan] = useState<any>(null)
   const [testResults, setTestResults] = useState<any>(null)
   const [issues, setIssues] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [lastError, setLastError] = useState<string | null>(null)
 
   useEffect(() => {
+    let cancelled = false
+
     const fetchAgentData = async () => {
       try {
-        // Try Electron API first
+        setLastError(null)
+
+        // Try Electron API first, then HTTP API.
         if (window.electronAPI) {
           const memory = await window.electronAPI.getAgentMemory()
-          setAgentMemory(memory)
+          if (!cancelled) setAgentMemory(memory || {})
         } else {
-          // Fallback to HTTP API
-          const res = await axios.get(`${API_BASE}/api/agent/memory`)
-          setAgentMemory(res.data)
+          const res = await axios.get(`${API_BASE}/api/agent/memory`, { timeout: 8000 })
+          if (!cancelled) setAgentMemory(res.data || {})
         }
 
-        // Fetch upgrade plan
-        const planRes = await axios.get(`${API_BASE}/api/agent/upgrade-plan`)
-        if (planRes.data && planRes.data.status !== 'none') {
-          setUpgradePlan(planRes.data)
-        }
-
-        // Fetch issues (with timeout handling)
+        // Fetch upgrade plan. API shape may vary, so render defensively.
+        let planData: any = null
         try {
-          const issuesRes = await axios.get(`${API_BASE}/api/agent/issues`, { timeout: 5000 })
-          setIssues(issuesRes.data.issues || [])
+          const planRes = await axios.get(`${API_BASE}/api/agent/upgrade-plan`, { timeout: 8000 })
+          planData = planRes.data || null
+          const status = safeText(planData?.status, 'none').toLowerCase()
+          if (!cancelled) setUpgradePlan(planData && status !== 'none' ? planData : null)
+        } catch (error: any) {
+          if (!cancelled) setUpgradePlan(null)
+        }
+
+        // Fetch issues. Always store an array.
+        try {
+          const issuesRes = await axios.get(`${API_BASE}/api/agent/issues`, { timeout: 8000 })
+          if (!cancelled) setIssues(asArray(issuesRes.data?.issues))
         } catch (error: any) {
           console.warn('Error fetching issues:', error)
-          // Don't set error state, just use empty array
-          setIssues([])
+          if (!cancelled) setIssues([])
         }
 
-        // Fetch test results
-        if (upgradePlan) {
-          const testRes = await axios.get(`${API_BASE}/api/agent/test-results/${upgradePlan.plan_id}`)
-          setTestResults(testRes.data)
+        // Fetch test results only when a plan id exists.
+        const planId = planData?.plan_id
+        if (planId) {
+          try {
+            const testRes = await axios.get(`${API_BASE}/api/agent/test-results/${encodeURIComponent(planId)}`, { timeout: 8000 })
+            if (!cancelled) setTestResults(testRes.data || null)
+          } catch (error: any) {
+            if (!cancelled) setTestResults(null)
+          }
+        } else if (!cancelled) {
+          setTestResults(null)
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching agent data:', error)
+        if (!cancelled) {
+          setLastError(error?.message || 'Agent data fetch failed')
+          setAgentMemory((prev: any) => prev || {})
+          setIssues([])
+          setUpgradePlan(null)
+          setTestResults(null)
+        }
       }
     }
 
     fetchAgentData()
-    const interval = setInterval(fetchAgentData, 10000) // Poll every 10 seconds
-    return () => clearInterval(interval)
-  }, [upgradePlan])
+    const interval = setInterval(fetchAgentData, 10000)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [])
 
   const handleApplyUpgrade = async () => {
-    if (!upgradePlan) return
-    
+    if (!upgradePlan?.plan_id) return
+
     setLoading(true)
     try {
       const res = await axios.post(`${API_BASE}/api/agent/apply-upgrade`, {
-        plan_id: upgradePlan.plan_id
+        plan_id: upgradePlan.plan_id,
       })
-      
-      if (res.data.success) {
+
+      if (res.data?.success) {
         alert('Upgrade applied successfully!')
         setUpgradePlan(null)
-        
-        // Show notification if Electron
+
         if (window.electronAPI) {
           await window.electronAPI.showNotification({
             title: 'Upgrade Applied',
-            body: 'System upgrade has been applied successfully'
+            body: 'System upgrade has been applied successfully',
           })
         }
       } else {
-        alert(`Upgrade failed: ${res.data.message}`)
+        alert(`Upgrade failed: ${safeText(res.data?.message, 'Unknown error')}`)
       }
     } catch (error: any) {
       alert(`Error applying upgrade: ${error.message}`)
@@ -99,14 +132,14 @@ export default function AgentConsole() {
 
   const handleRollback = async () => {
     if (!confirm('Rollback to previous version? This will undo the last upgrade.')) return
-    
+
     setLoading(true)
     try {
       const res = await axios.post(`${API_BASE}/api/agent/rollback`)
-      if (res.data.success) {
+      if (res.data?.success) {
         alert('Rollback successful!')
       } else {
-        alert(`Rollback failed: ${res.data.message}`)
+        alert(`Rollback failed: ${safeText(res.data?.message, 'Unknown error')}`)
       }
     } catch (error: any) {
       alert(`Error rolling back: ${error.message}`)
@@ -119,12 +152,10 @@ export default function AgentConsole() {
     try {
       if (window.electronAPI) {
         const result = await window.electronAPI.downloadProofPack()
-        if (result.success) {
-          // Download via Electron
+        if (result?.success) {
           window.open(`${API_BASE}/api/proof-pack`, '_blank')
         }
       } else {
-        // Browser download
         window.open(`${API_BASE}/api/proof-pack`, '_blank')
       }
     } catch (error: any) {
@@ -135,11 +166,17 @@ export default function AgentConsole() {
   const handlePauseAgent = async () => {
     try {
       const res = await axios.post(`${API_BASE}/api/agent/pause`)
-      alert(res.data.paused ? 'Agent paused' : 'Agent resumed')
+      alert(res.data?.paused ? 'Agent paused' : 'Agent resumed')
     } catch (error: any) {
       alert(`Error: ${error.message}`)
     }
   }
+
+  const memoryTasks = asArray(agentMemory?.tasks)
+  const completedCount = memoryTasks.filter((t: any) => t?.status === 'completed').length
+  const inProgressCount = memoryTasks.filter((t: any) => t?.status === 'in_progress').length
+  const planStatus = safeText(upgradePlan?.status, 'unknown')
+  const planChanges = asArray(upgradePlan?.changes)
 
   return (
     <div className="space-y-6">
@@ -161,6 +198,12 @@ export default function AgentConsole() {
         </div>
       </div>
 
+      {lastError && (
+        <div className="bg-yellow-900 border border-yellow-700 p-4 rounded-lg text-yellow-100">
+          Agent API warning: {lastError}. Showing safe fallback values.
+        </div>
+      )}
+
       {/* Current Version */}
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">System Version</h3>
@@ -175,7 +218,7 @@ export default function AgentConsole() {
           </div>
           <div>
             <div className="text-sm text-gray-400">Run ID</div>
-            <div className="text-lg">{agentMemory?.run_id || 'N/A'}</div>
+            <div className="text-lg">{safeText(agentMemory?.run_id)}</div>
           </div>
         </div>
       </div>
@@ -185,12 +228,15 @@ export default function AgentConsole() {
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">Detected Issues</h3>
           <div className="space-y-2">
-            {issues.map((issue, idx) => (
-              <div key={idx} className={`p-3 rounded ${issue.severity === 'critical' ? 'bg-red-900' : issue.severity === 'high' ? 'bg-yellow-900' : 'bg-gray-700'}`}>
-                <div className="font-bold">{issue.type}</div>
-                <div className="text-sm text-gray-300">{issue.message}</div>
-              </div>
-            ))}
+            {issues.map((issue, idx) => {
+              const severity = safeText(issue?.severity, 'normal').toLowerCase()
+              return (
+                <div key={idx} className={`p-3 rounded ${severity === 'critical' ? 'bg-red-900' : severity === 'high' ? 'bg-yellow-900' : 'bg-gray-700'}`}>
+                  <div className="font-bold">{safeText(issue?.type, 'Issue')}</div>
+                  <div className="text-sm text-gray-300">{safeText(issue?.message, 'No details')}</div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
@@ -202,21 +248,25 @@ export default function AgentConsole() {
           <div className="space-y-4">
             <div>
               <div className="text-sm text-gray-400">Plan ID</div>
-              <div className="font-mono">{upgradePlan.plan_id}</div>
+              <div className="font-mono">{safeText(upgradePlan.plan_id)}</div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Status</div>
-              <div className={`inline-block px-2 py-1 rounded ${upgradePlan.status === 'ready' ? 'bg-green-600' : 'bg-yellow-600'}`}>
-                {upgradePlan.status.toUpperCase()}
+              <div className={`inline-block px-2 py-1 rounded ${planStatus.toLowerCase() === 'ready' ? 'bg-green-600' : 'bg-yellow-600'}`}>
+                {planStatus.toUpperCase()}
               </div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Changes</div>
-              <ul className="list-disc list-inside mt-2">
-                {upgradePlan.changes?.map((change: any, idx: number) => (
-                  <li key={idx} className="text-sm">{change.action}</li>
-                ))}
-              </ul>
+              {planChanges.length > 0 ? (
+                <ul className="list-disc list-inside mt-2">
+                  {planChanges.map((change: any, idx: number) => (
+                    <li key={idx} className="text-sm">{safeText(change?.action || change, 'Change')}</li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-sm text-gray-400 mt-2">No change list provided</div>
+              )}
             </div>
             <div>
               <div className="text-sm text-gray-400">Auto-Apply</div>
@@ -228,13 +278,13 @@ export default function AgentConsole() {
               <div>
                 <div className="text-sm text-gray-400">Test Results</div>
                 <div className="mt-2">
-                  <div className="text-green-400">Passed: {testResults.passed}</div>
-                  <div className="text-red-400">Failed: {testResults.failed}</div>
+                  <div className="text-green-400">Passed: {safeText(testResults.passed, '0')}</div>
+                  <div className="text-red-400">Failed: {safeText(testResults.failed, '0')}</div>
                 </div>
               </div>
             )}
             <div className="flex gap-2 mt-4">
-              {upgradePlan.status === 'ready' && (
+              {planStatus.toLowerCase() === 'ready' && (
                 <button
                   onClick={handleApplyUpgrade}
                   disabled={loading}
@@ -256,33 +306,27 @@ export default function AgentConsole() {
       )}
 
       {/* Agent Memory Status */}
-      {agentMemory && (
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">Agent Memory Status</h3>
-          <div className="space-y-2">
-            <div>
-              <div className="text-sm text-gray-400">Total Tasks</div>
-              <div className="text-lg">{agentMemory.tasks?.length || 0}</div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-400">Completed</div>
-              <div className="text-lg text-green-400">
-                {agentMemory.tasks?.filter((t: any) => t.status === 'completed').length || 0}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-400">In Progress</div>
-              <div className="text-lg text-yellow-400">
-                {agentMemory.tasks?.filter((t: any) => t.status === 'in_progress').length || 0}
-              </div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-400">Last Updated</div>
-              <div className="text-sm">{agentMemory.last_updated || 'N/A'}</div>
-            </div>
+      <div className="bg-gray-800 p-6 rounded-lg">
+        <h3 className="text-xl font-bold mb-4">Agent Memory Status</h3>
+        <div className="space-y-2">
+          <div>
+            <div className="text-sm text-gray-400">Total Tasks</div>
+            <div className="text-lg">{memoryTasks.length}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-400">Completed</div>
+            <div className="text-lg text-green-400">{completedCount}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-400">In Progress</div>
+            <div className="text-lg text-yellow-400">{inProgressCount}</div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-400">Last Updated</div>
+            <div className="text-sm">{safeText(agentMemory?.last_updated)}</div>
           </div>
         </div>
-      )}
+      </div>
 
       {!upgradePlan && issues.length === 0 && (
         <div className="bg-gray-800 p-6 rounded-lg text-center text-gray-400">
