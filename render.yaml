@@ -10,7 +10,7 @@ services:
     plan: free
     dockerfilePath: ./dashboard/backend/Dockerfile
     dockerContext: .
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: SYSTEM3_DEPLOY_TARGET
         value: render

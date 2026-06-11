@@ -343,93 +343,17 @@ async def get_state_history(limit: int = 100):
 
 @app.get("/api/broker/status")
 async def get_broker_status():
-    """Get broker connection status. Uses Dhan if configured, falls back to AngelOne."""
-    # If Dhan credentials are present, use Dhan (read-only, analyzer mode)
-    dhan_client_id = os.getenv("DHAN_CLIENT_ID", "").strip()
-    dhan_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
-    if dhan_client_id and dhan_token:
-        try:
-            from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
-            return _dhan_status()
-        except Exception as _e:
-            pass  # fall through to AngelOne
-
-    # Try AngelOne
-    broker_class = AngelOneBroker if BROKER_AVAILABLE and AngelOneBroker is not None else None
-    if broker_class is None:
-        try:
-            from core.brokers.angel_one.broker import AngelOneBroker as BrokerClass
-
-            broker_class = BrokerClass
-        except ImportError as e:
-            return {
-                "connected": False,
-                "name": "AngelOne",
-                "status": "not_available",
-                "error": f"Broker module import failed: {str(e)[:200]}",
-                "error_type": "MODULE_NOT_AVAILABLE",
-                "latency_ms": None,
-                "last_ok": None,
-            }
-
+    """Get broker connection status. Uses Dhan broker (read-only, analyzer mode)."""
     try:
-        import time
-
-        start_time = time.time()
-        broker = broker_class(allow_data_only=True)
-
-        # Test with profile fetch to ensure connection is real
-        profile = broker.get_profile()
-        latency_ms = int((time.time() - start_time) * 1000)
-
-        if profile and profile.get("status"):
-            return {
-                "connected": True,
-                "name": "AngelOne",
-                "status": "connected",
-                "latency_ms": latency_ms,
-                "last_ok": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
-                "client_code": profile.get("data", {}).get("clientcode", "N/A"),
-                "profile_status": profile.get("status"),
-            }
-        else:
-            return {
-                "connected": False,
-                "name": "AngelOne",
-                "status": "disconnected",
-                "error": "Profile fetch failed",
-                "error_type": "PROFILE_FETCH_FAILED",
-                "latency_ms": latency_ms,
-                "last_ok": None,
-            }
-    except ImportError:
+        from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+        return _dhan_status()
+    except Exception as _e:
         return {
             "connected": False,
-            "name": "AngelOne",
-            "status": "not_available",
-            "error": "SmartApi not installed",
-            "error_type": "MODULE_NOT_FOUND",
-            "latency_ms": None,
-            "last_ok": None,
-        }
-    except Exception as e:
-        error_msg = str(e)
-        # Extract specific error details
-        if "Missing" in error_msg or "credentials" in error_msg.lower():
-            error_type = "NO_CREDENTIALS"
-        elif "TOTP" in error_msg or "totp" in error_msg.lower():
-            error_type = "TOTP_ERROR"
-        elif "login" in error_msg.lower() or "session" in error_msg.lower():
-            error_type = "LOGIN_FAILED"
-        else:
-            error_type = "CONNECTION_ERROR"
-
-        return {
-            "connected": False,
-            "name": "AngelOne",
-            "status": "disconnected",
-            "error": error_msg[:200],
-            "error_type": error_type,
+            "name": "dhan",
+            "status": "error",
+            "error": str(_e)[:200],
+            "error_type": "DHAN_STATUS_ERROR",
             "latency_ms": None,
             "last_ok": None,
         }
@@ -969,21 +893,7 @@ async def get_health():
                 except Exception:
                     pass
 
-            # Fallback: Try SSOT state (AngelOne) if Dhan not connected
-            if not broker_connected:
-                if SSOT_AVAILABLE and state_store:
-                    ssot_state = state_store.get_state()
-                    broker_connected = ssot_state.get("broker", {}).get("connected", False)
-                    broker_status_str = "connected" if broker_connected else "disconnected"
-                    mode = ssot_state.get("mode", "PAPER")
-                    broker_name = ssot_state.get("broker", {}).get("name", "unknown")
-                else:
-                    health_file = OUTPUTS_DIR / "health.json"
-                    if health_file.exists():
-                        health = json.loads(health_file.read_text())
-                        broker_connected = health.get("is_connected", False)
-                        broker_status_str = "connected" if broker_connected else "disconnected"
-                        mode = health.get("mode", "PAPER")
+            # Dhan is the only broker — no AngelOne fallback
 
             # If broker not ready, return explicit NOT_READY state
             if not broker_connected:
@@ -1018,7 +928,7 @@ async def get_health():
                     "message": "BROKER_NOT_READY - Real data unavailable",
                 }
 
-            # Broker IS connected (Dhan or AngelOne) — return PAPER/ANALYZER ready state
+            # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
             # live_allowed=False always: LIVE trading is permanently disabled
             return {
                 "status": "ok",
