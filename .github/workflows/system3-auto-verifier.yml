@@ -2,15 +2,6 @@ name: System3 Auto Verifier
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - render.yaml
-      - dashboard/backend/**
-      - .github/workflows/**
-      - Run-FullQA.ps1
-      - .gitignore
 
 permissions:
   contents: read

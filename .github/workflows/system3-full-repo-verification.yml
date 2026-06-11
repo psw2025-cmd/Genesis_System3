@@ -4,24 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "41 2 * * *"
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/system3-full-repo-verification.yml
-      - scripts/system3_full_repo_verification.py
-      - scripts/system3_master_proof_orchestrator.py
-      - dashboard/**
-      - core/**
-      - src/**
-      - config/**
-      - docs/project_control/**
-      - reports/latest/**
-      - render.yaml
-      - Run-FullQA.ps1
-      - package.json
-      - pyproject.toml
-      - requirements*.txt
 
 permissions:
   contents: write

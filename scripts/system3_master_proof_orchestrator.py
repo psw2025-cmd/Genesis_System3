@@ -219,8 +219,8 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
         warnings.append("render_live_trading_flag_not_found")
     if render["mentions_live_trading_enabled"] and not render["live_trading_default_zero_or_false"]:
         blockers.append("render_live_trading_not_proven_disabled")
-    if "smartapi-python" not in req_text:
-        blockers.append("smartapi_python_dependency_missing")
+    if "dhanhq" not in req_text:
+        blockers.append("dhanhq_dependency_missing")
     if "logzero" not in req_text:
         blockers.append("logzero_dependency_missing")
 
@@ -231,7 +231,7 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
         "secret_content_finding_count": len(secret_content),
         "secret_content_findings": secret_content[:50],
         "render_safety": render,
-        "requirements_contains_smartapi_python": "smartapi-python" in req_text,
+        "requirements_contains_dhanhq": "dhanhq" in req_text,
         "requirements_contains_logzero": "logzero" in req_text,
     }
     return GateResult(
@@ -342,8 +342,8 @@ def gate_deployment_endpoint() -> GateResult:
     req_text = read_text("dashboard/backend/requirements.txt").lower()
     if "logzero" not in req_text:
         blockers.append("backend_dependency_logzero_missing")
-    if "smartapi-python" not in req_text:
-        blockers.append("backend_dependency_smartapi_python_missing")
+    if "dhanhq" not in req_text:
+        blockers.append("backend_dependency_dhanhq_missing")
 
     if base_url:
         clean_base = base_url.rstrip("/")
@@ -733,7 +733,7 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
         "generated_utc": utc_now(),
         "runtime_backend_present": file_exists("dashboard/backend/app.py") and file_exists("dashboard/backend/Dockerfile"),
         "render_live_trading_disabled": render_yaml_safety()["live_trading_default_zero_or_false"],
-        "smartapi_dependency_present": "smartapi-python" in read_text("dashboard/backend/requirements.txt").lower(),
+        "dhanhq_dependency_present": "dhanhq" in read_text("dashboard/backend/requirements.txt").lower(),
         "logzero_dependency_present": "logzero" in read_text("dashboard/backend/requirements.txt").lower(),
         "proven_live_market_paper_trade_today": False,
         "proven_model_training_fresh": False,

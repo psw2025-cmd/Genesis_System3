@@ -86,7 +86,6 @@ def safety_scan(files: list[str]) -> dict[str, Any]:
         "live_trading_disabled_in_render": "LIVE_TRADING_ENABLED" in render and re.search(r"LIVE_TRADING_ENABLED[^\n]*(\"0\"|'0'|0|false|False)", render) is not None,
         "analyze_mode_enabled_in_render": "ANALYZE_MODE" in render and re.search(r"ANALYZE_MODE[^\n]*(\"1\"|'1'|1|true|True)", render) is not None,
         "dhanhq_dependency_present": "dhanhq" in req,
-        "smartapi_dependency_present": "smartapi-python" in req,
         "tracked_secret_style_file_count": len(tracked_secret_names),
         "tracked_secret_style_files": tracked_secret_names[:50],
     }

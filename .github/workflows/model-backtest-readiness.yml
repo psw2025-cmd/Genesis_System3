@@ -4,16 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 3 * * *'
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/model-backtest-readiness.yml
-      - core/**
-      - scripts/**
-      - run_system3.py
-      - system3_ultra.py
-      - dashboard/backend/**
 
 permissions:
   contents: write

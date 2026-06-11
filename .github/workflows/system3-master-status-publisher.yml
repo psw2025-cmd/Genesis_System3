@@ -63,7 +63,7 @@ jobs:
               lines.append(f'- Trade ready: `{pipeline.get("trade_ready", False)}`')
               lines.append(f'- Runtime backend present: `{pipeline.get("runtime_backend_present")}`')
               lines.append(f'- Render live trading disabled: `{pipeline.get("render_live_trading_disabled")}`')
-              lines.append(f'- SmartAPI dependency present: `{pipeline.get("smartapi_dependency_present")}`')
+              lines.append(f'- DhanHQ dependency present: `{pipeline.get("dhanhq_dependency_present")}`')
               lines.append(f'- Data/history candidates: `{pipeline.get("data_history_candidate_count")}`')
               lines.append(f'- Model/training candidates: `{pipeline.get("model_training_candidate_count")}`')
               lines.append(f'- Backtest candidates: `{pipeline.get("backtest_candidate_count")}`')

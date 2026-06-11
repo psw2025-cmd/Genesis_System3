@@ -4,19 +4,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "17 3 * * *"
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/system3-master-proof-control-plane.yml
-      - scripts/system3_master_proof_orchestrator.py
-      - dashboard/**
-      - core/**
-      - src/**
-      - config/**
-      - render.yaml
-      - docs/project_control/**
-      - reports/latest/**
 
 permissions:
   contents: write

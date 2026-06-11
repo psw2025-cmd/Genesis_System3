@@ -7,7 +7,13 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from SmartApi import SmartConnect  # smartapi-python library
+try:
+    from SmartApi import SmartConnect  # smartapi-python library (legacy — not in requirements)
+    _SMARTAPI_AVAILABLE = True
+except ImportError:
+    SmartConnect = None
+    _SMARTAPI_AVAILABLE = False
+
 import pyotp
 
 from core.utils.env_loader import get_angelone_credentials
@@ -26,14 +32,11 @@ def _env_live_guard():
 
 class AngelOneBroker:
     def __init__(self, allow_data_only: bool = False):
-        """
-        Initialize Angel One broker connection.
-
-        Args:
-            allow_data_only: If True, allows data fetching without live trading guard.
-                            If False, requires SYSTEM3_LIVE_TRADING_ALLOWED for any operation.
-                            Default: False (backward compatible)
-        """
+        if not _SMARTAPI_AVAILABLE:
+            raise RuntimeError(
+                "AngelOneBroker requires smartapi-python which is not installed. "
+                "This broker is legacy — use DhanHQ (core/brokers/dhan/) instead."
+            )
         # Only enforce live trading guard if not in data-only mode
         # Data-only mode allows fetching market data, option chains, etc. without live trading permission
         if not allow_data_only:
