@@ -1,13 +1,13 @@
 # External Data Yahoo Proof
 
-Generated UTC: 2026-06-10T05:07:22.678367+00:00
+Generated UTC: 2026-06-11T05:13:02.165033+00:00
 
 Source: `Yahoo Finance via yfinance`
 
 Symbols requested: `15`
 Symbols OK: `14`
 Symbols failed: `1`
-Rows total: `136`
+Rows total: `138`
 
 ## Role in System3
 
@@ -19,8 +19,8 @@ Rows total: `136`
 
 | Symbol | OK | Rows |
 |---|---:|---:|
-| `^NSEI` | `True` | `8` |
-| `^NSEBANK` | `True` | `8` |
+| `^NSEI` | `True` | `9` |
+| `^NSEBANK` | `True` | `9` |
 | `RELIANCE.NS` | `True` | `10` |
 | `TCS.NS` | `True` | `10` |
 | `HDFCBANK.NS` | `True` | `10` |
