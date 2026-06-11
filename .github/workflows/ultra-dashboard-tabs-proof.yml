@@ -2,11 +2,6 @@ name: Ultra Dashboard Tabs Proof
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/ultra-dashboard-tabs-proof.yml
-      - dashboard/frontend/**
 
 permissions:
   contents: read
