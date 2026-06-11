@@ -46,7 +46,7 @@
           "config/.env.example",
           "reports/latest/safety_and_secrets/summary.json"
         ],
-        "tracked_file_count": 3696
+        "tracked_file_count": 3705
       },
       "gate": "safety_and_secrets",
       "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
@@ -1862,7 +1862,7 @@
       ]
     }
   ],
-  "generated_utc": "2026-06-10T04:50:11.111188+00:00",
+  "generated_utc": "2026-06-11T04:55:17.042495+00:00",
   "live_trading_enabled": false,
   "manual_only_items": [
     "broker OTP/manual login/session renewal when required",
