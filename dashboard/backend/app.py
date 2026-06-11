@@ -45,7 +45,6 @@ except Exception as e:
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:
@@ -234,10 +233,7 @@ app.add_middleware(
 )
 
 
-# Serve the dashboard UI at /ui (index.html + app.js + style.css)
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
-if _DASHBOARD_DIR.exists():
-    app.mount("/ui", StaticFiles(directory=str(_DASHBOARD_DIR), html=True), name="dashboard-ui")
 
 # Root route - helpful message
 @app.get("/")
@@ -257,8 +253,34 @@ async def root():
             "health": "/api/health",
             "state": "/api/state",
             "broker_status": "/api/broker/status",
+            "dashboard": "/ui",
         },
     }
+
+
+@app.get("/ui", include_in_schema=False)
+@app.get("/ui/", include_in_schema=False)
+async def serve_dashboard_index():
+    f = _DASHBOARD_DIR / "index.html"
+    if f.exists():
+        return FileResponse(str(f), media_type="text/html")
+    raise HTTPException(status_code=404, detail="Dashboard not found")
+
+
+@app.get("/ui/app.js", include_in_schema=False)
+async def serve_dashboard_js():
+    f = _DASHBOARD_DIR / "app.js"
+    if f.exists():
+        return FileResponse(str(f), media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="app.js not found")
+
+
+@app.get("/ui/style.css", include_in_schema=False)
+async def serve_dashboard_css():
+    f = _DASHBOARD_DIR / "style.css"
+    if f.exists():
+        return FileResponse(str(f), media_type="text/css")
+    raise HTTPException(status_code=404, detail="style.css not found")
 
 
 # Alias routes for convenience (point to /api/* endpoints)
