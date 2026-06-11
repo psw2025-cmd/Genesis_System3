@@ -513,6 +513,9 @@
     "path": "core/brokers/angel_one/broker.py"
   },
   {
+    "path": "core/brokers/dhan/dhan_readonly.py"
+  },
+  {
     "path": "core/config/live_trade_config_loader.py"
   },
   {
@@ -586,6 +589,9 @@
   },
   {
     "path": "create_yaml_configs.py"
+  },
+  {
+    "path": "dashboard/backend/app.py"
   },
   {
     "path": "docker-compose.oracle.yml"
@@ -811,6 +817,9 @@
   },
   {
     "path": "scripts/system3_master_proof_orchestrator.py"
+  },
+  {
+    "path": "scripts/verify_dhan_readonly.py"
   },
   {
     "path": "system3_autophase_validation.md"
@@ -1489,14 +1498,5 @@
   },
   {
     "path": "tests/auto/system3_generated_tests/test_phase_279.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_280.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_281.py"
-  },
-  {
-    "path": "tests/auto/system3_generated_tests/test_phase_282.py"
   }
 ]

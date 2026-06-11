@@ -10,7 +10,7 @@
     "path": "Run-FullQA.ps1"
   },
   {
-    "bytes": 149407,
+    "bytes": 150355,
     "exists": true,
     "path": "dashboard/backend/app.py"
   },
@@ -20,7 +20,7 @@
     "path": "dashboard/backend/Dockerfile"
   },
   {
-    "bytes": 212,
+    "bytes": 226,
     "exists": true,
     "path": "dashboard/backend/requirements.txt"
   },
@@ -30,7 +30,7 @@
     "path": "dashboard/frontend/package.json"
   },
   {
-    "bytes": 833,
+    "bytes": 1324,
     "exists": true,
     "path": "core/utils/env_loader.py"
   },

@@ -65,7 +65,7 @@
     "verdict": "TRADE_READY_BLOCKED"
   },
   {
-    "bytes": 107078,
+    "bytes": 106941,
     "exists": true,
     "keys": [
       "blockers",

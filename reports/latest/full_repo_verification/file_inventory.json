@@ -277,7 +277,7 @@
     ".png": 1,
     ".ps1": 53,
     ".pth": 5,
-    ".py": 1257,
+    ".py": 1260,
     ".sh": 4,
     ".toml": 1,
     ".ts": 4,
@@ -301,7 +301,7 @@
     "AI_AGENT_RUNS": 14,
     "agent_memory": 4,
     "config": 16,
-    "core": 597,
+    "core": 599,
     "dashboard": 66,
     "desktop_app": 6,
     "docs": 496,
@@ -309,11 +309,11 @@
     "proof": 9,
     "reports": 837,
     "runtime_reports": 6,
-    "scripts": 211,
+    "scripts": 212,
     "src": 32,
     "state": 5,
     "tests": 233,
     "tools": 36
   },
-  "tracked_file_count": 3705
+  "tracked_file_count": 3708
 }
