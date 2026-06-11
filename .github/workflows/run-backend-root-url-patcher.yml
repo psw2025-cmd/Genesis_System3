@@ -2,12 +2,6 @@ name: Run Backend Root URL Patcher
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - scripts/patch_backend_root_urls.py
-      - .github/workflows/run-backend-root-url-patcher.yml
 
 permissions:
   contents: write
@@ -43,5 +37,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dashboard/backend/app.py
-          git commit -m "fix: use production-safe root endpoint URLs"
+          git commit -m "fix: patch backend root URLs"
           git push
