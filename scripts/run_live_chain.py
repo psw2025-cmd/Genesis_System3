@@ -26,8 +26,6 @@ except ImportError:
     pytz = None
     _PYTZ_AVAILABLE = False
 
-from core.brokers.angel_one.broker import AngelOneBroker  # disabled shim
-from src.angel.live_chain_ws import LiveChainWebSocket    # disabled shim
 from src.angel.live_chain_rest import LiveChainREST
 from src.metrics.iv_solver import solve_implied_volatility
 from src.metrics.greeks import calculate_greeks_from_market_price
@@ -90,11 +88,11 @@ class LiveChainRunner:
 
         # Initialize components
         if not sim_mode:
-            logger.info("Initializing broker...")
-            self.broker = AngelOneBroker(allow_data_only=True)
-            logger.info("Initializing components...")
-            self.ws_manager = LiveChainWebSocket(self.broker) if use_websocket else None
-            self.rest_fallback = LiveChainREST(self.broker)
+            raise RuntimeError(
+                "LiveChainRunner: Angel One broker path is disabled. "
+                "System3 is Dhan-only. Pass sim_mode=True for simulation, "
+                "or use the Dhan data feed instead."
+            )
         else:
             logger.info("SIMULATION MODE: Skipping broker initialization")
             self.broker = None

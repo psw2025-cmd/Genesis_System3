@@ -69,31 +69,10 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
                     f.write("Reason: Missing required credential fields\n")
                     angelone_status = "INCOMPLETE_CREDENTIALS"
                 else:
-                    # Attempt safe read-only call
-                    try:
-                        from core.brokers.angel_one.broker import AngelOneBroker
-
-                        broker = AngelOneBroker(
-                            allow_data_only=True
-                        )  # Data fetching doesn't require live trading permission
-                        profile = broker.get_profile()
-
-                        if profile and profile.get("status"):
-                            f.write("Status: ✅ CONNECTED\n")
-                            f.write(f"Profile Status: {profile.get('status')}\n")
-                            if profile.get("data"):
-                                clientcode = profile["data"].get("clientcode", "N/A")
-                                f.write(f"Client Code: {clientcode}\n")
-                            angelone_status = "CONNECTED"
-                        else:
-                            f.write("Status: ⚠️ CONNECTION_FAILED\n")
-                            f.write("Reason: Profile fetch returned invalid response\n")
-                            angelone_status = "CONNECTION_FAILED"
-                    except Exception as e:
-                        f.write(f"Status: ❌ CONNECTION_ERROR\n")
-                        f.write(f"Error: {str(e)}\n")
-                        angelone_status = "CONNECTION_ERROR"
-                        errors.append(f"AngelOne connection error: {e}")
+                    # Angel One broker path is disabled — Dhan-only mode
+                    f.write("Status: DISABLED\n")
+                    f.write("Reason: Angel One broker path disabled — System3 is Dhan-only\n")
+                    angelone_status = "DISABLED_DHAN_ONLY"
             except ImportError:
                 f.write("Status: ❌ MODULE_NOT_FOUND\n")
                 f.write("Reason: Cannot import broker modules\n")

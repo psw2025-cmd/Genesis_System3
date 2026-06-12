@@ -85,19 +85,13 @@ def run_pre_market_diagnostic() -> Dict[str, Any]:
         "signals_exists": signals_csv.exists(),
     }
 
-    # Check 5: Broker connection (read-only test)
-    try:
-        from core.brokers.angel_one.broker import AngelOneBroker
-
-        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
-        # Don't actually connect, just check if class is available
-        diagnostics["checks"]["broker"] = {
-            "status": "PASS",
-            "available": True,
-        }
-    except Exception as e:
-        diagnostics["checks"]["broker"] = {"status": "WARN", "error": str(e)}
-        diagnostics["warnings"].append(f"Broker check: {e}")
+    # Check 5: Broker connection — disabled (Dhan-only mode)
+    diagnostics["checks"]["broker"] = {
+        "status": "DISABLED",
+        "available": False,
+        "reason": "Angel One broker path disabled — System3 is Dhan-only",
+    }
+    diagnostics["warnings"].append("Angel One broker check skipped — Dhan-only mode")
 
     # Print results
     print("=== DIAGNOSTIC RESULTS ===\n")

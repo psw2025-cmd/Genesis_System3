@@ -7,7 +7,7 @@ tries to execute any Angel One API call via the disabled shim.
 """
 import time
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 import sys
 from pathlib import Path
@@ -16,7 +16,6 @@ ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.brokers.angel_one.broker import AngelOneBroker
 from core.utils.logger import logger
 
 
@@ -26,7 +25,7 @@ class LiveChainREST:
     Implements rate limiting and batching.
     """
     
-    def __init__(self, broker: AngelOneBroker, max_requests_per_minute: int = 60):
+    def __init__(self, broker: Any, max_requests_per_minute: int = 60):
         """
         Initialize REST fallback.
         

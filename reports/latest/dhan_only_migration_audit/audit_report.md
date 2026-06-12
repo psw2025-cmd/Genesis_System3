@@ -1,19 +1,41 @@
 # Dhan-Only Migration Audit Report — Full End-to-End Verification
 
-**Date:** 2026-06-12 (re-verified pass 2)  
+**Date:** 2026-06-12 (pass 3 — final clean sweep)  
 **Verdict: PASS** — No active runtime path uses Angel One / SmartAPI.
 
 ---
 
 ## Summary
 
-Full end-to-end re-verification sweep across all Python files, workflow files,
-menu handlers, and import paths. All active Angel/SmartAPI broker paths are
-disabled. Every remaining reference either:
-- Is in the `archive/` directory (excluded)
+Full end-to-end sweep across all Python files, workflow files, menu handlers, and
+import paths. All Angel/SmartAPI broker paths are disabled. Every remaining
+reference either:
+- Is in the `archive/legacy_angel_one/` directory (excluded from active code)
 - Is a docs/reporting string (not an import or call)
 - Is a disabled shim that raises `RuntimeError` on instantiation
-- Is dead code guarded by `if False:` or an early `return`
+- Is a commented-out placeholder (not active code)
+- Is a shim-presence check in diagnostic/validation files
+
+### Mandatory Verification Greps (pass 3 — final)
+
+```
+GREP 1 — active AngelOneBroker instantiation (excluding archive/, reports/):
+  NONE FOUND
+  Result: PASS ✅ (zero results)
+
+GREP 2 — active AngelOneBroker import (excluding archive/, reports/):
+  scripts/connectivity_probe.py:41  →  ALLOWED — explicit shim-presence check inside try/except
+  Result: PASS ✅ (one result, matches carve-out exception: shim validation probe)
+
+GREP 3 — module-level SmartApi imports (excluding archive/, reports/):
+  NONE FOUND
+  Result: PASS ✅ (zero results)
+```
+
+Notes on GREP 2 remaining hit:
+- `connectivity_probe.py:41` — Comment block reads "Angel One broker shim (should import cleanly, raise only on use)".
+  Import is inside `try/except`, used only to confirm the disabled shim is importable without crashing.
+  This is the "shim validation" exception per audit mandate.
 
 ---
 
@@ -32,7 +54,7 @@ disabled. Every remaining reference either:
 |------|--------------------|--------------------|
 | `core/brokers/angel_one/broker.py` | ✅ No SmartApi import | Raises `RuntimeError` |
 | `src/angel/live_chain_ws.py` | ✅ No SmartApi import | Raises `RuntimeError` |
-| `src/angel/live_chain_rest.py` | ✅ Uses shim only | Fails at runtime via shim |
+| `src/angel/live_chain_rest.py` | ✅ No AngelOneBroker import — uses `Any` type hint | Constructor takes external broker arg; never instantiates broker itself |
 
 ---
 
@@ -48,6 +70,7 @@ All files pass `python -m py_compile`. Import smoke results:
 | `core.engine.ultra_live_signals_shadow` | ✅ OK | numpy/joblib guarded |
 | `system3_ultra_runtime_loops` | ✅ OK | live_signal_loop disabled |
 | `scripts.connectivity_probe` | ✅ OK | Dhan-probe rewrite |
+| `core.validation.option_chain_validator` | ✅ OK | Disabled shim |
 
 Verified behaviour:
 - `AngelOneBroker()` → raises `RuntimeError: Angel One / SmartAPI broker path is disabled`
@@ -116,20 +139,50 @@ Two SmartAPI string references in workflows — both in regex/reporting patterns
 
 ---
 
-## I. Remaining Angel Code Classification
+## I. File-by-File Classification (All 18 Flagged Files + Additional)
 
-| File | Classification |
-|------|---------------|
-| `archive/root_clutter/*.py` | **Archive** — excluded from audit |
-| `core/engine/angel_*.py` | **Archived in place** — disabled menus (4-72) can't call them; all use shim |
-| `scripts/start_real_live_trading.py` | **Fail-closed standalone** — not in any menu; fails at import (missing pytz) then at AngelOneBroker (shim) |
-| `scripts/test_greeks_*.py`, `scripts/verify_*.py` | **Standalone test scripts** — not in any menu; fail at AngelOneBroker() via shim |
-| `core/engine/ultra_live_signals_shadow.py` | **Disabled in-place** — function returns DISABLED; option 80 handler blocked |
-| `option_chain_automation_master.py` | **Not in any active menu** — AngelOneBroker() inside try/except; shim raises at runtime |
+| File | Classification | Action Taken |
+|------|---------------|-------------|
+| `core/brokers/angel_one/broker.py` | **Disabled shim** — defines shim only, raises RuntimeError on instantiation | Converted to disabled shim (prior session) |
+| `src/angel/live_chain_ws.py` | **Disabled shim** — no SmartApi import; raises RuntimeError | Converted to disabled shim (prior session) |
+| `src/angel/live_chain_rest.py` | **Disabled at runtime** — AngelOneBroker import removed; uses `Any` type hint; broker arg never instantiated here | AngelOneBroker import removed (pass 3 final) |
+| `validate_option_chain_system.py` | **ARCHIVED** — validated the old Angel One system; unreferenced by any active file | `git mv` to `archive/legacy_angel_one/` |
+| `scripts/connectivity_probe.py` | **Shim-presence check** — imports AngelOneBroker to confirm shim; probes Dhan only | Rewritten to Dhan-only probe |
+| `run_system3.py` | **Legacy menu disabled** — show_menu() shows DISABLED; main() accepts only "0) Exit" | Replaced menu+dispatch |
+| `system3_ultra.py` | **Active entrypoint; Angel options guarded** — options 4-72, 80 blocked at display+handler | Guard sets added |
+| `system3_ultra_runtime_loops.py` | **live_signal_loop() disabled** — prints DISABLED notice and returns immediately | Function body replaced |
+| `core/engine/ultra_live_signals_shadow.py` | **Disabled shim** — run_ultra_live_shadow_once() returns DISABLED immediately | Full 237-line body replaced |
+| `option_chain_automation_master.py` | **Disabled shim** — class raises RuntimeError on init; run/start/main all raise | Converted (2254→25 lines) |
+| `core/validation/option_chain_validator.py` | **Disabled shim (interface preserved)** — broker init raises RuntimeError; static validate_dataframe kept | Converted to disabled shim |
+| `scripts/run_live_chain.py` | **Guarded** — raises RuntimeError for non-sim_mode; sim_mode path does not use broker | RuntimeError guard added |
+| `scripts/comprehensive_end_to_end_verification.py` | **Guarded** — verify_index_fetch() returns DISABLED immediately | Returns DISABLED directly |
+| `core/engine/angel_monday_diagnostic.py` | **Guarded** — broker check hardcoded to DISABLED/unavailable | Broker block replaced |
+| `core/engine/system3_phase205_broker_selftest.py` | **Guarded** — writes DISABLED_DHAN_ONLY status to file; no broker instantiation | Broker block replaced |
+| `scripts/production_readiness_check.py` | **Fixed** — AngelOneBroker import removed from check_imports() | Import line removed |
+| `core/engine/angel_executor_live_prep.py` | **Commented-out placeholder** — Angel broker references are all `#` comments; not an active import; live exec returns "not yet implemented"; not imported anywhere | No change needed (already non-functional) |
+| `core/engine/angel_automation_config.py` | **Retained active (safety config)** — provides AUTOMATION_CONFIG/DRY_RUN safety gates used by system3_ultra.py and 15+ other active files; does not import Angel broker | No change needed |
+
+### 12 Files Archived via `git mv` to `archive/legacy_angel_one/`
+
+**`archive/legacy_angel_one/core_engine/`:**
+- `angel_options_watch.py`
+- `angel_options_watch_loop.py`
+- `auto_fetch_option_chain_hourly.py`
+- `fetch_all_indices_option_chain.py`
+- `test_angelone_api.py`
+- `test_angelone_option_chain.py`
+
+**`archive/legacy_angel_one/scripts/`:**
+- `start_real_live_trading.py`
+- `test_greeks_calculation.py`
+- `test_greeks_api.py`
+- `verify_all_columns_fetched.py`
+- `verify_parallel_processing.py`
+- `debug_greeks_calculation.py`
 
 ---
 
-## J. Files Modified (this audit)
+## J. Files Modified (this audit — pass 3)
 
 | File | Change |
 |------|--------|
@@ -137,11 +190,19 @@ Two SmartAPI string references in workflows — both in regex/reporting patterns
 | `src/angel/live_chain_ws.py` | Full disabled shim (prior session) |
 | `src/angel/live_chain_rest.py` | Disabled at runtime via shim (prior session) |
 | `run_system3.py` | show_menu()+main() replaced with DISABLED stubs |
-| `system3_ultra.py` | Options 4-72 disabled in menu+handler; option 80 blocked |
+| `system3_ultra.py` | Options 4-72 disabled in menu+handler; option 80 blocked; options 51-80 guards added |
 | `system3_ultra_runtime_loops.py` | live_signal_loop() disabled; option 1 shows DISABLED |
 | `core/engine/ultra_live_signals_shadow.py` | run_ultra_live_shadow_once() returns DISABLED immediately; numpy/joblib guarded |
 | `scripts/connectivity_probe.py` | Rewritten to probe Dhan only |
-| `scripts/run_live_chain.py` | pytz guarded; shim imports (prior session) |
+| `scripts/run_live_chain.py` | Angel broker init replaced with RuntimeError for non-sim_mode |
+| `scripts/comprehensive_end_to_end_verification.py` | verify_index_fetch() returns DISABLED; AngelOneBroker import removed |
+| `core/engine/angel_monday_diagnostic.py` | Broker check hardcoded DISABLED |
+| `core/engine/system3_phase205_broker_selftest.py` | Broker block writes DISABLED_DHAN_ONLY |
+| `option_chain_automation_master.py` | Converted to disabled shim (25 lines) |
+| `core/validation/option_chain_validator.py` | Converted to disabled shim (broker init raises RuntimeError) |
+| `scripts/production_readiness_check.py` | AngelOneBroker import removed from check_imports() |
+| `archive/legacy_angel_one/core_engine/` | 6 files archived via git mv |
+| `archive/legacy_angel_one/scripts/` | 6 files archived via git mv |
 | `reports/latest/dhan_only_migration_audit/audit_report.md` | This report |
 
 ---
@@ -150,14 +211,15 @@ Two SmartAPI string references in workflows — both in regex/reporting patterns
 
 All criteria from the mandatory audit scope are met:
 
-- ✅ No active runtime path uses Angel One / SmartAPI (all blocked at menu level or return DISABLED)
-- ✅ No master menu exposes active Angel One broker/data/trading options (options 4-72, 80 disabled)
+- ✅ No active non-archive file instantiates AngelOneBroker
+- ✅ No active non-archive script imports AngelOneBroker except acceptable shim validation/report files
+- ✅ All old Angel operational files archived, disabled, or replaced with Dhan
+- ✅ Proof report includes file-by-file classification (section I above)
 - ✅ No workflow installs SmartAPI
-- ✅ All remaining Angel code classified: shim / archived-in-place / blocked-with-proof
-- ✅ py_compile PASS on all 14 target files
-- ✅ Import smoke tests PASS (all 6 tested modules import clean)
+- ✅ py_compile PASS on all 15 target files (pass 3)
+- ✅ Import smoke tests PASS (all 7 tested modules import clean)
 - ✅ Shim guards verified: AngelOneBroker() raises, LiveChainWebSocket() raises, ultra shadow returns DISABLED
 - ✅ Live trading remains disabled
 - ✅ .env, secrets, DB, model artifacts untouched
 
-*Generated by Claude Code Dhan-only migration audit — 2026-06-12 (pass 2)*
+*Generated by Claude Code Dhan-only migration audit — 2026-06-12 (pass 3)*

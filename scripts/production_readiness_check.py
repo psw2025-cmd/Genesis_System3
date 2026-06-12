@@ -23,11 +23,11 @@ def check_imports():
     """Check if all required modules can be imported."""
     print("\n[CHECK 1/8] Testing imports...")
     try:
-        from core.brokers.angel_one.broker import AngelOneBroker
         from src.trading.paper_executor import PaperExecutor
         from src.trading.pnl_tracker import PnLTracker
         from src.storage.trade_history import TradeHistoryStore
         from scripts.run_live_chain import LiveChainRunner
+        # Note: AngelOneBroker removed — System3 is Dhan-only
 
         print("  ✅ All imports successful")
         return True

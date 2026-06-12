@@ -26,8 +26,6 @@ except ImportError:
     build_angel_training_main = None
     _ANGEL_TRAINING_AVAILABLE = False
 
-from core.brokers.angel_one.broker import AngelOneBroker  # disabled shim — safe to import
-
 try:
     from core.engine.main_launcher import main as launch_core
     from core.engine.health_check import main as health_main

@@ -11,18 +11,33 @@ Comprehensive End-to-End Verification
 import sys
 from pathlib import Path
 from datetime import datetime
-import pytz
-import pandas as pd
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+
+try:
+    import pytz
+    import pandas as pd
+    _NUMERIC_AVAILABLE = True
+except ImportError:
+    pytz = None
+    pd = None
+    _NUMERIC_AVAILABLE = False
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.brokers.angel_one.broker import AngelOneBroker
-from core.utils.logger import logger
+try:
+    from core.utils.logger import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
+
+_SCRIPT_DISABLED_REASON = (
+    "comprehensive_end_to_end_verification: Angel One broker path is disabled. "
+    "System3 is Dhan-only. This script cannot run live data verification."
+)
 from src.validation.qc_validator import QCValidator
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
@@ -45,40 +60,7 @@ def verify_index_fetch(index_config):
 
     print(f"\n  [INDEX] {name} ({exchange})")
 
-    try:
-        broker = AngelOneBroker(allow_data_only=True)
-        chain_data = broker.get_option_chain_by_underlying(name, exchange=exchange)
-
-        if not chain_data or len(chain_data) == 0:
-            return {"index": name, "status": "FAILED", "count": 0, "error": "No data returned"}
-
-        df = pd.DataFrame(chain_data)
-
-        # Check critical columns
-        checks = {
-            "has_contracts": len(df) > 0,
-            "has_ltp": df["ltp"].notna().any(),
-            "has_oi": df["oi"].notna().any(),
-            "has_bid_ask": df["bidPrice"].notna().any() and df["offerPrice"].notna().any(),
-            "has_greeks": df["delta"].notna().any(),
-            "has_pOI": df["pOI"].notna().any(),
-            "has_timestamps": df["timestamp_ist"].notna().any() if "timestamp_ist" in df.columns else False,
-        }
-
-        all_ok = all(checks.values())
-
-        return {
-            "index": name,
-            "status": "OK" if all_ok else "PARTIAL",
-            "count": len(df),
-            "checks": checks,
-            "pOI_count": df["pOI"].notna().sum(),
-            "delta_count": df["delta"].notna().sum(),
-            "timestamp_count": df["timestamp_ist"].notna().sum() if "timestamp_ist" in df.columns else 0,
-        }
-
-    except Exception as e:
-        return {"index": name, "status": "ERROR", "count": 0, "error": str(e)}
+    return {"index": name, "status": "DISABLED", "count": 0, "error": _SCRIPT_DISABLED_REASON}
 
 
 def verify_calculations(df):
