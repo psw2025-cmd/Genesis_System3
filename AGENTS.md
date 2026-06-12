@@ -221,3 +221,40 @@ Target: ρ ≥ 0.7 sustained over 14-day rolling window.
 2. After any code generation, grep for "angel" and fix immediately if found.
 3. Archive folder (`archive/`) is read-only legacy — never import from it.
 4. If another agent (Gemini) or a script generates angel-named artifacts, correct them.
+
+---
+
+## BROKER RULE — PERMANENT (NEVER VIOLATE)
+
+**ONLY BROKER: Dhan (DhanHQ)**
+- Angel One, AngelOne, SmartAPI are PERMANENTLY REMOVED from this system.
+- If you ever encounter `angel`, `angel_one`, `AngelOne`, `SmartAPI` anywhere in the codebase — treat it as a bug and fix it immediately.
+
+**Renaming convention:**
+| Old (WRONG) | New (CORRECT) |
+|-------------|---------------|
+| `angel_`    | `dhan_`       |
+| `AngelOne`  | `Dhan`        |
+| `Angel One` | `Dhan`        |
+| `ANGEL_ONE` | `DHAN`        |
+| `SmartAPI`  | `DhanHQ`      |
+| `smartapi`  | `dhanhq`      |
+
+**Migration completed June 2026:**
+- 92 engine files renamed: `core/engine/angel_*.py` → `core/engine/dhan_*.py`
+- `src/angel/` → `src/dhan/`
+- `core/brokers/angel_one/` → merged into `core/brokers/dhan/`
+- `core/models/angel_one/` → `core/models/dhan/`
+- `core/models/angel_one_ultra/` → `core/models/dhan_ultra/`
+- `core/models/angel_one_real_blended/` → `core/models/dhan_real_blended/`
+- `config/angel_automation_config.json` → `config/dhan_automation_config.json`
+- GitHub workflow `patch-render-root-and-smartapi.yml` → `patch-render-root-and-dhanhq.yml`
+
+**Active Dhan integration:**
+- Broker client: `core/brokers/dhan/dhan_readonly.py`
+- Credentials: `.secrets/dhan.env` (DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN)
+- Options chain: fetched via DhanHQ API
+
+**Self-check rule:** After every session, run:
+`find . -not -path './.git/*' -not -path './archive/*' -not -path './node_modules/*' -iname "*angel*" -o -iname "*smartapi*" | grep -v ".pyc"`
+Result must be EMPTY. If not — fix it before finishing.

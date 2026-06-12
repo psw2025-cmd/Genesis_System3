@@ -208,3 +208,26 @@ rolling = validator.get_rolling_accuracy(days=10)
 - **ALWAYS** use `dhan_` prefix for new engine files, `Dhan` for class names.
 - If you find any stray "angel" reference anywhere in active code, fix it immediately.
 - Archive folder (`archive/`) may still contain legacy angel code — do NOT import from it.
+
+---
+
+## BROKER RULE — PERMANENT (NEVER VIOLATE)
+
+**ONLY BROKER: Dhan (DhanHQ)**
+- Angel One / AngelOne / SmartAPI are DEAD. They are NOT used. They do NOT exist in this system.
+- If you see any file, class, variable, import, comment, or string with: `angel`, `angel_one`, `AngelOne`, `SmartAPI`, `smartapi` — RENAME/REPLACE IT immediately to Dhan equivalent.
+- Naming convention: `angel_` → `dhan_`, `AngelOne` → `Dhan`, `SmartAPI` → `DhanHQ`
+- Broker client: `core/brokers/dhan/dhan_readonly.py`
+- All model dirs: `core/models/dhan/`, `core/models/dhan_ultra/`, `core/models/dhan_real_blended/`
+- All engine files: `core/engine/dhan_*.py` (92 files, all renamed from angel_ in June 2026)
+- Options chain data source: Dhan API via `core/brokers/dhan/`
+
+**What was done (June 2026):**
+- 92 `core/engine/angel_*.py` files renamed → `dhan_*.py` via `git mv`
+- `src/angel/` → `src/dhan/`
+- `core/brokers/angel_one/` → merged into `core/brokers/dhan/`
+- `core/models/angel_one*/` → `core/models/dhan*/`
+- `config/angel_automation_config.json` → `config/dhan_automation_config.json`
+- `.github/workflows/patch-render-root-and-smartapi.yml` → `patch-render-root-and-dhanhq.yml`
+- Docs renamed accordingly
+- Internal content confirmed clean (no angel_ refs in any active .py file)
