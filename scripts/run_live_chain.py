@@ -1,5 +1,9 @@
 """
-Live Option Chain Runner - Main entry point
+Live Option Chain Runner - DISABLED (Angel One / SmartAPI path).
+
+System3 is Dhan-only. This script depends on Angel One broker and SmartAPI
+WebSocket which are disabled. Running this script will raise RuntimeError
+when attempting to connect to Angel One.
 """
 
 import sys
@@ -8,7 +12,6 @@ import argparse
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict
-import pytz
 import pandas as pd
 import json
 
@@ -16,9 +19,15 @@ ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.brokers.angel_one.broker import AngelOneBroker
-from src.angel.expiry_selector import get_expiry_for_all_indices
-from src.angel.live_chain_ws import LiveChainWebSocket
+try:
+    import pytz
+    _PYTZ_AVAILABLE = True
+except ImportError:
+    pytz = None
+    _PYTZ_AVAILABLE = False
+
+from core.brokers.angel_one.broker import AngelOneBroker  # disabled shim
+from src.angel.live_chain_ws import LiveChainWebSocket    # disabled shim
 from src.angel.live_chain_rest import LiveChainREST
 from src.metrics.iv_solver import solve_implied_volatility
 from src.metrics.greeks import calculate_greeks_from_market_price

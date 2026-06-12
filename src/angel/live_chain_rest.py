@@ -1,11 +1,14 @@
 """
-REST Fallback for Option Chain - Secondary method when WebSocket fails
+REST Fallback for Option Chain - Secondary method when WebSocket fails.
+
+NOTE: Angel One broker path is disabled (System3 is Dhan-only).
+LiveChainREST will raise RuntimeError at runtime when the broker
+tries to execute any Angel One API call via the disabled shim.
 """
 import time
 import pandas as pd
 from typing import Dict, List, Optional
 from datetime import datetime
-import pytz
 import sys
 from pathlib import Path
 

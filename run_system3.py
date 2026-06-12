@@ -1,28 +1,56 @@
-﻿from core.engine.train_angel_models import main as train_angel_models_main
-from core.engine.build_angel_training_dataset import main as build_angel_training_main
+﻿"""
+run_system3.py — LEGACY ANGEL ONE MENU (DISABLED)
+
+System3 is Dhan-only. All menu options in this file target Angel One /
+SmartAPI data paths that are disabled. Any menu option that attempts to
+use the broker will raise RuntimeError from the disabled shim.
+
+Do not use this script for live operation. Use system3_ultra.py instead,
+which routes to the active Dhan/analyzer paths.
+"""
 
 import sys
 import os
 
-# Ensure project root is in path
+# Ensure project root is in path before any project imports
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from core.engine.main_launcher import main as launch_core
-from core.engine.health_check import main as health_main
-from core.engine.test_data_pipeline import main as data_test_main
-from core.engine.test_angelone_api import main as angelone_test_main
-from core.engine.test_angelone_instruments import main as angelone_instr_test_main
-from core.engine.angel_options_watch import main as angel_options_watch_main
-from core.engine.angel_options_watch_loop import (
-    main as angel_options_watch_loop_main,
-    _build_full_snapshot,
-)
-from core.engine.angel_options_analyze import main as angel_options_analyze_main
-from core.engine import angel_live_ai_signals
-from core.engine.angel_synthetic_backtester import run_backtest as angel_synthetic_backtest_run
-from core.brokers.angel_one.broker import AngelOneBroker
+# All Angel module imports are guarded — they may fail due to missing optional
+# dependencies (sklearn, pyotp, etc.) without affecting the Dhan/main runtime.
+try:
+    from core.engine.train_angel_models import main as train_angel_models_main
+    from core.engine.build_angel_training_dataset import main as build_angel_training_main
+    _ANGEL_TRAINING_AVAILABLE = True
+except ImportError:
+    train_angel_models_main = None
+    build_angel_training_main = None
+    _ANGEL_TRAINING_AVAILABLE = False
+
+from core.brokers.angel_one.broker import AngelOneBroker  # disabled shim — safe to import
+
+try:
+    from core.engine.main_launcher import main as launch_core
+    from core.engine.health_check import main as health_main
+    from core.engine.test_data_pipeline import main as data_test_main
+    from core.engine.test_angelone_api import main as angelone_test_main
+    from core.engine.test_angelone_instruments import main as angelone_instr_test_main
+    from core.engine.angel_options_watch import main as angel_options_watch_main
+    from core.engine.angel_options_watch_loop import (
+        main as angel_options_watch_loop_main,
+        _build_full_snapshot,
+    )
+    from core.engine.angel_options_analyze import main as angel_options_analyze_main
+    from core.engine import angel_live_ai_signals
+    from core.engine.angel_synthetic_backtester import run_backtest as angel_synthetic_backtest_run
+    _ANGEL_ENGINE_AVAILABLE = True
+except ImportError as _e:
+    launch_core = health_main = data_test_main = angelone_test_main = None
+    angelone_instr_test_main = angel_options_watch_main = None
+    angel_options_watch_loop_main = _build_full_snapshot = None
+    angel_options_analyze_main = angel_live_ai_signals = angel_synthetic_backtest_run = None
+    _ANGEL_ENGINE_AVAILABLE = False
 
 
 def show_menu():
