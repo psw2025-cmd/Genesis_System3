@@ -7,7 +7,7 @@ Consumes healed forward signals (Phase 304) and produces reconciled output with:
 - Expiry filled using available metadata
 - Invalid rows isolated to errors directory
 
-Outputs: `angel_index_ai_signals_reconciled.csv`
+Outputs: `dhan_index_ai_signals_reconciled.csv`
 DRY-RUN ONLY: No trading flags touched.
 """
 
@@ -25,8 +25,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-FORWARD_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
-RECONCILED_CSV = STORAGE_LIVE / "angel_index_ai_signals_reconciled.csv"
+FORWARD_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
+RECONCILED_CSV = STORAGE_LIVE / "dhan_index_ai_signals_reconciled.csv"
 INVALID_CSV = STORAGE_LIVE / "errors" / "_invalid_reconciled_rows.csv"
 REPORT_JSON = STORAGE_LIVE / "meta" / "phase305_reconcile_report.json"
 INVALID_CSV.parent.mkdir(parents=True, exist_ok=True)

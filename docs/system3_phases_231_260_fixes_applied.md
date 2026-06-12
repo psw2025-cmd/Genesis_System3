@@ -42,8 +42,8 @@ Running `python system3_phase_231_260_diagnostics.py` should now show:
 ## 🎯 VALIDATION
 
 **WARN statuses are expected** for phases that require data files:
-- Phase 238: Needs `angel_virtual_orders.csv`
-- Phase 239: Needs `angel_virtual_orders.csv` + forward returns
+- Phase 238: Needs `dhan_virtual_orders.csv`
+- Phase 239: Needs `dhan_virtual_orders.csv` + forward returns
 - Phase 240: Needs enriched orders CSV
 - Phase 241: Needs enriched orders CSV
 - Phase 244-247: Need various data files

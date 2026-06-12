@@ -150,19 +150,19 @@ snap_data = self.get_snap_quote(exchange, symbol, token)
 | `impliedVolatility` | 101 rows | 100% | ❌ **CRITICAL** |
 
 **Root Cause**:
-- `get_option_greeks()` method may not exist in SmartAPI
+- `get_option_greeks()` method may not exist in DhanHQ
 - Method exists but API calls are failing (wrong parameters?)
 - Expiry date format mismatch (critical for Greeks API)
 - Market closed (Greeks not available after hours)
-- API endpoint not available in current SmartAPI version
+- API endpoint not available in current DhanHQ version
 
 **Fix Required**: ⚠️ **NEEDS INVESTIGATION**
 
 **Investigation Steps**:
-1. Check if `getOptionGreek` method exists in SmartAPI Python library
+1. Check if `getOptionGreek` method exists in DhanHQ Python library
 2. Test manually with sample option:
    ```python
-   broker = AngelOneBroker(allow_data_only=True)
+   broker = DhanBroker(allow_data_only=True)
    test = broker.get_option_greeks(
        "NFO", "NIFTY24FEB2625000CE", "64829",
        25000.0, "24FEB2026", "CE"
@@ -173,7 +173,7 @@ snap_data = self.get_snap_quote(exchange, symbol, token)
    - `"24FEB2026"` (DDMMMYYYY)
    - `"24-FEB-2026"` (DD-MMM-YYYY)
    - `"2026-02-24"` (YYYY-MM-DD)
-4. Check SmartAPI documentation for correct method signature
+4. Check DhanHQ documentation for correct method signature
 
 **Fallback Solution**: ✅ **AVAILABLE**
 - If API unavailable, calculate Greeks using Black-Scholes
@@ -182,7 +182,7 @@ snap_data = self.get_snap_quote(exchange, symbol, token)
 
 **API Method**: `smart.getOptionGreek()` - **NEEDS VERIFICATION**
 
-**Availability**: ⚠️ **UNKNOWN** - May not be available in all SmartAPI versions
+**Availability**: ⚠️ **UNKNOWN** - May not be available in all DhanHQ versions
 
 ---
 
@@ -197,7 +197,7 @@ snap_data = self.get_snap_quote(exchange, symbol, token)
 **Root Cause**:
 - Part of Greeks API response
 - Missing because Greeks API is not working
-- May not be supported in all SmartAPI versions
+- May not be supported in all DhanHQ versions
 
 **Fix Required**: ⚠️ **DEPENDS ON GREEKS API**
 
@@ -211,7 +211,7 @@ snap_data = self.get_snap_quote(exchange, symbol, token)
 
 **Status**: Code exists but needs verification it's actually being called.
 
-**Check**: Review `core/brokers/angel_one/broker.py` line ~400+ to ensure:
+**Check**: Review `core/brokers/dhan/broker.py` line ~400+ to ensure:
 ```python
 # This should be called for EVERY option:
 quote_data = self.get_quote(exchange, row["symbol"], str(row["token"]))
@@ -225,19 +225,19 @@ quote_data = self.get_quote(exchange, row["symbol"], str(row["token"]))
 
 **Current Code**: May have fallback to `get_ltp()` if `getQuote()` not available.
 
-**Issue**: Need to ensure it actually calls SmartAPI `getQuote()` method.
+**Issue**: Need to ensure it actually calls DhanHQ `getQuote()` method.
 
-**Check SmartAPI Methods**:
+**Check DhanHQ Methods**:
 ```python
 # Check what methods are available:
-broker = AngelOneBroker(allow_data_only=True)
+broker = DhanBroker(allow_data_only=True)
 available_methods = [m for m in dir(broker.smart) if not m.startswith('_')]
-print("Available SmartAPI methods:", available_methods)
+print("Available DhanHQ methods:", available_methods)
 
 # Look for: getQuote, marketData, snapQuote, etc.
 ```
 
-**Fix**: Update `get_quote()` to use correct SmartAPI method name.
+**Fix**: Update `get_quote()` to use correct DhanHQ method name.
 
 ---
 
@@ -248,10 +248,10 @@ print("Available SmartAPI methods:", available_methods)
 **Issue**: None of them may be working or method doesn't exist.
 
 **Investigation**:
-1. Check SmartAPI Python library GitHub: https://github.com/angel-one/smartapi-python
+1. Check DhanHQ Python library GitHub: https://github.com/angel-one/dhanhq-python
 2. Search for "Greek" or "greeks" in codebase
 3. Test with sample option manually
-4. Check API documentation: https://smartapi.angelbroking.com/docs
+4. Check API documentation: https://dhanhq.angelbroking.com/docs
 
 **Possible Solutions**:
 - Use correct method name if found
@@ -360,12 +360,12 @@ def is_market_open():
 
 1. **Verify get_quote() is being called**
    - Add logging to confirm API calls
-   - Check if SmartAPI `getQuote()` method exists
+   - Check if DhanHQ `getQuote()` method exists
 
 2. **Test Greeks API manually**
    - Run test script to see actual API response
    - Verify expiry date format
-   - Check if method exists in SmartAPI version
+   - Check if method exists in DhanHQ version
 
 3. **Run Validator**
    - Execute `OptionChainValidator` on current CSV

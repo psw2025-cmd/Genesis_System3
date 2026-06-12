@@ -17,15 +17,15 @@ This document maps the complete operational flow from Pre-Market through Intrada
 ### Recommended Sequence
 
 1. **Environment Check** (Option 50 or 107)
-   - `angel_env_consistency_checker` or `system3_phase43_env_guard`
+   - `dhan_env_consistency_checker` or `system3_phase43_env_guard`
    - Verify environment variables, packages, directories
 
 2. **Pre-Market Diagnostic** (Option OP1 or 48)
-   - `angel_market_warmup_scanner`
+   - `dhan_market_warmup_scanner`
    - Validate models, configs, directories
 
 3. **System Health Check** (Option 2 or 18)
-   - `health_check` or `angel_watchdog_recovery`
+   - `health_check` or `dhan_watchdog_recovery`
    - Verify system health
 
 4. **Safety Status** (Option S)
@@ -40,19 +40,19 @@ This document maps the complete operational flow from Pre-Market through Intrada
 ### Recommended Sequence
 
 1. **Start Live Signal Generation** (Option OP2 or 11)
-   - `angel_live_ai_signals`
+   - `dhan_live_ai_signals`
    - Continuous signal generation loop
 
 2. **Monitor Signals** (Option 44)
-   - `angel_live_snapshot_reasoner`
+   - `dhan_live_snapshot_reasoner`
    - Analyze latest signals
 
 3. **Trade Decision** (Option OP3)
-   - `angel_trade_decision`
+   - `dhan_trade_decision`
    - Generate trade plans
 
 4. **Intraday Monitoring** (Option 16)
-   - `angel_intraday_pnl_monitor`
+   - `dhan_intraday_pnl_monitor`
    - Monitor active trades
 
 5. **Ultra Shadow Execution** (Option 97)
@@ -68,23 +68,23 @@ This document maps the complete operational flow from Pre-Market through Intrada
 ### Recommended Sequence
 
 1. **Outcome Logging** (Option 55)
-   - `angel_unified_outcome_logger_v3`
+   - `dhan_unified_outcome_logger_v3`
    - Log real trade outcomes
 
 2. **Post-Market Analysis** (Option OP4 or 57)
-   - `angel_daily_learning_digest`
+   - `dhan_daily_learning_digest`
    - Daily learning summary
 
 3. **Misfire Detection** (Option 56)
-   - `angel_misfire_classifier_v2`
+   - `dhan_misfire_classifier_v2`
    - Classify misfires
 
 4. **Daily Reports** (Option 40)
-   - `angel_daily_auto_reports`
+   - `dhan_daily_auto_reports`
    - Generate all daily reports
 
 5. **PnL Summary** (Option 15)
-   - `angel_daily_pnl_summary`
+   - `dhan_daily_pnl_summary`
    - Daily PnL summary
 
 **Menu Options**: OP4, 15, 40, 55, 56, 57
@@ -100,11 +100,11 @@ This document maps the complete operational flow from Pre-Market through Intrada
    - Aggregate weekly data
 
 2. **Weekly Summary** (Option 41)
-   - `angel_weekly_summary_report`
+   - `dhan_weekly_summary_report`
    - Weekly summary report
 
 3. **Rolling Dashboard** (Option 37)
-   - `angel_rolling_learning_dashboard`
+   - `dhan_rolling_learning_dashboard`
    - 7-day rolling dashboard
 
 4. **Governance Summary** (Option 101)

@@ -21,7 +21,7 @@
 - ✅ `system3_autorun_master.py` (601 lines) - Main orchestration script
 - ✅ `system3_watchdog.py` (262 lines) - Monitoring and restart script
 - ✅ `system3_live_day_autopilot.py` (560 lines) - Live trading autopilot
-- ✅ `core/engine/angel_monday_diagnostic.py` (132 lines) - Pre-market diagnostic
+- ✅ `core/engine/dhan_monday_diagnostic.py` (132 lines) - Pre-market diagnostic
 
 ### Log Files Analyzed
 - ✅ `logs/system3_autorun_master_20251203.log` (875+ lines)
@@ -33,7 +33,7 @@
 - ✅ `system3_daily_heartbeat.json` - Heartbeat file (last update: 15:15:08)
 
 ### Storage Files
-- ✅ `storage/live/angel_index_ai_signals.csv` - Empty (headers only, no signals)
+- ✅ `storage/live/dhan_index_ai_signals.csv` - Empty (headers only, no signals)
 
 ---
 
@@ -79,7 +79,7 @@
 
 ### A) CRITICAL FAILURE: Autopilot Abort Due to Unicode Encoding
 
-**File**: `core/engine/angel_monday_diagnostic.py`  
+**File**: `core/engine/dhan_monday_diagnostic.py`  
 **Lines**: 102, 108, 113, 125, 127  
 **Error**: `UnicodeEncodeError: 'charmap' codec can't encode character '\u2705'`
 
@@ -95,7 +95,7 @@
 
 ---
 
-### B) SECONDARY FAILURE: SmartAPI Import Error in Colab
+### B) SECONDARY FAILURE: DhanHQ Import Error in Colab
 
 **File**: `system3_live_day_autopilot.py`  
 **Line**: 179  
@@ -114,7 +114,7 @@
 
 ### C) MISSING SIGNAL FILE: Empty Signals CSV
 
-**File**: `storage/live/angel_index_ai_signals.csv`  
+**File**: `storage/live/dhan_index_ai_signals.csv`  
 **Status**: Empty (headers only, no data rows)
 
 **Root Cause**:
@@ -132,7 +132,7 @@
 
 ### 🔧 FIX 1: Remove Emoji in Diagnostics
 
-**File**: `core/engine/angel_monday_diagnostic.py`
+**File**: `core/engine/dhan_monday_diagnostic.py`
 
 **Changes Applied**:
 
@@ -195,17 +195,17 @@ print("\n[OK] SYSTEM READY FOR TRADING (DRY RUN MODE)")
 ```python
 # BEFORE:
 try:
-    from core.brokers.angel_one.broker import AngelOneBroker
+    from core.brokers.dhan.broker import DhanBroker
     ...
-    broker = AngelOneBroker()
+    broker = DhanBroker()
     logger.info("Broker initialized successfully.\n")
 
 # AFTER:
 try:
-    from core.brokers.angel_one.broker import AngelOneBroker
+    from core.brokers.dhan.broker import DhanBroker
     ...
     try:
-        broker = AngelOneBroker()
+        broker = DhanBroker()
         logger.info("Broker initialized successfully.\n")
     except ImportError as e:
         logger.error(f"[ERROR] SmartApi missing - cannot initialize broker: {e}")
@@ -292,7 +292,7 @@ except Exception as e:
 
 **Phases**: 221, 222
 
-**Reason**: Empty `angel_index_ai_signals.csv` file (no signals to process)
+**Reason**: Empty `dhan_index_ai_signals.csv` file (no signals to process)
 
 **Status**: ✅ **EXPECTED** (will resolve when signals are generated)
 
@@ -396,14 +396,14 @@ except Exception as e:
 
 ### Summary of All Fixes Done
 
-1. ✅ **Fix 1**: Removed emoji characters from `angel_monday_diagnostic.py` (5 lines fixed)
+1. ✅ **Fix 1**: Removed emoji characters from `dhan_monday_diagnostic.py` (5 lines fixed)
 2. ✅ **Fix 2**: Added SmartApi-safe import handling in `system3_live_day_autopilot.py`
 3. ✅ **Fix 3**: Added UnicodeEncodeError handling to prevent autopilot abort
 
 ### Exact Root Cause
 
 **PRIMARY ROOT CAUSE**: Unicode encoding error in pre-market diagnostic
-- **File**: `core/engine/angel_monday_diagnostic.py`
+- **File**: `core/engine/dhan_monday_diagnostic.py`
 - **Line**: 102 (and 108, 113, 125, 127)
 - **Error**: Emoji characters (`✅`, `⚠️`, `❌`) cannot be encoded by Windows `charmap` codec
 - **Impact**: Autopilot aborted before live session, preventing ALL signal generation
@@ -427,7 +427,7 @@ except Exception as e:
    - Confirm OP2 live session starts successfully
 
 3. **Verify Signal Generation**:
-   - Check `storage/live/angel_index_ai_signals.csv` for new signals
+   - Check `storage/live/dhan_index_ai_signals.csv` for new signals
    - Verify phases 221-223 no longer warn (signals available)
 
 4. **Monitor Heartbeat**:
@@ -455,7 +455,7 @@ except Exception as e:
 ### Patched Files Snapshot
 
 **Files Modified**:
-1. ✅ `core/engine/angel_monday_diagnostic.py` (5 lines changed)
+1. ✅ `core/engine/dhan_monday_diagnostic.py` (5 lines changed)
 2. ✅ `system3_live_day_autopilot.py` (2 sections modified)
 
 **Files Unchanged** (as required):
@@ -496,7 +496,7 @@ except Exception as e:
 
 ### Fixes Applied ✅
 
-1. ✅ **CRITICAL**: Fixed Unicode encoding in `angel_monday_diagnostic.py`
+1. ✅ **CRITICAL**: Fixed Unicode encoding in `dhan_monday_diagnostic.py`
 2. ✅ **MEDIUM**: Added SmartApi-safe import handling
 3. ✅ **IMPROVEMENT**: Added UnicodeEncodeError handling to prevent abort
 

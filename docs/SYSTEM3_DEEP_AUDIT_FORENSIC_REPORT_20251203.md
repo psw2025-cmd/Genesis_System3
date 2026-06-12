@@ -446,7 +446,7 @@ def update_heartbeat():
 
 **Answer**: ❌ **AUTOPILOT ENCODING ERROR** - Pre-market diagnostic failed due to Unicode encoding error, causing autopilot to abort before live session.
 
-**Root Cause**: `core/engine/angel_monday_diagnostic.py` prints emoji characters (✅, ⚠️, ❌) which cannot be encoded by Windows `charmap` codec (cp1252).
+**Root Cause**: `core/engine/dhan_monday_diagnostic.py` prints emoji characters (✅, ⚠️, ❌) which cannot be encoded by Windows `charmap` codec (cp1252).
 
 **Exact Error**:
 ```
@@ -456,8 +456,8 @@ def update_heartbeat():
 **Log Evidence** (`logs/live_day_autopilot_20251203.log` lines 23-31):
 ```
 2025-12-03 09:15:13 [INFO] [OP1.2] Running Pre-Market Diagnostic...
-2025-12-03 09:15:14 [INFO] Connecting to Angel One SmartAPI...
-2025-12-03 09:15:14 [INFO] AngelOne login successful.
+2025-12-03 09:15:14 [INFO] Connecting to Dhan DhanHQ...
+2025-12-03 09:15:14 [INFO] Dhan login successful.
 2025-12-03 09:15:14 [WARNING] [WARN] Pre-market diagnostic failed: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
 2025-12-03 09:15:14 [INFO] [OP1.3] Running Environment Guard...
 2025-12-03 09:15:14 [INFO] [OK] Environment guard complete
@@ -481,7 +481,7 @@ def update_heartbeat():
 
 **Windows Instance** (Primary Failure):
 - **Error**: `'charmap' codec can't encode character '\u2705'`
-- **Location**: `core/engine/angel_monday_diagnostic.py` line 102
+- **Location**: `core/engine/dhan_monday_diagnostic.py` line 102
 - **Impact**: Autopilot aborted before live session
 
 **Colab Instance** (Secondary Failure):
@@ -490,7 +490,7 @@ def update_heartbeat():
 - **Impact**: Live session failed, no signals generated
 
 **Code Reference** (Encoding Error):
-```99:103:core/engine/angel_monday_diagnostic.py
+```99:103:core/engine/dhan_monday_diagnostic.py
     # Print results
     print("=== DIAGNOSTIC RESULTS ===\n")
     for check_name, check_result in diagnostics["checks"].items():
@@ -506,25 +506,25 @@ def update_heartbeat():
 
 #### 12. Explain the REAL root cause with line-number evidence.
 
-**Answer**: **ROOT CAUSE: Unicode encoding error in `angel_monday_diagnostic.py`**
+**Answer**: **ROOT CAUSE: Unicode encoding error in `dhan_monday_diagnostic.py`**
 
-**Exact Location**: `core/engine/angel_monday_diagnostic.py` lines 102, 108, 113, 125, 127
+**Exact Location**: `core/engine/dhan_monday_diagnostic.py` lines 102, 108, 113, 125, 127
 
 **Code Evidence**:
-```102:103:core/engine/angel_monday_diagnostic.py
+```102:103:core/engine/dhan_monday_diagnostic.py
         status_icon = "✅" if check_result.get("status") == "PASS" else "⚠️" if check_result.get("status") == "WARN" else "❌"
         print(f"{status_icon} {check_name.upper()}: {check_result.get('status', 'UNKNOWN')}")
 ```
 
-```108:108:core/engine/angel_monday_diagnostic.py
+```108:108:core/engine/dhan_monday_diagnostic.py
             print(f"⚠️  {warning}")
 ```
 
-```113:113:core/engine/angel_monday_diagnostic.py
+```113:113:core/engine/dhan_monday_diagnostic.py
             print(f"❌ {error}")
 ```
 
-```125:127:core/engine/angel_monday_diagnostic.py
+```125:127:core/engine/dhan_monday_diagnostic.py
         print("\n⚠️  SYSTEM NOT READY FOR TRADING - FIX ERRORS ABOVE")
     else:
         print("\n✅ SYSTEM READY FOR TRADING (DRY RUN MODE)")
@@ -532,14 +532,14 @@ def update_heartbeat():
 
 **Call Chain**:
 1. `system3_live_day_autopilot.py` line 134 calls `run_pre_market_diagnostic()`
-2. `angel_monday_diagnostic.py` line 102 prints emoji `✅`
+2. `dhan_monday_diagnostic.py` line 102 prints emoji `✅`
 3. Windows console (cp1252) cannot encode Unicode emoji
 4. `UnicodeEncodeError` raised
 5. Exception caught at `system3_live_day_autopilot.py` line 138
 6. Autopilot aborts at line 159 (`return all_ok` returns False)
 7. Live session never starts (line 162+)
 
-**Conclusion**: The root cause is Unicode emoji characters in `angel_monday_diagnostic.py` that cannot be encoded by Windows `charmap` codec.
+**Conclusion**: The root cause is Unicode emoji characters in `dhan_monday_diagnostic.py` that cannot be encoded by Windows `charmap` codec.
 
 ---
 
@@ -652,7 +652,7 @@ def update_heartbeat():
 
 **OP3 Error** (also related):
 ```
-2025-12-03 09:15:13 [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\angel_index_ai_signals.csv
+2025-12-03 09:15:13 [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\dhan_index_ai_signals.csv
 ```
 
 **Conclusion**: Phases 221-222 warned due to missing/empty signals file. Phase 223 OK (threshold tuner doesn't require signals).
@@ -663,10 +663,10 @@ def update_heartbeat():
 
 #### 17. Determine the exact reason OP1.2 aborted.
 
-**Answer**: ❌ **UnicodeEncodeError** - `angel_monday_diagnostic.py` tried to print emoji character `✅` (U+2705) which cannot be encoded by Windows `charmap` codec.
+**Answer**: ❌ **UnicodeEncodeError** - `dhan_monday_diagnostic.py` tried to print emoji character `✅` (U+2705) which cannot be encoded by Windows `charmap` codec.
 
 **Exact Reason**: 
-- Function: `run_pre_market_diagnostic()` in `core/engine/angel_monday_diagnostic.py`
+- Function: `run_pre_market_diagnostic()` in `core/engine/dhan_monday_diagnostic.py`
 - Line: 102
 - Action: `print(f"{status_icon} {check_name.upper()}: ...")` where `status_icon = "✅"`
 - Error: `'charmap' codec can't encode character '\u2705' in position 0`
@@ -676,7 +676,7 @@ def update_heartbeat():
     # 2. Monday Diagnostic (if applicable)
     try:
         logger.info("[OP1.2] Running Pre-Market Diagnostic...")
-        from core.engine.angel_monday_diagnostic import run_pre_market_diagnostic
+        from core.engine.dhan_monday_diagnostic import run_pre_market_diagnostic
         result = run_pre_market_diagnostic()
         results["diagnostic"] = result.get("status", "UNKNOWN")
         logger.info(f"[OK] Pre-market diagnostic: {results['diagnostic']}")
@@ -696,8 +696,8 @@ def update_heartbeat():
 **Exact Log Segment**:
 ```
 2025-12-03 09:15:13,313 [INFO] [OP1.2] Running Pre-Market Diagnostic...
-2025-12-03 09:15:14,010 [INFO] Connecting to Angel One SmartAPI...
-2025-12-03 09:15:14,217 [INFO] AngelOne login successful.
+2025-12-03 09:15:14,010 [INFO] Connecting to Dhan DhanHQ...
+2025-12-03 09:15:14,217 [INFO] Dhan login successful.
 2025-12-03 09:15:14,217 [INFO] Feed token obtained: eyJhbGciOiJIUzUxMiJ9...
 2025-12-03 09:15:14,217 [WARNING] [WARN] Pre-market diagnostic failed: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
 2025-12-03 09:15:14,218 [INFO] [OP1.3] Running Environment Guard...
@@ -719,7 +719,7 @@ def update_heartbeat():
 **Evidence**:
 - **Autopilot Aborted**: Line 159 in `system3_live_day_autopilot.py` returned `False`
 - **Live Session Never Started**: OP2 (live session) never executed
-- **Signal Generation Never Ran**: `angel_live_ai_signals.py` never called
+- **Signal Generation Never Ran**: `dhan_live_ai_signals.py` never called
 - **Signals CSV**: Empty (only headers, no data rows)
 
 **Code Reference**:
@@ -843,16 +843,16 @@ if not run_op1_pre_market():
 **Answer**: ❌ **NO**
 
 **Evidence**:
-- **Broker Calls**: All successful (AngelOne login successful multiple times)
+- **Broker Calls**: All successful (Dhan login successful multiple times)
 - **API Errors**: None logged
 - **Data Quality**: No data corruption errors
 
 **Log Evidence**:
 ```
-2025-12-03 08:06:59 [INFO] Connecting to Angel One SmartAPI...
-2025-12-03 08:06:59 [INFO] AngelOne login successful.
-2025-12-03 09:15:14 [INFO] Connecting to Angel One SmartAPI...
-2025-12-03 09:15:14 [INFO] AngelOne login successful.
+2025-12-03 08:06:59 [INFO] Connecting to Dhan DhanHQ...
+2025-12-03 08:06:59 [INFO] Dhan login successful.
+2025-12-03 09:15:14 [INFO] Connecting to Dhan DhanHQ...
+2025-12-03 09:15:14 [INFO] Dhan login successful.
 ```
 
 **Conclusion**: No service/API returned bad data. ✅
@@ -901,7 +901,7 @@ def enforce_safety_checks() -> bool:
     
     # Check 2: Automation config
     try:
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         if AUTOMATION_CONFIG.auto_execute_trades:
             errors.append("AUTOMATION_CONFIG.auto_execute_trades is True (must be False)")
         logger.info(f"auto_execute_trades: {AUTOMATION_CONFIG.auto_execute_trades}")
@@ -945,10 +945,10 @@ def enforce_safety_checks() -> bool:
 
 **Status**: ❌ **FAILED**
 
-**Root Cause**: Unicode encoding error in `core/engine/angel_monday_diagnostic.py`
+**Root Cause**: Unicode encoding error in `core/engine/dhan_monday_diagnostic.py`
 
 **Exact Location**: 
-- **File**: `core/engine/angel_monday_diagnostic.py`
+- **File**: `core/engine/dhan_monday_diagnostic.py`
 - **Lines**: 102, 108, 113, 125, 127
 - **Function**: `run_pre_market_diagnostic()`
 - **Error**: `UnicodeEncodeError: 'charmap' codec can't encode character '\u2705'`
@@ -956,17 +956,17 @@ def enforce_safety_checks() -> bool:
 **Root Cause Trace**:
 
 1. **Trigger**: `system3_live_day_autopilot.py` line 134 calls `run_pre_market_diagnostic()`
-2. **Execution**: `angel_monday_diagnostic.py` line 102 attempts to print emoji `✅`
+2. **Execution**: `dhan_monday_diagnostic.py` line 102 attempts to print emoji `✅`
 3. **Error**: Windows console (cp1252) cannot encode Unicode emoji
 4. **Exception**: `UnicodeEncodeError` raised
 5. **Catch**: Exception caught at `system3_live_day_autopilot.py` line 138
 6. **Result**: `results["diagnostic"] = "WARN"` (line 140)
 7. **Abort**: `all_ok = False` (line 153), function returns `False` (line 159)
 8. **Impact**: Autopilot aborts, OP2 (live session) never runs
-9. **Consequence**: No signals generated, `angel_index_ai_signals.csv` remains empty
+9. **Consequence**: No signals generated, `dhan_index_ai_signals.csv` remains empty
 
 **Code Evidence**:
-```102:103:core/engine/angel_monday_diagnostic.py
+```102:103:core/engine/dhan_monday_diagnostic.py
         status_icon = "✅" if check_result.get("status") == "PASS" else "⚠️" if check_result.get("status") == "WARN" else "❌"
         print(f"{status_icon} {check_name.upper()}: {check_result.get('status', 'UNKNOWN')}")
 ```
@@ -976,7 +976,7 @@ def enforce_safety_checks() -> bool:
 - **Frequency**: Every autopilot start
 - **Workaround**: None (autopilot aborts before live session)
 
-**Fix Required**: Replace emoji characters with ASCII-safe alternatives in `angel_monday_diagnostic.py`.
+**Fix Required**: Replace emoji characters with ASCII-safe alternatives in `dhan_monday_diagnostic.py`.
 
 ---
 
@@ -1028,7 +1028,7 @@ def enforce_safety_checks() -> bool:
 
 **Priority**: 🔴 **CRITICAL** (blocks signal generation)
 
-**File**: `core/engine/angel_monday_diagnostic.py`
+**File**: `core/engine/dhan_monday_diagnostic.py`
 
 **Changes Required**:
 
@@ -1092,13 +1092,13 @@ def enforce_safety_checks() -> bool:
 **Line 179**: Add graceful handling for missing SmartApi
 ```python
 # BEFORE:
-from core.brokers.angel_one.broker import AngelOneBroker
-broker = AngelOneBroker()
+from core.brokers.dhan.broker import DhanBroker
+broker = DhanBroker()
 
 # AFTER:
 try:
-    from core.brokers.angel_one.broker import AngelOneBroker
-    broker = AngelOneBroker()
+    from core.brokers.dhan.broker import DhanBroker
+    broker = DhanBroker()
 except ImportError as e:
     logger.error(f"[ERROR] Failed to import broker: {e}")
     logger.error("[ERROR] SmartApi module not found. Install with: pip install SmartApi")
@@ -1159,7 +1159,7 @@ run_phases_range(181, 260)  # Include phases 181-187
 
 ### Corrections Required 🔧
 
-1. 🔴 **CRITICAL**: Fix Unicode encoding in `angel_monday_diagnostic.py` (5 lines)
+1. 🔴 **CRITICAL**: Fix Unicode encoding in `dhan_monday_diagnostic.py` (5 lines)
 2. 🟡 **MEDIUM**: Handle missing SmartApi in Colab (optional)
 3. 🟢 **LOW**: Add phases 181-187 to autorun if needed (optional)
 
@@ -1170,7 +1170,7 @@ run_phases_range(181, 260)  # Include phases 181-187
 **Status**: ✅ **SYSTEM IS PRODUCTION-READY** (after fixing encoding error)
 
 **Action Required**: 
-1. **IMMEDIATE**: Fix Unicode encoding error in `angel_monday_diagnostic.py`
+1. **IMMEDIATE**: Fix Unicode encoding error in `dhan_monday_diagnostic.py`
 2. **VERIFY**: Test autopilot after fix to confirm signal generation works
 3. **OPTIONAL**: Fix Colab SmartApi issue if Colab monitoring is desired
 

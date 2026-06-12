@@ -45,7 +45,7 @@ All safety checks passed:
 - Phase 202: Permissions Self-Repair ✅
 - Phase 203: Config Consistency ✅
 - Phase 204: Python Environment Validator ✅
-- Phase 205: Broker Credential Self-Tester ✅ (AngelOne connected)
+- Phase 205: Broker Credential Self-Tester ✅ (Dhan connected)
 - Phase 206: Model Compatibility ✅
 - Phase 207: Hotfix Registry ✅
 - Phase 208: Signal Consistency ✅
@@ -81,7 +81,7 @@ All safety checks passed:
 
 ## Broker Connectivity
 
-**AngelOne Connection**: ✅ **SUCCESSFUL**
+**Dhan Connection**: ✅ **SUCCESSFUL**
 
 - Login successful
 - Feed token obtained
@@ -115,7 +115,7 @@ Heartbeat file updated:
 
 1. **Safety Checks**: All passed, DRY-RUN confirmed
 2. **Phase Execution**: Phases 201-230 run successfully
-3. **Broker Connection**: AngelOne connected successfully
+3. **Broker Connection**: Dhan connected successfully
 4. **Heartbeat**: Updating correctly
 5. **Logging**: Comprehensive logging working
 6. **Error Handling**: Graceful handling of missing phases (231-260)
@@ -165,7 +165,7 @@ All 5 WARN phases are expected and documented:
 - **Memory**: Normal
 - **CPU**: Normal
 - **Disk I/O**: Normal
-- **Network**: AngelOne connection successful
+- **Network**: Dhan connection successful
 
 ---
 

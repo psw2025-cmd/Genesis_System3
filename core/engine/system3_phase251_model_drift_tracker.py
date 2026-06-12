@@ -39,7 +39,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 # Directories
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 STORAGE_DIR = PROJECT_ROOT / "storage" / "live"
 

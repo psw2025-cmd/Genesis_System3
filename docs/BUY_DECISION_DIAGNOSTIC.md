@@ -21,7 +21,7 @@
 
 ## Signal Analysis
 
-### Signals File: `storage/live/angel_index_ai_signals.csv`
+### Signals File: `storage/live/dhan_index_ai_signals.csv`
 
 **Total Signals**: 30  
 **BUY Signals**: 0  
@@ -169,7 +169,7 @@ else:
 
 ## Curated File Analysis
 
-### Curated File: `storage/live/angel_index_ai_signals_curated.csv`
+### Curated File: `storage/live/dhan_index_ai_signals_curated.csv`
 
 **Total Rows**: 610 (includes historical data)  
 **Columns**: 86 (72 base + 14 curated columns)  

@@ -18,7 +18,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "signals"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_signal_consistency_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
 def run_phase208(**kwargs) -> Dict[str, Any]:

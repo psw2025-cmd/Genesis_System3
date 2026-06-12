@@ -38,7 +38,7 @@ def run_phase338_signal_outcome_correlation(root_path: str = None, **kwargs) -> 
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load forward signals
-    forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+    forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
     if not forward_file.exists():
         logger.warning(f"Forward signals file not found: {forward_file}")

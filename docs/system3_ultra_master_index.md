@@ -7,7 +7,7 @@
 
 ## Overview
 
-System3 Ultra is the advanced integration layer for Angel One Index Options trading, providing:
+System3 Ultra is the advanced integration layer for Dhan Index Options trading, providing:
 - Risk-adaptive intelligence (Phases 21-30)
 - Integration and governance (Phases 31-38)
 - Rollout and safety shell (Phases 39-45)
@@ -33,7 +33,7 @@ System3 Ultra is the advanced integration layer for Angel One Index Options trad
 | **31** | Ultra Decision Fusion | `core/engine/system3_phase31_ultra_fusion.py` | `storage/ultra/phase31_ultra_fused_decisions.csv` | 94 |
 | **32** | Ultra vs Baseline Comparator | `core/engine/system3_phase32_ultra_vs_baseline.py` | `storage/ultra/phase32_ultra_vs_baseline_summary.md` | 95 |
 | **33** | Ultra Promotion Planner | `core/engine/system3_phase33_promotion_planner.py` | `storage/ultra/phase33_promotion_plan.json` | 96 |
-| **34** | Ultra Live Shadow Comparison | `core/engine/system3_phase34_ultra_shadow_exec.py` | `storage/live/angel_index_ai_ultra_trades_shadow.csv` | 97 |
+| **34** | Ultra Live Shadow Comparison | `core/engine/system3_phase34_ultra_shadow_exec.py` | `storage/live/dhan_index_ai_ultra_trades_shadow.csv` | 97 |
 | **35** | Ultra Decision Auditor | `core/engine/system3_phase35_ultra_auditor.py` | `storage/ultra/phase35_decision_audit_report.md` | 98 |
 | **36** | Ultra Continuous Learning Cycle | `core/engine/system3_phase36_cull_orchestrator.py` | `storage/ultra/phase36_cull_execution_log.md` | 99 |
 | **37** | Ultra Policy & Risk Monitor | `core/engine/system3_phase37_policy_risk_monitor.py` | `storage/ultra/phase37_policy_risk_dashboard.md` | 100 |
@@ -104,7 +104,7 @@ python -m core.engine.system3_phase43_env_guard
 
 ### Baseline Protection
 - ✅ **No baseline overwrites**: All writes to `storage/ultra/`, `storage/snapshots/`
-- ✅ **Baseline models protected**: `core/models/angel_one/` never modified
+- ✅ **Baseline models protected**: `core/models/dhan/` never modified
 - ✅ **Configs read-only**: All config reads are read-only
 
 ### Execution Safety

@@ -175,7 +175,7 @@ python -m core.engine.system3_phase41_promotion_executor
 - Checks flag file (must contain keyword)
 - Checks promotion plan (must have eligible underlyings)
 - Checks snapshot (must exist)
-- Copies Ultra models to staging: `core/models/angel_one_ultra_staging/`
+- Copies Ultra models to staging: `core/models/dhan_ultra_staging/`
 - **NEVER overwrites baseline**
 
 **Output**: `storage/ultra/phase41_promotion_staging_report.md`

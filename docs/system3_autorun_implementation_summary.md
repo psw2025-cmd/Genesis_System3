@@ -101,7 +101,7 @@
 
 **Triple Safety Check**:
 1. `config/live_trade_config.py`: `LIVE_TRADING_ENABLED = False`
-2. `core/engine/angel_automation_config.py`: `auto_execute_trades = False`
+2. `core/engine/dhan_automation_config.py`: `auto_execute_trades = False`
 3. `core/config/system3_ultra_safety.json`: `AUTO_EXECUTE_TRADES = false`
 
 **Abort on Failure**: If any safety check fails, script aborts immediately

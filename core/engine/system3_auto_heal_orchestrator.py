@@ -119,7 +119,7 @@ class AutoHealOrchestrator:
                 logger.warning(f"Could not re-run phase 306: {e}")
 
             # Option 2: Check if signals CSV itself is stale and needs refresh
-            signals_csv = STORAGE_LIVE / "angel_index_ai_signals.csv"
+            signals_csv = STORAGE_LIVE / "dhan_index_ai_signals.csv"
             if signals_csv.exists():
                 import pandas as pd
 

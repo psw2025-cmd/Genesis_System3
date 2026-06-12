@@ -21,7 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 META_DIR = PROJECT_ROOT / "storage" / "meta"
 CLEAN_DIR = PROJECT_ROOT / "storage" / "clean"
 THRESHOLDS_JSON = META_DIR / "system3_live_thresholds.json"
-EV_READY_CSV = CLEAN_DIR / "angel_index_ai_signals_with_forward_ev_ready.csv"
+EV_READY_CSV = CLEAN_DIR / "dhan_index_ai_signals_with_forward_ev_ready.csv"
 
 # Expected signal counts (from distribution analysis)
 EXPECTED_BUY_SIGNALS = 40

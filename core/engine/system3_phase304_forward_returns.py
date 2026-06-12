@@ -26,8 +26,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-FORWARD_INPUT = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
-CURATED_INPUT = STORAGE_LIVE / "angel_index_ai_signals_curated.csv"
+FORWARD_INPUT = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
+CURATED_INPUT = STORAGE_LIVE / "dhan_index_ai_signals_curated.csv"
 OUTPUT_CSV = FORWARD_INPUT  # overwrite in-place after healing
 INVALID_CSV = STORAGE_LIVE / "errors" / "_invalid_forward_rows.csv"
 REPORT_JSON = STORAGE_LIVE / "meta" / "phase304_heal_report.json"

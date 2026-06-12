@@ -15,7 +15,7 @@ Each module below includes:
 
 ### A1. Real-Time Volatility Detection
 
-**File**: `core/engine/angel_volatility_detector.py`
+**File**: `core/engine/dhan_volatility_detector.py`
 
 **Functions to implement**:
 ```python
@@ -37,7 +37,7 @@ def classify_volatility_state(df: pd.DataFrame) -> str  # Returns: "LOW", "NORMA
 
 ### A2. Microtrend Recognition
 
-**File**: `core/engine/angel_microtrend_recognizer.py`
+**File**: `core/engine/dhan_microtrend_recognizer.py`
 
 **Functions to implement**:
 ```python
@@ -59,7 +59,7 @@ def classify_trend_direction(df: pd.DataFrame) -> str  # Returns: "UP", "DOWN", 
 
 ### A3. Breakout Prediction Engine
 
-**File**: `core/engine/angel_breakout_predictor.py`
+**File**: `core/engine/dhan_breakout_predictor.py`
 
 **Functions to implement**:
 ```python
@@ -81,7 +81,7 @@ def detect_breakout_signal(df: pd.DataFrame) -> pd.DataFrame
 
 ### A4. Synthetic IV Estimator Refinement
 
-**File**: `core/engine/angel_iv_estimator.py`
+**File**: `core/engine/dhan_iv_estimator.py`
 
 **Functions to implement**:
 ```python
@@ -103,7 +103,7 @@ def compute_iv_rank(iv: float, iv_history: pd.Series) -> float  # Returns percen
 
 ### A5. Risk-Event Scanner
 
-**File**: `core/engine/angel_risk_event_scanner.py`
+**File**: `core/engine/dhan_risk_event_scanner.py`
 
 **Functions to implement**:
 ```python
@@ -127,7 +127,7 @@ def classify_risk_level(df: pd.DataFrame) -> str  # Returns: "LOW", "MEDIUM", "H
 
 ### B1. Trade Lifecycle Validator V2
 
-**File**: `core/engine/angel_trade_validator_v2.py`
+**File**: `core/engine/dhan_trade_validator_v2.py`
 
 **Functions to implement**:
 ```python
@@ -149,7 +149,7 @@ def detect_lifecycle_anomalies(trade_row: pd.Series) -> List[str]
 
 ### B2. Entry Optimizer
 
-**File**: `core/engine/angel_entry_optimizer.py`
+**File**: `core/engine/dhan_entry_optimizer.py`
 
 **Functions to implement**:
 ```python
@@ -171,7 +171,7 @@ def suggest_entry_strategy(signal_row: pd.Series) -> str  # Returns: "MARKET", "
 
 ### B3. Exit Optimizer
 
-**File**: `core/engine/angel_exit_optimizer.py`
+**File**: `core/engine/dhan_exit_optimizer.py`
 
 **Functions to implement**:
 ```python
@@ -193,7 +193,7 @@ def suggest_exit_strategy(trade_data: Dict[str, Any]) -> str  # Returns: "HOLD",
 
 ### B4. Dynamic SL/TP Engine
 
-**File**: `core/engine/angel_dynamic_sl_tp.py`
+**File**: `core/engine/dhan_dynamic_sl_tp.py`
 
 **Functions to implement**:
 ```python
@@ -215,7 +215,7 @@ def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series, period: int =
 
 ### B5. Confidence-Score Fusion Layer
 
-**File**: `core/engine/angel_confidence_score_fusion.py`
+**File**: `core/engine/dhan_confidence_score_fusion.py`
 
 **Functions to implement**:
 ```python
@@ -237,7 +237,7 @@ def normalize_fusion_scores(scores: pd.Series) -> pd.Series
 
 ### B6. Multi-Model Agreement Filter
 
-**File**: `core/engine/angel_multi_model_agreement.py`
+**File**: `core/engine/dhan_multi_model_agreement.py`
 
 **Functions to implement**:
 ```python
@@ -262,7 +262,7 @@ def filter_by_agreement(df_signals: pd.DataFrame, min_agreement: float = 0.7) ->
 
 ### C1. Multi-Timeframe Profile Mapping
 
-**File**: `core/engine/angel_market_profile.py`
+**File**: `core/engine/dhan_market_profile.py`
 
 **Functions to implement**:
 ```python
@@ -285,7 +285,7 @@ def classify_price_location(price: float, profile_levels: Dict[str, List[float]]
 
 ### C2. Premium-to-Spot Behavior Classifier
 
-**File**: `core/engine/angel_premium_spot_classifier.py`
+**File**: `core/engine/dhan_premium_spot_classifier.py`
 
 **Functions to implement**:
 ```python
@@ -308,7 +308,7 @@ def detect_premium_spot_divergence(df: pd.DataFrame) -> pd.DataFrame
 
 ### C3. Multi-Timeframe Confirmation Logic
 
-**File**: `core/engine/angel_multi_timeframe_confirmation.py`
+**File**: `core/engine/dhan_multi_timeframe_confirmation.py`
 
 **Functions to implement**:
 ```python
@@ -332,7 +332,7 @@ def filter_confirmed_signals(df: pd.DataFrame, min_confirmation: float = 0.6) ->
 
 ### D1. Over-Trade Detector
 
-**File**: `core/engine/angel_overtrade_detector.py`
+**File**: `core/engine/dhan_overtrade_detector.py`
 
 **Functions to implement**:
 ```python
@@ -354,7 +354,7 @@ def check_overtrade_risk(underlying: str, recent_trades: int, limit: int) -> boo
 
 ### D2. Signal Quality Meter
 
-**File**: `core/engine/angel_signal_quality_meter.py`
+**File**: `core/engine/dhan_signal_quality_meter.py`
 
 **Functions to implement**:
 ```python
@@ -376,7 +376,7 @@ def classify_quality_level(quality_score: float) -> str  # Returns: "POOR", "FAI
 
 ### D3. Execution Guardrail
 
-**File**: `core/engine/angel_execution_guardrail.py`
+**File**: `core/engine/dhan_execution_guardrail.py`
 
 **Functions to implement**:
 ```python
@@ -398,7 +398,7 @@ def enforce_execution_limits(underlying: str, daily_count: int, limit: int) -> b
 
 ### D4. Market Regime Classifier
 
-**File**: `core/engine/angel_market_regime_classifier.py`
+**File**: `core/engine/dhan_market_regime_classifier.py`
 
 **Functions to implement**:
 ```python
@@ -433,7 +433,7 @@ def adjust_strategy_for_regime(regime: str, current_strategy: Dict[str, Any]) ->
 **Handler pattern**:
 ```python
 elif choice == "24":
-    from core.engine.angel_market_intelligence_dashboard import main as market_intel_main
+    from core.engine.dhan_market_intelligence_dashboard import main as market_intel_main
     market_intel_main()
 ```
 

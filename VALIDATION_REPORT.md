@@ -16,7 +16,7 @@
 - ✓ `PHASE_GAPS_ANALYSIS.md`
 - ✓ `PRIORITY_IMPLEMENTATION_SUMMARY.md`
 - ✓ `start_system3_env.bat`
-- ✓ `storage/live/angel_index_ai_signals_with_forward.csv`
+- ✓ `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 ## System Status
 

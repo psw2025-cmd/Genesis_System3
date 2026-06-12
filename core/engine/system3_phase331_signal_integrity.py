@@ -22,16 +22,16 @@ logger = logging.getLogger(__name__)
 
 # Signal CSV files to check
 SIGNAL_FILES = [
-    "storage/live/angel_index_ai_signals.csv",
-    "storage/live/angel_index_ai_signals_curated.csv",
-    "storage/live/angel_index_ai_signals_with_forward.csv",
+    "storage/live/dhan_index_ai_signals.csv",
+    "storage/live/dhan_index_ai_signals_curated.csv",
+    "storage/live/dhan_index_ai_signals_with_forward.csv",
 ]
 
 # Required columns for each file
 REQUIRED_COLUMNS = {
-    "angel_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
-    "angel_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts", "pred_label"],
-    "angel_index_ai_signals_with_forward.csv": [
+    "dhan_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+    "dhan_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts", "pred_label"],
+    "dhan_index_ai_signals_with_forward.csv": [
         "underlying",
         "symbol",
         "signal",

@@ -67,7 +67,7 @@ class BrokerAbstraction:
 
 def test_broker_compatibility() -> Dict[str, Any]:
     """Test broker abstraction compatibility (shadow-only)."""
-    brokers = ["AngelOne", "Binance", "Zerodha"]
+    brokers = ["Dhan", "Binance", "Zerodha"]
     results = {}
 
     for broker_name in brokers:

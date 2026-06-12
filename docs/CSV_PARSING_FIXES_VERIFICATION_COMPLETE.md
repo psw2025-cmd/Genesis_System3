@@ -15,7 +15,7 @@ All tests executed successfully on **2025-12-03 21:35:20**
 
 ## TEST RESULTS
 
-### ✅ TEST 1: PnL Simulator (`angel_pnl_simulator.py`)
+### ✅ TEST 1: PnL Simulator (`dhan_pnl_simulator.py`)
 
 **Status**: **PASSED** ✅
 
@@ -39,7 +39,7 @@ All tests executed successfully on **2025-12-03 21:35:20**
 
 ---
 
-### ✅ TEST 2: Trade Decision (`angel_trade_decision.py`)
+### ✅ TEST 2: Trade Decision (`dhan_trade_decision.py`)
 
 **Status**: **PASSED** ✅
 
@@ -55,7 +55,7 @@ All tests executed successfully on **2025-12-03 21:35:20**
 
 ---
 
-### ✅ TEST 3: Data Extractor (`angel_real_data_extractor.py`)
+### ✅ TEST 3: Data Extractor (`dhan_real_data_extractor.py`)
 
 **Status**: **PASSED** ✅
 
@@ -83,7 +83,7 @@ All tests executed successfully on **2025-12-03 21:35:20**
 
 **Command Output**:
 ```
-[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\angel_index_ai_pnl_log.csv
+[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\dhan_index_ai_pnl_log.csv
 
 === PnL SUMMARY BY UNDERLYING ===
 underlying  count  mean  max  min
@@ -117,9 +117,9 @@ underlying  count  mean  max  min
    - Now: Completes successfully and generates PnL log
 
 3. ✅ **All Fixed Files Verified**
-   - `angel_pnl_simulator.py` ✅
-   - `angel_trade_decision.py` ✅
-   - `angel_real_data_extractor.py` ✅
+   - `dhan_pnl_simulator.py` ✅
+   - `dhan_trade_decision.py` ✅
+   - `dhan_real_data_extractor.py` ✅
 
 4. ✅ **System Continues to Function**
    - Signal generation unaffected ✅
@@ -144,9 +144,9 @@ This ensures:
 
 ### Files Modified
 
-1. ✅ `core/engine/angel_pnl_simulator.py` (lines 43-53)
-2. ✅ `core/engine/angel_trade_decision.py` (lines 242-248)
-3. ✅ `core/engine/angel_real_data_extractor.py` (line 42)
+1. ✅ `core/engine/dhan_pnl_simulator.py` (lines 43-53)
+2. ✅ `core/engine/dhan_trade_decision.py` (lines 242-248)
+3. ✅ `core/engine/dhan_real_data_extractor.py` (line 42)
 
 ---
 

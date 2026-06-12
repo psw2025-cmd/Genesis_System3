@@ -56,7 +56,7 @@
 ```
 2025-12-03 09:15:12 [INFO] Starting OP2: Live Signal Generation (DRY-RUN autopilot)...
 2025-12-03 09:15:13 [INFO] OP2: Autopilot started
-2025-12-03 09:15:13 [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\angel_index_ai_signals.csv
+2025-12-03 09:15:13 [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\dhan_index_ai_signals.csv
 2025-12-03 13:06:14 [INFO] Signals CSV is empty or contained only headers after creation. No trade plan will be generated.
 2025-12-03 16:00:18 [INFO] SYSTEM3 AUTORUN MASTER - SHUTDOWN COMPLETE
 ```
@@ -77,7 +77,7 @@
 2025-12-03 16:00:17 [JSON] shutdown_flag.json: {"shutdown_date": "2025-12-03", "shutdown_time": "2025-12-03T16:00:17.813898", "reason": "scheduled_shutdown_4pm"}
 2025-12-03 16:01:16 [INFO] Shutdown flag detected - Master shut down today. Watchdog will NOT restart master (as intended).
 2025-12-03 21:13:31 [INFO] Signal engine processing complete. Generated 30 signals
-2025-12-03 21:13:31 [INFO] Appended 30 signals to C:\Genesis_System3\storage\live\angel_index_ai_signals.csv
+2025-12-03 21:13:31 [INFO] Appended 30 signals to C:\Genesis_System3\storage\live\dhan_index_ai_signals.csv
 ```
 
 ---

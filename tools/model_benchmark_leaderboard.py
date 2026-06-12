@@ -9,8 +9,8 @@ ROOT = Path.cwd()
 OUT_DIR = ROOT / "reports" / "model_benchmark_dashboard"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-TRAINING_CSV = ROOT / "storage" / "training" / "angel_index_options_training.csv"
-MODELS_DIR = ROOT / "core" / "models" / "angel_one"
+TRAINING_CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"
+MODELS_DIR = ROOT / "core" / "models" / "dhan"
 AUTHORITY_MAP = ROOT / "reports" / "authority_map" / "system3_authority_runtime_map.json"
 
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]

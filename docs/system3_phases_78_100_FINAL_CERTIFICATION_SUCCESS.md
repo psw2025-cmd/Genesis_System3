@@ -27,7 +27,7 @@
    - `storage/ultra/ph76_ph100/` ✅
 
 2. **Key Configuration Files**: ✅ All present
-   - `config/angel_automation_config.json` ✅
+   - `config/dhan_automation_config.json` ✅
    - `config/system3_job_scheduler.json` ✅
 
 3. **System Status**: ✅ **CERTIFIED**
@@ -85,7 +85,7 @@ From automated test logs, the following phases executed successfully:
 
 ## Configuration Files Created
 
-1. ✅ `config/angel_automation_config.json`
+1. ✅ `config/dhan_automation_config.json`
    - Automation settings (all safety flags: false)
    - Matches Python module defaults
 

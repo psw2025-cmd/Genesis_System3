@@ -19,7 +19,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
 STALENESS_CSV = STORAGE_META / "system3_staleness_flags_306.csv"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "performance"

@@ -154,13 +154,13 @@ From all validation MD files:
 
 - **Baseline protection:**
   - No overwrites of:
-    - `core/models/angel_one/*_model.pkl`
-    - `core/models/angel_one/*_model_meta.json`
+    - `core/models/dhan/*_model.pkl`
+    - `core/models/dhan/*_model_meta.json`
 
 - **Ultra isolation:**
   - All Ultra artifacts in:
     - `storage/ultra/...`
-    - `core/models/angel_one_ultra/...`
+    - `core/models/dhan_ultra/...`
     - `storage/learning/...` (staging/blended)
 
 - **Auto-execution: DISABLED**
@@ -201,8 +201,8 @@ Run these commands whenever you want to reconfirm System3 health.
 ### 4.2 Models + training health
 
 ```powershell
-(venv) PS C:\Genesis_System3> python -m core.engine.train_angel_models
-(venv) PS C:\Genesis_System3> python -m core.engine.offline_angel_ai_test
+(venv) PS C:\Genesis_System3> python -m core.engine.train_dhan_models
+(venv) PS C:\Genesis_System3> python -m core.engine.offline_dhan_ai_test
 ```
 
 **Confirm:**
@@ -216,7 +216,7 @@ Run these commands whenever you want to reconfirm System3 health.
 ### 4.3 Live pipeline (DRY-RUN)
 
 ```powershell
-(venv) PS C:\Genesis_System3> python -m core.engine.angel_live_ai_signals
+(venv) PS C:\Genesis_System3> python -m core.engine.dhan_live_ai_signals
 ```
 
 **Confirm:**
@@ -230,8 +230,8 @@ Run these commands whenever you want to reconfirm System3 health.
 ### 4.4 Backtester + PnL
 
 ```powershell
-(venv) PS C:\Genesis_System3> python -m core.engine.angel_synthetic_backtester
-(venv) PS C:\Genesis_System3> python -m core.engine.angel_daily_pnl_summary
+(venv) PS C:\Genesis_System3> python -m core.engine.dhan_synthetic_backtester
+(venv) PS C:\Genesis_System3> python -m core.engine.dhan_daily_pnl_summary
 ```
 
 **Confirm:**

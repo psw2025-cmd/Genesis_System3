@@ -1,9 +1,9 @@
 """
-Live Option Chain Runner - DISABLED (Angel One / SmartAPI path).
+Live Option Chain Runner - DISABLED (Dhan / DhanHQ path).
 
-System3 is Dhan-only. This script depends on Angel One broker and SmartAPI
+System3 is Dhan-only. This script depends on Dhan broker and DhanHQ
 WebSocket which are disabled. Running this script will raise RuntimeError
-when attempting to connect to Angel One.
+when attempting to connect to Dhan.
 """
 
 import sys
@@ -89,7 +89,7 @@ class LiveChainRunner:
         # Initialize components
         if not sim_mode:
             raise RuntimeError(
-                "LiveChainRunner: Angel One broker path is disabled. "
+                "LiveChainRunner: Dhan broker path is disabled. "
                 "System3 is Dhan-only. Pass sim_mode=True for simulation, "
                 "or use the Dhan data feed instead."
             )

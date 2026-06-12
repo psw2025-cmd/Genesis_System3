@@ -1,8 +1,8 @@
 """
 run_system3.py — LEGACY ANGEL ONE MENU (DISABLED)
 
-System3 is Dhan-only. All menu options in this file target Angel One /
-SmartAPI data paths that are disabled. Any menu option that attempts to
+System3 is Dhan-only. All menu options in this file target Dhan /
+DhanHQ data paths that are disabled. Any menu option that attempts to
 use the broker will raise RuntimeError from the disabled shim.
 
 Do not use this script for live operation. Use system3_ultra.py instead,
@@ -18,12 +18,12 @@ if ROOT_DIR not in sys.path:
 
 # Guarded imports — may fail when optional deps (sklearn, pyotp) are absent.
 try:
-    from core.engine.train_angel_models import main as train_angel_models_main
-    from core.engine.build_angel_training_dataset import main as build_angel_training_main
+    from core.engine.train_dhan_models import main as train_dhan_models_main
+    from core.engine.build_dhan_training_dataset import main as build_dhan_training_main
     _ANGEL_TRAINING_AVAILABLE = True
 except ImportError:
-    train_angel_models_main = None
-    build_angel_training_main = None
+    train_dhan_models_main = None
+    build_dhan_training_main = None
     _ANGEL_TRAINING_AVAILABLE = False
 
 try:
@@ -32,34 +32,34 @@ try:
     from core.engine.test_data_pipeline import main as data_test_main
     from core.engine.test_angelone_api import main as angelone_test_main
     from core.engine.test_angelone_instruments import main as angelone_instr_test_main
-    from core.engine.angel_options_watch import main as angel_options_watch_main
-    from core.engine.angel_options_watch_loop import (
-        main as angel_options_watch_loop_main,
+    from core.engine.dhan_options_watch import main as dhan_options_watch_main
+    from core.engine.dhan_options_watch_loop import (
+        main as dhan_options_watch_loop_main,
         _build_full_snapshot,
     )
-    from core.engine.angel_options_analyze import main as angel_options_analyze_main
-    from core.engine import angel_live_ai_signals
-    from core.engine.angel_synthetic_backtester import run_backtest as angel_synthetic_backtest_run
+    from core.engine.dhan_options_analyze import main as dhan_options_analyze_main
+    from core.engine import dhan_live_ai_signals
+    from core.engine.dhan_synthetic_backtester import run_backtest as dhan_synthetic_backtest_run
     _ANGEL_ENGINE_AVAILABLE = True
 except ImportError as _e:
     launch_core = health_main = data_test_main = angelone_test_main = None
-    angelone_instr_test_main = angel_options_watch_main = None
-    angel_options_watch_loop_main = _build_full_snapshot = None
-    angel_options_analyze_main = angel_live_ai_signals = angel_synthetic_backtest_run = None
+    angelone_instr_test_main = dhan_options_watch_main = None
+    dhan_options_watch_loop_main = _build_full_snapshot = None
+    dhan_options_analyze_main = dhan_live_ai_signals = dhan_synthetic_backtest_run = None
     _ANGEL_ENGINE_AVAILABLE = False
 
 
 def show_menu() -> str:
     print("\n=== GENESIS SYSTEM 3 — LEGACY MENU (DISABLED) ===")
     print()
-    print("  [DISABLED] All options in this script target Angel One / SmartAPI")
+    print("  [DISABLED] All options in this script target Dhan / DhanHQ")
     print("  data paths that are no longer active. System3 is Dhan-only.")
     print()
     print("  Use system3_ultra.py instead:")
     print("    python system3_ultra.py")
     print()
     print("0) Exit")
-    # Former options 1-107 mapped to Angel One broker / SmartAPI paths — removed.
+    # Former options 1-107 mapped to Dhan broker / DhanHQ paths — removed.
     return input("Select option [0 to exit]: ").strip()
 
 

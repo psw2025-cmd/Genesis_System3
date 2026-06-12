@@ -156,7 +156,7 @@
 
 | File | Status | Key Finding |
 |------|--------|-------------|
-| `angel_index_ai_signals_with_forward.csv` | ✅ | 560/608 rows (92%) with forward returns |
+| `dhan_index_ai_signals_with_forward.csv` | ✅ | 560/608 rows (92%) with forward returns |
 | `system3_signal_edge_report.md` | ✅ | 51 EV tables, neutral scores perform best |
 | `system3_live_thresholds.json` | ✅ | BANKNIFTY 0.10, others 0.40 |
 | `system3_thresholds_comparison.md` | ✅ | 2 BUY signals vs 0 with defaults |

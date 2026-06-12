@@ -248,7 +248,7 @@ venv\Scripts\python.exe -c "import pandas as pd; df = pd.read_csv('storage/live/
 
 1. **Market Hours**: Script automatically skips when market is closed
 2. **File Size**: CSV file will grow over time. Consider archiving old data periodically
-3. **API Limits**: Be aware of Angel One API rate limits
+3. **API Limits**: Be aware of Dhan API rate limits
 4. **Errors**: Script logs errors but continues with other indices
 5. **Weekends**: Script will skip weekends automatically
 

@@ -74,7 +74,7 @@
 - 17 files copied:
   - 5 model files (.pkl)
   - 12 metadata files (.json)
-  - Config files (thresholds_auto.json, angel_trade_config.txt)
+  - Config files (thresholds_auto.json, dhan_trade_config.txt)
 
 **Output Files**:
 - `storage/snapshots/20251129_230931/models/` - Model files ✅
@@ -200,7 +200,7 @@
 
 1. **No Baseline Overwrites**: ✅
    - All writes to `storage/ultra/`, `storage/snapshots/`
-   - No files in `core/models/angel_one/` modified
+   - No files in `core/models/dhan/` modified
 
 2. **No Auto-Execution**: ✅
    - Shadow trades logged only
@@ -233,7 +233,7 @@
 - ✅ `storage/logs_ultra/system3_phases_39_45.log`
 
 ### No Baseline Files Modified
-- ✅ `core/models/angel_one/` - Unchanged
+- ✅ `core/models/dhan/` - Unchanged
 - ✅ `storage/training/` - Unchanged
 - ✅ `storage/config/` - Only new files created (read-only)
 

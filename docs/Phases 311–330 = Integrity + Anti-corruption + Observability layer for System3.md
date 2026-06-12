@@ -57,7 +57,7 @@ All WARNs are expected. No action required.
 ## Current System Health: ✅ HEALTHY
 - Zero errors
 - All safety checks passed
-- Broker connected (AngelOne)
+- Broker connected (Dhan)
 - 35 phases working correctly
 - 54 WARNs expected (data-dependent)
 - 21 skipped phases (not yet implemented)

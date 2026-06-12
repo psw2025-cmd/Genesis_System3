@@ -1,5 +1,5 @@
 """
-System3 Phase 107 - AngelOne LIVE Execution (ONE-LOT, GUARDED, OFF BY DEFAULT)
+System3 Phase 107 - Dhan LIVE Execution (ONE-LOT, GUARDED, OFF BY DEFAULT)
 
 Actual real-order placement, but tightly guarded and controlled by config.
 """
@@ -32,7 +32,7 @@ except ImportError as e:
 
 # Import wrapper
 try:
-    from core.broker.angel_live_order_wrapper import AngelLiveOrderWrapper
+    from core.broker.dhan_live_order_wrapper import AngelLiveOrderWrapper
 except ImportError as e:
     print(f"[PH107] ERROR: Failed to import AngelLiveOrderWrapper: {e}")
     sys.exit(1)

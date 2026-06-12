@@ -86,7 +86,7 @@ class UltraMicroVerifier:
     def test_imports(self) -> Dict:
         """Test all critical imports."""
         imports_to_test = [
-            ("core.brokers.angel_one.broker", "AngelOneBroker"),
+            ("core.brokers.dhan.broker", "DhanBroker"),
             ("src.trading.paper_executor", "PaperExecutor"),
             ("src.trading.pnl_tracker", "PnLTracker"),
             ("src.storage.trade_history", "TradeHistoryStore"),

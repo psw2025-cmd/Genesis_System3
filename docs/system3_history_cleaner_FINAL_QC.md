@@ -13,9 +13,9 @@
   - Now imports and calls `clean_all_history_files()` via
     `run_history_cleanup_phase()`.
   - Order of operations:
-    1. Archive previous `storage/live/angel_index_ai_signals.csv`.
+    1. Archive previous `storage/live/dhan_index_ai_signals.csv`.
     2. **History cleanup phase** – clean malformed rows in:
-       - `storage/live/angel_index_ai_signals.csv`
+       - `storage/live/dhan_index_ai_signals.csv`
        - All `*.csv` under `storage/live/archive/`
     3. Optional curated training export from recent archives.
   - Logs to: `logs/system3_prep_for_new_day_YYYYMMDD.log`
@@ -39,7 +39,7 @@ path=... | status=cleaned | total=<rows> | kept=<rows> | dropped=<rows> | width=
 
 ### Expected cleaning behaviour
 
-- **Live file**: `storage/live/angel_index_ai_signals.csv`
+- **Live file**: `storage/live/dhan_index_ai_signals.csv`
 - **Archived files**: `storage/live/archive/*.csv`
 
 For both the current live file and at least one archived file (containing the
@@ -57,7 +57,7 @@ From `C:\Genesis_System3` in the venv:
    ```
 
    - Check `logs/system3_prep_for_new_day_YYYYMMDD.log` for:
-     - Archive summary of the previous `angel_index_ai_signals.csv`.
+     - Archive summary of the previous `dhan_index_ai_signals.csv`.
      - `=== HISTORY CLEANUP PHASE: CLEANING MALFORMED ROWS ===` with per‑file
        summaries and non‑zero `dropped_rows` where malformed rows existed.
 

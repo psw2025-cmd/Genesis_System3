@@ -19,7 +19,7 @@
 
 ### ✅ 2. EV-Ready CSV Analysis
 
-**File**: `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv`
+**File**: `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv`
 
 **Statistics**:
 - **Total Rows**: 232 (complete forward returns + valid signals)
@@ -74,9 +74,9 @@
 
 ### ✅ Clean Files Generated
 
-- `storage/clean/angel_index_ai_signals_with_forward_clean.csv` (596 rows)
-- `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
-- `storage/clean/angel_index_ai_signals_sell_anomalies.csv` (2 rows)
+- `storage/clean/dhan_index_ai_signals_with_forward_clean.csv` (596 rows)
+- `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
+- `storage/clean/dhan_index_ai_signals_sell_anomalies.csv` (2 rows)
 
 ---
 

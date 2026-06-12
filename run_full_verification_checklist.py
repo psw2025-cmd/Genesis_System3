@@ -111,7 +111,7 @@ def verify_models_training() -> Tuple[bool, Dict]:
     
     # Model training (may skip if models exist)
     success, output = run_command(
-        ["python", "-m", "core.engine.train_angel_models"],
+        ["python", "-m", "core.engine.train_dhan_models"],
         "Model training"
     )
     results["model_training"] = True  # Non-critical if models already exist
@@ -123,7 +123,7 @@ def verify_models_training() -> Tuple[bool, Dict]:
     
     # Offline test
     success, output = run_command(
-        ["python", "-m", "core.engine.offline_angel_ai_test"],
+        ["python", "-m", "core.engine.offline_dhan_ai_test"],
         "Offline AI test"
     )
     results["offline_test"] = success
@@ -142,7 +142,7 @@ def verify_live_pipeline() -> Tuple[bool, Dict]:
     results = {}
     
     # Note: This would run indefinitely, so we'll just check the module exists
-    module_path = PROJECT_ROOT / "core" / "engine" / "angel_live_ai_signals.py"
+    module_path = PROJECT_ROOT / "core" / "engine" / "dhan_live_ai_signals.py"
     if module_path.exists():
         print_success("Live AI signals module exists")
         results["module_exists"] = True
@@ -152,7 +152,7 @@ def verify_live_pipeline() -> Tuple[bool, Dict]:
     
     # Check config
     try:
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         if not AUTOMATION_CONFIG.auto_execute_trades:
             print_success("Auto-execution is DISABLED (safe)")
             results["auto_exec_disabled"] = True
@@ -173,7 +173,7 @@ def verify_backtester_pnl() -> Tuple[bool, Dict]:
     
     # Synthetic backtester
     success, output = run_command(
-        ["python", "-m", "core.engine.angel_synthetic_backtester"],
+        ["python", "-m", "core.engine.dhan_synthetic_backtester"],
         "Synthetic backtester"
     )
     results["backtester"] = success
@@ -187,7 +187,7 @@ def verify_backtester_pnl() -> Tuple[bool, Dict]:
     
     # PnL summary
     success, output = run_command(
-        ["python", "-m", "core.engine.angel_daily_pnl_summary"],
+        ["python", "-m", "core.engine.dhan_daily_pnl_summary"],
         "Daily PnL summary"
     )
     results["pnl_summary"] = True  # Non-critical

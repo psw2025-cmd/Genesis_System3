@@ -73,7 +73,7 @@ Watch for BUY signals:
 python -m core.engine.system3_phase31_ultra_fusion
 
 # Check shadow trades
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 ---

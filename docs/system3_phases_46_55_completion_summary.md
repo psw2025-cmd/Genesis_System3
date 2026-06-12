@@ -104,7 +104,7 @@ Verify files in `storage/ultra/ph46_ph55/`:
 
 ### 5. Verify No Baseline Changes
 
-- Check `core/models/angel_one/` - no new files
+- Check `core/models/dhan/` - no new files
 - Check baseline configs - unchanged
 
 ---

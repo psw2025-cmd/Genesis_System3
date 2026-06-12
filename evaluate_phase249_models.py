@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Directories - use absolute paths
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 STORAGE_DIR = PROJECT_ROOT / "storage" / "live"
 
@@ -52,7 +52,7 @@ UNDERLYINGS = ["NIFTY", "SENSEX", "FINNIFTY", "MIDCPNIFTY", "BANKNIFTY"]
 FEATURE_COLS = ['ltp', 'spot', 'iv', 'delta', 'gamma', 'theta', 'vega', 
                 'trend_score', 'rsi', 'time_to_expiry']
 TARGET_COL = 'fwd_ret_5'
-INPUT_CSV = STORAGE_DIR / "angel_index_ai_signals_with_forward.csv"
+INPUT_CSV = STORAGE_DIR / "dhan_index_ai_signals_with_forward.csv"
 
 
 class ModelEvaluator:

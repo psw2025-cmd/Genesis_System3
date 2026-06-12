@@ -34,7 +34,7 @@ ARCHIVE_DIRS = [
     STORAGE_LIVE / "backup",
     STORAGE_LIVE / "raw_backup",
 ]
-OUTPUT_CSV = STORAGE_LIVE / "angel_index_ai_signals_curated_full.csv"
+OUTPUT_CSV = STORAGE_LIVE / "dhan_index_ai_signals_curated_full.csv"
 VALIDATION_JSON = STORAGE_LIVE / "meta" / "PHASE220_AGGREGATION_VALIDATION.json"
 VALIDATION_JSON.parent.mkdir(parents=True, exist_ok=True)
 
@@ -60,9 +60,9 @@ def find_curated_archives(days_back: int = 14) -> list:
     found_files = []
 
     patterns = [
-        "angel_index_ai_signals_curated*.csv",
+        "dhan_index_ai_signals_curated*.csv",
         "*curated*.csv",
-        "angel_index_ai_signals_*.csv",
+        "dhan_index_ai_signals_*.csv",
     ]
 
     for archive_dir in ARCHIVE_DIRS:
@@ -84,7 +84,7 @@ def find_curated_archives(days_back: int = 14) -> list:
                     _log(f"WARN: Could not check {file_path}: {e}")
 
     # Also check current curated file
-    current_curated = STORAGE_LIVE / "angel_index_ai_signals_curated.csv"
+    current_curated = STORAGE_LIVE / "dhan_index_ai_signals_curated.csv"
     if current_curated.exists():
         found_files.append(current_curated)
 

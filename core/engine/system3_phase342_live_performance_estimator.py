@@ -40,8 +40,8 @@ def run_phase_342_live_performance_estimator(root_path: str = None, logger_obj=N
 
     try:
         # Load virtual orders and forward returns
-        virt_orders_file = root / "storage" / "live" / "angel_virtual_orders.csv"
-        signals_forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+        virt_orders_file = root / "storage" / "live" / "dhan_virtual_orders.csv"
+        signals_forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
         diag_dir = root / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 

@@ -81,12 +81,12 @@ Analyzed the output files list from diagnostics (lines 117-156) against:
 | 219 | system3_breakout_analyzer.log | ✅ EXISTS | `logs/research/` |
 | 220 | system3_correlation_matrices.csv | ✅ EXISTS | `storage/meta/` |
 | 220 | system3_correlation_report.md | ✅ EXISTS | `logs/research/` |
-| 221 | angel_index_ai_signals_with_forward.csv | ✅ EXISTS | `storage/live/` |
+| 221 | dhan_index_ai_signals_with_forward.csv | ✅ EXISTS | `storage/live/` |
 | 222 | system3_signal_edge_report.md | ✅ EXISTS | `logs/research/` |
 | 223 | system3_threshold_candidates.json | ✅ EXISTS | `storage/meta/` |
 | 223 | system3_threshold_optimizer.log | ✅ EXISTS | `logs/research/` |
 | 224 | system3_score_component_attribution.md | ✅ EXISTS | `logs/research/` |
-| 225 | angel_index_ai_signals_reconciled.csv | ✅ EXISTS | `storage/live/` |
+| 225 | dhan_index_ai_signals_reconciled.csv | ✅ EXISTS | `storage/live/` |
 | 226 | system3_feature_importances.json | ✅ EXISTS | `storage/meta/` |
 | 226 | system3_feature_importance_report.md | ✅ EXISTS | `logs/ml/` |
 | 227 | system3_latency_profile.md | ✅ EXISTS | `logs/performance/` |
@@ -140,11 +140,11 @@ The diagnostic script checks for these keys:
 | 218 | `storage/meta/system3_momentum_patterns.csv` + report | ✅ Matches | ✅ |
 | 219 | `storage/meta/system3_breakout_zones.json` + log | ✅ Matches | ✅ |
 | 220 | `storage/meta/system3_correlation_matrices.csv` + report | ✅ Matches | ✅ |
-| 221 | `storage/live/angel_index_ai_signals_with_forward.csv` | ✅ Matches | ✅ |
+| 221 | `storage/live/dhan_index_ai_signals_with_forward.csv` | ✅ Matches | ✅ |
 | 222 | `logs/research/system3_signal_edge_report.md` | ✅ Matches | ✅ |
 | 223 | `storage/meta/system3_threshold_candidates.json` + log | ✅ Matches | ✅ |
 | 224 | `logs/research/system3_score_component_attribution.md` | ✅ Matches | ✅ |
-| 225 | `storage/live/angel_index_ai_signals_reconciled.csv` | ✅ Matches | ✅ |
+| 225 | `storage/live/dhan_index_ai_signals_reconciled.csv` | ✅ Matches | ✅ |
 | 226 | `storage/meta/system3_feature_importances.json` + report | ✅ Matches | ✅ |
 | 227 | `logs/performance/system3_latency_profile.md` | ✅ Matches | ✅ |
 | 228 | `storage/meta/system3_snapshot_coverage.csv` + report | ✅ Matches | ✅ |
@@ -216,8 +216,8 @@ storage/
 │   ├── system3_feature_importances.json (Phase 226)
 │   └── system3_snapshot_coverage.csv (Phase 228)
 └── live/
-    ├── angel_index_ai_signals_with_forward.csv (Phase 221)
-    └── angel_index_ai_signals_reconciled.csv (Phase 225)
+    ├── dhan_index_ai_signals_with_forward.csv (Phase 221)
+    └── dhan_index_ai_signals_reconciled.csv (Phase 225)
 ```
 
 **Organization**: ✅ **EXCELLENT** - Well-structured, logical grouping

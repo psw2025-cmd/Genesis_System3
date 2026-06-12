@@ -78,7 +78,7 @@ def analyze_resource_usage() -> Dict[str, Any]:
     # Sample modules to measure
     sample_modules = [
         "core.engine.check_system3_status",
-        "core.engine.angel_live_ai_signals",
+        "core.engine.dhan_live_ai_signals",
         "core.engine.system3_phase31_ultra_fusion",
     ]
 

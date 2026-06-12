@@ -12,7 +12,7 @@
 **Answer**: ✅ **REST API calls repeatedly**
 
 **Current Method**:
-- Using REST API calls via `smartapi-python` library
+- Using REST API calls via `dhanhq-python` library
 - Methods used:
   - `smart.getMarketData()` - For quotes (LTP, OHLC, volume, OI, bid/ask)
   - `smart.optionGreek()` - For Greeks data
@@ -82,7 +82,7 @@ df_opts = future_expiries[future_expiries["expiry_dt"] == nearest_expiry]
 
 **Implementation**:
 ```python
-# Angel One SmartAPI supports WebSocket
+# Dhan DhanHQ supports WebSocket
 from SmartApi.smartWebSocketV2 import SmartWebSocketV2
 
 # Subscribe to option chain updates

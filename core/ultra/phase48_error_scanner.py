@@ -30,8 +30,8 @@ def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
     # Try to load from various sources
     sources = [
         (ULTRA_DIR / "phase31_ultra_fused_decisions.csv", "final_action"),
-        (LIVE_DIR / "angel_index_ai_signals.csv", "pred_label"),
-        (LIVE_DIR / "angel_index_ai_trades_plan.csv", "action"),
+        (LIVE_DIR / "dhan_index_ai_signals.csv", "pred_label"),
+        (LIVE_DIR / "dhan_index_ai_trades_plan.csv", "action"),
     ]
 
     predictions = []

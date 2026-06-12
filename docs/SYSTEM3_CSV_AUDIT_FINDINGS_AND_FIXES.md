@@ -1,5 +1,5 @@
 # System3 CSV Audit - Findings and Fixes
-**File**: `storage/live/angel_index_ai_signals_with_forward.csv`  
+**File**: `storage/live/dhan_index_ai_signals_with_forward.csv`  
 **Analysis Date**: December 4, 2025, 7:30 PM IST  
 **Status**: ⚠️ **CRITICAL ISSUES FOUND - FIXES REQUIRED**
 
@@ -122,8 +122,8 @@ python system3_csv_cleanup_fix.py
 ```
 
 **Output**:
-- Backup: `angel_index_ai_signals_with_forward.csv.backup`
-- Cleaned: `angel_index_ai_signals_with_forward.csv.cleaned`
+- Backup: `dhan_index_ai_signals_with_forward.csv.backup`
+- Cleaned: `dhan_index_ai_signals_with_forward.csv.cleaned`
 
 ---
 
@@ -215,7 +215,7 @@ else:
 
 3. **Replace Original** (if cleaned file is good):
    ```bash
-   copy angel_index_ai_signals_with_forward.csv.cleaned angel_index_ai_signals_with_forward.csv
+   copy dhan_index_ai_signals_with_forward.csv.cleaned dhan_index_ai_signals_with_forward.csv
    ```
 
 4. **Fix Phase 221**:

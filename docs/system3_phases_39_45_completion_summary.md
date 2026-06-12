@@ -48,7 +48,7 @@
 - `storage/snapshots/` (for Phase 42)
 - `storage/logs_ultra/` (for logging)
 - `storage/ultra/weekly_packs/` (for Phase 40)
-- `core/models/angel_one_ultra_staging/` (for Phase 41)
+- `core/models/dhan_ultra_staging/` (for Phase 41)
 
 ---
 

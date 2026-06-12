@@ -72,16 +72,16 @@ def verify_safety_configs():
                 logger.error("❌ live_trade_config.py: LIVE_TRADING_ENABLED is NOT False")
                 safety_verified = False
 
-    # Check angel_automation_config.json
-    angel_config = config_dir / "angel_automation_config.json"
-    if angel_config.exists():
-        with open(angel_config, "r") as f:
+    # Check dhan_automation_config.json
+    dhan_config = config_dir / "dhan_automation_config.json"
+    if dhan_config.exists():
+        with open(dhan_config, "r") as f:
             config = json.load(f)
             dry_run = config.get("DRY_RUN", config.get("dry_run"))
             if dry_run is True:
-                logger.info("✓ angel_automation_config.json: DRY_RUN = true")
+                logger.info("✓ dhan_automation_config.json: DRY_RUN = true")
             else:
-                logger.error("❌ angel_automation_config.json: DRY_RUN is NOT true")
+                logger.error("❌ dhan_automation_config.json: DRY_RUN is NOT true")
                 safety_verified = False
 
     return safety_verified

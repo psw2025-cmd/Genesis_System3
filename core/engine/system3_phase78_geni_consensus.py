@@ -22,8 +22,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files (baseline predictions = live signals, ultra = same or separate)
-BASELINE_SIGNALS = STORAGE_LIVE / "angel_index_ai_signals.csv"
-ULTRA_SIGNALS = STORAGE_LIVE / "angel_index_ai_signals.csv"  # Can be same or separate
+BASELINE_SIGNALS = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+ULTRA_SIGNALS = STORAGE_LIVE / "dhan_index_ai_signals.csv"  # Can be same or separate
 
 # Output files
 OUTPUT_PARQUET = STORAGE_ULTRA / "phase78_geni_consensus.parquet"

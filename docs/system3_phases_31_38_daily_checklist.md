@@ -52,7 +52,7 @@
   ```
 - [ ] Review shadow trades
   ```powershell
-  type storage\live\angel_index_ai_ultra_trades_shadow.csv
+  type storage\live\dhan_index_ai_ultra_trades_shadow.csv
   ```
 - [ ] Compare with baseline trades
 
@@ -186,7 +186,7 @@
 
 ### Key Files
 - Fused Decisions: `storage/ultra/phase31_ultra_fused_decisions.csv`
-- Shadow Trades: `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- Shadow Trades: `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 - Promotion Plan: `storage/ultra/phase33_promotion_plan.md`
 - Audit Report: `storage/ultra/phase35_decision_audit_report.md`
 - Governance: `storage/ultra/phase38_governance_summary.md`

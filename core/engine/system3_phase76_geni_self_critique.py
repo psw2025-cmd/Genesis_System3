@@ -23,9 +23,9 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_JSON = STORAGE_ULTRA / "phase76_geni_self_review.json"

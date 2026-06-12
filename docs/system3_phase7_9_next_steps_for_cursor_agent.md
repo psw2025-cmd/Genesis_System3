@@ -52,7 +52,7 @@ Phase 7 – Agent Tasks (Code & Files)
 
 New Engine Module: Real Master Dataset Builder
 
-File: core/engine/angel_real_master_dataset.py
+File: core/engine/dhan_real_master_dataset.py
 
 Mode: READ/WRITE, but only into /storage/learning/ (no changes to training CSV used by baseline).
 
@@ -60,11 +60,11 @@ Responsibilities:
 
 Read the following (if they exist):
 
-storage/live/angel_index_ai_signals.csv
+storage/live/dhan_index_ai_signals.csv
 
-storage/live/angel_index_ai_trades_plan.csv
+storage/live/dhan_index_ai_trades_plan.csv
 
-storage/live/angel_index_ai_pnl_log.csv
+storage/live/dhan_index_ai_pnl_log.csv
 
 storage/learning/real_outcomes/*.csv (if Real Outcome Logger already writes per-day files)
 
@@ -87,10 +87,10 @@ market_regime, vol_regime (if available from volatility/regime modules)
 Output:
 
 Master Parquet:
-storage/learning/angel_index_real_master_dataset.parquet
+storage/learning/dhan_index_real_master_dataset.parquet
 
 Master CSV:
-storage/learning/angel_index_real_master_dataset.csv
+storage/learning/dhan_index_real_master_dataset.csv
 
 Handle missing files gracefully:
 
@@ -106,7 +106,7 @@ Option 48 – Build Real Master Dataset
 
 When selected:
 
-Call a main() function in angel_real_master_dataset.py that:
+Call a main() function in dhan_real_master_dataset.py that:
 
 Logs which source files were found.
 
@@ -119,7 +119,7 @@ Basic Checks inside the module
 Ensure:
 
 No changes to existing training CSV:
-storage/training/angel_index_options_training.csv
+storage/training/dhan_index_options_training.csv
 
 No deletion of any existing logs.
 
@@ -138,7 +138,7 @@ Choose the new menu option 48 – “Build Real Master Dataset”.
 
 Then run:
 
-(venv) PS C:\Genesis_System3> python -m core.engine.angel_real_master_dataset
+(venv) PS C:\Genesis_System3> python -m core.engine.dhan_real_master_dataset
 
 
 (if there is a standalone main() in that module; if menu already calls it, just the menu run is enough.)
@@ -158,7 +158,7 @@ A brief dir listing:
 
 Optional: first 10 lines of the CSV:
 
-(venv) PS C:\Genesis_System3> python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(df.head(10).to_string())"
+(venv) PS C:\Genesis_System3> python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(df.head(10).to_string())"
 
 
 I will use this to confirm:
@@ -182,7 +182,7 @@ to create new models without touching the frozen baseline models.
 
 Baseline models must remain untouched in:
 
-core/models/angel_one/*.pkl (existing files)
+core/models/dhan/*.pkl (existing files)
 
 All new models should be saved into new directories / filenames.
 
@@ -190,17 +190,17 @@ Phase 8 – Agent Tasks (Code & Files)
 
 New Engine Module: Blended Training V3
 
-File: core/engine/angel_blended_training_v3.py
+File: core/engine/dhan_blended_training_v3.py
 
 Responsibilities:
 
 Read:
 
 Baseline synthetic training CSV:
-storage/training/angel_index_options_training.csv
+storage/training/dhan_index_options_training.csv
 
 Real master dataset:
-storage/learning/angel_index_real_master_dataset.parquet
+storage/learning/dhan_index_real_master_dataset.parquet
 (fallback to CSV if parquet missing)
 
 For each underlying:
@@ -217,7 +217,7 @@ Use same feature engineering pipeline already documented (moneyness, atm_dist, c
 
 Train new models with a clear naming convention, e.g.:
 
-Path: core/models/angel_one_real_blended/
+Path: core/models/dhan_real_blended/
 
 Filenames: NIFTY_model_blended_v3.pkl, etc.
 
@@ -230,11 +230,11 @@ No overwrite of baseline models
 
 Ensure module never writes to:
 
-core/models/angel_one/NIFTY_model.pkl or similar.
+core/models/dhan/NIFTY_model.pkl or similar.
 
 Only writes new files in a dedicated directory:
 
-core/models/angel_one_real_blended/
+core/models/dhan_real_blended/
 
 New Menu Option: Blended Retrain (V3)
 
@@ -246,7 +246,7 @@ Option 49 – Train Real+Synthetic Blended Models (V3)
 
 When selected:
 
-Call main() in angel_blended_training_v3.py.
+Call main() in dhan_blended_training_v3.py.
 
 Print:
 
@@ -258,7 +258,7 @@ Paths of saved .pkl and .json files.
 
 Optional config file
 
-New file: storage/config/angel_blended_training_v3_config.json
+New file: storage/config/dhan_blended_training_v3_config.json
 
 Fields:
 
@@ -289,12 +289,12 @@ Per underlying: rows used, accuracy, F1, save paths.
 
 A dir listing of the new model directory:
 
-(venv) PS C:\Genesis_System3> dir core\models\angel_one_real_blended
+(venv) PS C:\Genesis_System3> dir core\models\dhan_real_blended
 
 
 Optional (if easy): the content of one meta file, e.g.:
 
-(venv) PS C:\Genesis_System3> type core\models\angel_one_real_blended\NIFTY_model_blended_v3_meta.json
+(venv) PS C:\Genesis_System3> type core\models\dhan_real_blended\NIFTY_model_blended_v3_meta.json
 
 
 I will validate:
@@ -344,7 +344,7 @@ All fields are read-only hints; no auto-write, only read.
 
 New Engine Adapter: Model Selector
 
-File: core/engine/angel_model_selector.py
+File: core/engine/dhan_model_selector.py
 
 Responsibilities:
 
@@ -368,13 +368,13 @@ profiles: "BASELINE", "LIVE_BETA"
 
 Integrate model selector into LIVE AI signals (non-destructive)
 
-File: core/engine/angel_live_ai_signals.py
+File: core/engine/dhan_live_ai_signals.py
 
 Add a non-default path:
 
 Default behavior (current baseline) unchanged.
 
-If an optional flag/profile is set (e.g., via environment variable or small config flag), use angel_model_selector to load models:
+If an optional flag/profile is set (e.g., via environment variable or small config flag), use dhan_model_selector to load models:
 
 "BASELINE" vs "LIVE_BETA".
 
@@ -435,7 +435,7 @@ It should now show LIVE_BETA profile and model paths pointing to *_model_blended
 
 Optional: run a single snapshot of live signals under LIVE_BETA profile:
 
-(venv) PS C:\Genesis_System3> python -m core.engine.angel_live_ai_signals
+(venv) PS C:\Genesis_System3> python -m core.engine.dhan_live_ai_signals
 
 
 (if there is a way to set profile via env/config; Cursor agent must document that in the module docstring.)
@@ -458,7 +458,7 @@ Do not modify or overwrite:
 
 Existing engine modules listed in baseline freeze docs.
 
-Existing model files in core/models/angel_one/.
+Existing model files in core/models/dhan/.
 
 Existing configs that control Monday behavior.
 

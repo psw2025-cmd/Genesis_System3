@@ -6,7 +6,7 @@
 
 ## 1. Auto Threshold Adjustment
 
-### Module: `angel_auto_threshold_adjuster.py`
+### Module: `dhan_auto_threshold_adjuster.py`
 - **Menu**: Option 19
 - **Function**: Analyzes real performance, generates threshold recommendations
 - **Current Status**: Recommendations only (auto-adjust DISABLED)
@@ -25,7 +25,7 @@
 ### Post-Monday Usage
 ```python
 # After Monday, run:
-python -m core.engine.angel_auto_threshold_adjuster
+python -m core.engine.dhan_auto_threshold_adjuster
 
 # Review recommendations in:
 # storage/config/thresholds_recommended.json
@@ -38,7 +38,7 @@ python -m core.engine.angel_auto_threshold_adjuster
 
 ## 2. Confidence & Score Calibration
 
-### Module: `angel_confidence_calibrator.py`
+### Module: `dhan_confidence_calibrator.py`
 - **Menu**: Option 20
 - **Function**: Calibrates model confidence vs actual outcomes
 - **Current Status**: Ready (waits for real data)
@@ -53,7 +53,7 @@ python -m core.engine.angel_auto_threshold_adjuster
 ### Post-Monday Usage
 ```python
 # After collecting real data:
-python -m core.engine.angel_confidence_calibrator
+python -m core.engine.dhan_confidence_calibrator
 
 # Review calibration in:
 # storage/config/confidence_calibration.json
@@ -63,7 +63,7 @@ python -m core.engine.angel_confidence_calibrator
 
 ## 3. Strategy Optimizer
 
-### Module: `angel_strategy_optimizer.py`
+### Module: `dhan_strategy_optimizer.py`
 - **Menu**: Option 21
 - **Function**: Optimizes position sizing, risk management, allocation
 - **Current Status**: Ready (waits for real data)
@@ -78,7 +78,7 @@ python -m core.engine.angel_confidence_calibrator
 ### Post-Monday Usage
 ```python
 # After collecting real data:
-python -m core.engine.angel_strategy_optimizer
+python -m core.engine.dhan_strategy_optimizer
 
 # Review optimizations in:
 # storage/config/strategy_optimization.json
@@ -88,7 +88,7 @@ python -m core.engine.angel_strategy_optimizer
 
 ## 4. Advanced Feature Ranking
 
-### Module: `angel_feature_ranker.py`
+### Module: `dhan_feature_ranker.py`
 - **Menu**: Option 22
 - **Function**: Ranks features beyond MI (correlation, stability, completeness)
 - **Current Status**: Ready
@@ -103,7 +103,7 @@ python -m core.engine.angel_strategy_optimizer
 ### Usage
 ```python
 # Run advanced feature ranking:
-python -m core.engine.angel_feature_ranker
+python -m core.engine.dhan_feature_ranker
 
 # Results saved to:
 # storage/training/feature_rankings/advanced_ranking_*.csv
@@ -113,11 +113,11 @@ python -m core.engine.angel_feature_ranker
 
 ## 5. Blended Model Training
 
-### Module: `angel_blended_model_trainer.py`
+### Module: `dhan_blended_model_trainer.py`
 - **Menu**: Option 23
 - **Function**: Blends synthetic + real training data
 - **Current Status**: Ready (waits for real data)
-- **Output**: `storage/training/angel_index_options_blended_training.csv`
+- **Output**: `storage/training/dhan_index_options_blended_training.csv`
 
 ### How It Works
 1. Loads synthetic training data
@@ -128,20 +128,20 @@ python -m core.engine.angel_feature_ranker
 ### Post-Monday Usage
 ```python
 # After Monday, build real training data first:
-python -m core.engine.build_angel_training_dataset  # Menu 9
+python -m core.engine.build_dhan_training_dataset  # Menu 9
 
 # Then blend:
-python -m core.engine.angel_blended_model_trainer  # Menu 23
+python -m core.engine.dhan_blended_model_trainer  # Menu 23
 
 # Retrain models with blended data:
-python -m core.engine.train_angel_models  # Menu 10
+python -m core.engine.train_dhan_models  # Menu 10
 ```
 
 ---
 
 ## 6. Enhanced Signal Scoring
 
-### Module: `angel_enhanced_signal_scorer.py`
+### Module: `dhan_enhanced_signal_scorer.py`
 - **Function**: Multi-factor signal scoring
 - **Status**: Ready (integrated into pipeline)
 - **Components**:
@@ -154,7 +154,7 @@ python -m core.engine.train_angel_models  # Menu 10
 
 ### Usage
 ```python
-from core.engine.angel_enhanced_signal_scorer import get_enhanced_scorer
+from core.engine.dhan_enhanced_signal_scorer import get_enhanced_scorer
 
 scorer = get_enhanced_scorer()
 score_data = scorer.compute_enhanced_score(signal_row)
@@ -165,7 +165,7 @@ score_data = scorer.compute_enhanced_score(signal_row)
 
 ## 7. Alerting System
 
-### Module: `angel_alerting_system.py`
+### Module: `dhan_alerting_system.py`
 - **Function**: Monitors system, generates alerts
 - **Status**: Ready
 - **Output**: `storage/live/system_alerts.log`
@@ -186,7 +186,7 @@ score_data = scorer.compute_enhanced_score(signal_row)
 
 ## 8. LIVE Mode Preparation
 
-### Module: `angel_executor_live_prep.py`
+### Module: `dhan_executor_live_prep.py`
 - **Function**: Prepares for LIVE order execution
 - **Status**: Infrastructure ready (DISABLED)
 - **Safety**: Requires explicit enablement

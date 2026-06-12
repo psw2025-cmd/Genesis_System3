@@ -26,10 +26,10 @@ LINEAGE_LOG = HEALTH_DIR / "data_lineage_log.jsonl"
 
 # Key files to track
 KEY_FILES = [
-    "storage/live/angel_index_ai_signals.csv",
-    "storage/live/angel_index_ai_signals_curated.csv",
-    "storage/live/angel_index_ai_signals_with_forward.csv",
-    "storage/live/angel_index_ai_pnl_log.csv",
+    "storage/live/dhan_index_ai_signals.csv",
+    "storage/live/dhan_index_ai_signals_curated.csv",
+    "storage/live/dhan_index_ai_signals_with_forward.csv",
+    "storage/live/dhan_index_ai_pnl_log.csv",
 ]
 
 

@@ -17,14 +17,14 @@ Assume existing structure:
 - Project root: `C:\Genesis_System3`
 - Core engine: `core/engine/`
 - Models:
-  - Baseline: `core/models/angel_one/`
-  - Real+synthetic Ultra: `core/models/angel_one_real_blended/`
-  - Existing Ultra: `core/models/angel_one_ultra/` (if already created)
+  - Baseline: `core/models/dhan/`
+  - Real+synthetic Ultra: `core/models/dhan_real_blended/`
+  - Existing Ultra: `core/models/dhan_ultra/` (if already created)
 - Data:
   - Training: `storage/training/`
-  - Live signals: `storage/live/angel_index_ai_signals.csv`
-  - Trades: `storage/live/angel_index_ai_trades_plan.csv`
-  - PnL: `storage/live/angel_index_ai_pnl_log.csv`
+  - Live signals: `storage/live/dhan_index_ai_signals.csv`
+  - Trades: `storage/live/dhan_index_ai_trades_plan.csv`
+  - PnL: `storage/live/dhan_index_ai_pnl_log.csv`
   - Learning: `storage/learning/`
   - Reports: `storage/reports/`
   - Ultra: `storage/ultra/` (create if not present)
@@ -32,11 +32,11 @@ Assume existing structure:
 ### 0.2. Safety rules
 
 1. **Never overwrite** baseline files:
-   - No write to `core/models/angel_one/`
+   - No write to `core/models/dhan/`
    - No write to baseline config files (except where explicitly allowed and documented)
 2. **Ultra outputs** must go under:
    - `storage/ultra/phaseXX_*.{csv,json,md}`
-   - `core/models/angel_one_ultra/`
+   - `core/models/dhan_ultra/`
 3. **No auto-execution**:
    - No automatic broker orders
    - No changes in `AUTOMATION_CONFIG` defaults
@@ -75,9 +75,9 @@ For every new `system3_phaseXX_*.py` file:
    - Any early-exit or "no data" conditions
 
 3. **Never modify**:
-   - `core/models/angel_one/` (baseline models)
+   - `core/models/dhan/` (baseline models)
    - Baseline automation configs (trade execution, thresholds)
-   - All Ultra-related writes must go under `storage/ultra/` or `core/models/angel_one_ultra/`.
+   - All Ultra-related writes must go under `storage/ultra/` or `core/models/dhan_ultra/`.
 
 4. **On any error**:
    - Catch exceptions
@@ -105,7 +105,7 @@ Combine all **Ultra outputs** (SL/TP, risk, position size, regime, confidence, s
   - `storage/reports_ultra/phase30_calibration_results.csv` (from Phase 30)
   - Note: Phases 22, 23, 25, 26, 27 provide runtime calculations, not stored files
 - Live signals snapshot:
-  - `storage/live/angel_index_ai_signals.csv` (latest)
+  - `storage/live/dhan_index_ai_signals.csv` (latest)
 
 ### 31.3. Outputs
 
@@ -211,9 +211,9 @@ Does Ultra lower risk per trade?
 32.2. Inputs
 Baseline:
 
-storage/live/angel_index_ai_trades_plan.csv
+storage/live/dhan_index_ai_trades_plan.csv
 
-storage/live/angel_index_ai_pnl_log.csv
+storage/live/dhan_index_ai_pnl_log.csv
 
 Ultra:
 
@@ -376,7 +376,7 @@ Ultra fused decisions (Phase 31).
 34.3. Outputs
 Shadow trade plan:
 
-storage/live/angel_index_ai_ultra_trades_shadow.csv
+storage/live/dhan_index_ai_ultra_trades_shadow.csv
 
 34.4. Cursor Agent – Implementation Steps
 New file: core/engine/system3_phase34_ultra_shadow_exec.py
@@ -385,7 +385,7 @@ Main function:
 
 def run_phase34_shadow_once() -> str:
 
-Reads latest angel_index_ai_signals.csv.
+Reads latest dhan_index_ai_signals.csv.
 
 Reads phase31_ultra_fused_decisions.csv.
 
@@ -397,7 +397,7 @@ Append a shadow trade row:
 
 timestamp, underlying, strike, side, action, size, reason='ULTRA_SHADOW'
 
-Appends to angel_index_ai_ultra_trades_shadow.csv.
+Appends to dhan_index_ai_ultra_trades_shadow.csv.
 
 Returns path.
 
@@ -419,7 +419,7 @@ Run:
 powershell
 Copy code
 (venv) PS C:\Genesis_System3> python -m core.engine.system3_phase34_ultra_shadow_exec
-type storage\live\angel_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
 Expected:
 
 CSV exists.
@@ -441,7 +441,7 @@ Excessive size vs baseline risk limits
 35.2. Inputs
 phase31_ultra_fused_decisions.csv
 
-Shadow Ultra trades: angel_index_ai_ultra_trades_shadow.csv
+Shadow Ultra trades: dhan_index_ai_ultra_trades_shadow.csv
 
 Baseline safety limits (read-only from config).
 
@@ -834,10 +834,10 @@ Any early-exit or “no data” conditions
 
 Never modify:
 
-core/models/angel_one/ (baseline models)
+core/models/dhan/ (baseline models)
 
 Baseline automation configs (trade execution, thresholds)
-All Ultra-related writes must go under storage/ultra/ or core/models/angel_one_ultra/.
+All Ultra-related writes must go under storage/ultra/ or core/models/dhan_ultra/.
 
 On any error:
 

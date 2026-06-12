@@ -25,7 +25,7 @@ These phases build on earlier ones, especially:
  
 **Inputs:**
  
-- `storage/live/angel_index_ai_signals_with_forward.csv`  
+- `storage/live/dhan_index_ai_signals_with_forward.csv`  
   - Produced by Phase 221.  
   - Contains at least:
     - `ts`, `underlying`, `strike`, `side` (CE/PE), `pred_label` (BUY/SELL/HOLD)  
@@ -100,7 +100,7 @@ These phases build on earlier ones, especially:
  
 **Inputs:**
  
-- `storage/live/angel_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
 - Configuration (can be from an existing global config or local default):
   - List of forward horizons (e.g., 1, 3, 5 snapshots).
  
@@ -180,8 +180,8 @@ These phases build on earlier ones, especially:
 **Inputs:**
  
 - Latest reconciled signals:
-  - `storage/live/angel_index_ai_signals_reconciled.csv`  
-    (or fall back to `angel_index_ai_signals_with_forward.csv` if reconciled file missing).
+  - `storage/live/dhan_index_ai_signals_reconciled.csv`  
+    (or fall back to `dhan_index_ai_signals_with_forward.csv` if reconciled file missing).
 - Supporting metadata:
   - `storage/meta/system3_edge_decay_profile_303.json`
   - `storage/meta/system3_regime_performance_302.json`
@@ -199,11 +199,11 @@ These phases build on earlier ones, especially:
 4. Add a new column:
    - `confidence_tier` in {HIGH, MEDIUM, LOW}.
 5. Write a new enriched file (DON’T overwrite original in place):
-   - e.g., `storage/live/angel_index_ai_signals_confidence_tagged_305.csv`.
+   - e.g., `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv`.
  
 **Outputs:**
  
-- `storage/live/angel_index_ai_signals_confidence_tagged_305.csv`  
+- `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv`  
   - Same columns as input + `confidence_tier`.
 - `logs/ml/system3_confidence_tiering_305.md`
   - Summary:
@@ -220,14 +220,14 @@ These phases build on earlier ones, especially:
 **Inputs:**
  
 - Latest live signals / snapshots:
-  - `storage/live/angel_index_ai_signals.csv`
+  - `storage/live/dhan_index_ai_signals.csv`
 - System time (now) when phase is executed.
 - Optional:
   - `logs/performance/system3_latency_profile.md` (Phase 227).
  
 **Logic:**
  
-1. Load recent portion of `angel_index_ai_signals.csv` (last N snapshots).
+1. Load recent portion of `dhan_index_ai_signals.csv` (last N snapshots).
 2. For each row:
    - Compute time delta: `now - ts`.
 3. Decide staleness thresholds:
@@ -255,7 +255,7 @@ These phases build on earlier ones, especially:
 **Inputs:**
  
 - Live signals:
-  - `storage/live/angel_index_ai_signals.csv`
+  - `storage/live/dhan_index_ai_signals.csv`
 - Test-mode output (can be regenerated on demand or cached):
   - `logs/signals/system3_signal_test_mode_last_run.md`  
     (or equivalent summary file).
@@ -266,7 +266,7 @@ These phases build on earlier ones, especially:
 1. Identify a common time window (e.g., last X snapshots) for comparison.
 2. For that window:
    - Recompute (or read from test-mode) predicted BUY/SELL/HOLD for each row.
-   - Compare with what live DRY-RUN stored in `angel_index_ai_signals.csv` as `pred_label`.
+   - Compare with what live DRY-RUN stored in `dhan_index_ai_signals.csv` as `pred_label`.
 3. Compute:
    - Match rate = % of rows where live label == test-mode label.
    - Any systematic bias (e.g., live always HOLD while test-mode sees BUY/SELL).
@@ -292,8 +292,8 @@ These phases build on earlier ones, especially:
  
 **Inputs:**
  
-- `storage/live/angel_index_ai_signals_with_forward.csv`
-- `storage/live/angel_index_ai_signals_confidence_tagged_305.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv`
 - `storage/meta/system3_daily_performance_301.json`
 - `storage/meta/system3_regime_performance_302.json`
 - `storage/meta/system3_live_vs_test_consistency_307.json`

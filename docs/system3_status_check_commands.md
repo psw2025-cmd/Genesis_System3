@@ -21,13 +21,13 @@ python run_system3.py
 ### 2. Configuration Status
 ```bash
 # Check trade thresholds
-python -c "from core.engine.angel_trade_config import DEFAULT_THRESHOLDS; print(f'Confidence: {DEFAULT_THRESHOLDS.min_confidence}, Score: {DEFAULT_THRESHOLDS.min_abs_score}')"
+python -c "from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS; print(f'Confidence: {DEFAULT_THRESHOLDS.min_confidence}, Score: {DEFAULT_THRESHOLDS.min_abs_score}')"
 
 # Check automation config
-python -c "from core.engine.angel_automation_config import AUTOMATION_CONFIG; print(f'Auto-execute: {AUTOMATION_CONFIG.auto_execute_trades}, Auto-PnL: {AUTOMATION_CONFIG.auto_simulate_pnl}')"
+python -c "from core.engine.dhan_automation_config import AUTOMATION_CONFIG; print(f'Auto-execute: {AUTOMATION_CONFIG.auto_execute_trades}, Auto-PnL: {AUTOMATION_CONFIG.auto_simulate_pnl}')"
 
 # Check Ultra-Mode status
-python -m core.engine.angel_ultramode_prep
+python -m core.engine.dhan_ultramode_prep
 ```
 
 ### 3. Data Files Status
@@ -38,11 +38,11 @@ import pandas as pd
 from pathlib import Path
 
 files = [
-    ('Signals', 'storage/live/angel_index_ai_signals.csv'),
-    ('Trade Plans', 'storage/live/angel_index_ai_trades_plan.csv'),
-    ('PnL Log', 'storage/live/angel_index_ai_pnl_log.csv'),
-    ('Training', 'storage/training/angel_index_options_training.csv'),
-    ('Outcomes', 'storage/learning/angel_real_outcomes.csv'),
+    ('Signals', 'storage/live/dhan_index_ai_signals.csv'),
+    ('Trade Plans', 'storage/live/dhan_index_ai_trades_plan.csv'),
+    ('PnL Log', 'storage/live/dhan_index_ai_pnl_log.csv'),
+    ('Training', 'storage/training/dhan_index_options_training.csv'),
+    ('Outcomes', 'storage/learning/dhan_real_outcomes.csv'),
 ]
 
 for name, path in files:
@@ -63,7 +63,7 @@ for name, path in files:
 # Check trained models
 python -c "
 from pathlib import Path
-models_dir = Path('core/models/angel_one')
+models_dir = Path('core/models/dhan')
 if models_dir.exists():
     models = list(models_dir.glob('*_model.pkl'))
     print(f'Found {len(models)} models:')
@@ -77,11 +77,11 @@ else:
 ### 5. Module Availability
 ```bash
 # Test key modules (should all work)
-python -m core.engine.angel_real_outcome_logger
-python -m core.engine.angel_signal_outcome_analyzer
-python -m core.engine.angel_misfire_detector
-python -m core.engine.angel_daily_learning_report
-python -m core.engine.angel_rolling_learning_dashboard
+python -m core.engine.dhan_real_outcome_logger
+python -m core.engine.dhan_signal_outcome_analyzer
+python -m core.engine.dhan_misfire_detector
+python -m core.engine.dhan_daily_learning_report
+python -m core.engine.dhan_rolling_learning_dashboard
 ```
 
 ### 6. Reports Status
@@ -118,25 +118,25 @@ python run_system3.py
 ### Step 3: Key Modules Test
 ```bash
 # Test outcome logger
-python -m core.engine.angel_real_outcome_logger
+python -m core.engine.dhan_real_outcome_logger
 
 # Test signal analyzer
-python -m core.engine.angel_signal_outcome_analyzer
+python -m core.engine.dhan_signal_outcome_analyzer
 
 # Test Ultra-Mode prep
-python -m core.engine.angel_ultramode_prep
+python -m core.engine.dhan_ultramode_prep
 
 # Test daily reports
-python -m core.engine.angel_daily_auto_reports
+python -m core.engine.dhan_daily_auto_reports
 ```
 
 ### Step 4: Data Verification
 ```bash
 # Check training data
-python -c "import pandas as pd; df = pd.read_csv('storage/training/angel_index_options_training.csv'); print(f'Training rows: {len(df):,}'); print(f'Underlyings: {df[\"underlying\"].unique() if \"underlying\" in df.columns else \"N/A\"}')"
+python -c "import pandas as pd; df = pd.read_csv('storage/training/dhan_index_options_training.csv'); print(f'Training rows: {len(df):,}'); print(f'Underlyings: {df[\"underlying\"].unique() if \"underlying\" in df.columns else \"N/A\"}')"
 
 # Check signals (if exists)
-python -c "import pandas as pd; from pathlib import Path; p = Path('storage/live/angel_index_ai_signals.csv'); print(f'Signals file exists: {p.exists()}'); df = pd.read_csv(p) if p.exists() else None; print(f'Signals rows: {len(df):,}' if df is not None else 'No signals yet')"
+python -c "import pandas as pd; from pathlib import Path; p = Path('storage/live/dhan_index_ai_signals.csv'); print(f'Signals file exists: {p.exists()}'); df = pd.read_csv(p) if p.exists() else None; print(f'Signals rows: {len(df):,}' if df is not None else 'No signals yet')"
 ```
 
 ---
@@ -155,9 +155,9 @@ print()
 
 # Check imports
 try:
-    from core.engine.angel_trade_config import DEFAULT_THRESHOLDS
-    from core.engine.angel_automation_config import AUTOMATION_CONFIG
-    from core.engine.angel_ultramode_prep import load_ultramode_config
+    from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
+    from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+    from core.engine.dhan_ultramode_prep import load_ultramode_config
     print('✅ All key modules importable')
 except Exception as e:
     print(f'❌ Import error: {e}')
@@ -172,8 +172,8 @@ except:
 # Check files
 files = [
     'run_system3.py',
-    'core/engine/angel_live_ai_signals.py',
-    'storage/training/angel_index_options_training.csv',
+    'core/engine/dhan_live_ai_signals.py',
+    'storage/training/dhan_index_options_training.csv',
 ]
 for f in files:
     p = Path(f)

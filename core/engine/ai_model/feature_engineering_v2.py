@@ -419,7 +419,7 @@ def run_phase_389() -> Dict[str, Any]:
         logger.info("Phase 389: Feature Engineering Upgrade - Starting")
 
         # Load curated dataset
-        curated_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+        curated_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
         if not curated_path.exists():
             logger.warning(f"Curated dataset not found: {curated_path}")
             # Use sample data for testing

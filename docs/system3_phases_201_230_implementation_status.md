@@ -52,11 +52,11 @@
 
 | Phase | Name | Status | Module | Main Outputs |
 |-------|------|--------|--------|--------------|
-| 221 | Forward Return Calculator | ✅ OK | `system3_phase221_forward_returns.py` | `storage/live/angel_index_ai_signals_with_forward.csv` |
+| 221 | Forward Return Calculator | ✅ OK | `system3_phase221_forward_returns.py` | `storage/live/dhan_index_ai_signals_with_forward.csv` |
 | 222 | Signal Edge Estimator | ✅ OK | `system3_phase222_signal_edge.py` | `logs/research/system3_signal_edge_report.md` |
 | 223 | Threshold Optimizer | ✅ OK | `system3_phase223_threshold_optimizer.py` | `storage/meta/system3_threshold_candidates.json`, `logs/research/system3_threshold_optimizer.log` |
 | 224 | Score Component Attribution | ✅ OK | `system3_phase224_score_attribution.py` | `logs/research/system3_score_component_attribution.md` |
-| 225 | Label Reconciliation Engine | ✅ OK | `system3_phase225_label_reconciliation.py` | `storage/live/angel_index_ai_signals_reconciled.csv` |
+| 225 | Label Reconciliation Engine | ✅ OK | `system3_phase225_label_reconciliation.py` | `storage/live/dhan_index_ai_signals_reconciled.csv` |
 | 226 | Feature Importance Tracker | ✅ OK | `system3_phase226_feature_importance.py` | `storage/meta/system3_feature_importances.json`, `logs/ml/system3_feature_importance_report.md` |
 | 227 | Data Latency Profiler | ✅ OK | `system3_phase227_latency_profiler.py` | `logs/performance/system3_latency_profile.md` |
 | 228 | Snapshot Coverage Auditor | ✅ OK | `system3_phase228_snapshot_coverage.py` | `storage/meta/system3_snapshot_coverage.csv`, `logs/performance/system3_snapshot_coverage_report.md` |

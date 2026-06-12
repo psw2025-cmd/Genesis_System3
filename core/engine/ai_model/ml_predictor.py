@@ -36,8 +36,8 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # System3 training data configuration
 # ---------------------------------------------------------------------------
-CURATED_TRAINING_PATH = Path("storage") / "live" / "angel_index_ai_signals_curated.csv"
-LIVE_TRAINING_PATH = Path("storage") / "live" / "angel_index_ai_signals.csv"
+CURATED_TRAINING_PATH = Path("storage") / "live" / "dhan_index_ai_signals_curated.csv"
+LIVE_TRAINING_PATH = Path("storage") / "live" / "dhan_index_ai_signals.csv"
 
 # Minimum number of rows required for a dataset to be considered usable
 MIN_TRAINING_SAMPLES = 200

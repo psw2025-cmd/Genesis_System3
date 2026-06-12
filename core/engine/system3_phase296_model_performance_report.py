@@ -15,7 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "ml"
 LOG_DIR.mkdir(parents=True, exist_ok=True)

@@ -149,7 +149,7 @@ def run_phase135_master_session_summary() -> Dict[str, Any]:
             f.write("## Final Summary\n\n")
             f.write(f"- **MASTER_SESSION_READY**: {master_session_ready}\n")
             f.write(f"- **DRY_RUN_ONLY**: YES ✅\n")
-            f.write(f"- **BROKER**: ANGEL_ONE ✅\n")
+            f.write(f"- **BROKER**: DHAN ✅\n")
 
         status = "OK" if not errors else "ERROR"
         details = f"Master session summary generated: READY={master_session_ready}"

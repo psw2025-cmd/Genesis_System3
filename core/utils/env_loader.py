@@ -18,7 +18,7 @@ for env_path in ENV_PATHS:
 
 def get_angelone_credentials():
     """
-    Returns Angel One credentials from config/.env
+    Returns Dhan credentials from config/.env
     """
     return {
         "api_key": os.getenv("ANGELONE_API_KEY", "").strip(),

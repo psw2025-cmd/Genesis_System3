@@ -19,7 +19,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "performance"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_latency_profile.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
 def run_phase227(**kwargs) -> Dict[str, Any]:

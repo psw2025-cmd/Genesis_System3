@@ -21,7 +21,7 @@ The assistant may request manual user action only when required by limits outsid
 - Local Windows command execution.
 - Private secrets or environment variables.
 - Broker login or OTP/TOTP access.
-- OpenAlgo or Angel One session access.
+- OpenAlgo or Dhan session access.
 - Live market feed access from the user's machine.
 - Permissions unavailable through available tools.
 

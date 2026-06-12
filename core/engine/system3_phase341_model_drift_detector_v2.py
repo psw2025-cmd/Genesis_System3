@@ -328,7 +328,7 @@ def run_phase_341_model_drift_detector_v2(root_path: str = None, logger_obj=None
 
     try:
         # Paths
-        signals_with_forward = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+        signals_with_forward = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
         diag_dir = root / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 

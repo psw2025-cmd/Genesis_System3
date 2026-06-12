@@ -43,7 +43,7 @@ class ContinuousLearningSystem:
     
     def __init__(self):
         self.paper_trades_file = ROOT_DIR / "src" / "outputs" / "paper_trades_live.csv"
-        self.pnl_log_file = ROOT_DIR / "storage" / "live" / "angel_index_ai_pnl_log.csv"
+        self.pnl_log_file = ROOT_DIR / "storage" / "live" / "dhan_index_ai_pnl_log.csv"
         self.models_dir = ROOT_DIR / "core" / "models"
         self.xgboost_dir = self.models_dir / "xgboost"
         self.learning_log = ROOT_DIR / "storage" / "learning" / "continuous_learning_log.json"
@@ -70,7 +70,7 @@ class ContinuousLearningSystem:
         pnl_files = [
             self.pnl_log_file,
             ROOT_DIR / "outputs" / "paper_pnl.csv",
-            ROOT_DIR / "storage" / "live" / "angel_virtual_orders_with_pnl.csv"
+            ROOT_DIR / "storage" / "live" / "dhan_virtual_orders_with_pnl.csv"
         ]
         
         for pnl_file in pnl_files:

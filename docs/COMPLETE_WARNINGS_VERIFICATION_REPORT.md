@@ -29,17 +29,17 @@
 
 All three files verified to use robust CSV loading:
 
-#### 1. `angel_pnl_simulator.py` ✅
+#### 1. `dhan_pnl_simulator.py` ✅
 - **Lines 43-53**: Uses `engine="python", on_bad_lines="skip"`
 - **Error Handling**: try/except blocks for both CSV reads
 - **Status**: ✅ **VERIFIED**
 
-#### 2. `angel_trade_decision.py` ✅
+#### 2. `dhan_trade_decision.py` ✅
 - **Lines 242-248**: Uses `engine="python", on_bad_lines="skip"`
 - **Error Handling**: try/except with logging
 - **Status**: ✅ **VERIFIED**
 
-#### 3. `angel_real_data_extractor.py` ✅
+#### 3. `dhan_real_data_extractor.py` ✅
 - **Lines 41-45**: Uses `engine="python", on_bad_lines="skip"`
 - **Error Handling**: try/except returns empty DataFrame
 - **Status**: ✅ **VERIFIED**
@@ -74,7 +74,7 @@ All three files verified to use robust CSV loading:
 - Creates EV tables by signal type and score decile
 
 **Why WARN**:
-- **Missing File**: `storage/live/angel_index_ai_signals_with_forward.csv` doesn't exist
+- **Missing File**: `storage/live/dhan_index_ai_signals_with_forward.csv` doesn't exist
 - **Missing Columns**: Regular signals CSV doesn't have `forward_return_*` columns
 - **Dependency**: Requires Phase 221 to run first
 
@@ -110,7 +110,7 @@ python -m core.engine.system3_phase222_signal_edge
 - Requires enriched orders + signals data
 
 **Why WARN**:
-- **Missing File**: `storage/live/angel_virtual_orders_with_pnl.csv` doesn't exist
+- **Missing File**: `storage/live/dhan_virtual_orders_with_pnl.csv` doesn't exist
 - **No Matching Keys**: If files exist but can't join (different schemas)
 
 **CSV Loading**:
@@ -119,8 +119,8 @@ python -m core.engine.system3_phase222_signal_edge
 - ✅ Proper error handling
 
 **Required Files**:
-1. `storage/live/angel_virtual_orders_with_pnl.csv` (enriched orders)
-2. `storage/live/angel_index_ai_signals.csv` (signals)
+1. `storage/live/dhan_virtual_orders_with_pnl.csv` (enriched orders)
+2. `storage/live/dhan_index_ai_signals.csv` (signals)
 
 **Required Join Keys**:
 - `ts`, `underlying`, `strike`, `side`, `option_type`, `expiry`
@@ -191,15 +191,15 @@ except Exception as e:
 
 ### Files Modified
 
-1. ✅ **`core/engine/angel_pnl_simulator.py`** (lines 43-53)
+1. ✅ **`core/engine/dhan_pnl_simulator.py`** (lines 43-53)
    - Added robust CSV loading to both CSV reads
    - Added error handling
 
-2. ✅ **`core/engine/angel_trade_decision.py`** (lines 242-248)
+2. ✅ **`core/engine/dhan_trade_decision.py`** (lines 242-248)
    - Added robust CSV loading
    - Added error handling with logging
 
-3. ✅ **`core/engine/angel_real_data_extractor.py`** (line 42)
+3. ✅ **`core/engine/dhan_real_data_extractor.py`** (line 42)
    - Updated to use robust CSV loading
 
 4. ✅ **`core/engine/system3_phase222_signal_edge.py`** (lines 60-68)
@@ -250,13 +250,13 @@ python verify_all_warnings.py
 
 ```bash
 # PnL Simulator
-python -c "from core.engine.angel_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
+python -c "from core.engine.dhan_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
 
 # Trade Decision
-python -c "from core.engine.angel_trade_decision import main; main()"
+python -c "from core.engine.dhan_trade_decision import main; main()"
 
 # Data Extractor
-python -c "from core.engine.angel_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
+python -c "from core.engine.dhan_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
 
 # Phase 222
 python -m core.engine.system3_phase222_signal_edge

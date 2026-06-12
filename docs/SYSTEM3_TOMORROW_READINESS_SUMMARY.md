@@ -21,7 +21,7 @@
 | **Batch File** | ✅ PASS | Structure valid, all components present |
 | **Autorun Master** | ✅ PASS | Safety, heartbeat, shutdown, market hours all OK |
 | **Watchdog** | ✅ PASS | Market hours, shutdown check, heartbeat check all OK |
-| **Autopilot** | ✅ PASS | Safety checks, encoding fix, SmartAPI fix all OK |
+| **Autopilot** | ✅ PASS | Safety checks, encoding fix, DhanHQ fix all OK |
 | **Critical Files** | ✅ PASS | All 8 critical files exist |
 | **Market Hours** | ✅ PASS | 09:15-15:30 IST (correct) |
 

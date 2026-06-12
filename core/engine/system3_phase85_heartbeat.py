@@ -33,7 +33,7 @@ def get_system_status() -> Dict[str, str]:
     """Get current system status."""
     try:
         from core.engine.ultra_safety import load_ultra_safety
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
 
         safety = load_ultra_safety()
         auto_exec = safety.get("AUTO_EXECUTE_TRADES", False) or AUTOMATION_CONFIG.auto_execute_trades

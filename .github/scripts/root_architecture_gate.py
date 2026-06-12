@@ -220,7 +220,7 @@ def check_trading_safety_text(files: list[str]) -> dict:
         "STRATEGY_MODE=LIVE",
         "placeOrder(",
         "place_order(",
-        "smartapi.placeOrder",
+        "dhanhq.placeOrder",
     ]
     gate_script = ".github/scripts/root_architecture_gate.py"
     for f in files:

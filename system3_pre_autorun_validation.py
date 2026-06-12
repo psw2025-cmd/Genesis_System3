@@ -382,7 +382,7 @@ def phase_d_risk_flags():
     
     # 2. No stale signals (check recent signals)
     logger.info("Checking signal staleness...")
-    signals_file = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+    signals_file = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
     if signals_file.exists():
         # Would need to check timestamps - simplified
         checklist_items.append(("Signal staleness", "✅ PASS", "Signals file exists"))

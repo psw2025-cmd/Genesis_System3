@@ -53,7 +53,7 @@ All 10 phases (301-310) have been successfully implemented following the System3
 
 ### Phase 305
 - `logs/ml/system3_confidence_tiering_305.md`
-- `storage/live/angel_index_ai_signals_confidence_tagged_305.csv`
+- `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv`
 
 ### Phase 306
 - `logs/performance/system3_staleness_guard_306.md`

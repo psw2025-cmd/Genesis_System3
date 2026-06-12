@@ -67,7 +67,7 @@
 - **Input**: 30 signals, 1 Ultra decision
 - **Output**: Shadow trades file (empty - expected)
 - **Files Generated**:
-  - `storage/live/angel_index_ai_ultra_trades_shadow.csv` (empty, but file exists)
+  - `storage/live/dhan_index_ai_ultra_trades_shadow.csv` (empty, but file exists)
 
 **Status**: ✅ Working correctly (empty file expected with no BUY actions + SAFE risk)
 
@@ -161,7 +161,7 @@ All expected output files have been generated:
 - ✅ `storage/ultra/phase33_promotion_plan.md`
 
 ### Phase 34
-- ✅ `storage/live/angel_index_ai_ultra_trades_shadow.csv` (empty, but exists)
+- ✅ `storage/live/dhan_index_ai_ultra_trades_shadow.csv` (empty, but exists)
 
 ### Phase 35
 - ✅ `storage/ultra/phase35_decision_audit.csv` (930 rows)

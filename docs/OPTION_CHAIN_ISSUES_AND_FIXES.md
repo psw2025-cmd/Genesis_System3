@@ -6,9 +6,9 @@
 **Problem**: Required packages were not installed in the virtual environment.
 
 **Missing Packages**:
-- `smartapi-python` - Main Angel One API library
-- `logzero` - Dependency of smartapi-python
-- `websocket-client` - Dependency of smartapi-python  
+- `dhanhq-python` - Main Dhan API library
+- `logzero` - Dependency of dhanhq-python
+- `websocket-client` - Dependency of dhanhq-python  
 - `pyotp` - TOTP library (was in requirements.txt but not installed)
 - `python-dotenv` - Environment variable loader (was in requirements.txt but not installed)
 - `pandas` - Data manipulation (was in requirements.txt but not installed)
@@ -17,7 +17,7 @@
 
 **Fix Applied**:
 ```bash
-pip install smartapi-python logzero websocket-client pyotp python-dotenv pandas
+pip install dhanhq-python logzero websocket-client pyotp python-dotenv pandas
 ```
 
 ---
@@ -28,7 +28,7 @@ pip install smartapi-python logzero websocket-client pyotp python-dotenv pandas
 SettingWithCopyWarning: A value is trying to be set on a copy of a slice from a DataFrame.
 ```
 
-**Location**: `core/brokers/angel_one/broker.py` line 301
+**Location**: `core/brokers/dhan/broker.py` line 301
 
 **Status**: ✅ **FIXED** - Added `.copy()` calls before modifying DataFrames
 
@@ -77,7 +77,7 @@ venv\Scripts\python.exe -u core\engine\test_angelone_option_chain.py NIFTY
 ## Testing Status
 
 ### ✅ Dependencies Installed
-- [x] smartapi-python
+- [x] dhanhq-python
 - [x] logzero
 - [x] websocket-client
 - [x] pyotp
@@ -102,10 +102,10 @@ venv\Scripts\python.exe -u core\engine\test_angelone_option_chain.py NIFTY
 ### Performance Note
 - Fetching all strikes can take 1-2 minutes (100+ API calls)
 - Use ATM strikes only (default) for faster testing (~10-20 seconds)
-- Consider implementing batch LTP fetching if SmartAPI supports it
+- Consider implementing batch LTP fetching if DhanHQ supports it
 
 ### Credentials Required
-- Script requires valid Angel One credentials in `config/.env`:
+- Script requires valid Dhan credentials in `config/.env`:
   - `ANGELONE_API_KEY`
   - `ANGELONE_CLIENT_ID`
   - `ANGELONE_PIN` or `ANGELONE_PASSWORD`
@@ -136,7 +136,7 @@ $env:PYTHONUNBUFFERED=1; venv\Scripts\python.exe core\engine\test_angelone_optio
 Fetching option chain for NIFTY on NFO...
 All strikes: False
 
-Initializing AngelOne broker...
+Initializing Dhan broker...
 Login successful.
 
 Fetching option chain data...

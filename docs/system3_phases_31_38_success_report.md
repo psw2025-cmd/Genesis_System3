@@ -116,7 +116,7 @@ All 13 expected output files created:
 - ✅ `storage/ultra/phase33_promotion_plan.md`
 
 ### Phase 34
-- ✅ `storage/live/angel_index_ai_ultra_trades_shadow.csv` (empty, but exists)
+- ✅ `storage/live/dhan_index_ai_ultra_trades_shadow.csv` (empty, but exists)
 
 ### Phase 35
 - ✅ `storage/ultra/phase35_decision_audit.csv` (930 rows)

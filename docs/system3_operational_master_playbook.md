@@ -116,7 +116,7 @@ Clear PASS/WARN table.
 
 **Important checks:**
 
-- AngelOne / Binance separation: **PASS**
+- Dhan / Binance separation: **PASS**
 - Baseline vs Ultra directories separation: **PASS**
 - No auto-execute flags: **PASS**
 
@@ -155,13 +155,13 @@ Messages similar to:
 **OR:**
 
 ```bash
-python -m core.engine.angel_trade_config_viewer
+python -m core.engine.dhan_trade_config_viewer
 ```
 
 **OR check file directly:**
 
 ```bash
-type core\engine\angel_trade_config.py
+type core\engine\dhan_trade_config.py
 ```
 
 **Expected:**
@@ -176,7 +176,7 @@ Global safety limits:
 - `max_trades_per_day` ≈ 20
 - `max_trades_per_underlying` ≈ 5
 
-**If thresholds are much lower (e.g. 0.5 / 0.1) and you want conservative mode, adjust them back in `angel_trade_config.py`.**
+**If thresholds are much lower (e.g. 0.5 / 0.1) and you want conservative mode, adjust them back in `dhan_trade_config.py`.**
 
 ---
 
@@ -185,7 +185,7 @@ Global safety limits:
 **Inspect:**
 
 ```bash
-type core\engine\angel_automation_config.py
+type core\engine\dhan_automation_config.py
 ```
 
 **Confirm:**
@@ -203,14 +203,14 @@ AUTO_SIMULATE_PNL  = False
 
 **From menu:**
 
-- **11) Angel One index options LIVE AI signals (from models)**
+- **11) Dhan index options LIVE AI signals (from models)**
 
 This will:
 
-- Fetch live snapshots from AngelOne
+- Fetch live snapshots from Dhan
 - Run 5 models
 - Log into:
-  - `storage/live/angel_index_ai_signals.csv`
+  - `storage/live/dhan_index_ai_signals.csv`
   - (Optionally) trade plans CSV if any BUY signals appear
 
 **Expected console behavior in conservative mode:**
@@ -305,13 +305,13 @@ Press **Ctrl + C** in the terminal that is running menu option 11.
 **If you have any DRY-RUN trade plans:**
 
 ```bash
-python -m core.engine.angel_pnl_simulator
-python -m core.engine.angel_daily_pnl_summary
+python -m core.engine.dhan_pnl_simulator
+python -m core.engine.dhan_daily_pnl_summary
 ```
 
 **Expected files:**
 
-- `storage/live/angel_index_ai_pnl_log.csv`
+- `storage/live/dhan_index_ai_pnl_log.csv`
 
 **MD or text summary in console:**
 
@@ -325,7 +325,7 @@ python -m core.engine.angel_daily_pnl_summary
 ### OP4.3 – Daily Auto-Reports (menu or direct)
 
 ```bash
-python -m core.engine.angel_daily_auto_reports
+python -m core.engine.dhan_daily_auto_reports
 ```
 
 **Expected:**
@@ -345,9 +345,9 @@ Reports in `storage/reports/`:
 **Run (as configured):**
 
 ```bash
-python -m core.engine.angel_real_outcome_logger     # Phase 28
-python -m core.engine.angel_signal_outcome_analyzer  # Phase 29
-python -m core.engine.angel_misfire_detector        # Phase 30
+python -m core.engine.dhan_real_outcome_logger     # Phase 28
+python -m core.engine.dhan_signal_outcome_analyzer  # Phase 29
+python -m core.engine.dhan_misfire_detector        # Phase 30
 python -m core.engine.system3_phase31_ultra_fusion  # Phase 31
 ```
 
@@ -446,9 +446,9 @@ python -m core.engine.ultra_threshold_lab                # Phase 16
 
 **Expected:**
 
-Outputs under `storage/ultra/` and `core/models/angel_one_ultra/` (or similar Ultra directory).
+Outputs under `storage/ultra/` and `core/models/dhan_ultra/` (or similar Ultra directory).
 
-**No files in baseline model dirs (`core/models/angel_one/`) are changed.**
+**No files in baseline model dirs (`core/models/dhan/`) are changed.**
 
 **Always confirm:**
 

@@ -133,7 +133,7 @@ Failed: 0
 
 ---
 
-### Option 10: Train Angel One Index Options Models
+### Option 10: Train Dhan Index Options Models
 
 **Expected Output**:
 ```
@@ -148,8 +148,8 @@ Failed: 0
   Training samples: X
   Features: X
   [TRAIN] Training model...
-  [SAVE] Model saved to: core/models/angel_one/NIFTY_model.pkl
-  [SAVE] Metadata saved to: core/models/angel_one/NIFTY_model_meta.json
+  [SAVE] Model saved to: core/models/dhan/NIFTY_model.pkl
+  [SAVE] Metadata saved to: core/models/dhan/NIFTY_model_meta.json
   [OK] NIFTY model trained successfully
 
 [BANKNIFTY]
@@ -399,7 +399,7 @@ Loop 2/3 started
 ```
 [Phase41] Promotion flag found and valid
 [LOAD] Loading promotion plan...
-[STAGE] Staging Ultra models to: core/models/angel_one_ultra_staging/
+[STAGE] Staging Ultra models to: core/models/dhan_ultra_staging/
 [OK] Phase 41 Promotion Executor completed
 ```
 

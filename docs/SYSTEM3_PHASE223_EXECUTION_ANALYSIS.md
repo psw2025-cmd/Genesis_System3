@@ -99,7 +99,7 @@
 ## Data Quality Analysis
 
 ### Input Data
-- **Source**: `storage/live/angel_index_ai_signals_with_forward.csv`
+- **Source**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Column Used**: `final_score`
 - **Data Type**: Converted from string to numeric
 - **NaN Handling**: Rows with invalid scores filtered out

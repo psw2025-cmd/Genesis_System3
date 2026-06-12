@@ -23,7 +23,7 @@ Comprehensive audit of System3 project structure, phase implementations, and mon
 #### Working Phases (35):
 **Critical Infrastructure** (201-207): All 7 phases operational
 - Phase 201: Filesystem Integrity ✅
-- Phase 205: Broker Self-Tester (AngelOne connected) ✅
+- Phase 205: Broker Self-Tester (Dhan connected) ✅
 - All others: ✅ Verified
 
 **Data Processing**: Phase 209, 211, 213-214 ✅
@@ -108,14 +108,14 @@ All are **expected and non-blocking**:
 ## 5. DATA & RUNTIME STATUS
 
 ### Live Data: ✅ PRESENT
-- `storage/live/angel_index_ai_signals_curated.csv` - ✅ Exists
-- `storage/live/angel_index_ai_signals_with_forward.csv` - ✅ Exists
-- `storage/live/angel_index_ai_pnl_log.csv` - ✅ Exists
+- `storage/live/dhan_index_ai_signals_curated.csv` - ✅ Exists
+- `storage/live/dhan_index_ai_signals_with_forward.csv` - ✅ Exists
+- `storage/live/dhan_index_ai_pnl_log.csv` - ✅ Exists
 - **Data freshness**: 2025-12-01 (4 days old, expected)
 
 ### Autopilot Status: ✅ OPERATIONAL
 - **Latest log**: `logs/live_day_autopilot_20251204.log`
-- **Broker**: AngelOne connected ✅
+- **Broker**: Dhan connected ✅
 - **Feed token**: Active
 - **Last run**: 2025-12-04 09:15:51
 
@@ -161,7 +161,7 @@ All are **expected and non-blocking**:
 |--------|--------|-------|
 | Phase implementations | ✅ Operational | 35/35 working |
 | Error rate | ✅ Zero | 0% |
-| Broker connectivity | ✅ Connected | AngelOne active |
+| Broker connectivity | ✅ Connected | Dhan active |
 | Data availability | ✅ Present | 3 CSVs with live data |
 | Test coverage | ✅ Complete | Auto-generated test suite |
 | Safety checks | ✅ Passed | DRY-RUN confirmed |

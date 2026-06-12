@@ -20,7 +20,7 @@
 
 ## Detailed File Analysis
 
-### 1. `angel_daily_learning_report_20251129.txt`
+### 1. `dhan_daily_learning_report_20251129.txt`
 
 **Content**:
 ```
@@ -105,7 +105,7 @@ score,0.3-0.4,2,10.0,100.0
 
 ```
 storage/reports/
-├── angel_daily_learning_report_20251129.txt    ✅ 5 lines
+├── dhan_daily_learning_report_20251129.txt    ✅ 5 lines
 ├── daily_quick_summary_20251129.txt            ✅ 7 lines
 └── real_learning_summary_20251129.csv          ✅ 3 lines (header + 2 data rows)
 ```
@@ -193,12 +193,12 @@ The reports directory is healthy and functioning correctly.
 
 1. **Generate Weekly Reports** (if needed):
    ```bash
-   python -m core.engine.angel_weekly_summary_report
+   python -m core.engine.dhan_weekly_summary_report
    ```
 
 2. **Generate Rolling Dashboard** (if needed):
    ```bash
-   python -m core.engine.angel_rolling_learning_dashboard
+   python -m core.engine.dhan_rolling_learning_dashboard
    ```
 
 3. **Monitor Learning Metrics**:

@@ -32,7 +32,7 @@ python -m core.engine.system3_phase38_governance_summary
 ```powershell
 # Monitor live signals (Menu 11)
 # Check shadow trades periodically
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 ### After Market Close
@@ -49,14 +49,14 @@ python -m core.engine.system3_phase38_governance_summary
 ## Key Files to Monitor
 
 ### Input Files
-- `storage/live/angel_index_ai_signals.csv` - Live signals
-- `storage/live/angel_index_ai_trades_plan.csv` - Baseline trades
-- `storage/live/angel_index_ai_pnl_log.csv` - Baseline PnL
+- `storage/live/dhan_index_ai_signals.csv` - Live signals
+- `storage/live/dhan_index_ai_trades_plan.csv` - Baseline trades
+- `storage/live/dhan_index_ai_pnl_log.csv` - Baseline PnL
 
 ### Output Files
 - `storage/ultra/phase31_ultra_fused_decisions.csv` - Fused decisions
 - `storage/ultra/phase33_promotion_plan.json` - Promotion plan
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv` - Shadow trades
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv` - Shadow trades
 - `storage/ultra/phase35_decision_audit_report.md` - Audit results
 - `storage/ultra/phase38_governance_summary.md` - Governance summary
 
@@ -72,7 +72,7 @@ type storage\ultra\phase31_ultra_fused_decisions.csv | Select-Object -First 10
 
 ### Check Shadow Trades
 ```powershell
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 ### Check Promotion Status

@@ -43,7 +43,7 @@ Current Safety Settings:
 
 #### ✅ Test 2: Profile Selector
 ```bash
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 **Expected Output**:
@@ -53,7 +53,7 @@ python -m core.engine.angel_model_selector
 Active Profile: BASELINE
 ...
 === PROFILE PATHS ===
-Model Directory: core/models/angel_one
+Model Directory: core/models/dhan
 ...
 ```
 
@@ -63,7 +63,7 @@ Model Directory: core/models/angel_one
 
 #### ✅ Test 3: Directory Structure
 ```bash
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 dir storage\ultra
 dir storage\learning_ultra
 dir storage\reports_ultra
@@ -86,7 +86,7 @@ python -m core.engine.ultra_shadow_data_engine
 **Expected**:
 - Loads signals/trades/PnL (if available)
 - Builds shadow master dataset
-- Saves to `storage/learning_ultra/angel_ultra_shadow_master.csv`
+- Saves to `storage/learning_ultra/dhan_ultra_shadow_master.csv`
 
 **Note**: May show "NO_DATA" if no baseline data exists (expected for fresh setup)
 
@@ -103,12 +103,12 @@ python -m core.engine.ultra_feature_engineering
 - Loads synthetic training CSV
 - Loads shadow master (if Phase 10 completed)
 - Adds Ultra features (~100 total)
-- Saves to `storage/training/angel_ultra_training.csv`
+- Saves to `storage/training/dhan_ultra_training.csv`
 
 **Prerequisites**: Synthetic training CSV must exist
 ```bash
 # Generate if missing:
-python -m core.engine.generate_synthetic_angel_training
+python -m core.engine.generate_synthetic_dhan_training
 ```
 
 **Status**: ⏳ Test after Phase 10
@@ -123,7 +123,7 @@ python -m core.engine.ultra_train_models
 **Expected**:
 - Loads Ultra training dataset
 - Trains models for all 5 underlyings
-- Saves to `core/models/angel_one_ultra/*_ultra_model.pkl`
+- Saves to `core/models/dhan_ultra/*_ultra_model.pkl`
 - Shows accuracy for each underlying
 
 **Prerequisites**: Phase 11 must complete successfully
@@ -207,7 +207,7 @@ python -m core.engine.ultra_live_signals_shadow
 - Connects to broker (may fail if offline)
 - Builds live snapshot
 - Runs Baseline + Ultra predictions
-- Saves shadow signals to `storage/ultra/angel_ultra_live_shadow_signals.csv`
+- Saves shadow signals to `storage/ultra/dhan_ultra_live_shadow_signals.csv`
 
 **Prerequisites**: Phase 12 must complete, broker connection required
 
@@ -225,7 +225,7 @@ python -m core.engine.ultra_trade_simulator
 **Expected**:
 - Simulates trades from shadow signals
 - Generates trade plans and PnL
-- Saves to `storage/ultra/angel_ultra_trade_plan_sim.csv`
+- Saves to `storage/ultra/dhan_ultra_trade_plan_sim.csv`
 - Shows summary per underlying
 
 **Prerequisites**: Phase 10 or Phase 17 must complete successfully
@@ -276,10 +276,10 @@ python -m core.engine.ultra_promotion_manager
 python -m core.engine.ultra_safety
 
 # 2. Profile selector
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 
 # 3. Check directories
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 dir storage\ultra
 dir storage\learning_ultra
 dir storage\reports_ultra
@@ -289,13 +289,13 @@ dir storage\reports_ultra
 ```bash
 # Foundation
 python -m core.engine.ultra_safety
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 
 # Phase 10
 python -m core.engine.ultra_shadow_data_engine
 
 # Phase 11 (requires synthetic training)
-python -m core.engine.generate_synthetic_angel_training  # If missing
+python -m core.engine.generate_synthetic_dhan_training  # If missing
 python -m core.engine.ultra_feature_engineering
 
 # Phase 12
@@ -325,20 +325,20 @@ python -m core.engine.ultra_promotion_manager
 ```
 core/
   models/
-    angel_one_ultra/
+    dhan_ultra/
       NIFTY_ultra_model.pkl
       NIFTY_ultra_model_meta.json
       ... (other underlyings)
 
 storage/
   ultra/
-    angel_ultra_live_shadow_signals.csv
-    angel_ultra_trade_plan_sim.csv
-    angel_ultra_pnl_sim.csv
+    dhan_ultra_live_shadow_signals.csv
+    dhan_ultra_trade_plan_sim.csv
+    dhan_ultra_pnl_sim.csv
 
   learning_ultra/
-    angel_ultra_shadow_master.csv
-    angel_ultra_shadow_master.parquet
+    dhan_ultra_shadow_master.csv
+    dhan_ultra_shadow_master.parquet
 
   reports_ultra/
     ultra_hparam_results_*.csv
@@ -350,9 +350,9 @@ storage/
     ultra_promotion_log.txt
 
   training/
-    angel_ultra_training.csv
-    angel_ultra_training.parquet
-    angel_ultra_training_with_regime.parquet
+    dhan_ultra_training.csv
+    dhan_ultra_training.parquet
+    dhan_ultra_training_with_regime.parquet
 ```
 
 ---
@@ -384,7 +384,7 @@ storage/
 ### Issue: "NO_DATA" in Phase 10
 **Solution**: Run baseline data collection first:
 ```bash
-python -m core.engine.generate_synthetic_angel_training
+python -m core.engine.generate_synthetic_dhan_training
 ```
 
 ### Issue: "Module not found" errors

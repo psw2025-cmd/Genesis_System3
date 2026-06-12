@@ -42,7 +42,7 @@ PHASE_OUTPUTS = {
     ],
     305: [
         "logs/ml/system3_confidence_tiering_305.md",
-        "storage/live/angel_index_ai_signals_confidence_tagged_305.csv",
+        "storage/live/dhan_index_ai_signals_confidence_tagged_305.csv",
     ],
     306: [
         "logs/performance/system3_staleness_guard_306.md",

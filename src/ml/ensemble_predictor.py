@@ -165,11 +165,11 @@ class EnsemblePredictor:
             rf_model_dir: Directory with RandomForest models
         """
         if ultra_model_dir is None:
-            ultra_model_dir = ROOT_DIR / "core" / "models" / "angel_one_ultra"
+            ultra_model_dir = ROOT_DIR / "core" / "models" / "dhan_ultra"
         if xgboost_model_dir is None:
-            xgboost_model_dir = ROOT_DIR / "core" / "models" / "angel_one"
+            xgboost_model_dir = ROOT_DIR / "core" / "models" / "dhan"
         if rf_model_dir is None:
-            rf_model_dir = ROOT_DIR / "core" / "models" / "angel_one"
+            rf_model_dir = ROOT_DIR / "core" / "models" / "dhan"
         
         self.ultra_model_dir = Path(ultra_model_dir)
         self.xgboost_model_dir = Path(xgboost_model_dir)

@@ -17,7 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import wrapper
 try:
-    from core.broker.angel_live_order_wrapper import AngelLiveOrderWrapper
+    from core.broker.dhan_live_order_wrapper import AngelLiveOrderWrapper
 except ImportError as e:
     print(f"[PH108] ERROR: Failed to import AngelLiveOrderWrapper: {e}")
     sys.exit(1)
@@ -137,7 +137,7 @@ def run_phase108(**kwargs) -> dict:
                             "status": "ERROR",
                             "details": "Order status refresh not implemented (wrapper is DRY_RUN)",
                             "outputs": {"status_counts": {}},
-                            "errors": ["NOT_IMPLEMENTED - Real SmartAPI integration pending"],
+                            "errors": ["NOT_IMPLEMENTED - Real DhanHQ integration pending"],
                         }
                     else:
                         errors.append(f"Status check failed for {broker_order_id}: {result.get('error')}")

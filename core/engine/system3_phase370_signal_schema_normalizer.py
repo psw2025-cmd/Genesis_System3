@@ -223,9 +223,9 @@ def run_phase370(context: Dict[str, Any] = None) -> Dict[str, Any]:
     try:
         # Target signal files
         signal_files = [
-            STORAGE_LIVE / "angel_index_ai_signals.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
         ]
 
         # Process each file

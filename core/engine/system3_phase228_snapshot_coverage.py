@@ -22,7 +22,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "performance"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_snapshot_coverage_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 TRADING_HOURS_START = time(9, 15)
 TRADING_HOURS_END = time(15, 30)

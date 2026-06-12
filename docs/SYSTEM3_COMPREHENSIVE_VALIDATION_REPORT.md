@@ -214,8 +214,8 @@ pause
    - Prevents abort due to text formatting issues
    - Non-critical encoding errors don't stop trading
 
-3. ✅ **SmartAPI Fix**: `ImportError` handling (Lines 189-195)
-   - Graceful handling if SmartAPI not installed
+3. ✅ **DhanHQ Fix**: `ImportError` handling (Lines 189-195)
+   - Graceful handling if DhanHQ not installed
    - Non-blocking for DRY-RUN mode
 
 **Status**: ✅ All features present and validated
@@ -231,7 +231,7 @@ pause
 - ✅ `system3_live_day_autopilot.py`: EXISTS
 - ✅ `START_AUTORUN_AND_WATCHDOG.bat`: EXISTS
 - ✅ `venv/Scripts/python.exe`: EXISTS (assumed - venv activated)
-- ✅ `storage/live/angel_index_ai_signals.csv`: EXISTS (30 rows)
+- ✅ `storage/live/dhan_index_ai_signals.csv`: EXISTS (30 rows)
 - ✅ `system3_daily_heartbeat.json`: EXISTS (from yesterday)
 - ✅ `system3_shutdown_flag.json`: EXISTS (from yesterday)
 

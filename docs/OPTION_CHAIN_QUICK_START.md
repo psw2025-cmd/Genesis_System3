@@ -29,10 +29,10 @@ python -m core.engine.test_angelone_option_chain SENSEX
 ### 2. Use in Python Code
 
 ```python
-from core.brokers.angel_one.broker import AngelOneBroker
+from core.brokers.dhan.broker import DhanBroker
 
 # Initialize broker (automatically authenticates with TOTP)
-broker = AngelOneBroker()
+broker = DhanBroker()
 
 # Fetch option chain for NIFTY
 option_chain = broker.get_option_chain_by_underlying(
@@ -175,9 +175,9 @@ Summary:
 ### Fetch for Multiple Underlyings
 
 ```python
-from core.brokers.angel_one.broker import AngelOneBroker
+from core.brokers.dhan.broker import DhanBroker
 
-broker = AngelOneBroker()
+broker = DhanBroker()
 
 underlyings = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
 

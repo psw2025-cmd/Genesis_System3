@@ -131,7 +131,7 @@ def _build_daily_summary() -> str:
     summary_lines.append("")
 
     # Read shadow trades
-    shadow_file = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_ultra_trades_shadow.csv"
+    shadow_file = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_ultra_trades_shadow.csv"
     if shadow_file.exists():
         try:
             df_shadow = pd.read_csv(shadow_file)

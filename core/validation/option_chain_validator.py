@@ -1,13 +1,13 @@
 """
-Option Chain Validator — DISABLED (Angel One / SmartAPI path).
+Option Chain Validator — DISABLED (Dhan / DhanHQ path).
 
-System3 is Dhan-only. This validator used AngelOneBroker to re-fetch missing
+System3 is Dhan-only. This validator used DhanBroker to re-fetch missing
 option chain data. That path is not operational.
 
 The class interface is preserved so imports do not break; any instantiation
 with broker=None (the auto-create path) raises RuntimeError.
 Callers that pass an explicit broker will still get the disabled shim error
-when AngelOneBroker itself raises.
+when DhanBroker itself raises.
 """
 
 import sys
@@ -26,13 +26,13 @@ except ImportError:
 
 _DISABLED_REASON = (
     "OptionChainValidator auto-fetch path is disabled. "
-    "System3 is Dhan-only. AngelOneBroker is not operational."
+    "System3 is Dhan-only. DhanBroker is not operational."
 )
 
 
 class OptionChainValidator:
     """
-    Disabled Angel One option-chain validator.
+    Disabled Dhan option-chain validator.
 
     Preserved for backward-compatible imports only.
     Raises RuntimeError if broker auto-creation is attempted (broker=None).

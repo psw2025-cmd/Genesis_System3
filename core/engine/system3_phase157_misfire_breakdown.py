@@ -20,7 +20,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase157_misfire_breakdown.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase157_misfire_breakdown_report.md"
 

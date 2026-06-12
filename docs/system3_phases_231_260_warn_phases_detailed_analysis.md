@@ -24,14 +24,14 @@
 **Reason**: File not found
 
 #### **What It Checks**
-- Validates schema of `storage/live/angel_virtual_orders.csv`
+- Validates schema of `storage/live/dhan_virtual_orders.csv`
 - Checks for required columns
 - Validates data types
 - Reports missing columns or data issues
 
 #### **Required File**
 ```
-Path: storage/live/angel_virtual_orders.csv
+Path: storage/live/dhan_virtual_orders.csv
 ```
 
 #### **Required Columns** (15 total)
@@ -108,11 +108,11 @@ if not VIRTUAL_ORDERS_CSV.exists():
 
 #### **Required Input Files** (2 files)
 
-**File 1**: `storage/live/angel_virtual_orders.csv`
+**File 1**: `storage/live/dhan_virtual_orders.csv`
 - **Source**: Phase 237 (virtual execution)
 - **Contains**: Virtual orders with scores, lots, approval status
 
-**File 2**: `storage/live/angel_index_ai_signals_with_forward.csv`
+**File 2**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Source**: Phase 221 (forward returns computation)
 - **Contains**: Signals with forward return columns (`forward_ret_1`, `forward_ret_3`, `forward_ret_5`, etc.)
 
@@ -151,7 +151,7 @@ for col in forward_cols:
 
 #### **Output File**
 ```
-Path: storage/live/angel_virtual_orders_with_pnl.csv
+Path: storage/live/dhan_virtual_orders_with_pnl.csv
 ```
 
 #### **New Columns Added**
@@ -176,7 +176,7 @@ Path: storage/live/angel_virtual_orders_with_pnl.csv
         "total_orders": X,
         "matched": Y,
         "unmatched": Z,
-        "output_file": "storage/live/angel_virtual_orders_with_pnl.csv"
+        "output_file": "storage/live/dhan_virtual_orders_with_pnl.csv"
     }
 }
 ```
@@ -201,7 +201,7 @@ Path: storage/live/angel_virtual_orders_with_pnl.csv
 
 #### **Required Input File**
 ```
-Path: storage/live/angel_virtual_orders_with_pnl.csv
+Path: storage/live/dhan_virtual_orders_with_pnl.csv
 ```
 
 #### **Required Columns**
@@ -305,7 +305,7 @@ Path: logs/research/system3_virtual_trades_pnl_report.md
 
 #### **Required Input File**
 ```
-Path: storage/live/angel_virtual_orders_with_pnl.csv
+Path: storage/live/dhan_virtual_orders_with_pnl.csv
 ```
 
 #### **Checks Performed**
@@ -407,10 +407,10 @@ Path: logs/research/system3_virtual_trades_diagnostics.md
 
 #### **Required Input Files** (2 files)
 
-**File 1**: `storage/live/angel_virtual_orders_with_pnl.csv`
+**File 1**: `storage/live/dhan_virtual_orders_with_pnl.csv`
 - **Contains**: Virtual trades with PnL
 
-**File 2**: `storage/live/angel_index_ai_signals.csv`
+**File 2**: `storage/live/dhan_index_ai_signals.csv`
 - **Contains**: Original signals with all score components
 
 #### **Join Logic**
@@ -504,7 +504,7 @@ Path: logs/research/system3_score_to_trade_attribution.md
 
 #### **Required Input File**
 ```
-Path: storage/live/angel_virtual_orders.csv
+Path: storage/live/dhan_virtual_orders.csv
 ```
 
 #### **Required Columns**
@@ -587,7 +587,7 @@ Path: logs/research/system3_symbol_participation_summary.md
 
 #### **Required Input Files** (2 files)
 
-**File 1**: `storage/live/angel_virtual_orders.csv`
+**File 1**: `storage/live/dhan_virtual_orders.csv`
 - **Contains**: Virtual trades
 
 **File 2**: `storage/meta/system3_vol_regimes.csv`
@@ -675,7 +675,7 @@ Path: logs/research/system3_trade_density_vs_regime.md
 
 #### **Required Input File**
 ```
-Path: storage/live/angel_virtual_orders_with_pnl.csv
+Path: storage/live/dhan_virtual_orders_with_pnl.csv
 ```
 
 #### **Required Columns**
@@ -785,18 +785,18 @@ bucket_df.to_csv(OUTPUT_CSV, index=False)
 ```
 Phase 237 (Virtual Execution)
     ↓
-Creates: storage/live/angel_virtual_orders.csv
+Creates: storage/live/dhan_virtual_orders.csv
     ↓
 Phase 238 (Schema Check) → ✅ OK
 Phase 245 (Participation) → ✅ OK
     ↓
 Phase 221 (Forward Returns) [Already implemented]
     ↓
-Creates: storage/live/angel_index_ai_signals_with_forward.csv
+Creates: storage/live/dhan_index_ai_signals_with_forward.csv
     ↓
 Phase 239 (PnL Joiner)
     ↓
-Creates: storage/live/angel_virtual_orders_with_pnl.csv
+Creates: storage/live/dhan_virtual_orders_with_pnl.csv
     ↓
 Phase 240 (PnL Summary) → ✅ OK
 Phase 241 (Diagnostics) → ✅ OK
@@ -822,7 +822,7 @@ python system3_live_day_autopilot.py
 ```
 - Generates signals with BUY/SELL
 - Phase 237 creates virtual orders
-- **Result**: `angel_virtual_orders.csv` created
+- **Result**: `dhan_virtual_orders.csv` created
 
 **Step 2: Phases Show OK**
 - ✅ Phase 238: Schema check passes
@@ -830,11 +830,11 @@ python system3_live_day_autopilot.py
 
 **Step 3: Forward Returns Computed**
 - Phase 221 (already runs) computes forward returns
-- **Result**: `angel_index_ai_signals_with_forward.csv` updated
+- **Result**: `dhan_index_ai_signals_with_forward.csv` updated
 
 **Step 4: PnL Enrichment**
 - Phase 239 joins orders with forward returns
-- **Result**: `angel_virtual_orders_with_pnl.csv` created
+- **Result**: `dhan_virtual_orders_with_pnl.csv` created
 
 **Step 5: All Phases Show OK**
 - ✅ Phase 240: PnL summary generated
@@ -852,11 +852,11 @@ python system3_live_day_autopilot.py
 ## 📁 FILE CREATION TIMELINE
 
 ### **After 1 Autopilot Snapshot**
-- ✅ `angel_virtual_orders.csv` (if BUY/SELL signals generated)
-- ⏳ `angel_virtual_orders_with_pnl.csv` (needs forward returns)
+- ✅ `dhan_virtual_orders.csv` (if BUY/SELL signals generated)
+- ⏳ `dhan_virtual_orders_with_pnl.csv` (needs forward returns)
 
 ### **After Forward Returns Computed**
-- ✅ `angel_virtual_orders_with_pnl.csv` (Phase 239)
+- ✅ `dhan_virtual_orders_with_pnl.csv` (Phase 239)
 - ✅ All PnL reports available
 
 ### **After Multiple Snapshots**
@@ -870,7 +870,7 @@ python system3_live_day_autopilot.py
 ### **Phase 238 - Schema Check**
 ```python
 Conditions:
-✅ File exists: storage/live/angel_virtual_orders.csv
+✅ File exists: storage/live/dhan_virtual_orders.csv
 ✅ File not empty (len(df) > 0)
 ✅ All 15 required columns present
 ✅ No data type errors
@@ -881,8 +881,8 @@ Will show OK when: File created by Phase 237
 ### **Phase 239 - PnL Joiner**
 ```python
 Conditions:
-✅ File 1 exists: storage/live/angel_virtual_orders.csv
-✅ File 2 exists: storage/live/angel_index_ai_signals_with_forward.csv
+✅ File 1 exists: storage/live/dhan_virtual_orders.csv
+✅ File 2 exists: storage/live/dhan_index_ai_signals_with_forward.csv
 ✅ Join keys match (ts, underlying, strike, side, option_type, expiry)
 ✅ At least 1 matched row
 ✅ Output file created successfully
@@ -893,7 +893,7 @@ Will show OK when: Both files exist and have matching rows
 ### **Phase 240 - PnL Summary**
 ```python
 Conditions:
-✅ File exists: storage/live/angel_virtual_orders_with_pnl.csv
+✅ File exists: storage/live/dhan_virtual_orders_with_pnl.csv
 ✅ File not empty
 ✅ PnL column found (pnl_1, pnl_3, or pnl_5)
 ✅ Report generated successfully
@@ -904,7 +904,7 @@ Will show OK when: Enriched orders file exists (from Phase 239)
 ### **Phase 241 - Diagnostics**
 ```python
 Conditions:
-✅ File exists: storage/live/angel_virtual_orders_with_pnl.csv
+✅ File exists: storage/live/dhan_virtual_orders_with_pnl.csv
 ✅ File not empty
 ✅ Required columns present (lots, underlying, final_score, pnl)
 ✅ Report generated successfully
@@ -915,8 +915,8 @@ Will show OK when: Enriched orders file exists (from Phase 239)
 ### **Phase 244 - Attribution**
 ```python
 Conditions:
-✅ File 1 exists: storage/live/angel_virtual_orders_with_pnl.csv
-✅ File 2 exists: storage/live/angel_index_ai_signals.csv
+✅ File 1 exists: storage/live/dhan_virtual_orders_with_pnl.csv
+✅ File 2 exists: storage/live/dhan_index_ai_signals.csv
 ✅ Join keys match
 ✅ Score component columns found
 ✅ At least 1 matched row
@@ -927,7 +927,7 @@ Will show OK when: Both files exist and have matching rows
 ### **Phase 245 - Participation**
 ```python
 Conditions:
-✅ File exists: storage/live/angel_virtual_orders.csv
+✅ File exists: storage/live/dhan_virtual_orders.csv
 ✅ File not empty
 ✅ Required columns present (underlying, side, expiry)
 ✅ Report generated successfully
@@ -938,7 +938,7 @@ Will show OK when: Virtual orders file exists (from Phase 237)
 ### **Phase 246 - Trade Density**
 ```python
 Conditions:
-✅ File 1 exists: storage/live/angel_virtual_orders.csv
+✅ File 1 exists: storage/live/dhan_virtual_orders.csv
 ✅ File 2 exists: storage/meta/system3_vol_regimes.csv (optional)
 ✅ Date extraction successful
 ✅ Report generated successfully
@@ -949,7 +949,7 @@ Will show OK when: Orders file exists (regimes file optional)
 ### **Phase 247 - Edge Tracker**
 ```python
 Conditions:
-✅ File exists: storage/live/angel_virtual_orders_with_pnl.csv
+✅ File exists: storage/live/dhan_virtual_orders_with_pnl.csv
 ✅ File not empty
 ✅ final_score column present
 ✅ PnL column found
@@ -963,9 +963,9 @@ Will show OK when: Enriched orders file exists (from Phase 239)
 
 ## 🔍 DETAILED FILE REQUIREMENTS
 
-### **File 1: angel_virtual_orders.csv**
+### **File 1: dhan_virtual_orders.csv**
 **Created By**: Phase 237 (Virtual Execution)  
-**Location**: `storage/live/angel_virtual_orders.csv`  
+**Location**: `storage/live/dhan_virtual_orders.csv`  
 **Required For**: Phases 238, 239, 244, 245, 246
 
 **Schema**:
@@ -981,9 +981,9 @@ ts,underlying,strike,option_type,side,expiry,ltp,final_score,ai_score,lots,appro
 
 ---
 
-### **File 2: angel_index_ai_signals_with_forward.csv**
+### **File 2: dhan_index_ai_signals_with_forward.csv**
 **Created By**: Phase 221 (Forward Returns)  
-**Location**: `storage/live/angel_index_ai_signals_with_forward.csv`  
+**Location**: `storage/live/dhan_index_ai_signals_with_forward.csv`  
 **Required For**: Phase 239
 
 **Schema**:
@@ -1002,9 +1002,9 @@ ts,underlying,strike,side,option_type,expiry,...,forward_ret_1,forward_ret_3,for
 
 ---
 
-### **File 3: angel_virtual_orders_with_pnl.csv**
+### **File 3: dhan_virtual_orders_with_pnl.csv**
 **Created By**: Phase 239 (PnL Joiner)  
-**Location**: `storage/live/angel_virtual_orders_with_pnl.csv`  
+**Location**: `storage/live/dhan_virtual_orders_with_pnl.csv`  
 **Required For**: Phases 240, 241, 244, 247
 
 **Schema**:
@@ -1014,7 +1014,7 @@ ts,underlying,strike,option_type,side,expiry,ltp,final_score,ai_score,lots,appro
 ```
 
 **Required Columns**:
-- All columns from `angel_virtual_orders.csv`
+- All columns from `dhan_virtual_orders.csv`
 - Plus: `pnl_1`, `pnl_3`, `pnl_5` (or at least one PnL column)
 
 **Minimum Data Required**:
@@ -1068,7 +1068,7 @@ Expected Output:
         "total_orders": 50,
         "matched": 45,      # 45 orders matched with forward returns
         "unmatched": 5,     # 5 orders without forward returns
-        "output_file": "storage/live/angel_virtual_orders_with_pnl.csv"
+        "output_file": "storage/live/dhan_virtual_orders_with_pnl.csv"
     }
 }
 ```
@@ -1153,14 +1153,14 @@ Expected Output:
 ### **When Autopilot Runs**
 
 **Snapshot 1** (First BUY/SELL signal):
-1. Phase 237 creates `angel_virtual_orders.csv` (1 row)
+1. Phase 237 creates `dhan_virtual_orders.csv` (1 row)
 2. ✅ Phase 238: WARN → OK (file exists, schema valid)
 3. ✅ Phase 245: WARN → OK (participation summary generated)
 4. ⚠️ Phase 239: Still WARN (needs forward returns)
 5. ⚠️ Phases 240-241, 244, 247: Still WARN (need enriched file)
 
 **After Forward Returns Computed**:
-1. Phase 221 updates `angel_index_ai_signals_with_forward.csv`
+1. Phase 221 updates `dhan_index_ai_signals_with_forward.csv`
 2. Phase 239 runs (manually or via autopilot integration)
 3. ✅ Phase 239: WARN → OK (enriched file created)
 4. ✅ Phase 240: WARN → OK (PnL summary generated)
@@ -1180,17 +1180,17 @@ Expected Output:
 
 - [ ] **Step 1**: Run autopilot to generate signals
   - Command: `python system3_live_day_autopilot.py`
-  - Result: `angel_virtual_orders.csv` created
+  - Result: `dhan_virtual_orders.csv` created
   - Phases fixed: 238, 245
 
 - [ ] **Step 2**: Ensure forward returns are computed
   - Phase 221 should run automatically (or manually)
-  - Result: `angel_index_ai_signals_with_forward.csv` updated
+  - Result: `dhan_index_ai_signals_with_forward.csv` updated
   - Phases fixed: 239 (can now run)
 
 - [ ] **Step 3**: Run Phase 239 (PnL Joiner)
   - Command: `python system3_virtual_trades_enrichment.py`
-  - Result: `angel_virtual_orders_with_pnl.csv` created
+  - Result: `dhan_virtual_orders_with_pnl.csv` created
   - Phases fixed: 240, 241, 244, 247
 
 - [ ] **Step 4**: Ensure vol regimes are detected
@@ -1206,21 +1206,21 @@ Expected Output:
 
 | Phase | File Needed | Created By | Will Show OK When |
 |-------|-------------|------------|-------------------|
-| **238** | `angel_virtual_orders.csv` | Phase 237 | File exists + valid schema |
-| **239** | `angel_virtual_orders.csv` + `angel_index_ai_signals_with_forward.csv` | Phase 237 + Phase 221 | Both files exist + matching rows |
-| **240** | `angel_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has PnL data |
-| **241** | `angel_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has PnL data |
-| **244** | `angel_virtual_orders_with_pnl.csv` + `angel_index_ai_signals.csv` | Phase 239 + Phase 237 | Both files exist + matching rows |
-| **245** | `angel_virtual_orders.csv` | Phase 237 | File exists + has data |
-| **246** | `angel_virtual_orders.csv` + `system3_vol_regimes.csv` | Phase 237 + Phase 217 | Orders file exists (regimes optional) |
-| **247** | `angel_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has score + PnL data |
+| **238** | `dhan_virtual_orders.csv` | Phase 237 | File exists + valid schema |
+| **239** | `dhan_virtual_orders.csv` + `dhan_index_ai_signals_with_forward.csv` | Phase 237 + Phase 221 | Both files exist + matching rows |
+| **240** | `dhan_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has PnL data |
+| **241** | `dhan_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has PnL data |
+| **244** | `dhan_virtual_orders_with_pnl.csv` + `dhan_index_ai_signals.csv` | Phase 239 + Phase 237 | Both files exist + matching rows |
+| **245** | `dhan_virtual_orders.csv` | Phase 237 | File exists + has data |
+| **246** | `dhan_virtual_orders.csv` + `system3_vol_regimes.csv` | Phase 237 + Phase 217 | Orders file exists (regimes optional) |
+| **247** | `dhan_virtual_orders_with_pnl.csv` | Phase 239 | File exists + has score + PnL data |
 
 ### **Quick Resolution Path**
 
-1. **Run Autopilot** → Creates `angel_virtual_orders.csv`
+1. **Run Autopilot** → Creates `dhan_virtual_orders.csv`
    - Fixes: Phases 238, 245
 
-2. **Run Phase 239** → Creates `angel_virtual_orders_with_pnl.csv`
+2. **Run Phase 239** → Creates `dhan_virtual_orders_with_pnl.csv`
    - Fixes: Phases 240, 241, 244, 247
 
 3. **Run Phase 217** (if not already) → Creates `system3_vol_regimes.csv`

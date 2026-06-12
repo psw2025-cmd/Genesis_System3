@@ -1,7 +1,7 @@
 """
 System3 Ultra - Phase 43: Environment & Broker Guard
 
-Ensure System3 (Angel indices) never accidentally touches non-Angel brokers and
+Ensure System3 (Angel indices) never accidentally touches non-Dhan brokers and
 prepare guardrails for future Binance System3.
 
 All operations are Ultra-Isolated, Baseline-Protected, Read-Only.
@@ -47,7 +47,7 @@ def _log(message: str) -> None:
 
 def load_env_config() -> Dict[str, Any]:
     """Load or create environment config."""
-    default_config = {"angel_system3_enabled": True, "binance_system3_enabled": False}
+    default_config = {"dhan_system3_enabled": True, "binance_system3_enabled": False}
 
     if not ENV_CONFIG_FILE.exists():
         _log("Env config file not found, creating with defaults")
@@ -67,7 +67,7 @@ def load_env_config() -> Dict[str, Any]:
         return default_config
 
 
-def check_angel_env_vars() -> Dict[str, Any]:
+def check_dhan_env_vars() -> Dict[str, Any]:
     """Check Angel environment variables."""
     result = {"present": [], "missing": [], "status": "PASS"}
 
@@ -125,14 +125,14 @@ def run_phase43_env_guard() -> None:
 
     # Load config
     env_config = load_env_config()
-    angel_enabled = env_config.get("angel_system3_enabled", True)
+    dhan_enabled = env_config.get("dhan_system3_enabled", True)
     binance_enabled = env_config.get("binance_system3_enabled", False)
 
-    _log(f"Angel System3: {'ENABLED' if angel_enabled else 'DISABLED'}")
+    _log(f"Angel System3: {'ENABLED' if dhan_enabled else 'DISABLED'}")
     _log(f"Binance System3: {'ENABLED' if binance_enabled else 'DISABLED'}")
 
     # Check environment variables
-    angel_env = check_angel_env_vars()
+    dhan_env = check_dhan_env_vars()
     binance_env = check_binance_env_vars()
     code_check = check_code_imports()
 
@@ -148,15 +148,15 @@ def run_phase43_env_guard() -> None:
 
     report_lines.append("### Angel System3 Variables")
     report_lines.append("")
-    if angel_env["present"]:
+    if dhan_env["present"]:
         report_lines.append("**Present:**")
-        for var in angel_env["present"]:
+        for var in dhan_env["present"]:
             report_lines.append(f"- `{var}`: ✓")
-    if angel_env["missing"]:
+    if dhan_env["missing"]:
         report_lines.append("**Missing:**")
-        for var in angel_env["missing"]:
+        for var in dhan_env["missing"]:
             report_lines.append(f"- `{var}`: ✗")
-    report_lines.append(f"**Status**: {angel_env['status']}")
+    report_lines.append(f"**Status**: {dhan_env['status']}")
     report_lines.append("")
 
     report_lines.append("### Binance System3 Variables")
@@ -171,9 +171,9 @@ def run_phase43_env_guard() -> None:
 
     report_lines.append("## Configuration Status")
     report_lines.append("")
-    report_lines.append(f"- **Angel System3 Enabled**: {angel_enabled}")
+    report_lines.append(f"- **Angel System3 Enabled**: {dhan_enabled}")
     report_lines.append(f"- **Binance System3 Enabled**: {binance_enabled}")
-    if angel_enabled and binance_enabled:
+    if dhan_enabled and binance_enabled:
         report_lines.append("")
         report_lines.append("⚠️ **WARNING**: Both systems enabled - ensure proper separation")
     report_lines.append("")
@@ -190,7 +190,7 @@ def run_phase43_env_guard() -> None:
     report_lines.append("## Summary")
     report_lines.append("")
     overall_status = "PASS"
-    if angel_env["status"] == "WARN" or code_check["status"] == "WARN":
+    if dhan_env["status"] == "WARN" or code_check["status"] == "WARN":
         overall_status = "WARN"
 
     report_lines.append(f"**Overall Status**: {overall_status}")

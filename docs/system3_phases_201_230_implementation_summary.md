@@ -130,8 +130,8 @@ storage/meta/
 ### Storage/Live Directory
 ```
 storage/live/
-├── angel_index_ai_signals_with_forward.csv (Phase 221)
-└── angel_index_ai_signals_reconciled.csv (Phase 225)
+├── dhan_index_ai_signals_with_forward.csv (Phase 221)
+└── dhan_index_ai_signals_reconciled.csv (Phase 225)
 ```
 
 ---
@@ -141,7 +141,7 @@ storage/live/
 On a fresh system with little or no historical data, you may see:
 
 ### Expected WARN Status
-- **Phase 208, 209, 210, 211, 212**: "Signals CSV not found" or "No data to process" (if `storage/live/angel_index_ai_signals.csv` doesn't exist yet)
+- **Phase 208, 209, 210, 211, 212**: "Signals CSV not found" or "No data to process" (if `storage/live/dhan_index_ai_signals.csv` doesn't exist yet)
 - **Phase 213**: "No training data available" (if curated CSV is empty)
 - **Phase 215**: "Overfit detection requires stored validation metrics" (expected - metrics not yet logged)
 - **Phase 217, 218, 219, 220**: "Required columns not found" or "Insufficient data" (if signals CSV is empty)

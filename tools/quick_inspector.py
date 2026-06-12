@@ -10,9 +10,9 @@ import sys, csv, json
 
 KEY_FILES = {
     "heartbeat_json": "storage/meta/system3_daily_heartbeat.json",
-    "signals_curated_csv": "storage/live/angel_index_ai_signals_curated.csv",
-    "signals_forward_csv": "storage/live/angel_index_ai_signals_with_forward.csv",
-    "pnl_log_csv": "storage/live/angel_index_ai_pnl_log.csv",
+    "signals_curated_csv": "storage/live/dhan_index_ai_signals_curated.csv",
+    "signals_forward_csv": "storage/live/dhan_index_ai_signals_with_forward.csv",
+    "pnl_log_csv": "storage/live/dhan_index_ai_pnl_log.csv",
     "autopilot_log_dir": "logs",
 }
 

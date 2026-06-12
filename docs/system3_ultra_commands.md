@@ -27,7 +27,7 @@ python system3_ultra.py
 # Select: OP1
 
 # Or directly:
-python -m core.engine.angel_market_warmup_scanner
+python -m core.engine.dhan_market_warmup_scanner
 ```
 
 ### Live Trading Session
@@ -37,7 +37,7 @@ python system3_ultra.py
 # Select: OP2 or 11
 
 # Or directly:
-python -m core.engine.angel_live_ai_signals
+python -m core.engine.dhan_live_ai_signals
 ```
 
 ### Post-Market
@@ -47,7 +47,7 @@ python system3_ultra.py
 # Select: OP4
 
 # Or directly:
-python -m core.engine.angel_daily_learning_digest
+python -m core.engine.dhan_daily_learning_digest
 ```
 
 ### Weekly Review
@@ -67,13 +67,13 @@ python -m core.engine.system3_phase40_weekly_governance_pack
 ### Baseline Core
 ```bash
 # Train models
-python -m core.engine.train_angel_models
+python -m core.engine.train_dhan_models
 
 # Synthetic backtest
-python -m core.engine.angel_synthetic_backtester
+python -m core.engine.dhan_synthetic_backtester
 
 # Daily PnL summary
-python -m core.engine.angel_daily_pnl_summary
+python -m core.engine.dhan_daily_pnl_summary
 ```
 
 ### Ultra Shadow

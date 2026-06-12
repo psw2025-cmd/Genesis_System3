@@ -7,7 +7,7 @@
 ## Modules Implemented
 
 ### 1. Unified Outcome Logger V3
-- **File**: `core/engine/angel_unified_outcome_logger_v3.py`
+- **File**: `core/engine/dhan_unified_outcome_logger_v3.py`
 - **Menu**: Option 55
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only logging, no threshold changes
@@ -29,7 +29,7 @@
 ---
 
 ### 2. Misfire Classifier V2
-- **File**: `core/engine/angel_misfire_classifier_v2.py`
+- **File**: `core/engine/dhan_misfire_classifier_v2.py`
 - **Menu**: Option 56
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Classification only, generates report
@@ -49,7 +49,7 @@
 ---
 
 ### 3. Daily Learning Digest
-- **File**: `core/engine/angel_daily_learning_digest.py`
+- **File**: `core/engine/dhan_daily_learning_digest.py`
 - **Menu**: Option 57
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only report generation
@@ -92,9 +92,9 @@
 ## Files Created
 
 ### Engine Modules
-1. `core/engine/angel_unified_outcome_logger_v3.py`
-2. `core/engine/angel_misfire_classifier_v2.py`
-3. `core/engine/angel_daily_learning_digest.py`
+1. `core/engine/dhan_unified_outcome_logger_v3.py`
+2. `core/engine/dhan_misfire_classifier_v2.py`
+3. `core/engine/dhan_daily_learning_digest.py`
 
 ### Documentation
 1. `docs/system3_phase3_outcome_logger_misfire.md` (this file)

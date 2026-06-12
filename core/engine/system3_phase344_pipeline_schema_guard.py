@@ -39,10 +39,10 @@ def run_phase_344_pipeline_schema_guard(root_path: str = None, logger_obj=None) 
     try:
         # Define expected schema per CSV (aligned with actual writer implementations)
         expected_schema = {
-            "angel_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
-            "angel_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+            "dhan_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+            "dhan_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
             # Matches live_execution_engine.py::log_virtual_orders() - 15 columns
-            "angel_virtual_orders.csv": [
+            "dhan_virtual_orders.csv": [
                 "ts",
                 "underlying",
                 "strike",
@@ -59,8 +59,8 @@ def run_phase_344_pipeline_schema_guard(root_path: str = None, logger_obj=None) 
                 "risk_flags_json",
                 "snapshot_id",
             ],
-            # Matches angel_pnl_simulator.py::run_pnl_simulation() - 15 columns
-            "angel_index_ai_pnl_log.csv": [
+            # Matches dhan_pnl_simulator.py::run_pnl_simulation() - 15 columns
+            "dhan_index_ai_pnl_log.csv": [
                 "ts",
                 "underlying",
                 "strike",

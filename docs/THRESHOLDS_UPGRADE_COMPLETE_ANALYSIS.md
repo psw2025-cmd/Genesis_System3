@@ -15,7 +15,7 @@
 
 ## 1. Forward Returns Analysis (Phase 221)
 
-### File: `storage/live/angel_index_ai_signals_with_forward.csv`
+### File: `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 **Total Rows**: 608  
 **Rows with Forward Returns**: 560 (92.1% coverage)  

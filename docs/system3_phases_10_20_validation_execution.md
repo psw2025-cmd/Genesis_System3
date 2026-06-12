@@ -13,17 +13,17 @@ The validation plan references different module names, but functionality matches
 
 | Plan Name | Actual Name | Status |
 |-----------|-------------|--------|
-| `angel_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Same functionality |
-| `angel_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Same functionality |
-| `angel_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Same functionality |
-| `angel_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Same functionality |
-| `angel_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Same functionality |
-| `angel_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Same functionality |
-| `angel_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Same functionality |
+| `dhan_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Same functionality |
+| `dhan_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Same functionality |
+| `dhan_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Same functionality |
+| `dhan_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Same functionality |
+| `dhan_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Same functionality |
+| `dhan_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Same functionality |
+| `dhan_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Same functionality |
 | `ultra_live_signals_shadow` | `ultra_live_signals_shadow.py` | ✅ Same functionality |
-| `angel_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Same functionality |
-| `angel_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Same functionality |
-| `angel_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Same functionality |
+| `dhan_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Same functionality |
+| `dhan_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Same functionality |
+| `dhan_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Same functionality |
 
 **Conclusion**: All modules implemented with correct functionality, just different naming convention.
 
@@ -43,8 +43,8 @@ The validation plan references different module names, but functionality matches
 
 **Files Verified**:
 ```
-storage/learning_ultra/angel_ultra_shadow_master.csv (512 bytes)
-storage/learning_ultra/angel_ultra_shadow_master.parquet (10,170 bytes)
+storage/learning_ultra/dhan_ultra_shadow_master.csv (512 bytes)
+storage/learning_ultra/dhan_ultra_shadow_master.parquet (10,170 bytes)
 ```
 
 **Result**: ✅ **VALIDATED**
@@ -59,11 +59,11 @@ storage/learning_ultra/angel_ultra_shadow_master.parquet (10,170 bytes)
 - ✅ Loads shadow master dataset
 - ✅ Adds Ultra features (29 extra)
 - ✅ Total features: 52 (within 40-52 range)
-- ✅ Outputs to `storage/training/angel_ultra_training.*`
+- ✅ Outputs to `storage/training/dhan_ultra_training.*`
 
 **Files Verified**:
-- ✅ `storage/training/angel_ultra_training.csv`
-- ✅ `storage/training/angel_ultra_training.parquet`
+- ✅ `storage/training/dhan_ultra_training.csv`
+- ✅ `storage/training/dhan_ultra_training.parquet`
 
 **Feature Count**: 52 features ✅ (Expected: 40-52)
 
@@ -77,13 +77,13 @@ storage/learning_ultra/angel_ultra_shadow_master.parquet (10,170 bytes)
 
 **Validation Checks**:
 - ✅ Trains models for all 5 underlyings
-- ✅ Models saved to `core/models/angel_one_ultra/`
+- ✅ Models saved to `core/models/dhan_ultra/`
 - ✅ Accuracy: 99.17% - 100% (target: 99-100%) ✅
 - ✅ Metadata includes: accuracy, features, timestamp, training_rows
 
 **Files Verified**:
-- ✅ `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- ✅ `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 **Sample Metadata (NIFTY)**:
 ```json
@@ -130,7 +130,7 @@ storage/learning_ultra/angel_ultra_shadow_master.parquet (10,170 bytes)
 - ✅ Top regime: HIGH_VOL_RANGE (57.2%)
 
 **Files Verified**:
-- ✅ `storage/training/angel_ultra_training_with_regime.parquet`
+- ✅ `storage/training/dhan_ultra_training_with_regime.parquet`
 - ✅ `storage/reports_ultra/ultra_regime_summary.csv`
 
 **Regime Distribution**:
@@ -258,17 +258,17 @@ SENSEX       0.0000     0.9917     +0.9917
 ### Baseline Protection ✅
 
 **Checked**:
-- ✅ `core/models/angel_one/*.pkl` - **UNCHANGED**
-- ✅ `core/models/angel_one/*_meta.json` - **UNCHANGED**
-- ✅ `storage/training/angel_index_options_training.*` - **UNCHANGED**
+- ✅ `core/models/dhan/*.pkl` - **UNCHANGED**
+- ✅ `core/models/dhan/*_meta.json` - **UNCHANGED**
+- ✅ `storage/training/dhan_index_options_training.*` - **UNCHANGED**
 - ✅ `storage/config/*` - **READ ONLY** (no modifications)
 
 **Ultra Isolation**:
 - ✅ All Ultra work in separate directories
-- ✅ `core/models/angel_one_ultra/` - **SEPARATE** (5 models)
+- ✅ `core/models/dhan_ultra/` - **SEPARATE** (5 models)
 - ✅ `storage/learning_ultra/` - **SEPARATE** (shadow master)
 - ✅ `storage/reports_ultra/` - **SEPARATE** (reports)
-- ✅ `storage/training/angel_ultra_*` - **SEPARATE** (training data)
+- ✅ `storage/training/dhan_ultra_*` - **SEPARATE** (training data)
 
 **Result**: ✅ **BASELINE FULLY PROTECTED**
 

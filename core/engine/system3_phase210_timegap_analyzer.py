@@ -22,7 +22,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "history"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_timegap_analyzer_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 GAP_THRESHOLD_MINUTES = 2
 
 

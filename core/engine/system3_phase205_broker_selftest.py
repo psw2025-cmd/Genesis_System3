@@ -51,8 +51,8 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
 
-            # Test AngelOne
-            f.write("## AngelOne Connectivity Test\n\n")
+            # Test Dhan
+            f.write("## Dhan Connectivity Test\n\n")
             try:
                 from core.utils.env_loader import get_angelone_credentials
 
@@ -69,20 +69,20 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
                     f.write("Reason: Missing required credential fields\n")
                     angelone_status = "INCOMPLETE_CREDENTIALS"
                 else:
-                    # Angel One broker path is disabled — Dhan-only mode
+                    # Dhan broker path is disabled — Dhan-only mode
                     f.write("Status: DISABLED\n")
-                    f.write("Reason: Angel One broker path disabled — System3 is Dhan-only\n")
+                    f.write("Reason: Dhan broker path disabled — System3 is Dhan-only\n")
                     angelone_status = "DISABLED_DHAN_ONLY"
             except ImportError:
                 f.write("Status: ❌ MODULE_NOT_FOUND\n")
                 f.write("Reason: Cannot import broker modules\n")
                 angelone_status = "MODULE_NOT_FOUND"
-                errors.append("AngelOne broker module not found")
+                errors.append("Dhan broker module not found")
             except Exception as e:
                 f.write(f"Status: ❌ ERROR\n")
                 f.write(f"Error: {str(e)}\n")
                 angelone_status = "ERROR"
-                errors.append(f"AngelOne test error: {e}")
+                errors.append(f"Dhan test error: {e}")
 
             f.write("\n")
 
@@ -95,11 +95,11 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
             f.write("\n" + "=" * 70 + "\n")
             f.write("Summary\n")
             f.write("=" * 70 + "\n")
-            f.write(f"AngelOne: {angelone_status}\n")
+            f.write(f"Dhan: {angelone_status}\n")
             f.write(f"Binance: {binance_status}\n")
 
         status = "OK" if angelone_status == "CONNECTED" else "WARN"
-        details = f"AngelOne: {angelone_status}"
+        details = f"Dhan: {angelone_status}"
         if binance_status != "NOT_CONFIGURED":
             details += f", Binance: {binance_status}"
 
@@ -141,7 +141,7 @@ def main():
 
     if result["outputs"]:
         print(f"\nLog: {result['outputs']['log_path']}")
-        print(f"AngelOne: {result['outputs']['angelone_status']}")
+        print(f"Dhan: {result['outputs']['angelone_status']}")
         print(f"Binance: {result['outputs']['binance_status']}")
 
     return 0 if result["status"] in ("OK", "WARN") else 1

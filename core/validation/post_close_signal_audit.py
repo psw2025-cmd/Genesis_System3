@@ -22,7 +22,7 @@ META_DIR = PROJECT_ROOT / "storage" / "meta"
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 LOGS_DIR = PROJECT_ROOT / "storage" / "logs"
 THRESHOLDS_JSON = META_DIR / "system3_live_thresholds.json"
-SIGNALS_CSV = LIVE_DIR / "angel_index_ai_signals.csv"
+SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 
 # Required columns for signal audit
 REQUIRED_COLUMNS = ["underlying", "ts", "final_score", "signal", "side", "strike", "expiry"]

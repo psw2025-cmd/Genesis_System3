@@ -91,9 +91,9 @@ def check_data_freshness() -> Dict[str, Any]:
     freshness_check = {"fresh_files": [], "stale_files": [], "missing_files": []}
 
     signal_files = [
-        "angel_index_ai_signals.csv",
-        "angel_index_ai_signals_curated.csv",
-        "angel_index_ai_signals_with_forward.csv",
+        "dhan_index_ai_signals.csv",
+        "dhan_index_ai_signals_curated.csv",
+        "dhan_index_ai_signals_with_forward.csv",
     ]
 
     STALE_THRESHOLD_HOURS = 24

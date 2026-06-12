@@ -8,11 +8,11 @@
 
 **Name**: System3  
 **Full Name**: Genesis System3 - Autonomous Trading System  
-**Description**: Fully autonomous, AI-driven index options trading system for AngelOne (NSE/BSE)  
+**Description**: Fully autonomous, AI-driven index options trading system for Dhan (NSE/BSE)  
 **Language**: Python 3.8+  
 **Architecture**: Modular Phase-Based System  
 **Trading Mode**: DRY-RUN ONLY (No live trading)  
-**Broker**: AngelOne (SmartAPI)
+**Broker**: Dhan (DhanHQ)
 
 ---
 
@@ -55,7 +55,7 @@ C:\Genesis_System3\
 ├── core/                    # Core engine modules
 │   ├── engine/              # Phase implementations (219 files)
 │   ├── phases/              # Additional phase modules
-│   ├── brokers/             # Broker integration (AngelOne)
+│   ├── brokers/             # Broker integration (Dhan)
 │   ├── models/              # ML models (5 underlyings)
 │   ├── config/              # Configuration files
 │   └── utils/               # Utility functions
@@ -140,7 +140,7 @@ C:\Genesis_System3\
 
 **Error Handling**:
 - Lines 138-141: UnicodeEncodeError handling (non-critical)
-- Lines 189-195: SmartAPI ImportError handling (graceful)
+- Lines 189-195: DhanHQ ImportError handling (graceful)
 
 ### 4. `START_AUTORUN_AND_WATCHDOG.bat`
 **Purpose**: Launch script for autorun system  
@@ -201,25 +201,25 @@ PHASE_MODULES = {
 ### Signal Generation Flow
 
 ```
-Market Data (AngelOne API)
+Market Data (Dhan API)
     ↓
-Options Chain Retrieval (angel_options_watch.py)
+Options Chain Retrieval (dhan_options_watch.py)
     ↓
 Feature Engineering
     ↓
 AI Model Prediction (5 models: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX)
     ↓
-Signal Generation (angel_live_ai_signals.py)
+Signal Generation (dhan_live_ai_signals.py)
     ↓
-angel_index_ai_signals.csv (Raw signals)
+dhan_index_ai_signals.csv (Raw signals)
     ↓
 Phase 144: PnL vs Execution Scenario
     ↓
-angel_index_ai_signals_curated.csv (Curated signals)
+dhan_index_ai_signals_curated.csv (Curated signals)
     ↓
 Phase 221: Forward Returns Calculation
     ↓
-angel_index_ai_signals_with_forward.csv (Enriched signals)
+dhan_index_ai_signals_with_forward.csv (Enriched signals)
     ↓
 Phase 222: Signal Edge Estimation
     ↓
@@ -229,7 +229,7 @@ Phase 304: Threshold Tuner
     ↓
 storage/meta/system3_live_thresholds.json
     ↓
-Trade Decision Engine (angel_trade_decision.py)
+Trade Decision Engine (dhan_trade_decision.py)
     ↓
 Trade Plans (DRY-RUN only)
 ```
@@ -237,12 +237,12 @@ Trade Plans (DRY-RUN only)
 ### File Dependencies
 
 **Input Files**:
-- `storage/live/angel_index_ai_signals.csv` (Raw signals)
-- `storage/live/angel_index_ai_signals_curated.csv` (Curated signals)
+- `storage/live/dhan_index_ai_signals.csv` (Raw signals)
+- `storage/live/dhan_index_ai_signals_curated.csv` (Curated signals)
 - `storage/meta/system3_live_thresholds.json` (Thresholds)
 
 **Output Files**:
-- `storage/live/angel_index_ai_signals_with_forward.csv` (Phase 221)
+- `storage/live/dhan_index_ai_signals_with_forward.csv` (Phase 221)
 - `logs/research/system3_signal_edge_report.md` (Phase 222)
 - `storage/meta/system3_threshold_proposals_*.json` (Phase 304)
 
@@ -256,7 +256,7 @@ Trade Plans (DRY-RUN only)
 - `LIVE_TRADING_ENABLED`: Must be `False`
 - `USE_LIVE_EXECUTION_ENGINE`: Must be `False`
 
-**File**: `core/engine/angel_automation_config.py`
+**File**: `core/engine/dhan_automation_config.py`
 - `AUTOMATION_CONFIG.auto_execute_trades`: Must be `False`
 
 **File**: `core/config/system3_ultra_safety.json`

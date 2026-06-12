@@ -52,7 +52,7 @@ Ensure all safety flags are disabled:
 LIVE_TRADING_ENABLED = False
 USE_LIVE_EXECUTION_ENGINE = False
 
-# core/engine/angel_automation_config.py
+# core/engine/dhan_automation_config.py
 AUTOMATION_CONFIG.auto_execute_trades = False
 
 # core/config/system3_ultra_safety.json

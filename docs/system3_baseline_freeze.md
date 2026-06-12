@@ -17,9 +17,9 @@
 - All configuration files
 
 ### Configuration (No Auto-Updates)
-- `angel_trade_config.py` - Thresholds frozen
-- `angel_automation_config.py` - Automation disabled
-- All model files in `core/models/angel_one/`
+- `dhan_trade_config.py` - Thresholds frozen
+- `dhan_automation_config.py` - Automation disabled
+- All model files in `core/models/dhan/`
 - All training datasets
 
 ### Menu System (Stable)

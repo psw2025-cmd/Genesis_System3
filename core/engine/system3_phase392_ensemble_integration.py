@@ -62,7 +62,7 @@ class EnsembleConfig:
     xgboost_weight: float = 0.40
     delta_weight: float = 0.10
 
-    ultra_models_dir: str = "core/models/angel_one_ultra"
+    ultra_models_dir: str = "core/models/dhan_ultra"
     xgboost_models_dir: str = "models/xgboost_v1"
     dataset_path: str = "storage/datasets/phase_390_balanced_features.csv"
 

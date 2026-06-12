@@ -1,0 +1,206 @@
+[
+  {
+    "date": "2026-06-12",
+    "time": "14:00:00",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "BANKNIFTY",
+        "gain_score": 72,
+        "expected_move_pct": 0.018,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 65,
+        "expected_move_pct": 0.012,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "FINNIFTY",
+        "gain_score": 58,
+        "expected_move_pct": 0.009,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 41,
+        "expected_move_pct": 0.007,
+        "recommendation": "SKIP"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "time": "18:08:31",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "FINNIFTY",
+        "gain_score": 50.16,
+        "expected_move_pct": 0.021,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "BANKNIFTY",
+        "gain_score": 46.79,
+        "expected_move_pct": 0.009,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "NIFTY",
+        "gain_score": 46.69,
+        "expected_move_pct": 0.017,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 46.48,
+        "expected_move_pct": 0.012,
+        "recommendation": "TRADE"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "time": "18:09:14",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "FINNIFTY",
+        "gain_score": 53.15,
+        "expected_move_pct": 0.01,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 47.87,
+        "expected_move_pct": 0.023,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 45.14,
+        "expected_move_pct": 0.001,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 44.42,
+        "expected_move_pct": 0.011,
+        "recommendation": "TRADE"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "time": "18:09:14",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "FINNIFTY",
+        "gain_score": 53.15,
+        "expected_move_pct": 0.01,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 47.87,
+        "expected_move_pct": 0.023,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 45.14,
+        "expected_move_pct": 0.001,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 44.42,
+        "expected_move_pct": 0.011,
+        "recommendation": "TRADE"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "time": "18:11:23",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "NIFTY",
+        "gain_score": 47.83,
+        "expected_move_pct": 0.011,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 45.9,
+        "expected_move_pct": 0.033,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "FINNIFTY",
+        "gain_score": 45.12,
+        "expected_move_pct": 0.021,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "BANKNIFTY",
+        "gain_score": 41.17,
+        "expected_move_pct": 0.007,
+        "recommendation": "TRADE"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-12",
+    "time": "18:11:23",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "NIFTY",
+        "gain_score": 47.83,
+        "expected_move_pct": 0.011,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 45.9,
+        "expected_move_pct": 0.033,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "FINNIFTY",
+        "gain_score": 45.12,
+        "expected_move_pct": 0.021,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "BANKNIFTY",
+        "gain_score": 41.17,
+        "expected_move_pct": 0.007,
+        "recommendation": "TRADE"
+      }
+    ]
+  }
+]

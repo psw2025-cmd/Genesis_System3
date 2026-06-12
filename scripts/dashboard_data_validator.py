@@ -1,6 +1,6 @@
 """
 Dashboard Data Validator - Production Grade
-Compares dashboard data with live internet sources (NSE, BSE, Angel One)
+Compares dashboard data with live internet sources (NSE, BSE, Dhan)
 Validates all data points and identifies discrepancies
 """
 

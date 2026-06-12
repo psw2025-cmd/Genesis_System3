@@ -159,7 +159,7 @@ type storage\ultra\phase38_governance_summary.md
 
 ### Check Shadow Trades
 ```powershell
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 ### Full Test Suite

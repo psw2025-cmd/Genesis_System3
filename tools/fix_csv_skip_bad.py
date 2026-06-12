@@ -5,7 +5,7 @@ import shutil
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-CSV = ROOT / "storage" / "training" / "angel_index_options_training.csv"
+CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"
 if not CSV.exists():
     print("CSV missing", CSV)
     raise SystemExit(1)

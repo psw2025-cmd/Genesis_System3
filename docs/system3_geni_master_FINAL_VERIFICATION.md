@@ -130,7 +130,7 @@ Failed: 0
 ### Files Fixed
 
 1. ✅ `system3_ultra_validation.py` - Fixed ✓/✗ characters
-2. ✅ `core/engine/angel_market_warmup_scanner.py` - Fixed ✅/❌/⚠️ characters
+2. ✅ `core/engine/dhan_market_warmup_scanner.py` - Fixed ✅/❌/⚠️ characters
 
 ### Results
 

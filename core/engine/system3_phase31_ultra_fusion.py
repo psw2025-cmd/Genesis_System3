@@ -29,7 +29,7 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 def _load_live_signals() -> Optional[pd.DataFrame]:
     """Load latest live signals CSV."""
-    signals_csv = LIVE_DIR / "angel_index_ai_signals.csv"
+    signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
     if not signals_csv.exists():
         return None
 
@@ -257,7 +257,7 @@ def run_phase31_fusion(max_rows: int = 1000) -> str:
         print("[PHASE 31][ERROR] No live signals found")
         error_path = ULTRA_DIR / "phase31_error_no_signals.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write("# Phase 31 Error\n\nNo live signals found in `storage/live/angel_index_ai_signals.csv`\n")
+            f.write("# Phase 31 Error\n\nNo live signals found in `storage/live/dhan_index_ai_signals.csv`\n")
         return str(error_path)
 
     print(f"[LOAD] Loaded {len(df_signals)} signals")

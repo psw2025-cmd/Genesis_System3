@@ -47,7 +47,7 @@ def verify_safety_flags() -> bool:
     logger.info("\n[SAFETY CHECK]")
 
     # Check for common safety flag files
-    safety_files = ["live_trade_config.py", "angel_automation_config.json", "system3_ultra_safety.json"]
+    safety_files = ["live_trade_config.py", "dhan_automation_config.json", "system3_ultra_safety.json"]
 
     for fname in safety_files:
         fpath = Path("core") / "config" / fname

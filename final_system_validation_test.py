@@ -42,10 +42,10 @@ def test_csv_files():
     
     csv_dir = r'C:\Genesis_System3\storage\live'
     required_files = [
-        'angel_index_ai_signals.csv',
-        'angel_index_ai_signals_curated.csv',
-        'angel_index_ai_trades_exec_log.csv',
-        'angel_index_ai_pnl_log.csv',
+        'dhan_index_ai_signals.csv',
+        'dhan_index_ai_signals_curated.csv',
+        'dhan_index_ai_trades_exec_log.csv',
+        'dhan_index_ai_pnl_log.csv',
     ]
     
     results = {}

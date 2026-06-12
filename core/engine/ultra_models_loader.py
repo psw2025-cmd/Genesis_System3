@@ -27,7 +27,7 @@ import os
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra"
 
 # Supported underlyings
 SUPPORTED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
@@ -44,7 +44,7 @@ def load_ultra_model(underlying: str) -> Optional[Any]:
         Loaded sklearn/xgboost model or None if not found
         
     Behavior:
-        - Checks core/models/angel_one_ultra/{underlying}_ultra_model.pkl
+        - Checks core/models/dhan_ultra/{underlying}_ultra_model.pkl
         - Returns None gracefully if model missing (enables delta fallback)
         - Logs success/failure explicitly for telemetry
         - NEVER raises exceptions to caller
@@ -95,7 +95,7 @@ def get_ultra_model_metadata(underlying: str) -> Dict[str, Any]:
     Returns:
         {
             "underlying": "NIFTY",
-            "model_path": "core/models/angel_one_ultra/NIFTY_ultra_model.pkl",
+            "model_path": "core/models/dhan_ultra/NIFTY_ultra_model.pkl",
             "file_size_kb": 245.6,
             "last_modified": "2025-12-05 14:23:10",
             "exists": True,

@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def load_signals_with_forward_returns() -> pd.DataFrame:
     """Load signal data with forward returns."""
-    signal_file = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
+    signal_file = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
 
     if not signal_file.exists():
         logger.warning(f"Signal file not found: {signal_file}")
@@ -191,7 +191,7 @@ def compute_time_window_performance(df: pd.DataFrame) -> Dict[str, Any]:
 
 def load_virtual_orders_pnl() -> Dict[str, Any]:
     """Load virtual orders and compute PnL if available."""
-    virtual_orders_file = STORAGE_LIVE / "angel_virtual_orders.csv"
+    virtual_orders_file = STORAGE_LIVE / "dhan_virtual_orders.csv"
 
     if not virtual_orders_file.exists():
         return {"status": "not_available", "message": "Virtual orders file not found"}

@@ -26,7 +26,7 @@ Phase 223 started failing at 9:45 AM and continued to fail in all subsequent run
 **Potential Causes**:
 
 1. **File Locking Issue** (Most Likely):
-   - Phase 223 reads `angel_index_ai_signals_with_forward.csv`
+   - Phase 223 reads `dhan_index_ai_signals_with_forward.csv`
    - Phase 221 writes to this file every 30 minutes
    - If Phase 221 is writing while Phase 223 tries to read, file may be locked
    - Windows file locking can cause `pd.read_csv()` to fail
@@ -156,7 +156,7 @@ System stopped responding around 12:13 PM (last heartbeat update). No graceful s
    - **Wait**: 12:13 PM is still during market hours! Watchdog should have restarted.
 
 3. **Network/API Issue**:
-   - SmartAPI connection may have been lost
+   - DhanHQ connection may have been lost
    - Autopilot may have hung waiting for API response
    - No timeout handling
 

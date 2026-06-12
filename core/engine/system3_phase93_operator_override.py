@@ -25,8 +25,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 CONFIG_JSON = CONFIG_DIR / "system3_operator_override.json"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
 
 # Output files
 STATE_JSON = STORAGE_ULTRA / "phase93_override_state.json"

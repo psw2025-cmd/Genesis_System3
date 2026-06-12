@@ -1,6 +1,6 @@
 {
   "level1_code_verification": {
-    "angel_pnl_simulator": {
+    "dhan_pnl_simulator": {
       "status": "PASSED",
       "checks": {
         "has_engine_python": true,
@@ -10,7 +10,7 @@
       },
       "issues": []
     },
-    "angel_trade_decision": {
+    "dhan_trade_decision": {
       "status": "PASSED",
       "checks": {
         "has_engine_python": true,
@@ -20,7 +20,7 @@
       },
       "issues": []
     },
-    "angel_real_data_extractor": {
+    "dhan_real_data_extractor": {
       "status": "PASSED",
       "checks": {
         "has_engine_python": true,

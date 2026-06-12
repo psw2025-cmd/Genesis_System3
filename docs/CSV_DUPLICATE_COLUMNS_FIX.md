@@ -28,7 +28,7 @@
 
 ### 1. Code Changes
 
-#### `core/brokers/angel_one/broker.py`
+#### `core/brokers/dhan/broker.py`
 - **Line 629-632**: Removed duplicate column creation
   - Removed: `"strikePrice": float(row["strike_val"])`
   - Removed: `"optionType": opt_type`

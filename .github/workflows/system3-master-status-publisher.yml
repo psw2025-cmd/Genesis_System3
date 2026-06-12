@@ -54,7 +54,7 @@ jobs:
               lines.append('')
               lines.append(f"- Verdict: `{pipeline.get('verdict', 'UNKNOWN')}`")
               lines.append(f"- Trade ready: `{pipeline.get('trade_ready', False)}`")
-              lines.append(f"- DhanHQ dependency present: `{pipeline.get('dhanhq_dependency_present', pipeline.get('smartapi_dependency_present', 'UNKNOWN'))}`")
+              lines.append(f"- DhanHQ dependency present: `{pipeline.get('dhanhq_dependency_present', pipeline.get('dhanhq_dependency_present', 'UNKNOWN'))}`")
               blockers = pipeline.get('blockers', [])
               lines.append(f"- Blockers: `{len(blockers)}`")
               for b in blockers:

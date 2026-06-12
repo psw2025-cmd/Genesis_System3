@@ -1,6 +1,6 @@
 # TradingView-Style and Exchange (e.g. Binance) Dashboards – How They’re Built
 
-**Purpose:** Explain how **TradingView** dashboards are created and how **exchange-style** dashboards (like Binance) are built from scratch, so you can reuse ideas for an Angel One–focused dashboard. **This repo is Angel One only; no Binance integration is added.**
+**Purpose:** Explain how **TradingView** dashboards are created and how **exchange-style** dashboards (like Binance) are built from scratch, so you can reuse ideas for an Dhan–focused dashboard. **This repo is Dhan only; no Binance integration is added.**
 
 ---
 
@@ -127,7 +127,7 @@ That’s the “from scratch to final” path for an **exchange-style** dashboar
 - **Charts:** **Recharts** (Line, Bar, Pie) in React (Overview, PaperTrading, AdvancedCharts, MLPerformance).  
 - **Advanced charting backend:** `dashboard/backend/advanced_charting.py` – heatmap, IV surface, Greeks, PCR; consumed by `AdvancedCharts.tsx` via `/api/charting/...`.  
 - **No TradingView Charting Library** in code (only in `.cursor/extensions.json` as a recommendation).  
-- **No Binance:** This project is **Angel One only**. No Binance APIs, no Binance widgets, no Binance config.
+- **No Binance:** This project is **Dhan only**. No Binance APIs, no Binance widgets, no Binance config.
 
 ---
 

@@ -32,7 +32,7 @@ Each phase has:
 - If critical libraries are missing, mark phase status as `WARN` and list them in `logs/env/system3_env_validator.log`.
 
 ## PHASE 205 – Broker Credential Self-Tester
-- Load AngelOne credentials from the existing config location (without printing secrets to logs).
+- Load Dhan credentials from the existing config location (without printing secrets to logs).
 - Perform a safe, read-only API call (e.g., profile or exchange info) to validate connectivity.
 - Perform a read-only public call to Binance (if enabled in config) and confirm reachability.
 - Mask all sensitive fields before logging and write results to `logs/brokers/system3_broker_selftest.log`.
@@ -50,13 +50,13 @@ Each phase has:
 - Log a summary of newly applied, active, and retired hotfixes to `logs/meta/system3_hotfix_registry.log`.
 
 ## PHASE 208 – Signal Consistency Engine
-- Load recent signals from `storage/live/angel_index_ai_signals.csv` (using robust parser).
+- Load recent signals from `storage/live/dhan_index_ai_signals.csv` (using robust parser).
 - Validate that no row has impossible combinations (e.g., `BUY` with negative `final_score` far below sell threshold).
 - Detect contradictory signals for the same `(ts, underlying, strike, side)` and auto-correct based on scoring rules.
 - Write a consistency summary to `logs/signals/system3_signal_consistency_report.md` and return counts of fixed rows.
 
 ## PHASE 209 – Training Data Duplicate Purger
-- Load curated training data from `storage/live/angel_index_ai_signals_curated.csv`.
+- Load curated training data from `storage/live/dhan_index_ai_signals_curated.csv`.
 - Identify duplicates based on composite key `(ts, underlying, strike, side, expiry)`.
 - Keep only the most recent row per key (e.g., latest `ts` or file-order) and drop older duplicates.
 - Rewrite the curated file with deduplicated rows and log purged counts to `logs/data_cleaning/system3_duplicate_purger.log`.
@@ -130,7 +130,7 @@ Each phase has:
 ## PHASE 221 – Forward Return Calculator
 - Use archived price data to compute forward returns (e.g., next 1, 3, 5 snapshots) for past signals.
 - Attach forward return metrics to historical signals for label quality and edge analysis.
-- Save enriched data to `storage/live/angel_index_ai_signals_with_forward.csv`.
+- Save enriched data to `storage/live/dhan_index_ai_signals_with_forward.csv`.
 
 ## PHASE 222 – Signal Edge Estimator
 - Estimate expected value (EV) of BUY/SELL signals based on forward returns by score decile.
@@ -150,7 +150,7 @@ Each phase has:
 ## PHASE 225 – Label Reconciliation Engine
 - Rebuild labels for historical rows using a consistent rule set and forward returns.
 - Compare old vs rebuilt labels and quantify discrepancies.
-- Optionally write a reconciled dataset for retraining at `storage/live/angel_index_ai_signals_reconciled.csv`.
+- Optionally write a reconciled dataset for retraining at `storage/live/dhan_index_ai_signals_reconciled.csv`.
 
 ## PHASE 226 – Feature Importance Tracker
 - Compute feature importances from current models and store in `storage/meta/system3_feature_importances.json`.

@@ -87,7 +87,7 @@
 **Details**: "Required input files not found"
 
 **Root Cause**:
-- Phase 263 requires `storage/live/angel_virtual_orders_with_pnl.csv`
+- Phase 263 requires `storage/live/dhan_virtual_orders_with_pnl.csv`
 - This file doesn't exist yet (will be auto-generated)
 - This is **expected behavior** - file created during live trading
 
@@ -196,9 +196,9 @@
 **Status**: ✅ **ALL PASSED**
 
 **Files Verified**: 5/5
-- ✅ `angel_pnl_simulator.py`
-- ✅ `angel_trade_decision.py`
-- ✅ `angel_real_data_extractor.py`
+- ✅ `dhan_pnl_simulator.py`
+- ✅ `dhan_trade_decision.py`
+- ✅ `dhan_real_data_extractor.py`
 - ✅ `system3_phase222_signal_edge.py`
 - ✅ `system3_phase263_advanced_pnl_attribution.py`
 

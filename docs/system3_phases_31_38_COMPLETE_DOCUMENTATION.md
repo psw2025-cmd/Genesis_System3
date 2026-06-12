@@ -41,7 +41,7 @@
 **Purpose**: Combine all Ultra outputs into single fused decisions
 
 **What It Does**:
-- Loads live signals from `storage/live/angel_index_ai_signals.csv`
+- Loads live signals from `storage/live/dhan_index_ai_signals.csv`
 - Loads Ultra artifacts from phases 21-30:
   - Phase 21: Risk evaluations (`phase21_risk_evaluations.csv`)
   - Phase 24: Confidence drift (`phase24_confidence_drift_report.json`)
@@ -68,8 +68,8 @@
 **Purpose**: Compare Ultra performance against baseline system
 
 **What It Does**:
-- Loads baseline trades from `storage/live/angel_index_ai_trades_plan.csv`
-- Loads baseline PnL from `storage/live/angel_index_ai_pnl_log.csv`
+- Loads baseline trades from `storage/live/dhan_index_ai_trades_plan.csv`
+- Loads baseline PnL from `storage/live/dhan_index_ai_pnl_log.csv`
 - Loads Ultra decisions from Phase 31
 - Aligns trades by timestamp, underlying, strike, side
 - Computes metrics:
@@ -105,7 +105,7 @@
 **Purpose**: Log Ultra decisions as shadow trades (never executed)
 
 **What It Does**:
-- Loads live signals from `storage/live/angel_index_ai_signals.csv`
+- Loads live signals from `storage/live/dhan_index_ai_signals.csv`
 - Loads Ultra fused decisions from Phase 31
 - Filters for BUY actions with SAFE risk flag
 - Creates shadow trade entries with:
@@ -113,7 +113,7 @@
   - Reason: "ULTRA_SHADOW"
   - LTP, spot, confidence, score
   - SL/TP percentages
-- Appends to `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- Appends to `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 - **NEVER EXECUTES** - logging only
 
 **Result**: ✅ **0 shadow trades** (expected - no BUY + SAFE risk signals yet)
@@ -311,15 +311,15 @@
 ### Input Files Used
 
 **Phase 31**:
-- `storage/live/angel_index_ai_signals.csv` - Live signals
+- `storage/live/dhan_index_ai_signals.csv` - Live signals
 - `storage/reports_ultra/phase21_risk_evaluations.csv` - Risk evaluations
 - `storage/reports_ultra/phase24_confidence_drift_report.json` - Confidence drift
 - `storage/reports_ultra/phase29_sensitivity_summary.json` - Sensitivity analysis
 - `storage/reports_ultra/phase30_calibration_results.csv` - Calibration results
 
 **Phase 32**:
-- `storage/live/angel_index_ai_trades_plan.csv` - Baseline trades
-- `storage/live/angel_index_ai_pnl_log.csv` - Baseline PnL
+- `storage/live/dhan_index_ai_trades_plan.csv` - Baseline trades
+- `storage/live/dhan_index_ai_pnl_log.csv` - Baseline PnL
 - `storage/ultra/phase31_ultra_fused_decisions.csv` - Ultra decisions
 
 **Phase 33**:
@@ -327,12 +327,12 @@
 - `storage/config/thresholds_auto.json` - Baseline thresholds (read-only)
 
 **Phase 34**:
-- `storage/live/angel_index_ai_signals.csv` - Live signals
+- `storage/live/dhan_index_ai_signals.csv` - Live signals
 - `storage/ultra/phase31_ultra_fused_decisions.csv` - Ultra decisions
 
 **Phase 35**:
 - `storage/ultra/phase31_ultra_fused_decisions.csv` - Ultra decisions
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv` - Shadow trades
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv` - Shadow trades
 
 **Phase 36**:
 - Calls other phases and modules
@@ -341,7 +341,7 @@
 **Phase 37**:
 - `storage/config/thresholds_auto.json` - Thresholds (read-only)
 - `storage/ultra/phase35_decision_audit.csv` - Audit results
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv` - Shadow trades
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv` - Shadow trades
 
 **Phase 38**:
 - `storage/ultra/phase32_ultra_vs_baseline_summary.md` - Comparison summary
@@ -366,7 +366,7 @@
 - `storage/ultra/phase33_promotion_plan.md` - Promotion plan MD
 
 **Phase 34**:
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv` - Shadow trades (0 rows currently)
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv` - Shadow trades (0 rows currently)
 
 **Phase 35**:
 - `storage/ultra/phase35_decision_audit.csv` - Audit CSV (930 rows)

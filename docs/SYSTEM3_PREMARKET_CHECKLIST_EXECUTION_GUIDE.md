@@ -22,7 +22,7 @@ run_premarket_checklist.bat
 
 The script performs 20 comprehensive checks:
 
-1. ✅ SmartAPI Login (dry-run)
+1. ✅ DhanHQ Login (dry-run)
 2. ✅ Internet Stability
 3. ✅ Heartbeat Freshness (< 60 seconds)
 4. ✅ Watchdog Running
@@ -34,7 +34,7 @@ The script performs 20 comprehensive checks:
 10. ✅ Shutdown Flag Check
 11. ✅ No Crash Logs (last 24h)
 12. ✅ Next_Run Timestamps Match Schedule
-13. ✅ AngelOne Data Extractor
+13. ✅ Dhan Data Extractor
 14. ✅ PnL Simulator Loads CSV
 15. ✅ Options Chain Retrieval
 16. ✅ EV Tables Exist
@@ -56,7 +56,7 @@ The script performs 20 comprehensive checks:
 - Check 20: Candidate Trade Score - May be low if no signals yet (OK)
 
 **Expected Passes**:
-- Check 1: SmartAPI Login - May fail if not installed (non-blocking for DRY-RUN)
+- Check 1: DhanHQ Login - May fail if not installed (non-blocking for DRY-RUN)
 - Check 2: Internet Stability - Should pass
 - Check 6-7: CSV Files - Should exist if signals were generated
 - Check 8: CSV Parsing - Should pass (errors handled gracefully)
@@ -100,7 +100,7 @@ If the script cannot run due to terminal issues, manually verify:
 ### Critical Checks (Must Pass):
 1. **Internet**: Ping 8.8.8.8
 2. **Shutdown Flag**: Check `system3_shutdown_flag.json` date (should be yesterday)
-3. **CSV Files**: Verify `storage/live/angel_index_ai_signals.csv` exists
+3. **CSV Files**: Verify `storage/live/dhan_index_ai_signals.csv` exists
 4. **Safety Flags**: Verify `config/live_trade_config.py` has `LIVE_TRADING_ENABLED = False`
 
 ### Non-Critical Checks (Warnings OK):
@@ -119,7 +119,7 @@ If the script cannot run due to terminal issues, manually verify:
 4. Re-run the check
 
 ### Common Issues:
-- **SmartAPI not installed**: Non-blocking for DRY-RUN mode
+- **DhanHQ not installed**: Non-blocking for DRY-RUN mode
 - **CSV files missing**: Will be created when signals generate
 - **Processes not running**: Expected before autorun starts
 - **Stale heartbeat**: Expected, updates on autorun start

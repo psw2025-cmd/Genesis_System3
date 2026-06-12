@@ -2,7 +2,7 @@
 
 ## Overview
 
-System3 is a fully integrated, AI-driven index options trading system for Angel One. It provides end-to-end automation from signal generation to trade execution, with comprehensive monitoring, safety checks, and optimization tools.
+System3 is a fully integrated, AI-driven index options trading system for Dhan. It provides end-to-end automation from signal generation to trade execution, with comprehensive monitoring, safety checks, and optimization tools.
 
 ---
 
@@ -13,7 +13,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    LIVE MARKET DATA                         │
-│              (Angel One API - Index Options)                │
+│              (Dhan API - Index Options)                │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -22,7 +22,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 │  - Loads trained models (5 underlyings)                    │
 │  - Generates predictions (BUY_CE/BUY_PE/HOLD)               │
 │  - Computes confidence & expected_move_score                 │
-│  - Logs to: storage/live/angel_index_ai_signals.csv         │
+│  - Logs to: storage/live/dhan_index_ai_signals.csv         │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -31,7 +31,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 │  - Trade Rule Engine evaluation                             │
 │  - Safety validation (confidence, score, limits)            │
 │  - Trade plan generation (entry/target/SL)                   │
-│  - Logs to: storage/live/angel_index_ai_trades_plan.csv     │
+│  - Logs to: storage/live/dhan_index_ai_trades_plan.csv     │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -40,7 +40,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 │  - Validates trade plans                                     │
 │  - Builds order payloads                                     │
 │  - Executes in DRY RUN mode (no real orders)               │
-│  - Logs to: storage/live/angel_index_ai_trades_exec_log.csv │
+│  - Logs to: storage/live/dhan_index_ai_trades_exec_log.csv │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -48,7 +48,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 │            PnL SIMULATOR (Manual/Auto)                       │
 │  - Simulates trade outcomes (TP/SL/TIMEOUT)                 │
 │  - Computes PnL percentages                                  │
-│  - Logs to: storage/live/angel_index_ai_pnl_log.csv          │
+│  - Logs to: storage/live/dhan_index_ai_pnl_log.csv          │
 └──────────────────────┬──────────────────────────────────────┘
                        │
                        ▼
@@ -68,20 +68,20 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ### 1. Data Generation & Training
 
 #### Synthetic Training Generator
-- **File**: `core/engine/generate_synthetic_angel_training.py`
-- **Output**: `storage/training/angel_index_options_training.csv`
+- **File**: `core/engine/generate_synthetic_dhan_training.py`
+- **Output**: `storage/training/dhan_index_options_training.csv`
 - **Features**: 25+ advanced features, multi-resolution labels
 - **Status**: ✅ Working
 
 #### Model Training
-- **File**: `core/engine/train_angel_models.py`
+- **File**: `core/engine/train_dhan_models.py`
 - **Models**: 5 models (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX)
 - **Accuracy**: 98-100% on synthetic data
 - **Features**: MI-selected (12 features per underlying)
 - **Status**: ✅ Working
 
 #### Feature Importance
-- **File**: `core/engine/angel_feature_importance.py`
+- **File**: `core/engine/dhan_feature_importance.py`
 - **Method**: Mutual Information (MI)
 - **Output**: `storage/training/feature_importance_*.csv`
 - **Status**: ✅ Working
@@ -91,22 +91,22 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ### 2. Live Trading Pipeline
 
 #### AI Signals Engine
-- **File**: `core/engine/angel_live_ai_signals.py`
+- **File**: `core/engine/dhan_live_ai_signals.py`
 - **Menu**: Option 11
 - **Function**: Generates AI signals from live data
 - **Integration**: Auto-creates trade plans
 - **Status**: ✅ Working
 
 #### Trade Decision Layer
-- **File**: `core/engine/angel_trade_decision.py`
+- **File**: `core/engine/dhan_trade_decision.py`
 - **Components**:
-  - Trade Rule Engine (`angel_trade_rules.py`)
-  - Safety Validator (`angel_safety_checks.py`)
+  - Trade Rule Engine (`dhan_trade_rules.py`)
+  - Safety Validator (`dhan_safety_checks.py`)
 - **Function**: Filters signals, creates trade plans
 - **Status**: ✅ Working
 
 #### Trade Executor
-- **File**: `core/engine/angel_trade_executor.py`
+- **File**: `core/engine/dhan_trade_executor.py`
 - **Menu**: Option 14
 - **Mode**: DRY RUN (no real orders)
 - **Function**: Executes trade plans
@@ -117,25 +117,25 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ### 3. Monitoring & Analysis
 
 #### Daily PnL Summary
-- **File**: `core/engine/angel_daily_pnl_summary.py`
+- **File**: `core/engine/dhan_daily_pnl_summary.py`
 - **Menu**: Option 15
 - **Function**: Shows today's PnL per underlying
 - **Status**: ✅ Working
 
 #### Intraday PnL Monitor
-- **File**: `core/engine/angel_intraday_pnl_monitor.py`
+- **File**: `core/engine/dhan_intraday_pnl_monitor.py`
 - **Menu**: Option 16
 - **Function**: Real-time PnL for active trades
 - **Status**: ✅ Working
 
 #### Daily Report Generator
-- **File**: `core/engine/angel_daily_report_generator.py`
+- **File**: `core/engine/dhan_daily_report_generator.py`
 - **Menu**: Option 17
 - **Output**: `storage/reports/daily_report_YYYY-MM-DD.txt`
 - **Status**: ✅ Working
 
 #### System Health Check
-- **File**: `core/engine/angel_watchdog_recovery.py`
+- **File**: `core/engine/dhan_watchdog_recovery.py`
 - **Menu**: Option 18
 - **Function**: Monitors pipeline health, disk space, logs
 - **Status**: ✅ Working
@@ -145,32 +145,32 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ### 4. Optimization & Tuning
 
 #### Auto Threshold Adjuster
-- **File**: `core/engine/angel_auto_threshold_adjuster.py`
+- **File**: `core/engine/dhan_auto_threshold_adjuster.py`
 - **Menu**: Option 19
 - **Function**: Analyzes performance, recommends threshold adjustments
 - **Mode**: Recommendations only (auto-adjust disabled)
 - **Status**: ✅ Ready
 
 #### Confidence Calibrator
-- **File**: `core/engine/angel_confidence_calibrator.py`
+- **File**: `core/engine/dhan_confidence_calibrator.py`
 - **Menu**: Option 20
 - **Function**: Calibrates confidence predictions vs actual outcomes
 - **Status**: ✅ Ready
 
 #### Strategy Optimizer
-- **File**: `core/engine/angel_strategy_optimizer.py`
+- **File**: `core/engine/dhan_strategy_optimizer.py`
 - **Menu**: Option 21
 - **Function**: Optimizes position sizing, risk management, allocation
 - **Status**: ✅ Ready
 
 #### Advanced Feature Ranker
-- **File**: `core/engine/angel_feature_ranker.py`
+- **File**: `core/engine/dhan_feature_ranker.py`
 - **Menu**: Option 22
 - **Function**: Ranks features beyond MI (correlation, stability)
 - **Status**: ✅ Ready
 
 #### Blended Model Trainer
-- **File**: `core/engine/angel_blended_model_trainer.py`
+- **File**: `core/engine/dhan_blended_model_trainer.py`
 - **Menu**: Option 23
 - **Function**: Blends synthetic + real training data
 - **Status**: ✅ Ready (waits for real data)
@@ -180,25 +180,25 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ### 5. Advanced Features
 
 #### Enhanced Signal Scorer
-- **File**: `core/engine/angel_enhanced_signal_scorer.py`
+- **File**: `core/engine/dhan_enhanced_signal_scorer.py`
 - **Function**: Multi-factor signal scoring
 - **Components**: Confidence, move, moneyness, volatility, momentum, risk-reward
 - **Status**: ✅ Ready
 
 #### Trade Lifecycle Logger
-- **File**: `core/engine/angel_trade_lifecycle_logger.py`
+- **File**: `core/engine/dhan_trade_lifecycle_logger.py`
 - **Function**: Complete audit trail (SIGNAL → PLAN → EXECUTE → EXIT → PnL)
-- **Output**: `storage/live/angel_trade_lifecycle_log.csv`
+- **Output**: `storage/live/dhan_trade_lifecycle_log.csv`
 - **Status**: ✅ Integrated
 
 #### Alerting System
-- **File**: `core/engine/angel_alerting_system.py`
+- **File**: `core/engine/dhan_alerting_system.py`
 - **Function**: Monitors system, generates alerts
 - **Output**: `storage/live/system_alerts.log`
 - **Status**: ✅ Ready
 
 #### Threshold Tuner
-- **File**: `core/engine/angel_threshold_tuner.py`
+- **File**: `core/engine/dhan_threshold_tuner.py`
 - **Function**: Auto-tunes thresholds based on performance
 - **Output**: `storage/config/thresholds_auto.json`
 - **Status**: ✅ Working (uses real PnL when available)
@@ -208,7 +208,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 ## Configuration
 
 ### Trade Thresholds
-- **File**: `core/engine/angel_trade_config.py`
+- **File**: `core/engine/dhan_trade_config.py`
 - **Current Settings** (Monday - Very Conservative):
   - `min_confidence = 0.80`
   - `min_abs_score = 0.30`
@@ -216,7 +216,7 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
   - `stoploss_pct = 5.0%`
 
 ### Automation Config
-- **File**: `core/engine/angel_automation_config.py`
+- **File**: `core/engine/dhan_automation_config.py`
 - **Current Settings** (Monday - Maximum Safety):
   - `auto_execute_trades = False` ✅ DISABLED
   - `auto_simulate_pnl = False` ✅ DISABLED
@@ -299,40 +299,40 @@ System3 is a fully integrated, AI-driven index options trading system for Angel 
 C:\Genesis_System3\
 ├── core/
 │   ├── engine/
-│   │   ├── angel_live_ai_signals.py          # Signal generation
-│   │   ├── angel_trade_decision.py           # Trade planning
-│   │   ├── angel_trade_executor.py           # Trade execution
-│   │   ├── angel_pnl_simulator.py            # PnL simulation
-│   │   ├── angel_daily_pnl_summary.py         # Daily summary
-│   │   ├── angel_intraday_pnl_monitor.py      # Intraday monitor
-│   │   ├── angel_daily_report_generator.py   # Daily reports
-│   │   ├── angel_watchdog_recovery.py         # Health checks
-│   │   ├── angel_trade_lifecycle_logger.py   # Lifecycle tracking
-│   │   ├── angel_safety_checks.py             # Safety validation
-│   │   ├── angel_auto_threshold_adjuster.py  # Threshold optimization
-│   │   ├── angel_confidence_calibrator.py     # Confidence calibration
-│   │   ├── angel_strategy_optimizer.py       # Strategy optimization
-│   │   ├── angel_feature_ranker.py           # Feature ranking
-│   │   ├── angel_blended_model_trainer.py    # Blended training
-│   │   ├── angel_enhanced_signal_scorer.py   # Enhanced scoring
-│   │   ├── angel_alerting_system.py          # Alerting
+│   │   ├── dhan_live_ai_signals.py          # Signal generation
+│   │   ├── dhan_trade_decision.py           # Trade planning
+│   │   ├── dhan_trade_executor.py           # Trade execution
+│   │   ├── dhan_pnl_simulator.py            # PnL simulation
+│   │   ├── dhan_daily_pnl_summary.py         # Daily summary
+│   │   ├── dhan_intraday_pnl_monitor.py      # Intraday monitor
+│   │   ├── dhan_daily_report_generator.py   # Daily reports
+│   │   ├── dhan_watchdog_recovery.py         # Health checks
+│   │   ├── dhan_trade_lifecycle_logger.py   # Lifecycle tracking
+│   │   ├── dhan_safety_checks.py             # Safety validation
+│   │   ├── dhan_auto_threshold_adjuster.py  # Threshold optimization
+│   │   ├── dhan_confidence_calibrator.py     # Confidence calibration
+│   │   ├── dhan_strategy_optimizer.py       # Strategy optimization
+│   │   ├── dhan_feature_ranker.py           # Feature ranking
+│   │   ├── dhan_blended_model_trainer.py    # Blended training
+│   │   ├── dhan_enhanced_signal_scorer.py   # Enhanced scoring
+│   │   ├── dhan_alerting_system.py          # Alerting
 │   │   └── ... (other engine modules)
 │   ├── models/
-│   │   └── angel_one/
+│   │   └── dhan/
 │   │       ├── NIFTY_model.pkl
 │   │       ├── BANKNIFTY_model.pkl
 │   │       └── ... (other models)
 │   └── ...
 ├── storage/
 │   ├── live/
-│   │   ├── angel_index_ai_signals.csv
-│   │   ├── angel_index_ai_trades_plan.csv
-│   │   ├── angel_index_ai_trades_exec_log.csv
-│   │   ├── angel_index_ai_pnl_log.csv
-│   │   ├── angel_trade_lifecycle_log.csv
+│   │   ├── dhan_index_ai_signals.csv
+│   │   ├── dhan_index_ai_trades_plan.csv
+│   │   ├── dhan_index_ai_trades_exec_log.csv
+│   │   ├── dhan_index_ai_pnl_log.csv
+│   │   ├── dhan_trade_lifecycle_log.csv
 │   │   └── system_alerts.log
 │   ├── training/
-│   │   ├── angel_index_options_training.csv
+│   │   ├── dhan_index_options_training.csv
 │   │   └── feature_importance_*.csv
 │   ├── config/
 │   │   ├── thresholds_auto.json
@@ -341,7 +341,7 @@ C:\Genesis_System3\
 │   ├── reports/
 │   │   └── daily_report_*.txt
 │   └── backtests/
-│       └── angel_backtest_trades_detailed.csv
+│       └── dhan_backtest_trades_detailed.csv
 └── run_system3.py                            # Main menu
 ```
 

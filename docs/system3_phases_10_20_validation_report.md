@@ -13,17 +13,17 @@ The validation plan uses different module names than implemented. Here's the map
 
 | Plan Name | Actual Implementation | Status |
 |-----------|----------------------|--------|
-| `angel_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Implemented |
-| `angel_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Implemented |
-| `angel_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Implemented |
-| `angel_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Implemented |
-| `angel_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Implemented |
-| `angel_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Implemented |
-| `angel_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Implemented |
+| `dhan_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Implemented |
+| `dhan_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Implemented |
+| `dhan_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Implemented |
+| `dhan_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Implemented |
+| `dhan_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Implemented |
+| `dhan_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Implemented |
+| `dhan_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Implemented |
 | `ultra_live_signals_shadow` | `ultra_live_signals_shadow.py` | ✅ Implemented |
-| `angel_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Implemented |
-| `angel_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Implemented |
-| `angel_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Implemented |
+| `dhan_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Implemented |
+| `dhan_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Implemented |
+| `dhan_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Implemented |
 
 **Note**: All modules are implemented with slightly different names but same functionality.
 
@@ -43,8 +43,8 @@ The validation plan uses different module names than implemented. Here's the map
 - ✅ No baseline files modified
 
 **Files Created**:
-- ✅ `storage/learning_ultra/angel_ultra_shadow_master.csv`
-- ✅ `storage/learning_ultra/angel_ultra_shadow_master.parquet`
+- ✅ `storage/learning_ultra/dhan_ultra_shadow_master.csv`
+- ✅ `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
 
 **Result**: ✅ **VALIDATED**
 
@@ -58,12 +58,12 @@ The validation plan uses different module names than implemented. Here's the map
 - ✅ Loads shadow master dataset
 - ✅ Adds Ultra features (29 extra features)
 - ✅ Total features: 52 (22 base + 29 Ultra)
-- ✅ Outputs to `storage/training/angel_ultra_training.*`
+- ✅ Outputs to `storage/training/dhan_ultra_training.*`
 - ✅ No baseline feature pipeline modified
 
 **Files Created**:
-- ✅ `storage/training/angel_ultra_training.csv`
-- ✅ `storage/training/angel_ultra_training.parquet`
+- ✅ `storage/training/dhan_ultra_training.csv`
+- ✅ `storage/training/dhan_ultra_training.parquet`
 
 **Feature Count**: 52 features (as expected: 40-52 range)
 
@@ -77,14 +77,14 @@ The validation plan uses different module names than implemented. Here's the map
 
 **Validation Checks**:
 - ✅ Trains models for all 5 underlyings
-- ✅ Models saved to `core/models/angel_one_ultra/`
+- ✅ Models saved to `core/models/dhan_ultra/`
 - ✅ Accuracy: 99.17% - 100% (excellent)
 - ✅ Metadata includes: accuracy, features, timestamp
 - ✅ No baseline models overwritten
 
 **Files Created**:
-- ✅ `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- ✅ `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 **Result**: ✅ **VALIDATED**
 
@@ -118,7 +118,7 @@ The validation plan uses different module names than implemented. Here's the map
 - ✅ Top regime: HIGH_VOL_RANGE (57.2%)
 
 **Files Created**:
-- ✅ `storage/training/angel_ultra_training_with_regime.parquet`
+- ✅ `storage/training/dhan_ultra_training_with_regime.parquet`
 - ✅ `storage/reports_ultra/ultra_regime_summary.csv`
 
 **Result**: ✅ **VALIDATED**
@@ -224,14 +224,14 @@ The validation plan uses different module names than implemented. Here's the map
 ### Baseline Protection ✅
 
 **Checked**:
-- ✅ `core/models/angel_one/*.pkl` - **UNCHANGED**
-- ✅ `core/models/angel_one/*_meta.json` - **UNCHANGED**
-- ✅ `storage/training/angel_index_options_training.*` - **UNCHANGED**
+- ✅ `core/models/dhan/*.pkl` - **UNCHANGED**
+- ✅ `core/models/dhan/*_meta.json` - **UNCHANGED**
+- ✅ `storage/training/dhan_index_options_training.*` - **UNCHANGED**
 - ✅ `storage/config/*` - **READ ONLY** (no modifications)
 
 **Ultra Isolation**:
 - ✅ All Ultra work in separate directories
-- ✅ `core/models/angel_one_ultra/` - **SEPARATE**
+- ✅ `core/models/dhan_ultra/` - **SEPARATE**
 - ✅ `storage/learning_ultra/` - **SEPARATE**
 - ✅ `storage/reports_ultra/` - **SEPARATE**
 

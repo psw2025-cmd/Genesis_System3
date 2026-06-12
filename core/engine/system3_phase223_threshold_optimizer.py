@@ -24,7 +24,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_threshold_optimizer.log"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
 def run_phase223(**kwargs) -> Dict[str, Any]:
@@ -55,7 +55,7 @@ def run_phase223(**kwargs) -> Dict[str, Any]:
             signals_file = (
                 SIGNALS_CSV
                 if SIGNALS_CSV.exists()
-                else PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+                else PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
             )
 
             if not signals_file.exists():

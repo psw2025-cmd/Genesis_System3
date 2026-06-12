@@ -117,7 +117,7 @@ STATE_DIR.mkdir(parents=True, exist_ok=True)
 MASTER_PID_FILE = STATE_DIR / "system3_master.pid"
 WATCHDOG_PID_FILE = STATE_DIR / "system3_watchdog.pid"
 
-SIGNALS_FILE = ROOT_DIR / "angel_index_ai_signals.csv"
+SIGNALS_FILE = ROOT_DIR / "dhan_index_ai_signals.csv"
 
 # Thresholds and intervals
 OP2_STALL_THRESHOLD = 300          # seconds without activity before considering OP2 stalled
@@ -563,7 +563,7 @@ def enforce_safety_checks() -> bool:
     
     # Check 2: Automation config
     try:
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         if AUTOMATION_CONFIG.auto_execute_trades:
             errors.append("AUTOMATION_CONFIG.auto_execute_trades is True (must be False)")
         logger.info(f"auto_execute_trades: {AUTOMATION_CONFIG.auto_execute_trades}")
@@ -697,7 +697,7 @@ def run_op1():
     """OP1: Pre-Market Diagnostic with retry logic."""
     logger.info("Running OP1: Pre-Market Diagnostic...")
     try:
-        from core.engine.angel_market_warmup_scanner import scan_market_warmup
+        from core.engine.dhan_market_warmup_scanner import scan_market_warmup
         result = scan_market_warmup()
         logger.info(f"OP1 complete: {result.get('status', 'UNKNOWN')}")
         return True
@@ -748,7 +748,7 @@ def run_op3():
     """OP3: Trade Decision & Planning with retry logic."""
     logger.info("Running OP3: Trade Decision & Planning...")
     try:
-        from core.engine.angel_trade_decision import main as op3_main
+        from core.engine.dhan_trade_decision import main as op3_main
         op3_main()
         logger.info("OP3 complete")
         return True
@@ -805,7 +805,7 @@ def run_eod_learning():
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            from core.engine.angel_daily_learning_digest import main as eod_main
+            from core.engine.dhan_daily_learning_digest import main as eod_main
             eod_main()
             logger.info("EOD Learning complete")
             return True
@@ -920,8 +920,8 @@ def main():
                     
                     # CRITICAL FIX: Generate signals BEFORE running analysis phases
                     try:
-                        from core.engine.angel_options_watch_loop import load_latest_watch_snapshot
-                        from core.engine.angel_live_ai_signals import run_once_with_snapshot
+                        from core.engine.dhan_options_watch_loop import load_latest_watch_snapshot
+                        from core.engine.dhan_live_ai_signals import run_once_with_snapshot
                         
                         # Load latest snapshot from watch file
                         df_snapshot = load_latest_watch_snapshot()

@@ -24,8 +24,8 @@
 - ⚠️ Real outcomes: **Missing** (handled gracefully)
 
 **Output Files**:
-- ✅ `storage/learning/angel_index_real_master_dataset.csv` - **CREATED**
-- ⚠️ `storage/learning/angel_index_real_master_dataset.parquet` - **SKIPPED** (pyarrow not installed)
+- ✅ `storage/learning/dhan_index_real_master_dataset.csv` - **CREATED**
+- ⚠️ `storage/learning/dhan_index_real_master_dataset.parquet` - **SKIPPED** (pyarrow not installed)
 
 ### Analysis
 
@@ -46,7 +46,7 @@
 
 ### Fix Applied
 
-Updated `angel_real_master_dataset.py` to:
+Updated `dhan_real_master_dataset.py` to:
 - Save CSV first (always works)
 - Try Parquet second (optional, with graceful error handling)
 - Continue even if Parquet fails
@@ -77,16 +77,16 @@ Updated `angel_real_master_dataset.py` to:
 | **SENSEX** | 600 | 11 | 480 | 120 | **0.9833** ✅ |
 
 **Models Created**:
-- ✅ `core/models/angel_one_real_blended/NIFTY_model_blended_v3.pkl`
-- ✅ `core/models/angel_one_real_blended/NIFTY_model_blended_v3_meta.json`
-- ✅ `core/models/angel_one_real_blended/BANKNIFTY_model_blended_v3.pkl`
-- ✅ `core/models/angel_one_real_blended/BANKNIFTY_model_blended_v3_meta.json`
-- ✅ `core/models/angel_one_real_blended/FINNIFTY_model_blended_v3.pkl`
-- ✅ `core/models/angel_one_real_blended/FINNIFTY_model_blended_v3_meta.json`
-- ✅ `core/models/angel_one_real_blended/MIDCPNIFTY_model_blended_v3.pkl`
-- ✅ `core/models/angel_one_real_blended/MIDCPNIFTY_model_blended_v3_meta.json`
-- ✅ `core/models/angel_one_real_blended/SENSEX_model_blended_v3.pkl`
-- ✅ `core/models/angel_one_real_blended/SENSEX_model_blended_v3_meta.json`
+- ✅ `core/models/dhan_real_blended/NIFTY_model_blended_v3.pkl`
+- ✅ `core/models/dhan_real_blended/NIFTY_model_blended_v3_meta.json`
+- ✅ `core/models/dhan_real_blended/BANKNIFTY_model_blended_v3.pkl`
+- ✅ `core/models/dhan_real_blended/BANKNIFTY_model_blended_v3_meta.json`
+- ✅ `core/models/dhan_real_blended/FINNIFTY_model_blended_v3.pkl`
+- ✅ `core/models/dhan_real_blended/FINNIFTY_model_blended_v3_meta.json`
+- ✅ `core/models/dhan_real_blended/MIDCPNIFTY_model_blended_v3.pkl`
+- ✅ `core/models/dhan_real_blended/MIDCPNIFTY_model_blended_v3_meta.json`
+- ✅ `core/models/dhan_real_blended/SENSEX_model_blended_v3.pkl`
+- ✅ `core/models/dhan_real_blended/SENSEX_model_blended_v3_meta.json`
 
 **Total Files Created**: **10 files** (5 models + 5 metadata files)
 
@@ -110,8 +110,8 @@ Updated `angel_real_master_dataset.py` to:
 
 ### Safety Confirmation
 
-- ✅ **Baseline models untouched** - Confirmed in output: "Baseline models untouched in: core/models/angel_one/"
-- ✅ **Separate directory** - All new models in `angel_one_real_blended/`
+- ✅ **Baseline models untouched** - Confirmed in output: "Baseline models untouched in: core/models/dhan/"
+- ✅ **Separate directory** - All new models in `dhan_real_blended/`
 - ✅ **No overwrites** - New naming convention (`*_blended_v3.pkl`)
 
 ---
@@ -126,12 +126,12 @@ Updated `angel_real_master_dataset.py` to:
 
 When executed, will show:
 - Active profile: **BASELINE** (default, since beta profile disabled)
-- Model sources: Baseline models from `core/models/angel_one/`
+- Model sources: Baseline models from `core/models/dhan/`
 - Thresholds: Default (0.8 confidence, 0.3 score)
 
 After enabling beta profile (edit config):
 - Active profile: **LIVE_BETA**
-- Model sources: Blended models from `core/models/angel_one_real_blended/`
+- Model sources: Blended models from `core/models/dhan_real_blended/`
 - Thresholds: Beta (0.75 confidence, 0.25 score)
 
 ---
@@ -141,7 +141,7 @@ After enabling beta profile (edit config):
 ### Files Created
 
 **Phase 7**:
-- ✅ 1 file: `storage/learning/angel_index_real_master_dataset.csv`
+- ✅ 1 file: `storage/learning/dhan_index_real_master_dataset.csv`
 - ⚠️ 0 files: Parquet skipped (optional)
 
 **Phase 8**:
