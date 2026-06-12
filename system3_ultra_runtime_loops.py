@@ -40,52 +40,12 @@ def check_safety() -> bool:
 
 def live_signal_loop(interval_sec: int = 30, max_iterations: Optional[int] = None):
     """
-    Continuous live signal generation loop.
-    
-    Args:
-        interval_sec: Seconds between snapshots
-        max_iterations: Maximum iterations (None for infinite)
+    DISABLED — Live signal loop used Angel One broker which is not active.
+    System3 is Dhan-only. This loop is blocked.
     """
-    if not check_safety():
-        return
-    
-    print("=== SYSTEM3 ULTRA - LIVE SIGNAL LOOP ===")
-    print(f"Interval: {interval_sec} seconds")
-    print(f"Max iterations: {max_iterations or 'Infinite'}")
-    print("[SAFETY] Shadow-only, no real trades\n")
-    
-    try:
-        from core.brokers.angel_one.broker import AngelOneBroker
-        from core.engine.angel_options_watch_loop import _build_full_snapshot
-        from core.engine import angel_live_ai_signals
-        
-        broker = AngelOneBroker()
-        print("Broker initialized.\n")
-        
-        iteration = 0
-        while True:
-            iteration += 1
-            if max_iterations and iteration > max_iterations:
-                break
-            
-            print(f"[{datetime.now().strftime('%H:%M:%S')}] Snapshot #{iteration}...")
-            try:
-                df_snap = _build_full_snapshot(broker)
-                if df_snap is not None and not df_snap.empty:
-                    angel_live_ai_signals.run_once_with_snapshot(df_snap)
-                    print(f"  -> Signals generated")
-                else:
-                    print("  -> No data")
-            except Exception as e:
-                print(f"  -> Error: {e}")
-            
-            if iteration < (max_iterations or float('inf')):
-                time.sleep(interval_sec)
-                
-    except KeyboardInterrupt:
-        print("\n[INFO] Loop interrupted by user.")
-    except Exception as e:
-        print(f"\n[ERROR] Loop failed: {e}")
+    print("[DISABLED] Live Signal Loop uses Angel One / SmartAPI broker path.")
+    print("           System3 is Dhan-only. This loop is not operational.")
+    print("           Replace with a Dhan data feed loop when ready.")
 
 
 def decision_audit_loop(interval_sec: int = 300, max_iterations: Optional[int] = None):
@@ -217,7 +177,7 @@ def main():
     print("SYSTEM3 ULTRA - RUNTIME LOOPS")
     print("="*70)
     print("\nSelect loop type:")
-    print("1) Live Signal Loop (30s interval)")
+    print("  [DISABLED] 1) Live Signal Loop — Angel One broker path, blocked")
     print("2) Decision Audit Loop (5min interval)")
     print("3) Snapshot Generation Loop (1hr interval)")
     print("4) Health Check Loop (10min interval)")

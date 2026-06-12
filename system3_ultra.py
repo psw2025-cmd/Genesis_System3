@@ -144,38 +144,22 @@ def show_menu() -> str:
     print("  Choosing 4-50 will print this notice and return to menu.")
     
     print("\n" + "="*70)
-    print("REAL-DATA LEARNING CYCLE (51-64)")
+    print("REAL-DATA LEARNING CYCLE (51-64) — DISABLED (Angel One paths)")
     print("="*70)
-    print("51) Real Data Capture Starter")
-    print("52) Real Signal Collector V2")
-    print("53) Outcome Placeholder Generator")
-    print("54) Market Regime Recorder")
-    print("55) Unified Outcome Logger V3")
-    print("56) Misfire Classifier V2")
-    print("57) Daily Learning Digest")
-    print("58) Real Threshold Recommender V3")
-    print("59) Risk Profile Optimizer V3")
-    print("60) Feature Drift Analyzer")
-    print("61) Performance Consistency Checker")
-    print("62) Dataset Merger (Real + Synthetic)")
-    print("63) Blended Training Orchestrator (Dry-Run)")
-    print("64) Ultra-Mode Readiness Report")
-    
+    print("  [DISABLED — options 51-64] All route to angel_* modules (Angel One).")
+    print("  Choosing 51-64 will print this notice and return to menu.")
+
     print("\n" + "="*70)
-    print("ULTRA OBSERVABILITY (65-69)")
+    print("ULTRA OBSERVABILITY (65-69) — DISABLED (Angel One paths)")
     print("="*70)
-    print("65) Ultra Health Tree")
-    print("66) Latency Drift Observatory")
-    print("67) Failure Point Predictor")
-    print("68) Execution Readiness Auditor")
-    print("69) Ultra Dashboard (Read-Only)")
-    
+    print("  [DISABLED — options 65-69] All route to angel_* modules (Angel One).")
+    print("  Choosing 65-69 will print this notice and return to menu.")
+
     print("\n" + "="*70)
-    print("MASTER DATASET & MODEL TOOLS (70-72)")
+    print("MASTER DATASET & MODEL TOOLS (70-72) — DISABLED (Angel One paths)")
     print("="*70)
-    print("70) Build Real Master Dataset")
-    print("71) Train Real+Synthetic Blended Models (V3)")
-    print("72) Show Live Profiles & Model Sources")
+    print("  [DISABLED — options 70-72] All route to angel_* modules (Angel One).")
+    print("  Choosing 70-72 will print this notice and return to menu.")
     
     print("\n" + "="*70)
     print("ULTRA SHADOW DATA & FEATURES (73-79)")
@@ -191,7 +175,7 @@ def show_menu() -> str:
     print("\n" + "="*70)
     print("ULTRA LIVE & SIMULATION (80-83)")
     print("="*70)
-    print("80) Ultra Live Signals (Shadow)")
+    print("  [DISABLED — option 80] Ultra Live Signals uses Angel One broker.")
     print("81) Ultra Trade Simulator")
     print("82) Ultra PnL Analyzer")
     print("83) Ultra Promotion Manager")
@@ -392,8 +376,15 @@ def handle_baseline_core(choice: str) -> bool:
     return False
 
 
+_ANGEL_LEARNING_CHOICES = {str(n) for n in range(51, 65)}
+_ANGEL_OBSERVABILITY_CHOICES = {str(n) for n in range(65, 73)}  # 65-72 incl.
+
+
 def handle_learning_cycle(choice: str) -> bool:
     """Handle real-data learning cycle (51-64)."""
+    if choice in _ANGEL_LEARNING_CHOICES:
+        print(f"[DISABLED] Option {choice} routes to an Angel One module — blocked in Dhan-only mode.")
+        return False
     learning_handlers = {
         "51": ("core.engine.angel_real_data_capture_starter", "main"),
         "52": ("core.engine.angel_real_signal_collector_v2", "main"),
@@ -418,7 +409,10 @@ def handle_learning_cycle(choice: str) -> bool:
 
 
 def handle_ultra_observability(choice: str) -> bool:
-    """Handle Ultra observability (65-69)."""
+    """Handle Ultra observability (65-69) and master dataset (70-72) — all disabled."""
+    if choice in _ANGEL_OBSERVABILITY_CHOICES:
+        print(f"[DISABLED] Option {choice} routes to an Angel One module — blocked in Dhan-only mode.")
+        return False
     observability_handlers = {
         "65": ("core.engine.angel_ultra_health_tree", "main"),
         "66": ("core.engine.angel_latency_drift_observatory", "main"),
@@ -467,8 +461,11 @@ def handle_ultra_shadow(choice: str) -> bool:
 
 def handle_ultra_live(choice: str) -> bool:
     """Handle Ultra live & simulation (80-83)."""
+    if choice == "80":
+        print("[DISABLED] Option 80 (Ultra Live Signals) uses Angel One broker — blocked in Dhan-only mode.")
+        return False
     live_handlers = {
-        "80": ("core.engine.ultra_live_signals_shadow", "main"),
+        "80": ("core.engine.ultra_live_signals_shadow", "main"),  # unreachable — guarded above
         "81": ("core.engine.ultra_trade_simulator", "main"),
         "82": ("core.engine.ultra_pnl_analyzer", "main"),
         "83": ("core.engine.ultra_promotion_manager", "main"),

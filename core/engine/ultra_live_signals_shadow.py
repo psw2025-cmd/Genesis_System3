@@ -1,23 +1,23 @@
 """
-System3 Ultra - Ultra Prediction Engine (Shadow Live)
+System3 Ultra - Ultra Prediction Engine (Shadow Live) — DISABLED.
 
-Runs Ultra models in parallel (shadow) with baseline signals for comparison.
-Shadow mode only - no trade plans generated.
+This module previously used Angel One broker (AngelOneBroker) to build live
+option-chain snapshots. System3 is Dhan-only — this path is not operational.
 
-Inputs:
-- Live snapshots (same _build_full_snapshot used by baseline)
-- Baseline models: core/models/angel_one/
-- Ultra models: core/models/angel_one_ultra/
-
-Outputs:
-- storage/ultra/angel_ultra_live_shadow_signals.csv
-
-Menu Option: 80
+Menu option 80 in system3_ultra.py is blocked at the handler level.
+Calling run_ultra_live_shadow_once() returns a DISABLED status immediately.
 """
 
-import pandas as pd
-import numpy as np
-import joblib
+try:
+    import pandas as pd
+    import numpy as np
+    import joblib
+    _NUMERIC_AVAILABLE = True
+except ImportError:
+    pd = None
+    np = None
+    joblib = None
+    _NUMERIC_AVAILABLE = False
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -30,9 +30,14 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from core.brokers.angel_one.broker import AngelOneBroker
-from core.engine.angel_options_watch_loop import _build_full_snapshot
-from core.engine.angel_features import add_advanced_features
+from core.brokers.angel_one.broker import AngelOneBroker  # disabled shim — import safe
+
+try:
+    from core.engine.angel_options_watch_loop import _build_full_snapshot
+    from core.engine.angel_features import add_advanced_features
+except ImportError:
+    _build_full_snapshot = None
+    add_advanced_features = None
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -69,20 +74,25 @@ def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> 
         return None
 
 
-def run_ultra_live_shadow_once() -> Dict[str, Any]:
-    """
-    Run Ultra live shadow signals for a single snapshot.
+_DISABLED_REASON = (
+    "ultra_live_signals_shadow is disabled. System3 is Dhan-only. "
+    "Angel One broker path is not operational."
+)
 
-    Returns:
-        Dict with results
-    """
+
+def run_ultra_live_shadow_once() -> Dict[str, Any]:
+    """DISABLED — Angel One broker path. Returns DISABLED status immediately."""
+    print(f"[DISABLED] {_DISABLED_REASON}")
+    return {"status": "DISABLED", "message": _DISABLED_REASON}
+
+    # --- Original implementation below — unreachable, preserved for audit reference ---
     print("=== SYSTEM3 ULTRA - LIVE SIGNALS (SHADOW) ===")
     print("[INFO] Running Ultra models in shadow mode\n")
     print("[SAFETY] Shadow only - no trades, no executor calls\n")
 
     # Initialize broker
     try:
-        broker = AngelOneBroker(allow_data_only=True)  # Data fetching doesn't require live trading permission
+        broker = AngelOneBroker(allow_data_only=True)
         print("[BROKER] Connected")
     except Exception as e:
         return {
