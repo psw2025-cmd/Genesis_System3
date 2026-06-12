@@ -133,58 +133,15 @@ def show_menu() -> str:
     print("OP6) Ultra Experiments")
     
     print("\n" + "="*70)
-    print("BASELINE CORE OPERATIONS (1-50)")
+    print("BASELINE CORE OPERATIONS (1-3 active | 4-50 DISABLED)")
     print("="*70)
     print("1) Core boot (basic startup)")
     print("2) Health check")
     print("3) Test data pipeline")
-    print("4) Test Angel One API")
-    print("5) Test Angel One instruments")
-    print("6) Angel One index options watch (single snapshot)")
-    print("7) Angel One index options LIVE watch loop")
-    print("8) Analyze Angel One index options log")
-    print("9) Build Angel One index options training dataset")
-    print("10) Train Angel One index options models")
-    print("11) Angel One index options LIVE AI signals")
-    print("12) Angel One SYNTHETIC backtest (CONSERVATIVE)")
-    print("13) Angel One SYNTHETIC backtest (DEV)")
-    print("14) Angel One trade EXECUTOR (DRY RUN)")
-    print("15) Angel One DAILY PnL SUMMARY")
-    print("16) Angel One INTRADAY PnL MONITOR")
-    print("17) Angel One DAILY REPORT GENERATOR")
-    print("18) Angel One SYSTEM HEALTH CHECK")
-    print("19) Angel One AUTO THRESHOLD ADJUSTER")
-    print("20) Angel One CONFIDENCE CALIBRATOR")
-    print("21) Angel One STRATEGY OPTIMIZER")
-    print("22) Angel One ADVANCED FEATURE RANKER")
-    print("23) Angel One BLENDED MODEL TRAINER")
-    print("24) Angel One MARKET INTELLIGENCE DASHBOARD")
-    print("25) Angel One ACTION LAYER VALIDATOR")
-    print("26) Angel One MARKET PROFILE ANALYZER")
-    print("27) Angel One SAFETY LAYER V2 CHECK")
-    print("28) Angel One REAL OUTCOME LOGGER")
-    print("29) Angel One SIGNAL VS OUTCOME ANALYZER")
-    print("30) Angel One MISFIRE DETECTOR")
-    print("31) Angel One REAL THRESHOLD RECOMMENDER")
-    print("32) Angel One RISK PROFILE OPTIMIZER")
-    print("33) Angel One REAL DATA EXTRACTOR")
-    print("34) Angel One BLENDED DATASET BUILDER")
-    print("35) Angel One BLENDED MODEL TRAINER (V2)")
-    print("36) Angel One DAILY LEARNING REPORT")
-    print("37) Angel One ROLLING 7-DAY LEARNING DASHBOARD")
-    print("38) Angel One BLENDED MODEL TRAINER V2 (Enhanced)")
-    print("39) Angel One ULTRA-MODE PREP LAYER")
-    print("40) Angel One DAILY AUTO-REPORTS")
-    print("41) Angel One WEEKLY SUMMARY REPORT")
-    print("42) Angel One MONDAY MORNING PRE-MARKET DIAGNOSTIC")
-    print("43) Angel One REPORT AUTO-SCHEDULER")
-    print("44) Angel One LIVE SNAPSHOT REASONER")
-    print("45) Angel One OUTCOME CONFIDENCE CURVE ANALYZER")
-    print("46) Angel One ADAPTIVE VOLATILITY MAP")
-    print("47) Angel One SAFETY LAYER V3")
-    print("48) Angel One MARKET WARMUP SCANNER")
-    print("49) Angel One SIGNAL RECORD BUFFER")
-    print("50) Angel One ENVIRONMENT CONSISTENCY CHECKER")
+    print()
+    print("  [DISABLED — options 4-50] Angel One / SmartAPI broker paths.")
+    print("  System3 is Dhan-only. These options are blocked.")
+    print("  Choosing 4-50 will print this notice and return to menu.")
     
     print("\n" + "="*70)
     print("REAL-DATA LEARNING CYCLE (51-64)")
@@ -357,13 +314,21 @@ def handle_operational_phase(choice: str) -> bool:
     return False
 
 
+_ANGEL_BASELINE_CHOICES = {str(n) for n in range(4, 51)}
+
+
 def handle_baseline_core(choice: str) -> bool:
     """Handle baseline core operations (1-50)."""
+    if choice in _ANGEL_BASELINE_CHOICES:
+        print(f"[DISABLED] Option {choice} targets Angel One / SmartAPI — blocked in Dhan-only mode.")
+        return False
+
     # Import all baseline modules dynamically
     baseline_handlers = {
         "1": ("core.engine.main_launcher", "main"),
         "2": ("core.engine.health_check", "main"),
         "3": ("core.engine.test_data_pipeline", "main"),
+        # 4-50: Angel One paths — removed from dispatch (blocked above)
         "4": ("core.engine.test_angelone_api", "main"),
         "5": ("core.engine.test_angelone_instruments", "main"),
         "6": ("core.engine.angel_options_watch", "main"),

@@ -1,85 +1,66 @@
 """
-Connectivity Probe - Test broker/data source connectivity
+Connectivity Probe — Dhan broker / data source only.
+
+System3 is Dhan-only. This probe verifies that the Dhan SDK can be
+imported and that basic module availability is healthy. Angel One /
+SmartAPI paths are intentionally excluded.
 """
 
 import json
 import sys
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 
 def probe_connectivity() -> Dict[str, Any]:
-    """Probe broker/data source connectivity."""
-    probe = {
+    """Probe Dhan broker / data source connectivity."""
+    probe: Dict[str, Any] = {
         "timestamp": datetime.now().isoformat(),
-        "broker_available": False,
-        "data_fetcher_available": False,
-        "websocket_available": False,
-        "rest_available": False,
+        "mode": "dhan-only",
+        "dhan_sdk_available": False,
+        "angel_broker_shim": False,
+        "live_chain_ws_shim": False,
         "status": "UNKNOWN",
         "details": {},
     }
 
-    # Check if SmartApi is available
+    # Dhan SDK import check
     try:
-        from SmartApi.smartConnect import SmartConnect
-
-        probe["broker_available"] = True
-        probe["details"]["smartapi_import"] = "SUCCESS"
+        import dhanhq  # noqa: F401
+        probe["dhan_sdk_available"] = True
+        probe["details"]["dhanhq_import"] = "SUCCESS"
     except ImportError:
-        probe["details"]["smartapi_import"] = "FAILED - SmartApi not installed"
+        probe["details"]["dhanhq_import"] = "FAILED — dhanhq not installed"
 
-    # Check if broker can be initialized
+    # Angel One broker shim (should import cleanly, raise only on use)
     try:
-        from core.brokers.angel_one.broker import AngelOneBroker
+        from core.brokers.angel_one.broker import AngelOneBroker  # noqa: F401
+        probe["angel_broker_shim"] = True
+        probe["details"]["angel_broker_shim"] = "SUCCESS — disabled shim present"
+    except Exception as exc:
+        probe["details"]["angel_broker_shim"] = f"FAILED — {exc}"
 
-        try:
-            broker = AngelOneBroker(allow_data_only=True)
-            probe["data_fetcher_available"] = True
-            probe["rest_available"] = True
-            probe["details"]["broker_init"] = "SUCCESS"
-            probe["status"] = "CONNECTED"
-        except Exception as e:
-            probe["details"]["broker_init"] = f"FAILED - {str(e)[:100]}"
-            probe["status"] = "NO_CREDENTIALS"
-    except ImportError:
-        probe["details"]["broker_init"] = "FAILED - Broker module not available"
-        probe["status"] = "NO_BROKER"
-
-    # Check WebSocket availability
+    # live_chain_ws shim (should import cleanly)
     try:
-        from src.angel.live_chain_ws import LiveChainWebSocket
+        from src.angel.live_chain_ws import LiveChainWebSocket  # noqa: F401
+        probe["live_chain_ws_shim"] = True
+        probe["details"]["live_chain_ws_shim"] = "SUCCESS — disabled shim present"
+    except Exception as exc:
+        probe["details"]["live_chain_ws_shim"] = f"FAILED — {exc}"
 
-        probe["websocket_available"] = True
-        probe["details"]["websocket_import"] = "SUCCESS"
-    except ImportError:
-        probe["details"]["websocket_import"] = "FAILED - WebSocket module not available"
-
-    # Check REST fallback
-    try:
-        from src.angel.live_chain_rest import LiveChainREST
-
-        probe["rest_available"] = True
-        probe["details"]["rest_import"] = "SUCCESS"
-    except ImportError:
-        probe["details"]["rest_import"] = "FAILED - REST module not available"
-
-    # Final status determination
-    if probe["status"] == "UNKNOWN":
-        if not probe["broker_available"]:
-            probe["status"] = "NO_BROKER"
-        elif not probe["data_fetcher_available"]:
-            probe["status"] = "NO_CREDENTIALS"
-        else:
-            probe["status"] = "CONNECTED"
+    # Overall status
+    if probe["dhan_sdk_available"]:
+        probe["status"] = "DHAN_READY"
+    else:
+        probe["status"] = "DHAN_SDK_MISSING"
 
     return probe
 
 
 if __name__ == "__main__":
-    probe = probe_connectivity()
-    print(json.dumps(probe, indent=2))
+    result = probe_connectivity()
+    print(json.dumps(result, indent=2))
