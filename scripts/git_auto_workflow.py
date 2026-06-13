@@ -801,17 +801,20 @@ class GitAutoWorkflow:
             print(f"  Main is merged and tagged — remaining changes go in next workflow run.")
             return
 
-        # Pull with rebase to keep clean history
+        # Sync to remote using fetch + reset — avoids rebase conflicts after squash merges
         def _do_pull():
-            rc, out, err = _run(["git", "pull", "--rebase", "origin", main])
-            if rc != 0:
-                raise RuntimeError(f"git pull failed: {err}")
-            return out
+            rc_f, _, err_f = _run(["git", "fetch", "origin", main])
+            if rc_f != 0:
+                raise RuntimeError(f"git fetch failed: {err_f}")
+            rc_r, out_r, err_r = _run(["git", "reset", "--hard", f"origin/{main}"])
+            if rc_r != 0:
+                raise RuntimeError(f"git reset failed: {err_r}")
+            return out_r
 
-        out = _retry(_do_pull,
-                     max_retries=self.cfg["retry"]["max_retries"],
-                     delay=self.cfg["retry"]["delay_seconds"])
-        print(f"  Pulled latest {main}  ✓")
+        _retry(_do_pull,
+               max_retries=self.cfg["retry"]["max_retries"],
+               delay=self.cfg["retry"]["delay_seconds"])
+        print(f"  Synced to latest {main}  ✓")
 
         # Restore any stashed changes back onto main for next workflow run
         if did_stash:
