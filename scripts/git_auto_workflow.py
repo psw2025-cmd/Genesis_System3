@@ -538,23 +538,38 @@ class GitAutoWorkflow:
             print(f"  [DRY-RUN] would push: {branch}")
             return
 
+        main = self.cfg["main_branch"]
+
+        # Rebase onto latest main before pushing — prevents "not mergeable" errors
+        # when a previous PR was squash-merged and left the branch behind.
+        _run(["git", "fetch", "origin", main])
+        rc_rb, _, rb_err = _run([
+            "git", "rebase", f"origin/{main}", "--", "--autostash"
+        ])
+        if rc_rb != 0:
+            # Abort conflicted rebase and push as-is (merge will handle it)
+            _run(["git", "rebase", "--abort"])
+            print(f"  [WARN] Rebase onto {main} had conflicts — pushing without rebase")
+        else:
+            print(f"  Rebased onto origin/{main}")
+
         def _do_push():
             rc, out, err = _run([
                 "git", "push", "--set-upstream", "origin", branch, "--force-with-lease"
             ])
             if rc != 0:
-                # If force-with-lease fails because remote is ahead, try regular push
+                # force-with-lease rejected (remote moved) — force push
                 rc2, out2, err2 = _run([
-                    "git", "push", "--set-upstream", "origin", branch
+                    "git", "push", "--set-upstream", "origin", branch, "--force"
                 ])
                 if rc2 != 0:
                     raise RuntimeError(f"Push failed: {err2}")
                 return out2
             return out
 
-        out = _retry(_do_push,
-                     max_retries=self.cfg["retry"]["max_retries"],
-                     delay=self.cfg["retry"]["delay_seconds"])
+        _retry(_do_push,
+               max_retries=self.cfg["retry"]["max_retries"],
+               delay=self.cfg["retry"]["delay_seconds"])
         print(f"  Pushed to origin/{branch}")
 
     def _create_pr(
@@ -667,7 +682,7 @@ class GitAutoWorkflow:
                 time.sleep(2)  # brief pause for GitHub to register state change
 
         def _do_merge():
-            # Primary: admin bypass (immediate, no review required)
+            # Primary: admin bypass, squash
             rc, out, err = _run([
                 "gh", "pr", "merge", str(pr_number),
                 merge_flag, "--admin",
@@ -677,15 +692,28 @@ class GitAutoWorkflow:
                 print(f"  Merged PR #{pr_number} ({strategy})")
                 return
 
-            # Fallback: auto-merge (waits for CI, then merges)
-            print(f"  Admin merge failed ({err[:80]}) — trying auto-merge...")
-            rc2, out2, err2 = _run([
+            # If "not mergeable" — GitHub hasn't computed merge status yet; wait and retry
+            if "not mergeable" in err.lower():
+                print(f"  PR not mergeable yet (GitHub computing) — waiting 10s...")
+                time.sleep(10)
+                rc3, _, err3 = _run([
+                    "gh", "pr", "merge", str(pr_number),
+                    merge_flag, "--admin", "--subject", commit_msg,
+                ])
+                if rc3 == 0:
+                    print(f"  Merged PR #{pr_number} ({strategy})")
+                    return
+                err = err3
+
+            # Final fallback: regular merge commit (avoids squash conflict issues)
+            print(f"  Squash failed ({err[:60]}) — trying regular merge commit...")
+            rc2, _, err2 = _run([
                 "gh", "pr", "merge", str(pr_number),
-                merge_flag, "--auto",
+                "--merge", "--admin", "--subject", commit_msg,
             ])
             if rc2 != 0:
-                raise RuntimeError(f"Auto-merge also failed: {err2}")
-            print(f"  Auto-merge enabled for PR #{pr_number} (will merge when CI passes)")
+                raise RuntimeError(f"Merge failed: {err2}")
+            print(f"  Merged PR #{pr_number} (merge commit)")
 
         _retry(_do_merge,
                max_retries=self.cfg["retry"]["max_retries"],
