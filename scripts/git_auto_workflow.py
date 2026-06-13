@@ -600,9 +600,17 @@ class GitAutoWorkflow:
 
         def _do_create():
             rc, out, err = _run(cmd)
-            if rc != 0:
-                raise RuntimeError(f"gh pr create failed: {err}")
-            return out.strip()
+            if rc == 0:
+                return out.strip()
+            # If label doesn't exist, retry without labels
+            if "not found" in err and "--label" in " ".join(cmd):
+                cmd_no_labels = [c for i, c in enumerate(cmd)
+                                 if c != "--label" and (i == 0 or cmd[i-1] != "--label")]
+                rc2, out2, err2 = _run(cmd_no_labels)
+                if rc2 == 0:
+                    return out2.strip()
+                raise RuntimeError(f"gh pr create failed: {err2}")
+            raise RuntimeError(f"gh pr create failed: {err}")
 
         pr_url = _retry(_do_create,
                         max_retries=self.cfg["retry"]["max_retries"],
