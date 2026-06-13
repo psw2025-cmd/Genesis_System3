@@ -644,6 +644,20 @@ class GitAutoWorkflow:
         strategy = self.cfg.get("pr", {}).get("merge_method", "squash")
         merge_flag = f"--{strategy}"
 
+        # Convert draft to ready-for-review (draft PRs cannot be merged)
+        rc_draft, pr_state, _ = _run([
+            "gh", "pr", "view", str(pr_number),
+            "--json", "isDraft", "--jq", ".isDraft"
+        ])
+        if rc_draft == 0 and pr_state.strip() == "true":
+            print(f"  PR #{pr_number} is a draft — marking ready for review...")
+            rc_ready, _, err_ready = _run(["gh", "pr", "ready", str(pr_number)])
+            if rc_ready != 0:
+                print(f"  [WARN] Could not mark ready: {err_ready}")
+            else:
+                print(f"  PR #{pr_number} is now ready for review")
+                time.sleep(2)  # brief pause for GitHub to register state change
+
         def _do_merge():
             # Primary: admin bypass (immediate, no review required)
             rc, out, err = _run([
@@ -725,10 +739,19 @@ class GitAutoWorkflow:
             print(f"  [DRY-RUN] would pull {main}")
             return
 
+        # Stash any remaining local changes so checkout doesn't fail
+        _, stash_out, _ = _run(["git", "stash", "push", "--include-untracked",
+                                 "-m", "auto-workflow-pre-pull"])
+        did_stash = "No local changes to save" not in stash_out and stash_out.strip()
+
         # Switch to main
         rc, _, err = _run(["git", "checkout", main])
         if rc != 0:
-            print(f"  [WARN] Could not checkout {main}: {err}")
+            # Unstash and stay on current branch
+            if did_stash:
+                _run(["git", "stash", "pop"])
+            print(f"  [WARN] Could not checkout {main}: {err[:60]}")
+            print(f"  Main is merged and tagged — remaining changes go in next workflow run.")
             return
 
         # Pull with rebase to keep clean history
@@ -742,6 +765,12 @@ class GitAutoWorkflow:
                      max_retries=self.cfg["retry"]["max_retries"],
                      delay=self.cfg["retry"]["delay_seconds"])
         print(f"  Pulled latest {main}  ✓")
+
+        # Restore any stashed changes back onto main for next workflow run
+        if did_stash:
+            rc_pop, _, _ = _run(["git", "stash", "pop"])
+            if rc_pop == 0:
+                print("  Stashed changes restored — run workflow again to commit them.")
 
     # ── Summary ───────────────────────────────────────────────────────────
 
