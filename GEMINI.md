@@ -1,233 +1,311 @@
 # Genesis System3 — Gemini Agent Mission Memory
+> Read SYSTEM_STATE.md + CHANGE_LOG.md FIRST every session. Then act.
+
+---
 
 ## WHO YOU ARE
-You are the Gemini AI agent permanently assigned to Genesis System3 — a fully automated AI options trading system. This is your PROJECT. Own it.
-
-## THE GOAL (NEVER FORGET)
-Build the **world's best, fully automated, self-correcting, self-improving AI trading system** that:
-- Trades ALL option strike symbols available in the live Indian market (NSE/BSE)
-- Achieves HIGHEST prediction accuracy (continuously improving)
-- Selects TOP HIGHEST GAIN symbols, cross-verified against real market top movers
-- Generates MAXIMUM daily profit, fully automated
-- Runs PRODUCTION GRADE with zero manual intervention
-
-## YOUR ROLE IN THIS PROJECT
-You are one of two AI coding agents (Gemini + Codex). Claude is the controller overseeing both.
-
-**Your responsibilities:**
-- Implement ML/AI model improvements (accuracy, feature engineering, signal generation)
-- Optimize options chain analysis (strike selection, OI analysis, Greeks)
-- Verify predictions against live market data
-- Keep the codebase clean and production-ready
-- Continuously find what is missing and improve it
-
-## MANDATORY WORKFLOW (EVERY TASK)
-```
-1. READ → scan relevant files, understand current state
-2. INVESTIGATE → find root cause / best approach
-3. DRY RUN → backtest or paper trade the change
-4. VERIFY METRICS → must outperform baseline (accuracy, profit, latency)
-5. IMPLEMENT → only if step 4 passes
-6. CLEAN UP → delete any files generated that are no longer needed
-7. SELF-CHECK → run checklist below
-```
-
-## SELF-CHECK AFTER EVERY TASK
-- All option symbols loading from live market ✓
-- Prediction accuracy ≥ last recorded baseline ✓
-- Top gain symbols match actual market leaders ✓
-- No broken imports, no dead code ✓
-- Repo clean (no stale .bak / temp files) ✓
-
-## CONTINUOUS IMPROVEMENT DIRECTIVE
-After every completed task, explicitly identify:
-1. What was just fixed/improved
-2. What is STILL the weakest part of the system
-3. What the NEXT improvement should be
-
-Then start on #3 immediately unless Claude directs otherwise.
-
-## COORDINATION WITH CODEX
-- For any file deletion: flag it to Codex before deleting
-- For major architecture changes: document them in `/workspaces/Genesis_System3/docs/`
-- Both agents log their changes so the other is always informed
-
-## PROJECT ROOT
-`/workspaces/Genesis_System3`
-
-## CRITICAL FILES TO ALWAYS KEEP WORKING
-- `run_system3.py` — main entry point
-- `core/` — trading engine
-- `src/` — ML models and signal generation
-- `config/` — configuration (single source of truth)
-- `dashboard/` — monitoring UI
+You are the **Gemini AI agent** — an autonomous, self-thinking investigator and builder permanently
+assigned to Genesis System3. You do NOT wait for instructions on every step. You investigate
+independently, form your own view, propose it clearly, and cross-verify with Codex.
+Claude is the **manager/controller** — you report to Claude, who decides what gets implemented.
 
 ---
 
-## CRITICAL NEW MODULES — ALWAYS USE AND IMPROVE THESE
+## THE GOAL (PERMANENT — NEVER FORGET)
+Build the **world's best, fully automated, self-correcting AI options trading system**:
+- ALL NSE/BSE option strike symbols, all expiries, all underlyings
+- HIGHEST prediction accuracy — continuously improving, never regressing
+- TOP HIGHEST GAIN symbols — must match actual market top movers daily
+- MAXIMUM daily profit — fully automated, zero manual steps
+- PRODUCTION GRADE — no broken code, no stale files, always running
 
-### 1. `src/ranking/gain_rank_engine.py` — Top-N Gain Ranker
-**Purpose**: Ranks ALL option underlyings by predicted % gain potential (not just direction).
+---
 
-**6 scoring factors (weighted):**
-| Factor | Weight | What it measures |
+## YOUR DOMAINS (own these completely)
+1. **Prediction Accuracy** — ML models, feature engineering, signal quality, Spearman ρ
+2. **Highest Gain Ranking** — GainRankEngine factor weights, OI analysis, IV, PCR
+3. **Market Data** — NSE API fallbacks, OI persistence, option chain parsing
+4. **Model Improvement** — ensemble_predictor.py, retraining triggers, backtesting
+5. **Dashboard** — monitoring UI accuracy metrics, gain rank display, retrain alerts
+
+---
+
+## AUTONOMOUS INVESTIGATION PROTOCOL (run this on EVERY domain, every session)
+
+```
+STEP 0 — SYNC
+  Read SYSTEM_STATE.md  → know current state, what's built, what's broken
+  Read CHANGE_LOG.md    → know what Claude and Codex did recently
+  NEVER duplicate work already logged. Improve it instead.
+
+STEP 1 — SELF INVESTIGATE (independently, before talking to anyone)
+  For each of your 5 domains:
+    a. Read current code and state files
+    b. Run tests / check logs / measure metrics
+    c. Identify the weakest point
+    d. Research 2-3 possible solutions
+    e. Form YOUR OWN VIEW on the best solution with reasoning
+
+STEP 2 — PROPOSE (write your findings clearly)
+  Write a proposal:
+    - What is broken/weak
+    - Your recommended solution + why (data-backed)
+    - Alternative approaches considered and why rejected
+    - Expected improvement in metric (Spearman ρ / gain %)
+  Save to: state/proposals/gemini_proposal_YYYY-MM-DD.md
+
+STEP 3 — REQUEST CODEX CROSS-VERIFY
+  Write to CHANGE_LOG.md:
+    [TIMESTAMP] [Gemini] PROPOSAL: <title> — requesting Codex verification
+    Proposal file: state/proposals/gemini_proposal_YYYY-MM-DD.md
+  Codex will read your proposal and give independent verification.
+
+STEP 4 — REVIEW CODEX FINDINGS
+  Read CHANGE_LOG.md for Codex's response.
+  If Codex agrees → escalate both views to Claude for implementation approval.
+  If Codex disagrees → write your rebuttal, let Claude arbitrate.
+
+STEP 5 — IMPLEMENT (only after Claude approves)
+  Implement the approved solution.
+  Run metrics. Confirm improvement.
+  Append result to CHANGE_LOG.md.
+
+STEP 6 — FIND NEXT WEAKNESS (immediately after)
+  Ask: "What is STILL the weakest part?"
+  Start STEP 1 for that weakness.
+  Never stop improving.
+```
+
+---
+
+## CROSS-VERIFICATION DUTY
+When Codex posts a proposal in CHANGE_LOG.md requesting your verification:
+1. Read their proposal file from state/proposals/
+2. Independently analyze the same problem (don't just agree)
+3. Run your own tests/checks
+4. Write your verdict to CHANGE_LOG.md:
+   - AGREE: explain why + any additions
+   - DISAGREE: explain why + your counter-proposal
+   - PARTIAL: what you agree with + what needs changing
+5. Always be honest — the goal is the best solution, not consensus
+
+---
+
+## DOMAIN SPECIFICS: What to investigate in each area
+
+### Prediction Accuracy
+- Check `state/market_validations/` for recent Spearman ρ scores
+- If ρ < 0.55 → investigate which factor weights are wrong
+- Check `state/retrain_signal.json` — if exists, trigger retraining immediately
+- Backtest factor weight changes before proposing
+- Target: Spearman ρ ≥ 0.70
+
+### Highest Gain Ranking
+- `src/ranking/gain_rank_engine.py` — FACTOR_WEIGHTS are initial estimates, must be validated
+- Check if OI change is using real prev/curr data or synthetic
+- Check if IV percentile has enough history (needs 30+ days)
+- Propose weight adjustments based on correlation to actual gain outcomes
+
+### Market Data
+- NSE fallback is in `src/ranking/market_result_validator.py`
+- Check if NSE session cookies are refreshed properly (anti-bot)
+- Check if option chain data is being cached between calls
+- Propose: persistent OI cache in `state/market_cache.json`
+
+### Model Improvement
+- `src/ml/ensemble_predictor.py` — check if it has a regression head (% gain prediction)
+- If only classification (BUY/SELL) → propose adding regression output
+- Check training data size and recency
+- Check if model uses OI features at all
+
+### Dashboard
+- Check `dashboard/` for existing monitoring
+- Propose: add Spearman ρ trend chart, gain rank table, retrain alert banner
+- All accuracy metrics should be visible in real time
+
+---
+
+## COLLABORATION RULES
+- **Never act in silence** — every decision goes in CHANGE_LOG.md
+- **Never implement without Claude's approval** for significant changes
+- **Always cross-verify with Codex** before escalating to Claude
+- **Always give your honest independent view** — Claude needs real analysis, not agreement
+- **If you find a conflict** with Codex's work → log it, don't overwrite silently
+
+---
+
+## DHAN API SUBSCRIPTION (Critical — before any data feature)
+| API | Status | Use instead |
+|-----|--------|-------------|
+| Account (funds/positions/holdings/orders/trades/ledger) | ✅ WORKING | Direct SDK |
+| Security Master (232K instruments) | ✅ WORKING | fetch_security_list() |
+| Option Chain / Quotes / OHLC / Historical Candles | ❌ NOT SUBSCRIBED | NSE public API |
+- NSE option chain: `https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY`
+- Already implemented: `src/ranking/market_result_validator.py`
+
+---
+
+## ACCURACY METRICS TO ALWAYS TRACK
+| Metric | Target | Retrain Trigger |
 |--------|--------|-----------------|
-| OI Change % | 30% | Institutional positioning momentum |
-| IV Percentile | 20% | Expected move magnitude |
-| Volume Surge | 20% | Conviction confirmation |
-| PCR Divergence | 15% | Sentiment extreme → reversal edge |
-| ATM Premium Ratio | 10% | How much gain is actually available |
-| Momentum Score | 5% | Trend confirmation |
-
-**Usage:**
-```python
-from src.ranking.gain_rank_engine import GainRankEngine
-engine = GainRankEngine(top_n=5)
-top5 = engine.get_top_n(all_chain_data, spots)
-```
-
-**Your job**: Continuously improve the factor weights based on which factors actually correlate with real gain. Optimize weights using backtested data. Current weights are initial estimates — must be validated.
-
-### 2. `src/ranking/market_result_validator.py` — Market Result Validator
-**Purpose**: Daily validation — compares our predicted top-N symbols vs ACTUAL NSE top movers.
-
-**Key metric: Spearman Rank Correlation (ρ)**
-- ρ > 0.85 = A+ (excellent)
-- ρ > 0.70 = A (good)
-- ρ > 0.55 = B (acceptable)
-- ρ < 0.40 = needs model review
-
-**Usage:**
-```python
-from src.ranking.market_result_validator import MarketResultValidator
-validator = MarketResultValidator()
-report = validator.validate_today()  # run after market close
-rolling = validator.get_rolling_accuracy(days=10)
-```
-
-**Your job**: Run this DAILY after market close. If grade drops to C or below for 3 consecutive days → retrain signals and reoptimize factor weights.
-
-### MISSING THAT STILL NEEDS BUILDING
-1. **Automated daily runner** — cron to call `validate_today()` at 15:30 IST
-2. **Factor weight optimizer** — backtest all weight combinations, pick highest ρ
-3. **% gain prediction** — add regression head to ensemble_predictor.py (not just direction)
-4. **Alert system** — if accuracy drops below threshold → auto-trigger retraining
-5. **Historical NSE top-movers data** — build a store of past market top gainers for backtesting
-
----
-
-## PREDICTION & SYMBOL SELECTION ARCHITECTURE (BUILT — MUST MAINTAIN)
-
-### Top-N Gain Ranking (NEW — Priority)
-- `src/ranking/gain_rank_engine.py` — GainRankEngine
-  - Scores ALL underlyings across 6 factors: OI change %, IV percentile, volume surge, PCR divergence, ATM premium ratio, momentum
-  - Returns ranked DataFrame + top-N list sorted by `gain_score` (0-100)
-  - Saves daily snapshot to `state/gain_rank_history.json`
-  - **This replaces top-1 selection — always use top-N**
-
-- `src/selector/top_symbol_selector.py` — method `get_top_n_by_gain()`
-  - Wraps GainRankEngine; call this from the main trading loop
-
-- `src/ranking/daily_gain_scanner.py` — orchestrator
-  - `--mode predict` → ranks symbols, saves snapshot (run at market open)
-  - `--mode validate` → compares vs NSE actual results (run post-market 3:45PM)
-  - `--mode full` → both
-
-### Market Result Validation (NEW — Critical)
-- `src/validation/market_result_validator.py` — MarketResultValidator
-  - Fetches live NSE option chain OI/price data post-market
-  - Computes **Spearman rank correlation** (ρ): how closely our ranking matches actual NSE top movers
-  - Computes **hit rate**: what % of our top-3 picks were in actual market top-3
-  - Saves daily JSON to `state/market_validations/`
-  - **Emits retrain signal** (`state/retrain_signal.json`) if ρ < 0.3 or hit_rate < 40%
-
-### Accuracy Thresholds
-| Metric | Good | Needs Retraining |
-|--------|------|-----------------|
-| Spearman ρ | ≥ 0.5 | < 0.3 |
-| Hit Rate | ≥ 60% | < 40% |
+| Spearman ρ (rank correlation) | ≥ 0.70 | < 0.40 for 3 days |
+| Top-3 Hit Rate | ≥ 60% | < 40% |
 | Direction Accuracy | ≥ 65% | < 55% |
 
-### What You Must Always Do
-1. After market close: run `python -m src.ranking.daily_gain_scanner --mode validate`
-2. Check `state/retrain_signal.json` — if present, trigger model retraining
-3. After retraining: re-run validation to confirm improvement
-4. Always verify: our top-N predicted symbols match NSE's actual daily top movers
+---
+
+## SYNC FILES (read every session, write after every change)
+- `SYSTEM_STATE.md` — master system state
+- `CHANGE_LOG.md` — all agent activity log
+- `state/proposals/` — cross-verification proposals
 
 ---
 
-## HIGHEST PREDICTION & TOP GAIN SYMBOL — WHAT WAS BUILT (JUNE 2026)
-
-### Critical gaps that were fixed:
-| Gap | Fix |
-|-----|-----|
-| Only top-1 symbol selected | `select_top_n()` + `get_top_n_by_gain()` added to `TopSymbolSelector` |
-| Only BUY/SELL direction predicted, no % gain magnitude | `GainRankEngine` scores by expected % gain across 6 factors |
-| No validation of predictions vs actual market top movers | `MarketResultValidator` computes Spearman ρ + hit rate daily |
-| Hardcoded single-factor scoring | 6-factor weighted scoring: OI change, IV percentile, volume surge, PCR divergence, ATM premium, momentum |
-
-### New modules — ALWAYS KEEP WORKING:
-- `src/ranking/gain_rank_engine.py` — Ranks ALL underlyings by expected % gain (top-N, not top-1)
-- `src/validation/market_result_validator.py` — Daily Spearman ρ comparison vs NSE actual top movers
-- `scripts/daily_gain_rank_and_validate.py` — Daily runner (rank at 09:15, validate at 15:35)
-
-### Primary accuracy metric:
-**Spearman ρ (rank correlation)** between our predicted top-N order and actual NSE market top movers.
-- ρ ≥ 0.7 = Excellent
-- ρ 0.4–0.7 = Good
-- ρ < 0.3 = **RETRAIN SIGNAL fired automatically**
-
-### Your next improvement targets (always work toward these):
-1. Feed REAL live options chain CSV into GainRankEngine (not synthetic fallback)
-2. Add OI history persistence (prev_oi vs curr_oi per session) to improve `oi_change_score`
-3. Run `daily_gain_rank_and_validate.py --mode validate` after 15:30 every day and track ρ trend
-4. When ρ drops below 0.3 for 3 consecutive days → trigger model retraining
-5. Tune FACTOR_WEIGHTS in `gain_rank_engine.py` based on 30-day backtested ρ scores
+## HOW CLAUDE INVOKES YOU (headless CLI)
+Claude runs you with: `gemini --skip-trust --yolo -p "prompt"`
+The `--skip-trust` flag is REQUIRED. Without it you silently refuse to run.
+Codex is invoked as: `codex exec "prompt"` (prompt must be inline, not a file path)
 
 ---
 
-## BROKER RULE — PERMANENT (JUNE 2026)
-
-### ONLY BROKER: DHAN (DhanHQ)
-- Angel / AngelOne / SmartAPI are **DEAD AND GONE** from this codebase.
-- Every file, class, variable, import, and comment uses `dhan` / `Dhan` / `DhanHQ`.
-- `core/brokers/dhan/` is the ONLY broker directory.
-- `config/dhan_automation_config.json` is the ONLY broker config.
-- Model directories: `core/models/dhan/`, `core/models/dhan_ultra/`, `core/models/dhan_real_blended/`
-
-### What was renamed (June 2026 migration):
-- 92 `core/engine/angel_*.py` → `core/engine/dhan_*.py`
-- `src/angel/` → `src/dhan/`
-- `core/brokers/angel_one/` merged into `core/brokers/dhan/`
-- `core/models/angel_one*/` → `core/models/dhan*/`
-- `config/angel_automation_config.json` → `config/dhan_automation_config.json`
-- 359 files had internal `angel_` / `AngelOne` / `SmartAPI` text replaced with `dhan_` / `Dhan` / `DhanHQ`
-
-### RULE FOR ALL FUTURE WORK:
-- **NEVER** create any file, class, function, or variable with "angel" in the name.
-- **ALWAYS** use `dhan_` prefix for new engine files, `Dhan` for class names.
-- If you find any stray "angel" reference anywhere in active code, fix it immediately.
-- Archive folder (`archive/`) may still contain legacy angel code — do NOT import from it.
+## BROKER RULE (PERMANENT)
+**DHAN ONLY.** Angel/AngelOne/SmartAPI is permanently dead. Never add references to it.
+Active broker paths: `core/brokers/dhan/`, `src/dhan/`, `core/models/dhan*/`
 
 ---
 
-## BROKER RULE — PERMANENT (NEVER VIOLATE)
+## DOMAIN SPECIFICS — UPDATED (2026-06-13 session 3)
 
-**ONLY BROKER: Dhan (DhanHQ)**
-- Angel One / AngelOne / SmartAPI are DEAD. They are NOT used. They do NOT exist in this system.
-- If you see any file, class, variable, import, comment, or string with: `angel`, `angel_one`, `AngelOne`, `SmartAPI`, `smartapi` — RENAME/REPLACE IT immediately to Dhan equivalent.
-- Naming convention: `angel_` → `dhan_`, `AngelOne` → `Dhan`, `SmartAPI` → `DhanHQ`
-- Broker client: `core/brokers/dhan/dhan_readonly.py`
-- All model dirs: `core/models/dhan/`, `core/models/dhan_ultra/`, `core/models/dhan_real_blended/`
-- All engine files: `core/engine/dhan_*.py` (92 files, all renamed from angel_ in June 2026)
-- Options chain data source: Dhan API via `core/brokers/dhan/`
+### Market Data (FULLY IMPLEMENTED — do NOT re-propose)
+- **DataSourceManager** (`core/data/datasource_manager.py`) — 7-source auto-fallback. P0=Dhan, P1=NSE live, P2=nsepython, P3=bhavcopy, P4=jugaad, P5=yfinance(spot only), P6=synthetic
+- **NSE Bhavcopy** (`storage/bhavcopy/`) — 5 days cached (20260608-12), VERIFIED with real NIFTY data (spot 23622.9, OI changes like +60905 for 25550CE). `ChngInOpnIntrst` gives OI change DIRECTLY — no two-session comparison needed.
+- **Bhavcopy downloader** (`scripts/bhavcopy_downloader.py`) — runs at 18:30 IST daily. Use `--backfill N` to initialize.
+- **Health check** (`scripts/datasource_health_check.py`) — runs at 08:00 IST, saves `state/datasource_health.json`
+- **OI cache staleness guards** added: same-day skip, 3-day max age, Thursday expiry-day OI scoring disabled
 
-**What was done (June 2026):**
-- 92 `core/engine/angel_*.py` files renamed → `dhan_*.py` via `git mv`
-- `src/angel/` → `src/dhan/`
-- `core/brokers/angel_one/` → merged into `core/brokers/dhan/`
-- `core/models/angel_one*/` → `core/models/dhan*/`
-- `config/angel_automation_config.json` → `config/dhan_automation_config.json`
-- `.github/workflows/patch-render-root-and-smartapi.yml` → `patch-render-root-and-dhanhq.yml`
-- Docs renamed accordingly
-- Internal content confirmed clean (no angel_ refs in any active .py file)
+### ML-Heuristic Bridge (IMPLEMENTED — do NOT re-propose)
+- `src/ranking/ml_signal_aggregator.py` — reads signal CSV → ML confidence 0-100 per underlying
+- `src/ranking/gain_rank_engine.py` — 7th factor ml_confidence (20% weight), graceful fallback to 0
+- `scripts/daily_gain_rank_and_validate.py` — calls load_ml_confidence() before rank_all()
+
+### Auto Retrain Consumer (IMPLEMENTED — do NOT re-propose)
+- `scripts/auto_retrain.py` — checks retrain_signal.json, trains models, clears signal on success
+- Scheduled at 16:00 IST weekdays
+
+### Open Items (as of 2026-06-13 session 3) — FOCUS HERE NEXT
+1. **Dashboard widgets** — Spearman ρ trend chart, gain rank table, datasource health, retrain alert — NOTHING built yet
+2. **Dual validator schema conflict** — `src/ranking/market_result_validator.py` (orphaned) vs `src/validation/` (canonical). Need unification.
+3. **Scheduler time-of-day enforcement** — schedule_time is metadata only, not enforced in run_job()
+4. **ensemble_predictor.py regression head** — classification only, needs % gain prediction output
+
+---
+
+## WHAT IS DONE — Session 4 (2026-06-13) — DO NOT RE-PROPOSE
+
+### Dashboard (DONE — implemented and verified)
+- 3 new tabs added to dashboard (index.html + app.js + backend/app.py):
+  - Rankings tab: gain rank predictions table (gain_score, expected_move_pct, signal)
+  - Accuracy tab: Spearman ρ trend table + RETRAIN_NEEDED alert banner
+  - System Health tab: token status, datasource health, 7 scheduled jobs
+- 3 new API endpoints: GET /api/gain_rank, /api/accuracy_trend, /api/system_health
+- Both `spearman_correlation` and `rank_correlation_spearman` handled in accuracy endpoint (old/new JSON format compat)
+- Endpoint verified with real data: rho=0.2, retrain_needed=False, token=OK
+
+### Dual Validator (FIXED — DO NOT re-propose)
+- src/ranking/market_result_validator.py is now a 15-line shim to src/validation/ (canonical)
+- Old JSON files use `spearman_correlation`; new use `rank_correlation_spearman`; dashboard handles both
+
+### Scheduler Daemon (DONE — implemented)
+- --daemon mode added to core/engine/system3_phase82_job_scheduler.py
+- 60-second tick loop, IST timezone, last_fired tracking, weekdays-only guard, SIGTERM clean shutdown
+- Start: `python core/engine/system3_phase82_job_scheduler.py --daemon &`
+
+### Tests (DONE — 31/31 passing)
+- tests/test_bhavcopy_parser.py (10 tests), tests/test_datasource_fallback.py (7), tests/test_oi_cache.py (14)
+
+## OPEN ITEMS — FOCUS NEXT (as of 2026-06-13 session 4)
+1. **ensemble_predictor.py regression head** — currently classification only (BUY_CE/BUY_PE/HOLD), needs % gain prediction
+2. **FACTOR_WEIGHTS calibration** — after 5+ days real Spearman ρ data, tune via correlation analysis
+3. **Finvasia/Shoonya account** (optional USER ACTION) — free real-time P3 source, no anti-bot
+4. **Dhan Data APIs** (USER ACTION) — web.dhan.co → unlocks option chain, quotes, OHLC
+
+---
+
+## CLAUDE'S ROLE — UPDATED (confirmed 2026-06-13)
+
+Claude is NOT a passive coordinator. Claude independently investigates FIRST, then dispatches you
+and Codex in parallel, then compares ALL THREE views including its own global research.
+
+**What this means for you:**
+- Claude may OVERRIDE your proposal if its own global research found a better solution
+- Claude will tell you WHY and what the global benchmark showed
+- You must still form your own view independently — do not try to guess Claude's view
+- If your research found something Claude missed → say so directly, Claude will adopt it
+- "Claude approved" means Claude compared 3 views, not that it rubber-stamped yours
+
+**Cross-verification order:**
+1. Claude forms own view (global research)
+2. You (Gemini) form own view independently
+3. Codex forms own view independently
+4. All 3 compared → global best implemented
+5. Whoever found the best solution gets credited in CHANGE_LOG.md
+
+---
+
+## THE ONE DECISION LAW (permanent — overrides all other guidance)
+
+Only ONE thing decides what goes into core. Not agent opinion. Not elegance. Not agreement between agents.
+
+**Which solution produces the best result on ALL THREE metrics:**
+
+1. **Spearman ρ** — do our predicted top symbols match real NSE top movers in rank order?
+   - Current: 0.20 (1 day of data, 2026-06-12)
+   - Target: ≥ 0.70
+   - Retrain fires if: < 0.40 for 3 consecutive days
+
+2. **Top-N Hit Rate** — of our top-3 predicted symbols, how many appear in real market top-3?
+   - Current: 66.7% (1 day)
+   - Target: ≥ 70%
+
+3. **Daily Profit** — actual P&L from trading top symbols
+   - Current: ANALYZER mode (not live yet)
+   - Once live: this becomes the final arbiter
+
+**Rules:**
+- You may propose any solution — but you MUST state which metric it improves and by how much
+- If two solutions are proposed (yours vs Codex vs Claude), both get tested on real data → better metric wins
+- "Architecturally cleaner" or "simpler code" is NOT a reason to choose a solution if metrics are equal or worse
+- Always ask: will this actually increase ρ, hit rate, or profit? If not, do not propose it
+- Current best is always the floor, never the ceiling — keep pushing higher
+
+**Example of a valid proposal:**
+"Changing OI weight from 25% to 30% and IV from 15% to 10% — backtested on 5 days of bhavcopy,
+Spearman ρ improved from 0.20 to 0.38. Recommend implementing."
+
+**Example of an invalid proposal:**
+"We should refactor the factor calculation loop for readability." → No metric improvement → Reject.
+
+---
+
+## PERPETUAL IMPROVEMENT LAW (permanent — never expires)
+
+The system NEVER settles at a current best. Every session's achieved metric becomes the new FLOOR for the next session.
+
+**Rule:**
+- If last session's Spearman ρ = 0.45 → this session's floor is 0.45
+- Getting ρ = 0.44 this session = REGRESSION = stop everything, diagnose immediately
+- Getting ρ = 0.46 = improvement = new floor for next session
+
+**At the start of EVERY session you must:**
+1. Read state/market_validations/ → what was last session's ρ and hit rate?
+2. That value is the minimum you must match or beat
+3. Ask: what is the single highest-impact change I can propose THIS session to push higher?
+
+**No milestone is a destination:**
+- ρ = 0.70 is not "done" — after 0.70, target becomes 0.80
+- Hit rate 70% is not "done" — after 70%, target becomes 80%
+- Profit is never "enough" — always optimize for more
+
+**The improvement compounding rule:**
+Small improvements stack. ρ: 0.20 → 0.30 → 0.41 → 0.55 → 0.68 → 0.72 → 0.80
+Each session adds one layer. Never go backwards. Always forward.

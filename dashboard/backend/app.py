@@ -513,6 +513,126 @@ async def get_status():
         }
 
 
+# ─── System3 Analytics Endpoints ─────────────────────────────────────────────
+
+GAIN_RANK_FILE   = ROOT_DIR / "state" / "gain_rank_history.json"
+VALIDATION_DIR   = ROOT_DIR / "state" / "market_validations"
+DS_HEALTH_FILE   = ROOT_DIR / "state" / "datasource_health.json"
+RETRAIN_FLAG     = ROOT_DIR / "state" / "retrain_signal.json"
+WATCHDOG_LOG     = ROOT_DIR / "logs" / "dhan_watchdog.log"
+JOB_SCHED_CFG    = ROOT_DIR / "config" / "system3_job_scheduler.json"
+
+
+@app.get("/api/gain_rank")
+async def get_gain_rank():
+    """Latest gain rank predictions and 14-day history from gain_rank_history.json."""
+    try:
+        if not GAIN_RANK_FILE.exists():
+            return {"status": "no_data", "latest": None, "history": []}
+        history = json.loads(GAIN_RANK_FILE.read_text())
+        if not isinstance(history, list):
+            history = []
+        today = datetime.now(IST).strftime("%Y-%m-%d")
+        today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
+        latest = today_entry or (history[-1] if history else None)
+        return {
+            "status": "ok",
+            "latest": latest,
+            "history": history[-14:],
+            "total_days": len(history),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e), "latest": None, "history": []}
+
+
+@app.get("/api/accuracy_trend")
+async def get_accuracy_trend():
+    """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
+    try:
+        if not VALIDATION_DIR.exists():
+            return {"status": "no_data", "trend": [], "retrain_needed": RETRAIN_FLAG.exists()}
+        files = sorted(VALIDATION_DIR.glob("market_validation_*.json"))[-14:]
+        trend = []
+        for f in files:
+            try:
+                d = json.loads(f.read_text())
+                rho = d.get("rank_correlation_spearman") or d.get("spearman_correlation")
+                trend.append({
+                    "date": d.get("date", f.stem.replace("market_validation_", "")),
+                    "rho": round(rho, 4) if rho is not None else None,
+                    "hit_rate": d.get("hit_rate"),
+                    "status": d.get("status", "UNKNOWN"),
+                    "predicted": d.get("predicted_ranking", []),
+                    "actual": d.get("actual_ranking", []),
+                })
+            except Exception:
+                continue
+        avg_rho = None
+        rhos = [e["rho"] for e in trend if e["rho"] is not None]
+        if rhos:
+            avg_rho = round(sum(rhos) / len(rhos), 4)
+        return {
+            "status": "ok",
+            "trend": trend,
+            "avg_rho": avg_rho,
+            "retrain_needed": RETRAIN_FLAG.exists(),
+            "days_available": len(trend),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e), "trend": [], "retrain_needed": False}
+
+
+@app.get("/api/system_health")
+async def get_system_health():
+    """Datasource health, token status, retrain flag, and scheduler job status."""
+    try:
+        # Token status from watchdog log last line
+        token_status = {"status": "unknown", "log_line": "log not found"}
+        try:
+            if WATCHDOG_LOG.exists():
+                lines = WATCHDOG_LOG.read_text().strip().splitlines()
+                last_line = lines[-1] if lines else ""
+                token_status = {"status": "ok" if "Token OK" in last_line else "warning", "log_line": last_line}
+        except Exception:
+            pass
+
+        # Datasource health
+        ds_health = None
+        ds_resilience = "UNKNOWN"
+        try:
+            if DS_HEALTH_FILE.exists():
+                ds_health = json.loads(DS_HEALTH_FILE.read_text())
+                ds_resilience = ds_health.get("resilience", "UNKNOWN")
+        except Exception:
+            pass
+
+        # Scheduler jobs
+        jobs_summary = []
+        try:
+            cfg = json.loads(JOB_SCHED_CFG.read_text())
+            for j in cfg.get("jobs", []):
+                jobs_summary.append({
+                    "id": j.get("id"),
+                    "name": j.get("name"),
+                    "schedule_time": j.get("schedule_time", "daily"),
+                    "enabled": j.get("enabled", False),
+                })
+        except Exception:
+            pass
+
+        return {
+            "status": "ok",
+            "timestamp": datetime.now(IST).isoformat(),
+            "token": token_status,
+            "datasource_health": ds_health,
+            "datasource_resilience": ds_resilience,
+            "retrain_needed": RETRAIN_FLAG.exists(),
+            "jobs": jobs_summary,
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
 # WebSocket connections
 active_connections: List[WebSocket] = []
 
