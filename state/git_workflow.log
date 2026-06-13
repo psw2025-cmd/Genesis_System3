@@ -62,3 +62,16 @@ fatal: failed to write commit object
 [2026-06-13 20:11:30] [INFO] STEP 1/11 — Preflight checks
 [2026-06-13 20:11:30] [INFO] STEP 2/11 — Quality gates
 [2026-06-13 20:11:30] [INFO] STEP 3/11 — Staging files
+[2026-06-13 20:11:30] [INFO] STEP 4/11 — Generating commit message
+[2026-06-13 20:11:30] [INFO] STEP 5/11 — Committing
+[2026-06-13 20:11:31] [INFO] STEP 6/11 — Branch resolution
+[2026-06-13 20:11:31] [INFO] STEP 7/11 — Pushing to remote
+[2026-06-13 20:11:34] [INFO] STEP 8/11 — Opening pull request
+[2026-06-13 20:11:35] [INFO] STEP 9/11 — Auto-approving & merging PR
+[2026-06-13 20:12:37] [ERROR] WORKFLOW FAILED: Merge failed: X Pull request psw2025-cmd/Genesis_System3#32 is not mergeable: the merge commit cannot be cleanly created.
+To have the pull request merged after all the requirements have been met, add the `--auto` flag.
+Run the following to resolve the merge conflicts locally:
+  gh pr checkout 32 && git fetch origin main && git merge origin/main
+[2026-06-13 20:15:14] [INFO] STEP 1/11 — Preflight checks
+[2026-06-13 20:15:14] [INFO] STEP 2/11 — Quality gates
+[2026-06-13 20:15:14] [INFO] STEP 3/11 — Staging files

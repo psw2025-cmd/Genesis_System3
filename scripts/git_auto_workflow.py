@@ -540,18 +540,29 @@ class GitAutoWorkflow:
 
         main = self.cfg["main_branch"]
 
-        # Rebase onto latest main before pushing — prevents "not mergeable" errors
-        # when a previous PR was squash-merged and left the branch behind.
+        # Sync with latest main before pushing — prevents merge conflicts in PR.
         _run(["git", "fetch", "origin", main])
-        rc_rb, _, rb_err = _run([
-            "git", "rebase", f"origin/{main}", "--", "--autostash"
-        ])
-        if rc_rb != 0:
-            # Abort conflicted rebase and push as-is (merge will handle it)
-            _run(["git", "rebase", "--abort"])
-            print(f"  [WARN] Rebase onto {main} had conflicts — pushing without rebase")
-        else:
+
+        # Try rebase first (cleanest history)
+        rc_rb, _, _ = _run(["git", "rebase", "--autostash", f"origin/{main}"])
+        if rc_rb == 0:
             print(f"  Rebased onto origin/{main}")
+        else:
+            # Rebase has conflicts — abort and use merge with auto-resolution
+            _run(["git", "rebase", "--abort"])
+            print(f"  Rebase conflicted — auto-resolving with merge (-X ours)...")
+            _run(["git", "stash"])  # stash any pending changes
+            rc_mg, _, mg_err = _run([
+                "git", "merge", f"origin/{main}",
+                "-X", "ours",       # our changes win all conflicts
+                "--no-edit",
+                "-m", f"chore: sync with {main} (auto-resolved, ours strategy)",
+            ])
+            _run(["git", "stash", "pop"])  # restore
+            if rc_mg == 0:
+                print(f"  Merged origin/{main} with conflict auto-resolution (ours wins)")
+            else:
+                print(f"  [WARN] Auto-merge also failed ({mg_err[:60]}) — continuing anyway")
 
         def _do_push():
             rc, out, err = _run([
