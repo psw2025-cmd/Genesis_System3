@@ -22,3 +22,13 @@ fatal: failed to write commit object
 [2026-06-13 19:56:51] [INFO] STEP 1/11 — Preflight checks
 [2026-06-13 19:56:51] [INFO] STEP 2/11 — Quality gates
 [2026-06-13 19:56:51] [INFO] STEP 3/11 — Staging files
+[2026-06-13 19:56:52] [INFO] STEP 4/11 — Generating commit message
+[2026-06-13 19:56:52] [INFO] STEP 5/11 — Committing
+[2026-06-13 19:56:55] [INFO] STEP 6/11 — Branch resolution
+[2026-06-13 19:56:55] [INFO] STEP 7/11 — Pushing to remote
+[2026-06-13 19:57:02] [INFO] STEP 8/11 — Opening pull request
+[2026-06-13 19:57:03] [INFO] STEP 9/11 — Auto-approving & merging PR
+[2026-06-13 19:57:46] [ERROR] WORKFLOW FAILED: Auto-merge also failed: GraphQL: Pull Request is still a draft (mergePullRequest)
+[2026-06-13 20:00:10] [INFO] STEP 1/11 — Preflight checks
+[2026-06-13 20:00:10] [INFO] STEP 2/11 — Quality gates
+[2026-06-13 20:00:10] [INFO] STEP 3/11 — Staging files
