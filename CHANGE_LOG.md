@@ -341,3 +341,52 @@ Phase 1 is now fully implemented. Feedback loop: signal engine → aggregator �
 **WARNING: ρ=0.80 measured on 1 day only — HIGH overfitting risk.**
 - calibrate_factor_weights.py will auto-update weights once 5+ validation days accumulate
 - Conservative 50% move applied (not full grid-search optimal)
+
+---
+
+## Session 6 — 2026-06-13 (Signal Engine Activation + Git Sync)
+
+### Summary
+System3 signal engine audit complete. Three bugs found and fixed. The 15% ml_confidence 
+weight in GainRankEngine is now ACTIVE starting from next trading day (bhavcopy data 
+path, no Dhan API subscription required). Git state synced: local main = remote main @ v1.1.1.
+
+### Changes
+
+1. `core/engine/system3_signal_engine.py` — ADD `prob_BUY_CE` COLUMN
+   - Signal engine never produced `prob_BUY_CE` despite ml_signal_aggregator requiring it
+   - Added derivation in `process_snapshot()` after `expected_move_score` mapping (line 914-918)
+   - Formula: CE rows → `(final_score + 1) / 2`; PE rows → `1 - (final_score + 1) / 2`
+   - Encodes directional conviction: BUY CE signal at score=+1.0 → prob_BUY_CE=1.0
+   - This column is now in every row written to `storage/live/dhan_index_ai_signals.csv`
+
+2. `src/ranking/ml_signal_aggregator.py` — FIX STALENESS WINDOW
+   - `MAX_SIGNAL_AGE_HOURS`: 4.0 → 24.0
+   - Bug: signals written at 18:45 IST were rejected as stale at next day 09:15 (14.5h gap)
+   - 24h covers: written same-day post-market → read pre-open next trading day
+
+3. `scripts/run_signal_engine_from_bhavcopy.py` — NEW RUNNER SCRIPT
+   - Scheduled daily at 18:45 IST (15 min after bhavcopy_download at 18:30)
+   - Loads latest `storage/bhavcopy/*_fo_bhavcopy.csv`
+   - Filters to INDEX_SYMBOLS: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
+   - ATM ± 10 strikes, nearest expiry only → ~40-80 rows per symbol
+   - Calls `run_signal_engine(df_snap, enable_safety_checks=False)`
+   - Result: `storage/live/dhan_index_ai_signals.csv` populated with `prob_BUY_CE` + `expected_move_score`
+   - CLI: `--bhavcopy <path>` for specific file, `--verbose` for debug logging
+
+4. `config/system3_job_scheduler.json` — ADD `signal_engine_bhavcopy` JOB
+   - New job ID: `signal_engine_bhavcopy`, daily 18:45 IST, weekdays only
+   - Runs 15 min after `bhavcopy_download` to ensure file is fully written
+   - Total scheduled jobs: 8
+
+### Effect from Next Trading Day
+- Flow: bhavcopy (18:30) → signal runner (18:45) → signals CSV ready
+- GainRankEngine at 09:15 next day: `ml_signal_aggregator.load_ml_confidence()` returns real scores
+- **All 7 factors now contributing** — ml_confidence was the only dead weight
+
+### Git State
+- Local main synced to origin/main via `git pull --no-rebase -X theirs`
+- Squash-merged review/dhan-full-migration-token-automation improvements
+- semver.json corrected to v1.1.1 (tag exists, file was behind at v1.1.0)
+- Remote main HEAD: fefedf53 → ready for session 6 commit push
+

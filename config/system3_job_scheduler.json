@@ -78,6 +78,18 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "description": "Probes all data sources (NSE, bhavcopy, nsepython, jugaad, yfinance). Saves state/datasource_health.json. Alerts CHANGE_LOG if resilience CRITICAL or LOW."
+    },
+    {
+      "id": "signal_engine_bhavcopy",
+      "name": "Signal Engine — Bhavcopy Runner (Post-Market)",
+      "script": "scripts/run_signal_engine_from_bhavcopy.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "18:45",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Transforms today's NSE FO bhavcopy into option chain snapshot and runs system3_signal_engine. Writes storage/live/dhan_index_ai_signals.csv (prob_BUY_CE, expected_move_score per option). Activates the 15% ml_confidence weight in GainRankEngine for next morning's 09:15 ranking. Runs 15 min after bhavcopy_download completes."
     }
   ]
 }

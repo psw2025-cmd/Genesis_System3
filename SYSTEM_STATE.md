@@ -64,9 +64,10 @@
 | MarketResultValidator | src/ranking/market_result_validator.py | SHIM → src/validation/ (canonical) |
 | TopSymbolSelector | src/selector/top_symbol_selector.py | Modified to use GainRankEngine |
 | Daily Runner | scripts/daily_gain_rank_and_validate.py | Scheduled ✅, expiry-day guard added |
-| ML Signal Aggregator | src/ranking/ml_signal_aggregator.py | Bridges signal CSV to GainRankEngine 7th factor |
+| ML Signal Aggregator | src/ranking/ml_signal_aggregator.py | Bridges signal CSV to GainRankEngine 7th factor; staleness=24h |
+| Signal Engine Runner | scripts/run_signal_engine_from_bhavcopy.py | NEW — daily 18:45 IST, bhavcopy→df_snap→signal CSV (activates 15% ml_confidence) |
 | Auto Retrain | scripts/auto_retrain.py | Reads retrain_signal.json, triggers trainer at 16:00 |
-| Job Scheduler Config | config/system3_job_scheduler.json | 7 jobs: + bhavcopy_download (18:30) + datasource_health_check (08:00) |
+| Job Scheduler Config | config/system3_job_scheduler.json | 8 jobs: + signal_engine_bhavcopy (18:45) |
 | Token Manager | core/brokers/dhan/token_manager.py | Live, 3-strategy refresh |
 | Token Daemon | scripts/dhan_token_auto_refresh.py | Running (check PID with pgrep) |
 | Watchdog | scripts/dhan_watchdog_runner.py | Running (check PID with pgrep) |
@@ -78,7 +79,8 @@
 ---
 
 ## PENDING TASKS (priority order)
-1. **[USER ACTION]** Subscribe to Dhan Data APIs → unlocks option chain, quotes, historical candles
+1. **[USER ACTION]** Subscribe to Dhan Data APIs → unlocks option chain, quotes, historical candles (ml_confidence now active via bhavcopy; live chain would boost all 6 other factors too)
+2. ~~**[CODE]** Wire system3_signal_engine to generate signal CSV (activate dead 15% ml_confidence weight)~~ ✅ DONE (session 6: bhavcopy runner + prob_BUY_CE fix + staleness fix)
 2. ~~**[CODE]** Schedule daily_gain_rank_and_validate.py in orchestrator at 09:15 + 15:35~~ ✅ DONE
 3. ~~**[CODE]** Wire real live option chain data into GainRankEngine (currently synthetic)~~ ✅ DONE (NSE first, CSV fallback, synthetic last)
 4. ~~**[CODE]** Persist OI between sessions (prev_oi vs curr_oi) for accurate OI change scoring~~ ✅ DONE (market_cache.json via nse_provider.py)

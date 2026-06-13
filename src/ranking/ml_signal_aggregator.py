@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SIGNAL_CSV = os.path.join(ROOT_DIR, "storage", "live", "dhan_index_ai_signals.csv")
 
-MAX_SIGNAL_AGE_HOURS = 4.0  # signals older than 4h are stale for today's ranking
+MAX_SIGNAL_AGE_HOURS = 24.0  # bhavcopy signals written at 18:45 IST are valid until next-day 09:15 (14.5h gap)
 
 
 def load_ml_confidence() -> Dict[str, float]:

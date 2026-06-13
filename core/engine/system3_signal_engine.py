@@ -911,6 +911,12 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
     # Map final_score to expected_move_score (for compatibility)
     df["expected_move_score"] = df["final_score"]
 
+    # prob_BUY_CE: P(underlying goes UP), derived from final_score + side
+    # CE: positive score → bullish → high prob; PE: positive score → bearish → low prob
+    _score_norm = (df["final_score"].clip(-1.0, 1.0) + 1.0) / 2.0
+    _is_ce = df.get("side", pd.Series("CE", index=df.index)) == "CE"
+    df["prob_BUY_CE"] = np.where(_is_ce, _score_norm, 1.0 - _score_norm)
+
     # Confidence from signal strength
     if "signal_strength" in df.columns:
         df["pred_confidence"] = df["signal_strength"]
