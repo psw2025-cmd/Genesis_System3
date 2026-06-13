@@ -185,7 +185,7 @@ jobs:
           {
             echo "# Compile smoke for likely runtime files"
             python --version
-            for f in dashboard/backend/app.py dashboard/app.py runner.py system3_complete_orchestrator.py core/brokers/angel_one/broker.py; do
+            for f in dashboard/backend/app.py dashboard/app.py runner.py system3_complete_orchestrator.py core/brokers/dhan/broker.py; do
               if [ -f "$f" ]; then
                 python -m py_compile "$f" && echo "PY_COMPILE_PASS $f" || echo "PY_COMPILE_FAIL $f"
               else

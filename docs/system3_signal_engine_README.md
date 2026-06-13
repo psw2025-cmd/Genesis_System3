@@ -58,7 +58,7 @@ The System3 Signal Engine is a complete rebuild of the signal generation system,
 **system3_signal_engine.py** - Main integration module that:
 - Orchestrates all engines
 - Processes snapshots through complete pipeline
-- Outputs to `storage/live/angel_index_ai_signals.csv`
+- Outputs to `storage/live/dhan_index_ai_signals.csv`
 - Maintains compatibility with existing code
 
 ## Usage
@@ -86,13 +86,13 @@ df_signals = run_signal_engine(df_snap)
 
 ### Integration with Existing Code
 
-The existing `angel_live_ai_signals.py` has been updated to use the new engine by default:
+The existing `dhan_live_ai_signals.py` has been updated to use the new engine by default:
 
 ```python
-from core.engine import angel_live_ai_signals
+from core.engine import dhan_live_ai_signals
 
 # This now uses the new signal engine
-df_signals = angel_live_ai_signals.run_once_with_snapshot(df_snap)
+df_signals = dhan_live_ai_signals.run_once_with_snapshot(df_snap)
 ```
 
 ## Signal Generation Logic
@@ -123,7 +123,7 @@ The engine ensures scores are never exactly zero unless all components are zero.
 
 ## Output Format
 
-The signal engine outputs to `storage/live/angel_index_ai_signals.csv` with columns:
+The signal engine outputs to `storage/live/dhan_index_ai_signals.csv` with columns:
 
 - Standard columns: `ts`, `underlying`, `expiry`, `strike`, `side`, `ltp`, `spot`
 - Greeks: `delta`, `gamma`, `theta`, `vega`
@@ -196,11 +196,11 @@ core/engine/
 
 ### With Autopilot
 
-The autopilot (`system3_live_day_autopilot.py`) automatically uses the new signal engine when calling `angel_live_ai_signals.run_once_with_snapshot()`.
+The autopilot (`system3_live_day_autopilot.py`) automatically uses the new signal engine when calling `dhan_live_ai_signals.run_once_with_snapshot()`.
 
 ### With Existing Code
 
-All existing code that uses `angel_live_ai_signals.run_once_with_snapshot()` will automatically use the new engine. The output format is compatible with existing trade decision and execution modules.
+All existing code that uses `dhan_live_ai_signals.run_once_with_snapshot()` will automatically use the new engine. The output format is compatible with existing trade decision and execution modules.
 
 ## Performance
 

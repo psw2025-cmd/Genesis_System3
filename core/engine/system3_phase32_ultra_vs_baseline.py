@@ -26,7 +26,7 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 def _load_baseline_trades() -> Optional[pd.DataFrame]:
     """Load baseline trade plans."""
-    trades_csv = LIVE_DIR / "angel_index_ai_trades_plan.csv"
+    trades_csv = LIVE_DIR / "dhan_index_ai_trades_plan.csv"
     if not trades_csv.exists():
         return None
     try:
@@ -37,7 +37,7 @@ def _load_baseline_trades() -> Optional[pd.DataFrame]:
 
 def _load_baseline_pnl() -> Optional[pd.DataFrame]:
     """Load baseline PnL log."""
-    pnl_csv = LIVE_DIR / "angel_index_ai_pnl_log.csv"
+    pnl_csv = LIVE_DIR / "dhan_index_ai_pnl_log.csv"
     if not pnl_csv.exists():
         return None
     try:

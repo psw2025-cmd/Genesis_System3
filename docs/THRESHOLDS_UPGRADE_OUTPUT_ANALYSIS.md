@@ -6,7 +6,7 @@
 ## File-by-File Analysis
 
 ### 1. Forward Returns File
-**File**: `storage/live/angel_index_ai_signals_with_forward.csv`
+**File**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 | Metric | Value | Status |
 |--------|-------|--------|

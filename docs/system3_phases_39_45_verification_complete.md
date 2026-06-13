@@ -72,7 +72,7 @@ All 7 phases (39-45) have been successfully implemented and verified. The system
 - ✅ `storage/logs_ultra/system3_phases_39_45.log`
 
 ### Baseline Files (All Protected)
-- ✅ `core/models/angel_one/` - Unchanged
+- ✅ `core/models/dhan/` - Unchanged
 - ✅ `storage/training/` - Unchanged
 - ✅ `storage/config/` - Only new files (read-only)
 

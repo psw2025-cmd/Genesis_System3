@@ -19,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
-UNIVERSE_CSV_PATH = STORAGE_ULTRA / "phase136_angel_symbol_universe.csv"
+UNIVERSE_CSV_PATH = STORAGE_ULTRA / "phase136_dhan_symbol_universe.csv"
 OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase139_lot_margin.csv"
 
 # Known lot sizes (hard-coded constants)

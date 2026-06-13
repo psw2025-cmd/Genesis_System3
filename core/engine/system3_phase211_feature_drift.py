@@ -19,7 +19,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "ml"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_feature_drift_report.md"
 
-CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 DRIFT_THRESHOLD_SIGMA = 3.0
 KEY_FEATURES = ["delta", "gamma", "theta", "vega", "iv", "iv_rank", "iv_percentile"]
 

@@ -30,7 +30,7 @@ def run_phase272(**kwargs) -> Dict[str, Any]:
 
     try:
         # Load curated training data to analyze features
-        CURATED_PATH = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+        CURATED_PATH = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
         if not CURATED_PATH.exists():
             return {

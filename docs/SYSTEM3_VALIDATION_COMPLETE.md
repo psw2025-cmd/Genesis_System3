@@ -20,7 +20,7 @@ All three critical System3 commands have been validated and are working correctl
 - **Script**: `core/engine/system3_phase221_forward_returns.py`
 - **Status**: ✅ **SUCCESS**
 - **Output**: Computed forward returns for 560 of 608 rows
-- **Output File**: `storage/live/angel_index_ai_signals_with_forward.csv`
+- **Output File**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Fixes Applied**: None needed
 
 ### Phase 222 - Signal Edge
@@ -31,7 +31,7 @@ All three critical System3 commands have been validated and are working correctl
 - **Fixes Applied**: None needed
 
 ### PnL Simulator
-- **Script**: `core/engine/angel_pnl_simulator.py`
+- **Script**: `core/engine/dhan_pnl_simulator.py`
 - **Initial Status**: ❌ **FAILED** (ModuleNotFoundError: No module named 'core')
 - **Root Cause**: Missing project root in sys.path when script is run directly
 - **Fix Applied**: Added project root to sys.path before import:
@@ -51,7 +51,7 @@ All three critical System3 commands have been validated and are working correctl
 ## Files Modified
 
 ### Fixed Files
-1. **`core/engine/angel_pnl_simulator.py`**
+1. **`core/engine/dhan_pnl_simulator.py`**
    - **Change**: Added project root to sys.path before import
    - **Lines**: Added lines 2-7 (import sys, Path setup)
    - **Reason**: Fix ModuleNotFoundError when script is run directly
@@ -103,7 +103,7 @@ C:\Genesis_System3\venv\Scripts\python.exe <script_path> [args...]
 
 **Example**:
 ```batch
-C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 ```
 
 ---

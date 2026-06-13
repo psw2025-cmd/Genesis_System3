@@ -63,11 +63,11 @@ All file paths match the specification exactly:
 - ✅ Phase 218: `storage/meta/system3_momentum_patterns.csv` + `logs/research/system3_momentum_scan_report.md` ✓
 - ✅ Phase 219: `storage/meta/system3_breakout_zones.json` + `logs/research/system3_breakout_analyzer.log` ✓
 - ✅ Phase 220: `storage/meta/system3_correlation_matrices.csv` + `logs/research/system3_correlation_report.md` ✓
-- ✅ Phase 221: `storage/live/angel_index_ai_signals_with_forward.csv` ✓
+- ✅ Phase 221: `storage/live/dhan_index_ai_signals_with_forward.csv` ✓
 - ✅ Phase 222: `logs/research/system3_signal_edge_report.md` ✓
 - ✅ Phase 223: `storage/meta/system3_threshold_candidates.json` + `logs/research/system3_threshold_optimizer.log` ✓
 - ✅ Phase 224: `logs/research/system3_score_component_attribution.md` ✓
-- ✅ Phase 225: `storage/live/angel_index_ai_signals_reconciled.csv` ✓
+- ✅ Phase 225: `storage/live/dhan_index_ai_signals_reconciled.csv` ✓
 - ✅ Phase 226: `storage/meta/system3_feature_importances.json` + `logs/ml/system3_feature_importance_report.md` ✓
 - ✅ Phase 227: `logs/performance/system3_latency_profile.md` ✓
 - ✅ Phase 228: `storage/meta/system3_snapshot_coverage.csv` + `logs/performance/system3_snapshot_coverage_report.md` ✓

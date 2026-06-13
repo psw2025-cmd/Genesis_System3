@@ -93,9 +93,9 @@ def validate_data_integrity() -> Dict[str, Any]:
         import pandas as pd
 
         signal_files = [
-            "angel_index_ai_signals.csv",
-            "angel_index_ai_signals_curated.csv",
-            "angel_index_ai_signals_with_forward.csv",
+            "dhan_index_ai_signals.csv",
+            "dhan_index_ai_signals_curated.csv",
+            "dhan_index_ai_signals_with_forward.csv",
         ]
 
         required_columns = ["symbol", "signal", "signal_type"]
@@ -231,9 +231,9 @@ def assess_production_readiness() -> Dict[str, Any]:
 
         # Check 3: Required data files exist
         required_files = [
-            "angel_index_ai_signals.csv",
-            "angel_index_ai_signals_curated.csv",
-            "angel_index_ai_signals_with_forward.csv",
+            "dhan_index_ai_signals.csv",
+            "dhan_index_ai_signals_curated.csv",
+            "dhan_index_ai_signals_with_forward.csv",
         ]
 
         files_exist = sum(1 for f in required_files if (STORAGE_LIVE / f).exists())

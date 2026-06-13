@@ -94,7 +94,7 @@ Result: All signals = HOLD (correct)
 
 ### PnL Simulator CSV Loading
 
-**File**: `core/engine/angel_pnl_simulator.py`  
+**File**: `core/engine/dhan_pnl_simulator.py`  
 **Status**: ✅ **FIXED** (now uses `engine="python", on_bad_lines="skip"`)
 
 **Before Fix**: Would fail on malformed CSV lines  
@@ -108,7 +108,7 @@ Result: All signals = HOLD (correct)
 
 ### Trade Decision Engine
 
-**File**: `core/engine/angel_trade_decision.py`  
+**File**: `core/engine/dhan_trade_decision.py`  
 **Function**: `build_trade_plan()`
 
 **Logic**:

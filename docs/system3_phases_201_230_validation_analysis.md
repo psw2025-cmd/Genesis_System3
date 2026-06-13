@@ -115,7 +115,7 @@ python -m core.engine.system3_phase213_training_window
 ## Data Quality Issues Identified
 
 ### Issue 1: Header Rows in Training Data
-**Location**: `storage/live/angel_index_ai_signals_curated.csv`  
+**Location**: `storage/live/dhan_index_ai_signals_curated.csv`  
 **Symptom**: `'pred_label': 1` and `'underlying': 1` appear as values  
 **Root Cause**: Header rows from malformed CSVs included during curation  
 **Impact**: Low (only 2 invalid rows out of 301)  

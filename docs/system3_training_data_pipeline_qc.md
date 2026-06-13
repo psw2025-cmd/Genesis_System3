@@ -6,12 +6,12 @@ for DRY‑RUN ML training.
 
 ### Data sources
 
-- **Live history (raw)**: `storage/live/angel_index_ai_signals.csv`
+- **Live history (raw)**: `storage/live/dhan_index_ai_signals.csv`
 - **Archived days**: `storage/live/archive/*.csv`
-- **Curated training dataset**: `storage/live/angel_index_ai_signals_curated.csv`
+- **Curated training dataset**: `storage/live/dhan_index_ai_signals_curated.csv`
 
 The live engine (`system3_live_day_autopilot.py`) appends rows to
-`angel_index_ai_signals.csv` throughout the day. At the start of a new day,
+`dhan_index_ai_signals.csv` throughout the day. At the start of a new day,
 `system3_prep_for_new_day.py` archives the previous file and (optionally)
 builds a curated training dataset from recent archives.
 
@@ -53,8 +53,8 @@ Location: `core/engine/ai_model/ml_predictor.py`
 
 Constants:
 
-- `CURATED_TRAINING_PATH = "storage/live/angel_index_ai_signals_curated.csv"`
-- `LIVE_TRAINING_PATH    = "storage/live/angel_index_ai_signals.csv"`
+- `CURATED_TRAINING_PATH = "storage/live/dhan_index_ai_signals_curated.csv"`
+- `LIVE_TRAINING_PATH    = "storage/live/dhan_index_ai_signals.csv"`
 
 Helper: `get_training_dataframe(prefer_curated: bool = True) -> Optional[pd.DataFrame]`
 
@@ -81,17 +81,17 @@ Location: `system3_prep_for_new_day.py`
 Responsibilities:
 
 1. **Archive previous live history**
-   - If `storage/live/angel_index_ai_signals.csv` exists, it is moved to:
-     - `storage/live/archive/angel_index_ai_signals_YYYYMMDD_HHMMSS_before_new_day.csv`
+   - If `storage/live/dhan_index_ai_signals.csv` exists, it is moved to:
+     - `storage/live/archive/dhan_index_ai_signals_YYYYMMDD_HHMMSS_before_new_day.csv`
    - Row count is estimated (with robust parsing) and logged.
 2. **Optional curated export (enabled by default)**
    - Controlled by `ENABLE_CURATED_EXPORT = True` and `CURATED_LOOKBACK_DAYS`.
-   - Scans `storage/live/archive/` for recent `angel_index_ai_signals_*.csv` files.
+   - Scans `storage/live/archive/` for recent `dhan_index_ai_signals_*.csv` files.
    - Uses robust parsing (`engine="python", on_bad_lines="skip"`) to read each.
    - Concatenates them into a single DataFrame and drops rows missing
      essential columns (`ts`, `spot`, `underlying` when present).
    - Writes the result to:
-     - `storage/live/angel_index_ai_signals_curated.csv`
+     - `storage/live/dhan_index_ai_signals_curated.csv`
    - Logs the number of rows before/after cleaning, and the final curated row count.
 
 Logging:
@@ -130,7 +130,7 @@ For each new DRY‑RUN day:
    - Run:
      - `python system3_prep_for_new_day.py`
    - Verify in the console + log that:
-     - Yesterday’s `angel_index_ai_signals.csv` was archived.
+     - Yesterday’s `dhan_index_ai_signals.csv` was archived.
      - (Optional) A curated training dataset was built with a non‑zero row count.
 2. **After some live history exists (mid‑day or EOD)**
    - Run:

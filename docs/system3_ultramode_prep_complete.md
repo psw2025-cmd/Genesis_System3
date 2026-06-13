@@ -16,7 +16,7 @@ All existing modules (1-37) remain unchanged and stable.
 ## New Modules Added (Additive Only)
 
 ### 1. Blended Model Trainer V2 (Enhanced)
-- **File**: `core/engine/angel_blended_model_trainer_v2.py`
+- **File**: `core/engine/dhan_blended_model_trainer_v2.py`
 - **Menu**: Option 38
 - **Status**: ✅ Complete
 - **Mode**: MANUAL TRIGGER ONLY
@@ -37,7 +37,7 @@ All existing modules (1-37) remain unchanged and stable.
 ---
 
 ### 2. Ultra-Mode Prep Layer
-- **File**: `core/engine/angel_ultramode_prep.py`
+- **File**: `core/engine/dhan_ultramode_prep.py`
 - **Menu**: Option 39
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE ONLY (All features disabled)
@@ -66,18 +66,18 @@ All existing modules (1-37) remain unchanged and stable.
 ---
 
 ### 3. Daily Auto-Reports Generator
-- **File**: `core/engine/angel_daily_auto_reports.py`
+- **File**: `core/engine/dhan_daily_auto_reports.py`
 - **Menu**: Option 40
 - **Status**: ✅ Complete
 - **Mode**: READ-ONLY
 
 **Reports Generated**:
-1. Daily Learning Report (via `angel_daily_learning_report.py`)
-2. Rolling 7-Day Dashboard (via `angel_rolling_learning_dashboard.py`)
+1. Daily Learning Report (via `dhan_daily_learning_report.py`)
+2. Rolling 7-Day Dashboard (via `dhan_rolling_learning_dashboard.py`)
 3. Quick Summary Report (new)
 
 **Output Locations**:
-- `storage/reports/angel_daily_learning_report_YYYYMMDD.txt`
+- `storage/reports/dhan_daily_learning_report_YYYYMMDD.txt`
 - `storage/reports/rolling_learning_dashboard_YYYYMMDD.csv`
 - `storage/reports/daily_quick_summary_YYYYMMDD.txt`
 
@@ -90,7 +90,7 @@ All existing modules (1-37) remain unchanged and stable.
 ---
 
 ### 4. Weekly Summary Report
-- **File**: `core/engine/angel_weekly_summary_report.py`
+- **File**: `core/engine/dhan_weekly_summary_report.py`
 - **Menu**: Option 41
 - **Status**: ✅ Complete
 - **Mode**: READ-ONLY
@@ -147,12 +147,12 @@ storage/
 ├── config/
 │   └── ultramode_config.json          # Ultra-Mode config (all disabled)
 ├── reports/
-│   ├── angel_daily_learning_report_*.txt
+│   ├── dhan_daily_learning_report_*.txt
 │   ├── rolling_learning_dashboard_*.csv
 │   ├── daily_quick_summary_*.txt
 │   └── weekly_summary_*.txt
 └── models/
-    └── angel_one_backup/              # Model backups (created during training)
+    └── dhan_backup/              # Model backups (created during training)
 ```
 
 ---
@@ -189,16 +189,16 @@ storage/
 
 ```bash
 # Check Ultra-Mode status
-python -m core.engine.angel_ultramode_prep
+python -m core.engine.dhan_ultramode_prep
 
 # Generate daily auto-reports
-python -m core.engine.angel_daily_auto_reports
+python -m core.engine.dhan_daily_auto_reports
 
 # Generate weekly summary
-python -m core.engine.angel_weekly_summary_report
+python -m core.engine.dhan_weekly_summary_report
 
 # Blended model trainer (requires confirmation)
-python -m core.engine.angel_blended_model_trainer_v2
+python -m core.engine.dhan_blended_model_trainer_v2
 ```
 
 ---

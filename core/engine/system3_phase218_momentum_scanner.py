@@ -23,7 +23,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_momentum_scan_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
 def compute_rsi(prices: pd.Series, window: int = 14) -> pd.Series:

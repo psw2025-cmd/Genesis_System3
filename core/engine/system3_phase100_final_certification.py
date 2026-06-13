@@ -37,7 +37,7 @@ REQUIRED_FOLDERS = [
 
 # Key configs
 KEY_CONFIGS = [
-    "config/angel_automation_config.json",
+    "config/dhan_automation_config.json",
     "config/system3_job_scheduler.json",
 ]
 

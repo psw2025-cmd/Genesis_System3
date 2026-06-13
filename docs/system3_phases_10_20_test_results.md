@@ -28,12 +28,12 @@ Current Safety Settings:
 ---
 
 #### ✅ Test 2: Profile Selector
-**Command**: `python -m core.engine.angel_model_selector`
+**Command**: `python -m core.engine.dhan_model_selector`
 
 **Result**: ✅ **PASSED**
 ```
 Active Profile: BASELINE
-Model Directory: C:\Genesis_System3\core\models\angel_one
+Model Directory: C:\Genesis_System3\core\models\dhan
 All 5 underlyings found with BASELINE models
 ```
 
@@ -60,7 +60,7 @@ All 5 underlyings found with BASELINE models
 ---
 
 #### ✅ Test 4: Synthetic Training Generation
-**Command**: `python -m core.engine.generate_synthetic_angel_training`
+**Command**: `python -m core.engine.generate_synthetic_dhan_training`
 
 **Result**: ✅ **PASSED**
 ```
@@ -214,7 +214,7 @@ python -m core.engine.ultra_promotion_manager
 [ULTRA RESULT] MIDCPNIFTY accuracy: 0.9917
 [ULTRA TRAIN] SENSEX: 600 samples, 40 features
 [ULTRA RESULT] SENSEX accuracy: 0.9917
-[SAVE] All Ultra models saved to: core/models/angel_one_ultra
+[SAVE] All Ultra models saved to: core/models/dhan_ultra
 [SAFETY] Baseline models untouched
 ```
 

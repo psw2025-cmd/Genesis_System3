@@ -11,23 +11,23 @@ Agent – ALWAYS enforce:
 
 Do NOT modify or delete:
 
-core/models/angel_one/*.pkl
+core/models/dhan/*.pkl
 
-core/models/angel_one/*_meta.json
+core/models/dhan/*_meta.json
 
-Existing files under storage/training/angel_index_options_training*
+Existing files under storage/training/dhan_index_options_training*
 
 Existing configs under storage/config/ (only read)
 
 All Ultra work must stay under:
 
-core/models/angel_one_ultra/
+core/models/dhan_ultra/
 
 storage/learning_ultra/
 
 storage/reports_ultra/
 
-storage/training/angel_ultra_*
+storage/training/dhan_ultra_*
 
 No auto-promotion to LIVE.
 
@@ -46,21 +46,21 @@ Goal: Build a shadow dataset from existing signals/trade/PnL logs that is safe f
 
 10.1 Files & Modules
 
-Module: core/engine/angel_ultra_shadow_data.py
+Module: core/engine/dhan_ultra_shadow_data.py
 
 Input sources (read-only):
 
-storage/live/angel_index_ai_signals.csv
+storage/live/dhan_index_ai_signals.csv
 
-storage/live/angel_index_ai_trades_plan.csv
+storage/live/dhan_index_ai_trades_plan.csv
 
-storage/live/angel_index_ai_pnl_log.csv
+storage/live/dhan_index_ai_pnl_log.csv
 
 Output (Ultra-only):
 
-storage/learning_ultra/angel_ultra_shadow_master.csv
+storage/learning_ultra/dhan_ultra_shadow_master.csv
 
-storage/learning_ultra/angel_ultra_shadow_master.parquet
+storage/learning_ultra/dhan_ultra_shadow_master.parquet
 
 10.2 Expected Behavior
 
@@ -73,17 +73,17 @@ Handle small datasets gracefully (even with only 3 rows).
 Do not crash if trade or PnL files are missing; just log a warning and continue with what’s available.
 
 10.3 Command
-python -m core.engine.angel_ultra_shadow_data
+python -m core.engine.dhan_ultra_shadow_data
 
 10.4 Agent – Confirmation to show
 
 After implementation and run, show:
 
-The final head() of angel_ultra_shadow_master.csv (first ~5 rows).
+The final head() of dhan_ultra_shadow_master.csv (first ~5 rows).
 
 print(df.shape) for the master dataset (should show something like (3, N) for current environment).
 
-dir storage\learning_ultra\angel_ultra_shadow_master.* output to confirm both CSV & Parquet exist.
+dir storage\learning_ultra\dhan_ultra_shadow_master.* output to confirm both CSV & Parquet exist.
 
 Phase 11 – Feature Expander (Ultra Features)
 
@@ -91,17 +91,17 @@ Goal: Build rich Ultra feature set on top of shadow data, without touching basel
 
 11.1 Files & Modules
 
-Module: core/engine/angel_ultra_feature_expander.py
+Module: core/engine/dhan_ultra_feature_expander.py
 
 Input:
 
-storage/learning_ultra/angel_ultra_shadow_master.parquet
+storage/learning_ultra/dhan_ultra_shadow_master.parquet
 
 Output:
 
-storage/training/angel_ultra_training.csv
+storage/training/dhan_ultra_training.csv
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
 11.2 Features
 
@@ -140,11 +140,11 @@ rr_ratio_hint, premium_strength, spot_leads_premium, premium_leads_spot
 Total: expect ~40–52 features per row (22 baseline-style + extra Ultra).
 
 11.3 Command
-python -m core.engine.angel_ultra_feature_expander
+python -m core.engine.dhan_ultra_feature_expander
 
 11.4 Agent – Confirmation to show
 
-print(df.shape) for angel_ultra_training.parquet (rows, columns).
+print(df.shape) for dhan_ultra_training.parquet (rows, columns).
 
 print(sorted(df.columns.tolist())) (ensure new Ultra features appear).
 
@@ -154,7 +154,7 @@ Number of columns (should be around 40–52).
 
 Confirm file presence:
 
-dir storage\training\angel_ultra_training.*
+dir storage\training\dhan_ultra_training.*
 
 Phase 12 – Ultra Model Trainer
 
@@ -162,17 +162,17 @@ Goal: Train Ultra models for each underlying using the extended Ultra training d
 
 12.1 Files & Modules
 
-Module: core/engine/angel_ultra_model_trainer.py
+Module: core/engine/dhan_ultra_model_trainer.py
 
 Input:
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
 Output:
 
-core/models/angel_one_ultra/*_ultra_model.pkl
+core/models/dhan_ultra/*_ultra_model.pkl
 
-core/models/angel_one_ultra/*_ultra_model_meta.json
+core/models/dhan_ultra/*_ultra_model_meta.json
 
 12.2 Behavior
 
@@ -188,7 +188,7 @@ Train/test split, compute metrics.
 
 Save:
 
-Model file under angel_one_ultra/.
+Model file under dhan_ultra/.
 
 Meta file with:
 
@@ -203,7 +203,7 @@ timestamp
 training_rows
 
 12.3 Command
-python -m core.engine.angel_ultra_model_trainer
+python -m core.engine.dhan_ultra_model_trainer
 
 12.4 Agent – Confirmation to show
 
@@ -211,7 +211,7 @@ Training log showing accuracy per underlying (target: ~99–100% on synthetic+sh
 
 Directory listing:
 
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 
 
 Print one sample meta JSON (e.g., NIFTY_ultra_model_meta.json) showing:
@@ -228,11 +228,11 @@ Goal: Explore different hyperparameters for Ultra models and log results only (n
 
 13.1 Files & Modules
 
-Module: core/engine/angel_ultra_hparam_explorer.py
+Module: core/engine/dhan_ultra_hparam_explorer.py
 
 Input:
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
 Output:
 
@@ -257,7 +257,7 @@ Save results into per-underlying CSV report.
 Do not write any model files in this phase.
 
 13.3 Command
-python -m core.engine.angel_ultra_hparam_explorer
+python -m core.engine.dhan_ultra_hparam_explorer
 
 13.4 Agent – Confirmation to show
 
@@ -265,7 +265,7 @@ dir storage\reports_ultra\ultra_hparam_results_*.csv
 
 head -n 10 (or first few rows) of one report (e.g. NIFTY).
 
-Confirm no new files created in core/models/angel_one_ultra/ during this step.
+Confirm no new files created in core/models/dhan_ultra/ during this step.
 
 Phase 14 – Regime Classifier
 
@@ -273,15 +273,15 @@ Goal: Tag each Ultra training row with a market regime (e.g., HIGH_VOL_TREND_UP,
 
 14.1 Files & Modules
 
-Module: core/engine/angel_ultra_regime_classifier.py
+Module: core/engine/dhan_ultra_regime_classifier.py
 
 Input:
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
 Output:
 
-storage/training/angel_ultra_training_with_regime.parquet
+storage/training/dhan_ultra_training_with_regime.parquet
 
 storage/reports_ultra/ultra_regime_summary.csv
 
@@ -306,7 +306,7 @@ Save summary with:
 regime, count, pct
 
 14.3 Command
-python -m core.engine.angel_ultra_regime_classifier
+python -m core.engine.dhan_ultra_regime_classifier
 
 14.4 Agent – Confirmation to show
 
@@ -316,7 +316,7 @@ Show ultra_regime_summary.csv first 10 lines.
 
 Confirm file presence:
 
-dir storage\training\angel_ultra_training_with_regime.parquet
+dir storage\training\dhan_ultra_training_with_regime.parquet
 dir storage\reports_ultra\ultra_regime_summary.csv
 
 Phase 15 – Multi-Consensus (Baseline vs Ultra)
@@ -325,15 +325,15 @@ Goal: Compare baseline vs Ultra predictions on the same sample rows to measure a
 
 15.1 Files & Modules
 
-Module: core/engine/angel_ultra_multi_consensus.py
+Module: core/engine/dhan_ultra_multi_consensus.py
 
 Inputs:
 
-Baseline models: core/models/angel_one/*.pkl
+Baseline models: core/models/dhan/*.pkl
 
-Ultra models: core/models/angel_one_ultra/*_ultra_model.pkl
+Ultra models: core/models/dhan_ultra/*_ultra_model.pkl
 
-A subset of angel_ultra_training_with_regime.parquet
+A subset of dhan_ultra_training_with_regime.parquet
 
 Output:
 
@@ -356,7 +356,7 @@ agreement_flag
 Save consensus sample CSV.
 
 15.3 Command
-python -m core.engine.angel_ultra_multi_consensus
+python -m core.engine.dhan_ultra_multi_consensus
 
 15.4 Agent – Confirmation to show
 
@@ -374,11 +374,11 @@ Goal: Try multiple threshold combinations on Ultra predictions and identify good
 
 16.1 Files & Modules
 
-Module: core/engine/angel_ultra_threshold_lab.py
+Module: core/engine/dhan_ultra_threshold_lab.py
 
 Inputs:
 
-angel_ultra_training_with_regime.parquet
+dhan_ultra_training_with_regime.parquet
 
 Ultra models
 
@@ -407,7 +407,7 @@ Approx PnL proxy (based on labels)
 Save results per underlying into one combined CSV.
 
 16.3 Command
-python -m core.engine.angel_ultra_threshold_lab
+python -m core.engine.dhan_ultra_threshold_lab
 
 16.4 Agent – Confirmation to show
 
@@ -433,7 +433,7 @@ Ultra models.
 
 Outputs:
 
-e.g. storage/live/angel_ultra_live_shadow_signals.csv (or similar).
+e.g. storage/live/dhan_ultra_live_shadow_signals.csv (or similar).
 
 17.2 Behavior
 
@@ -460,15 +460,15 @@ Goal: Simulate Ultra-only trades using the Ultra shadow master dataset, with Ult
 
 18.1 Files & Modules
 
-Module: core/engine.angel_ultra_trade_simulator
+Module: core/engine.dhan_ultra_trade_simulator
 
 Input:
 
-storage/learning_ultra/angel_ultra_shadow_master.parquet
+storage/learning_ultra/dhan_ultra_shadow_master.parquet
 
 Output:
 
-storage/learning_ultra/angel_ultra_trade_sim_results.csv (or similar)
+storage/learning_ultra/dhan_ultra_trade_sim_results.csv (or similar)
 
 18.2 Behavior
 
@@ -483,7 +483,7 @@ Simulate entries/exits using shadow timeline.
 Save trade list + synthetic PnL.
 
 18.3 Command
-python -m core.engine.angel_ultra_trade_simulator
+python -m core.engine.dhan_ultra_trade_simulator
 
 18.4 Agent – Confirmation to show
 
@@ -503,11 +503,11 @@ Goal: Analyze results of Phase 18 simulation.
 
 19.1 Files & Modules
 
-Module: core/engine.angel_ultra_pnl_analyzer
+Module: core/engine.dhan_ultra_pnl_analyzer
 
 Input:
 
-angel_ultra_trade_sim_results.csv
+dhan_ultra_trade_sim_results.csv
 
 Output:
 
@@ -524,7 +524,7 @@ If present:
 Compute win rate, avg PnL, distribution, regime stats.
 
 19.3 Command
-python -m core.engine.angel_ultra_pnl_analyzer
+python -m core.engine.dhan_ultra_pnl_analyzer
 
 19.4 Agent – Confirmation to show
 
@@ -540,7 +540,7 @@ Goal: Compare Baseline vs Ultra models and provide a manual, keyword-gated mecha
 
 20.1 Files & Modules
 
-Module: core/engine.angel_ultra_promotion_manager
+Module: core/engine.dhan_ultra_promotion_manager
 
 Inputs:
 
@@ -569,7 +569,7 @@ Require explicit keyword (e.g., PROMOTE_ULTRA_TO_BASELINE_I_UNDERSTAND_THE_RISK)
 In safe mode: no promotions must be executed.
 
 20.3 Command
-python -m core.engine.angel_ultra_promotion_manager
+python -m core.engine.dhan_ultra_promotion_manager
 
 20.4 Agent – Confirmation to show
 
@@ -579,9 +579,9 @@ Confirm:
 
 No baseline files changed.
 
-No files copied to core/models/angel_one/ in current run (since no keyword provided).
+No files copied to core/models/dhan/ in current run (since no keyword provided).
 
-dir core\models\angel_one before & after → identical.
+dir core\models\dhan before & after → identical.
 
 Final Checklist for Agent
 
@@ -589,18 +589,18 @@ After completing Phases 10–20:
 
 Run all phase commands once in order:
 
-python -m core.engine.angel_ultra_shadow_data
-python -m core.engine.angel_ultra_feature_expander
-python -m core.engine.angel_ultra_model_trainer
-python -m core.engine.angel_ultra_hparam_explorer
-python -m core.engine.angel_ultra_regime_classifier
-python -m core.engine.angel_ultra_multi_consensus
-python -m core.engine.angel_ultra_threshold_lab
+python -m core.engine.dhan_ultra_shadow_data
+python -m core.engine.dhan_ultra_feature_expander
+python -m core.engine.dhan_ultra_model_trainer
+python -m core.engine.dhan_ultra_hparam_explorer
+python -m core.engine.dhan_ultra_regime_classifier
+python -m core.engine.dhan_ultra_multi_consensus
+python -m core.engine.dhan_ultra_threshold_lab
 # (Optional, broker-dependent)
 # python -m core.engine.ultra_live_signals_shadow
-python -m core.engine.angel_ultra_trade_simulator
-python -m core.engine.angel_ultra_pnl_analyzer
-python -m core.engine.angel_ultra_promotion_manager
+python -m core.engine.dhan_ultra_trade_simulator
+python -m core.engine.dhan_ultra_pnl_analyzer
+python -m core.engine.dhan_ultra_promotion_manager
 
 
 Prepare a short execution summary:

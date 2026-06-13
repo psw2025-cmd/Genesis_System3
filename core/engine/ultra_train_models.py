@@ -5,11 +5,11 @@ Trains Ultra shadow models separate from baseline.
 Uses Ultra training dataset with extended features.
 
 Inputs:
-- storage/training/angel_ultra_training.parquet
+- storage/training/dhan_ultra_training.parquet
 
 Outputs:
-- core/models/angel_one_ultra/*_ultra_model.pkl
-- core/models/angel_one_ultra/*_ultra_model_meta.json
+- core/models/dhan_ultra/*_ultra_model.pkl
+- core/models/dhan_ultra/*_ultra_model_meta.json
 
 Menu Option: 75
 """
@@ -27,11 +27,11 @@ from sklearn.metrics import accuracy_score, classification_report
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
-ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra"
 
 # Input
-ULTRA_TRAINING_PARQUET = TRAINING_DIR / "angel_ultra_training.parquet"
-ULTRA_TRAINING_CSV = TRAINING_DIR / "angel_ultra_training.csv"
+ULTRA_TRAINING_PARQUET = TRAINING_DIR / "dhan_ultra_training.parquet"
+ULTRA_TRAINING_CSV = TRAINING_DIR / "dhan_ultra_training.csv"
 
 ULTRA_MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -281,7 +281,7 @@ def main() -> None:
                 print(f"{underlying}: {res.get('message', 'Skipped')}")
 
         print(f"\n[SAVE] All Ultra models saved to: {ULTRA_MODELS_DIR}")
-        print("[SAFETY] Baseline models untouched in: core/models/angel_one/")
+        print("[SAFETY] Baseline models untouched in: core/models/dhan/")
     else:
         print(f"\n[INFO] {result.get('message', 'Training not completed')}")
 

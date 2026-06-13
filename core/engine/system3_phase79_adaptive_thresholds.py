@@ -24,8 +24,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_JSON = STORAGE_ULTRA / "phase79_adaptive_thresholds.json"

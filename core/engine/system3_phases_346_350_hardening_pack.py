@@ -104,7 +104,7 @@ def run_phase_348_virtual_orders_guard(root_path: str = None, logger_obj=None) -
         diag_dir = root / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 
-        virt_orders_file = root / "storage" / "live" / "angel_virtual_orders.csv"
+        virt_orders_file = root / "storage" / "live" / "dhan_virtual_orders.csv"
         validation_report = {
             "timestamp": datetime.now().isoformat(),
             "checks": {

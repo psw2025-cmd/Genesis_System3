@@ -19,8 +19,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-RECONCILED_CSV = STORAGE_LIVE / "angel_index_ai_signals_reconciled.csv"
-FALLBACK_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
+RECONCILED_CSV = STORAGE_LIVE / "dhan_index_ai_signals_reconciled.csv"
+FALLBACK_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
 
 DECAY_303_JSON = STORAGE_META / "system3_edge_decay_profile_303.json"
 REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
@@ -28,7 +28,7 @@ REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
 LOG_DIR = PROJECT_ROOT / "logs" / "ml"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_confidence_tiering_305.md"
-OUTPUT_CSV = STORAGE_LIVE / "angel_index_ai_signals_confidence_tagged_305.csv"
+OUTPUT_CSV = STORAGE_LIVE / "dhan_index_ai_signals_confidence_tagged_305.csv"
 
 
 def load_csv_robust(path: Path) -> pd.DataFrame:

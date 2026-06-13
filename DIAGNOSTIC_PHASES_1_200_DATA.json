@@ -112,12 +112,12 @@
         "run_phase107",
         "main"
       ],
-      "imports": "{'pandas', 'typing', 'sys', 'config.live_trade_config', 'core.broker.angel_live_order_wrapper', 'datetime', 'pathlib'}",
+      "imports": "{'pandas', 'typing', 'sys', 'config.live_trade_config', 'core.broker.dhan_live_order_wrapper', 'datetime', 'pathlib'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": true,
       "deprecated": [],
-      "docstring": "System3 Phase 107 - AngelOne LIVE Execution (ONE-LOT, GUARDED, OFF BY DEFAULT)\n\nActual real-order placement, but tightly guarded and controlled by config."
+      "docstring": "System3 Phase 107 - Dhan LIVE Execution (ONE-LOT, GUARDED, OFF BY DEFAULT)\n\nActual real-order placement, but tightly guarded and controlled by config."
     },
     "108": {
       "file": "system3_phase108_order_status_refresher.py",
@@ -127,7 +127,7 @@
         "run_phase108",
         "main"
       ],
-      "imports": "{'pandas', 'typing', 'sys', 'core.broker.angel_live_order_wrapper', 'datetime', 'pathlib'}",
+      "imports": "{'pandas', 'typing', 'sys', 'core.broker.dhan_live_order_wrapper', 'datetime', 'pathlib'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": true,
@@ -456,17 +456,17 @@
       "is_stub": false,
       "has_run_function": true,
       "deprecated": [],
-      "docstring": "System3 Phase 131 - Master Session Config\n\nBuilds master session configuration for AngelOne-only DRY-RUN mode."
+      "docstring": "System3 Phase 131 - Master Session Config\n\nBuilds master session configuration for Dhan-only DRY-RUN mode."
     },
     "132": {
       "file": "system3_phase132_master_health_snapshot.py",
       "size_kb": 6.498046875,
       "functions": [
-        "check_angel_connectivity",
+        "check_dhan_connectivity",
         "run_phase132_master_health_snapshot",
         "main"
       ],
-      "imports": "{'typing', 'sys', 'platform', 'core.brokers.angel_one.broker', 'datetime', 'json', 'pathlib'}",
+      "imports": "{'typing', 'sys', 'platform', 'core.brokers.dhan.broker', 'datetime', 'json', 'pathlib'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": true,
@@ -516,10 +516,10 @@
       "docstring": "System3 Phase 135 - Master Session Human Summary MD\n\nGenerates human-readable summary of master session setup."
     },
     "136": {
-      "file": "system3_phase136_angel_symbol_universe.py",
+      "file": "system3_phase136_dhan_symbol_universe.py",
       "size_kb": 3.3779296875,
       "functions": [
-        "run_phase136_angel_symbol_universe",
+        "run_phase136_dhan_symbol_universe",
         "main"
       ],
       "imports": "{'pandas', 'typing', 'sys', 'datetime', 'json', 'pathlib'}",
@@ -1528,7 +1528,7 @@
         "run_phase36_cull_full_cycle",
         "main"
       ],
-      "imports": "{'core.engine.system3_phase33_promotion_planner', 'typing', 'sys', 'core.engine.angel_blended_dataset_builder', 'core.engine.system3_phase32_ultra_vs_baseline', 'core.engine.angel_real_data_extractor', 'core.engine.angel_blended_training_v3', 'io', 'datetime', 'pathlib', 'core.engine.system3_phase35_ultra_auditor'}",
+      "imports": "{'core.engine.system3_phase33_promotion_planner', 'typing', 'sys', 'core.engine.dhan_blended_dataset_builder', 'core.engine.system3_phase32_ultra_vs_baseline', 'core.engine.dhan_real_data_extractor', 'core.engine.dhan_blended_training_v3', 'io', 'datetime', 'pathlib', 'core.engine.system3_phase35_ultra_auditor'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": true,
@@ -1653,7 +1653,7 @@
       "functions": [
         "_log",
         "load_env_config",
-        "check_angel_env_vars",
+        "check_dhan_env_vars",
         "check_binance_env_vars",
         "check_code_imports",
         "run_phase43_env_guard",
@@ -1664,7 +1664,7 @@
       "is_stub": false,
       "has_run_function": true,
       "deprecated": [],
-      "docstring": "System3 Ultra - Phase 43: Environment & Broker Guard\n\nEnsure System3 (Angel indices) never accidentally touches non-Angel brokers and\nprepare guardrails for future Binance System3.\n\nAll operations are Ultra-Isolated, Baseline-Protected, Read-Only.\nZero Auto-execution, Zero Auto-updates.\n\nMenu Option: 107"
+      "docstring": "System3 Ultra - Phase 43: Environment & Broker Guard\n\nEnsure System3 (Angel indices) never accidentally touches non-Dhan brokers and\nprepare guardrails for future Binance System3.\n\nAll operations are Ultra-Isolated, Baseline-Protected, Read-Only.\nZero Auto-execution, Zero Auto-updates.\n\nMenu Option: 107"
     },
     "76": {
       "file": "system3_phase76_geni_self_critique.py",
@@ -1834,7 +1834,7 @@
         "run_heartbeat",
         "main"
       ],
-      "imports": "{'traceback', 'datetime', 'typing', 'sys', 'core.engine.ultra_safety', 'time', 'argparse', 'pathlib', 'core.engine.angel_automation_config'}",
+      "imports": "{'traceback', 'datetime', 'typing', 'sys', 'core.engine.ultra_safety', 'time', 'argparse', 'pathlib', 'core.engine.dhan_automation_config'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": false,
@@ -1934,7 +1934,7 @@
         "generate_dashboard",
         "main"
       ],
-      "imports": "{'traceback', 'pandas', 'typing', 'sys', 'datetime', 'pathlib', 'json', 'core.engine.ultra_safety', 'core.engine.angel_automation_config'}",
+      "imports": "{'traceback', 'pandas', 'typing', 'sys', 'datetime', 'pathlib', 'json', 'core.engine.ultra_safety', 'core.engine.dhan_automation_config'}",
       "is_reserved": false,
       "is_stub": false,
       "has_run_function": false,

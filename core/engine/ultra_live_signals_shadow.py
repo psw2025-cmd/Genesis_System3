@@ -1,7 +1,7 @@
 """
 System3 Ultra - Ultra Prediction Engine (Shadow Live) — DISABLED.
 
-This module previously used Angel One broker (AngelOneBroker) to build live
+This module previously used Dhan broker (DhanBroker) to build live
 option-chain snapshots. System3 is Dhan-only — this path is not operational.
 
 Menu option 80 in system3_ultra.py is blocked at the handler level.
@@ -21,7 +21,7 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 _DISABLED_REASON = (
     "ultra_live_signals_shadow is disabled. System3 is Dhan-only. "
-    "Angel One broker path is not operational."
+    "Dhan broker path is not operational."
 )
 
 
@@ -31,7 +31,7 @@ def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> 
 
 
 def run_ultra_live_shadow_once() -> Dict[str, Any]:
-    """DISABLED — Angel One broker path. Returns DISABLED status immediately."""
+    """DISABLED — Dhan broker path. Returns DISABLED status immediately."""
     print(f"[DISABLED] {_DISABLED_REASON}")
     return {"status": "DISABLED", "message": _DISABLED_REASON}
 

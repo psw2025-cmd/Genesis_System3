@@ -35,7 +35,7 @@ Implement Deep Learning (LSTM) models as **shadow models** to enhance forward re
 Train LSTM model to predict forward returns (5min, 10min, 15min) for 5 underlyings (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX).
 
 #### Inputs
-- `storage/live/angel_index_ai_signals_with_forward.csv` (Phase 221 output)
+- `storage/live/dhan_index_ai_signals_with_forward.csv` (Phase 221 output)
 - Historical signals with forward returns (target: forward_return_5m, forward_return_10m, forward_return_15m)
 
 #### Data Preprocessing
@@ -161,7 +161,7 @@ def train_lstm_for_underlying(underlying: str, df: pd.DataFrame):
     print(f"[{underlying}] LSTM Test Accuracy: {accuracy:.4f}")
     
     # Save model
-    model_file = Path(f"core/models/angel_one/{underlying}_lstm_model.pth")
+    model_file = Path(f"core/models/dhan/{underlying}_lstm_model.pth")
     torch.save(model.state_dict(), model_file)
     print(f"[SAVE] LSTM Model: {model_file}")
     
@@ -169,15 +169,15 @@ def train_lstm_for_underlying(underlying: str, df: pd.DataFrame):
 ```
 
 #### Outputs
-- **Model Files:** `core/models/angel_one/{underlying}_lstm_model.pth` (5 files)
-- **Metadata:** `core/models/angel_one/{underlying}_lstm_meta.json` (accuracy, training date, feature list)
+- **Model Files:** `core/models/dhan/{underlying}_lstm_model.pth` (5 files)
+- **Metadata:** `core/models/dhan/{underlying}_lstm_meta.json` (accuracy, training date, feature list)
 - **Phase Report:** `logs/phase249_lstm_training_YYYY-MM-DD.log`
 
 #### Integration with Phase 221
 - Phase 249 runs **after** Phase 221 (forward returns calculated)
 - LSTM predictions added as new columns: `lstm_signal`, `lstm_confidence`
 - Original `signal` column preserved (RandomForest/XGBoost predictions)
-- CSV output: `storage/live/angel_index_ai_signals_with_forward_lstm.csv`
+- CSV output: `storage/live/dhan_index_ai_signals_with_forward_lstm.csv`
 
 #### Success Criteria
 - ✅ LSTM trains without errors for all 5 underlyings
@@ -201,7 +201,7 @@ def update_lstm_with_new_data(underlying: str, new_data: pd.DataFrame):
     import torch
     
     # Load existing model
-    model_file = Path(f"core/models/angel_one/{underlying}_lstm_model.pth")
+    model_file = Path(f"core/models/dhan/{underlying}_lstm_model.pth")
     model = ForwardReturnsLSTM(input_size=10, hidden_size=64, num_layers=2, num_classes=3)
     model.load_state_dict(torch.load(model_file))
     model.train()  # Set to training mode
@@ -241,7 +241,7 @@ def update_lstm_with_new_data(underlying: str, new_data: pd.DataFrame):
 - **Validation:** Test on recent data before overwriting model
 
 #### Outputs
-- **Updated Models:** `core/models/angel_one/{underlying}_lstm_model.pth` (in-place update)
+- **Updated Models:** `core/models/dhan/{underlying}_lstm_model.pth` (in-place update)
 - **Update Log:** `logs/phase250_online_learning_YYYY-MM-DD.log`
 - **Metadata:** Update `online_learning_count` in model metadata JSON
 
@@ -404,9 +404,9 @@ Atomically switch from shadow LSTM model to production after validation.
 ```python
 def promote_shadow_model(underlying: str):
     """Promote validated shadow model to production."""
-    shadow_model = Path(f"core/models/angel_one/{underlying}_lstm_model_shadow.pth")
-    prod_model = Path(f"core/models/angel_one/{underlying}_lstm_model.pth")
-    backup_model = Path(f"core/models/angel_one/{underlying}_lstm_model_backup.pth")
+    shadow_model = Path(f"core/models/dhan/{underlying}_lstm_model_shadow.pth")
+    prod_model = Path(f"core/models/dhan/{underlying}_lstm_model.pth")
+    backup_model = Path(f"core/models/dhan/{underlying}_lstm_model_backup.pth")
     
     # Backup current production model
     if prod_model.exists():
@@ -487,7 +487,7 @@ core/
 │   └── system3_phase256-260_*.py  (deferred to Sprint 2)
 │
 ├── models/
-│   └── angel_one/
+│   └── dhan/
 │       ├── NIFTY_lstm_model.pth  ⭐ NEW
 │       ├── BANKNIFTY_lstm_model.pth  ⭐ NEW
 │       ├── FINNIFTY_lstm_model.pth  ⭐ NEW
@@ -504,7 +504,7 @@ logs/
 
 storage/
 └── live/
-    └── angel_index_ai_signals_with_forward_lstm.csv  ⭐ NEW
+    └── dhan_index_ai_signals_with_forward_lstm.csv  ⭐ NEW
 ```
 
 ### Integration Points
@@ -620,7 +620,7 @@ def run_market_hours_cycle():
 ### Phase 249: LSTM Training
 - [ ] LSTM trains successfully for all 5 underlyings
 - [ ] Test accuracy ≥60% for each underlying
-- [ ] Model files saved to `core/models/angel_one/`
+- [ ] Model files saved to `core/models/dhan/`
 - [ ] Metadata JSON includes accuracy, training date, feature list
 - [ ] Training log saved to `logs/phase249_*.log`
 
@@ -658,7 +658,7 @@ def run_market_hours_cycle():
 ### Integration Tests
 - [ ] Phase 221 → Phase 249 pipeline works end-to-end
 - [ ] Phase 250 → Phase 251 → Phase 252 automation works
-- [ ] LSTM predictions appear in `angel_index_ai_signals_with_forward_lstm.csv`
+- [ ] LSTM predictions appear in `dhan_index_ai_signals_with_forward_lstm.csv`
 - [ ] No errors in System3 startup after adding phases 249-255
 
 ### Documentation
@@ -673,7 +673,7 @@ def run_market_hours_cycle():
 ### Existing Codebase (Patterns to Follow)
 - **Training Pattern:** `core/engine/ultra_train_models.py` (lines 180-250) - RandomForest training
 - **Phase Structure:** `core/engine/system3_phase221_forward_returns.py` - Phase return format
-- **Model Metadata:** `core/models/angel_one/*_meta.json` - JSON structure
+- **Model Metadata:** `core/models/dhan/*_meta.json` - JSON structure
 
 ### Documentation
 - **Phase Gaps Analysis:** `PHASE_GAPS_ANALYSIS.md` (phases 249-260 identified as critical gap)
@@ -698,7 +698,7 @@ python -m core.engine.system3_phase249_lstm_forward_predictor
 type logs\phase249_lstm_training_*.log | findstr "accuracy"
 
 # Verify models created
-dir core\models\angel_one\*_lstm_model.pth
+dir core\models\dhan\*_lstm_model.pth
 ```
 
 ### Monitoring Online Learning (Phase 250)
@@ -707,7 +707,7 @@ dir core\models\angel_one\*_lstm_model.pth
 Get-Content logs\phase250_online_learning_*.log -Wait -Tail 10
 
 # Check update count in metadata
-python -c "import json; meta=json.load(open('core/models/angel_one/NIFTY_lstm_meta.json')); print(f'Updates: {meta[\"online_learning_count\"]}')"
+python -c "import json; meta=json.load(open('core/models/dhan/NIFTY_lstm_meta.json')); print(f'Updates: {meta[\"online_learning_count\"]}')"
 ```
 
 ### Drift Detection (Phase 251)

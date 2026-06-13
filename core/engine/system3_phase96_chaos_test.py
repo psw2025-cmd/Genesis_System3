@@ -36,12 +36,12 @@ CHAOS_SCENARIOS = [
     {
         "name": "corrupted_csv_header",
         "description": "Corrupted CSV header",
-        "module": "core.engine.angel_live_ai_signals",
+        "module": "core.engine.dhan_live_ai_signals",
     },
     {
         "name": "empty_signals",
         "description": "Empty signals file",
-        "module": "core.engine.angel_trade_decision",
+        "module": "core.engine.dhan_trade_decision",
     },
 ]
 

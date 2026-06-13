@@ -27,7 +27,7 @@ def check_imports():
         from src.trading.pnl_tracker import PnLTracker
         from src.storage.trade_history import TradeHistoryStore
         from scripts.run_live_chain import LiveChainRunner
-        # Note: AngelOneBroker removed — System3 is Dhan-only
+        # Note: DhanBroker removed — System3 is Dhan-only
 
         print("  ✅ All imports successful")
         return True

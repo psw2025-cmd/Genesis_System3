@@ -27,7 +27,7 @@ LIVE_DIR.mkdir(parents=True, exist_ok=True)
 
 def _load_latest_signals() -> Optional[pd.DataFrame]:
     """Load latest signals CSV."""
-    signals_csv = LIVE_DIR / "angel_index_ai_signals.csv"
+    signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
     if not signals_csv.exists():
         return None
     try:
@@ -130,7 +130,7 @@ def run_phase34_shadow_once() -> str:
         print(f"[GENERATE] Generated {len(df_shadow)} shadow trades")
 
     # Append to shadow CSV
-    shadow_csv = LIVE_DIR / "angel_index_ai_ultra_trades_shadow.csv"
+    shadow_csv = LIVE_DIR / "dhan_index_ai_ultra_trades_shadow.csv"
     write_header = not shadow_csv.exists()
 
     if not df_shadow.empty:

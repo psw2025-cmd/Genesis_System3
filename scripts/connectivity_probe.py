@@ -2,8 +2,8 @@
 Connectivity Probe — Dhan broker / data source only.
 
 System3 is Dhan-only. This probe verifies that the Dhan SDK can be
-imported and that basic module availability is healthy. Angel One /
-SmartAPI paths are intentionally excluded.
+imported and that basic module availability is healthy. Dhan /
+DhanHQ paths are intentionally excluded.
 """
 
 import json
@@ -22,7 +22,7 @@ def probe_connectivity() -> Dict[str, Any]:
         "timestamp": datetime.now().isoformat(),
         "mode": "dhan-only",
         "dhan_sdk_available": False,
-        "angel_broker_shim": False,
+        "dhan_broker_shim": False,
         "live_chain_ws_shim": False,
         "status": "UNKNOWN",
         "details": {},
@@ -36,13 +36,13 @@ def probe_connectivity() -> Dict[str, Any]:
     except ImportError:
         probe["details"]["dhanhq_import"] = "FAILED — dhanhq not installed"
 
-    # Angel One broker shim (should import cleanly, raise only on use)
+    # Dhan broker shim (should import cleanly, raise only on use)
     try:
-        from core.brokers.angel_one.broker import AngelOneBroker  # noqa: F401
-        probe["angel_broker_shim"] = True
-        probe["details"]["angel_broker_shim"] = "SUCCESS — disabled shim present"
+        from core.brokers.dhan.broker import DhanBroker  # noqa: F401
+        probe["dhan_broker_shim"] = True
+        probe["details"]["dhan_broker_shim"] = "SUCCESS — disabled shim present"
     except Exception as exc:
-        probe["details"]["angel_broker_shim"] = f"FAILED — {exc}"
+        probe["details"]["dhan_broker_shim"] = f"FAILED — {exc}"
 
     # live_chain_ws shim (should import cleanly)
     try:

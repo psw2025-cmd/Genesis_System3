@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-All **30 phases (101-130)** for Angel One Full Auto Layer (Mode 1) have been successfully implemented according to the plan document. The implementation follows all safety requirements:
+All **30 phases (101-130)** for Dhan Full Auto Layer (Mode 1) have been successfully implemented according to the plan document. The implementation follows all safety requirements:
 
 - ✅ **Additive Only**: No changes to existing Baseline/Ultra code
 - ✅ **Config-Driven**: All real trading controlled by `config/live_trade_config.py`
@@ -22,7 +22,7 @@ All **30 phases (101-130)** for Angel One Full Auto Layer (Mode 1) have been suc
 
 ### Broker Wrapper (1 file)
 2. ✅ `core/broker/__init__.py` - Package init
-3. ✅ `core/broker/angel_live_order_wrapper.py` - AngelOne order wrapper skeleton
+3. ✅ `core/broker/dhan_live_order_wrapper.py` - Dhan order wrapper skeleton
 
 ### Phase Modules (30 files)
 
@@ -79,7 +79,7 @@ All **30 phases (101-130)** for Angel One Full Auto Layer (Mode 1) have been suc
 |-------|--------|--------|--------------|
 | **101** | Live Trading Config Check | ✅ | Config validation, snapshot JSON |
 | **102** | Order Ledger Schema | ✅ | CSV header creation, schema validation |
-| **103** | AngelOne Order Wrapper | ✅ | Skeleton class (DRY_RUN mode) |
+| **103** | Dhan Order Wrapper | ✅ | Skeleton class (DRY_RUN mode) |
 | **104** | Trade Plan → Orders | ✅ | Convert trade plan to ledger orders |
 | **105** | Ledger Integrity Check | ✅ | Validate ledger before execution |
 
@@ -228,13 +228,13 @@ python -m core.engine.system3_phase114_live_session_health
 ## Integration Points
 
 ### Existing System3 Components Used
-1. ✅ **DRY RUN Executor**: `core/engine/angel_trade_executor.py` (referenced in Phase 106)
-2. ✅ **Trade Plan CSV**: `storage/live/angel_index_ai_trades_plan.csv` (used by Phase 104)
+1. ✅ **DRY RUN Executor**: `core/engine/dhan_trade_executor.py` (referenced in Phase 106)
+2. ✅ **Trade Plan CSV**: `storage/live/dhan_index_ai_trades_plan.csv` (used by Phase 104)
 3. ✅ **Real Outcome Files**: `storage/learning/` (connected by Phase 117)
 
 ### New Components Created
 1. ✅ **Config File**: `config/live_trade_config.py`
-2. ✅ **Broker Wrapper**: `core/broker/angel_live_order_wrapper.py`
+2. ✅ **Broker Wrapper**: `core/broker/dhan_live_order_wrapper.py`
 3. ✅ **Order Ledger**: `storage/live/live_orders_ledger.csv`
 4. ✅ **30 Phase Modules**: `core/engine/system3_phaseNNN_*.py`
 
@@ -266,7 +266,7 @@ python -m core.engine.system3_phase114_live_session_health
 
 ### Future Enhancements
 1. ⏳ **PENDING**: Wire phases 101-120 into `system3_ultra.py` menu
-2. ⏳ **PENDING**: Implement real SmartAPI integration in `AngelLiveOrderWrapper`
+2. ⏳ **PENDING**: Implement real DhanHQ integration in `AngelLiveOrderWrapper`
 3. ⏳ **PENDING**: Implement phases 121-125 (currently stubs)
 4. ⏳ **PENDING**: Implement phases 126-130 menu integration
 
@@ -276,7 +276,7 @@ python -m core.engine.system3_phase114_live_session_health
 
 ### Phase 103 (Wrapper)
 - Currently returns `DRY_RUN` or `NOT_IMPLEMENTED`
-- Real SmartAPI integration to be added later by operator
+- Real DhanHQ integration to be added later by operator
 - All phases use this wrapper, so no real API calls until wrapper is updated
 
 ### Phase 107 (Live Execution)

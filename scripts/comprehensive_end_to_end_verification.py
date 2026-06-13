@@ -35,7 +35,7 @@ except ImportError:
     logger = logging.getLogger(__name__)
 
 _SCRIPT_DISABLED_REASON = (
-    "comprehensive_end_to_end_verification: Angel One broker path is disabled. "
+    "comprehensive_end_to_end_verification: Dhan broker path is disabled. "
     "System3 is Dhan-only. This script cannot run live data verification."
 )
 from src.validation.qc_validator import QCValidator

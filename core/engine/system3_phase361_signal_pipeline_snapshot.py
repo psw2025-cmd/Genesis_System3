@@ -26,10 +26,10 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Signal files to analyze
 SIGNAL_FILES = {
-    "signals": STORAGE_LIVE / "angel_index_ai_signals.csv",
-    "curated": STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-    "with_forward": STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
-    "virtual_orders": STORAGE_LIVE / "angel_virtual_orders.csv",
+    "signals": STORAGE_LIVE / "dhan_index_ai_signals.csv",
+    "curated": STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+    "with_forward": STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
+    "virtual_orders": STORAGE_LIVE / "dhan_virtual_orders.csv",
 }
 
 

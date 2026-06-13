@@ -27,7 +27,7 @@ All 8 validation checks passed successfully. Minor observations below are expect
 
 **Analysis**: ✅ **EXPECTED BEHAVIOR**
 
-- This file (`storage/live/angel_index_ai_trades_exec_log.csv`) is only created when trades are executed
+- This file (`storage/live/dhan_index_ai_trades_exec_log.csv`) is only created when trades are executed
 - Since auto-execution is DISABLED and no real trades have been executed, this file doesn't exist
 - **This is correct behavior** - the file will be created when trades are executed (even in DRY RUN mode)
 

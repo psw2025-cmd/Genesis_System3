@@ -44,12 +44,12 @@ The system currently:
 - **What it does**: Simulates trade execution with realistic fills
 
 ### **2. Backtesting Infrastructure**
-- **Location**: `core/engine/angel_synthetic_backtester.py`
+- **Location**: `core/engine/dhan_synthetic_backtester.py`
 - **Status**: Exists but separate system
 - **What it does**: Backtests strategies on historical/synthetic data
 
 ### **3. PnL Tracking**
-- **Location**: `core/engine/angel_pnl_simulator.py`
+- **Location**: `core/engine/dhan_pnl_simulator.py`
 - **Status**: Exists but separate system
 - **What it does**: Calculates profit/loss for trades
 

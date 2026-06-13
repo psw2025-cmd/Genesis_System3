@@ -122,9 +122,9 @@ class TestPhase223(unittest.TestCase):
                 output_path = PROJECT_ROOT / "storage/meta/system3_threshold_candidates.json"
                 # Note: File may not exist if phase hasn't run yet
                 # self.assertTrue(output_path.exists(), f"Expected output file {output_path} not found")
-            # Check for storage/live/angel_index_ai_signals.csv
-            if "storage/live/angel_index_ai_signals.csv" in str(result.get("outputs", {})):
-                output_path = PROJECT_ROOT / "storage/live/angel_index_ai_signals.csv"
+            # Check for storage/live/dhan_index_ai_signals.csv
+            if "storage/live/dhan_index_ai_signals.csv" in str(result.get("outputs", {})):
+                output_path = PROJECT_ROOT / "storage/live/dhan_index_ai_signals.csv"
                 # Note: File may not exist if phase hasn't run yet
                 # self.assertTrue(output_path.exists(), f"Expected output file {output_path} not found")
             # Check for logs/risk/system3_vol_regime_report.md

@@ -83,9 +83,9 @@
 **All 8 WARN statuses are EXPECTED and BENIGN**:
 
 These phases require data files that don't exist yet:
-- **Phase 238**: Needs `storage/live/angel_virtual_orders.csv`
-- **Phase 239**: Needs virtual orders + `angel_index_ai_signals_with_forward.csv`
-- **Phase 240**: Needs `angel_virtual_orders_with_pnl.csv`
+- **Phase 238**: Needs `storage/live/dhan_virtual_orders.csv`
+- **Phase 239**: Needs virtual orders + `dhan_index_ai_signals_with_forward.csv`
+- **Phase 240**: Needs `dhan_virtual_orders_with_pnl.csv`
 - **Phase 241**: Needs enriched orders CSV
 - **Phase 244**: Needs virtual orders + signals CSV
 - **Phase 245**: Needs virtual orders CSV
@@ -204,8 +204,8 @@ After autopilot runs:
 
 After running autopilot:
 
-1. **Virtual Orders**: `storage/live/angel_virtual_orders.csv`
-2. **Enriched Orders**: `storage/live/angel_virtual_orders_with_pnl.csv`
+1. **Virtual Orders**: `storage/live/dhan_virtual_orders.csv`
+2. **Enriched Orders**: `storage/live/dhan_virtual_orders_with_pnl.csv`
 3. **Threshold History**: `storage/meta/system3_threshold_history.csv`
 4. **Edge Tracking**: `storage/meta/system3_edge_by_score_bucket.csv`
 5. **Reports**: Various markdown reports in `logs/research/`

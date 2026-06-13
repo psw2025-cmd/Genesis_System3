@@ -1,8 +1,8 @@
 # Signal Quality Audit
 **Analysis Date**: 2025-12-04  
 **Files Analyzed**: 
-- `storage/live/angel_index_ai_signals.csv`
-- `storage/live/angel_index_ai_signals_curated.csv`
+- `storage/live/dhan_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_signals_curated.csv`
 
 ---
 
@@ -17,7 +17,7 @@
 
 ## Signals File Analysis
 
-### File: `angel_index_ai_signals.csv`
+### File: `dhan_index_ai_signals.csv`
 
 **Total Rows**: 30  
 **Columns**: 72  
@@ -38,7 +38,7 @@
 
 ## Curated File Analysis
 
-### File: `angel_index_ai_signals_curated.csv`
+### File: `dhan_index_ai_signals_curated.csv`
 
 **Total Rows**: 610 (includes historical data)  
 **Columns**: 86 (72 base + 14 curated columns)  

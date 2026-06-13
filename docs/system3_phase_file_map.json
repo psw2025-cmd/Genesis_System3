@@ -4,8 +4,8 @@
     "script": "core/engine/ultra_shadow_data_engine.py",
     "function": "main",
     "outputs": [
-      "storage/learning_ultra/angel_ultra_shadow_master.parquet",
-      "storage/learning_ultra/angel_ultra_shadow_master.csv"
+      "storage/learning_ultra/dhan_ultra_shadow_master.parquet",
+      "storage/learning_ultra/dhan_ultra_shadow_master.csv"
     ],
     "logs": []
   },
@@ -14,8 +14,8 @@
     "script": "core/engine/ultra_feature_engineering.py",
     "function": "main",
     "outputs": [
-      "storage/training/angel_ultra_training.parquet",
-      "storage/training/angel_ultra_training.csv"
+      "storage/training/dhan_ultra_training.parquet",
+      "storage/training/dhan_ultra_training.csv"
     ],
     "logs": []
   },
@@ -24,8 +24,8 @@
     "script": "core/engine/ultra_train_models.py",
     "function": "main",
     "outputs": [
-      "core/models/angel_one_ultra/*.pkl",
-      "core/models/angel_one_ultra/*_meta.json"
+      "core/models/dhan_ultra/*.pkl",
+      "core/models/dhan_ultra/*_meta.json"
     ],
     "logs": []
   },
@@ -43,7 +43,7 @@
     "script": "core/engine/ultra_regime_classifier.py",
     "function": "main",
     "outputs": [
-      "storage/training/angel_ultra_training_with_regime.parquet",
+      "storage/training/dhan_ultra_training_with_regime.parquet",
       "storage/reports_ultra/ultra_regime_summary.csv"
     ],
     "logs": []
@@ -71,7 +71,7 @@
     "script": "core/engine/ultra_live_signals_shadow.py",
     "function": "main",
     "outputs": [
-      "storage/ultra/angel_ultra_live_shadow_signals.csv"
+      "storage/ultra/dhan_ultra_live_shadow_signals.csv"
     ],
     "logs": []
   },
@@ -80,8 +80,8 @@
     "script": "core/engine/ultra_trade_simulator.py",
     "function": "main",
     "outputs": [
-      "storage/ultra/angel_ultra_trade_plan_sim.csv",
-      "storage/ultra/angel_ultra_pnl_sim.csv",
+      "storage/ultra/dhan_ultra_trade_plan_sim.csv",
+      "storage/ultra/dhan_ultra_pnl_sim.csv",
       "storage/reports_ultra/ultra_trade_sim_summary.csv"
     ],
     "logs": []
@@ -220,7 +220,7 @@
     "script": "core/engine/system3_phase34_ultra_shadow_exec.py",
     "function": "run_phase34_shadow_once",
     "outputs": [
-      "storage/live/angel_index_ai_ultra_trades_shadow.csv"
+      "storage/live/dhan_index_ai_ultra_trades_shadow.csv"
     ],
     "logs": []
   },
@@ -266,7 +266,7 @@
     "script": "core/engine/system3_phase39_shadow_campaign.py",
     "function": "run_phase39_shadow_campaign",
     "outputs": [
-      "storage/live/angel_index_ai_ultra_trades_shadow.csv"
+      "storage/live/dhan_index_ai_ultra_trades_shadow.csv"
     ],
     "logs": [
       "storage/logs_ultra/system3_phases_39_45.log"

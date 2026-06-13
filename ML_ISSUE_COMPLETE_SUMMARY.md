@@ -30,7 +30,7 @@ Missing: ⚠️  ML learning capability
 ### 1️⃣ ULTRA MODELS - QUICKEST FIX ⭐⭐⭐⭐⭐
 
 **What:** Use pre-trained models already in your system
-**Where:** `core/models/angel_one_ultra/`
+**Where:** `core/models/dhan_ultra/`
 **Time:** 1 hour to implement
 **Benefit:** +5-10% accuracy improvement
 

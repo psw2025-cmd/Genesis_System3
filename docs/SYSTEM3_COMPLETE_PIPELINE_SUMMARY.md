@@ -92,9 +92,9 @@
 ## Files Generated
 
 ### Clean CSV Files
-- ✅ `storage/clean/angel_index_ai_signals_with_forward_clean.csv` (596 rows)
-- ✅ `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
-- ✅ `storage/clean/angel_index_ai_signals_sell_anomalies.csv` (2 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_with_forward_clean.csv` (596 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_sell_anomalies.csv` (2 rows)
 
 ### Configuration Files
 - ✅ `storage/meta/system3_live_thresholds.json` - **UPDATED** with feasible thresholds

@@ -9,15 +9,15 @@
 
 | Phase | Description | Script Path | Function | Output Files | Log Files |
 |-------|-------------|-------------|----------|--------------|-----------|
-| **10** | Ultra Shadow Data Engine | `core/engine/ultra_shadow_data_engine.py` | `main` | `storage/learning_ultra/angel_ultra_shadow_master.parquet`<br>`storage/learning_ultra/angel_ultra_shadow_master.csv` | - |
-| **11** | Ultra Feature Expander | `core/engine/ultra_feature_engineering.py` | `main` | `storage/training/angel_ultra_training.parquet`<br>`storage/training/angel_ultra_training.csv` | - |
-| **12** | Train Ultra Shadow Models | `core/engine/ultra_train_models.py` | `main` | `core/models/angel_one_ultra/*.pkl`<br>`core/models/angel_one_ultra/*_meta.json` | - |
+| **10** | Ultra Shadow Data Engine | `core/engine/ultra_shadow_data_engine.py` | `main` | `storage/learning_ultra/dhan_ultra_shadow_master.parquet`<br>`storage/learning_ultra/dhan_ultra_shadow_master.csv` | - |
+| **11** | Ultra Feature Expander | `core/engine/ultra_feature_engineering.py` | `main` | `storage/training/dhan_ultra_training.parquet`<br>`storage/training/dhan_ultra_training.csv` | - |
+| **12** | Train Ultra Shadow Models | `core/engine/ultra_train_models.py` | `main` | `core/models/dhan_ultra/*.pkl`<br>`core/models/dhan_ultra/*_meta.json` | - |
 | **13** | Ultra Hyperparameter Explorer | `core/engine/ultra_hparam_explorer.py` | `main` | `storage/reports_ultra/ultra_hparam_results_{underlying}.csv` | - |
-| **14** | Ultra Risk Regime Classifier | `core/engine/ultra_regime_classifier.py` | `main` | `storage/training/angel_ultra_training_with_regime.parquet`<br>`storage/reports_ultra/ultra_regime_summary.csv` | - |
+| **14** | Ultra Risk Regime Classifier | `core/engine/ultra_regime_classifier.py` | `main` | `storage/training/dhan_ultra_training_with_regime.parquet`<br>`storage/reports_ultra/ultra_regime_summary.csv` | - |
 | **15** | Ultra Multi-Consensus Analyzer | `core/engine/ultra_multi_consensus.py` | `main` | `storage/reports_ultra/ultra_consensus_sample.csv` | - |
 | **16** | Ultra Threshold Lab | `core/engine/ultra_threshold_lab.py` | `main` | `storage/reports_ultra/ultra_threshold_grid_search.csv` | - |
-| **17** | Ultra Live Signals (Shadow) | `core/engine/ultra_live_signals_shadow.py` | `main` | `storage/ultra/angel_ultra_live_shadow_signals.csv` | - |
-| **18** | Ultra Trade Simulator | `core/engine/ultra_trade_simulator.py` | `main` | `storage/ultra/angel_ultra_trade_plan_sim.csv`<br>`storage/ultra/angel_ultra_pnl_sim.csv`<br>`storage/reports_ultra/ultra_trade_sim_summary.csv` | - |
+| **17** | Ultra Live Signals (Shadow) | `core/engine/ultra_live_signals_shadow.py` | `main` | `storage/ultra/dhan_ultra_live_shadow_signals.csv` | - |
+| **18** | Ultra Trade Simulator | `core/engine/ultra_trade_simulator.py` | `main` | `storage/ultra/dhan_ultra_trade_plan_sim.csv`<br>`storage/ultra/dhan_ultra_pnl_sim.csv`<br>`storage/reports_ultra/ultra_trade_sim_summary.csv` | - |
 | **19** | Ultra PnL Analyzer | `core/engine/ultra_pnl_analyzer.py` | `main` | `storage/reports_ultra/ultra_pnl_report.csv` | - |
 | **20** | Ultra Promotion Manager | `core/engine/ultra_promotion_manager.py` | `main` | `storage/reports_ultra/ultra_promotion_report.json` | - |
 | **21** | Adaptive Risk Engine (ARE) | `core/ultra/phase21_adaptive_risk_engine.py` | `run_phase21_adaptive_risk` | `storage/reports_ultra/phase21_risk_evaluations.csv` | - |
@@ -33,12 +33,12 @@
 | **31** | Ultra Decision Fusion Layer | `core/engine/system3_phase31_ultra_fusion.py` | `run_phase31_fusion` | `storage/ultra/phase31_ultra_fused_decisions.csv`<br>`storage/ultra/phase31_ultra_fused_decisions_summary.json` | - |
 | **32** | Ultra vs Baseline Comparator | `core/engine/system3_phase32_ultra_vs_baseline.py` | `run_phase32_comparison` | `storage/ultra/phase32_ultra_vs_baseline_comparison.csv`<br>`storage/ultra/phase32_ultra_vs_baseline_summary.md` | - |
 | **33** | Ultra Promotion Planner | `core/engine/system3_phase33_promotion_planner.py` | `run_phase33_promotion_planner` | `storage/ultra/phase33_promotion_plan.json`<br>`storage/ultra/phase33_promotion_plan.md` | - |
-| **34** | Ultra Live Shadow Comparison | `core/engine/system3_phase34_ultra_shadow_exec.py` | `run_phase34_shadow_once` | `storage/live/angel_index_ai_ultra_trades_shadow.csv` | - |
+| **34** | Ultra Live Shadow Comparison | `core/engine/system3_phase34_ultra_shadow_exec.py` | `run_phase34_shadow_once` | `storage/live/dhan_index_ai_ultra_trades_shadow.csv` | - |
 | **35** | Ultra Decision Auditor | `core/engine/system3_phase35_ultra_auditor.py` | `run_phase35_audit` | `storage/ultra/phase35_decision_audit.csv`<br>`storage/ultra/phase35_decision_audit_report.md` | - |
 | **36** | Ultra Continuous Learning Cycle (CULL) | `core/engine/system3_phase36_cull_orchestrator.py` | `run_phase36_cull_full_cycle` | `storage/ultra/phase36_cull_execution_log.md` | - |
 | **37** | Ultra Policy & Risk Monitor | `core/engine/system3_phase37_policy_risk_monitor.py` | `run_phase37_policy_risk_dashboard` | `storage/ultra/phase37_policy_risk_dashboard.md` | - |
 | **38** | Ultra Governance Summary | `core/engine/system3_phase38_governance_summary.py` | `run_phase38_governance_summary` | `storage/ultra/phase38_governance_summary.md` | - |
-| **39** | Ultra Shadow Campaign Manager | `core/engine/system3_phase39_shadow_campaign.py` | `run_phase39_shadow_campaign` | `storage/live/angel_index_ai_ultra_trades_shadow.csv` | `storage/logs_ultra/system3_phases_39_45.log` |
+| **39** | Ultra Shadow Campaign Manager | `core/engine/system3_phase39_shadow_campaign.py` | `run_phase39_shadow_campaign` | `storage/live/dhan_index_ai_ultra_trades_shadow.csv` | `storage/logs_ultra/system3_phases_39_45.log` |
 | **40** | Weekly Ultra vs Baseline Governance Pack | `core/engine/system3_phase40_weekly_governance_pack.py` | `run_phase40_weekly_pack` | `storage/ultra/weekly_governance_pack_*.md` | - |
 | **41** | Ultra Promotion Execution Framework | `core/engine/system3_phase41_promotion_executor.py` | `run_phase41_promotion_executor` | - | - |
 | **42** | Model Snapshot & Rollback Manager | `core/engine/system3_phase42_snapshot_manager.py` | `run_phase42_snapshot_create` | `storage/snapshots/YYYYMMDD_HHMMSS/` | - |

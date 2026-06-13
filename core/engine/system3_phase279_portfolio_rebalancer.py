@@ -17,7 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
-VIRTUAL_ORDERS_CSV = STORAGE_LIVE / "angel_virtual_orders.csv"
+VIRTUAL_ORDERS_CSV = STORAGE_LIVE / "dhan_virtual_orders.csv"
 REBALANCE_JSON = STORAGE_META / "system3_portfolio_rebalance.json"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "research"

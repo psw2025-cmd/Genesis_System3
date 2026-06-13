@@ -65,7 +65,7 @@ def measure_volatility() -> Dict[str, float]:
 
     Approximates volatility from signal diversity and confidence spread.
     """
-    curated_path = STORAGE_LIVE / "angel_index_ai_signals_curated.csv"
+    curated_path = STORAGE_LIVE / "dhan_index_ai_signals_curated.csv"
 
     if not curated_path.exists():
         logger.warning("Curated signals not found for volatility measurement")
@@ -112,7 +112,7 @@ def compute_signal_conflict_load() -> float:
 
     Conflict = multiple signals for same symbol in short time window.
     """
-    curated_path = STORAGE_LIVE / "angel_index_ai_signals_curated.csv"
+    curated_path = STORAGE_LIVE / "dhan_index_ai_signals_curated.csv"
 
     if not curated_path.exists():
         logger.warning("Curated signals not found for conflict analysis")
@@ -146,8 +146,8 @@ def check_data_freshness() -> Dict[str, Any]:
     freshness = {"files": {}, "overall_freshness": "unknown"}
 
     critical_files = [
-        STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-        STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+        STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+        STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
     ]
 
     freshness_scores = []

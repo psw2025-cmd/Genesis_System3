@@ -6,7 +6,78 @@
       "module": "core.engine.check_system3_status",
       "enabled": true,
       "type": "daily"
+    },
+    {
+      "id": "daily_gain_rank",
+      "name": "Daily Gain Rank (Pre-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "rank"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "09:15",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Ranks all tracked underlyings by predicted gain potential at market open"
+    },
+    {
+      "id": "daily_gain_validate",
+      "name": "Daily Gain Validate (Post-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "validate"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:35",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Validates predictions vs NSE actual results, saves OI snapshot for next session"
+    },
+    {
+      "id": "daily_gain_trend",
+      "name": "Daily Accuracy Trend (Post-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "trend"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:40",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Prints 14-day accuracy trend, fires retrain signal if Spearman rho < 0.40 for 3 days"
+    },
+    {
+      "id": "auto_retrain",
+      "name": "Auto Model Retrain (Post-Market)",
+      "script": "scripts/auto_retrain.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "16:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Reads state/retrain_signal.json; if present, retrains ensemble_predictor models and clears signal"
+    },
+    {
+      "id": "bhavcopy_download",
+      "name": "NSE FO Bhavcopy Download (Post-Market)",
+      "script": "scripts/bhavcopy_downloader.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "18:30",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Downloads NSE F&O bhavcopy EOD archive after market close. Stores to storage/bhavcopy/. Used as P3 fallback source with real OI change data (CHG_IN_OI)."
+    },
+    {
+      "id": "datasource_health_check",
+      "name": "Data Source Health Check (Pre-Market)",
+      "script": "scripts/datasource_health_check.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "08:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Probes all data sources (NSE, bhavcopy, nsepython, jugaad, yfinance). Saves state/datasource_health.json. Alerts CHANGE_LOG if resilience CRITICAL or LOW."
     }
   ]
 }
-

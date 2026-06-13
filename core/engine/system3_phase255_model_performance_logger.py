@@ -67,7 +67,7 @@ def run_phase255(**kwargs) -> Dict[str, Any]:
 
     try:
         # Check if shadow predictions CSV exists
-        shadow_csv = STORAGE_DIR / "angel_index_ai_signals_with_forward_lstm.csv"
+        shadow_csv = STORAGE_DIR / "dhan_index_ai_signals_with_forward_lstm.csv"
 
         if not shadow_csv.exists():
             return {

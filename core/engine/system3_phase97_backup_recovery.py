@@ -30,7 +30,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 # Essential files to backup
 ESSENTIAL_FILES = [
-    "config/angel_automation_config.json",
+    "config/dhan_automation_config.json",
     "config/system3_job_scheduler.json",
     "config/system3_operator_override.json",
     "storage/ultra/ph76_ph100/phase79_adaptive_thresholds.json",

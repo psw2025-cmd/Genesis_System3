@@ -88,7 +88,7 @@
 - **Outputs**: 
   - `phase52_broker_abstraction_test.json`
   - `phase52_broker_compatibility.md`
-- **Summary**: All 3 brokers tested successfully (AngelOne, Binance, Zerodha)
+- **Summary**: All 3 brokers tested successfully (Dhan, Binance, Zerodha)
 - **Safety**: Shadow-only, no real connections
 
 ### Phase 53: Ultra Monitoring AI Agent ✅

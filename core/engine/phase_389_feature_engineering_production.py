@@ -611,7 +611,7 @@ def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
         # Step 1: Load input data
         logger.info("\n[Step 1] Loading input data...")
         if input_csv_path is None:
-            input_csv_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+            input_csv_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
         else:
             input_csv_path = Path(input_csv_path)
 

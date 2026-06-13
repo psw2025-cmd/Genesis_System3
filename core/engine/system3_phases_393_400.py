@@ -47,7 +47,7 @@ def run_phase_394():
         logger.info("Phase 394: PnL Outcome Learning - Starting")
 
         # Check for PnL log
-        pnl_log_path = Path("storage/live/angel_index_ai_pnl_log.csv")
+        pnl_log_path = Path("storage/live/dhan_index_ai_pnl_log.csv")
         real_trades = 0
 
         if pnl_log_path.exists():

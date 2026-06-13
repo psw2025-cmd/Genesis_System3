@@ -14,7 +14,7 @@
 
 **Impact**: 
 - ⚠️ **Non-critical** - System handles it gracefully with `on_bad_lines="skip"`
-- ⚠️ **Affects PnL simulator** - Fails to load signals CSV (line 43 in `angel_pnl_simulator.py`)
+- ⚠️ **Affects PnL simulator** - Fails to load signals CSV (line 43 in `dhan_pnl_simulator.py`)
 - ✅ **Does NOT block signal generation** - Signals continue to be generated and appended
 
 ---
@@ -23,7 +23,7 @@
 
 ### 1. CSV File Structure
 
-**File**: `storage/live/angel_index_ai_signals.csv`
+**File**: `storage/live/dhan_index_ai_signals.csv`
 
 **Header (Line 1)**:
 ```
@@ -123,7 +123,7 @@ except Exception:
 
 ---
 
-#### Location 2: `angel_pnl_simulator.py` (Line 43)
+#### Location 2: `dhan_pnl_simulator.py` (Line 43)
 
 **Code**:
 ```python
@@ -141,7 +141,7 @@ df_sig = pd.read_csv(sig_path)
 
 ---
 
-#### Location 3: `angel_trade_decision.py` (Line 242)
+#### Location 3: `dhan_trade_decision.py` (Line 242)
 
 **Code**:
 ```python
@@ -152,7 +152,7 @@ df = pd.read_csv(signals_csv)
 
 ---
 
-#### Location 4: `angel_real_data_extractor.py` (Line 42)
+#### Location 4: `dhan_real_data_extractor.py` (Line 42)
 
 **Code**:
 ```python
@@ -239,7 +239,7 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
 
 #### Affected Components:
 
-1. **PnL Simulator** (`angel_pnl_simulator.py`):
+1. **PnL Simulator** (`dhan_pnl_simulator.py`):
    - ❌ **FAILS** - Cannot load signals CSV
    - ⚠️ **Impact**: PnL simulation doesn't run (non-critical for signal generation)
 
@@ -247,11 +247,11 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
    - ✅ **HANDLED** - Uses `on_bad_lines="skip"` to skip malformed lines
    - ⚠️ **Impact**: Some historical data may be skipped (minor)
 
-3. **Trade Decision** (`angel_trade_decision.py`):
+3. **Trade Decision** (`dhan_trade_decision.py`):
    - ⚠️ **POTENTIALLY PROBLEMATIC** - May fail if pandas doesn't auto-handle it
    - ⚠️ **Impact**: Trade plan generation may fail (non-critical)
 
-4. **Real Data Extractor** (`angel_real_data_extractor.py`):
+4. **Real Data Extractor** (`dhan_real_data_extractor.py`):
    - ⚠️ **POTENTIALLY PROBLEMATIC** - May fail
    - ⚠️ **Impact**: Training data extraction may fail (non-critical)
 
@@ -276,17 +276,17 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
 
 #### Critical (Causes Failures):
 
-1. **`core/engine/angel_pnl_simulator.py`** (Line 43)
+1. **`core/engine/dhan_pnl_simulator.py`** (Line 43)
    - **Current**: `df_sig = pd.read_csv(sig_path)`
    - **Fix**: Add error handling with `on_bad_lines="skip"`
 
 #### Potentially Problematic:
 
-2. **`core/engine/angel_trade_decision.py`** (Line 242)
+2. **`core/engine/dhan_trade_decision.py`** (Line 242)
    - **Current**: `df = pd.read_csv(signals_csv)`
    - **Fix**: Add error handling with `on_bad_lines="skip"`
 
-3. **`core/engine/angel_real_data_extractor.py`** (Line 42)
+3. **`core/engine/dhan_real_data_extractor.py`** (Line 42)
    - **Current**: `df_signals = pd.read_csv(SIGNALS_CSV)`
    - **Fix**: Add error handling with `on_bad_lines="skip"`
 
@@ -299,9 +299,9 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
 
 ### 10. Exact Fix Required
 
-#### Fix 1: `angel_pnl_simulator.py` (CRITICAL)
+#### Fix 1: `dhan_pnl_simulator.py` (CRITICAL)
 
-**File**: `core/engine/angel_pnl_simulator.py`  
+**File**: `core/engine/dhan_pnl_simulator.py`  
 **Line**: 43
 
 **Current Code**:
@@ -320,9 +320,9 @@ except Exception as e:
 
 ---
 
-#### Fix 2: `angel_trade_decision.py` (RECOMMENDED)
+#### Fix 2: `dhan_trade_decision.py` (RECOMMENDED)
 
-**File**: `core/engine/angel_trade_decision.py`  
+**File**: `core/engine/dhan_trade_decision.py`  
 **Line**: 242
 
 **Current Code**:
@@ -343,9 +343,9 @@ except Exception as e:
 
 ---
 
-#### Fix 3: `angel_real_data_extractor.py` (RECOMMENDED)
+#### Fix 3: `dhan_real_data_extractor.py` (RECOMMENDED)
 
-**File**: `core/engine/angel_real_data_extractor.py`  
+**File**: `core/engine/dhan_real_data_extractor.py`  
 **Line**: 42
 
 **Current Code**:
@@ -428,9 +428,9 @@ def append_signals_to_csv(df_signals: pd.DataFrame) -> None:
 **Priority**: **MEDIUM** (fixes PnL simulation, but non-critical)
 
 **Files to Fix**:
-1. ✅ **CRITICAL**: `angel_pnl_simulator.py` (line 43)
-2. ⚠️ **RECOMMENDED**: `angel_trade_decision.py` (line 242)
-3. ⚠️ **RECOMMENDED**: `angel_real_data_extractor.py` (line 42)
+1. ✅ **CRITICAL**: `dhan_pnl_simulator.py` (line 43)
+2. ⚠️ **RECOMMENDED**: `dhan_trade_decision.py` (line 242)
+3. ⚠️ **RECOMMENDED**: `dhan_real_data_extractor.py` (line 42)
 
 ---
 

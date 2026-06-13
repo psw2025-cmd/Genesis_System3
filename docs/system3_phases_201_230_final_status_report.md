@@ -150,8 +150,8 @@
 - Phase 217: `system3_vol_regimes.csv`
 - Phase 218: `system3_momentum_patterns.csv`
 - Phase 220: `system3_correlation_matrices.csv` ✅ (now detected!)
-- Phase 221: `angel_index_ai_signals_with_forward.csv` (30 rows)
-- Phase 225: `angel_index_ai_signals_reconciled.csv`
+- Phase 221: `dhan_index_ai_signals_with_forward.csv` (30 rows)
+- Phase 225: `dhan_index_ai_signals_reconciled.csv`
 - Phase 228: `system3_snapshot_coverage.csv`
 
 ---

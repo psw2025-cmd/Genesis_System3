@@ -28,9 +28,9 @@
 
 | File | Status | Checks |
 |------|--------|--------|
-| `angel_pnl_simulator.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
-| `angel_trade_decision.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
-| `angel_real_data_extractor.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
+| `dhan_pnl_simulator.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
+| `dhan_trade_decision.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
+| `dhan_real_data_extractor.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
 | `system3_phase222_signal_edge.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
 | `system3_phase263_advanced_pnl_attribution.py` | ✅ **PASSED** | engine="python", on_bad_lines="skip", try/except |
 
@@ -120,7 +120,7 @@
 
 #### Current CSV File Check
 - **Status**: ✅ **PASSED**
-- **File**: `storage/live/angel_index_ai_signals.csv`
+- **File**: `storage/live/dhan_index_ai_signals.csv`
 - **Rows**: 30 rows loaded successfully
 - **Columns**: 72 columns (correct schema)
 - **Parsing**: No errors - malformed lines skipped gracefully
@@ -134,9 +134,9 @@
 ### Code Verification ✅
 
 **All 5 files verified**:
-1. ✅ `angel_pnl_simulator.py` - Robust CSV loading
-2. ✅ `angel_trade_decision.py` - Robust CSV loading
-3. ✅ `angel_real_data_extractor.py` - Robust CSV loading
+1. ✅ `dhan_pnl_simulator.py` - Robust CSV loading
+2. ✅ `dhan_trade_decision.py` - Robust CSV loading
+3. ✅ `dhan_real_data_extractor.py` - Robust CSV loading
 4. ✅ `system3_phase222_signal_edge.py` - Robust CSV loading (improved)
 5. ✅ `system3_phase263_advanced_pnl_attribution.py` - Robust CSV loading
 
@@ -171,15 +171,15 @@
 
 ### Files Modified (4 files)
 
-1. ✅ **`core/engine/angel_pnl_simulator.py`** (lines 43-53)
+1. ✅ **`core/engine/dhan_pnl_simulator.py`** (lines 43-53)
    - Added robust CSV loading to both CSV reads
    - Added error handling
 
-2. ✅ **`core/engine/angel_trade_decision.py`** (lines 242-248)
+2. ✅ **`core/engine/dhan_trade_decision.py`** (lines 242-248)
    - Added robust CSV loading
    - Added error handling with logging
 
-3. ✅ **`core/engine/angel_real_data_extractor.py`** (line 42)
+3. ✅ **`core/engine/dhan_real_data_extractor.py`** (line 42)
    - Updated to robust CSV loading
 
 4. ✅ **`core/engine/system3_phase222_signal_edge.py`** (lines 60-68)
@@ -283,16 +283,16 @@ python validate_csv_fixes_and_system3.py
 
 ```bash
 # PnL Simulator
-python -c "from core.engine.angel_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
+python -c "from core.engine.dhan_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
 
 # Trade Decision
-python -c "from core.engine.angel_trade_decision import main; main()"
+python -c "from core.engine.dhan_trade_decision import main; main()"
 
 # Data Extractor
-python -c "from core.engine.angel_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
+python -c "from core.engine.dhan_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
 
 # Full PnL Simulation
-python -c "from core.engine.angel_pnl_simulator import run_pnl_simulation; result = run_pnl_simulation(); print('✅ PASSED' if result is not None else '⚠️ No trades')"
+python -c "from core.engine.dhan_pnl_simulator import run_pnl_simulation; result = run_pnl_simulation(); print('✅ PASSED' if result is not None else '⚠️ No trades')"
 ```
 
 ---

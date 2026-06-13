@@ -34,9 +34,9 @@
 
 | File | Status | Checks | Issues |
 |------|--------|--------|--------|
-| `angel_pnl_simulator.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
-| `angel_trade_decision.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
-| `angel_real_data_extractor.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
+| `dhan_pnl_simulator.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
+| `dhan_trade_decision.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
+| `dhan_real_data_extractor.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
 | `system3_phase222_signal_edge.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
 | `system3_phase263_advanced_pnl_attribution.py` | ✅ **PASSED** | 4/4 ✅ | **0** |
 
@@ -102,7 +102,7 @@
 
 - ✅ **Status**: PASSED
 - ✅ **Trades Simulated**: 3 trades
-- ✅ **Output File**: Generated successfully (`angel_index_ai_pnl_log.csv`)
+- ✅ **Output File**: Generated successfully (`dhan_index_ai_pnl_log.csv`)
 - ✅ **Summary**: Created for FINNIFTY
 - ✅ **No CSV Parsing Errors**: All CSV reads handled gracefully
 - ✅ **End-to-End**: Complete workflow tested successfully
@@ -187,7 +187,7 @@
 **Errors**: [] (empty)
 
 **Root Cause**:
-- Phase 263 requires `angel_virtual_orders_with_pnl.csv`
+- Phase 263 requires `dhan_virtual_orders_with_pnl.csv`
 - This file doesn't exist yet (will be auto-generated)
 - This is **expected behavior** - file created during live trading
 
@@ -275,7 +275,7 @@ Error tokenizing data. C error: Expected 72 fields in line 32, saw 75
 #### CSV File Check
 
 **Status**: ✅ **PASSED**  
-**File**: `storage/live/angel_index_ai_signals.csv`  
+**File**: `storage/live/dhan_index_ai_signals.csv`  
 **Rows**: 30  
 **Columns**: 72
 

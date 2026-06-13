@@ -23,7 +23,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from core.engine.ultra_safety import load_ultra_safety
-from core.engine.angel_automation_config import AUTOMATION_CONFIG
+from core.engine.dhan_automation_config import AUTOMATION_CONFIG
 
 
 def check_safety() -> bool:
@@ -40,10 +40,10 @@ def check_safety() -> bool:
 
 def live_signal_loop(interval_sec: int = 30, max_iterations: Optional[int] = None):
     """
-    DISABLED — Live signal loop used Angel One broker which is not active.
+    DISABLED — Live signal loop used Dhan broker which is not active.
     System3 is Dhan-only. This loop is blocked.
     """
-    print("[DISABLED] Live Signal Loop uses Angel One / SmartAPI broker path.")
+    print("[DISABLED] Live Signal Loop uses Dhan / DhanHQ broker path.")
     print("           System3 is Dhan-only. This loop is not operational.")
     print("           Replace with a Dhan data feed loop when ready.")
 
@@ -177,7 +177,7 @@ def main():
     print("SYSTEM3 ULTRA - RUNTIME LOOPS")
     print("="*70)
     print("\nSelect loop type:")
-    print("  [DISABLED] 1) Live Signal Loop — Angel One broker path, blocked")
+    print("  [DISABLED] 1) Live Signal Loop — Dhan broker path, blocked")
     print("2) Decision Audit Loop (5min interval)")
     print("3) Snapshot Generation Loop (1hr interval)")
     print("4) Health Check Loop (10min interval)")

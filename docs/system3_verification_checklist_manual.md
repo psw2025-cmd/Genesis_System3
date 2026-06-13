@@ -44,8 +44,8 @@ python run_system3.py
 
 **Commands**:
 ```bash
-python -m core.engine.train_angel_models
-python -m core.engine.offline_angel_ai_test
+python -m core.engine.train_dhan_models
+python -m core.engine.offline_dhan_ai_test
 ```
 
 **Expected**:
@@ -69,10 +69,10 @@ python -m core.engine.offline_angel_ai_test
 **Commands**:
 ```bash
 # Check module exists
-python -c "from core.engine.angel_live_ai_signals import main; print('OK')"
+python -c "from core.engine.dhan_live_ai_signals import main; print('OK')"
 
 # Check automation config
-python -c "from core.engine.angel_automation_config import AUTOMATION_CONFIG; print('Auto-execute:', AUTOMATION_CONFIG.auto_execute_trades)"
+python -c "from core.engine.dhan_automation_config import AUTOMATION_CONFIG; print('Auto-execute:', AUTOMATION_CONFIG.auto_execute_trades)"
 ```
 
 **Expected**:
@@ -92,8 +92,8 @@ python -c "from core.engine.angel_automation_config import AUTOMATION_CONFIG; pr
 
 **Commands**:
 ```bash
-python -m core.engine.angel_synthetic_backtester
-python -m core.engine.angel_daily_pnl_summary
+python -m core.engine.dhan_synthetic_backtester
+python -m core.engine.dhan_daily_pnl_summary
 ```
 
 **Expected**:
@@ -184,9 +184,9 @@ python -m core.engine.system3_phase43_env_guard
 After running all verifications, check for:
 
 ### Core Files
-- ✅ `storage/live/angel_index_ai_signals.csv`
-- ✅ `storage/live/angel_index_ai_trades_plan.csv`
-- ✅ `storage/live/angel_index_ai_pnl_log.csv`
+- ✅ `storage/live/dhan_index_ai_signals.csv`
+- ✅ `storage/live/dhan_index_ai_trades_plan.csv`
+- ✅ `storage/live/dhan_index_ai_pnl_log.csv`
 
 ### Ultra Files
 - ✅ `storage/ultra/phase35_decision_audit.csv`

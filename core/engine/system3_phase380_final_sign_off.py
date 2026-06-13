@@ -181,7 +181,7 @@ def verify_safety_compliance() -> Dict[str, Any]:
 
         # Check 2: No live trading code
         live_trading_code_found = False
-        dangerous_patterns = ["execute_live_trade", "place_live_order", "live_execution", "angel_broker.place_order"]
+        dangerous_patterns = ["execute_live_trade", "place_live_order", "live_execution", "dhan_broker.place_order"]
 
         phase_files = list((PROJECT_ROOT / "core" / "engine").glob("system3_phase37*.py"))
         for phase_file in phase_files:

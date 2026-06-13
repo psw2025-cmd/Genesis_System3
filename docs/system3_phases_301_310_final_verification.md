@@ -93,13 +93,13 @@ def run_phaseNNN(**kwargs) -> Dict[str, Any]:
 
 | Phase | Required Inputs | Status |
 |-------|----------------|--------|
-| 301 | `angel_index_ai_signals_with_forward.csv` | ✅ Handles missing gracefully |
+| 301 | `dhan_index_ai_signals_with_forward.csv` | ✅ Handles missing gracefully |
 | 302 | Phase 301 output + `system3_vol_regimes.csv` | ✅ Handles missing gracefully |
-| 303 | `angel_index_ai_signals_with_forward.csv` | ✅ Handles missing gracefully |
+| 303 | `dhan_index_ai_signals_with_forward.csv` | ✅ Handles missing gracefully |
 | 304 | Phases 301-303 outputs + threshold candidates | ✅ Handles missing gracefully |
 | 305 | Reconciled signals + Phases 302-303 outputs | ✅ Handles missing gracefully |
-| 306 | `angel_index_ai_signals.csv` | ✅ Handles missing gracefully |
-| 307 | `angel_index_ai_signals.csv` | ✅ Handles missing gracefully |
+| 306 | `dhan_index_ai_signals.csv` | ✅ Handles missing gracefully |
+| 307 | `dhan_index_ai_signals.csv` | ✅ Handles missing gracefully |
 | 308 | Phases 301, 302, 305, 307 outputs | ✅ Handles missing gracefully |
 | 309 | None | ✅ No dependencies |
 | 310 | All phases 301-309 outputs | ✅ Handles missing gracefully |

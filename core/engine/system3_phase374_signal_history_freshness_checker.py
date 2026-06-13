@@ -40,9 +40,9 @@ def run_phase374(context: Dict[str, Any] = None) -> Dict[str, Any]:
 
     try:
         target_files = [
-            "angel_index_ai_signals.csv",
-            "angel_index_ai_signals_curated.csv",
-            "angel_index_ai_signals_with_forward.csv",
+            "dhan_index_ai_signals.csv",
+            "dhan_index_ai_signals_curated.csv",
+            "dhan_index_ai_signals_with_forward.csv",
         ]
 
         for filename in target_files:

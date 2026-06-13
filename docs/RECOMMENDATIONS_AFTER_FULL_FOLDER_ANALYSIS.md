@@ -35,7 +35,7 @@
 
 ## 4. Root package.json vs Dashboard Frontend
 
-- **Current:** Root `package.json` has `lightweight-charts`, `plotly.js`, `react-plotly.js`, `smartapi-javascript`, `d3`. Dashboard frontend uses **Recharts** and **Vite** and does not list these.
+- **Current:** Root `package.json` has `lightweight-charts`, `plotly.js`, `react-plotly.js`, `dhanhq-javascript`, `d3`. Dashboard frontend uses **Recharts** and **Vite** and does not list these.
 - **Recommendation:** Clarify whether root `package.json` is for a separate app (e.g. Electron or another UI). If it’s legacy or unused, add a short comment or move it; if it’s for the same dashboard, consider aligning dependencies with `dashboard/frontend/package.json` (e.g. add lightweight-charts there if you implement the candlestick chart from the dashboard checklist).
 
 ---

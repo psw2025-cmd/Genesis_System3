@@ -72,11 +72,11 @@ Assume:
   - `logs/`
   - `reports/`
 - Key CSVs (DRY-RUN data):
-  - `storage/live/angel_index_ai_signals.csv`
-  - `storage/live/angel_index_ai_signals_curated.csv`
-  - `storage/live/angel_index_ai_signals_with_forward.csv`
-  - `storage/live/angel_virtual_orders.csv`
-  - `storage/live/angel_index_ai_pnl_log.csv`
+  - `storage/live/dhan_index_ai_signals.csv`
+  - `storage/live/dhan_index_ai_signals_curated.csv`
+  - `storage/live/dhan_index_ai_signals_with_forward.csv`
+  - `storage/live/dhan_virtual_orders.csv`
+  - `storage/live/dhan_index_ai_pnl_log.csv`
  
 Before doing deeper work, you may:
 - List repo structure (read-only): `dir` / `ls`

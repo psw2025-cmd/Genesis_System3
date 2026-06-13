@@ -1,7 +1,7 @@
 """
 System3 Phase 343 - Signals Existence & Freshness Enforcer
 
-Guarantees that angel_index_ai_signals.csv and angel_index_ai_signals_with_forward.csv
+Guarantees that dhan_index_ai_signals.csv and dhan_index_ai_signals_with_forward.csv
 always exist and are fresh enough, or forces OP3 into NO-TRADE with clear logs.
 
 Mode: Pre-market and each OP cycle before OP3.
@@ -55,7 +55,7 @@ def run_phase_343_signals_freshness_enforcer(root_path: str = None, logger_obj=N
         }
 
         # Check signals.csv
-        signals_file = root / "storage" / "live" / "angel_index_ai_signals.csv"
+        signals_file = root / "storage" / "live" / "dhan_index_ai_signals.csv"
         if signals_file.exists():
             try:
                 df = pd.read_csv(signals_file)
@@ -63,7 +63,7 @@ def run_phase_343_signals_freshness_enforcer(root_path: str = None, logger_obj=N
                 age_minutes = (datetime.now() - mtime).total_seconds() / 60
 
                 if age_minutes > max_signal_age_minutes or len(df) < min_row_count:
-                    signal_status["signals"]["angel_index_ai_signals.csv"] = {
+                    signal_status["signals"]["dhan_index_ai_signals.csv"] = {
                         "status": "stale" if age_minutes > max_signal_age_minutes else "empty",
                         "age_minutes": age_minutes,
                         "rows": len(df),
@@ -71,22 +71,22 @@ def run_phase_343_signals_freshness_enforcer(root_path: str = None, logger_obj=N
                     status = "WARN"
                     logger.warning(f"[PH343] Signals CSV stale or empty: age={age_minutes:.1f}m, rows={len(df)}")
                 else:
-                    signal_status["signals"]["angel_index_ai_signals.csv"] = {
+                    signal_status["signals"]["dhan_index_ai_signals.csv"] = {
                         "status": "ok",
                         "age_minutes": age_minutes,
                         "rows": len(df),
                     }
             except Exception as e:
                 logger.error(f"[PH343] Error reading signals CSV: {e}")
-                signal_status["signals"]["angel_index_ai_signals.csv"] = {"status": "error"}
+                signal_status["signals"]["dhan_index_ai_signals.csv"] = {"status": "error"}
                 status = "WARN"
         else:
-            signal_status["signals"]["angel_index_ai_signals.csv"] = {"status": "missing"}
+            signal_status["signals"]["dhan_index_ai_signals.csv"] = {"status": "missing"}
             status = "WARN"
             logger.warning("[PH343] Signals CSV file missing")
 
         # Check signals_with_forward.csv
-        signals_forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+        signals_forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
         if signals_forward_file.exists():
             try:
                 df = pd.read_csv(signals_forward_file)
@@ -94,7 +94,7 @@ def run_phase_343_signals_freshness_enforcer(root_path: str = None, logger_obj=N
                 age_minutes = (datetime.now() - mtime).total_seconds() / 60
 
                 if age_minutes > max_signal_age_minutes or len(df) < min_row_count:
-                    signal_status["signals"]["angel_index_ai_signals_with_forward.csv"] = {
+                    signal_status["signals"]["dhan_index_ai_signals_with_forward.csv"] = {
                         "status": "stale" if age_minutes > max_signal_age_minutes else "empty",
                         "age_minutes": age_minutes,
                         "rows": len(df),
@@ -104,17 +104,17 @@ def run_phase_343_signals_freshness_enforcer(root_path: str = None, logger_obj=N
                         f"[PH343] Signals with forward CSV stale or empty: age={age_minutes:.1f}m, rows={len(df)}"
                     )
                 else:
-                    signal_status["signals"]["angel_index_ai_signals_with_forward.csv"] = {
+                    signal_status["signals"]["dhan_index_ai_signals_with_forward.csv"] = {
                         "status": "ok",
                         "age_minutes": age_minutes,
                         "rows": len(df),
                     }
             except Exception as e:
                 logger.error(f"[PH343] Error reading signals with forward CSV: {e}")
-                signal_status["signals"]["angel_index_ai_signals_with_forward.csv"] = {"status": "error"}
+                signal_status["signals"]["dhan_index_ai_signals_with_forward.csv"] = {"status": "error"}
                 status = "WARN"
         else:
-            signal_status["signals"]["angel_index_ai_signals_with_forward.csv"] = {"status": "missing"}
+            signal_status["signals"]["dhan_index_ai_signals_with_forward.csv"] = {"status": "missing"}
             status = "WARN"
             logger.warning("[PH343] Signals with forward CSV file missing")
 

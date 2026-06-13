@@ -34,7 +34,7 @@ CONTROL = ROOT / "docs" / "project_control"
 SECRET_PATTERNS = [
     re.compile(r"(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\s*[:=]\s*['\"]?[A-Za-z0-9_./+=@:-]{8,}"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PRIVATE )?PRIVATE KEY-----"),
-    re.compile(r"(?i)smartapi.*(?:password|pin|totp|secret)"),
+    re.compile(r"(?i)dhanhq.*(?:password|pin|totp|secret)"),
 ]
 
 SECRET_FILENAME_RE = re.compile(
@@ -373,27 +373,27 @@ def gate_deployment_endpoint() -> GateResult:
 
 def gate_data_automation(files: list[str]) -> GateResult:
     data_candidates = scan_text_for_terms(files, ["data", "histor", "ohlc", "candle", "option", "chain", "nse", "bse", "angel", "binance", "duckdb", "sqlite", "parquet", "csv"], 500)
-    angel_candidates = [f for f in data_candidates if "angel" in f.lower() or "nse" in f.lower() or "bse" in f.lower() or "option" in f.lower()]
+    dhan_candidates = [f for f in data_candidates if "angel" in f.lower() or "nse" in f.lower() or "bse" in f.lower() or "option" in f.lower()]
     binance_candidates = [f for f in data_candidates if "binance" in f.lower() or "crypto" in f.lower()]
 
     yahoo = load_json("reports/latest/external_data_yahoo/yahoo_data_summary.json")
     blockers: list[str] = []
     warnings: list[str] = []
 
-    if not angel_candidates:
-        blockers.append("angel_india_data_candidates_missing")
+    if not dhan_candidates:
+        blockers.append("dhan_india_data_candidates_missing")
     if not binance_candidates:
         warnings.append("binance_crypto_data_candidates_not_proven")
     if yahoo is None:
         warnings.append("external_yahoo_fallback_proof_missing")
     if not os.getenv("ANGEL_API_KEY") and not os.getenv("SMARTAPI_API_KEY"):
-        warnings.append("angel_broker_secrets_not_available_to_ci_data_live_probe_skipped")
+        warnings.append("dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped")
 
     evidence = {
         "data_candidate_count": len(data_candidates),
         "data_candidates_sample": data_candidates[:120],
-        "angel_india_candidate_count": len(angel_candidates),
-        "angel_india_candidates_sample": angel_candidates[:80],
+        "dhan_india_candidate_count": len(dhan_candidates),
+        "dhan_india_candidates_sample": dhan_candidates[:80],
         "binance_crypto_candidate_count": len(binance_candidates),
         "binance_crypto_candidates_sample": binance_candidates[:80],
         "fallback_yahoo_report_present": yahoo is not None,
@@ -430,7 +430,7 @@ def gate_model_training_load(files: list[str]) -> GateResult:
     candidates = scan_text_for_terms(files, ["model", "train", "retrain", "predict", "accuracy", "calibrat", "drift", "shadow", "kronos", "wavelet", "xgboost", "lightgbm", "catboost"], 500)
     likely_runtime = [
         "src/ml/ensemble_predictor.py",
-        "core/engine/angel_model_selector.py",
+        "core/engine/dhan_model_selector.py",
         "scripts/system3_retrain.py",
         "system3_ultra_validation.py",
     ]

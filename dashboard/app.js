@@ -1,7 +1,7 @@
 // Genesis System3 Dashboard - Vue3 Application
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const API_BASE = 'https://genesis-system3-backend.onrender.com';
+const API_BASE = window.location.origin; // local Codespace preview
 
 createApp({
     setup() {
@@ -17,7 +17,10 @@ createApp({
             { id: 'risk', label: 'Risk', icon: '🛡️' },
             { id: 'greeks', label: 'Greeks', icon: '📈' },
             { id: 'options', label: 'Option Chain', icon: '🔗' },
-            { id: 'trades', label: 'Live Trades', icon: '💹' }
+            { id: 'trades', label: 'Live Trades', icon: '💹' },
+            { id: 'rankings', label: 'Rankings', icon: '🏆' },
+            { id: 'accuracy', label: 'Accuracy', icon: '🎯' },
+            { id: 'syshealth', label: 'System Health', icon: '🩺' },
         ];
 
         const metrics = ref({
@@ -48,6 +51,11 @@ createApp({
         });
 
         const liveTrades = ref([]);
+
+        // System3 analytics state
+        const gainRankData = ref({ status: 'loading', latest: null, history: [], total_days: 0 });
+        const accuracyData = ref({ status: 'loading', trend: [], avg_rho: null, retrain_needed: false, days_available: 0 });
+        const systemHealth = ref({ status: 'loading', token: null, datasource_health: null, datasource_resilience: 'UNKNOWN', retrain_needed: false, jobs: [] });
 
         // Computed
         const filteredContracts = computed(() => {
@@ -215,6 +223,37 @@ createApp({
             }
         };
 
+        // System3 analytics fetch functions
+        const fetchGainRank = async () => {
+            try {
+                const r = await fetch(`${API_BASE}/api/gain_rank`);
+                if (!r.ok) return;
+                gainRankData.value = await r.json();
+            } catch (e) {
+                console.error('Error fetching gain rank:', e);
+            }
+        };
+
+        const fetchAccuracyTrend = async () => {
+            try {
+                const r = await fetch(`${API_BASE}/api/accuracy_trend`);
+                if (!r.ok) return;
+                accuracyData.value = await r.json();
+            } catch (e) {
+                console.error('Error fetching accuracy trend:', e);
+            }
+        };
+
+        const fetchSystemHealth = async () => {
+            try {
+                const r = await fetch(`${API_BASE}/api/system_health`);
+                if (!r.ok) return;
+                systemHealth.value = await r.json();
+            } catch (e) {
+                console.error('Error fetching system health:', e);
+            }
+        };
+
         const fetchGreeksStatus = async () => {
             // Ensure chain data is loaded first
             if (!chainData.value.contracts || chainData.value.contracts.length === 0) {
@@ -265,6 +304,15 @@ createApp({
                 if (activeTab.value === 'options' || activeTab.value === 'greeks') {
                     await fetchChainData(selectedUnderlying.value);
                 }
+                if (activeTab.value === 'rankings') {
+                    await fetchGainRank();
+                }
+                if (activeTab.value === 'accuracy') {
+                    await fetchAccuracyTrend();
+                }
+                if (activeTab.value === 'syshealth') {
+                    await fetchSystemHealth();
+                }
             } catch (error) {
                 console.error('Error updating data:', error);
             } finally {
@@ -287,6 +335,9 @@ createApp({
                 if (newTab === 'options' || newTab === 'greeks') {
                     await fetchChainData(selectedUnderlying.value);
                 }
+                if (newTab === 'rankings') await fetchGainRank();
+                if (newTab === 'accuracy') await fetchAccuracyTrend();
+                if (newTab === 'syshealth') await fetchSystemHealth();
             });
             
             // Watch for underlying changes
@@ -319,6 +370,9 @@ createApp({
             metrics,
             chainData,
             liveTrades,
+            gainRankData,
+            accuracyData,
+            systemHealth,
             filteredContracts,
             formatNumber,
             formatTime,
@@ -328,6 +382,9 @@ createApp({
             getLatencyClass,
             getRiskClass,
             fetchChainData,
+            fetchGainRank,
+            fetchAccuracyTrend,
+            fetchSystemHealth,
             watchTab
         };
     }

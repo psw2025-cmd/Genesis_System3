@@ -93,7 +93,7 @@ quote_data = self.get_quote(exchange, symbol, token)  # Includes volume, OI, bid
 #### 2. **Greeks Data Missing** (`delta`, `gamma`, `theta`, `vega`, `rho`, `iv`)
 
 **Root Cause**:
-- `get_option_greeks()` method may not be available in SmartAPI version
+- `get_option_greeks()` method may not be available in DhanHQ version
 - Method exists but API calls are failing silently
 - Market closed (Greeks not available after hours)
 - Expiry date format mismatch
@@ -104,7 +104,7 @@ quote_data = self.get_quote(exchange, symbol, token)  # Includes volume, OI, bid
 
 **Fix**:
 ```python
-# Need to verify SmartAPI method name and parameters
+# Need to verify DhanHQ method name and parameters
 # May need to use different API endpoint or format
 greeks_data = self.get_option_greeks(exchange, symbol, token, strike, expiry, option_type)
 ```
@@ -132,7 +132,7 @@ greeks_data = self.get_option_greeks(exchange, symbol, token, strike, expiry, op
 
 **Solution**: Ensure `get_quote()` is called and data is properly parsed.
 
-**Code Location**: `core/brokers/angel_one/broker.py` - `get_option_chain_by_underlying()`
+**Code Location**: `core/brokers/dhan/broker.py` - `get_option_chain_by_underlying()`
 
 **Fix Applied**: ✅ Already implemented in latest code, but may need verification that it's actually being called.
 
@@ -141,14 +141,14 @@ greeks_data = self.get_option_greeks(exchange, symbol, token, strike, expiry, op
 **Current Issue**: Greeks API may not be available or method name incorrect.
 
 **Solution**: 
-1. Check SmartAPI documentation for correct method name
+1. Check DhanHQ documentation for correct method name
 2. Verify parameter format (expiry date format is critical)
 3. Add fallback to calculated Greeks if API unavailable
 
-**Code Location**: `core/brokers/angel_one/broker.py` - `get_option_greeks()`
+**Code Location**: `core/brokers/dhan/broker.py` - `get_option_greeks()`
 
 **Investigation Needed**:
-- Check if `getOptionGreek` method exists in SmartAPI
+- Check if `getOptionGreek` method exists in DhanHQ
 - Verify expiry date format (DDMMMYYYY vs DD-MMM-YYYY)
 - Test with sample option to see actual API response
 
@@ -158,7 +158,7 @@ greeks_data = self.get_option_greeks(exchange, symbol, token, strike, expiry, op
 
 **Solution**: Use batch/market data API if available.
 
-**SmartAPI Batch Methods** (if available):
+**DhanHQ Batch Methods** (if available):
 ```python
 # Batch quote fetch
 params = {
@@ -223,14 +223,14 @@ snap = broker.get_snap_quote(exchange, symbol, token)
 ### Option Greeks (`delta`, `gamma`, `theta`, `vega`, `rho`, `iv`)
 
 **Why Missing**:
-- `get_option_greeks()` method may not exist in SmartAPI
+- `get_option_greeks()` method may not exist in DhanHQ
 - Wrong parameter format (expiry date format critical)
-- API endpoint not available in current SmartAPI version
+- API endpoint not available in current DhanHQ version
 - Market closed (Greeks not calculated after hours)
 
 **How to Fetch**:
 ```python
-# Check actual SmartAPI method name
+# Check actual DhanHQ method name
 # May be: getOptionGreek, optionGreek, getGreeks, etc.
 
 # Expiry format is critical - try multiple formats:
@@ -251,7 +251,7 @@ for expiry_fmt in expiry_formats:
 
 **API Endpoint**: `getOptionGreek()` (verify exact name)
 
-**Availability**: ⚠️ **NEEDS VERIFICATION** - May not be available in all SmartAPI versions
+**Availability**: ⚠️ **NEEDS VERIFICATION** - May not be available in all DhanHQ versions
 
 **Fallback**: Calculate Greeks using Black-Scholes if API unavailable:
 ```python
@@ -275,7 +275,7 @@ greeks = compute_greeks(
 **Why Missing**:
 - Part of Greeks API response
 - Not available if Greeks API fails
-- May not be supported in all SmartAPI versions
+- May not be supported in all DhanHQ versions
 
 **How to Fetch**:
 - Same as Greeks - comes from `getOptionGreek()` response
@@ -293,7 +293,7 @@ greeks = compute_greeks(
 
 **Check**:
 1. Is `get_quote()` method actually being called in the loop?
-2. Does SmartAPI `getQuote()` return volume, OI, bid/ask?
+2. Does DhanHQ `getQuote()` return volume, OI, bid/ask?
 3. Are we parsing the response correctly?
 
 **Fix Code**:
@@ -302,7 +302,7 @@ greeks = compute_greeks(
 quote_data = self.get_quote(exchange, row["symbol"], str(row["token"]))
 
 # Verify response structure matches what we expect
-# May need to check SmartAPI docs for exact response format
+# May need to check DhanHQ docs for exact response format
 ```
 
 ### Priority 2: Fix Greeks API (HIGH)
@@ -310,7 +310,7 @@ quote_data = self.get_quote(exchange, row["symbol"], str(row["token"]))
 **Action**: Investigate and fix Greeks fetching.
 
 **Steps**:
-1. Check SmartAPI Python library source code for available methods
+1. Check DhanHQ Python library source code for available methods
 2. Test `getOptionGreek` with sample option manually
 3. Verify expiry date format
 4. Add fallback to calculated Greeks if API unavailable
@@ -318,7 +318,7 @@ quote_data = self.get_quote(exchange, row["symbol"], str(row["token"]))
 **Test Code**:
 ```python
 # Manual test
-broker = AngelOneBroker(allow_data_only=True)
+broker = DhanBroker(allow_data_only=True)
 test_greeks = broker.get_option_greeks(
     "NFO", "NIFTY24FEB2625000CE", "64829", 
     25000.0, "24FEB2026", "CE"
@@ -424,7 +424,7 @@ File ready: storage/live/option_chain_NIFTY_NFO_v2.csv
 ## 📝 Next Steps
 
 1. **Run Validator**: Execute the validator on current CSV to see actual missing data rates
-2. **Investigate API Methods**: Check SmartAPI documentation for exact method names
+2. **Investigate API Methods**: Check DhanHQ documentation for exact method names
 3. **Test Greeks API**: Manually test `getOptionGreek` with sample option
 4. **Implement Fallbacks**: Add calculated Greeks if API unavailable
 5. **Add Monitoring**: Integrate with dashboard for real-time completeness tracking

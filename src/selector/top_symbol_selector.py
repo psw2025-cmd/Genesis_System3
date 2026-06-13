@@ -14,6 +14,12 @@ if str(ROOT_DIR) not in sys.path:
 
 from core.utils.logger import logger
 
+try:
+    from src.ranking.gain_rank_engine import GainRankEngine
+    _GAIN_RANK_AVAILABLE = True
+except ImportError:
+    _GAIN_RANK_AVAILABLE = False
+
 
 class TopSymbolSelector:
     """
@@ -357,5 +363,44 @@ class TopSymbolSelector:
         
         top = rankings_df.iloc[0] if not rankings_df.empty else None
         top_underlying = top['underlying'] if top is not None and top['recommendation'] == 'TRADE' else None
-        
+
         return top_underlying, rankings_df
+
+    def get_top_n_by_gain(
+        self,
+        all_data: Dict[str, pd.DataFrame],
+        spots: Dict[str, float],
+        top_n: int = 5,
+        oi_history: Optional[Dict] = None,
+        vol_history: Optional[Dict] = None,
+    ) -> List[Dict]:
+        """
+        Return top-N symbols ranked by predicted % GAIN potential.
+        Uses GainRankEngine for multi-factor scoring (OI change, IV, volume surge,
+        PCR divergence, ATM premium, momentum).
+
+        Args:
+            all_data: {underlying: options_chain_df}
+            spots: {underlying: spot_price}
+            top_n: Number of top symbols to return
+            oi_history: {underlying: {"prev_oi": float, "curr_oi": float}}
+            vol_history: {underlying: avg_5day_volume}
+
+        Returns:
+            List of dicts sorted by gain_score desc, each with:
+            [rank, underlying, gain_score, expected_move_pct, recommendation, ...]
+        """
+        if not _GAIN_RANK_AVAILABLE:
+            logger.warning("GainRankEngine not available — falling back to basic ranking")
+            _, rankings_df = self.select_top_underlying(all_data, spots, {})
+            if rankings_df.empty:
+                return []
+            return rankings_df.head(top_n).to_dict(orient="records")
+
+        engine = GainRankEngine(top_n=top_n)
+        return engine.get_top_n(
+            all_chain_data=all_data,
+            spots=spots,
+            oi_history=oi_history,
+            vol_history=vol_history,
+        )

@@ -39,7 +39,7 @@
 
 ### 2. Signal Distribution
 
-**From Archived CSV** (`angel_index_ai_signals_20251202_153015_before_new_day.csv`):
+**From Archived CSV** (`dhan_index_ai_signals_20251202_153015_before_new_day.csv`):
 
 | Signal Type | Count | Percentage |
 |------------|-------|------------|
@@ -173,7 +173,7 @@
 **Action**: Verify `load_recent_signal_history()` and `compute_short_history_features()` are working
 
 **Check**:
-1. Does `storage/live/angel_index_ai_signals.csv` exist during autopilot run?
+1. Does `storage/live/dhan_index_ai_signals.csv` exist during autopilot run?
 2. Is history being loaded correctly?
 3. Are short-history features being computed and merged?
 

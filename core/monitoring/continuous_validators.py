@@ -48,7 +48,7 @@ class TimestampValidator:
 
         phase_files = [
             Path("storage/live/forward/phase221_forward_returns.csv"),
-            Path("storage/live/enriched/angel_virtual_orders_with_pnl.csv"),
+            Path("storage/live/enriched/dhan_virtual_orders_with_pnl.csv"),
         ]
         results = []
         for pf in phase_files:
@@ -181,7 +181,7 @@ class MergeKeyValidator:
         from pathlib import Path
 
         signals_file = Path("storage/live/forward/phase221_forward_returns.csv")
-        orders_file = Path("storage/live/healed/angel_virtual_orders_healed.csv")
+        orders_file = Path("storage/live/healed/dhan_virtual_orders_healed.csv")
         if signals_file.exists() and orders_file.exists():
             result = self.validate_alignment(signals_file, orders_file)
             return {"passed": result.get("status") == "OK", "result": result}
@@ -466,7 +466,7 @@ class ContinuousMonitor:
         self.logger.info("[*] Running timestamp validation...")
         phase_files = [
             self.watch_dir / "forward" / "phase221_forward_returns.csv",
-            self.watch_dir / "enriched" / "angel_virtual_orders_with_pnl.csv",
+            self.watch_dir / "enriched" / "dhan_virtual_orders_with_pnl.csv",
         ]
         ts_results = []
         for pf in phase_files:
@@ -479,7 +479,7 @@ class ContinuousMonitor:
         # Merge key validation
         self.logger.info("[*] Running merge key validation...")
         signals_file = self.watch_dir / "forward" / "phase221_forward_returns.csv"
-        orders_file = self.watch_dir / "healed" / "angel_virtual_orders_healed.csv"
+        orders_file = self.watch_dir / "healed" / "dhan_virtual_orders_healed.csv"
         if signals_file.exists() and orders_file.exists():
             key_results = self.key_validator.validate_alignment(signals_file, orders_file)
             results["validators"]["merge_keys"] = key_results

@@ -22,7 +22,7 @@ Agent must follow these rules for **all** phases in this file:
 
 1. **No baseline overwrite**
    - Never modify or delete anything under:
-     - `core/models/angel_one/`
+     - `core/models/dhan/`
      - `storage/training/`
      - `storage/config/` (except read-only)
    - All new writes go under:
@@ -34,7 +34,7 @@ Agent must follow these rules for **all** phases in this file:
 2. **No auto-execution of real trades**
    - Do not send any order to any broker.
    - Only log *shadow* trades into:
-     - `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+     - `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
    - Trade executor remains DRY RUN only.
 
 3. **No auto-promotion**
@@ -96,7 +96,7 @@ Turn Ultra shadow trading into a *structured campaign*: run fused decisions + sh
            - `storage/ultra/phase39_shadow_campaign_summary_<YYYYMMDD>.md`
            - Include:
              - Count of fused decisions (read from `phase31_ultra_fused_decisions.csv`).
-             - Count of shadow trades (from `angel_index_ai_ultra_trades_shadow.csv`).
+             - Count of shadow trades (from `dhan_index_ai_ultra_trades_shadow.csv`).
              - BUY vs HOLD distribution for Ultra.
              - SAFE vs RISKY decisions.
      - `main()` – CLI entry.
@@ -234,7 +234,7 @@ Provide a safe, two-step mechanism that can prepare promotion of Ultra to baseli
 - `core/engine/system3_phase41_promotion_executor.py`
 
 **New directories**  
-- `core/models/angel_one_ultra_staging/`
+- `core/models/dhan_ultra_staging/`
 - `storage/snapshots/` (shared with Phase 42)
 
 **Menu**  
@@ -272,11 +272,11 @@ Even when all are true, do not overwrite baseline models; copy to staging only.
     - If None → log error "No snapshot found, cannot stage promotion" and exit.
   - For each eligible underlying (e.g., FINNIFTY):
     - Identify Ultra model path:
-      - `core/models/angel_one_real_blended/<UNDERLYING>_model.pkl`
-      - `core/models/angel_one_real_blended/<UNDERLYING>_model_meta.json`
+      - `core/models/dhan_real_blended/<UNDERLYING>_model.pkl`
+      - `core/models/dhan_real_blended/<UNDERLYING>_model_meta.json`
     - Copy these into staging:
-      - `core/models/angel_one_ultra_staging/<UNDERLYING>_model.pkl`
-      - `core/models/angel_one_ultra_staging/<UNDERLYING>_model_meta.json`
+      - `core/models/dhan_ultra_staging/<UNDERLYING>_model.pkl`
+      - `core/models/dhan_ultra_staging/<UNDERLYING>_model_meta.json`
     - Log:
       - `[Phase41] Staged Ultra model for UNDERLYING based on snapshot SNAPSHOT_DIR`
   - Create report:
@@ -311,14 +311,14 @@ python -m core.engine.system3_phase41_promotion_executor
 [Phase41] Promotion flag detected and valid
 [Phase41] Eligible underlyings: FINNIFTY, ...
 [Phase41] Using snapshot: storage/snapshots/YYYYMMDD_HHMMSS
-[Phase41] Staged Ultra model for FINNIFTY -> core/models/angel_one_ultra_staging/...
+[Phase41] Staged Ultra model for FINNIFTY -> core/models/dhan_ultra_staging/...
 ```
 
 **Files:**
-- `core/models/angel_one_ultra_staging/FINNIFTY_model.pkl`
-- `core/models/angel_one_ultra_staging/FINNIFTY_model_meta.json`
+- `core/models/dhan_ultra_staging/FINNIFTY_model.pkl`
+- `core/models/dhan_ultra_staging/FINNIFTY_model_meta.json`
 - `storage/ultra/phase41_promotion_staging_report.md`
-- **No files in `core/models/angel_one/` changed.**
+- **No files in `core/models/dhan/` changed.**
 
 ---
 
@@ -343,9 +343,9 @@ Guarantee we can always roll back: snapshot baseline models + configs before any
 **Snapshot contents**
 
 Include at minimum:
-- `core/models/angel_one/` (all `*_model.pkl` + `*_meta.json`)
+- `core/models/dhan/` (all `*_model.pkl` + `*_meta.json`)
 - `storage/config/thresholds_auto.json`
-- `storage/config/angel_trade_config.py` (copy file as `.txt` for reference)
+- `storage/config/dhan_trade_config.py` (copy file as `.txt` for reference)
 
 Store under:
 - `storage/snapshots/YYYYMMDD_HHMMSS/`
@@ -398,7 +398,7 @@ This snapshot directory will be used by Phase 41 as protection.
 ## Phase 43 – Environment & Broker Guard (Angel vs Binance Separation)
 
 **Goal**  
-Ensure System3 (Angel indices) never accidentally touches non-Angel brokers and prepare guardrails for future Binance System3.
+Ensure System3 (Angel indices) never accidentally touches non-Dhan brokers and prepare guardrails for future Binance System3.
 
 **New module**  
 - `core/engine/system3_phase43_env_guard.py`
@@ -423,7 +423,7 @@ Confirm:
 
 **Read a small config:**
 - `storage/config/system3_env_config.json`:
-  - E.g., `{ "angel_system3_enabled": true, "binance_system3_enabled": false }`
+  - E.g., `{ "dhan_system3_enabled": true, "binance_system3_enabled": false }`
 - If missing, create with defaults.
 
 **Output**

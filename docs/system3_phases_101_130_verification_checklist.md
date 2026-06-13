@@ -13,7 +13,7 @@
 
 #### Broker Wrapper
 - [x] `core/broker/__init__.py`
-- [x] `core/broker/angel_live_order_wrapper.py`
+- [x] `core/broker/dhan_live_order_wrapper.py`
 
 #### Phase Modules (101-120)
 - [x] `core/engine/system3_phase101_live_trade_config_check.py`
@@ -156,7 +156,7 @@ python -m core.engine.system3_phase114_live_session_health
 ### ⏳ Pending
 - **Verification testing** (run Step 1-3 commands)
 - **Menu integration** (wire into `system3_ultra.py`)
-- **Real SmartAPI integration** (update wrapper when ready)
+- **Real DhanHQ integration** (update wrapper when ready)
 
 ---
 

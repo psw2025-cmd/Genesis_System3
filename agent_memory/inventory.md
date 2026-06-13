@@ -35,7 +35,7 @@
 - **Features:** Paper trading, signal generation, position management
 
 ### Broker Integration
-- **Broker:** Angel One SmartAPI
+- **Broker:** Dhan DhanHQ
 - **Location:** `src/broker/` (likely)
 - **Status:** ✅ Working
 

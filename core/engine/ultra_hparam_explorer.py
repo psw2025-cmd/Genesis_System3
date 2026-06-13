@@ -5,7 +5,7 @@ Offline hyperparameter exploration for Ultra models.
 Reports only - no model overwrites.
 
 Inputs:
-- storage/training/angel_ultra_training.parquet
+- storage/training/dhan_ultra_training.parquet
 
 Outputs:
 - storage/reports_ultra/ultra_hparam_results_{underlying}.csv
@@ -27,8 +27,8 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 
-ULTRA_TRAINING_PARQUET = TRAINING_DIR / "angel_ultra_training.parquet"
-ULTRA_TRAINING_CSV = TRAINING_DIR / "angel_ultra_training.csv"
+ULTRA_TRAINING_PARQUET = TRAINING_DIR / "dhan_ultra_training.parquet"
+ULTRA_TRAINING_CSV = TRAINING_DIR / "dhan_ultra_training.csv"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -27,7 +27,7 @@ Two phases (132 and 200) report WARN status due to broker connectivity checks. T
 
 **Broker Connectivity Check**: WARN status
 
-The phase attempts to check broker (AngelOne) connectivity but cannot establish a connection or verify broker status. This results in:
+The phase attempts to check broker (Dhan) connectivity but cannot establish a connection or verify broker status. This results in:
 - `broker_health.connectivity`: "WARN"
 - `overall_status`: "WARN"
 
@@ -45,7 +45,7 @@ The phase attempts to check broker (AngelOne) connectivity but cannot establish 
     "timestamp": "2025-11-30T16:23:05.xxxxx"
   },
   "broker_health": {
-    "broker_name": "ANGEL_ONE",
+    "broker_name": "DHAN",
     "connectivity": "WARN",
     "details": "Broker connectivity check simulated. Real API calls are not allowed in DRY-RUN mode."
   },
@@ -61,13 +61,13 @@ The phase attempts to check broker (AngelOne) connectivity but cannot establish 
 ### Why This Warning Occurs
 
 1. **Import Error - Class Name Mismatch**: 
-   - Phase 132 tries to import: `from core.brokers.angel_one.broker import Broker as AngelBroker`
-   - Actual class name in the module is: `AngelOneBroker` (not `Broker`)
+   - Phase 132 tries to import: `from core.brokers.dhan.broker import Broker as AngelBroker`
+   - Actual class name in the module is: `DhanBroker` (not `Broker`)
    - This causes an `ImportError` which triggers WARN status
 
 2. **Broker Module Exists But Import Fails**:
-   - The broker module exists at: `core/brokers/angel_one/broker.py`
-   - The class is named `AngelOneBroker`, not `Broker`
+   - The broker module exists at: `core/brokers/dhan/broker.py`
+   - The class is named `DhanBroker`, not `Broker`
    - Import statement needs correction
 
 3. **By Design (Current Behavior)**:
@@ -96,16 +96,16 @@ The phase attempts to check broker (AngelOne) connectivity but cannot establish 
 
 ```python
 def _get_broker_health(broker_name: str) -> Dict[str, Any]:
-    """Simulates or attempts a safe AngelOne broker health check."""
+    """Simulates or attempts a safe Dhan broker health check."""
     broker_health = {
         "broker_name": broker_name,
         "connectivity": "WARN",  # Default to WARN
         "details": "Broker connectivity check simulated. Real API calls are not allowed in DRY-RUN mode.",
     }
-    # In a real scenario, you'd import and use AngelOneBroker for a safe call
-    # e.g., from core.brokers.angelone_broker import AngelOneBroker
+    # In a real scenario, you'd import and use DhanBroker for a safe call
+    # e.g., from core.brokers.angelone_broker import DhanBroker
     # try:
-    #     broker = AngelOneBroker()
+    #     broker = DhanBroker()
     #     profile = broker.get_profile()  # A safe, read-only call
     #     broker_health["connectivity"] = "OK"
     #     broker_health["details"] = f"Successfully fetched broker profile for {profile.get('clientcode')}."
@@ -127,10 +127,10 @@ def _get_broker_health(broker_name: str) -> Dict[str, Any]:
 **Option 1: Fix Import Statement** (Line 38 in `system3_phase132_master_health_snapshot.py`):
 ```python
 # Current (incorrect):
-from core.brokers.angel_one.broker import Broker as AngelBroker
+from core.brokers.dhan.broker import Broker as AngelBroker
 
 # Should be:
-from core.brokers.angel_one.broker import AngelOneBroker
+from core.brokers.dhan.broker import DhanBroker
 ```
 
 **Option 2: Keep Current Behavior** (Recommended for DRY-RUN):
@@ -141,11 +141,11 @@ from core.brokers.angel_one.broker import AngelOneBroker
 #### For Future Live Trading
 
 1. **Fix Import Statement**:
-   - Update Phase 132 to import `AngelOneBroker` correctly
+   - Update Phase 132 to import `DhanBroker` correctly
    - Test import works
 
 2. **Configure Broker Credentials**:
-   - Set up AngelOne API credentials
+   - Set up Dhan API credentials
    - Store credentials securely in config files
    - Verify credential format and permissions
 
@@ -180,7 +180,7 @@ Phase 200 consolidates system status from previous phases, including the health 
 {
   "timestamp": "2025-11-30T16:24:01.xxxxx",
   "dry_run": true,
-  "broker": "ANGEL_ONE",
+  "broker": "DHAN",
   "one_lot_test": "ACTIVE",
   "last_known_status": "WARN",
   "config": {
@@ -330,7 +330,7 @@ Despite the warnings, all critical safety mechanisms are operational:
 ⏳ **ACTION REQUIRED** (When ready for live trading)
 
 1. **Configure Broker API**:
-   - Set up AngelOne API credentials
+   - Set up Dhan API credentials
    - Test connectivity with safe, read-only calls
    - Verify network access to broker endpoints
 

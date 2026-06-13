@@ -20,7 +20,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from core.engine.ultra_safety import load_ultra_safety
-from core.engine.angel_automation_config import AUTOMATION_CONFIG
+from core.engine.dhan_automation_config import AUTOMATION_CONFIG
 
 
 def check_safety() -> bool:
@@ -54,7 +54,7 @@ def run_op1_pre_market():
     print("="*70)
     
     try:
-        from core.engine.angel_market_warmup_scanner import main
+        from core.engine.dhan_market_warmup_scanner import main
         main()
         print("\n[OK] OP1 complete")
         return True
@@ -81,7 +81,7 @@ def run_op3_trade_decision():
     print("="*70)
     
     try:
-        from core.engine.angel_trade_decision import main
+        from core.engine.dhan_trade_decision import main
         main()
         print("\n[OK] OP3 complete")
         return True
@@ -97,7 +97,7 @@ def run_op4_post_market():
     print("="*70)
     
     try:
-        from core.engine.angel_daily_learning_digest import main
+        from core.engine.dhan_daily_learning_digest import main
         main()
         print("\n[OK] OP4 complete")
         return True

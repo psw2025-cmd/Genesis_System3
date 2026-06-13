@@ -5,12 +5,15 @@ Provide a job scheduler abstraction to run tasks (fetch, train, eval, reports)
 in a controlled way.
 """
 
+import os
 import sys
 import json
+import time
+import signal
 import argparse
 import subprocess
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List, Optional
 
 # Ensure project root is in path
@@ -86,15 +89,23 @@ def save_state(state: Dict[str, Any]) -> None:
 
 
 def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
-    """Run a single job."""
+    """Run a single job.
+    Supports two formats:
+      module-based: {"module": "core.engine.foo"}  → python -m core.engine.foo
+      script-based: {"script": "scripts/foo.py", "args": ["--mode", "rank"]}
+    """
     job_id = job["id"]
-    module_name = job["module"]
-
     print(f"[PH82] Running job: {job['name']} ({job_id})...")
+
+    if "script" in job:
+        cmd = [sys.executable, str(PROJECT_ROOT / job["script"])] + job.get("args", [])
+    else:
+        module_name = job["module"]
+        cmd = [sys.executable, "-m", module_name]
 
     try:
         result = subprocess.run(
-            [sys.executable, "-m", module_name],
+            cmd,
             cwd=PROJECT_ROOT,
             capture_output=True,
             text=True,
@@ -211,12 +222,119 @@ def generate_log_md(state: Dict[str, Any], config: Dict[str, Any]) -> None:
             )
 
 
+_IST = timezone(timedelta(hours=5, minutes=30))
+
+
+def _now_ist() -> datetime:
+    return datetime.now(_IST)
+
+
+def _time_matches(schedule_time: str, now: datetime, window_seconds: int = 60) -> bool:
+    if not schedule_time or schedule_time.lower() == "daily":
+        return False
+    try:
+        h, m = map(int, schedule_time.split(":"))
+    except ValueError:
+        return False
+    target = now.replace(hour=h, minute=m, second=0, microsecond=0)
+    return abs((now - target).total_seconds()) <= window_seconds
+
+
+def _append_daemon_log(message: str) -> None:
+    log_path = PROJECT_ROOT / "CHANGE_LOG.md"
+    if not log_path.exists():
+        return
+    try:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"\n- {message}\n")
+    except Exception as e:
+        print(f"[Daemon] CHANGE_LOG write failed: {e}")
+
+
+def run_daemon() -> None:
+    """
+    Daemon loop: fires enabled jobs at their schedule_time (IST) once per day.
+    Weekdays only (skip Saturday/Sunday). Checks every 60 seconds.
+    Start: python core/engine/system3_phase82_job_scheduler.py --daemon
+    Stop:  kill $(cat state/scheduler_daemon.pid)
+    """
+    pid_file = PROJECT_ROOT / "state" / "scheduler_daemon.pid"
+    pid_file.parent.mkdir(parents=True, exist_ok=True)
+    pid_file.write_text(str(os.getpid()))
+    print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
+
+    last_fired: Dict[str, str] = {}      # job_id → "YYYY-MM-DD HH:MM"
+    last_fired_date: Dict[str, str] = {} # job_id → "YYYY-MM-DD" (for daily jobs)
+    _stop = {"flag": False}
+
+    def _handle(signum, frame):
+        print(f"[PH82-Daemon] Signal {signum} — shutting down...")
+        _stop["flag"] = True
+
+    signal.signal(signal.SIGTERM, _handle)
+    signal.signal(signal.SIGINT, _handle)
+
+    state = load_state()
+    if "jobs" not in state:
+        state["jobs"] = {}
+
+    while not _stop["flag"]:
+        now = _now_ist()
+        today_str = now.strftime("%Y-%m-%d")
+        is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
+
+        config = load_config()  # hot-reload each tick
+        for job in config.get("jobs", []):
+            if not job.get("enabled", False):
+                continue
+            job_id = job["id"]
+            sched = job.get("schedule_time", "daily")
+            if job.get("weekdays_only", False) and not is_weekday:
+                continue
+
+            should_fire = False
+            if sched.lower() == "daily":
+                if last_fired_date.get(job_id) != today_str:
+                    should_fire = True
+            else:
+                if _time_matches(sched, now):
+                    fire_key = f"{today_str} {sched}"
+                    if last_fired.get(job_id) != fire_key:
+                        should_fire = True
+                        last_fired[job_id] = fire_key
+
+            if should_fire:
+                print(f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — FIRING: {job.get('name', job_id)}")
+                result = run_job(job)
+                state["jobs"][job_id] = result
+                save_state(state)
+                if sched.lower() == "daily":
+                    last_fired_date[job_id] = today_str
+                _append_daemon_log(
+                    f"[{now.strftime('%Y-%m-%d %H:%M')} IST] [Scheduler-Daemon] "
+                    f"JOB FIRED: {job_id} — status={result.get('last_status', 'UNKNOWN')}"
+                )
+                print(f"[PH82-Daemon] {job_id} done — {result.get('last_status')}")
+
+        if _stop["flag"]:
+            break
+        time.sleep(60)
+
+    print(f"[PH82-Daemon] Stopped at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
+    try:
+        pid_file.unlink(missing_ok=True)
+    except Exception:
+        pass
+    save_state(state)
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="System3 Phase 82 - Job Scheduler")
     parser.add_argument("--list", action="store_true", help="List all jobs")
     parser.add_argument("--run-once", action="store_true", help="Run all enabled jobs")
     parser.add_argument("--job-id", type=str, help="Run a single job by ID")
+    parser.add_argument("--daemon", action="store_true", help="Run daemon: fire jobs at scheduled IST times")
 
     args = parser.parse_args()
 
@@ -227,6 +345,8 @@ def main():
             run_all_jobs()
         elif args.job_id:
             run_single_job(args.job_id)
+        elif args.daemon:
+            run_daemon()
         else:
             parser.print_help()
 

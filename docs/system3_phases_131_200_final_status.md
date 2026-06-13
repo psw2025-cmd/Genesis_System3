@@ -87,7 +87,7 @@ summary_by_underlying = {}  # Initialize to avoid reference error
 | Check | Status | Details |
 |-------|--------|---------|
 | DRY_RUN only | ✅ PASS | All phases in DRY-RUN mode |
-| ANGEL_ONLY | ✅ PASS | Broker: ANGEL_ONE |
+| ANGEL_ONLY | ✅ PASS | Broker: DHAN |
 | Live Trading Disabled | ✅ PASS | `live_trading_enabled: false` |
 | Kill Switch | ✅ PASS | INACTIVE |
 | Capital Guardrails | ✅ PASS | 1-lot-only enforced |

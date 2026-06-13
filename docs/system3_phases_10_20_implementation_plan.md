@@ -22,7 +22,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 ### Foundation Tasks (0.1-0.3)
 
 **Task 0.1**: Create Ultra Directories
-- `core/models/angel_one_ultra/` - Ultra models
+- `core/models/dhan_ultra/` - Ultra models
 - `storage/ultra/` - Ultra live data
 - `storage/learning_ultra/` - Ultra learning data
 - `storage/reports_ultra/` - Ultra reports
@@ -33,7 +33,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 - `core/engine/ultra_safety.py` - Safety helper module
 
 **Task 0.3**: Profile Selector Extension
-- Extend `angel_model_selector.py` for ULTRA_DEV profile
+- Extend `dhan_model_selector.py` for ULTRA_DEV profile
 - `core/config/system3_active_profile.json` - Profile config
 
 ### Phase Implementation (10-20)
@@ -61,13 +61,13 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Build shadow learning datasets from real signals/trades/PnL
 
 **Inputs**:
-- `storage/live/angel_index_ai_signals.csv`
-- `storage/live/angel_index_ai_trades_plan.csv`
-- `storage/live/angel_index_ai_pnl_log.csv`
+- `storage/live/dhan_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_trades_plan.csv`
+- `storage/live/dhan_index_ai_pnl_log.csv`
 
 **Outputs**:
-- `storage/learning_ultra/angel_ultra_shadow_master.parquet`
-- `storage/learning_ultra/angel_ultra_shadow_master.csv`
+- `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
+- `storage/learning_ultra/dhan_ultra_shadow_master.csv`
 
 **Key Features**:
 - Consolidates real data into shadow master dataset
@@ -81,12 +81,12 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Extend features from ~25 to ~100 for Ultra models
 
 **Inputs**:
-- `storage/training/angel_index_options_training.csv` (synthetic)
-- `storage/learning_ultra/angel_ultra_shadow_master.parquet`
+- `storage/training/dhan_index_options_training.csv` (synthetic)
+- `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
 
 **Outputs**:
-- `storage/training/angel_ultra_training.parquet`
-- `storage/training/angel_ultra_training.csv`
+- `storage/training/dhan_ultra_training.parquet`
+- `storage/training/dhan_ultra_training.csv`
 
 **New Features**:
 - Multi-timeframe momentum (1, 3, 5, 10 steps)
@@ -104,11 +104,11 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Train Ultra models separate from baseline
 
 **Inputs**:
-- `storage/training/angel_ultra_training.parquet`
+- `storage/training/dhan_ultra_training.parquet`
 
 **Outputs**:
-- `core/models/angel_one_ultra/*_ultra_model.pkl`
-- `core/models/angel_one_ultra/*_ultra_model_meta.json`
+- `core/models/dhan_ultra/*_ultra_model.pkl`
+- `core/models/dhan_ultra/*_ultra_model_meta.json`
 
 **Models**: RandomForest / XGBoost / Ensemble
 
@@ -119,7 +119,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Offline hyperparameter exploration
 
 **Inputs**:
-- `storage/training/angel_ultra_training.parquet`
+- `storage/training/dhan_ultra_training.parquet`
 
 **Outputs**:
 - `storage/reports_ultra/ultra_hparam_results_{underlying}.csv`
@@ -133,10 +133,10 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Classify market regimes (low/medium/high vol, trending/ranging)
 
 **Inputs**:
-- `storage/training/angel_ultra_training.parquet`
+- `storage/training/dhan_ultra_training.parquet`
 
 **Outputs**:
-- `storage/training/angel_ultra_training_with_regime.parquet`
+- `storage/training/dhan_ultra_training_with_regime.parquet`
 - `storage/reports_ultra/ultra_regime_summary.csv`
 
 **Regime Labels**: LOW_VOL, HIGH_VOL, TREND_UP, RANGE
@@ -163,7 +163,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Experiment thresholds on shadow PnL
 
 **Inputs**:
-- `storage/learning_ultra/angel_ultra_shadow_master.parquet`
+- `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
 
 **Outputs**:
 - `storage/reports_ultra/ultra_threshold_grid_search.csv`
@@ -180,7 +180,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 - Live snapshots (same as baseline)
 
 **Outputs**:
-- `storage/ultra/angel_ultra_live_shadow_signals.csv`
+- `storage/ultra/dhan_ultra_live_shadow_signals.csv`
 
 **Functionality**: Side-by-side baseline vs ultra predictions, shadow only
 
@@ -195,8 +195,8 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 - Ultra models
 
 **Outputs**:
-- `storage/ultra/angel_ultra_trade_plan_sim.csv`
-- `storage/ultra/angel_ultra_pnl_sim.csv`
+- `storage/ultra/dhan_ultra_trade_plan_sim.csv`
+- `storage/ultra/dhan_ultra_pnl_sim.csv`
 - `storage/reports_ultra/ultra_trade_sim_summary.csv`
 
 **Functionality**: Offline simulation, no real trades
@@ -208,7 +208,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 **Purpose**: Advanced analysis of Ultra simulator PnL
 
 **Inputs**:
-- `storage/ultra/angel_ultra_pnl_sim.csv`
+- `storage/ultra/dhan_ultra_pnl_sim.csv`
 
 **Outputs**:
 - `storage/reports_ultra/ultra_pnl_report.csv`
@@ -308,7 +308,7 @@ This document outlines the implementation plan for **System3 Ultra-Mode** - a co
 ```
 core/
   models/
-    angel_one_ultra/          # Ultra models
+    dhan_ultra/          # Ultra models
   config/                     # Ultra configs
   engine/
     ultra_*.py                # 11 new Ultra modules

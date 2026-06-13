@@ -23,8 +23,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_JSON = STORAGE_ULTRA / "phase83_tick_to_trade_latency.json"

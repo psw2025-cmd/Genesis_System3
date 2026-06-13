@@ -105,7 +105,7 @@ python system3_geni_master.py all
 ### ⚠️ Known Issues (Not in GENI Master)
 
 1. **Unicode Encoding**: Some underlying scripts have Unicode issues on Windows console
-   - **Location**: `system3_ultra_validation.py`, `angel_market_warmup_scanner.py`
+   - **Location**: `system3_ultra_validation.py`, `dhan_market_warmup_scanner.py`
    - **Impact**: Scripts may fail with encoding errors
    - **GENI Master**: Handles gracefully, captures output correctly
    - **Fix**: Would need to fix underlying scripts (not GENI Master's responsibility)

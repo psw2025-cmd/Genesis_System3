@@ -165,11 +165,11 @@ class EnsemblePredictor:
             rf_model_dir: Directory with RandomForest models
         """
         if ultra_model_dir is None:
-            ultra_model_dir = ROOT_DIR / "core" / "models" / "angel_one_ultra"
+            ultra_model_dir = ROOT_DIR / "core" / "models" / "dhan_ultra"
         if xgboost_model_dir is None:
-            xgboost_model_dir = ROOT_DIR / "core" / "models" / "angel_one"
+            xgboost_model_dir = ROOT_DIR / "core" / "models" / "dhan"
         if rf_model_dir is None:
-            rf_model_dir = ROOT_DIR / "core" / "models" / "angel_one"
+            rf_model_dir = ROOT_DIR / "core" / "models" / "dhan"
         
         self.ultra_model_dir = Path(ultra_model_dir)
         self.xgboost_model_dir = Path(xgboost_model_dir)
@@ -523,12 +523,20 @@ class EnsemblePredictor:
         
         # Calculate overall confidence
         overall_confidence = np.mean(list(confidences.values())) if confidences else 0.0
-        
+
+        # Regression head: expected % gain for this underlying.
+        # Heuristic until real regression training data is available:
+        #   |mean_signal| * confidence * 2.5%  (index options rarely exceed 2.5% intraday)
+        # Once real training data exists, replace with a trained regressor output here.
+        mean_signal = float(np.mean(final_pred)) if len(final_pred) > 0 else 0.0
+        expected_gain_pct = round(abs(mean_signal) * float(overall_confidence) * 2.5, 4)
+
         return {
             'prediction': final_pred,
             'confidence': float(overall_confidence),
             'models_used': available_models,
             'method': ensemble_method,
+            'expected_gain_pct': expected_gain_pct,
             'individual_predictions': {k: v.tolist() if isinstance(v, np.ndarray) else v for k, v in predictions.items()}
         }
     
@@ -575,7 +583,8 @@ class EnsemblePredictor:
                 'predictions': predictions_list,
                 'confidences': confidences_list,
                 'model_name': 'ensemble',
-                'models_used': result.get('models_used', [])
+                'models_used': result.get('models_used', []),
+                'expected_gain_pct': result.get('expected_gain_pct', 0.0),
             }
             
         except Exception as e:
@@ -718,5 +727,6 @@ def predict_with_ensemble(
     df['ensemble_prediction'] = result['prediction']
     df['ensemble_confidence'] = result['confidence']
     df['ensemble_models_used'] = str(result['models_used'])
-    
+    df['expected_gain_pct'] = result.get('expected_gain_pct', 0.0)
+
     return df

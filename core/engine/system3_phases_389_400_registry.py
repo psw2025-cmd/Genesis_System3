@@ -54,7 +54,7 @@ PHASES_389_400_REGISTRY = {
         "dependencies": [391],
         "inputs": [
             "models/xgboost_v1/{UNDERLYING}_xgb_model.pkl",
-            "core/models/angel_one_ultra/{UNDERLYING}_ultra_model.pkl",
+            "core/models/dhan_ultra/{UNDERLYING}_ultra_model.pkl",
             "storage/datasets/phase_390_balanced_features.csv",
         ],
         "outputs": [

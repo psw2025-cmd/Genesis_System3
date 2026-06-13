@@ -51,7 +51,7 @@
 11. `core/engine/ultra_promotion_manager.py`
 
 ### Updated Files (2 files)
-1. `core/engine/angel_model_selector.py` - Extended for ULTRA_DEV
+1. `core/engine/dhan_model_selector.py` - Extended for ULTRA_DEV
 2. `run_system3.py` - Added menu options 73-83
 
 **Total**: 16 new/updated files
@@ -64,7 +64,7 @@
 ```
 core/
   models/
-    angel_one_ultra/          # Ultra models
+    dhan_ultra/          # Ultra models
   config/                     # Ultra configs
   engine/
     ultra_*.py                # 11 Ultra modules
@@ -170,7 +170,7 @@ Phase 20: Compare & Promote
 **Test Foundation**:
 ```bash
 python -m core.engine.ultra_safety
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 **Test Phases** (in order):

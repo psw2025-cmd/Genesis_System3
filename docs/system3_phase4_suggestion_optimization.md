@@ -7,7 +7,7 @@
 ## Modules Implemented
 
 ### 1. Real Threshold Recommender V3
-- **File**: `core/engine/angel_real_threshold_reco_v3.py`
+- **File**: `core/engine/dhan_real_threshold_reco_v3.py`
 - **Menu**: Option 58
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Suggestions only, NO threshold application
@@ -27,7 +27,7 @@
 ---
 
 ### 2. Risk Profile Optimizer V3
-- **File**: `core/engine/angel_risk_profile_optimizer_v3.py`
+- **File**: `core/engine/dhan_risk_profile_optimizer_v3.py`
 - **Menu**: Option 59
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Suggestions only, NO position-size changes
@@ -46,7 +46,7 @@
 ---
 
 ### 3. Feature Drift Analyzer
-- **File**: `core/engine/angel_feature_drift_analyzer.py`
+- **File**: `core/engine/dhan_feature_drift_analyzer.py`
 - **Menu**: Option 60
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Detection only, NO model update
@@ -64,7 +64,7 @@
 ---
 
 ### 4. Performance Consistency Checker
-- **File**: `core/engine/angel_performance_consistency_checker.py`
+- **File**: `core/engine/dhan_performance_consistency_checker.py`
 - **Menu**: Option 61
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only evaluation
@@ -109,10 +109,10 @@
 ## Files Created
 
 ### Engine Modules
-1. `core/engine/angel_real_threshold_reco_v3.py`
-2. `core/engine/angel_risk_profile_optimizer_v3.py`
-3. `core/engine/angel_feature_drift_analyzer.py`
-4. `core/engine/angel_performance_consistency_checker.py`
+1. `core/engine/dhan_real_threshold_reco_v3.py`
+2. `core/engine/dhan_risk_profile_optimizer_v3.py`
+3. `core/engine/dhan_feature_drift_analyzer.py`
+4. `core/engine/dhan_performance_consistency_checker.py`
 
 ### Documentation
 1. `docs/system3_phase4_suggestion_optimization.md` (this file)

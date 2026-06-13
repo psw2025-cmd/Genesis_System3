@@ -181,7 +181,7 @@ This report provides a detailed analysis of the JSON analysis file generated fro
 
 ### File Status
 
-- **File Exists**: ✅ Yes (`angel_index_ai_signals.csv`)
+- **File Exists**: ✅ Yes (`dhan_index_ai_signals.csv`)
 - **Content**: Empty (headers only, no data rows)
 
 ### Analysis

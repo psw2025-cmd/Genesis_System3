@@ -62,7 +62,7 @@
    - These will create shadow trades in Phase 34
 
 2. **Shadow Trade Activity**:
-   - Check `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+   - Check `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
    - Monitor growth of shadow trades
    - Compare with baseline trades
 
@@ -79,7 +79,7 @@ python -m core.engine.system3_phase31_ultra_fusion
 type storage\ultra\phase31_ultra_fused_decisions.csv | Select-Object -First 20
 
 # Check shadow trades
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 
 # Check audit results
 python -m core.engine.system3_phase35_ultra_auditor
@@ -202,7 +202,7 @@ dir storage\ultra\phase*.json
 
 ### No Shadow Trades Generated
 
-**Symptom**: `angel_index_ai_ultra_trades_shadow.csv` is empty
+**Symptom**: `dhan_index_ai_ultra_trades_shadow.csv` is empty
 
 **Possible Causes**:
 1. No BUY signals generated (all HOLD)
@@ -255,16 +255,16 @@ dir storage\ultra\phase*.json
 ## File Locations Reference
 
 ### Input Files
-- Live Signals: `storage/live/angel_index_ai_signals.csv`
-- Baseline Trades: `storage/live/angel_index_ai_trades_plan.csv`
-- Baseline PnL: `storage/live/angel_index_ai_pnl_log.csv`
+- Live Signals: `storage/live/dhan_index_ai_signals.csv`
+- Baseline Trades: `storage/live/dhan_index_ai_trades_plan.csv`
+- Baseline PnL: `storage/live/dhan_index_ai_pnl_log.csv`
 - Ultra Artifacts: `storage/reports_ultra/phase21_*.csv`, `phase24_*.json`, etc.
 
 ### Output Files
 - Phase 31: `storage/ultra/phase31_ultra_fused_decisions.csv`
 - Phase 32: `storage/ultra/phase32_ultra_vs_baseline_summary.md`
 - Phase 33: `storage/ultra/phase33_promotion_plan.json` + `.md`
-- Phase 34: `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- Phase 34: `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 - Phase 35: `storage/ultra/phase35_decision_audit_report.md`
 - Phase 36: `storage/ultra/phase36_cull_execution_log.md`
 - Phase 37: `storage/ultra/phase37_policy_risk_dashboard.md`

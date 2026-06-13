@@ -1,6 +1,6 @@
 # System3 Live Day Autopilot
 
-**Single-button full-day autopilot for System3 (AngelOne ONLY, DRY-RUN ONLY)**
+**Single-button full-day autopilot for System3 (Dhan ONLY, DRY-RUN ONLY)**
 
 ---
 
@@ -9,7 +9,7 @@
 The `system3_live_day_autopilot.py` script orchestrates a complete trading day automatically:
 
 - **OP1**: Pre-market checks and diagnostics
-- **OP2**: Live DRY-RUN AngelOne signal loop
+- **OP2**: Live DRY-RUN Dhan signal loop
 - **OP3**: Intraday monitors (periodic)
 - **OP4**: End-of-day processing (PnL, learning, reports)
 
@@ -32,7 +32,7 @@ If any of these are `True`, the script will **ABORT** with an error message.
 
 ### No Real Orders
 
-The script **never** calls any function that can send a real AngelOne order. All execution is DRY-RUN only.
+The script **never** calls any function that can send a real Dhan order. All execution is DRY-RUN only.
 
 ---
 
@@ -63,13 +63,13 @@ python system3_live_day_autopilot.py
 
 Runs before market opens:
 
-1. **Market Warmup Scanner** (`angel_market_warmup_scanner`)
+1. **Market Warmup Scanner** (`dhan_market_warmup_scanner`)
    - Validates directory structure
    - Checks model presence (5 models)
    - Validates key files
    - Checks configuration safety
 
-2. **Pre-Market Diagnostic** (`angel_monday_diagnostic`)
+2. **Pre-Market Diagnostic** (`dhan_monday_diagnostic`)
    - Comprehensive pre-market diagnostics
    - Model validation
    - Configuration checks
@@ -88,7 +88,7 @@ Runs before market opens:
 Runs continuously during market hours:
 
 - **Live AI Signal Generation**: Every 30 seconds
-  - Builds full snapshot from AngelOne broker
+  - Builds full snapshot from Dhan broker
   - Generates AI signals using trained models
   - Creates trade plans (DRY-RUN only)
   - Logs signals to CSV
@@ -131,21 +131,21 @@ Runs automatically every 10 snapshots during live session:
 
 Runs after live session ends (Ctrl+C or market close):
 
-1. **PnL Simulation** (`angel_pnl_simulator`)
+1. **PnL Simulation** (`dhan_pnl_simulator`)
    - Simulates PnL for all trade plans
-   - Output: `storage/live/angel_index_ai_pnl_log.csv`
+   - Output: `storage/live/dhan_index_ai_pnl_log.csv`
 
-2. **Daily PnL Summary** (`angel_daily_pnl_summary`)
+2. **Daily PnL Summary** (`dhan_daily_pnl_summary`)
    - Summarizes daily PnL by underlying
    - Trade count, win rate, exit reasons
    - Console output + CSV
 
-3. **Daily Learning Report** (`angel_daily_learning_report`)
+3. **Daily Learning Report** (`dhan_daily_learning_report`)
    - End-of-day learning summary
    - Outcome analysis
-   - Output: `storage/reports/angel_daily_learning_report_YYYYMMDD.txt`
+   - Output: `storage/reports/dhan_daily_learning_report_YYYYMMDD.txt`
 
-4. **Daily Auto Reports** (`angel_daily_auto_reports`)
+4. **Daily Auto Reports** (`dhan_daily_auto_reports`)
    - Daily learning report
    - Rolling 7-day dashboard
    - Quick summary
@@ -212,15 +212,15 @@ The log file includes:
 ## Internal Functions/Modules Used
 
 ### Pre-Market (OP1)
-- `core.engine.angel_market_warmup_scanner.scan_market_warmup()`
-- `core.engine.angel_monday_diagnostic.run_pre_market_diagnostic()`
+- `core.engine.dhan_market_warmup_scanner.scan_market_warmup()`
+- `core.engine.dhan_monday_diagnostic.run_pre_market_diagnostic()`
 - `core.engine.system3_phase43_env_guard.run_phase43()`
 
 ### Live Session (OP2)
-- `core.brokers.angel_one.broker.AngelOneBroker()`
-- `core.engine.angel_options_watch_loop._build_full_snapshot()`
-- `core.engine.angel_live_ai_signals.run_once_with_snapshot()`
-- `core.engine.angel_pnl_simulator.run_pnl_simulation()` (periodic)
+- `core.brokers.dhan.broker.DhanBroker()`
+- `core.engine.dhan_options_watch_loop._build_full_snapshot()`
+- `core.engine.dhan_live_ai_signals.run_once_with_snapshot()`
+- `core.engine.dhan_pnl_simulator.run_pnl_simulation()` (periodic)
 
 ### Intraday Monitors (OP3)
 - `core.engine.system3_phase35_ultra_auditor.run_phase35_audit()`
@@ -228,15 +228,15 @@ The log file includes:
 - `core.engine.system3_phase38_governance_summary.run_phase38_governance_summary()`
 
 ### End-of-Day (OP4)
-- `core.engine.angel_pnl_simulator.run_pnl_simulation()`
-- `core.engine.angel_daily_pnl_summary.main()`
-- `core.engine.angel_daily_learning_report.generate_daily_learning_report()`
-- `core.engine.angel_daily_auto_reports.generate_daily_auto_report()`
+- `core.engine.dhan_pnl_simulator.run_pnl_simulation()`
+- `core.engine.dhan_daily_pnl_summary.main()`
+- `core.engine.dhan_daily_learning_report.generate_daily_learning_report()`
+- `core.engine.dhan_daily_auto_reports.generate_daily_auto_report()`
 
 ### Safety Checks
 - `config.live_trade_config.LIVE_TRADING_ENABLED`
 - `config.live_trade_config.USE_LIVE_EXECUTION_ENGINE`
-- `core.engine.angel_automation_config.AUTOMATION_CONFIG`
+- `core.engine.dhan_automation_config.AUTOMATION_CONFIG`
 - `core.engine.ultra_safety.load_ultra_safety()`
 
 ---
@@ -246,7 +246,7 @@ The log file includes:
 The script uses existing System3 configuration files:
 
 - `config/live_trade_config.py` - Live trading flags
-- `core/engine/angel_automation_config.py` - Automation settings
+- `core/engine/dhan_automation_config.py` - Automation settings
 - `core/engine/ultra_safety.py` - Ultra mode safety
 
 **No new configuration files are created or modified.**
@@ -259,12 +259,12 @@ The script uses existing System3 configuration files:
 
 If safety checks fail, check:
 1. `config/live_trade_config.py` - Ensure `LIVE_TRADING_ENABLED = False`
-2. `core/engine/angel_automation_config.py` - Ensure `auto_execute_trades = False`
+2. `core/engine/dhan_automation_config.py` - Ensure `auto_execute_trades = False`
 3. Ultra safety config - Ensure `AUTO_EXECUTE_TRADES = False`
 
 ### Broker Connection Fails
 
-- Check AngelOne API credentials
+- Check Dhan API credentials
 - Verify network connectivity
 - Check broker initialization in logs
 
@@ -278,7 +278,7 @@ If safety checks fail, check:
 
 ## Notes
 
-- **AngelOne ONLY**: Binance/multi-broker modules are ignored
+- **Dhan ONLY**: Binance/multi-broker modules are ignored
 - **DRY-RUN ONLY**: No real orders are ever sent
 - **Automatic**: All phases run automatically in sequence
 - **Interruptible**: Press Ctrl+C to stop live session and proceed to EOD

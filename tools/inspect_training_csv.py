@@ -8,7 +8,7 @@ import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CSV = ROOT / "storage" / "training" / "angel_index_options_training.csv"
+CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"
 
 
 def main():

@@ -74,7 +74,7 @@ summary_by_underlying = {}  # Initialize to avoid reference error
 **Root Cause**:
 - Broker connectivity check returned WARN status
 - May indicate:
-  - Missing AngelOne API credentials
+  - Missing Dhan API credentials
   - Broker API offline
   - Network connectivity issues
   - Broker module not fully configured
@@ -268,7 +268,7 @@ summary_by_underlying = {}  # Initialize to avoid reference error
 | DRY_RUN mode | ✅ ACTIVE | `dry_run: true` in all configs |
 | Live Trading | ✅ DISABLED | `live_trading_enabled: false` enforced |
 | Kill Switch | ✅ INACTIVE | No critical errors detected |
-| Broker Config | ✅ ANGEL_ONE | All phases configured for AngelOne |
+| Broker Config | ✅ DHAN | All phases configured for Dhan |
 | Capital Guardrails | ✅ ACTIVE | 1-lot-only mode enforced |
 | Master Session | ✅ READY | Phase 135: READY=YES |
 | DRY-RUN Readiness | ✅ YES | Phase 196: All checks passed |
@@ -330,7 +330,7 @@ summary_by_underlying = {}  # Initialize to avoid reference error
 ### Non-Critical Actions
 
 4. ⏳ **FUTURE**: Verify broker connectivity
-   - Check AngelOne API credentials
+   - Check Dhan API credentials
    - Test broker connection
    - Resolve WARN status (non-critical for DRY-RUN)
 

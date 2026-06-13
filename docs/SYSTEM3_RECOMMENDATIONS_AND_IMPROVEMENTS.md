@@ -302,7 +302,7 @@ def validate_configuration():
     # Check config files exist
     config_files = [
         "config/live_trade_config.py",
-        "core/engine/angel_automation_config.py",
+        "core/engine/dhan_automation_config.py",
     ]
     
     for config_file in config_files:
@@ -372,8 +372,8 @@ def send_alert(level: str, message: str):
 def backup_critical_files():
     """Backup critical files to backup directory."""
     critical_files = [
-        "storage/live/angel_index_ai_signals.csv",
-        "storage/live/angel_index_ai_signals_curated.csv",
+        "storage/live/dhan_index_ai_signals.csv",
+        "storage/live/dhan_index_ai_signals_curated.csv",
         "system3_daily_heartbeat.json",
         "system3_shutdown_flag.json",
     ]

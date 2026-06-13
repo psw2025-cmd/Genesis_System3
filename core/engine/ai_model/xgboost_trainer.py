@@ -87,7 +87,7 @@ def load_training_data() -> pd.DataFrame:
         return pd.read_csv(feature_eng_path)
 
     # Fallback to curated dataset
-    curated_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+    curated_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
     if curated_path.exists():
         logger.info(f"Loading curated data: {curated_path}")
         return pd.read_csv(curated_path)

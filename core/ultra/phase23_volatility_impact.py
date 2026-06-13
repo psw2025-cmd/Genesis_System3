@@ -199,7 +199,7 @@ def main() -> None:
         print(f"  Explanation: {', '.join(result['explanation'])}")
 
     # Try to analyze from shadow master if available
-    shadow_csv = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+    shadow_csv = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
     if shadow_csv.exists():
         try:
             df = pd.read_csv(shadow_csv)

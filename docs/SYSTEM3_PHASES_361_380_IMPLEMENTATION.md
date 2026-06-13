@@ -31,10 +31,10 @@ Naming conventions:
 Create a single, consolidated snapshot of the current **signal pipeline state** (index options) and write a human-readable report and machine-readable JSON.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals.csv`
-- `storage/live/angel_index_ai_signals_curated.csv`
-- `storage/live/angel_index_ai_signals_with_forward.csv`
-- Optional: `storage/live/angel_virtual_orders.csv` (if present)
+- `storage/live/dhan_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_signals_curated.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
+- Optional: `storage/live/dhan_virtual_orders.csv` (if present)
 
 **Outputs:**
 - `storage/metrics/signal_pipeline_snapshot_361.json`
@@ -69,7 +69,7 @@ Create a single, consolidated snapshot of the current **signal pipeline state** 
 Measure the **real-world predictive strength** of signals using the `*_with_forward.csv` file and produce calibration metrics for thresholds.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
   - Must contain at least: symbol, expiry, strike, signal, forward_return_Xmin/hour (name as currently in your file).
 
 **Outputs:**
@@ -108,7 +108,7 @@ Detect if the live data distribution has drifted far from the training baseline.
 **Inputs:**
 - Training baseline stats (if present): e.g. `storage/models/feature_baseline_stats.json`
 - Live signals / features:
-  - `storage/live/angel_index_ai_signals_curated.csv`
+  - `storage/live/dhan_index_ai_signals_curated.csv`
   - Or any live feature CSV used by the model (agent must inspect existing model pipeline to choose correct file).
 
 **Outputs:**
@@ -179,7 +179,7 @@ Aggregate information from phases 361–363 into a single JSON/MD that can be sh
 Compute **rolling live accuracy metrics** over recent N bars/hours/days using forward returns.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 **Outputs:**
 - `storage/metrics/live_accuracy_tracker_365.json`
@@ -209,7 +209,7 @@ Compute **rolling live accuracy metrics** over recent N bars/hours/days using fo
 Evaluate different internal “threshold” configurations (e.g. probability cutoffs, risk multipliers) using current forward-return data, **without changing live behavior yet**.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
 - Configuration: either:
   - `config/system3_strategy_thresholds.json`
   - or a new config file created by this phase.
@@ -271,7 +271,7 @@ Based on metrics from 362, 363, 365, 366, compute **recommended safety mode**, b
 ## PHASE 368 — BROKER LATENCY & STABILITY MONITOR (READ-ONLY)
 
 **Objective:**  
-Measure basic latency and stability of AngelOne API responses during the day.
+Measure basic latency and stability of Dhan API responses during the day.
 
 **Inputs:**
 - Access to existing broker helper module used in phases 205 etc.
@@ -338,14 +338,14 @@ Measure timing of critical blocks (OP1, OP2, OP3, signals generation) to detect 
 Detect and repair **schema mismatches** in signals CSVs into a clean version, without touching the originals.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals.csv`
-- `storage/live/angel_index_ai_signals_curated.csv`
-- `storage/live/angel_index_ai_signals_with_forward.csv`
+- `storage/live/dhan_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_signals_curated.csv`
+- `storage/live/dhan_index_ai_signals_with_forward.csv`
 - Knowledge of expected core columns (agent must infer from existing pipeline and Phase 339).
 
 **Outputs:**
-- `storage/live/angel_index_ai_signals_clean_370.csv`
-- `storage/live/angel_index_ai_signals_with_forward_clean_370.csv`
+- `storage/live/dhan_index_ai_signals_clean_370.csv`
+- `storage/live/dhan_index_ai_signals_with_forward_clean_370.csv`
 - `reports/SIGNAL_SCHEMA_AUTOREPAIR_370.md`
 - `storage/metrics/signal_schema_repair_370.json`
 
@@ -354,7 +354,7 @@ Detect and repair **schema mismatches** in signals CSVs into a clean version, wi
 - For each file:
   - Detect rows where column count != header length → mark as corrupted rows.
   - Drop corrupted rows into a separate quarantine CSV:
-    - `storage/live/quarantine/angel_index_ai_signals_badrows_370.csv`
+    - `storage/live/quarantine/dhan_index_ai_signals_badrows_370.csv`
   - Ensure all required core columns exist; if missing:
     - log ERROR in report, but still keep file; do not invent columns.
 - Write cleaned versions with rows filtered and minimal type normalization.
@@ -377,7 +377,7 @@ Detect and repair **schema mismatches** in signals CSVs into a clean version, wi
 Analyse and prepare a plan to resolve **duplicate signals** (same symbol/expiry/strike/timestamp).
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals_clean_370.csv` (if present, else fallback to original).
+- `storage/live/dhan_index_ai_signals_clean_370.csv` (if present, else fallback to original).
 - Columns that identify uniqueness:
   - broker-specific instrument token or (symbol, expiry, strike, option_type, timestamp).
 
@@ -408,11 +408,11 @@ Analyse and prepare a plan to resolve **duplicate signals** (same symbol/expiry/
 Produce a **deduplicated version** of signals using clear rules, without destroying the originals.
 
 **Inputs:**
-- `storage/live/angel_index_ai_signals_clean_370.csv`
+- `storage/live/dhan_index_ai_signals_clean_370.csv`
 - `storage/metrics/signal_dedup_analysis_371.json` (if available)
 
 **Outputs:**
-- `storage/live/angel_index_ai_signals_dedup_372.csv`
+- `storage/live/dhan_index_ai_signals_dedup_372.csv`
 - `reports/SIGNAL_DEDUP_CLEANER_372.md`
 - `storage/metrics/signal_dedup_cleaner_372.json`
 
@@ -442,11 +442,11 @@ Summarize the entire cleaned pipeline: original → clean → dedup → with_for
 
 **Inputs:**
 - Original & derived CSVs:
-  - `angel_index_ai_signals.csv`
-  - `angel_index_ai_signals_clean_370.csv`
-  - `angel_index_ai_signals_dedup_372.csv`
-  - `angel_index_ai_signals_with_forward.csv`
-  - `angel_index_ai_signals_with_forward_clean_370.csv` (if created)
+  - `dhan_index_ai_signals.csv`
+  - `dhan_index_ai_signals_clean_370.csv`
+  - `dhan_index_ai_signals_dedup_372.csv`
+  - `dhan_index_ai_signals_with_forward.csv`
+  - `dhan_index_ai_signals_with_forward_clean_370.csv` (if created)
 - Metrics from 370–372.
 
 **Outputs:**

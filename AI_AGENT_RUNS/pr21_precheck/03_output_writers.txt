@@ -824,7 +824,7 @@
 ./scripts/auto_monitor_and_improve.py:121:            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
 ./scripts/auto_monitor_and_improve.py:141:            positions_file = OUTPUTS_DIR / "positions_live.json"
 ./COMPLETE_END_TO_END_VERIFICATION_SUMMARY.md:165:- ✅ `outputs/chain_raw_live.csv` - Main option chain data
-./enhanced_angel_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
+./enhanced_dhan_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
 ./COMPLETE_VERIFICATION_PROOF.md:163:- ✅ `outputs/pnl_live.json` - Active PnL tracking
 ./COMPLETE_VERIFICATION_PROOF.md:164:- ✅ `outputs/positions_live.json` - Active position tracking
 ./COMPLETE_VERIFICATION_PROOF.md:165:- ✅ `outputs/chain_raw_live.csv` - Live data feed
@@ -1750,7 +1750,7 @@
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:824:./scripts/auto_monitor_and_improve.py:121:            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:825:./scripts/auto_monitor_and_improve.py:141:            positions_file = OUTPUTS_DIR / "positions_live.json"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:826:./COMPLETE_END_TO_END_VERIFICATION_SUMMARY.md:165:- ✅ `outputs/chain_raw_live.csv` - Main option chain data
-./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_angel_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
+./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_dhan_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:828:./COMPLETE_VERIFICATION_PROOF.md:163:- ✅ `outputs/pnl_live.json` - Active PnL tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:829:./COMPLETE_VERIFICATION_PROOF.md:164:- ✅ `outputs/positions_live.json` - Active position tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:830:./COMPLETE_VERIFICATION_PROOF.md:165:- ✅ `outputs/chain_raw_live.csv` - Live data feed
@@ -2676,7 +2676,7 @@
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1750:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:824:./scripts/auto_monitor_and_improve.py:121:            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1751:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:825:./scripts/auto_monitor_and_improve.py:141:            positions_file = OUTPUTS_DIR / "positions_live.json"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1752:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:826:./COMPLETE_END_TO_END_VERIFICATION_SUMMARY.md:165:- ✅ `outputs/chain_raw_live.csv` - Main option chain data
-./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1753:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_angel_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
+./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1753:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_dhan_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1754:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:828:./COMPLETE_VERIFICATION_PROOF.md:163:- ✅ `outputs/pnl_live.json` - Active PnL tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1755:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:829:./COMPLETE_VERIFICATION_PROOF.md:164:- ✅ `outputs/positions_live.json` - Active position tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1756:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:830:./COMPLETE_VERIFICATION_PROOF.md:165:- ✅ `outputs/chain_raw_live.csv` - Live data feed
@@ -3602,7 +3602,7 @@
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2676:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1750:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:824:./scripts/auto_monitor_and_improve.py:121:            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2677:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1751:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:825:./scripts/auto_monitor_and_improve.py:141:            positions_file = OUTPUTS_DIR / "positions_live.json"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2678:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1752:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:826:./COMPLETE_END_TO_END_VERIFICATION_SUMMARY.md:165:- ✅ `outputs/chain_raw_live.csv` - Main option chain data
-./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2679:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1753:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_angel_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
+./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2679:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1753:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:827:./enhanced_dhan_data_integration.py:25:            chain_file = ROOT_DIR / "outputs" / "chain_raw_live.csv"
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2680:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1754:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:828:./COMPLETE_VERIFICATION_PROOF.md:163:- ✅ `outputs/pnl_live.json` - Active PnL tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2681:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1755:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:829:./COMPLETE_VERIFICATION_PROOF.md:164:- ✅ `outputs/positions_live.json` - Active position tracking
 ./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:2682:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:1756:./AI_AGENT_RUNS/pr21_precheck/03_output_writers.txt:830:./COMPLETE_VERIFICATION_PROOF.md:165:- ✅ `outputs/chain_raw_live.csv` - Live data feed

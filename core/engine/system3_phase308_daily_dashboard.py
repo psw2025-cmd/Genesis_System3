@@ -19,8 +19,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_WITH_FORWARD_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
-CONFIDENCE_TAGGED_CSV = STORAGE_LIVE / "angel_index_ai_signals_confidence_tagged_305.csv"
+SIGNALS_WITH_FORWARD_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
+CONFIDENCE_TAGGED_CSV = STORAGE_LIVE / "dhan_index_ai_signals_confidence_tagged_305.csv"
 PERFORMANCE_301_JSON = STORAGE_META / "system3_daily_performance_301.json"
 REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
 CONSISTENCY_307_JSON = STORAGE_META / "system3_live_vs_test_consistency_307.json"

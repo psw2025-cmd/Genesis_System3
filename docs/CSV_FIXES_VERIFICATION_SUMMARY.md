@@ -11,7 +11,7 @@
 
 All three files have been verified to use robust CSV loading:
 
-#### ✅ 1. `core/engine/angel_pnl_simulator.py`
+#### ✅ 1. `core/engine/dhan_pnl_simulator.py`
 
 **Lines 43-53**:
 ```python
@@ -36,7 +36,7 @@ except Exception as e:
 
 ---
 
-#### ✅ 2. `core/engine/angel_trade_decision.py`
+#### ✅ 2. `core/engine/dhan_trade_decision.py`
 
 **Lines 242-248**:
 ```python
@@ -57,7 +57,7 @@ except Exception as e:
 
 ---
 
-#### ✅ 3. `core/engine/angel_real_data_extractor.py`
+#### ✅ 3. `core/engine/dhan_real_data_extractor.py`
 
 **Lines 41-45**:
 ```python
@@ -101,7 +101,7 @@ All tests passed successfully:
 
 #### ✅ Test 4: Full PnL Simulation
 ```
-[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\angel_index_ai_pnl_log.csv
+[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\dhan_index_ai_pnl_log.csv
 
 === PnL SUMMARY BY UNDERLYING ===
 underlying  count  mean  max  min
@@ -115,17 +115,17 @@ underlying  count  mean  max  min
 
 ### Files Modified
 
-1. ✅ **`core/engine/angel_pnl_simulator.py`** (lines 43-53)
+1. ✅ **`core/engine/dhan_pnl_simulator.py`** (lines 43-53)
    - **Change**: Added `engine="python", on_bad_lines="skip"` to both CSV reads
    - **Change**: Added try/except blocks for error handling
    - **Impact**: PnL simulation now handles malformed CSV lines gracefully
 
-2. ✅ **`core/engine/angel_trade_decision.py`** (lines 242-248)
+2. ✅ **`core/engine/dhan_trade_decision.py`** (lines 242-248)
    - **Change**: Added `engine="python", on_bad_lines="skip"` to CSV read
    - **Change**: Added try/except block with proper logging
    - **Impact**: Trade decision generation handles malformed CSV lines gracefully
 
-3. ✅ **`core/engine/angel_real_data_extractor.py`** (line 42)
+3. ✅ **`core/engine/dhan_real_data_extractor.py`** (line 42)
    - **Change**: Updated existing try/except to use `engine="python", on_bad_lines="skip"`
    - **Impact**: Training data extraction handles malformed CSV lines gracefully
 
@@ -164,9 +164,9 @@ python test_csv_parsing_fixes.py
 python validate_csv_fixes_and_system3.py
 
 # Individual tests
-python -c "from core.engine.angel_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
-python -c "from core.engine.angel_trade_decision import main; main()"
-python -c "from core.engine.angel_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
+python -c "from core.engine.dhan_pnl_simulator import _load_data; df_sig, df_tr = _load_data(); print('✅ PASSED' if df_sig is not None or df_tr is not None else '⚠️ Files not found')"
+python -c "from core.engine.dhan_trade_decision import main; main()"
+python -c "from core.engine.dhan_real_data_extractor import extract_real_training_data; df = extract_real_training_data(); print(f'✅ PASSED ({len(df)} rows)')"
 ```
 
 ---

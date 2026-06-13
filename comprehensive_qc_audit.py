@@ -35,12 +35,12 @@ class ComprehensiveQCAudit:
             print(f"     Details: {details}")
     
     def audit_signals_csv(self):
-        """Deep analysis of angel_index_ai_signals.csv"""
+        """Deep analysis of dhan_index_ai_signals.csv"""
         print("\n" + "="*80)
         print("AUDIT: SIGNALS CSV FILE")
         print("="*80)
         
-        signals_path = self.base_path / "storage" / "live" / "angel_index_ai_signals.csv"
+        signals_path = self.base_path / "storage" / "live" / "dhan_index_ai_signals.csv"
         
         if not signals_path.exists():
             self.log_finding("INFO", "SIG-000", "Signals CSV not present (acceptable when no live/paper data)", str(signals_path))
@@ -145,12 +145,12 @@ class ComprehensiveQCAudit:
             self.log_finding("WARNING", "SIG-099", "Error reading signals CSV", str(e))
     
     def audit_orders_csv(self):
-        """Deep analysis of angel_virtual_orders.csv"""
+        """Deep analysis of dhan_virtual_orders.csv"""
         print("\n" + "="*80)
         print("AUDIT: ORDERS CSV FILE")
         print("="*80)
         
-        orders_path = self.base_path / "storage" / "live" / "angel_virtual_orders.csv"
+        orders_path = self.base_path / "storage" / "live" / "dhan_virtual_orders.csv"
         
         if not orders_path.exists():
             self.log_finding("INFO", "ORD-000", "Orders CSV not present (acceptable when no live/paper data)", str(orders_path))
@@ -252,7 +252,7 @@ class ComprehensiveQCAudit:
         print("AUDIT: PNL LOG FILE")
         print("="*80)
         
-        pnl_path = self.base_path / "storage" / "live" / "angel_index_ai_pnl_log.csv"
+        pnl_path = self.base_path / "storage" / "live" / "dhan_index_ai_pnl_log.csv"
         
         if not pnl_path.exists():
             self.log_finding("INFO", "PNL-000", "PnL log not present (acceptable when no live/paper data)", str(pnl_path))

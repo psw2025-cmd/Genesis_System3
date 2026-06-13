@@ -190,7 +190,7 @@ def clean_all_history_files() -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
 
     # Main live file
-    live_path = os.path.join("storage", "live", "angel_index_ai_signals.csv")
+    live_path = os.path.join("storage", "live", "dhan_index_ai_signals.csv")
     results.append(clean_csv_file(live_path, backup=True))
 
     # Archived CSVs

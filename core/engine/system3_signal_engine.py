@@ -11,7 +11,7 @@ Integrates all engines:
 - Scoring Engine
 - AI Model
 
-Outputs to: storage/live/angel_index_ai_signals.csv
+Outputs to: storage/live/dhan_index_ai_signals.csv
 """
 
 import sys
@@ -53,7 +53,7 @@ except ImportError:
     logger.warning("Ensemble predictor not available, will use Ultra/delta fallback")
 
 try:
-    from core.engine.angel_market_regime_classifier import classify_market_regime, adjust_strategy_for_regime
+    from core.engine.dhan_market_regime_classifier import classify_market_regime, adjust_strategy_for_regime
 
     REGIME_AVAILABLE = True
 except ImportError:
@@ -61,7 +61,7 @@ except ImportError:
     logger.warning("Market regime classifier not available")
 
 try:
-    from core.engine.angel_multi_timeframe_confirmation import check_multi_timeframe_confirmation
+    from core.engine.dhan_multi_timeframe_confirmation import check_multi_timeframe_confirmation
 
     MULTI_TF_AVAILABLE = True
 except ImportError:
@@ -71,7 +71,7 @@ except ImportError:
 # Output path
 LIVE_DIR = ROOT_DIR / "storage" / "live"
 LIVE_DIR.mkdir(parents=True, exist_ok=True)
-SIGNALS_CSV = LIVE_DIR / "angel_index_ai_signals.csv"
+SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 
 
 def load_recent_signal_history(
@@ -82,7 +82,7 @@ def load_recent_signal_history(
     System3 AI upgrade: Load recent signal history from CSV.
 
     Args:
-        history_path: Path to angel_index_ai_signals.csv
+        history_path: Path to dhan_index_ai_signals.csv
         max_rows: Max number of recent rows to keep
 
     Returns:

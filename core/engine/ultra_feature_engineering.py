@@ -5,12 +5,12 @@ Extends features from ~25 to ~100 for Ultra models only (shadow).
 Does not modify baseline features.
 
 Inputs:
-- storage/training/angel_index_options_training.csv (synthetic baseline)
-- storage/learning_ultra/angel_ultra_shadow_master.parquet (Phase 10)
+- storage/training/dhan_index_options_training.csv (synthetic baseline)
+- storage/learning_ultra/dhan_ultra_shadow_master.parquet (Phase 10)
 
 Outputs:
-- storage/training/angel_ultra_training.parquet
-- storage/training/angel_ultra_training.csv
+- storage/training/dhan_ultra_training.parquet
+- storage/training/dhan_ultra_training.csv
 
 Menu Option: 74
 """
@@ -25,13 +25,13 @@ TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"
 
 # Inputs
-SYNTHETIC_CSV = TRAINING_DIR / "angel_index_options_training.csv"
-SHADOW_PARQUET = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.parquet"
-SHADOW_CSV = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+SYNTHETIC_CSV = TRAINING_DIR / "dhan_index_options_training.csv"
+SHADOW_PARQUET = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.parquet"
+SHADOW_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 
 # Outputs
-ULTRA_TRAINING_PARQUET = TRAINING_DIR / "angel_ultra_training.parquet"
-ULTRA_TRAINING_CSV = TRAINING_DIR / "angel_ultra_training.csv"
+ULTRA_TRAINING_PARQUET = TRAINING_DIR / "dhan_ultra_training.parquet"
+ULTRA_TRAINING_CSV = TRAINING_DIR / "dhan_ultra_training.csv"
 
 TRAINING_DIR.mkdir(parents=True, exist_ok=True)
 LEARNING_ULTRA_DIR.mkdir(parents=True, exist_ok=True)

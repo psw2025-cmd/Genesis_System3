@@ -19,7 +19,7 @@
 ## New Modules Added (42-47)
 
 ### 1. Monday Morning Pre-Market Diagnostic
-- **File**: `core/engine/angel_monday_diagnostic.py`
+- **File**: `core/engine/dhan_monday_diagnostic.py`
 - **Menu**: Option 42
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only checks
@@ -36,7 +36,7 @@
 ---
 
 ### 2. Report Auto-Scheduler
-- **File**: `core/engine/angel_report_scheduler.py`
+- **File**: `core/engine/dhan_report_scheduler.py`
 - **Menu**: Option 43
 - **Status**: ✅ Complete
 - **Mode**: READ-ONLY - No auto-execution
@@ -50,7 +50,7 @@
 ---
 
 ### 3. Live Snapshot Reasoner
-- **File**: `core/engine/angel_live_snapshot_reasoner.py`
+- **File**: `core/engine/dhan_live_snapshot_reasoner.py`
 - **Menu**: Option 44
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only analysis
@@ -64,7 +64,7 @@
 ---
 
 ### 4. Outcome Confidence Curve Analyzer
-- **File**: `core/engine/angel_outcome_confidence_analyzer.py`
+- **File**: `core/engine/dhan_outcome_confidence_analyzer.py`
 - **Menu**: Option 45
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only analysis
@@ -78,7 +78,7 @@
 ---
 
 ### 5. Adaptive Volatility Map
-- **File**: `core/engine/angel_adaptive_volatility_map.py`
+- **File**: `core/engine/dhan_adaptive_volatility_map.py`
 - **Menu**: Option 46
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only analysis
@@ -92,7 +92,7 @@
 ---
 
 ### 6. Safety Layer V3 (Overfit Guard + Noise Suppressor)
-- **File**: `core/engine/angel_safety_layer_v3.py`
+- **File**: `core/engine/dhan_safety_layer_v3.py`
 - **Menu**: Option 47
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only validation
@@ -147,36 +147,36 @@
 ### Pre-Market (Monday Morning)
 ```bash
 # Run comprehensive diagnostic
-python -m core.engine.angel_monday_diagnostic
+python -m core.engine.dhan_monday_diagnostic
 # Or: Menu option 42
 ```
 
 ### During Trading
 ```bash
 # Reason about current snapshot
-python -m core.engine.angel_live_snapshot_reasoner
+python -m core.engine.dhan_live_snapshot_reasoner
 # Or: Menu option 44
 
 # Check volatility map
-python -m core.engine.angel_adaptive_volatility_map
+python -m core.engine.dhan_adaptive_volatility_map
 # Or: Menu option 46
 ```
 
 ### Post-Trading Analysis
 ```bash
 # Analyze confidence curves
-python -m core.engine.angel_outcome_confidence_analyzer
+python -m core.engine.dhan_outcome_confidence_analyzer
 # Or: Menu option 45
 
 # Run safety checks V3
-python -m core.engine.angel_safety_layer_v3
+python -m core.engine.dhan_safety_layer_v3
 # Or: Menu option 47
 ```
 
 ### Report Scheduling
 ```bash
 # Check report schedule status
-python -m core.engine.angel_report_scheduler
+python -m core.engine.dhan_report_scheduler
 # Or: Menu option 43
 ```
 
@@ -186,12 +186,12 @@ python -m core.engine.angel_report_scheduler
 
 ```bash
 # Test all new modules
-python -m core.engine.angel_monday_diagnostic
-python -m core.engine.angel_report_scheduler
-python -m core.engine.angel_live_snapshot_reasoner
-python -m core.engine.angel_outcome_confidence_analyzer
-python -m core.engine.angel_adaptive_volatility_map
-python -m core.engine.angel_safety_layer_v3
+python -m core.engine.dhan_monday_diagnostic
+python -m core.engine.dhan_report_scheduler
+python -m core.engine.dhan_live_snapshot_reasoner
+python -m core.engine.dhan_outcome_confidence_analyzer
+python -m core.engine.dhan_adaptive_volatility_map
+python -m core.engine.dhan_safety_layer_v3
 ```
 
 ---

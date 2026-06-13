@@ -19,8 +19,8 @@ from typing import Dict, Any, List, Optional
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
-STAGING_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra_staging"
-BLENDED_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_real_blended"
+STAGING_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra_staging"
+BLENDED_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_real_blended"
 LOGS_ULTRA_DIR = PROJECT_ROOT / "storage" / "logs_ultra"
 
 STAGING_MODELS_DIR.mkdir(parents=True, exist_ok=True)

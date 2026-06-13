@@ -41,7 +41,7 @@ All required files exist and are accessible:
 ✅ **Configuration Files** (3 files)
 - `core/config/system3_ultra_safety.json`
 - `core/engine/ultra_safety.py`
-- `core/engine/angel_automation_config.py`
+- `core/engine/dhan_automation_config.py`
 
 ✅ **Ultra Phase Modules** (8 files)
 - `core/ultra/phase21_adaptive_risk_engine.py`

@@ -27,7 +27,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 def load_current_risk_params() -> Dict[str, Any]:
     """Load current risk parameters."""
     # Try to load from config
-    config_path = CONFIG_DIR / "angel_trade_config.json"
+    config_path = CONFIG_DIR / "dhan_trade_config.json"
     if config_path.exists():
         try:
             with config_path.open("r", encoding="utf-8") as f:
@@ -50,7 +50,7 @@ def load_current_risk_params() -> Dict[str, Any]:
 def load_performance_metrics() -> Dict[str, float]:
     """Load recent performance metrics."""
     # Try to load from PnL logs
-    pnl_path = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_pnl_log.csv"
+    pnl_path = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_pnl_log.csv"
     if pnl_path.exists():
         try:
             df = pd.read_csv(pnl_path)

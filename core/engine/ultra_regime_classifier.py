@@ -5,10 +5,10 @@ Classifies market regimes (low/medium/high volatility, trending vs ranging).
 Adds regime labels to Ultra training data.
 
 Inputs:
-- storage/training/angel_ultra_training.parquet
+- storage/training/dhan_ultra_training.parquet
 
 Outputs:
-- storage/training/angel_ultra_training_with_regime.parquet
+- storage/training/dhan_ultra_training_with_regime.parquet
 - storage/reports_ultra/ultra_regime_summary.csv
 
 Menu Option: 77
@@ -23,9 +23,9 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 
-ULTRA_TRAINING_PARQUET = TRAINING_DIR / "angel_ultra_training.parquet"
-ULTRA_TRAINING_CSV = TRAINING_DIR / "angel_ultra_training.csv"
-ULTRA_TRAINING_WITH_REGIME_PARQUET = TRAINING_DIR / "angel_ultra_training_with_regime.parquet"
+ULTRA_TRAINING_PARQUET = TRAINING_DIR / "dhan_ultra_training.parquet"
+ULTRA_TRAINING_CSV = TRAINING_DIR / "dhan_ultra_training.csv"
+ULTRA_TRAINING_WITH_REGIME_PARQUET = TRAINING_DIR / "dhan_ultra_training_with_regime.parquet"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 

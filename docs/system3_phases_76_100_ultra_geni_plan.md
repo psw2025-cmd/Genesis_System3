@@ -41,9 +41,9 @@ GENI reviews past signals vs outcomes and creates a **self-critique report**: wh
 ### Implementation details (for agent)
 
 - Input sources:
-  - `storage/live/angel_index_ai_signals.csv`  (historical signals)
-  - `storage/live/angel_index_ai_trades_plan.csv` (if exists)
-  - `storage/live/angel_index_ai_pnl_log.csv` (if exists)
+  - `storage/live/dhan_index_ai_signals.csv`  (historical signals)
+  - `storage/live/dhan_index_ai_trades_plan.csv` (if exists)
+  - `storage/live/dhan_index_ai_pnl_log.csv` (if exists)
 - For each **signal** row (unique by timestamp, underlying, strike, side):
   - Find any corresponding trade (optional)
   - Find any outcome in PnL log (optional)

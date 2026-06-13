@@ -41,7 +41,7 @@ def run_phase332_signal_volume_coverage(root_path: str = None, **kwargs) -> Dict
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load curated signals
-    signals_file = root / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+    signals_file = root / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
     warnings = []
 

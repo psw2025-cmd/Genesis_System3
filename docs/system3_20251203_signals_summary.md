@@ -2,13 +2,13 @@
 
 **Date**: 2025-12-03 (India time)  
 **Analysis Date**: 2025-12-03  
-**Broker**: AngelOne (Index Options Only)
+**Broker**: Dhan (Index Options Only)
 
 ---
 
 ## Executive Summary
 
-**No signals were generated today** - The autopilot did not produce any BUY/SELL signals in `angel_index_ai_signals.csv`. This is likely due to conservative thresholds or market conditions not meeting signal criteria.
+**No signals were generated today** - The autopilot did not produce any BUY/SELL signals in `dhan_index_ai_signals.csv`. This is likely due to conservative thresholds or market conditions not meeting signal criteria.
 
 **Key Finding**: The signals CSV file exists but contains only headers (no data rows for today).
 
@@ -18,11 +18,11 @@
 
 | File | Exists | Rows Today | Status |
 |------|--------|-------------|--------|
-| `angel_index_ai_signals.csv` | ✅ Yes | 0 | Empty (headers only) |
-| `angel_index_ai_signals_curated.csv` | ✅ Yes | - | Contains historical data |
-| `angel_index_ai_signals_with_forward.csv` | ✅ Yes | - | Contains historical data |
-| `angel_index_ai_signals_reconciled.csv` | ✅ Yes | - | Contains historical data |
-| `angel_index_ai_signals_confidence_tagged_305.csv` | ✅ Yes | - | Contains historical data |
+| `dhan_index_ai_signals.csv` | ✅ Yes | 0 | Empty (headers only) |
+| `dhan_index_ai_signals_curated.csv` | ✅ Yes | - | Contains historical data |
+| `dhan_index_ai_signals_with_forward.csv` | ✅ Yes | - | Contains historical data |
+| `dhan_index_ai_signals_reconciled.csv` | ✅ Yes | - | Contains historical data |
+| `dhan_index_ai_signals_confidence_tagged_305.csv` | ✅ Yes | - | Contains historical data |
 
 ---
 
@@ -54,7 +54,7 @@ Based on the logs, the autopilot ran successfully but did not generate signals. 
 
 3. **OP3 Error**: Throughout the day, OP3 (Trade Decision & Planning) consistently reported:
    ```
-   [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\angel_index_ai_signals.csv
+   [ERROR] Signals CSV not found: C:\Genesis_System3\storage\live\dhan_index_ai_signals.csv
    ```
    This indicates the autopilot did not create the signals file.
 
@@ -99,7 +99,7 @@ Based on the logs, the autopilot ran successfully but did not generate signals. 
 - **Note**: Threshold tuner ran successfully but had no signals to tune thresholds for
 
 ### Files Updated
-- `angel_index_ai_signals_with_forward.csv`: Not updated (no new signals)
+- `dhan_index_ai_signals_with_forward.csv`: Not updated (no new signals)
 - `system3_signal_edge_report.md`: Not updated (no new signals)
 - Threshold candidates JSON: Not updated (no new signals)
 
@@ -115,7 +115,7 @@ The curated file was refreshed 4 times during the day:
 - 13:15:48 IST
 - 15:16:10 IST
 
-**Training Source**: `angel_index_ai_signals_curated.csv` (contains historical data)
+**Training Source**: `dhan_index_ai_signals_curated.csv` (contains historical data)
 
 **Note**: The model trained from historical curated data, not from today's signals (since none were generated).
 

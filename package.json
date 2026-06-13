@@ -4,6 +4,6 @@
     "lightweight-charts": "^5.1.0",
     "plotly.js": "^3.4.0",
     "react-plotly.js": "^2.6.0",
-    "smartapi-javascript": "^1.0.27"
+    "dhanhq-javascript": "^1.0.27"
   }
 }

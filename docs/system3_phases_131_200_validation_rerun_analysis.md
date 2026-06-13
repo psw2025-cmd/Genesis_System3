@@ -278,7 +278,7 @@ The variable reference error is completely resolved:
 | DRY_RUN Mode | ✅ ACTIVE | `dry_run: true` in all configs |
 | Live Trading | ✅ DISABLED | `live_trading_enabled: false` |
 | Kill Switch | ✅ INACTIVE | No critical errors |
-| Broker Config | ✅ ANGEL_ONE | All phases configured |
+| Broker Config | ✅ DHAN | All phases configured |
 | Capital Guardrails | ✅ ACTIVE | 1-lot-only enforced |
 | Master Session | ✅ READY | Phase 135: READY=YES |
 | DRY-RUN Readiness | ✅ YES | Phase 196: All checks passed |

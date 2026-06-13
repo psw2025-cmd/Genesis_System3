@@ -42,7 +42,7 @@ C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase221_forward_
 - EXIT CODE: 0
 - **SUCCESS**: If exit code is 0, no error keywords in stderr, and output file created
 
-**Output File**: `storage\live\angel_index_ai_signals_with_forward.csv`
+**Output File**: `storage\live\dhan_index_ai_signals_with_forward.csv`
 
 **Error Keywords to Check**:
 - error
@@ -75,7 +75,7 @@ C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase222_signal_e
 
 ### 4. PnL Simulator
 ```batch
-C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 ```
 
 **Expected Output**:
@@ -84,7 +84,7 @@ C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
 - EXIT CODE: 0
 - **SUCCESS**: If exit code is 0, no error keywords in stderr, and output file created
 
-**Output File**: `storage\live\angel_index_ai_pnl_log.csv`
+**Output File**: `storage\live\dhan_index_ai_pnl_log.csv`
 
 **Error Keywords to Check**: Same as above
 

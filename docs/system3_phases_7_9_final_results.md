@@ -26,8 +26,8 @@
 - ⚠️ Real outcomes: Missing (handled gracefully)
 
 **Output Files Created**:
-- ✅ `storage/learning/angel_index_real_master_dataset.csv` - **3 rows**
-- ✅ `storage/learning/angel_index_real_master_dataset.parquet` - **3 rows** (pyarrow now working!)
+- ✅ `storage/learning/dhan_index_real_master_dataset.csv` - **3 rows**
+- ✅ `storage/learning/dhan_index_real_master_dataset.parquet` - **3 rows** (pyarrow now working!)
 
 **Status**: ✅ **COMPLETE SUCCESS**
 
@@ -75,7 +75,7 @@
 - 5 model files: `*_model_blended_v3.pkl`
 - 5 metadata files: `*_model_blended_v3_meta.json`
 
-**Location**: `core/models/angel_one_real_blended/`
+**Location**: `core/models/dhan_real_blended/`
 
 **Status**: ✅ **COMPLETE SUCCESS**
 
@@ -99,11 +99,11 @@
 - Execution Mode: **DRY_RUN_ONLY**
 
 **Model Sources** (BASELINE mode):
-- ✅ NIFTY: `core/models/angel_one/NIFTY_model.pkl` (BASELINE)
-- ✅ BANKNIFTY: `core/models/angel_one/BANKNIFTY_model.pkl` (BASELINE)
-- ✅ FINNIFTY: `core/models/angel_one/FINNIFTY_model.pkl` (BASELINE)
-- ✅ MIDCPNIFTY: `core/models/angel_one/MIDCPNIFTY_model.pkl` (BASELINE)
-- ✅ SENSEX: `core/models/angel_one/SENSEX_model.pkl` (BASELINE)
+- ✅ NIFTY: `core/models/dhan/NIFTY_model.pkl` (BASELINE)
+- ✅ BANKNIFTY: `core/models/dhan/BANKNIFTY_model.pkl` (BASELINE)
+- ✅ FINNIFTY: `core/models/dhan/FINNIFTY_model.pkl` (BASELINE)
+- ✅ MIDCPNIFTY: `core/models/dhan/MIDCPNIFTY_model.pkl` (BASELINE)
+- ✅ SENSEX: `core/models/dhan/SENSEX_model.pkl` (BASELINE)
 
 **Thresholds** (BASELINE):
 - min_confidence: **0.8**
@@ -166,29 +166,29 @@
 
 **Check Phase 7**:
 ```bash
-dir storage\learning\angel_index_real_master_dataset.*
+dir storage\learning\dhan_index_real_master_dataset.*
 ```
 
 **Check Phase 8**:
 ```bash
-dir core\models\angel_one_real_blended
+dir core\models\dhan_real_blended
 ```
 
 **Check Phase 9**:
 ```bash
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 ### Detailed Verification
 
 **View Master Dataset**:
 ```bash
-python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}')"
+python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}')"
 ```
 
 **View Model Metadata**:
 ```bash
-type core\models\angel_one_real_blended\FINNIFTY_model_blended_v3_meta.json
+type core\models\dhan_real_blended\FINNIFTY_model_blended_v3_meta.json
 ```
 
 ---

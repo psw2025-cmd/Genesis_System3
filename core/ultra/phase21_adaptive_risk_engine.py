@@ -46,8 +46,8 @@ class AdaptiveRiskEngine:
         win_rates = {}
 
         # Try to load from PnL logs or shadow master
-        pnl_csv = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
-        shadow_csv = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+        pnl_csv = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
+        shadow_csv = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 
         for csv_path in [pnl_csv, shadow_csv]:
             if csv_path.exists():

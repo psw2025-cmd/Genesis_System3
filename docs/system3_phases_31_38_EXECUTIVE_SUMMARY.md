@@ -82,7 +82,7 @@ storage/ultra/
 └── phase38_governance_summary.md
 
 storage/live/
-└── angel_index_ai_ultra_trades_shadow.csv         (0 rows, header only)
+└── dhan_index_ai_ultra_trades_shadow.csv         (0 rows, header only)
 ```
 
 ### Monitoring Scripts (8 files)
@@ -187,15 +187,15 @@ docs/
 ## 📋 Input Files Used
 
 ### Phase 31
-- `storage/live/angel_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_signals.csv`
 - `storage/reports_ultra/phase21_risk_evaluations.csv`
 - `storage/reports_ultra/phase24_confidence_drift_report.json`
 - `storage/reports_ultra/phase29_sensitivity_summary.json`
 - `storage/reports_ultra/phase30_calibration_results.csv`
 
 ### Phase 32
-- `storage/live/angel_index_ai_trades_plan.csv`
-- `storage/live/angel_index_ai_pnl_log.csv`
+- `storage/live/dhan_index_ai_trades_plan.csv`
+- `storage/live/dhan_index_ai_pnl_log.csv`
 - `storage/ultra/phase31_ultra_fused_decisions.csv`
 
 ### Phase 33
@@ -203,12 +203,12 @@ docs/
 - `storage/config/thresholds_auto.json` (read-only)
 
 ### Phase 34
-- `storage/live/angel_index_ai_signals.csv`
+- `storage/live/dhan_index_ai_signals.csv`
 - `storage/ultra/phase31_ultra_fused_decisions.csv`
 
 ### Phase 35
 - `storage/ultra/phase31_ultra_fused_decisions.csv`
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 
 ### Phase 36
 - Calls other phases and modules
@@ -217,7 +217,7 @@ docs/
 ### Phase 37
 - `storage/config/thresholds_auto.json` (read-only)
 - `storage/ultra/phase35_decision_audit.csv`
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 
 ### Phase 38
 - `storage/ultra/phase32_ultra_vs_baseline_summary.md`

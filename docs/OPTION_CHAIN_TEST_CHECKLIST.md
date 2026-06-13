@@ -4,7 +4,7 @@
 
 ### Files Modified/Created
 
-1. **Core Broker Class** (`core/brokers/angel_one/broker.py`)
+1. **Core Broker Class** (`core/brokers/dhan/broker.py`)
    - ✅ Added `allow_data_only` parameter to `__init__()`
    - ✅ Added `get_option_chain()` method
    - ✅ Added `get_option_chain_by_underlying()` method
@@ -19,9 +19,9 @@
 
 3. **Updated Existing Scripts** (All use `allow_data_only=True`)
    - ✅ `core/engine/test_angelone_api.py`
-   - ✅ `core/engine/angel_options_watch.py`
-   - ✅ `core/engine/angel_options_watch_loop.py`
-   - ✅ `core/engine/angel_monday_diagnostic.py`
+   - ✅ `core/engine/dhan_options_watch.py`
+   - ✅ `core/engine/dhan_options_watch_loop.py`
+   - ✅ `core/engine/dhan_monday_diagnostic.py`
    - ✅ `core/engine/system3_phase205_broker_selftest.py`
    - ✅ `core/engine/ultra_live_signals_shadow.py`
 
@@ -38,7 +38,7 @@ Before running the test, ensure:
   - [ ] `ANGELONE_PIN` or `ANGELONE_PASSWORD`
   - [ ] `ANGELONE_TOTP` (TOTP secret)
 - [ ] Instruments master file exists: `storage/instruments/OpenAPIScripMaster.json`
-- [ ] Dependencies installed: `smartapi-python`, `pyotp`, `pandas`
+- [ ] Dependencies installed: `dhanhq-python`, `pyotp`, `pandas`
 
 ### Test Commands
 
@@ -61,7 +61,7 @@ python -m core.engine.test_angelone_option_chain SENSEX
 ### Expected Output
 
 ```
-Initializing AngelOne broker...
+Initializing Dhan broker...
 Login successful.
 
 Fetching option chain data...
@@ -94,7 +94,7 @@ Option chain saved to: storage/live/option_chain_NIFTY_NFO.csv
 #### Issue: "LIVE TRADING BLOCKED BY ENV GUARD"
 **Status**: ✅ **FIXED** - Should not occur with `allow_data_only=True`
 
-#### Issue: "Missing AngelOne env values"
+#### Issue: "Missing Dhan env values"
 **Solution**: Check `config/.env` file has all required credentials
 
 #### Issue: "Index NIFTY not found"

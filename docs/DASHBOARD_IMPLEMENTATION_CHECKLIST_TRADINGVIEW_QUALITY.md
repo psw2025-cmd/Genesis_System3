@@ -1,6 +1,6 @@
 # Dashboard Implementation Checklist — TradingView/Binance Quality & Full Working Capability
 
-**Goal:** Implement everything needed so our dashboard matches the **quality and full working capability** of TradingView / exchange-style (e.g. Binance) dashboards, using **Angel One only** (no Binance).
+**Goal:** Implement everything needed so our dashboard matches the **quality and full working capability** of TradingView / exchange-style (e.g. Binance) dashboards, using **Dhan only** (no Binance).
 
 ---
 
@@ -141,6 +141,6 @@ The dashboard will be at **TradingView/Binance-style quality and full working ca
 - **TradingView / exchange reference:** `docs/TRADINGVIEW_AND_EXCHANGE_DASHBOARD_REFERENCE.md`
 - **Current backend routes:** `dashboard/backend/app.py` (e.g. `/api/chain`, `/api/charting/*`, `/api/orders/*`, `/api/trades/*`, `/api/export/*`, `/api/proof-pack`).
 - **Current frontend:** `dashboard/frontend/src/App.tsx` (routes), `dashboard/frontend/src/components/*`.
-- **Angel only:** No Binance; all data and orders via Angel One.
+- **Angel only:** No Binance; all data and orders via Dhan.
 
 Use this checklist to implement the missing pieces so the dashboard matches TradingView/exchange quality and is fully usable end-to-end.

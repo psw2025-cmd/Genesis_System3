@@ -26,28 +26,28 @@ OUTPUT_JSON_PATH = STORAGE_ULTRA / "phase132_master_health_snapshot.json"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase132_master_health_snapshot.md"
 
 
-def check_angel_connectivity() -> Dict[str, Any]:
+def check_dhan_connectivity() -> Dict[str, Any]:
     """
-    Check AngelOne connectivity (safe mode, no orders).
+    Check Dhan connectivity (safe mode, no orders).
 
     Returns:
         dict: Status info
     """
     try:
-        # Try to import existing AngelOne modules
-        from core.brokers.angel_one.broker import Broker as AngelBroker
+        # Try to import existing Dhan modules
+        from core.brokers.dhan.broker import Broker as AngelBroker
 
         # Try a safe operation (like checking if broker class exists)
         # DO NOT place orders or modify anything
         broker_status = "OK"
-        broker_message = "AngelOne broker module available"
+        broker_message = "Dhan broker module available"
 
     except ImportError:
         broker_status = "WARN"
-        broker_message = "AngelOne broker module not found (may be optional)"
+        broker_message = "Dhan broker module not found (may be optional)"
     except Exception as e:
         broker_status = "ERROR"
-        broker_message = f"Error checking AngelOne: {e}"
+        broker_message = f"Error checking Dhan: {e}"
 
     return {
         "status": broker_status,
@@ -85,8 +85,8 @@ def run_phase132_master_health_snapshot() -> Dict[str, Any]:
         python_version = platform.python_version()
         venv_detected = "venv" in sys.executable.lower() or "virtualenv" in sys.executable.lower()
 
-        # Check AngelOne connectivity
-        broker_info = check_angel_connectivity()
+        # Check Dhan connectivity
+        broker_info = check_dhan_connectivity()
 
         # Classify statuses
         env_status = "OK"
@@ -113,7 +113,7 @@ def run_phase132_master_health_snapshot() -> Dict[str, Any]:
                 "status": env_status,
             },
             "broker": {
-                "name": "ANGEL_ONE",
+                "name": "DHAN",
                 "status": broker_status,
                 "message": broker_info["message"],
             },
@@ -133,7 +133,7 @@ def run_phase132_master_health_snapshot() -> Dict[str, Any]:
             f.write("| Check | Status | Details |\n")
             f.write("|-------|--------|---------|\n")
             f.write(f"| Environment | {env_status} | Python {python_version}, venv: {venv_detected} |\n")
-            f.write(f"| Broker (AngelOne) | {broker_status} | {broker_info['message']} |\n")
+            f.write(f"| Broker (Dhan) | {broker_status} | {broker_info['message']} |\n")
             f.write(f"| Config Loaded | {'YES' if health_data['config_loaded'] else 'NO'} | {MASTER_CONFIG_PATH} |\n")
 
             f.write("\n## Summary\n\n")

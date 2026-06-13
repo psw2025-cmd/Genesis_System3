@@ -60,7 +60,7 @@ The **System3 Ultra Control Panel** has been successfully implemented as the mas
 ### Baseline Core Operations (50 modules)
 All baseline modules from `run_system3.py` are integrated:
 - Core boot, health check, data pipeline tests
-- Angel One API tests and instruments
+- Dhan API tests and instruments
 - Index options watch and analysis
 - Training dataset building and model training
 - Live AI signals and synthetic backtesting
@@ -164,7 +164,7 @@ All Ultra operations run in **shadow-mode**:
 - `storage/ultra/` - Ultra live data
 - `storage/learning_ultra/` - Ultra learning data
 - `storage/reports_ultra/` - Ultra reports
-- `core/models/angel_one_ultra/` - Ultra models
+- `core/models/dhan_ultra/` - Ultra models
 - `storage/logs_ultra/` - Ultra logs
 
 ---

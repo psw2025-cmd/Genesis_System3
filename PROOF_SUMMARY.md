@@ -1,7 +1,7 @@
 # Live Option Chain System - Proof Summary
 
 **Date**: 2026-01-30  
-**System**: Angel One SmartAPI Live Trading Option Chain Pipeline  
+**System**: Dhan DhanHQ Live Trading Option Chain Pipeline  
 **Status**: ✅ **IMPLEMENTATION COMPLETE**
 
 ---

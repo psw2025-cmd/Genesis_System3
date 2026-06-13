@@ -35,7 +35,7 @@ jobs:
 
           train_rx = re.compile(r'(train|retrain|model|predict|accuracy|calibrat|drift|shadow|kronos|wavelet|xgboost|lstm)', re.I)
           backtest_rx = re.compile(r'(backtest|walk.?forward|strategy|pnl|performance|validation)', re.I)
-          broker_rx = re.compile(r'(SmartApi|generateSession|placeOrder|modifyOrder|cancelOrder|live trading|SYSTEM3_LIVE_TRADING_ALLOWED|AngelOneBroker)', re.I)
+          broker_rx = re.compile(r'(SmartApi|generateSession|placeOrder|modifyOrder|cancelOrder|live trading|SYSTEM3_LIVE_TRADING_ALLOWED|DhanBroker)', re.I)
           safe_cli_rx = re.compile(r'(dry.?run|read.?only|analyzer|paper|no.?broker|mock|sample|help|argparse|click)', re.I)
 
           def inspect(path):

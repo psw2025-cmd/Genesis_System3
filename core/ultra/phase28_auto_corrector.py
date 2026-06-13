@@ -134,7 +134,7 @@ def analyze_misfires(df: pd.DataFrame, n: int = 300) -> Dict[str, Any]:
 def load_recent_outcomes(n: int = 300) -> Optional[pd.DataFrame]:
     """Load last N outcomes from available sources."""
     # Try PnL simulation
-    pnl_csv = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
+    pnl_csv = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
     if pnl_csv.exists():
         try:
             df = pd.read_csv(pnl_csv)
@@ -143,7 +143,7 @@ def load_recent_outcomes(n: int = 300) -> Optional[pd.DataFrame]:
             pass
 
     # Try shadow master
-    shadow_csv = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+    shadow_csv = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
     if shadow_csv.exists():
         try:
             df = pd.read_csv(shadow_csv)

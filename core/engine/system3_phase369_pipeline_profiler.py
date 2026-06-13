@@ -70,10 +70,10 @@ class PipelineProfiler:
         """Profile all critical signal files."""
 
         files_to_profile = [
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
-            STORAGE_LIVE / "clean" / "angel_index_ai_signals_deduped.csv",
-            STORAGE_LIVE / "clean" / "angel_index_ai_signals_with_forward_deduped.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "clean" / "dhan_index_ai_signals_deduped.csv",
+            STORAGE_LIVE / "clean" / "dhan_index_ai_signals_with_forward_deduped.csv",
         ]
 
         profile_results = {}

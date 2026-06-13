@@ -11,9 +11,9 @@
 
 **Created Missing Configuration Files**:
 
-#### `config/angel_automation_config.json`
+#### `config/dhan_automation_config.json`
 - **Status**: ✅ Created
-- **Location**: `C:\Genesis_System3\config\angel_automation_config.json`
+- **Location**: `C:\Genesis_System3\config\dhan_automation_config.json`
 - **Contents**:
   ```json
   {
@@ -108,7 +108,7 @@ python system3_ultra.py
 ## Summary
 
 ### ✅ Completed
-1. ✅ Created `config/angel_automation_config.json`
+1. ✅ Created `config/dhan_automation_config.json`
 2. ✅ Created `config/system3_job_scheduler.json`
 3. ✅ Verified menu handler is working
 4. ✅ Verified phases are functional (from log analysis)
@@ -140,7 +140,7 @@ python system3_ultra.py
 
 ## Files Created/Updated
 
-1. ✅ `config/angel_automation_config.json` - Created
+1. ✅ `config/dhan_automation_config.json` - Created
 2. ✅ `config/system3_job_scheduler.json` - Created
 3. ✅ `docs/system3_phases_78_100_next_steps_completed.md` - This document
 

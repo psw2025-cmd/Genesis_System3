@@ -1,7 +1,7 @@
 """
 System3 Forward Signal Integrity Test Suite
 
-Validates angel_index_ai_signals_with_forward.csv integrity before PnL enrichment.
+Validates dhan_index_ai_signals_with_forward.csv integrity before PnL enrichment.
 Tests critical columns: ts, side, no NaN in keys, file length.
 """
 
@@ -14,7 +14,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-FORWARD_SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+FORWARD_SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
 def test_forward_signal_integrity() -> dict:

@@ -17,9 +17,9 @@
 
 ## Detailed Check Results
 
-### ✅ Check 1: SmartAPI Login (dry-run)
+### ✅ Check 1: DhanHQ Login (dry-run)
 **Status**: ✅ **PASS**
-- **Details**: SmartAPI import successful
+- **Details**: DhanHQ import successful
 - **Verdict**: OK (non-blocking for DRY-RUN)
 
 ### ✅ Check 2: Internet Stability
@@ -48,8 +48,8 @@
 ### ✅ Check 6: Storage CSVs Exist
 **Status**: ✅ **PASS**
 - **Details**: 
-  - `storage/live/angel_index_ai_signals.csv`: 30 rows
-  - `storage/live/angel_index_ai_signals_curated.csv`: 608 rows
+  - `storage/live/dhan_index_ai_signals.csv`: 30 rows
+  - `storage/live/dhan_index_ai_signals_curated.csv`: 608 rows
 - **Verdict**: OK
 
 ### ✅ Check 7: Curated Signals Not Corrupted
@@ -87,7 +87,7 @@
 - **Details**: Schedule hints file exists
 - **Verdict**: OK
 
-### ✅ Check 13: AngelOne Data Extractor
+### ✅ Check 13: Dhan Data Extractor
 **Status**: ✅ **PASS**
 - **Details**: Extractor imports successfully
 - **Verdict**: OK
@@ -99,7 +99,7 @@
 
 ### ✅ Check 15: Options Chain Retrieval
 **Status**: ✅ **PASS**
-- **Details**: Chain code exists: `core/engine/angel_options_watch.py`
+- **Details**: Chain code exists: `core/engine/dhan_options_watch.py`
 - **Verdict**: OK
 
 ### ✅ Check 16: EV Tables Exist
@@ -119,7 +119,7 @@
 
 ### ✅ Check 19: Strike Decision Logic
 **Status**: ✅ **PASS**
-- **Details**: Decision logic found: `core/engine/angel_trade_decision.py`
+- **Details**: Decision logic found: `core/engine/dhan_trade_decision.py`
 - **Verdict**: OK
 
 ### ✅ Check 20: Candidate Trade Score
@@ -193,7 +193,7 @@
 - Shutdown flag: From yesterday ✅
 - No crash logs: Clean ✅
 - Internet: Connected ✅
-- SmartAPI: Available (non-blocking) ✅
+- DhanHQ: Available (non-blocking) ✅
 
 ### ✅ Market Hours (IST)
 - Market open: 09:15 ✅

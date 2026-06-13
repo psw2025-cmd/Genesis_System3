@@ -65,7 +65,7 @@ run_pre_market_check.bat
 ```
 
 **What it does**:
-- Loads latest snapshot from `storage/live/angel_index_ai_signals.csv`
+- Loads latest snapshot from `storage/live/dhan_index_ai_signals.csv`
 - Applies live thresholds (global + per_underlying)
 - Computes signal counts per underlying
 - Analyzes score distribution near thresholds
@@ -138,7 +138,7 @@ run_post_close_audit.bat
 ```
 
 **What it does**:
-- Loads today's signals from `storage/live/angel_index_ai_signals.csv`
+- Loads today's signals from `storage/live/dhan_index_ai_signals.csv`
 - Verifies each signal decision matches its score and thresholds
 - Checks for missing essential fields
 - Computes daily diagnostics:
@@ -208,7 +208,7 @@ run_post_close_audit.bat
 
 ### Configuration Files
 - `storage/meta/system3_live_thresholds.json` - Live thresholds
-- `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` - EV-ready data
+- `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` - EV-ready data
 
 ### Log Files
 - `storage/logs/system3_pre_market_check_YYYYMMDD.md` - Pre-market reports
@@ -216,7 +216,7 @@ run_post_close_audit.bat
 - `storage/logs/system3_post_close_audit_YYYYMMDD.md` - Post-close audits
 
 ### Signal Files
-- `storage/live/angel_index_ai_signals.csv` - Live signals log
+- `storage/live/dhan_index_ai_signals.csv` - Live signals log
 
 ---
 

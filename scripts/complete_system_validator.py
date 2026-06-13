@@ -29,7 +29,7 @@ class CompleteSystemValidator:
         print("-" * 80)
 
         critical_modules = [
-            "core.brokers.angel_one.broker",
+            "core.brokers.dhan.broker",
             "src.trading.paper_executor",
             "src.trading.pnl_tracker",
             "src.trading.advanced_position_sizing",
@@ -65,7 +65,7 @@ class CompleteSystemValidator:
         print("-" * 80)
 
         critical_files = [
-            "core/brokers/angel_one/broker.py",
+            "core/brokers/dhan/broker.py",
             "src/trading/paper_executor.py",
             "src/trading/pnl_tracker.py",
             "src/trading/advanced_position_sizing.py",

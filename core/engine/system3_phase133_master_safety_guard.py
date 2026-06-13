@@ -106,7 +106,7 @@ def run_phase133_master_safety_guard() -> Dict[str, Any]:
             "kill_switch_reasons": kill_switch_reasons if kill_switch_active else [],
             "safety_flags": {
                 "dry_run_only": True,
-                "angel_one_only": True,
+                "dhan_only": True,
                 "one_lot_only": True,
             },
         }
@@ -125,7 +125,7 @@ def run_phase133_master_safety_guard() -> Dict[str, Any]:
             f.write(f"- **live_trading_allowed**: FALSE (MASTER MODE)\n")
             f.write(f"- **max_risk_percent_per_day**: {max_risk_percent_per_day}%\n")
             f.write(f"- **dry_run_only**: {safety_state['safety_flags']['dry_run_only']}\n")
-            f.write(f"- **angel_one_only**: {safety_state['safety_flags']['angel_one_only']}\n")
+            f.write(f"- **dhan_only**: {safety_state['safety_flags']['dhan_only']}\n")
             f.write(f"- **one_lot_only**: {safety_state['safety_flags']['one_lot_only']}\n")
 
             if kill_switch_reasons:

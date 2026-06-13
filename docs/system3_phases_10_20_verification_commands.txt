@@ -10,10 +10,10 @@ Run these commands in your external terminal (venv activated):
 python -m core.engine.ultra_safety
 
 # Test 2: Profile Selector
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 
 # Test 3: Check Directories
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 dir storage\ultra
 dir storage\learning_ultra
 dir storage\reports_ultra
@@ -28,7 +28,7 @@ python -m core.engine.ultra_shadow_data_engine
 
 # Phase 11: Feature Expander
 # (First ensure synthetic training exists)
-python -m core.engine.generate_synthetic_angel_training
+python -m core.engine.generate_synthetic_dhan_training
 python -m core.engine.ultra_feature_engineering
 
 # Phase 12: Model Trainer
@@ -63,7 +63,7 @@ python -m core.engine.ultra_promotion_manager
 ===========================================
 
 # Check Ultra models
-dir core\models\angel_one_ultra\*.pkl
+dir core\models\dhan_ultra\*.pkl
 
 # Check Ultra data
 dir storage\ultra\*.csv
@@ -71,7 +71,7 @@ dir storage\learning_ultra\*.csv
 dir storage\reports_ultra\*.csv
 
 # Check Ultra training
-dir storage\training\angel_ultra_training.*
+dir storage\training\dhan_ultra_training.*
 
 ===========================================
 # MENU TEST

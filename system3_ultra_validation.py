@@ -67,7 +67,7 @@ def validate_files():
         # Safety configs
         ("core/config/system3_ultra_safety.json", "Ultra safety config"),
         ("core/engine/ultra_safety.py", "Ultra safety module"),
-        ("core/engine/angel_automation_config.py", "Automation config"),
+        ("core/engine/dhan_automation_config.py", "Automation config"),
         
         # Key Ultra modules
         ("core/ultra/phase21_adaptive_risk_engine.py", "Phase 21"),
@@ -111,7 +111,7 @@ def validate_imports():
     
     modules_to_test = [
         ("core.engine.ultra_safety", "Ultra safety module"),
-        ("core.engine.angel_automation_config", "Automation config"),
+        ("core.engine.dhan_automation_config", "Automation config"),
         ("core.ultra.phase21_adaptive_risk_engine", "Phase 21"),
         ("core.engine.system3_phase31_ultra_fusion", "Phase 31"),
         ("core.engine.system3_phase35_ultra_auditor", "Phase 35"),
@@ -139,7 +139,7 @@ def validate_safety():
     
     try:
         from core.engine.ultra_safety import load_ultra_safety
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         
         # Check automation config
         auto_exec = AUTOMATION_CONFIG.auto_execute_trades
@@ -166,8 +166,8 @@ def validate_safety():
                   "ENABLED" if ultra_auto_promote else "DISABLED (OK)")
         
         # Check baseline protection
-        baseline_models_dir = ROOT_DIR / "core" / "models" / "angel_one"
-        ultra_models_dir = ROOT_DIR / "core" / "models" / "angel_one_ultra"
+        baseline_models_dir = ROOT_DIR / "core" / "models" / "dhan"
+        ultra_models_dir = ROOT_DIR / "core" / "models" / "dhan_ultra"
         baseline_exists = baseline_models_dir.exists()
         ultra_separate = ultra_models_dir.exists() or True  # Ultra dir may not exist yet
         

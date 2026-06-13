@@ -19,7 +19,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_signal_edge_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
 def run_phase222(**kwargs) -> Dict[str, Any]:
@@ -43,7 +43,7 @@ def run_phase222(**kwargs) -> Dict[str, Any]:
     try:
         if not SIGNALS_CSV.exists():
             # Fallback to regular signals CSV
-            SIGNALS_CSV_FALLBACK = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+            SIGNALS_CSV_FALLBACK = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
             if not SIGNALS_CSV_FALLBACK.exists():
                 return {
                     "phase": 222,

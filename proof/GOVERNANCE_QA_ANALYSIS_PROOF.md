@@ -12,7 +12,7 @@
 | 1 | Confirm .in ↔ .txt consistency | Done | All pinned versions within ranges; no changes needed. |
 | 2 | Fix .pre-commit-config.yaml JSON hook | Done | Replaced local `json-tool` (config.json only) with pre-commit-hooks `check-json`. |
 | 3 | Fix Run-FullGovernance.ps1 | Done | Removed auto-fix step (wheel 0.46.2); no venv recreation; fail-fast on pip check, pip-audit, safety, black, flake8, bandit, pytest; proof under `logs/inspector/`. |
-| 4 | Fix Run-FullQA.ps1 | Done | Strict exit codes; optional tools (codeql, sonar, SmartAPI) skipped if missing; runtime import check uses LASTEXITCODE; lint scope limited (core, scripts, tools, phases, dashboard\backend). |
+| 4 | Fix Run-FullQA.ps1 | Done | Strict exit codes; optional tools (codeql, sonar, DhanHQ) skipped if missing; runtime import check uses LASTEXITCODE; lint scope limited (core, scripts, tools, phases, dashboard\backend). |
 | 5 | Run-All.bat: skip Git when no .git | Done | Step 13 (git add/commit/push) runs only if `.git` exists. |
 | 6 | Run-All.bat Step 5: upgrade pip only | Not done | Left as-is (upgrade pip/setuptools/wheel); install step restores pins. |
 | 7 | Resolve pip check conflicts | Done | Pydantic/typer/altair updated in requirements_runtime.in/.txt for safety & great-expectations. |
@@ -59,4 +59,4 @@
 - `.flake8` – New; select E9,F63,F7,F82; exclude generated tests.  
 - `pyproject.toml` – Black line-length 120, force-exclude ultra_models_loader; `[tool.pytest.ini_options]` (python_files, testpaths, addopts).
 - `Run-FullGovernance.ps1` / `Run-FullQA.ps1` – pip-audit and safety report-only; bandit report-only (JSON); pytest --ignore=... (SmartApi tests + scripts); QA frontend build optional.  
-- Phase/script fixes: `system3_phase165_risk-reward_analysis.py`, `system3_phase167_time-of-day_analysis.py`, `system3_phase220_historical_aggregation.py`, `core/brokers/angel_one/broker.py`, `dashboard/backend/app.py`, `scripts/check_monitor_output.py`, `scripts/final_verification.py`, `scripts/show_practical_results.py`, `scripts/verify_all_outputs.py`, `scripts/optimize_best_ai_configuration.py`, `scripts/ultra_micro_verification.py`, `scripts/enhance_optionchain_with_predictions.py`, `core/engine/angel_outcome_confidence_analyzer.py`, `core/engine/ensemble_predictor.py`.
+- Phase/script fixes: `system3_phase165_risk-reward_analysis.py`, `system3_phase167_time-of-day_analysis.py`, `system3_phase220_historical_aggregation.py`, `core/brokers/dhan/broker.py`, `dashboard/backend/app.py`, `scripts/check_monitor_output.py`, `scripts/final_verification.py`, `scripts/show_practical_results.py`, `scripts/verify_all_outputs.py`, `scripts/optimize_best_ai_configuration.py`, `scripts/ultra_micro_verification.py`, `scripts/enhance_optionchain_with_predictions.py`, `core/engine/dhan_outcome_confidence_analyzer.py`, `core/engine/ensemble_predictor.py`.

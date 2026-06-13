@@ -19,7 +19,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "data"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_schema_guard.log"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 # Expected schema for signals CSV
 EXPECTED_SIGNALS_SCHEMA = {

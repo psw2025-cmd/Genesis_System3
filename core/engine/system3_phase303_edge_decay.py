@@ -20,7 +20,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
 LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_edge_decay_303.md"

@@ -16,12 +16,12 @@ This implementation upgrades System3's threshold system to use data-driven thres
 **File**: `core/engine/system3_phase221_forward_returns.py`
 
 **Changes**:
-- ✅ Now reads from `angel_index_ai_signals_curated.csv` (has more historical data)
+- ✅ Now reads from `dhan_index_ai_signals_curated.csv` (has more historical data)
 - ✅ Uses safe CSV loader (`engine="python", on_bad_lines="skip"`)
 - ✅ Computes forward returns using LTP (option premium) instead of spot price
 - ✅ Groups by `underlying`, `strike`, `side` to match same option contracts
 - ✅ Outputs columns: `fwd_ret_1`, `fwd_ret_3`, `fwd_ret_5` (percentage returns)
-- ✅ Writes to `storage/live/angel_index_ai_signals_with_forward.csv`
+- ✅ Writes to `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 **Status**: ✅ **COMPLETE**
 
@@ -109,7 +109,7 @@ This implementation upgrades System3's threshold system to use data-driven thres
 ```bash
 python core/engine/system3_phase221_forward_returns.py
 ```
-**Output**: `storage/live/angel_index_ai_signals_with_forward.csv`
+**Output**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 
 ### Step 2: Compute EV Tables
 ```bash
@@ -194,7 +194,7 @@ python system3_signal_test_mode.py --lookback-snapshots 200 --use-live-threshold
 
 ### Generated Files
 
-1. `storage/live/angel_index_ai_signals_with_forward.csv` - Enriched signals with forward returns
+1. `storage/live/dhan_index_ai_signals_with_forward.csv` - Enriched signals with forward returns
 2. `logs/research/system3_signal_edge_report.md` - EV tables by underlying and score bin
 3. `storage/meta/system3_live_thresholds.json` - Live thresholds (new format)
 4. `storage/meta/system3_threshold_candidates.json` - Threshold candidates (compatibility)

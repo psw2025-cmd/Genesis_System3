@@ -80,7 +80,7 @@
 - **Application**: Filters signals based on selected thresholds
 - **Current Impact**: Only SELL signals would be generated (no BUY signals)
 
-#### 3. **Trade Decision Engine** (`core/engine/angel_trade_decision.py`)
+#### 3. **Trade Decision Engine** (`core/engine/dhan_trade_decision.py`)
 - **Usage**: Uses thresholds to evaluate trade eligibility
 - **Current State**: Would only generate SELL trade plans
 - **Impact**: No BUY trades would be executed
@@ -90,7 +90,7 @@
 ## Data Quality Assessment
 
 ### Input Data Analysis
-- **Source File**: `storage/live/angel_index_ai_signals_with_forward.csv`
+- **Source File**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Column Used**: `final_score`
 - **Data Type**: Successfully converted from string to numeric ✅
 - **Data Size**: Small dataset (only 2 SELL signals found)
@@ -108,7 +108,7 @@
 ### Immediate Actions
 
 1. **Verify Data Source**:
-   - Check if `angel_index_ai_signals_with_forward.csv` is up-to-date
+   - Check if `dhan_index_ai_signals_with_forward.csv` is up-to-date
    - Verify if this is from today's market session or historical data
    - Check if dataset is complete
 

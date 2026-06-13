@@ -21,7 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_LIVE.mkdir(parents=True, exist_ok=True)
 
-TRADE_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
+TRADE_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
 LEDGER_CSV = STORAGE_LIVE / "live_orders_ledger.csv"
 
 

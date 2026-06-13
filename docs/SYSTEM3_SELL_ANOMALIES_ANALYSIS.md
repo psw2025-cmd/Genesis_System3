@@ -1,7 +1,7 @@
 # System3 SELL Signal Anomalies Analysis
 
 **Date**: 2025-12-04  
-**File**: `storage/clean/angel_index_ai_signals_sell_anomalies.csv`  
+**File**: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`  
 **Anomaly Count**: 2 rows
 
 ---

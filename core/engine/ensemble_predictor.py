@@ -130,7 +130,7 @@ _weight_tracker = DynamicWeightTracker()
 def load_ultra_model(underlying: str) -> Optional[Any]:
     """Load Ultra Model for given underlying."""
     try:
-        model_path = Path(f"core/models/angel_one_ultra/{underlying}_ultra_model.pkl")
+        model_path = Path(f"core/models/dhan_ultra/{underlying}_ultra_model.pkl")
         if model_path.exists():
             model = joblib.load(model_path)
             logger.debug(f"Loaded Ultra model: {underlying}")

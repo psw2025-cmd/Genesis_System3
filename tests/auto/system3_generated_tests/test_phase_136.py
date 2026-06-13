@@ -2,7 +2,7 @@
 Auto-generated test for System3 Phase 136
 
 Generated: 2025-12-03 00:26:02
-Module: core.engine.system3_phase136_angel_symbol_universe
+Module: core.engine.system3_phase136_dhan_symbol_universe
 Function: run_phase136
 """
 
@@ -23,7 +23,7 @@ class TestPhase136(unittest.TestCase):
     def setUpClass(cls):
         """Set up test class."""
         cls.phase_num = 136
-        cls.module_name = "core.engine.system3_phase136_angel_symbol_universe"
+        cls.module_name = "core.engine.system3_phase136_dhan_symbol_universe"
         cls.func_name = "run_phase136"
         
         # Try to import module

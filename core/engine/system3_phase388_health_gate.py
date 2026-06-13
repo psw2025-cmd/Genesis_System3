@@ -35,7 +35,7 @@ def check_safety_configs() -> dict:
     safety_status = {
         "live_trade_config_checked": False,
         "live_trading_enabled": None,
-        "angel_automation_config_checked": False,
+        "dhan_automation_config_checked": False,
         "dry_run_enabled": None,
         "system3_ultra_safety_checked": False,
         "auto_execute_trades": None,
@@ -56,18 +56,18 @@ def check_safety_configs() -> dict:
         except Exception as e:
             logger.warning(f"Could not check live_trade_config.py: {e}")
 
-    # Check angel_automation_config.json
-    angel_config_path = CONFIG_DIR / "angel_automation_config.json"
-    if angel_config_path.exists():
+    # Check dhan_automation_config.json
+    dhan_config_path = CONFIG_DIR / "dhan_automation_config.json"
+    if dhan_config_path.exists():
         try:
-            with open(angel_config_path, "r") as f:
+            with open(dhan_config_path, "r") as f:
                 config = json.load(f)
                 dry_run = config.get("DRY_RUN", config.get("dry_run"))
                 if dry_run is True:
                     safety_status["dry_run_enabled"] = True
-                    safety_status["angel_automation_config_checked"] = True
+                    safety_status["dhan_automation_config_checked"] = True
         except Exception as e:
-            logger.warning(f"Could not check angel_automation_config.json: {e}")
+            logger.warning(f"Could not check dhan_automation_config.json: {e}")
 
     # Overall safety verified if all critical flags are safe
     if safety_status["live_trading_enabled"] is False and safety_status["dry_run_enabled"] is True:

@@ -163,7 +163,7 @@
 ## Safety Status
 
 - ✅ **DRY_RUN only**: All phases in DRY-RUN mode
-- ✅ **ANGEL_ONLY**: All phases configured for AngelOne
+- ✅ **ANGEL_ONLY**: All phases configured for Dhan
 - ✅ **Live Trading Disabled**: `live_trading_enabled: false`
 - ✅ **Kill Switch**: INACTIVE
 - ✅ **Capital Guardrails**: ACTIVE (1-lot-only)

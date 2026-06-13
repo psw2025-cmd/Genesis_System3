@@ -34,8 +34,8 @@
 **Average Accuracy**: 99.74% 🎯
 
 **Files Created**:
-- `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 **Safety Verified**: ✅ Baseline models untouched
 

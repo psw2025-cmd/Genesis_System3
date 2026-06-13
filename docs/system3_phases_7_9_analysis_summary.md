@@ -21,45 +21,45 @@ All three phases (7-9) have been successfully implemented with proper safety gua
 ### ✅ Source Files Available
 
 **Phase 7 Inputs (All Present)**:
-- ✅ `storage/live/angel_index_ai_signals.csv` - EXISTS
-- ✅ `storage/live/angel_index_ai_trades_plan.csv` - EXISTS
-- ✅ `storage/live/angel_index_ai_pnl_log.csv` - EXISTS
-- ✅ `storage/learning/angel_real_outcomes.csv` - EXISTS (Note: filename slightly different, but module handles this)
+- ✅ `storage/live/dhan_index_ai_signals.csv` - EXISTS
+- ✅ `storage/live/dhan_index_ai_trades_plan.csv` - EXISTS
+- ✅ `storage/live/dhan_index_ai_pnl_log.csv` - EXISTS
+- ✅ `storage/learning/dhan_real_outcomes.csv` - EXISTS (Note: filename slightly different, but module handles this)
 
 **Phase 8 Inputs**:
-- ✅ `storage/training/angel_index_options_training.csv` - EXISTS (synthetic baseline)
-- ⏳ `storage/learning/angel_index_real_master_dataset.parquet` - WILL BE CREATED by Phase 7
+- ✅ `storage/training/dhan_index_options_training.csv` - EXISTS (synthetic baseline)
+- ⏳ `storage/learning/dhan_index_real_master_dataset.parquet` - WILL BE CREATED by Phase 7
 
 **Phase 9 Configs**:
 - ✅ `storage/config/system3_live_beta_profile.json` - EXISTS (enabled: false)
-- ✅ `storage/config/angel_blended_training_v3_config.json` - EXISTS
+- ✅ `storage/config/dhan_blended_training_v3_config.json` - EXISTS
 
 ### ✅ Baseline Models Protected
 
 **Baseline Models (Untouched)**:
-- ✅ `core/models/angel_one/NIFTY_model.pkl` - EXISTS
-- ✅ `core/models/angel_one/BANKNIFTY_model.pkl` - EXISTS
-- ✅ `core/models/angel_one/FINNIFTY_model.pkl` - EXISTS
-- ✅ `core/models/angel_one/MIDCPNIFTY_model.pkl` - EXISTS
-- ✅ `core/models/angel_one/SENSEX_model.pkl` - EXISTS
+- ✅ `core/models/dhan/NIFTY_model.pkl` - EXISTS
+- ✅ `core/models/dhan/BANKNIFTY_model.pkl` - EXISTS
+- ✅ `core/models/dhan/FINNIFTY_model.pkl` - EXISTS
+- ✅ `core/models/dhan/MIDCPNIFTY_model.pkl` - EXISTS
+- ✅ `core/models/dhan/SENSEX_model.pkl` - EXISTS
 
 **Blended Models Directory**:
-- ⏳ `core/models/angel_one_real_blended/` - WILL BE CREATED by Phase 8
+- ⏳ `core/models/dhan_real_blended/` - WILL BE CREATED by Phase 8
 
 ---
 
 ## Phase 7: Real-Data Dataset Consolidation
 
-### Module: `angel_real_master_dataset.py`
+### Module: `dhan_real_master_dataset.py`
 ### Menu Option: 70
 
 ### What It Does
 
 1. **Reads Multiple Sources**:
-   - Live signals (`storage/live/angel_index_ai_signals.csv`)
-   - Trade plans (`storage/live/angel_index_ai_trades_plan.csv`)
-   - PnL logs (`storage/live/angel_index_ai_pnl_log.csv`)
-   - Real outcomes (`storage/learning/angel_real_outcomes.csv`)
+   - Live signals (`storage/live/dhan_index_ai_signals.csv`)
+   - Trade plans (`storage/live/dhan_index_ai_trades_plan.csv`)
+   - PnL logs (`storage/live/dhan_index_ai_pnl_log.csv`)
+   - Real outcomes (`storage/learning/dhan_real_outcomes.csv`)
 
 2. **Joins Data**:
    - Matches rows by underlying, strike, and timestamp proximity
@@ -67,8 +67,8 @@ All three phases (7-9) have been successfully implemented with proper safety gua
    - Enriches with all available information
 
 3. **Outputs**:
-   - `storage/learning/angel_index_real_master_dataset.parquet` (binary format)
-   - `storage/learning/angel_index_real_master_dataset.csv` (human-readable)
+   - `storage/learning/dhan_index_real_master_dataset.parquet` (binary format)
+   - `storage/learning/dhan_index_real_master_dataset.csv` (human-readable)
 
 ### Expected Output Schema
 
@@ -95,8 +95,8 @@ Standard Columns:
 [LOAD] Real outcomes: <L> rows
 
 [INFO] Sources found: signals, trades_plan, pnl_log, real_outcomes
-[SAVE] Master dataset (Parquet): storage/learning/angel_index_real_master_dataset.parquet (<TOTAL> rows)
-[SAVE] Master dataset (CSV): storage/learning/angel_index_real_master_dataset.csv (<TOTAL> rows)
+[SAVE] Master dataset (Parquet): storage/learning/dhan_index_real_master_dataset.parquet (<TOTAL> rows)
+[SAVE] Master dataset (CSV): storage/learning/dhan_index_real_master_dataset.csv (<TOTAL> rows)
 
 === BUILD SUMMARY ===
 Sources Found: signals, trades_plan, pnl_log, real_outcomes
@@ -115,14 +115,14 @@ Total Rows: <TOTAL>
 
 ## Phase 8: Real/Blended Model Training Lane
 
-### Module: `angel_blended_training_v3.py`
+### Module: `dhan_blended_training_v3.py`
 ### Menu Option: 71
 
 ### What It Does
 
 1. **Loads Training Data**:
-   - Synthetic: `storage/training/angel_index_options_training.csv`
-   - Real: `storage/learning/angel_index_real_master_dataset.parquet` (from Phase 7)
+   - Synthetic: `storage/training/dhan_index_options_training.csv`
+   - Real: `storage/learning/dhan_index_real_master_dataset.parquet` (from Phase 7)
 
 2. **Combines Per Underlying**:
    - Configurable limits: 600 synthetic + 200 real rows per underlying (default)
@@ -134,14 +134,14 @@ Total Rows: <TOTAL>
    - 80/20 train/validation split
 
 4. **Saves to Separate Directory**:
-   - `core/models/angel_one_real_blended/NIFTY_model_blended_v3.pkl`
-   - `core/models/angel_one_real_blended/NIFTY_model_blended_v3_meta.json`
+   - `core/models/dhan_real_blended/NIFTY_model_blended_v3.pkl`
+   - `core/models/dhan_real_blended/NIFTY_model_blended_v3_meta.json`
    - (Same for all 5 underlyings)
 
 ### Expected Output Structure
 
 ```
-core/models/angel_one_real_blended/
+core/models/dhan_real_blended/
 ├── NIFTY_model_blended_v3.pkl
 ├── NIFTY_model_blended_v3_meta.json
 ├── BANKNIFTY_model_blended_v3.pkl
@@ -176,8 +176,8 @@ core/models/angel_one_real_blended/
 [TRAIN] NIFTY...
 [TRAIN] NIFTY: 800 samples, 25 features
 [RESULT] NIFTY accuracy: 0.XXXX
-[SAVE] Model: core/models/angel_one_real_blended/NIFTY_model_blended_v3.pkl
-[SAVE] Meta: core/models/angel_one_real_blended/NIFTY_model_blended_v3_meta.json
+[SAVE] Model: core/models/dhan_real_blended/NIFTY_model_blended_v3.pkl
+[SAVE] Meta: core/models/dhan_real_blended/NIFTY_model_blended_v3_meta.json
 
 ... (repeated for all 5 underlyings)
 
@@ -186,10 +186,10 @@ NIFTY:
   Accuracy: 0.XXXX
   Train Rows: 640
   Test Rows: 160
-  Model: core/models/angel_one_real_blended/NIFTY_model_blended_v3.pkl
+  Model: core/models/dhan_real_blended/NIFTY_model_blended_v3.pkl
 
-[SAVE] All models saved to: core/models/angel_one_real_blended
-[SAFETY] Baseline models untouched in: core/models/angel_one/
+[SAVE] All models saved to: core/models/dhan_real_blended
+[SAFETY] Baseline models untouched in: core/models/dhan/
 ```
 
 ### Safety Guarantees
@@ -203,7 +203,7 @@ NIFTY:
 
 ## Phase 9: Live-Mode Beta Track (DRY RUN ONLY)
 
-### Module: `angel_model_selector.py`
+### Module: `dhan_model_selector.py`
 ### Menu Option: 72
 
 ### What It Does
@@ -213,8 +213,8 @@ NIFTY:
    - Default: `enabled: false` (BASELINE mode)
 
 2. **Selects Models**:
-   - **BASELINE**: Uses `core/models/angel_one/*_model.pkl`
-   - **LIVE_BETA**: Uses `core/models/angel_one_real_blended/*_model_blended_v3.pkl`
+   - **BASELINE**: Uses `core/models/dhan/*_model.pkl`
+   - **LIVE_BETA**: Uses `core/models/dhan_real_blended/*_model_blended_v3.pkl`
    - Falls back to baseline if blended models missing
 
 3. **Shows Profile Info**:
@@ -233,11 +233,11 @@ Use Blended Models: True
 Execution Mode: DRY_RUN_ONLY
 
 === MODEL SOURCES ===
-NIFTY: core/models/angel_one/NIFTY_model.pkl (BASELINE)
-BANKNIFTY: core/models/angel_one/BANKNIFTY_model.pkl (BASELINE)
-FINNIFTY: core/models/angel_one/FINNIFTY_model.pkl (BASELINE)
-MIDCPNIFTY: core/models/angel_one/MIDCPNIFTY_model.pkl (BASELINE)
-SENSEX: core/models/angel_one/SENSEX_model.pkl (BASELINE)
+NIFTY: core/models/dhan/NIFTY_model.pkl (BASELINE)
+BANKNIFTY: core/models/dhan/BANKNIFTY_model.pkl (BASELINE)
+FINNIFTY: core/models/dhan/FINNIFTY_model.pkl (BASELINE)
+MIDCPNIFTY: core/models/dhan/MIDCPNIFTY_model.pkl (BASELINE)
+SENSEX: core/models/dhan/SENSEX_model.pkl (BASELINE)
 
 === THRESHOLDS ===
 min_confidence: 0.8
@@ -255,11 +255,11 @@ Use Blended Models: True
 Execution Mode: DRY_RUN_ONLY
 
 === MODEL SOURCES ===
-NIFTY: core/models/angel_one_real_blended/NIFTY_model_blended_v3.pkl (BLENDED)
-BANKNIFTY: core/models/angel_one_real_blended/BANKNIFTY_model_blended_v3.pkl (BLENDED)
-FINNIFTY: core/models/angel_one_real_blended/FINNIFTY_model_blended_v3.pkl (BLENDED)
-MIDCPNIFTY: core/models/angel_one_real_blended/MIDCPNIFTY_model_blended_v3.pkl (BLENDED)
-SENSEX: core/models/angel_one_real_blended/SENSEX_model_blended_v3.pkl (BLENDED)
+NIFTY: core/models/dhan_real_blended/NIFTY_model_blended_v3.pkl (BLENDED)
+BANKNIFTY: core/models/dhan_real_blended/BANKNIFTY_model_blended_v3.pkl (BLENDED)
+FINNIFTY: core/models/dhan_real_blended/FINNIFTY_model_blended_v3.pkl (BLENDED)
+MIDCPNIFTY: core/models/dhan_real_blended/MIDCPNIFTY_model_blended_v3.pkl (BLENDED)
+SENSEX: core/models/dhan_real_blended/SENSEX_model_blended_v3.pkl (BLENDED)
 
 === THRESHOLDS ===
 min_confidence: 0.75
@@ -268,7 +268,7 @@ min_score: 0.25
 
 ### Integration with Live AI Signals
 
-The `angel_live_ai_signals.py` module has been **non-destructively** modified to:
+The `dhan_live_ai_signals.py` module has been **non-destructively** modified to:
 
 1. **Check for profile** (via environment variable or config)
 2. **Use model selector** if profile is set
@@ -296,19 +296,19 @@ The `angel_live_ai_signals.py` module has been **non-destructively** modified to
 ```bash
 python run_system3.py  # Choose option 70
 # OR
-python -m core.engine.angel_real_master_dataset
+python -m core.engine.dhan_real_master_dataset
 ```
 
 **Check Outputs**:
-- [ ] `storage/learning/angel_index_real_master_dataset.parquet` exists
-- [ ] `storage/learning/angel_index_real_master_dataset.csv` exists
+- [ ] `storage/learning/dhan_index_real_master_dataset.parquet` exists
+- [ ] `storage/learning/dhan_index_real_master_dataset.csv` exists
 - [ ] CSV has expected columns (ts_entry, underlying, strike, side, etc.)
 - [ ] Row count matches expected (based on source files)
 
 **Verify**:
 ```bash
 dir storage\learning
-python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}')"
+python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}')"
 ```
 
 ### Phase 8 Verification
@@ -319,15 +319,15 @@ python run_system3.py  # Choose option 71
 ```
 
 **Check Outputs**:
-- [ ] `core/models/angel_one_real_blended/` directory exists
+- [ ] `core/models/dhan_real_blended/` directory exists
 - [ ] 5 model files (`*_model_blended_v3.pkl`) exist
 - [ ] 5 meta files (`*_model_blended_v3_meta.json`) exist
-- [ ] Baseline models untouched in `core/models/angel_one/`
+- [ ] Baseline models untouched in `core/models/dhan/`
 
 **Verify**:
 ```bash
-dir core\models\angel_one_real_blended
-type core\models\angel_one_real_blended\NIFTY_model_blended_v3_meta.json
+dir core\models\dhan_real_blended
+type core\models\dhan_real_blended\NIFTY_model_blended_v3_meta.json
 ```
 
 ### Phase 9 Verification
@@ -357,7 +357,7 @@ python run_system3.py  # Choose option 72
 ### Files Created (After Execution)
 
 **Phase 7**:
-- 2 files: `angel_index_real_master_dataset.parquet` + `.csv`
+- 2 files: `dhan_index_real_master_dataset.parquet` + `.csv`
 
 **Phase 8**:
 - 10 files: 5 model files + 5 meta files
@@ -367,9 +367,9 @@ python run_system3.py  # Choose option 72
 
 ### Total New Modules
 
-- **Phase 7**: 1 module (`angel_real_master_dataset.py`)
-- **Phase 8**: 1 module (`angel_blended_training_v3.py`)
-- **Phase 9**: 1 module (`angel_model_selector.py`)
+- **Phase 7**: 1 module (`dhan_real_master_dataset.py`)
+- **Phase 8**: 1 module (`dhan_blended_training_v3.py`)
+- **Phase 9**: 1 module (`dhan_model_selector.py`)
 - **Total**: 3 new modules
 
 ### Menu Options Added

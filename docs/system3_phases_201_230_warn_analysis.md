@@ -221,7 +221,7 @@ Model training pipeline does not yet store validation metrics for comparison.
 
 #### Root Cause
 1. **Missing Forward Returns**: Phase 221 not run or failed
-2. **Data Dependency**: Requires `angel_index_ai_signals_with_forward.csv`
+2. **Data Dependency**: Requires `dhan_index_ai_signals_with_forward.csv`
 3. **Forward Return Columns**: Needs columns starting with `forward_return`
 
 #### Resolution
@@ -232,7 +232,7 @@ python -m core.engine.system3_phase221_forward_returns
 Then re-run Phase 222.
 
 **Option 2**: Check if forward returns file exists
-- Verify `storage/live/angel_index_ai_signals_with_forward.csv` exists
+- Verify `storage/live/dhan_index_ai_signals_with_forward.csv` exists
 - Check if it contains forward return columns
 
 #### Recommendation

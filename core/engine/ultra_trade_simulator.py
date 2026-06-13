@@ -9,8 +9,8 @@ Inputs:
 - Ultra models
 
 Outputs:
-- storage/ultra/angel_ultra_trade_plan_sim.csv
-- storage/ultra/angel_ultra_pnl_sim.csv
+- storage/ultra/dhan_ultra_trade_plan_sim.csv
+- storage/ultra/dhan_ultra_pnl_sim.csv
 - storage/reports_ultra/ultra_trade_sim_summary.csv
 
 Menu Option: 81
@@ -27,12 +27,12 @@ ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"
 
-SHADOW_SIGNALS_CSV = ULTRA_DIR / "angel_ultra_live_shadow_signals.csv"
-SHADOW_MASTER_PARQUET = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.parquet"
-SHADOW_MASTER_CSV = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+SHADOW_SIGNALS_CSV = ULTRA_DIR / "dhan_ultra_live_shadow_signals.csv"
+SHADOW_MASTER_PARQUET = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.parquet"
+SHADOW_MASTER_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 
-TRADE_PLAN_SIM_CSV = ULTRA_DIR / "angel_ultra_trade_plan_sim.csv"
-PNL_SIM_CSV = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
+TRADE_PLAN_SIM_CSV = ULTRA_DIR / "dhan_ultra_trade_plan_sim.csv"
+PNL_SIM_CSV = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
 SUMMARY_CSV = REPORTS_ULTRA_DIR / "ultra_trade_sim_summary.csv"
 
 ULTRA_DIR.mkdir(parents=True, exist_ok=True)

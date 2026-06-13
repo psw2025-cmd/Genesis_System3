@@ -14,7 +14,7 @@ The Phase 250-255 LSTM evaluation and promotion pipeline is now **fully wired an
 
 | Component | Before | After |
 |-----------|--------|-------|
-| **Phase 251 Input** | Reads non-existent CSV `angel_index_ai_signals_with_forward_lstm.csv` | Reads Phase 250 JSON: `logs/phase249_model_evaluation_*.json` |
+| **Phase 251 Input** | Reads non-existent CSV `dhan_index_ai_signals_with_forward_lstm.csv` | Reads Phase 250 JSON: `logs/phase249_model_evaluation_*.json` |
 | **Phase 251 Accuracy** | Hardcoded stub `0.65` | Real metrics from Phase 250 evaluation |
 | **Phase 251 Output** | Drift report JSON with limited structure | Structured promotion decision JSON |
 | **Phase 251→252 Link** | No integration (NOTE comment only) | Direct JSON file handoff |
@@ -423,7 +423,7 @@ python system3_phase250_255_pipeline_test.py
 
 ## Migration Checklist
 
-✅ Removed all references to non-existent `angel_index_ai_signals_with_forward_lstm.csv`  
+✅ Removed all references to non-existent `dhan_index_ai_signals_with_forward_lstm.csv`  
 ✅ Removed hardcoded accuracy stub `0.65` from Phase 251  
 ✅ Implemented robust JSON reader with error handling  
 ✅ Added Phase 251 → Phase 252 pipeline integration  

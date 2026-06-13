@@ -81,7 +81,7 @@ def run_phase200_master_status_snapshot() -> Dict[str, Any]:
         master_snapshot = {
             "timestamp": datetime.now().isoformat(),
             "dry_run": True,
-            "broker": "ANGEL_ONE",
+            "broker": "DHAN",
             "one_lot_test": "ACTIVE",
             "last_known_status": overall_status,
             "config": {

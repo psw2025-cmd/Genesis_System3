@@ -68,7 +68,7 @@ subprocess.run([PYTHON_PATH, "script.py"])
 ### Phase 221 - Forward Returns
 - **Script**: `core/engine/system3_phase221_forward_returns.py`
 - **Status**: ⏳ **NOT YET RUN** (requires manual execution)
-- **Expected**: Computes forward returns, writes to `angel_index_ai_signals_with_forward.csv`
+- **Expected**: Computes forward returns, writes to `dhan_index_ai_signals_with_forward.csv`
 - **Code Review**: ✅ Uses robust CSV loading, proper error handling
 - **Fix Applied**: None needed (code is correct)
 
@@ -80,7 +80,7 @@ subprocess.run([PYTHON_PATH, "script.py"])
 - **Fix Applied**: None needed (code is correct)
 
 ### PnL Simulator
-- **Script**: `core/engine/angel_pnl_simulator.py`
+- **Script**: `core/engine/dhan_pnl_simulator.py`
 - **Status**: ⏳ **NOT YET RUN** (requires manual execution)
 - **Expected**: Simulates PnL from signals and trades
 - **Code Review**: ✅ Uses robust CSV loading (`engine="python", on_bad_lines="skip"`)
@@ -152,7 +152,7 @@ C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase222_signal_e
 
 #### PnL Simulator
 ```batch
-C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 ```
 
 ### Option 3: Use Batch Files

@@ -7,7 +7,7 @@
 ## Modules Implemented
 
 ### 1. Real Signal Collector V2
-- **File**: `core/engine/angel_real_signal_collector_v2.py`
+- **File**: `core/engine/dhan_real_signal_collector_v2.py`
 - **Menu**: Option 52
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Writes ONLY to new file
@@ -15,7 +15,7 @@
 **Functionality**:
 - Stores all Monday signals
 - Writes ONLY to `learning/real_signals_raw.csv`
-- Does NOT touch existing `live/angel_index_ai_signals.csv`
+- Does NOT touch existing `live/dhan_index_ai_signals.csv`
 - Provides collection statistics
 - Deduplication to avoid duplicates
 
@@ -24,7 +24,7 @@
 ---
 
 ### 2. Outcome Placeholder Generator
-- **File**: `core/engine/angel_outcome_placeholder_generator.py`
+- **File**: `core/engine/dhan_outcome_placeholder_generator.py`
 - **Menu**: Option 53
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Placeholders only, no scoring, no PnL
@@ -44,7 +44,7 @@
 ---
 
 ### 3. Market Regime Recorder
-- **File**: `core/engine/angel_market_regime_recorder.py`
+- **File**: `core/engine/dhan_market_regime_recorder.py`
 - **Menu**: Option 54
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only logging
@@ -88,9 +88,9 @@
 ## Files Created
 
 ### Engine Modules
-1. `core/engine/angel_real_signal_collector_v2.py`
-2. `core/engine/angel_outcome_placeholder_generator.py`
-3. `core/engine/angel_market_regime_recorder.py`
+1. `core/engine/dhan_real_signal_collector_v2.py`
+2. `core/engine/dhan_outcome_placeholder_generator.py`
+3. `core/engine/dhan_market_regime_recorder.py`
 
 ### Documentation
 1. `docs/system3_phase2_real_learning_cycle.md` (this file)
@@ -131,13 +131,13 @@
 
 ```bash
 # Test signal collector
-python -m core.engine.angel_real_signal_collector_v2
+python -m core.engine.dhan_real_signal_collector_v2
 
 # Test placeholder generator
-python -m core.engine.angel_outcome_placeholder_generator
+python -m core.engine.dhan_outcome_placeholder_generator
 
 # Test regime recorder
-python -m core.engine.angel_market_regime_recorder
+python -m core.engine.dhan_market_regime_recorder
 ```
 
 ---

@@ -11,11 +11,11 @@
 C:\Genesis_System3\
 ├── core\
 │   ├── engine\                    # 130+ Python modules
-│   │   ├── angel_*.py             # Baseline trading modules
+│   │   ├── dhan_*.py             # Baseline trading modules
 │   │   ├── system3_phase*.py      # Ultra phases 31-43
 │   │   ├── ultra_*.py             # Ultra shadow modules
-│   │   ├── angel_trade_config.py  # Trade thresholds
-│   │   ├── angel_automation_config.py  # Automation settings
+│   │   ├── dhan_trade_config.py  # Trade thresholds
+│   │   ├── dhan_automation_config.py  # Automation settings
 │   │   └── ...
 │   ├── ultra\                     # Ultra phases 21-30, 46-55
 │   │   ├── phase21_adaptive_risk_engine.py
@@ -39,13 +39,13 @@ C:\Genesis_System3\
 │   │   ├── phase54_back_reconstruction.py
 │   │   └── phase55_intelligence_dashboard.py
 │   ├── models\
-│   │   ├── angel_one\             # Baseline models
+│   │   ├── dhan\             # Baseline models
 │   │   │   ├── *_model.pkl
 │   │   │   └── *_model_meta.json
-│   │   ├── angel_one_real_blended\  # Blended models
+│   │   ├── dhan_real_blended\  # Blended models
 │   │   │   ├── *_blended_v3.pkl
 │   │   │   └── *_blended_v3_meta.json
-│   │   └── angel_one_ultra\       # Ultra models
+│   │   └── dhan_ultra\       # Ultra models
 │   │       ├── *_ultra_model.pkl
 │   │       └── *_ultra_model_meta.json
 │   ├── config\
@@ -57,7 +57,7 @@ C:\Genesis_System3\
 │   │   ├── live_fetcher.py
 │   │   └── storage_manager.py
 │   └── brokers\
-│       └── angel_one\
+│       └── dhan\
 │           ├── broker.py
 │           └── instruments.py
 ```
@@ -73,18 +73,18 @@ C:\Genesis_System3\
 │   │   ├── *.csv
 │   │   └── *.parquet
 │   ├── live\                      # Live trading data
-│   │   ├── angel_index_ai_signals.csv
-│   │   ├── angel_index_ai_trades_plan.csv
-│   │   ├── angel_index_ai_pnl_log.csv
-│   │   ├── angel_index_ai_trades_exec_log.csv
-│   │   └── angel_index_options_watch.csv
+│   │   ├── dhan_index_ai_signals.csv
+│   │   ├── dhan_index_ai_trades_plan.csv
+│   │   ├── dhan_index_ai_pnl_log.csv
+│   │   ├── dhan_index_ai_trades_exec_log.csv
+│   │   └── dhan_index_options_watch.csv
 │   ├── learning\                  # Real-data learning
-│   │   ├── angel_real_outcomes.csv
+│   │   ├── dhan_real_outcomes.csv
 │   │   ├── real_signals_raw.csv
-│   │   └── angel_index_real_master_dataset.csv
+│   │   └── dhan_index_real_master_dataset.csv
 │   ├── learning_ultra\           # Ultra learning data
-│   │   ├── angel_ultra_shadow_master.csv
-│   │   └── angel_ultra_shadow_master.parquet
+│   │   ├── dhan_ultra_shadow_master.csv
+│   │   └── dhan_ultra_shadow_master.parquet
 │   ├── ultra\                    # Ultra phase outputs
 │   │   ├── phase31_ultra_fused_decisions.csv
 │   │   ├── phase35_decision_audit.csv
@@ -95,7 +95,7 @@ C:\Genesis_System3\
 │   │   │   └── ... (20 files total)
 │   │   └── ...
 │   ├── reports\                  # Reports and summaries
-│   │   ├── angel_daily_learning_report_*.txt
+│   │   ├── dhan_daily_learning_report_*.txt
 │   │   ├── daily_report_*.txt
 │   │   ├── real_learning_summary_*.csv
 │   │   ├── rolling_learning_dashboard_*.csv
@@ -109,7 +109,7 @@ C:\Genesis_System3\
 │   │   ├── phase29_sensitivity_analysis.csv
 │   │   └── ...
 │   ├── config\                   # Configuration files
-│   │   ├── angel_blended_training_v3_config.json
+│   │   ├── dhan_blended_training_v3_config.json
 │   │   ├── risk_profile_suggestions.json
 │   │   ├── thresholds_*.json
 │   │   └── system3_*.json
@@ -119,7 +119,7 @@ C:\Genesis_System3\
 │   │       ├── configs\
 │   │       └── snapshot_meta.json
 │   ├── features\                 # Feature data
-│   │   └── angel_index_options_features.csv
+│   │   └── dhan_index_options_features.csv
 │   ├── history\                  # Historical data
 │   │   └── *.json
 │   ├── instruments\              # Instrument data
@@ -185,15 +185,15 @@ C:\Genesis_System3\
 - `system3_ultra.py` - Ultra control panel
 
 ### Configuration
-- `core/engine/angel_trade_config.py` - Trade thresholds
-- `core/engine/angel_automation_config.py` - Automation settings
+- `core/engine/dhan_trade_config.py` - Trade thresholds
+- `core/engine/dhan_automation_config.py` - Automation settings
 - `core/config/system3_ultra_safety.json` - Safety switches
 - `storage/config/*.json` - Various configs
 
 ### Models
-- `core/models/angel_one/*.pkl` - Baseline models
-- `core/models/angel_one_real_blended/*.pkl` - Blended models
-- `core/models/angel_one_ultra/*.pkl` - Ultra models
+- `core/models/dhan/*.pkl` - Baseline models
+- `core/models/dhan_real_blended/*.pkl` - Blended models
+- `core/models/dhan_ultra/*.pkl` - Ultra models
 
 ### Data
 - `storage/live/*.csv` - Live trading data

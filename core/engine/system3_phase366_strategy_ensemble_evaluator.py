@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 def load_curated_signals() -> pd.DataFrame:
     """Load curated signals dataset with schema validation."""
-    curated_path = STORAGE_LIVE / "angel_index_ai_signals_curated.csv"
+    curated_path = STORAGE_LIVE / "dhan_index_ai_signals_curated.csv"
 
     if not curated_path.exists():
         logger.warning(f"Curated signals not found: {curated_path}")

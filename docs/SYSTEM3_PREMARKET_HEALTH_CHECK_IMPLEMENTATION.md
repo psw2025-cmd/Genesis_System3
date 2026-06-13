@@ -46,8 +46,8 @@ A comprehensive pre-market health check script has been implemented to catch iss
   - `system3_live_day_autopilot.py`
   - `START_AUTORUN_AND_WATCHDOG.bat`
   - `venv/Scripts/python.exe`
-  - `storage/live/angel_index_ai_signals.csv`
-  - `storage/live/angel_index_ai_signals_curated.csv`
+  - `storage/live/dhan_index_ai_signals.csv`
+  - `storage/live/dhan_index_ai_signals_curated.csv`
 - **Status**: Blocking (FAIL if any missing)
 
 ### 4. Python Version Check ✅

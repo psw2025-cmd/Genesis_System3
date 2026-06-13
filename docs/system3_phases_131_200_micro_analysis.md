@@ -241,7 +241,7 @@ if summary_by_underlying:  # ERROR: variable may not exist
    - ⏳ **PENDING**: Re-run Phase 144 to verify fix and generate missing report
 
 2. ⚠️ **NON-CRITICAL**: Verify broker connectivity
-   - Check AngelOne API credentials
+   - Check Dhan API credentials
    - Test broker connection when ready
    - WARN status is acceptable for DRY-RUN
 

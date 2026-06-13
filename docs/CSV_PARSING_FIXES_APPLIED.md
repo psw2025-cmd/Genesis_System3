@@ -14,9 +14,9 @@ Fixed CSV parsing errors in 3 files that were failing due to schema evolution (m
 
 ## FIXES APPLIED
 
-### Fix 1: `core/engine/angel_pnl_simulator.py` ✅
+### Fix 1: `core/engine/dhan_pnl_simulator.py` ✅
 
-**File**: `core/engine/angel_pnl_simulator.py`  
+**File**: `core/engine/dhan_pnl_simulator.py`  
 **Line**: 43-44  
 **Status**: ✅ **FIXED**
 
@@ -53,9 +53,9 @@ except Exception as e:
 
 ---
 
-### Fix 2: `core/engine/angel_trade_decision.py` ✅
+### Fix 2: `core/engine/dhan_trade_decision.py` ✅
 
-**File**: `core/engine/angel_trade_decision.py`  
+**File**: `core/engine/dhan_trade_decision.py`  
 **Line**: 242  
 **Status**: ✅ **FIXED**
 
@@ -81,9 +81,9 @@ except Exception as e:
 
 ---
 
-### Fix 3: `core/engine/angel_real_data_extractor.py` ✅
+### Fix 3: `core/engine/dhan_real_data_extractor.py` ✅
 
-**File**: `core/engine/angel_real_data_extractor.py`  
+**File**: `core/engine/dhan_real_data_extractor.py`  
 **Line**: 42  
 **Status**: ✅ **FIXED**
 
@@ -166,21 +166,21 @@ Line 32 has 3 extra fields (`0.0,0.0,0.0`) inserted at positions 10-12, shifting
 
 1. **Run PnL Simulation**:
    ```python
-   from core.engine.angel_pnl_simulator import run_pnl_simulation
+   from core.engine.dhan_pnl_simulator import run_pnl_simulation
    run_pnl_simulation()
    ```
    **Expected**: Should complete successfully, skipping malformed line 32
 
 2. **Run Trade Decision**:
    ```python
-   from core.engine.angel_trade_decision import main
+   from core.engine.dhan_trade_decision import main
    main()
    ```
    **Expected**: Should complete successfully, skipping malformed lines
 
 3. **Run Data Extractor**:
    ```python
-   from core.engine.angel_real_data_extractor import extract_real_training_data
+   from core.engine.dhan_real_data_extractor import extract_real_training_data
    df = extract_real_training_data()
    ```
    **Expected**: Should return DataFrame, skipping malformed lines
@@ -189,9 +189,9 @@ Line 32 has 3 extra fields (`0.0,0.0,0.0`) inserted at positions 10-12, shifting
 
 ## FILES MODIFIED
 
-1. ✅ `core/engine/angel_pnl_simulator.py` (lines 43-51)
-2. ✅ `core/engine/angel_trade_decision.py` (lines 242-248)
-3. ✅ `core/engine/angel_real_data_extractor.py` (line 42)
+1. ✅ `core/engine/dhan_pnl_simulator.py` (lines 43-51)
+2. ✅ `core/engine/dhan_trade_decision.py` (lines 242-248)
+3. ✅ `core/engine/dhan_real_data_extractor.py` (line 42)
 
 ---
 

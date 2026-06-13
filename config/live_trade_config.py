@@ -1,5 +1,5 @@
 """
-System3 Live Trading Configuration (Mode 1 - Angel One Only)
+System3 Live Trading Configuration (Mode 1 - Dhan Only)
 
 This is the CENTRAL configuration file for all live trading operations.
 All phases 101-130 MUST check these flags before any real trading operations.
@@ -47,7 +47,7 @@ LIVE_ALLOWED_UNDERLYINGS = [
 # ============================================================================
 # ANGEL ONE SPECIFIC SETTINGS
 # ============================================================================
-ANGEL_PRODUCT_TYPE = "INTRADAY"  # or as per current SmartAPI usage
+ANGEL_PRODUCT_TYPE = "INTRADAY"  # or as per current DhanHQ usage
 ANGEL_ORDER_VARIETY = "NORMAL"
 ANGEL_ALLOWED_ORDER_TYPES = ["MARKET"]  # For phase 1 live trading
 

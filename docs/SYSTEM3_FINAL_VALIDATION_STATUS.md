@@ -13,7 +13,7 @@ All three critical System3 commands have been successfully validated:
 - **Script**: `core/engine/system3_phase221_forward_returns.py`
 - **Status**: ✅ **PASSED**
 - **Output**: Computed forward returns for 560 of 608 rows
-- **Output File**: `storage/live/angel_index_ai_signals_with_forward.csv`
+- **Output File**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Last Run**: 2025-12-04 00:54:36
 
 ### ✅ Phase 222 - Signal Edge
@@ -26,10 +26,10 @@ All three critical System3 commands have been successfully validated:
 
 ### ✅ PnL Simulator
 - **Batch File**: `run_pnl_simulator.bat`
-- **Script**: `core/engine/angel_pnl_simulator.py`
+- **Script**: `core/engine/dhan_pnl_simulator.py`
 - **Status**: ✅ **PASSED** (after import fix)
 - **Output**: PnL log written, 3 trades evaluated (FINNIFTY)
-- **Output File**: `storage/live/angel_index_ai_pnl_log.csv`
+- **Output File**: `storage/live/dhan_index_ai_pnl_log.csv`
 - **Last Run**: 2025-12-04 00:54:58
 
 ---
@@ -37,7 +37,7 @@ All three critical System3 commands have been successfully validated:
 ## Fixes Applied
 
 ### PnL Simulator Import Fix
-- **File**: `core/engine/angel_pnl_simulator.py`
+- **File**: `core/engine/dhan_pnl_simulator.py`
 - **Issue**: `ModuleNotFoundError: No module named 'core'`
 - **Fix**: Added project root to sys.path before import
 - **Status**: ✅ **RESOLVED**
@@ -59,7 +59,7 @@ All commands can be run via:
    ```batch
    C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase221_forward_returns.py
    C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase222_signal_edge.py
-   C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+   C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
    ```
 
 3. **Validation Script**:
