@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genesis System3 Ultra Dashboard</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/ui/style.css">
 </head>
 <body>
     <div id="app">
@@ -278,10 +278,174 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Gain Rankings Tab -->
+                <div v-if="activeTab === 'rankings'" class="tab-content">
+                    <h2>Gain Rankings</h2>
+                    <div v-if="gainRankData.latest" class="panel">
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="metric-label">Date</div>
+                                <div class="metric-value" style="font-size:1rem">{{ gainRankData.latest.date }}</div>
+                                <div class="metric-change">{{ gainRankData.latest.time }}</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Top Symbol</div>
+                                <div class="metric-value">{{ gainRankData.latest.predictions && gainRankData.latest.predictions[0] ? gainRankData.latest.predictions[0].underlying : '-' }}</div>
+                                <div class="metric-change">Score: {{ gainRankData.latest.predictions && gainRankData.latest.predictions[0] ? gainRankData.latest.predictions[0].gain_score : '-' }}</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Predictions</div>
+                                <div class="metric-value">{{ gainRankData.latest.predictions ? gainRankData.latest.predictions.length : 0 }}</div>
+                                <div class="metric-change">underlyings ranked</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">History</div>
+                                <div class="metric-value">{{ gainRankData.total_days }}</div>
+                                <div class="metric-change">days of data</div>
+                            </div>
+                        </div>
+                        <div class="table-container" style="margin-top:1rem">
+                            <table class="chain-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Underlying</th>
+                                        <th>Gain Score</th>
+                                        <th>Expected Move %</th>
+                                        <th>Signal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="p in (gainRankData.latest.predictions || [])" :key="p.rank">
+                                        <td>{{ p.rank }}</td>
+                                        <td style="font-weight:bold">{{ p.underlying }}</td>
+                                        <td :class="p.gain_score >= 40 ? 'green' : p.gain_score >= 25 ? 'yellow' : 'red'">{{ p.gain_score }}</td>
+                                        <td>{{ (p.expected_move_pct * 100).toFixed(3) }}%</td>
+                                        <td :class="p.recommendation === 'BUY' ? 'green' : p.recommendation === 'SKIP' ? 'yellow' : ''">{{ p.recommendation }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div v-else class="panel" style="color:#888;text-align:center;padding:2rem">
+                        No ranking data — run: python scripts/daily_gain_rank_and_validate.py --mode rank
+                    </div>
+                </div>
+
+                <!-- Accuracy Trend Tab -->
+                <div v-if="activeTab === 'accuracy'" class="tab-content">
+                    <h2>Accuracy Trend</h2>
+                    <div v-if="accuracyData.retrain_needed" class="alert-banner retrain-alert" style="margin-bottom:1rem;padding:0.75rem 1rem;border-radius:4px;background:#330000;border:1px solid #ff3333;color:#ff6666;font-weight:bold">
+                        RETRAIN NEEDED — Spearman rho below threshold for 3+ days. auto_retrain.py fires at 16:00 IST.
+                    </div>
+                    <div class="panel">
+                        <div class="metric-grid">
+                            <div class="metric-card" :class="accuracyData.avg_rho >= 0.70 ? 'green' : accuracyData.avg_rho >= 0.40 ? 'yellow' : 'red'">
+                                <div class="metric-label">Avg Spearman rho</div>
+                                <div class="metric-value">{{ accuracyData.avg_rho !== null ? accuracyData.avg_rho : 'N/A' }}</div>
+                                <div class="metric-change">Target: >= 0.70</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Days Tracked</div>
+                                <div class="metric-value">{{ accuracyData.days_available }}</div>
+                                <div class="metric-change">of last 14</div>
+                            </div>
+                            <div class="metric-card" :class="accuracyData.retrain_needed ? 'red' : 'green'">
+                                <div class="metric-label">Retrain Signal</div>
+                                <div class="metric-value">{{ accuracyData.retrain_needed ? 'ACTIVE' : 'CLEAR' }}</div>
+                                <div class="metric-change">{{ accuracyData.retrain_needed ? 'fires at 16:00' : 'no retrain needed' }}</div>
+                            </div>
+                        </div>
+                        <div class="table-container" style="margin-top:1rem">
+                            <table class="chain-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Spearman rho</th>
+                                        <th>Hit Rate</th>
+                                        <th>Status</th>
+                                        <th>Predicted</th>
+                                        <th>Actual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="row in [...(accuracyData.trend || [])].reverse()" :key="row.date">
+                                        <td>{{ row.date }}</td>
+                                        <td :class="row.rho >= 0.70 ? 'green' : row.rho >= 0.40 ? 'yellow' : 'red'">{{ row.rho }}</td>
+                                        <td>{{ row.hit_rate ? (row.hit_rate * 100).toFixed(1) + '%' : 'N/A' }}</td>
+                                        <td :class="row.status === 'RETRAIN_NEEDED' ? 'red' : 'green'">{{ row.status }}</td>
+                                        <td>{{ (row.predicted || []).join(' > ') }}</td>
+                                        <td>{{ (row.actual || []).join(' > ') }}</td>
+                                    </tr>
+                                    <tr v-if="(accuracyData.trend || []).length === 0">
+                                        <td colspan="6" style="text-align:center;color:#888">No validation data yet</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Health Tab -->
+                <div v-if="activeTab === 'syshealth'" class="tab-content">
+                    <h2>System Health</h2>
+                    <div class="metric-grid">
+                        <div class="metric-card" :class="systemHealth.token && systemHealth.token.status === 'ok' ? 'green' : 'red'">
+                            <div class="metric-label">Token Status</div>
+                            <div class="metric-value" style="font-size:0.9rem">{{ systemHealth.token ? systemHealth.token.status.toUpperCase() : 'N/A' }}</div>
+                            <div class="metric-change" style="font-size:0.65rem;word-break:break-all">{{ systemHealth.token ? systemHealth.token.log_line : '' }}</div>
+                        </div>
+                        <div class="metric-card" :class="systemHealth.datasource_resilience === 'HIGH' ? 'green' : systemHealth.datasource_resilience === 'MEDIUM' ? 'yellow' : systemHealth.datasource_resilience === 'CRITICAL' ? 'red' : ''">
+                            <div class="metric-label">Data Resilience</div>
+                            <div class="metric-value">{{ systemHealth.datasource_resilience || 'NOT RUN' }}</div>
+                            <div class="metric-change">08:00 IST daily check</div>
+                        </div>
+                        <div class="metric-card" :class="systemHealth.retrain_needed ? 'red' : 'green'">
+                            <div class="metric-label">Retrain Signal</div>
+                            <div class="metric-value">{{ systemHealth.retrain_needed ? 'ACTIVE' : 'CLEAR' }}</div>
+                            <div class="metric-change">auto_retrain at 16:00</div>
+                        </div>
+                    </div>
+                    <div v-if="systemHealth.datasource_health" class="panel" style="margin-top:1rem">
+                        <h3>Datasource Health (last 08:00 check)</h3>
+                        <div class="table-container">
+                            <table class="chain-table">
+                                <thead><tr><th>Source</th><th>Status</th><th>Latency</th><th>Rows</th></tr></thead>
+                                <tbody>
+                                    <tr v-for="(src, name) in (systemHealth.datasource_health.sources || {})" :key="name">
+                                        <td>{{ name }}</td>
+                                        <td :class="src.status === 'ok' ? 'green' : 'red'">{{ src.status }}</td>
+                                        <td>{{ src.latency_ms !== undefined ? src.latency_ms + ' ms' : '-' }}</td>
+                                        <td>{{ src.rows !== undefined ? src.rows : '-' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div v-else class="panel" style="margin-top:1rem;color:#888;text-align:center;padding:1rem">
+                        Datasource health not available — will appear after 08:00 IST
+                    </div>
+                    <div class="panel" style="margin-top:1rem">
+                        <h3>Scheduled Jobs</h3>
+                        <div class="table-container">
+                            <table class="chain-table">
+                                <thead><tr><th>Job</th><th>Schedule (IST)</th><th>Enabled</th></tr></thead>
+                                <tbody>
+                                    <tr v-for="job in (systemHealth.jobs || [])" :key="job.id">
+                                        <td>{{ job.name || job.id }}</td>
+                                        <td>{{ job.schedule_time }}</td>
+                                        <td :class="job.enabled ? 'green' : 'red'">{{ job.enabled ? 'YES' : 'NO' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="/ui/app.js"></script>
 </body>
 </html>
