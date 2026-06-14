@@ -1,5 +1,93 @@
 # AI Production Readiness Findings
 
+## CLAUDE START HERE — INTENT, GOAL, AND SELF-VERIFICATION PROTOCOL
+
+**Read this section first before any code change, proof run, dashboard change, or readiness claim.**
+
+### User's unchanged goal
+
+The user's goal remains:
+
+```text
+Build System3 into a proof-first, option-tradability-aware, broker-reconciled, risk-controlled, self-learning AI trading control system that can eventually seek highest controlled asymmetric gain from the options segment, but only after Analyzer/Paper proof is complete.
+```
+
+This goal has **not changed**.
+
+### What the user expects from Claude/agent
+
+The user will usually give only the high-level goal. The agent is responsible for doing the full forensic discovery.
+
+Claude/agent must not wait for the user to list every check. Claude/agent must self-check all dependency gaps before action:
+
+```text
+Goal
+→ data gaps
+→ signal gaps
+→ tradability gaps
+→ option-chain gaps
+→ broker gaps
+→ proof gaps
+→ dashboard gaps
+→ risk gaps
+→ execution gaps
+→ governance gaps
+→ validated action plan
+→ proof artifacts
+→ only then patch/action
+```
+
+### Non-confusion rule
+
+Claude must not confuse these levels:
+
+| Level | Meaning | Can it approve real trading? |
+|---|---|---|
+| `BROKER_CONNECTED` | Dhan read-only connection appears healthy | No |
+| `ANALYZER_READY` | Dashboard/API can observe safely | No |
+| `PAPER_READY` | Real market paper lifecycle can run | No live trading |
+| `TRADE_READY` | All production proof gates pass | Still needs user approval |
+| `LIVE_ENABLED` | Real order placement explicitly allowed | Only after user approval |
+
+### Final authority rule
+
+No AI opinion, dashboard green color, or single PASS label is final.
+
+Final truth must come from:
+
+- proof status matrix
+- full trading pipeline readiness report
+- real market paper lifecycle proof
+- live data/source proof
+- option tradability proof
+- broker quote/orderbook/tradebook/position reconciliation proof
+- dashboard browser/API/report reconciliation proof
+- risk proof
+- governance/user approval
+
+### Mandatory fail-closed rule
+
+If any item is stale, synthetic, fallback, simulated, closed-market, unproven, missing-token, or not reconciled, Claude must mark it:
+
+```text
+NOT_PROVEN / PASS_WITH_WARNINGS / BLOCKED
+```
+
+Claude must not mark it production-ready.
+
+### Immediate Claude behavior
+
+Before any action Claude must:
+
+1. Read this file.
+2. Identify which gap family the task belongs to.
+3. Inspect current repo/runtime proof.
+4. State what is proven and what is not proven.
+5. Only then patch or recommend.
+6. Update this same file after material findings or fixes.
+
+---
+
 **Purpose:** Single living audit file for Genesis System3 production-grade real trading readiness.
 
 **Intended users:** Pritam, Claude, Cursor, Gemini, Codex, and future repo agents.
@@ -70,6 +158,7 @@ Use these when proof is incomplete:
 | 2026-06-14 22:25 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | forensic gap framework | Added mandatory goal-to-core gap decomposition: data, signal, tradability, option-chain, broker, proof, dashboard, risk, execution, governance | this file | DONE |
 | 2026-06-14 22:35 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | original vision gap matrix | Added original System3 design vision vs current implementation gap matrix | this file | DONE |
 | 2026-06-14 22:45 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | multi-validation batch 1 | Added backend runtime truth, SSOT, dashboard hardcoded proof, CORS/security, and position reconciliation findings | this file | DONE |
+| 2026-06-14 22:55 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | Claude start-here protocol | Added explicit intent, unchanged goal, non-confusion levels, and self-verification protocol at top of file | this file | DONE |
 
 ---
 
@@ -153,15 +242,9 @@ The original System3 design was intended as a complete **AI trading control syst
 
 **Evidence:** `dashboard/backend/app.py` imports synthetic data generators and also has `REAL_ONLY` logic.
 
-**Observation:** The backend has two competing concepts:
+**Observation:** The backend has two competing concepts: real-only mode and synthetic fallback branches. `/api/status` can derive data source from market-hours logic rather than the same SSOT used by `/api/state`.
 
-- `REAL_ONLY=True` by default, which says synthetic data should not be used for production.
-- synthetic generator modules still exist and fallback branches can return synthetic health if real-only is disabled.
-- `/api/status` can derive data source from market-hours logic rather than the same SSOT used by `/api/state`.
-
-**Impact:** different endpoints can describe the same runtime differently.
-
-**Required fix:** define one authoritative runtime data-source enum: `LIVE_BROKER`, `LIVE_PUBLIC`, `BHAVCOPY_EOD`, `SYNTHETIC`, `FALLBACK`, `NOT_READY`. Every endpoint and dashboard card must use this same value.
+**Required fix:** define one authoritative runtime data-source enum: `LIVE_BROKER`, `LIVE_PUBLIC`, `BHAVCOPY_EOD`, `SYNTHETIC`, `FALLBACK`, `NOT_READY`.
 
 **Status:** BLOCKER.
 
@@ -171,16 +254,9 @@ The original System3 design was intended as a complete **AI trading control syst
 
 **Evidence:** `dashboard/backend/app.py` returns broker-connected `ANALYZER_READY` state in REAL_ONLY mode when Dhan is connected.
 
-**Observation:** This is acceptable as broker/analyzer status, but it is unsafe if UI/agents read it as production readiness.
+**Observation:** This is acceptable as broker/analyzer status, but unsafe if UI/agents read it as production readiness.
 
-**Required fix:** split statuses clearly:
-
-- `broker_ready`
-- `analyzer_ready`
-- `paper_market_ready`
-- `production_trade_ready`
-
-`ANALYZER_READY` must never imply `trade_ready`.
+**Required fix:** split statuses into `broker_ready`, `analyzer_ready`, `paper_market_ready`, and `production_trade_ready`.
 
 **Status:** PARTIAL_PASS / NEEDS_LABEL_FIX.
 
@@ -192,13 +268,7 @@ The original System3 design was intended as a complete **AI trading control syst
 
 **Observation:** If those files are stale/missing, `/api/state` can become incomplete even while `/api/broker/status` reports connected.
 
-**Required fix:** add freshness age and source provenance to every state field:
-
-- `source_file`
-- `source_timestamp`
-- `age_seconds`
-- `is_stale`
-- `proof_status`
+**Required fix:** add source provenance to every state field: `source_file`, `source_timestamp`, `age_seconds`, `is_stale`, `proof_status`.
 
 **Status:** BLOCKER for dashboard truth.
 
@@ -210,11 +280,7 @@ The original System3 design was intended as a complete **AI trading control syst
 
 **Observation:** The system cannot honestly claim broker position reconciliation while broker positions are not fetched.
 
-**Required fix:** implement read-only Dhan positions fetch, then compare broker positions vs internal ledger and dashboard state. Until then, show:
-
-```text
-BROKER POSITION RECONCILED: NO / NOT IMPLEMENTED
-```
+**Required fix:** implement read-only Dhan positions fetch. Until then show `BROKER POSITION RECONCILED: NO / NOT IMPLEMENTED`.
 
 **Status:** HARD_BLOCKER.
 
@@ -224,7 +290,7 @@ BROKER POSITION RECONCILED: NO / NOT IMPLEMENTED
 
 **Evidence:** `dashboard/app.js` contains static `proofGates` and static `readinessLadder` values.
 
-**Observation:** The UI can show proof PASS even if official proof matrix has warnings or `trade_ready=false`. ML Accuracy can be shown as PASS despite weak rho and insufficient validation days.
+**Observation:** The UI can show PASS even if official proof matrix has warnings or `trade_ready=false`. ML Accuracy can be shown as PASS despite weak rho and insufficient validation days.
 
 **Required fix:** dashboard proof tab must be driven from backend proof matrix and pipeline reports, not frontend hardcoded arrays.
 
@@ -234,9 +300,9 @@ BROKER POSITION RECONCILED: NO / NOT IMPLEMENTED
 
 ## MV1-06 — Dashboard lacks hard production-ready computation
 
-**Evidence:** `dashboard/app.js` did not show a clear runtime computation for `PRODUCTION READY: NO` based on trade-ready, data source, market state, contract count, signal, broker reconciliation, and execution readiness.
+**Evidence:** `dashboard/app.js` did not show clear runtime computation for `PRODUCTION READY: NO`.
 
-**Required fix:** add a backend endpoint or frontend computed value:
+**Required computation:**
 
 ```text
 production_ready = trade_ready && data_live && market_open && valid_contract && signal_live && risk_pass && broker_reconciled && execution_supported && user_approved
@@ -252,9 +318,7 @@ If any condition is false, dashboard must show red `PRODUCTION READY: NO` with e
 
 **Evidence:** `dashboard/backend/app.py` configures CORS with `allow_origins=["*"]` and `allow_credentials=True`; root endpoint advertises `/docs`.
 
-**Observation:** This is acceptable for development/analyzer only, not for production trading control.
-
-**Required fix:** add auth, restrict CORS origins, protect or disable docs in production, add security headers and rate limiting.
+**Required fix:** add auth, restrict CORS origins, protect/disable docs in production, add security headers and rate limiting.
 
 **Status:** BLOCKER.
 
@@ -262,20 +326,9 @@ If any condition is false, dashboard must show red `PRODUCTION READY: NO` with e
 
 ## MV1-08 — Source-of-truth naming is still confusing
 
-**Observation:** Current system uses terms like `live`, `real`, `synthetic`, `not_ready`, `PAPER`, `ANALYZER_READY`, `BROKER LIVE`, and `trade_ready` in overlapping ways.
+**Observation:** Current system uses overlapping terms: `live`, `real`, `synthetic`, `not_ready`, `PAPER`, `ANALYZER_READY`, `BROKER LIVE`, and `trade_ready`.
 
-**Impact:** agents and users can misread connectivity as trading readiness.
-
-**Required fix:** standardize vocabulary:
-
-| Term | Meaning |
-|---|---|
-| `BROKER_CONNECTED` | Dhan read-only status works |
-| `DATA_LIVE` | fresh usable market/option data exists |
-| `ANALYZER_READY` | safe monitoring/prediction only |
-| `PAPER_READY` | real market paper lifecycle possible |
-| `TRADE_READY` | all production proof gates pass |
-| `LIVE_ENABLED` | real order placement explicitly allowed |
+**Required vocabulary:** `BROKER_CONNECTED`, `DATA_LIVE`, `ANALYZER_READY`, `PAPER_READY`, `TRADE_READY`, `LIVE_ENABLED`.
 
 **Status:** BLOCKER until UI/API labels are normalized.
 
@@ -283,80 +336,19 @@ If any condition is false, dashboard must show red `PRODUCTION READY: NO` with e
 
 # Mandatory forensic gap framework
 
-## 1. Data gaps
-
-**Question:** Is the system using real, fresh, complete data or stale/synthetic/fallback data?
-
-**Current status:** BLOCKER due source-truth conflict and missing freshness proof.
-
-## 2. Signal gaps
-
-**Question:** Is there a valid live signal, or only stale/fallback/no-trade output?
-
-**Current status:** BLOCKER until live market signal is proven.
-
-## 3. Tradability gaps
-
-**Question:** Can the selected underlying/contract actually be traded in options?
-
-**Current status:** BLOCKER because contract/token/liquidity path is not fully proven.
-
-## 4. Option-chain gaps
-
-**Question:** Is option-chain data complete enough for strike selection and risk?
-
-**Current status:** NOT_PROVEN.
-
-## 5. Broker gaps
-
-**Question:** Is broker connectivity enough for read-only proof, paper proof, and eventual execution?
-
-**Current status:** PARTIAL_PASS / NEEDS_BROKER_RUNTIME.
-
-## 6. Proof gaps
-
-**Question:** Are PASS labels truthful, or hiding fallback/simulation?
-
-**Current status:** FALSE_PASS_RISK.
-
-## 7. Dashboard gaps
-
-**Question:** Does dashboard show actual truth or attractive/green status?
-
-**Current status:** BLOCKER / NEEDS_BROWSER_PROOF.
-
-## 8. Risk gaps
-
-**Question:** Is max loss controlled before any order can be placed?
-
-**Current status:** NOT_PROVEN.
-
-## 9. Execution gaps
-
-**Question:** Can the system go from signal to order to fill to exit to P&L correctly?
-
-**Current status:** HARD_BLOCKER.
-
-## 10. Governance gaps
-
-**Question:** Who or what is allowed to declare production-ready?
-
-**Current status:** BLOCKER.
-
----
-
-# Non-negotiable rules for Claude and all agents
-
-1. Never call simulated/fallback/weekend lifecycle proof production proof.
-2. Any fallback, synthetic, stale, closed-market, or non-token proof must be at most `PASS_WITH_WARNINGS`.
-3. Official trade-ready authority is proof matrix + full pipeline + dashboard truth + broker reconciliation + user approval.
-4. Do not enable live trading from automation.
-5. Every goal must be decomposed into the 10 gap framework before action.
-6. Every agent must update this file after material findings, fixes, or proof runs.
-7. Dashboard must distinguish broker connectivity, analyzer readiness, paper readiness, trade readiness, and live enablement.
+1. **Data gaps** — Current status: BLOCKER due source-truth conflict and missing freshness proof.
+2. **Signal gaps** — Current status: BLOCKER until live market signal is proven.
+3. **Tradability gaps** — Current status: BLOCKER because contract/token/liquidity path is not fully proven.
+4. **Option-chain gaps** — Current status: NOT_PROVEN.
+5. **Broker gaps** — Current status: PARTIAL_PASS / NEEDS_BROKER_RUNTIME.
+6. **Proof gaps** — Current status: FALSE_PASS_RISK.
+7. **Dashboard gaps** — Current status: BLOCKER / NEEDS_BROWSER_PROOF.
+8. **Risk gaps** — Current status: NOT_PROVEN.
+9. **Execution gaps** — Current status: HARD_BLOCKER.
+10. **Governance gaps** — Current status: BLOCKER.
 
 ---
 
 # Current final statement
 
-The current System3 is a useful Analyzer/Paper foundation, but it has not yet reached the original design target of a proof-first, option-tradability-aware, broker-reconciled, risk-controlled, self-learning, ultra-dashboard-governed production trading system. Multi-validation Batch 1 adds concrete backend and dashboard evidence that source-of-truth, proof classification, position reconciliation, dashboard hardcoded PASS logic, and security governance remain open blockers.
+The current System3 is a useful Analyzer/Paper foundation, but it has not yet reached the original design target of a proof-first, option-tradability-aware, broker-reconciled, risk-controlled, self-learning, ultra-dashboard-governed production trading system. Claude must treat this file as the start-here protocol and must self-verify all gap families before action. The goal is unchanged; only verified proof may move the system toward production readiness.
