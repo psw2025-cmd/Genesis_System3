@@ -1,0 +1,26 @@
+[
+  {
+    "severity": "CRITICAL",
+    "category": "safety_secrets",
+    "file": "",
+    "issue": "Secret-style patterns found: 96. Review redacted report; rotate any real exposed credential."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "config_runtime",
+    "file": "",
+    "issue": "localhost/live-mode references found: 3366. Review for dashboard/deploy/runtime leakage."
+  },
+  {
+    "severity": "MEDIUM",
+    "category": "repo_cleanup",
+    "file": "",
+    "issue": "Duplicate/same-name candidates found: 138. Requires runtime authority before delete/archive."
+  },
+  {
+    "severity": "LOW",
+    "category": "code_debt",
+    "file": "",
+    "issue": "TODO/FIXME/HACK markers found: 473."
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "git_branch": {
+    "cmd": "git branch --show-current",
+    "rc": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "git_head": {
+    "cmd": "git rev-parse HEAD",
+    "rc": 0,
+    "stdout": "ad356bffff0bf359a53cc56558201b2b2ed3067f\n",
+    "stderr": ""
+  },
+  "git_status": {
+    "cmd": "git status --short --untracked-files=all",
+    "rc": 0,
+    "stdout": "?? reports/latest/claude_full_repo_scan/claude_full_repo_scan.py\n?? reports/latest/manual_full_repo_audit/audit_stdout.txt\n?? state/scheduler_daemon.pid\n",
+    "stderr": ""
+  },
+  "git_recent": {
+    "cmd": "git log --oneline -10",
+    "rc": 0,
+    "stdout": "ad356bff fix(codespace): install deps on startup + wire job scheduler daemon\n2ace4db9 chore(codespaces): add startup service hook\n7c2112f8 feat(signal): activate ml_confidence weight \u2014 bhavcopy signal engine runner\n637e486b fix(workflow): use fetch+reset in pull_main \u2014 eliminates rebase conflicts after squash merge\n92392745 Merge branch 'review/dhan-full-migration-token-automation'\nfefedf53 fix(state): sync semver.json to v1.1.1 \u2014 tag existed but JSON was behind\n0cd7eb2d Merge branch 'main' of https://github.com/psw2025-cmd/Genesis_System3\n270ed7af fix(workflow): auto conflict resolution, rebase+merge strategy, full pipeline verified\n885baafb fix(workflow): auto conflict resolution, rebase+merge strategy, full pipeline verified\n2a32c28d chore: sync with main (auto-resolved)\n",
+    "stderr": ""
+  },
+  "git_file_count": {
+    "cmd": "git ls-files | wc -l",
+    "rc": 0,
+    "stdout": "3785\n",
+    "stderr": ""
+  }
+}

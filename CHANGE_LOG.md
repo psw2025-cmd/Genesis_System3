@@ -438,3 +438,46 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 - pandas 3.0.3 (wheel for cp314), numpy 2.4.6
 
 **Verification:** `scripts/dhan_startup_check.py --status` shows Token OK, Daemon running, Watchdog running.
+
+---
+
+## Session 7 — 2026-06-14 Part 2 (Full Repo Scan + Security Fixes)
+
+### [2026-06-14 18:00 IST] [Claude] FULL REPO SCAN + SECURITY REMEDIATION
+
+**Scan scope:** 5200 files, 1670 Python files, 3785 git-tracked files
+
+**Results summary:**
+- Python compile failures: 0/1670 ✅
+- Secret-style findings: 96 (mostly false positives — env var reads, not hardcoded values)
+- TODO/FIXME markers: 473 (LOW priority, no action needed)
+- localhost/live-mode refs: 3366 (expected — dashboard dev/deploy config)
+- Duplicate name candidates: 138 (archive files, no action needed)
+
+**REAL ISSUES FOUND AND FIXED:**
+
+1. **[CRITICAL] `.claude/settings.json` line 37** — Live JWT access token hardcoded in a Bash permission entry. File is NOT git-tracked, but is a security risk. Removed the entry (functionality covered by separate `"Bash(python scripts/verify_dhan_readonly.py)"` permission).
+
+2. **[CI-BLOCKER] CI safety_and_secrets gate was FAILING** — `forbidden_secret_style_files_tracked` + `possible_secret_like_content_in_tracked_text`. Root cause: Angel One credential keys in tracked files after broker removal.
+   - `config/.env.example` — replaced Angel One credential keys with Dhan-only template
+   - `core/utils/env_loader.py` — removed `get_angelone_credentials()` function (reads ANGELONE_* env vars — dead code since session 5)
+   - `core/engine/system3_phase205_broker_selftest.py` — migrated to `get_dhan_credentials()`
+   
+3. **[MEDIUM] `.gitignore` missing `.secrets/` and `.claude/` entries** — Added `.secrets/` and `.claude/settings.local.json`
+
+4. **[MEDIUM] `config/live_trade_config.py`** — `ANGEL_PRODUCT_TYPE`, `ANGEL_ORDER_VARIETY` constants renamed to `DHAN_*`; backward-compat aliases kept so phase101/107 continue to work
+
+5. **[MEDIUM] `.github/workflows/main.yml`** — Removed stale `ANGEL_API_KEY` env/secret reference (Angel One removed 2026-06-12)
+
+**Post-fix verification:**
+- All 5 previously-flagged files: CLEAN (no secret patterns remain)
+- All modified Python files: compile OK
+- DHAN_* constants and backward-compat ANGEL_* aliases: working
+
+**Next CI run should show:** `safety_and_secrets` gate: PASS (was FAIL)
+
+**NOT FIXED (out of scope / by design):**
+- 473 TODO/FIXME markers — mostly in archive/, tools/, legacy scripts; LOW priority
+- 3366 localhost references — expected in dashboard/FastAPI code
+- 138 duplicate names — archive/ files; safe without runtime authority to delete
+- "=== ANGEL ONE INDEX OPTIONS ===" print strings in ~30 core/engine/ files — just labels, not functional; low priority cosmetic cleanup

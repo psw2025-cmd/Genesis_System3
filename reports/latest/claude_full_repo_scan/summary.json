@@ -1,0 +1,25 @@
+{
+  "generated_utc": "2026-06-14T11:41:13.967300+00:00",
+  "git_branch": "main",
+  "git_head": "ad356bffff0bf359a53cc56558201b2b2ed3067f",
+  "git_status_line_count": 3,
+  "tracked_file_count_git": "3785",
+  "files_scanned": 5200,
+  "python_files_scanned": 1670,
+  "python_compile_fail_count": 0,
+  "secret_style_finding_count": 96,
+  "todo_fixme_count": 473,
+  "localhost_live_mode_count": 3366,
+  "duplicate_candidate_count": 138,
+  "runtime_entrypoint_candidate_count": 1394,
+  "dashboard_api_candidate_count": 406,
+  "trading_safety_candidate_count": 683,
+  "issue_count_total": 4,
+  "issue_count_by_severity": {
+    "CRITICAL": 1,
+    "MEDIUM": 2,
+    "LOW": 1
+  },
+  "verdict": "BLOCKED_CRITICAL_FINDINGS",
+  "live_trading_rule": "DO_NOT_ENABLE_LIVE_TRADING_FROM_THIS_SCAN. Analyzer/Paper only until gates pass."
+}
