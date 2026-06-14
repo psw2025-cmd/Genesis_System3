@@ -578,4 +578,49 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 3. **5+ Spearman ρ validation days** — Required before live enablement checklist
    - ρ=0.80 measured on 1 day only; HIGH overfitting risk if treated as stable
 
+---
+
+## 2026-06-14 (Session 9)
+
+**[2026-06-14 14:00] [Claude]** OVERHAUL: Complete dashboard UI rebuild — institutional Bloomberg-grade design.
+
+### dashboard/index.html (526 lines, rewrite)
+- Vue 3 (CDN) + Chart.js 4.4 (CDN) — both loaded in correct order
+- 7-tab layout: Overview, Signals, Accuracy, Risk, Options, Health, Proof Gates
+- Persistent topbar: live IST clock, market open/closed pill + countdown, broker status chip, live ρ badge
+- Collapsible sidebar with active indicator + last-sync footer
+- Overview: 6 KPI cards + GainRank rank table + ρ sparkline + system status grid
+- Signal Intelligence: factor weight bars + rank table + pipeline flow steps
+- Accuracy: ρ kpis + dual chart (sparkline + full trend with target line) + validation log + walk-forward proof
+- Risk: safety gates checklist + live-enablement checklist
+- Options: data source priority table + OI cache status
+- Health: job scheduler table + token/auth info + data resilience
+- Proof Gates: 8-gate matrix + readiness ladder
+
+### dashboard/style.css (650 lines, rewrite)
+- Dark navy institutional theme: #070c18 background
+- Monospace font for all numeric values (JetBrains Mono / Courier New)
+- KPI cards with colored top border per type (green/red/blue/cyan/purple/amber)
+- Score bar component with dynamic color (green ≥70, amber ≥40, red <40)
+- Rank table grid: RANK/UNDERLYING/SCORE_BAR/MOVE%/ACTION columns
+- Animated logo glow, pulsing market open dot
+- Fully responsive: sidebar collapses to icons on mobile
+- Custom scrollbars throughout
+
+### dashboard/app.js (420 lines, rewrite)
+- Chart.js global defaults set for dark theme
+- Real-time clock with IST market hours (09:15–15:30 Mon–Fri)
+- Market countdown: "Opens in Xh Ym" / "Closes in Xh Ym"
+- 10-second polling of all 5 APIs: /api/state, /api/broker/status, /api/gain_rank, /api/accuracy_trend, /api/system_health
+- ρ sparkline chart (rhoChart) + full trend with target=0.70 dashed line (rhoChartFull)
+- GainRank bar chart with per-bar colors (rhoHistoryChart)
+- Tab-switch watch: re-renders correct charts on tab activation
+- 7 factor weights hardcoded (OI 25%, IV 20%, PCR 15%, ML 15%, Momentum 10%, Volume 10%, Greeks 5%)
+- 6 data source priority rows
+- 8 proof gate rows with PASS/PEND status
+- 8-rung readiness ladder with done/pending state
+- Proper cleanup on unmount (intervals + chart instances)
+
+**Live trading: DISABLED. No credentials touched.**
+
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**

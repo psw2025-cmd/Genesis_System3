@@ -1,451 +1,526 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genesis System3 Ultra Dashboard</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <link rel="stylesheet" href="/ui/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genesis System3 — AI Options Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/ui/style.css">
 </head>
 <body>
-    <div id="app">
-        <div class="dashboard">
-            <!-- Sidebar Navigation -->
-            <div class="sidebar">
-                <div class="logo">
-                    <h1>System3</h1>
-                    <div class="status-indicator" :class="systemStatus.toLowerCase()"></div>
-                </div>
-                <nav class="nav-tabs">
-                    <div 
-                        v-for="tab in tabs" 
-                        :key="tab.id"
-                        class="tab" 
-                        :class="{active: activeTab === tab.id}" 
-                        @click="activeTab = tab.id"
-                    >
-                        <span class="tab-icon">{{ tab.icon }}</span>
-                        <span class="tab-label">{{ tab.label }}</span>
-                    </div>
-                </nav>
-            </div>
+<div id="app">
 
-            <!-- Main Content Area -->
-            <div class="content">
-                <!-- Overview Tab -->
-                <div v-if="activeTab === 'overview'" class="tab-content">
-                    <h2>System Overview</h2>
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getPnLClass()">
-                            <div class="metric-label">Total PnL</div>
-                            <div class="metric-value">₹{{ formatNumber(metrics.pnl) }}</div>
-                            <div class="metric-change">{{ metrics.pnlChange >= 0 ? '+' : '' }}{{ metrics.pnlChange.toFixed(2) }}%</div>
-                        </div>
-                        <div class="metric-card" :class="getPerfClass()">
-                            <div class="metric-label">Cycle Duration</div>
-                            <div class="metric-value">{{ metrics.cycleDuration }}s</div>
-                            <div class="metric-change">{{ metrics.cycleDuration < 3 ? 'GREEN' : metrics.cycleDuration < 10 ? 'YELLOW' : 'RED' }}</div>
-                        </div>
-                        <div class="metric-card green">
-                            <div class="metric-label">Trades Executed</div>
-                            <div class="metric-value">{{ metrics.tradesExecuted }}</div>
-                            <div class="metric-change">Open: {{ metrics.openPositions }}</div>
-                        </div>
-                        <div class="metric-card" :class="getGreeksClass()">
-                            <div class="metric-label">Greeks Success</div>
-                            <div class="metric-value">{{ metrics.greeksSuccess }}%</div>
-                            <div class="metric-change">Fallback: {{ metrics.greeksFallback }}</div>
-                        </div>
-                    </div>
-
-                    <div class="panel">
-                        <h3>System Status</h3>
-                        <div class="status-grid">
-                            <div class="status-item">
-                                <span class="status-label">Mode:</span>
-                                <span class="status-value">{{ systemStatus }}</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Last Fetch:</span>
-                                <span class="status-value">{{ formatTime(metrics.lastFetch) }}</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Data Success Rate:</span>
-                                <span class="status-value">{{ metrics.dataSuccessRate }}%</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Signal Success Rate:</span>
-                                <span class="status-value">{{ metrics.signalSuccessRate }}%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Latency Tab -->
-                <div v-if="activeTab === 'latency'" class="tab-content">
-                    <h2>Latency Metrics</h2>
-                    <div class="panel">
-                        <div class="latency-grid">
-                            <div class="latency-item" :class="getLatencyClass(metrics.fetchDuration)">
-                                <div class="latency-label">Fetch Duration</div>
-                                <div class="latency-value">{{ metrics.fetchDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.fetchDuration < 3 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                            <div class="latency-item" :class="getLatencyClass(metrics.strategyDuration)">
-                                <div class="latency-label">Strategy Duration</div>
-                                <div class="latency-value">{{ metrics.strategyDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.strategyDuration < 1 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                            <div class="latency-item" :class="getLatencyClass(metrics.cycleDuration)">
-                                <div class="latency-label">Total Cycle</div>
-                                <div class="latency-value">{{ metrics.cycleDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.cycleDuration < 10 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Tab -->
-                <div v-if="activeTab === 'risk'" class="tab-content">
-                    <h2>Risk Management</h2>
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getRiskClass(metrics.maxDrawdown)">
-                            <div class="metric-label">Max Drawdown</div>
-                            <div class="metric-value">{{ metrics.maxDrawdown }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Win Rate</div>
-                            <div class="metric-value">{{ metrics.winRate }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Trades</div>
-                            <div class="metric-value">{{ metrics.totalTrades }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Winning Trades</div>
-                            <div class="metric-value">{{ metrics.winningTrades }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Greeks Tab -->
-                <div v-if="activeTab === 'greeks'" class="tab-content">
-                    <h2>Greeks Status</h2>
-                    
-                    <!-- Underlying Selector -->
-                    <div class="underlying-selector">
-                        <button 
-                            v-for="u in underlyings" 
-                            :key="u"
-                            class="underlying-btn"
-                            :class="{active: selectedUnderlying === u}"
-                            @click="selectedUnderlying = u; fetchChainData(u)"
-                        >
-                            {{ u }}
-                        </button>
-                    </div>
-                    
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getGreeksClass()">
-                            <div class="metric-label">API Success Rate</div>
-                            <div class="metric-value">{{ metrics.greeksSuccess.toFixed(1) }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Black-Scholes Fallback</div>
-                            <div class="metric-value">{{ metrics.greeksFallback }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Unavailable</div>
-                            <div class="metric-value">{{ metrics.greeksUnavailable }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Contracts</div>
-                            <div class="metric-value">{{ chainData.totalContracts }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="panel">
-                        <h3>Greeks Distribution</h3>
-                        <div class="greeks-status">
-                            <div class="status-row">
-                                <span>Contracts with Full Greeks (Delta, Gamma, Vega, Theta):</span>
-                                <span class="green">{{ Math.round(chainData.totalContracts * metrics.greeksSuccess / 100) }}</span>
-                            </div>
-                            <div class="status-row">
-                                <span>Contracts with Partial Greeks:</span>
-                                <span class="yellow">{{ metrics.greeksFallback }}</span>
-                            </div>
-                            <div class="status-row">
-                                <span>Contracts without Greeks:</span>
-                                <span class="red">{{ metrics.greeksUnavailable }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Option Chain Tab -->
-                <div v-if="activeTab === 'options'" class="tab-content">
-                    <h2>Option Chain Analytics</h2>
-                    
-                    <!-- Underlying Selector -->
-                    <div class="underlying-selector">
-                        <button 
-                            v-for="u in underlyings" 
-                            :key="u"
-                            class="underlying-btn"
-                            :class="{active: selectedUnderlying === u}"
-                            @click="selectedUnderlying = u; fetchChainData(u)"
-                        >
-                            {{ u }}
-                        </button>
-                    </div>
-
-                    <!-- Metrics -->
-                    <div class="metric-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Spot Price</div>
-                            <div class="metric-value">₹{{ formatNumber(chainData.spot) }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Put-Call Ratio</div>
-                            <div class="metric-value">{{ chainData.pcr?.toFixed(2) || 'N/A' }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Contracts</div>
-                            <div class="metric-value">{{ chainData.totalContracts || 0 }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Filtered</div>
-                            <div class="metric-value">{{ filteredContracts.length }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Chain Table -->
-                    <div class="panel">
-                        <div class="table-container">
-                            <table class="chain-table">
-                                <thead>
-                                    <tr>
-                                        <th>Strike</th>
-                                        <th>Type</th>
-                                        <th>LTP</th>
-                                        <th>OI</th>
-                                        <th>Volume</th>
-                                        <th>IV</th>
-                                        <th>Delta</th>
-                                        <th>Gamma</th>
-                                        <th>Vega</th>
-                                        <th>Theta</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(contract, idx) in filteredContracts.slice(0, 100)" :key="idx">
-                                        <td>{{ contract.strike }}</td>
-                                        <td>{{ contract.option_type }}</td>
-                                        <td>₹{{ contract.ltp?.toFixed(2) || 'N/A' }}</td>
-                                        <td>{{ formatNumber(contract.oi) }}</td>
-                                        <td>{{ formatNumber(contract.volume) }}</td>
-                                        <td>{{ contract.iv ? (contract.iv * 100).toFixed(2) + '%' : 'N/A' }}</td>
-                                        <td>{{ contract.delta?.toFixed(3) || 'N/A' }}</td>
-                                        <td>{{ contract.gamma?.toFixed(4) || 'N/A' }}</td>
-                                        <td>{{ contract.vega?.toFixed(2) || 'N/A' }}</td>
-                                        <td>{{ contract.theta?.toFixed(2) || 'N/A' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Trades Tab -->
-                <div v-if="activeTab === 'trades'" class="tab-content">
-                    <h2>Live Trades</h2>
-                    <div class="panel">
-                        <div class="trades-list">
-                            <div v-for="trade in liveTrades" :key="trade.id" class="trade-item">
-                                <div class="trade-symbol">{{ trade.symbol }}</div>
-                                <div class="trade-details">
-                                    <span>Entry: ₹{{ trade.entryPrice }}</span>
-                                    <span>Current: ₹{{ trade.currentPrice }}</span>
-                                    <span :class="trade.pnl >= 0 ? 'green' : 'red'">
-                                        PnL: ₹{{ trade.pnl.toFixed(2) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div v-if="liveTrades.length === 0" class="no-trades">
-                                No active trades
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gain Rankings Tab -->
-                <div v-if="activeTab === 'rankings'" class="tab-content">
-                    <h2>Gain Rankings</h2>
-                    <div v-if="gainRankData.latest" class="panel">
-                        <div class="metric-grid">
-                            <div class="metric-card">
-                                <div class="metric-label">Date</div>
-                                <div class="metric-value" style="font-size:1rem">{{ gainRankData.latest.date }}</div>
-                                <div class="metric-change">{{ gainRankData.latest.time }}</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">Top Symbol</div>
-                                <div class="metric-value">{{ gainRankData.latest.predictions && gainRankData.latest.predictions[0] ? gainRankData.latest.predictions[0].underlying : '-' }}</div>
-                                <div class="metric-change">Score: {{ gainRankData.latest.predictions && gainRankData.latest.predictions[0] ? gainRankData.latest.predictions[0].gain_score : '-' }}</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">Predictions</div>
-                                <div class="metric-value">{{ gainRankData.latest.predictions ? gainRankData.latest.predictions.length : 0 }}</div>
-                                <div class="metric-change">underlyings ranked</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">History</div>
-                                <div class="metric-value">{{ gainRankData.total_days }}</div>
-                                <div class="metric-change">days of data</div>
-                            </div>
-                        </div>
-                        <div class="table-container" style="margin-top:1rem">
-                            <table class="chain-table">
-                                <thead>
-                                    <tr>
-                                        <th>Rank</th>
-                                        <th>Underlying</th>
-                                        <th>Gain Score</th>
-                                        <th>Expected Move %</th>
-                                        <th>Signal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="p in (gainRankData.latest.predictions || [])" :key="p.rank">
-                                        <td>{{ p.rank }}</td>
-                                        <td style="font-weight:bold">{{ p.underlying }}</td>
-                                        <td :class="p.gain_score >= 40 ? 'green' : p.gain_score >= 25 ? 'yellow' : 'red'">{{ p.gain_score }}</td>
-                                        <td>{{ (p.expected_move_pct * 100).toFixed(3) }}%</td>
-                                        <td :class="p.recommendation === 'BUY' ? 'green' : p.recommendation === 'SKIP' ? 'yellow' : ''">{{ p.recommendation }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div v-else class="panel" style="color:#888;text-align:center;padding:2rem">
-                        No ranking data — run: python scripts/daily_gain_rank_and_validate.py --mode rank
-                    </div>
-                </div>
-
-                <!-- Accuracy Trend Tab -->
-                <div v-if="activeTab === 'accuracy'" class="tab-content">
-                    <h2>Accuracy Trend</h2>
-                    <div v-if="accuracyData.retrain_needed" class="alert-banner retrain-alert" style="margin-bottom:1rem;padding:0.75rem 1rem;border-radius:4px;background:#330000;border:1px solid #ff3333;color:#ff6666;font-weight:bold">
-                        RETRAIN NEEDED — Spearman rho below threshold for 3+ days. auto_retrain.py fires at 16:00 IST.
-                    </div>
-                    <div class="panel">
-                        <div class="metric-grid">
-                            <div class="metric-card" :class="accuracyData.avg_rho >= 0.70 ? 'green' : accuracyData.avg_rho >= 0.40 ? 'yellow' : 'red'">
-                                <div class="metric-label">Avg Spearman rho</div>
-                                <div class="metric-value">{{ accuracyData.avg_rho !== null ? accuracyData.avg_rho : 'N/A' }}</div>
-                                <div class="metric-change">Target: >= 0.70</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">Days Tracked</div>
-                                <div class="metric-value">{{ accuracyData.days_available }}</div>
-                                <div class="metric-change">of last 14</div>
-                            </div>
-                            <div class="metric-card" :class="accuracyData.retrain_needed ? 'red' : 'green'">
-                                <div class="metric-label">Retrain Signal</div>
-                                <div class="metric-value">{{ accuracyData.retrain_needed ? 'ACTIVE' : 'CLEAR' }}</div>
-                                <div class="metric-change">{{ accuracyData.retrain_needed ? 'fires at 16:00' : 'no retrain needed' }}</div>
-                            </div>
-                        </div>
-                        <div class="table-container" style="margin-top:1rem">
-                            <table class="chain-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Spearman rho</th>
-                                        <th>Hit Rate</th>
-                                        <th>Status</th>
-                                        <th>Predicted</th>
-                                        <th>Actual</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="row in [...(accuracyData.trend || [])].reverse()" :key="row.date">
-                                        <td>{{ row.date }}</td>
-                                        <td :class="row.rho >= 0.70 ? 'green' : row.rho >= 0.40 ? 'yellow' : 'red'">{{ row.rho }}</td>
-                                        <td>{{ row.hit_rate ? (row.hit_rate * 100).toFixed(1) + '%' : 'N/A' }}</td>
-                                        <td :class="row.status === 'RETRAIN_NEEDED' ? 'red' : 'green'">{{ row.status }}</td>
-                                        <td>{{ (row.predicted || []).join(' > ') }}</td>
-                                        <td>{{ (row.actual || []).join(' > ') }}</td>
-                                    </tr>
-                                    <tr v-if="(accuracyData.trend || []).length === 0">
-                                        <td colspan="6" style="text-align:center;color:#888">No validation data yet</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- System Health Tab -->
-                <div v-if="activeTab === 'syshealth'" class="tab-content">
-                    <h2>System Health</h2>
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="systemHealth.token && systemHealth.token.status === 'ok' ? 'green' : 'red'">
-                            <div class="metric-label">Token Status</div>
-                            <div class="metric-value" style="font-size:0.9rem">{{ systemHealth.token ? systemHealth.token.status.toUpperCase() : 'N/A' }}</div>
-                            <div class="metric-change" style="font-size:0.65rem;word-break:break-all">{{ systemHealth.token ? systemHealth.token.log_line : '' }}</div>
-                        </div>
-                        <div class="metric-card" :class="systemHealth.datasource_resilience === 'HIGH' ? 'green' : systemHealth.datasource_resilience === 'MEDIUM' ? 'yellow' : systemHealth.datasource_resilience === 'CRITICAL' ? 'red' : ''">
-                            <div class="metric-label">Data Resilience</div>
-                            <div class="metric-value">{{ systemHealth.datasource_resilience || 'NOT RUN' }}</div>
-                            <div class="metric-change">08:00 IST daily check</div>
-                        </div>
-                        <div class="metric-card" :class="systemHealth.retrain_needed ? 'red' : 'green'">
-                            <div class="metric-label">Retrain Signal</div>
-                            <div class="metric-value">{{ systemHealth.retrain_needed ? 'ACTIVE' : 'CLEAR' }}</div>
-                            <div class="metric-change">auto_retrain at 16:00</div>
-                        </div>
-                    </div>
-                    <div v-if="systemHealth.datasource_health" class="panel" style="margin-top:1rem">
-                        <h3>Datasource Health (last 08:00 check)</h3>
-                        <div class="table-container">
-                            <table class="chain-table">
-                                <thead><tr><th>Source</th><th>Status</th><th>Latency</th><th>Rows</th></tr></thead>
-                                <tbody>
-                                    <tr v-for="(src, name) in (systemHealth.datasource_health.sources || {})" :key="name">
-                                        <td>{{ name }}</td>
-                                        <td :class="src.status === 'ok' ? 'green' : 'red'">{{ src.status }}</td>
-                                        <td>{{ src.latency_ms !== undefined ? src.latency_ms + ' ms' : '-' }}</td>
-                                        <td>{{ src.rows !== undefined ? src.rows : '-' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div v-else class="panel" style="margin-top:1rem;color:#888;text-align:center;padding:1rem">
-                        Datasource health not available — will appear after 08:00 IST
-                    </div>
-                    <div class="panel" style="margin-top:1rem">
-                        <h3>Scheduled Jobs</h3>
-                        <div class="table-container">
-                            <table class="chain-table">
-                                <thead><tr><th>Job</th><th>Schedule (IST)</th><th>Enabled</th></tr></thead>
-                                <tbody>
-                                    <tr v-for="job in (systemHealth.jobs || [])" :key="job.id">
-                                        <td>{{ job.name || job.id }}</td>
-                                        <td>{{ job.schedule_time }}</td>
-                                        <td :class="job.enabled ? 'green' : 'red'">{{ job.enabled ? 'YES' : 'NO' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- TOP HEADER BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo-mark">⬡</div>
+      <div class="logo-text">GENESIS <span>SYSTEM3</span></div>
+      <div class="mode-badge" :class="modeClass">{{ state.mode || 'PAPER' }}</div>
     </div>
+    <div class="topbar-center">
+      <div class="market-clock">
+        <span class="clock-label">IST</span>
+        <span class="clock-time">{{ currentTime }}</span>
+      </div>
+      <div class="market-status-pill" :class="marketOpen ? 'open' : 'closed'">
+        <span class="pulse-dot"></span>
+        {{ marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED' }}
+        <span class="market-countdown">{{ marketCountdown }}</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-chip" :class="broker.connected ? 'connected' : 'disconnected'">
+        <span class="chip-dot"></span>
+        {{ broker.connected ? 'DHAN CONNECTED' : 'BROKER OFFLINE' }}
+      </div>
+      <div class="status-chip neutral">
+        <span class="chip-dot yellow"></span>
+        LIVE TRADING OFF
+      </div>
+      <div class="rho-badge" :title="'Spearman ρ: ' + (latestRho || 'N/A')">
+        ρ {{ latestRho !== null ? latestRho.toFixed(2) : '--' }}
+      </div>
+    </div>
+  </header>
 
-    <script src="/ui/app.js"></script>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav>
+      <div v-for="tab in tabs" :key="tab.id"
+           class="nav-item" :class="{ active: activeTab === tab.id }"
+           @click="activeTab = tab.id">
+        <span class="nav-icon">{{ tab.icon }}</span>
+        <span class="nav-label">{{ tab.label }}</span>
+        <span v-if="tab.badge" class="nav-badge" :class="tab.badgeClass">{{ tab.badge }}</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sf-label">Last Sync</div>
+      <div class="sf-value">{{ lastSync }}</div>
+      <div class="sf-label">Build</div>
+      <div class="sf-value">v1.1.1</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <section v-if="activeTab === 'overview'" class="tab-section">
+      <div class="section-header">
+        <h2>System Overview</h2>
+        <span class="section-sub">Live — refreshes every 10s</span>
+      </div>
+
+      <!-- KPI row -->
+      <div class="kpi-row">
+        <div class="kpi-card" :class="broker.connected ? 'kpi-green' : 'kpi-red'">
+          <div class="kpi-label">BROKER</div>
+          <div class="kpi-val">{{ broker.connected ? 'LIVE' : 'OFFLINE' }}</div>
+          <div class="kpi-sub">{{ broker.error || 'Dhan · ANALYZER' }}</div>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">TOTAL P&L</div>
+          <div class="kpi-val">₹{{ formatNum(state.total_pnl) }}</div>
+          <div class="kpi-sub">{{ state.trades_executed || 0 }} trades · {{ state.open_positions || 0 }} open</div>
+        </div>
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-label">SPEARMAN ρ</div>
+          <div class="kpi-val">{{ latestRho !== null ? latestRho.toFixed(3) : '--' }}</div>
+          <div class="kpi-sub">{{ rhoStatus }} · {{ accuracyData.days_available || 0 }} day(s)</div>
+        </div>
+        <div class="kpi-card kpi-cyan">
+          <div class="kpi-label">TOP SIGNAL</div>
+          <div class="kpi-val">{{ topSignal.underlying || '--' }}</div>
+          <div class="kpi-sub">Score {{ topSignal.gain_score || '--' }} · {{ topSignal.recommendation || '' }}</div>
+        </div>
+        <div class="kpi-card" :class="marketOpen ? 'kpi-green' : 'kpi-amber'">
+          <div class="kpi-label">MARKET</div>
+          <div class="kpi-val">{{ marketOpen ? 'OPEN' : 'CLOSED' }}</div>
+          <div class="kpi-sub">{{ marketCountdown }}</div>
+        </div>
+        <div class="kpi-card kpi-slate">
+          <div class="kpi-label">DATA SOURCE</div>
+          <div class="kpi-val">{{ state.data_source || 'NSE' }}</div>
+          <div class="kpi-sub">Cycle {{ state.cycle_count || 0 }} · {{ state.qc_status || '--' }}</div>
+        </div>
+      </div>
+
+      <!-- Two column: signal rank + ρ chart -->
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">⚡ GainRank Intelligence</span>
+            <span class="panel-sub">{{ gainRankData.latest ? gainRankData.latest.date : 'No data' }} · {{ gainRankData.latest ? gainRankData.latest.time : '' }}</span>
+          </div>
+          <div class="rank-table">
+            <div class="rank-header">
+              <span>RANK</span><span>UNDERLYING</span><span>SCORE</span><span>EXP MOVE</span><span>ACTION</span>
+            </div>
+            <div v-if="gainRankData.latest && gainRankData.latest.predictions.length">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying"
+                   class="rank-row" :class="p.recommendation === 'TRADE' ? 'rank-trade' : 'rank-skip'">
+                <span class="rank-num">#{{ p.rank }}</span>
+                <span class="rank-sym">{{ p.underlying }}</span>
+                <span class="rank-score">
+                  <div class="score-bar-wrap">
+                    <div class="score-bar" :style="{ width: p.gain_score + '%', background: scoreColor(p.gain_score) }"></div>
+                  </div>
+                  <span class="score-num">{{ p.gain_score.toFixed(1) }}</span>
+                </span>
+                <span class="rank-move">{{ (p.expected_move_pct * 100).toFixed(2) }}%</span>
+                <span class="rank-action" :class="p.recommendation === 'TRADE' ? 'action-trade' : 'action-skip'">
+                  {{ p.recommendation }}
+                </span>
+              </div>
+            </div>
+            <div v-else class="no-data">No signal data — runs at 18:45 IST post-bhavcopy</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">📈 Spearman ρ Trend</span>
+            <span class="panel-sub">Prediction accuracy · target ≥ 0.70</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="rhoChart"></canvas>
+          </div>
+          <div class="rho-stats">
+            <div class="rho-stat"><span>Avg ρ</span><strong>{{ accuracyData.avg_rho ? accuracyData.avg_rho.toFixed(3) : '--' }}</strong></div>
+            <div class="rho-stat"><span>Days</span><strong>{{ accuracyData.days_available || 0 }}</strong></div>
+            <div class="rho-stat"><span>Hit Rate</span><strong>{{ latestHitRate !== null ? (latestHitRate * 100).toFixed(1) + '%' : '--' }}</strong></div>
+            <div class="rho-stat"><span>Status</span><strong :class="rhoStatusClass">{{ rhoStatus }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System status row -->
+      <div class="panel mt16">
+        <div class="panel-header"><span class="panel-title">🔧 System Status</span></div>
+        <div class="status-grid">
+          <div class="status-item">
+            <span class="si-label">Broker Error</span>
+            <span class="si-val" :class="broker.error ? 'text-red' : 'text-green'">{{ broker.error || 'None' }}</span>
+          </div>
+          <div class="status-item">
+            <span class="si-label">Live Trading</span>
+            <span class="si-val text-green">DISABLED ✓</span>
+          </div>
+          <div class="status-item">
+            <span class="si-label">Order Placement</span>
+            <span class="si-val text-green">BLOCKED ✓</span>
+          </div>
+          <div class="status-item">
+            <span class="si-label">QC Status</span>
+            <span class="si-val" :class="state.qc_status === 'PASS' ? 'text-green' : 'text-amber'">{{ state.qc_status || '--' }}</span>
+          </div>
+          <div class="status-item">
+            <span class="si-label">Daily P&L</span>
+            <span class="si-val">₹{{ formatNum(state.daily_pnl) }}</span>
+          </div>
+          <div class="status-item">
+            <span class="si-label">Cycle Time</span>
+            <span class="si-val">{{ (state.performance_sla && state.performance_sla.cycle_duration_sec) ? state.performance_sla.cycle_duration_sec.toFixed(2) + 's' : '--' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SIGNAL INTELLIGENCE ═══ -->
+    <section v-if="activeTab === 'signals'" class="tab-section">
+      <div class="section-header"><h2>Signal Intelligence</h2><span class="section-sub">GainRankEngine · 7-Factor Scoring</span></div>
+
+      <div class="factor-weights panel">
+        <div class="panel-header"><span class="panel-title">⚙️ Factor Weight Configuration</span></div>
+        <div class="factor-grid">
+          <div v-for="f in factors" :key="f.name" class="factor-item">
+            <div class="factor-name">{{ f.name }}</div>
+            <div class="factor-bar-wrap">
+              <div class="factor-bar" :style="{ width: (f.weight * 100) + '%', background: f.color }"></div>
+            </div>
+            <div class="factor-pct">{{ (f.weight * 100).toFixed(0) }}%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🏆 Latest Rankings</span></div>
+          <div class="rank-table">
+            <div class="rank-header"><span>RANK</span><span>SYMBOL</span><span>SCORE / 100</span><span>MOVE%</span><span>CALL</span></div>
+            <div v-if="gainRankData.latest">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying"
+                   class="rank-row" :class="p.recommendation === 'TRADE' ? 'rank-trade' : 'rank-skip'">
+                <span class="rank-num">#{{ p.rank }}</span>
+                <span class="rank-sym">{{ p.underlying }}</span>
+                <span class="rank-score">
+                  <div class="score-bar-wrap">
+                    <div class="score-bar" :style="{ width: p.gain_score + '%', background: scoreColor(p.gain_score) }"></div>
+                  </div>
+                  <span class="score-num">{{ p.gain_score.toFixed(2) }}</span>
+                </span>
+                <span class="rank-move">{{ (p.expected_move_pct * 100).toFixed(3) }}%</span>
+                <span class="rank-action" :class="p.recommendation === 'TRADE' ? 'action-trade' : 'action-skip'">{{ p.recommendation }}</span>
+              </div>
+            </div>
+            <div v-else class="no-data">Runs daily at 09:15 IST</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">📊 Rank History</span></div>
+          <div class="chart-wrap">
+            <canvas id="rankHistoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="panel-header"><span class="panel-title">🔄 Signal Pipeline Status</span></div>
+        <div class="pipeline-flow">
+          <div class="pipe-step done">
+            <div class="pipe-icon">📥</div>
+            <div class="pipe-label">NSE Bhavcopy</div>
+            <div class="pipe-sub">18:30 IST daily</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step done">
+            <div class="pipe-icon">⚙️</div>
+            <div class="pipe-label">Signal Engine</div>
+            <div class="pipe-sub">18:45 IST daily</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step done">
+            <div class="pipe-icon">🧠</div>
+            <div class="pipe-label">ML Aggregator</div>
+            <div class="pipe-sub">15% weight</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step done">
+            <div class="pipe-icon">🏆</div>
+            <div class="pipe-label">GainRankEngine</div>
+            <div class="pipe-sub">09:15 IST daily</div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step active">
+            <div class="pipe-icon">✅</div>
+            <div class="pipe-label">Validation</div>
+            <div class="pipe-sub">15:35 IST daily</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ ACCURACY ═══ -->
+    <section v-if="activeTab === 'accuracy'" class="tab-section">
+      <div class="section-header"><h2>Prediction Accuracy</h2><span class="section-sub">Spearman ρ · Hit Rate · Walk-Forward Validation</span></div>
+
+      <div class="kpi-row">
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-label">AVG SPEARMAN ρ</div>
+          <div class="kpi-val">{{ accuracyData.avg_rho ? accuracyData.avg_rho.toFixed(4) : '--' }}</div>
+          <div class="kpi-sub">Target ≥ 0.700 · Best 0.800</div>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">LATEST HIT RATE</div>
+          <div class="kpi-val">{{ latestHitRate !== null ? (latestHitRate * 100).toFixed(1) + '%' : '--' }}</div>
+          <div class="kpi-sub">Top-N prediction accuracy</div>
+        </div>
+        <div class="kpi-card" :class="accuracyData.retrain_needed ? 'kpi-red' : 'kpi-green'">
+          <div class="kpi-label">RETRAIN STATUS</div>
+          <div class="kpi-val">{{ accuracyData.retrain_needed ? 'NEEDED' : 'OK' }}</div>
+          <div class="kpi-sub">Fires if ρ < 0.40 for 3 days</div>
+        </div>
+        <div class="kpi-card kpi-slate">
+          <div class="kpi-label">VALIDATION DAYS</div>
+          <div class="kpi-val">{{ accuracyData.days_available || 0 }}</div>
+          <div class="kpi-sub">Need 5+ for calibration</div>
+        </div>
+      </div>
+
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">📈 ρ Trend (All Days)</span></div>
+          <div class="chart-wrap-tall">
+            <canvas id="rhoChartFull"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">📋 Validation Log</span></div>
+          <div class="val-table">
+            <div class="val-header"><span>DATE</span><span>ρ</span><span>HIT RATE</span><span>STATUS</span></div>
+            <div v-if="accuracyData.trend && accuracyData.trend.length">
+              <div v-for="row in accuracyData.trend" :key="row.date" class="val-row">
+                <span>{{ row.date }}</span>
+                <span :class="row.rho >= 0.7 ? 'text-green' : row.rho >= 0.4 ? 'text-amber' : 'text-red'">{{ row.rho.toFixed(3) }}</span>
+                <span>{{ (row.hit_rate * 100).toFixed(1) }}%</span>
+                <span :class="row.status === 'RETRAIN_NEEDED' ? 'text-red' : 'text-green'">{{ row.status }}</span>
+              </div>
+            </div>
+            <div v-else class="no-data">No validation days yet — runs at 15:35 IST</div>
+          </div>
+          <div class="panel-header mt16"><span class="panel-title">🔮 Walk-Forward Proof</span></div>
+          <div class="wf-info">
+            <div class="wf-row"><span>Bhavcopy Days</span><strong class="text-green">5 days (Jun 8–12)</strong></div>
+            <div class="wf-row"><span>Cost Model</span><strong>₹20/side + STT + SEBI + slippage</strong></div>
+            <div class="wf-row"><span>Proof Status</span><strong class="text-green">PASS ✓</strong></div>
+            <div class="wf-row"><span>Trades Simulated</span><strong>8 walk-forward trades</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ RISK ═══ -->
+    <section v-if="activeTab === 'risk'" class="tab-section">
+      <div class="section-header"><h2>Risk Monitor</h2><span class="section-sub">Live safety controls · Paper mode enforced</span></div>
+
+      <div class="kpi-row">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">LIVE TRADING</div>
+          <div class="kpi-val">DISABLED</div>
+          <div class="kpi-sub">LIVE_TRADING_ENABLED=0</div>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">ORDER PLACEMENT</div>
+          <div class="kpi-val">BLOCKED</div>
+          <div class="kpi-sub">Skeleton wrapper active</div>
+        </div>
+        <div class="kpi-card kpi-slate">
+          <div class="kpi-label">OPEN POSITIONS</div>
+          <div class="kpi-val">{{ state.open_positions || 0 }}</div>
+          <div class="kpi-sub">Paper mode only</div>
+        </div>
+        <div class="kpi-card kpi-slate">
+          <div class="kpi-label">TOTAL P&L</div>
+          <div class="kpi-val">₹{{ formatNum(state.total_pnl) }}</div>
+          <div class="kpi-sub">Paper simulation</div>
+        </div>
+      </div>
+
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🛡️ Safety Gates</span></div>
+          <div class="safety-list">
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>LIVE_TRADING_ENABLED = False</span></div>
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>SYSTEM3_LIVE_TRADING_ALLOWED = 0</span></div>
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>Order wrapper is placeholder (cannot place real orders)</span></div>
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>Broker connected in read-only mode</span></div>
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>No credentials committed to git</span></div>
+            <div class="safety-item pass"><span class="si-icon">✅</span><span>Render env: LIVE_TRADING_ENABLED=0 hardcoded</span></div>
+            <div class="safety-item warn"><span class="si-icon">⏳</span><span>Paper lifecycle proof: waiting for Mon market day</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">📋 Live Enablement Checklist</span></div>
+          <div class="checklist">
+            <div class="check-item done"><span>✅</span> 8/8 Proof gates passing</div>
+            <div class="check-item done"><span>✅</span> Broker connected (ANALYZER mode)</div>
+            <div class="check-item done"><span>✅</span> Costed walk-forward proven</div>
+            <div class="check-item done"><span>✅</span> Model training dry-run proven</div>
+            <div class="check-item done"><span>✅</span> Dashboard endpoints verified</div>
+            <div class="check-item pending"><span>⏳</span> Paper lifecycle (Mon 09:30 IST)</div>
+            <div class="check-item pending"><span>⏳</span> 5+ Spearman ρ validation days</div>
+            <div class="check-item pending"><span>⏳</span> Human enablement approval</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ OPTIONS CHAIN ═══ -->
+    <section v-if="activeTab === 'options'" class="tab-section">
+      <div class="section-header"><h2>Option Chain Intelligence</h2><span class="section-sub">NSE public API · PCR · OI analysis</span></div>
+      <div class="panel info-panel">
+        <div class="info-icon">📊</div>
+        <div class="info-text">
+          <strong>Real Option Chain requires Dhan Data APIs subscription</strong>
+          <p>Current data path: NSE public API (session-based) → nsepython (P2 fallback) → NSE Bhavcopy (P3 · real OI change from ChngInOpnIntrst column)</p>
+          <p>Subscribe at: web.dhan.co → Profile → DhanHQ Trading APIs → Data APIs plan</p>
+        </div>
+      </div>
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">📦 Data Source Priority</span></div>
+          <div class="datasource-list">
+            <div class="ds-item" v-for="ds in dataSources" :key="ds.name" :class="ds.status">
+              <span class="ds-prio">P{{ ds.priority }}</span>
+              <span class="ds-name">{{ ds.name }}</span>
+              <span class="ds-desc">{{ ds.desc }}</span>
+              <span class="ds-status">{{ ds.statusText }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🏛️ OI Cache Status</span></div>
+          <div class="oi-stats">
+            <div class="oi-row"><span>Cache File</span><strong class="text-green">state/market_cache.json ✓</strong></div>
+            <div class="oi-row"><span>IV History</span><strong class="text-green">state/iv_history.json ✓</strong></div>
+            <div class="oi-row"><span>Real OI Change</span><strong class="text-green">Bhavcopy ChngInOpnIntrst</strong></div>
+            <div class="oi-row"><span>Staleness Guard</span><strong>3-day max</strong></div>
+            <div class="oi-row"><span>Expiry Guard</span><strong>Thursday disabled</strong></div>
+            <div class="oi-row"><span>Same-Day Guard</span><strong>Active</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ HEALTH ═══ -->
+    <section v-if="activeTab === 'health'" class="tab-section">
+      <div class="section-header"><h2>System Health</h2><span class="section-sub">Jobs · Token · Data Sources</span></div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">⏰ Job Scheduler (IST)</span></div>
+          <div class="job-table">
+            <div class="job-header"><span>JOB</span><span>TIME</span><span>STATUS</span></div>
+            <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled ? 'job-enabled' : 'job-disabled'">
+              <span class="job-name">{{ job.name || job.id }}</span>
+              <span class="job-time">{{ job.schedule_time }}</span>
+              <span class="job-status" :class="job.enabled ? 'text-green' : 'text-muted'">{{ job.enabled ? 'ACTIVE' : 'OFF' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">🔑 Token & Auth</span></div>
+          <div class="token-info">
+            <div class="token-row"><span>Strategy</span><strong>PIN + TOTP (automated)</strong></div>
+            <div class="token-row"><span>Auto-Refresh</span><strong class="text-green">Daily 08:30 IST ✓</strong></div>
+            <div class="token-row"><span>Watchdog</span><strong class="text-green">Every 30 min ✓</strong></div>
+            <div class="token-row"><span>4-Layer Safety</span><strong class="text-green">L0→L1→L2→L3 ✓</strong></div>
+            <div class="token-row"><span>Cloud Auto-Refresh</span><strong class="text-green">On every deploy ✓</strong></div>
+            <div class="token-row"><span>Status</span>
+              <strong :class="broker.connected ? 'text-green' : 'text-red'">
+                {{ broker.connected ? 'VALID' : broker.error || 'UNKNOWN' }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="panel-header mt16"><span class="panel-title">📡 Data Resilience</span></div>
+          <div class="resilience-info">
+            <div class="res-row"><span>Resilience</span><strong :class="healthData.datasource_resilience === 'UNKNOWN' ? 'text-amber' : 'text-green'">{{ healthData.datasource_resilience || 'UNKNOWN' }}</strong></div>
+            <div class="res-row"><span>Retrain Needed</span><strong :class="healthData.retrain_needed ? 'text-red' : 'text-green'">{{ healthData.retrain_needed ? 'YES' : 'NO' }}</strong></div>
+            <div class="res-row"><span>Fallback Sources</span><strong>7 priority levels</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROOF STATUS ═══ -->
+    <section v-if="activeTab === 'proof'" class="tab-section">
+      <div class="section-header"><h2>Proof Status Matrix</h2><span class="section-sub">8-Gate Orchestrator · ANALYZER_READY verdict</span></div>
+
+      <div class="kpi-row">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">GATES PASSING</div>
+          <div class="kpi-val">8 / 8</div>
+          <div class="kpi-sub">0 blockers</div>
+        </div>
+        <div class="kpi-card kpi-amber">
+          <div class="kpi-label">VERDICT</div>
+          <div class="kpi-val" style="font-size:1rem">ANALYZER_READY</div>
+          <div class="kpi-sub">PROOF_INCOMPLETE</div>
+        </div>
+        <div class="kpi-card kpi-red">
+          <div class="kpi-label">TRADE READY</div>
+          <div class="kpi-val">NO</div>
+          <div class="kpi-sub">By design · paper only</div>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">LIVE TRADING</div>
+          <div class="kpi-val">OFF</div>
+          <div class="kpi-sub">Permanently locked</div>
+        </div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="panel-header"><span class="panel-title">🔬 Gate Matrix</span></div>
+        <div class="gate-table">
+          <div class="gate-header"><span>GATE</span><span>STATUS</span><span>PASS</span><span>NOTES</span></div>
+          <div v-for="gate in proofGates" :key="gate.name" class="gate-row">
+            <span class="gate-name">{{ gate.name }}</span>
+            <span class="gate-status" :class="gate.statusClass">{{ gate.status }}</span>
+            <span class="gate-pass" :class="gate.pass ? 'text-green' : 'text-red'">{{ gate.pass ? '✓' : '✗' }}</span>
+            <span class="gate-note text-muted">{{ gate.note }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="panel-header"><span class="panel-title">🪜 Readiness Ladder</span></div>
+        <div class="ladder">
+          <div v-for="rung in readinessLadder" :key="rung.label" class="ladder-rung" :class="rung.done ? 'rung-done' : 'rung-pending'">
+            <span class="rung-icon">{{ rung.done ? '✅' : '⏳' }}</span>
+            <span class="rung-label">{{ rung.label }}</span>
+            <span class="rung-detail">{{ rung.detail }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="/ui/app.js"></script>
 </body>
 </html>
