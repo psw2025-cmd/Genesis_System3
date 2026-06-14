@@ -1,1 +1,0 @@
-No localhost references found in frontend scan.

@@ -1,7 +1,0 @@
-# Compile smoke for likely runtime files
-Python 3.12.3
-PY_COMPILE_PASS dashboard/backend/app.py
-PY_COMPILE_PASS dashboard/backend/backtesting.py
-PY_COMPILE_PASS core/brokers/angel_one/broker.py
-PY_COMPILE_PASS run_system3.py
-PY_COMPILE_PASS system3_ultra.py

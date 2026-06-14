@@ -49,3 +49,30 @@ FETCH_HEAD
 # Desktop app build output (large binaries; exceed GitHub limits)
 desktop_app/dist/
 google-cloud-sdk/
+
+# Windows launch scripts (never needed on Linux/cloud)
+*.bat
+*.bat.bak*
+*.ps1
+*.cmd
+*.bak
+
+# Root-level JS/TS scratch files and stale data dumps
+*.tsx
+COMPLETE_DIAGNOSTIC_SCRIPT.js
+ONE_LINE_TESTS.js
+QUICK_FIX_CONSOLE.js
+verify_dashboard_fix.js
+*.xlsx
+OptionChain_Master_v3_AI_FINAL.csv
+
+# Auto-generated test suites (regenerate from source if needed)
+tests/auto/
+
+# Legacy archive and agent run logs
+archive/
+AI_AGENT_RUNS/
+
+# Phase reports and proof artifacts (generated, not source)
+reports/
+state/
