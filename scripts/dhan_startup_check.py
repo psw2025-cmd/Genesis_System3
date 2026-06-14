@@ -105,7 +105,7 @@ def run_startup_check(status_only: bool = False) -> dict:
 
     if status_only:
         print(f"  Daemon running: {_process_running('dhan_token_auto_refresh')}")
-        print(f"  Watchdog run  : {_process_running('token_watchdog')}")
+        print(f"  Watchdog run  : {_process_running('dhan_watchdog_runner.py')}")
         print()
         return {"status": status, "actions": []}
 
@@ -151,7 +151,7 @@ def run_startup_check(status_only: bool = False) -> dict:
         print("  ✅ Daemon running")
 
     # Ensure WATCHDOG is running
-    if not _process_running("token_watchdog"):
+    if not _process_running("dhan_watchdog_runner.py"):
         print("  ⚠ Watchdog not running — starting...")
         try:
             pid = _start_daemon("dhan_watchdog_runner.py", "dhan_watchdog.log")
