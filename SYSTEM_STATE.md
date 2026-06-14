@@ -1,6 +1,6 @@
 # SYSTEM_STATE.md — Single Source of Truth
 > **ALL AGENTS MUST READ THIS FILE FIRST before making any changes.**
-> Last updated: 2026-06-13 21:00 IST | Updated by: Claude (controller)
+> Last updated: 2026-06-14 20:30 IST | Updated by: Claude (controller)
 
 ---
 
@@ -17,8 +17,10 @@
 - **ACTIVE:** DhanHQ ONLY
 - **Client ID:** ...3741
 - **SDK:** dhanhq 2.2.0
-- **Status:** CONNECTED ✅ (verified 2026-06-12)
-- **Balance:** ₹17.53
+- **Status (Codespace):** Token expired — TOTP strategy giving "Invalid TOTP" (2026-06-14). User must complete OAuth flow.
+- **Status (Render cloud):** TOKEN_EXPIRED_OR_INVALID — user must set fresh `DHAN_ACCESS_TOKEN` in Render dashboard.
+- **Balance:** ₹17.53 (last verified 2026-06-12)
+- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)
 | API Category | Status | Notes |
@@ -42,12 +44,14 @@
 ---
 
 ## TOKEN MANAGEMENT
-- **Strategy:** generate_token(PIN + TOTP) — pure API, fully automated
-- **Daemon:** Running daily at 08:30 AM (dhan_token_auto_refresh.py)
-- **Watchdog:** Running every 30 min (dhan_watchdog_runner.py)
+- **Strategy:** generate_token(PIN + TOTP) — pure API, fully automated (Codespace)
+- **Cloud strategy:** `cloud_worker.py` runs token-daemon thread; web service refreshes on startup if DHAN_PIN+DHAN_TOTP_SECRET set in Render env
+- **Daemon:** Start with `scripts/dhan_token_auto_refresh.py` (daily 08:30, or `--now` for manual refresh)
+- **Watchdog:** `scripts/dhan_watchdog_runner.py` (every 30 min)
 - **Startup check:** Runs on every terminal login via ~/.bashrc
-- **Credentials:** DHAN_PIN ✅, DHAN_TOTP_SECRET ✅, DHAN_APP_ID ✅, DHAN_APP_SECRET ✅
-- **Current token expires:** 2026-06-13 ~19:00 IST
+- **Credentials (Codespace):** DHAN_PIN ✅, DHAN_TOTP_SECRET ✅, DHAN_APP_ID ✅, DHAN_APP_SECRET ✅ — BUT TOTP returns "Invalid TOTP" as of 2026-06-14 (token expired 2026-06-13 ~19:00)
+- **Credentials (Render):** DHAN_* must be set in Render dashboard (sync: false). Token currently expired.
+- **Current token:** EXPIRED — requires OAuth flow to renew
 
 ---
 
@@ -68,18 +72,24 @@
 | Signal Engine Runner | scripts/run_signal_engine_from_bhavcopy.py | NEW — daily 18:45 IST, bhavcopy→df_snap→signal CSV (activates 15% ml_confidence) |
 | Auto Retrain | scripts/auto_retrain.py | Reads retrain_signal.json, triggers trainer at 16:00 |
 | Job Scheduler Config | config/system3_job_scheduler.json | 8 jobs: + signal_engine_bhavcopy (18:45) |
-| Token Manager | core/brokers/dhan/token_manager.py | Live, 3-strategy refresh |
-| Token Daemon | scripts/dhan_token_auto_refresh.py | Running (check PID with pgrep) |
+| Token Manager | core/brokers/dhan/token_manager.py | Cloud-mode env fallback added (session 8); token currently EXPIRED |
+| Cloud Worker | scripts/cloud_worker.py | NEW (session 8) — Render worker supervisor: 3 daemon threads + safety guard |
+| Token Daemon | scripts/dhan_token_auto_refresh.py | Token expired — run --now or complete OAuth flow |
 | Watchdog | scripts/dhan_watchdog_runner.py | Running (check PID with pgrep) |
 | Pre-flight Check | core/brokers/dhan/preflight.py | Ready for integration |
-| Dhan Read-Only | core/brokers/dhan/dhan_readonly.py | Connected ✅ |
+| Dhan Read-Only | core/brokers/dhan/dhan_readonly.py | Token expired — reconnect needed |
+| Paper Lifecycle Proof | scripts/paper_lifecycle_proof.py | NEW (session 8) — dry-run PASS; real proof needs market day + connected broker |
+| Live Issue Check | reports/latest/live_current_issue_check/ | NEW (session 8) — comprehensive cloud health scan |
 | Factor Weight Calibrator | scripts/calibrate_factor_weights.py | NEW — grid search, auto-updates at 5+ validation days |
 | IV History | state/iv_history.json | NEW — rolling 5-day ATM straddle IV proxy per symbol |
 
 ---
 
 ## PENDING TASKS (priority order)
-1. **[USER ACTION]** Subscribe to Dhan Data APIs → unlocks option chain, quotes, historical candles (ml_confidence now active via bhavcopy; live chain would boost all 6 other factors too)
+1. **[USER ACTION — BLOCKER]** Renew Dhan access token via OAuth flow → `connected=true` on `/api/broker/status`. Until done, broker is disconnected in both Codespace and Render cloud.
+   - Step: `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88` → copy tokenId → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>` → set in Render dashboard
+2. **[MARKET DAY — 2026-06-16]** Run paper lifecycle proof at 09:30 IST (auto-scheduled or `python scripts/paper_lifecycle_proof.py`)
+3. **[USER ACTION]** Subscribe to Dhan Data APIs → unlocks option chain, quotes, historical candles (ml_confidence now active via bhavcopy; live chain would boost all 6 other factors too)
 2. ~~**[CODE]** Wire system3_signal_engine to generate signal CSV (activate dead 15% ml_confidence weight)~~ ✅ DONE (session 6: bhavcopy runner + prob_BUY_CE fix + staleness fix)
 2. ~~**[CODE]** Schedule daily_gain_rank_and_validate.py in orchestrator at 09:15 + 15:35~~ ✅ DONE
 3. ~~**[CODE]** Wire real live option chain data into GainRankEngine (currently synthetic)~~ ✅ DONE (NSE first, CSV fallback, synthetic last)

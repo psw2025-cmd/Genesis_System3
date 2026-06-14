@@ -481,3 +481,101 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 - 3366 localhost references — expected in dashboard/FastAPI code
 - 138 duplicate names — archive/ files; safe without runtime authority to delete
 - "=== ANGEL ONE INDEX OPTIONS ===" print strings in ~30 core/engine/ files — just labels, not functional; low priority cosmetic cleanup
+
+---
+
+## Session 8 — 2026-06-14 (Cloud Migration + Git Cleanup + Proof Regeneration)
+
+### [2026-06-14 19:00 IST] [Claude] CLOUD MIGRATION: Render worker + token_manager cloud fallback
+
+**Core changes:**
+
+1. `core/brokers/dhan/token_manager.py` — Cloud-mode env fallback
+   - `_load_env()` now falls back to `os.environ` when `.secrets/dhan.env` is missing (cloud mode)
+   - `_write_token()` sets `os.environ["DHAN_ACCESS_TOKEN"]` first, then optionally writes file
+   - Added `_CLOUD_MODE = bool(os.environ.get("RENDER") or os.environ.get("CLOUD_WORKER"))`
+   - Added `_DHAN_KEYS` tuple for consistent env key enumeration
+
+2. `scripts/cloud_worker.py` — NEW: Single-process Render worker supervisor
+   - 3 daemon threads: token-daemon, watchdog, job-scheduler
+   - Hard safety exit if `LIVE_TRADING_ENABLED` is truthy
+   - Thread supervisor: restarts dead threads every 60s
+   - Bootstraps token at startup via `refresh_token()` if no token present
+   - Uses `importlib.util.spec_from_file_location` to load daemon scripts (no `scripts/__init__.py`)
+
+3. `render.yaml` — REWRITTEN: Two-service config
+   - `genesis-system3-backend` (web, starter) + `genesis-system3-worker` (worker, starter)
+   - Worker `dockerCommand: python scripts/cloud_worker.py`
+   - All `DHAN_*` secrets with `sync: false` (set in Render dashboard)
+   - `LIVE_TRADING_ENABLED: "0"` and `SYSTEM3_LIVE_TRADING_ALLOWED: "0"` hardcoded on both services
+   - `RENDER: "true"` and `CLOUD_WORKER: "true"` set on worker
+
+4. `dashboard/backend/app.py` — Startup token refresh
+   - Added to `startup()` event: if `DHAN_PIN` + `DHAN_TOTP_SECRET` set, calls `refresh_token()`
+   - Web service independently bootstraps its own token on each deploy
+
+### [2026-06-14 19:30 IST] [Claude] PROOF REGENERATION: 8-gate orchestrator fixes
+
+**Bugs fixed in `scripts/system3_master_proof_orchestrator.py`:**
+
+1. SECRET_PATTERNS cross-line regex: `\s*[:=]\s*` → `[ \t]*[:=][ \t]*`
+   - `core/brokers/dhan/token_manager.py:163` false-positive: `if not pin:\n    logger.warning` matched because `\s*` includes `\n`
+   - Added negative lookahead to exclude pyotp/sys/step_ references
+
+2. `detect_secret_files()`: Added `and not f.endswith(".example")` to exclude template files
+   - `config/.env.example` was being flagged as a secret file
+
+3. `scan_secrets()`: Added `_SCAN_SKIP_EXACT` and `_SCAN_SKIP_PREFIXES` skip sets
+   - Excluded: self-referential orchestrator, docs/ markdown, dashboard/frontend/dist/
+
+4. Deployment gate: Added Render URL default + fixed endpoint list (`/api/health` not `/health/status`)
+
+**Added scripts:**
+- `scripts/paper_lifecycle_proof.py` — Full signal→order→fill→exit→P&L lifecycle proof in PAPER/ANALYZER mode
+  - Safety gate: exits if LIVE_TRADING_ENABLED truthy; paper simulation only
+  - `--dry-run` mode: all steps simulated without Dhan API calls (PASS verified)
+  - Writes to `reports/latest/analyzer_paper_lifecycle_proof/summary.json`
+- `reports/latest/live_current_issue_check/live_current_issue_check.py` — Comprehensive cloud health check
+  - AST-aware live flag scan (replaced overly broad grep)
+  - Fixed false positives: test strings + safety guard wrappers reclassified correctly
+  - Checks: repo sync, compile, endpoint health, broker status, live safety, proof matrix
+
+**Paper lifecycle job added to `config/system3_job_scheduler.json`:**
+- `paper_lifecycle_proof` at 09:30 IST weekdays (Mon–Fri)
+
+### [2026-06-14 20:00 IST] [Claude] GIT CLEANUP: Removed all stale branches
+
+**Root cause:** Automated "zero-touch CI/CD" workflow on `review/dhan-full-migration-token-automation` was fighting itself — creating stash conflicts, auto-merge commits, and duplicate `feat(core): add git auto workflow` commits.
+
+**Cleaned up:**
+- Dropped 2 stash entries (review/dhan branch stash, WIP on main: 0e7a54ac)
+- Deleted 12 local branches (review/, pr13/, pr14/, audit/, blackboxai/, feature/, fix/, phase-c/)
+- Deleted 23 remote branches via `git push origin --delete`
+- Pruned with `git fetch --prune origin`
+
+**Final state:**
+- Local: `main` only
+- Remote: `origin/main` only (+ origin/HEAD)
+- No stashes — clean linear graph
+
+### [2026-06-14 20:30 IST] [Claude] GITIGNORE FIX: reports/ tracking
+
+- Changed `reports/` to `reports/*` with `!reports/latest` exception
+- Allows proof artifacts in `reports/latest/` to be tracked while ignoring run archives
+
+### Pending (requires user action):
+
+1. **Dhan OAuth flow** — `DHAN_ACCESS_TOKEN` expired (TOKEN_EXPIRED_OR_INVALID)
+   - Visit: `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`
+   - Copy tokenId from redirect URL → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`
+   - Set `DHAN_ACCESS_TOKEN` in Render dashboard (both web + worker)
+   - Set `DHAN_PIN` + `DHAN_TOTP_SECRET` in Render for daily auto-refresh
+   - Verify: `/api/broker/status` → `connected=true, error=null`
+
+2. **Monday 2026-06-16 09:30 IST** — Paper lifecycle proof fires via scheduler (or run manually)
+   - `python scripts/paper_lifecycle_proof.py` to prove signal→order→fill→exit→P&L with real broker
+
+3. **5+ Spearman ρ validation days** — Required before live enablement checklist
+   - ρ=0.80 measured on 1 day only; HIGH overfitting risk if treated as stable
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
