@@ -6,13 +6,16 @@
       "module": "core.engine.check_system3_status",
       "enabled": false,
       "type": "daily",
-      "note": "disabled — module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
+      "note": "disabled \u2014 module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
     },
     {
       "id": "daily_gain_rank",
       "name": "Daily Gain Rank (Pre-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "rank"],
+      "args": [
+        "--mode",
+        "rank"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "09:15",
@@ -24,7 +27,10 @@
       "id": "daily_gain_validate",
       "name": "Daily Gain Validate (Post-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "validate"],
+      "args": [
+        "--mode",
+        "validate"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "15:35",
@@ -36,7 +42,10 @@
       "id": "daily_gain_trend",
       "name": "Daily Accuracy Trend (Post-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "trend"],
+      "args": [
+        "--mode",
+        "trend"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "15:40",
@@ -82,7 +91,7 @@
     },
     {
       "id": "signal_engine_bhavcopy",
-      "name": "Signal Engine — Bhavcopy Runner (Post-Market)",
+      "name": "Signal Engine \u2014 Bhavcopy Runner (Post-Market)",
       "script": "scripts/run_signal_engine_from_bhavcopy.py",
       "args": [],
       "enabled": true,
@@ -91,6 +100,26 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "description": "Transforms today's NSE FO bhavcopy into option chain snapshot and runs system3_signal_engine. Writes storage/live/dhan_index_ai_signals.csv (prob_BUY_CE, expected_move_score per option). Activates the 15% ml_confidence weight in GainRankEngine for next morning's 09:15 ranking. Runs 15 min after bhavcopy_download completes."
+    },
+    {
+      "id": "paper_lifecycle_proof",
+      "enabled": true,
+      "schedule_time": "09:30",
+      "days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "module": "scripts.paper_lifecycle_proof",
+      "function": "run_proof",
+      "kwargs": {
+        "dry_run": false,
+        "force": false
+      },
+      "description": "Analyzer/Paper lifecycle proof \u2014 signal to P&L on each market day",
+      "timeout_minutes": 10
     }
   ]
 }

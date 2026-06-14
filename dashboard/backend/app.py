@@ -2368,6 +2368,32 @@ async def background_data_refresh():
 async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
+
+    # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode)
+    # This ensures the web service has a fresh token after each deploy.
+    _pin = os.environ.get("DHAN_PIN", "").strip()
+    _totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
+    if _pin and _totp:
+        try:
+            import importlib.util as _ilu, pathlib as _pl
+            _spec = _ilu.spec_from_file_location(
+                "token_manager_startup",
+                _pl.Path(__file__).resolve().parent.parent.parent / "core" / "brokers" / "dhan" / "token_manager.py",
+            )
+            if _spec and _spec.loader:
+                _tm = _ilu.module_from_spec(_spec)
+                _spec.loader.exec_module(_tm)  # type: ignore[union-attr]
+                _result = _tm.refresh_token()
+                if _result.get("success"):
+                    print(f"[startup] Dhan token refreshed via {_result.get('strategy')}")
+                else:
+                    print(f"[startup] Dhan token refresh skipped/failed: {_result.get('message', _result)}")
+        except Exception as _e:
+            print(f"[startup] Token refresh error (non-fatal): {_e}")
+    else:
+        if not os.environ.get("DHAN_ACCESS_TOKEN"):
+            print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set — token refresh skipped")
+
     # Start background data refresh
     asyncio.create_task(background_data_refresh())
 
