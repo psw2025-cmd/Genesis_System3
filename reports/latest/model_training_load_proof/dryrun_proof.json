@@ -1,0 +1,86 @@
+{
+  "proof_id": "ML_DRYRUN_20260614_151056",
+  "started": "2026-06-14T15:10:56.965184+00:00",
+  "completed": "2026-06-14T15:10:57.189967+00:00",
+  "pass": true,
+  "status": "PASS",
+  "fresh_training_metrics_proven": true,
+  "promotion_allowed": false,
+  "compile_results": [
+    {
+      "file": "src/ml/ensemble_predictor.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "core/engine/dhan_model_selector.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "src/ranking/gain_rank_engine.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "src/ranking/ml_signal_aggregator.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "scripts/auto_retrain.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "scripts/calibrate_factor_weights.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    },
+    {
+      "file": "scripts/run_signal_engine_from_bhavcopy.py",
+      "exists": true,
+      "compile_pass": true,
+      "error": null
+    }
+  ],
+  "import_results": [
+    {
+      "module": "src/ml/ensemble_predictor.py",
+      "importable": null,
+      "error": "env_incompatibility: numpy._core.multiarray failed to import"
+    },
+    {
+      "module": "src/ranking/gain_rank_engine.py",
+      "importable": null,
+      "error": "env_incompatibility: numpy._core.multiarray failed to import"
+    }
+  ],
+  "compile_failures": 0,
+  "import_failures": 0,
+  "env_import_skipped": 2,
+  "missing_files": 0,
+  "artifacts": {
+    "signal_csv_exists": false,
+    "iv_history_exists": true,
+    "market_cache_exists": true,
+    "model_files_count": 0,
+    "retrain_signal_active": false,
+    "retrain_signal_content": null,
+    "auto_retrain_script_exists": true,
+    "calibrator_script_exists": true
+  },
+  "blockers": [],
+  "warnings": [
+    "signal_csv_not_yet_generated (runs after first bhavcopy at 18:45)",
+    "env_import_skipped_in_codespace: ['src/ml/ensemble_predictor.py', 'src/ranking/gain_rank_engine.py']"
+  ],
+  "live_trading_enabled": false,
+  "note": "Dry-run validates compile/import/artifact pipeline. Promotion blocked until: signal_csv generated + model_files present + 5+ validation days."
+}

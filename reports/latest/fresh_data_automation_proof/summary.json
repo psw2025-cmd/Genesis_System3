@@ -4,7 +4,7 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 151,
+    "data_candidate_count": 153,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       ".github/workflows/external-data-yahoo-proof.yml",
@@ -106,6 +106,8 @@
       "models/xgboost_v1/SENSEX_xgb_meta.json",
       "models/xgboost_v1/SENSEX_xgb_model.pkl",
       "option_chain_automation_master.py",
+      "reports/latest/fresh_data_automation_proof/README.md",
+      "reports/latest/fresh_data_automation_proof/summary.json",
       "scripts/add_realtime_data_refresh.py",
       "scripts/analyze_chain_raw_live.py",
       "scripts/analyze_optionchain_master.py",
@@ -123,9 +125,7 @@
       "scripts/run_live_chain.py",
       "scripts/smart_live_chain_runner.py",
       "scripts/test_csv_edge_cases.py",
-      "scripts/test_csv_write_scenarios.py",
-      "scripts/test_excel_with_virtual_live_data.py",
-      "scripts/update_optionchain_master.py"
+      "scripts/test_csv_write_scenarios.py"
     ],
     "dhan_india_candidate_count": 51,
     "dhan_india_candidates_sample": [
@@ -181,8 +181,21 @@
       "test_option_chain_automation.py",
       "tools/run_phase_392_ensemble_test.py"
     ],
-    "fallback_yahoo_report_keys": [],
-    "fallback_yahoo_report_present": false,
+    "fallback_yahoo_report_keys": [
+      "blockers",
+      "completed_utc",
+      "gate",
+      "generated_utc",
+      "note",
+      "pass",
+      "results",
+      "status",
+      "tickers_ok",
+      "tickers_tested",
+      "warnings",
+      "yahoo_api_reachable"
+    ],
+    "fallback_yahoo_report_present": true,
     "fresh_broker_live_data_proven": false,
     "reason_fresh_broker_live_data_not_proven": "CI proof avoids broker login and has no broker secrets/session by default."
   },
@@ -191,8 +204,6 @@
   "pass": true,
   "status": "PASS_WITH_WARNINGS",
   "warnings": [
-    "binance_crypto_data_candidates_not_proven",
-    "external_yahoo_fallback_proof_missing",
     "dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
   ]
 }

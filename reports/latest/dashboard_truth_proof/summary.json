@@ -19,8 +19,37 @@
         "file": "dashboard/backend/backtesting.py"
       }
     ],
-    "dashboard_endpoint_coverage_keys": [],
-    "dashboard_endpoint_coverage_report_present": false,
+    "dashboard_endpoint_coverage_keys": [
+      "all_required_endpoints_pass",
+      "api_db_report_reconciliation_proven",
+      "base_url",
+      "blockers",
+      "broker_connected",
+      "broker_error",
+      "browser_visual_truth_proven",
+      "endpoint_coverage_complete",
+      "endpoints",
+      "gate",
+      "generated_utc",
+      "health_status",
+      "live_allowed",
+      "live_trading_enabled",
+      "next_action",
+      "no_safety_violations",
+      "optional_endpoints_ok",
+      "optional_endpoints_total",
+      "pass",
+      "required_endpoints_failed",
+      "required_endpoints_ok",
+      "required_endpoints_total",
+      "safety_checks_passed",
+      "safety_violations",
+      "state_mode",
+      "status",
+      "system3_live_trading_allowed",
+      "warnings"
+    ],
+    "dashboard_endpoint_coverage_report_present": true,
     "dashboard_file_count": 66,
     "frontend_file_count": 36
   },
@@ -29,7 +58,6 @@
   "pass": true,
   "status": "PASS_WITH_WARNINGS",
   "warnings": [
-    "dashboard_endpoint_coverage_report_missing",
     "browser_screenshot_truth_not_proven_in_ci"
   ]
 }

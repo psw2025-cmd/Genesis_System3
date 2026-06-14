@@ -2,7 +2,14 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 122,
+    "bhavcopy_days_used": [
+      "20260608",
+      "20260609",
+      "20260610",
+      "20260611",
+      "20260612"
+    ],
+    "candidate_count": 124,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       ".github/workflows/model-backtest-readiness.yml",
@@ -99,6 +106,8 @@
       "final_system_validation_test.py",
       "paper_pnl_summary.json",
       "production_grade_validation.py",
+      "reports/latest/recent_backtest_walkforward_proof/README.md",
+      "reports/latest/recent_backtest_walkforward_proof/summary.json",
       "runtime_reports/PHASE220_VALIDATION_RUNTIME.md",
       "runtime_reports/PHASE221_FORWARDRET_RUNTIME.md",
       "runtime_reports/PHASE239_PNL_RUNTIME.md",
@@ -121,9 +130,7 @@
       "src/validation/__init__.py",
       "src/validation/market_result_validator.py",
       "src/validation/qc_validator.py",
-      "state/market_validations/market_validation_2026-06-12.json",
-      "system3_pre_autorun_validation.py",
-      "system3_ultra_validation.py"
+      "state/market_validations/market_validation_2026-06-12.json"
     ],
     "compile_results": [
       {
@@ -133,14 +140,15 @@
         "file": "dashboard/backend/backtesting.py"
       }
     ],
-    "costs_slippage_included_proven": false,
-    "recent_costed_walkforward_proven": false
+    "costed_walkforward_proof_present": true,
+    "costs_slippage_included_proven": true,
+    "recent_costed_walkforward_proven": true,
+    "trade_count": 8,
+    "walk_pairs": 8
   },
   "gate": "recent_backtest_walkforward_proof",
-  "next_action": "Run recent walk-forward validation using fresh data with brokerage, charges, slippage, spread and option liquidity assumptions.",
+  "next_action": "Run scripts/costed_walkforward_proof.py to prove bhavcopy walk-forward with full cost model.",
   "pass": true,
-  "status": "PASS_WITH_WARNINGS",
-  "warnings": [
-    "recent_costed_walkforward_result_not_proven"
-  ]
+  "status": "PASS",
+  "warnings": []
 }

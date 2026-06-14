@@ -1,6 +1,6 @@
 # System3 Master Control Plane
 
-Generated UTC: 2026-06-14T14:02:21.248313+00:00
+Generated UTC: 2026-06-14T15:19:35.695693+00:00
 
 - Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
@@ -14,11 +14,11 @@ Generated UTC: 2026-06-14T14:02:21.248313+00:00
 | `safety_and_secrets` | `PASS` | `True` | `0` | `0` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `deployment_and_endpoint_proof` | `PASS` | `True` | `0` | `0` |
-| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `3` |
-| `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
-| `recent_backtest_walkforward_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
-| `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
-| `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
+| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
+| `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
+| `recent_backtest_walkforward_proof` | `PASS` | `True` | `0` | `0` |
+| `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |
+| `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 
 ## Active blockers
 

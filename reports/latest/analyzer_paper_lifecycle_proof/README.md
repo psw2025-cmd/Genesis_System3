@@ -1,6 +1,6 @@
 # analyzer_paper_lifecycle_proof
 
-Generated UTC: 2026-06-14T14:02:21.247368+00:00
+Generated UTC: 2026-06-14T15:19:35.694946+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -13,7 +13,8 @@ Generated UTC: 2026-06-14T14:02:21.247368+00:00
 ## Warnings
 
 - `full_signal_to_exit_pnl_lifecycle_not_proven`
+- `lifecycle_proof_broker_not_connected`
 
 ## Next action
 
-Run analyzer paper session proof and reconcile signal/order/fill/exit/PnL/dashboard/Telegram counts before allowing next readiness level.
+Run scripts/paper_lifecycle_proof.py on a market day (Mon-Fri) with broker connected to prove real lifecycle.

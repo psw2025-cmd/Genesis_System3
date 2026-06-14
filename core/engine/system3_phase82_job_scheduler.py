@@ -93,9 +93,10 @@ def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
     Supports two formats:
       module-based: {"module": "core.engine.foo"}  → python -m core.engine.foo
       script-based: {"script": "scripts/foo.py", "args": ["--mode", "rank"]}
+    Optional: {"timeout_minutes": 10} overrides default 5-minute timeout.
     """
     job_id = job["id"]
-    print(f"[PH82] Running job: {job['name']} ({job_id})...")
+    print(f"[PH82] Running job: {job.get('name', job_id)} ({job_id})...")
 
     if "script" in job:
         cmd = [sys.executable, str(PROJECT_ROOT / job["script"])] + job.get("args", [])
@@ -103,13 +104,15 @@ def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
         module_name = job["module"]
         cmd = [sys.executable, "-m", module_name]
 
+    timeout_secs = int(job.get("timeout_minutes", 5)) * 60
+
     try:
         result = subprocess.run(
             cmd,
             cwd=PROJECT_ROOT,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=timeout_secs,
         )
 
         return {
@@ -121,7 +124,7 @@ def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "last_run_time": datetime.now().isoformat(),
             "last_status": "TIMEOUT",
-            "last_error": "Job timed out after 5 minutes",
+            "last_error": f"Job timed out after {timeout_secs // 60} minutes",
         }
     except Exception as e:
         return {
@@ -289,8 +292,15 @@ def run_daemon() -> None:
                 continue
             job_id = job["id"]
             sched = job.get("schedule_time", "daily")
+
+            # Day-of-week filtering: weekdays_only OR explicit days list
             if job.get("weekdays_only", False) and not is_weekday:
                 continue
+            named_days = job.get("days")
+            if named_days and isinstance(named_days, list):
+                day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                if day_names[now.weekday()] not in named_days:
+                    continue
 
             should_fire = False
             if sched.lower() == "daily":

@@ -103,23 +103,29 @@
     },
     {
       "id": "paper_lifecycle_proof",
+      "name": "Analyzer/Paper Lifecycle Proof",
+      "script": "scripts/paper_lifecycle_proof.py",
+      "args": [],
       "enabled": true,
+      "type": "daily",
       "schedule_time": "09:30",
-      "days": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "module": "scripts.paper_lifecycle_proof",
-      "function": "run_proof",
-      "kwargs": {
-        "dry_run": false,
-        "force": false
-      },
-      "description": "Analyzer/Paper lifecycle proof \u2014 signal to P&L on each market day",
-      "timeout_minutes": 10
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Analyzer/Paper lifecycle proof \u2014 signal to P&L on each market day. Runs auto-detect; skips if market closed."
+    },
+    {
+      "id": "dashboard_endpoint_coverage",
+      "name": "Dashboard Endpoint Coverage Proof",
+      "script": "scripts/dashboard_endpoint_coverage_proof.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "08:05",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 5,
+      "description": "Probes all dashboard API endpoints, writes coverage report to reports/latest/dashboard_endpoint_coverage/"
     }
   ]
 }

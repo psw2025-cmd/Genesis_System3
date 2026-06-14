@@ -1,0 +1,923 @@
+[
+  {
+    "url": "https://genesis-system3-backend.onrender.com/health",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 647,
+    "json": {
+      "status": "not_ready",
+      "mode": "PAPER",
+      "broker_status": "disconnected",
+      "market_status": "closed",
+      "data_source": "live",
+      "live_allowed": false,
+      "live_blockers": [
+        "Broker not connected - real data unavailable"
+      ],
+      "broker": {
+        "connected": false,
+        "status": "disconnected",
+        "error": "Broker not connected"
+      },
+      "market": {
+        "is_open": false,
+        "reason": "closed"
+      },
+      "cycle_count": 0,
+      "refresh_interval": 5,
+      "last_fetch": null,
+      "qc_status": "NOT_READY",
+      "qc_failures": [
+        "Broker not connected - real data unavailable"
+      ],
+      "trades_executed": 0,
+      "open_positions": 0,
+      "total_pnl": 0.0,
+      "daily_pnl": 0.0,
+      "performance_sla": {
+        "cycle_duration_sec": 0,
+        "fetch_duration_sec": 0,
+        "strategy_duration_sec": 0,
+        "sla_pass": false
+      },
+      "message": "BROKER_NOT_READY - Real data unavailable"
+    },
+    "snippet": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_pos",
+    "endpoint": "/health",
+    "required": true
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/health",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 1074,
+    "json": {
+      "status": "not_ready",
+      "mode": "PAPER",
+      "broker_status": "disconnected",
+      "market_status": "closed",
+      "data_source": "live",
+      "live_allowed": false,
+      "live_blockers": [
+        "Broker not connected - real data unavailable"
+      ],
+      "broker": {
+        "connected": false,
+        "status": "disconnected",
+        "error": "Broker not connected"
+      },
+      "market": {
+        "is_open": false,
+        "reason": "closed"
+      },
+      "cycle_count": 0,
+      "refresh_interval": 5,
+      "last_fetch": null,
+      "qc_status": "NOT_READY",
+      "qc_failures": [
+        "Broker not connected - real data unavailable"
+      ],
+      "trades_executed": 0,
+      "open_positions": 0,
+      "total_pnl": 0.0,
+      "daily_pnl": 0.0,
+      "performance_sla": {
+        "cycle_duration_sec": 0,
+        "fetch_duration_sec": 0,
+        "strategy_duration_sec": 0,
+        "sla_pass": false
+      },
+      "message": "BROKER_NOT_READY - Real data unavailable"
+    },
+    "snippet": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_pos",
+    "endpoint": "/api/health",
+    "required": true
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/state",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 352,
+    "json": {
+      "state_version": 18,
+      "timestamp_utc": "2026-06-14T15:12:29.981200Z",
+      "timestamp_ist": "2026-06-14T20:42:29.981201+05:30",
+      "mode": "PAPER",
+      "data_source": "SYNTHETIC",
+      "market": {
+        "is_open": false,
+        "reason": "Market closed: Weekend (Sunday)",
+        "next_open": "2026-06-15 09:15:00 IST",
+        "current_time_ist": "2026-06-14T20:42:29.979704+05:30"
+      },
+      "broker": {
+        "broker": "dhan",
+        "mode": "ANALYZER",
+        "connected": false,
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "credentials_present": true,
+        "latency_ms": 256,
+        "error": "TOKEN_EXPIRED_OR_INVALID",
+        "sdk_available": true,
+        "env_source": "core.utils.env_loader"
+      },
+      "qc": {
+        "status": "PASS",
+        "reasons": [],
+        "contracts_total": 0,
+        "underlyings": 0,
+        "failures": []
+      },
+      "signals": {
+        "status": "NO_TRADE",
+        "underlying": null,
+        "confidence": 0,
+        "reason": "No signal generated",
+        "last_signal": null
+      },
+      "positions": [],
+      "pnl": {
+        "unrealized": 0.0,
+        "realized": 0.0,
+        "total": 0.0,
+        "day_total": 0.0
+      },
+      "risk": {
+        "var95": 0.0,
+        "es95": 0.0,
+        "exposure": 0.0,
+        "concentration": 0.0,
+        "greeks": {
+          "delta": 0.0,
+          "gamma": 0.0,
+          "theta": 0.0,
+          "vega": 0.0
+        },
+        "limits": {
+          "status": "PASS",
+          "breaches": []
+        }
+      },
+      "model": {
+        "active": null,
+        "type": null,
+        "fallback_used": false,
+        "metrics": {}
+      },
+      "alerts": [
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:29.979852+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:24.976546+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:19.972872+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:14.970545+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:09.710890+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:42:04.707374+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:41:55.129711+05:30",
+          "read": false
+        },
+        {
+          "level": "WARN",
+          "code": "BROKER_DISCONNECTED",
+          "message": "Broker connection lost",
+          "ts": "2026-06-14T20:41:50.126941+05:30",
+          "read": false
+        }
+      ],
+      "cycle_count": 18,
+      "last_cycle_ts_iso": "2026-06-14T20:42:29.981201+05:30",
+      "last_fetch_ts_iso": "2026-06-14T20:42:29.981201+05:30",
+      "positions_source": "INTERNAL_UNVERIFIED",
+      "reconciliation": {
+        "status": "OK",
+        "mismatches": [],
+        "timestamp": "2026-06-14T20:41:48.905954+05:30"
+      }
+    },
+    "snippet": "{\"state_version\":18,\"timestamp_utc\":\"2026-06-14T15:12:29.981200Z\",\"timestamp_ist\":\"2026-06-14T20:42:29.981201+05:30\",\"mode\":\"PAPER\",\"data_source\":\"SYNTHETIC\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Weekend (Sunday)\",\"next_open\":\"2026-06-15 09:15:00 IST\",\"current_time_ist\":\"2026-06-14T20:42:29.979704+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":256,\"error\":\"TOKE",
+    "endpoint": "/api/state",
+    "required": true
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 1104,
+    "json": {
+      "broker": "dhan",
+      "mode": "ANALYZER",
+      "connected": false,
+      "live_trading_enabled": false,
+      "order_placement_allowed": false,
+      "credentials_present": true,
+      "latency_ms": 252,
+      "error": "TOKEN_EXPIRED_OR_INVALID",
+      "sdk_available": true,
+      "env_source": "core.utils.env_loader"
+    },
+    "snippet": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":252,\"error\":\"TOKEN_EXPIRED_OR_INVALID\",\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+    "endpoint": "/api/broker/status",
+    "required": true
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/docs",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 346,
+    "json": null,
+    "snippet": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Ultra Dashboard API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/sw",
+    "endpoint": "/docs",
+    "required": true
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 365,
+    "json": {
+      "message": "System3 Ultra Dashboard API",
+      "status": "running",
+      "backend_url": "https://genesis-system3-backend.onrender.com",
+      "dashboard_url": "https://genesis-system3-backend.onrender.com",
+      "api_docs": "https://genesis-system3-backend.onrender.com/docs",
+      "health": "https://genesis-system3-backend.onrender.com/api/health",
+      "state": "https://genesis-system3-backend.onrender.com/api/state",
+      "relative_paths": {
+        "api_docs": "/docs",
+        "health": "/api/health",
+        "state": "/api/state",
+        "broker_status": "/api/broker/status",
+        "dashboard": "/ui"
+      }
+    },
+    "snippet": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"https://genesis-system3-backend.onrender.com\",\"dashboard_url\":\"https://genesis-system3-backend.onrender.com\",\"api_docs\":\"https://genesis-system3-backend.onrender.com/docs\",\"health\":\"https://genesis-system3-backend.onrender.com/api/health\",\"state\":\"https://genesis-system3-backend.onrender.com/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\",\"da",
+    "endpoint": "/",
+    "required": false
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/gain_rank",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 343,
+    "json": {
+      "status": "ok",
+      "latest": {
+        "date": "2026-06-13",
+        "time": "19:07:05",
+        "predictions": [
+          {
+            "rank": 1,
+            "underlying": "NIFTY",
+            "gain_score": 76.93,
+            "expected_move_pct": 0.032,
+            "recommendation": "TRADE"
+          },
+          {
+            "rank": 2,
+            "underlying": "BANKNIFTY",
+            "gain_score": 66.04,
+            "expected_move_pct": 0.099,
+            "recommendation": "TRADE"
+          },
+          {
+            "rank": 3,
+            "underlying": "MIDCPNIFTY",
+            "gain_score": 61.7,
+            "expected_move_pct": 0.147,
+            "recommendation": "TRADE"
+          },
+          {
+            "rank": 4,
+            "underlying": "FINNIFTY",
+            "gain_score": 34.58,
+            "expected_move_pct": 0.031,
+            "recommendation": "SKIP"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-06-12",
+          "time": "14:00:00",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "BANKNIFTY",
+              "gain_score": 72,
+              "expected_move_pct": 0.018,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "NIFTY",
+              "gain_score": 65,
+              "expected_move_pct": 0.012,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "FINNIFTY",
+              "gain_score": 58,
+              "expected_move_pct": 0.009,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 41,
+              "expected_move_pct": 0.007,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "time": "18:08:31",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "FINNIFTY",
+              "gain_score": 50.16,
+              "expected_move_pct": 0.021,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "BANKNIFTY",
+              "gain_score": 46.79,
+              "expected_move_pct": 0.009,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "NIFTY",
+              "gain_score": 46.69,
+              "expected_move_pct": 0.017,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 46.48,
+              "expected_move_pct": 0.012,
+              "recommendation": "TRADE"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "time": "18:09:14",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "FINNIFTY",
+              "gain_score": 53.15,
+              "expected_move_pct": 0.01,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "NIFTY",
+              "gain_score": 47.87,
+              "expected_move_pct": 0.023,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "BANKNIFTY",
+              "gain_score": 45.14,
+              "expected_move_pct": 0.001,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 44.42,
+              "expected_move_pct": 0.011,
+              "recommendation": "TRADE"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "time": "18:09:14",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "FINNIFTY",
+              "gain_score": 53.15,
+              "expected_move_pct": 0.01,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "NIFTY",
+              "gain_score": 47.87,
+              "expected_move_pct": 0.023,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "BANKNIFTY",
+              "gain_score": 45.14,
+              "expected_move_pct": 0.001,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 44.42,
+              "expected_move_pct": 0.011,
+              "recommendation": "TRADE"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "time": "18:11:23",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "NIFTY",
+              "gain_score": 47.83,
+              "expected_move_pct": 0.011,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 45.9,
+              "expected_move_pct": 0.033,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "FINNIFTY",
+              "gain_score": 45.12,
+              "expected_move_pct": 0.021,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "BANKNIFTY",
+              "gain_score": 41.17,
+              "expected_move_pct": 0.007,
+              "recommendation": "TRADE"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-12",
+          "time": "18:11:23",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "NIFTY",
+              "gain_score": 47.83,
+              "expected_move_pct": 0.011,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 45.9,
+              "expected_move_pct": 0.033,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "FINNIFTY",
+              "gain_score": 45.12,
+              "expected_move_pct": 0.021,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "BANKNIFTY",
+              "gain_score": 41.17,
+              "expected_move_pct": 0.007,
+              "recommendation": "TRADE"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "05:56:15",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 30.31,
+              "expected_move_pct": 0.027,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 2,
+              "underlying": "FINNIFTY",
+              "gain_score": 29.96,
+              "expected_move_pct": 0.023,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 3,
+              "underlying": "BANKNIFTY",
+              "gain_score": 28.42,
+              "expected_move_pct": 0.008,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 4,
+              "underlying": "NIFTY",
+              "gain_score": 28.24,
+              "expected_move_pct": 0.006,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "05:56:15",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 30.31,
+              "expected_move_pct": 0.027,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 2,
+              "underlying": "FINNIFTY",
+              "gain_score": 29.96,
+              "expected_move_pct": 0.023,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 3,
+              "underlying": "BANKNIFTY",
+              "gain_score": 28.42,
+              "expected_move_pct": 0.008,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 4,
+              "underlying": "NIFTY",
+              "gain_score": 28.24,
+              "expected_move_pct": 0.006,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "06:56:01",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 32.3,
+              "expected_move_pct": 0.046,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 2,
+              "underlying": "FINNIFTY",
+              "gain_score": 29.78,
+              "expected_move_pct": 0.02,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 3,
+              "underlying": "NIFTY",
+              "gain_score": 28.93,
+              "expected_move_pct": 0.012,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 4,
+              "underlying": "BANKNIFTY",
+              "gain_score": 28.66,
+              "expected_move_pct": 0.009,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "06:56:01",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 32.3,
+              "expected_move_pct": 0.046,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 2,
+              "underlying": "FINNIFTY",
+              "gain_score": 29.78,
+              "expected_move_pct": 0.02,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 3,
+              "underlying": "NIFTY",
+              "gain_score": 28.93,
+              "expected_move_pct": 0.012,
+              "recommendation": "SKIP"
+            },
+            {
+              "rank": 4,
+              "underlying": "BANKNIFTY",
+              "gain_score": 28.66,
+              "expected_move_pct": 0.009,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "19:05:15",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "NIFTY",
+              "gain_score": 74.11,
+              "expected_move_pct": 0.032,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "BANKNIFTY",
+              "gain_score": 62.61,
+              "expected_move_pct": 0.099,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 56.74,
+              "expected_move_pct": 0.147,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "FINNIFTY",
+              "gain_score": 34.61,
+              "expected_move_pct": 0.031,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        {
+          "date": "2026-06-13",
+          "time": "19:07:05",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "NIFTY",
+              "gain_score": 76.93,
+              "expected_move_pct": 0.032,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "BANKNIFTY",
+              "gain_score": 66.04,
+              "expected_move_pct": 0.099,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 61.7,
+              "expected_move_pct": 0.147,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "FINNIFTY",
+              "gain_score": 34.58,
+              "expected_move_pct": 0.031,
+              "recommendation": "SKIP"
+            }
+          ]
+        }
+      ],
+      "total_days": 12
+    },
+    "snippet": "{\"status\":\"ok\",\"latest\":{\"date\":\"2026-06-13\",\"time\":\"19:07:05\",\"predictions\":[{\"rank\":1,\"underlying\":\"NIFTY\",\"gain_score\":76.93,\"expected_move_pct\":0.032,\"recommendation\":\"TRADE\"},{\"rank\":2,\"underlying\":\"BANKNIFTY\",\"gain_score\":66.04,\"expected_move_pct\":0.099,\"recommendation\":\"TRADE\"},{\"rank\":3,\"underlying\":\"MIDCPNIFTY\",\"gain_score\":61.7,\"expected_move_pct\":0.147,\"recommendation\":\"TRADE\"},{\"rank\":4,\"underlying\":\"FINNIFTY\",\"gain_score\":34.58,\"expected_move_pct\":0.031,\"recommendation\":\"SKIP\"}]},\"h",
+    "endpoint": "/api/gain_rank",
+    "required": false
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/accuracy_trend",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 355,
+    "json": {
+      "status": "ok",
+      "trend": [
+        {
+          "date": "2026-06-12",
+          "rho": 0.2,
+          "hit_rate": 0.6667,
+          "status": "RETRAIN_NEEDED",
+          "predicted": [
+            "NIFTY",
+            "MIDCPNIFTY",
+            "FINNIFTY",
+            "BANKNIFTY"
+          ],
+          "actual": [
+            "NIFTY",
+            "BANKNIFTY",
+            "FINNIFTY",
+            "MIDCPNIFTY"
+          ]
+        }
+      ],
+      "avg_rho": 0.2,
+      "retrain_needed": false,
+      "days_available": 1
+    },
+    "snippet": "{\"status\":\"ok\",\"trend\":[{\"date\":\"2026-06-12\",\"rho\":0.2,\"hit_rate\":0.6667,\"status\":\"RETRAIN_NEEDED\",\"predicted\":[\"NIFTY\",\"MIDCPNIFTY\",\"FINNIFTY\",\"BANKNIFTY\"],\"actual\":[\"NIFTY\",\"BANKNIFTY\",\"FINNIFTY\",\"MIDCPNIFTY\"]}],\"avg_rho\":0.2,\"retrain_needed\":false,\"days_available\":1}",
+    "endpoint": "/api/accuracy_trend",
+    "required": false
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/system_health",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 357,
+    "json": {
+      "status": "ok",
+      "timestamp": "2026-06-14T20:42:33.584105+05:30",
+      "token": {
+        "status": "unknown",
+        "log_line": "log not found"
+      },
+      "datasource_health": null,
+      "datasource_resilience": "UNKNOWN",
+      "retrain_needed": false,
+      "jobs": [
+        {
+          "id": "daily_status",
+          "name": "Daily Status Check",
+          "schedule_time": "daily",
+          "enabled": false
+        },
+        {
+          "id": "daily_gain_rank",
+          "name": "Daily Gain Rank (Pre-Market)",
+          "schedule_time": "09:15",
+          "enabled": true
+        },
+        {
+          "id": "daily_gain_validate",
+          "name": "Daily Gain Validate (Post-Market)",
+          "schedule_time": "15:35",
+          "enabled": true
+        },
+        {
+          "id": "daily_gain_trend",
+          "name": "Daily Accuracy Trend (Post-Market)",
+          "schedule_time": "15:40",
+          "enabled": true
+        },
+        {
+          "id": "auto_retrain",
+          "name": "Auto Model Retrain (Post-Market)",
+          "schedule_time": "16:00",
+          "enabled": true
+        },
+        {
+          "id": "bhavcopy_download",
+          "name": "NSE FO Bhavcopy Download (Post-Market)",
+          "schedule_time": "18:30",
+          "enabled": true
+        },
+        {
+          "id": "datasource_health_check",
+          "name": "Data Source Health Check (Pre-Market)",
+          "schedule_time": "08:00",
+          "enabled": true
+        },
+        {
+          "id": "signal_engine_bhavcopy",
+          "name": "Signal Engine \u2014 Bhavcopy Runner (Post-Market)",
+          "schedule_time": "18:45",
+          "enabled": true
+        },
+        {
+          "id": "paper_lifecycle_proof",
+          "name": null,
+          "schedule_time": "09:30",
+          "enabled": true
+        }
+      ]
+    },
+    "snippet": "{\"status\":\"ok\",\"timestamp\":\"2026-06-14T20:42:33.584105+05:30\",\"token\":{\"status\":\"unknown\",\"log_line\":\"log not found\"},\"datasource_health\":null,\"datasource_resilience\":\"UNKNOWN\",\"retrain_needed\":false,\"jobs\":[{\"id\":\"daily_status\",\"name\":\"Daily Status Check\",\"schedule_time\":\"daily\",\"enabled\":false},{\"id\":\"daily_gain_rank\",\"name\":\"Daily Gain Rank (Pre-Market)\",\"schedule_time\":\"09:15\",\"enabled\":true},{\"id\":\"daily_gain_validate\",\"name\":\"Daily Gain Validate (Post-Market)\",\"schedule_time\":\"15:35\",\"enab",
+    "endpoint": "/api/system_health",
+    "required": false
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/broker/deps",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 5198,
+    "json": {
+      "dhanhq_installed": true,
+      "dhanhq_version": "unknown",
+      "python_path": "/usr/local/bin/python",
+      "pip_freeze_hit": true,
+      "broker_module_available": true
+    },
+    "snippet": "{\"dhanhq_installed\":true,\"dhanhq_version\":\"unknown\",\"python_path\":\"/usr/local/bin/python\",\"pip_freeze_hit\":true,\"broker_module_available\":true}",
+    "endpoint": "/api/broker/deps",
+    "required": false
+  },
+  {
+    "url": "https://genesis-system3-backend.onrender.com/api/status",
+    "ok": true,
+    "http": 200,
+    "latency_ms": 364,
+    "json": {
+      "status": "ok",
+      "timestamp": "2026-06-14T20:42:39.145809+05:30",
+      "backend": {
+        "running": true,
+        "port": 8000,
+        "uptime_estimate": "running"
+      },
+      "frontend": {
+        "expected_url": "http://localhost:3000",
+        "status": "should_be_running"
+      },
+      "data": {
+        "source": "real",
+        "market_status": {
+          "is_open": false,
+          "reason": "Market closed: Weekend (Sunday)",
+          "current_time_ist": null,
+          "next_open": "2026-06-15 09:15:00 IST",
+          "seconds_until_open": null
+        },
+        "fresh": false,
+        "last_update": null
+      },
+      "health": false,
+      "endpoints": {
+        "health": "/api/health",
+        "chain": "/api/chain/{underlying}",
+        "signals": "/api/signal/top",
+        "positions": "/api/positions",
+        "pnl": "/api/pnl",
+        "perf": "/api/perf"
+      }
+    },
+    "snippet": "{\"status\":\"ok\",\"timestamp\":\"2026-06-14T20:42:39.145809+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Market closed: Weekend (Sunday)\",\"current_time_ist\":null,\"next_open\":\"2026-06-15 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/ch",
+    "endpoint": "/api/status",
+    "required": false
+  }
+]

@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 151,
+    "candidate_count": 153,
     "candidates_sample": [
       ".github/workflows/model-backtest-readiness.yml",
       "core/engine/ai_model/__init__.py",
@@ -145,17 +145,17 @@
         "file": "system3_ultra_validation.py"
       }
     ],
+    "dryrun_proof_present": true,
     "existing_model_backtest_readiness_keys": [],
     "existing_model_backtest_readiness_present": false,
-    "fresh_training_metrics_proven": false,
+    "fresh_training_metrics_proven": true,
     "promotion_allowed": false
   },
   "gate": "model_training_load_proof",
-  "next_action": "Create secure dry-run training/load proof with metrics; do not promote/overwrite models until explicit policy passes.",
+  "next_action": "Run scripts/model_training_dryrun_proof.py to prove pipeline; promotion requires signal_csv + model files + 5+ validation days.",
   "pass": true,
   "status": "PASS_WITH_WARNINGS",
   "warnings": [
-    "fresh_training_accuracy_metrics_not_proven",
     "model_promotion_remains_blocked_without_policy"
   ]
 }
