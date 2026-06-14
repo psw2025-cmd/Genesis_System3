@@ -21,6 +21,7 @@ Goal
 → tradability gaps
 → option-chain gaps
 → option-price microstructure gaps
+→ India/global market-impact gaps
 → broker gaps
 → proof gaps
 → dashboard gaps
@@ -42,7 +43,7 @@ Goal
 | `TRADE_READY` | All production proof gates pass | Still needs user approval |
 | `LIVE_ENABLED` | Real order placement explicitly allowed | Only after user approval |
 
-No AI opinion, dashboard green color, or single PASS label is final. If anything is stale, synthetic, fallback, simulated, closed-market, unproven, missing-token, not liquid, not reconciled, or not costed, Claude must mark it `NOT_PROVEN / PASS_WITH_WARNINGS / BLOCKED` and must not mark it production-ready.
+No AI opinion, dashboard green color, or single PASS label is final. If anything is stale, synthetic, fallback, simulated, closed-market, unproven, missing-token, not liquid, not reconciled, not costed, or not market-context validated, Claude must mark it `NOT_PROVEN / PASS_WITH_WARNINGS / BLOCKED` and must not mark it production-ready.
 
 ---
 
@@ -71,7 +72,8 @@ Mini summary:
 | 2026-06-14 22:45 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | multi-validation batch 1 | Added backend runtime truth, SSOT, dashboard hardcoded proof, CORS/security, and position reconciliation findings | this file | DONE |
 | 2026-06-14 22:55 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | Claude start-here protocol | Added explicit intent, unchanged goal, non-confusion levels, and self-verification protocol | this file | DONE |
 | 2026-06-14 23:10 | ChatGPT | external market research + repo baseline | market intelligence batch 2 | Added India + global options market gap matrix and System3 requirement impacts | this file | DONE |
-| 2026-06-14 23:25 | ChatGPT | external market research + repo baseline | option price microstructure batch 3 | Added why option-chain prices rise/fall and the missing System3 proof/gates required to model it | this file | DONE |
+| 2026-06-14 23:25 | ChatGPT | external market research + repo baseline | option price microstructure batch 3 | Added why option-chain prices rise/fall and missing System3 proof/gates | this file | DONE |
+| 2026-06-14 23:40 | ChatGPT | external market research + repo baseline | India market impact batch 4 | Added India market-impact gap matrix: macro, FII/DII, RBI/Fed, USDINR, crude, VIX, expiry, holiday, sector, news, and F&O-ban effects | this file | DONE |
 
 ---
 
@@ -97,12 +99,13 @@ System3 was intended as a complete **AI trading control system**, not only a das
 3. Full signal lifecycle: data → scanner → signal → rank → tradability → paper order → exit → net P&L → learning.
 4. Options-first tradability: valid underlying, expiry, strike, token, spread, liquidity.
 5. Option-price microstructure: know why premium rises/falls before selecting strike.
-6. Broker proof: quote access, orderbook, tradebook, positions, token watchdog.
-7. Ultra dashboard truth command center.
-8. Risk-first execution.
-9. Proof-first governance.
-10. Self-learning loop.
-11. Fail-closed production.
+6. India/global market-impact intelligence: know what can move underlying, IV, liquidity, and expiry behavior.
+7. Broker proof: quote access, orderbook, tradebook, positions, token watchdog.
+8. Ultra dashboard truth command center.
+9. Risk-first execution.
+10. Proof-first governance.
+11. Self-learning loop.
+12. Fail-closed production.
 
 ---
 
@@ -155,169 +158,28 @@ The options market is a live microstructure problem involving contract specs, li
 
 ## Core formula
 
-Option premium is not moved by one thing. It is the market price of a contract containing:
-
 ```text
 option premium = intrinsic value + extrinsic/time value
 ```
 
 Intrinsic value depends on spot/underlying vs strike. Extrinsic value depends on time remaining, implied volatility, supply/demand, event risk, liquidity, and rates/dividends where applicable.
 
-## 1. Underlying price movement
+## Micro price drivers
 
-| Situation | Call option | Put option | Required System3 check |
-|---|---|---|---|
-| Underlying rises | Usually rises | Usually falls | live spot/underlying tick + option tick correlation |
-| Underlying falls | Usually falls | Usually rises | live spot/underlying tick + option tick correlation |
-| Underlying flat | May fall due theta or IV crush | May fall due theta or IV crush | no-trade if premium decays without directional edge |
+1. **Underlying price move** — calls usually rise when underlying rises; puts usually rise when underlying falls, but this is not sufficient alone.
+2. **Delta** — first-order sensitivity to underlying.
+3. **Gamma** — acceleration in delta; high near ATM/expiry.
+4. **Theta** — time decay; can destroy option buying if expected move is slow.
+5. **Vega/IV** — premium can rise due to IV expansion and fall due to IV crush.
+6. **Moneyness** — ITM/ATM/OTM have different delta/gamma/liquidity/risk.
+7. **Bid/ask/depth** — LTP is not executable truth.
+8. **Volume/OI/OI change** — must be interpreted with price, not alone.
+9. **Event/news volatility** — IV can expand before event and crush after event.
+10. **Expiry-day microstructure** — gamma/theta extreme; OTM can go to zero quickly.
+11. **Order book imbalance** — quote depth and market-maker behavior affect entry/exit.
+12. **Correlation/regime** — index, sector, futures, global cues matter.
 
-**Gap:** System3 must not infer option price direction from underlying alone. It must also check delta, gamma, IV, spread, time, and liquidity.
-
-## 2. Delta — first-order directional sensitivity
-
-Delta estimates how much option price changes for a change in underlying.
-
-**System3 gap:** every trade candidate must record:
-
-- delta
-- delta source
-- timestamp
-- moneyness bucket: ITM/ATM/OTM
-- expected premium move for underlying move
-
-**Required artifact:** `reports/latest/greeks_validation/summary.json`.
-
-## 3. Gamma — acceleration risk/reward
-
-Gamma changes delta as the underlying moves. Gamma is usually highest near ATM and near expiry. This is why ATM/near-expiry options can explode or collapse quickly.
-
-**System3 gap:** no candidate should be ranked high without gamma and expiry-risk classification.
-
-**Required fields:** `gamma`, `gamma_bucket`, `near_expiry_gamma_risk`, `max_expected_premium_acceleration`.
-
-## 4. Theta — time decay
-
-Theta reduces extrinsic value as time passes. Near expiry, time decay can dominate direction if the underlying does not move fast enough.
-
-**System3 gap:** option-buying signals must prove expected move speed is greater than theta decay plus spread and charges.
-
-**Required computation:**
-
-```text
-expected_intraday_edge = expected_delta_gain + expected_gamma_gain + expected_vega_gain - theta_decay - spread_cost - charges - slippage
-```
-
-Reject if expected edge <= 0.
-
-## 5. Vega and implied volatility
-
-IV affects option premium. Calls and puts can rise even if spot movement is small when IV expands. They can fall despite correct direction when IV crushes after event/news.
-
-**System3 gap:** current scanner must not use only price momentum; it must track IV change and IV rank.
-
-**Required fields:**
-
-- `iv_now`
-- `iv_change_1m/5m/15m`
-- `iv_rank`
-- `iv_percentile`
-- `vega`
-- `event_iv_crush_risk`
-
-## 6. Moneyness: ITM / ATM / OTM
-
-| Bucket | Behavior | System3 gap |
-|---|---|---|
-| ITM | more intrinsic, higher delta, lower relative gamma | less explosive but more stable |
-| ATM | high gamma, active liquidity, sensitive to direction/IV/time | often best for controlled high-gain scanner |
-| OTM | cheap, high % move possible, high expiry risk | reject if no liquidity or unrealistic move required |
-
-**Required gate:** System3 must compute distance-to-strike and required underlying move to break even before entry.
-
-## 7. Bid/ask spread and market depth
-
-An option can show high LTP but be untradeable if bid/ask spread is wide or quantity is thin.
-
-**System3 gap:** LTP alone is not enough. Candidate must have:
-
-- bid
-- ask
-- bid quantity
-- ask quantity
-- spread absolute
-- spread percent
-- depth/liquidity score
-
-Reject if spread is too wide or bid is missing.
-
-## 8. Volume, OI, and OI change
-
-Volume shows current session activity. OI shows open contracts. OI change may suggest build-up/unwinding but must be interpreted with price movement.
-
-**System3 gap:** System3 must classify OI + price behavior:
-
-| Price | OI | Possible interpretation |
-|---|---|---|
-| Price up | OI up | long build-up / fresh buying interest |
-| Price up | OI down | short covering / unwind |
-| Price down | OI up | short build-up / writing pressure |
-| Price down | OI down | long unwinding |
-
-This interpretation must be proof-tagged, not assumed.
-
-## 9. Event/news volatility
-
-Events can increase IV before the event and crush IV after the event. Correct direction can still lose money if IV crush is larger than directional gain.
-
-**System3 gap:** add event-risk gate:
-
-- earnings/news/economic event
-- result day
-- RBI/Fed/global macro event
-- index rebalancing
-- corporate action
-- large gap-open risk
-
-## 10. Expiry-day microstructure
-
-Near expiry, option premium becomes extremely sensitive to small underlying moves and time decay. OTM options can go to zero quickly.
-
-**System3 gap:** add special expiry-day mode:
-
-- tighter time stop
-- tighter spread rule
-- no deep OTM unless exceptional liquidity and momentum
-- mandatory real bid/ask
-- fast exit rule
-- no carry of near-expiry lottery options without proof
-
-## 11. Demand/supply and order book imbalance
-
-Market makers and participants move bid/ask based on underlying, IV, inventory, hedging, and order flow. LTP can jump on a small trade but executable bid may not support exit.
-
-**System3 gap:** add order-book microstructure fields:
-
-- top 5 bid/ask depth where broker supports it
-- imbalance ratio
-- last trade size
-- quote update frequency
-- stale quote flag
-
-## 12. Correlation and pair behavior
-
-Index options depend on basket movement. Stock options depend on stock + sector + market. Global options may depend on futures, ETF, FX, rates, or volatility product dynamics.
-
-**System3 gap:** candidate scoring must include market regime and correlation:
-
-- index trend
-- sector trend
-- stock relative strength
-- futures basis where applicable
-- global cue risk
-
----
-
-# Option Price Movement Gaps for System3
+## Option Price Movement Gaps for System3
 
 | Gap ID | Missing capability | Why it matters | Required artifact/status |
 |---|---|---|---|
@@ -333,6 +195,125 @@ Index options depend on basket movement. Stock options depend on stock + sector 
 | OPM3-10 | expected edge after theta/spread/charges/slippage | Highest gain must be net profitable, not gross premium movement | `reports/latest/expected_option_edge/summary.json` |
 | OPM3-11 | live spot-option tick correlation | Need prove option reacts correctly to underlying | `reports/latest/spot_option_correlation/summary.json` |
 | OPM3-12 | regime-aware scoring | Option behavior changes in trend/range/high IV/news/expiry | `reports/latest/market_regime_option_behavior/summary.json` |
+
+---
+
+# India Market Impact Batch 4 — What moves Indian option chain and market
+
+## Why this section exists
+
+Option-chain price movement is downstream of market-impact drivers. System3 must understand what can move the underlying index/stock, implied volatility, liquidity, spreads, OI, volume, and expiry-day behavior.
+
+## Public market findings used
+
+- SEBI/Reuters reported very high individual F&O loss rates and large net losses in FY25, reinforcing fail-closed risk rules.
+- SEBI has changed/standardized derivatives expiry rules, and NSE/BSE expiry days can change under regulatory/exchange decisions.
+- NSE derivatives activity and equity options remain central to Indian market volume/revenue, so liquidity and crowding risk matter.
+- Indian exchanges publish holiday calendars that affect expiry, time decay, liquidity, and pre/post-holiday gaps.
+- Options volume and open interest are different liquidity/participation measures and both must be tracked.
+
+## India market-impact gap matrix
+
+| Impact driver | How it can affect market/options | Present System3 gap | Required gate/artifact |
+|---|---|---|---|
+| RBI policy / MPC | Moves Bank Nifty, INR, yields, rate-sensitive sectors, IV | No formal RBI event calendar gate | `reports/latest/macro_event_calendar/summary.json` |
+| US Fed / global rates | Moves global risk appetite, FII flow, USD/INR, gap opens | No global macro calendar integration | `reports/latest/global_macro_impact/summary.json` |
+| USD/INR | Impacts IT, pharma, importers, FIIs, inflation sentiment | No FX regime input | `reports/latest/fx_regime/summary.json` |
+| Crude oil | Impacts inflation, OMCs, aviation, paint, INR, broad market | No crude/regime input | `reports/latest/commodity_impact/summary.json` |
+| US indices / Nasdaq / S&P / Dow | Impacts Indian gap-open and IT/global risk | No pre-market global cue score | `reports/latest/global_cue_score/summary.json` |
+| GIFT Nifty | Early cue for Nifty gap/open sentiment | Not proven as live data source | `reports/latest/gift_nifty_cue/summary.json` |
+| FII/DII cash flows | Drives index trend, sector rotation, liquidity | No daily flow integration | `reports/latest/fii_dii_flow/summary.json` |
+| India VIX / volatility regime | Drives option premium expansion/crush | IV/VIX regime not formalized | `reports/latest/india_vix_regime/summary.json` |
+| Earnings/results | Stock options IV expansion/crush, gaps | No earnings calendar gate | `reports/latest/earnings_event_risk/summary.json` |
+| Corporate actions | Strike/lot adjustments, price gaps | No corporate-action adjustment proof | `reports/latest/corporate_action_contract_adjustment/summary.json` |
+| Index rebalancing | Basket demand/supply, sector/index moves | No index event gate | `reports/latest/index_rebalance_event/summary.json` |
+| Sector rotation | Index moves may hide sector winners/losers | No sector-relative strength gate | `reports/latest/sector_regime/summary.json` |
+| News/geopolitics | Sudden IV, gaps, liquidity changes | No news shock classifier | `reports/latest/news_shock_gate/summary.json` |
+| F&O ban / MWPL | Stock option/future trading can be restricted | No MWPL/F&O-ban gate proven | `reports/latest/fno_ban_mwpl_gate/summary.json` |
+| Exchange holidays | Time decay, gap risk, expiry shifts, liquidity | Calendar not proven as hard gate | `reports/latest/exchange_calendar_gate/summary.json` |
+| Expiry day rule changes | Changes theta/gamma/liquidity behavior | Expiry assumptions unsafe | `reports/latest/expiry_rule_monitor/summary.json` |
+| Lot size changes | Affects position sizing and risk | Lot-size freshness not proven | `reports/latest/lot_size_change_monitor/summary.json` |
+| Pre-open/session changes | Price discovery/gaps may change | No session microstructure model | `reports/latest/session_structure_gate/summary.json` |
+| Circuit/halt/surveillance | Orders may fail or liquidity vanish | No halt/circuit gate | `reports/latest/circuit_halt_gate/summary.json` |
+| Broker/API outages | Data/order proof fails | Broker watchdog exists but incomplete | `reports/latest/broker_outage_watchdog/summary.json` |
+| Tax/charges/regulatory changes | Net P&L changes | Static cost assumptions unsafe | `reports/latest/fee_tax_rule_monitor/summary.json` |
+| Market manipulation/crowding risk | Index options can be distorted on expiry | No crowding/anomaly detector | `reports/latest/options_crowding_anomaly/summary.json` |
+
+---
+
+# MKT4 required architecture additions
+
+## MKT4-01 — Market impact calendar engine
+
+Create a calendar engine for:
+
+- RBI policy
+- Fed policy
+- CPI/WPI/IIP/GDP
+- Budget/election/major policy events
+- earnings/results
+- holidays
+- expiry days
+- corporate actions
+- index rebalancing
+
+Status: `NOT_IMPLEMENTED`.
+
+## MKT4-02 — Pre-market global cue engine
+
+Before market open, System3 must score:
+
+- GIFT Nifty
+- US indices
+- Asian markets
+- USD/INR
+- crude
+- gold/risk-off proxy
+- global volatility
+
+Status: `NOT_PROVEN`.
+
+## MKT4-03 — India VIX and IV regime engine
+
+System3 must classify:
+
+- low IV / high IV
+- IV expansion
+- IV crush risk
+- expiry IV abnormality
+- event IV risk
+
+Status: `NOT_PROVEN`.
+
+## MKT4-04 — FII/DII and sector flow engine
+
+System3 must track FII/DII flows and sector rotation because options signals should not ignore institutional flow direction.
+
+Status: `NOT_IMPLEMENTED`.
+
+## MKT4-05 — F&O ban / MWPL gate
+
+Stock options/futures candidates must be rejected or downgraded if ban/MWPL/surveillance risk is present.
+
+Status: `NOT_PROVEN`.
+
+## MKT4-06 — News shock / event risk gate
+
+High-impact news must trigger observe-only or reduced-risk mode until spread/liquidity normalizes.
+
+Status: `NOT_IMPLEMENTED`.
+
+## MKT4-07 — Expiry/holiday/session rule monitor
+
+System3 must not hardcode expiry/holiday assumptions. It must monitor exchange calendars and regulatory/exchange circular changes.
+
+Status: `BLOCKER` until current proof artifact exists.
+
+## MKT4-08 — Market crowding/anomaly detector
+
+Because index options can become extremely crowded around expiry, System3 needs anomaly detection for abnormal OI, volume, IV, spread, and spot-option dislocation.
+
+Status: `NOT_IMPLEMENTED`.
 
 ---
 
@@ -352,6 +333,8 @@ controlled_gain_score =
   × iv_regime_score
   × theta_survival_score
   × expiry_risk_score
+  × market_impact_score
+  × event_risk_score
   × net_edge_after_costs
   × exit_probability
 ```
@@ -368,6 +351,9 @@ Immediate rejection if:
 - theta decay greater than expected edge
 - expiry risk too high
 - event IV crush risk high
+- macro/event risk not classified
+- F&O ban/MWPL/circuit risk unverified
+- holiday/expiry rule stale
 - net P&L after charges not positive
 - no exit liquidity
 - no broker reconciliation
@@ -376,4 +362,4 @@ Immediate rejection if:
 
 # Current final statement
 
-All currently known gaps are being collected in this living file. The latest expansion adds option-price microstructure: System3 must understand why option premiums rise/fall before it can safely chase highest controlled gain. The next repo batch must compare current code against OPM3-01 to OPM3-12 and create/patch proof artifacts for every missing capability before any production-ready claim.
+All currently known gaps are being collected in this living file. The latest expansion adds India market-impact intelligence: System3 must account for RBI/Fed/global cues, USD/INR, crude, FII/DII, India VIX, GIFT Nifty, earnings, corporate actions, F&O ban/MWPL, holidays, expiry-rule changes, sector rotation, news shocks, circuit/halt risk, and crowding/anomaly behavior. Highest controlled option gain cannot be pursued safely until market-impact, option-chain, microstructure, broker, risk, proof, and dashboard gaps are all proven in Analyzer/Paper mode.
