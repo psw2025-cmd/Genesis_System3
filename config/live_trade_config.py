@@ -45,11 +45,16 @@ LIVE_ALLOWED_UNDERLYINGS = [
 ]
 
 # ============================================================================
-# ANGEL ONE SPECIFIC SETTINGS
+# DHAN ORDER SETTINGS
 # ============================================================================
-ANGEL_PRODUCT_TYPE = "INTRADAY"  # or as per current DhanHQ usage
-ANGEL_ORDER_VARIETY = "NORMAL"
-ANGEL_ALLOWED_ORDER_TYPES = ["MARKET"]  # For phase 1 live trading
+DHAN_PRODUCT_TYPE = "INTRADAY"
+DHAN_ORDER_VARIETY = "NORMAL"
+DHAN_ALLOWED_ORDER_TYPES = ["MARKET"]
+
+# Backward-compat aliases (phases 101/107 still use old names — updated below)
+ANGEL_PRODUCT_TYPE = DHAN_PRODUCT_TYPE
+ANGEL_ORDER_VARIETY = DHAN_ORDER_VARIETY
+ANGEL_ALLOWED_ORDER_TYPES = DHAN_ALLOWED_ORDER_TYPES
 
 # ============================================================================
 # ADDITIONAL RISK CONTROLS

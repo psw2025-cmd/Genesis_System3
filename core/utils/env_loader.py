@@ -16,19 +16,6 @@ for env_path in ENV_PATHS:
         load_dotenv(env_path, override=False)
 
 
-def get_angelone_credentials():
-    """
-    Returns Dhan credentials from config/.env
-    """
-    return {
-        "api_key": os.getenv("ANGELONE_API_KEY", "").strip(),
-        "client_id": os.getenv("ANGELONE_CLIENT_ID", "").strip(),
-        "pin": os.getenv("ANGELONE_PIN", "").strip(),
-        "password": os.getenv("ANGELONE_PASSWORD", "").strip(),
-        "totp_secret": os.getenv("ANGELONE_TOTP", "").strip(),
-    }
-
-
 def get_dhan_credentials():
     """
     Returns Dhan credentials (read-only / analyzer-only).
