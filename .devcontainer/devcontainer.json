@@ -1,6 +1,7 @@
 {
   "name": "Genesis System3",
 
+  "postCreateCommand": "pip install -q -r /workspaces/Genesis_System3/requirements.txt",
   "postStartCommand": "bash /workspaces/Genesis_System3/scripts/codespace_startup.sh",
 
   "customizations": {

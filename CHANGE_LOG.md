@@ -390,3 +390,51 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 - semver.json corrected to v1.1.1 (tag exists, file was behind at v1.1.0)
 - Remote main HEAD: fefedf53 → ready for session 6 commit push
 
+
+- [2026-06-14 17:05 IST] [Scheduler-Daemon] JOB FIRED: daily_status — status=FAILED
+
+---
+
+## Session 7 — 2026-06-14 (Codespace Daemon Fix + Job Scheduler Activation)
+
+### [2026-06-14 17:10 IST] [Claude] CRITICAL FIX: All daemons were crashing on startup
+
+**Root cause found:** `python-dotenv` and all core packages were not installed in the Codespace Python 3.14 environment. `devcontainer.json` had `postStartCommand` but no `postCreateCommand` to install requirements. Both `dhan_token_auto_refresh.py` and `dhan_watchdog_runner.py` crashed at import (`ModuleNotFoundError: No module named 'dotenv'`).
+
+**Secondary issue:** `requirements.txt` pinned `pandas==2.2.3` and `numpy==1.26.4` — these versions have no pre-built wheels for Python 3.14, causing pip to compile from source (5+ min) or fail silently.
+
+**Changes applied:**
+
+1. `.devcontainer/devcontainer.json` — ADD `postCreateCommand`
+   - `"postCreateCommand": "pip install -q -r /workspaces/Genesis_System3/requirements.txt"`
+   - Ensures packages are installed on Codespace create/rebuild
+
+2. `scripts/codespace_startup.sh` — ADD dotenv guard + sleep increase
+   - Added: `if ! python3 -c "import dotenv"` → runs pip install before Layer 0 startup check
+   - `sleep 3` → `sleep 5` (more time for spawned daemons to register before pgrep check)
+   - Added Layer 3: job scheduler daemon (see below)
+
+3. `requirements.txt` — RELAX EXACT PINS for Python 3.14 compatibility
+   - `pandas==2.2.3` → `pandas>=2.2.3` (no wheel for Python 3.14 at exact version)
+   - `numpy==1.26.4` → `numpy>=1.26.4` (same reason)
+   - All other pins unchanged
+
+4. `scripts/codespace_startup.sh` — ADD Layer 3: job scheduler daemon
+   - `core/engine/system3_phase82_job_scheduler.py --daemon` now starts on Codespace boot
+   - Fires: datasource_health (08:00), gain_rank (09:15), gain_validate (15:35), gain_trend (15:40), auto_retrain (16:00), bhavcopy_download (18:30), signal_engine_bhavcopy (18:45)
+   - Without this, ALL 7 scheduled jobs were never executing — the scheduler config existed but nobody ran it
+
+5. `config/system3_job_scheduler.json` — DISABLE `daily_status` job
+   - `enabled: true` → `enabled: false`
+   - Reason: `core.engine.check_system3_status` module does not exist; no `schedule_time` caused it to fire on every scheduler restart
+
+**Current daemon state (all running):**
+- PID 53742: dhan_token_auto_refresh.py — Token valid, 21h remaining
+- PID 53744: dhan_watchdog_runner.py — Checking every 30min
+- PID 84700: system3_phase82_job_scheduler --daemon — Weekday jobs scheduled
+
+**Packages installed (Python 3.14):**
+- python-dotenv 1.0.1, dhanhq 2.2.0, pyotp 2.9.0, requests 2.32.3
+- pandas 3.0.3 (wheel for cp314), numpy 2.4.6
+
+**Verification:** `scripts/dhan_startup_check.py --status` shows Token OK, Daemon running, Watchdog running.

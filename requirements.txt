@@ -1,8 +1,9 @@
 # pandas: dataframe, CSV, backtest, and analysis support
-pandas==2.2.3
+# pinned to >=2.2 to keep API compatible; pip picks wheel for current Python
+pandas>=2.2.3
 
 # numpy: numerical arrays and vectorized calculations for indicators/backtests
-numpy==1.26.4
+numpy>=1.26.4
 
 # python-dotenv: local .env loading while keeping GitHub Actions secrets separate
 python-dotenv==1.0.1

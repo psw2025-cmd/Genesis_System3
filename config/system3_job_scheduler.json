@@ -4,8 +4,9 @@
       "id": "daily_status",
       "name": "Daily Status Check",
       "module": "core.engine.check_system3_status",
-      "enabled": true,
-      "type": "daily"
+      "enabled": false,
+      "type": "daily",
+      "note": "disabled — module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
     },
     {
       "id": "daily_gain_rank",

@@ -17,12 +17,19 @@ if [ -z "$PY" ] || [ ! -d "$PROJ" ]; then
     exit 0  # non-blocking — don't fail Codespace start
 fi
 
+# Ensure python-dotenv and core deps are installed (survives Codespace resume where
+# postCreateCommand doesn't re-run but packages may be missing after env reset)
+if ! "$PY" -c "import dotenv" 2>/dev/null; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing requirements (dotenv missing)..." >> "$LOG"
+    "$PY" -m pip install -q -r "$PROJ/requirements.txt" >> "$LOG" 2>&1 || true
+fi
+
 # Layer 0: run full startup check (token refresh + daemon + watchdog)
 "$PY" "$PROJ/scripts/dhan_startup_check.py" >> "$LOG" 2>&1 || true
 
-sleep 3  # allow spawned processes to register
+sleep 5  # allow spawned processes to register with the OS before pgrep checks
 
-# Layer 1 fallback: daemon
+# Layer 1 fallback: token daemon
 if ! pgrep -f "dhan_token_auto_refresh.py" > /dev/null 2>&1; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting token daemon (fallback)" >> "$LOG"
     nohup "$PY" -u "$PROJ/scripts/dhan_token_auto_refresh.py" \
@@ -35,6 +42,14 @@ if ! pgrep -f "dhan_watchdog_runner.py" > /dev/null 2>&1; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting watchdog (fallback)" >> "$LOG"
     nohup "$PY" -u "$PROJ/scripts/dhan_watchdog_runner.py" \
         >> "$PROJ/logs/dhan_watchdog.log" 2>&1 &
+    disown $!
+fi
+
+# Layer 3: job scheduler daemon (bhavcopy, gain rank, signal engine, auto-retrain)
+if ! pgrep -f "system3_phase82_job_scheduler.*--daemon" > /dev/null 2>&1; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting job scheduler daemon" >> "$LOG"
+    nohup "$PY" -u "$PROJ/core/engine/system3_phase82_job_scheduler.py" --daemon \
+        >> "$PROJ/logs/job_scheduler.log" 2>&1 &
     disown $!
 fi
 
