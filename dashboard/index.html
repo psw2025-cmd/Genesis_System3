@@ -77,7 +77,7 @@
       <div class="kpi-row">
         <div class="kpi-card" :class="broker.connected ? 'kpi-green' : 'kpi-red'">
           <div class="kpi-label">BROKER</div>
-          <div class="kpi-val">{{ broker.connected ? 'LIVE' : 'OFFLINE' }}</div>
+          <div class="kpi-val">{{ broker.connected ? 'CONN' : 'OFFLINE' }}</div>
           <div class="kpi-sub">{{ broker.error || 'Dhan · ANALYZER' }}</div>
         </div>
         <div class="kpi-card kpi-blue">
