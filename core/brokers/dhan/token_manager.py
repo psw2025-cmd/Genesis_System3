@@ -57,44 +57,76 @@ logger = logging.getLogger("dhan_token_manager")
 #  Env helpers                                                         #
 # ------------------------------------------------------------------ #
 
+_CLOUD_MODE = bool(os.environ.get("RENDER") or os.environ.get("CLOUD_WORKER"))
+
+_DHAN_KEYS = (
+    "DHAN_CLIENT_ID", "DHAN_APP_ID", "DHAN_APP_SECRET",
+    "DHAN_ACCESS_TOKEN", "DHAN_PIN", "DHAN_TOTP_SECRET",
+)
+
+
 def _load_env() -> dict:
-    """Load all key=value pairs from .secrets/dhan.env."""
-    env = {}
-    if not ENV_FILE.exists():
-        logger.error(f"Env file not found: {ENV_FILE}")
-        return env
-    for line in ENV_FILE.read_text().splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            k, _, v = line.partition("=")
-            env[k.strip()] = v.strip()
+    """Load Dhan credentials from .secrets/dhan.env, falling back to os.environ.
+    In cloud deployments (RENDER=true) the file never exists; credentials come
+    from platform environment variables set in the Render dashboard.
+    """
+    env: dict = {}
+
+    if ENV_FILE.exists():
+        for line in ENV_FILE.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                env[k.strip()] = v.strip()
+    else:
+        # Cloud/CI: read credentials from process environment
+        for key in _DHAN_KEYS:
+            val = os.environ.get(key, "")
+            if val:
+                env[key] = val
+        if env:
+            logger.info("Credentials loaded from environment variables (cloud mode)")
+        else:
+            logger.warning(f"Env file not found and no DHAN_* env vars set: {ENV_FILE}")
+
+    # Always overlay with os.environ so manually-set env vars take precedence
+    for key in _DHAN_KEYS:
+        val = os.environ.get(key, "")
+        if val:
+            env.setdefault(key, val)
+
     return env
 
 
 def _write_token(new_token: str) -> None:
-    """Update DHAN_ACCESS_TOKEN in .secrets/dhan.env in-place."""
-    if not ENV_FILE.exists():
-        logger.error("Cannot write token — env file missing")
-        return
-
-    content = ENV_FILE.read_text()
-    if "DHAN_ACCESS_TOKEN" in content:
-        content = re.sub(
-            r"^DHAN_ACCESS_TOKEN=.*$",
-            f"DHAN_ACCESS_TOKEN={new_token}",
-            content,
-            flags=re.MULTILINE,
-        )
-    else:
-        content += f"\nDHAN_ACCESS_TOKEN={new_token}\n"
-
-    ENV_FILE.write_text(content)
+    """Write refreshed token to .secrets/dhan.env (Codespace) or env only (cloud)."""
     os.environ["DHAN_ACCESS_TOKEN"] = new_token
-    logger.info("DHAN_ACCESS_TOKEN updated in .secrets/dhan.env")
+
+    if ENV_FILE.exists():
+        try:
+            content = ENV_FILE.read_text()
+            if "DHAN_ACCESS_TOKEN" in content:
+                content = re.sub(
+                    r"^DHAN_ACCESS_TOKEN=.*$",
+                    f"DHAN_ACCESS_TOKEN={new_token}",
+                    content,
+                    flags=re.MULTILINE,
+                )
+            else:
+                content += f"\nDHAN_ACCESS_TOKEN={new_token}\n"
+            ENV_FILE.write_text(content)
+            logger.info("DHAN_ACCESS_TOKEN updated in .secrets/dhan.env")
+        except OSError as e:
+            logger.warning(f"Could not write to env file ({e}); token set in os.environ only")
+    else:
+        logger.info("DHAN_ACCESS_TOKEN set in os.environ (cloud mode — no local env file)")
 
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG_FILE, "a") as f:
-        f.write(f"{datetime.now().isoformat()} | token refreshed | len={len(new_token)}\n")
+    try:
+        with open(LOG_FILE, "a") as f:
+            f.write(f"{datetime.now().isoformat()} | token refreshed | len={len(new_token)}\n")
+    except OSError:
+        pass
 
 
 def _token_expiry(token: str) -> datetime | None:

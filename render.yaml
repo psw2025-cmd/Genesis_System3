@@ -1,22 +1,113 @@
 # Render Blueprint for Genesis System3
-# Safe backend-only deployment.
-# Live trading is disabled by default.
-# Render CLI deployment enabled via GitHub Actions.
+# =====================================================================
+# TWO SERVICES:
+#   web    — FastAPI backend (always-on, Starter plan required)
+#   worker — Background daemons: token refresh + watchdog + job scheduler
+#
+# SECRETS: Set all DHAN_* variables in Render dashboard → Environment
+#   (sync: false means they come from the dashboard, not this file)
+#
+# PERSISTENT DISK (optional, V2):
+#   Uncomment the `disk:` block under the worker to persist bhavcopy
+#   cache, logs, and state across deploys. Costs ~$1/GB/month.
+#   Free plan does NOT support persistent disks.
+#
+# SAFETY: LIVE_TRADING_ENABLED is hardcoded 0. Do NOT change until
+#   cloud analyzer/paper proof passes and CI is fully green.
+# =====================================================================
 
 services:
+
+  # -------------------------------------------------------------------
+  # Web Service — FastAPI Backend
+  # -------------------------------------------------------------------
   - type: web
     name: genesis-system3-backend
     runtime: docker
-    plan: free
+    plan: starter          # free plan spins down after 15min inactivity
     dockerfilePath: ./dashboard/backend/Dockerfile
     dockerContext: .
     autoDeploy: true
+    healthCheckPath: /health
+
     envVars:
+      # --- Deploy identity ---
       - key: SYSTEM3_DEPLOY_TARGET
         value: render
+      - key: RENDER
+        value: "true"
+
+      # --- Safety gates (hardcoded off) ---
       - key: SYSTEM3_MODE
         value: analyzer
       - key: ANALYZE_MODE
         value: "1"
       - key: LIVE_TRADING_ENABLED
         value: "0"
+      - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+
+      # --- Dhan credentials (set in Render dashboard) ---
+      - key: DHAN_CLIENT_ID
+        sync: false
+      - key: DHAN_APP_ID
+        sync: false
+      - key: DHAN_APP_SECRET
+        sync: false
+      - key: DHAN_ACCESS_TOKEN
+        sync: false
+      - key: DHAN_PIN
+        sync: false
+      - key: DHAN_TOTP_SECRET
+        sync: false
+
+  # -------------------------------------------------------------------
+  # Worker Service — Background Daemons
+  # -------------------------------------------------------------------
+  - type: worker
+    name: genesis-system3-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./dashboard/backend/Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/cloud_worker.py
+    autoDeploy: true
+
+    envVars:
+      # --- Deploy identity ---
+      - key: SYSTEM3_DEPLOY_TARGET
+        value: render
+      - key: RENDER
+        value: "true"
+      - key: CLOUD_WORKER
+        value: "true"
+
+      # --- Safety gates (hardcoded off) ---
+      - key: SYSTEM3_MODE
+        value: analyzer
+      - key: ANALYZE_MODE
+        value: "1"
+      - key: LIVE_TRADING_ENABLED
+        value: "0"
+      - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+
+      # --- Dhan credentials (set in Render dashboard) ---
+      - key: DHAN_CLIENT_ID
+        sync: false
+      - key: DHAN_APP_ID
+        sync: false
+      - key: DHAN_APP_SECRET
+        sync: false
+      - key: DHAN_ACCESS_TOKEN
+        sync: false
+      - key: DHAN_PIN
+        sync: false
+      - key: DHAN_TOTP_SECRET
+        sync: false
+
+    # --- Persistent disk (uncomment when ready — requires paid plan) ---
+    # disk:
+    #   name: genesis-data
+    #   mountPath: /var/data/genesis
+    #   sizeGB: 1
