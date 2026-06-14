@@ -6,7 +6,7 @@
       "module": "core.engine.check_system3_status",
       "enabled": false,
       "type": "daily",
-      "note": "disabled \u2014 module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
+      "note": "disabled - module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
     },
     {
       "id": "daily_gain_rank",
@@ -91,7 +91,7 @@
     },
     {
       "id": "signal_engine_bhavcopy",
-      "name": "Signal Engine \u2014 Bhavcopy Runner (Post-Market)",
+      "name": "Signal Engine - Bhavcopy Runner (Post-Market)",
       "script": "scripts/run_signal_engine_from_bhavcopy.py",
       "args": [],
       "enabled": true,
@@ -103,7 +103,7 @@
     },
     {
       "id": "paper_lifecycle_proof",
-      "name": "Analyzer/Paper Lifecycle Proof",
+      "name": "Analyzer Paper Lifecycle Proof",
       "script": "scripts/paper_lifecycle_proof.py",
       "args": [],
       "enabled": true,
@@ -111,8 +111,8 @@
       "schedule_time": "09:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 10,
-      "description": "Analyzer/Paper lifecycle proof \u2014 signal to P&L on each market day. Runs auto-detect; skips if market closed."
+      "description": "Runs analyzer/paper lifecycle proof on market days. Produces real-market PASS only when broker is connected, market is open, and no dry-run/fallback data is used.",
+      "timeout_minutes": 10
     },
     {
       "id": "dashboard_endpoint_coverage",
