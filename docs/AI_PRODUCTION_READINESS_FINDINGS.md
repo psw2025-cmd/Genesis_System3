@@ -1,42 +1,45 @@
 # AI Production Readiness Findings
 
-**Purpose:** Single living audit file for micro-level observations, blockers, warnings, dashboard findings, recommendations, proof-truth rules, and action protocol for Genesis System3 production-grade real trading readiness.
+**Purpose:** Single living audit file for Genesis System3 production-grade real trading readiness.
 
-**Safety rule:** This file must not contain secrets, tokens, broker credentials, PINs, TOTP seeds, access keys, private account values, or raw personal/broker data.
+**Intended users:** Pritam, Claude, Cursor, Gemini, Codex, and future repo agents.
 
-**Intended users:** Pritam, Claude, Cursor, Gemini, Codex, and any future repo agent.
+**Safety rule:** Never write secrets, access tokens, PINs, TOTP seeds, API keys, broker credentials, private account values, or raw sensitive broker data into this file.
 
 ---
 
-## Living file update protocol
+## Update protocol
 
-Every agent must update this same file instead of scattering conclusions across chat, temporary logs, or untracked files.
+All agents must update this same file after every major proof, patch, or finding. Do not leave important conclusions only in chat.
 
-### Required update format
-
-Each new update must append under `Update log` using this format:
+### Required update row format
 
 ```text
 YYYY-MM-DD HH:MM IST | agent | commit/ref checked | area | finding/action | proof path | status
 ```
 
-### Required proof rule
+### Allowed proof sources
 
-No PASS may be written unless the proof is one of:
+A PASS can only be written when supported by one of:
 
-- committed repo proof artifact path
-- Render endpoint response path/artifact
+- committed repo proof artifact
+- committed command output file
+- Render endpoint proof artifact
 - CI/job log artifact
-- local command output copied into a committed proof file
-- user-provided screenshot/log clearly identified as user-provided runtime evidence
+- browser screenshot/DOM proof artifact
+- user-provided screenshot/log clearly marked as user-provided runtime evidence
 
-If proof is not available, use one of these statuses:
+### Allowed non-pass statuses
+
+Use these when proof is incomplete:
 
 - `NOT_PROVEN`
-- `NEEDS_RUNTIME_PROOF`
-- `NEEDS_RENDER_LOGS`
 - `NEEDS_MARKET_OPEN`
+- `NEEDS_RENDER_LOGS`
 - `NEEDS_BROKER_RUNTIME`
+- `NEEDS_BROWSER_PROOF`
+- `PASS_WITH_WARNINGS`
+- `BLOCKED`
 
 ---
 
@@ -45,97 +48,86 @@ If proof is not available, use one of these statuses:
 | Time IST | Agent | Commit/ref checked | Area | Finding/action | Proof path | Status |
 |---|---|---|---|---|---|---|
 | 2026-06-14 21:58 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | initial audit | Created living production readiness audit file | `docs/AI_PRODUCTION_READINESS_FINDINGS.md` | DONE |
-| 2026-06-14 22:02 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | Claude protocol | Added proof-truth, self-verification, dashboard, and action rules for Claude/agents | this file | DONE |
+| 2026-06-14 22:02 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | Claude protocol | Added proof-truth, self-verification, dashboard, and action rules | this file | DONE |
+| 2026-06-14 22:15 | ChatGPT | `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01` | continuous master | Rebuilt file as continuous master with action pack, dashboard pack, proof map, issue map, and Claude update protocol | this file | DONE |
 
 ---
 
-## Audit baseline
+# Current baseline truth
 
 - **Repo:** `psw2025-cmd/Genesis_System3`
-- **Baseline `main` commit inspected:** `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01`
-- **Primary observed mode:** Analyzer/Paper.
-- **Observed live trading state:** Disabled.
-- **Current high-level verdict:** Cloud Analyzer/Paper readiness is improving, but production-grade real-money trading is not ready.
+- **Baseline main commit inspected:** `86d7717b7b7dbab626162cfa6f8e56f8dbad6d01`
+- **Mode:** Analyzer/Paper.
+- **Live trading:** Disabled.
+- **Order placement:** Blocked.
+- **Broker:** Dhan appears connected in latest endpoint coverage proof.
+- **Official readiness:** Not trade-ready.
+- **Production-grade real trading:** Not ready.
 
 ---
 
-## Capability and limitation statement
+# Current proof-truth snapshot
 
-### What can be checked from GitHub/repo proof
-
-- Latest committed code and reports.
-- Proof matrices and generated JSON artifacts.
-- Render configuration stored in `render.yaml`.
-- Dashboard backend/frontend source.
-- Scheduler configuration and job-runner compatibility.
-- Safety flags, hardcoded live-disabled settings, and placeholder execution modules.
-- Public endpoint coverage artifacts committed to repo.
-
-### What cannot be fully proven from repo alone
-
-- Current Render secret values.
-- Current Dhan token value or expiry internals.
-- Render worker live logs unless exported/provided.
-- True market-open behavior before market opens.
-- Broker orderbook/tradebook/position truth without broker runtime proof.
-- Real live order placement, because live trading is disabled and wrapper is placeholder.
+| Area | Current truth | Proof path | Status |
+|---|---|---|---|
+| Master matrix | 8 gates published, but `trade_ready=false`, verdict `ANALYZER_READY_PROOF_INCOMPLETE` | `reports/latest/proof_status_matrix/proof_status_matrix.json` | NOT_PRODUCTION_READY |
+| Full pipeline | Blocker remains: `live_market_analyzer_paper_trade_not_proven` | `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json` | NOT_TRADE_READY |
+| Broker | `/api/broker/status` shows Dhan connected, error null, order placement blocked | `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json` | ANALYZER_OK |
+| Health | `/api/health` says `data_source=live`, status ok, broker connected | `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json` | PARTIAL_PASS |
+| State | `/api/state` says `data_source=SYNTHETIC`, no signal, no positions, contracts_total 0, underlyings 0 | `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json` | BLOCKER |
+| Lifecycle | Summary marks PASS, but latest artifact is weekend/fallback/simulated paper flow | `reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json` | FALSE_PASS_RISK |
+| Model | Fresh training metrics proven, but `promotion_allowed=false` | `reports/latest/model_training_load_proof/summary.json` | PASS_WITH_WARNINGS |
+| Backtest | Costed walk-forward proven, but only 8 trades / 8 walk pairs | `reports/latest/recent_backtest_walkforward_proof/summary.json` | SMALL_SAMPLE_PASS |
+| Dashboard | Endpoint coverage exists; browser visual truth and API/DB reconciliation are false | `reports/latest/dashboard_truth_proof/summary.json` | PASS_WITH_WARNINGS |
+| Live execution | Dhan live wrapper is skeleton and returns NOT_IMPLEMENTED outside dry-run | `core/broker/dhan_live_order_wrapper.py` | HARD_BLOCKER |
+| Render runtime | Web + worker configured; live flags hardcoded off; persistent disk commented | `render.yaml` | ANALYZER_ONLY |
+| PR #35 | Scheduler fix PR exists but became non-mergeable after main moved | PR #35 | NEEDS_REBASE_OR_REAPPLY |
 
 ---
 
-# Current truth summary
+# Final production-grade verdict
 
-## Current PASS / improvement items
+```text
+NOT PRODUCTION-GRADE FOR REAL MONEY TRADING.
+```
 
-- Render backend is reachable.
-- Dashboard UI loads.
-- Dhan broker connectivity appears fixed in latest endpoint coverage.
-- `/api/broker/status` proof shows broker connected and no broker error in latest endpoint coverage.
-- Live trading is off.
-- Real order placement is blocked.
-- Proof matrix has 8 published gates.
-- Backtest/walk-forward proof now reports PASS with cost/slippage included.
-- Model training/load proof reports fresh training metrics proven, but promotion remains blocked.
-- Dashboard endpoint coverage exists.
-- HEAD `/` 405 issue was reportedly fixed by latest Claude commit.
+Current system is cloud Analyzer/Paper capable, and broker connectivity appears improved, but production real trading is blocked because:
 
-## Current production-grade blockers
-
-- `trade_ready` remains false.
-- Full pipeline still blocks on `live_market_analyzer_paper_trade_not_proven`.
-- Real live order wrapper is still a skeleton / NOT_IMPLEMENTED.
-- `/api/state` still reports `data_source: SYNTHETIC` in latest endpoint coverage.
-- Health/state source truth is inconsistent: health says live, state says synthetic.
-- Lifecycle proof can mark fallback/weekend/simulated paper path as PASS.
-- Live option-chain/tradability proof is missing.
-- Real market-day signal -> paper order -> real LTP exit -> charges -> net P&L is not proven.
-- Dashboard browser visual truth remains not proven.
-- API/DB/report reconciliation remains not proven.
-- Model promotion policy is missing/blocked.
-- Persistent storage is not enabled in `render.yaml`.
-- Worker runtime logs and heartbeats are not proven from repo alone.
-- Dashboard/API production auth is not proven.
-- Public docs remain reachable unless protected outside the repo.
+1. `trade_ready=false`.
+2. Full pipeline still has `live_market_analyzer_paper_trade_not_proven`.
+3. Real Dhan order wrapper is skeleton / NOT_IMPLEMENTED.
+4. Live trading flags are disabled in source and Render.
+5. `/api/state` still reports `SYNTHETIC` data.
+6. `/api/health` and `/api/state` disagree on data source.
+7. Lifecycle proof can falsely pass fallback/weekend/simulated data.
+8. Real live option contract tradability is not proven.
+9. Real market-day signal -> paper order -> real LTP exit -> charges -> net P&L is not proven.
+10. Browser visual dashboard truth is not proven.
+11. API/DB/report reconciliation is not proven.
+12. Model promotion remains blocked.
+13. Persistent storage is not enabled.
+14. Worker runtime logs and heartbeats are not proven.
+15. Production auth/security hardening is not proven.
 
 ---
 
-# Claude / agent self-verification protocol
+# Non-negotiable rules for Claude and all agents
 
-Claude must read this section before making any future readiness claim.
+## Rule 1 - Never call simulated lifecycle proof production proof
 
-## Rule 1 - Never call simulated proof production proof
+A lifecycle proof is **not production-grade** if any are true:
 
-A lifecycle proof is **not production-grade** if any of these are true:
+- market is weekend/holiday/pre-market/post-market/closed
+- `dry_run=true`
+- `force=true`
+- token is `DRY_RUN_TOKEN`, `FALLBACK_TOKEN`, missing, or not broker verified
+- source is fallback/synthetic/mock/dry-run/sample/fixture
+- exit price is generated by formula, such as fixed +5%
+- fill has no real quote timestamp
+- exit has no real quote/LTP timestamp
+- broker connection is only public status, not linked to quote/tradebook proof
 
-- `market_status` contains weekend, holiday, pre-market, post-market, or closed.
-- `dry_run=true`.
-- `force=true`.
-- `instrument_token` is `DRY_RUN_TOKEN`, `FALLBACK_TOKEN`, missing, or not broker-verified.
-- `source` contains fallback, synthetic, mock, dry-run, sample, seeded, or fixture.
-- exit price is generated by formula instead of real market quote/LTP.
-- broker connection is checked only by public status endpoint and not linked to real quote/tradebook proof.
-- paper fill has no quote timestamp and no live LTP timestamp.
-
-If any are true, lifecycle status can be at most:
+If any are true, status must be at most:
 
 ```text
 PASS_WITH_WARNINGS
@@ -143,68 +135,42 @@ PASS_WITH_WARNINGS
 
 It must not clear production readiness.
 
-## Rule 2 - Production-ready lifecycle PASS requirements
+## Rule 2 - Real market paper lifecycle PASS requirements
 
-A real market analyzer/paper lifecycle proof requires all of the following:
+A real market paper lifecycle PASS requires all:
 
-- Market is open during NSE/BSE options market hours.
-- Broker is connected.
-- Real live quote or option-chain data is present.
-- Signal source is non-fallback and non-synthetic.
-- Instrument token is verified against broker/NSE option universe.
-- Expiry and strike are valid and tradable.
-- Bid/ask or LTP exists and is fresh.
-- Spread and liquidity are checked.
-- Paper order is created with real quote timestamp.
-- Paper fill is simulated using real quote/LTP, not fixed formula.
-- Exit price is based on real quote/LTP stream or a documented market quote snapshot.
-- Charges, brokerage, slippage, gross P&L, and net P&L are calculated.
-- Order/fill/exit/P&L are reconciled.
-- Dashboard shows the same counts and P&L as the report.
-- No live order is placed.
+- market open
+- broker connected
+- real live quote or option-chain data
+- non-fallback signal
+- real broker/NSE option instrument token
+- valid expiry and strike
+- bid/ask/LTP fresh
+- spread/liquidity check
+- lot size and quantity check
+- paper entry using real quote timestamp
+- paper fill based on quote/LTP, not fixed formula
+- exit based on real quote/LTP snapshot
+- charges, brokerage, slippage, gross P&L, net P&L
+- order/fill/exit/P&L reconciliation
+- dashboard count and P&L match proof report
+- no live order placed
 
-## Rule 3 - Production dashboard PASS requirements
+## Rule 3 - Official readiness authority
 
-Dashboard is not production-grade unless it visibly shows:
+Production real trading is blocked unless all are true:
 
-- Broker connection: connected/disconnected.
-- Data source: broker-live/synthetic/fallback.
-- Market status: open/closed/holiday.
-- Live trading: off/on.
-- Real order placement: blocked/allowed.
-- Latest quote timestamp and age.
-- Latest signal timestamp and source.
-- Current contract validation: underlying, expiry, strike, token, lot size, bid, ask, spread.
-- Latest paper lifecycle status.
-- Broker/order/position reconciliation.
-- Daily P&L and risk limits.
-- Proof matrix status.
-- Production readiness status.
-
-The UI must show red/not-ready if:
-
-- data source is synthetic
-- broker disconnected
-- market closed
-- no live signal
-- no real option contract proof
-- proof matrix trade_ready is false
-
-## Rule 4 - Official `trade_ready` is the final authority
-
-Even if a component says PASS, production real trading is blocked unless all of these are true:
-
-- `reports/latest/proof_status_matrix/proof_status_matrix.json` has `trade_ready: true`
-- `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json` has `trade_ready: true`
-- live order wrapper is implemented and tested
+- `reports/latest/proof_status_matrix/proof_status_matrix.json` has `trade_ready=true`
+- `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json` has `trade_ready=true`
+- real order wrapper implemented and tested
 - risk manager passes
 - dashboard truth passes
-- broker reconciliation passes
+- broker orderbook/tradebook/position reconciliation passes
 - explicit user approval exists
 
-## Rule 5 - Do not enable live trading from automation
+## Rule 4 - Do not enable live trading from automation
 
-No agent should set these to true/1 without explicit user instruction and complete proof trail:
+Do not set these true/1 from automation:
 
 - `LIVE_TRADING_ENABLED`
 - `USE_LIVE_EXECUTION_ENGINE`
@@ -212,418 +178,394 @@ No agent should set these to true/1 without explicit user instruction and comple
 
 ---
 
-# Detailed findings
+# Continuous Claude execution pack
 
-## A. Hard blockers for production-grade real trading
-
-### B01 - Live trading is intentionally disabled
-
-**Evidence paths:**
-
-- `config/live_trade_config.py`
-- `render.yaml`
-- `reports/latest/proof_status_matrix/proof_status_matrix.json`
-
-**Observation:** Live trading flags remain off by design:
-
-- `LIVE_TRADING_ENABLED = False`
-- `USE_LIVE_EXECUTION_ENGINE = False`
-- Render env keeps `LIVE_TRADING_ENABLED=0` and `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
-
-**Impact:** Production real trade cannot occur until a controlled approval process enables live trading after proof gates pass.
-
-**Recommendation:** Do not enable live flags until 5+ market-day analyzer/paper proofs, broker reconciliation, model acceptance, risk controls, and dashboard truth are proven.
-
----
-
-### B02 - Real Dhan order execution wrapper is not implemented
-
-**Evidence path:**
-
-- `core/broker/dhan_live_order_wrapper.py`
-
-**Observation:** The wrapper is still a skeleton. It returns dry-run IDs in dry mode and returns `NOT_IMPLEMENTED - Real DhanHQ integration pending` outside dry-run.
-
-**Impact:** Even if live flags are turned on, real order placement/cancel/status is not production implemented.
-
-**Recommendation:** Implement Dhan order placement, cancel, and status refresh only after analyzer/paper proof is stable. Add mandatory safety gates before any real order call.
-
----
-
-### B03 - Official pipeline still says trade-ready false
-
-**Evidence path:**
-
-- `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json`
-
-**Observation:** Latest report still shows:
-
-- `trade_ready: false`
-- `verdict: NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR`
-- blocker: `live_market_analyzer_paper_trade_not_proven`
-
-**Impact:** The system's own official readiness gate blocks real trading.
-
-**Recommendation:** Keep final readiness blocked until real market-day paper lifecycle is proven with broker connected, non-fallback signal, real quote/LTP, real option token, and reconciled net P&L.
-
----
-
-## B. Market/data blockers
-
-### D01 - `/api/state` still shows synthetic data
-
-**Evidence path:**
-
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`
-
-**Observation:** Broker connection is shown as connected in endpoint coverage, but `/api/state` reports `data_source: SYNTHETIC`.
-
-**Impact:** Production trade decisioning must not rely on synthetic state.
-
-**Recommendation:** Enforce a hard production blocker if `/api/state.data_source` is not real broker/live-confirmed. Add visible dashboard red banner: `SYNTHETIC DATA - NOT TRADE READY`.
-
----
-
-### D02 - Health and state data-source truth are inconsistent
-
-**Evidence path:**
-
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`
-
-**Observation:** `/api/health` says data source is live, but `/api/state` says data source is synthetic.
-
-**Impact:** Production trading requires a single source of truth. Inconsistent health/state can mislead the operator.
-
-**Recommendation:** Define authoritative runtime state and make all endpoints derive from it. Fail dashboard readiness if endpoint truth disagrees.
-
----
-
-### D03 - Live option-chain tradability proof is missing
-
-**Evidence path:**
-
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`
-
-**Observation:** Current state does not prove non-zero contracts, underlyings, live option tokens, spreads, expiry, or strike tradability.
-
-**Impact:** Options trading can fail or select non-tradable/illiquid contracts.
-
-**Recommendation:** Before any trade-ready status, prove: underlying, expiry, strike, instrument token, bid/ask/ltp, spread, lot size, freeze quantity, and F&O eligibility.
-
----
-
-## C. Lifecycle proof governance blockers
-
-### L01 - Lifecycle proof can pass fallback/weekend simulated flow
-
-**Evidence paths:**
-
-- `scripts/paper_lifecycle_proof.py`
-- `reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json`
-- `reports/latest/analyzer_paper_lifecycle_proof/summary.json`
-
-**Observation:** A lifecycle artifact is marked `PASS` even though it used:
-
-- `market_status: Weekend (Sunday)`
-- `instrument_token: FALLBACK_TOKEN`
-- `source: BHAVCOPY_FALLBACK`
-- simulated paper exit
-
-**Impact:** This can falsely clear readiness even without real market, real contract, or real LTP/exit proof.
-
-**Recommendation:** Update proof logic so `PASS` requires all of:
-
-- market open
-- broker connected
-- non-fallback signal
-- real instrument token
-- real quote/LTP timestamp
-- real paper fill model
-- real exit price from quote stream
-- full charges and net P&L calculation
-- no `--force` and no dry-run
-
-Fallback/weekend/simulation should be `PASS_WITH_WARNINGS` at best and must not clear production readiness.
-
----
-
-### L02 - Mandatory lifecycle fields are incomplete
-
-**Evidence path:**
-
-- `scripts/paper_lifecycle_proof.py`
-
-**Observation:** Current mandatory field check is weaker than production lifecycle needs.
-
-**Impact:** A lifecycle proof can pass without full execution audit fields.
-
-**Recommendation:** Mandatory proof fields should include:
-
-- `signal_id`
-- `symbol`
-- `underlying`
-- `instrument_token`
-- `expiry`
-- `strike`
-- `option_type`
-- `qty`
-- `lot_size`
-- `entry_time`
-- `entry_quote_ts`
-- `entry_price`
-- `order_id`
-- `fill_status`
-- `exit_time`
-- `exit_quote_ts`
-- `exit_price`
-- `charges`
-- `gross_pnl`
-- `net_pnl`
-- `proof_status`
-- `source_type`
-- `tradability_status`
-
----
-
-## D. Model/prediction blockers
-
-### M01 - Model promotion remains blocked
-
-**Evidence path:**
-
-- `reports/latest/model_training_load_proof/summary.json`
-
-**Observation:** Fresh training pipeline proof exists, but `promotion_allowed: false` and warning `model_promotion_remains_blocked_without_policy` remains.
-
-**Impact:** Prediction model is not production-promoted.
-
-**Recommendation:** Define promotion policy requiring multiple market days, minimum sample size, costed P&L, drawdown, stability, and no data leakage.
-
----
-
-### M02 - Dashboard accuracy is weak / insufficient history
-
-**Evidence source:** Dashboard screenshot provided by operator.
-
-**Observation:** Dashboard shows Spearman rho around `0.200`, status `WEAK`, and only `1 day` of accuracy history.
-
-**Impact:** This is insufficient for production-grade strategy confidence.
-
-**Recommendation:** Require a rolling validation window with minimum 20 trading days or clearly label predictions as experimental.
-
----
-
-## E. Dashboard/product safety blockers
-
-### U01 - Dashboard endpoint coverage passes, but browser truth is not proven
-
-**Evidence paths:**
-
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`
-- `reports/latest/dashboard_truth_proof/summary.json`
-
-**Observation:** Required and optional API endpoints are reachable, but browser visual truth remains unproven in CI.
-
-**Impact:** UI values may not match backend truth.
-
-**Recommendation:** Add Playwright/screenshot/DOM proof that checks visible status cards against `/api/state`, `/api/health`, and `/api/broker/status`.
-
----
-
-### U02 - UI wording can mislead operator
-
-**Evidence source:** Dashboard screenshot provided by operator.
-
-**Observation:** Dashboard shows `BROKER LIVE` while also showing `LIVE TRADING OFF`. The word `LIVE` may be confused with real trading.
-
-**Impact:** Operator can misread broker connectivity as live trading enabled.
-
-**Recommendation:** Rename card to `BROKER CONNECTED`, and separately show `REAL ORDER PLACEMENT: BLOCKED`.
-
----
-
-### U03 - Synthetic data must be a hard red dashboard blocker
-
-**Evidence paths:**
-
-- Dashboard screenshot provided by operator.
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`.
-
-**Observation:** Dashboard shows `DATA SOURCE: SYNTHETIC`, but proof gates show `8/8`, which can create false confidence.
-
-**Impact:** Operator may think the system is ready while the runtime state is synthetic.
-
-**Recommendation:** Add a production readiness banner:
-
-`PRODUCTION READY: NO - data source is SYNTHETIC`
-
-The UI should not show green production status while synthetic data is active.
-
----
-
-### U04 - Dashboard cards need clearer production-grade semantics
-
-**Evidence source:** Dashboard screenshot provided by operator.
-
-**Observation:** Current overview cards are useful but insufficient for production trading decisions.
-
-**Required dashboard cards before production:**
-
-- Broker connection: connected/disconnected
-- Real data source: broker-live/synthetic/fallback
-- Market status: open/closed/holiday
-- Live trading: off/on
-- Order placement: blocked/allowed
-- Current contract validation: expiry, token, strike, lot size, bid/ask, spread
-- Latest quote timestamp and freshness age
-- Last signal timestamp and source
-- Latest paper order lifecycle state
-- Latest broker orderbook/tradebook reconciliation
-- Risk limit status
-- Daily loss limit status
-- Proof matrix status
-
----
-
-### U05 - Public dashboard/API hardening not proven
-
-**Evidence paths:**
-
-- `dashboard/backend/app.py`
-- Public `/ui` and `/docs` observations
-
-**Observation:** Public dashboard and Swagger docs are accessible. CORS has previously been development-grade.
-
-**Impact:** Production trading dashboard should not be publicly accessible without authentication.
-
-**Recommendation:** Require authentication, disable public docs in production, restrict CORS to approved origins, and add rate-limits/security headers.
-
----
-
-## F. Infrastructure/runtime blockers
-
-### I01 - Persistent storage is not enabled in Render config
-
-**Evidence path:**
-
-- `render.yaml`
-
-**Observation:** Persistent disk block is commented out.
-
-**Impact:** Runtime state, paper ledgers, and logs may be lost across restarts/redeploys unless external storage is used.
-
-**Recommendation:** Use persistent disk or external DB for all proof, order, signal, and audit ledgers.
-
----
-
-### I02 - Worker runtime proof needs live Render logs
-
-**Evidence path:**
-
-- `render.yaml`
-
-**Observation:** Worker service is configured, but repo alone does not prove live worker loop health, restart recovery, daemon uptime, or scheduler fire history.
-
-**Impact:** Production trading requires proven continuous background processing.
-
-**Recommendation:** Export worker logs or write worker heartbeats to a durable location. Required heartbeat fields: token daemon, watchdog, scheduler, last job run, next job, crash count, restart count.
-
----
-
-## G. Security/production blockers
-
-### S01 - Public docs should not remain open for production trading
-
-**Evidence path:**
-
-- `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`
-
-**Observation:** `/docs` is reachable in endpoint proof.
-
-**Impact:** Public API docs increase exposure for a trading dashboard.
-
-**Recommendation:** Disable docs in production or protect with authentication.
-
----
-
-### S02 - Authentication proof is missing
-
-**Evidence source:** Public dashboard loads at `/ui`.
-
-**Observation:** No repo proof confirms login/session requirement for dashboard access.
-
-**Impact:** Production trading dashboard state should not be publicly visible.
-
-**Recommendation:** Add auth middleware before production trading features.
-
----
-
-# Action checklist for Claude
-
-Claude should run these checks before any patch:
+Claude must start every session with:
 
 ```bash
 cd /workspaces/Genesis_System3
 git fetch origin
+echo "LOCAL=$(git rev-parse HEAD)"
+echo "MAIN=$(git rev-parse origin/main)"
 git status --short --untracked-files=all
-git rev-parse HEAD
-git rev-parse origin/main
 ```
 
-Claude should not patch blindly if local HEAD does not match the intended branch.
+Claude must not patch blindly if local HEAD does not match the intended branch.
 
-## Priority 1 - Proof governance correction
+## Step A - Re-check current official reports
+
+```bash
+cd /workspaces/Genesis_System3
+cat reports/latest/proof_status_matrix/proof_status_matrix.json
+cat reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json
+cat reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json
+cat reports/latest/dashboard_truth_proof/summary.json
+cat reports/latest/analyzer_paper_lifecycle_proof/summary.json
+```
+
+Expected current blocker:
+
+```text
+live_market_analyzer_paper_trade_not_proven
+```
+
+## Step B - Patch lifecycle proof governance
 
 Files:
 
 - `scripts/paper_lifecycle_proof.py`
 - `scripts/system3_master_proof_orchestrator.py`
 
-Required result:
+Required behavior:
 
-- Weekend/fallback/simulated lifecycle cannot become clean `PASS`.
-- `trade_ready` stays false until market-day real data paper lifecycle is proven.
+- Weekend/fallback/simulated lifecycle cannot become clean PASS.
+- If market closed, status must be `PASS_WITH_WARNINGS` or `SKIPPED`.
+- If token is fallback/dry-run, production lifecycle false.
+- If signal is fallback/synthetic/dry-run, production lifecycle false.
+- If exit price is formula-generated, production lifecycle false.
+- `trade_ready` remains false until real market-day paper lifecycle is proven.
 
-## Priority 2 - Runtime truth reconciliation
+Required proof after patch:
 
-Endpoints:
+```bash
+python scripts/paper_lifecycle_proof.py --force || true
+python scripts/system3_master_proof_orchestrator.py --auto-fix || true
+cat reports/latest/analyzer_paper_lifecycle_proof/summary.json
+cat reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json
+cat reports/latest/proof_status_matrix/proof_status_matrix.json
+```
+
+Acceptance target outside market hours:
+
+```json
+{
+  "full_lifecycle_proven": false,
+  "status": "PASS_WITH_WARNINGS",
+  "trade_ready": false
+}
+```
+
+## Step C - Fix runtime truth reconciliation
+
+Endpoints that must agree:
 
 - `/api/health`
 - `/api/state`
 - `/api/broker/status`
 - `/api/gain_rank`
 
-Required result:
+Current problem:
+
+- health says `data_source=live`
+- state says `data_source=SYNTHETIC`
+
+Required behavior:
 
 - one authoritative state source
-- synthetic data produces red blocker
-- health/state cannot disagree on data source
+- if `/api/state.data_source=SYNTHETIC`, all readiness outputs must say not production ready
+- if contracts_total = 0 or underlyings = 0, option trading readiness false
+- no dashboard green production status while synthetic/no-contract/no-signal state exists
 
-## Priority 3 - Dashboard production safety
+Required proof:
 
-Files:
+```bash
+python scripts/dashboard_endpoint_coverage_proof.py
+cat reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json
+cat reports/latest/dashboard_truth_proof/summary.json
+```
 
-- `dashboard/app.js`
-- `dashboard/index.html`
-- `dashboard/backend/app.py`
+## Step D - Dashboard production verification
 
-Required result:
+Layer 1 API check:
 
-- UI must show `PRODUCTION READY: NO` when synthetic/fallback/no-contract/no-market-proof is active.
-- `BROKER LIVE` should be renamed to `BROKER CONNECTED`.
-- `LIVE TRADING OFF` and `ORDER PLACEMENT BLOCKED` must remain clearly visible.
+```bash
+curl -sS https://genesis-system3-backend.onrender.com/api/health | python -m json.tool
+curl -sS https://genesis-system3-backend.onrender.com/api/state | python -m json.tool
+curl -sS https://genesis-system3-backend.onrender.com/api/broker/status | python -m json.tool
+curl -sS https://genesis-system3-backend.onrender.com/api/gain_rank | python -m json.tool
+```
 
-## Priority 4 - Infrastructure proof
+Layer 2 browser truth must prove:
 
-Required result:
+- UI shows `PRODUCTION READY: NO` when `trade_ready=false`
+- UI shows `DATA SOURCE: SYNTHETIC` as red/blocker
+- UI uses `BROKER CONNECTED`, not misleading `BROKER LIVE`
+- UI shows `LIVE TRADING OFF`
+- UI shows `ORDER PLACEMENT BLOCKED`
+- UI shows `MARKET CLOSED` if market closed
+- UI shows latest proof matrix status
 
-- worker heartbeat proof
-- scheduler fire proof
-- token watchdog proof
-- persistent audit/log storage proof
+Required proof artifacts:
+
+- screenshot path
+- DOM text dump path
+- API-vs-DOM comparison JSON
+
+Layer 3 API/DB/report reconciliation:
+
+| Field | API source | UI source | Report source | Must match? |
+|---|---|---|---|---|
+| broker connected | `/api/broker/status` | broker card | endpoint coverage | yes |
+| live trading | `/api/health` | safety card | proof matrix | yes |
+| data source | `/api/state` | data source card | endpoint coverage | yes |
+| trade ready | pipeline report | production banner | proof matrix | yes |
+| signal | `/api/state` or `/api/gain_rank` | signal card | lifecycle proof | yes |
+| P&L | `/api/pnl` | P&L card | paper lifecycle | yes |
+
+## Step E - Reapply scheduler PR safely
+
+PR #35 became non-mergeable after main moved. Claude should re-check current scheduler config and reapply only if needed.
+
+Required check:
+
+```bash
+cat config/system3_job_scheduler.json
+sed -n '90,170p' core/engine/system3_phase82_job_scheduler.py
+```
+
+Correct job format should use:
+
+```json
+{
+  "id": "paper_lifecycle_proof",
+  "script": "scripts/paper_lifecycle_proof.py",
+  "args": [],
+  "weekdays_only": true,
+  "schedule_time": "09:30",
+  "timezone": "Asia/Kolkata"
+}
+```
+
+Do not use unsupported `function`, `kwargs`, or unrecognized `days` unless scheduler code explicitly supports them.
+
+## Step F - Model promotion policy
+
+Current proof says fresh metrics exist, but `promotion_allowed=false`.
+
+Claude must create or update a promotion policy requiring:
+
+- minimum 20 market days or explicitly justified smaller sample
+- minimum paper trade count
+- costed net P&L positive after brokerage/slippage
+- max drawdown threshold
+- stability across regimes
+- no data leakage check
+- shadow model comparison
+- rollback plan
+
+Until then dashboard should show:
+
+```text
+MODEL STATUS: EXPERIMENTAL / NOT PROMOTED
+```
+
+## Step G - Infrastructure proof
+
+Render config has worker service, but runtime proof is incomplete.
+
+Claude must produce a durable worker heartbeat artifact containing:
+
+- token daemon status
+- token watchdog status
+- scheduler status
+- last job run
+- next scheduled job
+- crash count
+- restart count
+- uptime
+- last broker status
+
+Persistent storage is not enabled because Render disk is commented. Claude must not claim production persistence until disk or external DB proof exists.
+
+---
+
+# Dashboard production cards required
+
+Before production trading, dashboard must show all of these clearly:
+
+1. Production Ready: YES/NO
+2. Trade Ready: YES/NO
+3. Broker Connected: YES/NO
+4. Data Source: LIVE/SYNTHETIC/FALLBACK
+5. Market Status: OPEN/CLOSED/HOLIDAY
+6. Live Trading: OFF/ON
+7. Order Placement: BLOCKED/ALLOWED
+8. Current Underlying
+9. Current Option Token
+10. Expiry
+11. Strike
+12. Option Type CE/PE
+13. Bid
+14. Ask
+15. LTP
+16. Spread
+17. Quote timestamp
+18. Quote age seconds
+19. Liquidity status
+20. Signal source
+21. Signal timestamp
+22. Signal confidence
+23. Paper order status
+24. Paper fill status
+25. Exit status
+26. Gross P&L
+27. Charges
+28. Net P&L
+29. Broker orderbook reconciliation
+30. Broker tradebook reconciliation
+31. Position reconciliation
+32. Risk limit status
+33. Daily loss status
+34. Proof matrix verdict
+35. Last proof generation time
+
+---
+
+# Detailed issue map
+
+## B01 - Live trading intentionally disabled
+
+Evidence: `config/live_trade_config.py`, `render.yaml`, `reports/latest/proof_status_matrix/proof_status_matrix.json`.
+
+Observation: Live flags are OFF. Render keeps live disabled.
+
+Recommendation: Keep off until all proof gates pass.
+
+## B02 - Real Dhan order execution not implemented
+
+Evidence: `core/broker/dhan_live_order_wrapper.py`.
+
+Observation: Wrapper is skeleton and returns NOT_IMPLEMENTED outside dry-run.
+
+Recommendation: Implement only after analyzer/paper is stable.
+
+## B03 - Official pipeline is not trade-ready
+
+Evidence: `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json`.
+
+Observation: `trade_ready=false`, `proven_live_market_paper_trade_today=false`.
+
+Recommendation: Need market-day real broker-connected paper lifecycle proof.
+
+## D01 - `/api/state` reports synthetic data
+
+Evidence: `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`.
+
+Observation: `/api/state.data_source=SYNTHETIC`, signals `NO_TRADE`, contracts_total 0, underlyings 0.
+
+Recommendation: Synthetic must force `PRODUCTION READY: NO`.
+
+## D02 - Health/state source truth conflict
+
+Evidence: `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`.
+
+Observation: `/api/health.data_source=live`; `/api/state.data_source=SYNTHETIC`.
+
+Recommendation: One authoritative runtime state.
+
+## D03 - Live option-chain tradability missing
+
+Evidence: `reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json`.
+
+Observation: no proof of tradable expiry, strike, broker token, bid/ask, spread, lot size, or liquidity.
+
+Recommendation: Add tradability gate.
+
+## L01 - Lifecycle false PASS risk
+
+Evidence: `scripts/paper_lifecycle_proof.py`, `reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json`.
+
+Observation: PASS despite weekend, fallback token, fallback source, simulated exit.
+
+Recommendation: Change PASS logic.
+
+## L02 - Mandatory lifecycle fields incomplete
+
+Evidence: `scripts/paper_lifecycle_proof.py`.
+
+Observation: missing qty/order_id/fill_status/charges/gross_pnl/quote timestamps/tradability status/proof status.
+
+Recommendation: Expand mandatory fields.
+
+## M01 - Model promotion blocked
+
+Evidence: `reports/latest/model_training_load_proof/summary.json`.
+
+Observation: `fresh_training_metrics_proven=true`, `promotion_allowed=false`.
+
+Recommendation: Add promotion policy.
+
+## M02 - Accuracy history insufficient
+
+Evidence: user dashboard screenshot.
+
+Observation: weak Spearman and only 1 day history.
+
+Recommendation: label experimental until rolling validation passes.
+
+## U01 - Browser visual truth not proven
+
+Evidence: `reports/latest/dashboard_truth_proof/summary.json`.
+
+Observation: `browser_visual_truth_proven=false`, `api_db_report_reconciliation_proven=false`.
+
+Recommendation: Add browser screenshot/DOM/API comparison proof.
+
+## U02 - Dashboard wording can mislead
+
+Evidence: user dashboard screenshot.
+
+Observation: `BROKER LIVE` can be confused with live trading.
+
+Recommendation: Rename to `BROKER CONNECTED` and show `REAL ORDER PLACEMENT: BLOCKED`.
+
+## U03 - Synthetic data must be hard red blocker
+
+Evidence: screenshot and endpoint coverage.
+
+Observation: UI can show 8/8 gates while data is synthetic.
+
+Recommendation: add red banner `PRODUCTION READY: NO - data source is SYNTHETIC`.
+
+## U04 - Public dashboard/API hardening not proven
+
+Evidence: public `/ui` and `/docs` behavior.
+
+Recommendation: Add auth, disable/protect docs, restrict CORS, add security headers and rate limits.
+
+## I01 - Persistent storage not enabled
+
+Evidence: `render.yaml` disk block commented.
+
+Recommendation: use persistent disk or external DB.
+
+## I02 - Worker runtime proof missing
+
+Evidence: `render.yaml` config only.
+
+Recommendation: add worker heartbeat artifact.
+
+---
+
+# Claude action-result update format
+
+After every Claude action, append one update row and list:
+
+- modified source files
+- proof JSON files
+- screenshot/DOM proof files
+- command output files
+- commit SHA
+- final status
+
+Example:
+
+```text
+2026-06-15 09:45 IST | Claude | <commit> | lifecycle | Ran market paper lifecycle with broker connected and non-fallback token | reports/latest/analyzer_paper_lifecycle_proof/<file>.json | PASS_WITH_WARNINGS
+```
 
 ---
 
 ## Current final statement
 
-The system is currently **cloud Analyzer/Paper ready**, with Dhan broker connectivity now appearing healthy in latest endpoint proof. It is **not production-grade for real trade** because live execution is disabled/not implemented, `/api/state` still reports synthetic data, lifecycle proof can pass fallback/weekend simulated flows, dashboard browser truth is incomplete, model promotion is blocked, public hardening is not proven, persistent storage is not enabled, worker runtime proof is incomplete, and official `trade_ready` remains false.
+The system is cloud Analyzer/Paper capable and Dhan broker connectivity appears healthy in endpoint proof. It is **not production-grade for real trade** because live execution is disabled/not implemented, `/api/state` still reports synthetic data, lifecycle proof can pass fallback/weekend/simulated flows, dashboard browser truth is incomplete, API/DB/report reconciliation is incomplete, model promotion is blocked, public hardening is not proven, persistent storage is not enabled, worker runtime proof is incomplete, and official `trade_ready` remains false.
