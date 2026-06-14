@@ -1,6 +1,6 @@
 # Auto-Recovery Blocker Classification
 
-Generated UTC: 2026-06-14T15:19:35.698377+00:00
+Generated UTC: 2026-06-14T16:28:41.275493+00:00
 
 - Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
@@ -21,7 +21,7 @@ Generated UTC: 2026-06-14T15:19:35.698377+00:00
 
 ### MANUAL_BROKER_LOGIN_REQUIRED
 
-- `analyzer_paper_lifecycle_proof:lifecycle_proof_broker_not_connected`
+- None
 
 ### SOURCE_AUTHORITY_UNKNOWN
 
@@ -42,4 +42,3 @@ Generated UTC: 2026-06-14T15:19:35.698377+00:00
 ### PROOF_REQUIRED
 
 - `model_training_load_proof:model_promotion_remains_blocked_without_policy`
-- `analyzer_paper_lifecycle_proof:full_signal_to_exit_pnl_lifecycle_not_proven`

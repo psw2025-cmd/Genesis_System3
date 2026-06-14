@@ -8,25 +8,25 @@
   "head": {
     "cmd": "git rev-parse HEAD",
     "rc": 0,
-    "stdout": "dac219c6b14254b200594c944f1567e5ba5e94e9\n",
+    "stdout": "7d23907f1b38e669a84dac16905839e433102084\n",
     "stderr": ""
   },
   "origin_head": {
     "cmd": "git rev-parse origin/main",
     "rc": 0,
-    "stdout": "dac219c6b14254b200594c944f1567e5ba5e94e9\n",
+    "stdout": "7d23907f1b38e669a84dac16905839e433102084\n",
     "stderr": ""
   },
   "status": {
     "cmd": "git status --short --untracked-files=all",
     "rc": 0,
-    "stdout": " M config/system3_job_scheduler.json\n M dashboard/backend/app.py\n M reports/latest/analyzer_paper_lifecycle_proof/summary.json\n?? reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json\n?? reports/latest/live_current_issue_check/LIVE_CURRENT_ISSUE_REPORT.md\n?? reports/latest/live_current_issue_check/compile_results.json\n?? reports/latest/live_current_issue_check/endpoint_results.json\n?? reports/latest/live_current_issue_check/git_status.json\n?? reports/latest/live_current_issue_check/issues.json\n?? reports/latest/live_current_issue_check/live_current_issue_check.py\n?? reports/latest/live_current_issue_check/live_current_issue_check_20260614_141612.zip\n?? reports/latest/live_current_issue_check/live_current_issue_check_20260614_142201.zip\n?? reports/latest/live_current_issue_check/summary.json\n?? scripts/paper_lifecycle_proof.py\n",
+    "stdout": " M dashboard/backend/app.py\n",
     "stderr": ""
   },
   "recent": {
     "cmd": "git log --oneline -8",
     "rc": 0,
-    "stdout": "dac219c6 feat(proof): cloud health proof \u2014 8/8 gates PASS, 0 blockers\n2465e35f chore(cleanup): remove 2157 files of repo clutter + update .gitignore\n12a510ab feat(cloud): add Render worker service + cloud-safe token manager\nb16d91eb chore(audit): add full repo scan report + update CHANGE_LOG session 7\n2e19498f fix(security): clear CI safety_and_secrets blockers + remove Angel One remnants\nad356bff fix(codespace): install deps on startup + wire job scheduler daemon\n2ace4db9 chore(codespaces): add startup service hook\n7c2112f8 feat(signal): activate ml_confidence weight \u2014 bhavcopy signal engine runner\n",
+    "stdout": "7d23907f fix(dashboard): broker KPI shows CONN not LIVE to avoid confusion with live trading\n2c2d61b3 feat(dashboard): complete institutional-grade UI rebuild \u2014 Bloomberg dark theme\ne0a9775d fix(proof): clear all 8 orchestrator gate blockers \u2014 ANALYZER_READY achieved\n7678433d chore(docs): update CHANGE_LOG + SYSTEM_STATE for session 8\n3fd12846 feat(proof): paper lifecycle proof + cloud fixes + issue scan\ndac219c6 feat(proof): cloud health proof \u2014 8/8 gates PASS, 0 blockers\n2465e35f chore(cleanup): remove 2157 files of repo clutter + update .gitignore\n12a510ab feat(cloud): add Render worker service + cloud-safe token manager\n",
     "stderr": ""
   }
 }

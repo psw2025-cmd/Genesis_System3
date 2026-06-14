@@ -4,7 +4,7 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 153,
+    "data_candidate_count": 154,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       ".github/workflows/external-data-yahoo-proof.yml",
@@ -106,6 +106,7 @@
       "models/xgboost_v1/SENSEX_xgb_meta.json",
       "models/xgboost_v1/SENSEX_xgb_model.pkl",
       "option_chain_automation_master.py",
+      "reports/latest/external_data_yahoo/yahoo_data_summary.json",
       "reports/latest/fresh_data_automation_proof/README.md",
       "reports/latest/fresh_data_automation_proof/summary.json",
       "scripts/add_realtime_data_refresh.py",
@@ -124,8 +125,7 @@
       "scripts/monitor_optionchain_performance.py",
       "scripts/run_live_chain.py",
       "scripts/smart_live_chain_runner.py",
-      "scripts/test_csv_edge_cases.py",
-      "scripts/test_csv_write_scenarios.py"
+      "scripts/test_csv_edge_cases.py"
     ],
     "dhan_india_candidate_count": 51,
     "dhan_india_candidates_sample": [

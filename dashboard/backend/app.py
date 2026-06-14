@@ -231,7 +231,7 @@ app.add_middleware(
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
 
 # Root route - helpful message
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     base_url = os.environ.get("PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
     dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")

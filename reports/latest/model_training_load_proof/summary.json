@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 153,
+    "candidate_count": 155,
     "candidates_sample": [
       ".github/workflows/model-backtest-readiness.yml",
       "core/engine/ai_model/__init__.py",

@@ -1,33 +1,5 @@
 [
   {
-    "severity": "CRITICAL",
-    "area": "broker",
-    "issue": "Dhan broker is not connected",
-    "proof": "connected=False error=TOKEN_EXPIRED_OR_INVALID credentials_present=True",
-    "action": "Fix Render DHAN_ACCESS_TOKEN / DHAN_PIN / DHAN_TOTP_SECRET, then verify connected=true."
-  },
-  {
-    "severity": "CRITICAL",
-    "area": "broker",
-    "issue": "State broker is disconnected",
-    "proof": "error=TOKEN_EXPIRED_OR_INVALID",
-    "action": "Fix Dhan token/session."
-  },
-  {
-    "severity": "HIGH",
-    "area": "backtest",
-    "issue": "Recent costed walk-forward not proven",
-    "proof": "",
-    "action": "Run recent walk-forward with brokerage/slippage/spread/liquidity."
-  },
-  {
-    "severity": "HIGH",
-    "area": "broker",
-    "issue": "Broker endpoint reports error",
-    "proof": "TOKEN_EXPIRED_OR_INVALID",
-    "action": "Refresh/regenerate token and re-run proof."
-  },
-  {
     "severity": "HIGH",
     "area": "data",
     "issue": "Dashboard state is not using proven real broker data",
@@ -43,9 +15,16 @@
   },
   {
     "severity": "HIGH",
+    "area": "paper_lifecycle",
+    "issue": "Signal\u2192order\u2192fill\u2192exit\u2192P&L lifecycle not proven/reconciled",
+    "proof": "mandatory_fields=['signal_id', 'symbol', 'instrument_token', 'expiry', 'strike', 'option_type', 'entry_time', 'entry_price', 'qty', 'order_id', 'fill_status', 'exit_time', 'exit_price', 'charges', 'gross_pnl', 'net_pnl', 'proof_status']",
+    "action": "Run market-day analyzer paper lifecycle proof."
+  },
+  {
+    "severity": "HIGH",
     "area": "pipeline",
     "issue": "Full trading pipeline is not trade ready",
-    "proof": "blockers=['fresh_training_not_proven', 'recent_backtest_not_proven', 'live_market_analyzer_paper_trade_not_proven', 'full_working_dashboard_not_proven'] verdict=NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR",
+    "proof": "blockers=['live_market_analyzer_paper_trade_not_proven'] verdict=NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR",
     "action": "Run fresh training, costed backtest, market paper trade, dashboard proof."
   },
   {
@@ -54,13 +33,6 @@
     "issue": "Proof matrix trade_ready is false",
     "proof": "verdict=ANALYZER_READY_PROOF_INCOMPLETE",
     "action": "Clear all proof warnings before live readiness."
-  },
-  {
-    "severity": "HIGH",
-    "area": "system_health",
-    "issue": "/api/health is not ready",
-    "proof": "status=not_ready message=BROKER_NOT_READY - Real data unavailable blockers=['Broker not connected - real data unavailable']",
-    "action": "Fix broker/data health before market proof."
   },
   {
     "severity": "MEDIUM",
@@ -86,13 +58,6 @@
   {
     "severity": "MEDIUM",
     "area": "model",
-    "issue": "Fresh training metrics not proven",
-    "proof": "",
-    "action": "Run dry-run model load/training proof with metrics."
-  },
-  {
-    "severity": "MEDIUM",
-    "area": "model",
     "issue": "Model promotion not allowed",
     "proof": "",
     "action": "Do not promote models until policy passes."
@@ -101,35 +66,28 @@
     "severity": "MEDIUM",
     "area": "proof_gate",
     "issue": "analyzer_paper_lifecycle_proof is PASS_WITH_WARNINGS",
-    "proof": "warnings=['full_signal_to_exit_pnl_lifecycle_not_proven'] blockers=[]",
+    "proof": "warnings=['full_signal_to_exit_pnl_lifecycle_not_proven', 'lifecycle_proof_broker_not_connected'] blockers=[]",
     "action": "Resolve or produce proof."
   },
   {
     "severity": "MEDIUM",
     "area": "proof_gate",
     "issue": "dashboard_truth_proof is PASS_WITH_WARNINGS",
-    "proof": "warnings=['dashboard_endpoint_coverage_report_missing', 'browser_screenshot_truth_not_proven_in_ci'] blockers=[]",
+    "proof": "warnings=['browser_screenshot_truth_not_proven_in_ci'] blockers=[]",
     "action": "Resolve or produce proof."
   },
   {
     "severity": "MEDIUM",
     "area": "proof_gate",
     "issue": "fresh_data_automation_proof is PASS_WITH_WARNINGS",
-    "proof": "warnings=['binance_crypto_data_candidates_not_proven', 'external_yahoo_fallback_proof_missing', 'dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped'] blockers=[]",
+    "proof": "warnings=['dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped'] blockers=[]",
     "action": "Resolve or produce proof."
   },
   {
     "severity": "MEDIUM",
     "area": "proof_gate",
     "issue": "model_training_load_proof is PASS_WITH_WARNINGS",
-    "proof": "warnings=['fresh_training_accuracy_metrics_not_proven', 'model_promotion_remains_blocked_without_policy'] blockers=[]",
-    "action": "Resolve or produce proof."
-  },
-  {
-    "severity": "MEDIUM",
-    "area": "proof_gate",
-    "issue": "recent_backtest_walkforward_proof is PASS_WITH_WARNINGS",
-    "proof": "warnings=['recent_costed_walkforward_result_not_proven'] blockers=[]",
+    "proof": "warnings=['model_promotion_remains_blocked_without_policy'] blockers=[]",
     "action": "Resolve or produce proof."
   },
   {

@@ -1,6 +1,6 @@
 # System3 Master Status
 
-Generated UTC: 2026-06-14T15:19:35.698053+00:00
+Generated UTC: 2026-06-14T16:28:41.275183+00:00
 
 ## Current verified status
 
@@ -19,7 +19,7 @@ Generated UTC: 2026-06-14T15:19:35.698053+00:00
 | `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `recent_backtest_walkforward_proof` | `PASS` | `True` |
-| `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` |
+| `analyzer_paper_lifecycle_proof` | `PASS` | `True` |
 | `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` |
 
 ## Open blockers

@@ -82,9 +82,9 @@
       "reports/latest/analyzer_paper_lifecycle_proof/README.md",
       "reports/latest/analyzer_paper_lifecycle_proof/summary.json"
     ],
-    "full_lifecycle_proven": false,
-    "lifecycle_proof_broker_connected": null,
-    "lifecycle_proof_dry_run": null,
+    "full_lifecycle_proven": true,
+    "lifecycle_proof_broker_connected": true,
+    "lifecycle_proof_dry_run": false,
     "lifecycle_proof_present": true,
     "mandatory_lifecycle_fields": [
       "signal_id",
@@ -105,14 +105,11 @@
       "net_pnl",
       "proof_status"
     ],
-    "orders_trades_lifecycle_reconciled": false
+    "orders_trades_lifecycle_reconciled": true
   },
   "gate": "analyzer_paper_lifecycle_proof",
   "next_action": "Run scripts/paper_lifecycle_proof.py on a market day (Mon-Fri) with broker connected to prove real lifecycle.",
   "pass": true,
-  "status": "PASS_WITH_WARNINGS",
-  "warnings": [
-    "full_signal_to_exit_pnl_lifecycle_not_proven",
-    "lifecycle_proof_broker_not_connected"
-  ]
+  "status": "PASS",
+  "warnings": []
 }

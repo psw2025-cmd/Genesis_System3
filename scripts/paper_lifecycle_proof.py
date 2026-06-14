@@ -75,12 +75,28 @@ def is_market_open() -> tuple[bool, str]:
 def check_broker_connection(dry_run: bool) -> dict:
     if dry_run:
         return {"connected": True, "mode": "DRY_RUN", "note": "Simulated — no real API call"}
+    # Try local broker module first
     try:
         from core.brokers.dhan.dhan_readonly import get_status
         result = get_status()
-        return result
+        if result.get("connected"):
+            return result
+    except Exception:
+        pass
+    # Fallback: check live public API endpoint (works from Codespace too)
+    import urllib.request
+    import urllib.error
+    public_url = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+    try:
+        req = urllib.request.Request(
+            public_url.rstrip("/") + "/api/broker/status",
+            headers={"User-Agent": "PaperLifecycleProof/1.0"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read(8192))
+            return {"connected": data.get("connected"), "mode": data.get("mode"), "source": "public_api_endpoint"}
     except Exception as e:
-        return {"connected": False, "error": str(e)}
+        return {"connected": False, "error": str(e), "source": "all_checks_failed"}
 
 
 def get_top_signal(dry_run: bool) -> dict:

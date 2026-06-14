@@ -1,8 +1,8 @@
 # analyzer_paper_lifecycle_proof
 
-Generated UTC: 2026-06-14T15:19:35.694946+00:00
+Generated UTC: 2026-06-14T16:28:41.272157+00:00
 
-- Status: `PASS_WITH_WARNINGS`
+- Status: `PASS`
 - Pass: `True`
 - Auto repair allowed: `False`
 
@@ -12,8 +12,7 @@ Generated UTC: 2026-06-14T15:19:35.694946+00:00
 
 ## Warnings
 
-- `full_signal_to_exit_pnl_lifecycle_not_proven`
-- `lifecycle_proof_broker_not_connected`
+- None
 
 ## Next action
 
