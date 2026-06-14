@@ -1,0 +1,100 @@
+{
+  "generated_utc": "2026-06-14T14:02:21.251215+00:00",
+  "mode": "Analyzer/Paper only; live trading disabled",
+  "optional_missing_count": 0,
+  "pending_count": 0,
+  "published_count": 8,
+  "required_missing_count": 0,
+  "rows": [
+    {
+      "blockers": [],
+      "name": "safety_and_secrets",
+      "pass": true,
+      "path": "reports/latest/safety_and_secrets/summary.json",
+      "required": true,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "blockers": [],
+      "name": "repo_authority_and_duplicate_control",
+      "pass": true,
+      "path": "reports/latest/repo_authority_and_duplicate_control/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "duplicate_basename_candidates_need_runtime_classification"
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "deployment_and_endpoint_proof",
+      "pass": true,
+      "path": "reports/latest/deployment_and_endpoint_proof/summary.json",
+      "required": true,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "blockers": [],
+      "name": "fresh_data_automation_proof",
+      "pass": true,
+      "path": "reports/latest/fresh_data_automation_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "binance_crypto_data_candidates_not_proven",
+        "external_yahoo_fallback_proof_missing",
+        "dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "model_training_load_proof",
+      "pass": true,
+      "path": "reports/latest/model_training_load_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "fresh_training_accuracy_metrics_not_proven",
+        "model_promotion_remains_blocked_without_policy"
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "recent_backtest_walkforward_proof",
+      "pass": true,
+      "path": "reports/latest/recent_backtest_walkforward_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "recent_costed_walkforward_result_not_proven"
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "analyzer_paper_lifecycle_proof",
+      "pass": true,
+      "path": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "full_signal_to_exit_pnl_lifecycle_not_proven"
+      ]
+    },
+    {
+      "blockers": [],
+      "name": "dashboard_truth_proof",
+      "pass": true,
+      "path": "reports/latest/dashboard_truth_proof/summary.json",
+      "required": true,
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "dashboard_endpoint_coverage_report_missing",
+        "browser_screenshot_truth_not_proven_in_ci"
+      ]
+    }
+  ],
+  "trade_ready": false,
+  "verdict": "ANALYZER_READY_PROOF_INCOMPLETE"
+}

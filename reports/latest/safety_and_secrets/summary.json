@@ -1,0 +1,25 @@
+{
+  "auto_repair_allowed": false,
+  "blockers": [],
+  "evidence": {
+    "render_safety": {
+      "live_trading_default_zero_or_false": true,
+      "mentions_live_trading_enabled": true,
+      "mentions_public_backend_url": false,
+      "mentions_system3_mode": true,
+      "render_yaml_exists": true
+    },
+    "requirements_contains_dhanhq": true,
+    "requirements_contains_logzero": true,
+    "secret_content_finding_count": 0,
+    "secret_content_findings": [],
+    "secret_style_filename_count": 0,
+    "secret_style_filenames": [],
+    "tracked_file_count": 1649
+  },
+  "gate": "safety_and_secrets",
+  "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
+  "pass": true,
+  "status": "PASS",
+  "warnings": []
+}

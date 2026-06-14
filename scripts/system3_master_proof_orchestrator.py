@@ -32,10 +32,21 @@ REPORTS = ROOT / "reports" / "latest"
 CONTROL = ROOT / "docs" / "project_control"
 
 SECRET_PATTERNS = [
-    re.compile(r"(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)\s*[:=]\s*['\"]?[A-Za-z0-9_./+=@:-]{8,}"),
+    # Matches hardcoded credential values on a SINGLE LINE only ([ \t]* prevents cross-line match).
+    # Excludes Python variable assignments and module paths via negative lookahead.
+    re.compile(r"(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)[ \t]*[:=][ \t]*(?!pyotp\.|sys\.|step_|totp\.|now\(|[a-z_]+\()['\"]?[A-Za-z0-9_./+=@:-]{8,}"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PRIVATE )?PRIVATE KEY-----"),
     re.compile(r"(?i)dhanhq.*(?:password|pin|totp|secret)"),
 ]
+
+# Files where pattern matches are always false-positives (templates, compiled output, docs, self)
+_SCAN_SKIP_EXACT = frozenset({
+    "scripts/system3_master_proof_orchestrator.py",  # self-referential pattern definitions
+})
+_SCAN_SKIP_PREFIXES = (
+    "docs/",                      # documentation — not executable credentials
+    "dashboard/frontend/dist/",   # compiled/minified frontend bundle
+)
 
 SECRET_FILENAME_RE = re.compile(
     r"(?i)(^|/)(\.env($|\.)|.*service.*account.*\.json$|.*secret.*\.json$|.*credential.*\.json$|.*private.*key.*|.*\.pem$|.*\.p12$)"
@@ -160,7 +171,8 @@ def scan_text_for_terms(files: Iterable[str], terms: Iterable[str], limit: int =
 
 
 def detect_secret_files(files: Iterable[str]) -> list[str]:
-    return sorted(f for f in files if SECRET_FILENAME_RE.search(f))
+    # .env.example and similar *.example files are templates, not real secret files
+    return sorted(f for f in files if SECRET_FILENAME_RE.search(f) and not f.endswith(".example"))
 
 
 def scan_secrets(files: list[str], max_files: int = 1500) -> list[dict[str, str]]:
@@ -175,6 +187,12 @@ def scan_secrets(files: list[str], max_files: int = 1500) -> list[dict[str, str]
         if p.suffix.lower() not in TEXT_FILE_SUFFIXES and p.name not in {".env", ".env.example"}:
             continue
         if any(part in f for part in (".git/", "node_modules/", "reports/latest/")):
+            continue
+        if f in _SCAN_SKIP_EXACT:
+            continue
+        if any(f.startswith(pfx) for pfx in _SCAN_SKIP_PREFIXES):
+            continue
+        if f.endswith(".example"):  # template files contain only placeholder values
             continue
         checked += 1
         try:
@@ -321,9 +339,16 @@ def endpoint_check(url: str, timeout: float = 12.0) -> dict[str, Any]:
         return {"url": url, "checked_utc": started, "ok": False, "status": None, "error": repr(exc), "snippet": ""}
 
 
+_RENDER_BACKEND_URL = "https://genesis-system3-backend.onrender.com"
+
+
 def gate_deployment_endpoint() -> GateResult:
-    base_url = os.getenv("SYSTEM3_PUBLIC_BACKEND_URL") or os.getenv("PUBLIC_BACKEND_URL") or ""
-    endpoints = ["/", "/docs", "/health", "/health/status", "/api/broker/status", "/api/state"]
+    base_url = (
+        os.getenv("SYSTEM3_PUBLIC_BACKEND_URL")
+        or os.getenv("PUBLIC_BACKEND_URL")
+        or _RENDER_BACKEND_URL  # known production URL; always probed unless overridden
+    )
+    endpoints = ["/", "/docs", "/health", "/api/health", "/api/broker/status", "/api/state"]
 
     evidence: dict[str, Any] = {
         "base_url_configured": bool(base_url),

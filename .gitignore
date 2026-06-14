@@ -73,6 +73,10 @@ tests/auto/
 archive/
 AI_AGENT_RUNS/
 
-# Phase reports and proof artifacts (generated, not source)
-reports/
+# Phase reports: allow reports/latest/ (live proof artifacts), block everything else
+reports/*
+!reports/latest
+reports/latest/manual_*
+
+# Runtime state files
 state/

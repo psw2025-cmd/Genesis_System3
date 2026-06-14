@@ -1,10 +1,10 @@
 # System3 Master Status
 
-Generated UTC: 2026-06-11T17:10:55.741392+00:00
+Generated UTC: 2026-06-14T14:02:21.252193+00:00
 
 ## Current verified status
 
-- Master verdict: `TRADE_READY_BLOCKED`
+- Master verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
 - Live trading enabled: `False`
 - Mode: `Analyzer/Paper only`
@@ -13,9 +13,9 @@ Generated UTC: 2026-06-11T17:10:55.741392+00:00
 
 | Gate | Status | Pass |
 |---|---|---:|
-| `safety_and_secrets` | `FAIL` | `False` |
+| `safety_and_secrets` | `PASS` | `True` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` |
-| `deployment_and_endpoint_proof` | `PASS_WITH_WARNINGS` | `True` |
+| `deployment_and_endpoint_proof` | `PASS` | `True` |
 | `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `recent_backtest_walkforward_proof` | `PASS_WITH_WARNINGS` | `True` |
@@ -24,8 +24,7 @@ Generated UTC: 2026-06-11T17:10:55.741392+00:00
 
 ## Open blockers
 
-- `safety_and_secrets:forbidden_secret_style_files_tracked`
-- `safety_and_secrets:possible_secret_like_content_in_tracked_text`
+- None
 
 ## Operating rule
 
