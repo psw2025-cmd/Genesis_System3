@@ -1,8 +1,8 @@
-name: CI - Governance & QA Guardian
+name: Genesis System3 Global Safety CI
 
 on:
   push:
-    branches: [ main, develop, fix/ci-syntax-errors-2026-05-27 ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
@@ -12,156 +12,72 @@ permissions:
   actions: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: global-safety-ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SYSTEM3_MODE: analyze
+  ANALYZE_MODE: "1"
+  LIVE_TRADING_ENABLED: "0"
+  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+
 jobs:
-  root-architecture-gate:
-    name: BLOCKING - Root architecture and trading safety gate
+  workflow-policy-guard:
+    name: BLOCKING - single safe workflow guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify workflow policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
+          printf '%s\n' "${workflows[@]}"
+          test "${#workflows[@]}" -eq 1
+          test "${workflows[0]}" = ".github/workflows/ci.yml"
+          ! grep -RIn "contents: write" .github/workflows
+          ! grep -RIn -- "--auto-fix" .github/workflows
+          ! grep -RIn "azure/webapps-deploy" .github/workflows
+
+  architecture-trading-safety:
+    name: BLOCKING - architecture and trading safety gate
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
+    needs: workflow-policy-guard
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Prepare proof directory and CI context
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p reports/ci_truth
-          {
-            echo "# CI Context"
-            echo "generated_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "github_repository=${GITHUB_REPOSITORY}"
-            echo "github_ref=${GITHUB_REF}"
-            echo "github_sha=${GITHUB_SHA}"
-            echo "github_event_name=${GITHUB_EVENT_NAME}"
-            echo "runner_os=${RUNNER_OS}"
-            echo "python_before_setup=$(command -v python || true)"
-            git --version || true
-            git status --short || true
-            git branch -a || true
-          } | tee reports/ci_truth/ci_context.txt
-
-      - name: Fetch main for reliable diff
-        shell: bash
-        run: |
-          git fetch --no-tags --prune --depth=50 origin +refs/heads/main:refs/remotes/origin/main || true
-          git rev-parse HEAD | tee reports/ci_truth/head_sha.txt
-          git rev-parse origin/main | tee reports/ci_truth/origin_main_sha.txt || true
-          git diff --name-only origin/main...HEAD | tee reports/ci_truth/changed_files_origin_main.txt || true
-          git diff --name-only HEAD~1..HEAD | tee reports/ci_truth/changed_files_last_commit.txt || true
-
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Run blocking root architecture gate
+      - name: Run root architecture gate
         shell: bash
         run: |
-          set +e
-          python --version | tee reports/ci_truth/python_version.txt
-          python .github/scripts/root_architecture_gate.py 2>&1 | tee reports/ci_truth/root_architecture_gate.log
-          gate_rc=${PIPESTATUS[0]}
-          echo "${gate_rc}" | tee reports/ci_truth/root_architecture_gate.exitcode
-          exit "${gate_rc}"
+          set -euo pipefail
+          python --version
+          test -f .github/scripts/root_architecture_gate.py
+          python .github/scripts/root_architecture_gate.py
 
-      - name: Upload root architecture gate proof
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: root-architecture-gate-${{ github.run_id }}-${{ github.run_attempt }}
-          path: reports/ci_truth/
-          if-no-files-found: warn
-          retention-days: 14
-
-  legacy-quality-report:
-    name: REPORT ONLY - Legacy quality findings
+  python-compile-proof:
+    name: BLOCKING - Python compile proof only
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    continue-on-error: true
-
+    timeout-minutes: 15
+    needs: workflow-policy-guard
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Prepare legacy report directory
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p reports/ci_truth/legacy
-          echo "legacy_report_started_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee reports/ci_truth/legacy/context.txt
-
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "pip"
-          cache-dependency-path: requirements-ci.txt
-
-      - name: Install Python CI dependencies report only
-        continue-on-error: true
+      - name: Compile critical scripts only
         shell: bash
         run: |
-          set +e
-          python -m pip install --upgrade pip 2>&1 | tee reports/ci_truth/legacy/pip_upgrade.log
-          python -m pip install --timeout 60 --retries 3 -r requirements-ci.txt 2>&1 | tee reports/ci_truth/legacy/pip_install.log
-          exit 0
-
-      - name: Legacy Python quality report only
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          echo "## Legacy Quality Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "These findings are report-only temporarily. Architecture/trading safety gate is blocking." >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-
-          {
-            echo "=== REPORT ONLY - Black ==="
-            black --check . || true
-            echo "=== REPORT ONLY - Flake8 ==="
-            flake8 . || true
-            echo "=== REPORT ONLY - Isort ==="
-            isort --check-only . || true
-            echo "=== REPORT ONLY - Mypy ==="
-            mypy . || true
-            echo "=== REPORT ONLY - Bandit ==="
-            if [ -d core ]; then bandit -r core || true; else echo "core directory not found"; fi
-            echo "=== REPORT ONLY - Pytest ==="
-            pytest --maxfail=1 --disable-warnings -q || true
-          } 2>&1 | tee reports/ci_truth/legacy/python_quality_report.log
-          exit 0
-
-      - name: Optional JS/YAML/Docker reports only
-        continue-on-error: true
-        shell: bash
-        run: |
-          set +e
-          {
-            echo "=== REPORT ONLY - ESLint ==="
-            if [ -f eslint.config.js ] || [ -f .eslintrc ] || [ -f .eslintrc.js ] || [ -f .eslintrc.json ]; then
-              npx eslint . || true
-            else
-              echo "ESLint config not found. REPORT_ONLY."
-            fi
-            echo "=== REPORT ONLY - YAML Lint ==="
-            if [ -f config.yaml ]; then yamllint config.yaml || true; else echo "config.yaml not found. REPORT_ONLY."; fi
-            echo "=== REPORT ONLY - Dockerfile Lint ==="
-            if [ -f Dockerfile ]; then npx --yes dockerfilelint Dockerfile || true; else echo "Dockerfile not found."; fi
-          } 2>&1 | tee reports/ci_truth/legacy/optional_reports.log
-          exit 0
-
-      - name: Upload legacy quality proof
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: legacy-quality-report-${{ github.run_id }}-${{ github.run_attempt }}
-          path: reports/ci_truth/legacy/
-          if-no-files-found: warn
-          retention-days: 14
+          set -euo pipefail
+          python -m py_compile scripts/system3_full_repo_verification.py
+          python -m py_compile scripts/system3_master_proof_orchestrator.py
