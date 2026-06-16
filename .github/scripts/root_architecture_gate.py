@@ -40,7 +40,6 @@ SECRET_PATTERNS = [
 CRITICAL_FILES = [
     "run_system3.py",
     ".github/workflows/ci.yml",
-    ".github/workflows/qa.yml",
     "requirements-ci.txt",
 ]
 
@@ -256,7 +255,7 @@ def main() -> int:
     failed = [c for c in checks if c["status"] != "PASS"]
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "policy": "Architecture and trading safety must be FULL PASS. Legacy cleanup may remain report-only temporarily.",
+        "policy": "Architecture and trading safety must be FULL PASS. Only ci.yml is the active workflow.",
         "blocking": True,
         "changed_files": files,
         "checks": checks,
