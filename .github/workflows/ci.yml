@@ -79,5 +79,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -m py_compile system3_control_plane.py
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
