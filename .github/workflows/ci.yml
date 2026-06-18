@@ -82,3 +82,83 @@ jobs:
           python -m py_compile system3_control_plane.py
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
+
+  full-proof-pack-validation:
+    name: BLOCKING - full proof pack validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: workflow-policy-guard
+    env:
+      SYSTEM3_MODE: analyze
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      SYSTEM3_REAL_ONLY: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install CI and backend dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python --version
+          python -m pip install --upgrade pip
+          test -f requirements-ci.txt
+          test -f dashboard/backend/requirements.txt
+          pip install --no-cache-dir -r requirements-ci.txt
+          pip install --no-cache-dir -r dashboard/backend/requirements.txt
+
+      - name: Compile expanded critical scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile system3_control_plane.py
+          python -m py_compile system3_ultra.py
+          python -m py_compile run_system3.py
+          python -m py_compile .github/scripts/root_architecture_gate.py
+          python -m py_compile scripts/system3_full_repo_verification.py
+          python -m py_compile scripts/system3_master_proof_orchestrator.py
+          python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
+          python -m py_compile dashboard/backend/app.py
+
+      - name: Dashboard backend import smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          os.environ["SYSTEM3_MODE"] = "analyze"
+          os.environ["ANALYZE_MODE"] = "1"
+          os.environ["LIVE_TRADING_ENABLED"] = "0"
+          os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+          os.environ["SYSTEM3_REAL_ONLY"] = "1"
+          import dashboard.backend.app as app
+          assert getattr(app, "app", None) is not None
+          print("dashboard_backend_import_smoke=PASS")
+          PY
+
+      - name: Run issue 24 26 27 28 proof batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f scripts/system3_issue_24_26_27_28_proof_batch.py
+          python scripts/system3_issue_24_26_27_28_proof_batch.py
+          test -d reports/latest/implementation_batch
+          test -f reports/latest/implementation_batch/status_matrix.json
+          test -f reports/latest/implementation_batch/unresolved_blockers.md
+          find reports/latest -maxdepth 2 -type f | sort
+
+      - name: Upload proof pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: system3-proof-pack
+          path: reports/latest/
+          if-no-files-found: error
