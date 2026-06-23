@@ -266,15 +266,22 @@ async def root():
 async def serve_dashboard_index():
     f = _DASHBOARD_DIR / "index.html"
     if f.exists():
-        return FileResponse(str(f), media_type="text/html")
+        return FileResponse(str(f), media_type="text/html", headers=_NO_CACHE_HEADERS)
     raise HTTPException(status_code=404, detail="Dashboard not found")
+
+
+_NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
 
 
 @app.get("/ui/app.js", include_in_schema=False)
 async def serve_dashboard_js():
     f = _DASHBOARD_DIR / "app.js"
     if f.exists():
-        return FileResponse(str(f), media_type="application/javascript")
+        return FileResponse(str(f), media_type="application/javascript", headers=_NO_CACHE_HEADERS)
     raise HTTPException(status_code=404, detail="app.js not found")
 
 
@@ -282,7 +289,7 @@ async def serve_dashboard_js():
 async def serve_dashboard_css():
     f = _DASHBOARD_DIR / "style.css"
     if f.exists():
-        return FileResponse(str(f), media_type="text/css")
+        return FileResponse(str(f), media_type="text/css", headers=_NO_CACHE_HEADERS)
     raise HTTPException(status_code=404, detail="style.css not found")
 
 
