@@ -42,6 +42,7 @@ const app = createApp({
     const brokerPositions = ref({ data: null });
     const brokerFunds = ref({ data: null });
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
+    const approvalData  = ref({ human_approval: false, dashboard_status: 'PEND' });
 
     // Chain
     const chainSymbols      = ['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY'];
@@ -87,16 +88,16 @@ const app = createApp({
       { name:'ML Accuracy',           status:'PEND', pass:false, note:'1/5 days · ρ=0.20 · need ≥0.70' },
     ];
 
-    const readinessLadder = [
+    const readinessLadder = computed(() => [
       { label:'All proof gates green',        done:true,  detail:'8/8 PASS' },
-      { label:'Broker connected',             done:true,  detail:'Dhan ANALYZER' },
+      { label:'Broker connected',             done:broker.value.connected, detail: broker.value.connected?'Dhan ANALYZER':'Awaiting session' },
       { label:'Dhan Data APIs subscribed',    done:true,  detail:'Till 23 Jul 2026' },
       { label:'Costed walk-forward proven',   done:true,  detail:'5 days · cost model' },
       { label:'Model training dry-run',       done:true,  detail:'All 7 ML files compile' },
       { label:'Paper lifecycle (real broker)',done:false, detail:'09:30 IST market day' },
-      { label:'5+ Spearman ρ days',           done:false, detail:'1/5 · need ρ≥0.70' },
-      { label:'Human approval to live',       done:false, detail:'Permanent gate' },
-    ];
+      { label:'5+ Spearman ρ days',           done:(accuracyData.value.days_available||0)>=5 && (latestRho.value||0)>=0.70, detail:`${accuracyData.value.days_available||1}/5 · need ρ≥0.70` },
+      { label:'Human approval to live',       done:!!approvalData.value.human_approval, detail: approvalData.value.human_approval?(approvalData.value.approved_by||'Owner approved'):'Pending sign-off' },
+    ]);
 
     // Computed
     const topSignal     = computed(() => gainRankData.value.latest?.predictions?.[0] || {});
@@ -165,7 +166,11 @@ const app = createApp({
       if (rho !== null && rho < 0.40) reasons.push({ gate:'Model Accuracy', status:'WARN', reason:`ρ=${rho.toFixed(3)} < 0.40 — retrain needed` });
       else reasons.push({ gate:'Model Accuracy', status: rho!==null?'PASS':'UNKNOWN', reason: rho!==null?`ρ=${rho.toFixed(3)}`:'No validation data' });
       reasons.push({ gate:'Live Trading', status:'PASS', reason:'DISABLED — paper only' });
-      reasons.push({ gate:'Human Approval', status:'PEND', reason:'Required before live' });
+      if (approvalData.value.human_approval) {
+        reasons.push({ gate:'Human Approval', status:'PASS', reason: approvalData.value.dashboard_reason || 'Owner approved' });
+      } else {
+        reasons.push({ gate:'Human Approval', status:'PEND', reason:'Required before live' });
+      }
       return reasons;
     });
 
@@ -267,10 +272,10 @@ const app = createApp({
 
     let _polling = false;
     async function pollAll(){
-      if (_polling) return;  // prevent overlapping polls if one hangs
+      if (_polling) return;
       _polling = true;
       try {
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -287,6 +292,7 @@ const app = createApp({
         fetchJSON('/api/broker/holdings'),
         fetchJSON('/api/broker/positions/live'),
         fetchJSON('/api/broker/funds'),
+        fetchJSON('/api/approval/status'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -301,6 +307,10 @@ const app = createApp({
       if(pf) perfData.value=pf;
       if(lrn) learningData.value=lrn;
       if(port) portfolioData.value=port;
+      if(hld) brokerHoldings.value=hld;
+      if(pos) brokerPositions.value=pos;
+      if(funds) brokerFunds.value=funds;
+      if(appr) approvalData.value=appr;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
         if (st) { connHealth.value = 'live'; failCount.value = 0; }
@@ -387,7 +397,7 @@ const app = createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,approvalData,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
       paperPositions,paperSummary,tradeHistory,pnlWithCharges,

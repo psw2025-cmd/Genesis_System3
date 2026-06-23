@@ -115,6 +115,14 @@ def _load_trade_history() -> List[Dict[str, Any]]:
 
 
 def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
+    try:
+        from dashboard.backend.human_approval_service import load_human_approval
+    except ImportError:
+        from human_approval_service import load_human_approval
+
+    human_gate = load_human_approval()
+    human_approved = bool(human_gate.get("approved"))
+
     paper_summary = _load_paper_summary(outputs_dir)
     paper_positions = _load_paper_positions(outputs_dir)
     trade_history = _load_trade_history()
@@ -179,6 +187,8 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
         "broker_positions": broker_positions,
         "trade_history": trade_history[:100],
         "production_ready_for_real_money": False,
+        "human_approval": human_approved,
+        "human_approval_by": human_gate.get("approved_by"),
         "blockers": [
             "LIVE_TRADING_DISABLED_BY_DESIGN",
             "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
@@ -187,8 +197,8 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
         ],
         "next_actions": [
             "Run market-day paper lifecycle proof with broker connected",
-            "Reconcile broker holdings vs paper positions explicitly in UI",
             "Prove positive net expectancy after all costs",
-            "Human approval required before any live enablement",
-        ],
+            "Accumulate 5+ prediction days with rho>=0.70",
+        ]
+        + ([] if human_approved else ["Human approval required before any live enablement"]),
     }

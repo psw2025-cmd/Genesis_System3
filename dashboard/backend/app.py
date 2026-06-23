@@ -486,6 +486,16 @@ async def get_trader_requirements():
     return build_trader_requirements_report(OUTPUTS_DIR)
 
 
+@app.get("/api/approval/status")
+async def get_approval_status():
+    """Human approval gate — owner sign-off status (does not enable live trading)."""
+    try:
+        from dashboard.backend.human_approval_service import build_approval_status
+    except ImportError:
+        from human_approval_service import build_approval_status
+    return build_approval_status()
+
+
 @app.get("/api/broker/deps")
 async def get_broker_deps():
     """Get broker dependency installation status (Dhan)"""
