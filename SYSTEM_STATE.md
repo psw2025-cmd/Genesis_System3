@@ -28,18 +28,20 @@
 | Account APIs (funds, positions, holdings, orders, trades, ledger) | ✅ SUBSCRIBED | All working |
 | Security Master (232K instruments) | ✅ SUBSCRIBED | Downloads via fetch_security_list() |
 | Margin Calculator | ✅ SUBSCRIBED | Returns 0 for this account type |
-| **Option Chain (expiry list, OI, IV, Greeks)** | ❌ NOT SUBSCRIBED | Error 806 — needs Data APIs plan |
-| **Quote Data (real-time LTP, bid/ask, depth)** | ❌ NOT SUBSCRIBED | Error 806 |
-| **OHLC Data (real-time)** | ❌ NOT SUBSCRIBED | Error 806 |
-| **Historical Candles (daily/intraday)** | ❌ NOT SUBSCRIBED | Error DH-902 |
-| **WebSocket Market Feed** | ❌ NOT SUBSCRIBED | Error 806 |
+| **Option Chain (expiry list, OI, IV, Greeks)** | ✅ SUBSCRIBED | Data APIs Active — valid till 23 Jul 2026 |
+| **Quote Data (real-time LTP, bid/ask, depth)** | ✅ SUBSCRIBED | Data APIs Active |
+| **OHLC Data (real-time)** | ✅ SUBSCRIBED | Data APIs Active |
+| **Historical Candles (daily/intraday)** | ✅ SUBSCRIBED | Data APIs Active — 5 years history |
+| **WebSocket Market Feed** | ✅ SUBSCRIBED | Data APIs Active — 20 market depth |
 
-**Action needed:** User must subscribe to Dhan Data APIs at web.dhan.co → Profile → DhanHQ Trading APIs → Data APIs plan.
+**Data APIs subscribed 2026-06-23.** Monthly plan ₹499, valid till 23 Jul 2026. Real-time price, historical data 5Y, 20 market depth, option chain on APIs, full market depth, expired options data — ALL UNLOCKED.
 
-### Data Fallback (used until Data APIs subscribed)
-- Option chain OI data: NSE public API `https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY`
-- Most active options: `https://www.nseindia.com/api/live-analysis-most-active-securities?index=options`
-- These work but have rate limits and require session cookies (handled in market_result_validator.py)
+### Data Source Priority (updated 2026-06-23)
+- **P0 — Dhan Data APIs** (PRIMARY): Option chain, real-time LTP, historical candles — NOW ACTIVE ✅
+- **P1 — NSE public API**: Fallback if Dhan API fails (rate limits apply)
+- **P2 — nsepython**: Secondary fallback
+- **P3 — bhavcopy archive**: EOD data, always available
+- **P4 — yfinance**: Spot price fallback only
 
 ---
 
@@ -89,7 +91,7 @@
 1. **[USER ACTION — BLOCKER]** Renew Dhan access token via OAuth flow → `connected=true` on `/api/broker/status`. Until done, broker is disconnected in both Codespace and Render cloud.
    - Step: `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88` → copy tokenId → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>` → set in Render dashboard
 2. **[MARKET DAY — 2026-06-16]** Run paper lifecycle proof at 09:30 IST (auto-scheduled or `python scripts/paper_lifecycle_proof.py`)
-3. **[USER ACTION]** Subscribe to Dhan Data APIs → unlocks option chain, quotes, historical candles (ml_confidence now active via bhavcopy; live chain would boost all 6 other factors too)
+3. ~~**[USER ACTION]** Subscribe to Dhan Data APIs~~ ✅ DONE 2026-06-23 — All data unlocked
 2. ~~**[CODE]** Wire system3_signal_engine to generate signal CSV (activate dead 15% ml_confidence weight)~~ ✅ DONE (session 6: bhavcopy runner + prob_BUY_CE fix + staleness fix)
 2. ~~**[CODE]** Schedule daily_gain_rank_and_validate.py in orchestrator at 09:15 + 15:35~~ ✅ DONE
 3. ~~**[CODE]** Wire real live option chain data into GainRankEngine (currently synthetic)~~ ✅ DONE (NSE first, CSV fallback, synthetic last)
@@ -248,3 +250,4 @@ Never ask "is the system good enough?" — it is never good enough. Always bette
 
 **No final state exists.** ρ=0.80 achieved on 1 day — target is now 0.80+ confirmed on 5+ days, then 0.85, then 0.90.
 The system is always improving. That is the permanent operating mode.
+
