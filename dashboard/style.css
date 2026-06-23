@@ -556,3 +556,36 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
   0%   { left: -40%; }
   100% { left: 120%; }
 }
+
+/* ── HONEST STATUS BANNER ── */
+.honest-status-banner {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+}
+.hsb-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  background: var(--bg3);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.hsb-label {
+  font-family: var(--mono);
+  font-size: .58rem;
+  color: var(--txt3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.hsb-val {
+  font-family: var(--mono);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
