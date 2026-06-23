@@ -351,3 +351,35 @@ def get_state_store(outputs_dir: Optional[Path] = None) -> RuntimeStateStore:
         _state_store.load_state()
         _state_store.sync_from_files()
     return _state_store
+    def upsert_alert(self, level: str, code: str, message: str) -> None:
+        """Insert alert only if not already active. Prevents duplicate flood every 5s."""
+        with self._lock:
+            # Check if active (non-resolved) alert with same code exists
+            existing = [a for a in self._state.get("alerts", [])
+                        if a.get("code") == code and not a.get("resolved", False)]
+            if existing:
+                existing[0]["ts"] = datetime.now(IST).isoformat()
+                return
+            alert = {
+                "level": level, "code": code, "message": message,
+                "ts": datetime.now(IST).isoformat(),
+                "read": False, "resolved": False,
+            }
+            alerts = self._state.get("alerts", [])
+            alerts.insert(0, alert)
+            self._state["alerts"] = alerts[:100]
+            self._state_version += 1
+
+    def resolve_alert(self, code: str) -> None:
+        """Remove active alert by code. Called when condition clears."""
+        with self._lock:
+            alerts = self._state.get("alerts", [])
+            before = len(alerts)
+            self._state["alerts"] = [
+                a for a in alerts
+                if not (a.get("code") == code and not a.get("resolved", False))
+            ]
+            if len(self._state["alerts"]) != before:
+                self._state_version += 1
+
+
