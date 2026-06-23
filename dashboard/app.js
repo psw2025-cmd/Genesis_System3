@@ -37,6 +37,9 @@ createApp({
     const logsData     = ref([]);
     const learningData = ref({});
     const portfolioData = ref({});
+    const brokerHoldings = ref({ data: null });
+    const brokerPositions = ref({ data: null });
+    const brokerFunds = ref({ data: null });
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
 
     // Chain
@@ -54,6 +57,7 @@ createApp({
       { id:'scanner',  icon:'📡',  label:'Market Scanner'   },
       { id:'options',  icon:'📊',  label:'Option Chain'     },
       { id:'paper',    icon:'📋',  label:'Paper Lifecycle'  },
+      { id:'portfolio',icon:'💼',  label:'Portfolio'        },
       { id:'accuracy', icon:'📈',  label:'Prediction Actual'},
       { id:'signals',  icon:'⚡',  label:'Signals'          },
       { id:'alerts',   icon:'🔔',  label:'Alerts', badge: computed(()=> alertsData.value.filter(a=>!a.read&&!a.resolved).length || null) },
@@ -111,6 +115,27 @@ createApp({
     const brokerPositions = computed(() => portfolioData.value.broker_positions || []);
     const portfolioTransparency = computed(() => portfolioData.value.data_transparency || '--');
     const activeAlerts = computed(() => alertsData.value.filter(a => !a.resolved));
+
+    // Broker holdings rows (real Dhan equity)
+    const holdingRows = computed(() => {
+      const d = brokerHoldings.value?.data;
+      if (!d) return [];
+      const items = Array.isArray(d) ? d : (d.data || d.holdings || []);
+      return Array.isArray(items) ? items : [];
+    });
+    const positionRows = computed(() => {
+      const d = brokerPositions.value?.data;
+      if (!d) return [];
+      const items = Array.isArray(d) ? d : (d.data || d.positions || []);
+      return Array.isArray(items) ? items : [];
+    });
+    const fundsInfo = computed(() => {
+      const d = brokerFunds.value?.data;
+      if (!d) return {};
+      return Array.isArray(d) ? (d[0]||{}) : (d.data || d);
+    });
+    const brokerHoldingsOk = computed(() => brokerHoldings.value?.success === true);
+    const brokerFundsOk = computed(() => brokerFunds.value?.success === true);
     const unreadCount  = computed(() => alertsData.value.filter(a => !a.read && !a.resolved).length);
 
     // No-trade reason from QC + signal
@@ -254,6 +279,9 @@ createApp({
         fetchJSON('/api/perf'),
         fetchJSON('/api/learning/status'),
         fetchJSON('/api/portfolio/unified'),
+        fetchJSON('/api/broker/holdings'),
+        fetchJSON('/api/broker/positions/live'),
+        fetchJSON('/api/broker/funds'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -353,7 +381,8 @@ createApp({
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
       factors,proofGates,readinessLadder,
-      portfolioData,
+      portfolioData, brokerHoldings, brokerPositions, brokerFunds,
+      holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk,
       formatNum,formatLakh,scoreColor,ageStr,
       selectChainSymbol,loadChain,loadLogs,
     };
