@@ -611,11 +611,17 @@
             <template v-if="accuracyData.trend?.length">
               <div v-for="row in accuracyData.trend" :key="row.date" class="val-row">
                 <span>{{ row.date }}</span>
-                <span class="tx-c">{{ (row.predicted||[]).slice(0,3).join('·') }}</span>
-                <span class="tx-g">{{ (row.actual||[]).slice(0,3).join('·') }}</span>
-                <span :class="row.rho>=0.7?'tx-g':row.rho>=0.4?'tx-a':'tx-r'">{{ row.rho?row.rho.toFixed(3):'--' }}</span>
-                <span>{{ row.hit_rate?(row.hit_rate*100).toFixed(1)+'%':'--' }}</span>
-                <span :class="row.status==='RETRAIN_NEEDED'?'tx-r':'tx-g'" style="font-size:.6rem">{{ row.status }}</span>
+                <span class="val-chips">
+                  <span v-for="(sym,i) in (row.predicted||[]).slice(0,3)" :key="'p'+row.date+i" class="val-chip val-chip-p">{{ sym }}</span>
+                  <span v-if="!(row.predicted||[]).length" class="tx-m">--</span>
+                </span>
+                <span class="val-chips">
+                  <span v-for="(sym,i) in (row.actual||[]).slice(0,3)" :key="'a'+row.date+i" class="val-chip val-chip-a">{{ sym }}</span>
+                  <span v-if="!(row.actual||[]).length" class="tx-m">--</span>
+                </span>
+                <span :class="row.rho>=0.7?'tx-g':row.rho>=0.4?'tx-a':'tx-r'">{{ row.rho!=null?row.rho.toFixed(3):'--' }}</span>
+                <span>{{ row.hit_rate!=null?(row.hit_rate*100).toFixed(1)+'%':'--' }}</span>
+                <span class="val-status" :class="row.status==='RETRAIN_NEEDED'?'tx-r':'tx-g'">{{ row.status }}</span>
               </div>
             </template>
             <div v-else class="no-data">1 day available (Jun 12) · Runs daily 15:35 IST</div>
