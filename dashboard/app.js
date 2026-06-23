@@ -36,6 +36,7 @@ createApp({
     const perfData     = ref({});
     const logsData     = ref([]);
     const learningData = ref({});
+    const portfolioData = ref({});
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
 
     // Chain
@@ -352,6 +353,7 @@ createApp({
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
       factors,proofGates,readinessLadder,
+      portfolioData,
       formatNum,formatLakh,scoreColor,ageStr,
       selectChainSymbol,loadChain,loadLogs,
     };
