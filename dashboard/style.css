@@ -838,3 +838,19 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
   .topbar-right { gap: 3px; }
   .rho-pill { display: none; }
 }
+
+/* ── CONNECTION HEALTH INDICATOR ── */
+.conn-health {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 9px; border-radius: 4px;
+  font-family: var(--mono); font-size: .58rem; font-weight: 700;
+  letter-spacing: .06em;
+}
+.conn-dot { width: 6px; height: 6px; border-radius: 50%; }
+.conn-live { background: rgba(0,232,122,.1); color: var(--green); border: 1px solid rgba(0,232,122,.3); }
+.conn-live .conn-dot { background: var(--green); box-shadow: 0 0 4px var(--green); animation: pulse 2s ease-in-out infinite; }
+.conn-reconnecting { background: rgba(255,184,48,.1); color: var(--amber); border: 1px solid rgba(255,184,48,.3); }
+.conn-reconnecting .conn-dot { background: var(--amber); animation: pulse 0.8s ease-in-out infinite; }
+.conn-connecting { background: rgba(59,130,246,.1); color: var(--blue); border: 1px solid rgba(59,130,246,.3); }
+.conn-connecting .conn-dot { background: var(--blue); animation: pulse 1s ease-in-out infinite; }
+@media (max-width: 768px) { .conn-health { font-size: .5rem; padding: 3px 6px; } }
