@@ -1987,13 +1987,19 @@ async def get_pnl():
             processed_history.append(processed_item)
 
         if not processed_history:
-            session_file = ROOT_DIR / "storage" / "paper" / "closed_trades_feb2026.json"
-            if session_file.exists():
+            for session_file in [
+                ROOT_DIR / "tests" / "fixtures" / "paper_closed_trades_feb2026.json",
+                ROOT_DIR / "storage" / "paper" / "closed_trades_feb2026.json",
+            ]:
+                if not session_file.exists():
+                    continue
                 try:
                     session = json.loads(session_file.read_text(encoding="utf-8"))
                     processed_history = session.get("trades", [])
                     if summary and not summary.get("data_source"):
                         summary["data_source"] = session.get("data_source", "paper_simulation")
+                    if processed_history:
+                        break
                 except Exception:
                     pass
 
