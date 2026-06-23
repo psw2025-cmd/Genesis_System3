@@ -1620,22 +1620,35 @@ async def get_chain(underlying: str):
             df["liquidity_score"] = 0
 
         # Convert to dict, handling NaN values
+        # Also map CSV column names to standard dashboard field names
+        _col_map = {
+            "dOI": "oi_change",     # OI change from CSV
+            "dVolume": "vol_change", # Volume change
+            "spot_price": "spot_price",
+        }
         contracts = []
         for _, row in df.iterrows():
             contract = {}
             for col in df.columns:
                 val = row[col]
+                target_col = _col_map.get(col, col)
                 if pd.isna(val):
-                    contract[col] = None
+                    contract[target_col] = None
                 else:
-                    contract[col] = val
+                    try:
+                        contract[target_col] = float(val) if isinstance(val, (int, float)) else val
+                    except (TypeError, ValueError):
+                        contract[target_col] = val
+            # Ensure oi_change exists even if dOI missing
+            if "oi_change" not in contract:
+                contract["oi_change"] = 0
             contracts.append(contract)
 
         return {
             "underlying": underlying,
             "spot": float(spot),
             "pcr": float(pcr),
-            "contracts": contracts[:1000],  # Limit to 1000 contracts
+            "contracts": contracts[:1000],
             "total_contracts": len(contracts),
             "data_source": "real",
             "status": "MARKET_OPEN",
