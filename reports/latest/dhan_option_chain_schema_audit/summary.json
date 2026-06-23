@@ -1,0 +1,35 @@
+{
+  "generated_utc": "2026-06-23T19:34:36.778110Z",
+  "files_scanned": [
+    "core/data/datasource_manager.py",
+    "core/data/dhan_option_chain_parser.py",
+    "dashboard/backend/app.py",
+    "src/dhan/live_chain_rest.py"
+  ],
+  "files_changed": [
+    "core/data/dhan_option_chain_parser.py",
+    "core/data/datasource_manager.py"
+  ],
+  "wrong_mappings_found": [],
+  "correct_mappings_verified": [
+    "oi",
+    "previous_oi",
+    "top_bid_price",
+    "top_ask_price",
+    "greeks.delta",
+    "change_in_oi",
+    "bid_ask_spread"
+  ],
+  "tests_added": [
+    "tests/test_dhan_option_chain_parser.py",
+    "tests/fixtures/dhan_option_chain_sample.json"
+  ],
+  "test_result": {
+    "exit_code": 0,
+    "stdout": "......                                                                   [100%]",
+    "stderr": "",
+    "passed": true
+  },
+  "status": "PASS",
+  "remaining_blockers": []
+}

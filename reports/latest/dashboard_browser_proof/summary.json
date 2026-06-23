@@ -1,0 +1,156 @@
+{
+  "url_tested": "https://genesis-system3-backend.onrender.com/ui",
+  "viewports_tested": [
+    "1920x1080",
+    "768x1024",
+    "375x667"
+  ],
+  "screenshots_created": [
+    "desktop_1920x1080.png",
+    "mobile_375x667.png",
+    "tablet_768x1024.png"
+  ],
+  "fields_found": [
+    {
+      "field": "analyzer_paper_mode_desktop",
+      "status": "PASS",
+      "detail": "Matched /PAPER/i"
+    },
+    {
+      "field": "broker_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /broker/i"
+    },
+    {
+      "field": "data_source_desktop",
+      "status": "PASS",
+      "detail": "Matched /BROKER/i"
+    },
+    {
+      "field": "market_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /market/i"
+    },
+    {
+      "field": "option_chain_readiness_desktop",
+      "status": "PASS",
+      "detail": "Matched /option.?chain/i"
+    },
+    {
+      "field": "proof_audit_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /proof/i"
+    },
+    {
+      "field": "no_false_live_ready_desktop",
+      "status": "PASS",
+      "detail": "No false LIVE_READY claim detected"
+    },
+    {
+      "field": "analyzer_paper_mode_tablet",
+      "status": "PASS",
+      "detail": "Matched /PAPER/i"
+    },
+    {
+      "field": "broker_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /broker/i"
+    },
+    {
+      "field": "data_source_tablet",
+      "status": "PASS",
+      "detail": "Matched /BROKER/i"
+    },
+    {
+      "field": "market_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /market/i"
+    },
+    {
+      "field": "option_chain_readiness_tablet",
+      "status": "PASS",
+      "detail": "Matched /contracts/i"
+    },
+    {
+      "field": "proof_audit_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /proof/i"
+    },
+    {
+      "field": "no_false_live_ready_tablet",
+      "status": "PASS",
+      "detail": "No false LIVE_READY claim detected"
+    },
+    {
+      "field": "analyzer_paper_mode_mobile",
+      "status": "PASS",
+      "detail": "Matched /PAPER/i"
+    },
+    {
+      "field": "broker_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /broker/i"
+    },
+    {
+      "field": "data_source_mobile",
+      "status": "PASS",
+      "detail": "Matched /BROKER/i"
+    },
+    {
+      "field": "market_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /market/i"
+    },
+    {
+      "field": "option_chain_readiness_mobile",
+      "status": "PASS",
+      "detail": "Matched /contracts/i"
+    },
+    {
+      "field": "proof_audit_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /proof/i"
+    },
+    {
+      "field": "no_false_live_ready_mobile",
+      "status": "PASS",
+      "detail": "No false LIVE_READY claim detected"
+    }
+  ],
+  "fields_missing": [
+    {
+      "field": "live_trading_disabled_desktop",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    },
+    {
+      "field": "pnl_positions_desktop",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    },
+    {
+      "field": "live_trading_disabled_tablet",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    },
+    {
+      "field": "pnl_positions_tablet",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    },
+    {
+      "field": "live_trading_disabled_mobile",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    },
+    {
+      "field": "pnl_positions_mobile",
+      "status": "UI_NOT_VISIBLE",
+      "detail": "Not found in rendered page text"
+    }
+  ],
+  "load_result": "PASS",
+  "console_errors": [],
+  "final_verdict": "PASS_WITH_WARNINGS",
+  "generated_utc": "2026-06-23T19:32:57.363Z"
+}

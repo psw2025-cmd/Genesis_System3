@@ -1,0 +1,60 @@
+{
+  "generated_utc": "2026-06-23T19:34:36.843129Z",
+  "status": "NOT_PROVEN",
+  "portfolio": {
+    "total_invested": "NOT_FOUND",
+    "current_value": "NOT_FOUND",
+    "gross_pnl": "PASS_WITH_WARNINGS",
+    "net_pnl": "PASS_WITH_WARNINGS",
+    "cash_available": "NOT_FOUND",
+    "open_positions": "PASS",
+    "win_rate": "NOT_FOUND",
+    "max_loss_position": "NOT_FOUND"
+  },
+  "trade_history": {
+    "trade_id": "NOT_FOUND",
+    "timestamp_ist": "NOT_FOUND",
+    "symbol": "NOT_FOUND",
+    "entry_price": "NOT_FOUND",
+    "exit_price": "NOT_FOUND",
+    "gross_pnl": "NOT_FOUND",
+    "net_pnl": "NOT_FOUND",
+    "charges_breakdown": "NOT_FOUND",
+    "duration_minutes": "NOT_FOUND",
+    "exit_reason": "NOT_FOUND",
+    "source": "NOT_FOUND",
+    "Greeks_at_entry": "NOT_FOUND",
+    "Greeks_at_exit": "NOT_FOUND",
+    "slippage_realized": "NOT_FOUND",
+    "market_condition_at_entry": "NOT_FOUND"
+  },
+  "live_positions": {
+    "position_id": "NOT_FOUND",
+    "symbol": "NOT_FOUND",
+    "strike": "NOT_FOUND",
+    "entry_price": "NOT_FOUND",
+    "current_ltp": "NOT_FOUND",
+    "unrealized_pnl": "NOT_FOUND",
+    "Greeks_now": "NOT_FOUND",
+    "Greeks_change_since_entry": "NOT_FOUND",
+    "iv_change": "NOT_FOUND",
+    "stoploss": "NOT_FOUND",
+    "target": "NOT_FOUND",
+    "risk_reward_ratio": "NOT_FOUND",
+    "days_to_expiry": "NOT_FOUND"
+  },
+  "prediction_vs_market": {
+    "prediction_timestamp": "NOT_FOUND",
+    "predicted_top_3": "NOT_FOUND",
+    "actual_top_3": "NOT_FOUND",
+    "accuracy_pct": "NOT_FOUND",
+    "ranking_correlation": "NOT_FOUND",
+    "market_result_proof": "NOT_FOUND"
+  },
+  "evidence_source": "reports/latest/system3_truth_bridge/latest.json",
+  "remaining_blockers": [
+    "trade_history_fields_not_exposed",
+    "portfolio_detail_fields_missing",
+    "prediction_vs_market_not_proven"
+  ]
+}

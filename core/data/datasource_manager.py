@@ -287,25 +287,10 @@ class DataSourceManager:
             resp = dhan.option_chain(under_security_id=sec_id, under_exchange_segment="IDX_I",
                                       expiry=expiry)
             if resp and resp.get("status") == "success":
-                data = resp.get("data", {}).get("data", [])
-                if data:
-                    rows = []
-                    spot = 0.0
-                    for item in data:
-                        spot = item.get("last_price", spot)
-                        for opt_type in ["CE", "PE"]:
-                            leg = item.get(opt_type.lower(), {})
-                            if leg:
-                                rows.append({
-                                    "strike": float(item.get("strike_price", 0)),
-                                    "option_type": opt_type,
-                                    "oi": int(leg.get("oi", 0)),
-                                    "volume": int(leg.get("volume", 0)),
-                                    "ltp": float(leg.get("last_price", 0)),
-                                    "iv": float(leg.get("implied_volatility", 0)) / 100.0,
-                                })
-                    if rows:
-                        return pd.DataFrame(rows), spot
+                from core.data.dhan_option_chain_parser import parse_dhan_option_chain_payload
+                df, spot = parse_dhan_option_chain_payload(resp)
+                if not df.empty:
+                    return df, spot
             return None
         except Exception:
             return None  # Silently fail — Error 806 is expected until subscribed

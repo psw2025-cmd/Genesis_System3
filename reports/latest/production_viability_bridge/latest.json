@@ -1,30 +1,28 @@
-{
-  "generated_utc": "NOT_RUN_YET",
-  "repo": "psw2025-cmd/Genesis_System3",
-  "summary": {
-    "production_live_ready": false,
-    "paper_analyzer_allowed": true,
-    "strategy_quarantined_for_live": true,
-    "status": "NOT_RUN_YET",
-    "reason": "Production viability bridge scripts are installed, but no live report has been generated yet."
-  },
-  "blockers": [
-    {
-      "severity": "HIGH",
-      "code": "PRODUCTION_VIABILITY_NOT_RUN_YET",
-      "message": "Production viability report has not been generated from live Truth Bridge output yet."
-    },
-    {
-      "severity": "HIGH",
-      "code": "LIVE_DISABLED_UNTIL_PROVEN",
-      "message": "Live trading remains disabled until real market paper lifecycle, broker freshness, tick health, execution quality, and positive net expectancy are proven."
-    }
-  ],
-  "warnings": [
-    {
-      "severity": "MEDIUM",
-      "code": "GITHUB_ACTIONS_BILLING_SAFE_MODE",
-      "message": "Scheduled GitHub Actions are disabled to avoid billing/minute usage."
-    }
-  ]
+﻿{
+    "generated_utc":  "2026-06-23T19:21:05.1712097Z",
+    "summary":  {
+                    "generated_utc":  "2026-06-23T19:21:05.1712097Z",
+                    "runner":  "PowerShell-NoPython",
+                    "production_live_ready":  false,
+                    "paper_analyzer_allowed":  true,
+                    "strategy_quarantined_for_live":  true,
+                    "reason":  "Production/live readiness remains blocked until real market paper lifecycle, broker freshness, tick health, execution quality and positive net expectancy are proven."
+                },
+    "blockers":  [
+                     {
+                         "severity":  "HIGH",
+                         "code":  "LIVE_DISABLED_UNTIL_PROVEN",
+                         "message":  "Live trading remains disabled until all production gates pass."
+                     },
+                     {
+                         "severity":  "HIGH",
+                         "code":  "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
+                         "message":  "WebSocket tick health proof is not available from PowerShell bridge."
+                     },
+                     {
+                         "severity":  "HIGH",
+                         "code":  "FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE",
+                         "message":  "Positive expectancy after all costs is not proven."
+                     }
+                 ]
 }

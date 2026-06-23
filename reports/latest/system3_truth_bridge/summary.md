@@ -1,25 +1,27 @@
-# System3 Truth Bridge
+﻿# System3 Truth Bridge
 
-Generated UTC: `NOT_RUN_YET`
+Generated UTC: `2026-06-23T19:21:05.1712097Z`
 
 ## Summary
 
 | Field | Value |
 |---|---|
-| `status` | `NOT_RUN_YET` |
-| `reason` | `Truth bridge scripts are installed, but no live run output has been committed yet.` |
+| `generated_utc` | `2026-06-23T19:21:05.1712097Z` |
+| `runner` | `PowerShell-NoPython` |
 | `repo` | `psw2025-cmd/Genesis_System3` |
-| `billing_mode` | `GitHub Actions schedule disabled; manual/local only.` |
-| `live_fetch_from_chatgpt` | `FAILED_CACHE_MISS` |
+| `mode` | `PAPER` |
+| `market_open` | `False` |
+| `state_data_source` | `BROKER_CONNECTED_MARKET_CLOSED` |
+| `health_data_source` | `live` |
+| `broker_connected` | `True` |
+| `alerts_count` | `0` |
+| `issue_count` | `2` |
+| `live_trading_enabled` | `False` |
+| `order_placement_allowed` | `False` |
 
 ## Issues
 
 | Severity | Code | Message |
 |---|---|---|
-| MEDIUM | `TRUTH_BRIDGE_NOT_RUN_YET` | Run `tools\run_truth_bridge_local.bat` from the cloned Genesis_System3 repo, or manually run the GitHub Action if billing allows. |
-
-## Next command
-
-```bat
-tools\run_truth_bridge_local.bat
-```
+| CRITICAL | `TRADE_READY_FALSE` | Full trading pipeline is not trade ready. |
+| CRITICAL | `REAL_PAPER_LIFECYCLE_NOT_PROVEN` | Real market analyzer paper lifecycle is not proven. |

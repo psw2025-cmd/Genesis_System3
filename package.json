@@ -5,5 +5,14 @@
     "plotly.js": "^3.4.0",
     "react-plotly.js": "^2.6.0",
     "dhanhq-javascript": "^1.0.27"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "test:dashboard": "playwright test",
+    "playwright:install": "playwright install chromium"
   }
 }

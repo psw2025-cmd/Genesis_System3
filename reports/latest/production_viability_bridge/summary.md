@@ -1,26 +1,22 @@
-# System3 Production Viability Bridge
+﻿# System3 Production Viability Bridge
 
-Generated UTC: `NOT_RUN_YET`
+Generated UTC: `2026-06-23T19:21:05.1712097Z`
 
 ## Summary
 
 | Field | Value |
 |---|---|
-| `production_live_ready` | `false` |
-| `paper_analyzer_allowed` | `true` |
-| `strategy_quarantined_for_live` | `true` |
-| `status` | `NOT_RUN_YET` |
-| `reason` | `Production viability bridge scripts are installed, but no live report has been generated yet.` |
+| `generated_utc` | `2026-06-23T19:21:05.1712097Z` |
+| `runner` | `PowerShell-NoPython` |
+| `production_live_ready` | `False` |
+| `paper_analyzer_allowed` | `True` |
+| `strategy_quarantined_for_live` | `True` |
+| `reason` | `Production/live readiness remains blocked until real market paper lifecycle, broker freshness, tick health, execution quality and positive net expectancy are proven.` |
 
 ## Blockers
 
-| Severity | Code | Message | Action |
-|---|---|---|---|
-| HIGH | `PRODUCTION_VIABILITY_NOT_RUN_YET` | Production viability report has not been generated from live Truth Bridge output yet. | Run local truth bridge from cloned Genesis_System3 repo. |
-| HIGH | `LIVE_DISABLED_UNTIL_PROVEN` | Live trading remains disabled until real market paper lifecycle, broker freshness, tick health, execution quality, and positive net expectancy are proven. | Keep analyzer/paper only. |
-
-## Warnings
-
-| Severity | Code | Message | Action |
-|---|---|---|---|
-| MEDIUM | `GITHUB_ACTIONS_BILLING_SAFE_MODE` | Scheduled GitHub Actions are disabled to avoid billing/minute usage. | Use local run or manual workflow only if acceptable. |
+| Severity | Code | Message |
+|---|---|---|
+| HIGH | `LIVE_DISABLED_UNTIL_PROVEN` | Live trading remains disabled until all production gates pass. |
+| HIGH | `WEBSOCKET_TICK_HEALTH_NOT_PROVEN` | WebSocket tick health proof is not available from PowerShell bridge. |
+| HIGH | `FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE` | Positive expectancy after all costs is not proven. |
