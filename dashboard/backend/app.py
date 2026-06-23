@@ -1390,6 +1390,24 @@ async def get_chain(underlying: str):
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
+                # FALLBACK: state_store may not have broker truth on fresh deploy
+                # Try direct Dhan API check before returning NOT_READY
+                try:
+                    from core.brokers.dhan.dhan_readonly import get_status as _direct_dhan
+                    _dstatus = _direct_dhan()
+                    if _dstatus.get("connected"):
+                        broker_connected = True
+                        # Update state_store with real truth
+                        if SSOT_AVAILABLE and state_store:
+                            state_store.update_state({"broker": {
+                                "connected": True, "name": "dhan",
+                                "status": "connected", "error": None,
+                                "latency_ms": _dstatus.get("latency_ms"),
+                            }})
+                except Exception:
+                    pass
+
+            if not broker_connected:
                 return {
                     "underlying": underlying.upper(),
                     "contracts": [],
