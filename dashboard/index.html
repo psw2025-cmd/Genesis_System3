@@ -18,7 +18,10 @@
         <span class="sys-hex">⬡</span>
         <div class="sys-name-stack">
           <div class="sys-title-line">SYSTEM3&nbsp;<span class="sys-ai">AI</span>&nbsp;TRADING CONTROL CENTER</div>
-          <div class="owner-name">PRITAM S. WARGHADE</div>
+          <div class="owner-name-block">
+            <div class="owner-name">PRITAM S. WARGHADE</div>
+            <div class="owner-name-line" aria-hidden="true"></div>
+          </div>
           <div class="owner-roles">OWNER · MARKET INTELLIGENCE · OPTION CHAIN · AUTONOMOUS LEARNING</div>
         </div>
       </div>
@@ -194,10 +197,14 @@
       <div class="panel mt16">
         <div class="ph"><span class="pt">⏰ Job Scheduler (IST)</span></div>
         <div class="job-tbl">
-          <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span></div>
+          <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span><span>LAST RUN</span><span>RESULT</span></div>
           <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled?'je':'jd'">
             <span>{{ job.name||job.id }}</span><span>{{ job.schedule_time }}</span>
             <span :class="job.enabled?'tx-g':'tx-m'">{{ job.enabled?'ACTIVE':'OFF' }}</span>
+            <span class="tx-m">{{ job.last_run_time ? new Date(job.last_run_time).toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: false}).replace(',', '') : 'NEVER' }}</span>
+            <span :class="job.last_status === 'SUCCESS' ? 'tx-g' : job.last_status === 'FAILED' || job.last_status === 'ERROR' || job.last_status === 'TIMEOUT' ? 'tx-r' : 'tx-m'">
+              {{ job.last_status || 'N/A' }}
+            </span>
           </div>
         </div>
       </div>
@@ -322,6 +329,13 @@
       <div class="path-banner path-b">
         <span>PATH B — OPTION PAPER TRADE</span>
         <span class="path-gate">Gate: Symbol valid ✅ · Chain available ✅ · Paper mode ✅ · Live disabled ✅ · Human approval pending ⏳</span>
+      </div>
+
+      <div class="proof-strip mt16" aria-label="Paper lifecycle proof status">
+        <div class="proof-chip proof-ok"><span>Proof Status</span><strong>Gate Matrix 8/8</strong></div>
+        <div class="proof-chip proof-safe"><span>Safety</span><strong>LIVE TRADING BLOCKED</strong></div>
+        <div class="proof-chip proof-paper"><span>P&L Positions</span><strong>GROSS P&L · NET P&L · OPEN POSITIONS</strong></div>
+        <div class="proof-chip proof-source"><span>Source Truth</span><strong>DHAN_READONLY · PAPER ONLY</strong></div>
       </div>
 
       <!-- P&L with charges -->
