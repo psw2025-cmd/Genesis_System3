@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-23T20:25:00.054029Z",
+  "generated_utc": "2026-06-23T21:27:02.910837Z",
   "mode": "ANALYZER_PAPER_ONLY",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
@@ -7,68 +7,80 @@
   "agents": [
     {
       "id": "gate_orchestrator",
-      "role": "8-gate proof matrix",
       "evidence": "reports/latest/proof_status_matrix/proof_status_matrix.json",
       "evidence_exists": true,
       "run_attempted": true,
       "run_passed": true,
       "run_detail": {
         "exit_code": 0,
-        "stdout_tail": "{\n  \"blocker_count\": 0,\n  \"fail_count\": 0,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-06-23T20:24:54.279322+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 8,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"ANALYZER_READY_PROOF_INCOMPLETE\",\n  \"warning_count\": 6\n}\n",
+        "stdout_tail": "{\n  \"blocker_count\": 0,\n  \"fail_count\": 0,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-06-23T21:26:07.490926+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 8,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"ANALYZER_READY_PROOF_INCOMPLETE\",\n  \"warning_count\": 6\n}\n",
         "stderr_tail": "",
         "passed": true
       }
     },
     {
-      "id": "truth_bridge",
-      "role": "Live cloud API truth",
-      "evidence": "reports/latest/system3_truth_bridge/summary.json",
-      "evidence_exists": false,
-      "run_attempted": false,
-      "run_passed": null
+      "id": "dashboard_audit",
+      "evidence": "reports/latest/dashboard_full_audit/summary.json",
+      "evidence_exists": true,
+      "run_attempted": true,
+      "run_passed": true,
+      "run_detail": {
+        "exit_code": 0,
+        "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\dashboard_full_audit\\summary.md\n",
+        "stderr_tail": "",
+        "passed": true
+      }
     },
     {
-      "id": "dhan_schema_audit",
-      "role": "Dhan option-chain schema",
-      "evidence": "reports/latest/dhan_option_chain_schema_audit/summary.json",
+      "id": "broker_validation",
+      "evidence": "reports/latest/broker_trader_validation/summary.json",
       "evidence_exists": true,
       "run_attempted": true,
       "run_passed": false,
       "run_detail": {
         "exit_code": 1,
-        "stdout_tail": "",
-        "stderr_tail": "erate_audit_reports.py\", line 112, in audit_trader_fields\n    from dashboard.backend.trader_requirements_service import build_trader_requirements_report\nModuleNotFoundError: No module named 'dashboard'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 238, in <module>\n    raise SystemExit(main())\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 188, in main\n    trader = audit_trader_fields(truth)\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 114, in audit_trader_fields\n    from trader_requirements_service import build_trader_requirements_report\nModuleNotFoundError: No module named 'trader_requirements_service'\n",
+        "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\broker_trader_validation\\summary.md\n",
+        "stderr_tail": "",
         "passed": false
       }
     },
     {
-      "id": "dashboard_browser",
-      "role": "Playwright UI proof",
-      "evidence": "reports/latest/dashboard_browser_proof/summary.json",
+      "id": "audit_reports",
+      "evidence": "reports/latest/dhan_option_chain_schema_audit/summary.json",
       "evidence_exists": true,
-      "run_attempted": false,
-      "run_passed": null
+      "run_attempted": true,
+      "run_passed": true,
+      "run_detail": {
+        "exit_code": 0,
+        "stdout_tail": "",
+        "stderr_tail": "",
+        "passed": true
+      }
     },
     {
-      "id": "geni_orchestrator",
-      "role": "Internal task coordination (AUTO_EXECUTE_REAL_TRADES=False)",
-      "evidence": "core/geni/geni_config.py",
+      "id": "human_approval",
+      "evidence": "reports/latest/human_approval_gate/summary.json",
       "evidence_exists": true,
-      "run_attempted": false,
-      "run_passed": null
+      "run_attempted": true,
+      "run_passed": true,
+      "run_detail": {
+        "exit_code": 0,
+        "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\human_approval_gate\\summary.md\n",
+        "stderr_tail": "",
+        "passed": true
+      }
     },
     {
       "id": "control_plane",
-      "role": "Repo authority + master control",
       "evidence": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
       "evidence_exists": true,
       "run_attempted": true,
-      "run_passed": false,
+      "run_passed": true,
       "run_detail": {
-        "exit_code": 2,
-        "stdout_tail": "",
-        "stderr_tail": "usage: system3_control_plane.py [-h] {inventory,classify,cleanup,proofs} ...\nsystem3_control_plane.py: error: the following arguments are required: command\n",
-        "passed": false
+        "exit_code": 0,
+        "stdout_tail": "{\n  \"status\": \"OK\",\n  \"output\": \"C:\\\\System3\\\\Genesis_System3\\\\reports\\\\ci_truth\\\\control_plane\\\\proofs_summary.json\",\n  \"proofs\": [\n    {\n      \"path\": \"reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json\",\n      \"exists\": true\n    },\n    {\n      \"path\": \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n      \"exists\": true\n    },\n    {\n      \"path\": \"docs/project_control/REPO_CLEANUP_MANIFEST_20260616.md\",\n      \"exists\": true\n    },\n    {\n      \"path\": \"docs/project_control/GLOBAL_CONTROL_PLANE_STRUCTURE_20260616.md\",\n      \"exists\": true\n    }\n  ]\n}\n",
+        "stderr_tail": "",
+        "passed": true
       }
     }
   ],
@@ -76,27 +88,47 @@
     "/api/state": {
       "status": 200,
       "ok": true,
-      "sample": "{\"state_version\":684,\"timestamp_utc\":\"2026-06-23T20:24:55.903604Z\",\"timestamp_ist\":\"2026-06-24T01:54:55.903606+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Before pre-market (opens at 09:15)\",\"next_open\":\"2026-06-24 09:15:00 IST\",\"current_time_ist\":\"2026-06-24T01:54:55.902333+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_prese"
+      "sample": "{\"state_version\":135,\"timestamp_utc\":\"2026-06-23T21:26:49.116767Z\",\"timestamp_ist\":\"2026-06-24T02:56:49.116769+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Before pre-market (opens at 09:15)\",\"next_open\":\"2026-06-24 09:15:00 IST\",\"current_time_ist\":\"2026-06-24T02:56:49.115638+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_prese"
     },
     "/api/paper": {
       "status": 200,
       "ok": true,
-      "sample": "{\"positions\":{\"positions\":[],\"open_count\":0,\"closed_count\":0,\"timestamp\":null},\"pnl\":{\"history\":[],\"summary\":{\"total_trades\":9,\"winning_trades\":3,\"losing_trades\":6,\"win_rate\":0.3333,\"total_realized_pnl\":-1806.07,\"total_unrealized_pnl\":0.0,\"total_pnl\":-1806.07,\"avg_pnl_per_trade\":-200.67,\"open_positions\":0,\"note\":\"Feb 1 2026 paper session \u2014 9 synthetic trades, 3W/6L\",\"data_source\":\"paper_simulation\"}}}"
+      "sample": "{\"positions\":{\"positions\":[],\"open_count\":0,\"closed_count\":0,\"timestamp\":null},\"pnl\":{\"history\":[{\"position_id\":\"POS_0001\",\"time_ist\":\"2026-02-01 10:15:00 IST\",\"underlying\":\"NIFTY\",\"option_type\":\"CE\",\"strike\":23500,\"entry_price\":142.5,\"exit_price\":128.0,\"qty\":50,\"realized_pnl\":-725.0,\"realized_pnl_pct\":-10.2,\"exit_reason\":\"STOP_LOSS\"},{\"position_id\":\"POS_0002\",\"time_ist\":\"2026-02-01 10:42:00 IST\",\"underlying\":\"BANKNIFTY\",\"option_type\":\"PE\",\"strike\":48500,\"entry_price\":210.0,\"exit_price\":245.0,\"q"
     },
     "/api/portfolio/unified": {
-      "status": 0,
-      "ok": false,
-      "error": "HTTP Error 404: Not Found"
+      "status": 200,
+      "ok": true,
+      "sample": "{\"generated_utc\":\"2026-06-23T21:26:55.466595Z\",\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"data_transparency\":\"MIXED_PAPER_AND_BROKER_READONLY\",\"broker\":{\"connected\":true,\"holdings_count\":11,\"positions_count\":0,\"error\":null,\"source\":\"dhan_readonly\"},\"paper\":{\"summary\":{\"total_trades\":9,\"winning_trades\":3,\"losing_trades\":6,\"win_rate\":0.3333,\"total_realized_pnl\":-1806.07,\"total_unrealized_pnl\":0.0,\"total_pnl\":-1806.07,\"avg_pnl_per_trade\":-200.67,\"open_positions\":0,\"note\":\"Feb 1 2"
     },
     "/api/broker/holdings": {
-      "status": 0,
-      "ok": false,
-      "error": "HTTP Error 404: Not Found"
+      "status": 200,
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":11,\"rows\":[{\"symbol\":\"PARADEEP\",\"quantity\":165.0,\"avg_price\":115.44,\"ltp\":134.99,\"current_value\":22273.350000000002,\"pnl\":3225.750000000002,\"pnl_pct\":16.935204435204447,\"raw\":{\"exchange\":\"ALL\",\"tradingSymbol\":\"PARADEEP\",\"securityId\":\"9741\",\"isin\":\"INE088F01024\",\"totalQty\":165,\"dpQty\":165,\"t1Qty\":0,\"mtf_t1_qty\":0,\"mtf_qty\":0,\"availableQty\":165,\"collateralQty\":0,\"avgCostPrice\":115.44,\"lastTradedPr"
     },
     "/api/broker/positions/live": {
-      "status": 0,
-      "ok": false,
-      "error": "HTTP Error 404: Not Found"
+      "status": 200,
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":0,\"rows\":[],\"success\":true,\"data\":[]}"
+    },
+    "/api/broker/funds": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"normalized\":{\"available_balance\":0.71,\"utilized_amount\":null,\"total_limit\":17.53,\"raw\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":0.71,\"sodLimit\":17.53,\"collateralAmount\":0.0,\"receiveableAmount\":0.0,\"utilizedAmount\":0.0,\"blockedPayoutAmount\":588.0,\"withdrawableBalance\":0.0}},\"success\":true,\"data\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":0.71,\"sodLimit\":17.53,\"collateralAmount\":0.0,\"receivea"
+    },
+    "/api/broker/truth": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"generated_utc\":\"2026-06-23T21:26:59.357251Z\",\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":256,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"broker_connected\":true,\"validation\":{\"overall\":\"P"
+    },
+    "/api/trader/requirements": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"status\":\"PASS_WITH_WARNINGS\",\"live_trading_enabled\":false,\"production_ready_for_real_money\":false,\"data_transparency\":\"MIXED_PAPER_AND_BROKER_READONLY\",\"broker_validation\":{\"overall\":\"PASS_WITH_WARNINGS\",\"valid_pct\":90,\"valid_count\":9,\"total_fields\":10,\"all_apis_success\":true},\"broker_data_source\":\"DHAN_BROKER_READONLY\",\"portfolio\":{\"total_invested\":\"PASS\",\"current_value\":\"PASS\",\"gross_pnl\":\"PASS_WITH_WARNINGS\",\"net_pnl\":\"PASS_WITH_WARNINGS\",\"cash_available\":\"PASS\",\"open_positions\":\"PASS\",\"win"
+    },
+    "/api/approval/status": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"generated_utc\":\"2026-06-23T21:27:02.009733Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"ML_SPEARMAN_RHO_GTE_0_70_OV"
     },
     "/api/trades/history": {
       "status": 200,
@@ -104,13 +136,14 @@
       "sample": "{\"trades\":[],\"count\":0,\"date\":null,\"start_time\":null,\"end_time\":null}"
     }
   },
-  "broker_connected": true,
-  "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
+  "broker_connected": false,
+  "data_source": null,
   "readiness_ladder": {
     "repo_safe": true,
     "cloud_deployed": true,
-    "dashboard_production_grade": false,
-    "broker_readonly_portfolio_api": false,
+    "dashboard_production_grade": true,
+    "broker_readonly_portfolio_api": true,
+    "human_approval_recorded": true,
     "real_money_ready": false
   },
   "blockers": [
@@ -118,13 +151,13 @@
     "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
     "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
     "MULTI_DAY_STABILITY_NOT_PROVEN",
-    "HUMAN_APPROVAL_REQUIRED_FOR_LIVE"
+    "WEBSOCKET_TICK_HEALTH_NOT_PROVEN"
   ],
   "next_exact_actions": [
-    "Deploy this branch to Render (portfolio unified API + dashboard panel)",
-    "Run market-day paper lifecycle proof Mon-Fri 09:30-15:30 IST",
-    "Prove positive net expectancy after brokerage/STT/slippage",
-    "Accumulate 5+ prediction accuracy days with rho>=0.70",
-    "Explicit human sign-off before LIVE_TRADING_ENABLED (never auto)"
+    "Run market-day paper lifecycle proof Mon-Fri 09:15-15:30 IST",
+    "Accumulate 5+ prediction days with rho>=0.70",
+    "Prove positive net expectancy after all costs",
+    "Implement Dhan WebSocket tick health",
+    "ENV flip for live only after all gates + owner final sign-off"
   ]
 }

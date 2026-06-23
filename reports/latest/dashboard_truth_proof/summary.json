@@ -3,7 +3,7 @@
   "blockers": [],
   "evidence": {
     "api_db_report_reconciliation_proven": false,
-    "backend_file_count": 23,
+    "backend_file_count": 28,
     "browser_visual_truth_proven": false,
     "compile_results": [
       {
@@ -50,7 +50,7 @@
       "warnings"
     ],
     "dashboard_endpoint_coverage_report_present": true,
-    "dashboard_file_count": 66,
+    "dashboard_file_count": 71,
     "frontend_file_count": 36
   },
   "gate": "dashboard_truth_proof",

@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 77,
+    "candidate_count": 82,
     "candidates_sample": [
       "config/live_trade_config.json",
       "config/live_trade_config.py",
@@ -51,6 +51,7 @@
       "dashboard/backend/position_reconciliation.py",
       "dashboard/backend/trade_journal.py",
       "dashboard/backend/trade_logger.py",
+      "dashboard/backend/trader_requirements_service.py",
       "dashboard/frontend/src/components/PaperTrading.tsx",
       "docs/CURRENT_STATUS_PAPER_TRADING.md",
       "docs/FINAL_PAPER_TRADING_REPORT.md",
@@ -63,6 +64,8 @@
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
       "reports/latest/analyzer_paper_lifecycle_proof/README.md",
       "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+      "reports/latest/broker_trader_validation/summary.json",
+      "reports/latest/broker_trader_validation/summary.md",
       "reports/latest/trader_requirements_audit/summary.json",
       "reports/latest/trader_requirements_audit/summary.md",
       "scripts/check_paper_trading_status.py",
@@ -78,6 +81,8 @@
       "src/storage/trade_history.py",
       "src/trading/advanced_position_sizing.py",
       "src/trading/paper_executor.py",
+      "tests/fixtures/paper_closed_trades_feb2026.json",
+      "tools/broker_trader_validation.py",
       "tools/run_paper_trading_e2e_test.py",
       "tools/storage/live/live_orders_ledger.csv",
       "tools/visualize_live_fills.py"

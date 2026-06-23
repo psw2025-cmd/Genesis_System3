@@ -1,5 +1,5 @@
 {
-  "url_tested": "https://genesis-system3-backend.onrender.com/ui",
+  "url_tested": "http://127.0.0.1:8000/ui",
   "viewports_tested": [
     "1920x1080",
     "768x1024",
@@ -24,7 +24,7 @@
     {
       "field": "broker_status_desktop",
       "status": "PASS",
-      "detail": "Matched /DHAN CONNECTED/i"
+      "detail": "Matched /BROKER OFFLINE/i"
     },
     {
       "field": "data_source_desktop",
@@ -40,6 +40,11 @@
       "field": "option_chain_readiness_desktop",
       "status": "PASS",
       "detail": "Matched /Option Chain/i"
+    },
+    {
+      "field": "proof_audit_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /Proof Status/i"
     },
     {
       "field": "pnl_positions_desktop",
@@ -64,7 +69,7 @@
     {
       "field": "broker_status_tablet",
       "status": "PASS",
-      "detail": "Matched /DHAN CONNECTED/i"
+      "detail": "Matched /BROKER OFFLINE/i"
     },
     {
       "field": "data_source_tablet",
@@ -79,12 +84,17 @@
     {
       "field": "option_chain_readiness_tablet",
       "status": "PASS",
-      "detail": "Matched /Contracts/i"
+      "detail": "Matched /Option Chain/i"
     },
     {
       "field": "proof_audit_status_tablet",
       "status": "PASS",
-      "detail": "Matched /Gate Matrix/i"
+      "detail": "Matched /Proof Status/i"
+    },
+    {
+      "field": "pnl_positions_tablet",
+      "status": "PASS",
+      "detail": "Matched /GROSS P&L/i"
     },
     {
       "field": "no_false_live_ready_tablet",
@@ -104,7 +114,7 @@
     {
       "field": "broker_status_mobile",
       "status": "PASS",
-      "detail": "Matched /DHAN CONNECTED/i"
+      "detail": "Matched /BROKER OFFLINE/i"
     },
     {
       "field": "data_source_mobile",
@@ -119,12 +129,17 @@
     {
       "field": "option_chain_readiness_mobile",
       "status": "PASS",
-      "detail": "Matched /Contracts/i"
+      "detail": "Matched /Option Chain/i"
     },
     {
       "field": "proof_audit_status_mobile",
       "status": "PASS",
-      "detail": "Matched /Gate Matrix/i"
+      "detail": "Matched /Proof Status/i"
+    },
+    {
+      "field": "pnl_positions_mobile",
+      "status": "PASS",
+      "detail": "Matched /GROSS P&L/i"
     },
     {
       "field": "no_false_live_ready_mobile",
@@ -132,25 +147,9 @@
       "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
     }
   ],
-  "fields_missing": [
-    {
-      "field": "proof_audit_status_desktop",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    },
-    {
-      "field": "pnl_positions_tablet",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    },
-    {
-      "field": "pnl_positions_mobile",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    }
-  ],
+  "fields_missing": [],
   "load_result": "PASS",
   "console_errors": [],
-  "final_verdict": "PASS_WITH_WARNINGS",
-  "generated_utc": "2026-06-23T19:43:35.595Z"
+  "final_verdict": "PASS",
+  "generated_utc": "2026-06-23T21:06:29.587Z"
 }

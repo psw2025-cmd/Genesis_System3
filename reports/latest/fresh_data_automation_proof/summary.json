@@ -4,7 +4,7 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 161,
+    "data_candidate_count": 162,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       "core/data/__init__ - Copy - Copy - Copy (3).py",
@@ -60,6 +60,7 @@
       "core/tools/validate_clean_csv.py",
       "core/utils/option_chain_calculations.py",
       "core/validation/option_chain_validator.py",
+      "dashboard/backend/chain_adapter.py",
       "dashboard/backend/synthetic_data_generator.py",
       "dashboard/frontend/src/components/ChainAnalytics.tsx",
       "dashboard/frontend/src/components/DataSourceWarning.tsx",
@@ -124,8 +125,7 @@
       "scripts/enhance_optionchain_with_predictions.py",
       "scripts/final_data_check.py",
       "scripts/fix_csv_structure.py",
-      "scripts/fix_dashboard_data_issues.py",
-      "scripts/generate_synthetic_live_data.py"
+      "scripts/fix_dashboard_data_issues.py"
     ],
     "dhan_india_candidate_count": 57,
     "dhan_india_candidates_sample": [

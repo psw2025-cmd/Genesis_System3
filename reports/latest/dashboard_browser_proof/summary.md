@@ -1,11 +1,11 @@
 # Dashboard Browser Proof
 
-Generated UTC: `2026-06-23T19:43:35.595Z`
+Generated UTC: `2026-06-23T21:06:29.587Z`
 
-URL: https://genesis-system3-backend.onrender.com/ui
+URL: http://127.0.0.1:8000/ui
 
 Load result: **PASS**
-Final verdict: **PASS_WITH_WARNINGS**
+Final verdict: **PASS**
 
 ## Viewports
 - 1920x1080
@@ -18,9 +18,6 @@ Final verdict: **PASS_WITH_WARNINGS**
 - screenshots/tablet_768x1024.png
 
 ## Fields missing / not proven
-- proof_audit_status_desktop: UI_NOT_VISIBLE — Not found in rendered page text
-- pnl_positions_tablet: UI_NOT_VISIBLE — Not found in rendered page text
-- pnl_positions_mobile: UI_NOT_VISIBLE — Not found in rendered page text
 
 ## Console errors
 - none

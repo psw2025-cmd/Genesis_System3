@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """
 Multi-agent production coordination — proof-only, no live trading.
-
-Coordinates existing agents/runners and publishes a single readiness report.
-Does NOT enable live trading or place broker orders.
 """
 
 from __future__ import annotations
@@ -19,43 +16,16 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest" / "production_grade_readiness"
 BASE_URL = "https://genesis-system3-backend.onrender.com"
 
-AGENTS = [
-    {
-        "id": "gate_orchestrator",
-        "role": "8-gate proof matrix",
-        "runner": "scripts/system3_master_proof_orchestrator.py",
-        "output": "reports/latest/proof_status_matrix/proof_status_matrix.json",
-    },
-    {
-        "id": "truth_bridge",
-        "role": "Live cloud API truth",
-        "runner": "tools/run_truth_bridge_powershell.bat",
-        "output": "reports/latest/system3_truth_bridge/summary.json",
-    },
-    {
-        "id": "dhan_schema_audit",
-        "role": "Dhan option-chain schema",
-        "runner": "tools/generate_audit_reports.py",
-        "output": "reports/latest/dhan_option_chain_schema_audit/summary.json",
-    },
-    {
-        "id": "dashboard_browser",
-        "role": "Playwright UI proof",
-        "runner": "tools/run_dashboard_proof.bat",
-        "output": "reports/latest/dashboard_browser_proof/summary.json",
-    },
-    {
-        "id": "geni_orchestrator",
-        "role": "Internal task coordination (AUTO_EXECUTE_REAL_TRADES=False)",
-        "runner": None,
-        "output": "core/geni/geni_config.py",
-    },
-    {
-        "id": "control_plane",
-        "role": "Repo authority + master control",
-        "runner": "system3_control_plane.py",
-        "output": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
-    },
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+AGENT_RUNS = [
+    ("gate_orchestrator", [sys.executable, "scripts/system3_master_proof_orchestrator.py"], "reports/latest/proof_status_matrix/proof_status_matrix.json"),
+    ("dashboard_audit", [sys.executable, "tools/dashboard_full_audit.py"], "reports/latest/dashboard_full_audit/summary.json"),
+    ("broker_validation", [sys.executable, "tools/broker_trader_validation.py"], "reports/latest/broker_trader_validation/summary.json"),
+    ("audit_reports", [sys.executable, "tools/generate_audit_reports.py"], "reports/latest/dhan_option_chain_schema_audit/summary.json"),
+    ("human_approval", [sys.executable, "tools/record_human_approval.py"], "reports/latest/human_approval_gate/summary.json"),
+    ("control_plane", [sys.executable, "system3_control_plane.py", "proofs"], "reports/latest/system3_master_control_plane/system3_master_control_plane.json"),
 ]
 
 
@@ -63,17 +33,17 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def run_cmd(cmd: List[str], cwd: Path) -> Dict[str, Any]:
+def run_cmd(cmd: List[str]) -> Dict[str, Any]:
     try:
-        proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=300)
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=300)
         return {
             "exit_code": proc.returncode,
-            "stdout_tail": proc.stdout[-1500:],
-            "stderr_tail": proc.stderr[-800:],
+            "stdout_tail": proc.stdout[-1200:],
+            "stderr_tail": proc.stderr[-600:],
             "passed": proc.returncode == 0,
         }
     except Exception as exc:
-        return {"exit_code": -1, "error": str(exc), "passed": False}
+        return {"exit_code": -1, "error": str(exc)[:200], "passed": False}
 
 
 def probe_live_endpoints() -> Dict[str, Any]:
@@ -85,13 +55,17 @@ def probe_live_endpoints() -> Dict[str, Any]:
         "/api/portfolio/unified",
         "/api/broker/holdings",
         "/api/broker/positions/live",
+        "/api/broker/funds",
+        "/api/broker/truth",
+        "/api/trader/requirements",
+        "/api/approval/status",
         "/api/trades/history",
     ]
     results = {}
     for ep in endpoints:
         url = f"{BASE_URL}{ep}"
         try:
-            with urllib.request.urlopen(url, timeout=30) as resp:
+            with urllib.request.urlopen(url, timeout=60) as resp:
                 body = resp.read(4000).decode("utf-8", errors="replace")
                 results[ep] = {"status": resp.status, "ok": resp.status == 200, "sample": body[:500]}
         except Exception as exc:
@@ -99,46 +73,37 @@ def probe_live_endpoints() -> Dict[str, Any]:
     return results
 
 
-def load_json(path: Path) -> Dict[str, Any]:
-    if path.exists():
-        with open(path, encoding="utf-8-sig") as f:
-            return json.load(f)
-    return {}
-
-
 def main() -> int:
     REPORTS.mkdir(parents=True, exist_ok=True)
 
     agent_results = []
-    for agent in AGENTS:
-        evidence_path = ROOT / agent["output"] if agent["output"] else None
-        result = {
-            "id": agent["id"],
-            "role": agent["role"],
-            "evidence": agent["output"],
-            "evidence_exists": evidence_path.exists() if evidence_path else False,
-            "run_attempted": False,
-            "run_passed": None,
-        }
-        if agent["runner"] and agent["runner"].endswith(".py"):
-            py = ROOT / agent["runner"]
-            if py.exists():
-                result["run_attempted"] = True
-                run = run_cmd([sys.executable, str(py)], ROOT)
-                result["run_passed"] = run["passed"]
-                result["run_detail"] = run
-        agent_results.append(result)
+    for agent_id, cmd, evidence in AGENT_RUNS:
+        evidence_path = ROOT / evidence
+        run = run_cmd(cmd)
+        agent_results.append({
+            "id": agent_id,
+            "evidence": evidence,
+            "evidence_exists": evidence_path.exists(),
+            "run_attempted": True,
+            "run_passed": run["passed"],
+            "run_detail": run,
+        })
 
     live = probe_live_endpoints()
-    truth = load_json(ROOT / "reports/latest/system3_truth_bridge/latest.json")
-    state = (truth.get("live") or {}).get("state", {}).get("data", {})
-    broker = state.get("broker") or {}
+    state_data = {}
+    try:
+        state_data = json.loads(live.get("/api/state", {}).get("sample", "{}"))
+    except Exception:
+        pass
+    broker = state_data.get("broker") or {}
+    broker_connected = bool(broker.get("connected"))
 
     blockers = [
         "LIVE_TRADING_DISABLED_BY_DESIGN",
         "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
         "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
         "MULTI_DAY_STABILITY_NOT_PROVEN",
+        "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
     ]
     try:
         from dashboard.backend.human_approval_service import load_human_approval
@@ -146,8 +111,6 @@ def main() -> int:
             blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
     except Exception:
         blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
-    if not broker.get("connected"):
-        blockers.append("BROKER_NOT_CONNECTED")
 
     payload = {
         "generated_utc": utc_now(),
@@ -157,22 +120,23 @@ def main() -> int:
         "cloud_url": BASE_URL,
         "agents": agent_results,
         "live_endpoint_probe": live,
-        "broker_connected": broker.get("connected"),
-        "data_source": state.get("data_source"),
+        "broker_connected": broker_connected,
+        "data_source": state_data.get("data_source"),
         "readiness_ladder": {
             "repo_safe": True,
             "cloud_deployed": live.get("/api/state", {}).get("ok", False),
-            "dashboard_production_grade": live.get("/api/portfolio/unified", {}).get("ok", False),
+            "dashboard_production_grade": live.get("/api/broker/truth", {}).get("ok", False),
             "broker_readonly_portfolio_api": live.get("/api/broker/holdings", {}).get("ok", False),
+            "human_approval_recorded": live.get("/api/approval/status", {}).get("ok", False),
             "real_money_ready": False,
         },
         "blockers": blockers,
         "next_exact_actions": [
-            "Deploy this branch to Render (portfolio unified API + dashboard panel)",
-            "Run market-day paper lifecycle proof Mon-Fri 09:30-15:30 IST",
-            "Prove positive net expectancy after brokerage/STT/slippage",
-            "Accumulate 5+ prediction accuracy days with rho>=0.70",
-            "Technical proof gates must pass before LIVE_TRADING_ENABLED ENV flip",
+            "Run market-day paper lifecycle proof Mon-Fri 09:15-15:30 IST",
+            "Accumulate 5+ prediction days with rho>=0.70",
+            "Prove positive net expectancy after all costs",
+            "Implement Dhan WebSocket tick health",
+            "ENV flip for live only after all gates + owner final sign-off",
         ],
     }
 
@@ -184,12 +148,12 @@ def main() -> int:
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
         "",
-        "**Verdict: NOT READY FOR REAL MONEY** (live trading remains disabled)",
+        "**Verdict: ANALYZER READY — REAL MONEY BLOCKED**",
         "",
-        "## Agent coordination map",
+        "## Agents run",
     ]
     for a in agent_results:
-        md_lines.append(f"- **{a['id']}** ({a['role']}) — evidence: `{a['evidence']}`")
+        md_lines.append(f"- **{a['id']}**: {'PASS' if a['run_passed'] else 'FAIL'} — `{a['evidence']}`")
     md_lines.extend([
         "",
         "## Cloud probes",

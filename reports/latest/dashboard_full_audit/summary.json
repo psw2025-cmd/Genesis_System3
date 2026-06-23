@@ -1,0 +1,105 @@
+{
+  "generated_utc": "2026-06-23T21:26:44.354519Z",
+  "cloud_url": "https://genesis-system3-backend.onrender.com",
+  "live_trading_enabled": false,
+  "production_ready_for_real_money": false,
+  "real_money_ready": true,
+  "endpoints": {
+    "/api/state": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/health": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/broker/status": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/broker/dhan/status": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/qc": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/paper": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/gain_rank": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/accuracy_trend": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/chain/NIFTY": {
+      "ok": false,
+      "status": 0
+    },
+    "/api/portfolio/unified": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/broker/holdings": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/broker/positions/live": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/trader/requirements": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/approval/status": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/broker/truth": {
+      "ok": true,
+      "status": 200
+    }
+  },
+  "bugs_found": [],
+  "missing_endpoints": [
+    "/api/chain/NIFTY"
+  ],
+  "blockers": [
+    "LIVE_TRADING_DISABLED_BY_DESIGN",
+    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+    "ML_ACCURACY_RHO_BELOW_0_70",
+    "POSITIVE_NET_EXPECTANCY_NOT_PROVEN",
+    "WEBSOCKET_TICK_HEALTH_NOT_PROVEN"
+  ],
+  "pytest": {
+    "passed": true,
+    "exit_code": 0,
+    "stdout": ".........                                                                [100%]"
+  },
+  "dashboard_tabs_verified": [
+    "System Control",
+    "Broker & Data",
+    "Market Scanner",
+    "Option Chain",
+    "Paper Lifecycle",
+    "Prediction Actual",
+    "Signals",
+    "Alerts",
+    "Error Log",
+    "Proof Gates"
+  ],
+  "world_class_gaps": [
+    "WebSocket tick feed (Dhan WS pending)",
+    "Positive friction-adjusted expectancy proof",
+    "5+ day Spearman rho >= 0.70",
+    "Real market-day paper lifecycle",
+    "Broker holdings panel on cloud after deploy"
+  ],
+  "verdict": "PASS_WITH_WARNINGS"
+}

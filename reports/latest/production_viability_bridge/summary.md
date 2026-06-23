@@ -1,12 +1,12 @@
 ﻿# System3 Production Viability Bridge
 
-Generated UTC: `2026-06-23T19:21:05.1712097Z`
+Generated UTC: `2026-06-23T21:27:27.3732048Z`
 
 ## Summary
 
 | Field | Value |
 |---|---|
-| `generated_utc` | `2026-06-23T19:21:05.1712097Z` |
+| `generated_utc` | `2026-06-23T21:27:27.3732048Z` |
 | `runner` | `PowerShell-NoPython` |
 | `production_live_ready` | `False` |
 | `paper_analyzer_allowed` | `True` |

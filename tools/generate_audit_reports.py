@@ -12,6 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS = ROOT / "reports" / "latest"
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -26,7 +29,12 @@ def load_json(path: Path):
 
 def run_pytest_parser() -> dict:
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/test_dhan_option_chain_parser.py", "-q"],
+        [
+            sys.executable, "-m", "pytest",
+            "tests/test_dhan_option_chain_parser.py",
+            "tests/test_dhan_payload_normalizer.py",
+            "-q",
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,

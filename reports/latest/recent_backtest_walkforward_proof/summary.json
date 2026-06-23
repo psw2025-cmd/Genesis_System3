@@ -9,7 +9,7 @@
       "20260611",
       "20260612"
     ],
-    "candidate_count": 124,
+    "candidate_count": 127,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       "complete_end_to_end_validation.py",
@@ -104,6 +104,8 @@
       "final_system_validation_test.py",
       "paper_pnl_summary.json",
       "production_grade_validation.py",
+      "reports/latest/broker_trader_validation/summary.json",
+      "reports/latest/broker_trader_validation/summary.md",
       "reports/latest/recent_backtest_walkforward_proof/README.md",
       "reports/latest/recent_backtest_walkforward_proof/costed_walkforward_proof.json",
       "reports/latest/recent_backtest_walkforward_proof/summary.json",
@@ -128,9 +130,7 @@
       "src/selector/strategy_engine.py",
       "src/trading/pnl_tracker.py",
       "src/validation/__init__.py",
-      "src/validation/market_result_validator.py",
-      "src/validation/qc_validator.py",
-      "state/market_validations/market_validation_2026-06-12.json"
+      "src/validation/market_result_validator.py"
     ],
     "compile_results": [
       {

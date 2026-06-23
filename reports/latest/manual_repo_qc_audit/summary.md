@@ -1,24 +1,24 @@
 # Manual Repo QC Audit Summary
 
-Updated UTC: `2026-06-23T20:16:38.053448Z`
+Updated UTC: `2026-06-23T21:26:52.507260Z`
 
 ## Audit results (automated run)
 
 - Dhan schema audit: **PASS**
-- Dashboard browser proof: **PASS_WITH_WARNINGS**
-- Trader requirements audit: **NOT_PROVEN**
+- Dashboard browser proof: **PASS**
+- Trader requirements audit: **BROKER_OFFLINE**
 - Real market data proof: **PASS_WITH_WARNINGS**
 - Truth bridge: **PASS**
 - Production viability: **NOT_PROVEN**
 
 ## Remaining blockers
-- prediction_vs_market_not_proven
-- TRADE_READY_FALSE
-- trade_history_fields_not_exposed
-- portfolio_detail_fields_missing
-- nse_comparison_proof_missing
 - real_market_analyzer_paper_lifecycle_not_proven
+- nse_comparison_proof_missing
+- TRADE_READY_FALSE
+- MULTI_DAY_STABILITY_NOT_PROVEN
+- POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN
 - REAL_PAPER_LIFECYCLE_NOT_PROVEN
+- LIVE_TRADING_DISABLED_BY_DESIGN
 
 ## Next exact action
 1. Run market-session analyzer paper lifecycle proof with broker connected.

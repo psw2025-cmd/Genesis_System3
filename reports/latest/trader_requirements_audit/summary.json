@@ -1,47 +1,60 @@
 {
-  "generated_utc": "2026-06-23T20:16:38.045595Z",
-  "status": "NOT_PROVEN",
+  "status": "BROKER_OFFLINE",
+  "live_trading_enabled": false,
+  "production_ready_for_real_money": false,
+  "data_transparency": "PAPER_SIMULATION",
+  "broker_validation": {
+    "overall": "BROKER_OFFLINE",
+    "valid_pct": 0,
+    "valid_count": 0,
+    "total_fields": 8,
+    "all_apis_success": false
+  },
+  "broker_data_source": "BROKER_OFFLINE",
   "portfolio": {
-    "total_invested": "NOT_FOUND",
-    "current_value": "NOT_FOUND",
+    "total_invested": "BROKER_OFFLINE",
+    "current_value": "BROKER_OFFLINE",
     "gross_pnl": "PASS_WITH_WARNINGS",
     "net_pnl": "PASS_WITH_WARNINGS",
-    "cash_available": "NOT_FOUND",
-    "open_positions": "PASS",
-    "win_rate": "NOT_FOUND",
-    "max_loss_position": "NOT_FOUND"
+    "cash_available": "BROKER_OFFLINE",
+    "open_positions": "BROKER_OFFLINE",
+    "win_rate": "PASS_WITH_WARNINGS",
+    "max_loss_position": "NOT_FOUND",
+    "utilized_margin": "BROKER_OFFLINE",
+    "holdings_count": "BROKER_OFFLINE",
+    "positions_count": "BROKER_OFFLINE"
   },
   "trade_history": {
-    "trade_id": "NOT_FOUND",
-    "timestamp_ist": "NOT_FOUND",
-    "symbol": "NOT_FOUND",
-    "entry_price": "NOT_FOUND",
-    "exit_price": "NOT_FOUND",
-    "gross_pnl": "NOT_FOUND",
-    "net_pnl": "NOT_FOUND",
-    "charges_breakdown": "NOT_FOUND",
-    "duration_minutes": "NOT_FOUND",
-    "exit_reason": "NOT_FOUND",
-    "source": "NOT_FOUND",
-    "Greeks_at_entry": "NOT_FOUND",
-    "Greeks_at_exit": "NOT_FOUND",
-    "slippage_realized": "NOT_FOUND",
-    "market_condition_at_entry": "NOT_FOUND"
+    "trade_id": "PASS",
+    "timestamp_ist": "PASS",
+    "symbol": "PASS",
+    "entry_price": "PASS",
+    "exit_price": "PASS",
+    "gross_pnl": "PASS",
+    "net_pnl": "PASS",
+    "charges_breakdown": "PASS_WITH_WARNINGS",
+    "duration_minutes": "PASS_WITH_WARNINGS",
+    "exit_reason": "PASS",
+    "source": "PASS",
+    "Greeks_at_entry": "PASS_WITH_WARNINGS",
+    "Greeks_at_exit": "PASS_WITH_WARNINGS",
+    "slippage_realized": "PASS_WITH_WARNINGS",
+    "market_condition_at_entry": "PASS_WITH_WARNINGS"
   },
   "live_positions": {
-    "position_id": "NOT_FOUND",
-    "symbol": "NOT_FOUND",
-    "strike": "NOT_FOUND",
-    "entry_price": "NOT_FOUND",
-    "current_ltp": "NOT_FOUND",
-    "unrealized_pnl": "NOT_FOUND",
-    "Greeks_now": "NOT_FOUND",
-    "Greeks_change_since_entry": "NOT_FOUND",
-    "iv_change": "NOT_FOUND",
-    "stoploss": "NOT_FOUND",
-    "target": "NOT_FOUND",
-    "risk_reward_ratio": "NOT_FOUND",
-    "days_to_expiry": "NOT_FOUND"
+    "position_id": "BROKER_OFFLINE",
+    "symbol": "BROKER_OFFLINE",
+    "strike": "BROKER_OFFLINE",
+    "entry_price": "BROKER_OFFLINE",
+    "current_ltp": "BROKER_OFFLINE",
+    "unrealized_pnl": "BROKER_OFFLINE",
+    "Greeks_now": "BROKER_OFFLINE",
+    "Greeks_change_since_entry": "BROKER_OFFLINE",
+    "iv_change": "BROKER_OFFLINE",
+    "stoploss": "BROKER_OFFLINE",
+    "target": "BROKER_OFFLINE",
+    "risk_reward_ratio": "BROKER_OFFLINE",
+    "days_to_expiry": "BROKER_OFFLINE"
   },
   "prediction_vs_market": {
     "prediction_timestamp": "NOT_FOUND",
@@ -51,10 +64,42 @@
     "ranking_correlation": "NOT_FOUND",
     "market_result_proof": "NOT_FOUND"
   },
-  "evidence_source": "reports/latest/system3_truth_bridge/latest.json",
+  "evidence": {
+    "paper_summary": {
+      "total_trades": 9,
+      "winning_trades": 3,
+      "losing_trades": 6,
+      "win_rate": 0.3333,
+      "total_realized_pnl": -1806.07,
+      "total_unrealized_pnl": 0.0,
+      "total_pnl": -1806.07,
+      "avg_pnl_per_trade": -200.67,
+      "open_positions": 0,
+      "note": "Feb 1 2026 paper session \u2014 9 synthetic trades, 3W/6L",
+      "data_source": "paper_simulation"
+    },
+    "trade_history_count": 9,
+    "broker_holdings_count": 0,
+    "broker_positions_count": 0,
+    "funds_available": null,
+    "validation_pct": 0
+  },
+  "blockers": [
+    "LIVE_TRADING_DISABLED_BY_DESIGN",
+    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+    "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
+    "MULTI_DAY_STABILITY_NOT_PROVEN"
+  ],
+  "next_actions": [
+    "Run market-day paper lifecycle proof with broker connected",
+    "Prove positive net expectancy after all costs",
+    "Accumulate 5+ prediction days with rho>=0.70"
+  ],
+  "generated_utc": "2026-06-23T21:26:52.500264Z",
   "remaining_blockers": [
-    "trade_history_fields_not_exposed",
-    "portfolio_detail_fields_missing",
-    "prediction_vs_market_not_proven"
+    "LIVE_TRADING_DISABLED_BY_DESIGN",
+    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+    "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
+    "MULTI_DAY_STABILITY_NOT_PROVEN"
   ]
 }
