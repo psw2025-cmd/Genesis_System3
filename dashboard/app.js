@@ -112,8 +112,8 @@ const app = createApp({
       if (pos?.summary?.closed_positions) return pos.summary.closed_positions;
       return paperData.value.pnl?.history || [];
     });
-    const brokerHoldings = computed(() => portfolioData.value.broker_holdings || []);
-    const brokerPositions = computed(() => portfolioData.value.broker_positions || []);
+    const unifiedHoldings = computed(() => portfolioData.value.broker_holdings || []);
+    const unifiedPositions = computed(() => portfolioData.value.broker_positions || []);
     const portfolioTransparency = computed(() => portfolioData.value.data_transparency || '--');
     const activeAlerts = computed(() => alertsData.value.filter(a => !a.resolved));
 
@@ -396,7 +396,7 @@ const app = createApp({
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
       factors,proofGates,readinessLadder,
-      connHealth, failCount,
+      connHealth, failCount, unifiedHoldings, unifiedPositions,
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
       holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk,
       formatNum,formatLakh,scoreColor,ageStr,
