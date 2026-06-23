@@ -36,11 +36,9 @@ class RuntimeStateStore:
 
     def _check_broker_connectivity(self) -> Dict[str, Any]:
         """Check broker connectivity and return status - uses health.json as source of truth"""
-        # First try to read from health.json (same source as /api/health)
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
-            result = _dhan_status()
-            return result
+            return _dhan_status()
         except Exception as e:
             return {
                 "connected": False,
@@ -53,8 +51,6 @@ class RuntimeStateStore:
 
     def _initialize_state(self):
         """Initialize state with defaults"""
-        # Don't check broker connectivity on initialization - use sync_from_files instead
-        # This ensures consistency with /api/health endpoint
         broker_status = {
             "connected": False,
             "name": "dhan",
@@ -107,7 +103,6 @@ class RuntimeStateStore:
         with self._lock:
             self._state_version += 1
 
-            # Update timestamp
             now_utc = datetime.utcnow()
             now_ist = datetime.now(IST)
 
@@ -116,25 +111,19 @@ class RuntimeStateStore:
             self._state["timestamp_ist"] = now_ist.isoformat()
             self._last_update = now_ist
 
-            # Increment cycle count on state update
             if "cycle_count" not in self._state:
                 self._state["cycle_count"] = 0
             self._state["cycle_count"] = self._state_version
             self._state["last_cycle_ts_iso"] = now_ist.isoformat()
             self._state["last_fetch_ts_iso"] = now_ist.isoformat()
 
-            # Check broker connectivity periodically (every 10 state updates)
-            # BUT: Don't overwrite broker status if it was set by sync_from_files
-            # Only check if broker status is not already set
+            # Check broker connectivity periodically (every 10 state updates), but do not overwrite
+            # broker status when a fresher broker value was supplied in this update.
             if self._state_version % 10 == 0 and "broker" not in updates:
                 self._state["broker"] = self._check_broker_connectivity()
 
-            # Deep merge updates
             self._deep_merge(self._state, updates)
-
-            # Save to file for persistence
             self._save_state()
-
             return self._state_version
 
     def _deep_merge(self, base: Dict, updates: Dict):
@@ -148,7 +137,6 @@ class RuntimeStateStore:
     def get_state(self) -> Dict[str, Any]:
         """Get current state snapshot (thread-safe)"""
         with self._lock:
-            # Return a deep copy to prevent external modifications
             return json.loads(json.dumps(self._state))
 
     def get_state_version(self) -> int:
@@ -162,14 +150,12 @@ class RuntimeStateStore:
             with open(state_file, "w") as f:
                 json.dump(self._state, f, indent=2)
 
-            # Also save to state_snapshots for history
             snapshots_dir = self.outputs_dir / "state_snapshots"
             snapshots_dir.mkdir(exist_ok=True)
             snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
             with open(snapshot_file, "w") as f:
                 json.dump(self._state, f, indent=2)
 
-            # Keep only last 1000 snapshots
             snapshot_files = sorted(
                 snapshots_dir.glob("state_*.json"),
                 key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
@@ -178,7 +164,7 @@ class RuntimeStateStore:
                 for old_file in snapshot_files[:-1000]:
                     try:
                         old_file.unlink()
-                    except:
+                    except Exception:
                         pass
         except Exception as e:
             print(f"Warning: Failed to save state: {e}")
@@ -203,24 +189,20 @@ class RuntimeStateStore:
         """
         updates = {}
 
-        # Sync health data
         try:
             health_file = self.outputs_dir / "health.json"
             if health_file.exists():
                 health = json.loads(health_file.read_text())
 
-                # Always enforce PAPER mode - never allow LIVE mode (safety)
                 updates["mode"] = "PAPER"  # Force PAPER regardless of health data
 
-                # Use is_connected from health.json (same logic as /api/health endpoint)
-                # health.json has 'is_connected' field, /api/health converts it to 'broker_status'
                 is_connected = health.get("is_connected", False)
                 broker_status_str = "connected" if is_connected else "disconnected"
 
                 updates["broker"] = {
                     "connected": is_connected,
                     "name": "dhan",
-                    "status": broker_status_str,  # Match /api/health format
+                    "status": broker_status_str,
                     "error": None,
                     "latency_ms": health.get("broker_latency_ms"),
                     "last_ok": datetime.now(IST).isoformat() if is_connected else None,
@@ -229,9 +211,8 @@ class RuntimeStateStore:
                     "is_open": health.get("market_status") == "open",
                     "reason": health.get("market_status", "closed"),
                 }
-                # REAL_ONLY MODE: Never set data_source to SYNTHETIC
                 health_data_source = health.get("data_source", "not_ready" if REAL_ONLY else "SYNTHETIC")
-                if REAL_ONLY and health_data_source.lower() in ("synthetic", "simulated"):
+                if REAL_ONLY and str(health_data_source).lower() in ("synthetic", "simulated"):
                     updates["data_source"] = "not_ready"
                 else:
                     updates["data_source"] = health_data_source
@@ -248,7 +229,6 @@ class RuntimeStateStore:
         except Exception as e:
             print(f"Warning: Failed to sync health: {e}")
 
-        # Sync positions with reconciliation
         try:
             from dashboard.backend.position_reconciliation import PositionReconciliation
 
@@ -265,7 +245,6 @@ class RuntimeStateStore:
             }
         except Exception as e:
             print(f"Warning: Failed to reconcile positions: {e}")
-            # Fallback to simple sync
             try:
                 positions_file = self.outputs_dir / "positions_live.json"
                 if positions_file.exists():
@@ -274,10 +253,9 @@ class RuntimeStateStore:
                     if isinstance(positions, list):
                         updates["positions"] = positions
                         updates["positions_source"] = "INTERNAL_UNVERIFIED"
-            except:
+            except Exception:
                 pass
 
-        # Sync PnL
         try:
             pnl_file = self.outputs_dir / "paper_pnl_summary.json"
             if pnl_file.exists():
@@ -291,7 +269,6 @@ class RuntimeStateStore:
         except Exception as e:
             print(f"Warning: Failed to sync PnL: {e}")
 
-        # Sync signals
         try:
             signal_file = self.outputs_dir / "top_trade_signal.json"
             if signal_file.exists():
@@ -307,68 +284,44 @@ class RuntimeStateStore:
         except Exception as e:
             print(f"Warning: Failed to sync signals: {e}")
 
-        # Add cycle tracking
         updates["cycle_count"] = 0
         updates["last_cycle_ts_iso"] = None
         updates["last_fetch_ts_iso"] = datetime.now(IST).isoformat()
 
-        # Apply updates
         if updates:
             self.update_state(updates)
 
     def add_alert(self, level: str, code: str, message: str):
-        """Add an alert to the state"""
-        alert = {
-            "level": level,  # INFO, WARN, CRIT
-            "code": code,
-            "message": message,
-            "ts": datetime.now(IST).isoformat(),
-            "read": False,
-        }
+        """Add an alert to the state. Kept for backward compatibility."""
+        self.upsert_alert(level, code, message)
 
-        with self._lock:
-            if "alerts" not in self._state:
-                self._state["alerts"] = []
-            self._state["alerts"].insert(0, alert)  # Most recent first
-            # Keep only last 100 alerts
-            self._state["alerts"] = self._state["alerts"][:100]
-            self._state_version += 1
-            self._save_state()
-
-
-# Global instance
-_state_store: Optional[RuntimeStateStore] = None
-
-
-def get_state_store(outputs_dir: Optional[Path] = None) -> RuntimeStateStore:
-    """Get or create global state store instance"""
-    global _state_store
-    if _state_store is None:
-        if outputs_dir is None:
-            # Default to outputs directory
-            outputs_dir = Path(__file__).parent.parent.parent / "outputs"
-        _state_store = RuntimeStateStore(outputs_dir)
-        _state_store.load_state()
-        _state_store.sync_from_files()
-    return _state_store
     def upsert_alert(self, level: str, code: str, message: str) -> None:
         """Insert alert only if not already active. Prevents duplicate flood every 5s."""
         with self._lock:
-            # Check if active (non-resolved) alert with same code exists
-            existing = [a for a in self._state.get("alerts", [])
-                        if a.get("code") == code and not a.get("resolved", False)]
+            if "alerts" not in self._state:
+                self._state["alerts"] = []
+            existing = [
+                a for a in self._state.get("alerts", [])
+                if a.get("code") == code and not a.get("resolved", False)
+            ]
             if existing:
                 existing[0]["ts"] = datetime.now(IST).isoformat()
+                existing[0]["level"] = level
+                existing[0]["message"] = message
+                self._save_state()
                 return
             alert = {
-                "level": level, "code": code, "message": message,
+                "level": level,
+                "code": code,
+                "message": message,
                 "ts": datetime.now(IST).isoformat(),
-                "read": False, "resolved": False,
+                "read": False,
+                "resolved": False,
             }
-            alerts = self._state.get("alerts", [])
-            alerts.insert(0, alert)
-            self._state["alerts"] = alerts[:100]
+            self._state["alerts"].insert(0, alert)
+            self._state["alerts"] = self._state["alerts"][:100]
             self._state_version += 1
+            self._save_state()
 
     def resolve_alert(self, code: str) -> None:
         """Remove active alert by code. Called when condition clears."""
@@ -381,5 +334,20 @@ def get_state_store(outputs_dir: Optional[Path] = None) -> RuntimeStateStore:
             ]
             if len(self._state["alerts"]) != before:
                 self._state_version += 1
+                self._save_state()
 
 
+# Global instance
+_state_store: Optional[RuntimeStateStore] = None
+
+
+def get_state_store(outputs_dir: Optional[Path] = None) -> RuntimeStateStore:
+    """Get or create global state store instance"""
+    global _state_store
+    if _state_store is None:
+        if outputs_dir is None:
+            outputs_dir = Path(__file__).parent.parent.parent / "outputs"
+        _state_store = RuntimeStateStore(outputs_dir)
+        _state_store.load_state()
+        _state_store.sync_from_files()
+    return _state_store
