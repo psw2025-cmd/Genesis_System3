@@ -1528,7 +1528,24 @@ async def get_chain(underlying: str):
             except Exception:
                 pass
 
-        # Market is open (or closed with cached CSV fallback)
+        # ALWAYS try Dhan P0 first when market is open (or as fallback)
+        # chain_raw_live.csv on Render is from repo clone — may be months old
+        # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
+        try:
+            from dashboard.backend.chain_adapter import fetch_chain_for_api
+            from core.data.datasource_manager import DataSourceManager
+            _dsm = DataSourceManager()
+            _live = fetch_chain_for_api(_dsm, underlying.upper())
+            if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
+                _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
+                _live["source_priority"] = "dhan_p0_live"
+                return _live
+            else:
+                print(f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback")
+        except Exception as _dsm_err:
+            print(f"[chain/{underlying}] DSM failed: {_dsm_err} — using CSV fallback")
+
+        # CSV fallback (only reached if Dhan P0 fails)
         chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
         if not chain_file.exists():
             # Try Dhan Data API directly
@@ -1551,21 +1568,7 @@ async def get_chain(underlying: str):
                 "data_source": "real",
             }
 
-        # Freshness check: if file older than 4 hours, try Dhan API first
-        import time as _time
-        file_age_hours = (_time.time() - chain_file.stat().st_mtime) / 3600
-        if file_age_hours > 4:
-            try:
-                from core.data.datasource_manager import DataSourceManager
-                from dashboard.backend.chain_adapter import fetch_chain_for_api
-                _dsm = DataSourceManager()
-                _fresh = fetch_chain_for_api(_dsm, underlying.upper())
-                if _fresh and _fresh.get("contracts") and len(_fresh["contracts"]) > 10:
-                    _fresh["file_age_hours"] = round(file_age_hours, 1)
-                    _fresh["source_note"] = "Live Dhan API (CSV was stale)"
-                    return _fresh
-            except Exception:
-                pass  # Fall through to stale CSV
+        # DSM already tried above — directly read CSV as last resort
 
         # Try pandas first, fallback to csv module
         df = None
