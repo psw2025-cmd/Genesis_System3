@@ -264,7 +264,11 @@ const app = createApp({
     function selectChainSymbol(sym){chainSymbol.value=sym;loadChain();}
     async function loadLogs(){const d=await fetchJSON('/api/logs/tail?lines=150');if(d?.logs)logsData.value=d.logs;}
 
+    let _polling = false;
     async function pollAll(){
+      if (_polling) return;  // prevent overlapping polls if one hangs
+      _polling = true;
+      try {
       const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
@@ -297,6 +301,11 @@ const app = createApp({
       if(lrn) learningData.value=lrn;
       if(port) portfolioData.value=port;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+      } catch(e) {
+        console.warn('[dashboard] poll error (will retry next cycle):', e?.message);
+      } finally {
+        _polling = false;
+      }
     }
 
     // Charts
