@@ -11,13 +11,21 @@
 <body>
 <div id="app">
 
-  <!-- TOPBAR -->
+  <!-- PREMIUM IDENTITY HEADER -->
   <header class="topbar">
-    <div class="topbar-left">
-      <div class="logo-hex">⬡</div>
-      <div class="logo-text">GENESIS <span>SYSTEM3</span></div>
-      <div class="mode-badge">{{ state.mode || 'PAPER' }}</div>
+    <!-- LEFT: System identity + owner card -->
+    <div class="identity-block">
+      <div class="system-title">
+        <span class="sys-hex">⬡</span>
+        <div class="sys-name-stack">
+          <div class="sys-title-line">SYSTEM3 <span class="sys-ai">AI</span> TRADING CONTROL CENTER</div>
+          <div class="owner-name">PRITAM S. WARGHADE</div>
+          <div class="owner-roles">OWNER · MARKET INTELLIGENCE · OPTION CHAIN · AUTONOMOUS LEARNING</div>
+        </div>
+      </div>
     </div>
+
+    <!-- CENTER: Market clock + status -->
     <div class="topbar-center">
       <div class="market-clock">
         <span class="clock-label">IST</span>
@@ -29,12 +37,18 @@
         <span class="pill-countdown">{{ marketCountdown }}</span>
       </div>
     </div>
+
+    <!-- RIGHT: Status chips -->
     <div class="topbar-right">
       <div class="status-chip" :class="broker.connected ? 'chip-green' : 'chip-red'">
         <span class="cdot"></span>{{ broker.connected ? 'DHAN CONNECTED' : 'BROKER OFFLINE' }}
       </div>
-      <div class="status-chip chip-amber"><span class="cdot"></span>PAPER MODE</div>
-      <div class="status-chip chip-red-dim"><span class="cdot"></span>LIVE OFF</div>
+      <div class="mode-chip">
+        <span class="mode-dot"></span>ANALYZER / PAPER
+      </div>
+      <div class="live-chip">
+        <span class="live-dot"></span>LIVE DISABLED
+      </div>
       <div class="rho-pill" :class="rhoClass">ρ {{ latestRho !== null ? latestRho.toFixed(2) : '--' }}</div>
     </div>
   </header>
