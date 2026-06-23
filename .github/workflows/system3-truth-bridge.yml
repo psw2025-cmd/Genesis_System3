@@ -30,14 +30,22 @@ jobs:
         run: |
           python scripts/system3_truth_bridge.py
 
-      - name: Commit truth bridge report
+      - name: Run Production Viability Bridge
+        run: |
+          python scripts/system3_production_viability_bridge.py
+
+      - name: Commit truth bridge reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/system3_truth_bridge/latest.json reports/latest/system3_truth_bridge/summary.md
+          git add \
+            reports/latest/system3_truth_bridge/latest.json \
+            reports/latest/system3_truth_bridge/summary.md \
+            reports/latest/production_viability_bridge/latest.json \
+            reports/latest/production_viability_bridge/summary.md
           if git diff --cached --quiet; then
             echo "No truth bridge changes to commit"
           else
-            git commit -m "proof: update System3 truth bridge snapshot"
+            git commit -m "proof: update System3 truth and production viability bridge snapshots"
             git push
           fi
