@@ -324,3 +324,59 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
   .nav-label, .sidebar-foot { display: none; }
   .nav-icon { width: 100%; text-align: center; }
 }
+
+/* ── PATH BANNERS ── */
+.path-banner { display:flex; flex-direction:column; gap:4px; padding:10px 16px;
+  border-radius:var(--r); border:1px solid var(--border2); font-family:var(--mono); font-size:.72rem; }
+.path-banner.path-b { background:rgba(59,130,246,.08); color:var(--blue); border-color:rgba(59,130,246,.2); }
+.path-gate { font-size:.65rem; color:var(--txt3); margin-top:2px; }
+.scanner-note { padding:10px 16px; background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--r); font-size:.72rem; color:var(--txt2); margin-bottom:4px; }
+.badge-a { padding:2px 8px; border-radius:3px; background:var(--amber2); color:var(--amber);
+  font-family:var(--mono); font-size:.6rem; font-weight:700; }
+.badge-b { padding:2px 8px; border-radius:3px; background:var(--blue2); color:var(--blue);
+  font-family:var(--mono); font-size:.6rem; font-weight:700; }
+.badge-live { background:var(--green2); color:var(--green); }
+.badge-closed { background:var(--red2); color:var(--red); }
+.sn-badge.index { display:inline-block; padding:2px 8px; border-radius:3px;
+  background:var(--cyan2); color:var(--cyan); font-family:var(--mono); font-size:.65rem; font-weight:700; margin-right:8px; }
+
+/* ── FORECAST TABLE ── */
+.forecast-table { padding:0 16px 12px; }
+.fc-hdr,.fc-row { display:grid; grid-template-columns:1fr 70px 80px 70px 1fr;
+  gap:8px; padding:6px 0; font-family:var(--mono); font-size:.68rem; border-bottom:1px solid var(--border); }
+.fc-hdr { color:var(--txt3); font-size:.6rem; }
+.tag-idx { padding:1px 6px; border-radius:3px; background:var(--cyan2); color:var(--cyan); font-size:.6rem; font-weight:700; }
+.tag-opt-t { padding:1px 6px; border-radius:3px; background:var(--green2); color:var(--green); font-size:.6rem; }
+.tag-opt { padding:1px 6px; border-radius:3px; background:var(--green2); color:var(--green); font-size:.6rem; font-weight:700; }
+.fc-note { display:flex; align-items:center; gap:8px; padding:8px 16px; background:var(--bg3);
+  border-top:1px solid var(--border); font-size:.7rem; color:var(--txt3); }
+
+/* ── TRADABILITY ROW ── */
+.tradability-row { display:flex; gap:8px; flex-wrap:wrap; }
+.trad-item { display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:4px;
+  font-family:var(--mono); font-size:.65rem; background:var(--bg2); border:1px solid var(--border); }
+.trad-item.pass { color:var(--green); border-color:rgba(0,232,122,.2); background:var(--green2); }
+.trad-item.warn { color:var(--amber); border-color:rgba(255,184,48,.2); background:var(--amber2); }
+
+/* ── KILL SWITCH BANNER ── */
+.kill-switch-banner { display:flex; align-items:center; gap:12px; padding:12px 16px;
+  background:rgba(255,61,90,.08); border:1px solid rgba(255,61,90,.2); border-radius:var(--r); }
+.ks-icon { font-size:1.3rem; }
+.ks-title { font-family:var(--mono); font-size:.75rem; font-weight:700; color:var(--red); }
+.ks-sub { font-size:.65rem; color:var(--txt3); margin-top:3px; }
+
+/* ── LOG BOX ── */
+.log-box { height:420px; overflow-y:auto; padding:8px 16px; background:var(--bg); font-family:var(--mono); font-size:.65rem; }
+.log-line { padding:2px 0; border-bottom:1px solid rgba(28,48,80,.4); color:var(--txt3); word-break:break-all; }
+.log-err { color:var(--red); }
+.log-warn { color:var(--amber); }
+.log-info { color:var(--txt2); }
+.btn-sm { padding:3px 10px; background:var(--bg3); border:1px solid var(--border2);
+  color:var(--txt2); border-radius:4px; cursor:pointer; font-family:var(--mono); font-size:.65rem; }
+.btn-sm:hover { background:var(--bg4); color:var(--txt); }
+
+/* ── CHIP VARIANTS ── */
+.chip-red-dim { background:rgba(255,61,90,.08); color:var(--red); border:1px solid rgba(255,61,90,.2); }
+.panel-foot { padding:6px 16px; font-family:var(--mono); font-size:.62rem; color:var(--txt3);
+  border-top:1px solid var(--border); background:var(--bg3); }
