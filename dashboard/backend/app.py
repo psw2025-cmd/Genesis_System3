@@ -413,6 +413,29 @@ async def get_broker_holdings():
         }
 
 
+@app.get("/api/broker/funds")
+async def get_broker_funds():
+    """Dhan fund limits / available balance — read-only. No orders."""
+    try:
+        from core.brokers.dhan.dhan_readonly import get_funds
+
+        result = get_funds()
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            **result,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
     """Dhan open positions — read-only. No orders."""
