@@ -126,6 +126,8 @@ createApp({
         reasons.push({ gate:'QC / Spread', status:'FAIL', reason: fails || 'Wide spread detected' });
       } else if (qcData.value.overall_passed === true) {
         reasons.push({ gate:'QC / Spread', status:'PASS', reason:'All spreads OK' });
+      } else if (qcData.value.skipped || qcData.value.status === 'MARKET_CLOSED') {
+        reasons.push({ gate:'QC / Spread', status:'WARN', reason:'Market closed — QC skipped' });
       } else {
         reasons.push({ gate:'QC / Spread', status:'UNKNOWN', reason:'No QC data (stale)' });
       }
@@ -220,7 +222,7 @@ createApp({
     function formatNum(n){return Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});}
     function formatLakh(n){n=Number(n||0);if(Math.abs(n)>=10000000)return(n/10000000).toFixed(2)+'Cr';if(Math.abs(n)>=100000)return(n/100000).toFixed(2)+'L';if(Math.abs(n)>=1000)return(n/1000).toFixed(1)+'K';return n.toFixed(0);}
     function scoreColor(s){if(s>=70)return'#00e87a';if(s>=40)return'#ffb830';return'#ff3d5a';}
-    function ageStr(ts){if(!ts)return'--';try{const d=new Date(ts);const s=Math.floor((Date.now()-d)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';return Math.floor(s/3600)+'h ago';}catch{return'--';}}
+    function ageStr(ts){if(!ts)return'--';try{const d=new Date(ts);const s=Math.floor((Date.now()-d)/1000);if(s<0)return'just now';if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}catch{return'--';}}
 
     async function fetchJSON(path){
       try{const r=await fetch(API+path,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json();}

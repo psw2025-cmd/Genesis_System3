@@ -1317,12 +1317,29 @@ async def get_qc():
                 return {
                     "status": "NOT_READY",
                     "qc_passed": False,
+                    "overall_passed": False,
                     "message": "BROKER_NOT_READY - Real QC data unavailable",
                     "data_source": "live",
                     "total_contracts": 0,
                     "underlying_count": 0,
                     "failures": ["Broker not connected"],
                 }
+
+        # Market closed — do not surface stale FAIL from last session
+        if not market_is_open:
+            return JSONResponse(
+                content={
+                    "status": "MARKET_CLOSED",
+                    "skipped": True,
+                    "overall_passed": None,
+                    "qc_passed": None,
+                    "message": "QC skipped — market closed (stale spread checks not applied)",
+                    "data_source": "skipped",
+                    "total_contracts": 0,
+                    "underlying_count": 0,
+                    "underlying_results": {},
+                }
+            )
 
         # Market is open - use real data
         qc_file = OUTPUTS_DIR / "qc_report_live.json"
@@ -1485,7 +1502,21 @@ async def get_chain(underlying: str):
                     "message": "BROKER_NOT_READY - Real chain data unavailable",
                 }
 
-        # Market is open - use real data
+        # Market closed — prefer Dhan snapshot, never label MARKET_OPEN
+        if not market_is_open:
+            try:
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+                _dsm = DataSourceManager()
+                _closed = fetch_chain_for_api(_dsm, underlying.upper())
+                if _closed and _closed.get("contracts"):
+                    _closed["status"] = "MARKET_CLOSED"
+                    _closed["message"] = "Market closed — last available chain snapshot"
+                    return _closed
+            except Exception:
+                pass
+
+        # Market is open (or closed with cached CSV fallback)
         chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
         if not chain_file.exists():
             # Try Dhan Data API directly
@@ -1752,6 +1783,7 @@ async def get_chain(underlying: str):
                 contract["oi_change"] = 0
             contracts.append(contract)
 
+        chain_status = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
         return {
             "underlying": underlying,
             "spot": float(spot),
@@ -1759,7 +1791,8 @@ async def get_chain(underlying: str):
             "contracts": contracts[:1000],
             "total_contracts": len(contracts),
             "data_source": "real",
-            "status": "MARKET_OPEN",
+            "status": chain_status,
+            "message": "Cached chain CSV" if not market_is_open else "Live chain data",
         }
     except Exception as e:
         # Return empty data instead of 500 error
@@ -1952,6 +1985,17 @@ async def get_pnl():
                 # No timestamp - add current one
                 processed_item["timestamp"] = datetime.now(IST).isoformat()
             processed_history.append(processed_item)
+
+        if not processed_history:
+            session_file = ROOT_DIR / "storage" / "paper" / "closed_trades_feb2026.json"
+            if session_file.exists():
+                try:
+                    session = json.loads(session_file.read_text(encoding="utf-8"))
+                    processed_history = session.get("trades", [])
+                    if summary and not summary.get("data_source"):
+                        summary["data_source"] = session.get("data_source", "paper_simulation")
+                except Exception:
+                    pass
 
         return {
             "history": processed_history,
