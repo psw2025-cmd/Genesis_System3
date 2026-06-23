@@ -684,12 +684,24 @@ async def get_system_health():
         jobs_summary = []
         try:
             cfg = json.loads(JOB_SCHED_CFG.read_text())
+            scheduler_state = {}
+            scheduler_state_file = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+            if scheduler_state_file.exists():
+                try:
+                    scheduler_state = json.loads(scheduler_state_file.read_text())
+                except Exception:
+                    pass
             for j in cfg.get("jobs", []):
+                job_id = j.get("id")
+                job_state = scheduler_state.get("jobs", {}).get(job_id, {})
                 jobs_summary.append({
-                    "id": j.get("id"),
+                    "id": job_id,
                     "name": j.get("name"),
                     "schedule_time": j.get("schedule_time", "daily"),
                     "enabled": j.get("enabled", False),
+                    "last_run_time": job_state.get("last_run_time"),
+                    "last_status": job_state.get("last_status"),
+                    "last_error": job_state.get("last_error"),
                 })
         except Exception:
             pass
@@ -1301,7 +1313,23 @@ async def get_qc():
             # Return JSONResponse to ensure proper serialization
             return JSONResponse(content=qc_data)
 
-        # REAL_ONLY MODE: If broker not ready, return NOT_READY
+        # Market closed — do not surface stale FAIL from last session (before broker gate)
+        if not market_is_open:
+            return JSONResponse(
+                content={
+                    "status": "MARKET_CLOSED",
+                    "skipped": True,
+                    "overall_passed": None,
+                    "qc_passed": None,
+                    "message": "QC skipped — market closed (stale spread checks not applied)",
+                    "data_source": "skipped",
+                    "total_contracts": 0,
+                    "underlying_count": 0,
+                    "underlying_results": {},
+                }
+            )
+
+        # REAL_ONLY MODE: If broker not ready, return NOT_READY (market open only)
         if REAL_ONLY:
             broker_connected = False
             if SSOT_AVAILABLE and state_store:
@@ -1324,22 +1352,6 @@ async def get_qc():
                     "underlying_count": 0,
                     "failures": ["Broker not connected"],
                 }
-
-        # Market closed — do not surface stale FAIL from last session
-        if not market_is_open:
-            return JSONResponse(
-                content={
-                    "status": "MARKET_CLOSED",
-                    "skipped": True,
-                    "overall_passed": None,
-                    "qc_passed": None,
-                    "message": "QC skipped — market closed (stale spread checks not applied)",
-                    "data_source": "skipped",
-                    "total_contracts": 0,
-                    "underlying_count": 0,
-                    "underlying_results": {},
-                }
-            )
 
         # Market is open - use real data
         qc_file = OUTPUTS_DIR / "qc_report_live.json"

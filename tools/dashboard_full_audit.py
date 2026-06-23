@@ -87,7 +87,13 @@ def main() -> int:
         bugs.append({"id": "LIVE_ENABLED", "severity": "CRITICAL", "detail": "live_trading_enabled true on cloud"})
     if chain.get("status") == "MARKET_OPEN" and not state.get("market", {}).get("is_open", False):
         bugs.append({"id": "CHAIN_STATUS_WRONG", "severity": "HIGH", "detail": "Chain MARKET_OPEN while market closed"})
-    if qc.get("overall_passed") is False and state.get("market", {}).get("is_open") is False:
+    qc_status = qc.get("status")
+    if (
+        qc.get("overall_passed") is False
+        and state.get("market", {}).get("is_open") is False
+        and qc_status not in ("MARKET_CLOSED", "NOT_READY", "NO_DATA")
+        and not qc.get("skipped")
+    ):
         bugs.append({"id": "QC_STALE_FAIL", "severity": "HIGH", "detail": "QC FAIL shown when market closed (stale report)"})
     if not paper.get("pnl", {}).get("history") and paper.get("pnl", {}).get("summary", {}).get("total_trades"):
         bugs.append({"id": "PAPER_HISTORY_EMPTY", "severity": "MEDIUM", "detail": "Paper summary exists but trade history empty"})
