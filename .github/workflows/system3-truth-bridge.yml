@@ -1,0 +1,43 @@
+name: System3 Truth Bridge
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub minimum practical interval is 5 minutes, but keep this light.
+    # Runs during Indian market hours plus after-market proof window.
+    - cron: '*/15 3-11 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  truth-bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run System3 Truth Bridge
+        env:
+          SYSTEM3_BASE_URL: https://genesis-system3-backend.onrender.com
+          SYSTEM3_UNDERLYINGS: NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY
+        run: |
+          python scripts/system3_truth_bridge.py
+
+      - name: Commit truth bridge report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/system3_truth_bridge/latest.json reports/latest/system3_truth_bridge/summary.md
+          if git diff --cached --quiet; then
+            echo "No truth bridge changes to commit"
+          else
+            git commit -m "proof: update System3 truth bridge snapshot"
+            git push
+          fi
