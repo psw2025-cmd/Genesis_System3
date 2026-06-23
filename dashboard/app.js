@@ -38,7 +38,6 @@ const app = createApp({
     const perfData     = ref({});
     const logsData     = ref([]);
     const learningData = ref({});
-    const portfolioData = ref({});
     const brokerHoldings = ref({ data: null });
     const brokerPositions = ref({ data: null });
     const brokerFunds = ref({ data: null });
