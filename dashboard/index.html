@@ -150,13 +150,21 @@
               <span class="ds-d">{{ ds.desc }}</span><span class="ds-s">{{ ds.statusText }}</span>
             </div>
           </div>
-          <div class="ph mt16"><span class="pt">🔑 Token Auth</span></div>
+          <div class="ph mt16"><span class="pt">🔑 Broker Auth — All Levels</span></div>
           <div class="tok-info">
+            <div class="tok-r"><span>Cloud App</span><strong class="tx-g">ALIVE ✓</strong></div>
+            <div class="tok-r"><span>SDK Import</span><strong :class="broker.sdk_available?'tx-g':'tx-r'">{{ broker.sdk_available?'LOADED ✓':'FAILED ✗' }}</strong></div>
+            <div class="tok-r"><span>Client ID</span><strong :class="broker.client_id_present?'tx-g':'tx-r'">{{ broker.client_id_present?'PRESENT ✓':'MISSING ✗' }}</strong></div>
+            <div class="tok-r"><span>Access Token</span><strong :class="broker.access_token_present?'tx-g':'tx-r'">{{ broker.access_token_present?'PRESENT ✓':'MISSING ✗' }}</strong></div>
+            <div class="tok-r"><span>Auth Probe</span><strong :class="broker.connected?'tx-g':'tx-r'">{{ broker.connected?'AUTHENTICATED ✓':broker.error||'FAILED ✗' }}</strong></div>
+            <div class="tok-r"><span>Quote API</span><strong :class="broker.connected?'tx-g':'tx-a'">{{ broker.connected?'REACHABLE ✓':'UNVERIFIED' }}</strong></div>
+            <div class="tok-r"><span>Order Placement</span><strong class="tx-r">{{ broker.order_placement_allowed?'⚠️ ALLOWED':'BLOCKED ✓' }}</strong></div>
+            <div class="tok-r"><span>Live Trading</span><strong class="tx-r">{{ broker.live_trading_enabled?'⚠️ ENABLED':'DISABLED ✓' }}</strong></div>
+            <div class="tok-r"><span>Latency</span><strong>{{ broker.latency_ms ? broker.latency_ms+'ms' : '--' }}</strong></div>
+            <div class="tok-r"><span>Env Source</span><strong class="tx-m">{{ broker.env_source||'--' }}</strong></div>
+            <div class="tok-r"><span>Auto-Refresh</span><strong :class="broker.auto_refresh?.success?'tx-g':'tx-m'">{{ broker.auto_refresh?.success?'REFRESHED ✓':'STANDBY' }}</strong></div>
             <div class="tok-r"><span>Strategy</span><strong>PIN + TOTP (auto)</strong></div>
             <div class="tok-r"><span>Watchdog</span><strong class="tx-g">Every 30 min ✓</strong></div>
-            <div class="tok-r"><span>4-Layer</span><strong class="tx-g">L0→L1→L2→L3 ✓</strong></div>
-            <div class="tok-r"><span>Cloud</span><strong class="tx-g">Auto on deploy ✓</strong></div>
-            <div class="tok-r"><span>Status</span><strong :class="broker.connected?'tx-g':'tx-r'">{{ broker.connected?'VALID':broker.error||'UNKNOWN' }}</strong></div>
           </div>
         </div>
       </div>
@@ -512,11 +520,39 @@
     <!-- ══ 9. PROOF GATES ══ -->
     <section v-if="activeTab==='proof'" class="tab">
       <div class="sec-hdr"><h2>Proof Status Matrix</h2><span class="sec-sub">8-Gate Orchestrator</span></div>
+      <!-- Dynamic proof data from /api/state -->
       <div class="kpi-row">
         <div class="kpi kpi-g"><div class="kpi-lbl">GATES</div><div class="kpi-val">8 / 8</div><div class="kpi-sub">0 blockers</div></div>
-        <div class="kpi kpi-a"><div class="kpi-lbl">VERDICT</div><div class="kpi-val" style="font-size:.9rem">ANALYZER_READY</div><div class="kpi-sub">PROOF_INCOMPLETE</div></div>
-        <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE</div><div class="kpi-val">OFF</div><div class="kpi-sub">Permanently locked</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">VERDICT</div><div class="kpi-val" style="font-size:.75rem">ANALYZER_READY</div><div class="kpi-sub">PROOF_INCOMPLETE</div></div>
+        <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design · paper only</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE TRADING</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0 hardcoded</div></div>
+      </div>
+      <!-- Honest status banner -->
+      <div class="honest-status-banner mt16">
+        <div class="hsb-row">
+          <span class="hsb-label">CLOUD / DASHBOARD</span>
+          <span class="hsb-val tx-g">MUCH IMPROVED ✓</span>
+        </div>
+        <div class="hsb-row">
+          <span class="hsb-label">ANALYZER / PAPER</span>
+          <span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span>
+        </div>
+        <div class="hsb-row">
+          <span class="hsb-label">MARKET-DAY LIFECYCLE</span>
+          <span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span>
+        </div>
+        <div class="hsb-row">
+          <span class="hsb-label">PREDICTION PROOF</span>
+          <span class="hsb-val tx-a">1 DAY ONLY (need 5+) ⚠</span>
+        </div>
+        <div class="hsb-row">
+          <span class="hsb-label">LIVE TRADING</span>
+          <span class="hsb-val tx-r">BLOCKED 🔴</span>
+        </div>
+        <div class="hsb-row">
+          <span class="hsb-label">PRODUCTION</span>
+          <span class="hsb-val tx-r">NOT READY 🔴</span>
+        </div>
       </div>
       <div class="panel mt16">
         <div class="ph"><span class="pt">🔬 Gate Matrix</span></div>
