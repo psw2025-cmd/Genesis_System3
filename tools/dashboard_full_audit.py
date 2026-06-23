@@ -29,6 +29,7 @@ REQUIRED_ENDPOINTS = [
     "/api/broker/holdings",
     "/api/broker/positions/live",
     "/api/trader/requirements",
+    "/api/approval/status",
 ]
 
 REAL_MONEY_BLOCKERS = [
@@ -37,7 +38,6 @@ REAL_MONEY_BLOCKERS = [
     "ML_ACCURACY_RHO_BELOW_0_70",
     "POSITIVE_NET_EXPECTANCY_NOT_PROVEN",
     "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
-    "HUMAN_APPROVAL_REQUIRED",
 ]
 
 

@@ -139,8 +139,13 @@ def main() -> int:
         "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
         "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
         "MULTI_DAY_STABILITY_NOT_PROVEN",
-        "HUMAN_APPROVAL_REQUIRED_FOR_LIVE",
     ]
+    try:
+        from dashboard.backend.human_approval_service import load_human_approval
+        if not load_human_approval().get("approved"):
+            blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
+    except Exception:
+        blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
     if not broker.get("connected"):
         blockers.append("BROKER_NOT_CONNECTED")
 
@@ -167,7 +172,7 @@ def main() -> int:
             "Run market-day paper lifecycle proof Mon-Fri 09:30-15:30 IST",
             "Prove positive net expectancy after brokerage/STT/slippage",
             "Accumulate 5+ prediction accuracy days with rho>=0.70",
-            "Explicit human sign-off before LIVE_TRADING_ENABLED (never auto)",
+            "Technical proof gates must pass before LIVE_TRADING_ENABLED ENV flip",
         ],
     }
 

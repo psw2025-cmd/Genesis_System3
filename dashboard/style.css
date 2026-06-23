@@ -375,6 +375,26 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 .sn-badge.index { display:inline-block; padding:2px 8px; border-radius:3px;
   background:var(--cyan2); color:var(--cyan); font-family:var(--mono); font-size:.65rem; font-weight:700; margin-right:8px; }
 
+.global-proof-strip {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:12px;
+}
+.global-proof-strip span {
+  min-width:0;
+  padding:7px 10px;
+  border:1px solid rgba(59,130,246,.25);
+  border-radius:var(--r);
+  background:rgba(59,130,246,.06);
+  color:var(--txt2);
+  font-family:var(--mono);
+  font-size:.62rem;
+  font-weight:700;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+
 /* ── FORECAST TABLE ── */
 .forecast-table { padding:0 16px 12px; }
 .fc-hdr,.fc-row { display:grid; grid-template-columns:1fr 70px 80px 70px 1fr;
@@ -414,6 +434,33 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 .chip-red-dim { background:rgba(255,61,90,.08); color:var(--red); border:1px solid rgba(255,61,90,.2); }
 .panel-foot { padding:6px 16px; font-family:var(--mono); font-size:.62rem; color:var(--txt3);
   border-top:1px solid var(--border); background:var(--bg3); }
+
+/* Owner approval banner */
+.owner-approval-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: var(--r);
+  border: 1px solid rgba(0,232,122,.35);
+  background: linear-gradient(135deg, rgba(0,232,122,.12), rgba(0,200,255,.06));
+  box-shadow: 0 0 24px rgba(0,232,122,.12), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.oab-icon { font-size: 1.5rem; filter: drop-shadow(0 0 8px rgba(0,232,122,.6)); }
+.oab-title {
+  font-family: var(--mono);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--green);
+  text-transform: uppercase;
+}
+.oab-sub {
+  margin-top: 4px;
+  font-size: .68rem;
+  color: var(--txt2);
+  line-height: 1.4;
+}
 
 
 /* ══════════════════════════════════════════
@@ -784,6 +831,8 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
   .proof-strip { grid-template-columns: 1fr 1fr; gap: 8px; }
   .proof-chip { padding: 9px 10px; }
   .proof-chip strong { font-size: .62rem; }
+  .global-proof-strip { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .global-proof-strip span { padding: 6px 8px; font-size: .58rem; }
 
   /* Two-col → single col on mobile */
   .two-col { grid-template-columns: 1fr !important; }
@@ -835,6 +884,7 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 @media (max-width: 480px) {
   .kpi-row { grid-template-columns: 1fr !important; }
   .proof-strip { grid-template-columns: 1fr; }
+  .global-proof-strip { grid-template-columns: 1fr; }
   .topbar-right { gap: 3px; }
   .rho-pill { display: none; }
 }
