@@ -589,3 +589,65 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
   font-weight: 700;
   letter-spacing: .06em;
 }
+
+/* ── NO TRADE REASON MATRIX ── */
+.no-trade-grid { padding: 0 16px 12px; }
+.nt-hdr, .nt-row { display: grid; grid-template-columns: 140px 100px 1fr; gap: 8px; padding: 7px 0;
+  border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: .68rem; }
+.nt-hdr { color: var(--txt3); font-size: .6rem; letter-spacing: .06em; }
+.nt-gate { font-weight: 700; }
+.nt-status { font-weight: 700; }
+.nt-reason { color: var(--txt3); }
+
+/* ── BROKER TRUTH GRID ── */
+.broker-truth-grid { padding: 8px 16px; }
+.bt-row { display: grid; grid-template-columns: 140px 160px 1fr; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: .68rem; }
+.bt-lbl { color: var(--txt3); }
+.bt-val { font-weight: 700; }
+.bt-note { color: var(--txt3); font-size: .62rem; }
+
+/* ── QC GRID ── */
+.qc-grid { padding: 6px 16px; }
+.qc-hdr, .qc-row { display: grid; grid-template-columns: 100px 80px 60px 1fr; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: .65rem; }
+.qc-hdr { color: var(--txt3); font-size: .58rem; }
+
+/* ── CHARGES BREAKDOWN ── */
+.charges-grid { padding: 8px 16px; }
+.ch-row { display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .72rem; }
+.ch-row span { color: var(--txt3); }
+.ch-row strong { font-family: var(--mono); font-size: .72rem; }
+.ch-total { background: var(--bg3); margin: 4px -16px 0; padding: 10px 16px; border-radius: 0 0 var(--r) var(--r); }
+.ch-total span { color: var(--txt); font-weight: 700; }
+.ch-total strong { font-size: .9rem; }
+
+/* ── FULL TRADE TABLE ── */
+.full-trade-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: .65rem; min-width: 800px; }
+.full-trade-table th { padding: 7px 8px; background: var(--bg3); color: var(--txt3); font-size: .58rem;
+  letter-spacing: .06em; border-bottom: 1px solid var(--border2); text-align: right; }
+.full-trade-table th:first-child, .full-trade-table th:nth-child(2), .full-trade-table th:nth-child(3) { text-align: left; }
+.ftt-row td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+.ftt-row td:first-child, .ftt-row td:nth-child(2), .ftt-row td:nth-child(3) { text-align: left; }
+.ftt-row:hover { background: var(--bg3); }
+
+/* ── ALERTS ── */
+.alert-row { display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: .7rem; }
+.alert-warn { border-left: 3px solid var(--amber); background: rgba(255,184,48,.04); }
+.alert-crit { border-left: 3px solid var(--red); background: rgba(255,61,90,.04); }
+.alert-info { border-left: 3px solid var(--blue); background: rgba(59,130,246,.04); }
+.alert-lvl { font-weight: 700; min-width: 40px; }
+.alert-code { color: var(--cyan); min-width: 160px; font-size: .68rem; }
+.alert-msg { flex: 1; color: var(--txt2); }
+.alert-ts { color: var(--txt3); font-size: .62rem; }
+.alert-tbl { padding: 0 16px 12px; }
+.alert-hdr, .alert-hist-row { display: grid; grid-template-columns: 50px 160px 1fr 70px 70px;
+  gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--border); align-items: center; }
+.alert-hdr { color: var(--txt3); font-size: .58rem; letter-spacing: .06em; }
+.alert-lvl-s { font-family: var(--mono); font-weight: 700; font-size: .65rem; }
+
+/* ── NAV ALERT badge (unread count) ── */
+.nav-alert { margin-left: auto; font-family: var(--mono); font-size: .6rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px; background: var(--red2); color: var(--red); }
