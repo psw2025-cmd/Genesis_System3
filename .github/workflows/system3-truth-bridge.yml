@@ -1,11 +1,9 @@
 name: System3 Truth Bridge
 
 on:
+  # Billing-safe mode: manual only.
+  # Do not enable schedule on GitHub-hosted runners while billing/quota is an issue.
   workflow_dispatch:
-  schedule:
-    # GitHub minimum practical interval is 5 minutes, but keep this light.
-    # Runs during Indian market hours plus after-market proof window.
-    - cron: '*/15 3-11 * * 1-5'
 
 permissions:
   contents: write
