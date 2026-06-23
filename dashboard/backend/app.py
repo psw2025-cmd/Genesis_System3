@@ -178,7 +178,15 @@ except ImportError:
     print("Warning: watchdog not available - file watching disabled")
 
 ROOT_DIR = Path(__file__).parent.parent.parent
-OUTPUTS_DIR = ROOT_DIR / "outputs"
+# OUTPUTS_DIR: check src/outputs first (actual data location), fallback to outputs/
+_src_outputs = ROOT_DIR / "src" / "outputs"
+_root_outputs = ROOT_DIR / "outputs"
+if _src_outputs.exists():
+    OUTPUTS_DIR = _src_outputs
+else:
+    OUTPUTS_DIR = _root_outputs
+    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+print(f"[Backend] OUTPUTS_DIR resolved to: {OUTPUTS_DIR}")
 LOGS_DIR = ROOT_DIR / "logs"
 AUDIT_DIR = OUTPUTS_DIR / "audit"
 DB_DIR = OUTPUTS_DIR / "db"
@@ -1751,6 +1759,8 @@ async def get_pnl():
     try:
         pnl_csv = OUTPUTS_DIR / "paper_pnl.csv"
         pnl_summary = OUTPUTS_DIR / "paper_pnl_summary.json"
+        if not pnl_summary.exists():
+            pnl_summary = ROOT_DIR / "paper_pnl_summary.json"
 
         csv_data = []
         if pnl_csv.exists():
@@ -1786,6 +1796,15 @@ async def get_pnl():
                 summary = json.loads(pnl_summary.read_text())
             except:
                 summary = {}
+        # Also try pnl_live.json as authoritative source
+        pnl_live = OUTPUTS_DIR / "pnl_live.json"
+        if pnl_live.exists() and not summary.get("total_trades"):
+            try:
+                live = json.loads(pnl_live.read_text())
+                if live.get("total_trades", 0) > 0:
+                    summary = live
+            except:
+                pass
 
         # Ensure history has proper ISO timestamps
         processed_history = []
@@ -4169,3 +4188,4 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
