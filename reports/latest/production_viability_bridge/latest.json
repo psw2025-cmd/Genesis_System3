@@ -1,0 +1,30 @@
+{
+  "generated_utc": "NOT_RUN_YET",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "summary": {
+    "production_live_ready": false,
+    "paper_analyzer_allowed": true,
+    "strategy_quarantined_for_live": true,
+    "status": "NOT_RUN_YET",
+    "reason": "Production viability bridge scripts are installed, but no live report has been generated yet."
+  },
+  "blockers": [
+    {
+      "severity": "HIGH",
+      "code": "PRODUCTION_VIABILITY_NOT_RUN_YET",
+      "message": "Production viability report has not been generated from live Truth Bridge output yet."
+    },
+    {
+      "severity": "HIGH",
+      "code": "LIVE_DISABLED_UNTIL_PROVEN",
+      "message": "Live trading remains disabled until real market paper lifecycle, broker freshness, tick health, execution quality, and positive net expectancy are proven."
+    }
+  ],
+  "warnings": [
+    {
+      "severity": "MEDIUM",
+      "code": "GITHUB_ACTIONS_BILLING_SAFE_MODE",
+      "message": "Scheduled GitHub Actions are disabled to avoid billing/minute usage."
+    }
+  ]
+}
