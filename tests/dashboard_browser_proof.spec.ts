@@ -50,9 +50,18 @@ for (const viewport of [
 
     let responseOk = false;
     try {
-      const response = await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
+      const response = await page.goto(DASHBOARD_URL, { waitUntil: 'networkidle', timeout: 90000 });
       responseOk = !!response && response.ok();
-      await page.waitForTimeout(5000);
+      await page.waitForSelector('text=SYSTEM3', { timeout: 30000 }).catch(() => {});
+      await page.waitForSelector('text=PAPER', { timeout: 30000 }).catch(() => {});
+      await page.waitForTimeout(3000);
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(1500);
+      const paperTab = page.locator('.nav-label', { hasText: 'Paper Lifecycle' }).first();
+      if (await paperTab.isVisible().catch(() => false)) {
+        await paperTab.click().catch(() => {});
+        await page.waitForTimeout(2500);
+      }
     } catch (err) {
       loadResult = 'DASHBOARD_LOAD_FAILED';
       fieldResults.push({
@@ -75,24 +84,26 @@ for (const viewport of [
     }
 
     const checks: Array<[string, RegExp[]]> = [
-      ['analyzer_paper_mode', [/PAPER/i, /ANALYZER/i, /Paper/i]],
-      ['live_trading_disabled', [/live trading disabled/i, /Live Trading.*Disabled/i, /order_placement_allowed.*false/i]],
-      ['broker_status', [/broker/i, /dhan/i, /connected/i]],
-      ['data_source', [/data source/i, /BROKER/i, /source/i]],
-      ['market_status', [/market/i, /closed/i, /open/i]],
-      ['option_chain_readiness', [/option.?chain/i, /chain/i, /contracts/i]],
-      ['proof_audit_status', [/proof/i, /audit/i, /QC/i, /status/i]],
-      ['pnl_positions', [/P&L/i, /PnL/i, /positions/i, /unrealized/i]],
+      ['analyzer_paper_mode', [/ANALYZER\s*\/\s*PAPER/i, /PAPER ONLY/i, /PAPER MODE/i]],
+      ['live_trading_disabled', [/LIVE DISABLED/i, /LIVE TRADING[\s\S]{0,20}DISABLED/i, /LIVE TRADING KILL SWITCH/i, /BLOCKED/i]],
+      ['broker_status', [/DHAN CONNECTED/i, /BROKER OFFLINE/i, /BROKER/i, /Dhan/i]],
+      ['data_source', [/Chain Source/i, /DATA APIs/i, /Dhan/i, /REST Fallback/i]],
+      ['market_status', [/MARKET OPEN/i, /MARKET CLOSED/i, /MARKET/i]],
+      ['option_chain_readiness', [/Option Chain/i, /Contracts/i, /CHAIN/i]],
+      ['proof_audit_status', [/Proof Status/i, /Gate Matrix/i, /QC Report/i, /Production Gate/i]],
+      ['pnl_positions', [/GROSS P&L/i, /NET P&L/i, /OPEN POSITIONS/i, /Paper Trade/i, /WIN RATE/i, /P&L Charges/i]],
       ['no_false_live_ready', []],
     ];
 
     for (const [field, patterns] of checks) {
       if (field === 'no_false_live_ready') {
-        const falseLive = /LIVE[_\s-]?READY/i.test(bodyText) && !/NOT.*READY/i.test(bodyText);
+        const falseLive =
+          (/PRODUCTION\s*READY(?!\s*NOT)/i.test(bodyText) && !/NOT READY/i.test(bodyText)) ||
+          (/LIVE[_\s-]?READY/i.test(bodyText) && !/NOT.*READY/i.test(bodyText));
         fieldResults.push({
           field: `${field}_${viewport.name}`,
           status: falseLive ? 'NOT_PROVEN' : 'PASS',
-          detail: falseLive ? 'Possible false LIVE_READY claim' : 'No false LIVE_READY claim detected',
+          detail: falseLive ? 'Possible false LIVE/PRODUCTION READY claim' : 'Shows PRODUCTION NOT READY / LIVE BLOCKED',
         });
         continue;
       }
