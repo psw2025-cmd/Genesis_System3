@@ -1,8 +1,8 @@
 @echo off
 REM System3 Truth Bridge - Local No-Billing Runner
-REM Runs on your PC. Uses no GitHub Actions minutes.
+REM Runs from this cloned repo. Uses no GitHub Actions minutes.
 
-cd /d C:\openalgo-main
+cd /d "%~dp0\.."
 
 if exist .venv\Scripts\python.exe (
   set PY=.venv\Scripts\python.exe
@@ -10,6 +10,7 @@ if exist .venv\Scripts\python.exe (
   set PY=python
 )
 
+echo [INFO] Repo folder: %CD%
 echo [INFO] Running System3 Truth Bridge locally...
 %PY% scripts\system3_truth_bridge.py
 if errorlevel 1 goto fail
