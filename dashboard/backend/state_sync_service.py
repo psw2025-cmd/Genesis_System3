@@ -48,6 +48,30 @@ class StateSyncService:
         """Sync state from output files"""
         updates = {}
 
+        # BOOTSTRAP: On first few syncs, if state_store shows broker not connected,
+        # directly probe Dhan to get real truth (health.json may not exist on cloud)
+        try:
+            current = self.state_store.get_state()
+            if not current.get("broker", {}).get("connected", False):
+                try:
+                    import sys
+                    from pathlib import Path
+                    root = Path(__file__).parent.parent.parent
+                    if str(root) not in sys.path:
+                        sys.path.insert(0, str(root))
+                    from core.brokers.dhan.dhan_readonly import get_status as _probe_dhan
+                    _ds = _probe_dhan()
+                    if _ds.get("connected"):
+                        updates["broker"] = {
+                            "connected": True, "name": "dhan",
+                            "status": "connected", "error": None,
+                            "latency_ms": _ds.get("latency_ms"),
+                        }
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         # Sync market status
         try:
             if MARKET_DETECTION_AVAILABLE:
