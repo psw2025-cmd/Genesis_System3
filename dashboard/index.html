@@ -151,14 +151,14 @@
       <div class="kpi-row">
         <div class="kpi kpi-b">
           <div class="kpi-lbl">TOTAL P&L</div>
-          <div class="kpi-val" :class="(paperData.summary?.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">
-            ₹{{ formatNum(paperData.summary?.total_pnl||0) }}</div>
+          <div class="kpi-val" :class="(paperSummary?.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">
+            ₹{{ formatNum(paperSummary?.total_pnl||0) }}</div>
           <div class="kpi-sub">Realised + Unrealised</div>
         </div>
         <div class="kpi kpi-g">
           <div class="kpi-lbl">WIN RATE</div>
-          <div class="kpi-val">{{ paperData.summary?.win_rate ? (paperData.summary.win_rate*100).toFixed(1)+'%' : '--' }}</div>
-          <div class="kpi-sub">{{ paperData.summary?.winning_trades||0 }}W / {{ paperData.summary?.losing_trades||0 }}L</div>
+          <div class="kpi-val">{{ paperSummary?.win_rate ? (paperSummary.win_rate*100).toFixed(1)+'%' : '--' }}</div>
+          <div class="kpi-sub">{{ paperSummary?.winning_trades||0 }}W / {{ paperSummary?.losing_trades||0 }}L</div>
         </div>
         <div class="kpi kpi-c">
           <div class="kpi-lbl">OPEN POSITIONS</div>
@@ -167,19 +167,19 @@
         </div>
         <div class="kpi kpi-p">
           <div class="kpi-lbl">TOTAL TRADES</div>
-          <div class="kpi-val">{{ paperData.summary?.total_trades||0 }}</div>
+          <div class="kpi-val">{{ paperSummary?.total_trades||0 }}</div>
           <div class="kpi-sub">All lifecycle</div>
         </div>
         <div class="kpi kpi-a">
           <div class="kpi-lbl">REALISED P&L</div>
-          <div class="kpi-val" :class="(paperData.summary?.total_realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">
-            ₹{{ formatNum(paperData.summary?.total_realized_pnl||0) }}</div>
+          <div class="kpi-val" :class="(paperSummary?.total_realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">
+            ₹{{ formatNum(paperSummary?.total_realized_pnl||0) }}</div>
           <div class="kpi-sub">Closed trades</div>
         </div>
         <div class="kpi kpi-s">
           <div class="kpi-lbl">UNREALISED</div>
-          <div class="kpi-val" :class="(paperData.summary?.total_unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">
-            ₹{{ formatNum(paperData.summary?.total_unrealized_pnl||0) }}</div>
+          <div class="kpi-val" :class="(paperSummary?.total_unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">
+            ₹{{ formatNum(paperSummary?.total_unrealized_pnl||0) }}</div>
           <div class="kpi-sub">Open trades</div>
         </div>
       </div>
@@ -329,7 +329,7 @@
                 <td class="ce-col ltp-col">{{ formatNum(row.ce?.ltp||0) }}</td>
                 <td class="ce-col">{{ row.ce?.delta ? row.ce.delta.toFixed(2):'-' }}</td>
                 <!-- Strike -->
-                <td class="strike-col" :class="{atm-strike: row.isATM}">
+                <td class="strike-col" :class="{'atm-strike': row.isATM}">
                   {{ formatNum(row.strike) }}<span v-if="row.isATM" class="atm-tag">ATM</span>
                 </td>
                 <!-- PE side -->
@@ -416,7 +416,7 @@
       <div class="two-col mt16">
         <div class="panel">
           <div class="ph"><span class="pt">📈 ρ Trend vs Target</span></div>
-          <div class="chart-h-tall"><canvas id="rhoFull"></canvas></div>
+          <div class="chart-h-tall"><canvas id="rhoFull" style="display:block"></canvas></div>
         </div>
         <div class="panel">
           <div class="ph"><span class="pt">📋 Validation Log</span></div>
