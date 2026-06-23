@@ -397,18 +397,38 @@ async def get_dhan_broker_status():
         }
 
 
+@app.get("/api/broker/truth")
+async def get_broker_truth():
+    """Multi-validated broker trader truth — holdings, positions, funds."""
+    try:
+        from dashboard.backend.broker_truth_validator import build_broker_truth_report
+    except ImportError:
+        from broker_truth_validator import build_broker_truth_report
+    return build_broker_truth_report()
+
+
 @app.get("/api/broker/holdings")
 async def get_broker_holdings():
     """Dhan equity holdings — read-only. No orders."""
     try:
         from core.brokers.dhan.dhan_readonly import get_holdings
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_holdings_payload,
+            normalize_holding_row,
+        )
 
         result = get_holdings()
+        raw_rows = normalize_holdings_payload(result.get("data"))
+        normalized = [normalize_holding_row(r) for r in raw_rows]
         return {
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "count": len(normalized),
+            "rows": normalized,
             **result,
+            "data": raw_rows,
         }
     except Exception as exc:
         return {
@@ -425,13 +445,22 @@ async def get_broker_funds():
     """Dhan fund limits / available balance — read-only. No orders."""
     try:
         from core.brokers.dhan.dhan_readonly import get_funds
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_funds_payload,
+            normalize_funds_row,
+        )
 
         result = get_funds()
+        raw = normalize_funds_payload(result.get("data"))
+        normalized = normalize_funds_row(raw)
         return {
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "normalized": normalized,
             **result,
+            "data": raw,
         }
     except Exception as exc:
         return {
@@ -448,13 +477,23 @@ async def get_broker_positions_live():
     """Dhan open positions — read-only. No orders."""
     try:
         from core.brokers.dhan.dhan_readonly import get_positions
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_positions_payload,
+            normalize_position_row,
+        )
 
         result = get_positions()
+        raw_rows = normalize_positions_payload(result.get("data"))
+        normalized = [normalize_position_row(r) for r in raw_rows]
         return {
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "count": len(normalized),
+            "rows": normalized,
             **result,
+            "data": raw_rows,
         }
     except Exception as exc:
         return {

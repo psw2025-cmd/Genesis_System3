@@ -43,6 +43,7 @@ const app = createApp({
     const brokerFunds = ref({ data: null });
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
     const approvalData  = ref({ human_approval: false, dashboard_status: 'PEND' });
+    const brokerTruth   = ref({ validation: {}, trader_fields: {} });
 
     // Chain
     const chainSymbols      = ['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY'];
@@ -118,26 +119,40 @@ const app = createApp({
     const portfolioTransparency = computed(() => portfolioData.value.data_transparency || '--');
     const activeAlerts = computed(() => alertsData.value.filter(a => !a.resolved));
 
-    // Broker holdings rows (real Dhan equity)
+    // Broker holdings rows (real Dhan equity) — multi-validated
     const holdingRows = computed(() => {
+      const truth = brokerTruth.value?.holdings?.raw_rows;
+      if (Array.isArray(truth) && truth.length) return truth;
+      const norm = brokerHoldings.value?.rows;
+      if (Array.isArray(norm) && norm.length) return norm.map(r => r.raw || r);
       const d = brokerHoldings.value?.data;
       if (!d) return [];
       const items = Array.isArray(d) ? d : (d.data || d.holdings || []);
       return Array.isArray(items) ? items : [];
     });
     const positionRows = computed(() => {
+      const truth = brokerTruth.value?.positions?.raw_rows;
+      if (Array.isArray(truth) && truth.length) return truth;
+      const norm = brokerPositions.value?.rows;
+      if (Array.isArray(norm) && norm.length) return norm.map(r => r.raw || r);
       const d = brokerPositions.value?.data;
       if (!d) return [];
       const items = Array.isArray(d) ? d : (d.data || d.positions || []);
       return Array.isArray(items) ? items : [];
     });
     const fundsInfo = computed(() => {
+      const n = brokerTruth.value?.funds?.normalized || brokerFunds.value?.normalized;
+      if (n) return n.raw || n;
       const d = brokerFunds.value?.data;
       if (!d) return {};
       return Array.isArray(d) ? (d[0]||{}) : (d.data || d);
     });
-    const brokerHoldingsOk = computed(() => brokerHoldings.value?.success === true);
-    const brokerFundsOk = computed(() => brokerFunds.value?.success === true);
+    const brokerValidation = computed(() => brokerTruth.value?.validation || {});
+    const brokerTraderFields = computed(() => brokerTruth.value?.trader_fields || {});
+    const brokerDataSource = computed(() => brokerTruth.value?.data_source || '--');
+    const brokerHoldingsOk = computed(() => brokerHoldings.value?.success === true || brokerTruth.value?.holdings?.success === true);
+    const brokerFundsOk = computed(() => brokerFunds.value?.success === true || brokerTruth.value?.funds?.success === true);
+    const brokerPositionsOk = computed(() => brokerPositions.value?.success === true || brokerTruth.value?.positions?.success === true);
     const unreadCount  = computed(() => alertsData.value.filter(a => !a.read && !a.resolved).length);
 
     // No-trade reason from QC + signal
@@ -275,7 +290,7 @@ const app = createApp({
       if (_polling) return;
       _polling = true;
       try {
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -293,6 +308,7 @@ const app = createApp({
         fetchJSON('/api/broker/positions/live'),
         fetchJSON('/api/broker/funds'),
         fetchJSON('/api/approval/status'),
+        fetchJSON('/api/broker/truth'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -311,6 +327,7 @@ const app = createApp({
       if(pos) brokerPositions.value=pos;
       if(funds) brokerFunds.value=funds;
       if(appr) approvalData.value=appr;
+      if(bt) brokerTruth.value=bt;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
         if (st) { connHealth.value = 'live'; failCount.value = 0; }
@@ -397,7 +414,7 @@ const app = createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,approvalData,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,approvalData,brokerTruth,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
       paperPositions,paperSummary,tradeHistory,pnlWithCharges,
@@ -408,7 +425,8 @@ const app = createApp({
       factors,proofGates,readinessLadder,
       connHealth, failCount, unifiedHoldings, unifiedPositions,
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
-      holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk,
+      holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk, brokerPositionsOk,
+      brokerValidation, brokerTraderFields, brokerDataSource,
       formatNum,formatLakh,scoreColor,ageStr,
       selectChainSymbol,loadChain,loadLogs,
     };

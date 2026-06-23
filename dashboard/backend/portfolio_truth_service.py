@@ -19,9 +19,28 @@ def _utc_now() -> str:
 
 
 def _normalize_broker_rows(raw: Any) -> List[Dict[str, Any]]:
+    try:
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_holdings_payload,
+            normalize_holding_row,
+            normalize_positions_payload,
+            normalize_position_row,
+        )
+    except ImportError:
+        normalize_holdings_payload = normalize_positions_payload = None
+
     rows: List[Dict[str, Any]] = []
     if raw is None:
         return rows
+
+    if normalize_holdings_payload and isinstance(raw, (list, dict)):
+        items = normalize_holdings_payload(raw) or normalize_positions_payload(raw)
+        for item in items:
+            norm = normalize_holding_row(item)
+            rows.append({**norm, "source": "dhan_broker_readonly"})
+        if rows:
+            return rows
+
     if isinstance(raw, list):
         items = raw
     elif isinstance(raw, dict):

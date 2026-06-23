@@ -165,6 +165,10 @@
           <div class="bt-row"><span class="bt-lbl">Latency</span><span class="bt-val">{{ brokerDetail.latency_ms?brokerDetail.latency_ms+'ms':'--' }}</span><span class="bt-note">Profile API</span></div>
           <div class="bt-row"><span class="bt-lbl">Env Source</span><span class="bt-val tx-m">{{ brokerDetail.env_source||'cloud env' }}</span><span class="bt-note">Render dashboard</span></div>
           <div class="bt-row"><span class="bt-lbl">Token Refresh</span><span class="bt-val" :class="brokerDetail.auto_refresh?.success?'tx-g':'tx-m'">{{ brokerDetail.auto_refresh?.success?'REFRESHED ✓':'STANDBY' }}</span><span class="bt-note">PIN+TOTP auto</span></div>
+          <div class="bt-row"><span class="bt-lbl">Holdings API</span><span class="bt-val" :class="brokerHoldingsOk?'tx-g':'tx-r'">{{ brokerHoldingsOk?'VALID ✓':(brokerTruth.holdings?.error||'OFFLINE') }}</span><span class="bt-note">{{ holdingRows.length }} equity</span></div>
+          <div class="bt-row"><span class="bt-lbl">Funds API</span><span class="bt-val" :class="brokerFundsOk?'tx-g':'tx-r'">{{ brokerFundsOk?'VALID ✓':(brokerTruth.funds?.error||'OFFLINE') }}</span><span class="bt-note">Balance read-only</span></div>
+          <div class="bt-row"><span class="bt-lbl">Positions API</span><span class="bt-val" :class="brokerPositionsOk?'tx-g':'tx-r'">{{ brokerPositionsOk?'VALID ✓':(brokerTruth.positions?.error||'OFFLINE') }}</span><span class="bt-note">{{ positionRows.length }} open</span></div>
+          <div class="bt-row"><span class="bt-lbl">Trader Validation</span><span class="bt-val" :class="brokerValidation.overall==='VALID'?'tx-g':'tx-a'">{{ brokerValidation.overall||'--' }} · {{ brokerValidation.valid_pct||0 }}%</span><span class="bt-note">Multi-check</span></div>
         </div>
       </div>
 
@@ -503,14 +507,23 @@
 
       <!-- Transparency banner -->
       <div class="path-banner path-b">
-        <span>PORTFOLIO TRUTH — {{ portfolioData.data_transparency || 'LOADING' }}</span>
-        <span class="path-gate">Broker read-only ✅ · Order placement BLOCKED ✅ · Live trading DISABLED ✅ · Paper + real merged transparently</span>
+        <span>PORTFOLIO TRUTH — {{ portfolioData.data_transparency || 'LOADING' }} · {{ brokerDataSource }}</span>
+        <span class="path-gate">Broker read-only ✅ · Order placement BLOCKED ✅ · Live trading DISABLED ✅ · Multi-validated trader fields</span>
+      </div>
+
+      <!-- Broker validation status -->
+      <div class="broker-val-banner mt16" :class="brokerValidation.overall==='VALID'?'bvb-pass':brokerValidation.overall==='BROKER_OFFLINE'?'bvb-offline':'bvb-warn'">
+        <span class="bvb-icon">{{ brokerValidation.overall==='VALID'?'✅':brokerValidation.overall==='BROKER_OFFLINE'?'🔌':'⚠️' }}</span>
+        <div>
+          <div class="bvb-title">BROKER TRADER DATA — {{ brokerValidation.overall || 'CHECKING' }} · {{ brokerValidation.valid_pct||0 }}% fields valid</div>
+          <div class="bvb-sub">{{ broker.connected ? 'Dhan read-only APIs polled every 10s' : 'Broker offline — reconnect at market open or refresh token' }} · Holdings {{ brokerHoldingsOk?'LIVE':'--' }} · Funds {{ brokerFundsOk?'LIVE':'--' }} · Positions {{ brokerPositionsOk?'LIVE':'--' }}</div>
+        </div>
       </div>
 
       <!-- Account funds KPIs -->
       <div class="kpi-row mt16">
-        <div class="kpi kpi-b"><div class="kpi-lbl">AVAILABLE BALANCE</div><div class="kpi-val">{{ fundsInfo.availabelBalance!=null ? '₹'+formatNum(fundsInfo.availabelBalance) : fundsInfo.availableBalance!=null ? '₹'+formatNum(fundsInfo.availableBalance) : '--' }}</div><div class="kpi-sub">Dhan account</div></div>
-        <div class="kpi kpi-c"><div class="kpi-lbl">UTILISED MARGIN</div><div class="kpi-val">{{ fundsInfo.utilizedAmount!=null ? '₹'+formatNum(fundsInfo.utilizedAmount) : '--' }}</div><div class="kpi-sub">In use</div></div>
+        <div class="kpi kpi-b"><div class="kpi-lbl">AVAILABLE BALANCE</div><div class="kpi-val">{{ fundsInfo.available_balance!=null ? '₹'+formatNum(fundsInfo.available_balance) : fundsInfo.availabelBalance!=null ? '₹'+formatNum(fundsInfo.availabelBalance) : fundsInfo.availableBalance!=null ? '₹'+formatNum(fundsInfo.availableBalance) : '--' }}</div><div class="kpi-sub">{{ brokerFundsOk ? 'Dhan LIVE' : 'Unavailable' }}</div></div>
+        <div class="kpi kpi-c"><div class="kpi-lbl">UTILISED MARGIN</div><div class="kpi-val">{{ fundsInfo.utilized_amount!=null ? '₹'+formatNum(fundsInfo.utilized_amount) : fundsInfo.utilizedAmount!=null ? '₹'+formatNum(fundsInfo.utilizedAmount) : '--' }}</div><div class="kpi-sub">In use</div></div>
         <div class="kpi kpi-g"><div class="kpi-lbl">REAL HOLDINGS</div><div class="kpi-val">{{ holdingRows.length }}</div><div class="kpi-sub">Equity stocks</div></div>
         <div class="kpi kpi-p"><div class="kpi-lbl">REAL POSITIONS</div><div class="kpi-val">{{ positionRows.length }}</div><div class="kpi-sub">Open F&O/equity</div></div>
         <div class="kpi kpi-s"><div class="kpi-lbl">PAPER TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Simulation</div></div>
@@ -592,6 +605,19 @@
       </div>
 
       <div class="safety-banner mt16"><span>🛡️</span><span><strong>READ-ONLY PORTFOLIO</strong> — Real Dhan data shown for monitoring only. No orders can be placed. Live trading DISABLED. Paper trades are simulation.</span></div>
+
+      <!-- Trader field validation matrix -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">✅ Trader Field Validation</span><span class="ps">Multi-check: auth → API → shape → value</span></div>
+        <div class="val-tbl broker-field-tbl">
+          <div class="val-hdr bf-hdr"><span>FIELD</span><span>STATUS</span><span>VALUE</span></div>
+          <div v-for="(fld, key) in brokerTraderFields" :key="key" class="val-row bf-row">
+            <span class="tx-m">{{ key.replace(/_/g,' ') }}</span>
+            <span :class="fld.valid?'tx-g':fld.status==='BROKER_OFFLINE'?'tx-a':'tx-r'">{{ fld.valid ? 'VALID ✓' : fld.status }}</span>
+            <span>{{ fld.value!=null ? (typeof fld.value==='number' ? formatNum(fld.value) : fld.value) : '--' }}</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ══ PREDICTION VS ACTUAL ══ -->

@@ -30,6 +30,7 @@ REQUIRED_ENDPOINTS = [
     "/api/broker/positions/live",
     "/api/trader/requirements",
     "/api/approval/status",
+    "/api/broker/truth",
 ]
 
 REAL_MONEY_BLOCKERS = [
