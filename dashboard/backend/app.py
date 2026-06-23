@@ -1167,21 +1167,19 @@ async def get_health():
 
         # PRODUCTION GATE: live_allowed only when broker connected + real data + market open
         ds = (data_source if SSOT_AVAILABLE and state_store else "real").lower()
-        live_allowed = broker_connected and ds in ("real", "live") and market_status_str == "open"
-        live_blockers = []
-        if not broker_connected:
-            live_blockers.append("broker not connected")
-        if ds not in ("real", "live"):
-            live_blockers.append(f"data_source is {data_source}")
-        if market_status_str != "open":
-            live_blockers.append("market is closed")
+        # PERMANENT SAFETY: live_allowed is ALWAYS False in analyzer mode
+        # Even if broker+market are ready, live trading requires ENV change + human approval
+        live_allowed = False
+        live_blockers = ["Live trading permanently disabled — analyzer/paper mode only"]
+        # live_blockers already set above (permanent)
         mode_raw = mode if SSOT_AVAILABLE and state_store else health.get("mode", "UNKNOWN")
         mode_effective = mode_raw or "PAPER"
         if (mode_effective or "").upper() == "LIVE" and not live_allowed:
             mode_effective = "PAPER"
             print(f"[MODE_GATE] requested=LIVE allowed=false reason={live_blockers}")
-        elif (mode_effective or "").upper() == "LIVE" and live_allowed:
-            print(f"[MODE_GATE] requested=LIVE allowed=true")
+        elif (mode_effective or "").upper() == "LIVE":
+            mode_effective = "PAPER"  # Override: LIVE never allowed
+            print(f"[MODE_GATE] requested=LIVE forced=PAPER reason=permanent_analyzer_mode")
 
         return {
             "status": "ok",
