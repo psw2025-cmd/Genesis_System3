@@ -246,11 +246,32 @@ class DataSourceManager:
         return dict(self._source_stats)
 
     # ------------------------------------------------------------------ #
-    #  P1: Dhan Data API                                                   #
+    #  P0: Dhan Data API (PRIMARY — Data APIs ACTIVE 2026-06-23)            #
     # ------------------------------------------------------------------ #
 
+    # Security IDs for Dhan option chain API
+    _DHAN_SECURITY_IDS = {
+        "NIFTY":      "13",
+        "BANKNIFTY":  "25",
+        "FINNIFTY":   "27",
+        "MIDCPNIFTY": "442",
+        "SENSEX":     "51",
+    }
+
+    @staticmethod
+    def _nearest_expiry() -> str:
+        """Return nearest Thursday (weekly NIFTY/BANKNIFTY expiry) as YYYY-MM-DD."""
+        from datetime import date, timedelta
+        today = date.today()
+        # Thursday = weekday 3
+        days_ahead = (3 - today.weekday()) % 7
+        if days_ahead == 0:
+            days_ahead = 7  # already Thursday → use next week
+        expiry = today + timedelta(days=days_ahead)
+        return expiry.strftime("%Y-%m-%d")
+
     def _try_dhan(self, symbol: str) -> Optional[Tuple[pd.DataFrame, float]]:
-        """Dhan option chain API — requires Data APIs subscription (Error 806 if not)."""
+        """Dhan option chain API — Data APIs subscription ACTIVE as of 2026-06-23."""
         try:
             from dhanhq import dhanhq
             import dotenv
@@ -260,9 +281,11 @@ class DataSourceManager:
             if not token or not client_id:
                 return None
             dhan = dhanhq(client_id, token)
-            # Dhan option chain — will raise/return error if not subscribed
-            resp = dhan.option_chain(under_security_id="13", under_exchange_segment="IDX_I",
-                                      expiry="2026-06-26")  # dynamic expiry needed in prod
+            sec_id = self._DHAN_SECURITY_IDS.get(symbol.upper(), "13")
+            expiry = self._nearest_expiry()
+            logger.info(f"[Dhan P0] Fetching option chain: {symbol} sec_id={sec_id} expiry={expiry}")
+            resp = dhan.option_chain(under_security_id=sec_id, under_exchange_segment="IDX_I",
+                                      expiry=expiry)
             if resp and resp.get("status") == "success":
                 data = resp.get("data", {}).get("data", [])
                 if data:
@@ -735,3 +758,4 @@ def fetch_option_chain_smart(
 def run_health_check() -> Dict:
     """Run full health check on all data sources. Used by datasource_health_check.py."""
     return get_manager().health_check()
+
