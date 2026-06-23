@@ -380,3 +380,179 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 .chip-red-dim { background:rgba(255,61,90,.08); color:var(--red); border:1px solid rgba(255,61,90,.2); }
 .panel-foot { padding:6px 16px; font-family:var(--mono); font-size:.62rem; color:var(--txt3);
   border-top:1px solid var(--border); background:var(--bg3); }
+
+
+/* ══════════════════════════════════════════
+   PREMIUM IDENTITY HEADER
+   SYSTEM3 AI TRADING CONTROL CENTER
+   PRITAM S. WARGHADE
+   ══════════════════════════════════════════ */
+
+/* Override topbar height for identity block */
+:root { --topbar-h: 64px; }
+
+/* Topbar glassmorphism base */
+.topbar {
+  background: linear-gradient(135deg, #060c18 0%, #0b1728 50%, #060c18 100%) !important;
+  border-bottom: 1px solid transparent !important;
+  border-image: linear-gradient(90deg, transparent, #00c8ff44, #a855f744, #00e87a44, transparent) 1 !important;
+  box-shadow: 0 2px 32px rgba(0,200,255,.08), 0 1px 0 rgba(168,85,247,.15) !important;
+}
+
+/* Identity block — left side */
+.identity-block {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+
+.system-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Animated hex logo */
+.sys-hex {
+  font-size: 2rem;
+  color: var(--cyan);
+  filter: drop-shadow(0 0 8px rgba(0,200,255,.7));
+  animation: hexglow 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes hexglow {
+  0%,100% { filter: drop-shadow(0 0 6px rgba(0,200,255,.6)); color: #00c8ff; }
+  33%      { filter: drop-shadow(0 0 10px rgba(168,85,247,.7)); color: #a855f7; }
+  66%      { filter: drop-shadow(0 0 8px rgba(0,232,122,.6)); color: #00e87a; }
+}
+
+.sys-name-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Main system title line */
+.sys-title-line {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--txt2);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.sys-ai {
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0,200,255,.5);
+  font-style: italic;
+}
+
+/* Owner name — premium display */
+.owner-name {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  /* Neon gradient text */
+  background: linear-gradient(135deg, #ffffff 0%, #e2f0ff 30%, #00c8ff 65%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(0,200,255,.3));
+  position: relative;
+}
+
+/* Animated underline on name */
+.owner-name::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, #00c8ff, #a855f7, #00e87a);
+  animation: nameunderline 4s ease-in-out infinite;
+  background-size: 200%;
+}
+@keyframes nameunderline {
+  0%   { background-position: 0% 50%; opacity:.8; }
+  50%  { background-position: 100% 50%; opacity:1; }
+  100% { background-position: 0% 50%; opacity:.8; }
+}
+
+/* Roles tag line */
+.owner-roles {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: .55rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--txt3);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Mode chip — amber */
+.mode-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(255,184,48,.12), rgba(255,184,48,.06));
+  border: 1px solid rgba(255,184,48,.3);
+  font-family: 'JetBrains Mono','Courier New',monospace;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--amber);
+  box-shadow: 0 0 8px rgba(255,184,48,.1);
+}
+.mode-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 4px var(--amber);
+}
+
+/* Live disabled chip — red, always visible */
+.live-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(255,61,90,.15), rgba(255,61,90,.06));
+  border: 1px solid rgba(255,61,90,.4);
+  font-family: 'JetBrains Mono','Courier New',monospace;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--red);
+  box-shadow: 0 0 8px rgba(255,61,90,.12);
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 4px var(--red);
+  /* No animation — static red = disabled/off */
+}
+
+/* Subtle scan line effect on topbar */
+.topbar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,.04), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+}
+@keyframes scanline {
+  0%   { left: -40%; }
+  100% { left: 120%; }
+}
