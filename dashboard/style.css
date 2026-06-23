@@ -206,6 +206,7 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 .ce-col { text-align: right; padding: 5px 6px; color: var(--txt2); background: rgba(255,61,90,.03); }
 .pe-col { text-align: left; padding: 5px 6px; color: var(--txt2); background: rgba(0,232,122,.03); }
 .strike-col { text-align: center; padding: 5px 8px; font-weight: 700; color: var(--txt); background: var(--bg3); white-space: nowrap; }
+.atm-strike { color: var(--cyan) !important; background: rgba(0,200,255,.08) !important; }
 .chain-row { border-bottom: 1px solid var(--border); transition: background .1s; }
 .chain-row:hover { background: var(--bg3); }
 .chain-row.atm { background: rgba(0,200,255,.06); }
