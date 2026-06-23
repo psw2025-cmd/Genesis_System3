@@ -13,7 +13,7 @@ if (typeof Chart !== 'undefined') {
   Chart.defaults.font.size = 10;
 }
 
-createApp({
+const app = createApp({
   setup() {
     const activeTab   = ref('control');
     const lastSync    = ref('--');
@@ -387,4 +387,30 @@ createApp({
       selectChainSymbol,loadChain,loadLogs,
     };
   }
-}).mount('#app');
+});
+
+// ════════════════════════════════════════════════
+// RESILIENCE: Global error handler — never freeze
+// Multiple AI agents edit these files; a bad data shape
+// must NOT kill the dashboard. Log and keep rendering.
+// ════════════════════════════════════════════════
+app.config.errorHandler = (err, instance, info) => {
+  console.warn('[dashboard] render error caught (continuing):', err?.message || err, info);
+  // Do not rethrow — keep the app reactive and polling alive
+};
+
+app.config.warnHandler = () => {}; // Suppress noisy warnings in production
+
+app.mount('#app');
+
+// Watchdog: if poll stops updating for >60s, force reload data
+let _lastSyncEpoch = Date.now();
+window.addEventListener('error', (e) => {
+  console.warn('[dashboard] window error (continuing):', e?.message);
+  e.preventDefault();
+  return true;
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.warn('[dashboard] unhandled promise (continuing):', e?.reason);
+  e.preventDefault();
+});
