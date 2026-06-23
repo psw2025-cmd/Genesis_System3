@@ -10,6 +10,7 @@ import sys
 import json
 import time
 import signal
+import threading
 import argparse
 import subprocess
 from pathlib import Path
@@ -274,17 +275,36 @@ def run_daemon() -> None:
         print(f"[PH82-Daemon] Signal {signum} — shutting down...")
         _stop["flag"] = True
 
-    signal.signal(signal.SIGTERM, _handle)
-    signal.signal(signal.SIGINT, _handle)
+    # signal.signal() only works when called from the main thread of the main
+    # interpreter. cloud_worker.py runs this daemon inside a background
+    # threading.Thread, so registering handlers there raises ValueError on
+    # the very first line of setup, before the loop ever ticks once — and
+    # that ValueError was being silently caught by the caller's bare
+    # `except Exception`, killing the scheduler thread forever with no
+    # visible crash. This was the actual root cause of the dead job loop.
+    if threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGTERM, _handle)
+        signal.signal(signal.SIGINT, _handle)
+    else:
+        print("[PH82-Daemon] Running in non-main thread — skipping OS signal "
+              "handlers (daemon=True thread exits with the process).")
 
     state = load_state()
     if "jobs" not in state:
         state["jobs"] = {}
+    state["daemon_started_at"] = _now_ist().isoformat()
 
     while not _stop["flag"]:
         now = _now_ist()
         today_str = now.strftime("%Y-%m-%d")
         is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
+
+        # Heartbeat — proves the daemon loop itself is alive, independent of
+        # whether any job was due this tick. Without this, a dead/crashed
+        # daemon and "no job due yet" look identical from the dashboard.
+        state["daemon_heartbeat"] = now.isoformat()
+        state["daemon_pid"] = os.getpid()
+        save_state(state)
 
         config = load_config()  # hot-reload each tick
         for job in config.get("jobs", []):

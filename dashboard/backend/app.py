@@ -682,6 +682,9 @@ async def get_system_health():
 
         # Scheduler jobs
         jobs_summary = []
+        scheduler_heartbeat = None
+        scheduler_alive = False
+        scheduler_pid = None
         try:
             cfg = json.loads(JOB_SCHED_CFG.read_text())
             scheduler_state = {}
@@ -691,6 +694,20 @@ async def get_system_health():
                     scheduler_state = json.loads(scheduler_state_file.read_text())
                 except Exception:
                     pass
+
+            scheduler_heartbeat = scheduler_state.get("daemon_heartbeat")
+            scheduler_pid = scheduler_state.get("daemon_pid")
+            if scheduler_heartbeat:
+                try:
+                    last_beat = datetime.fromisoformat(scheduler_heartbeat)
+                    if last_beat.tzinfo is None:
+                        last_beat = IST.localize(last_beat)
+                    age_s = (datetime.now(IST) - last_beat).total_seconds()
+                    # Daemon ticks every 60s; >3 missed ticks = considered dead
+                    scheduler_alive = age_s < 180
+                except Exception:
+                    scheduler_alive = False
+
             for j in cfg.get("jobs", []):
                 job_id = j.get("id")
                 job_state = scheduler_state.get("jobs", {}).get(job_id, {})
@@ -713,6 +730,9 @@ async def get_system_health():
             "datasource_health": ds_health,
             "datasource_resilience": ds_resilience,
             "retrain_needed": RETRAIN_FLAG.exists(),
+            "scheduler_heartbeat": scheduler_heartbeat,
+            "scheduler_alive": scheduler_alive,
+            "scheduler_pid": scheduler_pid,
             "jobs": jobs_summary,
         }
     except Exception as e:

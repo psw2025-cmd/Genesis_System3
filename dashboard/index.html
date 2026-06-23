@@ -196,6 +196,13 @@
       <!-- Job scheduler -->
       <div class="panel mt16">
         <div class="ph"><span class="pt">⏰ Job Scheduler (IST)</span></div>
+        <div class="honest-status-banner" :class="healthData.scheduler_alive ? 'ok' : 'bad'">
+          <strong>{{ healthData.scheduler_alive ? '● SCHEDULER ALIVE' : '● SCHEDULER DEAD / NOT RUNNING' }}</strong>
+          <span class="tx-m">
+            heartbeat: {{ healthData.scheduler_heartbeat ? new Date(healthData.scheduler_heartbeat).toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: false}).replace(',', '') : 'NEVER SEEN' }}
+            <span v-if="healthData.scheduler_pid"> · pid {{ healthData.scheduler_pid }}</span>
+          </span>
+        </div>
         <div class="job-tbl">
           <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span><span>LAST RUN</span><span>RESULT</span></div>
           <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled?'je':'jd'">
