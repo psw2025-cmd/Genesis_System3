@@ -194,30 +194,45 @@ class StateSyncService:
         except Exception as e:
             print(f"Error computing risk metrics: {e}")
 
-        # Generate alerts based on state
+        # Generate alerts — use MERGED state (current + updates), not partial updates alone
+        # BUG FIX: old code used updates["broker"] which is missing when health.json absent
+        # causing false BROKER_DISCONNECTED every 5 seconds even when broker is connected.
         try:
-            alerts = []
+            # Merge updates into current state for accurate alert evaluation
+            current_state = self.state_store.get_state()
+            merged_broker = updates.get("broker") or current_state.get("broker", {})
+            broker_actually_connected = merged_broker.get("connected", False)
 
-            # QC FAIL alert
+            # QC FAIL alert — only when we have fresh QC data saying FAIL
             if updates.get("qc", {}).get("status") == "FAIL":
-                self.state_store.add_alert("WARN", "QC_FAIL", "Quality control check failed")
+                self.state_store.upsert_alert("WARN", "QC_FAIL", "Quality control check failed")
+            else:
+                self.state_store.resolve_alert("QC_FAIL")
 
-            # Broker disconnected alert
-            if not updates.get("broker", {}).get("connected", False):
-                self.state_store.add_alert("WARN", "BROKER_DISCONNECTED", "Broker connection lost")
+            # Broker alert — use MERGED state, not partial updates
+            if not broker_actually_connected and updates.get("broker") is not None:
+                # Only alert if THIS sync cycle actually checked broker and it failed
+                self.state_store.upsert_alert("WARN", "BROKER_DISCONNECTED", "Broker connection lost")
+            elif broker_actually_connected:
+                # Clear false alert when broker is connected
+                self.state_store.resolve_alert("BROKER_DISCONNECTED")
 
-            # Synthetic mode alert
+            # Synthetic mode alert — only when market open + broker unavailable
             if updates.get("data_source") == "SYNTHETIC" and updates.get("market", {}).get("is_open", False):
-                self.state_store.add_alert(
+                self.state_store.upsert_alert(
                     "INFO", "SYNTHETIC_MODE", "Using synthetic data (market open but broker unavailable)"
                 )
+            else:
+                self.state_store.resolve_alert("SYNTHETIC_MODE")
 
             # Positions while market closed
             positions_count = len(updates.get("positions", []))
             if positions_count > 0 and not updates.get("market", {}).get("is_open", False):
-                self.state_store.add_alert(
+                self.state_store.upsert_alert(
                     "INFO", "POSITIONS_MARKET_CLOSED", f"{positions_count} positions open while market is closed"
                 )
+            else:
+                self.state_store.resolve_alert("POSITIONS_MARKET_CLOSED")
 
         except Exception as e:
             print(f"Error generating alerts: {e}")
