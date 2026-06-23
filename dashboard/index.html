@@ -39,6 +39,9 @@
       </div>
       <div class="mode-chip"><span class="mode-dot"></span>ANALYZER / PAPER</div>
       <div class="live-chip"><span class="live-dot"></span>LIVE DISABLED</div>
+      <div class="conn-health" :class="'conn-'+connHealth" :title="'Connection: '+connHealth">
+        <span class="conn-dot"></span>{{ connHealth==='live'?'LIVE':connHealth==='reconnecting'?'RECONNECTING':'CONNECTING' }}
+      </div>
       <div class="rho-pill" :class="rhoClass">ρ {{ latestRho!==null?latestRho.toFixed(2):'--' }}</div>
     </div>
   </header>
