@@ -1422,15 +1422,39 @@ async def get_chain(underlying: str):
         # Market is open - use real data
         chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
         if not chain_file.exists():
+            # Try Dhan Data API directly
+            try:
+                from core.data.datasource_manager import DataSourceManager
+                _dsm = DataSourceManager()
+                _chain_result = _dsm.get_option_chain(underlying.upper())
+                if _chain_result and _chain_result.get("contracts"):
+                    return _chain_result
+            except Exception:
+                pass
             return {
                 "underlying": underlying,
                 "contracts": [],
-                "message": "Chain data not found",
+                "message": "Chain data not found — Dhan fetch also failed",
                 "spot": 0,
                 "pcr": 1.0,
                 "total_contracts": 0,
                 "data_source": "real",
             }
+
+        # Freshness check: if file older than 4 hours, try Dhan API first
+        import time as _time
+        file_age_hours = (_time.time() - chain_file.stat().st_mtime) / 3600
+        if file_age_hours > 4:
+            try:
+                from core.data.datasource_manager import DataSourceManager
+                _dsm = DataSourceManager()
+                _fresh = _dsm.get_option_chain(underlying.upper())
+                if _fresh and _fresh.get("contracts") and len(_fresh["contracts"]) > 10:
+                    _fresh["file_age_hours"] = round(file_age_hours, 1)
+                    _fresh["source_note"] = "Live Dhan API (CSV was stale)"
+                    return _fresh
+            except Exception:
+                pass  # Fall through to stale CSV
 
         # Try pandas first, fallback to csv module
         df = None
