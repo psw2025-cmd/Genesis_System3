@@ -651,3 +651,112 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 /* ── NAV ALERT badge (unread count) ── */
 .nav-alert { margin-left: auto; font-family: var(--mono); font-size: .6rem; font-weight: 700;
   padding: 1px 6px; border-radius: 3px; background: var(--red2); color: var(--red); }
+
+/* ══════════════════════════════════════
+   MOBILE RESPONSIVE — PHONE OPTIMISED
+   Tested against Samsung screenshots
+   ══════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  :root {
+    --topbar-h: 72px;
+    --sidebar-w: 52px;
+  }
+
+  /* Topbar: stack identity block */
+  .topbar {
+    padding: 6px 8px;
+    flex-wrap: wrap;
+    gap: 4px;
+    height: auto !important;
+    min-height: var(--topbar-h);
+  }
+
+  /* Hide roles line on mobile */
+  .owner-roles { display: none; }
+
+  /* Owner name smaller */
+  .owner-name {
+    font-size: .72rem !important;
+    letter-spacing: .1em !important;
+  }
+  .sys-title-line { font-size: .58rem !important; }
+  .sys-hex { font-size: 1.3rem !important; }
+
+  /* Topbar chips — smaller */
+  .topbar-center { gap: 4px; }
+  .clock-time { font-size: 1rem !important; }
+  .market-pill { font-size: .58rem !important; padding: 3px 8px; }
+  .pill-countdown { display: none; }
+  .mode-chip, .live-chip, .status-chip { font-size: .55rem !important; padding: 3px 7px; }
+  .rho-pill { font-size: .6rem !important; padding: 3px 8px; }
+
+  /* Sidebar — icon only on mobile */
+  .sidebar { width: var(--sidebar-w) !important; }
+  .nav-label { display: none; }
+  .nav-badge, .nav-alert { display: none; }
+  .nav-item { padding: 10px 0; justify-content: center; }
+  .nav-icon { font-size: 1.1rem; }
+  .sidebar-foot { display: none; }
+
+  /* Main content full width */
+  .main { margin-left: var(--sidebar-w) !important; padding: 10px 8px; }
+
+  /* KPI row — 2 cols on mobile */
+  .kpi-row { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+  .kpi-val { font-size: 1.2rem !important; }
+  .kpi-lbl { font-size: .58rem !important; }
+  .kpi-sub { font-size: .58rem !important; }
+
+  /* Two-col → single col on mobile */
+  .two-col { grid-template-columns: 1fr !important; }
+
+  /* Chain table — horizontal scroll */
+  .chain-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .chain-table { font-size: .6rem !important; }
+  .chain-table th, .chain-table td { padding: 4px 5px !important; }
+
+  /* Full trade table scroll */
+  .full-trade-table { font-size: .6rem !important; }
+
+  /* Section headers */
+  .sec-hdr h2 { font-size: 1.1rem !important; }
+  .sec-sub { font-size: .62rem !important; }
+
+  /* Panels */
+  .panel { border-radius: 6px; }
+  .ph { padding: 10px 12px; }
+  .pt { font-size: .7rem !important; }
+
+  /* No-trade grid - 2 col */
+  .nt-hdr, .nt-row { grid-template-columns: 90px 70px 1fr !important; font-size: .6rem !important; }
+
+  /* Broker truth grid */
+  .bt-row { grid-template-columns: 100px 130px 1fr !important; font-size: .6rem !important; }
+
+  /* Honest status banner - 2 col */
+  .honest-status-banner { grid-template-columns: 1fr 1fr !important; }
+
+  /* Log box height */
+  .log-box { height: 300px !important; }
+
+  /* Charts */
+  .chart-h { height: 180px !important; }
+  .chart-h-tall { height: 220px !important; }
+
+  /* Pipeline - horizontal scroll */
+  .pipeline { overflow-x: auto; padding-bottom: 8px; }
+  .pipe-step { min-width: 72px; }
+  .pipe-lbl { font-size: .6rem !important; }
+  .pipe-sub { font-size: .55rem !important; }
+
+  /* Rank table */
+  .rank-hdr, .rank-row { font-size: .6rem !important; }
+  .sbar-w { width: 50px !important; }
+}
+
+@media (max-width: 480px) {
+  .kpi-row { grid-template-columns: 1fr !important; }
+  .topbar-right { gap: 3px; }
+  .rho-pill { display: none; }
+}
