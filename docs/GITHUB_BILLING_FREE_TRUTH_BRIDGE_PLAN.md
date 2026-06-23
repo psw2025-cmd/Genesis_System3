@@ -12,13 +12,21 @@ The schedule was removed to stop automatic GitHub-hosted runner usage.
 
 ## Free / no-billing options
 
-### Option A — Local run on user's PC
+### Option A — Local run from the cloned `Genesis_System3` repo
 
-Use:
+Use this from whichever folder contains your cloned repo `psw2025-cmd/Genesis_System3`:
 
 ```bat
 tools\run_truth_bridge_local.bat
 ```
+
+The batch file is repo-relative and uses:
+
+```bat
+cd /d "%~dp0\.."
+```
+
+So it runs from the repo folder where the `tools` folder exists. It does **not** require `C:\openalgo-main`.
 
 This runs:
 
@@ -74,7 +82,7 @@ This would generate reports inside Render without GitHub Actions. It will not co
 Use Option A first:
 
 ```text
-Run locally from C:\openalgo-main using tools\run_truth_bridge_local.bat
+Run tools\run_truth_bridge_local.bat from your cloned Genesis_System3 repo.
 ```
 
 This is the safest zero-GitHub-billing method.
