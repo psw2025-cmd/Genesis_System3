@@ -43,3 +43,40 @@ Dhan option_chain() leg fields:
 trade_ready = false
 blocker = live_market_analyzer_paper_trade_not_proven
 verdict = ANALYZER_READY_PROOF_INCOMPLETE
+
+
+## ════════════════════════════════════════════
+## 2026-06-24 UPDATE — RESILIENCE + CONFLICT FIXES (Claude)
+## ════════════════════════════════════════════
+
+### Multi-agent conflicts found & resolved
+Multiple agents declared the SAME Vue refs → JS SyntaxError → blank dashboard.
+- `portfolioData` declared twice (Claude + Cursor) → removed Claude's simpler one, kept Cursor's richer
+- `brokerHoldings` declared twice (Claude ref + Cursor computed) → Cursor's renamed to `unifiedHoldings`
+- `brokerPositions` declared twice → Cursor's renamed to `unifiedPositions`
+
+### CRITICAL RULE FOR ALL AGENTS — before pushing app.js:
+1. Run `node --check dashboard/app.js` — MUST pass before commit
+2. Do NOT re-declare an existing `const` ref — search the file first
+3. Setup-scope refs (4-space indent `    const x = ref(...)`) must be UNIQUE
+4. If you need portfolio/unified data, use `unifiedHoldings`/`unifiedPositions` (already declared)
+5. If you need raw broker API data, use `brokerHoldings`/`brokerPositions`/`brokerFunds` refs (already declared) or the `holdingRows`/`positionRows`/`fundsInfo` computed
+
+### Resilience guards added (do NOT remove)
+- `app.config.errorHandler` — render errors logged, app keeps running (no freeze)
+- `window.addEventListener('error'/'unhandledrejection')` — global safety net
+- `_polling` flag — non-overlapping polls (won't stack if backend slow)
+- poll try/finally — survives any API/render error, auto-retries next cycle
+- `connHealth` ref — LIVE/RECONNECTING/CONNECTING indicator in topbar
+- `_NO_CACHE_HEADERS` in app.py — browser always gets freshest files after redeploy
+
+### Why this matters
+With 5+ agents editing the same dashboard files, one bad edit used to blank the
+whole UI. Now: a syntax error in ONE section won't kill the rest, poll auto-recovers,
+and the connection indicator shows when backend is redeploying.
+
+### Verification protocol (run after ANY dashboard edit)
+```
+node --check dashboard/app.js   # syntax
+grep -c "const portfolioData = ref(" dashboard/app.js   # must be 1
+```
