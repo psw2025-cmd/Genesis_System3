@@ -478,6 +478,103 @@
       <div class="safety-banner mt16"><span>🛡️</span><span><strong>PAPER MODE</strong> — All trades simulated. No real orders. Live trading DISABLED. Human approval required before live.</span></div>
     </section>
 
+    <!-- ══ PORTFOLIO — Real Dhan + Paper ══ -->
+    <section v-if="activeTab==='portfolio'" class="tab">
+      <div class="sec-hdr"><h2>Portfolio</h2><span class="sec-sub">Real Dhan holdings (read-only) + Paper trades · Live trading DISABLED</span></div>
+
+      <!-- Transparency banner -->
+      <div class="path-banner path-b">
+        <span>PORTFOLIO TRUTH — {{ portfolioData.data_transparency || 'LOADING' }}</span>
+        <span class="path-gate">Broker read-only ✅ · Order placement BLOCKED ✅ · Live trading DISABLED ✅ · Paper + real merged transparently</span>
+      </div>
+
+      <!-- Account funds KPIs -->
+      <div class="kpi-row mt16">
+        <div class="kpi kpi-b"><div class="kpi-lbl">AVAILABLE BALANCE</div><div class="kpi-val">{{ fundsInfo.availabelBalance!=null ? '₹'+formatNum(fundsInfo.availabelBalance) : fundsInfo.availableBalance!=null ? '₹'+formatNum(fundsInfo.availableBalance) : '--' }}</div><div class="kpi-sub">Dhan account</div></div>
+        <div class="kpi kpi-c"><div class="kpi-lbl">UTILISED MARGIN</div><div class="kpi-val">{{ fundsInfo.utilizedAmount!=null ? '₹'+formatNum(fundsInfo.utilizedAmount) : '--' }}</div><div class="kpi-sub">In use</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">REAL HOLDINGS</div><div class="kpi-val">{{ holdingRows.length }}</div><div class="kpi-sub">Equity stocks</div></div>
+        <div class="kpi kpi-p"><div class="kpi-lbl">REAL POSITIONS</div><div class="kpi-val">{{ positionRows.length }}</div><div class="kpi-sub">Open F&O/equity</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">PAPER TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Simulation</div></div>
+        <div class="kpi" :class="(paperSummary.total_pnl||0)>=0?'kpi-g':'kpi-r'"><div class="kpi-lbl">PAPER NET P&L</div><div class="kpi-val" :class="(paperSummary.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pnlWithCharges.net) }}</div><div class="kpi-sub">After charges</div></div>
+      </div>
+
+      <!-- Real Dhan Holdings -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">💼 Real Dhan Equity Holdings</span><span class="ps">Read-only · {{ brokerHoldingsOk ? 'LIVE' : 'unavailable' }}</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>SYMBOL</th><th>QTY</th><th>AVG PRICE</th><th>LTP</th><th>CUR VALUE</th><th>P&L</th><th>P&L%</th></tr></thead>
+            <tbody>
+              <template v-if="holdingRows.length">
+                <tr v-for="(h,i) in holdingRows" :key="i" class="ftt-row">
+                  <td class="sym-tag">{{ h.tradingSymbol||h.symbol||h.securityId||'--' }}</td>
+                  <td>{{ h.totalQty||h.quantity||h.availableQty||0 }}</td>
+                  <td>{{ formatNum(h.avgCostPrice||h.averagePrice||h.costPrice||0) }}</td>
+                  <td>{{ formatNum(h.lastTradedPrice||h.ltp||h.lastPrice||0) }}</td>
+                  <td>{{ formatNum((h.totalQty||h.quantity||0)*(h.lastTradedPrice||h.ltp||0)) }}</td>
+                  <td :class="((h.lastTradedPrice||0)-(h.avgCostPrice||0))>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(((h.lastTradedPrice||h.ltp||0)-(h.avgCostPrice||h.averagePrice||0))*(h.totalQty||h.quantity||0)) }}</td>
+                  <td :class="((h.lastTradedPrice||0)-(h.avgCostPrice||0))>=0?'pnl-pos':'pnl-neg'">{{ h.avgCostPrice ? (((h.lastTradedPrice||h.ltp||0)-(h.avgCostPrice))/(h.avgCostPrice)*100).toFixed(2)+'%' : '--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="7" class="no-data">{{ brokerHoldingsOk ? 'No equity holdings in Dhan account' : (brokerHoldings.error || 'Dhan holdings unavailable — broker may be reconnecting') }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Real Dhan Positions -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📊 Real Dhan Open Positions</span><span class="ps">Read-only · F&O + intraday</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>SYMBOL</th><th>PRODUCT</th><th>NET QTY</th><th>AVG PRICE</th><th>LTP</th><th>UNREAL P&L</th><th>REALISED P&L</th></tr></thead>
+            <tbody>
+              <template v-if="positionRows.length">
+                <tr v-for="(p,i) in positionRows" :key="i" class="ftt-row">
+                  <td class="sym-tag">{{ p.tradingSymbol||p.symbol||'--' }}</td>
+                  <td class="tx-m">{{ p.productType||p.product||'--' }}</td>
+                  <td>{{ p.netQty||p.netQuantity||p.quantity||0 }}</td>
+                  <td>{{ formatNum(p.buyAvg||p.averagePrice||p.costPrice||0) }}</td>
+                  <td>{{ formatNum(p.lastTradedPrice||p.ltp||0) }}</td>
+                  <td :class="(p.unrealizedProfit||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(p.unrealizedProfit||0) }}</td>
+                  <td :class="(p.realizedProfit||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(p.realizedProfit||0) }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="7" class="no-data">{{ brokerPositions.error || 'No open positions in Dhan account' }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Paper Trade Detail -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📋 Paper Trade Portfolio</span><span class="ps">Simulation · {{ tradeHistory.length }} closed trades</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>TIME</th><th>INDEX</th><th>CE/PE</th><th>STRIKE</th><th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>P&L</th><th>EXIT REASON</th></tr></thead>
+            <tbody>
+              <template v-if="tradeHistory.length">
+                <tr v-for="t in tradeHistory" :key="t.position_id" class="ftt-row">
+                  <td>{{ (t.time_ist||'').substring(5,16) }}</td>
+                  <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
+                  <td>{{ formatNum(t.strike||0) }}</td>
+                  <td>{{ formatNum(t.entry_price||0) }}</td>
+                  <td>{{ formatNum(t.exit_price||0) }}</td>
+                  <td>{{ formatNum(t.qty||0) }}</td>
+                  <td :class="(t.realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(t.realized_pnl||0) }}</td>
+                  <td class="tx-m">{{ t.exit_reason||'--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="9" class="no-data">No paper trades yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="safety-banner mt16"><span>🛡️</span><span><strong>READ-ONLY PORTFOLIO</strong> — Real Dhan data shown for monitoring only. No orders can be placed. Live trading DISABLED. Paper trades are simulation.</span></div>
+    </section>
+
     <!-- ══ PREDICTION VS ACTUAL ══ -->
     <section v-if="activeTab==='accuracy'" class="tab">
       <div class="sec-hdr"><h2>Prediction vs Actual</h2><span class="sec-sub">Spearman ρ · Hit Rate · Walk-Forward proof</span></div>
