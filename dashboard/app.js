@@ -17,6 +17,8 @@ const app = createApp({
   setup() {
     const activeTab   = ref('control');
     const lastSync    = ref('--');
+    const connHealth  = ref('connecting');  // connecting | live | reconnecting
+    const failCount   = ref(0);
     const currentTime = ref('');
     const marketOpen  = ref(false);
     const marketCountdown = ref('');
@@ -301,8 +303,13 @@ const app = createApp({
       if(lrn) learningData.value=lrn;
       if(port) portfolioData.value=port;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
+        // Connection health: if state came back, we're live
+        if (st) { connHealth.value = 'live'; failCount.value = 0; }
+        else { failCount.value++; if (failCount.value >= 2) connHealth.value = 'reconnecting'; }
       } catch(e) {
         console.warn('[dashboard] poll error (will retry next cycle):', e?.message);
+        failCount.value++;
+        if (failCount.value >= 2) connHealth.value = 'reconnecting';
       } finally {
         _polling = false;
       }
@@ -390,6 +397,7 @@ const app = createApp({
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
       factors,proofGates,readinessLadder,
+      connHealth, failCount,
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
       holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk,
       formatNum,formatLakh,scoreColor,ageStr,
