@@ -1,3 +1,34 @@
+## 2026-06-23 (Session 10 — Claude)
+
+### [2026-06-23 12:15 IST] [Claude] DATA APIs ACTIVATED — Full market data unlocked
+
+**Dhan Data APIs subscribed by user:**
+- Plan: Monthly ₹499
+- Valid until: 23 Jul 2026
+- Status: **Active** (confirmed via web.dhan.co)
+
+**What is now unlocked (was Error 806/DH-902 before):**
+- ✅ Option Chain (expiry list, OI, IV, Greeks) via Dhan API
+- ✅ Real-time LTP, bid/ask, 20 market depth
+- ✅ OHLC real-time data
+- ✅ Historical Candles — 5 years
+- ✅ WebSocket market feed
+- ✅ Expired Options Data
+
+**SYSTEM_STATE.md updated:** All 5 data API rows flipped ❌→✅
+
+**Impact on GainRankEngine:**
+- OI factor (25%) → now Dhan real OI, not NSE fallback
+- IV factor (20%) → now Dhan Greeks, not estimated
+- PCR factor (15%) → now Dhan option chain direct
+- Historical candles → model retraining with 5Y data possible
+- ml_confidence (15%) → bhavcopy already active; now supplemented by live chain
+
+**Next action:** Codex/Cursor to wire Dhan option chain API as P0 source in datasource_manager.py
+replacing NSE public API as primary. Dhan Data API calls: `/v2/optionchain`, `/v2/charts/historical`.
+
+---
+
 # CHANGE_LOG.md — Agent Activity Log
 > ALL AGENTS MUST APPEND HERE after every change.
 > Format: `[TIMESTAMP] [AGENT] ACTION: description`
@@ -624,3 +655,4 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 **Live trading: DISABLED. No credentials touched.**
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
