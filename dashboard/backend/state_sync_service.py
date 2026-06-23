@@ -96,8 +96,18 @@ class StateSyncService:
                 if not market_is_open and "next_open" in market_status:
                     updates["market"]["next_open"] = market_status["next_open"]
 
-                # Determine data source
-                updates["data_source"] = "BROKER" if market_is_open else "SYNTHETIC"
+                # Determine data source truthfully. Do not call closed-market broker/cache state SYNTHETIC.
+                current_state = self.state_store.get_state()
+                merged_broker = updates.get("broker") or current_state.get("broker", {})
+                broker_connected = bool(merged_broker.get("connected", False))
+                if market_is_open and broker_connected:
+                    updates["data_source"] = "BROKER_LIVE"
+                elif market_is_open and not broker_connected:
+                    updates["data_source"] = "NOT_READY"
+                elif broker_connected:
+                    updates["data_source"] = "BROKER_CONNECTED_MARKET_CLOSED"
+                else:
+                    updates["data_source"] = "MARKET_CLOSED_NO_BROKER"
         except Exception as e:
             print(f"Error syncing market status: {e}")
 
@@ -185,9 +195,9 @@ class StateSyncService:
             if qc_file.exists():
                 qc_data = json.loads(qc_file.read_text())
                 if "contracts_total" in qc_data:
-                    updates["qc"]["contracts_total"] = qc_data["contracts_total"]
+                    updates.setdefault("qc", {})["contracts_total"] = qc_data["contracts_total"]
                 if "underlyings" in qc_data:
-                    updates["qc"]["underlyings"] = qc_data["underlyings"]
+                    updates.setdefault("qc", {})["underlyings"] = qc_data["underlyings"]
         except Exception as e:
             print(f"Error syncing QC details: {e}")
 
