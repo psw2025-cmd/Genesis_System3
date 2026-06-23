@@ -9,11 +9,9 @@
       "20260611",
       "20260612"
     ],
-    "candidate_count": 126,
+    "candidate_count": 124,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
-      ".github/workflows/model-backtest-readiness.yml",
-      ".github/workflows/safe-dryrun-validation-execution.yml",
       "complete_end_to_end_validation.py",
       "comprehensive_pre_build_validation.py",
       "core/engine/dhan_daily_pnl_summary.py",
@@ -130,7 +128,9 @@
       "src/selector/strategy_engine.py",
       "src/trading/pnl_tracker.py",
       "src/validation/__init__.py",
-      "src/validation/market_result_validator.py"
+      "src/validation/market_result_validator.py",
+      "src/validation/qc_validator.py",
+      "state/market_validations/market_validation_2026-06-12.json"
     ],
     "compile_results": [
       {

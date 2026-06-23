@@ -20,7 +20,7 @@
         "secret_content_findings": [],
         "secret_style_filename_count": 0,
         "secret_style_filenames": [],
-        "tracked_file_count": 1693
+        "tracked_file_count": 1715
       },
       "gate": "safety_and_secrets",
       "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
@@ -39,7 +39,6 @@
             "render.yaml"
           ],
           "backtest_modules": [
-            ".github/workflows/model-backtest-readiness.yml",
             "core/engine/dhan_daily_pnl_summary.py",
             "core/engine/dhan_intraday_pnl_monitor.py",
             "core/engine/dhan_performance_consistency_checker.py",
@@ -187,7 +186,6 @@
             "dashboard/frontend/src/main.tsx"
           ],
           "model_modules": [
-            ".github/workflows/model-backtest-readiness.yml",
             "core/engine/ai_model/__init__.py",
             "core/engine/ai_model/data_balancing_v2.py",
             "core/engine/ai_model/feature_engineering_v2.py",
@@ -292,6 +290,7 @@
             "core/ultra/phase50_prediction_explainer.py",
             "dashboard/backend/performance_predictor.py",
             "dashboard/frontend/src/components/ModelBehavior.tsx",
+            "docs/control_plane/SYSTEM3_MODEL_ACCURACY_REGISTER.md",
             "docs/model_benchmark/MODEL_BENCHMARK_LEADERBOARD.md",
             "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
             "docs/system3_training_data_pipeline_qc.md",
@@ -315,6 +314,7 @@
             "scripts/build_advanced_excel_with_ai_predictions.py",
             "scripts/enhance_optionchain_with_predictions.py",
             "scripts/model_training_dryrun_proof.py",
+            "scripts/system3_model_accuracy_tracker.py",
             "scripts/test_performance_prediction.py",
             "src/ml/ensemble_predictor.py",
             "tools/clean_training_csv.py",
@@ -375,10 +375,15 @@
             "docs/FINAL_PAPER_TRADING_REPORT.md",
             "docs/PAPER_TRADING_INTEGRATION_COMPLETE.md",
             "docs/PAPER_TRADING_STATUS_UPDATE.md",
+            "docs/control_plane/SYSTEM3_SIGNAL_TO_TRADE_CONTROL.md",
             "paper_pnl_summary.json",
             "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
+            "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
+            "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
             "reports/latest/analyzer_paper_lifecycle_proof/README.md",
             "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+            "reports/latest/trader_requirements_audit/summary.json",
+            "reports/latest/trader_requirements_audit/summary.md",
             "scripts/check_paper_trading_status.py",
             "scripts/comprehensive_paper_trading_check.py",
             "scripts/get_todays_market_trades.py",
@@ -435,12 +440,14 @@
           "package-lock.json": [
             "dashboard/frontend/package-lock.json",
             "desktop_app/package-lock.json",
-            "package-lock.json"
+            "package-lock.json",
+            "tools/playwright-setup/package-lock.json"
           ],
           "package.json": [
             "dashboard/frontend/package.json",
             "desktop_app/package.json",
-            "package.json"
+            "package.json",
+            "tools/playwright-setup/package.json"
           ],
           "performance_metrics.py": [
             "scripts/performance_metrics.py",
@@ -484,44 +491,44 @@
         "base_url_env_name": "SYSTEM3_PUBLIC_BACKEND_URL or PUBLIC_BACKEND_URL",
         "endpoint_results": [
           {
-            "checked_utc": "2026-06-14T16:28:37.179571+00:00",
+            "checked_utc": "2026-06-23T20:24:50.520907+00:00",
             "ok": true,
             "snippet": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"https://genesis-system3-backend.onrender.com\",\"dashboard_url\":\"https://genesis-system3-backend.onrender.com\",\"api_docs\":\"https://genesis-system3-backend.onrender.com/docs\",\"health\":\"https://genesis-system3-backend.onrender.com/api/health\",\"state\":\"https://genesis-system3-backend.onrender.com/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\",\"dashboard\":\"/ui\"}}",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/"
           },
           {
-            "checked_utc": "2026-06-14T16:28:38.097273+00:00",
+            "checked_utc": "2026-06-23T20:24:50.930925+00:00",
             "ok": true,
             "snippet": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Ultra Dashboard API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\noauth2",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/docs"
           },
           {
-            "checked_utc": "2026-06-14T16:28:38.459044+00:00",
+            "checked_utc": "2026-06-23T20:24:51.306651+00:00",
             "ok": true,
-            "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-14T21:58:39.515920+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}",
+            "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-24T01:54:51.475658+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/health"
           },
           {
-            "checked_utc": "2026-06-14T16:28:39.581225+00:00",
+            "checked_utc": "2026-06-23T20:24:51.980680+00:00",
             "ok": true,
-            "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-14T21:58:40.139600+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}",
+            "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-24T01:54:52.103121+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/api/health"
           },
           {
-            "checked_utc": "2026-06-14T16:28:40.200055+00:00",
+            "checked_utc": "2026-06-23T20:24:52.628421+00:00",
             "ok": true,
-            "snippet": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":260,\"error\":null,\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+            "snippet": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":269,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/api/broker/status"
           },
           {
-            "checked_utc": "2026-06-14T16:28:40.829241+00:00",
+            "checked_utc": "2026-06-23T20:24:53.749271+00:00",
             "ok": true,
-            "snippet": "{\"state_version\":154,\"timestamp_utc\":\"2026-06-14T16:28:39.519394Z\",\"timestamp_ist\":\"2026-06-14T21:58:39.519396+05:30\",\"mode\":\"PAPER\",\"data_source\":\"SYNTHETIC\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Weekend (Sunday)\",\"next_open\":\"2026-06-15 09:15:00 IST\",\"current_time_ist\":\"2026-06-14T21:58:39.516605+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":264,\"error\":null,\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"",
+            "snippet": "{\"state_version\":683,\"timestamp_utc\":\"2026-06-23T20:24:50.627720Z\",\"timestamp_ist\":\"2026-06-24T01:54:50.627721+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Before pre-market (opens at 09:15)\",\"next_open\":\"2026-06-24 09:15:00 IST\",\"current_time_ist\":\"2026-06-24T01:54:50.626720+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":266,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"",
             "status": 200,
             "url": "https://genesis-system3-backend.onrender.com/api/state"
           }
@@ -545,14 +552,14 @@
       "evidence": {
         "binance_crypto_candidate_count": 0,
         "binance_crypto_candidates_sample": [],
-        "data_candidate_count": 154,
+        "data_candidate_count": 161,
         "data_candidates_sample": [
           "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
-          ".github/workflows/external-data-yahoo-proof.yml",
           "core/data/__init__ - Copy - Copy - Copy (3).py",
           "core/data/__init__.py",
           "core/data/data_router.py",
           "core/data/datasource_manager.py",
+          "core/data/dhan_option_chain_parser.py",
           "core/data/history_fetcher.py",
           "core/data/instruments_cache.py",
           "core/data/live_fetcher.py",
@@ -647,9 +654,13 @@
           "models/xgboost_v1/SENSEX_xgb_meta.json",
           "models/xgboost_v1/SENSEX_xgb_model.pkl",
           "option_chain_automation_master.py",
+          "reports/latest/dhan_option_chain_schema_audit/summary.json",
+          "reports/latest/dhan_option_chain_schema_audit/summary.md",
           "reports/latest/external_data_yahoo/yahoo_data_summary.json",
           "reports/latest/fresh_data_automation_proof/README.md",
           "reports/latest/fresh_data_automation_proof/summary.json",
+          "reports/latest/real_market_data_proof/summary.json",
+          "reports/latest/real_market_data_proof/summary.md",
           "scripts/add_realtime_data_refresh.py",
           "scripts/analyze_chain_raw_live.py",
           "scripts/analyze_optionchain_master.py",
@@ -662,15 +673,12 @@
           "scripts/final_data_check.py",
           "scripts/fix_csv_structure.py",
           "scripts/fix_dashboard_data_issues.py",
-          "scripts/generate_synthetic_live_data.py",
-          "scripts/monitor_optionchain_performance.py",
-          "scripts/run_live_chain.py",
-          "scripts/smart_live_chain_runner.py",
-          "scripts/test_csv_edge_cases.py"
+          "scripts/generate_synthetic_live_data.py"
         ],
-        "dhan_india_candidate_count": 51,
+        "dhan_india_candidate_count": 57,
         "dhan_india_candidates_sample": [
           "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
+          "core/data/dhan_option_chain_parser.py",
           "core/data/nse_provider.py",
           "core/engine/dhan_latency_drift_observatory.py",
           "core/engine/dhan_options_analyze.py",
@@ -711,15 +719,20 @@
           "models/xgboost_v1/SENSEX_xgb_meta.json",
           "models/xgboost_v1/SENSEX_xgb_model.pkl",
           "option_chain_automation_master.py",
+          "reports/latest/dhan_option_chain_schema_audit/summary.json",
+          "reports/latest/dhan_option_chain_schema_audit/summary.md",
           "scripts/analyze_optionchain_master.py",
           "scripts/build_production_optionchain_master.py",
           "scripts/enhance_optionchain_with_predictions.py",
           "scripts/monitor_optionchain_performance.py",
+          "scripts/system3_option_visibility_audit.py",
           "scripts/update_optionchain_master.py",
           "scripts/verify_optionchain_master.py",
           "src/ml/ensemble_predictor.py",
           "src/storage/live/option_chain.db",
           "test_option_chain_automation.py",
+          "tests/fixtures/dhan_option_chain_sample.json",
+          "tests/test_dhan_option_chain_parser.py",
           "tools/run_phase_392_ensemble_test.py"
         ],
         "fallback_yahoo_report_keys": [
@@ -752,9 +765,8 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 155,
+        "candidate_count": 156,
         "candidates_sample": [
-          ".github/workflows/model-backtest-readiness.yml",
           "core/engine/ai_model/__init__.py",
           "core/engine/ai_model/data_balancing_v2.py",
           "core/engine/ai_model/feature_engineering_v2.py",
@@ -873,7 +885,8 @@
           "core/models/dhan_ultra/SENSEX_ultra_model.pkl",
           "core/models/dhan_ultra/SENSEX_ultra_model_meta.json",
           "core/ultra/phase24_confidence_drift.py",
-          "core/ultra/phase30_calibration_engine.py"
+          "core/ultra/phase30_calibration_engine.py",
+          "core/ultra/phase50_prediction_explainer.py"
         ],
         "compile_results": [
           {
@@ -920,11 +933,9 @@
           "20260611",
           "20260612"
         ],
-        "candidate_count": 126,
+        "candidate_count": 124,
         "candidates_sample": [
           "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
-          ".github/workflows/model-backtest-readiness.yml",
-          ".github/workflows/safe-dryrun-validation-execution.yml",
           "complete_end_to_end_validation.py",
           "comprehensive_pre_build_validation.py",
           "core/engine/dhan_daily_pnl_summary.py",
@@ -1041,7 +1052,9 @@
           "src/selector/strategy_engine.py",
           "src/trading/pnl_tracker.py",
           "src/validation/__init__.py",
-          "src/validation/market_result_validator.py"
+          "src/validation/market_result_validator.py",
+          "src/validation/qc_validator.py",
+          "state/market_validations/market_validation_2026-06-12.json"
         ],
         "compile_results": [
           {
@@ -1067,7 +1080,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 72,
+        "candidate_count": 77,
         "candidates_sample": [
           "config/live_trade_config.json",
           "config/live_trade_config.py",
@@ -1121,10 +1134,15 @@
           "docs/FINAL_PAPER_TRADING_REPORT.md",
           "docs/PAPER_TRADING_INTEGRATION_COMPLETE.md",
           "docs/PAPER_TRADING_STATUS_UPDATE.md",
+          "docs/control_plane/SYSTEM3_SIGNAL_TO_TRADE_CONTROL.md",
           "paper_pnl_summary.json",
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
           "reports/latest/analyzer_paper_lifecycle_proof/README.md",
           "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+          "reports/latest/trader_requirements_audit/summary.json",
+          "reports/latest/trader_requirements_audit/summary.md",
           "scripts/check_paper_trading_status.py",
           "scripts/comprehensive_paper_trading_check.py",
           "scripts/get_todays_market_trades.py",
@@ -1144,12 +1162,14 @@
         ],
         "existing_lifecycle_report_candidates": [
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
           "reports/latest/analyzer_paper_lifecycle_proof/README.md",
           "reports/latest/analyzer_paper_lifecycle_proof/summary.json"
         ],
-        "full_lifecycle_proven": true,
-        "lifecycle_proof_broker_connected": true,
-        "lifecycle_proof_dry_run": false,
+        "full_lifecycle_proven": false,
+        "lifecycle_proof_broker_connected": null,
+        "lifecycle_proof_dry_run": null,
         "lifecycle_proof_present": true,
         "mandatory_lifecycle_fields": [
           "signal_id",
@@ -1170,13 +1190,16 @@
           "net_pnl",
           "proof_status"
         ],
-        "orders_trades_lifecycle_reconciled": true
+        "orders_trades_lifecycle_reconciled": false
       },
       "gate": "analyzer_paper_lifecycle_proof",
       "next_action": "Run scripts/paper_lifecycle_proof.py on a market day (Mon-Fri) with broker connected to prove real lifecycle.",
       "pass": true,
-      "status": "PASS",
-      "warnings": []
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "full_signal_to_exit_pnl_lifecycle_not_proven",
+        "lifecycle_proof_broker_not_connected"
+      ]
     },
     {
       "auto_repair_allowed": true,
@@ -1242,7 +1265,7 @@
       ]
     }
   ],
-  "generated_utc": "2026-06-14T16:28:41.272858+00:00",
+  "generated_utc": "2026-06-23T20:24:54.279322+00:00",
   "live_trading_enabled": false,
   "manual_only_items": [
     "broker OTP/manual login/session renewal when required",
@@ -1254,7 +1277,7 @@
   "mode": "Analyzer/Paper only; live trading disabled",
   "pass_count": 8,
   "readiness_ladder": {
-    "ANALYZER_PAPER_LIFECYCLE_PROVEN": true,
+    "ANALYZER_PAPER_LIFECYCLE_PROVEN": false,
     "DASHBOARD_TRUTH_PROVEN": true,
     "DEPLOYMENT_ENDPOINTS_PROVEN": true,
     "FRESH_DATA_PROVEN": true,
@@ -1266,11 +1289,13 @@
   },
   "trade_ready": false,
   "verdict": "ANALYZER_READY_PROOF_INCOMPLETE",
-  "warning_count": 4,
+  "warning_count": 6,
   "warnings": [
     "repo_authority_and_duplicate_control:duplicate_basename_candidates_need_runtime_classification",
     "fresh_data_automation_proof:dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped",
     "model_training_load_proof:model_promotion_remains_blocked_without_policy",
+    "analyzer_paper_lifecycle_proof:full_signal_to_exit_pnl_lifecycle_not_proven",
+    "analyzer_paper_lifecycle_proof:lifecycle_proof_broker_not_connected",
     "dashboard_truth_proof:browser_screenshot_truth_not_proven_in_ci"
   ]
 }

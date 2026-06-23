@@ -390,6 +390,72 @@ async def get_dhan_broker_status():
         }
 
 
+@app.get("/api/broker/holdings")
+async def get_broker_holdings():
+    """Dhan equity holdings — read-only. No orders."""
+    try:
+        from core.brokers.dhan.dhan_readonly import get_holdings
+
+        result = get_holdings()
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            **result,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/broker/positions/live")
+async def get_broker_positions_live():
+    """Dhan open positions — read-only. No orders."""
+    try:
+        from core.brokers.dhan.dhan_readonly import get_positions
+
+        result = get_positions()
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            **result,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/portfolio/unified")
+async def get_unified_portfolio():
+    """Paper + broker read-only portfolio truth. Never enables live trading."""
+    try:
+        from dashboard.backend.portfolio_truth_service import build_unified_portfolio
+    except ImportError:
+        from portfolio_truth_service import build_unified_portfolio
+    return build_unified_portfolio(OUTPUTS_DIR)
+
+
+@app.get("/api/trader/requirements")
+async def get_trader_requirements():
+    """Full trader field audit mapped to available API data."""
+    try:
+        from dashboard.backend.trader_requirements_service import build_trader_requirements_report
+    except ImportError:
+        from trader_requirements_service import build_trader_requirements_report
+    return build_trader_requirements_report(OUTPUTS_DIR)
+
+
 @app.get("/api/broker/deps")
 async def get_broker_deps():
     """Get broker dependency installation status (Dhan)"""
@@ -1425,8 +1491,9 @@ async def get_chain(underlying: str):
             # Try Dhan Data API directly
             try:
                 from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
                 _dsm = DataSourceManager()
-                _chain_result = _dsm.get_option_chain(underlying.upper())
+                _chain_result = fetch_chain_for_api(_dsm, underlying.upper())
                 if _chain_result and _chain_result.get("contracts"):
                     return _chain_result
             except Exception:
@@ -1447,8 +1514,9 @@ async def get_chain(underlying: str):
         if file_age_hours > 4:
             try:
                 from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
                 _dsm = DataSourceManager()
-                _fresh = _dsm.get_option_chain(underlying.upper())
+                _fresh = fetch_chain_for_api(_dsm, underlying.upper())
                 if _fresh and _fresh.get("contracts") and len(_fresh["contracts"]) > 10:
                     _fresh["file_age_hours"] = round(file_age_hours, 1)
                     _fresh["source_note"] = "Live Dhan API (CSV was stale)"

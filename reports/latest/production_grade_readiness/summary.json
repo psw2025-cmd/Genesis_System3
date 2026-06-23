@@ -1,0 +1,130 @@
+{
+  "generated_utc": "2026-06-23T20:25:00.054029Z",
+  "mode": "ANALYZER_PAPER_ONLY",
+  "live_trading_enabled": false,
+  "production_ready_for_real_money": false,
+  "cloud_url": "https://genesis-system3-backend.onrender.com",
+  "agents": [
+    {
+      "id": "gate_orchestrator",
+      "role": "8-gate proof matrix",
+      "evidence": "reports/latest/proof_status_matrix/proof_status_matrix.json",
+      "evidence_exists": true,
+      "run_attempted": true,
+      "run_passed": true,
+      "run_detail": {
+        "exit_code": 0,
+        "stdout_tail": "{\n  \"blocker_count\": 0,\n  \"fail_count\": 0,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-06-23T20:24:54.279322+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 8,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"ANALYZER_READY_PROOF_INCOMPLETE\",\n  \"warning_count\": 6\n}\n",
+        "stderr_tail": "",
+        "passed": true
+      }
+    },
+    {
+      "id": "truth_bridge",
+      "role": "Live cloud API truth",
+      "evidence": "reports/latest/system3_truth_bridge/summary.json",
+      "evidence_exists": false,
+      "run_attempted": false,
+      "run_passed": null
+    },
+    {
+      "id": "dhan_schema_audit",
+      "role": "Dhan option-chain schema",
+      "evidence": "reports/latest/dhan_option_chain_schema_audit/summary.json",
+      "evidence_exists": true,
+      "run_attempted": true,
+      "run_passed": false,
+      "run_detail": {
+        "exit_code": 1,
+        "stdout_tail": "",
+        "stderr_tail": "erate_audit_reports.py\", line 112, in audit_trader_fields\n    from dashboard.backend.trader_requirements_service import build_trader_requirements_report\nModuleNotFoundError: No module named 'dashboard'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 238, in <module>\n    raise SystemExit(main())\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 188, in main\n    trader = audit_trader_fields(truth)\n  File \"C:\\System3\\Genesis_System3\\tools\\generate_audit_reports.py\", line 114, in audit_trader_fields\n    from trader_requirements_service import build_trader_requirements_report\nModuleNotFoundError: No module named 'trader_requirements_service'\n",
+        "passed": false
+      }
+    },
+    {
+      "id": "dashboard_browser",
+      "role": "Playwright UI proof",
+      "evidence": "reports/latest/dashboard_browser_proof/summary.json",
+      "evidence_exists": true,
+      "run_attempted": false,
+      "run_passed": null
+    },
+    {
+      "id": "geni_orchestrator",
+      "role": "Internal task coordination (AUTO_EXECUTE_REAL_TRADES=False)",
+      "evidence": "core/geni/geni_config.py",
+      "evidence_exists": true,
+      "run_attempted": false,
+      "run_passed": null
+    },
+    {
+      "id": "control_plane",
+      "role": "Repo authority + master control",
+      "evidence": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+      "evidence_exists": true,
+      "run_attempted": true,
+      "run_passed": false,
+      "run_detail": {
+        "exit_code": 2,
+        "stdout_tail": "",
+        "stderr_tail": "usage: system3_control_plane.py [-h] {inventory,classify,cleanup,proofs} ...\nsystem3_control_plane.py: error: the following arguments are required: command\n",
+        "passed": false
+      }
+    }
+  ],
+  "live_endpoint_probe": {
+    "/api/state": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"state_version\":684,\"timestamp_utc\":\"2026-06-23T20:24:55.903604Z\",\"timestamp_ist\":\"2026-06-24T01:54:55.903606+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Before pre-market (opens at 09:15)\",\"next_open\":\"2026-06-24 09:15:00 IST\",\"current_time_ist\":\"2026-06-24T01:54:55.902333+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_prese"
+    },
+    "/api/paper": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"positions\":{\"positions\":[],\"open_count\":0,\"closed_count\":0,\"timestamp\":null},\"pnl\":{\"history\":[],\"summary\":{\"total_trades\":9,\"winning_trades\":3,\"losing_trades\":6,\"win_rate\":0.3333,\"total_realized_pnl\":-1806.07,\"total_unrealized_pnl\":0.0,\"total_pnl\":-1806.07,\"avg_pnl_per_trade\":-200.67,\"open_positions\":0,\"note\":\"Feb 1 2026 paper session \u2014 9 synthetic trades, 3W/6L\",\"data_source\":\"paper_simulation\"}}}"
+    },
+    "/api/portfolio/unified": {
+      "status": 0,
+      "ok": false,
+      "error": "HTTP Error 404: Not Found"
+    },
+    "/api/broker/holdings": {
+      "status": 0,
+      "ok": false,
+      "error": "HTTP Error 404: Not Found"
+    },
+    "/api/broker/positions/live": {
+      "status": 0,
+      "ok": false,
+      "error": "HTTP Error 404: Not Found"
+    },
+    "/api/trades/history": {
+      "status": 200,
+      "ok": true,
+      "sample": "{\"trades\":[],\"count\":0,\"date\":null,\"start_time\":null,\"end_time\":null}"
+    }
+  },
+  "broker_connected": true,
+  "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
+  "readiness_ladder": {
+    "repo_safe": true,
+    "cloud_deployed": true,
+    "dashboard_production_grade": false,
+    "broker_readonly_portfolio_api": false,
+    "real_money_ready": false
+  },
+  "blockers": [
+    "LIVE_TRADING_DISABLED_BY_DESIGN",
+    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+    "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
+    "MULTI_DAY_STABILITY_NOT_PROVEN",
+    "HUMAN_APPROVAL_REQUIRED_FOR_LIVE"
+  ],
+  "next_exact_actions": [
+    "Deploy this branch to Render (portfolio unified API + dashboard panel)",
+    "Run market-day paper lifecycle proof Mon-Fri 09:30-15:30 IST",
+    "Prove positive net expectancy after brokerage/STT/slippage",
+    "Accumulate 5+ prediction accuracy days with rho>=0.70",
+    "Explicit human sign-off before LIVE_TRADING_ENABLED (never auto)"
+  ]
+}

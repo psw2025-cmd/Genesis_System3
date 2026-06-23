@@ -2,9 +2,8 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 155,
+    "candidate_count": 156,
     "candidates_sample": [
-      ".github/workflows/model-backtest-readiness.yml",
       "core/engine/ai_model/__init__.py",
       "core/engine/ai_model/data_balancing_v2.py",
       "core/engine/ai_model/feature_engineering_v2.py",
@@ -123,7 +122,8 @@
       "core/models/dhan_ultra/SENSEX_ultra_model.pkl",
       "core/models/dhan_ultra/SENSEX_ultra_model_meta.json",
       "core/ultra/phase24_confidence_drift.py",
-      "core/ultra/phase30_calibration_engine.py"
+      "core/ultra/phase30_calibration_engine.py",
+      "core/ultra/phase50_prediction_explainer.py"
     ],
     "compile_results": [
       {

@@ -3,7 +3,7 @@
     "live_market_analyzer_paper_trade_not_proven"
   ],
   "dhanhq_dependency_present": true,
-  "generated_utc": "2026-06-14T16:28:41.274804+00:00",
+  "generated_utc": "2026-06-23T20:24:54.308837+00:00",
   "logzero_dependency_present": true,
   "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
   "master_control_plane_verdict": "ANALYZER_READY_PROOF_INCOMPLETE",

@@ -36,6 +36,7 @@ createApp({
     const perfData     = ref({});
     const logsData     = ref([]);
     const learningData = ref({});
+    const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
 
     // Chain
     const chainSymbols      = ['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY'];
@@ -99,10 +100,15 @@ createApp({
     const paperPositions = computed(() => paperData.value.positions?.positions || []);
     const paperSummary   = computed(() => paperData.value.pnl?.summary || {});
     const tradeHistory   = computed(() => {
+      const unified = portfolioData.value.trade_history || [];
+      if (unified.length) return unified;
       const pos = paperData.value.positions;
       if (pos?.summary?.closed_positions) return pos.summary.closed_positions;
       return paperData.value.pnl?.history || [];
     });
+    const brokerHoldings = computed(() => portfolioData.value.broker_holdings || []);
+    const brokerPositions = computed(() => portfolioData.value.broker_positions || []);
+    const portfolioTransparency = computed(() => portfolioData.value.data_transparency || '--');
     const activeAlerts = computed(() => alertsData.value.filter(a => !a.resolved));
     const unreadCount  = computed(() => alertsData.value.filter(a => !a.read && !a.resolved).length);
 
@@ -231,7 +237,7 @@ createApp({
     async function loadLogs(){const d=await fetchJSON('/api/logs/tail?lines=150');if(d?.logs)logsData.value=d.logs;}
 
     async function pollAll(){
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -244,6 +250,7 @@ createApp({
         fetchJSON('/api/trades/today'),
         fetchJSON('/api/perf'),
         fetchJSON('/api/learning/status'),
+        fetchJSON('/api/portfolio/unified'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -257,6 +264,7 @@ createApp({
       if(tod) todayTrades.value=tod;
       if(pf) perfData.value=pf;
       if(lrn) learningData.value=lrn;
+      if(port) portfolioData.value=port;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
     }
 
@@ -333,10 +341,11 @@ createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
       paperPositions,paperSummary,tradeHistory,pnlWithCharges,
+      brokerHoldings,brokerPositions,portfolioTransparency,
       activeAlerts,unreadCount,noTradeReasons,
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,

@@ -319,3 +319,61 @@ The system NEVER settles at a current best. Every session's achieved metric beco
 
 **The improvement compounding rule:**
 Small improvements stack. The system that wins long-term is the one that improves every single session, even by a tiny amount. Never backwards. Always forward.
+
+---
+
+## MULTI-AI COORDINATION PLAYBOOK (Claude + Cursor + Codex + Gemini)
+
+**Owner:** Pritam S. Warghade | **Repo:** `psw2025-cmd/Genesis_System3` | **Cloud:** https://genesis-system3-backend.onrender.com/ui
+
+### Agent roles
+| Agent | Tool | Primary job |
+|---|---|---|
+| **Claude** | Manager/controller | Approves changes, compares 3 views, blocks unsafe live enablement |
+| **Cursor Agent** | IDE automation | End-to-end implementation, proofs, deploy, dashboard |
+| **Codex** | `codex exec` | Architecture, data pipeline, tests — proposes to CHANGE_LOG |
+| **Gemini** | `gemini -p` | Independent cross-verify of Codex proposals |
+
+### Every session — read order
+1. `SYSTEM_STATE.md`
+2. `CHANGE_LOG.md`
+3. `reports/latest/production_grade_readiness/summary.json`
+4. `reports/latest/proof_status_matrix/proof_status_matrix.json`
+5. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
+
+### Coordination commands (safe only)
+```bat
+tools\run_truth_bridge_powershell.bat
+tools\run_dashboard_proof.bat
+tools\run_production_grade_coordination.bat
+python scripts\system3_master_proof_orchestrator.py
+python -m pytest tests\ -q
+```
+
+### Implementation priority (production grade — live STILL disabled)
+1. Deploy portfolio APIs (`/api/portfolio/unified`, `/api/broker/holdings`, `/api/trader/requirements`)
+2. Market-day paper lifecycle proof (Mon–Fri 09:30–15:30 IST)
+3. Wire trade history from `outputs/trade_execution_log.jsonl` + broker read-only positions
+4. Dashboard: label `PAPER_SIMULATION` vs `BROKER_READONLY` vs `MIXED`
+5. Prove ρ ≥ 0.70 over 5+ days; positive net expectancy after costs
+6. Human sign-off ONLY THEN discuss `LIVE_TRADING_ENABLED=1`
+
+### Hard rules (all agents)
+- **NEVER** enable live trading, place orders, or flip `LIVE_TRADING_ENABLED` without explicit human approval
+- **NEVER** fake PASS in `reports/latest/`
+- **NEVER** touch `.env`, tokens, OTP, PIN, passwords
+- **ALWAYS** write proof to `reports/latest/<gate>/summary.json`
+- **ALWAYS** append changes to `CHANGE_LOG.md`
+
+### Success metrics (the only scoreboard)
+1. **Spearman ρ** — target ≥ 0.70 (5+ days)
+2. **Top-N hit rate** — target ≥ 70%
+3. **Net daily P&L** — positive after brokerage + STT + slippage (paper first, then live only after gates)
+
+### Current blockers (2026-06-24)
+- `REAL_PAPER_LIFECYCLE_NOT_PROVEN`
+- `production_ready_for_real_money: false`
+- Trader history fields mostly `NOT_FOUND` until trade log populated
+- Portfolio unified API pending Render deploy
+
+**Verdict:** World-class analyzer/paper stack exists. Real-money ready = **NO** until all gates + human approval.

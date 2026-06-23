@@ -105,71 +105,17 @@ def write_dhan_audit(data: dict) -> None:
 
 
 def audit_trader_fields(truth: dict) -> dict:
-    state = (truth.get("live") or {}).get("state", {}).get("data", {})
-    pnl = state.get("pnl") or {}
-    positions = state.get("positions") or []
-
-    def field_status(name: str, found: bool, blocked: bool = False) -> str:
-        if blocked:
-            return "BLOCKED_SECRET_REQUIRED"
-        if found:
-            return "PASS"
-        return "NOT_FOUND"
-
-    portfolio = {
-        "total_invested": "NOT_FOUND",
-        "current_value": "NOT_FOUND",
-        "gross_pnl": "PASS_WITH_WARNINGS" if pnl.get("total") is not None else "NOT_FOUND",
-        "net_pnl": "PASS_WITH_WARNINGS" if pnl.get("total") is not None else "NOT_FOUND",
-        "cash_available": "NOT_FOUND",
-        "open_positions": "PASS" if "positions" in state else "NOT_FOUND",
-        "win_rate": "NOT_FOUND",
-        "max_loss_position": "NOT_FOUND",
-    }
-    trade_history = {k: "NOT_FOUND" for k in [
-        "trade_id", "timestamp_ist", "symbol", "entry_price", "exit_price",
-        "gross_pnl", "net_pnl", "charges_breakdown", "duration_minutes",
-        "exit_reason", "source", "Greeks_at_entry", "Greeks_at_exit",
-        "slippage_realized", "market_condition_at_entry",
-    ]}
-    live_positions = {k: "NOT_FOUND" for k in [
-        "position_id", "symbol", "strike", "entry_price", "current_ltp",
-        "unrealized_pnl", "Greeks_now", "Greeks_change_since_entry",
-        "iv_change", "stoploss", "target", "risk_reward_ratio", "days_to_expiry",
-    ]}
-    if positions:
-        live_positions["position_id"] = "NOT_PROVEN"
-    prediction = {k: "NOT_FOUND" for k in [
-        "prediction_timestamp", "predicted_top_3", "actual_top_3",
-        "accuracy_pct", "ranking_correlation", "market_result_proof",
-    ]}
-
-    counts = {}
-    for group in [portfolio, trade_history, live_positions, prediction]:
-        for v in group.values():
-            counts[v] = counts.get(v, 0) + 1
-
-    if counts.get("PASS", 0) <= 2:
-        status = "NOT_PROVEN"
-    elif counts.get("NOT_FOUND", 0) > 10:
-        status = "PASS_WITH_WARNINGS"
-    else:
-        status = "PASS_WITH_WARNINGS"
-
-    return {
-        "generated_utc": utc_now(),
-        "status": status,
-        "portfolio": portfolio,
-        "trade_history": trade_history,
-        "live_positions": live_positions,
-        "prediction_vs_market": prediction,
-        "evidence_source": "reports/latest/system3_truth_bridge/latest.json",
-        "remaining_blockers": [
-            "trade_history_fields_not_exposed",
-            "portfolio_detail_fields_missing",
-            "prediction_vs_market_not_proven",
-        ],
-    }
+    outputs = ROOT / "src" / "outputs"
+    if not outputs.exists():
+        outputs = ROOT / "outputs"
+    try:
+        from dashboard.backend.trader_requirements_service import build_trader_requirements_report
+    except ImportError:
+        from trader_requirements_service import build_trader_requirements_report
+    report = build_trader_requirements_report(outputs)
+    report["generated_utc"] = utc_now()
+    report["remaining_blockers"] = report.get("blockers", [])
+    return report
 
 
 def audit_real_market(truth: dict) -> dict:

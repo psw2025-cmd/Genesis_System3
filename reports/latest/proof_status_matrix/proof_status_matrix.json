@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-14T16:28:41.273724+00:00",
+  "generated_utc": "2026-06-23T20:24:54.288175+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "optional_missing_count": 0,
   "pending_count": 0,
@@ -72,8 +72,11 @@
       "pass": true,
       "path": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
       "required": true,
-      "status": "PASS",
-      "warnings": []
+      "status": "PASS_WITH_WARNINGS",
+      "warnings": [
+        "full_signal_to_exit_pnl_lifecycle_not_proven",
+        "lifecycle_proof_broker_not_connected"
+      ]
     },
     {
       "blockers": [],

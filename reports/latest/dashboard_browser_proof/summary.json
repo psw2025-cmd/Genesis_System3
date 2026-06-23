@@ -14,132 +14,132 @@
     {
       "field": "analyzer_paper_mode_desktop",
       "status": "PASS",
-      "detail": "Matched /PAPER/i"
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_desktop",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
     },
     {
       "field": "broker_status_desktop",
       "status": "PASS",
-      "detail": "Matched /broker/i"
+      "detail": "Matched /DHAN CONNECTED/i"
     },
     {
       "field": "data_source_desktop",
       "status": "PASS",
-      "detail": "Matched /BROKER/i"
+      "detail": "Matched /Dhan/i"
     },
     {
       "field": "market_status_desktop",
       "status": "PASS",
-      "detail": "Matched /market/i"
+      "detail": "Matched /MARKET CLOSED/i"
     },
     {
       "field": "option_chain_readiness_desktop",
       "status": "PASS",
-      "detail": "Matched /option.?chain/i"
+      "detail": "Matched /Option Chain/i"
     },
     {
-      "field": "proof_audit_status_desktop",
+      "field": "pnl_positions_desktop",
       "status": "PASS",
-      "detail": "Matched /proof/i"
+      "detail": "Matched /GROSS P&L/i"
     },
     {
       "field": "no_false_live_ready_desktop",
       "status": "PASS",
-      "detail": "No false LIVE_READY claim detected"
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
     },
     {
       "field": "analyzer_paper_mode_tablet",
       "status": "PASS",
-      "detail": "Matched /PAPER/i"
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_tablet",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
     },
     {
       "field": "broker_status_tablet",
       "status": "PASS",
-      "detail": "Matched /broker/i"
+      "detail": "Matched /DHAN CONNECTED/i"
     },
     {
       "field": "data_source_tablet",
       "status": "PASS",
-      "detail": "Matched /BROKER/i"
+      "detail": "Matched /DATA APIs/i"
     },
     {
       "field": "market_status_tablet",
       "status": "PASS",
-      "detail": "Matched /market/i"
+      "detail": "Matched /MARKET CLOSED/i"
     },
     {
       "field": "option_chain_readiness_tablet",
       "status": "PASS",
-      "detail": "Matched /contracts/i"
+      "detail": "Matched /Contracts/i"
     },
     {
       "field": "proof_audit_status_tablet",
       "status": "PASS",
-      "detail": "Matched /proof/i"
+      "detail": "Matched /Gate Matrix/i"
     },
     {
       "field": "no_false_live_ready_tablet",
       "status": "PASS",
-      "detail": "No false LIVE_READY claim detected"
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
     },
     {
       "field": "analyzer_paper_mode_mobile",
       "status": "PASS",
-      "detail": "Matched /PAPER/i"
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_mobile",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
     },
     {
       "field": "broker_status_mobile",
       "status": "PASS",
-      "detail": "Matched /broker/i"
+      "detail": "Matched /DHAN CONNECTED/i"
     },
     {
       "field": "data_source_mobile",
       "status": "PASS",
-      "detail": "Matched /BROKER/i"
+      "detail": "Matched /DATA APIs/i"
     },
     {
       "field": "market_status_mobile",
       "status": "PASS",
-      "detail": "Matched /market/i"
+      "detail": "Matched /MARKET CLOSED/i"
     },
     {
       "field": "option_chain_readiness_mobile",
       "status": "PASS",
-      "detail": "Matched /contracts/i"
+      "detail": "Matched /Contracts/i"
     },
     {
       "field": "proof_audit_status_mobile",
       "status": "PASS",
-      "detail": "Matched /proof/i"
+      "detail": "Matched /Gate Matrix/i"
     },
     {
       "field": "no_false_live_ready_mobile",
       "status": "PASS",
-      "detail": "No false LIVE_READY claim detected"
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
     }
   ],
   "fields_missing": [
     {
-      "field": "live_trading_disabled_desktop",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    },
-    {
-      "field": "pnl_positions_desktop",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    },
-    {
-      "field": "live_trading_disabled_tablet",
+      "field": "proof_audit_status_desktop",
       "status": "UI_NOT_VISIBLE",
       "detail": "Not found in rendered page text"
     },
     {
       "field": "pnl_positions_tablet",
-      "status": "UI_NOT_VISIBLE",
-      "detail": "Not found in rendered page text"
-    },
-    {
-      "field": "live_trading_disabled_mobile",
       "status": "UI_NOT_VISIBLE",
       "detail": "Not found in rendered page text"
     },
@@ -152,5 +152,5 @@
   "load_result": "PASS",
   "console_errors": [],
   "final_verdict": "PASS_WITH_WARNINGS",
-  "generated_utc": "2026-06-23T19:32:57.363Z"
+  "generated_utc": "2026-06-23T19:43:35.595Z"
 }

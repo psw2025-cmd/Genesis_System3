@@ -1,6 +1,6 @@
 # Dashboard Browser Proof
 
-Generated UTC: `2026-06-23T19:32:57.363Z`
+Generated UTC: `2026-06-23T19:43:35.595Z`
 
 URL: https://genesis-system3-backend.onrender.com/ui
 
@@ -18,11 +18,8 @@ Final verdict: **PASS_WITH_WARNINGS**
 - screenshots/tablet_768x1024.png
 
 ## Fields missing / not proven
-- live_trading_disabled_desktop: UI_NOT_VISIBLE — Not found in rendered page text
-- pnl_positions_desktop: UI_NOT_VISIBLE — Not found in rendered page text
-- live_trading_disabled_tablet: UI_NOT_VISIBLE — Not found in rendered page text
+- proof_audit_status_desktop: UI_NOT_VISIBLE — Not found in rendered page text
 - pnl_positions_tablet: UI_NOT_VISIBLE — Not found in rendered page text
-- live_trading_disabled_mobile: UI_NOT_VISIBLE — Not found in rendered page text
 - pnl_positions_mobile: UI_NOT_VISIBLE — Not found in rendered page text
 
 ## Console errors

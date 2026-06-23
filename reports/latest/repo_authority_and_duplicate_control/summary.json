@@ -9,7 +9,6 @@
         "render.yaml"
       ],
       "backtest_modules": [
-        ".github/workflows/model-backtest-readiness.yml",
         "core/engine/dhan_daily_pnl_summary.py",
         "core/engine/dhan_intraday_pnl_monitor.py",
         "core/engine/dhan_performance_consistency_checker.py",
@@ -157,7 +156,6 @@
         "dashboard/frontend/src/main.tsx"
       ],
       "model_modules": [
-        ".github/workflows/model-backtest-readiness.yml",
         "core/engine/ai_model/__init__.py",
         "core/engine/ai_model/data_balancing_v2.py",
         "core/engine/ai_model/feature_engineering_v2.py",
@@ -262,6 +260,7 @@
         "core/ultra/phase50_prediction_explainer.py",
         "dashboard/backend/performance_predictor.py",
         "dashboard/frontend/src/components/ModelBehavior.tsx",
+        "docs/control_plane/SYSTEM3_MODEL_ACCURACY_REGISTER.md",
         "docs/model_benchmark/MODEL_BENCHMARK_LEADERBOARD.md",
         "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
         "docs/system3_training_data_pipeline_qc.md",
@@ -285,6 +284,7 @@
         "scripts/build_advanced_excel_with_ai_predictions.py",
         "scripts/enhance_optionchain_with_predictions.py",
         "scripts/model_training_dryrun_proof.py",
+        "scripts/system3_model_accuracy_tracker.py",
         "scripts/test_performance_prediction.py",
         "src/ml/ensemble_predictor.py",
         "tools/clean_training_csv.py",
@@ -345,10 +345,15 @@
         "docs/FINAL_PAPER_TRADING_REPORT.md",
         "docs/PAPER_TRADING_INTEGRATION_COMPLETE.md",
         "docs/PAPER_TRADING_STATUS_UPDATE.md",
+        "docs/control_plane/SYSTEM3_SIGNAL_TO_TRADE_CONTROL.md",
         "paper_pnl_summary.json",
         "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
+        "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
+        "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
         "reports/latest/analyzer_paper_lifecycle_proof/README.md",
         "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+        "reports/latest/trader_requirements_audit/summary.json",
+        "reports/latest/trader_requirements_audit/summary.md",
         "scripts/check_paper_trading_status.py",
         "scripts/comprehensive_paper_trading_check.py",
         "scripts/get_todays_market_trades.py",
@@ -405,12 +410,14 @@
       "package-lock.json": [
         "dashboard/frontend/package-lock.json",
         "desktop_app/package-lock.json",
-        "package-lock.json"
+        "package-lock.json",
+        "tools/playwright-setup/package-lock.json"
       ],
       "package.json": [
         "dashboard/frontend/package.json",
         "desktop_app/package.json",
-        "package.json"
+        "package.json",
+        "tools/playwright-setup/package.json"
       ],
       "performance_metrics.py": [
         "scripts/performance_metrics.py",

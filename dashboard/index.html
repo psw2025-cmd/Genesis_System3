@@ -331,7 +331,33 @@
         <div class="kpi" :class="pnlWithCharges.net>=0?'kpi-g':'kpi-r'"><div class="kpi-lbl">NET P&L</div><div class="kpi-val" :class="pnlWithCharges.net>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pnlWithCharges.net) }}</div><div class="kpi-sub">After all charges</div></div>
         <div class="kpi kpi-g"><div class="kpi-lbl">WIN RATE</div><div class="kpi-val">{{ paperSummary.win_rate?(paperSummary.win_rate*100).toFixed(1)+'%':paperSummary.winning_trades!=null?((paperSummary.winning_trades/(paperSummary.total_trades||1))*100).toFixed(1)+'%':'--' }}</div><div class="kpi-sub">{{ paperSummary.winning_trades||0 }}W / {{ paperSummary.losing_trades||0 }}L</div></div>
         <div class="kpi kpi-c"><div class="kpi-lbl">TOTAL TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Paper simulation</div></div>
-        <div class="kpi kpi-s"><div class="kpi-lbl">OPEN POSITIONS</div><div class="kpi-val">{{ paperPositions.length }}</div><div class="kpi-sub">Active now</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">OPEN POSITIONS</div><div class="kpi-val">{{ paperPositions.length }}</div><div class="kpi-sub">Paper simulation</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">DATA TRUTH</div><div class="kpi-val" style="font-size:.75rem">{{ portfolioTransparency }}</div><div class="kpi-sub">Paper vs broker read-only</div></div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🏦 Dhan Broker Holdings (Read-Only)</span><span class="ps">Real account · no orders · LIVE DISABLED</span></div>
+        <div class="tok-info">
+          <div class="tok-r"><span>Holdings</span><strong>{{ brokerHoldings.length }}</strong></div>
+          <div class="tok-r"><span>Broker positions</span><strong>{{ brokerPositions.length }}</strong></div>
+          <div class="tok-r"><span>Source</span><strong class="tx-a">DHAN_READONLY</strong></div>
+        </div>
+        <div v-if="brokerHoldings.length || brokerPositions.length" style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>TYPE</th><th>SYMBOL</th><th>QTY</th><th>AVG</th><th>LTP</th><th>P&L</th></tr></thead>
+            <tbody>
+              <tr v-for="(h,i) in brokerHoldings" :key="'h'+i" class="ftt-row">
+                <td>HOLDING</td><td class="sym-tag">{{ h.symbol }}</td><td>{{ h.quantity||0 }}</td>
+                <td>{{ formatNum(h.avg_price||0) }}</td><td>{{ formatNum(h.ltp||0) }}</td><td>{{ h.pnl!=null?formatNum(h.pnl):'--' }}</td>
+              </tr>
+              <tr v-for="(p,i) in brokerPositions" :key="'p'+i" class="ftt-row">
+                <td>POSITION</td><td class="sym-tag">{{ p.symbol }}</td><td>{{ p.quantity||0 }}</td>
+                <td>{{ formatNum(p.avg_price||0) }}</td><td>{{ formatNum(p.ltp||0) }}</td><td>{{ p.pnl!=null?formatNum(p.pnl):'--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="no-data">No broker holdings/positions returned (market closed or read-only API empty)</div>
       </div>
 
       <!-- Charges breakdown -->

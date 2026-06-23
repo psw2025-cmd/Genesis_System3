@@ -1,6 +1,6 @@
 # Manual Repo QC Audit Summary
 
-Updated UTC: `2026-06-23T19:34:36.843129Z`
+Updated UTC: `2026-06-23T20:16:38.053448Z`
 
 ## Audit results (automated run)
 
@@ -12,12 +12,12 @@ Updated UTC: `2026-06-23T19:34:36.843129Z`
 - Production viability: **NOT_PROVEN**
 
 ## Remaining blockers
-- portfolio_detail_fields_missing
-- real_market_analyzer_paper_lifecycle_not_proven
-- trade_history_fields_not_exposed
-- TRADE_READY_FALSE
-- nse_comparison_proof_missing
 - prediction_vs_market_not_proven
+- TRADE_READY_FALSE
+- trade_history_fields_not_exposed
+- portfolio_detail_fields_missing
+- nse_comparison_proof_missing
+- real_market_analyzer_paper_lifecycle_not_proven
 - REAL_PAPER_LIFECYCLE_NOT_PROVEN
 
 ## Next exact action
