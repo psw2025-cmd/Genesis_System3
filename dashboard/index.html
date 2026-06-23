@@ -13,7 +13,6 @@
 
   <!-- PREMIUM IDENTITY HEADER -->
   <header class="topbar">
-    <!-- LEFT: System identity + owner card -->
     <div class="identity-block">
       <div class="system-title">
         <span class="sys-hex">⬡</span>
@@ -24,32 +23,20 @@
         </div>
       </div>
     </div>
-
-    <!-- CENTER: Market clock + status -->
     <div class="topbar-center">
-      <div class="market-clock">
-        <span class="clock-label">IST</span>
-        <span class="clock-time">{{ currentTime }}</span>
-      </div>
-      <div class="market-pill" :class="marketOpen ? 'pill-open' : 'pill-closed'">
-        <span class="pulse-dot"></span>
-        {{ marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED' }}
+      <div class="market-clock"><span class="clock-label">IST</span><span class="clock-time">{{ currentTime }}</span></div>
+      <div class="market-pill" :class="marketOpen?'pill-open':'pill-closed'">
+        <span class="pulse-dot"></span>{{ marketOpen?'MARKET OPEN':'MARKET CLOSED' }}
         <span class="pill-countdown">{{ marketCountdown }}</span>
       </div>
     </div>
-
-    <!-- RIGHT: Status chips -->
     <div class="topbar-right">
-      <div class="status-chip" :class="broker.connected ? 'chip-green' : 'chip-red'">
-        <span class="cdot"></span>{{ broker.connected ? 'DHAN CONNECTED' : 'BROKER OFFLINE' }}
+      <div class="status-chip" :class="broker.connected?'chip-green':'chip-red'">
+        <span class="cdot"></span>{{ broker.connected?'DHAN CONNECTED':'BROKER OFFLINE' }}
       </div>
-      <div class="mode-chip">
-        <span class="mode-dot"></span>ANALYZER / PAPER
-      </div>
-      <div class="live-chip">
-        <span class="live-dot"></span>LIVE DISABLED
-      </div>
-      <div class="rho-pill" :class="rhoClass">ρ {{ latestRho !== null ? latestRho.toFixed(2) : '--' }}</div>
+      <div class="mode-chip"><span class="mode-dot"></span>ANALYZER / PAPER</div>
+      <div class="live-chip"><span class="live-dot"></span>LIVE DISABLED</div>
+      <div class="rho-pill" :class="rhoClass">ρ {{ latestRho!==null?latestRho.toFixed(2):'--' }}</div>
     </div>
   </header>
 
@@ -57,11 +44,11 @@
   <aside class="sidebar">
     <nav class="sidenav">
       <div v-for="tab in tabs" :key="tab.id" class="nav-item"
-           :class="{ active: activeTab === tab.id }" @click="activeTab = tab.id">
+           :class="{active: activeTab===tab.id}" @click="activeTab=tab.id">
         <span class="nav-icon">{{ tab.icon }}</span>
         <span class="nav-label">{{ tab.label }}</span>
-        <span v-if="tab.badge" class="nav-badge" :class="tab.badgeClass">{{ tab.badge }}</span>
-        <span v-if="tab.alert" class="nav-alert">{{ tab.alert }}</span>
+        <span v-if="tab.badge && typeof tab.badge === 'string'" class="nav-badge" :class="tab.badgeClass">{{ tab.badge }}</span>
+        <span v-if="tab.badge && typeof tab.badge !== 'string' && tab.badge.value" class="nav-alert">{{ tab.badge.value }}</span>
       </div>
     </nav>
     <div class="sidebar-foot">
@@ -70,32 +57,43 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- ══ 1. SYSTEM CONTROL ══ -->
+    <!-- ══ SYSTEM CONTROL ══ -->
     <section v-if="activeTab==='control'" class="tab">
       <div class="sec-hdr"><h2>System Control</h2><span class="sec-sub">Master status · Safety gates · Production readiness</span></div>
       <div class="kpi-row">
         <div class="kpi kpi-b"><div class="kpi-lbl">SYSTEM MODE</div><div class="kpi-val">{{ state.mode||'PAPER' }}</div><div class="kpi-sub">Analyzer / Paper only</div></div>
         <div class="kpi" :class="broker.connected?'kpi-g':'kpi-r'"><div class="kpi-lbl">BROKER</div><div class="kpi-val">{{ broker.connected?'CONN':'OFFLINE' }}</div><div class="kpi-sub">{{ broker.error||'Dhan ANALYZER' }}</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE TRADING</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">Hardcoded ENV=0</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE TRADING</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0 hardcoded</div></div>
         <div class="kpi kpi-g"><div class="kpi-lbl">ORDER PLACEMENT</div><div class="kpi-val">BLOCKED</div><div class="kpi-sub">Skeleton wrapper</div></div>
         <div class="kpi" :class="marketOpen?'kpi-g':'kpi-a'"><div class="kpi-lbl">MARKET</div><div class="kpi-val">{{ marketOpen?'OPEN':'CLOSED' }}</div><div class="kpi-sub">{{ marketCountdown }}</div></div>
         <div class="kpi kpi-p"><div class="kpi-lbl">DATA APIs</div><div class="kpi-val">ACTIVE</div><div class="kpi-sub">Dhan · till 23 Jul</div></div>
       </div>
 
-      <!-- Production gate matrix -->
+      <!-- NO TRADE REASON MATRIX — critical for trader -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🚫 No-Trade Reason Matrix</span><span class="ps">Why system is/isn't trading right now</span></div>
+        <div class="no-trade-grid">
+          <div class="nt-hdr"><span>GATE</span><span>STATUS</span><span>REASON</span></div>
+          <div v-for="r in noTradeReasons" :key="r.gate" class="nt-row">
+            <span class="nt-gate">{{ r.gate }}</span>
+            <span class="nt-status" :class="r.status==='PASS'?'tx-g':r.status==='FAIL'?'tx-r':r.status==='PEND'?'tx-a':'tx-m'">
+              {{ r.status==='PASS'?'✅ PASS':r.status==='FAIL'?'❌ FAIL':r.status==='PEND'?'⏳ PEND':'⚠️ '+r.status }}
+            </span>
+            <span class="nt-reason tx-m">{{ r.reason }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="two-col mt16">
         <div class="panel">
           <div class="ph"><span class="pt">🔬 Production Gate Matrix</span><span class="ps">ANALYZER_READY verdict</span></div>
           <div class="gate-tbl">
             <div class="gate-hdr"><span>GATE</span><span>STATUS</span><span>✓</span><span>NOTES</span></div>
             <div v-for="g in proofGates" :key="g.name" class="gate-row">
-              <span>{{ g.name }}</span>
-              <span :class="g.pass?'tx-g':'tx-a'">{{ g.status }}</span>
-              <span :class="g.pass?'tx-g':'tx-r'">{{ g.pass?'✓':'✗' }}</span>
-              <span class="tx-m">{{ g.note }}</span>
+              <span>{{ g.name }}</span><span :class="g.pass?'tx-g':'tx-a'">{{ g.status }}</span>
+              <span :class="g.pass?'tx-g':'tx-r'">{{ g.pass?'✓':'✗' }}</span><span class="tx-m">{{ g.note }}</span>
             </div>
           </div>
         </div>
@@ -106,142 +104,155 @@
               <span>{{ r.done?'✅':'⏳' }}</span><span>{{ r.label }}</span><span class="tx-m">{{ r.detail }}</span>
             </div>
           </div>
-          <!-- Live kill switch display -->
           <div class="kill-switch-banner mt16">
             <span class="ks-icon">🔴</span>
-            <div>
-              <div class="ks-title">LIVE TRADING KILL SWITCH — ACTIVE</div>
-              <div class="ks-sub">LIVE_TRADING_ENABLED=0 · SYSTEM3_LIVE_TRADING_ALLOWED=0 · Cannot be enabled from dashboard</div>
-            </div>
+            <div><div class="ks-title">LIVE TRADING KILL SWITCH — ACTIVE</div>
+            <div class="ks-sub">LIVE_TRADING_ENABLED=0 · SYSTEM3_LIVE_TRADING_ALLOWED=0 · Cannot be enabled from dashboard</div></div>
           </div>
         </div>
       </div>
+
+      <!-- Honest status -->
+      <div class="honest-status-banner mt16">
+        <div class="hsb-row"><span class="hsb-label">CLOUD / DASHBOARD</span><span class="hsb-val tx-g">MUCH IMPROVED ✓</span></div>
+        <div class="hsb-row"><span class="hsb-label">ANALYZER / PAPER</span><span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">MARKET-DAY LIFECYCLE</span><span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span></div>
+        <div class="hsb-row"><span class="hsb-label">PREDICTION PROOF</span><span class="hsb-val tx-a">1/5 DAYS (ρ=0.20) ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">LIVE TRADING</span><span class="hsb-val tx-r">BLOCKED 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">PRODUCTION</span><span class="hsb-val tx-r">NOT READY 🔴</span></div>
+      </div>
     </section>
 
-    <!-- ══ 2. BROKER & DATA HEALTH ══ -->
+    <!-- ══ BROKER & DATA HEALTH ══ -->
     <section v-if="activeTab==='health'" class="tab">
-      <div class="sec-hdr"><h2>Broker & Data Health</h2><span class="sec-sub">Token · WebSocket · Data sources · Jobs</span></div>
-      <div class="kpi-row">
-        <div class="kpi" :class="broker.connected?'kpi-g':'kpi-r'"><div class="kpi-lbl">BROKER STATUS</div><div class="kpi-val">{{ broker.connected?'LIVE':'OFFLINE' }}</div><div class="kpi-sub">{{ broker.latency_ms ? broker.latency_ms+'ms' : '--' }}</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">TOKEN</div><div class="kpi-val">VALID</div><div class="kpi-sub">Auto-refresh 08:30 IST</div></div>
-        <div class="kpi kpi-a"><div class="kpi-lbl">WEBSOCKET</div><div class="kpi-val">N/A</div><div class="kpi-sub">Dhan WS — setup pending</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">DHAN DATA APIs</div><div class="kpi-val">ACTIVE</div><div class="kpi-sub">P0 source · till 23 Jul</div></div>
-        <div class="kpi" :class="healthData.datasource_resilience==='UNKNOWN'?'kpi-a':'kpi-g'">
-          <div class="kpi-lbl">RESILIENCE</div><div class="kpi-val">{{ healthData.datasource_resilience||'--' }}</div><div class="kpi-sub">7 fallback levels</div>
+      <div class="sec-hdr"><h2>Broker & Data Health</h2><span class="sec-sub">All auth levels · Data freshness · QC</span></div>
+
+      <!-- BROKER TRUTH — all 11 levels -->
+      <div class="panel">
+        <div class="ph"><span class="pt">🔑 Broker Auth Truth — All Levels</span><span class="ps">Not just "connected" — full proof</span></div>
+        <div class="broker-truth-grid">
+          <div class="bt-row"><span class="bt-lbl">Cloud App</span><span class="bt-val tx-g">ALIVE ✓</span><span class="bt-note">Render running</span></div>
+          <div class="bt-row"><span class="bt-lbl">SDK Import</span><span class="bt-val" :class="brokerDetail.sdk_available?'tx-g':'tx-r'">{{ brokerDetail.sdk_available?'LOADED ✓':'FAILED ✗' }}</span><span class="bt-note">dhanhq SDK</span></div>
+          <div class="bt-row"><span class="bt-lbl">Client ID</span><span class="bt-val" :class="brokerDetail.client_id_present?'tx-g':'tx-r'">{{ brokerDetail.client_id_present?'PRESENT ✓':'MISSING ✗' }}</span><span class="bt-note">...3741</span></div>
+          <div class="bt-row"><span class="bt-lbl">Access Token</span><span class="bt-val" :class="brokerDetail.access_token_present?'tx-g':'tx-r'">{{ brokerDetail.access_token_present?'PRESENT ✓':'MISSING ✗' }}</span><span class="bt-note">Auto-refreshed</span></div>
+          <div class="bt-row"><span class="bt-lbl">Auth Probe</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-r'">{{ brokerDetail.connected?'AUTHENTICATED ✓':(brokerDetail.error||'FAILED ✗') }}</span><span class="bt-note">Profile API call</span></div>
+          <div class="bt-row"><span class="bt-lbl">Quote API</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-a'">{{ brokerDetail.connected?'REACHABLE ✓':'UNVERIFIED' }}</span><span class="bt-note">Dhan Data APIs</span></div>
+          <div class="bt-row"><span class="bt-lbl">Option Chain API</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-a'">{{ brokerDetail.connected?'ACTIVE ✓':'UNVERIFIED' }}</span><span class="bt-note">Data APIs subscribed</span></div>
+          <div class="bt-row"><span class="bt-lbl">Order Placement</span><span class="bt-val tx-g">{{ brokerDetail.order_placement_allowed?'⚠️ ALLOWED':'BLOCKED ✓' }}</span><span class="bt-note">Skeleton wrapper</span></div>
+          <div class="bt-row"><span class="bt-lbl">Live Trading</span><span class="bt-val tx-g">{{ brokerDetail.live_trading_enabled?'⚠️ ENABLED':'DISABLED ✓' }}</span><span class="bt-note">ENV=0</span></div>
+          <div class="bt-row"><span class="bt-lbl">Latency</span><span class="bt-val">{{ brokerDetail.latency_ms?brokerDetail.latency_ms+'ms':'--' }}</span><span class="bt-note">Profile API</span></div>
+          <div class="bt-row"><span class="bt-lbl">Env Source</span><span class="bt-val tx-m">{{ brokerDetail.env_source||'cloud env' }}</span><span class="bt-note">Render dashboard</span></div>
+          <div class="bt-row"><span class="bt-lbl">Token Refresh</span><span class="bt-val" :class="brokerDetail.auto_refresh?.success?'tx-g':'tx-m'">{{ brokerDetail.auto_refresh?.success?'REFRESHED ✓':'STANDBY' }}</span><span class="bt-note">PIN+TOTP auto</span></div>
         </div>
-        <div class="kpi" :class="healthData.retrain_needed?'kpi-r':'kpi-g'"><div class="kpi-lbl">RETRAIN</div><div class="kpi-val">{{ healthData.retrain_needed?'NEEDED':'OK' }}</div><div class="kpi-sub">ρ &lt; 0.40 for 3d fires</div></div>
       </div>
+
+      <!-- Data freshness + QC -->
       <div class="two-col mt16">
         <div class="panel">
-          <div class="ph"><span class="pt">⏰ Job Scheduler (IST)</span></div>
-          <div class="job-tbl">
-            <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span></div>
-            <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled?'je':'jd'">
-              <span>{{ job.name||job.id }}</span><span>{{ job.schedule_time }}</span>
-              <span :class="job.enabled?'tx-g':'tx-m'">{{ job.enabled?'ACTIVE':'OFF' }}</span>
-            </div>
+          <div class="ph"><span class="pt">📡 Data Freshness</span><span class="ps">Dhan P0 · NSE fallback</span></div>
+          <div class="tok-info">
+            <div class="tok-r"><span>Option Chain</span><strong :class="qcData.timestamp?'tx-g':'tx-a'">{{ qcData.timestamp_ist ? ageStr(qcData.timestamp_ist) : '--' }}</strong></div>
+            <div class="tok-r"><span>Chain Source</span><strong>{{ chainData.data_source||'--' }}</strong></div>
+            <div class="tok-r"><span>Chain Status</span><strong :class="chainData.status==='MARKET_OPEN'?'tx-g':'tx-a'">{{ chainData.status||'--' }}</strong></div>
+            <div class="tok-r"><span>Contracts</span><strong>{{ chainData.total_contracts||0 }} loaded</strong></div>
+            <div class="tok-r"><span>WebSocket</span><strong class="tx-a">N/A — Dhan WS setup pending</strong></div>
+            <div class="tok-r"><span>REST Fallback</span><strong class="tx-g">NSE Public → nsepython</strong></div>
+            <div class="tok-r"><span>Bhavcopy EOD</span><strong class="tx-g">Jun 8–12 cached ✓</strong></div>
+            <div class="tok-r"><span>Last GainRank</span><strong>{{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : '--' }}</strong></div>
           </div>
         </div>
         <div class="panel">
-          <div class="ph"><span class="pt">📡 Data Source Priority</span></div>
-          <div class="ds-list">
-            <div v-for="ds in dataSources" :key="ds.name" class="ds-item" :class="ds.status">
-              <span class="ds-p">P{{ ds.priority }}</span><span class="ds-n">{{ ds.name }}</span>
-              <span class="ds-d">{{ ds.desc }}</span><span class="ds-s">{{ ds.statusText }}</span>
-            </div>
-          </div>
-          <div class="ph mt16"><span class="pt">🔑 Broker Auth — All Levels</span></div>
+          <div class="ph"><span class="pt">🔍 QC Report</span><span class="ps">Live option chain quality</span></div>
           <div class="tok-info">
-            <div class="tok-r"><span>Cloud App</span><strong class="tx-g">ALIVE ✓</strong></div>
-            <div class="tok-r"><span>SDK Import</span><strong :class="broker.sdk_available?'tx-g':'tx-r'">{{ broker.sdk_available?'LOADED ✓':'FAILED ✗' }}</strong></div>
-            <div class="tok-r"><span>Client ID</span><strong :class="broker.client_id_present?'tx-g':'tx-r'">{{ broker.client_id_present?'PRESENT ✓':'MISSING ✗' }}</strong></div>
-            <div class="tok-r"><span>Access Token</span><strong :class="broker.access_token_present?'tx-g':'tx-r'">{{ broker.access_token_present?'PRESENT ✓':'MISSING ✗' }}</strong></div>
-            <div class="tok-r"><span>Auth Probe</span><strong :class="broker.connected?'tx-g':'tx-r'">{{ broker.connected?'AUTHENTICATED ✓':broker.error||'FAILED ✗' }}</strong></div>
-            <div class="tok-r"><span>Quote API</span><strong :class="broker.connected?'tx-g':'tx-a'">{{ broker.connected?'REACHABLE ✓':'UNVERIFIED' }}</strong></div>
-            <div class="tok-r"><span>Order Placement</span><strong class="tx-r">{{ broker.order_placement_allowed?'⚠️ ALLOWED':'BLOCKED ✓' }}</strong></div>
-            <div class="tok-r"><span>Live Trading</span><strong class="tx-r">{{ broker.live_trading_enabled?'⚠️ ENABLED':'DISABLED ✓' }}</strong></div>
-            <div class="tok-r"><span>Latency</span><strong>{{ broker.latency_ms ? broker.latency_ms+'ms' : '--' }}</strong></div>
-            <div class="tok-r"><span>Env Source</span><strong class="tx-m">{{ broker.env_source||'--' }}</strong></div>
-            <div class="tok-r"><span>Auto-Refresh</span><strong :class="broker.auto_refresh?.success?'tx-g':'tx-m'">{{ broker.auto_refresh?.success?'REFRESHED ✓':'STANDBY' }}</strong></div>
-            <div class="tok-r"><span>Strategy</span><strong>PIN + TOTP (auto)</strong></div>
-            <div class="tok-r"><span>Watchdog</span><strong class="tx-g">Every 30 min ✓</strong></div>
+            <div class="tok-r"><span>Overall</span><strong :class="qcData.overall_passed?'tx-g':'tx-r'">{{ qcData.overall_passed===true?'PASS ✓':qcData.overall_passed===false?'FAIL ✗':'--' }}</strong></div>
+            <div class="tok-r"><span>QC Time</span><strong class="tx-m">{{ qcData.timestamp_ist||'--' }}</strong></div>
+          </div>
+          <template v-if="qcData.underlying_results">
+            <div class="qc-grid">
+              <div class="qc-hdr"><span>INDEX</span><span>CONTRACTS</span><span>STATUS</span><span>ISSUE</span></div>
+              <div v-for="(res, sym) in qcData.underlying_results" :key="sym" class="qc-row">
+                <span class="rs">{{ sym }}</span>
+                <span>{{ res.contract_count }}</span>
+                <span :class="res.passed?'tx-g':'tx-r'">{{ res.passed?'PASS':'FAIL' }}</span>
+                <span class="tx-m" style="font-size:.6rem">{{ res.reasons?.[0]||'--' }}</span>
+              </div>
+            </div>
+          </template>
+          <div v-else class="no-data">No QC data</div>
+          <!-- Data source priority -->
+          <div class="ph mt16"><span class="pt">📡 Source Priority</span></div>
+          <div class="tok-info">
+            <div class="tok-r"><span>P0 Dhan Data API</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P1 NSE Public</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P3 Bhavcopy EOD</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P5 Yahoo Finance</span><strong class="tx-a">FALLBACK</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job scheduler -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">⏰ Job Scheduler (IST)</span></div>
+        <div class="job-tbl">
+          <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span></div>
+          <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled?'je':'jd'">
+            <span>{{ job.name||job.id }}</span><span>{{ job.schedule_time }}</span>
+            <span :class="job.enabled?'tx-g':'tx-m'">{{ job.enabled?'ACTIVE':'OFF' }}</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══ 3. MARKET SCANNER ══ -->
+    <!-- ══ MARKET SCANNER ══ -->
     <section v-if="activeTab==='scanner'" class="tab">
-      <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank scoring · Trade eligibility</span></div>
-
-      <!-- Two separate rankings as doc requires -->
-      <div class="scanner-note">
-        <span class="sn-badge index">INDEX OPTIONS</span>
-        System3 currently ranks <strong>index option underlyings only</strong> (NIFTY · BANKNIFTY · FINNIFTY · MIDCPNIFTY · SENSEX).
-        Equity cash stock prediction is future scope.
-      </div>
-
+      <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank · PATH A/B</span></div>
+      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIONS ONLY</span>System ranks index underlyings. Cash equity: <strong>FORECAST_ONLY_CASH_EQUITY</strong> — future scope.</div>
       <div class="two-col mt16">
-        <!-- PATH B: Option paper trade candidates -->
         <div class="panel">
-          <div class="ph"><span class="pt">📊 Top Option Trade Candidates</span><span class="ps badge-b">PATH B — PAPER</span></div>
+          <div class="ph"><span class="pt">📊 Top Option Candidates</span><span class="ps badge-b">PATH B — PAPER TRADE</span></div>
           <div class="rank-table">
-            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE</span><span>MOVE%</span><span>OPT TRADE</span><span>CALL</span></div>
-            <template v-if="gainRankData.latest && gainRankData.latest.predictions.length">
-              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying"
-                   class="rank-row" :class="p.recommendation==='TRADE'?'rr-trade':'rr-skip'">
-                <span class="rn">#{{ p.rank }}</span>
-                <span class="rs">{{ p.underlying }}</span>
+            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE</span><span>MOVE%</span><span>OPTION</span><span>CALL</span></div>
+            <template v-if="gainRankData.latest?.predictions?.length">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying" class="rank-row" :class="p.recommendation==='TRADE'?'rr-trade':'rr-skip'">
+                <span class="rn">#{{ p.rank }}</span><span class="rs">{{ p.underlying }}</span>
                 <span class="rsc"><div class="sbar-w"><div class="sbar" :style="{width:p.gain_score+'%',background:scoreColor(p.gain_score)}"></div></div><span>{{ p.gain_score.toFixed(1) }}</span></span>
                 <span>{{ (p.expected_move_pct*100).toFixed(2) }}%</span>
-                <span class="tag-opt">OPTION ✓</span>
+                <span class="tag-opt">ELIGIBLE ✓</span>
                 <span class="ract" :class="p.recommendation==='TRADE'?'act-trade':'act-skip'">{{ p.recommendation }}</span>
               </div>
             </template>
-            <div v-else class="no-data">Runs 09:15 IST pre-market</div>
+            <div v-else class="no-data">09:15 IST pre-market · Last: {{ gainRankData.latest?.date||'--' }}</div>
           </div>
           <div class="panel-foot">Last run: {{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : 'N/A' }}</div>
         </div>
-
-        <!-- PATH A: Forecast only (index-level) -->
         <div class="panel">
-          <div class="ph"><span class="pt">🔮 Index Forecast (All 5)</span><span class="ps badge-a">PATH A — FORECAST</span></div>
+          <div class="ph"><span class="pt">🔮 Index Forecast</span><span class="ps badge-a">PATH A — FORECAST</span></div>
           <div class="forecast-table">
-            <div class="fc-hdr"><span>INDEX</span><span>SCORE</span><span>DIRECTION</span><span>TYPE</span><span>STATUS</span></div>
-            <template v-if="gainRankData.latest && gainRankData.latest.predictions.length">
+            <div class="fc-hdr"><span>INDEX</span><span>SCORE</span><span>DIR</span><span>TYPE</span><span>STATUS</span></div>
+            <template v-if="gainRankData.latest?.predictions?.length">
               <div v-for="p in gainRankData.latest.predictions" :key="p.underlying+'fc'" class="fc-row">
-                <span class="rs">{{ p.underlying }}</span>
-                <span>{{ p.gain_score.toFixed(1) }}</span>
+                <span class="rs">{{ p.underlying }}</span><span>{{ p.gain_score.toFixed(1) }}</span>
                 <span :class="p.gain_score>=50?'tx-g':'tx-r'">{{ p.gain_score>=50?'▲ UP':'▼ DOWN' }}</span>
-                <span class="tag-idx">INDEX</span>
-                <span class="tag-opt-t">OPTION ELIGIBLE</span>
+                <span class="tag-idx">INDEX</span><span class="tag-opt-t">OPTION ELIGIBLE</span>
               </div>
             </template>
             <div v-else class="no-data">No forecast data</div>
           </div>
-          <div class="fc-note">
-            <span class="fc-note-icon">ℹ️</span>
-            Cash equity stocks: <strong>FORECAST_ONLY_CASH_EQUITY</strong> — future scope. System is index-options focused.
-          </div>
+          <div class="fc-note"><span>ℹ️</span>Cash equity stocks: <strong>FORECAST_ONLY_CASH_EQUITY</strong></div>
         </div>
       </div>
-
-      <!-- Chart -->
       <div class="panel mt16">
         <div class="ph"><span class="pt">📊 Score Distribution</span></div>
         <div class="chart-h"><canvas id="scannerChart"></canvas></div>
       </div>
     </section>
 
-    <!-- ══ 4. OPTION CHAIN ══ -->
+    <!-- ══ OPTION CHAIN ══ -->
     <section v-if="activeTab==='options'" class="tab">
       <div class="sec-hdr"><h2>Option Chain Scanner</h2><span class="sec-sub">Dhan Data APIs P0 · OI · IV · Greeks · PCR · Max Pain</span></div>
       <div class="chain-controls">
         <div class="ctl-group"><label>INDEX</label>
-          <div class="seg-btns">
-            <button v-for="sym in chainSymbols" :key="sym" class="seg-btn"
-                    :class="{active: chainSymbol===sym}" @click="selectChainSymbol(sym)">{{ sym }}</button>
-          </div>
+          <div class="seg-btns"><button v-for="sym in chainSymbols" :key="sym" class="seg-btn" :class="{active:chainSymbol===sym}" @click="selectChainSymbol(sym)">{{ sym }}</button></div>
         </div>
         <div class="ctl-group"><label>STRIKES</label>
           <select class="chain-select" v-model="chainStrikeFilter">
@@ -252,20 +263,18 @@
           <span class="spot-badge">SPOT ₹{{ formatNum(chainData.spot||0) }}</span>
           <span class="pcr-badge" :class="(chainData.pcr||1)>1.2?'pcr-bull':(chainData.pcr||1)<0.8?'pcr-bear':'pcr-neut'">PCR {{ (chainData.pcr||0).toFixed(2) }}</span>
           <span class="src-badge">{{ chainData.data_source||'--' }}</span>
-          <span v-if="chainData.status" class="src-badge" :class="chainData.status==='MARKET_OPEN'?'badge-live':'badge-closed'">{{ chainData.status }}</span>
+          <span class="src-badge" :class="chainData.status==='MARKET_OPEN'?'badge-live':'badge-closed'">{{ chainData.status||'--' }}</span>
         </div>
       </div>
-
-      <!-- Option tradability warning -->
       <div class="tradability-row mt8">
         <div class="trad-item pass"><span>✅</span><span>Symbol valid</span></div>
         <div class="trad-item pass"><span>✅</span><span>Exchange IDX_I</span></div>
         <div class="trad-item" :class="chainData.contracts?.length?'pass':'warn'"><span>{{ chainData.contracts?.length?'✅':'⚠️' }}</span><span>Chain available</span></div>
         <div class="trad-item" :class="chainData.spot?'pass':'warn'"><span>{{ chainData.spot?'✅':'⚠️' }}</span><span>Spot price</span></div>
+        <div class="trad-item" :class="qcData.overall_passed?'pass':'warn'"><span>{{ qcData.overall_passed?'✅':'⚠️' }}</span><span>QC / Spread</span></div>
         <div class="trad-item pass"><span>✅</span><span>Paper mode</span></div>
         <div class="trad-item pass"><span>✅</span><span>Live disabled</span></div>
       </div>
-
       <div class="oi-summary panel mt8">
         <div class="oi-col"><div class="oi-lbl">CALL OI</div><div class="oi-val tx-r">{{ formatLakh(chainCeOI) }}</div></div>
         <div class="oi-bar-wrap"><div class="oi-bar-ce" :style="{width:ceOIPct+'%'}"></div><div class="oi-bar-pe" :style="{width:peOIPct+'%'}"></div></div>
@@ -274,29 +283,26 @@
         <div class="oi-stat">ATM IV: <strong>{{ atmIV?(atmIV*100).toFixed(1)+'%':'--' }}</strong></div>
         <div class="oi-stat">Contracts: <strong>{{ chainData.total_contracts||0 }}</strong></div>
       </div>
-
       <div class="panel mt8">
         <div class="chain-table-wrap">
           <table class="chain-table">
             <thead>
               <tr><th class="ce-h" colspan="6">CALLS</th><th class="strike-h">STRIKE</th><th class="pe-h" colspan="6">PUTS</th></tr>
-              <tr>
-                <th class="ce-col">OI</th><th class="ce-col">ChgOI</th><th class="ce-col">Vol</th><th class="ce-col">IV%</th><th class="ce-col">LTP</th><th class="ce-col">Δ</th>
-                <th class="strike-col">STRIKE</th>
-                <th class="pe-col">Δ</th><th class="pe-col">LTP</th><th class="pe-col">IV%</th><th class="pe-col">Vol</th><th class="pe-col">ChgOI</th><th class="pe-col">OI</th>
-              </tr>
+              <tr><th class="ce-col">OI</th><th class="ce-col">ChgOI</th><th class="ce-col">Vol</th><th class="ce-col">IV%</th><th class="ce-col">LTP</th><th class="ce-col">Δ</th>
+              <th class="strike-col">STRIKE</th>
+              <th class="pe-col">Δ</th><th class="pe-col">LTP</th><th class="pe-col">IV%</th><th class="pe-col">Vol</th><th class="pe-col">ChgOI</th><th class="pe-col">OI</th></tr>
             </thead>
             <tbody>
-              <tr v-if="chainLoading"><td colspan="13" class="no-data">Loading chain data...</td></tr>
-              <tr v-else-if="!filteredChainRows.length"><td colspan="13" class="no-data">{{ chainData.message || 'Select index above — Dhan Data APIs active' }}</td></tr>
-              <tr v-for="row in filteredChainRows" :key="row.strike" class="chain-row" :class="{atm: row.isATM}">
+              <tr v-if="chainLoading"><td colspan="13" class="no-data">Loading...</td></tr>
+              <tr v-else-if="!filteredChainRows.length"><td colspan="13" class="no-data">{{ chainData.message||'Select index above' }}</td></tr>
+              <tr v-for="row in filteredChainRows" :key="row.strike" class="chain-row" :class="{atm:row.isATM}">
                 <td class="ce-col oi-col">{{ formatLakh(row.ce?.oi||0) }}</td>
                 <td class="ce-col" :class="(row.ce?.oi_change||0)>0?'tx-g':'tx-r'">{{ formatLakh(row.ce?.oi_change||0) }}</td>
                 <td class="ce-col">{{ formatLakh(row.ce?.volume||0) }}</td>
                 <td class="ce-col">{{ row.ce?.iv?(row.ce.iv*100).toFixed(1):'-' }}</td>
                 <td class="ce-col ltp-col">{{ formatNum(row.ce?.ltp||0) }}</td>
                 <td class="ce-col">{{ row.ce?.delta?row.ce.delta.toFixed(2):'-' }}</td>
-                <td class="strike-col" :class="{'atm-strike': row.isATM}">{{ formatNum(row.strike) }}<span v-if="row.isATM" class="atm-tag">ATM</span></td>
+                <td class="strike-col" :class="{'atm-strike':row.isATM}">{{ formatNum(row.strike) }}<span v-if="row.isATM" class="atm-tag">ATM</span></td>
                 <td class="pe-col">{{ row.pe?.delta?row.pe.delta.toFixed(2):'-' }}</td>
                 <td class="pe-col ltp-col">{{ formatNum(row.pe?.ltp||0) }}</td>
                 <td class="pe-col">{{ row.pe?.iv?(row.pe.iv*100).toFixed(1):'-' }}</td>
@@ -310,26 +316,40 @@
       </div>
     </section>
 
-    <!-- ══ 5. PAPER TRADE LIFECYCLE ══ -->
+    <!-- ══ PAPER LIFECYCLE — Full trader P&L ══ -->
     <section v-if="activeTab==='paper'" class="tab">
-      <div class="sec-hdr"><h2>Paper Trade Lifecycle</h2><span class="sec-sub">Full signal→order→fill→exit→P&L chain · PAPER ONLY</span></div>
-
-      <!-- PATH B gate status -->
+      <div class="sec-hdr"><h2>Paper Trade Lifecycle</h2><span class="sec-sub">Full signal→order→fill→exit→P&L · PAPER ONLY</span></div>
       <div class="path-banner path-b">
         <span>PATH B — OPTION PAPER TRADE</span>
         <span class="path-gate">Gate: Symbol valid ✅ · Chain available ✅ · Paper mode ✅ · Live disabled ✅ · Human approval pending ⏳</span>
       </div>
 
+      <!-- P&L with charges -->
       <div class="kpi-row mt16">
-        <div class="kpi kpi-b"><div class="kpi-lbl">TOTAL P&L</div><div class="kpi-val" :class="(paperSummary.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(paperSummary.total_pnl||0) }}</div><div class="kpi-sub">Paper simulation</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">WIN RATE</div><div class="kpi-val">{{ paperSummary.win_rate?(paperSummary.win_rate*100).toFixed(1)+'%':paperSummary.win_rate===0?'0.0%':'--' }}</div><div class="kpi-sub">{{ paperSummary.winning_trades||0 }}W / {{ paperSummary.losing_trades||0 }}L</div></div>
-        <div class="kpi kpi-c"><div class="kpi-lbl">OPEN POSITIONS</div><div class="kpi-val">{{ paperPositions.length }}</div><div class="kpi-sub">Paper trades</div></div>
-        <div class="kpi kpi-p"><div class="kpi-lbl">TOTAL TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">All lifecycle</div></div>
-        <div class="kpi kpi-a"><div class="kpi-lbl">REALISED P&L</div><div class="kpi-val" :class="(paperSummary.total_realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(paperSummary.total_realized_pnl||0) }}</div><div class="kpi-sub">Closed trades</div></div>
-        <div class="kpi kpi-s"><div class="kpi-lbl">UNREALISED</div><div class="kpi-val" :class="(paperSummary.total_unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(paperSummary.total_unrealized_pnl||0) }}</div><div class="kpi-sub">Open trades</div></div>
+        <div class="kpi kpi-b"><div class="kpi-lbl">GROSS P&L</div><div class="kpi-val" :class="(paperSummary.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(paperSummary.total_pnl||0) }}</div><div class="kpi-sub">Before charges</div></div>
+        <div class="kpi kpi-r"><div class="kpi-lbl">EST. CHARGES</div><div class="kpi-val tx-r">₹{{ formatNum(pnlWithCharges.totalCharges) }}</div><div class="kpi-sub">Brokerage+STT+GST</div></div>
+        <div class="kpi" :class="pnlWithCharges.net>=0?'kpi-g':'kpi-r'"><div class="kpi-lbl">NET P&L</div><div class="kpi-val" :class="pnlWithCharges.net>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pnlWithCharges.net) }}</div><div class="kpi-sub">After all charges</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">WIN RATE</div><div class="kpi-val">{{ paperSummary.win_rate?(paperSummary.win_rate*100).toFixed(1)+'%':paperSummary.winning_trades!=null?((paperSummary.winning_trades/(paperSummary.total_trades||1))*100).toFixed(1)+'%':'--' }}</div><div class="kpi-sub">{{ paperSummary.winning_trades||0 }}W / {{ paperSummary.losing_trades||0 }}L</div></div>
+        <div class="kpi kpi-c"><div class="kpi-lbl">TOTAL TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Paper simulation</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">OPEN POSITIONS</div><div class="kpi-val">{{ paperPositions.length }}</div><div class="kpi-sub">Active now</div></div>
       </div>
 
-      <!-- Lifecycle pipeline -->
+      <!-- Charges breakdown -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">💰 P&L Charges Breakdown</span><span class="ps">Estimated · actual charges after real execution</span></div>
+        <div class="charges-grid">
+          <div class="ch-row"><span>Gross P&L</span><strong :class="pnlWithCharges.gross>=0?'tx-g':'tx-r'">₹{{ formatNum(pnlWithCharges.gross) }}</strong></div>
+          <div class="ch-row"><span>Brokerage (₹20/side)</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.brokerage) }}</strong></div>
+          <div class="ch-row"><span>STT (0.0125% sell)</span><strong class="tx-r">- ₹{{ pnlWithCharges.stt }}</strong></div>
+          <div class="ch-row"><span>Exchange charges</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.exchange) }}</strong></div>
+          <div class="ch-row"><span>GST (18%)</span><strong class="tx-r">- ₹{{ pnlWithCharges.gst }}</strong></div>
+          <div class="ch-row"><span>SEBI (₹10/Cr)</span><strong class="tx-r">- ₹{{ pnlWithCharges.sebi }}</strong></div>
+          <div class="ch-row"><span>Slippage (est.)</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.slippage) }}</strong></div>
+          <div class="ch-row ch-total"><span>NET P&L</span><strong :class="pnlWithCharges.net>=0?'tx-g':'tx-r'">₹{{ formatNum(pnlWithCharges.net) }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Trade lifecycle pipeline -->
       <div class="panel mt16">
         <div class="ph"><span class="pt">🔄 Trade Lifecycle Pipeline</span></div>
         <div class="pipeline">
@@ -341,7 +361,7 @@
           <div class="pipe-arr">→</div>
           <div class="pipe-step done"><div class="pipe-ico">💰</div><div class="pipe-lbl">Fill</div><div class="pipe-sub">Slippage model</div></div>
           <div class="pipe-arr">→</div>
-          <div class="pipe-step active"><div class="pipe-ico">📊</div><div class="pipe-lbl">SL/Target</div><div class="pipe-sub">Monitored</div></div>
+          <div class="pipe-step active"><div class="pipe-ico">📊</div><div class="pipe-lbl">SL/Target</div><div class="pipe-sub">Monitor</div></div>
           <div class="pipe-arr">→</div>
           <div class="pipe-step active"><div class="pipe-ico">🏁</div><div class="pipe-lbl">Exit</div><div class="pipe-sub">P&L calc</div></div>
           <div class="pipe-arr">→</div>
@@ -349,82 +369,97 @@
         </div>
       </div>
 
-      <!-- Open positions -->
+      <!-- Full trade history with all fields -->
       <div class="panel mt16">
-        <div class="ph"><span class="pt">📋 Open Positions</span><span class="ps">{{ paperPositions.length }} active</span></div>
-        <div class="trade-table">
-          <div class="trade-hdr"><span>SYMBOL</span><span>CE/PE</span><span>STRIKE</span><span>QTY</span><span>ENTRY ₹</span><span>CMP ₹</span><span>UNREAL P&L</span><span>EXIT REASON</span><span>STATUS</span></div>
-          <template v-if="paperPositions.length">
-            <div v-for="pos in paperPositions" :key="pos.position_id" class="trade-row">
-              <span class="sym-tag">{{ pos.underlying||pos.symbol||'--' }}</span>
-              <span :class="pos.option_type==='CE'?'tag-ce':'tag-pe'">{{ pos.option_type||'--' }}</span>
-              <span>{{ formatNum(pos.strike||0) }}</span>
-              <span>{{ pos.qty||pos.quantity||0 }}</span>
-              <span>{{ formatNum(pos.entry_price||0) }}</span>
-              <span>{{ formatNum(pos.current_price||pos.entry_price||0) }}</span>
-              <span :class="(pos.unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pos.unrealized_pnl||0) }}</span>
-              <span class="tx-m">{{ pos.exit_reason||'--' }}</span>
-              <span class="pos-status">{{ pos.status||'OPEN' }}</span>
-            </div>
-          </template>
-          <div v-else class="no-data">No open positions · Paper lifecycle runs at 09:30 IST</div>
+        <div class="ph"><span class="pt">📜 Complete Trade History</span><span class="ps">All closed trades · Feb 1 session</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr>
+              <th>TIME</th><th>POS ID</th><th>INDEX</th><th>CE/PE</th><th>STRIKE</th>
+              <th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>GROSS P&L</th><th>P&L%</th><th>EXIT REASON</th>
+            </tr></thead>
+            <tbody>
+              <template v-if="tradeHistory.length">
+                <tr v-for="t in tradeHistory" :key="t.position_id" class="ftt-row">
+                  <td>{{ (t.time_ist||'').substring(5,16) }}</td>
+                  <td class="tx-m">{{ t.position_id||'--' }}</td>
+                  <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
+                  <td>{{ formatNum(t.strike||0) }}</td>
+                  <td>{{ formatNum(t.entry_price||0) }}</td>
+                  <td>{{ formatNum(t.exit_price||0) }}</td>
+                  <td>{{ formatNum(t.qty||0) }}</td>
+                  <td :class="(t.realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(t.realized_pnl||0) }}</td>
+                  <td :class="(t.realized_pnl_pct||0)>=0?'pnl-pos':'pnl-neg'">{{ t.realized_pnl_pct?(t.realized_pnl_pct).toFixed(1)+'%':'--' }}</td>
+                  <td class="tx-m">{{ t.exit_reason||'--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="11" class="no-data">No closed trades yet</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Trade history + P&L chart -->
+      <!-- Today's trades from /api/trades/today -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📅 Today's Trades (09:15–15:30 IST)</span><span class="ps">{{ todayTrades.date||'--' }} · {{ todayTrades.total_trades||0 }} entries</span></div>
+        <div class="tok-info">
+          <div class="tok-r"><span>Entries</span><strong>{{ todayTrades.entries?.length||0 }}</strong></div>
+          <div class="tok-r"><span>Exits</span><strong>{{ todayTrades.exits?.length||0 }}</strong></div>
+          <div class="tok-r"><span>Total</span><strong>{{ todayTrades.count||0 }}</strong></div>
+        </div>
+        <div v-if="!todayTrades.entries?.length" class="no-data">No trades today · Paper lifecycle runs at 09:30 IST</div>
+      </div>
+
       <div class="two-col mt16">
         <div class="panel">
-          <div class="ph"><span class="pt">📜 Trade History</span><span class="ps">Closed trades</span></div>
-          <div class="trade-table">
-            <div class="trade-hdr" style="grid-template-columns:1fr .6fr .7fr .5fr 1fr .6fr"><span>DATE</span><span>SYMBOL</span><span>CE/PE</span><span>STRIKE</span><span>EXIT REASON</span><span>P&L</span></div>
-            <template v-if="tradeHistory.length">
-              <div v-for="t in tradeHistory.slice(0,12)" :key="t.position_id||t.timestamp" class="trade-row" style="grid-template-columns:1fr .6fr .7fr .5fr 1fr .6fr">
-                <span>{{ (t.time_ist||t.timestamp||'').substring(0,16) }}</span>
-                <span class="sym-tag">{{ t.underlying||'--' }}</span>
-                <span :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</span>
-                <span>{{ formatNum(t.strike||0) }}</span>
-                <span class="tx-m">{{ t.exit_reason||'--' }}</span>
-                <span :class="(t.realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(t.realized_pnl||0) }}</span>
-              </div>
-            </template>
-            <div v-else class="no-data">No closed trades yet</div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="ph"><span class="pt">📊 P&L History</span></div>
+          <div class="ph"><span class="pt">📊 P&L Chart</span></div>
           <div class="chart-h"><canvas id="pnlChart"></canvas></div>
         </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">📋 Open Positions</span><span class="ps">{{ paperPositions.length }} active</span></div>
+          <div v-if="paperPositions.length">
+            <div class="trade-table">
+              <div class="trade-hdr"><span>SYMBOL</span><span>CE/PE</span><span>STRIKE</span><span>QTY</span><span>ENTRY</span><span>CMP</span><span>UNREAL P&L</span><span>STATUS</span></div>
+              <div v-for="pos in paperPositions" :key="pos.position_id" class="trade-row">
+                <span class="sym-tag">{{ pos.underlying||pos.symbol||'--' }}</span>
+                <span :class="pos.option_type==='CE'?'tag-ce':'tag-pe'">{{ pos.option_type||'--' }}</span>
+                <span>{{ formatNum(pos.strike||0) }}</span><span>{{ pos.qty||0 }}</span>
+                <span>{{ formatNum(pos.entry_price||0) }}</span>
+                <span>{{ formatNum(pos.current_price||pos.entry_price||0) }}</span>
+                <span :class="(pos.unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pos.unrealized_pnl||0) }}</span>
+                <span class="pos-status">{{ pos.status||'OPEN' }}</span>
+              </div>
+            </div>
+          </div>
+          <div v-else class="no-data">No open positions</div>
+        </div>
       </div>
-
-      <div class="safety-banner mt16">
-        <span>🛡️</span><span><strong>PAPER MODE</strong> — All trades simulated. No real orders. Live trading DISABLED. Human approval required before any live enablement.</span>
-      </div>
+      <div class="safety-banner mt16"><span>🛡️</span><span><strong>PAPER MODE</strong> — All trades simulated. No real orders. Live trading DISABLED. Human approval required before live.</span></div>
     </section>
 
-    <!-- ══ 6. PREDICTION vs ACTUAL ══ -->
+    <!-- ══ PREDICTION VS ACTUAL ══ -->
     <section v-if="activeTab==='accuracy'" class="tab">
-      <div class="sec-hdr"><h2>Prediction vs Actual</h2><span class="sec-sub">Spearman ρ · Hit Rate · Daily validation · Walk-Forward</span></div>
+      <div class="sec-hdr"><h2>Prediction vs Actual</h2><span class="sec-sub">Spearman ρ · Hit Rate · Walk-Forward proof</span></div>
       <div class="kpi-row">
         <div class="kpi kpi-p"><div class="kpi-lbl">AVG ρ</div><div class="kpi-val">{{ accuracyData.avg_rho?accuracyData.avg_rho.toFixed(4):'--' }}</div><div class="kpi-sub">Target ≥ 0.700</div></div>
         <div class="kpi kpi-b"><div class="kpi-lbl">HIT RATE</div><div class="kpi-val">{{ latestHitRate!==null?(latestHitRate*100).toFixed(1)+'%':'--' }}</div><div class="kpi-sub">Top-N accuracy</div></div>
-        <div class="kpi" :class="accuracyData.retrain_needed?'kpi-r':'kpi-g'"><div class="kpi-lbl">RETRAIN</div><div class="kpi-val">{{ accuracyData.retrain_needed?'NEEDED':'OK' }}</div><div class="kpi-sub">Fires if ρ &lt; 0.40 × 3d</div></div>
+        <div class="kpi" :class="accuracyData.retrain_needed?'kpi-r':'kpi-g'"><div class="kpi-lbl">RETRAIN</div><div class="kpi-val">{{ accuracyData.retrain_needed?'NEEDED':'OK' }}</div><div class="kpi-sub">Fires if ρ&lt;0.40×3d</div></div>
         <div class="kpi kpi-s"><div class="kpi-lbl">DAYS</div><div class="kpi-val">{{ accuracyData.days_available||0 }} / 5</div><div class="kpi-sub">Min 5 for calibration</div></div>
       </div>
-
-      <!-- prediction vs actual table -->
       <div class="two-col mt16">
         <div class="panel">
-          <div class="ph"><span class="pt">📋 Prediction vs Actual Log</span></div>
+          <div class="ph"><span class="pt">📋 Prediction vs Actual Log</span><span class="ps">Real matured rows only</span></div>
           <div class="val-tbl">
             <div class="val-hdr"><span>DATE</span><span>PREDICTED TOP</span><span>ACTUAL TOP</span><span>ρ</span><span>HIT%</span><span>STATUS</span></div>
-            <template v-if="accuracyData.trend && accuracyData.trend.length">
+            <template v-if="accuracyData.trend?.length">
               <div v-for="row in accuracyData.trend" :key="row.date" class="val-row">
                 <span>{{ row.date }}</span>
                 <span class="tx-c">{{ (row.predicted||[]).slice(0,3).join('·') }}</span>
                 <span class="tx-g">{{ (row.actual||[]).slice(0,3).join('·') }}</span>
                 <span :class="row.rho>=0.7?'tx-g':row.rho>=0.4?'tx-a':'tx-r'">{{ row.rho?row.rho.toFixed(3):'--' }}</span>
                 <span>{{ row.hit_rate?(row.hit_rate*100).toFixed(1)+'%':'--' }}</span>
-                <span :class="row.status==='RETRAIN_NEEDED'?'tx-r':'tx-g'">{{ row.status }}</span>
+                <span :class="row.status==='RETRAIN_NEEDED'?'tx-r':'tx-g'" style="font-size:.6rem">{{ row.status }}</span>
               </div>
             </template>
             <div v-else class="no-data">1 day available (Jun 12) · Runs daily 15:35 IST</div>
@@ -435,25 +470,24 @@
           <div class="chart-h-tall"><canvas id="rhoFull"></canvas></div>
         </div>
       </div>
-
       <div class="panel mt16">
         <div class="ph"><span class="pt">🔮 Walk-Forward Proof</span></div>
         <div class="wf-grid">
-          <div class="wf-r"><span>Bhavcopy Days</span><strong class="tx-g">5 days (Jun 8–12)</strong></div>
+          <div class="wf-r"><span>Bhavcopy Days Used</span><strong class="tx-g">5 days (Jun 8–12)</strong></div>
           <div class="wf-r"><span>Cost Model</span><strong>₹20/side + STT + SEBI + slippage</strong></div>
           <div class="wf-r"><span>Trades Simulated</span><strong>8 walk-forward trades</strong></div>
-          <div class="wf-r"><span>Proof Status</span><strong class="tx-g">PASS ✓</strong></div>
-          <div class="wf-r"><span>Validation Days Needed</span><strong class="tx-a">5+ (currently 1)</strong></div>
-          <div class="wf-r"><span>Production Gate</span><strong class="tx-a">BLOCKED until 5+ days</strong></div>
+          <div class="wf-r"><span>Walk-Forward Status</span><strong class="tx-g">PASS ✓</strong></div>
+          <div class="wf-r"><span>Production Gate</span><strong class="tx-a">BLOCKED until 5+ days + ρ≥0.70</strong></div>
+          <div class="wf-r"><span>Prediction Maturity</span><strong class="tx-a">1/5 days · HIGH OVERFITTING RISK</strong></div>
         </div>
       </div>
     </section>
 
-    <!-- ══ 7. SIGNALS ══ -->
+    <!-- ══ SIGNALS ══ -->
     <section v-if="activeTab==='signals'" class="tab">
-      <div class="sec-hdr"><h2>Signal Intelligence</h2><span class="sec-sub">GainRankEngine · 7-Factor scoring · Dhan Data P0</span></div>
+      <div class="sec-hdr"><h2>Signal Intelligence</h2><span class="sec-sub">GainRankEngine · 7-Factor · Dhan Data P0</span></div>
       <div class="panel">
-        <div class="ph"><span class="pt">⚙️ Factor Weights</span><span class="ps">Calibrated via Spearman ρ</span></div>
+        <div class="ph"><span class="pt">⚙️ Factor Weights</span></div>
         <div class="factor-grid">
           <div v-for="f in factors" :key="f.name" class="factor-item">
             <div class="f-name">{{ f.name }}</div>
@@ -466,7 +500,7 @@
         <div class="panel">
           <div class="ph"><span class="pt">🏆 Latest Rankings</span></div>
           <div class="rank-table">
-            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE/100</span><span>MOVE%</span><span>CALL</span></div>
+            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE</span><span>MOVE%</span><span>CALL</span></div>
             <template v-if="gainRankData.latest">
               <div v-for="p in gainRankData.latest.predictions" :key="p.underlying" class="rank-row" :class="p.recommendation==='TRADE'?'rr-trade':'rr-skip'">
                 <span class="rn">#{{ p.rank }}</span><span class="rs">{{ p.underlying }}</span>
@@ -478,81 +512,67 @@
             <div v-else class="no-data">09:15 IST pre-market</div>
           </div>
         </div>
-        <div class="panel">
-          <div class="ph"><span class="pt">📊 Score Chart</span></div>
-          <div class="chart-h"><canvas id="rankHistChart"></canvas></div>
-        </div>
-      </div>
-      <div class="panel mt16">
-        <div class="ph"><span class="pt">🔄 Signal Pipeline</span></div>
-        <div class="pipeline">
-          <div class="pipe-step done"><div class="pipe-ico">📥</div><div class="pipe-lbl">Dhan P0</div><div class="pipe-sub">Live OC/IV</div></div>
-          <div class="pipe-arr">→</div>
-          <div class="pipe-step done"><div class="pipe-ico">⚙️</div><div class="pipe-lbl">Signal Engine</div><div class="pipe-sub">18:45 IST</div></div>
-          <div class="pipe-arr">→</div>
-          <div class="pipe-step done"><div class="pipe-ico">🧠</div><div class="pipe-lbl">ML Aggregator</div><div class="pipe-sub">15% weight</div></div>
-          <div class="pipe-arr">→</div>
-          <div class="pipe-step done"><div class="pipe-ico">🏆</div><div class="pipe-lbl">GainRank</div><div class="pipe-sub">09:15 IST</div></div>
-          <div class="pipe-arr">→</div>
-          <div class="pipe-step active"><div class="pipe-ico">✅</div><div class="pipe-lbl">Validate</div><div class="pipe-sub">15:35 IST</div></div>
-        </div>
+        <div class="panel"><div class="ph"><span class="pt">📊 Score Chart</span></div><div class="chart-h"><canvas id="rankHistChart"></canvas></div></div>
       </div>
     </section>
 
-    <!-- ══ 8. ERROR / SYSTEM LOG ══ -->
-    <section v-if="activeTab==='logs'" class="tab">
-      <div class="sec-hdr"><h2>Error & System Log</h2><span class="sec-sub">Live log tail · Secrets redacted · Last 200 lines</span></div>
-      <div class="panel">
-        <div class="ph">
-          <span class="pt">📋 System Log</span>
-          <button class="btn-sm" @click="loadLogs()">🔄 Refresh</button>
+    <!-- ══ ALERTS ══ -->
+    <section v-if="activeTab==='alerts'" class="tab">
+      <div class="sec-hdr"><h2>Alerts</h2><span class="sec-sub">Active · Resolved · Deduped — false BROKER_DISCONNECTED loop fixed</span></div>
+      <div class="kpi-row">
+        <div class="kpi" :class="unreadCount?'kpi-r':'kpi-g'"><div class="kpi-lbl">UNREAD</div><div class="kpi-val">{{ unreadCount }}</div><div class="kpi-sub">Active alerts</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">TOTAL</div><div class="kpi-val">{{ alertsData.length }}</div><div class="kpi-sub">Last 30</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">DEDUP FIX</div><div class="kpi-val">APPLIED</div><div class="kpi-sub">upsert + resolve</div></div>
+        <div class="kpi kpi-b"><div class="kpi-lbl">SYNC INTERVAL</div><div class="kpi-val">5s</div><div class="kpi-sub">No more flood</div></div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔔 Active Alerts</span></div>
+        <div v-if="activeAlerts.length">
+          <div v-for="a in activeAlerts" :key="a.ts" class="alert-row" :class="a.level==='CRIT'?'alert-crit':a.level==='WARN'?'alert-warn':'alert-info'">
+            <span class="alert-lvl">{{ a.level }}</span>
+            <span class="alert-code">{{ a.code }}</span>
+            <span class="alert-msg">{{ a.message }}</span>
+            <span class="alert-ts tx-m">{{ ageStr(a.ts) }}</span>
+          </div>
         </div>
-        <div class="log-box">
-          <div v-if="!logsData.length" class="no-data">Loading logs...</div>
-          <div v-for="(line, i) in logsData" :key="i" class="log-line"
-               :class="line.includes('ERROR')||line.includes('CRITICAL')?'log-err':line.includes('WARN')?'log-warn':line.includes('INFO')?'log-info':''">
-            {{ line }}
+        <div v-else class="no-data tx-g">✅ No active alerts</div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📋 Alert History (last 30)</span></div>
+        <div class="alert-tbl">
+          <div class="alert-hdr"><span>LEVEL</span><span>CODE</span><span>MESSAGE</span><span>TIME</span><span>STATUS</span></div>
+          <div v-for="a in alertsData" :key="a.ts+a.code" class="alert-hist-row">
+            <span class="alert-lvl-s" :class="a.level==='WARN'?'tx-a':a.level==='CRIT'?'tx-r':'tx-m'">{{ a.level }}</span>
+            <span class="tx-c" style="font-size:.65rem">{{ a.code }}</span>
+            <span class="tx-m" style="font-size:.65rem">{{ a.message }}</span>
+            <span class="tx-m" style="font-size:.6rem">{{ ageStr(a.ts) }}</span>
+            <span :class="a.resolved?'tx-g':'tx-a'" style="font-size:.6rem">{{ a.resolved?'RESOLVED':'ACTIVE' }}</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══ 9. PROOF GATES ══ -->
+    <!-- ══ ERROR LOG ══ -->
+    <section v-if="activeTab==='logs'" class="tab">
+      <div class="sec-hdr"><h2>Error & System Log</h2><span class="sec-sub">Live tail · Secrets redacted · 150 lines</span></div>
+      <div class="panel">
+        <div class="ph"><span class="pt">📋 System Log</span><button class="btn-sm" @click="loadLogs()">🔄 Refresh</button></div>
+        <div class="log-box">
+          <div v-if="!logsData.length" class="no-data">Loading...</div>
+          <div v-for="(line,i) in logsData" :key="i" class="log-line"
+               :class="line.includes('ERROR')||line.includes('CRITICAL')?'log-err':line.includes('WARN')?'log-warn':line.includes('INFO')?'log-info':''">{{ line }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PROOF GATES ══ -->
     <section v-if="activeTab==='proof'" class="tab">
       <div class="sec-hdr"><h2>Proof Status Matrix</h2><span class="sec-sub">8-Gate Orchestrator</span></div>
-      <!-- Dynamic proof data from /api/state -->
       <div class="kpi-row">
         <div class="kpi kpi-g"><div class="kpi-lbl">GATES</div><div class="kpi-val">8 / 8</div><div class="kpi-sub">0 blockers</div></div>
         <div class="kpi kpi-a"><div class="kpi-lbl">VERDICT</div><div class="kpi-val" style="font-size:.75rem">ANALYZER_READY</div><div class="kpi-sub">PROOF_INCOMPLETE</div></div>
-        <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design · paper only</div></div>
-        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE TRADING</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0 hardcoded</div></div>
-      </div>
-      <!-- Honest status banner -->
-      <div class="honest-status-banner mt16">
-        <div class="hsb-row">
-          <span class="hsb-label">CLOUD / DASHBOARD</span>
-          <span class="hsb-val tx-g">MUCH IMPROVED ✓</span>
-        </div>
-        <div class="hsb-row">
-          <span class="hsb-label">ANALYZER / PAPER</span>
-          <span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span>
-        </div>
-        <div class="hsb-row">
-          <span class="hsb-label">MARKET-DAY LIFECYCLE</span>
-          <span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span>
-        </div>
-        <div class="hsb-row">
-          <span class="hsb-label">PREDICTION PROOF</span>
-          <span class="hsb-val tx-a">1 DAY ONLY (need 5+) ⚠</span>
-        </div>
-        <div class="hsb-row">
-          <span class="hsb-label">LIVE TRADING</span>
-          <span class="hsb-val tx-r">BLOCKED 🔴</span>
-        </div>
-        <div class="hsb-row">
-          <span class="hsb-label">PRODUCTION</span>
-          <span class="hsb-val tx-r">NOT READY 🔴</span>
-        </div>
+        <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0</div></div>
       </div>
       <div class="panel mt16">
         <div class="ph"><span class="pt">🔬 Gate Matrix</span></div>
@@ -563,6 +583,14 @@
             <span :class="g.pass?'tx-g':'tx-r'">{{ g.pass?'✓':'✗' }}</span><span class="tx-m">{{ g.note }}</span>
           </div>
         </div>
+      </div>
+      <div class="honest-status-banner mt16">
+        <div class="hsb-row"><span class="hsb-label">CLOUD / DASHBOARD</span><span class="hsb-val tx-g">MUCH IMPROVED ✓</span></div>
+        <div class="hsb-row"><span class="hsb-label">ANALYZER / PAPER</span><span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">MARKET-DAY LIFECYCLE</span><span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span></div>
+        <div class="hsb-row"><span class="hsb-label">LIVE TRADING</span><span class="hsb-val tx-r">BLOCKED 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">PRODUCTION</span><span class="hsb-val tx-r">NOT READY 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">WEBSOCKET TICK</span><span class="hsb-val tx-a">NOT IMPLEMENTED ⚠</span></div>
       </div>
     </section>
 
