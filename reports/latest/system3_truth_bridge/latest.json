@@ -1,0 +1,18 @@
+{
+  "generated_utc": "NOT_RUN_YET",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "status": "NOT_RUN_YET",
+  "reason": "Truth bridge scripts are installed, but no live run output has been committed yet.",
+  "billing_mode": "GitHub Actions schedule disabled; manual/local only.",
+  "chatgpt_direct_live_fetch": {
+    "state": "FAILED_CACHE_MISS",
+    "health": "FAILED_CACHE_MISS"
+  },
+  "issues": [
+    {
+      "severity": "MEDIUM",
+      "code": "TRUTH_BRIDGE_NOT_RUN_YET",
+      "message": "Run local truth bridge from cloned Genesis_System3 repo, or manually run GitHub Action if billing allows."
+    }
+  ]
+}
