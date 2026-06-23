@@ -109,6 +109,7 @@ createApp({
     });
     const paperPositions = computed(() => paperData.value.positions?.positions || []);
     const pnlHistory     = computed(() => paperData.value.pnl?.history || []);
+    const paperSummary   = computed(() => paperData.value.pnl?.summary || {});
 
     // ── OPTION CHAIN COMPUTED ──
     const chainRows = computed(() => {
@@ -316,7 +317,7 @@ createApp({
       await nextTick();
       if(tab==='overview') { renderOvChart(); }
       if(tab==='signals')  { renderRankChart(); }
-      if(tab==='accuracy') { renderFullChart(); }
+      if(tab==='accuracy') { renderFullChart(); renderOvChart(); }
       if(tab==='paper')    { renderPnlChart(); }
       if(tab==='options')  { if(!chainData.value.contracts?.length) loadChain(); }
     });
@@ -338,7 +339,7 @@ createApp({
       activeTab, tabs, currentTime, marketOpen, marketCountdown, lastSync,
       state, broker, gainRankData, accuracyData, healthData, paperData, chainData,
       topSignal, latestRho, latestHitRate, rhoLabel, rhoClass,
-      paperPositions, pnlHistory,
+      paperPositions, pnlHistory, paperSummary,
       chainSymbols, chainSymbol, chainExpiries, chainExpiry, chainStrikeFilter, chainLoading,
       filteredChainRows, chainCeOI, chainPeOI, ceOIPct, peOIPct, maxPainStrike, atmIV,
       factors, dataSources, proofGates, readinessLadder,
