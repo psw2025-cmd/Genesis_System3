@@ -703,6 +703,35 @@ WATCHDOG_LOG     = ROOT_DIR / "logs" / "dhan_watchdog.log"
 JOB_SCHED_CFG    = ROOT_DIR / "config" / "system3_job_scheduler.json"
 
 
+@app.get("/api/instruments/health")
+async def get_instruments_health():
+    """Instrument master freshness — Dhan CDN sync status."""
+    try:
+        from core.data.instruments_cache import ensure_instruments_loaded
+        from core.data.instruments_master import META_JSON
+
+        metrics = ensure_instruments_loaded()
+        meta = {}
+        if META_JSON.exists():
+            meta = json.loads(META_JSON.read_text(encoding="utf-8"))
+        stale = True
+        if meta.get("synced_utc"):
+            from datetime import datetime, timezone
+
+            synced = datetime.fromisoformat(meta["synced_utc"].replace("Z", "+00:00"))
+            age_h = (datetime.now(timezone.utc) - synced).total_seconds() / 3600
+            stale = age_h > 24
+        return {
+            "status": "ok" if metrics.get("rows", 0) > 0 else "missing",
+            "rows": metrics.get("rows", 0),
+            "source": metrics.get("source"),
+            "stale": stale,
+            "meta": meta,
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
     """Latest gain rank predictions and 14-day history from gain_rank_history.json."""
@@ -2636,8 +2665,27 @@ async def get_logs_tail(lines: int = 200):
             all_lines = f.readlines()
             tail_lines = all_lines[-lines:]
 
-        # Redact secrets
-        redacted = [redact_secrets(line) for line in tail_lines]
+        # Redact secrets and collapse consecutive duplicate lines (UI log spam)
+        redacted_raw = [redact_secrets(line) for line in tail_lines]
+        redacted: list[str] = []
+        prev = None
+        dup_count = 0
+        for line in redacted_raw:
+            stripped = line.rstrip("\n")
+            if stripped == prev:
+                dup_count += 1
+                continue
+            if dup_count > 0 and prev is not None:
+                redacted.append(f"{prev}  (repeated {dup_count + 1}x)\n")
+                dup_count = 0
+            elif prev is not None:
+                redacted.append(prev + "\n")
+            prev = stripped
+        if prev is not None:
+            if dup_count > 0:
+                redacted.append(f"{prev}  (repeated {dup_count + 1}x)\n")
+            else:
+                redacted.append(prev + "\n")
 
         return {"logs": redacted, "file": latest_log.name, "total_lines": len(all_lines)}
     except Exception as e:

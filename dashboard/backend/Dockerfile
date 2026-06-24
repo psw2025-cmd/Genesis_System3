@@ -20,6 +20,10 @@ RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
       echo "No dashboard/backend/requirements.txt found; skipping pip install"; \
     fi
 
+# Bake official Dhan instrument master into image (production — no missing JSON at runtime)
+RUN python scripts/sync_dhan_instruments_master.py --force || \
+    python -c "print('[build] instrument sync skipped — will retry at startup')"
+
 WORKDIR /app
 
 EXPOSE 8000

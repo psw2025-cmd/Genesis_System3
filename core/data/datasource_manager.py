@@ -537,6 +537,8 @@ class DataSourceManager:
 
         # Build standard rows — include oi_change directly from bhavcopy
         rows = []
+        phantom_drops = 0
+        phantom_samples: list[str] = []
         for _, row in filtered.iterrows():
             opt_type = str(row.get("option_type", "")).strip().upper()
             if opt_type not in ("CE", "PE"):
@@ -562,11 +564,11 @@ class DataSourceManager:
                 if intrinsic == 0 and moneyness_pct > 2.0:
                     max_extrinsic = 0.03 * spot_val
                 if extrinsic > max_extrinsic:
-                    logger.warning(
-                        f"[bhavcopy] DROPPED phantom row {symbol} {strike_val:.0f}{opt_type} "
-                        f"ltp={ltp_val:.1f} extrinsic={extrinsic:.1f} > max={max_extrinsic:.1f} "
-                        f"({moneyness_pct:.1f}% OTM, spot={spot_val:.1f})"
-                    )
+                    phantom_drops += 1
+                    if len(phantom_samples) < 2:
+                        phantom_samples.append(
+                            f"{strike_val:.0f}{opt_type} ltp={ltp_val:.0f} extrinsic={extrinsic:.0f}"
+                        )
                     continue
             if strike_val <= 0:
                 continue
@@ -583,6 +585,13 @@ class DataSourceManager:
                 "expiry_date": str(row.get("_expiry", "") or ""),
                 "spot_price": spot_val,
             })
+
+        if phantom_drops:
+            sample = "; ".join(phantom_samples) if phantom_samples else ""
+            logger.info(
+                f"[bhavcopy] {symbol}: dropped {phantom_drops} phantom-priced rows (QC guard)"
+                + (f" — e.g. {sample}" if sample else "")
+            )
 
         if not rows:
             return None

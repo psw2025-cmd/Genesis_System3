@@ -353,7 +353,7 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
                     "token_length": len(new_token),
                     "expires_at": exp.isoformat() if exp else "unknown",
                 }
-            logger.warning("generate_token failed — falling back")
+            logger.info("generate_token failed — falling back")
 
     # Strategy 2: renew existing token
     if not force_generate and cur_token:
@@ -370,7 +370,7 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
                 "token_length": len(new_token),
                 "expires_at": exp.isoformat() if exp else "unknown",
             }
-        logger.warning("renew_token failed — falling back to OAuth manual")
+        logger.info("renew_token failed — falling back to OAuth manual")
 
     # Strategy 3: OAuth manual flow (requires browser action)
     logger.warning("Automated strategies failed — initiating OAuth manual flow")
