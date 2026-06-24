@@ -134,11 +134,44 @@
       "schedule_time": "09:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Runs analyzer/paper lifecycle proof on market days. Produces real-market PASS only when broker is connected, market is open, and no dry-run/fallback data is used.",
+      "description": "Runs analyzer/paper lifecycle proof on market days.",
       "timeout_minutes": 10
     },
     {
-      "id": "post_market_auto_pipeline",
+      "id": "paper_lifecycle_proof_midday",
+      "name": "Analyzer Paper Lifecycle Proof (Midday)",
+      "script": "scripts/paper_lifecycle_proof.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "12:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10
+    },
+    {
+      "id": "paper_lifecycle_proof_afternoon",
+      "name": "Analyzer Paper Lifecycle Proof (Afternoon)",
+      "script": "scripts/paper_lifecycle_proof.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "14:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10
+    },
+    {
+      "id": "ui_market_cross_verify_afternoon",
+      "name": "UI Market Cross Verify (Afternoon)",
+      "script": "scripts/ui_market_cross_verify.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "14:30",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true
+    },
       "name": "Post-Market Auto Pipeline",
       "script": "scripts/system3_post_market_auto_pipeline.py",
       "args": [],
@@ -160,6 +193,12 @@
       "enabled": true,
       "type": "daily",
       "schedule_time": "16:10",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Evening proof refresh after validation and friction reports."
+    },
+    {
+      "id": "auto_coordinator_premarket",
       "name": "Full Auto Coordinator (Pre-Market)",
       "script": "tools/system3_auto_coordinator.py",
       "args": [

@@ -33,8 +33,13 @@ def _read(path: Path) -> Optional[Dict[str, Any]]:
 
 
 def _evaluate_inline(live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    from scripts.runtime_gate_proofs import ensure_runtime_proofs
     from scripts.system3_gate_evaluator import evaluate_all, write_reports
 
+    try:
+        ensure_runtime_proofs(ROOT, live_state=live_state)
+    except Exception:
+        pass
     payload = evaluate_all(ROOT, live_state=live_state)
     try:
         write_reports(ROOT, payload)
