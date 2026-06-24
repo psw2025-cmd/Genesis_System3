@@ -194,13 +194,10 @@ class MarketResultValidator:
         if not _REQUESTS_OK:
             return None
         try:
-            session = requests.Session()
-            session.get("https://www.nseindia.com", headers=NSE_HEADERS, timeout=10)
-            time.sleep(0.5)
-            resp = session.get(f"{NSE_OPTION_CHAIN_URL}?symbol={symbol}", headers=NSE_HEADERS, timeout=15)
-            if resp.status_code != 200:
-                return None
-            records = resp.json().get("records", {}).get("data", [])
+            from core.data.nse_session import NSEFetchError, fetch_option_chain_json
+
+            data = fetch_option_chain_json(symbol)
+            records = data.get("records", {}).get("data", [])
             total_oi = sum(
                 (r.get("CE", {}).get("openInterest", 0) + r.get("PE", {}).get("openInterest", 0)) for r in records
             )
@@ -216,6 +213,9 @@ class MarketResultValidator:
                 "price_change_pct": 0,
                 "composite_score": oi_change_pct,
             }
+        except NSEFetchError as e:
+            logger.warning(f"NSE chain fetch failed for {symbol}: {e}")
+            return None
         except Exception as e:
             logger.warning(f"NSE chain fetch failed for {symbol}: {e}")
             return None

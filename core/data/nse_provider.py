@@ -6,6 +6,7 @@ v2: Now backed by DataSourceManager — tries NSE live API first, then falls
     back through nsepython → bhavcopy archive → jugaad-data → yfinance → synthetic.
     Direct NSE fetch functions preserved for backward compatibility.
 """
+
 import json
 import logging
 import os
@@ -17,8 +18,7 @@ logger = logging.getLogger(__name__)
 
 _NSE_HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     ),
     "Accept": "application/json, text/plain, */*",
     "Accept-Language": "en-US,en;q=0.9",
@@ -51,15 +51,16 @@ def reset_session() -> None:
 def fetch_option_chain(symbol: str) -> Optional[Dict]:
     """
     Returns raw NSE option chain JSON for the given index symbol (e.g. 'NIFTY').
-    Returns None on failure. Caller should handle None gracefully.
-    This is the DIRECT NSE path — used internally and by legacy callers.
-    For the smart multi-source path, use fetch_option_chain_smart() below.
+    Returns None on failure. Uses hardened session warm-up + JSON validation.
     """
-    url = _OPTION_CHAIN_URL.format(symbol=symbol)
+    from core.data.nse_session import NSEFetchError, fetch_option_chain_json
+
     try:
-        resp = _get_session().get(url, timeout=10)
-        resp.raise_for_status()
-        return resp.json()
+        return fetch_option_chain_json(symbol)
+    except NSEFetchError as exc:
+        logger.info(f"NSE option chain fetch failed [{symbol}]: {exc}")
+        reset_session()
+        return None
     except Exception as e:
         logger.warning(f"NSE option chain fetch failed [{symbol}]: {e}")
         reset_session()
@@ -74,6 +75,7 @@ def fetch_option_chain_smart(symbol: str):
     Falls back through: NSE → nsepython → bhavcopy → jugaad → yfinance → synthetic.
     """
     from core.data.datasource_manager import fetch_option_chain_smart as _smart_fetch
+
     return _smart_fetch(symbol)
 
 
@@ -103,7 +105,8 @@ def spot_price_from_chain(chain_json: Dict) -> float:
 
 MARKET_CACHE_FILE = os.path.join(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
-    "state", "market_cache.json",
+    "state",
+    "market_cache.json",
 )
 
 
@@ -120,6 +123,7 @@ def load_oi_cache() -> Dict[str, int]:
     - Returns {} if file missing/corrupt
     """
     from datetime import date, datetime
+
     try:
         with open(MARKET_CACHE_FILE) as f:
             data = json.load(f)
@@ -158,6 +162,7 @@ def save_oi_cache(oi_data: Dict[str, int]) -> None:
     Stores cache_date so staleness can be detected on next read.
     """
     from datetime import date, datetime
+
     os.makedirs(os.path.dirname(MARKET_CACHE_FILE), exist_ok=True)
     payload = {
         "last_updated": datetime.now().isoformat(timespec="seconds"),
@@ -175,4 +180,5 @@ def is_expiry_day() -> bool:
     On expiry day, OI change scores should be disabled to avoid rollover distortion.
     """
     from datetime import date
+
     return date.today().weekday() == 3  # Thursday = 3

@@ -97,8 +97,10 @@ def normalize_position_row(item: Dict[str, Any]) -> Dict[str, Any]:
                 "trading_symbol": parsed["trading_symbol"],
                 "symbol": parsed["trading_symbol"],
                 "exchange_segment": item.get("exchangeSegment") or "NSE_FNO",
+                "symbol_resolved_from": "parsed_trading_symbol",
             }
         )
+        return row
     return enrich_option_row(row)
 
 

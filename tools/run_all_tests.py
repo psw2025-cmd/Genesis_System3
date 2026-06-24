@@ -3,31 +3,6 @@
 
 from __future__ import annotations
 
-import json
-import os
-import subprocess
-import sys
-from pathlib import Path
-
-from subprocess_helpers import playwright_test_cmd
-
-ROOT = Path(__file__).resolve().parents[1]
-REPORT = ROOT / "reports" / "latest" / "all_tests_pass"
-
-
-def run(cmd: list[str], env: dict | None = None, timeout: int = 600) -> bool:
-    try:
-        proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=timeout)
-        return proc.returncode == 0
-    except subprocess.TimeoutExpired:
-        return False
-
-
-#!/usr/bin/env python3
-"""Run all automated tests and proofs — exit 0 only when everything passes."""
-
-from __future__ import annotations
-
 import argparse
 import json
 import os

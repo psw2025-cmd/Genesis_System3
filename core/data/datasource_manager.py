@@ -57,7 +57,7 @@ import requests
 ROOT_DIR = Path(__file__).parent.parent.parent
 BHAVCOPY_DIR = ROOT_DIR / "storage" / "bhavcopy"
 HEALTH_FILE = ROOT_DIR / "state" / "datasource_health.json"
-HEALTH_CACHE_MINUTES = 5   # Cache successful fetches for 5 min
+HEALTH_CACHE_MINUTES = 5  # Cache successful fetches for 5 min
 
 logger = logging.getLogger("datasource_manager")
 
@@ -71,32 +71,43 @@ STANDARD_COLS = ["strike", "option_type", "oi", "volume", "ltp", "iv", "source"]
 # UDiFF = Unified Data Interchange Format, NSE adopted it July 2024
 # KEY: CHG_IN_OI / ChngInOpnIntrst gives OI change DIRECTLY from single day's file
 _BHAV_OLD_MAP = {
-    "STRIKE_PR": "strike",   "OPTION_TYP": "option_type",   "OPTIONTYPE": "option_type",
-    "OPEN_INT": "oi",        "CHG_IN_OI": "oi_change",
-    "CONTRACTS": "volume",   "CLOSE": "ltp",
-    "SYMBOL": "_symbol",     "EXPIRY_DT": "_expiry",
+    "STRIKE_PR": "strike",
+    "OPTION_TYP": "option_type",
+    "OPTIONTYPE": "option_type",
+    "OPEN_INT": "oi",
+    "CHG_IN_OI": "oi_change",
+    "CONTRACTS": "volume",
+    "CLOSE": "ltp",
+    "SYMBOL": "_symbol",
+    "EXPIRY_DT": "_expiry",
 }
-_BHAV_UDIIF_MAP = {   # Post-July 2024 UDiFF format
-    "StrkPric": "strike",          "OptnTp": "option_type",
-    "OpnIntrst": "oi",             "ChngInOpnIntrst": "oi_change",
-    "TtlTradgVol": "volume",       "ClsPric": "ltp",
-    "TckrSymb": "_symbol",         "XpryDt": "_expiry",
-    "UndrlygPric": "_spot",        "FinInstrmTp": "_type",
+_BHAV_UDIIF_MAP = {  # Post-July 2024 UDiFF format
+    "StrkPric": "strike",
+    "OptnTp": "option_type",
+    "OpnIntrst": "oi",
+    "ChngInOpnIntrst": "oi_change",
+    "TtlTradgVol": "volume",
+    "ClsPric": "ltp",
+    "TckrSymb": "_symbol",
+    "XpryDt": "_expiry",
+    "UndrlygPric": "_spot",
+    "FinInstrmTp": "_type",
 }
 
 # Symbol→yfinance ticker for spot prices only
 _YF_SPOT_MAP = {
-    "NIFTY":      "^NSEI",
-    "BANKNIFTY":  "^NSEBANK",
-    "FINNIFTY":   "NIFTY_FIN_SERVICE.NS",
+    "NIFTY": "^NSEI",
+    "BANKNIFTY": "^NSEBANK",
+    "FINNIFTY": "NIFTY_FIN_SERVICE.NS",
     "MIDCPNIFTY": "NIFTY_MIDCAP_50.NS",
-    "SENSEX":     "^BSESN",
+    "SENSEX": "^BSESN",
 }
 
 
 # --------------------------------------------------------------------------- #
 #  DataSourceManager                                                            #
 # --------------------------------------------------------------------------- #
+
 
 class DataSourceManager:
     """
@@ -116,9 +127,7 @@ class DataSourceManager:
     #  Public API                                                          #
     # ------------------------------------------------------------------ #
 
-    def fetch_option_chain(
-        self, symbol: str, date_: Optional[date] = None
-    ) -> Tuple[Optional[pd.DataFrame], float]:
+    def fetch_option_chain(self, symbol: str, date_: Optional[date] = None) -> Tuple[Optional[pd.DataFrame], float]:
         """
         Fetch option chain for `symbol`.
         Returns (chain_df, spot_price) using the first working source.
@@ -136,12 +145,12 @@ class DataSourceManager:
 
         # P0=Dhan (guarded), P1=NSE live, P2=nsepython(server), P3=bhavcopy, P4=jugaad, P5=yfinance(spot), P6=synthetic
         sources = [
-            ("dhan",      self._try_dhan,      False),
-            ("nse",       self._try_nse,       False),
+            ("dhan", self._try_dhan, False),
+            ("nse", self._try_nse, False),
             ("nsepython", self._try_nsepython, False),
-            ("bhavcopy",  self._try_bhavcopy,  True),   # needs date_ arg
-            ("jugaad",    self._try_jugaad,    True),   # needs date_ arg
-            ("yfinance",  self._try_yfinance,  False),  # spot-only → synthetic chain
+            ("bhavcopy", self._try_bhavcopy, True),  # needs date_ arg
+            ("jugaad", self._try_jugaad, True),  # needs date_ arg
+            ("yfinance", self._try_yfinance, False),  # spot-only → synthetic chain
             ("synthetic", self._try_synthetic, False),
         ]
 
@@ -197,18 +206,15 @@ class DataSourceManager:
         Probe all sources for NIFTY and return health status.
         Saves result to state/datasource_health.json.
         """
-        status = {
-            "timestamp": datetime.now().isoformat(timespec="seconds"),
-            "sources": {}
-        }
+        status = {"timestamp": datetime.now().isoformat(timespec="seconds"), "sources": {}}
         test_symbol = "NIFTY"
         sources = [
-            ("dhan",      self._try_dhan,      False),
-            ("nse",       self._try_nse,       False),
+            ("dhan", self._try_dhan, False),
+            ("nse", self._try_nse, False),
             ("nsepython", self._try_nsepython, False),
-            ("bhavcopy",  self._try_bhavcopy,  True),
-            ("jugaad",    self._try_jugaad,    True),
-            ("yfinance",  self._try_yfinance,  False),
+            ("bhavcopy", self._try_bhavcopy, True),
+            ("jugaad", self._try_jugaad, True),
+            ("yfinance", self._try_yfinance, False),
         ]
         for src_name, src_fn, needs_date in sources:
             t0 = time.time()
@@ -229,7 +235,9 @@ class DataSourceManager:
         # Determine overall resilience
         ok_count = sum(1 for s in status["sources"].values() if s["status"] == "OK")
         status["ok_sources"] = ok_count
-        status["resilience"] = "HIGH" if ok_count >= 3 else "MEDIUM" if ok_count >= 2 else "LOW" if ok_count >= 1 else "CRITICAL"
+        status["resilience"] = (
+            "HIGH" if ok_count >= 3 else "MEDIUM" if ok_count >= 2 else "LOW" if ok_count >= 1 else "CRITICAL"
+        )
 
         HEALTH_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(HEALTH_FILE, "w") as f:
@@ -251,17 +259,18 @@ class DataSourceManager:
 
     # Security IDs for Dhan option chain API
     _DHAN_SECURITY_IDS = {
-        "NIFTY":      "13",
-        "BANKNIFTY":  "25",
-        "FINNIFTY":   "27",
+        "NIFTY": "13",
+        "BANKNIFTY": "25",
+        "FINNIFTY": "27",
         "MIDCPNIFTY": "442",
-        "SENSEX":     "51",
+        "SENSEX": "51",
     }
 
     @staticmethod
     def _nearest_expiry() -> str:
         """Return nearest Thursday (weekly NIFTY/BANKNIFTY expiry) as YYYY-MM-DD."""
         from datetime import date, timedelta
+
         today = date.today()
         # Thursday = weekday 3
         days_ahead = (3 - today.weekday()) % 7
@@ -275,6 +284,7 @@ class DataSourceManager:
         try:
             import dotenv
             from dhanhq import dhanhq
+
             dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
             token = os.environ.get("DHAN_ACCESS_TOKEN", "")
             client_id = os.environ.get("DHAN_CLIENT_ID", "")
@@ -284,12 +294,12 @@ class DataSourceManager:
             sec_id = self._DHAN_SECURITY_IDS.get(symbol.upper(), "13")
             expiry = self._nearest_expiry()
             logger.info(f"[Dhan P0] Fetching option chain: {symbol} sec_id={sec_id} expiry={expiry}")
-            resp = dhan.option_chain(under_security_id=sec_id, under_exchange_segment="IDX_I",
-                                      expiry=expiry)
+            resp = dhan.option_chain(under_security_id=sec_id, under_exchange_segment="IDX_I", expiry=expiry)
             if resp and resp.get("status") == "success":
                 from core.data.dhan_option_chain_parser import (
                     parse_dhan_option_chain_payload,
                 )
+
                 df, spot = parse_dhan_option_chain_payload(resp)
                 if not df.empty:
                     return df, spot
@@ -302,13 +312,12 @@ class DataSourceManager:
     # ------------------------------------------------------------------ #
 
     def _try_nse(self, symbol: str) -> Optional[Tuple[pd.DataFrame, float]]:
-        """NSE public API — works in production, anti-bot in cloud/CI."""
-        session = self._get_nse_session()
-        url = f"https://www.nseindia.com/api/option-chain-indices?symbol={symbol}"
+        """NSE public API — session warm-up + JSON validation (anti-bot aware)."""
+        from core.data.nse_session import NSEFetchError, fetch_option_chain_json
+
         try:
-            resp = session.get(url, timeout=10)
-            resp.raise_for_status()
-            data = resp.json()
+            data = fetch_option_chain_json(symbol, session=self._nse_session, retry=True)
+            self._nse_session = None  # fetch_json may rotate session internally
             records = data.get("records", {}).get("data", [])
             if not records:
                 return None
@@ -320,47 +329,61 @@ class DataSourceManager:
                     leg = entry.get(key, {})
                     if not leg:
                         continue
-                    rows.append({
-                        "strike": strike,
-                        "option_type": opt_type,
-                        "oi": int(leg.get("openInterest", 0)),
-                        "volume": int(leg.get("totalTradedVolume", 0)),
-                        "ltp": float(leg.get("lastPrice", 0)),
-                        "iv": float(leg.get("impliedVolatility", 0)) / 100.0,
-                    })
+                    rows.append(
+                        {
+                            "strike": strike,
+                            "option_type": opt_type,
+                            "oi": int(leg.get("openInterest", 0)),
+                            "volume": int(leg.get("totalTradedVolume", 0)),
+                            "ltp": float(leg.get("lastPrice", 0)),
+                            "iv": float(leg.get("impliedVolatility", 0)) / 100.0,
+                        }
+                    )
             return (pd.DataFrame(rows), spot) if rows else None
-        except Exception as e:
-            self._nse_session = None  # Reset session on failure
-            raise e
+        except NSEFetchError as exc:
+            self._nse_session = None
+            logger.info(f"{symbol}: [nse] {exc}")
+            return None
+        except Exception as exc:
+            self._nse_session = None
+            logger.info(f"{symbol}: [nse] failed — {exc}")
+            return None
 
     def _try_nse_spot(self, symbol: str) -> float:
-        """Quick spot price from NSE quote API."""
-        session = self._get_nse_session()
-        sym_map = {"NIFTY": "Nifty 50", "BANKNIFTY": "Nifty Bank",
-                   "FINNIFTY": "Nifty Fin Service", "MIDCPNIFTY": "NIFTY MID SELECT"}
+        """Quick spot price from NSE allIndices API."""
+        from core.data.nse_session import NSEFetchError, fetch_all_indices_json
+
+        sym_map = {
+            "NIFTY": "Nifty 50",
+            "BANKNIFTY": "Nifty Bank",
+            "FINNIFTY": "Nifty Fin Service",
+            "MIDCPNIFTY": "NIFTY MID SELECT",
+        }
         idx_name = sym_map.get(symbol, symbol)
-        url = f"https://www.nseindia.com/api/allIndices"
         try:
-            resp = session.get(url, timeout=5)
-            resp.raise_for_status()
-            data = resp.json()
+            data = fetch_all_indices_json(session=self._nse_session)
             for item in data.get("data", []):
                 if item.get("index") == idx_name:
                     return float(item.get("last", 0))
+        except NSEFetchError:
+            self._nse_session = None
         except Exception:
-            pass
+            self._nse_session = None
         return 0.0
 
     def _get_nse_session(self) -> requests.Session:
         if self._nse_session is None:
             s = requests.Session()
-            s.headers.update({
-                "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                               "AppleWebKit/537.36 Chrome/124.0 Safari/537.36"),
-                "Accept-Language": "en-US,en;q=0.9",
-                "Accept-Encoding": "gzip, deflate, br",
-                "Referer": "https://www.nseindia.com/option-chain",
-            })
+            s.headers.update(
+                {
+                    "User-Agent": (
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " "AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
+                    ),
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Referer": "https://www.nseindia.com/option-chain",
+                }
+            )
             # Warm up session with homepage cookies
             try:
                 s.get("https://www.nseindia.com", timeout=8)
@@ -393,14 +416,16 @@ class DataSourceManager:
                     leg = entry.get(opt_type, {})
                     if not leg:
                         continue
-                    rows.append({
-                        "strike": strike,
-                        "option_type": opt_type,
-                        "oi": int(leg.get("openInterest", 0)),
-                        "volume": int(leg.get("totalTradedVolume", 0)),
-                        "ltp": float(leg.get("lastPrice", 0)),
-                        "iv": float(leg.get("impliedVolatility", 0)) / 100.0,
-                    })
+                    rows.append(
+                        {
+                            "strike": strike,
+                            "option_type": opt_type,
+                            "oi": int(leg.get("openInterest", 0)),
+                            "volume": int(leg.get("totalTradedVolume", 0)),
+                            "ltp": float(leg.get("lastPrice", 0)),
+                            "iv": float(leg.get("impliedVolatility", 0)) / 100.0,
+                        }
+                    )
             return (pd.DataFrame(rows), spot) if rows else None
         except Exception as e:
             raise e
@@ -409,9 +434,7 @@ class DataSourceManager:
     #  P4: NSE Bhavcopy Archive (EOD, auto-downloaded)                    #
     # ------------------------------------------------------------------ #
 
-    def _try_bhavcopy(
-        self, symbol: str, date_: Optional[date] = None
-    ) -> Optional[Tuple[pd.DataFrame, float]]:
+    def _try_bhavcopy(self, symbol: str, date_: Optional[date] = None) -> Optional[Tuple[pd.DataFrame, float]]:
         """
         Read from locally cached bhavcopy CSV.
         Falls back to previous trading days (up to 5 days back) if today not yet available.
@@ -443,9 +466,7 @@ class DataSourceManager:
             logger.warning(f"Bhavcopy download failed: {e}")
             return None
 
-    def _download_and_parse_bhavcopy(
-        self, symbol: str, ref_date: date
-    ) -> Optional[Tuple[pd.DataFrame, float]]:
+    def _download_and_parse_bhavcopy(self, symbol: str, ref_date: date) -> Optional[Tuple[pd.DataFrame, float]]:
         """Download NSE FO bhavcopy from archives and parse it."""
         # Try last 5 trading days
         for delta in range(1, 6):
@@ -455,14 +476,15 @@ class DataSourceManager:
 
             date_str = check_date.strftime("%Y%m%d")
             # New format (2022+)
-            url_new = (f"https://nsearchives.nseindia.com/content/fo/"
-                       f"BhavCopy_NSE_FO_0_0_0_{date_str}_F_0000.csv.zip")
+            url_new = f"https://nsearchives.nseindia.com/content/fo/" f"BhavCopy_NSE_FO_0_0_0_{date_str}_F_0000.csv.zip"
             # Old format (pre-2022 fallback)
             old_dd = check_date.strftime("%d")
             old_mon = check_date.strftime("%b").upper()
             old_yyyy = check_date.strftime("%Y")
-            url_old = (f"https://nsearchives.nseindia.com/content/historical/DERIVATIVES/"
-                       f"{old_yyyy}/{old_mon}/fo{old_dd}{old_mon}{old_yyyy}bhav.csv.zip")
+            url_old = (
+                f"https://nsearchives.nseindia.com/content/historical/DERIVATIVES/"
+                f"{old_yyyy}/{old_mon}/fo{old_dd}{old_mon}{old_yyyy}bhav.csv.zip"
+            )
 
             for url in [url_new, url_old]:
                 try:
@@ -492,9 +514,7 @@ class DataSourceManager:
                     continue
         return None
 
-    def _parse_bhavcopy(
-        self, df: pd.DataFrame, symbol: str
-    ) -> Optional[Tuple[pd.DataFrame, float]]:
+    def _parse_bhavcopy(self, df: pd.DataFrame, symbol: str) -> Optional[Tuple[pd.DataFrame, float]]:
         """
         Parse bhavcopy DataFrame (old format pre-Jul 2024 OR UDiFF post-Jul 2024).
 
@@ -524,9 +544,12 @@ class DataSourceManager:
         # Filter: options for this symbol.
         # Do NOT filter by FinInstrmTp/INSTRUMENT — UDiFF uses "IDO" for index options
         # (not "OPTIDX"). Instead, filter by symbol + has a valid OptnTp (CE/PE).
-        mask = (df[sym_col].astype(str).str.strip().str.upper() == symbol.upper())
-        opt_col = "OptnTp" if "OptnTp" in cols else ("OPTION_TYP" if "OPTION_TYP" in cols
-                  else ("OPTIONTYPE" if "OPTIONTYPE" in cols else None))
+        mask = df[sym_col].astype(str).str.strip().str.upper() == symbol.upper()
+        opt_col = (
+            "OptnTp"
+            if "OptnTp" in cols
+            else ("OPTION_TYP" if "OPTION_TYP" in cols else ("OPTIONTYPE" if "OPTIONTYPE" in cols else None))
+        )
         if opt_col:
             mask &= df[opt_col].astype(str).str.strip().str.upper().isin(["CE", "PE"])
         filtered = df[mask].copy()
@@ -575,18 +598,20 @@ class DataSourceManager:
             if strike_val <= 0:
                 continue
 
-            rows.append({
-                "strike": strike_val,
-                "option_type": opt_type,
-                "oi": oi_val,
-                "oi_change": oi_chg,            # direct from bhavcopy!
-                "prev_oi": max(0, oi_val - oi_chg),  # reconstructed
-                "volume": int(float(row.get("volume", 0) or 0)),
-                "ltp": ltp_val,
-                "iv": 0.0,  # IV not in bhavcopy; ATM straddle proxy computed in gain_rank_engine
-                "expiry_date": str(row.get("_expiry", "") or ""),
-                "spot_price": spot_val,
-            })
+            rows.append(
+                {
+                    "strike": strike_val,
+                    "option_type": opt_type,
+                    "oi": oi_val,
+                    "oi_change": oi_chg,  # direct from bhavcopy!
+                    "prev_oi": max(0, oi_val - oi_chg),  # reconstructed
+                    "volume": int(float(row.get("volume", 0) or 0)),
+                    "ltp": ltp_val,
+                    "iv": 0.0,  # IV not in bhavcopy; ATM straddle proxy computed in gain_rank_engine
+                    "expiry_date": str(row.get("_expiry", "") or ""),
+                    "spot_price": spot_val,
+                }
+            )
 
         if phantom_drops:
             sample = "; ".join(phantom_samples) if phantom_samples else ""
@@ -611,9 +636,7 @@ class DataSourceManager:
     #  P5: jugaad-data (historical F&O)                                   #
     # ------------------------------------------------------------------ #
 
-    def _try_jugaad(
-        self, symbol: str, date_: Optional[date] = None
-    ) -> Optional[Tuple[pd.DataFrame, float]]:
+    def _try_jugaad(self, symbol: str, date_: Optional[date] = None) -> Optional[Tuple[pd.DataFrame, float]]:
         """jugaad-data — historical NSE F&O data. pip install jugaad-data"""
         try:
             from jugaad_data.nse.fno import FNO  # type: ignore
@@ -640,14 +663,16 @@ class DataSourceManager:
                 opt_type = str(row.get("OPTION_TYP", "")).strip().upper()
                 if opt_type not in ("CE", "PE"):
                     continue
-                rows.append({
-                    "strike": float(row.get("STRIKE_PR", 0) or 0),
-                    "option_type": opt_type,
-                    "oi": int(float(row.get("OPEN_INT", 0) or 0)),
-                    "volume": int(float(row.get("CONTRACTS", 0) or 0)),
-                    "ltp": float(row.get("CLOSE", 0) or 0),
-                    "iv": 0.0,
-                })
+                rows.append(
+                    {
+                        "strike": float(row.get("STRIKE_PR", 0) or 0),
+                        "option_type": opt_type,
+                        "oi": int(float(row.get("OPEN_INT", 0) or 0)),
+                        "volume": int(float(row.get("CONTRACTS", 0) or 0)),
+                        "ltp": float(row.get("CLOSE", 0) or 0),
+                        "iv": 0.0,
+                    }
+                )
             return (pd.DataFrame(rows), 0.0) if rows else None
         except Exception as e:
             raise e
@@ -691,17 +716,19 @@ class DataSourceManager:
         Last-resort flat synthetic data.
         OI is uniform (no change signal). Never saved to OI cache.
         """
-        spot_defaults = {"NIFTY": 23000.0, "BANKNIFTY": 52000.0,
-                         "FINNIFTY": 23500.0, "MIDCPNIFTY": 12000.0,
-                         "SENSEX": 76000.0}
+        spot_defaults = {
+            "NIFTY": 23000.0,
+            "BANKNIFTY": 52000.0,
+            "FINNIFTY": 23500.0,
+            "MIDCPNIFTY": 12000.0,
+            "SENSEX": 76000.0,
+        }
         spot = spot_defaults.get(symbol.upper(), 20000.0)
         chain = self._make_synthetic_chain(symbol, spot, source_tag="synthetic")
         logger.warning(f"{symbol}: SYNTHETIC FALLBACK — OI data will not be saved to cache")
         return chain, spot
 
-    def _make_synthetic_chain(
-        self, symbol: str, spot: float, source_tag: str = "synthetic"
-    ) -> pd.DataFrame:
+    def _make_synthetic_chain(self, symbol: str, spot: float, source_tag: str = "synthetic") -> pd.DataFrame:
         """Create a flat synthetic option chain (zero OI change signal)."""
         step = 50 if "NIFTY" in symbol.upper() else 100
         atm = round(spot / step) * step
@@ -709,15 +736,17 @@ class DataSourceManager:
         rows = []
         for s in strikes:
             for opt_type in ("CE", "PE"):
-                rows.append({
-                    "strike": float(s),
-                    "option_type": opt_type,
-                    "oi": 100000,  # flat — signals zero OI change
-                    "volume": 10000,
-                    "ltp": max(1.0, abs(spot - s) * 0.3),
-                    "iv": 0.18,
-                    "source": source_tag,
-                })
+                rows.append(
+                    {
+                        "strike": float(s),
+                        "option_type": opt_type,
+                        "oi": 100000,  # flat — signals zero OI change
+                        "volume": 10000,
+                        "ltp": max(1.0, abs(spot - s) * 0.3),
+                        "iv": 0.18,
+                        "source": source_tag,
+                    }
+                )
         return pd.DataFrame(rows)
 
     # ------------------------------------------------------------------ #
@@ -730,8 +759,10 @@ class DataSourceManager:
             df = df.copy()
             df["source"] = source
         for col, dtype, default in [
-            ("strike", float, 0.0), ("oi", int, 0),
-            ("volume", int, 0),     ("ltp", float, 0.0),
+            ("strike", float, 0.0),
+            ("oi", int, 0),
+            ("volume", int, 0),
+            ("ltp", float, 0.0),
             ("iv", float, 0.0),
         ]:
             if col not in df.columns:
@@ -768,9 +799,7 @@ def get_manager() -> DataSourceManager:
     return _manager
 
 
-def fetch_option_chain_smart(
-    symbol: str, date_: Optional[date] = None
-) -> Tuple[Optional[pd.DataFrame], float]:
+def fetch_option_chain_smart(symbol: str, date_: Optional[date] = None) -> Tuple[Optional[pd.DataFrame], float]:
     """
     Smart fetch with auto-fallback.
     Returns (chain_df, spot_price). chain_df may come from any source in the
@@ -782,4 +811,3 @@ def fetch_option_chain_smart(
 def run_health_check() -> Dict:
     """Run full health check on all data sources. Used by datasource_health_check.py."""
     return get_manager().health_check()
-

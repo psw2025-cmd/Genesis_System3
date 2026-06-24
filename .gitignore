@@ -17,6 +17,7 @@ config/.env.*
 
 # Local secret store (never commit real credentials)
 .secrets/
+.secrets/render_api_key
 
 # Claude Code settings (may contain session tokens or allowlisted commands with tokens)
 .claude/settings.local.json
@@ -52,6 +53,7 @@ google-cloud-sdk/
 
 # Windows launch scripts (never needed on Linux/cloud)
 *.bat
+!tools/*.bat
 *.bat.bak*
 *.ps1
 *.cmd
