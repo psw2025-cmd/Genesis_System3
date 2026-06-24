@@ -543,17 +543,39 @@ class DataSourceManager:
                 continue
             oi_val = int(float(row.get("oi", 0) or 0))
             oi_chg = int(float(row.get("oi_change", 0) or 0))
+            strike_val = float(row.get("strike", 0) or 0)
+            ltp_val = float(row.get("ltp", 0) or 0)
+            spot_val = float(row.get("_spot", 0) or 0)
+
+            # ── B1 DATA-INTEGRITY GUARD (source-level) ──
+            # Reject phantom-priced rows BEFORE they enter the pipeline.
+            # A bad bhavcopy row gave a BANKNIFTY 60000 CE an LTP of 4440 when
+            # fair value was ~280 → single -1.25L backtest loss. Drop such rows here.
+            if ltp_val > 0 and spot_val > 0 and strike_val > 0:
+                intrinsic = max(0.0, spot_val - strike_val) if opt_type == "CE" else max(0.0, strike_val - spot_val)
+                max_plausible = intrinsic + 0.15 * spot_val  # generous extrinsic cap
+                if ltp_val > max_plausible:
+                    logger.warning(
+                        f"[bhavcopy] DROPPED phantom row {symbol} {strike_val:.0f}{opt_type} "
+                        f"ltp={ltp_val:.1f} > max_plausible={max_plausible:.1f} "
+                        f"(intrinsic={intrinsic:.1f}, spot={spot_val:.1f})"
+                    )
+                    continue
+                # Also drop obviously broken negative/zero strikes
+            if strike_val <= 0:
+                continue
+
             rows.append({
-                "strike": float(row.get("strike", 0) or 0),
+                "strike": strike_val,
                 "option_type": opt_type,
                 "oi": oi_val,
                 "oi_change": oi_chg,            # direct from bhavcopy!
                 "prev_oi": max(0, oi_val - oi_chg),  # reconstructed
                 "volume": int(float(row.get("volume", 0) or 0)),
-                "ltp": float(row.get("ltp", 0) or 0),
+                "ltp": ltp_val,
                 "iv": 0.0,  # IV not in bhavcopy; ATM straddle proxy computed in gain_rank_engine
                 "expiry_date": str(row.get("_expiry", "") or ""),
-                "spot_price": float(row.get("_spot", 0) or 0),
+                "spot_price": spot_val,
             })
 
         if not rows:
