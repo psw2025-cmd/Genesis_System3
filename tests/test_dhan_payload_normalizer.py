@@ -27,10 +27,13 @@ def test_normalize_funds_dhan_typo_field():
     assert norm["utilized_amount"] == 12000
 
 
-def test_normalize_positions_wrapped():
-    raw = {"data": [{"tradingSymbol": "NIFTY", "netQty": 50, "unrealizedProfit": -200}]}
+def test_normalize_positions_fno_symbol():
+    raw = {"data": [{"tradingSymbol": "NIFTY05FEB2623500CE", "netQty": 50, "unrealizedProfit": -200}]}
     rows = normalize_positions_payload(raw)
     assert len(rows) == 1
     norm = normalize_position_row(rows[0])
-    assert norm["symbol"] == "NIFTY"
+    assert norm["trading_symbol"] == "NIFTY05FEB2623500CE"
+    assert norm["underlying"] == "NIFTY"
+    assert norm["strike"] == 23500.0
+    assert norm["option_type"] == "CE"
     assert norm["unrealized_pnl"] == -200

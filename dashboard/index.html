@@ -235,8 +235,36 @@
 
     <!-- ══ MARKET SCANNER ══ -->
     <section v-if="activeTab==='scanner'" class="tab">
-      <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank · PATH A/B</span></div>
-      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIONS ONLY</span>System ranks index underlyings. Cash equity: <strong>FORECAST_ONLY_CASH_EQUITY</strong> — future scope.</div>
+      <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank · Live CE/PE gainers · PATH A/B</span></div>
+      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIONS ONLY</span>4 segments: NIFTY · BANKNIFTY · FINNIFTY · MIDCPNIFTY · Cash equity: <strong>FORECAST_ONLY_CASH_EQUITY</strong></div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔥 Highest Gain CE / PE (Live Market)</span><span class="ps">{{ topGainersData.segments_implemented||0 }}/{{ topGainersData.segments_total||4 }} segments · NSE index F&O</span></div>
+        <div class="tok-info mb8">
+          <div class="tok-r"><span>Market Top CE</span><strong class="tx-r">{{ topGainersData.market_wide?.top_ce?.trading_symbol || '--' }} · {{ topGainersData.market_wide?.top_ce?.gain_pct!=null ? topGainersData.market_wide.top_ce.gain_pct.toFixed(2)+'%' : '--' }}</strong></div>
+          <div class="tok-r"><span>Market Top PE</span><strong class="tx-g">{{ topGainersData.market_wide?.top_pe?.trading_symbol || '--' }} · {{ topGainersData.market_wide?.top_pe?.gain_pct!=null ? topGainersData.market_wide.top_pe.gain_pct.toFixed(2)+'%' : '--' }}</strong></div>
+          <div class="tok-r"><span>All segments live</span><strong :class="topGainersData.all_segments_live?'tx-g':'tx-a'">{{ topGainersData.all_segments_live ? 'YES' : 'PARTIAL' }}</strong></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr>
+              <th>SEGMENT</th><th>STATUS</th><th>TOP CE SYMBOL</th><th>CE GAIN%</th><th>TOP PE SYMBOL</th><th>PE GAIN%</th><th>SPOT</th><th>SOURCE</th>
+            </tr></thead>
+            <tbody>
+              <tr v-for="seg in ['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY']" :key="seg">
+                <td class="sym-tag">{{ seg }}</td>
+                <td :class="topGainersData.by_segment?.[seg]?.implemented?'tx-g':'tx-a'">{{ topGainersData.by_segment?.[seg]?.implemented ? 'LIVE' : (topGainersData.by_segment?.[seg]?.status||'NO DATA') }}</td>
+                <td class="tx-m sym-contract">{{ topGainersData.by_segment?.[seg]?.top_ce?.trading_symbol || '--' }}</td>
+                <td class="tx-r">{{ topGainersData.by_segment?.[seg]?.top_ce?.gain_pct!=null ? topGainersData.by_segment[seg].top_ce.gain_pct.toFixed(2)+'%' : '--' }}</td>
+                <td class="tx-m sym-contract">{{ topGainersData.by_segment?.[seg]?.top_pe?.trading_symbol || '--' }}</td>
+                <td class="tx-g">{{ topGainersData.by_segment?.[seg]?.top_pe?.gain_pct!=null ? topGainersData.by_segment[seg].top_pe.gain_pct.toFixed(2)+'%' : '--' }}</td>
+                <td>{{ formatNum(topGainersData.by_segment?.[seg]?.spot||0) }}</td>
+                <td class="tx-m">{{ topGainersData.by_segment?.[seg]?.data_source||'--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-if="topGainersData.missing_segments?.length" class="fc-note mt8"><span>⚠️</span>Missing chain data: <strong>{{ topGainersData.missing_segments.join(', ') }}</strong></div>
+      </div>
       <div class="two-col mt16">
         <div class="panel">
           <div class="ph"><span class="pt">📊 Top Option Candidates</span><span class="ps badge-b">PATH B — PAPER TRADE</span></div>
@@ -434,11 +462,11 @@
 
       <!-- Full trade history with all fields -->
       <div class="panel mt16">
-        <div class="ph"><span class="pt">📜 Complete Trade History</span><span class="ps">All closed trades · Feb 1 session</span></div>
+        <div class="ph"><span class="pt">📜 Complete Trade History</span><span class="ps">{{ tradeHistorySubtitle }}</span></div>
         <div style="overflow-x:auto">
           <table class="full-trade-table">
             <thead><tr>
-              <th>TIME</th><th>POS ID</th><th>INDEX</th><th>CE/PE</th><th>STRIKE</th>
+              <th>TIME</th><th>POS ID</th><th>INDEX</th><th>SYMBOL</th><th>EXPIRY</th><th>CE/PE</th><th>STRIKE</th>
               <th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>GROSS P&L</th><th>P&L%</th><th>EXIT REASON</th>
             </tr></thead>
             <tbody>
@@ -447,6 +475,8 @@
                   <td>{{ (t.time_ist||'').substring(5,16) }}</td>
                   <td class="tx-m">{{ t.position_id||'--' }}</td>
                   <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td class="tx-m sym-contract">{{ contractSymbol(t) }}</td>
+                  <td>{{ formatExpiry(t.expiry_date) }}</td>
                   <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
                   <td>{{ formatNum(t.strike||0) }}</td>
                   <td>{{ formatNum(t.entry_price||0) }}</td>
@@ -457,7 +487,7 @@
                   <td class="tx-m">{{ t.exit_reason||'--' }}</td>
                 </tr>
               </template>
-              <tr v-else><td colspan="11" class="no-data">No closed trades yet</td></tr>
+              <tr v-else><td colspan="13" class="no-data">No closed trades yet</td></tr>
             </tbody>
           </table>
         </div>
@@ -483,9 +513,11 @@
           <div class="ph"><span class="pt">📋 Open Positions</span><span class="ps">{{ paperPositions.length }} active</span></div>
           <div v-if="paperPositions.length">
             <div class="trade-table">
-              <div class="trade-hdr"><span>SYMBOL</span><span>CE/PE</span><span>STRIKE</span><span>QTY</span><span>ENTRY</span><span>CMP</span><span>UNREAL P&L</span><span>STATUS</span></div>
+              <div class="trade-hdr"><span>SYMBOL</span><span>INDEX</span><span>EXPIRY</span><span>CE/PE</span><span>STRIKE</span><span>QTY</span><span>ENTRY</span><span>CMP</span><span>UNREAL P&L</span><span>STATUS</span></div>
               <div v-for="pos in paperPositions" :key="pos.position_id" class="trade-row">
-                <span class="sym-tag">{{ pos.underlying||pos.symbol||'--' }}</span>
+                <span class="tx-m sym-contract">{{ contractSymbol(pos) }}</span>
+                <span class="sym-tag">{{ pos.underlying||'--' }}</span>
+                <span>{{ formatExpiry(pos.expiry_date) }}</span>
                 <span :class="pos.option_type==='CE'?'tag-ce':'tag-pe'">{{ pos.option_type||'--' }}</span>
                 <span>{{ formatNum(pos.strike||0) }}</span><span>{{ pos.qty||0 }}</span>
                 <span>{{ formatNum(pos.entry_price||0) }}</span>
@@ -563,7 +595,7 @@
             <tbody>
               <template v-if="positionRows.length">
                 <tr v-for="(p,i) in positionRows" :key="i" class="ftt-row">
-                  <td class="sym-tag">{{ p.tradingSymbol||p.symbol||'--' }}</td>
+                  <td class="sym-tag">{{ p.trading_symbol||p.tradingSymbol||p.symbol||'--' }}</td>
                   <td class="tx-m">{{ p.productType||p.product||'--' }}</td>
                   <td>{{ p.netQty||p.netQuantity||p.quantity||0 }}</td>
                   <td>{{ formatNum(p.buyAvg||p.averagePrice||p.costPrice||0) }}</td>
@@ -583,12 +615,14 @@
         <div class="ph"><span class="pt">📋 Paper Trade Portfolio</span><span class="ps">Simulation · {{ tradeHistory.length }} closed trades</span></div>
         <div style="overflow-x:auto">
           <table class="full-trade-table">
-            <thead><tr><th>TIME</th><th>INDEX</th><th>CE/PE</th><th>STRIKE</th><th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>P&L</th><th>EXIT REASON</th></tr></thead>
+            <thead><tr><th>TIME</th><th>INDEX</th><th>SYMBOL</th><th>EXPIRY</th><th>CE/PE</th><th>STRIKE</th><th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>P&L</th><th>EXIT REASON</th></tr></thead>
             <tbody>
               <template v-if="tradeHistory.length">
                 <tr v-for="t in tradeHistory" :key="t.position_id" class="ftt-row">
                   <td>{{ (t.time_ist||'').substring(5,16) }}</td>
                   <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td class="tx-m sym-contract">{{ contractSymbol(t) }}</td>
+                  <td>{{ formatExpiry(t.expiry_date) }}</td>
                   <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
                   <td>{{ formatNum(t.strike||0) }}</td>
                   <td>{{ formatNum(t.entry_price||0) }}</td>
@@ -598,7 +632,7 @@
                   <td class="tx-m">{{ t.exit_reason||'--' }}</td>
                 </tr>
               </template>
-              <tr v-else><td colspan="9" class="no-data">No paper trades yet</td></tr>
+              <tr v-else><td colspan="11" class="no-data">No paper trades yet</td></tr>
             </tbody>
           </table>
         </div>

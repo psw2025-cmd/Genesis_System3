@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from core.brokers.dhan.nse_option_symbol import enrich_option_row, enrich_option_rows
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -100,7 +102,7 @@ def _load_paper_positions(outputs_dir: Path) -> List[Dict[str, Any]]:
     return []
 
 
-def _load_paper_fixture_history() -> List[Dict[str, Any]]:
+def _load_paper_fixture_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     for candidate in [
         ROOT / "tests" / "fixtures" / "paper_closed_trades_feb2026.json",
         ROOT / "storage" / "paper" / "closed_trades_feb2026.json",
@@ -109,14 +111,23 @@ def _load_paper_fixture_history() -> List[Dict[str, Any]]:
             continue
         try:
             session = json.loads(candidate.read_text(encoding="utf-8"))
-            trades = session.get("trades") or []
-            return trades if isinstance(trades, list) else []
+            session_expiry = session.get("session_expiry")
+            trade_list = trades if isinstance(trades, list) else []
+            enriched = enrich_option_rows(trade_list, default_expiry=session_expiry)
+            meta = {
+                "data_source": session.get("data_source", "paper_simulation"),
+                "session": session.get("session", "Paper session"),
+                "session_expiry": session_expiry,
+                "is_fixture": True,
+                "note": session.get("note", "Synthetic paper trades — not broker ledger"),
+            }
+            return enriched, meta
         except Exception:
             pass
-    return []
+    return [], {"data_source": "none", "session": "", "is_fixture": False}
 
 
-def _load_trade_history() -> List[Dict[str, Any]]:
+def _load_trade_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     try:
         from dashboard.backend.trade_logger import get_all_trades
     except ImportError:
@@ -127,7 +138,11 @@ def _load_trade_history() -> List[Dict[str, Any]]:
     try:
         trades = get_all_trades()
         if isinstance(trades, list) and trades:
-            return trades
+            return enrich_option_rows(trades), {
+                "data_source": "paper_live",
+                "session": "Live paper ledger",
+                "is_fixture": False,
+            }
     except Exception:
         pass
     return _load_paper_fixture_history()
@@ -144,7 +159,8 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
 
     paper_summary = _load_paper_summary(outputs_dir)
     paper_positions = _load_paper_positions(outputs_dir)
-    trade_history = _load_trade_history()
+    paper_positions = [enrich_option_row(p) for p in paper_positions]
+    trade_history, trade_history_meta = _load_trade_history()
 
     broker_holdings: List[Dict[str, Any]] = []
     broker_positions: List[Dict[str, Any]] = []
@@ -170,7 +186,7 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
     except Exception as exc:
         broker_error = str(exc)[:200]
 
-    paper_source = paper_summary.get("data_source") or "paper_internal"
+    paper_source = paper_summary.get("data_source") or trade_history_meta.get("data_source") or "paper_internal"
     has_broker_rows = bool(broker_holdings or broker_positions)
     has_paper_rows = bool(paper_positions or trade_history or paper_summary.get("total_trades"))
 
@@ -205,6 +221,7 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
         "broker_holdings": broker_holdings,
         "broker_positions": broker_positions,
         "trade_history": trade_history[:100],
+        "trade_history_meta": trade_history_meta,
         "production_ready_for_real_money": False,
         "human_approval": human_approved,
         "human_approval_by": human_gate.get("approved_by"),

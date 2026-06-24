@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
+
+from core.brokers.dhan.nse_option_symbol import enrich_option_row
 
 
 def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
@@ -19,6 +21,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         return None
 
     contracts: List[Dict[str, Any]] = []
+    chain_expiry = None
     for _, row in df.iterrows():
         opt = str(row.get("option_type", row.get("OptnTp", ""))).upper()
         if opt not in ("CE", "PE"):
@@ -26,24 +29,31 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         strike = float(row.get("strike", row.get("strike_price", 0)) or 0)
         oi = int(row.get("oi", 0) or 0)
         prev_oi = int(row.get("previous_oi", row.get("prev_oi", 0)) or 0)
-        contracts.append(
-            {
-                "strike": strike,
-                "option_type": opt,
-                "oi": oi,
-                "oi_change": int(row.get("change_in_oi", row.get("oi_change", oi - prev_oi)) or 0),
-                "volume": int(row.get("volume", 0) or 0),
-                "ltp": float(row.get("ltp", row.get("last_price", 0)) or 0),
-                "iv": float(row.get("iv", 0) or 0),
-                "delta": float(row.get("delta", 0) or 0),
-                "gamma": float(row.get("gamma", 0) or 0),
-                "theta": float(row.get("theta", 0) or 0),
-                "vega": float(row.get("vega", 0) or 0),
-                "top_bid_price": float(row.get("top_bid_price", 0) or 0),
+        if chain_expiry is None:
+            chain_expiry = row.get("expiry") or row.get("expiry_date")
+        base = {
+            "underlying": underlying.upper(),
+            "strike": strike,
+            "option_type": opt,
+            "oi": oi,
+            "oi_change": int(row.get("change_in_oi", row.get("oi_change", oi - prev_oi)) or 0),
+            "volume": int(row.get("volume", 0) or 0),
+            "ltp": float(row.get("ltp", row.get("last_price", 0)) or 0),
+            "iv": float(row.get("iv", 0) or 0),
+            "delta": float(row.get("delta", 0) or 0),
+            "gamma": float(row.get("gamma", 0) or 0),
+            "theta": float(row.get("theta", 0) or 0),
+            "vega": float(row.get("vega", 0) or 0),
+            "top_bid_price": float(row.get("top_bid_price", 0) or 0),
                 "top_ask_price": float(row.get("top_ask_price", 0) or 0),
-                "source": str(row.get("source", "datasource_manager")),
-            }
-        )
+                "previous_close_price": float(row.get("previous_close_price", 0) or 0),
+                "change_percent": float(row.get("change_percent", row.get("pChange", 0)) or 0),
+                "security_id": row.get("security_id") or row.get("token"),
+            "trading_symbol": row.get("trading_symbol") or row.get("tradingSymbol") or row.get("symbol"),
+            "expiry_date": row.get("expiry") or row.get("expiry_date"),
+            "source": str(row.get("source", "datasource_manager")),
+        }
+        contracts.append(enrich_option_row(base, default_expiry=chain_expiry))
 
     if not contracts:
         return None
@@ -61,4 +71,5 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         "total_contracts": len(contracts),
         "data_source": source,
         "status": "OK",
+        "expiry_date": chain_expiry,
     }

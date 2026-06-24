@@ -42,6 +42,7 @@ const app = createApp({
     const brokerPositions = ref({ data: null });
     const brokerFunds = ref({ data: null });
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
+    const topGainersData  = ref({ by_segment: {}, market_wide: {}, segments_total: 4 });
     const approvalData  = ref({ human_approval: false, dashboard_status: 'PEND' });
     const brokerTruth   = ref({ validation: {}, trader_fields: {} });
 
@@ -113,6 +114,15 @@ const app = createApp({
       const pos = paperData.value.positions;
       if (pos?.summary?.closed_positions) return pos.summary.closed_positions;
       return paperData.value.pnl?.history || [];
+    });
+    const tradeHistoryMeta = computed(() => portfolioData.value.trade_history_meta || {});
+    const tradeHistorySubtitle = computed(() => {
+      const meta = tradeHistoryMeta.value;
+      const n = tradeHistory.value.length;
+      if (!n) return 'No closed trades yet';
+      if (meta.is_fixture) return `${meta.session || 'Paper session'} · ${n} trades · simulation fixture`;
+      if (meta.session) return `${meta.session} · ${n} closed trades`;
+      return `${n} closed trades · paper ledger`;
     });
     const unifiedHoldings = computed(() => portfolioData.value.broker_holdings || []);
     const unifiedPositions = computed(() => portfolioData.value.broker_positions || []);
@@ -267,6 +277,17 @@ const app = createApp({
     }
 
     function formatNum(n){return Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});}
+    function formatExpiry(d){
+      if(!d) return '--';
+      const s=String(d).substring(0,10);
+      if(s.length<10) return s;
+      const [y,m,day]=s.split('-');
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `${day}-${months[parseInt(m,10)-1]||m}-${y}`;
+    }
+    function contractSymbol(row){
+      return row.trading_symbol||row.tradingSymbol||row.symbol||'--';
+    }
     function formatLakh(n){n=Number(n||0);if(Math.abs(n)>=10000000)return(n/10000000).toFixed(2)+'Cr';if(Math.abs(n)>=100000)return(n/100000).toFixed(2)+'L';if(Math.abs(n)>=1000)return(n/1000).toFixed(1)+'K';return n.toFixed(0);}
     function scoreColor(s){if(s>=70)return'#00e87a';if(s>=40)return'#ffb830';return'#ff3d5a';}
     function ageStr(ts){if(!ts)return'--';try{const d=new Date(ts);const s=Math.floor((Date.now()-d)/1000);if(s<0)return'just now';if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}catch{return'--';}}
@@ -290,7 +311,7 @@ const app = createApp({
       if (_polling) return;
       _polling = true;
       try {
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt,tg]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -309,6 +330,7 @@ const app = createApp({
         fetchJSON('/api/broker/funds'),
         fetchJSON('/api/approval/status'),
         fetchJSON('/api/broker/truth'),
+        fetchJSON('/api/scanner/top_contract_gainers'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -328,6 +350,7 @@ const app = createApp({
       if(funds) brokerFunds.value=funds;
       if(appr) approvalData.value=appr;
       if(bt) brokerTruth.value=bt;
+      if(tg) topGainersData.value=tg;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
         if (st) { connHealth.value = 'live'; failCount.value = 0; }
@@ -414,10 +437,10 @@ const app = createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,approvalData,brokerTruth,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,topGainersData,approvalData,brokerTruth,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
-      paperPositions,paperSummary,tradeHistory,pnlWithCharges,
+      paperPositions,paperSummary,tradeHistory,tradeHistorySubtitle,pnlWithCharges,
       brokerHoldings,brokerPositions,portfolioTransparency,
       activeAlerts,unreadCount,noTradeReasons,
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
@@ -427,7 +450,7 @@ const app = createApp({
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
       holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk, brokerPositionsOk,
       brokerValidation, brokerTraderFields, brokerDataSource,
-      formatNum,formatLakh,scoreColor,ageStr,
+      formatNum,formatLakh,formatExpiry,contractSymbol,scoreColor,ageStr,
       selectChainSymbol,loadChain,loadLogs,
     };
   }

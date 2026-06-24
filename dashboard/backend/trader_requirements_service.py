@@ -75,13 +75,19 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
     key_map = {
         "trade_id": "position_id",
         "timestamp_ist": "time_ist",
-        "symbol": "underlying",
+        "symbol": "trading_symbol",
         "gross_pnl": "realized_pnl",
         "net_pnl": "realized_pnl",
     }
     for field in trade_fields:
         src_key = key_map.get(field, field)
-        if field == "source":
+        if field == "symbol":
+            trade_history_map[field] = (
+                "PASS"
+                if sample.get("trading_symbol") or sample.get("symbol")
+                else ("PASS_WITH_WARNINGS" if sample.get("underlying") else "NOT_FOUND")
+            )
+        elif field == "source":
             trade_history_map[field] = "PASS" if sample.get("data_source") or has_trades else "NOT_FOUND"
         else:
             trade_history_map[field] = (
@@ -96,7 +102,7 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
     live_positions_map: Dict[str, str] = {}
     psample = positions_rows[0] if positions_rows else {}
     for field in live_fields:
-        if field == "symbol" and psample.get("symbol"):
+        if field == "symbol" and (psample.get("trading_symbol") or psample.get("symbol")):
             live_positions_map[field] = "PASS"
         elif field == "current_ltp" and psample.get("ltp") is not None:
             live_positions_map[field] = "PASS"

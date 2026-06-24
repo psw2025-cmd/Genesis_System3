@@ -37,7 +37,7 @@ except ImportError as e:
 except Exception as e:
     print(f"[Backend] Warning: Error importing Dhan broker module: {e}")
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
@@ -698,6 +698,28 @@ async def get_gain_rank():
         return {"status": "error", "error": str(e), "latest": None, "history": []}
 
 
+@app.get("/api/scanner/top_contract_gainers")
+async def get_top_contract_gainers(top_n: int = 5):
+    """
+    Live market scanner: highest % gain CE and PE per index segment.
+    Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
+    """
+    try:
+        from dashboard.backend.contract_gain_scanner import build_top_contract_gainers_report
+
+        report = build_top_contract_gainers_report(top_n=min(max(top_n, 1), 20))
+        report["status"] = "ok" if report.get("segments_implemented", 0) > 0 else "no_data"
+        return report
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)[:300],
+            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "segments_implemented": 0,
+            "by_segment": {},
+        }
+
+
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
     """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
@@ -761,6 +783,12 @@ async def get_system_health():
 
         # Scheduler jobs
         jobs_summary = []
+        scheduler_daemon = {
+            "started_at": None,
+            "heartbeat": None,
+            "pid": None,
+            "active": False
+        }
         try:
             cfg = json.loads(JOB_SCHED_CFG.read_text())
             scheduler_state = {}
@@ -768,6 +796,20 @@ async def get_system_health():
             if scheduler_state_file.exists():
                 try:
                     scheduler_state = json.loads(scheduler_state_file.read_text())
+                    scheduler_daemon["started_at"] = scheduler_state.get("daemon_started_at")
+                    scheduler_daemon["heartbeat"] = scheduler_state.get("daemon_heartbeat")
+                    scheduler_daemon["pid"] = scheduler_state.get("daemon_pid")
+                    
+                    if scheduler_daemon["heartbeat"]:
+                        try:
+                            hb_time = datetime.fromisoformat(scheduler_daemon["heartbeat"])
+                            if hb_time.tzinfo is None:
+                                hb_time = IST.localize(hb_time)
+                            now_ist = datetime.now(IST)
+                            age_seconds = (now_ist - hb_time).total_seconds()
+                            scheduler_daemon["active"] = 0 <= age_seconds < 180
+                        except Exception as hb_exc:
+                            print(f"Error parsing heartbeat: {hb_exc}")
                 except Exception:
                     pass
             for j in cfg.get("jobs", []):
@@ -792,10 +834,55 @@ async def get_system_health():
             "datasource_health": ds_health,
             "datasource_resilience": ds_resilience,
             "retrain_needed": RETRAIN_FLAG.exists(),
+            "scheduler_daemon": scheduler_daemon,
             "jobs": jobs_summary,
         }
     except Exception as e:
         return {"status": "error", "error": str(e)}
+
+
+@app.api_route("/api/scheduler/run/{job_id}", methods=["GET", "POST"])
+async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, secret: Optional[str] = None):
+    """
+    Trigger a specific scheduler job in the background.
+    Supports GET and POST to allow simple integration with external web-cron services (e.g. cron-job.org).
+    """
+    expected_secret = os.environ.get("SCHEDULER_SECRET")
+    if expected_secret and secret != expected_secret:
+        raise HTTPException(status_code=403, detail="Invalid scheduler secret")
+
+    # Load scheduler config to verify job ID
+    try:
+        cfg = json.loads(JOB_SCHED_CFG.read_text())
+        job = next((j for j in cfg.get("jobs", []) if j.get("id") == job_id), None)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found in scheduler config")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read scheduler config: {str(e)}")
+
+    # Run the job inside BackgroundTasks to return immediate response and avoid timeouts
+    def _run_job_bg():
+        try:
+            import importlib.util as _ilu, pathlib as _pl
+            _spec = _ilu.spec_from_file_location(
+                "job_scheduler_bg",
+                _pl.Path(__file__).resolve().parent.parent.parent / "core" / "engine" / "system3_phase82_job_scheduler.py",
+            )
+            if _spec and _spec.loader:
+                _js = _ilu.module_from_spec(_spec)
+                _spec.loader.exec_module(_js)  # type: ignore[union-attr]
+                _js.run_single_job(job_id)
+                print(f"[API-Scheduler] Background execution of job '{job_id}' completed.")
+        except Exception as exc:
+            print(f"[API-Scheduler] Background execution of job '{job_id}' failed: {exc}")
+
+    background_tasks.add_task(_run_job_bg)
+    return {
+        "status": "triggered",
+        "job_id": job_id,
+        "name": job.get("name"),
+        "message": f"Job '{job_id}' has been scheduled for background execution."
+    }
 
 
 # WebSocket connections
@@ -1459,7 +1546,7 @@ async def get_qc():
 
 
 # Default underlyings for discovery (validator and UI)
-DEFAULT_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+DEFAULT_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 
 
 @app.get("/api/underlyings")
@@ -2096,6 +2183,18 @@ async def get_pnl():
                         break
                 except Exception:
                     pass
+
+        try:
+            from core.brokers.dhan.nse_option_symbol import enrich_option_rows
+
+            session_expiry = None
+            if not processed_history:
+                pass
+            else:
+                session_expiry = processed_history[0].get("expiry_date")
+            processed_history = enrich_option_rows(processed_history, default_expiry=session_expiry)
+        except Exception:
+            pass
 
         return {
             "history": processed_history,

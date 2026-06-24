@@ -31,8 +31,7 @@ def run_pytest_parser() -> dict:
     proc = subprocess.run(
         [
             sys.executable, "-m", "pytest",
-            "tests/test_dhan_option_chain_parser.py",
-            "tests/test_dhan_payload_normalizer.py",
+            "tests/",
             "-q",
         ],
         cwd=ROOT,

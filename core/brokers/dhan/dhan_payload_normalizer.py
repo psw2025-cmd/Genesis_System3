@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Union
 
+from core.brokers.dhan.nse_option_symbol import enrich_option_row, parse_trading_symbol
+
 
 def _as_list(raw: Any, keys: tuple[str, ...]) -> List[Dict[str, Any]]:
     if raw is None:
@@ -72,8 +74,10 @@ def normalize_position_row(item: Dict[str, Any]) -> Dict[str, Any]:
         qty_f = float(qty)
     except (TypeError, ValueError):
         qty_f = 0.0
-    return {
-        "symbol": item.get("tradingSymbol") or item.get("symbol") or "UNKNOWN",
+    raw_sym = item.get("tradingSymbol") or item.get("symbol") or "UNKNOWN"
+    row = {
+        "symbol": raw_sym,
+        "trading_symbol": raw_sym,
         "product": item.get("productType") or item.get("product") or "--",
         "net_qty": qty_f,
         "avg_price": float(item.get("buyAvg") or item.get("averagePrice") or item.get("costPrice") or 0),
@@ -82,6 +86,20 @@ def normalize_position_row(item: Dict[str, Any]) -> Dict[str, Any]:
         "realized_pnl": float(item.get("realizedProfit") or item.get("realized_pnl") or 0),
         "raw": item,
     }
+    parsed = parse_trading_symbol(str(raw_sym))
+    if parsed:
+        row.update(
+            {
+                "underlying": parsed["underlying"],
+                "strike": parsed["strike"],
+                "option_type": parsed["option_type"],
+                "expiry_date": parsed["expiry_date"],
+                "trading_symbol": parsed["trading_symbol"],
+                "symbol": parsed["trading_symbol"],
+                "exchange_segment": item.get("exchangeSegment") or "NSE_FNO",
+            }
+        )
+    return enrich_option_row(row)
 
 
 def normalize_funds_row(item: Dict[str, Any]) -> Dict[str, Any]:
