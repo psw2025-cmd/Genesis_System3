@@ -75,6 +75,16 @@ class TradeRuleEngine:
             decision["action"] = "HOLD"
             return decision
 
+        # C1 GATE: never trade on degraded/fallback model predictions.
+        # ml_predictor flags model_healthy=False when model is None, predict
+        # failed, or delta-proxy degraded mode kicked in. Block those.
+        model_healthy = row.get("model_healthy", True)
+        if model_healthy is False or str(model_healthy).lower() == "false":
+            src = row.get("prediction_source", "UNKNOWN")
+            decision["reason"] = f"model_unhealthy({src}) — refusing to trade on non-model signal"
+            decision["action"] = "AVOID"
+            return decision
+
         if conf < float(self.t.min_confidence):
             decision["reason"] = f"low_confidence({conf:.3f}<{self.t.min_confidence:.3f})"
             decision["action"] = label
