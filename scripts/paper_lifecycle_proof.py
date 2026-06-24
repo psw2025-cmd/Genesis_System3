@@ -280,12 +280,49 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     log.info("[Step 3] Placing paper entry order")
     entry_order = simulate_paper_entry(signal)
     log.info(f"  order_id={entry_order['order_id']} fill_price={entry_order['fill_price']}")
+    try:
+        from dashboard.backend.trade_logger import log_trade_event
+
+        log_trade_event(
+            event_type="POSITION_OPENED",
+            position_id=entry_order["order_id"],
+            underlying=signal.get("symbol"),
+            symbol=signal.get("symbol"),
+            strike=float(signal.get("strike") or 0),
+            option_type=signal.get("option_type"),
+            action="OPEN",
+            entry_price=entry_order.get("fill_price"),
+            qty=int(signal.get("quantity") or entry_order.get("quantity") or 1),
+            strategy="PAPER_LIFECYCLE_PROOF",
+        )
+    except Exception as log_err:
+        log.warning(f"Trade log write skipped: {log_err}")
 
     # Step 4: Brief hold, then exit
     log.info("[Step 4] Simulating hold and paper exit")
     time.sleep(0.5)  # brief pause for timestamp separation
     exit_record = simulate_paper_exit(entry_order, signal)
     log.info(f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}")
+    try:
+        from dashboard.backend.trade_logger import log_trade_event
+
+        log_trade_event(
+            event_type="POSITION_CLOSED",
+            position_id=entry_order["order_id"],
+            underlying=signal.get("symbol"),
+            symbol=signal.get("symbol"),
+            strike=float(signal.get("strike") or 0),
+            option_type=signal.get("option_type"),
+            action="CLOSE",
+            entry_price=entry_order.get("fill_price"),
+            exit_price=exit_record.get("exit_price"),
+            qty=int(entry_order.get("quantity") or 1),
+            pnl=exit_record.get("pnl_total"),
+            strategy="PAPER_LIFECYCLE_PROOF",
+            exit_reason=exit_record.get("exit_reason"),
+        )
+    except Exception as log_err:
+        log.warning(f"Trade log write skipped: {log_err}")
 
     # Step 5: Reconcile
     log.info("[Step 5] Reconciling order->fill->exit->P&L")

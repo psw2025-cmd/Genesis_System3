@@ -677,25 +677,53 @@ JOB_SCHED_CFG    = ROOT_DIR / "config" / "system3_job_scheduler.json"
 
 
 @app.get("/api/gain_rank")
-async def get_gain_rank():
+async def get_gain_rank(refresh: bool = False):
     """Latest gain rank predictions and 14-day history from gain_rank_history.json."""
     try:
         if not GAIN_RANK_FILE.exists():
-            return {"status": "no_data", "latest": None, "history": []}
+            return {"status": "no_data", "latest": None, "history": [], "is_today": False, "stale": True}
         history = json.loads(GAIN_RANK_FILE.read_text())
         if not isinstance(history, list):
             history = []
         today = datetime.now(IST).strftime("%Y-%m-%d")
         today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
         latest = today_entry or (history[-1] if history else None)
+        stale = latest is None or latest.get("date") != today
+        market_open = False
+        if SSOT_AVAILABLE and state_store is not None:
+            market_open = bool((state_store.get_state().get("market") or {}).get("is_open"))
+        if (refresh or stale) and market_open:
+            try:
+                from scripts.daily_gain_rank_and_validate import run_ranking
+
+                run_ranking(top_n=5)
+                history = json.loads(GAIN_RANK_FILE.read_text())
+                if not isinstance(history, list):
+                    history = []
+                today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
+                latest = today_entry or (history[-1] if history else None)
+                stale = latest is None or latest.get("date") != today
+            except Exception as rank_err:
+                return {
+                    "status": "ok",
+                    "latest": latest,
+                    "history": history[-14:],
+                    "total_days": len(history),
+                    "is_today": not stale,
+                    "stale": stale,
+                    "rank_refresh_error": str(rank_err)[:200],
+                }
         return {
             "status": "ok",
             "latest": latest,
             "history": history[-14:],
             "total_days": len(history),
+            "is_today": not stale,
+            "stale": stale,
+            "latest_date": (latest or {}).get("date"),
         }
     except Exception as e:
-        return {"status": "error", "error": str(e), "latest": None, "history": []}
+        return {"status": "error", "error": str(e), "latest": None, "history": [], "is_today": False, "stale": True}
 
 
 @app.get("/api/scanner/top_contract_gainers")
@@ -3925,6 +3953,77 @@ async def get_today_trades():
         today = datetime.now(IST).strftime("%Y-%m-%d")
         trades = get_trades_by_date(today, start_time="09:15", end_time="15:30")
 
+        def _today_match(ts: str) -> bool:
+            return today in (ts or "")
+
+        # SSOT open positions opened today (paper analyzer cycle)
+        if SSOT_AVAILABLE and state_store is not None:
+            for p in state_store.get_state().get("positions") or []:
+                if not isinstance(p, dict):
+                    continue
+                ts = p.get("time_ist") or p.get("timestamp") or ""
+                if not _today_match(ts):
+                    continue
+                pid = p.get("position_id")
+                if pid and any(t.get("position_id") == pid for t in trades):
+                    continue
+                trades.append({
+                    "timestamp": p.get("timestamp"),
+                    "time_ist": p.get("time_ist"),
+                    "event_type": "POSITION_OPENED",
+                    "position_id": pid,
+                    "underlying": p.get("underlying"),
+                    "symbol": p.get("underlying"),
+                    "strike": p.get("strike"),
+                    "option_type": p.get("option_type"),
+                    "action": "OPEN",
+                    "entry_price": p.get("entry_price"),
+                    "qty": p.get("qty"),
+                    "strategy": p.get("strategy"),
+                    "source": "state_store",
+                })
+
+        # Lifecycle proof closed trades from today's artifact
+        lifecycle_summary = (
+            ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
+        )
+        if lifecycle_summary.exists():
+            try:
+                proof = json.loads(lifecycle_summary.read_text(encoding="utf-8"))
+                started = (proof.get("evidence") or {}).get("proof_id") or ""
+                if proof.get("pass") and _today_match(started):
+                    proof_file = sorted(
+                        (ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof").glob(
+                            "LIFECYCLE_*.json"
+                        )
+                    )
+                    if proof_file:
+                        detail = json.loads(proof_file[-1].read_text(encoding="utf-8"))
+                        oid = (detail.get("entry_order") or {}).get("order_id")
+                        if oid and not any(t.get("position_id") == oid for t in trades):
+                            sig = detail.get("signal") or {}
+                            ent = detail.get("entry_order") or {}
+                            ext = detail.get("exit_record") or {}
+                            trades.append({
+                                "time_ist": datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST"),
+                                "event_type": "POSITION_CLOSED",
+                                "position_id": oid,
+                                "underlying": sig.get("symbol"),
+                                "symbol": sig.get("symbol"),
+                                "strike": sig.get("strike"),
+                                "option_type": sig.get("option_type"),
+                                "action": "CLOSE",
+                                "entry_price": ent.get("fill_price"),
+                                "exit_price": ext.get("exit_price"),
+                                "qty": ent.get("quantity") or 1,
+                                "pnl": ext.get("pnl_total"),
+                                "strategy": "PAPER_LIFECYCLE_PROOF",
+                                "exit_reason": ext.get("exit_reason"),
+                                "source": "lifecycle_proof",
+                            })
+            except Exception:
+                pass
+
         # Separate by action
         entries = [t for t in trades if t.get("action") == "OPEN"]
         exits = [t for t in trades if t.get("action") == "CLOSE"]
@@ -3936,6 +4035,7 @@ async def get_today_trades():
             "entries": entries,
             "exits": exits,
             "count": len(trades),
+            "sources": sorted({t.get("source", "trade_logger") for t in trades}),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

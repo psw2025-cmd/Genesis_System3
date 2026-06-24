@@ -301,7 +301,7 @@
             </template>
             <div v-else class="no-data">09:15 IST pre-market · Last: {{ gainRankData.latest?.date||'--' }}</div>
           </div>
-          <div class="panel-foot">Last run: {{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : 'N/A' }}</div>
+          <div class="panel-foot">Last run: {{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : 'N/A' }}<span v-if="gainRankStale" class="tx-r"> · STALE (not {{ gainRankDate }}) — refreshes at market open</span></div>
         </div>
         <div class="panel">
           <div class="ph"><span class="pt">🔮 Index Forecast</span><span class="ps badge-a">PATH A — FORECAST</span></div>
@@ -399,11 +399,11 @@
       <div class="sec-hdr"><h2>Paper Trade Lifecycle</h2><span class="sec-sub">Full signal→order→fill→exit→P&L · PAPER ONLY</span></div>
       <div class="path-banner path-b">
         <span>PATH B — OPTION PAPER TRADE</span>
-        <span class="path-gate">Gate: Symbol valid ✅ · Chain available ✅ · Paper mode ✅ · Live disabled ✅ · Human approval pending ⏳</span>
+        <span class="path-gate">Gate: {{ autoGatesData.gates_passing||0 }}/{{ autoGatesData.gates_total||7 }} proof · Paper mode ✅ · Live disabled ✅</span>
       </div>
 
       <div class="proof-strip mt16" aria-label="Paper lifecycle proof status">
-        <div class="proof-chip proof-ok"><span>Proof Status</span><strong>Gate Matrix 8/8</strong></div>
+        <div class="proof-chip" :class="(autoGatesData.gates_passing||0)>=(autoGatesData.gates_total||1)?'proof-ok':'proof-warn'"><span>Proof Status</span><strong>Gate Matrix {{ autoGatesData.gates_passing||0 }}/{{ autoGatesData.gates_total||7 }}</strong></div>
         <div class="proof-chip proof-safe"><span>Safety</span><strong>LIVE TRADING BLOCKED</strong></div>
         <div class="proof-chip proof-paper"><span>P&L Positions</span><strong>GROSS P&L · NET P&L · OPEN POSITIONS</strong></div>
         <div class="proof-chip proof-source"><span>Source Truth</span><strong>DHAN_READONLY · PAPER ONLY</strong></div>
@@ -521,7 +521,7 @@
           <div class="tok-r"><span>Exits</span><strong>{{ todayTrades.exits?.length||0 }}</strong></div>
           <div class="tok-r"><span>Total</span><strong>{{ todayTrades.count||0 }}</strong></div>
         </div>
-        <div v-if="!todayTrades.entries?.length" class="no-data">No trades today · Paper lifecycle runs at 09:30 IST</div>
+        <div v-if="!todayTrades.entries?.length" class="no-data">No trade-log entries yet · SSOT open positions: {{ paperPositions.length }} · Lifecycle proof runs 09:30/12:00/14:00 IST</div>
       </div>
 
       <div class="two-col mt16">

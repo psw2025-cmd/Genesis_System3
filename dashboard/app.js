@@ -116,6 +116,8 @@ const app = createApp({
 
     // Computed
     const topSignal     = computed(() => gainRankData.value.latest?.predictions?.[0] || {});
+    const gainRankStale = computed(() => gainRankData.value.stale === true || gainRankData.value.is_today === false);
+    const gainRankDate  = computed(() => gainRankData.value.latest_date || gainRankData.value.latest?.date || '--');
     const latestRho     = computed(() => { const t=accuracyData.value.trend; return t?.length?t[t.length-1].rho:null; });
     const latestHitRate = computed(() => { const t=accuracyData.value.trend; return t?.length?t[t.length-1].hit_rate:null; });
     const rhoClass      = computed(() => { const r=latestRho.value; if(r===null)return ''; if(r>=0.70)return 'rho-strong tx-g'; if(r>=0.40)return 'tx-a'; return 'tx-r'; });
@@ -349,6 +351,8 @@ const app = createApp({
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
+      else if(st?.broker) broker.value=st.broker;
+      if(st?.broker?.connected) broker.value={...broker.value, ...st.broker, connected:true};
       if(brd) brokerDetail.value=brd;
       if(gr){gainRankData.value=gr;await nextTick();renderRankChart();renderScannerChart();}
       if(ac){accuracyData.value=ac;await nextTick();renderFullChart();}
@@ -461,7 +465,7 @@ const app = createApp({
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
       state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,topGainersData,equityOptionsData,approvalData,brokerTruth,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
-      topSignal,latestRho,latestHitRate,rhoClass,
+      topSignal,latestRho,latestHitRate,rhoClass,gainRankStale,gainRankDate,
       paperPositions,paperSummary,tradeHistory,tradeHistorySubtitle,pnlWithCharges,
       portfolioTransparency,
       activeAlerts,unreadCount,noTradeReasons,
