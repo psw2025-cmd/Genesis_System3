@@ -547,21 +547,27 @@ class DataSourceManager:
             ltp_val = float(row.get("ltp", 0) or 0)
             spot_val = float(row.get("_spot", 0) or 0)
 
-            # ── B1 DATA-INTEGRITY GUARD (source-level) ──
+            # ── B1 DATA-INTEGRITY GUARD (source-level, extrinsic-calibrated) ──
             # Reject phantom-priced rows BEFORE they enter the pipeline.
             # A bad bhavcopy row gave a BANKNIFTY 60000 CE an LTP of 4440 when
-            # fair value was ~280 → single -1.25L backtest loss. Drop such rows here.
+            # fair value was ~280 → single -1.25L backtest loss.
+            # Logic: an option's EXTRINSIC value (ltp - intrinsic) cannot exceed
+            # ~5% of spot for index options (ATM straddle is ~3-4% of spot).
+            # For far-OTM (>2% away, zero intrinsic), tighten to 3% of spot.
             if ltp_val > 0 and spot_val > 0 and strike_val > 0:
                 intrinsic = max(0.0, spot_val - strike_val) if opt_type == "CE" else max(0.0, strike_val - spot_val)
-                max_plausible = intrinsic + 0.15 * spot_val  # generous extrinsic cap
-                if ltp_val > max_plausible:
+                extrinsic = ltp_val - intrinsic
+                moneyness_pct = abs(spot_val - strike_val) / spot_val * 100.0
+                max_extrinsic = 0.05 * spot_val
+                if intrinsic == 0 and moneyness_pct > 2.0:
+                    max_extrinsic = 0.03 * spot_val
+                if extrinsic > max_extrinsic:
                     logger.warning(
                         f"[bhavcopy] DROPPED phantom row {symbol} {strike_val:.0f}{opt_type} "
-                        f"ltp={ltp_val:.1f} > max_plausible={max_plausible:.1f} "
-                        f"(intrinsic={intrinsic:.1f}, spot={spot_val:.1f})"
+                        f"ltp={ltp_val:.1f} extrinsic={extrinsic:.1f} > max={max_extrinsic:.1f} "
+                        f"({moneyness_pct:.1f}% OTM, spot={spot_val:.1f})"
                     )
                     continue
-                # Also drop obviously broken negative/zero strikes
             if strike_val <= 0:
                 continue
 
