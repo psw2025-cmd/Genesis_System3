@@ -2723,6 +2723,54 @@ async def websocket_endpoint(websocket: WebSocket):
             active_connections.remove(websocket)
 
 
+async def cloud_paper_trading_loop():
+    """Background task: generate paper trades from live chain during market hours.
+    PAPER ONLY — never places real orders. Phantom-guarded, single-lot."""
+    import asyncio as _asyncio
+
+    # Allow disabling via env (default ON)
+    if os.environ.get("CLOUD_PAPER_ENGINE", "1") in ("0", "false", "False"):
+        print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0")
+        return
+
+    while True:
+        try:
+            # Only run during market hours
+            mkt_open = False
+            if MARKET_DETECTION_AVAILABLE:
+                try:
+                    mkt_open, _ = is_market_open()
+                except Exception:
+                    mkt_open = False
+
+            if mkt_open:
+                try:
+                    from dashboard.backend.cloud_paper_engine import get_paper_engine
+                except ImportError:
+                    from cloud_paper_engine import get_paper_engine
+
+                engine = get_paper_engine(OUTPUTS_DIR)
+
+                # Fetch live chains for all index symbols
+                chains = []
+                for sym in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]:
+                    try:
+                        ch = await get_chain(sym)
+                        if ch and ch.get("contracts"):
+                            chains.append(ch)
+                    except Exception:
+                        continue
+
+                if chains:
+                    engine.step(chains, max_open=3)
+                    print(f"[paper-loop] tick: {len(engine.open_positions)} open, {len(engine.closed_positions)} closed")
+
+            await _asyncio.sleep(60)  # tick every 60s
+        except Exception as e:
+            print(f"[paper-loop] error (continuing): {e}")
+            await _asyncio.sleep(60)
+
+
 async def background_data_refresh():
     """Background task to refresh spot prices every 30 seconds"""
     import time
@@ -2807,6 +2855,9 @@ async def startup():
 
     # Start background data refresh
     asyncio.create_task(background_data_refresh())
+
+    # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
+    asyncio.create_task(cloud_paper_trading_loop())
 
     # Start state sync service if SSOT is available
     if SSOT_AVAILABLE and state_store is not None:
