@@ -72,21 +72,31 @@ def is_market_open() -> tuple[bool, str]:
     return True, f"Market open ({now.strftime('%H:%M')} IST)"
 
 
+def _backend_url() -> str:
+    port = os.environ.get("PORT")
+    if port:
+        return f"http://127.0.0.1:{port}"
+    return os.environ.get(
+        "SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com"
+    ).rstrip("/")
+
+
 def check_broker_connection(dry_run: bool) -> dict:
     if dry_run:
         return {"connected": True, "mode": "DRY_RUN", "note": "Simulated — no real API call"}
     # Try local broker module first
     try:
         from core.brokers.dhan.dhan_readonly import get_status
+
         result = get_status()
         if result.get("connected"):
             return result
     except Exception:
         pass
-    # Fallback: check live public API endpoint (works from Codespace too)
+    # Fallback: check live API endpoint (internal on Render, public elsewhere)
     import urllib.request
-    import urllib.error
-    public_url = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+
+    public_url = _backend_url()
     try:
         req = urllib.request.Request(
             public_url.rstrip("/") + "/api/broker/status",
@@ -94,7 +104,7 @@ def check_broker_connection(dry_run: bool) -> dict:
         )
         with urllib.request.urlopen(req, timeout=15) as r:
             data = json.loads(r.read(8192))
-            return {"connected": data.get("connected"), "mode": data.get("mode"), "source": "public_api_endpoint"}
+            return {"connected": data.get("connected"), "mode": data.get("mode"), "source": "api_endpoint"}
     except Exception as e:
         return {"connected": False, "error": str(e), "source": "all_checks_failed"}
 
@@ -117,9 +127,7 @@ def get_top_signal(dry_run: bool) -> dict:
     try:
         import urllib.request
 
-        public_url = os.environ.get(
-            "SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com"
-        )
+        public_url = _backend_url()
         with urllib.request.urlopen(public_url.rstrip("/") + "/api/gain_rank", timeout=45) as r:
             data = json.loads(r.read(65536))
         preds = (data.get("latest") or {}).get("predictions") or []
@@ -275,7 +283,7 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
 
     # Step 4: Brief hold, then exit
     log.info("[Step 4] Simulating hold and paper exit")
-    time.sleep(2)  # brief pause for timestamp separation
+    time.sleep(0.5)  # brief pause for timestamp separation
     exit_record = simulate_paper_exit(entry_order, signal)
     log.info(f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}")
 

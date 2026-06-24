@@ -32,14 +32,19 @@ def _read(path: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def _evaluate_inline(live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    from scripts.runtime_gate_proofs import ensure_runtime_proofs
+def _evaluate_inline(
+    live_state: Optional[Dict[str, Any]] = None,
+    skip_proofs: bool = False,
+) -> Dict[str, Any]:
     from scripts.system3_gate_evaluator import evaluate_all, write_reports
 
-    try:
-        ensure_runtime_proofs(ROOT, live_state=live_state)
-    except Exception:
-        pass
+    if not skip_proofs:
+        from scripts.runtime_gate_proofs import ensure_runtime_proofs
+
+        try:
+            ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=True)
+        except Exception:
+            pass
     payload = evaluate_all(ROOT, live_state=live_state)
     try:
         write_reports(ROOT, payload)
@@ -93,14 +98,27 @@ def build_auto_gates_report(
     payload: Dict[str, Any] = {}
     if refresh or not GATES_JSON.exists():
         try:
-            payload = _evaluate_inline(live_state)
+            from scripts.runtime_gate_proofs import ensure_runtime_proofs
+
+            ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=refresh)
+        except Exception:
+            pass
+    if refresh or not GATES_JSON.exists():
+        try:
+            payload = _evaluate_inline(live_state, skip_proofs=True)
         except Exception:
             payload = _read(GATES_JSON) or {}
     else:
         age = datetime.now(timezone.utc).timestamp() - GATES_JSON.stat().st_mtime
         if age > 300:
             try:
-                payload = _evaluate_inline(live_state)
+                from scripts.runtime_gate_proofs import ensure_runtime_proofs
+
+                ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=False)
+            except Exception:
+                pass
+            try:
+                payload = _evaluate_inline(live_state, skip_proofs=True)
             except Exception:
                 payload = _read(GATES_JSON) or {}
         else:
@@ -108,7 +126,10 @@ def build_auto_gates_report(
 
     if not payload.get("gates"):
         try:
-            payload = _evaluate_inline(live_state)
+            from scripts.runtime_gate_proofs import ensure_runtime_proofs
+
+            ensure_runtime_proofs(ROOT, live_state=live_state, force=True, include_lifecycle=True)
+            payload = _evaluate_inline(live_state, skip_proofs=True)
         except Exception:
             pass
 

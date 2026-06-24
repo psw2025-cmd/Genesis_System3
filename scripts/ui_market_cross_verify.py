@@ -103,8 +103,11 @@ def main() -> int:
     market = _ist_market_open()
     results: Dict[str, Any] = {}
     for ep in ENDPOINTS:
-        timeout = 120 if "/api/chain/" in ep else 90
-        results[ep] = _fetch(f"{CLOUD}{ep}", timeout=timeout)
+        timeout = 120 if ep == "/api/auto_gates" else (120 if "/api/chain/" in ep else 90)
+        url = f"{CLOUD}{ep}"
+        if ep == "/api/auto_gates":
+            url = f"{CLOUD}{ep}?refresh=false"
+        results[ep] = _fetch(url, timeout=timeout)
 
     issues = _issues(results, market)
     payload = {

@@ -52,6 +52,7 @@ def ensure_runtime_proofs(
     root: Path,
     live_state: Optional[Dict[str, Any]] = None,
     force: bool = False,
+    include_lifecycle: bool = False,
 ) -> Dict[str, Any]:
     """Generate stale/missing proof reports; returns summary of actions taken."""
     root = root.resolve()
@@ -109,7 +110,7 @@ def ensure_runtime_proofs(
             actions["model_accuracy"] = f"skip:{exc}"[:80]
 
     lifecycle_path = root / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
-    if market_open and (force or _stale(lifecycle_path)):
+    if include_lifecycle and market_open and (force or _stale(lifecycle_path)):
         try:
             from scripts.paper_lifecycle_proof import run_proof
 
@@ -117,6 +118,8 @@ def ensure_runtime_proofs(
             actions["paper_lifecycle"] = proof.get("status", "unknown")
         except Exception as exc:
             actions["paper_lifecycle"] = f"skip:{exc}"[:80]
+    elif not include_lifecycle:
+        actions["paper_lifecycle"] = "deferred_use_refresh_true"
     elif not market_open:
         actions["paper_lifecycle"] = "skipped_market_closed"
 
