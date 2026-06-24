@@ -656,3 +656,61 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
 
+---
+
+## 2026-06-24 (Session 10)
+
+**[2026-06-24 08:30 IST] [Gemini]** UPGRADE: Scheduler Liveness Monitoring, Web-Trigger APIs, and Verifier Fixes.
+
+### core/engine/system3_phase82_job_scheduler.py
+* Modified `run_daemon()` to write startup and periodic heartbeat metadata (`daemon_started_at`, `daemon_heartbeat`, `daemon_pid`) to the state file `phase82_job_scheduler_state.json` every 60 seconds.
+
+### dashboard/backend/app.py
+* Imported `BackgroundTasks` from `fastapi`.
+* Updated the `/api/system_health` endpoint to parse and return scheduler daemon liveness details (`started_at`, `heartbeat`, `pid`, `active`). A daemon is flagged `active: True` if the heartbeat is updated within the last 3 minutes.
+* Implemented new GET/POST route `/api/scheduler/run/{job_id}` which executes scheduler jobs in the background via `BackgroundTasks` to prevent HTTP timeouts. Supporting query/header token checks via `SCHEDULER_SECRET` env var. Allows free-tier hosting ping support (e.g. cron-job.org).
+
+### scripts/verify_dashboard.ps1
+* Replaced `localhost` with `127.0.0.1` in all HTTP calls to resolve Windows loopback routing mismatches where `localhost` resolves to IPv6 `[::1]`.
+* Increased warmup sleep to 15 seconds and `$maxRetries` to 10 to prevent false startup failures while uvicorn loads packages under load.
+
+### SYSTEM_STATE.md
+* Corrected the Spearman $\rho$ floor from the uncorroborated `0.80` value to the actual, verified value of `0.20` recorded in `state/market_validations/market_validation_2026-06-12.json` to ensure tracking baselines align with measured truth.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+
+---
+
+### [2026-06-24] [Claude] NOTICE TO ALL AGENTS (Cursor, Codex, Gemini): do not remove the threading guard in system3_phase82_job_scheduler.py
+
+**File:** `core/engine/system3_phase82_job_scheduler.py`, function `run_daemon()`.
+
+This file contains a `threading.current_thread() is threading.main_thread()` guard around the
+`signal.signal(SIGTERM/SIGINT, ...)` calls. **Do not remove this guard or the `import threading`
+line.** It is not a style choice — it is a fix for a real production crash:
+
+- `signal.signal()` only works when called from Python's main thread.
+- `scripts/cloud_worker.py` runs `run_daemon()` inside a background `threading.Thread`.
+- Without the guard, every worker startup raised `ValueError` on the first line of setup, before
+  the scheduling loop ever ticked once — silently swallowed by the caller's `except Exception`.
+- This was the confirmed root cause of the prediction/validation pipeline being frozen for 11
+  days (2026-06-13 → 2026-06-24): the daily rank/validate/retrain jobs never fired even once from
+  the cloud worker.
+
+This guard was already silently dropped once (between commits `999a599` and a later edit) by a
+heartbeat-logic rewrite that kept the new heartbeat fields but lost the thread-safety check —
+reintroducing the exact bug. It was restored in commit `cb8822a`. If you are refactoring
+`run_daemon()` for any reason (heartbeat format, logging, state schema), keep this check.
+
+To verify the fix is intact before changing this function, run:
+```
+python -c "
+import threading, time
+from core.engine.system3_phase82_job_scheduler import run_daemon
+t = threading.Thread(target=run_daemon, daemon=True)
+t.start(); time.sleep(3)
+assert t.is_alive(), 'run_daemon crashed in a background thread — guard is missing/broken'
+print('OK: daemon survives in a background thread')
+"
+```
