@@ -4,10 +4,11 @@ Generates realistic virtual data and creates Excel to show it working
 """
 
 import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
 from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

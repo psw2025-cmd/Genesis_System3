@@ -168,11 +168,38 @@ def detect_safety(state: Optional[Dict[str, Any]], broker: Optional[Dict[str, An
         live_enabled = broker.get("live_trading_enabled", live_enabled)
         order_allowed = broker.get("order_placement_allowed", order_allowed)
     if mode and str(mode).upper() not in {"PAPER", "ANALYZER", "ANALYZE"}:
-        blockers.append(Blocker("SYS3-BLK-SAFETY-001", "CRITICAL", "Safety", "Runtime mode is not PAPER/ANALYZER", f"mode={mode}", "Stop and restore PAPER/ANALYZER mode."))
+        blockers.append(
+            Blocker(
+                "SYS3-BLK-SAFETY-001",
+                "CRITICAL",
+                "Safety",
+                "Runtime mode is not PAPER/ANALYZER",
+                f"mode={mode}",
+                "Stop and restore PAPER/ANALYZER mode.",
+            )
+        )
     if live_enabled is True:
-        blockers.append(Blocker("SYS3-BLK-SAFETY-002", "CRITICAL", "Safety", "Live trading appears enabled", f"live_trading_enabled={live_enabled}", "Disable live trading immediately."))
+        blockers.append(
+            Blocker(
+                "SYS3-BLK-SAFETY-002",
+                "CRITICAL",
+                "Safety",
+                "Live trading appears enabled",
+                f"live_trading_enabled={live_enabled}",
+                "Disable live trading immediately.",
+            )
+        )
     if order_allowed is True:
-        blockers.append(Blocker("SYS3-BLK-SAFETY-003", "CRITICAL", "Safety", "Order placement appears allowed", f"order_placement_allowed={order_allowed}", "Block order placement immediately."))
+        blockers.append(
+            Blocker(
+                "SYS3-BLK-SAFETY-003",
+                "CRITICAL",
+                "Safety",
+                "Order placement appears allowed",
+                f"order_placement_allowed={order_allowed}",
+                "Block order placement immediately.",
+            )
+        )
     return blockers
 
 
@@ -180,14 +207,16 @@ def detect_missing_reports(root: Path) -> List[Blocker]:
     blockers: List[Blocker] = []
     missing = [p for p in REPORT_FILES if not (root / p).exists()]
     if missing:
-        blockers.append(Blocker(
-            "SYS3-BLK-007",
-            "HIGH",
-            "Control plane",
-            "Required proof reports are missing",
-            ", ".join(missing),
-            "Run markdown inventory, option visibility audit, and model accuracy tracker.",
-        ))
+        blockers.append(
+            Blocker(
+                "SYS3-BLK-007",
+                "HIGH",
+                "Control plane",
+                "Required proof reports are missing",
+                ", ".join(missing),
+                "Run markdown inventory, option visibility audit, and model accuracy tracker.",
+            )
+        )
     return blockers
 
 
@@ -195,14 +224,16 @@ def detect_missing_active_docs(root: Path) -> List[Blocker]:
     missing = [p for p in ACTIVE_CONTROL_DOCS if not (root / p).exists()]
     if not missing:
         return []
-    return [Blocker(
-        "SYS3-BLK-DOC-001",
-        "HIGH",
-        "Documentation",
-        "Required active control documents missing",
-        ", ".join(missing),
-        "Create/restore missing active control documents before patching runtime.",
-    )]
+    return [
+        Blocker(
+            "SYS3-BLK-DOC-001",
+            "HIGH",
+            "Documentation",
+            "Required active control documents missing",
+            ", ".join(missing),
+            "Create/restore missing active control documents before patching runtime.",
+        )
+    ]
 
 
 def detect_dashboard_hardcoded(root: Path) -> List[Blocker]:
@@ -215,14 +246,16 @@ def detect_dashboard_hardcoded(root: Path) -> List[Blocker]:
         if term in text:
             evidence_terms.append(term)
     if {"PASS", "PEND"}.issubset(set(evidence_terms)) and "Paper Lifecycle" in evidence_terms:
-        return [Blocker(
-            "SYS3-BLK-002",
-            "HIGH",
-            "Dashboard truth",
-            "Dashboard proof gates may contain static/hard-coded pass-pending contradiction",
-            f"dashboard/app.js contains terms: {', '.join(evidence_terms)}",
-            "Replace/label static proof matrix with backend/runtime report-driven proof gates.",
-        )]
+        return [
+            Blocker(
+                "SYS3-BLK-002",
+                "HIGH",
+                "Dashboard truth",
+                "Dashboard proof gates may contain static/hard-coded pass-pending contradiction",
+                f"dashboard/app.js contains terms: {', '.join(evidence_terms)}",
+                "Replace/label static proof matrix with backend/runtime report-driven proof gates.",
+            )
+        ]
     return []
 
 
@@ -233,14 +266,16 @@ def detect_option_visibility(root: Path) -> List[Blocker]:
     ]
     if all(p.exists() for p in outputs):
         return []
-    return [Blocker(
-        "SYS3-BLK-003",
-        "CRITICAL",
-        "Option visibility",
-        "PE/CE expiry/strike/token visibility report missing",
-        "reports/latest/option_strike_visibility.md/json not found",
-        "Run scripts/system3_option_visibility_audit.py and verify every signal maps or is blocked with reason.",
-    )]
+    return [
+        Blocker(
+            "SYS3-BLK-003",
+            "CRITICAL",
+            "Option visibility",
+            "PE/CE expiry/strike/token visibility report missing",
+            "reports/latest/option_strike_visibility.md/json not found",
+            "Run scripts/system3_option_visibility_audit.py and verify every signal maps or is blocked with reason.",
+        )
+    ]
 
 
 def detect_model_accuracy(root: Path) -> List[Blocker]:
@@ -250,14 +285,16 @@ def detect_model_accuracy(root: Path) -> List[Blocker]:
     ]
     if all(p.exists() for p in outputs):
         return []
-    return [Blocker(
-        "SYS3-BLK-005",
-        "HIGH",
-        "Model accuracy",
-        "Model accuracy proof report missing",
-        "reports/latest/model_accuracy_report.md/json not found",
-        "Run scripts/system3_model_accuracy_tracker.py; require prediction-before-move and actual outcome proof.",
-    )]
+    return [
+        Blocker(
+            "SYS3-BLK-005",
+            "HIGH",
+            "Model accuracy",
+            "Model accuracy proof report missing",
+            "reports/latest/model_accuracy_report.md/json not found",
+            "Run scripts/system3_model_accuracy_tracker.py; require prediction-before-move and actual outcome proof.",
+        )
+    ]
 
 
 def write_markdown(path: Path, summary: Dict[str, Any], blockers: List[Blocker]) -> None:
@@ -286,16 +323,20 @@ def write_markdown(path: Path, summary: Dict[str, Any], blockers: List[Blocker])
             action = b.required_action.replace("|", "/")[:500]
             lines.append(f"| `{b.blocker_id}` | `{b.severity}` | `{b.area}` | {b.title} | {evidence} | {action} |")
     else:
-        lines.append("| `NONE` | `INFO` | `All` | No blocker detected by this static scan | Runtime proof still required | Continue PAPER proof cycle |")
-    lines.extend([
-        "",
-        "## Non-Negotiable Reminder",
-        "",
-        "- Do not enable live trading.",
-        "- Do not touch credentials or `.env`.",
-        "- Do not mark trade-ready until PE/CE strike/token and model outcome reports exist.",
-        "- Do not use old FINAL/COMPLETE docs as current truth.",
-    ])
+        lines.append(
+            "| `NONE` | `INFO` | `All` | No blocker detected by this static scan | Runtime proof still required | Continue PAPER proof cycle |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Non-Negotiable Reminder",
+            "",
+            "- Do not enable live trading.",
+            "- Do not touch credentials or `.env`.",
+            "- Do not mark trade-ready until PE/CE strike/token and model outcome reports exist.",
+            "- Do not use old FINAL/COMPLETE docs as current truth.",
+        ]
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -303,7 +344,11 @@ def write_markdown(path: Path, summary: Dict[str, Any], blockers: List[Blocker])
 def main() -> int:
     parser = argparse.ArgumentParser(description="System3 blocker finder")
     parser.add_argument("--root", default=None, help="Repo root. Defaults to script parent repo root.")
-    parser.add_argument("--api-base", default=os.environ.get("SYSTEM3_API_BASE"), help="Optional live base URL, e.g. https://...render.com")
+    parser.add_argument(
+        "--api-base",
+        default=os.environ.get("SYSTEM3_API_BASE"),
+        help="Optional live base URL, e.g. https://...render.com",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve() if args.root else repo_root_from_script()
@@ -326,14 +371,16 @@ def main() -> int:
         if false_alert:
             blockers.append(false_alert)
     else:
-        blockers.append(Blocker(
-            "SYS3-BLK-RUNTIME-001",
-            "MEDIUM",
-            "Runtime truth",
-            "Runtime state not available to blocker finder",
-            state_err or "No state loaded",
-            "Run with --api-base or provide local runtime state output.",
-        ))
+        blockers.append(
+            Blocker(
+                "SYS3-BLK-RUNTIME-001",
+                "MEDIUM",
+                "Runtime truth",
+                "Runtime state not available to blocker finder",
+                state_err or "No state loaded",
+                "Run with --api-base or provide local runtime state output.",
+            )
+        )
 
     severity_counts: Dict[str, int] = {}
     for b in blockers:

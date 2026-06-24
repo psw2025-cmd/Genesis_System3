@@ -6,8 +6,9 @@ Works with both synthetic backtest logs and real live trading logs.
 """
 
 import os
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 LIVE_DIR = os.path.join(PROJECT_ROOT, "storage", "live")

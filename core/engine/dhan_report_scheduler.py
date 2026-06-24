@@ -5,9 +5,9 @@ Schedules automatic report generation (read-only).
 AUTO-UPDATE: DISABLED - Only schedules, never executes automatically.
 """
 
-from pathlib import Path
 from datetime import datetime, time
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"

@@ -8,8 +8,7 @@ continue to work without change.
 Field name note: canonical uses 'rank_correlation_spearman';
 older JSON files on disk may use 'spearman_correlation' — both mean the same thing.
 """
-from src.validation.market_result_validator import (  # noqa: F401
-    MarketResultValidator,
-)
+
+from src.validation.market_result_validator import MarketResultValidator  # noqa: F401
 
 __all__ = ["MarketResultValidator"]

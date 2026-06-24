@@ -4,11 +4,11 @@ System3 Phase 135 - Master Session Human Summary MD
 Generates human-readable summary of master session setup.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

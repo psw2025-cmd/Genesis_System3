@@ -5,14 +5,15 @@ Use volatility/regime features to generate adaptive thresholds per regime
 instead of single fixed values.
 """
 
-import sys
-import pandas as pd
 import json
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
 from itertools import product
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

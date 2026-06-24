@@ -4,26 +4,26 @@ System3 GENI - Orchestrator
 High-level coordinator for GENI operations.
 """
 
-import subprocess
 import json
-from pathlib import Path
-from typing import Dict, Any, Optional
+import subprocess
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 from .geni_config import (
-    PROJECT_ROOT,
+    AUTO_EXECUTE_REAL_TRADES,
+    AUTO_PROMOTE_MODELS,
+    AUTO_UPDATE_CONFIGS,
     GENI_LAST_RUN_JSON,
     GENI_LAST_RUN_MD,
-    PATH_GENI_STORAGE,
-    AUTO_EXECUTE_REAL_TRADES,
-    AUTO_UPDATE_CONFIGS,
-    AUTO_PROMOTE_MODELS,
     GENI_ULTRA_LIVE_MODE,
+    PATH_GENI_STORAGE,
+    PROJECT_ROOT,
     validate_paths,
 )
-from .geni_state import load_state, save_state, GeniState
-from .geni_tasks import get_task, get_all_tasks
-from .geni_validator import run_full_validation, run_quick_validation, ValidationResult
+from .geni_state import GeniState, load_state, save_state
+from .geni_tasks import get_all_tasks, get_task
+from .geni_validator import ValidationResult, run_full_validation, run_quick_validation
 
 
 def _run_task(task_name: str) -> Dict[str, Any]:

@@ -3,8 +3,9 @@ Pre-Market Check - Run this before market opens to ensure everything is ready
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -72,9 +73,9 @@ def pre_market_check():
     # Check 4: Python dependencies
     print("\n[CHECK 4] Python Dependencies...")
     try:
-        import pandas
         import numpy
         import openpyxl
+        import pandas
 
         # pytz already imported at top
         print("  [OK] All required packages installed")

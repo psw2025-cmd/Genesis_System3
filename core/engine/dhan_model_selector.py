@@ -13,10 +13,11 @@ Outputs:
 Environment/Config: Profile selection via config file.
 """
 
-import joblib
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import joblib
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"

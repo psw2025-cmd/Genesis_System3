@@ -13,11 +13,11 @@ Usage:
         ... rest of code ...
 """
 
+import base64
+import json
+import logging
 import os
 import sys
-import json
-import base64
-import logging
 from datetime import datetime
 from pathlib import Path
 

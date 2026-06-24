@@ -2,11 +2,12 @@
 Pre-Trading Validation - Complete System Check Before Paper Trading Starts
 """
 
-import sys
-from pathlib import Path
 import json
 import os
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -74,7 +75,10 @@ def check_configuration():
         # Check flags
         try:
             sys.path.insert(0, str(ROOT_DIR))
-            from config.live_trade_config import LIVE_TRADING_ENABLED, USE_LIVE_EXECUTION_ENGINE
+            from config.live_trade_config import (
+                LIVE_TRADING_ENABLED,
+                USE_LIVE_EXECUTION_ENGINE,
+            )
 
             if LIVE_TRADING_ENABLED:
                 issues.append("CRITICAL: LIVE_TRADING_ENABLED is True (should be False)")

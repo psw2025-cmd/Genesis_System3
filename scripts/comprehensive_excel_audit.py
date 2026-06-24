@@ -6,14 +6,15 @@ Comprehensive Excel File Audit
 - End-to-end verification
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import pytz
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
 import openpyxl
+import pandas as pd
+import pytz
 from openpyxl.utils import get_column_letter
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -474,7 +475,9 @@ class ExcelComprehensiveAudit:
             print(f"  Generated {len(virtual_df)} virtual contracts")
 
             # Test with virtual data
-            from scripts.build_production_optionchain_master import OptionChainMasterBuilder
+            from scripts.build_production_optionchain_master import (
+                OptionChainMasterBuilder,
+            )
 
             builder = OptionChainMasterBuilder()
 
@@ -523,7 +526,9 @@ class ExcelComprehensiveAudit:
                     print(f"    OK Handles empty data")
                     continue
 
-                from scripts.build_production_optionchain_master import OptionChainMasterBuilder
+                from scripts.build_production_optionchain_master import (
+                    OptionChainMasterBuilder,
+                )
 
                 builder = OptionChainMasterBuilder()
 

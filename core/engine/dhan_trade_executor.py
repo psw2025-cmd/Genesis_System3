@@ -13,8 +13,9 @@ Outputs:
 """
 
 import os
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 LIVE_DIR = os.path.join(PROJECT_ROOT, "storage", "live")
@@ -101,7 +102,10 @@ def execute_dry_run(only_new: bool = True) -> None:
         return
 
     exec_rows = []
-    from core.engine.dhan_trade_lifecycle_logger import get_lifecycle_logger, generate_trade_id
+    from core.engine.dhan_trade_lifecycle_logger import (
+        generate_trade_id,
+        get_lifecycle_logger,
+    )
 
     lifecycle_logger = get_lifecycle_logger()
     for _, row in df.iterrows():

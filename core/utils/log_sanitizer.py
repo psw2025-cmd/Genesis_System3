@@ -5,7 +5,6 @@ Log Sanitizer - Masks secrets and sensitive data in logs
 import re
 from typing import Any
 
-
 # JWT pattern: xxxxx.yyyyy.zzzzz (base64-like)
 JWT_PATTERN = re.compile(r"[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+")
 

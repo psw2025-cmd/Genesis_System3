@@ -2,9 +2,10 @@
 Test Performance Prediction and Profit Validation
 """
 
-import requests
 import json
 from datetime import datetime
+
+import requests
 
 API_BASE = "http://localhost:8000"
 

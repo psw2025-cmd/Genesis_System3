@@ -4,12 +4,12 @@ System3 Phase 374 - Signal History Freshness Checker
 Monitors data freshness and triggers warnings for stale files.
 """
 
-import sys
 import json
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, Any
 import logging
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

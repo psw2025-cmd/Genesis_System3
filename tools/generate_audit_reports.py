@@ -30,7 +30,9 @@ def load_json(path: Path):
 def run_pytest_parser() -> dict:
     proc = subprocess.run(
         [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             "tests/",
             "-q",
         ],
@@ -55,8 +57,13 @@ def scan_dhan_mappings() -> dict:
     ]
     wrong = []
     correct = [
-        "oi", "previous_oi", "top_bid_price", "top_ask_price",
-        "greeks.delta", "change_in_oi", "bid_ask_spread",
+        "oi",
+        "previous_oi",
+        "top_bid_price",
+        "top_ask_price",
+        "greeks.delta",
+        "change_in_oi",
+        "bid_ask_spread",
     ]
     changed = ["core/data/dhan_option_chain_parser.py", "core/data/datasource_manager.py"]
     tests_added = ["tests/test_dhan_option_chain_parser.py", "tests/fixtures/dhan_option_chain_sample.json"]
@@ -116,7 +123,9 @@ def audit_trader_fields(truth: dict) -> dict:
     if not outputs.exists():
         outputs = ROOT / "outputs"
     try:
-        from dashboard.backend.trader_requirements_service import build_trader_requirements_report
+        from dashboard.backend.trader_requirements_service import (
+            build_trader_requirements_report,
+        )
     except ImportError:
         from trader_requirements_service import build_trader_requirements_report
     report = build_trader_requirements_report(outputs)
@@ -222,22 +231,26 @@ def main() -> int:
     dashboard = load_json(REPORTS / "dashboard_browser_proof" / "summary.json")
     dashboard_status = dashboard.get("final_verdict", "NOT_PROVEN")
 
-    blockers = list({
-        *dhan.get("remaining_blockers", []),
-        *trader.get("remaining_blockers", []),
-        *real_market.get("remaining_blockers", []),
-        "TRADE_READY_FALSE",
-        "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
-    })
-    update_master_summary({
-        "dhan": dhan["status"],
-        "dashboard": dashboard_status,
-        "trader": trader["status"],
-        "real_market": real_market["status"],
-        "truth_bridge": truth_bridge,
-        "production": production,
-        "blockers": blockers,
-    })
+    blockers = list(
+        {
+            *dhan.get("remaining_blockers", []),
+            *trader.get("remaining_blockers", []),
+            *real_market.get("remaining_blockers", []),
+            "TRADE_READY_FALSE",
+            "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+        }
+    )
+    update_master_summary(
+        {
+            "dhan": dhan["status"],
+            "dashboard": dashboard_status,
+            "trader": trader["status"],
+            "real_market": real_market["status"],
+            "truth_bridge": truth_bridge,
+            "production": production,
+            "blockers": blockers,
+        }
+    )
     return 0
 
 

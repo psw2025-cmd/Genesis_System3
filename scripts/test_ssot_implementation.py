@@ -3,12 +3,13 @@ Test SSOT Implementation and Critical Fixes
 Validates that all fixes are working correctly
 """
 
-import sys
 import json
-import requests
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
+import requests
 
 # Fix encoding for Windows
 if sys.platform == "win32":

@@ -12,11 +12,11 @@ Notes:
     market price feed; see the TODOs in the script to integrate a price API.
 """
 
+import argparse
 import csv
 import time
-from pathlib import Path
 from datetime import datetime
-import argparse
+from pathlib import Path
 
 try:
     import matplotlib.pyplot as plt

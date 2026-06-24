@@ -3,12 +3,13 @@ Get Today's Complete Paper Trading Report
 Shows all trading details, performance, predictions, and P&L from real market data
 """
 
-import requests
 import json
 import sys
 from datetime import datetime
 from pathlib import Path
+
 import pytz
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 

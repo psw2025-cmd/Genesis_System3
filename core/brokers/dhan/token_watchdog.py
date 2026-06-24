@@ -15,11 +15,11 @@ The startup check (dhan_startup_check.py) is Layer 0.
 The pre-flight check (ensure_valid_token) is Layer 3 (called before trades).
 """
 
+import logging
 import os
 import sys
-import time
-import logging
 import threading
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -48,7 +48,8 @@ _fail_streak       = 0
 
 def _token_hours_remaining() -> float | None:
     """Returns hours left on current token, or None if can't determine."""
-    import base64, json
+    import base64
+    import json
     try:
         from core.utils.env_loader import get_dhan_credentials
         creds = get_dhan_credentials()
@@ -183,7 +184,8 @@ def start_watchdog_thread() -> threading.Thread:
 
 
 if __name__ == "__main__":
-    import argparse, json
+    import argparse
+    import json
     parser = argparse.ArgumentParser(description="Dhan Token Watchdog")
     parser.add_argument("--once",  action="store_true", help="Run one check cycle and exit")
     parser.add_argument("--loop",  action="store_true", help="Run watchdog loop forever")

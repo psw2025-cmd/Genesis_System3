@@ -5,8 +5,9 @@ Ensures dashboard always shows fresh data from broker
 
 import asyncio
 import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 import requests
 

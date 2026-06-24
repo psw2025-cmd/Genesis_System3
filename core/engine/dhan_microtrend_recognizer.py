@@ -4,9 +4,10 @@ Dhan Index Options - Microtrend Recognition
 Detects short-term trends in price movements.
 """
 
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
+import pandas as pd
 
 
 def detect_microtrend(df_signals: pd.DataFrame, lookback: int = 3) -> pd.DataFrame:

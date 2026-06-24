@@ -13,7 +13,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from core.brokers.dhan.equity_fo_universe import PRIORITY_EQUITY_FO, load_equity_fo_universe
+from core.brokers.dhan.equity_fo_universe import (
+    PRIORITY_EQUITY_FO,
+    load_equity_fo_universe,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 BHAVCOPY_DIR = ROOT / "storage" / "bhavcopy"
@@ -187,10 +190,12 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
             "data_available": bool(rows),
         },
         "implementation_gaps": [
-            g for g in [
+            g
+            for g in [
                 "LIVE_PER_STOCK_DHAN_CHAIN" if not segments["equity_options"].get("live_chain_per_stock") else None,
                 "BHAVCOPY_LOCAL" if not bhav_date else None,
                 "INTRADAY_PRICE_GAIN" if rows and rows[0].get("gain_metric") == "oi_buildup_pct" else None,
-            ] if g
+            ]
+            if g
         ],
     }

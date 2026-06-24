@@ -53,9 +53,11 @@ os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
 def ist_now() -> datetime:
     try:
         from zoneinfo import ZoneInfo
+
         return datetime.now(ZoneInfo("Asia/Kolkata"))
     except ImportError:
         import pytz
+
         return datetime.now(pytz.timezone("Asia/Kolkata"))
 
 
@@ -63,7 +65,7 @@ def is_market_open() -> tuple[bool, str]:
     now = ist_now()
     if now.weekday() >= 5:
         return False, f"Weekend ({now.strftime('%A')})"
-    market_open  = now.replace(hour=9,  minute=15, second=0, microsecond=0)
+    market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
     market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
     if now < market_open:
         return False, f"Pre-market ({now.strftime('%H:%M')} IST, opens 09:15)"
@@ -76,9 +78,7 @@ def _backend_url() -> str:
     port = os.environ.get("PORT")
     if port:
         return f"http://127.0.0.1:{port}"
-    return os.environ.get(
-        "SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com"
-    ).rstrip("/")
+    return os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
 
 
 def check_broker_connection(dry_run: bool) -> dict:
@@ -215,7 +215,7 @@ def simulate_paper_entry(signal: dict) -> dict:
 def simulate_paper_exit(order: dict, signal: dict, exit_after_secs: int = 300) -> dict:
     """Simulate exit after a brief hold — paper only."""
     target = signal.get("target_price", order["entry_price"] * 1.15)
-    stop   = signal.get("stop_loss",   order["entry_price"] * 0.90)
+    stop = signal.get("stop_loss", order["entry_price"] * 0.90)
     # Simulate a small move (paper proof — not real market data)
     exit_price = order["entry_price"] * 1.05  # +5% simulated move
     pnl_per_unit = exit_price - order["entry_price"]
@@ -270,8 +270,11 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     if not signal_id:
         log.error("No signal generated — lifecycle proof incomplete")
         failed = {
-            "proof_id": proof_id, "started": started, "status": "FAIL",
-            "reason": "No signal from engine", "signal": signal,
+            "proof_id": proof_id,
+            "started": started,
+            "status": "FAIL",
+            "reason": "No signal from engine",
+            "signal": signal,
         }
         (OUT / "summary.json").write_text(json.dumps(_make_summary(failed, broker_status), indent=2))
         return failed
@@ -302,7 +305,9 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     log.info("[Step 4] Simulating hold and paper exit")
     time.sleep(0.5)  # brief pause for timestamp separation
     exit_record = simulate_paper_exit(entry_order, signal)
-    log.info(f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}")
+    log.info(
+        f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}"
+    )
     try:
         from dashboard.backend.trade_logger import log_trade_event
 
@@ -336,9 +341,18 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
 
     # Mandatory lifecycle fields
     mandatory_fields = [
-        "signal_id", "symbol", "instrument_token", "expiry", "strike",
-        "option_type", "entry_time", "entry_price", "exit_time", "exit_price",
-        "pnl_total", "net_pnl",
+        "signal_id",
+        "symbol",
+        "instrument_token",
+        "expiry",
+        "strike",
+        "option_type",
+        "entry_time",
+        "entry_price",
+        "exit_time",
+        "exit_price",
+        "pnl_total",
+        "net_pnl",
     ]
     field_check = {f: (signal | entry_order | exit_record).get(f) for f in mandatory_fields}
     all_fields_present = all(v is not None for v in field_check.values())
@@ -387,20 +401,25 @@ def _make_summary(proof: dict, broker_status: dict) -> dict:
             "signal_generated": bool(proof.get("signal", {}).get("signal_id")),
             "entry_order_placed": bool(proof.get("entry_order", {}).get("order_id")),
             "exit_completed": bool(proof.get("exit_record", {}).get("exit_time")),
-            "full_lifecycle_proven": proof.get("reconciled", False) and proof.get("all_mandatory_fields_present", False),
+            "full_lifecycle_proven": proof.get("reconciled", False)
+            and proof.get("all_mandatory_fields_present", False),
             "orders_trades_lifecycle_reconciled": proof.get("reconciled", False),
             "mandatory_lifecycle_fields": list(proof.get("mandatory_field_check", {}).keys()),
             "pnl_total": proof.get("exit_record", {}).get("pnl_total"),
             "net_pnl": proof.get("exit_record", {}).get("net_pnl"),
             "market_status": proof.get("market_status"),
         },
-        "next_action": "PASS — lifecycle proven. Accumulate 5+ days before live enablement." if proof.get("status") == "PASS" else "Complete broker connection + run on market day.",
+        "next_action": (
+            "PASS — lifecycle proven. Accumulate 5+ days before live enablement."
+            if proof.get("status") == "PASS"
+            else "Complete broker connection + run on market day."
+        ),
     }
 
 
 def main():
     parser = argparse.ArgumentParser(description="Analyzer/Paper lifecycle proof")
-    parser.add_argument("--force",   action="store_true", help="Run even if market is closed")
+    parser.add_argument("--force", action="store_true", help="Run even if market is closed")
     parser.add_argument("--dry-run", action="store_true", help="Simulate without real API calls")
     args = parser.parse_args()
     proof = run_proof(dry_run=args.dry_run, force=args.force)

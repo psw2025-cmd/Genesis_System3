@@ -4,11 +4,12 @@ Run three consecutive production validation cycles with backend up.
 Exits 0 only if all three cycles pass; then generates proof pack.
 """
 import os
-import sys
 import subprocess
+import sys
 import time
-import requests
 from pathlib import Path
+
+import requests
 
 ROOT = Path(__file__).resolve().parent.parent
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")

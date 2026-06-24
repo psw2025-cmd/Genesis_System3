@@ -215,7 +215,12 @@ def step_ast_scan(py_files: Sequence[Path]) -> StepResult:
             for rx, label in patterns:
                 if rx.search(line) and "Exception" not in line:
                     findings.append(
-                        {"file": str(p.relative_to(ROOT)), "line": str(i), "issue": label, "snippet": line.strip()[:120]}
+                        {
+                            "file": str(p.relative_to(ROOT)),
+                            "line": str(i),
+                            "issue": label,
+                            "snippet": line.strip()[:120],
+                        }
                     )
         try:
             tree = ast.parse(text, filename=str(p))
@@ -233,7 +238,11 @@ def step_ast_scan(py_files: Sequence[Path]) -> StepResult:
                             "issue": "broker_order_call",
                         }
                     )
-    critical = [f for f in findings if f.get("issue") in {"hardcoded_api_key", "hardcoded_password", "live_trading_enable", "syntax_error"}]
+    critical = [
+        f
+        for f in findings
+        if f.get("issue") in {"hardcoded_api_key", "hardcoded_password", "live_trading_enable", "syntax_error"}
+    ]
     status = "FAIL" if critical else ("WARN" if findings else "PASS")
     return StepResult(
         name="ast_static_scan",

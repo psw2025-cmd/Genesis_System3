@@ -5,12 +5,13 @@ Validates live thresholds JSON structure and verifies signal counts match expect
 This is a pre-market check to ensure thresholds are safe before market opens.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

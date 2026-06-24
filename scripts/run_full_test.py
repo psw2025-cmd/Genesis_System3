@@ -2,11 +2,12 @@
 Full System Test - Tests everything end-to-end
 """
 
-import sys
 import json
-import requests
+import sys
 import time
 from pathlib import Path
+
+import requests
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")

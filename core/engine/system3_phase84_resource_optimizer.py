@@ -4,12 +4,12 @@ System3 Phase 84 - Resource Optimizer
 Analyze CPU/memory usage logs (if available) and suggest performance optimizations.
 """
 
-import sys
 import json
 import os
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Optional import for psutil (for actual resource monitoring)
 try:

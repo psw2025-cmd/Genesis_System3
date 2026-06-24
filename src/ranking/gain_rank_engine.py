@@ -16,13 +16,14 @@ Scoring factors (each normalized 0-100):
 Final rank score = weighted sum. Top-N returned sorted descending.
 """
 
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, date
 import json
 import os
 import sys
+from datetime import date, datetime
+from typing import Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
@@ -32,6 +33,7 @@ try:
     from core.utils.logger import logger
 except ImportError:
     import logging
+
     logger = logging.getLogger("gain_rank_engine")
 
 # Weights for the seven scoring factors (must sum to 1.0)
@@ -40,13 +42,13 @@ except ImportError:
 # Applied at 50% of optimal move to guard against 1-day overfitting.
 # Auto-updated by scripts/calibrate_factor_weights.py once 5+ validation days accumulate.
 FACTOR_WEIGHTS = {
-    "oi_change_pct":      0.20,   # Reduced 0.25→0.20; grid found OI less discriminating than PCR
-    "iv_percentile":      0.15,   # Now real signal via ATM straddle proxy (was dead 50.0)
-    "volume_surge":       0.15,   # Unchanged — volume confirms conviction
-    "pcr_divergence":     0.22,   # Raised 0.12→0.22; grid search found PCR most discriminating
-    "atm_premium_ratio":  0.08,   # Unchanged — expected move magnitude
-    "momentum_score":     0.05,   # Unchanged — no bhavcopy intraday data available
-    "ml_confidence":      0.15,   # Reduced 0.20→0.15; signal CSV not yet generated, redistributed
+    "oi_change_pct": 0.20,  # Reduced 0.25→0.20; grid found OI less discriminating than PCR
+    "iv_percentile": 0.15,  # Now real signal via ATM straddle proxy (was dead 50.0)
+    "volume_surge": 0.15,  # Unchanged — volume confirms conviction
+    "pcr_divergence": 0.22,  # Raised 0.12→0.22; grid search found PCR most discriminating
+    "atm_premium_ratio": 0.08,  # Unchanged — expected move magnitude
+    "momentum_score": 0.05,  # Unchanged — no bhavcopy intraday data available
+    "ml_confidence": 0.15,  # Reduced 0.20→0.15; signal CSV not yet generated, redistributed
 }
 
 # Minimum score to be included in recommended trades
@@ -54,7 +56,7 @@ MIN_GAIN_SCORE = 40.0
 
 # History files
 RANK_HISTORY_FILE = os.path.join(ROOT_DIR, "state", "gain_rank_history.json")
-IV_HISTORY_FILE   = os.path.join(ROOT_DIR, "state", "iv_history.json")
+IV_HISTORY_FILE = os.path.join(ROOT_DIR, "state", "iv_history.json")
 
 
 class GainRankEngine:
@@ -105,6 +107,7 @@ class GainRankEngine:
                 continue
             try:
                 from core.brokers.dhan.equity_fo_universe import is_tradeable_fo_symbol
+
                 if not is_tradeable_fo_symbol(underlying):
                     logger.debug("Skipping non-F&O symbol %s", underlying)
                     continue
@@ -190,22 +193,22 @@ class GainRankEngine:
         # weight proportionally to the other factors so scoring remains valid.
         if ml_conf > 0:
             gain_score = (
-                oi_score        * FACTOR_WEIGHTS["oi_change_pct"]
-                + iv_score      * FACTOR_WEIGHTS["iv_percentile"]
-                + vol_score     * FACTOR_WEIGHTS["volume_surge"]
-                + pcr_score     * FACTOR_WEIGHTS["pcr_divergence"]
+                oi_score * FACTOR_WEIGHTS["oi_change_pct"]
+                + iv_score * FACTOR_WEIGHTS["iv_percentile"]
+                + vol_score * FACTOR_WEIGHTS["volume_surge"]
+                + pcr_score * FACTOR_WEIGHTS["pcr_divergence"]
                 + premium_score * FACTOR_WEIGHTS["atm_premium_ratio"]
                 + momentum_score * FACTOR_WEIGHTS["momentum_score"]
-                + ml_conf       * FACTOR_WEIGHTS["ml_confidence"]
+                + ml_conf * FACTOR_WEIGHTS["ml_confidence"]
             )
         else:
             # No ML signal — redistribute ml_confidence weight proportionally
             base_weight = 1.0 - FACTOR_WEIGHTS["ml_confidence"]
             gain_score = (
-                oi_score        * FACTOR_WEIGHTS["oi_change_pct"] / base_weight
-                + iv_score      * FACTOR_WEIGHTS["iv_percentile"] / base_weight
-                + vol_score     * FACTOR_WEIGHTS["volume_surge"] / base_weight
-                + pcr_score     * FACTOR_WEIGHTS["pcr_divergence"] / base_weight
+                oi_score * FACTOR_WEIGHTS["oi_change_pct"] / base_weight
+                + iv_score * FACTOR_WEIGHTS["iv_percentile"] / base_weight
+                + vol_score * FACTOR_WEIGHTS["volume_surge"] / base_weight
+                + pcr_score * FACTOR_WEIGHTS["pcr_divergence"] / base_weight
                 + premium_score * FACTOR_WEIGHTS["atm_premium_ratio"] / base_weight
                 + momentum_score * FACTOR_WEIGHTS["momentum_score"] / base_weight
             )
@@ -290,7 +293,11 @@ class GainRankEngine:
         # Detect column style: parsed (has expiry_date) vs raw UDiFF (has XpryDt)
         if "expiry_date" in df.columns and "spot_price" in df.columns:
             expiry_col, strike_col, type_col, ltp_col, spot_col = (
-                "expiry_date", "strike", "option_type", "ltp", "spot_price"
+                "expiry_date",
+                "strike",
+                "option_type",
+                "ltp",
+                "spot_price",
             )
         elif "XpryDt" in df.columns and "UndrlygPric" in df.columns:
             expiry_col, strike_col, ltp_col, spot_col = "XpryDt", "StrkPric", "ClsPric", "UndrlygPric"
@@ -335,7 +342,7 @@ class GainRankEngine:
         if straddle <= 0 or spot_val <= 0:
             return None
 
-        return round(straddle / spot_val / (T ** 0.5), 6)
+        return round(straddle / spot_val / (T**0.5), 6)
 
     def _volume_surge_score(self, df: pd.DataFrame, avg_vol: Optional[float]) -> float:
         """Score based on volume surge vs 5-day average."""
@@ -347,7 +354,7 @@ class GainRankEngine:
             return 50.0
         if avg_vol and avg_vol > 0:
             surge_ratio = curr_vol / avg_vol
-            return min(100.0, (surge_ratio - 1.0) * 50 + 50)   # 1x=50, 2x=100
+            return min(100.0, (surge_ratio - 1.0) * 50 + 50)  # 1x=50, 2x=100
         # Fallback: absolute volume score
         return min(100.0, (curr_vol / 1_000_000) * 10)
 
@@ -398,8 +405,7 @@ class GainRankEngine:
     def _momentum_score(self, df: pd.DataFrame, spot: float) -> float:
         """Score based on recent spot momentum (change_pct column or derived)."""
         chg_col = next(
-            (c for c in df.columns if c.lower() in ("change_pct", "pct_change", "spot_change", "change%")),
-            None
+            (c for c in df.columns if c.lower() in ("change_pct", "pct_change", "spot_change", "change%")), None
         )
         if chg_col is not None:
             momentum = df[chg_col].mean()
@@ -466,7 +472,8 @@ class GainRankEngine:
             "date": datetime.now().strftime("%Y-%m-%d"),
             "time": datetime.now().strftime("%H:%M:%S"),
             "predictions": ranked_df[["rank", "underlying", "gain_score", "expected_move_pct", "recommendation"]]
-                           .head(10).to_dict(orient="records"),
+            .head(10)
+            .to_dict(orient="records"),
         }
         self._rank_history.append(snapshot)
         # Keep last 90 days

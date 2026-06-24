@@ -9,8 +9,8 @@ Supported intervals: 1, 5, 15, 25, 60 (minutes), D (daily)
 History: up to 5 years (Dhan Data APIs plan)
 """
 
-import os
 import logging
+import os
 from datetime import date, timedelta
 from pathlib import Path
 from typing import List, Optional
@@ -34,8 +34,8 @@ _DHAN_EXCHANGE = "IDX_I"
 def _load_dhan():
     """Load Dhan client from env."""
     try:
-        from dhanhq import dhanhq
         import dotenv
+        from dhanhq import dhanhq
         dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
         token = os.environ.get("DHAN_ACCESS_TOKEN", "")
         client_id = os.environ.get("DHAN_CLIENT_ID", "")

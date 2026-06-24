@@ -91,6 +91,7 @@ def build_steps(fast: bool, deploy_only: bool) -> List[Tuple[str, List[str], int
     ]
     if not fast:
         from subprocess_helpers import playwright_test_cmd
+
         steps.append(("playwright", playwright_test_cmd(), 300))
     return steps
 

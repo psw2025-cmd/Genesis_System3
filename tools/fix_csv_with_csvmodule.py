@@ -3,9 +3,9 @@
 This is more robust than naive split(). It preserves quoting behavior.
 """
 
-from pathlib import Path
-import shutil
 import csv
+import shutil
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"

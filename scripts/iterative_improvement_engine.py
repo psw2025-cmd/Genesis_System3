@@ -3,14 +3,15 @@ Iterative Improvement Engine - World-Class Optimization
 Tests multiple improvements and finds the best configuration
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import json
-from typing import Dict, List, Tuple
 import itertools
+import json
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -4,12 +4,13 @@ System3 Phase 93 - Operator Override Engine
 Allow operator to define override rules and log what they would block.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

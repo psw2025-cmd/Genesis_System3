@@ -5,9 +5,10 @@ Combines synthetic and real training data.
 AUTO-UPDATE: DISABLED - Only builds preview, never auto-trains.
 """
 
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"

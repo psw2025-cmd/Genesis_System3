@@ -4,8 +4,9 @@ Quick test script to run the system for a short duration and capture output.
 
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

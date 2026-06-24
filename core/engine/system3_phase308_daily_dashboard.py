@@ -4,12 +4,13 @@ System3 Phase 308 - Daily PnL & Accuracy Dashboard Generator (Research View)
 Produces a single daily dashboard summarizing PnL-like metrics, accuracy, and confidence tiers.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

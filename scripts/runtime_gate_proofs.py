@@ -36,8 +36,8 @@ def _market_open(live_state: Optional[Dict[str, Any]]) -> bool:
     if live_state:
         return bool((live_state.get("market") or {}).get("is_open"))
     try:
-        from zoneinfo import ZoneInfo
         from datetime import datetime
+        from zoneinfo import ZoneInfo
 
         now = datetime.now(ZoneInfo("Asia/Kolkata"))
         if now.weekday() >= 5:
@@ -67,9 +67,7 @@ def ensure_runtime_proofs(
 
             OUT.mkdir(parents=True, exist_ok=True)
             report = build_report()
-            (OUT / "summary.json").write_text(
-                __import__("json").dumps(report, indent=2), encoding="utf-8"
-            )
+            (OUT / "summary.json").write_text(__import__("json").dumps(report, indent=2), encoding="utf-8")
             actions["friction_expectancy"] = "generated"
         except Exception as exc:
             actions["friction_expectancy"] = f"skip:{exc}"[:80]

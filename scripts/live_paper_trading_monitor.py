@@ -3,14 +3,15 @@ Live Paper Trading Monitor - Real-time Dashboard
 Shows streaming data fetch, paper trading activity, and performance metrics
 """
 
+import json
+import os
 import sys
 import time
-import os
-from pathlib import Path
 from datetime import datetime
-import pytz
+from pathlib import Path
+
 import pandas as pd
-import json
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

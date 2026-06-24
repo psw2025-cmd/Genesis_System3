@@ -11,12 +11,13 @@ This module enforces strict normalization across:
 After normalization, Phase 239 join should succeed with >30% enrichment.
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Tuple, Dict, Any
 import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Tuple
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent
 METRICS_DIR = PROJECT_ROOT / "storage" / "metrics"
@@ -272,9 +273,7 @@ def main():
 
     # Load datasets
     signals_path = Path(__file__).parent.parent.parent / "storage" / "live" / "forward" / "phase221_forward_returns.csv"
-    orders_path = (
-        Path(__file__).parent.parent.parent / "storage" / "live" / "healed" / "dhan_virtual_orders_healed.csv"
-    )
+    orders_path = Path(__file__).parent.parent.parent / "storage" / "live" / "healed" / "dhan_virtual_orders_healed.csv"
 
     if not signals_path.exists():
         print(f"❌ Signals not found: {signals_path}")

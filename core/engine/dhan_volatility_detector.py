@@ -4,9 +4,10 @@ Dhan Index Options - Real-Time Volatility Detection
 Detects volatility regimes and shocks in real-time market data.
 """
 
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
+import pandas as pd
 
 
 def detect_volatility_regime(df_signals: pd.DataFrame, window: int = 5) -> pd.DataFrame:

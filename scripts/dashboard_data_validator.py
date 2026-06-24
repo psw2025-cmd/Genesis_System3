@@ -4,15 +4,16 @@ Compares dashboard data with live internet sources (NSE, BSE, Dhan)
 Validates all data points and identifies discrepancies
 """
 
-import requests
 import json
 import time
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
 import pytz
-from dataclasses import dataclass, asdict
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

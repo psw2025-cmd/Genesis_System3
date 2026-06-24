@@ -101,7 +101,9 @@ def git_files() -> list[str]:
             return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
     except Exception:
         pass
-    return sorted(str(p.relative_to(ROOT)).replace(os.sep, "/") for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts)
+    return sorted(
+        str(p.relative_to(ROOT)).replace(os.sep, "/") for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts
+    )
 
 
 def is_protected(path: str) -> bool:
@@ -127,16 +129,24 @@ def classify_path(path: str) -> FileClassification:
         return FileClassification(path, "ARCHIVE", "generated proof/output/log artifact", protected)
 
     if any(lower.endswith(suffix) for suffix in GENERATED_PATTERNS):
-        return FileClassification(path, "REVIEW", "generated-looking suffix; verify not required before deletion", protected)
+        return FileClassification(
+            path, "REVIEW", "generated-looking suffix; verify not required before deletion", protected
+        )
 
     if any(hint in lower for hint in ARCHIVE_HINTS):
-        return FileClassification(path, "REVIEW", "archive/backup/duplicate naming hint; verify references before deletion", protected)
+        return FileClassification(
+            path, "REVIEW", "archive/backup/duplicate naming hint; verify references before deletion", protected
+        )
 
-    if lower.startswith("docs/") and ("final" in lower or "complete" in lower or "success" in lower or "phases_" in lower):
+    if lower.startswith("docs/") and (
+        "final" in lower or "complete" in lower or "success" in lower or "phases_" in lower
+    ):
         return FileClassification(path, "ARCHIVE", "historical documentation candidate", protected)
 
     if lower.startswith("scripts/"):
-        return FileClassification(path, "MERGE", "script should be merged behind global control plane if still useful", protected)
+        return FileClassification(
+            path, "MERGE", "script should be merged behind global control plane if still useful", protected
+        )
 
     if protected:
         return FileClassification(path, "KEEP", "protected runtime path", protected)
@@ -191,10 +201,7 @@ def cmd_classify(args: argparse.Namespace) -> int:
 
 def cmd_cleanup(args: argparse.Namespace) -> int:
     payload = build_inventory()
-    candidates = [
-        item for item in payload["files"]
-        if item["classification"] == "DELETE" and not item["protected"]
-    ]
+    candidates = [item for item in payload["files"] if item["classification"] == "DELETE" and not item["protected"]]
     result = {
         "generated_utc": utc_now(),
         "mode": "dry_run" if args.dry_run else "blocked_apply",
@@ -204,7 +211,11 @@ def cmd_cleanup(args: argparse.Namespace) -> int:
         "note": "Apply mode is intentionally blocked in this control plane. Delete via reviewed commit only.",
     }
     out = write_json("cleanup_dry_run.json", result)
-    print(json.dumps({"status": "OK", "output": str(out), "candidate_count": len(candidates), "apply_allowed": False}, indent=2))
+    print(
+        json.dumps(
+            {"status": "OK", "output": str(out), "candidate_count": len(candidates), "apply_allowed": False}, indent=2
+        )
+    )
     return 0
 
 
@@ -217,9 +228,7 @@ def cmd_proofs(args: argparse.Namespace) -> int:
     ]
     result = {
         "generated_utc": utc_now(),
-        "proofs": [
-            {"path": path, "exists": (ROOT / path).exists()} for path in proof_paths
-        ],
+        "proofs": [{"path": path, "exists": (ROOT / path).exists()} for path in proof_paths],
         "live_trading_allowed": False,
         "mode": "Analyzer/Paper only",
     }

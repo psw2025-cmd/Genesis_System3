@@ -18,10 +18,10 @@ Usage:
 Add to ~/.bashrc (already done) or system startup for automatic execution.
 """
 
-import sys
-import os
 import json
+import os
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -45,6 +45,7 @@ def _load_env() -> dict:
 def _token_status(token: str) -> dict:
     """Decode JWT token — no API needed."""
     import base64
+
     if not token:
         return {"valid": False, "reason": "no_token", "hours_remaining": -999}
     try:
@@ -86,11 +87,11 @@ def _start_daemon(script: str, log: str) -> int:
 def run_startup_check(status_only: bool = False) -> dict:
     env = _load_env()
     token = env.get("DHAN_ACCESS_TOKEN", "")
-    has_pin  = bool(env.get("DHAN_PIN", "").strip())
+    has_pin = bool(env.get("DHAN_PIN", "").strip())
     has_totp = bool(env.get("DHAN_TOTP_SECRET", "").strip())
 
     status = _token_status(token)
-    hours  = status.get("hours_remaining", -999)
+    hours = status.get("hours_remaining", -999)
 
     print("\n╔═══════════════════════════════════════════╗")
     print("║   DHAN STARTUP CHECK — Genesis System3    ║")
@@ -118,8 +119,10 @@ def run_startup_check(status_only: bool = False) -> dict:
 
         try:
             from dotenv import load_dotenv
+
             load_dotenv(ROOT / ".secrets" / "dhan.env", override=True)
             from core.brokers.dhan.token_manager import refresh_token
+
             result = refresh_token()
             if result.get("success"):
                 print(f"  ✅ Token refreshed via {result['strategy']} — expires {result.get('expires_at','?')}")
@@ -168,6 +171,7 @@ def run_startup_check(status_only: bool = False) -> dict:
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="Dhan Startup Safety Check")
     parser.add_argument("--status", action="store_true", help="Status only, no auto-fix")
     args = parser.parse_args()

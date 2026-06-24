@@ -9,13 +9,14 @@ References:
 - Phase 221: system3_phase221_forward_returns.py (data source)
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

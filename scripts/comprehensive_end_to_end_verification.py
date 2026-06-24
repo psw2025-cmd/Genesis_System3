@@ -8,16 +8,17 @@ Comprehensive End-to-End Verification
 - Parallel processing verification
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
 import json
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+from pathlib import Path
 
 try:
-    import pytz
     import pandas as pd
+    import pytz
+
     _NUMERIC_AVAILABLE = True
 except ImportError:
     pytz = None
@@ -32,16 +33,17 @@ try:
     from core.utils.logger import logger
 except ImportError:
     import logging
+
     logger = logging.getLogger(__name__)
 
 _SCRIPT_DISABLED_REASON = (
     "comprehensive_end_to_end_verification: Dhan broker path is disabled. "
     "System3 is Dhan-only. This script cannot run live data verification."
 )
-from src.validation.qc_validator import QCValidator
+from core.utils.option_chain_calculations import add_calculated_columns
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
-from core.utils.option_chain_calculations import add_calculated_columns
+from src.validation.qc_validator import QCValidator
 
 # All indices to verify
 ALL_INDICES = [

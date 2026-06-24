@@ -4,20 +4,26 @@ System3 Phase 236 - Virtual Execution Engine
 Convert signals + thresholds into virtual orders and log them.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from typing import List, Dict, Any
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.utils.logger import logger
+
 from .order_models import PlannedOrder, RiskDecision
-from .risk_guard import check_per_trade_limits, check_daily_limits, apply_global_safety_flags
+from .risk_guard import (
+    apply_global_safety_flags,
+    check_daily_limits,
+    check_per_trade_limits,
+)
 
 LOG_DIR = PROJECT_ROOT / "logs" / "execution"
 LOG_DIR.mkdir(parents=True, exist_ok=True)

@@ -4,9 +4,10 @@ Tests how the code handles various write scenarios
 """
 
 import sys
-from pathlib import Path
-import pandas as pd
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

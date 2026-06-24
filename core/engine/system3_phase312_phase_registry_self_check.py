@@ -4,14 +4,14 @@ System3 Phase 312 - Phase Registry Self-Check
 Validates phase registry vs actual code implementations and logging.
 """
 
-import sys
-import json
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Set
-import logging
 import ast
 import importlib.util
+import json
+import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Set
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

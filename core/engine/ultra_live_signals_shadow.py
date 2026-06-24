@@ -11,7 +11,7 @@ The original 237-line implementation is preserved in git history.
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -20,8 +20,7 @@ ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 _DISABLED_REASON = (
-    "ultra_live_signals_shadow is disabled. System3 is Dhan-only. "
-    "Dhan broker path is not operational."
+    "ultra_live_signals_shadow is disabled. System3 is Dhan-only. " "Dhan broker path is not operational."
 )
 
 

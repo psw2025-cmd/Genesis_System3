@@ -48,7 +48,7 @@ LOT_SIZES = {"NIFTY": 75, "BANKNIFTY": 30, "FINNIFTY": 40, "MIDCPNIFTY": 75}
 # B2 gates
 PF_GATE = 1.20
 MAX_RISK_PER_TRADE_RUPEES = 2000.0
-NEAR_ATM_PCT = 3.0           # only trade strikes within 3% of spot
+NEAR_ATM_PCT = 3.0  # only trade strikes within 3% of spot
 PHANTOM_EXTRINSIC_PCT = 0.05  # extrinsic > 5% of spot = phantom (3% if far OTM)
 MIN_PREMIUM = 10.0
 
@@ -83,9 +83,12 @@ def compute_cost(entry_price, exit_price, symbol, qty):
     total_costs = brokerage + stt + exc + gst + sebi + entry_slip + exit_slip
     net_pnl = gross_pnl - total_costs
     return {
-        "lots": lots, "contracts": contracts,
-        "entry_value": round(entry_value, 2), "exit_value": round(exit_value, 2),
-        "gross_pnl": round(gross_pnl, 2), "total_costs": round(total_costs, 2),
+        "lots": lots,
+        "contracts": contracts,
+        "entry_value": round(entry_value, 2),
+        "exit_value": round(exit_value, 2),
+        "gross_pnl": round(gross_pnl, 2),
+        "total_costs": round(total_costs, 2),
         "net_pnl": round(net_pnl, 2),
     }
 
@@ -114,15 +117,18 @@ def load_bhavcopy(csv_path):
                 if ot not in ("CE", "PE"):
                     continue
                 try:
-                    rows.append({
-                        "symbol": sym, "option_type": ot,
-                        "strike": float(r.get(strike_c, 0) or 0),
-                        "close": float(r.get(close_c, 0) or 0),
-                        "oi": int(float(r.get(oi_c, 0) or 0)),
-                        "oi_chg": int(float(r.get(chg_c, 0) or 0)),
-                        "expiry": str(r.get(exp_c, "")).strip(),
-                        "spot": float(r.get(und_c, 0) or 0) if und_c else 0.0,
-                    })
+                    rows.append(
+                        {
+                            "symbol": sym,
+                            "option_type": ot,
+                            "strike": float(r.get(strike_c, 0) or 0),
+                            "close": float(r.get(close_c, 0) or 0),
+                            "oi": int(float(r.get(oi_c, 0) or 0)),
+                            "oi_chg": int(float(r.get(chg_c, 0) or 0)),
+                            "expiry": str(r.get(exp_c, "")).strip(),
+                            "spot": float(r.get(und_c, 0) or 0) if und_c else 0.0,
+                        }
+                    )
                 except (ValueError, TypeError):
                     continue
     except Exception as e:
@@ -150,9 +156,13 @@ def run():
     proof_id = f"PF_GATED_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     files = sorted(BHAVCOPY_DIR.glob("*_fo_bhavcopy.csv"))
     if len(files) < 2:
-        result = {"proof_id": proof_id, "status": "FAIL", "pass": False,
-                  "reason": f"Need >=2 bhavcopy files, found {len(files)}",
-                  "hint": "Run scripts/bhavcopy_downloader.py on laptop first"}
+        result = {
+            "proof_id": proof_id,
+            "status": "FAIL",
+            "pass": False,
+            "reason": f"Need >=2 bhavcopy files, found {len(files)}",
+            "hint": "Run scripts/bhavcopy_downloader.py on laptop first",
+        }
         (OUT / "pf_gated_backtest.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         return result
@@ -199,27 +209,45 @@ def run():
                 skipped_risk += 1
                 continue
             # Match on day 1
-            m = [r for r in d1["rows"] if r["symbol"] == symbol and r["option_type"] == "CE"
-                 and abs(r["strike"] - signal["strike"]) < 0.01 and r["expiry"] == signal["expiry"]]
+            m = [
+                r
+                for r in d1["rows"]
+                if r["symbol"] == symbol
+                and r["option_type"] == "CE"
+                and abs(r["strike"] - signal["strike"]) < 0.01
+                and r["expiry"] == signal["expiry"]
+            ]
             if not m:
                 continue
             exit_row = m[0]
             if exit_row["close"] <= 0 or signal["close"] <= 0:
                 continue
             cd = compute_cost(signal["close"], exit_row["close"], symbol, lot)
-            trades.append({
-                "symbol": symbol, "strike": signal["strike"], "expiry": signal["expiry"],
-                "entry_date": d0["date"], "exit_date": d1["date"],
-                "entry_price": round(signal["close"], 2), "exit_price": round(exit_row["close"], 2),
-                "spot_at_entry": round(spot, 1),
-                "gross_pnl": cd["gross_pnl"], "net_pnl": cd["net_pnl"],
-            })
+            trades.append(
+                {
+                    "symbol": symbol,
+                    "strike": signal["strike"],
+                    "expiry": signal["expiry"],
+                    "entry_date": d0["date"],
+                    "exit_date": d1["date"],
+                    "entry_price": round(signal["close"], 2),
+                    "exit_price": round(exit_row["close"], 2),
+                    "spot_at_entry": round(spot, 1),
+                    "gross_pnl": cd["gross_pnl"],
+                    "net_pnl": cd["net_pnl"],
+                }
+            )
 
     if not trades:
-        result = {"proof_id": proof_id, "status": "FAIL", "pass": False,
-                  "reason": "0 trades after near-ATM + phantom + risk filters",
-                  "dropped_phantom": dropped_phantom, "skipped_far_otm": skipped_far,
-                  "skipped_over_risk": skipped_risk}
+        result = {
+            "proof_id": proof_id,
+            "status": "FAIL",
+            "pass": False,
+            "reason": "0 trades after near-ATM + phantom + risk filters",
+            "dropped_phantom": dropped_phantom,
+            "skipped_far_otm": skipped_far,
+            "skipped_over_risk": skipped_risk,
+        }
         (OUT / "pf_gated_backtest.json").write_text(json.dumps(result, indent=2))
         print(json.dumps(result, indent=2))
         return result
@@ -235,7 +263,8 @@ def run():
     backtest_pass = pf >= PF_GATE and net > 0
 
     proof = {
-        "proof_id": proof_id, "started": started,
+        "proof_id": proof_id,
+        "started": started,
         "completed": datetime.now(timezone.utc).isoformat(),
         "backtest_pass": backtest_pass,
         "pass": backtest_pass,
@@ -243,7 +272,8 @@ def run():
         "profit_factor": round(pf, 3) if pf != float("inf") else 999.0,
         "pf_gate": PF_GATE,
         "trade_count": len(trades),
-        "win_count": len(wins), "loss_count": len(losses),
+        "win_count": len(wins),
+        "loss_count": len(losses),
         "win_rate_pct": round(win_rate, 1),
         "total_net_pnl": round(net, 2),
         "gross_profit": round(gross_profit, 2),
@@ -262,8 +292,10 @@ def run():
         "bhavcopy_days": [d["date"] for d in daily],
         "live_trading_enabled": False,
         "strategy": "near-ATM CE, OI-change ranked, next-day exit (B2 PF-gated honest backtest)",
-        "note": ("backtest_pass=True requires PF>=1.20 AND net>0 after full costs. "
-                 "This is a real profitability gate, NOT a pipeline-correctness check."),
+        "note": (
+            "backtest_pass=True requires PF>=1.20 AND net>0 after full costs. "
+            "This is a real profitability gate, NOT a pipeline-correctness check."
+        ),
         "trades": trades[:30],
     }
     (OUT / "pf_gated_backtest.json").write_text(json.dumps(proof, indent=2), encoding="utf-8")

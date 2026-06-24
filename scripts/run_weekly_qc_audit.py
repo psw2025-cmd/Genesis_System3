@@ -6,8 +6,8 @@ Creates proof/archive/qc_audit_YYYYMMDD.json and qc_audit_YYYYMMDD_summary.txt.
 import json
 import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PROOF_DIR = ROOT / "proof"

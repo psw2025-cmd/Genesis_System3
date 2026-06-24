@@ -162,9 +162,9 @@ def build_broker_truth_report() -> Dict[str, Any]:
 
     valid_count = sum(1 for f in trader_fields.values() if f.get("valid"))
     total_count = len(trader_fields)
-    all_apis_ok = all(
-        r.get("success") for r in (holdings_resp, positions_resp, funds_resp)
-    ) if broker_connected else False
+    all_apis_ok = (
+        all(r.get("success") for r in (holdings_resp, positions_resp, funds_resp)) if broker_connected else False
+    )
 
     if not broker_connected:
         overall = "BROKER_OFFLINE"
@@ -216,7 +216,9 @@ def build_broker_truth_report() -> Dict[str, Any]:
             "rows": positions_norm,
             "raw_rows": positions_raw,
         },
-        "data_source": "DHAN_BROKER_READONLY" if broker_connected and all_apis_ok else (
-            "BROKER_PARTIAL" if broker_connected else "BROKER_OFFLINE"
+        "data_source": (
+            "DHAN_BROKER_READONLY"
+            if broker_connected and all_apis_ok
+            else ("BROKER_PARTIAL" if broker_connected else "BROKER_OFFLINE")
         ),
     }

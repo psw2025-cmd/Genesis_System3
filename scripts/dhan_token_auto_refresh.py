@@ -10,17 +10,25 @@ Usage:
   python scripts/dhan_token_auto_refresh.py --verify # verify current token and exit
 """
 
-import sys, os, time, argparse, json
+import argparse
+import json
+import os
+import sys
+import time
 from datetime import datetime, timedelta
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
 
-from core.brokers.dhan.token_manager import refresh_token, verify_token, consume_oauth_token
+from core.brokers.dhan.token_manager import (
+    consume_oauth_token,
+    refresh_token,
+    verify_token,
+)
 
-REFRESH_HOUR   = 8
+REFRESH_HOUR = 8
 REFRESH_MINUTE = 30
-RETRY_DELAY_S  = 300   # retry every 5 min if first attempt fails
+RETRY_DELAY_S = 300  # retry every 5 min if first attempt fails
 
 
 def seconds_until_next_refresh() -> float:
@@ -46,7 +54,9 @@ def run_daemon():
         print(f"[TokenDaemon] Token INVALID ({v.get('reason')}) — refreshing now...")
         result = refresh_token()
         if result["success"]:
-            print(f"[TokenDaemon] Refreshed via {result['strategy']} — {result['token_preview']} expires {result.get('expires_at','?')}")
+            print(
+                f"[TokenDaemon] Refreshed via {result['strategy']} — {result['token_preview']} expires {result.get('expires_at','?')}"
+            )
         else:
             print(f"[TokenDaemon] FAILED: {result['message']}")
 
@@ -73,10 +83,10 @@ def run_daemon():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Dhan Token Auto-Refresh Daemon")
-    parser.add_argument("--now",     action="store_true", help="Refresh immediately and exit")
-    parser.add_argument("--verify",  action="store_true", help="Verify current token and exit")
-    parser.add_argument("--oauth",   action="store_true", help="Show OAuth consent URL (manual browser login)")
-    parser.add_argument("--consume", metavar="TOKEN_ID",  help="Consume tokenId from OAuth browser redirect")
+    parser.add_argument("--now", action="store_true", help="Refresh immediately and exit")
+    parser.add_argument("--verify", action="store_true", help="Verify current token and exit")
+    parser.add_argument("--oauth", action="store_true", help="Show OAuth consent URL (manual browser login)")
+    parser.add_argument("--consume", metavar="TOKEN_ID", help="Consume tokenId from OAuth browser redirect")
     args = parser.parse_args()
 
     if args.consume:
@@ -90,6 +100,7 @@ if __name__ == "__main__":
         print(json.dumps(r, indent=2))
     elif args.oauth:
         from core.brokers.dhan.token_manager import refresh_token as _rt
+
         r = _rt(force_oauth=True)
         print(json.dumps(r, indent=2))
     else:

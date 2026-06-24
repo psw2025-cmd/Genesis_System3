@@ -21,11 +21,10 @@ import json
 import os
 import re
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
-
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest"
@@ -35,18 +34,22 @@ SECRET_PATTERNS = [
     # Matches hardcoded credential values on a SINGLE LINE only ([ \t]* prevents cross-line match).
     # Negative lookahead excludes: module attribute access (os., environ., pyotp., etc.),
     # function calls with lowercase names (get(, strip(, etc.), and well-known safe patterns.
-    re.compile(r"(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)[ \t]*[:=][ \t]*(?!pyotp\.|sys\.|step_|totp\.|now\(|os\.|environ\.|[a-z_]+\.[a-z_]|[a-z_]+\()['\"]?[A-Za-z0-9_./+=@:-]{8,}"),
+    re.compile(
+        r"(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)[ \t]*[:=][ \t]*(?!pyotp\.|sys\.|step_|totp\.|now\(|os\.|environ\.|[a-z_]+\.[a-z_]|[a-z_]+\()['\"]?[A-Za-z0-9_./+=@:-]{8,}"
+    ),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PRIVATE )?PRIVATE KEY-----"),
     re.compile(r"(?i)dhanhq.*(?:password|pin|totp|secret)"),
 ]
 
 # Files where pattern matches are always false-positives (templates, compiled output, docs, self)
-_SCAN_SKIP_EXACT = frozenset({
-    "scripts/system3_master_proof_orchestrator.py",  # self-referential pattern definitions
-})
+_SCAN_SKIP_EXACT = frozenset(
+    {
+        "scripts/system3_master_proof_orchestrator.py",  # self-referential pattern definitions
+    }
+)
 _SCAN_SKIP_PREFIXES = (
-    "docs/",                      # documentation — not executable credentials
-    "dashboard/frontend/dist/",   # compiled/minified frontend bundle
+    "docs/",  # documentation — not executable credentials
+    "dashboard/frontend/dist/",  # compiled/minified frontend bundle
 )
 
 SECRET_FILENAME_RE = re.compile(
@@ -64,8 +67,24 @@ GENERATED_DIR_MARKERS = (
 )
 
 TEXT_FILE_SUFFIXES = {
-    ".py", ".yml", ".yaml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg",
-    ".env", ".sh", ".ps1", ".tsx", ".ts", ".js", ".jsx", ".html", ".css",
+    ".py",
+    ".yml",
+    ".yaml",
+    ".json",
+    ".md",
+    ".txt",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".env",
+    ".sh",
+    ".ps1",
+    ".tsx",
+    ".ts",
+    ".js",
+    ".jsx",
+    ".html",
+    ".css",
 }
 
 
@@ -121,6 +140,7 @@ def list_tracked_files() -> list[str]:
     if git_dir.exists():
         try:
             import subprocess
+
             out = subprocess.check_output(["git", "ls-files"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
             return sorted(p.strip() for p in out.splitlines() if p.strip())
         except Exception:
@@ -175,7 +195,8 @@ def detect_secret_files(files: Iterable[str]) -> list[str]:
     # Exclude: .example templates, generated report artifacts (reports/latest/ contains
     # gate names like "safety_and_secrets" that match secret filename patterns).
     return sorted(
-        f for f in files
+        f
+        for f in files
         if SECRET_FILENAME_RE.search(f)
         and not f.endswith(".example")
         and not any(f.startswith(pfx) for pfx in GENERATED_DIR_MARKERS)
@@ -219,7 +240,9 @@ def render_yaml_safety() -> dict[str, Any]:
     return {
         "render_yaml_exists": file_exists("render.yaml"),
         "mentions_live_trading_enabled": "LIVE_TRADING_ENABLED" in text,
-        "live_trading_default_zero_or_false": bool(re.search(r"LIVE_TRADING_ENABLED[^\\n]*(?:\"0\"|'0'|0|false|False)", text)),
+        "live_trading_default_zero_or_false": bool(
+            re.search(r"LIVE_TRADING_ENABLED[^\\n]*(?:\"0\"|'0'|0|false|False)", text)
+        ),
         "mentions_system3_mode": "SYSTEM3_MODE" in text or "ANALYZE_MODE" in text,
         "mentions_public_backend_url": "PUBLIC_BACKEND_URL" in text,
     }
@@ -274,12 +297,18 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
 def gate_repo_authority(files: list[str]) -> GateResult:
     categories = {
         "backend_entrypoints": ["dashboard/backend/app.py", "dashboard/backend/Dockerfile", "render.yaml"],
-        "frontend_entrypoints": ["dashboard/frontend/package.json", "dashboard/frontend/src/App.tsx", "dashboard/frontend/src/main.tsx"],
+        "frontend_entrypoints": [
+            "dashboard/frontend/package.json",
+            "dashboard/frontend/src/App.tsx",
+            "dashboard/frontend/src/main.tsx",
+        ],
         "runtime_launchers": ["run_system3.py", "system3_ultra.py", "system3_autorun_master.py"],
         "broker_modules": scan_text_for_terms(files, ["angel", "broker", "binance"], 200),
         "model_modules": scan_text_for_terms(files, ["model", "train", "predict", "kronos", "wavelet", "xgboost"], 200),
         "backtest_modules": scan_text_for_terms(files, ["backtest", "walk", "strategy", "pnl", "performance"], 200),
-        "paper_lifecycle_modules": scan_text_for_terms(files, ["paper", "analyzer", "sandbox", "order", "trade", "position"], 200),
+        "paper_lifecycle_modules": scan_text_for_terms(
+            files, ["paper", "analyzer", "sandbox", "order", "trade", "position"], 200
+        ),
         "dashboard_files": [f for f in files if f.startswith("dashboard/")][:500],
     }
 
@@ -290,7 +319,8 @@ def gate_repo_authority(files: list[str]) -> GateResult:
             continue
         duplicate_basenames.setdefault(name, []).append(f)
     duplicate_candidates = {
-        name: paths for name, paths in duplicate_basenames.items()
+        name: paths
+        for name, paths in duplicate_basenames.items()
         if len(paths) > 1 and any(not p.startswith(GENERATED_DIR_MARKERS) for p in paths)
     }
 
@@ -341,7 +371,14 @@ def endpoint_check(url: str, timeout: float = 12.0) -> dict[str, Any]:
             body = exc.read(800).decode("utf-8", errors="replace")
         except Exception:
             pass
-        return {"url": url, "checked_utc": started, "ok": False, "status": exc.code, "error": repr(exc), "snippet": body[:800]}
+        return {
+            "url": url,
+            "checked_utc": started,
+            "ok": False,
+            "status": exc.code,
+            "error": repr(exc),
+            "snippet": body[:800],
+        }
     except Exception as exc:
         return {"url": url, "checked_utc": started, "ok": False, "status": None, "error": repr(exc), "snippet": ""}
 
@@ -404,8 +441,31 @@ def gate_deployment_endpoint() -> GateResult:
 
 
 def gate_data_automation(files: list[str]) -> GateResult:
-    data_candidates = scan_text_for_terms(files, ["data", "histor", "ohlc", "candle", "option", "chain", "nse", "bse", "angel", "binance", "duckdb", "sqlite", "parquet", "csv"], 500)
-    dhan_candidates = [f for f in data_candidates if "angel" in f.lower() or "nse" in f.lower() or "bse" in f.lower() or "option" in f.lower()]
+    data_candidates = scan_text_for_terms(
+        files,
+        [
+            "data",
+            "histor",
+            "ohlc",
+            "candle",
+            "option",
+            "chain",
+            "nse",
+            "bse",
+            "angel",
+            "binance",
+            "duckdb",
+            "sqlite",
+            "parquet",
+            "csv",
+        ],
+        500,
+    )
+    dhan_candidates = [
+        f
+        for f in data_candidates
+        if "angel" in f.lower() or "nse" in f.lower() or "bse" in f.lower() or "option" in f.lower()
+    ]
     binance_candidates = [f for f in data_candidates if "binance" in f.lower() or "crypto" in f.lower()]
 
     yahoo = load_json("reports/latest/external_data_yahoo/yahoo_data_summary.json")
@@ -458,7 +518,25 @@ def py_compile_file(path: str) -> dict[str, Any]:
 
 
 def gate_model_training_load(files: list[str]) -> GateResult:
-    candidates = scan_text_for_terms(files, ["model", "train", "retrain", "predict", "accuracy", "calibrat", "drift", "shadow", "kronos", "wavelet", "xgboost", "lightgbm", "catboost"], 500)
+    candidates = scan_text_for_terms(
+        files,
+        [
+            "model",
+            "train",
+            "retrain",
+            "predict",
+            "accuracy",
+            "calibrat",
+            "drift",
+            "shadow",
+            "kronos",
+            "wavelet",
+            "xgboost",
+            "lightgbm",
+            "catboost",
+        ],
+        500,
+    )
     likely_runtime = [
         "src/ml/ensemble_predictor.py",
         "core/engine/dhan_model_selector.py",
@@ -510,7 +588,11 @@ def gate_model_training_load(files: list[str]) -> GateResult:
 
 
 def gate_backtest_walkforward(files: list[str]) -> GateResult:
-    candidates = scan_text_for_terms(files, ["backtest", "walk", "forward", "strategy", "pnl", "performance", "validation", "slippage", "charges"], 500)
+    candidates = scan_text_for_terms(
+        files,
+        ["backtest", "walk", "forward", "strategy", "pnl", "performance", "validation", "slippage", "charges"],
+        500,
+    )
     likely_runtime = ["dashboard/backend/backtesting.py"]
     compile_results = [py_compile_file(p) for p in likely_runtime if file_exists(p)]
     compile_failures = [r for r in compile_results if not r.get("compile_pass")]
@@ -554,16 +636,31 @@ def gate_backtest_walkforward(files: list[str]) -> GateResult:
 
 
 def gate_paper_lifecycle(files: list[str]) -> GateResult:
-    candidates = scan_text_for_terms(files, ["paper", "analyzer", "sandbox", "order", "trade", "position", "lifecycle", "fill"], 500)
+    candidates = scan_text_for_terms(
+        files, ["paper", "analyzer", "sandbox", "order", "trade", "position", "lifecycle", "fill"], 500
+    )
     lifecycle_reports = [
-        f for f in files
-        if ("lifecycle" in f.lower() or "paper" in f.lower()) and f.startswith("reports/")
+        f for f in files if ("lifecycle" in f.lower() or "paper" in f.lower()) and f.startswith("reports/")
     ]
 
     required_fields = [
-        "signal_id", "symbol", "instrument_token", "expiry", "strike", "option_type",
-        "entry_time", "entry_price", "qty", "order_id", "fill_status",
-        "exit_time", "exit_price", "charges", "gross_pnl", "net_pnl", "proof_status",
+        "signal_id",
+        "symbol",
+        "instrument_token",
+        "expiry",
+        "strike",
+        "option_type",
+        "entry_time",
+        "entry_price",
+        "qty",
+        "order_id",
+        "fill_status",
+        "exit_time",
+        "exit_price",
+        "charges",
+        "gross_pnl",
+        "net_pnl",
+        "proof_status",
     ]
 
     # Read external lifecycle proof (written by scripts/paper_lifecycle_proof.py)
@@ -733,12 +830,27 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
         "gates": [g.to_json() for g in gates],
         "readiness_ladder": {
             "REPO_SAFE": any(g.gate == "safety_and_secrets" and g.pass_ for g in gates),
-            "DEPLOYMENT_ENDPOINTS_PROVEN": any(g.gate == "deployment_and_endpoint_proof" and g.pass_ and not g.warnings for g in gates),
-            "FRESH_DATA_PROVEN": any(g.gate == "fresh_data_automation_proof" and g.evidence.get("fallback_yahoo_report_present") for g in gates),
-            "MODEL_LOAD_TRAINING_PROVEN": any(g.gate == "model_training_load_proof" and g.evidence.get("fresh_training_metrics_proven") for g in gates),
-            "RECENT_BACKTEST_PROVEN": any(g.gate == "recent_backtest_walkforward_proof" and g.evidence.get("recent_costed_walkforward_proven") for g in gates),
-            "ANALYZER_PAPER_LIFECYCLE_PROVEN": any(g.gate == "analyzer_paper_lifecycle_proof" and g.evidence.get("full_lifecycle_proven") for g in gates),
-            "DASHBOARD_TRUTH_PROVEN": any(g.gate == "dashboard_truth_proof" and g.evidence.get("dashboard_endpoint_coverage_report_present") for g in gates),
+            "DEPLOYMENT_ENDPOINTS_PROVEN": any(
+                g.gate == "deployment_and_endpoint_proof" and g.pass_ and not g.warnings for g in gates
+            ),
+            "FRESH_DATA_PROVEN": any(
+                g.gate == "fresh_data_automation_proof" and g.evidence.get("fallback_yahoo_report_present")
+                for g in gates
+            ),
+            "MODEL_LOAD_TRAINING_PROVEN": any(
+                g.gate == "model_training_load_proof" and g.evidence.get("fresh_training_metrics_proven") for g in gates
+            ),
+            "RECENT_BACKTEST_PROVEN": any(
+                g.gate == "recent_backtest_walkforward_proof" and g.evidence.get("recent_costed_walkforward_proven")
+                for g in gates
+            ),
+            "ANALYZER_PAPER_LIFECYCLE_PROVEN": any(
+                g.gate == "analyzer_paper_lifecycle_proof" and g.evidence.get("full_lifecycle_proven") for g in gates
+            ),
+            "DASHBOARD_TRUTH_PROVEN": any(
+                g.gate == "dashboard_truth_proof" and g.evidence.get("dashboard_endpoint_coverage_report_present")
+                for g in gates
+            ),
             "MULTI_DAY_STABILITY_PROVEN": False,
             "LIVE_READY_PENDING_HUMAN_ENABLEMENT": False,
         },
@@ -757,15 +869,17 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
     # Backwards-compatible proof status matrix used by existing docs.
     matrix_rows = []
     for g in gates:
-        matrix_rows.append({
-            "name": g.gate,
-            "status": g.status,
-            "pass": g.pass_,
-            "required": True,
-            "path": f"reports/latest/{g.gate}/summary.json",
-            "blockers": g.blockers,
-            "warnings": g.warnings,
-        })
+        matrix_rows.append(
+            {
+                "name": g.gate,
+                "status": g.status,
+                "pass": g.pass_,
+                "required": True,
+                "path": f"reports/latest/{g.gate}/summary.json",
+                "blockers": g.blockers,
+                "warnings": g.warnings,
+            }
+        )
     matrix = {
         "generated_utc": utc_now(),
         "published_count": len(matrix_rows),
@@ -834,7 +948,8 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
 
     pipeline = {
         "generated_utc": utc_now(),
-        "runtime_backend_present": file_exists("dashboard/backend/app.py") and file_exists("dashboard/backend/Dockerfile"),
+        "runtime_backend_present": file_exists("dashboard/backend/app.py")
+        and file_exists("dashboard/backend/Dockerfile"),
         "render_live_trading_disabled": render_yaml_safety()["live_trading_default_zero_or_false"],
         "dhanhq_dependency_present": "dhanhq" in read_text("dashboard/backend/requirements.txt").lower(),
         "logzero_dependency_present": "logzero" in read_text("dashboard/backend/requirements.txt").lower(),
@@ -843,7 +958,11 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
         "proven_backtest_recent": _proven_backtest,
         "proven_dashboard_full_ui_live": _proven_dashboard,
         "trade_ready": False,
-        "verdict": "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR" if _pipeline_blockers else "ANALYZER_READY_ALL_PIPELINE_GATES_PASS",
+        "verdict": (
+            "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR"
+            if _pipeline_blockers
+            else "ANALYZER_READY_ALL_PIPELINE_GATES_PASS"
+        ),
         "blockers": _pipeline_blockers,
         "master_control_plane_verdict": verdict,
         "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
@@ -872,26 +991,28 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
         status_lines.append(f"| `{g.gate}` | `{g.status}` | `{g.pass_}` |")
     status_lines.extend(["", "## Open blockers", ""])
     status_lines.extend([f"- `{b}`" for b in blockers] or ["- None"])
-    status_lines.extend([
-        "",
-        "## Operating rule",
-        "",
-        "- Analyzer/Paper mode only.",
-        "- Live trading remains disabled.",
-        "- Do not commit private keys, broker credentials, `.env`, OTP, TOTP, PIN, or passwords.",
-        "- Auto-fix may repair safe proof/report/config issues only; it must not bypass broker login, secrets, live trading safety, or unknown position-state blocks.",
-        "",
-        "## Next automatic work queue",
-        "",
-        "1. Keep this master control-plane workflow scheduled and green.",
-        "2. Run secure fresh broker data proof in broker-enabled runtime.",
-        "3. Run model-load/training proof with metrics.",
-        "4. Run recent backtest/walk-forward proof with costs/slippage.",
-        "5. Run analyzer paper lifecycle proof: signal → order → fill/sim-fill → exit → P&L.",
-        "6. Run dashboard API/browser truth proof.",
-        "7. Accumulate multi-day stability before any live enablement checklist.",
-        "",
-    ])
+    status_lines.extend(
+        [
+            "",
+            "## Operating rule",
+            "",
+            "- Analyzer/Paper mode only.",
+            "- Live trading remains disabled.",
+            "- Do not commit private keys, broker credentials, `.env`, OTP, TOTP, PIN, or passwords.",
+            "- Auto-fix may repair safe proof/report/config issues only; it must not bypass broker login, secrets, live trading safety, or unknown position-state blocks.",
+            "",
+            "## Next automatic work queue",
+            "",
+            "1. Keep this master control-plane workflow scheduled and green.",
+            "2. Run secure fresh broker data proof in broker-enabled runtime.",
+            "3. Run model-load/training proof with metrics.",
+            "4. Run recent backtest/walk-forward proof with costs/slippage.",
+            "5. Run analyzer paper lifecycle proof: signal → order → fill/sim-fill → exit → P&L.",
+            "6. Run dashboard API/browser truth proof.",
+            "7. Accumulate multi-day stability before any live enablement checklist.",
+            "",
+        ]
+    )
     write_text(CONTROL / "SYSTEM3_MASTER_STATUS.md", "\n".join(status_lines))
 
     return summary
@@ -984,7 +1105,11 @@ def publish_blocker_autorecovery(summary: dict[str, Any], gates: list[GateResult
 
 def run() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--auto-fix", action="store_true", help="Regenerate proof reports and status files; never touches live trading/secrets.")
+    parser.add_argument(
+        "--auto-fix",
+        action="store_true",
+        help="Regenerate proof reports and status files; never touches live trading/secrets.",
+    )
     parser.add_argument("--strict", action="store_true", help="Return nonzero when a safety/secrets gate fails.")
     args = parser.parse_args()
 
@@ -1009,23 +1134,29 @@ def run() -> int:
     summary = publish_consolidated(gates)
     publish_blocker_autorecovery(summary, gates)
 
-    print(json.dumps({
-        "generated_utc": summary["generated_utc"],
-        "verdict": summary["verdict"],
-        "trade_ready": summary["trade_ready"],
-        "live_trading_enabled": summary["live_trading_enabled"],
-        "gate_count": summary["gate_count"],
-        "pass_count": summary["pass_count"],
-        "fail_count": summary["fail_count"],
-        "warning_count": summary["warning_count"],
-        "blocker_count": len(summary["blockers"]),
-        "reports": [
-            "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
-            "reports/latest/proof_status_matrix/proof_status_matrix.json",
-            "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
-            "docs/project_control/SYSTEM3_MASTER_STATUS.md",
-        ],
-    }, indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "generated_utc": summary["generated_utc"],
+                "verdict": summary["verdict"],
+                "trade_ready": summary["trade_ready"],
+                "live_trading_enabled": summary["live_trading_enabled"],
+                "gate_count": summary["gate_count"],
+                "pass_count": summary["pass_count"],
+                "fail_count": summary["fail_count"],
+                "warning_count": summary["warning_count"],
+                "blocker_count": len(summary["blockers"]),
+                "reports": [
+                    "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+                    "reports/latest/proof_status_matrix/proof_status_matrix.json",
+                    "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
+                    "docs/project_control/SYSTEM3_MASTER_STATUS.md",
+                ],
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
     if args.strict and any(g.gate == "safety_and_secrets" and not g.pass_ for g in gates):
         return 2

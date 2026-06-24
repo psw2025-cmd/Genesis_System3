@@ -22,10 +22,34 @@ def test_compute_gain_from_change_percent():
 
 def test_scan_segment_finds_top_ce_and_pe():
     contracts = [
-        {"option_type": "CE", "strike": 24000, "ltp": 120, "previous_close_price": 100, "trading_symbol": "NIFTY05FEB2624000CE"},
-        {"option_type": "CE", "strike": 24100, "ltp": 55, "previous_close_price": 50, "trading_symbol": "NIFTY05FEB2624100CE"},
-        {"option_type": "PE", "strike": 23900, "ltp": 88, "previous_close_price": 80, "trading_symbol": "NIFTY05FEB2623900PE"},
-        {"option_type": "PE", "strike": 23800, "ltp": 30, "previous_close_price": 25, "trading_symbol": "NIFTY05FEB2623800PE"},
+        {
+            "option_type": "CE",
+            "strike": 24000,
+            "ltp": 120,
+            "previous_close_price": 100,
+            "trading_symbol": "NIFTY05FEB2624000CE",
+        },
+        {
+            "option_type": "CE",
+            "strike": 24100,
+            "ltp": 55,
+            "previous_close_price": 50,
+            "trading_symbol": "NIFTY05FEB2624100CE",
+        },
+        {
+            "option_type": "PE",
+            "strike": 23900,
+            "ltp": 88,
+            "previous_close_price": 80,
+            "trading_symbol": "NIFTY05FEB2623900PE",
+        },
+        {
+            "option_type": "PE",
+            "strike": 23800,
+            "ltp": 30,
+            "previous_close_price": 25,
+            "trading_symbol": "NIFTY05FEB2623800PE",
+        },
     ]
     result = scan_segment_contracts(contracts, "NIFTY")
     assert result["top_ce"]["gain_pct"] == pytest.approx(20.0)

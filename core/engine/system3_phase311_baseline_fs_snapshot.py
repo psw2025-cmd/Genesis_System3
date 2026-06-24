@@ -5,13 +5,13 @@ Creates a daily filesystem baseline of key System3 files before market,
 to detect unexpected edits and support rollback.
 """
 
-import sys
-import json
 import hashlib
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
+import json
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

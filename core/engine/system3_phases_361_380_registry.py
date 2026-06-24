@@ -11,8 +11,8 @@ Phase Categories:
   - self_test: Phases 376-380 (testing suite, validation, optimization, edge cases, sign-off)
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent

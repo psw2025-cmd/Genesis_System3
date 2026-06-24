@@ -7,11 +7,11 @@ Outputs: JSON metrics + Markdown report
 Safety: DRY-RUN only, read-only log parsing, no live trading
 """
 
-import sys
-from pathlib import Path
 import json
-from datetime import datetime, timedelta
 import re
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:

@@ -11,7 +11,6 @@ if ROOT_DIR not in sys.path:
 
 from core.utils.logger import logger
 
-
 LIVE_CSV = os.path.join(ROOT_DIR, "storage", "live", "dhan_index_options_watch.csv")
 
 

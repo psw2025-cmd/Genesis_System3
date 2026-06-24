@@ -3,10 +3,11 @@ Comprehensive Auto-Switch Test with Visible Output
 Tests market detection, mode switching, and provides proof
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -20,7 +21,11 @@ if sys.platform == "win32":
     except:
         pass
 
-from src.utils.market_hours import is_market_open, get_market_status, get_next_market_open
+from src.utils.market_hours import (
+    get_market_status,
+    get_next_market_open,
+    is_market_open,
+)
 
 IST = pytz.timezone("Asia/Kolkata")
 

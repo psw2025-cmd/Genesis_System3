@@ -5,9 +5,9 @@ Runs all phases 201-230 in test mode and prints summary.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -63,7 +63,7 @@ def main():
     print("SYSTEM3 PHASES 201-230 DIAGNOSTICS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-    
+
     results = []
     for phase_num in range(201, 231):
         if phase_num in PHASE_MODULES:
@@ -88,45 +88,56 @@ def main():
         else:
             print(f"Phase {phase_num:3d}... ⚠️ NOT IMPLEMENTED")
             results.append((phase_num, {"status": "NOT_IMPLEMENTED", "details": "Module not found"}))
-    
+
     # Summary
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    
+
     ok_count = sum(1 for _, r in results if r.get("status") == "OK")
     warn_count = sum(1 for _, r in results if r.get("status") == "WARN")
     error_count = sum(1 for _, r in results if r.get("status") == "ERROR")
     not_impl_count = sum(1 for _, r in results if r.get("status") == "NOT_IMPLEMENTED")
-    
+
     print(f"✅ OK: {ok_count}")
     print(f"⚠️ WARN: {warn_count}")
     print(f"❌ ERROR: {error_count}")
     print(f"⏸️ NOT IMPLEMENTED: {not_impl_count}")
     print(f"\nTotal: {len(results)} phases")
-    
+
     # List main output files
     print("\n" + "=" * 70)
     print("MAIN OUTPUT FILES")
     print("=" * 70)
-    
+
     output_files = []
     for phase_num, result in results:
         if "outputs" in result:
             outputs = result["outputs"]
-            for key in ["report_path", "log_path", "output_file", "flags_file", "regimes_file", 
-                       "patterns_file", "breakout_file", "coverage_file", "importance_file",
-                       "hparams_path", "candidates_file", "reconciled_file", "selected_window_path",
-                       "correlation_matrix_path"]:
+            for key in [
+                "report_path",
+                "log_path",
+                "output_file",
+                "flags_file",
+                "regimes_file",
+                "patterns_file",
+                "breakout_file",
+                "coverage_file",
+                "importance_file",
+                "hparams_path",
+                "candidates_file",
+                "reconciled_file",
+                "selected_window_path",
+                "correlation_matrix_path",
+            ]:
                 if key in outputs and outputs[key]:
                     output_files.append((phase_num, key, outputs[key]))
-    
+
     for phase_num, key, path in sorted(set(output_files)):
         print(f"Phase {phase_num:3d}: {Path(path).name}")
-    
+
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

@@ -74,21 +74,25 @@ def _issues(results: Dict[str, Any], market: Dict[str, Any]) -> List[Dict[str, s
     gates = results.get("/api/auto_gates", {}).get("data") or {}
     cloud_market = (state.get("market") or {}).get("is_open")
     if market["is_open"] != cloud_market and cloud_market is not None:
-        issues.append({
-            "id": "MARKET_OPEN_MISMATCH",
-            "severity": "HIGH",
-            "detail": f"local_ist={market['is_open']} cloud={cloud_market}",
-        })
+        issues.append(
+            {
+                "id": "MARKET_OPEN_MISMATCH",
+                "severity": "HIGH",
+                "detail": f"local_ist={market['is_open']} cloud={cloud_market}",
+            }
+        )
     if not (state.get("broker") or {}).get("connected"):
         issues.append({"id": "BROKER_DISCONNECTED", "severity": "HIGH", "detail": "Cloud broker not connected"})
     if not gates.get("gates"):
         issues.append({"id": "AUTO_GATES_EMPTY", "severity": "HIGH", "detail": "auto_gates returned empty gate map"})
     if gates.get("gates_passing", 0) == 0 and gates.get("gates_total", 0) > 0:
-        issues.append({
-            "id": "ALL_GATES_PENDING",
-            "severity": "MEDIUM",
-            "detail": f"0/{gates.get('gates_total')} gates passing",
-        })
+        issues.append(
+            {
+                "id": "ALL_GATES_PENDING",
+                "severity": "MEDIUM",
+                "detail": f"0/{gates.get('gates_total')} gates passing",
+            }
+        )
     acc = results.get("/api/accuracy_trend", {}).get("data") or {}
     if acc.get("status") == "ok" and not acc.get("trend"):
         issues.append({"id": "NO_ACCURACY_HISTORY", "severity": "MEDIUM", "detail": "accuracy_trend empty"})

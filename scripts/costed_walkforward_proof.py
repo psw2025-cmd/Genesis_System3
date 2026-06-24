@@ -34,12 +34,12 @@ if os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", ""
     sys.exit(1)
 
 # Realistic NSE Options cost model (Dhan flat fee plan)
-BROKERAGE_PER_SIDE = 20.0          # ₹20 flat per order (Dhan)
-STT_RATE = 0.000625                 # 0.0625% on sell-side premium
-EXCHANGE_TXN_CHARGE = 0.0005       # 0.05% of premium
-GST_ON_BROKERAGE = 0.18            # 18% GST on brokerage+charges
-SEBI_RATE = 0.000001               # ₹10 per crore traded
-SLIPPAGE_PCT = 0.001               # 0.1% slippage on entry + exit
+BROKERAGE_PER_SIDE = 20.0  # ₹20 flat per order (Dhan)
+STT_RATE = 0.000625  # 0.0625% on sell-side premium
+EXCHANGE_TXN_CHARGE = 0.0005  # 0.05% of premium
+GST_ON_BROKERAGE = 0.18  # 18% GST on brokerage+charges
+SEBI_RATE = 0.000001  # ₹10 per crore traded
+SLIPPAGE_PCT = 0.001  # 0.1% slippage on entry + exit
 
 INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"}
 LOT_SIZES = {"NIFTY": 75, "BANKNIFTY": 30, "FINNIFTY": 40, "MIDCPNIFTY": 75}
@@ -119,15 +119,17 @@ def load_bhavcopy(csv_path: Path) -> list[dict]:
                     close = float(row.get(close_col) or 0)
                     oi = float(row.get(oi_col) or 0)
                     oi_chg = float(row.get(oi_chg_col) or 0) if oi_chg_col else 0.0
-                    rows.append({
-                        "symbol": sym,
-                        "close": close,
-                        "oi": oi,
-                        "oi_chg": oi_chg,
-                        "option_type": (row.get("OptTp") or row.get("OptionType") or "CE").strip(),
-                        "strike": float(row.get("StrkPric") or row.get("Strike") or 0),
-                        "expiry": (row.get("XpryDt") or row.get("Expiry") or "").strip(),
-                    })
+                    rows.append(
+                        {
+                            "symbol": sym,
+                            "close": close,
+                            "oi": oi,
+                            "oi_chg": oi_chg,
+                            "option_type": (row.get("OptTp") or row.get("OptionType") or "CE").strip(),
+                            "strike": float(row.get("StrkPric") or row.get("Strike") or 0),
+                            "expiry": (row.get("XpryDt") or row.get("Expiry") or "").strip(),
+                        }
+                    )
                 except (ValueError, TypeError):
                     continue
     except Exception as e:
@@ -136,10 +138,7 @@ def load_bhavcopy(csv_path: Path) -> list[dict]:
 
 
 def select_atm_option(rows: list[dict], symbol: str, spot_proxy: float) -> dict | None:
-    candidates = [
-        r for r in rows
-        if r["symbol"] == symbol and r["option_type"] == "CE" and r["close"] > 5
-    ]
+    candidates = [r for r in rows if r["symbol"] == symbol and r["option_type"] == "CE" and r["close"] > 5]
     if not candidates:
         return None
     # Pick nearest strike to spot
@@ -203,8 +202,12 @@ def run_proof() -> dict:
         for symbol in ["NIFTY", "BANKNIFTY"]:
             # Best ATM CE signal from day 0
             # Find highest OI+OI-change CE row as "signal"
-            ce_rows_d0 = [r for r in day0["rows"] if r["symbol"] == symbol and r["option_type"] == "CE" and r["close"] > 10]
-            pe_rows_d0 = [r for r in day0["rows"] if r["symbol"] == symbol and r["option_type"] == "PE" and r["close"] > 10]
+            ce_rows_d0 = [
+                r for r in day0["rows"] if r["symbol"] == symbol and r["option_type"] == "CE" and r["close"] > 10
+            ]
+            pe_rows_d0 = [
+                r for r in day0["rows"] if r["symbol"] == symbol and r["option_type"] == "PE" and r["close"] > 10
+            ]
 
             if not ce_rows_d0:
                 continue
@@ -215,8 +218,10 @@ def run_proof() -> dict:
 
             # Find same option (same strike, expiry) on day 1
             matching_d1 = [
-                r for r in day1["rows"]
-                if r["symbol"] == symbol and r["option_type"] == "CE"
+                r
+                for r in day1["rows"]
+                if r["symbol"] == symbol
+                and r["option_type"] == "CE"
                 and abs(r["strike"] - signal["strike"]) < 0.01
                 and r["expiry"] == signal["expiry"]
             ]
@@ -290,7 +295,7 @@ def run_proof() -> dict:
             "stt_rate": STT_RATE,
             "exchange_txn_charge": EXCHANGE_TXN_CHARGE,
             "slippage_pct": SLIPPAGE_PCT,
-            "description": "Dhan flat-fee plan: ₹20/side + STT + exc charge + 18% GST + SEBI"
+            "description": "Dhan flat-fee plan: ₹20/side + STT + exc charge + 18% GST + SEBI",
         },
         "symbols_tested": ["NIFTY", "BANKNIFTY"],
         "strategy": "OI-change-ranked ATM CE next-day exit — walk-forward proof only, not trading signal",

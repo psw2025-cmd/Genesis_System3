@@ -34,14 +34,43 @@ def test_parse_stock_decimal_strike():
 
 
 def test_bhavcopy_equity_rows_exclude_index():
-    df = pd.DataFrame([
-        {"TckrSymb": "NIFTY", "OptnTp": "CE", "StrkPric": 24000, "OpnIntrst": 1000,
-         "ChngInOpnIntrst": 100, "TtlTradgVol": 500, "ClsPric": 150, "XpryDt": "2026-06-26", "FinInstrmTp": "IDO"},
-        {"TckrSymb": "RELIANCE", "OptnTp": "CE", "StrkPric": 2500, "OpnIntrst": 2000,
-         "ChngInOpnIntrst": 400, "TtlTradgVol": 800, "ClsPric": 80, "XpryDt": "2026-06-26", "FinInstrmTp": "STO"},
-        {"TckrSymb": "RELIANCE", "OptnTp": "PE", "StrkPric": 2480, "OpnIntrst": 1500,
-         "ChngInOpnIntrst": 150, "TtlTradgVol": 300, "ClsPric": 60, "XpryDt": "2026-06-26", "FinInstrmTp": "STO"},
-    ])
+    df = pd.DataFrame(
+        [
+            {
+                "TckrSymb": "NIFTY",
+                "OptnTp": "CE",
+                "StrkPric": 24000,
+                "OpnIntrst": 1000,
+                "ChngInOpnIntrst": 100,
+                "TtlTradgVol": 500,
+                "ClsPric": 150,
+                "XpryDt": "2026-06-26",
+                "FinInstrmTp": "IDO",
+            },
+            {
+                "TckrSymb": "RELIANCE",
+                "OptnTp": "CE",
+                "StrkPric": 2500,
+                "OpnIntrst": 2000,
+                "ChngInOpnIntrst": 400,
+                "TtlTradgVol": 800,
+                "ClsPric": 80,
+                "XpryDt": "2026-06-26",
+                "FinInstrmTp": "STO",
+            },
+            {
+                "TckrSymb": "RELIANCE",
+                "OptnTp": "PE",
+                "StrkPric": 2480,
+                "OpnIntrst": 1500,
+                "ChngInOpnIntrst": 150,
+                "TtlTradgVol": 300,
+                "ClsPric": 60,
+                "XpryDt": "2026-06-26",
+                "FinInstrmTp": "STO",
+            },
+        ]
+    )
     rows = _parse_equity_option_rows(df)
     assert len(rows) == 2
     assert all(r["underlying"] == "RELIANCE" for r in rows)

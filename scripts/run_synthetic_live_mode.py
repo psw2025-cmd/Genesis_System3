@@ -2,10 +2,10 @@
 Run Synthetic Live Mode - Continuously updates market data to simulate live trading
 """
 
-import time
 import subprocess
-from pathlib import Path
 import sys
+import time
+from pathlib import Path
 
 
 def main():

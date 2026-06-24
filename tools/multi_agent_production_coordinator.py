@@ -15,10 +15,14 @@ from typing import Any, Dict, List
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest" / "production_grade_readiness"
 import os
-BASE_URL = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")).rstrip("/")
+
+BASE_URL = os.environ.get(
+    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+).rstrip("/")
 
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
 
 def get_python_executable() -> str:
     venv_exe = ROOT / "venv" / "Scripts" / "python.exe"
@@ -26,15 +30,32 @@ def get_python_executable() -> str:
         venv_exe = ROOT / "venv" / "bin" / "python"
     return str(venv_exe) if venv_exe.exists() else sys.executable
 
+
 py_exe = get_python_executable()
 
 AGENT_RUNS = [
-    ("gate_orchestrator", [py_exe, "scripts/system3_master_proof_orchestrator.py"], "reports/latest/proof_status_matrix/proof_status_matrix.json"),
+    (
+        "gate_orchestrator",
+        [py_exe, "scripts/system3_master_proof_orchestrator.py"],
+        "reports/latest/proof_status_matrix/proof_status_matrix.json",
+    ),
     ("dashboard_audit", [py_exe, "tools/dashboard_full_audit.py"], "reports/latest/dashboard_full_audit/summary.json"),
-    ("broker_validation", [py_exe, "tools/broker_trader_validation.py"], "reports/latest/broker_trader_validation/summary.json"),
-    ("audit_reports", [py_exe, "tools/generate_audit_reports.py"], "reports/latest/dhan_option_chain_schema_audit/summary.json"),
+    (
+        "broker_validation",
+        [py_exe, "tools/broker_trader_validation.py"],
+        "reports/latest/broker_trader_validation/summary.json",
+    ),
+    (
+        "audit_reports",
+        [py_exe, "tools/generate_audit_reports.py"],
+        "reports/latest/dhan_option_chain_schema_audit/summary.json",
+    ),
     ("human_approval", [py_exe, "tools/record_human_approval.py"], "reports/latest/human_approval_gate/summary.json"),
-    ("control_plane", [py_exe, "system3_control_plane.py", "proofs"], "reports/latest/system3_master_control_plane/system3_master_control_plane.json"),
+    (
+        "control_plane",
+        [py_exe, "system3_control_plane.py", "proofs"],
+        "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+    ),
 ]
 
 
@@ -89,14 +110,16 @@ def main() -> int:
     for agent_id, cmd, evidence in AGENT_RUNS:
         evidence_path = ROOT / evidence
         run = run_cmd(cmd)
-        agent_results.append({
-            "id": agent_id,
-            "evidence": evidence,
-            "evidence_exists": evidence_path.exists(),
-            "run_attempted": True,
-            "run_passed": run["passed"],
-            "run_detail": run,
-        })
+        agent_results.append(
+            {
+                "id": agent_id,
+                "evidence": evidence,
+                "evidence_exists": evidence_path.exists(),
+                "run_attempted": True,
+                "run_passed": run["passed"],
+                "run_detail": run,
+            }
+        )
 
     live = probe_live_endpoints()
     state_data = {}
@@ -135,6 +158,7 @@ def main() -> int:
             pass
     try:
         from dashboard.backend.human_approval_service import load_human_approval
+
         if not load_human_approval().get("approved"):
             blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
     except Exception:
@@ -176,17 +200,19 @@ def main() -> int:
     ]
     for a in agent_results:
         md_lines.append(f"- **{a['id']}**: {'PASS' if a['run_passed'] else 'FAIL'} — `{a['evidence']}`")
-    md_lines.extend([
-        "",
-        "## Cloud probes",
-        *[f"- `{ep}`: {'OK' if v.get('ok') else 'FAIL'}" for ep, v in live.items()],
-        "",
-        "## Blockers",
-        *[f"- {b}" for b in blockers],
-        "",
-        "## Next actions",
-        *[f"- {x}" for x in payload["next_exact_actions"]],
-    ])
+    md_lines.extend(
+        [
+            "",
+            "## Cloud probes",
+            *[f"- `{ep}`: {'OK' if v.get('ok') else 'FAIL'}" for ep, v in live.items()],
+            "",
+            "## Blockers",
+            *[f"- {b}" for b in blockers],
+            "",
+            "## Next actions",
+            *[f"- {x}" for x in payload["next_exact_actions"]],
+        ]
+    )
     with open(REPORTS / "summary.md", "w", encoding="utf-8") as f:
         f.write("\n".join(md_lines))
 

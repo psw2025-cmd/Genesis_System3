@@ -4,12 +4,14 @@ COMPREHENSIVE QC AUDIT FOR SYSTEM3
 Deep multi-layer analysis of all data, configuration, and runtime state
 """
 
-import pandas as pd
-import numpy as np
 import json
 import os
 from datetime import datetime
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
 
 class ComprehensiveQCAudit:
     def __init__(self):

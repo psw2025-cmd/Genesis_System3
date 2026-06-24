@@ -7,11 +7,11 @@ Saves reports to state/market_validations/ and emits retrain signal if accuracy 
 """
 
 import json
+import logging
 import os
 import sys
 import time
-import logging
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -27,12 +27,13 @@ except ImportError:
 
 try:
     import requests
+
     _REQUESTS_OK = True
 except ImportError:
     _REQUESTS_OK = False
 
 RANK_HISTORY_FILE = os.path.join(ROOT_DIR, "state", "gain_rank_history.json")
-VALIDATION_DIR    = os.path.join(ROOT_DIR, "state", "market_validations")
+VALIDATION_DIR = os.path.join(ROOT_DIR, "state", "market_validations")
 RETRAIN_FLAG_FILE = os.path.join(ROOT_DIR, "state", "retrain_signal.json")
 
 NSE_HEADERS = {
@@ -40,11 +41,11 @@ NSE_HEADERS = {
     "Accept": "application/json",
     "Referer": "https://www.nseindia.com/",
 }
-NSE_OPTION_CHAIN_URL    = "https://www.nseindia.com/api/option-chain-indices"
+NSE_OPTION_CHAIN_URL = "https://www.nseindia.com/api/option-chain-indices"
 NSE_FNO_MOST_ACTIVE_URL = "https://www.nseindia.com/api/live-analysis-most-active-securities?index=options"
 
 TRACKED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
-RETRAIN_THRESHOLD_RHO = 0.40   # Fire retrain signal if ρ < this for 3 consecutive days
+RETRAIN_THRESHOLD_RHO = 0.40  # Fire retrain signal if ρ < this for 3 consecutive days
 RETRAIN_CONSECUTIVE_DAYS = 3
 
 
@@ -119,24 +120,20 @@ class MarketResultValidator:
         if not reports:
             return {"error": "No validation reports found", "days": days}
 
-        correlations = [r["rank_correlation_spearman"] for r in reports
-                        if "rank_correlation_spearman" in r]
+        correlations = [r["rank_correlation_spearman"] for r in reports if "rank_correlation_spearman" in r]
         top3_rates = [r["match_rate_top3"] for r in reports if "match_rate_top3" in r]
         grades = [r.get("grade") for r in reports]
 
-        retrain_needed = (
-            len(correlations) >= RETRAIN_CONSECUTIVE_DAYS
-            and all(c < RETRAIN_THRESHOLD_RHO for c in correlations[-RETRAIN_CONSECUTIVE_DAYS:])
+        retrain_needed = len(correlations) >= RETRAIN_CONSECUTIVE_DAYS and all(
+            c < RETRAIN_THRESHOLD_RHO for c in correlations[-RETRAIN_CONSECUTIVE_DAYS:]
         )
 
         return {
             "days_analyzed": len(reports),
             "avg_rank_correlation": round(np.mean(correlations), 4) if correlations else 0,
             "avg_top3_match_rate": round(np.mean(top3_rates), 4) if top3_rates else 0,
-            "best_day": max(reports, key=lambda r: r.get("rank_correlation_spearman", 0),
-                            default={}).get("date"),
-            "worst_day": min(reports, key=lambda r: r.get("rank_correlation_spearman", 1),
-                             default={}).get("date"),
+            "best_day": max(reports, key=lambda r: r.get("rank_correlation_spearman", 0), default={}).get("date"),
+            "worst_day": min(reports, key=lambda r: r.get("rank_correlation_spearman", 1), default={}).get("date"),
             "grades": grades,
             "retrain_signal": retrain_needed,
         }
@@ -177,14 +174,16 @@ class MarketResultValidator:
                 sym = item.get("symbol", "")
                 normalized = self._normalize_symbol(sym)
                 if normalized and normalized in TRACKED_UNDERLYINGS:
-                    results.append({
-                        "symbol": normalized,
-                        "volume": item.get("totalTradedVolume", 0),
-                        "oi_change_pct": item.get("pChange", 0),
-                        "price_change_pct": item.get("pChange", 0),
-                        "composite_score": abs(item.get("pChange", 0)),
-                        "market_rank": rank,
-                    })
+                    results.append(
+                        {
+                            "symbol": normalized,
+                            "volume": item.get("totalTradedVolume", 0),
+                            "oi_change_pct": item.get("pChange", 0),
+                            "price_change_pct": item.get("pChange", 0),
+                            "composite_score": abs(item.get("pChange", 0)),
+                            "market_rank": rank,
+                        }
+                    )
                     rank += 1
             return results
         except Exception as e:
@@ -198,14 +197,12 @@ class MarketResultValidator:
             session = requests.Session()
             session.get("https://www.nseindia.com", headers=NSE_HEADERS, timeout=10)
             time.sleep(0.5)
-            resp = session.get(f"{NSE_OPTION_CHAIN_URL}?symbol={symbol}",
-                               headers=NSE_HEADERS, timeout=15)
+            resp = session.get(f"{NSE_OPTION_CHAIN_URL}?symbol={symbol}", headers=NSE_HEADERS, timeout=15)
             if resp.status_code != 200:
                 return None
             records = resp.json().get("records", {}).get("data", [])
             total_oi = sum(
-                (r.get("CE", {}).get("openInterest", 0) + r.get("PE", {}).get("openInterest", 0))
-                for r in records
+                (r.get("CE", {}).get("openInterest", 0) + r.get("PE", {}).get("openInterest", 0)) for r in records
             )
             total_oi_change = sum(
                 abs(r.get("CE", {}).get("changeinOpenInterest", 0))
@@ -227,13 +224,9 @@ class MarketResultValidator:
     #  Rank correlation                                                   #
     # ------------------------------------------------------------------ #
 
-    def _compute_rank_correlation(
-        self, predictions: List[Dict], actuals: List[Dict]
-    ) -> Tuple[float, List[Dict]]:
-        pred_ranks = {r["underlying"]: r.get("rank", i + 1)
-                      for i, r in enumerate(predictions)}
-        actual_ranks = {r["symbol"]: r.get("market_rank", i + 1)
-                        for i, r in enumerate(actuals)}
+    def _compute_rank_correlation(self, predictions: List[Dict], actuals: List[Dict]) -> Tuple[float, List[Dict]]:
+        pred_ranks = {r["underlying"]: r.get("rank", i + 1) for i, r in enumerate(predictions)}
+        actual_ranks = {r["symbol"]: r.get("market_rank", i + 1) for i, r in enumerate(actuals)}
 
         max_pred = max(pred_ranks.values(), default=5) + 1
         max_actual = max(actual_ranks.values(), default=5) + 1
@@ -253,12 +246,15 @@ class MarketResultValidator:
         if np.isnan(rho):
             rho = 0.0
 
-        details = [{
-            "symbol": s,
-            "predicted_rank": int(pred_ranks[s]),
-            "actual_rank": int(actual_ranks[s]),
-            "rank_diff": int(abs(pred_ranks[s] - actual_ranks[s])),
-        } for s in symbols]
+        details = [
+            {
+                "symbol": s,
+                "predicted_rank": int(pred_ranks[s]),
+                "actual_rank": int(actual_ranks[s]),
+                "rank_diff": int(abs(pred_ranks[s] - actual_ranks[s])),
+            }
+            for s in symbols
+        ]
         return rho, details
 
     def _top_k_overlap(self, predictions: List[Dict], actuals: List[Dict], k: int) -> float:
@@ -271,21 +267,26 @@ class MarketResultValidator:
     # ------------------------------------------------------------------ #
 
     def _grade(self, rho: float) -> str:
-        if rho >= 0.85:   return "A+"
-        elif rho >= 0.70: return "A"
-        elif rho >= 0.55: return "B"
-        elif rho >= 0.40: return "C"
-        elif rho >= 0.20: return "D"
+        if rho >= 0.85:
+            return "A+"
+        elif rho >= 0.70:
+            return "A"
+        elif rho >= 0.55:
+            return "B"
+        elif rho >= 0.40:
+            return "C"
+        elif rho >= 0.20:
+            return "D"
         return "F"
 
     def _interpret(self, rho: float, grade: str) -> str:
         msgs = {
             "A+": "Excellent — predictions nearly match market. Strategy is highly aligned.",
-            "A":  "Good — strong alignment between predictions and actual top movers.",
-            "B":  "Acceptable — moderate alignment. Review factor weights.",
-            "C":  "Weak — limited alignment. Investigate which factors are off.",
-            "D":  "Poor — predictions missed actual top movers. Retrain signals.",
-            "F":  "Failed — no meaningful correlation. Full model review required.",
+            "A": "Good — strong alignment between predictions and actual top movers.",
+            "B": "Acceptable — moderate alignment. Review factor weights.",
+            "C": "Weak — limited alignment. Investigate which factors are off.",
+            "D": "Poor — predictions missed actual top movers. Retrain signals.",
+            "F": "Failed — no meaningful correlation. Full model review required.",
         }
         return msgs.get(grade, "Unknown")
 
@@ -297,15 +298,14 @@ class MarketResultValidator:
         reports = self._load_recent_reports(RETRAIN_CONSECUTIVE_DAYS)
         if len(reports) < RETRAIN_CONSECUTIVE_DAYS:
             return False
-        recent_rhos = [r.get("rank_correlation_spearman", 1.0)
-                       for r in reports[-RETRAIN_CONSECUTIVE_DAYS:]]
+        recent_rhos = [r.get("rank_correlation_spearman", 1.0) for r in reports[-RETRAIN_CONSECUTIVE_DAYS:]]
         return all(rho < RETRAIN_THRESHOLD_RHO for rho in recent_rhos)
 
     def _emit_retrain_signal(self) -> None:
         signal = {
             "triggered_at": datetime.now().isoformat(),
             "reason": f"Rank correlation below {RETRAIN_THRESHOLD_RHO} for "
-                      f"{RETRAIN_CONSECUTIVE_DAYS} consecutive days",
+            f"{RETRAIN_CONSECUTIVE_DAYS} consecutive days",
             "action": "retrain ensemble_predictor and reoptimize gain_rank factor weights",
         }
         try:

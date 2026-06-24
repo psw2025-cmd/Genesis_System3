@@ -2,9 +2,10 @@
 Trend Analyzer - Compute RSI, MACD, VWAP, SuperTrend, multi-timeframe trends
 """
 
+from typing import Any, Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, List
 
 
 def compute_rsi(prices: pd.Series, period: int = 14) -> pd.Series:

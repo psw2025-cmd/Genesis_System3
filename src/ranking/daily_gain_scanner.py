@@ -32,6 +32,7 @@ try:
     from core.utils.logger import logger
 except ImportError:
     import logging
+
     logger = logging.getLogger("daily_gain_scanner")
 
 TRACKED_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
@@ -41,13 +42,12 @@ REPORT_DIR = os.path.join(ROOT_DIR, "state", "daily_scan_reports")
 def load_chain_from_storage(symbol: str):
     """Load latest stored option chain CSV for a symbol."""
     import pandas as pd
+
     storage_dir = os.path.join(ROOT_DIR, "storage")
     if not os.path.isdir(storage_dir):
         return None
     candidates = sorted(
-        [f for f in os.listdir(storage_dir)
-         if symbol.lower() in f.lower() and f.endswith(".csv")],
-        reverse=True
+        [f for f in os.listdir(storage_dir) if symbol.lower() in f.lower() and f.endswith(".csv")], reverse=True
     )
     if not candidates:
         return None
@@ -95,8 +95,9 @@ def run_prediction() -> dict:
         "date": datetime.now().strftime("%Y-%m-%d"),
         "time": datetime.now().strftime("%H:%M:%S"),
         "top_predictions": top3,
-        "full_ranking": ranked[["rank", "underlying", "gain_score",
-                                  "expected_move_pct", "recommendation"]].to_dict(orient="records"),
+        "full_ranking": ranked[["rank", "underlying", "gain_score", "expected_move_pct", "recommendation"]].to_dict(
+            orient="records"
+        ),
     }
 
     os.makedirs(REPORT_DIR, exist_ok=True)
@@ -106,8 +107,10 @@ def run_prediction() -> dict:
 
     logger.info("Top predictions today:")
     for p in top3:
-        logger.info(f"  #{p['rank']} {p['underlying']:12s} | gain_score={p['gain_score']:.1f} | "
-                    f"expected_move={p['expected_move_pct']*100:.2f}%")
+        logger.info(
+            f"  #{p['rank']} {p['underlying']:12s} | gain_score={p['gain_score']:.1f} | "
+            f"expected_move={p['expected_move_pct']*100:.2f}%"
+        )
 
     return result
 
@@ -130,9 +133,11 @@ def run_validation() -> dict:
         _emit_retrain_signal()
 
     trend = validator.get_accuracy_trend(last_n_days=14)
-    logger.info(f"14-day trend | avg_ρ={trend.get('avg_spearman_correlation', 0):.3f} | "
-                f"avg_hit={trend.get('avg_hit_rate', 0):.1%} | "
-                f"trend={'↑' if trend.get('correlation_trend', 0) > 0 else '↓'}")
+    logger.info(
+        f"14-day trend | avg_ρ={trend.get('avg_spearman_correlation', 0):.3f} | "
+        f"avg_hit={trend.get('avg_hit_rate', 0):.1%} | "
+        f"trend={'↑' if trend.get('correlation_trend', 0) > 0 else '↓'}"
+    )
     return report
 
 
@@ -151,8 +156,7 @@ def _emit_retrain_signal():
 
 def main():
     parser = argparse.ArgumentParser(description="Daily Gain Scanner")
-    parser.add_argument("--mode", choices=["predict", "validate", "full"],
-                        default="full", help="Mode to run")
+    parser.add_argument("--mode", choices=["predict", "validate", "full"], default="full", help="Mode to run")
     args = parser.parse_args()
 
     results = {}

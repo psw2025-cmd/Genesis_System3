@@ -3,13 +3,14 @@ Ultra-Micro Level System Verification
 Tests every component, compares with best practices, and provides proof
 """
 
-import sys
 import json
+import sys
 import time
 import traceback
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
+
 import pandas as pd
 import pytz
 

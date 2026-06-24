@@ -1,13 +1,13 @@
+import json
 import os
 import sys
-import json
 from datetime import datetime
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import classification_report, accuracy_score
 import joblib
+import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
 
 from core.engine.dhan_multi_resolution_labels import generate_labels
 
@@ -17,7 +17,6 @@ if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
 from core.utils.logger import logger  # existing logger
-
 
 TRAIN_CSV = os.path.join(
     ROOT_DIR,

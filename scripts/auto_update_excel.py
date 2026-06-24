@@ -3,9 +3,10 @@ Auto Update Excel - Runs continuously and updates Excel every 5 minutes
 """
 
 import sys
-from pathlib import Path
 import time
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

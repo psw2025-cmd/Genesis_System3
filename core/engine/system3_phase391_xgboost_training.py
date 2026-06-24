@@ -18,20 +18,25 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import os
-import sys
 import json
 import logging
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from model_training_v2 import TrainingConfig, load_balanced_dataset, train_models_per_underlying, serialize_metrics
+from model_training_v2 import (
+    TrainingConfig,
+    load_balanced_dataset,
+    serialize_metrics,
+    train_models_per_underlying,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

@@ -4,12 +4,12 @@ System3 Phase 99 - Version Freeze & Tagging
 Create a version manifest marking current System3 code & config as a named release.
 """
 
-import sys
 import json
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

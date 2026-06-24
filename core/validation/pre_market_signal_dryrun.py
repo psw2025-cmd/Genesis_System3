@@ -5,13 +5,14 @@ Performs a dry-run signal generation using today's latest prepared live-features
 Applies live thresholds and performs safety checks before market opens.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
+import sys
+from datetime import date, datetime
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Optional
-from datetime import datetime, date
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

@@ -3,12 +3,12 @@ Find ALL Issues - Comprehensive Issue Detection
 Identifies every possible issue in the system
 """
 
-import sys
 import ast
 import importlib.util
-from pathlib import Path
-from typing import List, Dict
 import json
+import sys
+from pathlib import Path
+from typing import Dict, List
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

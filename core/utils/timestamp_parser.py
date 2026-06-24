@@ -13,10 +13,11 @@ DRY-RUN ONLY: No trading flags touched.
 from __future__ import annotations
 
 import json
-import pandas as pd
 from datetime import datetime
 from pathlib import Path
-from typing import Union, Optional, Tuple
+from typing import Optional, Tuple, Union
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 METRICS_DIR = PROJECT_ROOT / "storage" / "metrics"

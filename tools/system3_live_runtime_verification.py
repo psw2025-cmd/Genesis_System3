@@ -27,13 +27,13 @@ Usage:
   --report: Write SYSTEM3_LIVE_RUNTIME_REPORT.md
 """
 
-import sys
-import os
 import json
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+import os
 import subprocess
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Tuple
 
 ROOT_DIR = Path(__file__).parent.parent.absolute()
 

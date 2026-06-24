@@ -114,7 +114,9 @@ def compile_check(root: Path) -> Dict[str, Any]:
             results.append({"path": rel, "status": "MISSING", "returncode": 127, "stderr": "missing"})
             all_pass = False
             continue
-        proc = subprocess.run([sys.executable, "-m", "py_compile", str(p)], cwd=str(root), text=True, capture_output=True)
+        proc = subprocess.run(
+            [sys.executable, "-m", "py_compile", str(p)], cwd=str(root), text=True, capture_output=True
+        )
         status = "PASS" if proc.returncode == 0 else "FAIL"
         if proc.returncode != 0:
             all_pass = False
@@ -191,19 +193,27 @@ def endpoint_probe(api_base: str) -> Dict[str, Any]:
     return probes
 
 
-def write_master_reports(root: Path, base_out: Path, compile_result: Dict[str, Any], scenarios: List[ScenarioResult], probes: Dict[str, Any]) -> Path:
+def write_master_reports(
+    root: Path, base_out: Path, compile_result: Dict[str, Any], scenarios: List[ScenarioResult], probes: Dict[str, Any]
+) -> Path:
     latest = root / "reports" / "latest"
     latest.mkdir(parents=True, exist_ok=True)
     total_pass = sum(1 for s in scenarios if s.status == "PASS")
     data = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "verdict": "PASS_SCRIPTS_AND_SCENARIOS_REVIEW_REQUIRED" if compile_result["all_pass"] and total_pass >= 1 else "FAIL_REVIEW_REQUIRED",
+        "verdict": (
+            "PASS_SCRIPTS_AND_SCENARIOS_REVIEW_REQUIRED"
+            if compile_result["all_pass"] and total_pass >= 1
+            else "FAIL_REVIEW_REQUIRED"
+        ),
         "compile_check": compile_result,
         "scenarios": [asdict(s) for s in scenarios],
         "endpoint_probes": probes,
         "proof_folder": str(base_out.relative_to(root)),
     }
-    (latest / "system3_one_click_max_proof.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    (latest / "system3_one_click_max_proof.json").write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
 
     lines = [
         "# System3 One-Click Max Proof Report",
@@ -223,32 +233,42 @@ def write_master_reports(root: Path, base_out: Path, compile_result: Dict[str, A
     ]
     for r in compile_result["results"]:
         lines.append(f"| `{r['path']}` | `{r['status']}` | `{r['returncode']}` |")
-    lines.extend(["", "## Scenario Runs", "", "| Scenario | API Base | Status | Return Code | Output Folder |", "|---|---|---:|---:|---|"])
+    lines.extend(
+        [
+            "",
+            "## Scenario Runs",
+            "",
+            "| Scenario | API Base | Status | Return Code | Output Folder |",
+            "|---|---|---:|---:|---|",
+        ]
+    )
     for s in scenarios:
         lines.append(f"| `{s.name}` | `{s.api_base}` | `{s.status}` | `{s.returncode}` | `{s.output_dir}` |")
     lines.extend(["", "## Endpoint Probe Summary", "", "| API Base | Endpoint | OK | Error |", "|---|---|---:|---|"])
     for api, probe_set in probes.items():
         for endpoint, result in probe_set.items():
             lines.append(f"| `{api}` | `{endpoint}` | `{result.get('ok')}` | `{result.get('error')}` |")
-    lines.extend([
-        "",
-        "## What This Proves",
-        "",
-        "- Verification scripts compile and run where possible.",
-        "- Local-only and API-backed scenarios are preserved separately.",
-        "- Markdown, option visibility, model accuracy, blocker, and control-plane reports are bundled for review.",
-        "",
-        "## What This Does Not Prove",
-        "",
-        "- It does not prove live trading readiness.",
-        "- It does not fix runtime bugs by itself.",
-        "- It does not guarantee model profitability.",
-        "- It does not touch credentials or enable orders.",
-        "",
-        "## Next Rule",
-        "",
-        "Review this report and the preserved scenario folders before patching runtime code.",
-    ])
+    lines.extend(
+        [
+            "",
+            "## What This Proves",
+            "",
+            "- Verification scripts compile and run where possible.",
+            "- Local-only and API-backed scenarios are preserved separately.",
+            "- Markdown, option visibility, model accuracy, blocker, and control-plane reports are bundled for review.",
+            "",
+            "## What This Does Not Prove",
+            "",
+            "- It does not prove live trading readiness.",
+            "- It does not fix runtime bugs by itself.",
+            "- It does not guarantee model profitability.",
+            "- It does not touch credentials or enable orders.",
+            "",
+            "## Next Rule",
+            "",
+            "Review this report and the preserved scenario folders before patching runtime code.",
+        ]
+    )
     (latest / "system3_one_click_max_proof.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     shutil.copy2(latest / "system3_one_click_max_proof.json", base_out / "system3_one_click_max_proof.json")
     shutil.copy2(latest / "system3_one_click_max_proof.md", base_out / "system3_one_click_max_proof.md")
@@ -294,21 +314,41 @@ def main() -> int:
         except subprocess.TimeoutExpired as exc:
             out_dir = base_out / name
             out_dir.mkdir(parents=True, exist_ok=True)
-            scenario_results.append(ScenarioResult(name, api_base, 124, "TIMEOUT", str(out_dir.relative_to(root)), tail(exc.stdout or ""), tail(exc.stderr or ""), {}))
+            scenario_results.append(
+                ScenarioResult(
+                    name,
+                    api_base,
+                    124,
+                    "TIMEOUT",
+                    str(out_dir.relative_to(root)),
+                    tail(exc.stdout or ""),
+                    tail(exc.stderr or ""),
+                    {},
+                )
+            )
         except Exception as exc:
             out_dir = base_out / name
             out_dir.mkdir(parents=True, exist_ok=True)
-            scenario_results.append(ScenarioResult(name, api_base, 126, "ERROR", str(out_dir.relative_to(root)), "", f"{type(exc).__name__}: {exc}", {}))
+            scenario_results.append(
+                ScenarioResult(
+                    name, api_base, 126, "ERROR", str(out_dir.relative_to(root)), "", f"{type(exc).__name__}: {exc}", {}
+                )
+            )
 
     report_path = write_master_reports(root, base_out, compile_result, scenario_results, probes)
     zip_path = zip_proof(root, base_out)
 
     print("SYSTEM3_ONE_CLICK_MAX_PROOF_COMPLETE")
-    print(json.dumps({
-        "report": str(report_path.relative_to(root)),
-        "zip": str(zip_path.relative_to(root)),
-        "proof_folder": str(base_out.relative_to(root)),
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "report": str(report_path.relative_to(root)),
+                "zip": str(zip_path.relative_to(root)),
+                "proof_folder": str(base_out.relative_to(root)),
+            },
+            indent=2,
+        )
+    )
     return 0 if compile_result["all_pass"] else 1
 
 

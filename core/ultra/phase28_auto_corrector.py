@@ -10,10 +10,11 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 91
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"

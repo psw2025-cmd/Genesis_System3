@@ -5,9 +5,9 @@ Runs comprehensive pre-market diagnostics before trading.
 SAFE MODE ONLY - Read-only checks, no actions.
 """
 
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
@@ -43,8 +43,8 @@ def run_pre_market_diagnostic() -> Dict[str, Any]:
 
     # Check 2: Configuration
     try:
-        from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
 
         diagnostics["checks"]["config"] = {
             "status": "PASS",

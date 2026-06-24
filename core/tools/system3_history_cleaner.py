@@ -11,11 +11,10 @@ from __future__ import annotations
 import csv
 import glob
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
-
+from typing import Any, Dict, List, Tuple
 
 LOGS_DIR = Path("logs")
 

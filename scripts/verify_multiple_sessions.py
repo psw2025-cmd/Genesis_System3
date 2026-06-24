@@ -2,12 +2,13 @@
 Verify Multiple Sessions - Test system across multiple sessions
 """
 
-import sys
-from pathlib import Path
 import json
-from datetime import datetime
-import pytz
+import sys
 import time
+from datetime import datetime
+from pathlib import Path
+
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

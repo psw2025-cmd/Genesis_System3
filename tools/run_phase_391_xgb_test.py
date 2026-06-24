@@ -12,9 +12,9 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import sys
-import os
 import json
+import os
+import sys
 from pathlib import Path
 
 # Add project root to path

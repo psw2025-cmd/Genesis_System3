@@ -28,8 +28,24 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "reports" / "latest" / "full_repo_verification"
 
 TEXT_SUFFIXES = {
-    ".py", ".yml", ".yaml", ".json", ".md", ".txt", ".toml", ".ini", ".cfg",
-    ".ps1", ".bat", ".sh", ".ts", ".tsx", ".js", ".jsx", ".html", ".css",
+    ".py",
+    ".yml",
+    ".yaml",
+    ".json",
+    ".md",
+    ".txt",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".ps1",
+    ".bat",
+    ".sh",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".html",
+    ".css",
 }
 
 SAFE_ENV = {
@@ -185,11 +201,13 @@ def critical_path_status() -> list[dict[str, Any]]:
     rows = []
     for item in CRITICAL_PATHS:
         p = ROOT / item
-        rows.append({
-            "path": item,
-            "exists": p.exists(),
-            "bytes": p.stat().st_size if p.exists() and p.is_file() else 0,
-        })
+        rows.append(
+            {
+                "path": item,
+                "exists": p.exists(),
+                "bytes": p.stat().st_size if p.exists() and p.is_file() else 0,
+            }
+        )
     return rows
 
 
@@ -245,7 +263,12 @@ def static_text_scan(files: list[str], out_dir: Path) -> dict[str, Any]:
             findings["hardcoded_localhost_mentions"].append({"path": f})
         if "todo" in low or "fixme" in low:
             findings["todo_fixme_mentions"].append({"path": f})
-        if f.startswith(".github/workflows/") and "git push" in text and "pull --rebase" not in text and "rebase origin" not in text:
+        if (
+            f.startswith(".github/workflows/")
+            and "git push" in text
+            and "pull --rebase" not in text
+            and "rebase origin" not in text
+        ):
             findings["workflow_push_without_rebase"].append({"path": f})
     for key, rows in findings.items():
         write_json(out_dir / "static_scan" / f"{key}.json", rows[:500])
@@ -259,9 +282,24 @@ def command_plan(files: list[str]) -> list[tuple[str, list[str], int, Path | Non
         ("python_version", [sys.executable, "--version"], 60, None),
         ("python_compile_backend_app", [sys.executable, "-m", "py_compile", "dashboard/backend/app.py"], 120, None),
         ("python_compile_env_loader", [sys.executable, "-m", "py_compile", "core/utils/env_loader.py"], 120, None),
-        ("python_compile_master_orchestrator", [sys.executable, "-m", "py_compile", "scripts/system3_master_proof_orchestrator.py"], 120, None),
-        ("python_compile_full_repo_verifier", [sys.executable, "-m", "py_compile", "scripts/system3_full_repo_verification.py"], 120, None),
-        ("master_orchestrator_dry_run", [sys.executable, "scripts/system3_master_proof_orchestrator.py", "--auto-fix"], 180, None),
+        (
+            "python_compile_master_orchestrator",
+            [sys.executable, "-m", "py_compile", "scripts/system3_master_proof_orchestrator.py"],
+            120,
+            None,
+        ),
+        (
+            "python_compile_full_repo_verifier",
+            [sys.executable, "-m", "py_compile", "scripts/system3_full_repo_verification.py"],
+            120,
+            None,
+        ),
+        (
+            "master_orchestrator_dry_run",
+            [sys.executable, "scripts/system3_master_proof_orchestrator.py", "--auto-fix"],
+            180,
+            None,
+        ),
     ]
     if shutil.which("node"):
         commands.append(("node_version", ["node", "--version"], 60, None))
@@ -271,7 +309,14 @@ def command_plan(files: list[str]) -> list[tuple[str, list[str], int, Path | Non
         if (frontend_dir / "package.json").exists():
             commands.append(("frontend_package_scripts", ["npm", "run"], 90, frontend_dir))
             commands.append(("frontend_lint_if_present", ["npm", "run", "lint", "--if-present"], 180, frontend_dir))
-            commands.append(("frontend_test_if_present", ["npm", "run", "test", "--if-present", "--", "--watch=false"], 180, frontend_dir))
+            commands.append(
+                (
+                    "frontend_test_if_present",
+                    ["npm", "run", "test", "--if-present", "--", "--watch=false"],
+                    180,
+                    frontend_dir,
+                )
+            )
             commands.append(("frontend_build_if_present", ["npm", "run", "build", "--if-present"], 240, frontend_dir))
     # Compile a representative set of Python files, capped to keep CI safe.
     py_files = [f for f in files if f.endswith(".py") and not f.startswith(("reports/", "audit_artifacts/"))]
@@ -299,18 +344,28 @@ def publish_readme(out_dir: Path, summary: dict[str, Any]) -> None:
     ]
     lines.extend([f"- `{b}`" for b in summary["blockers"]] or ["- None"])
     lines.extend(["", "## Important outputs", ""])
-    lines.extend([
-        "- `summary.json`",
-        "- `commands_index.json`",
-        "- `commands/*.stdout.txt`",
-        "- `commands/*.stderr.txt`",
-        "- `file_inventory.json`",
-        "- `critical_paths.json`",
-        "- `proof_status.json`",
-        "- `search_groups.json`",
-        "- `static_scan/*.json`",
-    ])
-    lines.extend(["", "## Safety", "", "Analyzer/Paper only. Live trading disabled. No broker login or order placement is performed by this verifier.", ""])
+    lines.extend(
+        [
+            "- `summary.json`",
+            "- `commands_index.json`",
+            "- `commands/*.stdout.txt`",
+            "- `commands/*.stderr.txt`",
+            "- `file_inventory.json`",
+            "- `critical_paths.json`",
+            "- `proof_status.json`",
+            "- `search_groups.json`",
+            "- `static_scan/*.json`",
+        ]
+    )
+    lines.extend(
+        [
+            "",
+            "## Safety",
+            "",
+            "Analyzer/Paper only. Live trading disabled. No broker login or order placement is performed by this verifier.",
+            "",
+        ]
+    )
     write_text(out_dir / "README.md", "\n".join(lines))
 
 
@@ -347,7 +402,10 @@ def main() -> int:
         blockers.append("one_or_more_verification_commands_failed")
     if static["workflow_push_without_rebase"]["count"]:
         blockers.append("workflow_push_without_rebase_detected")
-    if not any(p["path"] == "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json" and p["exists"] for p in proofs):
+    if not any(
+        p["path"] == "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json" and p["exists"]
+        for p in proofs
+    ):
         blockers.append("pipeline_readiness_report_missing")
 
     summary = {
@@ -359,7 +417,11 @@ def main() -> int:
         },
         "mode": "Analyzer/Paper only; live trading disabled",
         "trade_ready": False,
-        "verdict": "FULL_REPO_VERIFICATION_COMPLETE_WITH_BLOCKERS" if blockers else "FULL_REPO_VERIFICATION_COMPLETE_NO_STATIC_BLOCKERS",
+        "verdict": (
+            "FULL_REPO_VERIFICATION_COMPLETE_WITH_BLOCKERS"
+            if blockers
+            else "FULL_REPO_VERIFICATION_COMPLETE_NO_STATIC_BLOCKERS"
+        ),
         "blockers": blockers,
         "command_summary": command_summary,
         "critical_missing_count": len(missing_critical),

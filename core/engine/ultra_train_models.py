@@ -14,16 +14,17 @@ Outputs:
 Menu Option: 75
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional, List
 import json
-import joblib
 from datetime import datetime
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"

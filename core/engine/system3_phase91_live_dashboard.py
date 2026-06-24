@@ -5,9 +5,9 @@ Provide a text/MD live dashboard snapshot of System3.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional, List
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -36,8 +36,8 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 def get_system_status() -> Dict[str, Any]:
     """Get current system status."""
     try:
-        from core.engine.ultra_safety import load_ultra_safety
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+        from core.engine.ultra_safety import load_ultra_safety
 
         safety = load_ultra_safety()
         auto_exec = safety.get("AUTO_EXECUTE_TRADES", False) or AUTOMATION_CONFIG.auto_execute_trades

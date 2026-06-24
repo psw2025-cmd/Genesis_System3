@@ -5,9 +5,9 @@ Logs Monday start-time and creates minimal recorder.
 SAFE MODE ONLY - Read-only logging, no execution.
 """
 
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"

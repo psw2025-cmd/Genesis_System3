@@ -7,14 +7,15 @@ Parses autorun logs and tracks WARN sources with categorized root causes.
 Mode: Post-market, optionally hourly.
 """
 
-import sys
 import json
-import re
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
 import logging
+import re
+import sys
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

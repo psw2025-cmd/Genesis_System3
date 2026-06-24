@@ -2,12 +2,14 @@
 LSTM-based time-series forecasting for option chain / spot / IV (Governance Responsibility 6).
 Optional: requires torch. Used for volatility and price movement predictions when data is available.
 """
+
 from typing import List, Optional
 
 # Optional torch
 try:
     import torch
     import torch.nn as nn
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False

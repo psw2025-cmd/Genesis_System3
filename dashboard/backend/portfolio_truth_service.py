@@ -23,10 +23,10 @@ def _utc_now() -> str:
 def _normalize_broker_rows(raw: Any) -> List[Dict[str, Any]]:
     try:
         from core.brokers.dhan.dhan_payload_normalizer import (
-            normalize_holdings_payload,
             normalize_holding_row,
-            normalize_positions_payload,
+            normalize_holdings_payload,
             normalize_position_row,
+            normalize_positions_payload,
         )
     except ImportError:
         normalize_holdings_payload = normalize_positions_payload = None
@@ -192,7 +192,11 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
     broker_error: Optional[str] = None
 
     try:
-        from core.brokers.dhan.dhan_readonly import get_holdings, get_positions, get_status
+        from core.brokers.dhan.dhan_readonly import (
+            get_holdings,
+            get_positions,
+            get_status,
+        )
 
         status = get_status()
         broker_connected = bool(status.get("connected"))

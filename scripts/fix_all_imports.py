@@ -3,9 +3,9 @@ Fix All Import Issues - Comprehensive Fix
 Identifies and fixes all import path issues
 """
 
+import re
 import sys
 from pathlib import Path
-import re
 
 ROOT_DIR = Path(__file__).parent.parent
 

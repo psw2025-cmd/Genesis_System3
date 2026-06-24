@@ -2,15 +2,16 @@
 Run and monitor the entire system, checking all components and resolving issues.
 """
 
-import sys
-import time
-import subprocess
-import threading
-from pathlib import Path
-from datetime import datetime
-import pytz
 import json
+import subprocess
+import sys
+import threading
+import time
+from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
+import pytz
 
 # Fix Unicode encoding for Windows console
 if sys.platform == "win32":

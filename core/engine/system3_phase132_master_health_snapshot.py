@@ -4,12 +4,12 @@ System3 Phase 132 - Master Session Health Snapshot
 Gathers minimal health info for master session.
 """
 
-import sys
 import json
 import platform
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

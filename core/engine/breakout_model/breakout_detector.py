@@ -2,9 +2,10 @@
 Breakout Detector - Detect H-L breakouts, CPR, ORB, support/resistance breaks
 """
 
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, List, Tuple
 
 
 def compute_cpr_levels(high: pd.Series, low: pd.Series, close: pd.Series) -> Dict[str, float]:

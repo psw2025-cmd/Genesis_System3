@@ -3,10 +3,10 @@ World-Class Trading System Comparison
 Compares current system with industry best practices
 """
 
+import json
 import sys
 from pathlib import Path
 from typing import Dict, List
-import json
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -3,11 +3,12 @@ Comprehensive Dashboard Validation Test Suite
 Tests all tabs, API endpoints, market open/closed scenarios, and load testing
 """
 
-import sys
-import os
-import json
-import time
 import asyncio
+import json
+import os
+import sys
+import time
+
 import requests
 
 # Fix Unicode encoding for Windows
@@ -16,7 +17,8 @@ if sys.platform == "win32":
     sys.stderr.reconfigure(encoding="utf-8")
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
+
 import pytz
 
 # Add project root to path

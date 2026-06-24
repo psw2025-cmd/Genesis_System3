@@ -3,13 +3,14 @@
 Comprehensive Pre-Build Validation
 Tests everything before rebuilding the app
 """
-import sys
-import requests
-import subprocess
 import json
-from pathlib import Path
-from typing import Dict, List, Any
+import subprocess
+import sys
 import time
+from pathlib import Path
+from typing import Any, Dict, List
+
+import requests
 
 ROOT_DIR = Path(__file__).parent
 sys.path.insert(0, str(ROOT_DIR))
@@ -99,7 +100,7 @@ class ComprehensivePreBuildValidator:
         """Test 21-30: Market hours and data switching"""
         self.test_count += 1
         try:
-            from src.utils.market_hours import is_market_open, get_market_status
+            from src.utils.market_hours import get_market_status, is_market_open
             
             is_open, reason = is_market_open()
             status = get_market_status()

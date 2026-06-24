@@ -1,4 +1,3 @@
-
 def test_tradeable_fo_symbol():
     from core.brokers.dhan.equity_fo_universe import is_tradeable_fo_symbol
 

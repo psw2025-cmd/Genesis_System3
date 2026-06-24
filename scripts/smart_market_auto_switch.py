@@ -5,19 +5,20 @@ Continuously monitors and switches seamlessly
 """
 
 import sys
-import time
 import threading
-from pathlib import Path
+import time
 from datetime import datetime
-from typing import Optional, Dict
+from pathlib import Path
+from typing import Dict, Optional
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.utils.market_hours import is_market_open, get_market_status
 from core.utils.logger import logger
+from src.utils.market_hours import get_market_status, is_market_open
 
 IST = pytz.timezone("Asia/Kolkata")
 

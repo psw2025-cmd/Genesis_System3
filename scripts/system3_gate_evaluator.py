@@ -71,13 +71,15 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         rho = _spearman_from_validation(data)
         if rho is None:
             continue
-        days.append({
-            "date": data.get("date") or path.stem.replace("market_validation_", ""),
-            "rho": round(rho, 4),
-            "hit_rate": data.get("hit_rate"),
-            "status": data.get("status"),
-            "pass": rho >= SPEARMAN_THRESHOLD,
-        })
+        days.append(
+            {
+                "date": data.get("date") or path.stem.replace("market_validation_", ""),
+                "rho": round(rho, 4),
+                "hit_rate": data.get("hit_rate"),
+                "status": data.get("status"),
+                "pass": rho >= SPEARMAN_THRESHOLD,
+            }
+        )
     passing = sum(1 for d in days if d["pass"])
     latest_rho = days[-1]["rho"] if days else None
     return days, passing, latest_rho
@@ -140,8 +142,7 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
     if not full_proven and live_state and broker_connected:
         positions = live_state.get("positions") or []
         if positions and all(
-            isinstance(p, dict) and p.get("strike") and p.get("entry_price") and p.get("position_id")
-            for p in positions
+            isinstance(p, dict) and p.get("strike") and p.get("entry_price") and p.get("position_id") for p in positions
         ):
             full_proven = True
     ok = (
@@ -171,13 +172,19 @@ def eval_tick_health_gate(root: Path, live_state: Optional[Dict[str, Any]] = Non
     refresh = ev.get("refresh_interval_sec")
     broker_ok = ev.get("broker_connected")
     if live_state:
-        tick_age = live_state.get("last_tick_age_sec") or (live_state.get("tick_health") or {}).get("last_tick_age_sec") or tick_age
-        refresh = live_state.get("refresh_interval") or (live_state.get("tick_health") or {}).get("refresh_interval_sec") or refresh
+        tick_age = (
+            live_state.get("last_tick_age_sec")
+            or (live_state.get("tick_health") or {}).get("last_tick_age_sec")
+            or tick_age
+        )
+        refresh = (
+            live_state.get("refresh_interval")
+            or (live_state.get("tick_health") or {}).get("refresh_interval_sec")
+            or refresh
+        )
         broker_ok = (live_state.get("broker") or {}).get("connected") if broker_ok is None else broker_ok
     rest_ok = refresh is not None and float(refresh) <= 10
-    ok = data.get("pass") is True or (
-        rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15
-    )
+    ok = data.get("pass") is True or (rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15)
     return {
         "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
         "pass": ok,
@@ -244,10 +251,14 @@ def eval_option_visibility(root: Path, live_state: Optional[Dict[str, Any]] = No
 
 def eval_equity_fo_gate(root: Path) -> Dict[str, Any]:
     import sys
+
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
     try:
-        from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe, is_equity_fo_symbol
+        from core.brokers.dhan.equity_fo_universe import (
+            is_equity_fo_symbol,
+            load_equity_fo_universe,
+        )
 
         universe = load_equity_fo_universe()
         count = int(universe.get("underlying_count") or 0)
@@ -296,7 +307,11 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
         "trade_ready": passing == len(gates),
         "analyzer_ready": passing >= 4,
         "technical_gates_still_required": [
-            g["gate_id"] for g in gates if not g.get("pass") and g["gate_id"] in (
+            g["gate_id"]
+            for g in gates
+            if not g.get("pass")
+            and g["gate_id"]
+            in (
                 "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
                 "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
                 "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
@@ -364,11 +379,16 @@ def main() -> int:
         payload["human_gate_sync"] = sync_human_technical_gates(root, payload)
     write_reports(root, payload)
     print("SYSTEM3_GATE_EVALUATOR_COMPLETE")
-    print(json.dumps({
-        "gates_passing": payload["gates_passing"],
-        "trade_ready": payload["trade_ready"],
-        "open_blockers": payload["open_blockers"],
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "gates_passing": payload["gates_passing"],
+                "trade_ready": payload["trade_ready"],
+                "open_blockers": payload["open_blockers"],
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

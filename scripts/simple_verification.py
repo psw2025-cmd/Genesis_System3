@@ -2,10 +2,10 @@
 Simple Verification Script - Produces visible output and proof
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -23,9 +23,9 @@ def test_imports():
     """Test critical imports."""
     print("  Testing imports...")
     try:
+        from src.storage.trade_history import TradeHistoryStore
         from src.trading.paper_executor import PaperExecutor
         from src.trading.pnl_tracker import PnLTracker
-        from src.storage.trade_history import TradeHistoryStore
 
         print("    [OK] All imports successful")
         return True

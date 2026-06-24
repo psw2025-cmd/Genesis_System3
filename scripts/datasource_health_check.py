@@ -44,12 +44,12 @@ def main() -> None:
         print(f"{'='*60}")
 
     from core.data.datasource_manager import get_manager
+
     mgr = get_manager()
 
     if args.quick:
         # Quick check: just NSE + bhavcopy (fast, used in pre-market)
-        from datetime import date
-        from datetime import timedelta
+        from datetime import date, timedelta
 
         results = {}
         import time
@@ -81,8 +81,7 @@ def main() -> None:
             ms = int((time.time() - t0) * 1000)
             results["bhavcopy"] = {"status": "FAIL", "error": str(e)[:80], "latency_ms": ms}
 
-        health = {"timestamp": datetime.now().isoformat(timespec="seconds"),
-                  "mode": "quick", "sources": results}
+        health = {"timestamp": datetime.now().isoformat(timespec="seconds"), "mode": "quick", "sources": results}
     else:
         # Full check
         health = mgr.health_check()
@@ -135,9 +134,11 @@ def main() -> None:
         log_file = ROOT_DIR / "CHANGE_LOG.md"
         if log_file.exists():
             ts = datetime.now().strftime("%Y-%m-%d %H:%M")
-            entry = (f"\n**[{ts}] [datasource_health_check.py]** "
-                     f"ALERT: Data source resilience = {resilience} ({ok_count} OK). "
-                     f"Source status: {json.dumps({k: v.get('status') for k, v in sources.items()})}\n")
+            entry = (
+                f"\n**[{ts}] [datasource_health_check.py]** "
+                f"ALERT: Data source resilience = {resilience} ({ok_count} OK). "
+                f"Source status: {json.dumps({k: v.get('status') for k, v in sources.items()})}\n"
+            )
             content = log_file.read_text()
             sentinel = "<!-- APPEND NEW ENTRIES ABOVE THIS LINE -->"
             if sentinel in content:

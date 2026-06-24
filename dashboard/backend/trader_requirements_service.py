@@ -47,15 +47,17 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
     portfolio = {
         "total_invested": _status_from_field(tf.get("holdings_total_value")),
         "current_value": _status_from_field(tf.get("holdings_total_value")),
-        "gross_pnl": _status_from_field(tf.get("positions_unrealized_pnl")) if positions_rows else (
-            "PASS_WITH_WARNINGS" if has_summary else "NOT_FOUND"
+        "gross_pnl": (
+            _status_from_field(tf.get("positions_unrealized_pnl"))
+            if positions_rows
+            else ("PASS_WITH_WARNINGS" if has_summary else "NOT_FOUND")
         ),
         "net_pnl": "PASS_WITH_WARNINGS" if has_summary else "NOT_FOUND",
         "cash_available": _status_from_field(tf.get("cash_available")),
         "open_positions": (
-            "PASS" if positions_rows or paper.get("open_positions") else (
-                "BROKER_OFFLINE" if not broker_connected else "PASS"
-            )
+            "PASS"
+            if positions_rows or paper.get("open_positions")
+            else ("BROKER_OFFLINE" if not broker_connected else "PASS")
         ),
         "win_rate": "PASS_WITH_WARNINGS" if "win_rate" in summary else "NOT_FOUND",
         "max_loss_position": "NOT_FOUND",
@@ -65,10 +67,21 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
     }
 
     trade_fields = [
-        "trade_id", "timestamp_ist", "symbol", "entry_price", "exit_price",
-        "gross_pnl", "net_pnl", "charges_breakdown", "duration_minutes",
-        "exit_reason", "source", "Greeks_at_entry", "Greeks_at_exit",
-        "slippage_realized", "market_condition_at_entry",
+        "trade_id",
+        "timestamp_ist",
+        "symbol",
+        "entry_price",
+        "exit_price",
+        "gross_pnl",
+        "net_pnl",
+        "charges_breakdown",
+        "duration_minutes",
+        "exit_reason",
+        "source",
+        "Greeks_at_entry",
+        "Greeks_at_exit",
+        "slippage_realized",
+        "market_condition_at_entry",
     ]
     trade_history_map: Dict[str, str] = {}
     sample = trades[0] if trades else {}
@@ -95,9 +108,19 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
             )
 
     live_fields = [
-        "position_id", "symbol", "strike", "entry_price", "current_ltp",
-        "unrealized_pnl", "Greeks_now", "Greeks_change_since_entry",
-        "iv_change", "stoploss", "target", "risk_reward_ratio", "days_to_expiry",
+        "position_id",
+        "symbol",
+        "strike",
+        "entry_price",
+        "current_ltp",
+        "unrealized_pnl",
+        "Greeks_now",
+        "Greeks_change_since_entry",
+        "iv_change",
+        "stoploss",
+        "target",
+        "risk_reward_ratio",
+        "days_to_expiry",
     ]
     live_positions_map: Dict[str, str] = {}
     psample = positions_rows[0] if positions_rows else {}
@@ -117,10 +140,17 @@ def build_trader_requirements_report(outputs_dir: Path) -> Dict[str, Any]:
         else:
             live_positions_map[field] = "NOT_FOUND"
 
-    prediction = {k: "NOT_FOUND" for k in [
-        "prediction_timestamp", "predicted_top_3", "actual_top_3",
-        "accuracy_pct", "ranking_correlation", "market_result_proof",
-    ]}
+    prediction = {
+        k: "NOT_FOUND"
+        for k in [
+            "prediction_timestamp",
+            "predicted_top_3",
+            "actual_top_3",
+            "accuracy_pct",
+            "ranking_correlation",
+            "market_result_proof",
+        ]
+    }
 
     counts: Dict[str, int] = {}
     for group in [portfolio, trade_history_map, live_positions_map, prediction]:

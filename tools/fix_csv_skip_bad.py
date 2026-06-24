@@ -1,7 +1,8 @@
 """Skip bad rows by using pandas with on_bad_lines='skip'."""
 
-from pathlib import Path
 import shutil
+from pathlib import Path
+
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]

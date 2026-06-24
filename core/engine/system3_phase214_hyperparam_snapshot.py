@@ -4,11 +4,11 @@ System3 Phase 214 - Model Hyperparameter Snapshotter
 Records current ML model hyperparameters.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

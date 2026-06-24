@@ -2,10 +2,11 @@
 Test Trade Logging and PnL Calculation Fixes
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 sys.stdout.reconfigure(encoding="utf-8")

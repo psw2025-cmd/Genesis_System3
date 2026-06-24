@@ -5,9 +5,10 @@ Overfit Guard + Noise Suppressor for model predictions.
 SAFE MODE ONLY - Read-only validation.
 """
 
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"

@@ -29,9 +29,9 @@ def main() -> int:
     broker_ok = (state.get("broker") or {}).get("connected")
     market_open = (state.get("market") or {}).get("is_open")
     rest_ok = refresh is not None and float(refresh) <= 10
-    pass_gate = (
-        tick_age is not None and float(tick_age) < 30 and broker_ok
-    ) or (rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15)
+    pass_gate = (tick_age is not None and float(tick_age) < 30 and broker_ok) or (
+        rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15
+    )
 
     report = {
         "generated_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),

@@ -14,10 +14,11 @@ Outputs:
 Menu Option: 77
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"

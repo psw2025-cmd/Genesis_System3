@@ -83,7 +83,9 @@ def _plan_auto_actions(api_base: str, full: bool) -> List[Tuple[str, List[str]]]
         actions.append(("model_accuracy", [py, "scripts/system3_model_accuracy_tracker.py", "--api-base", api_base]))
 
     if _missing("reports/latest/option_strike_visibility.json"):
-        actions.append(("option_visibility", [py, "scripts/system3_option_visibility_audit.py", "--api-base", api_base]))
+        actions.append(
+            ("option_visibility", [py, "scripts/system3_option_visibility_audit.py", "--api-base", api_base])
+        )
 
     actions.append(("friction_expectancy", [py, "scripts/system3_friction_expectancy_proof.py"]))
     actions.append(("websocket_tick_health", [py, "scripts/websocket_tick_health_proof.py"]))
@@ -102,11 +104,13 @@ def _plan_auto_actions(api_base: str, full: bool) -> List[Tuple[str, List[str]]]
     actions.append(("pytest", [py, "-m", "pytest", "tests/", "-q", "--tb=no"]))
 
     if full:
-        actions.extend([
-            ("master_orchestrator", [py, "scripts/system3_master_proof_orchestrator.py"]),
-            ("dashboard_audit", [py, "tools/dashboard_full_audit.py"]),
-            ("broker_validation", [py, "tools/broker_trader_validation.py"]),
-        ])
+        actions.extend(
+            [
+                ("master_orchestrator", [py, "scripts/system3_master_proof_orchestrator.py"]),
+                ("dashboard_audit", [py, "tools/dashboard_full_audit.py"]),
+                ("broker_validation", [py, "tools/broker_trader_validation.py"]),
+            ]
+        )
     return actions
 
 
@@ -140,7 +144,8 @@ def main() -> int:
 
     agents_passed = sum(1 for a in agent_results if a.get("passed"))
     critical_fail = [
-        a for a in agent_results
+        a
+        for a in agent_results
         if not a.get("passed") and a.get("agent") in ("pytest", "blocker_finder", "model_accuracy")
     ]
     payload = {

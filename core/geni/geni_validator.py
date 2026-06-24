@@ -4,18 +4,14 @@ System3 GENI - Validation Helpers
 Runs validation routines and parses results.
 """
 
-import subprocess
 import re
+import subprocess
 from dataclasses import dataclass
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
-from .geni_config import (
-    ULTRA_VALIDATION,
-    FULL_VERIFICATION,
-    PROJECT_ROOT,
-)
-from .geni_state import load_state, save_state, GeniState
+from .geni_config import FULL_VERIFICATION, PROJECT_ROOT, ULTRA_VALIDATION
+from .geni_state import GeniState, load_state, save_state
 
 
 @dataclass

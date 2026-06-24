@@ -3,10 +3,11 @@ Synthetic Data Generator for Dashboard
 Generates realistic option chain data when market is closed
 """
 
-import random
 import math
+import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")

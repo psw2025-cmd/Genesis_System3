@@ -5,7 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from core.data.dhan_option_chain_parser import parse_dhan_leg, parse_dhan_option_chain_payload
+from core.data.dhan_option_chain_parser import (
+    parse_dhan_leg,
+    parse_dhan_option_chain_payload,
+)
 
 FIXTURE = Path(__file__).parent / "fixtures" / "dhan_option_chain_sample.json"
 

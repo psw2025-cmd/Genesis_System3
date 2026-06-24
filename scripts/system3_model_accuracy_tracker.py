@@ -137,7 +137,10 @@ def extract_prediction_candidates(obj: Any) -> List[Dict[str, Any]]:
     seen = set()
     out = []
     for r in rows:
-        key = (norm_symbol(r.get("symbol") or r.get("underlying") or r.get("name")), str(r.get("ts") or r.get("timestamp") or r.get("time") or ""))
+        key = (
+            norm_symbol(r.get("symbol") or r.get("underlying") or r.get("name")),
+            str(r.get("ts") or r.get("timestamp") or r.get("time") or ""),
+        )
         if key not in seen and key[0]:
             seen.add(key)
             out.append(r)
@@ -182,11 +185,16 @@ def load_prediction_sources(root: Path, api_base: Optional[str]) -> tuple[List[D
     seen = set()
     out = []
     for r in all_rows:
-        key = json.dumps({
-            "sym": norm_symbol(r.get("symbol") or r.get("underlying") or r.get("name")),
-            "ts": str(r.get("ts") or r.get("timestamp") or r.get("time") or r.get("prediction_ts") or ""),
-            "score": str(r.get("score") or r.get("confidence") or r.get("display_score") or r.get("rank_score") or ""),
-        }, sort_keys=True)
+        key = json.dumps(
+            {
+                "sym": norm_symbol(r.get("symbol") or r.get("underlying") or r.get("name")),
+                "ts": str(r.get("ts") or r.get("timestamp") or r.get("time") or r.get("prediction_ts") or ""),
+                "score": str(
+                    r.get("score") or r.get("confidence") or r.get("display_score") or r.get("rank_score") or ""
+                ),
+            },
+            sort_keys=True,
+        )
         if key not in seen:
             seen.add(key)
             out.append(r)
@@ -206,7 +214,11 @@ def make_accuracy_rows(predictions: List[Dict[str, Any]]) -> List[AccuracyRow]:
         actual_30m = as_float(p.get("actual_30m") or p.get("ret_30m") or p.get("return_30m"))
         actual_eod = as_float(p.get("actual_eod") or p.get("eod_return") or p.get("return_eod"))
         direction_correct = None
-        outcome = actual_30m if actual_30m is not None else actual_15m if actual_15m is not None else actual_5m if actual_5m is not None else actual_eod
+        outcome = (
+            actual_30m
+            if actual_30m is not None
+            else actual_15m if actual_15m is not None else actual_5m if actual_5m is not None else actual_eod
+        )
         if outcome is not None and direction in {"UP", "DOWN"}:
             direction_correct = outcome > 0 if direction == "UP" else outcome < 0
         option_profitable = None
@@ -227,45 +239,51 @@ def make_accuracy_rows(predictions: List[Dict[str, Any]]) -> List[AccuracyRow]:
         if outcome is None:
             blockers.append("ACTUAL_OUTCOME_WINDOW_MISSING")
         proof_status = "PASS" if not blockers and direction_correct is not None else "BLOCKED"
-        rows.append(AccuracyRow(
-            prediction_ts_ist=str(p.get("ts") or p.get("timestamp") or p.get("time") or p.get("prediction_ts") or "UNKNOWN"),
-            symbol=sym,
-            symbol_type=symbol_type(sym),
-            direction=direction,
-            option_side=option_side,
-            confidence=confidence,
-            selected_strike=strike,
-            actual_5m=actual_5m,
-            actual_15m=actual_15m,
-            actual_30m=actual_30m,
-            actual_eod=actual_eod,
-            direction_correct=direction_correct,
-            option_profitable=option_profitable,
-            max_favorable_move=max_fav,
-            max_adverse_move=max_adv,
-            proof_status=proof_status,
-            blocker_reason=";".join(blockers) if blockers else "PASS",
-        ))
+        rows.append(
+            AccuracyRow(
+                prediction_ts_ist=str(
+                    p.get("ts") or p.get("timestamp") or p.get("time") or p.get("prediction_ts") or "UNKNOWN"
+                ),
+                symbol=sym,
+                symbol_type=symbol_type(sym),
+                direction=direction,
+                option_side=option_side,
+                confidence=confidence,
+                selected_strike=strike,
+                actual_5m=actual_5m,
+                actual_15m=actual_15m,
+                actual_30m=actual_30m,
+                actual_eod=actual_eod,
+                direction_correct=direction_correct,
+                option_profitable=option_profitable,
+                max_favorable_move=max_fav,
+                max_adverse_move=max_adv,
+                proof_status=proof_status,
+                blocker_reason=";".join(blockers) if blockers else "PASS",
+            )
+        )
     if not rows:
-        rows.append(AccuracyRow(
-            prediction_ts_ist="UNKNOWN",
-            symbol="NO_PREDICTION_FOUND",
-            symbol_type="UNKNOWN",
-            direction="UNKNOWN",
-            option_side="UNKNOWN",
-            confidence=None,
-            selected_strike="",
-            actual_5m=None,
-            actual_15m=None,
-            actual_30m=None,
-            actual_eod=None,
-            direction_correct=None,
-            option_profitable=None,
-            max_favorable_move=None,
-            max_adverse_move=None,
-            proof_status="BLOCKED",
-            blocker_reason="NO_PREDICTION_SOURCE_FOUND",
-        ))
+        rows.append(
+            AccuracyRow(
+                prediction_ts_ist="UNKNOWN",
+                symbol="NO_PREDICTION_FOUND",
+                symbol_type="UNKNOWN",
+                direction="UNKNOWN",
+                option_side="UNKNOWN",
+                confidence=None,
+                selected_strike="",
+                actual_5m=None,
+                actual_15m=None,
+                actual_30m=None,
+                actual_eod=None,
+                direction_correct=None,
+                option_profitable=None,
+                max_favorable_move=None,
+                max_adverse_move=None,
+                proof_status="BLOCKED",
+                blocker_reason="NO_PREDICTION_SOURCE_FOUND",
+            )
+        )
     return rows
 
 
@@ -284,7 +302,9 @@ def write_reports(root: Path, rows: List[AccuracyRow], sources: List[str]) -> No
         "proof_pass_count": len(pass_rows),
         "blocked_count": len(rows) - len(pass_rows),
         "direction_known_count": len(direction_known),
-        "direction_hit_rate": (sum(1 for r in direction_known if r.direction_correct) / len(direction_known)) if direction_known else None,
+        "direction_hit_rate": (
+            (sum(1 for r in direction_known if r.direction_correct) / len(direction_known)) if direction_known else None
+        ),
         "option_profitable_known_count": sum(1 for r in rows if r.option_profitable is not None),
     }
     data = {"summary": summary, "rows": [asdict(r) for r in rows]}
@@ -314,12 +334,14 @@ def write_reports(root: Path, rows: List[AccuracyRow], sources: List[str]) -> No
         lines.append(
             f"| `{r.symbol}` | `{r.symbol_type}` | `{r.direction}` | `{r.option_side}` | `{r.confidence}` | `{r.selected_strike}` | `{r.actual_5m}` | `{r.actual_15m}` | `{r.actual_30m}` | `{r.actual_eod}` | `{r.direction_correct}` | `{r.option_profitable}` | `{r.proof_status}` | `{r.blocker_reason}` |"
         )
-    lines.extend([
-        "",
-        "## Pass Rule",
-        "",
-        "Model accuracy is not proven until 5+ market days include prediction-before-move timestamps, option-mapped strike/token proof, and actual 5m/15m/30m/EOD outcomes.",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Pass Rule",
+            "",
+            "Model accuracy is not proven until 5+ market days include prediction-before-move timestamps, option-mapped strike/token proof, and actual 5m/15m/30m/EOD outcomes.",
+        ]
+    )
     (reports / "model_accuracy_report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

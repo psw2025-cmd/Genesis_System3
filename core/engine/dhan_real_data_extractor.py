@@ -5,9 +5,10 @@ Converts real outcomes into training rows.
 AUTO-UPDATE: DISABLED - Only extracts, never auto-trains.
 """
 
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import pandas as pd
 
 from core.engine.dhan_real_outcome_logger import load_outcomes
 

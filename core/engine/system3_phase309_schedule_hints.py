@@ -4,11 +4,11 @@ System3 Phase 309 - Schedule Hints Generator
 Analyzes phase execution patterns and suggests optimal scheduling for phases 301-310.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

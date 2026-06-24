@@ -119,7 +119,7 @@ def load_oi_cache() -> Dict[str, int]:
     - Returns {} if cache date == today (guards against same-day overwrite)
     - Returns {} if file missing/corrupt
     """
-    from datetime import datetime, date
+    from datetime import date, datetime
     try:
         with open(MARKET_CACHE_FILE) as f:
             data = json.load(f)
@@ -157,7 +157,7 @@ def save_oi_cache(oi_data: Dict[str, int]) -> None:
     Saves current OI totals to state/market_cache.json for next session's prev_oi.
     Stores cache_date so staleness can be detected on next read.
     """
-    from datetime import datetime, date
+    from datetime import date, datetime
     os.makedirs(os.path.dirname(MARKET_CACHE_FILE), exist_ok=True)
     payload = {
         "last_updated": datetime.now().isoformat(timespec="seconds"),

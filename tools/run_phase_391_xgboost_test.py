@@ -12,16 +12,17 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from core.engine.system3_phase391_xgboost_training import run_phase_391
 import json
+
+from core.engine.system3_phase391_xgboost_training import run_phase_391
 
 
 def main():

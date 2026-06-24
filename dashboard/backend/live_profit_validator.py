@@ -4,11 +4,12 @@ Multi-source validation for real-time profit calculations
 """
 
 import json
-import requests
 from datetime import datetime
-from typing import Dict, List, Optional, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pytz
+import requests
 
 IST = pytz.timezone("Asia/Kolkata")
 

@@ -2,9 +2,10 @@
 Momentum Analyzer - Compute rate of change, acceleration factor
 """
 
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
 
 
 def compute_momentum_features(df: pd.DataFrame, price_col: str = "spot") -> pd.DataFrame:

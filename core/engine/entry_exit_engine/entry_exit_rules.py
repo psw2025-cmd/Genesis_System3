@@ -2,9 +2,10 @@
 Entry/Exit Rules - Compute entry signals, dynamic SL/Target, trailing SL
 """
 
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
 
 
 def compute_dynamic_sl_tp(

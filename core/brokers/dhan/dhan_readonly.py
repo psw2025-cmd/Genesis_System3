@@ -8,10 +8,10 @@ SAFETY CONTRACT:
 - Profile endpoint used for connectivity check.
 """
 
+import logging
 import os
 import sys
 import time
-import logging
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 if ROOT_DIR not in sys.path:

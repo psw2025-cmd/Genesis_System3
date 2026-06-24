@@ -28,7 +28,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-
 SCRIPT_SEQUENCE = [
     ("markdown_inventory", "scripts/system3_markdown_inventory.py"),
     ("option_visibility", "scripts/system3_option_visibility_audit.py"),
@@ -180,15 +179,17 @@ def write_outputs(root: Path, data: Dict[str, Any]) -> None:
             for k, v in summary.items():
                 lines.append(f"- **{k}**: `{v}`")
         lines.append("")
-    lines.extend([
-        "## Safety Statement",
-        "",
-        "This runner and its child scripts are intended to be read-only verification/reporting tools. They do not enable live trading, do not place orders, and do not touch credentials.",
-        "",
-        "## Next Rule",
-        "",
-        "Do not patch runtime logic until this status report, blocker report, option visibility report, and model accuracy report have been reviewed.",
-    ])
+    lines.extend(
+        [
+            "## Safety Statement",
+            "",
+            "This runner and its child scripts are intended to be read-only verification/reporting tools. They do not enable live trading, do not place orders, and do not touch credentials.",
+            "",
+            "## Next Rule",
+            "",
+            "Do not patch runtime logic until this status report, blocker report, option visibility report, and model accuracy report have been reviewed.",
+        ]
+    )
     (reports / "system3_control_plane_status.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

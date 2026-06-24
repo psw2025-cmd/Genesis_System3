@@ -5,12 +5,13 @@ Provides unified, atomic, versioned state for all dashboard pages
 
 import json
 import os
+import threading
 import time
 from datetime import datetime
-from typing import Dict, List, Optional, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pytz
-import threading
 
 IST = pytz.timezone("Asia/Kolkata")
 
@@ -38,6 +39,7 @@ class RuntimeStateStore:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+
             return _dhan_status()
         except Exception as e:
             return {
@@ -301,8 +303,7 @@ class RuntimeStateStore:
             if "alerts" not in self._state:
                 self._state["alerts"] = []
             existing = [
-                a for a in self._state.get("alerts", [])
-                if a.get("code") == code and not a.get("resolved", False)
+                a for a in self._state.get("alerts", []) if a.get("code") == code and not a.get("resolved", False)
             ]
             if existing:
                 existing[0]["ts"] = datetime.now(IST).isoformat()
@@ -328,10 +329,7 @@ class RuntimeStateStore:
         with self._lock:
             alerts = self._state.get("alerts", [])
             before = len(alerts)
-            self._state["alerts"] = [
-                a for a in alerts
-                if not (a.get("code") == code and not a.get("resolved", False))
-            ]
+            self._state["alerts"] = [a for a in alerts if not (a.get("code") == code and not a.get("resolved", False))]
             if len(self._state["alerts"]) != before:
                 self._state_version += 1
                 self._save_state()

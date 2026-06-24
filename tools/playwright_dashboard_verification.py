@@ -15,8 +15,8 @@ Requires: pip install playwright && playwright install chromium
 """
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PROOF_ARCHIVE = ROOT / "proof" / "archive"

@@ -5,9 +5,10 @@ Validates trade plans and execution requests before processing.
 Ensures maximum safety for Monday's live trading.
 """
 
-import pandas as pd
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
+
+import pandas as pd
 
 from core.engine.dhan_automation_config import AUTOMATION_CONFIG
 from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
@@ -88,8 +89,8 @@ class SafetyValidator:
         - allowed: bool
         - reason: str (if not allowed)
         """
-        from pathlib import Path
         import os
+        from pathlib import Path
 
         PROJECT_ROOT = Path(__file__).parent.parent.parent
         EXEC_LOG_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_trades_exec_log.csv"

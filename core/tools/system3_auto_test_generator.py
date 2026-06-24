@@ -4,13 +4,13 @@ System3 Auto-Test Generator
 Automatically generates test files for phases based on registry and specifications.
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional
 import json
-import re
 import logging
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

@@ -6,9 +6,10 @@ Provides alerts and updates on trade performance.
 """
 
 import os
-import pandas as pd
 from datetime import datetime
 from pathlib import Path
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"

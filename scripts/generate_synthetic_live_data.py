@@ -3,12 +3,13 @@ Generate Synthetic Live Market Data for Dashboard Testing
 Creates realistic option chain data to simulate live market conditions
 """
 
+import csv
 import json
 import random
-import csv
 import time
 from datetime import datetime
 from pathlib import Path
+
 import pytz
 
 # Base spot prices (realistic values)

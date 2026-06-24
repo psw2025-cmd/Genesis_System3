@@ -5,13 +5,14 @@ Generates automated daily reports (read-only).
 AUTO-UPDATE: DISABLED - Only reads and reports.
 """
 
-import pandas as pd
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
-from core.engine.dhan_real_outcome_logger import load_outcomes, get_outcome_summary
+import pandas as pd
+
 from core.engine.dhan_daily_learning_report import generate_daily_learning_report
+from core.engine.dhan_real_outcome_logger import get_outcome_summary, load_outcomes
 from core.engine.dhan_rolling_learning_dashboard import generate_rolling_dashboard
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent

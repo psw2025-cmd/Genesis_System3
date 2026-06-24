@@ -10,9 +10,10 @@
 # ================================================
 
 import os
+
+import joblib
 import numpy as np
 import pandas as pd
-import joblib
 
 # Label mapping used during training
 LABEL_MAP = {

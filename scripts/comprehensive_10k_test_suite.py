@@ -3,27 +3,28 @@ Comprehensive 10,000+ Test Suite
 Tests all components, scenarios, and configurations
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import pytz
 import json
-from typing import Dict, List, Tuple
 import random
+import sys
+from datetime import datetime
 from itertools import product
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.selector.strategy_engine import StrategyEngine
+from src.selector.top_symbol_selector import TopSymbolSelector
 from src.trading.advanced_position_sizing import AdvancedPositionSizing
 from src.trading.dynamic_risk_management import DynamicRiskManager
-from src.selector.strategy_engine import StrategyEngine
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
-from src.selector.top_symbol_selector import TopSymbolSelector
 
 
 class Comprehensive10KTestSuite:

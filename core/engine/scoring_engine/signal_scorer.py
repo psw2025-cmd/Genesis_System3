@@ -2,9 +2,10 @@
 Signal Scorer - Combine all signals into final score
 """
 
+from typing import Dict
+
 import numpy as np
 import pandas as pd
-from typing import Dict
 
 
 def compute_final_score(df: pd.DataFrame, weights: Dict[str, float] | None = None) -> pd.DataFrame:

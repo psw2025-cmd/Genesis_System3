@@ -6,17 +6,18 @@ Enhance OptionChain Master Excel with:
 4. Live Paper Trading Details
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import pytz
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
 import openpyxl
-from openpyxl.chart import LineChart, BarChart, ScatterChart, Reference
+import pandas as pd
+import pytz
+from openpyxl.chart import BarChart, LineChart, Reference, ScatterChart
 from openpyxl.chart.series import DataPoint
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 ROOT_DIR = Path(__file__).parent.parent

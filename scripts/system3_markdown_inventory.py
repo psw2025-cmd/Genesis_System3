@@ -380,9 +380,7 @@ def write_contradictions_md(path: Path, summary: Dict[str, object], entries: Lis
         lines.append("| Strong Terms | Path | Recommended Action |")
         lines.append("|---|---|---|")
         for e in strong:
-            lines.append(
-                f"| `{', '.join(e.strong_ready_terms)}` | `{e.path}` | `{e.recommended_action}` |"
-            )
+            lines.append(f"| `{', '.join(e.strong_ready_terms)}` | `{e.path}` | `{e.recommended_action}` |")
     else:
         lines.append("- None")
     lines.append("")
@@ -392,9 +390,7 @@ def write_contradictions_md(path: Path, summary: Dict[str, object], entries: Lis
         lines.append("| Terms | Class | Path | Recommended Action |")
         lines.append("|---|---|---|---|")
         for e in conflicts:
-            lines.append(
-                f"| `{', '.join(e.risk_terms)}` | `{e.doc_class}` | `{e.path}` | `{e.recommended_action}` |"
-            )
+            lines.append(f"| `{', '.join(e.risk_terms)}` | `{e.doc_class}` | `{e.path}` | `{e.recommended_action}` |")
     else:
         lines.append("- None")
     lines.append("")

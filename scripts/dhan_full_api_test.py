@@ -9,9 +9,9 @@ Usage:
     python scripts/dhan_full_api_test.py --save    # save results to logs/
 """
 
-import sys
-import os
 import json
+import os
+import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -20,22 +20,23 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from dotenv import load_dotenv
+
 load_dotenv(ROOT / ".secrets" / "dhan.env", override=True)
 
 # ── Dhan client setup ──────────────────────────────────────────────────────────
 from dhanhq import dhanhq as DhanHQ
 from dhanhq.dhan_context import DhanContext
 
-CLIENT_ID    = os.getenv("DHAN_CLIENT_ID", "")
+CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "")
 ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN", "")
-ctx    = DhanContext(CLIENT_ID, ACCESS_TOKEN)
+ctx = DhanContext(CLIENT_ID, ACCESS_TOKEN)
 client = DhanHQ(ctx)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-NIFTY_SEC_ID    = "13"      # NIFTY 50 index security ID
-BANKNIFTY_SEC_ID = "25"     # BANK NIFTY index security ID
-NIFTY_IT_SEC_ID  = "27"     # NIFTY IT index security ID
-SENSEX_SEC_ID    = "51"     # SENSEX
+NIFTY_SEC_ID = "13"  # NIFTY 50 index security ID
+BANKNIFTY_SEC_ID = "25"  # BANK NIFTY index security ID
+NIFTY_IT_SEC_ID = "27"  # NIFTY IT index security ID
+SENSEX_SEC_ID = "51"  # SENSEX
 
 RESULTS = {}
 PASS = "✅ PASS"
@@ -88,9 +89,9 @@ def show(label, value, indent=4):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-print("\n" + "╔" + "═"*53 + "╗")
+print("\n" + "╔" + "═" * 53 + "╗")
 print("║       DHAN FULL API TEST — Genesis System3         ║")
-print("╚" + "═"*53 + "╝")
+print("╚" + "═" * 53 + "╝")
 print(f"  Client  : ...{CLIENT_ID[-4:]}")
 print(f"  Time    : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -132,19 +133,25 @@ if r:
     items = r if isinstance(r, list) else r.get("data", [])
     print(f"    trades today: {len(items)}")
 
-r = test("Trade History (last 30 days)", lambda: client.get_trade_history(
-    from_date=(datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
-    to_date=datetime.now().strftime("%Y-%m-%d"),
-    page_number=0
-))
+r = test(
+    "Trade History (last 30 days)",
+    lambda: client.get_trade_history(
+        from_date=(datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
+        to_date=datetime.now().strftime("%Y-%m-%d"),
+        page_number=0,
+    ),
+)
 if r:
     items = r if isinstance(r, list) else r.get("data", [])
     print(f"    trades in last 30 days: {len(items)}")
 
-r = test("Ledger Report (last 30 days)", lambda: client.ledger_report(
-    from_date=(datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
-    to_date=datetime.now().strftime("%Y-%m-%d")
-))
+r = test(
+    "Ledger Report (last 30 days)",
+    lambda: client.ledger_report(
+        from_date=(datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
+        to_date=datetime.now().strftime("%Y-%m-%d"),
+    ),
+)
 if r:
     items = r if isinstance(r, list) else r.get("data", [])
     print(f"    ledger entries: {len(items)}")
@@ -177,7 +184,7 @@ if nifty_expiries:
             strikes = list(chain.keys()) if isinstance(chain, dict) else []
             print(f"    strikes available: {len(strikes)}")
             if strikes:
-                mid = strikes[len(strikes)//2]
+                mid = strikes[len(strikes) // 2]
                 ce = chain[mid].get("ce", {})
                 pe = chain[mid].get("pe", {})
                 print(f"    ATM strike ~{mid}:")
@@ -199,14 +206,18 @@ if r:
     data = r.get("data", r)
     if isinstance(data, dict):
         for sec_id, q in list(data.items())[:2]:
-            print(f"    secId={sec_id}: ltp={q.get('last_price',0)} open={q.get('open',0)} high={q.get('high',0)} low={q.get('low',0)} close={q.get('close',0)}")
+            print(
+                f"    secId={sec_id}: ltp={q.get('last_price',0)} open={q.get('open',0)} high={q.get('high',0)} low={q.get('low',0)} close={q.get('close',0)}"
+            )
 
 r = test("OHLC Data (NIFTY + BANKNIFTY)", lambda: client.ohlc_data(securities_nse))
 if r:
     data = r.get("data", r)
     if isinstance(data, dict):
         for sec_id, q in list(data.items())[:2]:
-            print(f"    secId={sec_id}: open={q.get('open',0)} high={q.get('high',0)} low={q.get('low',0)} close={q.get('close',0)}")
+            print(
+                f"    secId={sec_id}: open={q.get('open',0)} high={q.get('high',0)} low={q.get('low',0)} close={q.get('close',0)}"
+            )
 
 
 # ── 4. HISTORICAL / CANDLE DATA ───────────────────────────────────────────────
@@ -214,15 +225,18 @@ section("4. HISTORICAL CANDLE DATA")
 
 today = datetime.now().strftime("%Y-%m-%d")
 from_30d = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-from_5d  = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
+from_5d = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
 
-r = test("NIFTY Daily Candles (30 days)", lambda: client.historical_daily_data(
-    security_id=NIFTY_SEC_ID,
-    exchange_segment=client.NSE_FNO,
-    instrument_type="INDEX",
-    from_date=from_30d,
-    to_date=today
-))
+r = test(
+    "NIFTY Daily Candles (30 days)",
+    lambda: client.historical_daily_data(
+        security_id=NIFTY_SEC_ID,
+        exchange_segment=client.NSE_FNO,
+        instrument_type="INDEX",
+        from_date=from_30d,
+        to_date=today,
+    ),
+)
 if r:
     data = r.get("data", r)
     if isinstance(data, dict):
@@ -231,28 +245,34 @@ if r:
         if opens:
             print(f"    latest close: {data.get('close', [])[-1] if data.get('close') else 'N/A'}")
 
-r = test("NIFTY 1-min Intraday (today)", lambda: client.intraday_minute_data(
-    security_id=NIFTY_SEC_ID,
-    exchange_segment=client.NSE_FNO,
-    instrument_type="INDEX",
-    from_date=today,
-    to_date=today,
-    interval=1
-))
+r = test(
+    "NIFTY 1-min Intraday (today)",
+    lambda: client.intraday_minute_data(
+        security_id=NIFTY_SEC_ID,
+        exchange_segment=client.NSE_FNO,
+        instrument_type="INDEX",
+        from_date=today,
+        to_date=today,
+        interval=1,
+    ),
+)
 if r:
     data = r.get("data", r)
     if isinstance(data, dict):
         opens = data.get("open", [])
         print(f"    1-min candles today: {len(opens)}")
 
-r = test("NIFTY 5-min Intraday (last 5 days)", lambda: client.intraday_minute_data(
-    security_id=NIFTY_SEC_ID,
-    exchange_segment=client.NSE_FNO,
-    instrument_type="INDEX",
-    from_date=from_5d,
-    to_date=today,
-    interval=5
-))
+r = test(
+    "NIFTY 5-min Intraday (last 5 days)",
+    lambda: client.intraday_minute_data(
+        security_id=NIFTY_SEC_ID,
+        exchange_segment=client.NSE_FNO,
+        instrument_type="INDEX",
+        from_date=from_5d,
+        to_date=today,
+        interval=5,
+    ),
+)
 if r:
     data = r.get("data", r)
     if isinstance(data, dict):
@@ -267,6 +287,7 @@ r = test("Security List Download (compact)", lambda: DhanHQ.fetch_security_list(
 if r is not None:
     print(f"    Security list: downloaded to security_id_list.csv")
     import os
+
     if os.path.exists("security_id_list.csv"):
         with open("security_id_list.csv") as f:
             lines = f.readlines()
@@ -278,15 +299,18 @@ if r is not None:
 # ── 6. MARGIN CALCULATOR ──────────────────────────────────────────────────────
 section("6. MARGIN CALCULATOR")
 
-r = test("Margin for NIFTY 1 lot (simulation)", lambda: client.margin_calculator(
-    security_id=NIFTY_SEC_ID,
-    exchange_segment=client.NSE_FNO,
-    transaction_type=client.BUY,
-    quantity=50,  # 1 NIFTY lot = 50
-    product_type=client.MARGIN,
-    price=23600,
-    trigger_price=0
-))
+r = test(
+    "Margin for NIFTY 1 lot (simulation)",
+    lambda: client.margin_calculator(
+        security_id=NIFTY_SEC_ID,
+        exchange_segment=client.NSE_FNO,
+        transaction_type=client.BUY,
+        quantity=50,  # 1 NIFTY lot = 50
+        product_type=client.MARGIN,
+        price=23600,
+        trigger_price=0,
+    ),
+)
 if r:
     data = r.get("data", r)
     if isinstance(data, dict):
@@ -298,7 +322,7 @@ if r:
 section("SUMMARY")
 passed = sum(1 for v in RESULTS.values() if v["status"] == "PASS")
 failed = sum(1 for v in RESULTS.values() if v["status"] == "FAIL")
-total  = len(RESULTS)
+total = len(RESULTS)
 
 print(f"\n  Total tests : {total}")
 print(f"  Passed      : {passed}  ✅")
@@ -316,6 +340,7 @@ else:
 
 # ── SAVE REPORT ───────────────────────────────────────────────────────────────
 import argparse
+
 if "--save" in sys.argv:
     report_path = ROOT / "logs" / f"api_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     report_path.parent.mkdir(exist_ok=True)

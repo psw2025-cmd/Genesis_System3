@@ -7,7 +7,8 @@ compatibility with existing code.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
 import pandas as pd
 
 # Ensure project root is in path
@@ -15,15 +16,12 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.utils.logger import logger
-from core.engine.system3_signal_engine import run_signal_engine
-
 # Import original function for fallback
-from core.engine.dhan_live_ai_signals import (
-    load_models_and_meta,
-    predict_for_snapshot_df as original_predict,
-    append_signals_to_csv as original_append,
-)
+from core.engine.dhan_live_ai_signals import append_signals_to_csv as original_append
+from core.engine.dhan_live_ai_signals import load_models_and_meta
+from core.engine.dhan_live_ai_signals import predict_for_snapshot_df as original_predict
+from core.engine.system3_signal_engine import run_signal_engine
+from core.utils.logger import logger
 
 SIGNALS_CSV = ROOT_DIR / "storage" / "live" / "dhan_index_ai_signals.csv"
 

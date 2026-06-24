@@ -78,66 +78,180 @@ def analyze(truth: Dict[str, Any], inputs: Dict[str, Dict[str, Any]]) -> Dict[st
     dash_ev = dash.get("evidence", {}) if isinstance(dash.get("evidence"), dict) else {}
 
     if pipeline.get("trade_ready") is not True:
-        add(blockers, "CRITICAL", "TRADE_READY_FALSE", "Full pipeline readiness is false.", {"verdict": pipeline.get("verdict"), "blockers": pipeline.get("blockers")}, "Keep live disabled; clear pipeline blockers.")
+        add(
+            blockers,
+            "CRITICAL",
+            "TRADE_READY_FALSE",
+            "Full pipeline readiness is false.",
+            {"verdict": pipeline.get("verdict"), "blockers": pipeline.get("blockers")},
+            "Keep live disabled; clear pipeline blockers.",
+        )
 
-    if lifecycle_evidence.get("full_lifecycle_proven") is not True or lifecycle_evidence.get("lifecycle_proof_dry_run") is True:
-        add(blockers, "CRITICAL", "REAL_MARKET_PAPER_LIFECYCLE_MISSING", "Real market paper lifecycle is not proven.", lifecycle_evidence, "Run market-session analyzer paper lifecycle proof.")
+    if (
+        lifecycle_evidence.get("full_lifecycle_proven") is not True
+        or lifecycle_evidence.get("lifecycle_proof_dry_run") is True
+    ):
+        add(
+            blockers,
+            "CRITICAL",
+            "REAL_MARKET_PAPER_LIFECYCLE_MISSING",
+            "Real market paper lifecycle is not proven.",
+            lifecycle_evidence,
+            "Run market-session analyzer paper lifecycle proof.",
+        )
 
-    if lifecycle_raw.get("dry_run") is True or lifecycle_raw.get("signal", {}).get("instrument_token") == "DRY_RUN_TOKEN":
-        add(blockers, "CRITICAL", "RAW_LIFECYCLE_DRY_RUN", "Raw lifecycle proof is simulation/dry-run.", {"market_status": lifecycle_raw.get("market_status"), "instrument_token": lifecycle_raw.get("signal", {}).get("instrument_token")}, "Do not mark production ready from dry-run proof.")
+    if (
+        lifecycle_raw.get("dry_run") is True
+        or lifecycle_raw.get("signal", {}).get("instrument_token") == "DRY_RUN_TOKEN"
+    ):
+        add(
+            blockers,
+            "CRITICAL",
+            "RAW_LIFECYCLE_DRY_RUN",
+            "Raw lifecycle proof is simulation/dry-run.",
+            {
+                "market_status": lifecycle_raw.get("market_status"),
+                "instrument_token": lifecycle_raw.get("signal", {}).get("instrument_token"),
+            },
+            "Do not mark production ready from dry-run proof.",
+        )
 
     if fresh_ev.get("fresh_broker_live_data_proven") is not True:
-        add(blockers, "HIGH", "FRESH_BROKER_DATA_NOT_PROVEN", "Fresh broker live data proof is missing.", {"reason": fresh_ev.get("reason_fresh_broker_live_data_not_proven")}, "Run secure runtime broker freshness proof.")
+        add(
+            blockers,
+            "HIGH",
+            "FRESH_BROKER_DATA_NOT_PROVEN",
+            "Fresh broker live data proof is missing.",
+            {"reason": fresh_ev.get("reason_fresh_broker_live_data_not_proven")},
+            "Run secure runtime broker freshness proof.",
+        )
 
     if model_ev.get("promotion_allowed") is not True:
-        add(blockers, "HIGH", "MODEL_PROMOTION_BLOCKED", "Model promotion is blocked.", {"promotion_allowed": model_ev.get("promotion_allowed")}, "Require policy + validation proof before promotion.")
+        add(
+            blockers,
+            "HIGH",
+            "MODEL_PROMOTION_BLOCKED",
+            "Model promotion is blocked.",
+            {"promotion_allowed": model_ev.get("promotion_allowed")},
+            "Require policy + validation proof before promotion.",
+        )
 
     if dash_ev.get("browser_visual_truth_proven") is not True:
-        add(warnings, "MEDIUM", "BROWSER_TRUTH_NOT_PROVEN", "Browser screenshot truth is not proven.", {}, "Run browser screenshot proof.")
+        add(
+            warnings,
+            "MEDIUM",
+            "BROWSER_TRUTH_NOT_PROVEN",
+            "Browser screenshot truth is not proven.",
+            {},
+            "Run browser screenshot proof.",
+        )
     if dash_ev.get("api_db_report_reconciliation_proven") is not True:
-        add(warnings, "MEDIUM", "API_DB_REPORT_RECON_NOT_PROVEN", "API/DB/report reconciliation is not proven.", {}, "Run dashboard truth reconciliation.")
+        add(
+            warnings,
+            "MEDIUM",
+            "API_DB_REPORT_RECON_NOT_PROVEN",
+            "API/DB/report reconciliation is not proven.",
+            {},
+            "Run dashboard truth reconciliation.",
+        )
 
     # WebSocket/tick health gate: block production until explicit proof file exists and passes.
     tick_health_path = Path("reports/latest/websocket_tick_health/summary.json")
     tick_health = read_json(tick_health_path)
     if tick_health.get("pass") is not True:
-        add(blockers, "HIGH", "WEBSOCKET_TICK_HEALTH_NOT_PROVEN", "WebSocket tick health is not proven.", {"path": str(tick_health_path), "found": tick_health_path.exists()}, "Implement/prove tick stream, last tick age, reconnect count and REST fallback state.")
+        add(
+            blockers,
+            "HIGH",
+            "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
+            "WebSocket tick health is not proven.",
+            {"path": str(tick_health_path), "found": tick_health_path.exists()},
+            "Implement/prove tick stream, last tick age, reconnect count and REST fallback state.",
+        )
 
     # REST polling/sync interval concern from live health/state.
     refresh_interval = health.get("refresh_interval") or state.get("refresh_interval")
     if refresh_interval is not None:
         try:
             if float(refresh_interval) >= 5:
-                add(blockers, "HIGH", "REST_POLLING_INTERVAL_TOO_SLOW_FOR_OPTIONS", "Dashboard/runtime refresh interval is too slow for intraday options execution.", {"refresh_interval_sec": refresh_interval}, "Use WebSocket tick stream for signal/execution timing; keep REST for fallback and audit only.")
+                add(
+                    blockers,
+                    "HIGH",
+                    "REST_POLLING_INTERVAL_TOO_SLOW_FOR_OPTIONS",
+                    "Dashboard/runtime refresh interval is too slow for intraday options execution.",
+                    {"refresh_interval_sec": refresh_interval},
+                    "Use WebSocket tick stream for signal/execution timing; keep REST for fallback and audit only.",
+                )
         except Exception:
             pass
     else:
-        add(warnings, "MEDIUM", "REFRESH_INTERVAL_UNKNOWN", "Refresh interval is not visible in live proof.", {}, "Expose refresh/tick latency in truth bridge.")
+        add(
+            warnings,
+            "MEDIUM",
+            "REFRESH_INTERVAL_UNKNOWN",
+            "Refresh interval is not visible in live proof.",
+            {},
+            "Expose refresh/tick latency in truth bridge.",
+        )
 
     # Friction/expectancy gate requires dedicated proof file.
     friction_path = Path("reports/latest/friction_expectancy/summary.json")
     friction = read_json(friction_path)
     if friction.get("pass") is not True:
-        add(blockers, "HIGH", "FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE", "Positive expectancy after brokerage, charges, spread and slippage is not proven.", {"path": str(friction_path), "found": friction_path.exists()}, "Generate costed expectancy report from paper/live-like trade ledger.")
+        add(
+            blockers,
+            "HIGH",
+            "FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE",
+            "Positive expectancy after brokerage, charges, spread and slippage is not proven.",
+            {"path": str(friction_path), "found": friction_path.exists()},
+            "Generate costed expectancy report from paper/live-like trade ledger.",
+        )
     else:
         ev = friction.get("evidence", {}) if isinstance(friction.get("evidence"), dict) else {}
         if ev.get("net_expectancy_after_costs", 0) <= 0:
-            add(blockers, "CRITICAL", "NEGATIVE_EXPECTANCY_AFTER_COSTS", "Strategy expectancy after all costs is non-positive.", ev, "Quarantine strategy until costed expectancy is positive.")
+            add(
+                blockers,
+                "CRITICAL",
+                "NEGATIVE_EXPECTANCY_AFTER_COSTS",
+                "Strategy expectancy after all costs is non-positive.",
+                ev,
+                "Quarantine strategy until costed expectancy is positive.",
+            )
 
     execution_path = Path("reports/latest/execution_quality/summary.json")
     execution = read_json(execution_path)
     if execution.get("pass") is not True:
-        add(blockers, "HIGH", "EXECUTION_QUALITY_NOT_PROVEN", "Execution quality/slippage/spread proof is missing.", {"path": str(execution_path), "found": execution_path.exists()}, "Generate entry/exit delay, spread paid and slippage proof.")
+        add(
+            blockers,
+            "HIGH",
+            "EXECUTION_QUALITY_NOT_PROVEN",
+            "Execution quality/slippage/spread proof is missing.",
+            {"path": str(execution_path), "found": execution_path.exists()},
+            "Generate entry/exit delay, spread paid and slippage proof.",
+        )
 
     chain_path = Path("reports/latest/option_chain_integrity/summary.json")
     chain = read_json(chain_path)
     if chain.get("pass") is not True:
-        add(blockers, "HIGH", "OPTION_CHAIN_INTEGRITY_NOT_PROVEN", "Spot/chain/Greeks synchronization proof is missing.", {"path": str(chain_path), "found": chain_path.exists()}, "Prove spot, option chain and Greeks timestamps are synchronized before signals.")
+        add(
+            blockers,
+            "HIGH",
+            "OPTION_CHAIN_INTEGRITY_NOT_PROVEN",
+            "Spot/chain/Greeks synchronization proof is missing.",
+            {"path": str(chain_path), "found": chain_path.exists()},
+            "Prove spot, option chain and Greeks timestamps are synchronized before signals.",
+        )
 
     model_gap_path = Path("reports/latest/model_to_trade_gap/summary.json")
     model_gap = read_json(model_gap_path)
     if model_gap.get("pass") is not True:
-        add(blockers, "HIGH", "MODEL_TO_TRADE_GAP_NOT_PROVEN", "Prediction hit rate is not proven to translate into net trade profitability.", {"path": str(model_gap_path), "found": model_gap_path.exists()}, "Compare forecast hit rate vs trade win rate and net expectancy.")
+        add(
+            blockers,
+            "HIGH",
+            "MODEL_TO_TRADE_GAP_NOT_PROVEN",
+            "Prediction hit rate is not proven to translate into net trade profitability.",
+            {"path": str(model_gap_path), "found": model_gap_path.exists()},
+            "Compare forecast hit rate vs trade win rate and net expectancy.",
+        )
 
     # Strategy quarantine decision.
     quarantined = bool(blockers)
@@ -155,7 +269,16 @@ def analyze(truth: Dict[str, Any], inputs: Dict[str, Dict[str, Any]]) -> Dict[st
 
 def write_md(report: Dict[str, Any], path: Path) -> None:
     summary = report["summary"]
-    lines = ["# System3 Production Viability Bridge", "", f"Generated UTC: `{report['generated_utc']}`", "", "## Summary", "", "| Field | Value |", "|---|---|"]
+    lines = [
+        "# System3 Production Viability Bridge",
+        "",
+        f"Generated UTC: `{report['generated_utc']}`",
+        "",
+        "## Summary",
+        "",
+        "| Field | Value |",
+        "|---|---|",
+    ]
     for k, v in summary.items():
         lines.append(f"| `{k}` | `{v}` |")
     lines += ["", "## Blockers", "", "| Severity | Code | Message | Action |", "|---|---|---|---|"]

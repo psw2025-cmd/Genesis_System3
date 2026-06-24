@@ -3,13 +3,14 @@ Post-Trading Cleanup and Archival
 Handles session end, data archival, and preparation for next session
 """
 
-import sys
-from pathlib import Path
 import json
-import pandas as pd
-from datetime import datetime
-import pytz
 import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

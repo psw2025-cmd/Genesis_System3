@@ -9,8 +9,8 @@ Do not use this script for live operation. Use system3_ultra.py instead,
 which routes to the active Dhan/analyzer paths.
 """
 
-import sys
 import os
+import sys
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
@@ -18,8 +18,9 @@ if ROOT_DIR not in sys.path:
 
 # Guarded imports — may fail when optional deps (sklearn, pyotp) are absent.
 try:
-    from core.engine.train_dhan_models import main as train_dhan_models_main
     from core.engine.build_dhan_training_dataset import main as build_dhan_training_main
+    from core.engine.train_dhan_models import main as train_dhan_models_main
+
     _ANGEL_TRAINING_AVAILABLE = True
 except ImportError:
     train_dhan_models_main = None
@@ -27,19 +28,20 @@ except ImportError:
     _ANGEL_TRAINING_AVAILABLE = False
 
 try:
-    from core.engine.main_launcher import main as launch_core
+    from core.engine import dhan_live_ai_signals
+    from core.engine.dhan_options_analyze import main as dhan_options_analyze_main
+    from core.engine.dhan_options_watch import main as dhan_options_watch_main
+    from core.engine.dhan_options_watch_loop import _build_full_snapshot
+    from core.engine.dhan_options_watch_loop import main as dhan_options_watch_loop_main
+    from core.engine.dhan_synthetic_backtester import (
+        run_backtest as dhan_synthetic_backtest_run,
+    )
     from core.engine.health_check import main as health_main
-    from core.engine.test_data_pipeline import main as data_test_main
+    from core.engine.main_launcher import main as launch_core
     from core.engine.test_angelone_api import main as angelone_test_main
     from core.engine.test_angelone_instruments import main as angelone_instr_test_main
-    from core.engine.dhan_options_watch import main as dhan_options_watch_main
-    from core.engine.dhan_options_watch_loop import (
-        main as dhan_options_watch_loop_main,
-        _build_full_snapshot,
-    )
-    from core.engine.dhan_options_analyze import main as dhan_options_analyze_main
-    from core.engine import dhan_live_ai_signals
-    from core.engine.dhan_synthetic_backtester import run_backtest as dhan_synthetic_backtest_run
+    from core.engine.test_data_pipeline import main as data_test_main
+
     _ANGEL_ENGINE_AVAILABLE = True
 except ImportError as _e:
     launch_core = health_main = data_test_main = angelone_test_main = None

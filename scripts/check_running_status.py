@@ -1,9 +1,9 @@
 """Quick check if system is running and generating data"""
 
-import sys
-from pathlib import Path
-from datetime import datetime
 import os
+import sys
+from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

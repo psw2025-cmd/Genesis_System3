@@ -34,13 +34,17 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-CONFIG_FILE  = ROOT_DIR / "config" / "git_workflow_config.json"
-SEMVER_FILE  = ROOT_DIR / "state" / "semver.json"
+CONFIG_FILE = ROOT_DIR / "config" / "git_workflow_config.json"
+SEMVER_FILE = ROOT_DIR / "state" / "semver.json"
 WORKFLOW_LOG = ROOT_DIR / "state" / "git_workflow.log"
 
 # Files that must NEVER be committed (security)
 NEVER_COMMIT = {
-    ".secrets/", ".env", "dhan.env", "*.totp", "credentials.json",
+    ".secrets/",
+    ".env",
+    "dhan.env",
+    "*.totp",
+    "credentials.json",
     "state/scheduler_daemon.pid",
 }
 
@@ -49,18 +53,15 @@ NEVER_COMMIT = {
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _run(cmd: List[str], capture: bool = True, check: bool = False,
-         cwd: Path = ROOT_DIR, env: dict = None) -> Tuple[int, str, str]:
+
+def _run(
+    cmd: List[str], capture: bool = True, check: bool = False, cwd: Path = ROOT_DIR, env: dict = None
+) -> Tuple[int, str, str]:
     """Run a shell command; returns (returncode, stdout, stderr)."""
     full_env = {**os.environ, **(env or {})}
-    result = subprocess.run(
-        cmd, capture_output=capture, text=True,
-        cwd=str(cwd), env=full_env
-    )
+    result = subprocess.run(cmd, capture_output=capture, text=True, cwd=str(cwd), env=full_env)
     if check and result.returncode != 0:
-        raise RuntimeError(
-            f"Command failed: {' '.join(cmd)}\n{result.stderr}"
-        )
+        raise RuntimeError(f"Command failed: {' '.join(cmd)}\n{result.stderr}")
     return result.returncode, result.stdout.strip(), result.stderr.strip()
 
 
@@ -72,7 +73,7 @@ def _retry(fn, max_retries: int = 3, delay: float = 5.0, backoff: float = 2.0):
             return fn()
         except Exception as e:
             last_exc = e
-            wait = delay * (backoff ** attempt)
+            wait = delay * (backoff**attempt)
             print(f"  ↻ retry {attempt+1}/{max_retries} after {wait:.0f}s — {e}")
             time.sleep(wait)
     raise last_exc
@@ -88,7 +89,8 @@ def _log(msg: str, level: str = "INFO"):
 
 
 def _ist_now() -> str:
-    from datetime import timezone, timedelta
+    from datetime import timedelta, timezone
+
     ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
     return ist.strftime("%Y-%m-%d %H:%M IST")
 
@@ -96,6 +98,7 @@ def _ist_now() -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # Semantic Versioning
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class SemVer:
     """Semantic version tracker with git-tag awareness."""
@@ -119,17 +122,20 @@ class SemVer:
         for tag in tags.splitlines():
             m = re.match(r"v?(\d+)\.(\d+)\.(\d+)", tag.strip())
             if m:
-                self.major, self.minor, self.patch = (
-                    int(m.group(1)), int(m.group(2)), int(m.group(3))
-                )
+                self.major, self.minor, self.patch = (int(m.group(1)), int(m.group(2)), int(m.group(3)))
                 self._persist()
                 return
         self.major, self.minor, self.patch = 1, 0, 0
         self._persist()
 
     def _persist(self, history_entry: str = ""):
-        d = {"major": self.major, "minor": self.minor, "patch": self.patch,
-             "last_tag": self.current(), "last_updated": datetime.now().isoformat()}
+        d = {
+            "major": self.major,
+            "minor": self.minor,
+            "patch": self.patch,
+            "last_tag": self.current(),
+            "last_updated": datetime.now().isoformat(),
+        }
         if SEMVER_FILE.exists():
             try:
                 old = json.loads(SEMVER_FILE.read_text())
@@ -156,9 +162,12 @@ class SemVer:
 
     def bump(self, kind: str) -> str:
         if kind == "major":
-            self.major += 1; self.minor = 0; self.patch = 0
+            self.major += 1
+            self.minor = 0
+            self.patch = 0
         elif kind == "minor":
-            self.minor += 1; self.patch = 0
+            self.minor += 1
+            self.patch = 0
         else:
             self.patch += 1
         self._persist(self.current())
@@ -181,6 +190,7 @@ class SemVer:
 # ─────────────────────────────────────────────────────────────────────────────
 # Commit message generation (AI + heuristic fallback)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class CommitMsgGenerator:
 
@@ -210,7 +220,7 @@ class CommitMsgGenerator:
             elif fl.endswith(".md"):
                 scores["docs"] += 1
             elif fl.startswith("src/") or fl.startswith("core/engine"):
-                scores["feat"] += 5   # weighted — production code matters most
+                scores["feat"] += 5  # weighted — production code matters most
             elif fl.startswith("core/"):
                 scores["feat"] += 3
             elif fl.startswith("scripts/") or fl.endswith(".yml"):
@@ -243,12 +253,9 @@ class CommitMsgGenerator:
                 "Output ONLY the commit message, nothing else — no quotes, no explanation.\n\n"
                 f"Changes:\n{diff_stat[:2000]}"
             )
-            rc, out, _ = _run(
-                ["claude", "-p", prompt],
-                cwd=ROOT_DIR
-            )
+            rc, out, _ = _run(["claude", "-p", prompt], cwd=ROOT_DIR)
             if rc == 0 and out:
-                line = out.strip().split("\n")[0].strip('"\'')
+                line = out.strip().split("\n")[0].strip("\"'")
                 # Validate it looks like a conventional commit
                 if ":" in line and len(line) <= 100:
                     return line[:72]
@@ -259,13 +266,12 @@ class CommitMsgGenerator:
     @classmethod
     def _heuristic(cls, changed_files: List[str]) -> str:
         """Build conventional commit message from file analysis."""
-        commit_type  = cls._type_from_files(changed_files)
+        commit_type = cls._type_from_files(changed_files)
         scope = cls._scope_from_files(changed_files)
         n = len(changed_files)
 
         # Try to name key files (max 2)
-        key = [Path(f).stem for f in changed_files
-               if f.endswith(".py") and "test" not in f.lower()][:2]
+        key = [Path(f).stem for f in changed_files if f.endswith(".py") and "test" not in f.lower()][:2]
         if key:
             description = f"update {', '.join(key)}"
         else:
@@ -278,6 +284,7 @@ class CommitMsgGenerator:
 # ─────────────────────────────────────────────────────────────────────────────
 # Main workflow
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class GitAutoWorkflow:
     """
@@ -362,9 +369,7 @@ class GitAutoWorkflow:
 
             # ── Step 6: Branch resolution ────────────────────────────────
             self._step("STEP 6/11 — Branch resolution")
-            target_branch, created = self._resolve_branch(
-                current_branch, branch_name, commit_message
-            )
+            target_branch, created = self._resolve_branch(current_branch, branch_name, commit_message)
             print(f"  Branch: {target_branch}  ({'created' if created else 'existing'})")
 
             # ── Step 7: Push ─────────────────────────────────────────────
@@ -373,9 +378,7 @@ class GitAutoWorkflow:
 
             # ── Step 8: Pull request ─────────────────────────────────────
             self._step("STEP 8/11 — Opening pull request")
-            pr_url, pr_number = self._create_pr(
-                target_branch, commit_message, staged
-            )
+            pr_url, pr_number = self._create_pr(target_branch, commit_message, staged)
             print(f"  PR #{pr_number}: {pr_url}")
 
             # ── Step 9: Auto-merge ───────────────────────────────────────
@@ -399,6 +402,7 @@ class GitAutoWorkflow:
         except Exception as e:
             _log(f"WORKFLOW FAILED: {e}", "ERROR")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -421,7 +425,7 @@ class GitAutoWorkflow:
         for line in out.splitlines():
             if len(line) >= 3:
                 status = line[:2].strip()
-                path   = line[3:].strip()
+                path = line[3:].strip()
                 # Skip security-sensitive files
                 if self._is_excluded(path):
                     print(f"  [EXCLUDED] {path}")
@@ -440,9 +444,7 @@ class GitAutoWorkflow:
         return False
 
     def _run_tests(self):
-        test_cmd = self.cfg.get("quality_gates", {}).get(
-            "test_command", "python -m pytest tests/ -q --tb=short"
-        )
+        test_cmd = self.cfg.get("quality_gates", {}).get("test_command", "python -m pytest tests/ -q --tb=short")
         print(f"  Running: {test_cmd}")
         if self.dry_run:
             print("  [DRY-RUN] skipping test execution")
@@ -503,14 +505,12 @@ class GitAutoWorkflow:
           - If on a protected branch (main/master) → create auto/YYYYMMDD-slug
           - Otherwise → stay on current branch
         """
-        protected = self.cfg.get("protected_branches",
-                                  ["main", "master", "production"])
+        protected = self.cfg.get("protected_branches", ["main", "master", "production"])
 
         if requested:
             target = requested
         elif current in protected:
-            slug = re.sub(r"[^a-z0-9-]", "-",
-                          commit_msg.split(":")[0].lower())[:20].strip("-")
+            slug = re.sub(r"[^a-z0-9-]", "-", commit_msg.split(":")[0].lower())[:20].strip("-")
             date_str = datetime.now().strftime("%Y%m%d")
             target = f"auto/{date_str}-{slug}"
         else:
@@ -518,10 +518,7 @@ class GitAutoWorkflow:
 
         # Check if branch exists locally
         _, branches, _ = _run(["git", "branch"])
-        exists_locally = any(
-            b.strip().lstrip("*").strip() == target
-            for b in branches.splitlines()
-        )
+        exists_locally = any(b.strip().lstrip("*").strip() == target for b in branches.splitlines())
         created = False
 
         if not exists_locally and target != current:
@@ -552,12 +549,18 @@ class GitAutoWorkflow:
             _run(["git", "rebase", "--abort"])
             print(f"  Rebase conflicted — auto-resolving with merge (-X ours)...")
             _run(["git", "stash"])  # stash any pending changes
-            rc_mg, _, mg_err = _run([
-                "git", "merge", f"origin/{main}",
-                "-X", "ours",       # our changes win all conflicts
-                "--no-edit",
-                "-m", f"chore: sync with {main} (auto-resolved, ours strategy)",
-            ])
+            rc_mg, _, mg_err = _run(
+                [
+                    "git",
+                    "merge",
+                    f"origin/{main}",
+                    "-X",
+                    "ours",  # our changes win all conflicts
+                    "--no-edit",
+                    "-m",
+                    f"chore: sync with {main} (auto-resolved, ours strategy)",
+                ]
+            )
             _run(["git", "stash", "pop"])  # restore
             if rc_mg == 0:
                 print(f"  Merged origin/{main} with conflict auto-resolution (ours wins)")
@@ -565,35 +568,24 @@ class GitAutoWorkflow:
                 print(f"  [WARN] Auto-merge also failed ({mg_err[:60]}) — continuing anyway")
 
         def _do_push():
-            rc, out, err = _run([
-                "git", "push", "--set-upstream", "origin", branch, "--force-with-lease"
-            ])
+            rc, out, err = _run(["git", "push", "--set-upstream", "origin", branch, "--force-with-lease"])
             if rc != 0:
                 # force-with-lease rejected (remote moved) — force push
-                rc2, out2, err2 = _run([
-                    "git", "push", "--set-upstream", "origin", branch, "--force"
-                ])
+                rc2, out2, err2 = _run(["git", "push", "--set-upstream", "origin", branch, "--force"])
                 if rc2 != 0:
                     raise RuntimeError(f"Push failed: {err2}")
                 return out2
             return out
 
-        _retry(_do_push,
-               max_retries=self.cfg["retry"]["max_retries"],
-               delay=self.cfg["retry"]["delay_seconds"])
+        _retry(_do_push, max_retries=self.cfg["retry"]["max_retries"], delay=self.cfg["retry"]["delay_seconds"])
         print(f"  Pushed to origin/{branch}")
 
-    def _create_pr(
-        self, branch: str, commit_msg: str, files: List[str]
-    ) -> Tuple[str, int]:
+    def _create_pr(self, branch: str, commit_msg: str, files: List[str]) -> Tuple[str, int]:
         """Create PR from branch → main. Returns (pr_url, pr_number)."""
         main = self.cfg["main_branch"]
 
         # Check if PR already exists for this branch
-        rc, existing, _ = _run([
-            "gh", "pr", "list", "--head", branch,
-            "--json", "number,url", "--limit", "1"
-        ])
+        rc, existing, _ = _run(["gh", "pr", "list", "--head", branch, "--json", "number,url", "--limit", "1"])
         if rc == 0 and existing.strip() not in ("[]", ""):
             try:
                 data = json.loads(existing)
@@ -613,11 +605,17 @@ class GitAutoWorkflow:
             return "https://github.com/dry-run", 0
 
         cmd = [
-            "gh", "pr", "create",
-            "--title", title,
-            "--body",  body,
-            "--base",  main,
-            "--head",  branch,
+            "gh",
+            "pr",
+            "create",
+            "--title",
+            title,
+            "--body",
+            body,
+            "--base",
+            main,
+            "--head",
+            branch,
         ]
 
         # Add labels if they exist on the repo
@@ -630,17 +628,16 @@ class GitAutoWorkflow:
                 return out.strip()
             # If label doesn't exist, retry without labels
             if "not found" in err and "--label" in " ".join(cmd):
-                cmd_no_labels = [c for i, c in enumerate(cmd)
-                                 if c != "--label" and (i == 0 or cmd[i-1] != "--label")]
+                cmd_no_labels = [c for i, c in enumerate(cmd) if c != "--label" and (i == 0 or cmd[i - 1] != "--label")]
                 rc2, out2, err2 = _run(cmd_no_labels)
                 if rc2 == 0:
                     return out2.strip()
                 raise RuntimeError(f"gh pr create failed: {err2}")
             raise RuntimeError(f"gh pr create failed: {err}")
 
-        pr_url = _retry(_do_create,
-                        max_retries=self.cfg["retry"]["max_retries"],
-                        delay=self.cfg["retry"]["delay_seconds"])
+        pr_url = _retry(
+            _do_create, max_retries=self.cfg["retry"]["max_retries"], delay=self.cfg["retry"]["delay_seconds"]
+        )
 
         # Extract PR number from URL
         m = re.search(r"/pull/(\d+)", pr_url)
@@ -679,10 +676,7 @@ class GitAutoWorkflow:
         merge_flag = f"--{strategy}"
 
         # Convert draft to ready-for-review (draft PRs cannot be merged)
-        rc_draft, pr_state, _ = _run([
-            "gh", "pr", "view", str(pr_number),
-            "--json", "isDraft", "--jq", ".isDraft"
-        ])
+        rc_draft, pr_state, _ = _run(["gh", "pr", "view", str(pr_number), "--json", "isDraft", "--jq", ".isDraft"])
         if rc_draft == 0 and pr_state.strip() == "true":
             print(f"  PR #{pr_number} is a draft — marking ready for review...")
             rc_ready, _, err_ready = _run(["gh", "pr", "ready", str(pr_number)])
@@ -694,11 +688,18 @@ class GitAutoWorkflow:
 
         def _do_merge():
             # Primary: admin bypass, squash
-            rc, out, err = _run([
-                "gh", "pr", "merge", str(pr_number),
-                merge_flag, "--admin",
-                "--subject", commit_msg,
-            ])
+            rc, out, err = _run(
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    str(pr_number),
+                    merge_flag,
+                    "--admin",
+                    "--subject",
+                    commit_msg,
+                ]
+            )
             if rc == 0:
                 print(f"  Merged PR #{pr_number} ({strategy})")
                 return
@@ -707,10 +708,18 @@ class GitAutoWorkflow:
             if "not mergeable" in err.lower():
                 print(f"  PR not mergeable yet (GitHub computing) — waiting 10s...")
                 time.sleep(10)
-                rc3, _, err3 = _run([
-                    "gh", "pr", "merge", str(pr_number),
-                    merge_flag, "--admin", "--subject", commit_msg,
-                ])
+                rc3, _, err3 = _run(
+                    [
+                        "gh",
+                        "pr",
+                        "merge",
+                        str(pr_number),
+                        merge_flag,
+                        "--admin",
+                        "--subject",
+                        commit_msg,
+                    ]
+                )
                 if rc3 == 0:
                     print(f"  Merged PR #{pr_number} ({strategy})")
                     return
@@ -718,23 +727,30 @@ class GitAutoWorkflow:
 
             # Final fallback: regular merge commit (avoids squash conflict issues)
             print(f"  Squash failed ({err[:60]}) — trying regular merge commit...")
-            rc2, _, err2 = _run([
-                "gh", "pr", "merge", str(pr_number),
-                "--merge", "--admin", "--subject", commit_msg,
-            ])
+            rc2, _, err2 = _run(
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    str(pr_number),
+                    "--merge",
+                    "--admin",
+                    "--subject",
+                    commit_msg,
+                ]
+            )
             if rc2 != 0:
                 raise RuntimeError(f"Merge failed: {err2}")
             print(f"  Merged PR #{pr_number} (merge commit)")
 
-        _retry(_do_merge,
-               max_retries=self.cfg["retry"]["max_retries"],
-               delay=self.cfg["retry"]["delay_seconds"])
+        _retry(_do_merge, max_retries=self.cfg["retry"]["max_retries"], delay=self.cfg["retry"]["delay_seconds"])
 
         # Delete branch after merge if configured
         if self.cfg.get("pr", {}).get("delete_branch_after_merge"):
             branch = self._current_branch()
-            _run(["gh", "api", f"repos/{{owner}}/{{repo}}/git/refs/heads/{branch}",
-                  "--method", "DELETE"])  # best-effort, ignore failure
+            _run(
+                ["gh", "api", f"repos/{{owner}}/{{repo}}/git/refs/heads/{branch}", "--method", "DELETE"]
+            )  # best-effort, ignore failure
 
     def _tag_version(self, bump: str, commit_msg: str) -> str:
         """Bump semver, create git tag, push to remote."""
@@ -756,23 +772,19 @@ class GitAutoWorkflow:
 
         # Create annotated tag
         tag_msg = f"Release {new_tag} — {commit_msg}"
-        rc, _, err = _run([
-            "git", "tag", "-a", new_tag, "-m", tag_msg,
-            f"origin/{self.cfg['main_branch']}"
-        ])
+        rc, _, err = _run(["git", "tag", "-a", new_tag, "-m", tag_msg, f"origin/{self.cfg['main_branch']}"])
         if rc != 0:
             # Fallback: tag current HEAD
             rc, _, err = _run(["git", "tag", "-a", new_tag, "-m", tag_msg, "HEAD"])
 
         if rc == 0:
+
             def _push_tag():
                 rc2, _, err2 = _run(["git", "push", "origin", new_tag])
                 if rc2 != 0:
                     raise RuntimeError(f"Push tag failed: {err2}")
 
-            _retry(_push_tag,
-                   max_retries=self.cfg["retry"]["max_retries"],
-                   delay=self.cfg["retry"]["delay_seconds"])
+            _retry(_push_tag, max_retries=self.cfg["retry"]["max_retries"], delay=self.cfg["retry"]["delay_seconds"])
             print(f"  Tag pushed: {new_tag}")
         else:
             print(f"  [WARN] Could not create tag: {err}")
@@ -787,8 +799,7 @@ class GitAutoWorkflow:
             return
 
         # Stash any remaining local changes so checkout doesn't fail
-        _, stash_out, _ = _run(["git", "stash", "push", "--include-untracked",
-                                 "-m", "auto-workflow-pre-pull"])
+        _, stash_out, _ = _run(["git", "stash", "push", "--include-untracked", "-m", "auto-workflow-pre-pull"])
         did_stash = "No local changes to save" not in stash_out and stash_out.strip()
 
         # Switch to main
@@ -811,9 +822,7 @@ class GitAutoWorkflow:
                 raise RuntimeError(f"git reset failed: {err_r}")
             return out_r
 
-        _retry(_do_pull,
-               max_retries=self.cfg["retry"]["max_retries"],
-               delay=self.cfg["retry"]["delay_seconds"])
+        _retry(_do_pull, max_retries=self.cfg["retry"]["max_retries"], delay=self.cfg["retry"]["delay_seconds"])
         print(f"  Synced to latest {main}  ✓")
 
         # Restore any stashed changes back onto main for next workflow run
@@ -824,8 +833,7 @@ class GitAutoWorkflow:
 
     # ── Summary ───────────────────────────────────────────────────────────
 
-    def _print_summary(self, commit_msg: str, branch: str,
-                       pr_url: str, tag: str):
+    def _print_summary(self, commit_msg: str, branch: str, pr_url: str, tag: str):
         print("\n" + "═" * 68)
         print("  DONE  ✓  Git Auto Workflow completed successfully")
         print("═" * 68)
@@ -854,6 +862,7 @@ class GitAutoWorkflow:
 # Status / inspection mode
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def show_status():
     """Print current git state and pending changes."""
     print("\n" + "═" * 68)
@@ -867,9 +876,11 @@ def show_status():
 
     print(f"  Current branch  : {branch}")
     print(f"  Current version : {semver.current()}")
-    print(f"  Next versions   : patch={semver.next_version('patch')}  "
-          f"minor={semver.next_version('minor')}  "
-          f"major={semver.next_version('major')}")
+    print(
+        f"  Next versions   : patch={semver.next_version('patch')}  "
+        f"minor={semver.next_version('minor')}  "
+        f"major={semver.next_version('major')}"
+    )
     print()
 
     changed = [l[3:] for l in status.splitlines() if l.strip()] if status else []
@@ -896,6 +907,7 @@ def show_status():
 # CLI entry point
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _load_config() -> dict:
     if CONFIG_FILE.exists():
         try:
@@ -907,9 +919,11 @@ def _load_config() -> dict:
                 "merge_strategy": "squash",
                 "protected_branches": ["main", "master", "production"],
                 "pr": {"merge_method": "squash", "delete_branch_after_merge": True, "labels": []},
-                "quality_gates": {"run_tests_before_commit": True,
-                                  "test_command": "python -m pytest tests/ -q",
-                                  "fail_on_test_failure": False},
+                "quality_gates": {
+                    "run_tests_before_commit": True,
+                    "test_command": "python -m pytest tests/ -q",
+                    "fail_on_test_failure": False,
+                },
                 "changelog": {"auto_append": True, "file": "CHANGE_LOG.md"},
                 "retry": {"max_retries": 3, "delay_seconds": 5, "exponential_backoff": True},
             }
@@ -919,12 +933,16 @@ def _load_config() -> dict:
         except Exception as e:
             print(f"[WARN] Could not load config: {e} — using defaults")
     return {
-        "main_branch": "main", "branch_prefix": "auto", "merge_strategy": "squash",
+        "main_branch": "main",
+        "branch_prefix": "auto",
+        "merge_strategy": "squash",
         "protected_branches": ["main", "master", "production"],
         "pr": {"merge_method": "squash", "delete_branch_after_merge": True, "labels": []},
-        "quality_gates": {"run_tests_before_commit": True,
-                          "test_command": "python -m pytest tests/ -q",
-                          "fail_on_test_failure": False},
+        "quality_gates": {
+            "run_tests_before_commit": True,
+            "test_command": "python -m pytest tests/ -q",
+            "fail_on_test_failure": False,
+        },
         "changelog": {"auto_append": True, "file": "CHANGE_LOG.md"},
         "retry": {"max_retries": 3, "delay_seconds": 5, "exponential_backoff": True},
     }
@@ -934,22 +952,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Fully automated Git workflow — zero user action required",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
-    parser.add_argument("--dry-run",    action="store_true",
-                        help="Preview what would happen — no changes made")
-    parser.add_argument("--status",     action="store_true",
-                        help="Show current git status and pending changes")
-    parser.add_argument("--branch",     metavar="BRANCH",
-                        help="Override branch name (default: auto/YYYYMMDD-slug)")
-    parser.add_argument("--message",    metavar="MSG",
-                        help="Override commit message (default: AI-generated)")
-    parser.add_argument("--bump",       choices=["major", "minor", "patch", "auto"],
-                        default="auto", help="Force version bump type")
-    parser.add_argument("--skip-tests", action="store_true",
-                        help="Skip running tests before commit")
-    parser.add_argument("--version",    action="store_true",
-                        help="Show current version and exit")
+    parser.add_argument("--dry-run", action="store_true", help="Preview what would happen — no changes made")
+    parser.add_argument("--status", action="store_true", help="Show current git status and pending changes")
+    parser.add_argument("--branch", metavar="BRANCH", help="Override branch name (default: auto/YYYYMMDD-slug)")
+    parser.add_argument("--message", metavar="MSG", help="Override commit message (default: AI-generated)")
+    parser.add_argument(
+        "--bump", choices=["major", "minor", "patch", "auto"], default="auto", help="Force version bump type"
+    )
+    parser.add_argument("--skip-tests", action="store_true", help="Skip running tests before commit")
+    parser.add_argument("--version", action="store_true", help="Show current version and exit")
 
     args = parser.parse_args()
 

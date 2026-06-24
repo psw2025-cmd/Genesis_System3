@@ -6,11 +6,12 @@ Skip training, dry-run only.
 SAFE MODE ONLY - No training, no model changes.
 """
 
-import pandas as pd
-from pathlib import Path
-from typing import Dict, Any, List
 import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"

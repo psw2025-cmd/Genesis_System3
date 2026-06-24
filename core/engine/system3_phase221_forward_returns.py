@@ -4,20 +4,24 @@ System3 Phase 221 - Forward Return Calculator
 Computes forward returns for historical signals.
 """
 
-import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import json
+import sys
 import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from core.utils.timestamp_parser import normalize_timestamp_column_strict, write_iso_timestamps
+from core.utils.timestamp_parser import (
+    normalize_timestamp_column_strict,
+    write_iso_timestamps,
+)
 
 OUTPUT_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 METRICS_DIR = PROJECT_ROOT / "storage" / "metrics"

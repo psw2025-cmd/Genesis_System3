@@ -155,12 +155,7 @@ def run_proof() -> dict:
         warnings.append("retrain_signal_active — retrain scheduled at 16:00")
 
     # Promotion policy
-    promotion_allowed = (
-        len(blockers) == 0
-        and signal_csv_exists
-        and iv_history_exists
-        and len(model_files) > 0
-    )
+    promotion_allowed = len(blockers) == 0 and signal_csv_exists and iv_history_exists and len(model_files) > 0
 
     proof_pass = len(blockers) == 0
 

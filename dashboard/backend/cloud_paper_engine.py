@@ -15,10 +15,11 @@ This is a SIMULATION for monitoring/validation, not a profitability claim.
 """
 
 from __future__ import annotations
+
 import csv
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -99,12 +100,17 @@ class CloudPaperEngine:
 
     def _save_state(self):
         try:
-            self.state_file.write_text(json.dumps({
-                "open_positions": self.open_positions,
-                "closed_positions": self.closed_positions,
-                "seq": self.seq,
-                "session_date": self.session_date,
-            }, indent=2))
+            self.state_file.write_text(
+                json.dumps(
+                    {
+                        "open_positions": self.open_positions,
+                        "closed_positions": self.closed_positions,
+                        "seq": self.seq,
+                        "session_date": self.session_date,
+                    },
+                    indent=2,
+                )
+            )
         except Exception:
             pass
 
@@ -140,8 +146,7 @@ class CloudPaperEngine:
                 continue
             # OI change column is dOI in the chain CSV
             oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
-            cands.append({"underlying": underlying, "strike": strike,
-                          "option_type": ot, "ltp": ltp, "oi_chg": oi_chg})
+            cands.append({"underlying": underlying, "strike": strike, "option_type": ot, "ltp": ltp, "oi_chg": oi_chg})
         if not cands:
             return None
         cands.sort(key=lambda x: x["oi_chg"], reverse=True)
@@ -177,10 +182,15 @@ class CloudPaperEngine:
                 exit_reason = "EOD_SQUAREOFF"
             if exit_reason:
                 net = _compute_net_pnl(entry, cur, pos["underlying"])
-                closed = {**pos, "action": "CLOSE", "exit_price": round(cur, 2),
-                          "exit_reason": exit_reason, "realized_pnl": net,
-                          "realized_pnl_pct": round(chg_pct, 2),
-                          "time_ist": _ist_str(now)}
+                closed = {
+                    **pos,
+                    "action": "CLOSE",
+                    "exit_price": round(cur, 2),
+                    "exit_reason": exit_reason,
+                    "realized_pnl": net,
+                    "realized_pnl_pct": round(chg_pct, 2),
+                    "time_ist": _ist_str(now),
+                }
                 self.closed_positions.append(closed)
                 self._append_trade_csv(closed, "CLOSE")
             else:
@@ -198,8 +208,12 @@ class CloudPaperEngine:
                     best = sig
             if best:
                 # Avoid duplicate open on same contract
-                dup = any(p["underlying"] == best["underlying"] and p["strike"] == best["strike"]
-                          and p["option_type"] == best["option_type"] for p in self.open_positions)
+                dup = any(
+                    p["underlying"] == best["underlying"]
+                    and p["strike"] == best["strike"]
+                    and p["option_type"] == best["option_type"]
+                    for p in self.open_positions
+                )
                 if not dup:
                     self.seq += 1
                     pos = {
@@ -223,25 +237,48 @@ class CloudPaperEngine:
         self._save_state()
 
     def _append_trade_csv(self, pos: Dict[str, Any], action: str):
-        header = ["position_id", "action", "timestamp", "time_ist", "underlying",
-                  "strike", "option_type", "price", "qty", "strategy", "exit_reason",
-                  "realized_pnl", "realized_pnl_pct", "entry_price", "exit_price"]
+        header = [
+            "position_id",
+            "action",
+            "timestamp",
+            "time_ist",
+            "underlying",
+            "strike",
+            "option_type",
+            "price",
+            "qty",
+            "strategy",
+            "exit_reason",
+            "realized_pnl",
+            "realized_pnl_pct",
+            "entry_price",
+            "exit_price",
+        ]
         exists = self.trades_csv.exists()
         try:
             with open(self.trades_csv, "a", newline="") as f:
                 w = csv.writer(f)
                 if not exists:
                     w.writerow(header)
-                w.writerow([
-                    pos.get("position_id"), action, pos.get("timestamp", _now_ist().isoformat()),
-                    pos.get("time_ist"), pos.get("underlying"), pos.get("strike"),
-                    pos.get("option_type"),
-                    pos.get("exit_price" if action == "CLOSE" else "entry_price"),
-                    pos.get("qty"), pos.get("strategy", ""),
-                    pos.get("exit_reason", ""), pos.get("realized_pnl", ""),
-                    pos.get("realized_pnl_pct", ""), pos.get("entry_price", ""),
-                    pos.get("exit_price", ""),
-                ])
+                w.writerow(
+                    [
+                        pos.get("position_id"),
+                        action,
+                        pos.get("timestamp", _now_ist().isoformat()),
+                        pos.get("time_ist"),
+                        pos.get("underlying"),
+                        pos.get("strike"),
+                        pos.get("option_type"),
+                        pos.get("exit_price" if action == "CLOSE" else "entry_price"),
+                        pos.get("qty"),
+                        pos.get("strategy", ""),
+                        pos.get("exit_reason", ""),
+                        pos.get("realized_pnl", ""),
+                        pos.get("realized_pnl_pct", ""),
+                        pos.get("entry_price", ""),
+                        pos.get("exit_price", ""),
+                    ]
+                )
         except Exception:
             pass
 
@@ -267,8 +304,8 @@ class CloudPaperEngine:
         # positions_live.json — get_positions reads data.get("positions") + open_count
         positions_out = {
             "timestamp_ist": ts,
-            "positions": self.open_positions,        # get_positions reads this key
-            "open_positions": self.open_positions,   # legacy alias
+            "positions": self.open_positions,  # get_positions reads this key
+            "open_positions": self.open_positions,  # legacy alias
             "open_count": len(self.open_positions),
             "closed_count": len(self.closed_positions),
             "summary": summary_block,
@@ -283,7 +320,9 @@ class CloudPaperEngine:
             "total_realized_pnl": round(total_realized, 2),
             "total_unrealized_pnl": round(total_unreal, 2),
             "total_pnl": round(total_realized + total_unreal, 2),
-            "avg_pnl_per_trade": round(total_realized / len(self.closed_positions), 2) if self.closed_positions else 0.0,
+            "avg_pnl_per_trade": (
+                round(total_realized / len(self.closed_positions), 2) if self.closed_positions else 0.0
+            ),
             "open_positions": len(self.open_positions),
             "mode": "PAPER_CLOUD_SIM",
             "live_trading_enabled": False,

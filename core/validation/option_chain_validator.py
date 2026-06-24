@@ -22,11 +22,11 @@ try:
     from core.utils.logger import logger
 except ImportError:
     import logging
+
     logger = logging.getLogger(__name__)
 
 _DISABLED_REASON = (
-    "OptionChainValidator auto-fetch path is disabled. "
-    "System3 is Dhan-only. DhanBroker is not operational."
+    "OptionChainValidator auto-fetch path is disabled. " "System3 is Dhan-only. DhanBroker is not operational."
 )
 
 

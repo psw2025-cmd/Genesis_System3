@@ -4,12 +4,13 @@ System3 Phase 136 - Angel Symbol Universe
 Creates static metadata for supported Angel index symbols.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

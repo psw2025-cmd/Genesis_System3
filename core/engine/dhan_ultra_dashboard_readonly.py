@@ -6,10 +6,10 @@ Read-only dashboard.
 SAFE MODE ONLY - No changes, display only.
 """
 
-from pathlib import Path
-from typing import Dict, Any
 import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
@@ -50,7 +50,9 @@ def generate_dashboard() -> Dict[str, Any]:
 
     # Section 2: Execution Readiness
     try:
-        from core.engine.dhan_execution_readiness_auditor import audit_execution_readiness
+        from core.engine.dhan_execution_readiness_auditor import (
+            audit_execution_readiness,
+        )
 
         audit = audit_execution_readiness()
         dashboard["sections"]["execution_readiness"] = {

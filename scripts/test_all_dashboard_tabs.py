@@ -3,8 +3,9 @@ Test All Dashboard Tabs - Frontend Component Verification
 """
 
 import sys
-import requests
 from pathlib import Path
+
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 

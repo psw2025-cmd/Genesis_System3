@@ -5,13 +5,14 @@ GENI reviews past signals vs outcomes and creates a self-critique report:
 where it was right, wrong, late, or too conservative.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional
+import sys
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

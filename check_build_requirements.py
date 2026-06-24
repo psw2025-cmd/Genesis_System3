@@ -3,8 +3,8 @@
 Check all requirements before building System3 Ultra installer.
 Run this first; fix any [FAIL] before running build_fresh_installer.bat.
 """
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent

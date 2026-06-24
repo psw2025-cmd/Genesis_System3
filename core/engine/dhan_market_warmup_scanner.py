@@ -5,9 +5,9 @@ Pre-market diagnostics and validation.
 SAFE MODE ONLY - Read-only checks, no changes, no execution.
 """
 
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
@@ -102,8 +102,8 @@ def scan_market_warmup() -> Dict[str, Any]:
 
     # Check 4: Configuration safety
     try:
-        from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
         from core.engine.dhan_ultramode_prep import load_ultramode_config
 
         ultramode = load_ultramode_config()

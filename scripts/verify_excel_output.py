@@ -5,6 +5,7 @@ No MD files - only show actual output
 
 import sys
 from pathlib import Path
+
 import openpyxl
 
 ROOT_DIR = Path(__file__).parent.parent

@@ -26,10 +26,7 @@ def tracked_files() -> list[str]:
 
 
 def get_root_targets(all_files: list[str]) -> list[str]:
-    return sorted(
-        f for f in all_files
-        if "/" not in f and Path(f).suffix.lower() in EXTENSIONS
-    )
+    return sorted(f for f in all_files if "/" not in f and Path(f).suffix.lower() in EXTENSIONS)
 
 
 def get_active_paths(all_files: list[str]) -> list[Path]:

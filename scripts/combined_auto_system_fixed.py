@@ -5,16 +5,17 @@ Goal: Maximum Profit
 FIXED: Data correction with backup and safety checks
 """
 
+import json
+import os
+import shutil
+import subprocess
 import sys
 import time
-import json
-import subprocess
-import requests
-import shutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
-import os
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

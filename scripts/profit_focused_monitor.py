@@ -3,14 +3,15 @@ Profit-Focused Monitor - Shows only what user cares about: PnL, Trades, Profit
 All background processes run automatically - user only sees results.
 """
 
-import sys
-import time
 import json
 import os
-from pathlib import Path
+import sys
+import time
 from datetime import datetime
-import pytz
+from pathlib import Path
+
 import pandas as pd
+import pytz
 
 # Fix Unicode encoding for Windows console
 if sys.platform == "win32":

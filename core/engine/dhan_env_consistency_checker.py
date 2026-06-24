@@ -7,7 +7,7 @@ SAFE MODE ONLY - Reporting only, no auto-fix.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 

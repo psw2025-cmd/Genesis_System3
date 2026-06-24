@@ -3,13 +3,14 @@ Market Scenario Testing - Tests both market open and closed scenarios
 Simulates synthetic data generation and real market data
 """
 
-import sys
-import os
 import json
+import os
+import sys
 import time
-import requests
 from datetime import datetime
+
 import pytz
+import requests
 
 # Fix Unicode encoding for Windows
 if sys.platform == "win32":

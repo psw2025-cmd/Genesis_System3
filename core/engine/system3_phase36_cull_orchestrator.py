@@ -18,10 +18,10 @@ Menu Option: 99
 """
 
 import sys
-from pathlib import Path
-from typing import Dict, Any
 from datetime import datetime
 from io import StringIO
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -75,7 +75,9 @@ def run_phase36_cull_full_cycle() -> str:
     log_entries.append("## Step 2: Blended Dataset Builder\n\n")
     log_entries.append("**Status**: STARTED\n\n")
     try:
-        from core.engine.dhan_blended_dataset_builder import main as blended_builder_main
+        from core.engine.dhan_blended_dataset_builder import (
+            main as blended_builder_main,
+        )
 
         result, output = _capture_output(blended_builder_main)
         log_entries.append(f"**Output**:\n```\n{output}\n```\n\n")
@@ -121,7 +123,9 @@ def run_phase36_cull_full_cycle() -> str:
     log_entries.append("## Step 5: Promotion Planner (Phase 33)\n\n")
     log_entries.append("**Status**: STARTED\n\n")
     try:
-        from core.engine.system3_phase33_promotion_planner import run_phase33_promotion_planner
+        from core.engine.system3_phase33_promotion_planner import (
+            run_phase33_promotion_planner,
+        )
 
         result, output = _capture_output(run_phase33_promotion_planner)
         log_entries.append(f"**Output**:\n```\n{output}\n```\n\n")

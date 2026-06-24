@@ -3,12 +3,13 @@ Comprehensive Dashboard Test - Multi-User Simulation
 Tests all dashboard tabs and simulates multiple traders/users
 """
 
-import requests
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
+import requests
 
 API_BASE = "http://localhost:8000"
 FRONTEND_BASE = "http://localhost:3000"

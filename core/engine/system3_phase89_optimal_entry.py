@@ -4,12 +4,13 @@ System3 Phase 89 - Optimal Entry Engine
 Assess quality of entry timing for trades.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

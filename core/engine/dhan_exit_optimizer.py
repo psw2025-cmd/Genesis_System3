@@ -10,8 +10,9 @@ UPGRADES (World-Class AI Trading System):
 - Time-based exits for range-bound markets
 """
 
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
-from typing import Dict, Any, Optional, List
 
 
 def calculate_partial_profit_levels(

@@ -1,9 +1,9 @@
 """Verify system is running and updating files"""
 
 import sys
-from pathlib import Path
-from datetime import datetime
 import time
+from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 outputs_dir = ROOT_DIR / "outputs"

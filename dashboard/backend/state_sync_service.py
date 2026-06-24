@@ -5,9 +5,10 @@ Ensures SSOT stays up-to-date with the trading system
 
 import asyncio
 import json
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -57,15 +58,21 @@ class StateSyncService:
                 try:
                     import sys
                     from pathlib import Path
+
                     root = Path(__file__).parent.parent.parent
                     if str(root) not in sys.path:
                         sys.path.insert(0, str(root))
-                    from core.brokers.dhan.dhan_readonly import get_status as _probe_dhan
+                    from core.brokers.dhan.dhan_readonly import (
+                        get_status as _probe_dhan,
+                    )
+
                     _ds = _probe_dhan()
                     if _ds.get("connected"):
                         updates["broker"] = {
-                            "connected": True, "name": "dhan",
-                            "status": "connected", "error": None,
+                            "connected": True,
+                            "name": "dhan",
+                            "status": "connected",
+                            "error": None,
                             "latency_ms": _ds.get("latency_ms"),
                         }
                 except Exception:
@@ -83,7 +90,7 @@ class StateSyncService:
                 src_path = Path(__file__).parent.parent.parent / "src"
                 if str(src_path) not in sys.path:
                     sys.path.insert(0, str(src_path))
-                from utils.market_hours import is_market_open, get_market_status
+                from utils.market_hours import get_market_status, is_market_open
 
                 market_is_open, reason = is_market_open()
                 market_status = get_market_status()
@@ -117,6 +124,7 @@ class StateSyncService:
             health_file = self.outputs_dir / "health.json"
             if health_file.exists():
                 import time
+
                 mtime = health_file.stat().st_mtime
                 age = time.time() - mtime
                 if age < 60:

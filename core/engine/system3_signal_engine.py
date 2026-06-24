@@ -15,33 +15,44 @@ Outputs to: storage/live/dhan_index_ai_signals.csv
 """
 
 import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.utils.logger import logger
+from core.engine.ai_model import (
+    get_training_dataframe,
+    predict_direction,
+    train_ml_model,
+)
+from core.engine.breakout_model import detect_breakouts
+from core.engine.entry_exit_engine import (
+    compute_dynamic_sl_tp,
+    compute_entry_signals,
+    compute_exit_signals,
+)
 
 # Import all engines
 from core.engine.greeks_engine import compute_greeks_for_df
-from core.engine.trend_model import compute_trend_features, compute_multi_timeframe_trend
-from core.engine.volatility_model import compute_volatility_features, detect_volatility_regime
-from core.engine.breakout_model import detect_breakouts
 from core.engine.momentum_model import compute_momentum_features
-from core.engine.entry_exit_engine import compute_entry_signals, compute_exit_signals, compute_dynamic_sl_tp
 from core.engine.scoring_engine import compute_final_score, generate_signals
-from core.engine.ai_model import (
-    train_ml_model,
-    predict_direction,
-    get_training_dataframe,
+from core.engine.trend_model import (
+    compute_multi_timeframe_trend,
+    compute_trend_features,
 )
 from core.engine.ultra_models_loader import load_ultra_model
+from core.engine.volatility_model import (
+    compute_volatility_features,
+    detect_volatility_regime,
+)
+from core.utils.logger import logger
 
 # UPGRADED: Import advanced ensemble, regime, and multi-timeframe functions
 try:
@@ -53,7 +64,10 @@ except ImportError:
     logger.warning("Ensemble predictor not available, will use Ultra/delta fallback")
 
 try:
-    from core.engine.dhan_market_regime_classifier import classify_market_regime, adjust_strategy_for_regime
+    from core.engine.dhan_market_regime_classifier import (
+        adjust_strategy_for_regime,
+        classify_market_regime,
+    )
 
     REGIME_AVAILABLE = True
 except ImportError:
@@ -61,7 +75,9 @@ except ImportError:
     logger.warning("Market regime classifier not available")
 
 try:
-    from core.engine.dhan_multi_timeframe_confirmation import check_multi_timeframe_confirmation
+    from core.engine.dhan_multi_timeframe_confirmation import (
+        check_multi_timeframe_confirmation,
+    )
 
     MULTI_TF_AVAILABLE = True
 except ImportError:
@@ -989,7 +1005,10 @@ def run_signal_engine(df_snap: pd.DataFrame, enable_safety_checks: bool = True) 
         # Runtime safety checks
         if enable_safety_checks:
             try:
-                from core.validation.live_safety_guard import check_signal_safety, log_safety_trip
+                from core.validation.live_safety_guard import (
+                    check_signal_safety,
+                    log_safety_trip,
+                )
 
                 # Group signals by underlying and check safety
                 for underlying in df_signals.get("underlying", pd.Series()).unique():
@@ -1021,12 +1040,12 @@ def run_signal_engine(df_snap: pd.DataFrame, enable_safety_checks: bool = True) 
 
         # Phase 237: Wire Virtual Execution into Live Loop
         try:
-            from core.engine.threshold_loader import load_thresholds
             from core.config.live_trade_config_loader import load_live_trade_config
+            from core.engine.threshold_loader import load_thresholds
             from core.execution.live_execution_engine import (
+                log_virtual_orders,
                 plan_orders_from_signals,
                 run_risk_checks_on_orders,
-                log_virtual_orders,
             )
 
             thresholds = load_thresholds(prefer_candidates=True)

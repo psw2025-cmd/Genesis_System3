@@ -3,8 +3,9 @@ Production Readiness Check - Validates all system components
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 # Fix Unicode encoding for Windows console
@@ -23,10 +24,11 @@ def check_imports():
     """Check if all required modules can be imported."""
     print("\n[CHECK 1/8] Testing imports...")
     try:
+        from scripts.run_live_chain import LiveChainRunner
+        from src.storage.trade_history import TradeHistoryStore
         from src.trading.paper_executor import PaperExecutor
         from src.trading.pnl_tracker import PnLTracker
-        from src.storage.trade_history import TradeHistoryStore
-        from scripts.run_live_chain import LiveChainRunner
+
         # Note: DhanBroker removed — System3 is Dhan-only
 
         print("  ✅ All imports successful")
@@ -98,7 +100,7 @@ def check_market_hours():
     """Check market hours detection."""
     print("\n[CHECK 5/8] Testing market hours detection...")
     try:
-        from src.utils.market_hours import is_market_open, get_market_status
+        from src.utils.market_hours import get_market_status, is_market_open
 
         ist = pytz.timezone("Asia/Kolkata")
         now = datetime.now(ist)

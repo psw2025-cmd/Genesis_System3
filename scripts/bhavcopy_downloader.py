@@ -32,16 +32,17 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-import requests
 import pandas as pd
+import requests
 
 BHAVCOPY_DIR = ROOT_DIR / "storage" / "bhavcopy"
 
 # NSE bhavcopy URL patterns (try new format first, then old)
-_URL_NEW = ("https://nsearchives.nseindia.com/content/fo/"
-            "BhavCopy_NSE_FO_0_0_0_{date_str}_F_0000.csv.zip")
-_URL_OLD = ("https://nsearchives.nseindia.com/content/historical/DERIVATIVES/"
-            "{yyyy}/{mon_upper}/fo{dd}{mon_upper}{yyyy}bhav.csv.zip")
+_URL_NEW = "https://nsearchives.nseindia.com/content/fo/" "BhavCopy_NSE_FO_0_0_0_{date_str}_F_0000.csv.zip"
+_URL_OLD = (
+    "https://nsearchives.nseindia.com/content/historical/DERIVATIVES/"
+    "{yyyy}/{mon_upper}/fo{dd}{mon_upper}{yyyy}bhav.csv.zip"
+)
 
 # Tracking summary for CHANGE_LOG
 _downloaded: list = []
@@ -51,13 +52,16 @@ _failed: list = []
 
 def _get_session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({
-        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                       "AppleWebKit/537.36 Chrome/124.0 Safari/537.36"),
-        "Accept": "*/*",
-        "Referer": "https://www.nseindia.com/",
-        "Accept-Language": "en-US,en;q=0.9",
-    })
+    s.headers.update(
+        {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " "AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
+            ),
+            "Accept": "*/*",
+            "Referer": "https://www.nseindia.com/",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+    )
     try:
         s.get("https://www.nseindia.com", timeout=8)
     except Exception:
@@ -115,8 +119,7 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
                 raw_csv = zf.read(csv_files[0])
 
             # Parse and validate the CSV
-            df = pd.read_csv(io.StringIO(raw_csv.decode("utf-8", errors="replace")),
-                             low_memory=False)
+            df = pd.read_csv(io.StringIO(raw_csv.decode("utf-8", errors="replace")), low_memory=False)
             if df.empty:
                 print("empty CSV")
                 continue
@@ -172,8 +175,7 @@ def verify_cache() -> None:
             if sym_col:
                 full_df = pd.read_csv(f, usecols=[sym_col], low_memory=False)
                 key_syms = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
-                found = [s for s in key_syms
-                         if (full_df[sym_col].astype(str).str.upper() == s).any()]
+                found = [s for s in key_syms if (full_df[sym_col].astype(str).str.upper() == s).any()]
                 syms = ", ".join(found) if found else "unknown"
             print(f"  {date_str:<12} {row_count:>8,} {size_kb:>8,} KB  {syms}")
         except Exception as e:
@@ -187,9 +189,11 @@ def _write_change_log(today: str, n_downloaded: int, n_failed: int) -> None:
     log_file = ROOT_DIR / "CHANGE_LOG.md"
     if not log_file.exists():
         return
-    entry = (f"\n**[{today}] [bhavcopy_downloader.py]** "
-             f"DOWNLOAD: {n_downloaded} bhavcopy files cached, {n_failed} failed. "
-             f"Dates: {_downloaded}\n")
+    entry = (
+        f"\n**[{today}] [bhavcopy_downloader.py]** "
+        f"DOWNLOAD: {n_downloaded} bhavcopy files cached, {n_failed} failed. "
+        f"Dates: {_downloaded}\n"
+    )
     content = log_file.read_text()
     # Insert before the sentinel line
     sentinel = "<!-- APPEND NEW ENTRIES ABOVE THIS LINE -->"
@@ -201,12 +205,9 @@ def _write_change_log(today: str, n_downloaded: int, n_failed: int) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="NSE FO bhavcopy downloader")
     parser.add_argument("--date", help="Download for specific date (YYYY-MM-DD)")
-    parser.add_argument("--backfill", type=int, metavar="N",
-                        help="Download last N trading days")
-    parser.add_argument("--verify", action="store_true",
-                        help="Show cache inventory, no download")
-    parser.add_argument("--delay", type=float, default=2.0,
-                        help="Seconds between requests (default: 2.0)")
+    parser.add_argument("--backfill", type=int, metavar="N", help="Download last N trading days")
+    parser.add_argument("--verify", action="store_true", help="Show cache inventory, no download")
+    parser.add_argument("--delay", type=float, default=2.0, help="Seconds between requests (default: 2.0)")
     args = parser.parse_args()
 
     print(f"\n{'='*60}")
@@ -225,7 +226,7 @@ def main() -> None:
         end = date.today() - timedelta(days=1)  # don't try today (market may not be closed)
         start = end - timedelta(days=args.backfill * 2)  # extra to account for weekends
         all_days = _trading_days(start, end)
-        target_dates = all_days[-args.backfill:]  # take last N trading days
+        target_dates = all_days[-args.backfill :]  # take last N trading days
     else:
         # Default: yesterday (today's bhavcopy only available after market close + NSE processing)
         yesterday = date.today() - timedelta(days=1)

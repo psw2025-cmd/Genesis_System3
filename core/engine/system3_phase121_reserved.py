@@ -6,7 +6,7 @@ This phase is reserved for future System3 live automation enhancements.
 
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

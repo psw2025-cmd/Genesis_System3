@@ -13,16 +13,14 @@ Safety:
     - Uses venv Python interpreter
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
-
-from core.utils.logger import logger
 
 # Import all phase modules
 from core.engine.system3_phase381_ultra_models_scanner import run_phase_381
@@ -34,6 +32,7 @@ from core.engine.system3_phase386_failsafe_guard import run_phase_386
 from core.engine.system3_phase387_impact_preview import run_phase_387
 from core.engine.system3_phase388_health_gate import run_phase_388
 from core.engine.system3_phases_381_388_registry import PHASES_381_388
+from core.utils.logger import logger
 
 # Output paths
 STORAGE_DIR = ROOT_DIR / "storage"

@@ -8,9 +8,9 @@ DhanHQ paths are intentionally excluded.
 
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
@@ -31,6 +31,7 @@ def probe_connectivity() -> Dict[str, Any]:
     # Dhan SDK import check
     try:
         import dhanhq  # noqa: F401
+
         probe["dhan_sdk_available"] = True
         probe["details"]["dhanhq_import"] = "SUCCESS"
     except ImportError:
@@ -39,6 +40,7 @@ def probe_connectivity() -> Dict[str, Any]:
     # Dhan broker shim (should import cleanly, raise only on use)
     try:
         from core.brokers.dhan.broker import DhanBroker  # noqa: F401
+
         probe["dhan_broker_shim"] = True
         probe["details"]["dhan_broker_shim"] = "SUCCESS — disabled shim present"
     except Exception as exc:
@@ -47,6 +49,7 @@ def probe_connectivity() -> Dict[str, Any]:
     # live_chain_ws shim (should import cleanly)
     try:
         from src.angel.live_chain_ws import LiveChainWebSocket  # noqa: F401
+
         probe["live_chain_ws_shim"] = True
         probe["details"]["live_chain_ws_shim"] = "SUCCESS — disabled shim present"
     except Exception as exc:

@@ -5,17 +5,17 @@ Provide a job scheduler abstraction to run tasks (fetch, train, eval, reports)
 in a controlled way.
 """
 
-import os
-import sys
-import json
-import time
-import signal
-import threading
 import argparse
+import json
+import os
+import signal
 import subprocess
+import sys
+import threading
+import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from datetime import datetime, timezone, timedelta
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -267,8 +267,8 @@ def run_daemon() -> None:
     pid_file.write_text(str(os.getpid()))
     print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
 
-    last_fired: Dict[str, str] = {}      # job_id → "YYYY-MM-DD HH:MM"
-    last_fired_date: Dict[str, str] = {} # job_id → "YYYY-MM-DD" (for daily jobs)
+    last_fired: Dict[str, str] = {}  # job_id → "YYYY-MM-DD HH:MM"
+    last_fired_date: Dict[str, str] = {}  # job_id → "YYYY-MM-DD" (for daily jobs)
     _stop = {"flag": False}
 
     def _handle(signum, frame):
@@ -285,13 +285,15 @@ def run_daemon() -> None:
         signal.signal(signal.SIGTERM, _handle)
         signal.signal(signal.SIGINT, _handle)
     else:
-        print("[PH82-Daemon] Running in non-main thread — skipping OS signal "
-              "handlers (daemon=True thread exits with the process).")
+        print(
+            "[PH82-Daemon] Running in non-main thread — skipping OS signal "
+            "handlers (daemon=True thread exits with the process)."
+        )
 
     state = load_state()
     if "jobs" not in state:
         state["jobs"] = {}
-    
+
     # Save startup metadata
     now_ist_str = _now_ist().isoformat()
     state["daemon_started_at"] = now_ist_str
@@ -301,13 +303,13 @@ def run_daemon() -> None:
 
     while not _stop["flag"]:
         now = _now_ist()
-        
+
         # Periodic heartbeat update
         state = load_state()
         state["daemon_heartbeat"] = now.isoformat()
         state["daemon_pid"] = os.getpid()
         save_state(state)
-        
+
         today_str = now.strftime("%Y-%m-%d")
         is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
 

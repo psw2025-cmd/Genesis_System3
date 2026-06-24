@@ -5,13 +5,14 @@ Aggregates key health metrics from phases 361-363 and system logs
 into a single dashboard-ready JSON feed for monitoring tools.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, Any, List
 import logging
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

@@ -5,9 +5,9 @@ Runs all phases 301-310 in test mode and prints summary.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -43,7 +43,7 @@ def main():
     print("SYSTEM3 PHASES 301-310 DIAGNOSTICS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-    
+
     results = []
     for phase_num in range(301, 311):
         if phase_num in PHASE_MODULES:
@@ -68,23 +68,23 @@ def main():
         else:
             print(f"Phase {phase_num:3d}... ⚠️ NOT IMPLEMENTED")
             results.append((phase_num, {"status": "NOT_IMPLEMENTED", "details": "Module not found"}))
-    
+
     # Summary
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    
+
     ok_count = sum(1 for _, r in results if r.get("status") == "OK")
     warn_count = sum(1 for _, r in results if r.get("status") == "WARN")
     error_count = sum(1 for _, r in results if r.get("status") == "ERROR")
     not_impl_count = sum(1 for _, r in results if r.get("status") == "NOT_IMPLEMENTED")
-    
+
     print(f"✅ OK:     {ok_count:2d}")
     print(f"⚠️  WARN:   {warn_count:2d}")
     print(f"❌ ERROR:  {error_count:2d}")
     print(f"⚠️  NOT IMPLEMENTED: {not_impl_count:2d}")
     print()
-    
+
     # WARN phases details
     warn_phases = [(p, r) for p, r in results if r.get("status") == "WARN"]
     if warn_phases:
@@ -92,7 +92,7 @@ def main():
         for phase_num, result in warn_phases:
             print(f"  Phase {phase_num}: {result.get('details', 'N/A')}")
         print()
-    
+
     # ERROR phases details
     error_phases = [(p, r) for p, r in results if r.get("status") == "ERROR"]
     if error_phases:
@@ -103,14 +103,13 @@ def main():
                 for error in result["errors"]:
                     print(f"    - {error}")
         print()
-    
+
     print("=" * 70)
     print("DIAGNOSTICS COMPLETE")
     print("=" * 70)
-    
+
     return 0 if error_count == 0 else 1
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

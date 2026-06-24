@@ -5,12 +5,12 @@ Generates comprehensive daily summary of signal pipeline health.
 Aggregates findings from Phases 331-338.
 """
 
-import sys
 import json
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

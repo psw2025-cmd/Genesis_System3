@@ -5,9 +5,9 @@ Runs all phases 261-300 in test mode and prints summary.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -26,7 +26,7 @@ for phase_num in range(261, 301):
             file_stem = phase_files[0].stem
             module_name = f"core.engine.{file_stem}"
             func_name = f"run_phase{phase_num}"
-            
+
             # Import module
             module = __import__(module_name, fromlist=[func_name])
             if hasattr(module, func_name):
@@ -41,10 +41,10 @@ def run_diagnostics() -> None:
     print("SYSTEM3 PHASES 261-300 DIAGNOSTICS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-    
+
     results = {}
     status_counts = {"OK": 0, "WARN": 0, "ERROR": 0, "NOT IMPLEMENTED": 0}
-    
+
     # Run each phase
     for phase_num in range(261, 301):
         if phase_num in PHASE_MODULES:
@@ -53,7 +53,7 @@ def run_diagnostics() -> None:
                 results[phase_num] = result
                 status = result.get("status", "ERROR")
                 status_counts[status] = status_counts.get(status, 0) + 1
-                
+
                 # Print status
                 status_icon = "✅" if status == "OK" else "⚠️" if status == "WARN" else "❌"
                 print(f"Phase {phase_num}... {status_icon} {status}")
@@ -77,7 +77,7 @@ def run_diagnostics() -> None:
             }
             status_counts["NOT IMPLEMENTED"] += 1
             print(f"Phase {phase_num}... ⏳ NOT IMPLEMENTED")
-    
+
     # Print summary
     print("\n" + "=" * 70)
     print("SUMMARY")
@@ -87,7 +87,7 @@ def run_diagnostics() -> None:
     print(f"ERROR: {status_counts.get('ERROR', 0)}")
     print(f"NOT IMPLEMENTED: {status_counts.get('NOT IMPLEMENTED', 0)}")
     print("=" * 70)
-    
+
     # List main output files
     print("\n## Main Output Files\n")
     for phase_num in sorted(results.keys()):
@@ -101,4 +101,3 @@ def run_diagnostics() -> None:
 
 if __name__ == "__main__":
     run_diagnostics()
-

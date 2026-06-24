@@ -2,11 +2,12 @@
 Quick Optimization Test - Tests 1000 strategies to find best approach
 """
 
+import json
 import sys
 from pathlib import Path
-import pandas as pd
+
 import numpy as np
-import json
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

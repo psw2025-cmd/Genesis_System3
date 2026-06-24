@@ -3,15 +3,16 @@ Visible Auto Monitor - Shows continuous activity in terminal
 Goal: Maximum Profit - Always visible progress
 """
 
+import json
+import os
+import subprocess
 import sys
 import time
-import json
-import subprocess
-import requests
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
-import os
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

@@ -273,8 +273,8 @@ class DataSourceManager:
     def _try_dhan(self, symbol: str) -> Optional[Tuple[pd.DataFrame, float]]:
         """Dhan option chain API — Data APIs subscription ACTIVE as of 2026-06-23."""
         try:
-            from dhanhq import dhanhq
             import dotenv
+            from dhanhq import dhanhq
             dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
             token = os.environ.get("DHAN_ACCESS_TOKEN", "")
             client_id = os.environ.get("DHAN_CLIENT_ID", "")
@@ -287,7 +287,9 @@ class DataSourceManager:
             resp = dhan.option_chain(under_security_id=sec_id, under_exchange_segment="IDX_I",
                                       expiry=expiry)
             if resp and resp.get("status") == "success":
-                from core.data.dhan_option_chain_parser import parse_dhan_option_chain_payload
+                from core.data.dhan_option_chain_parser import (
+                    parse_dhan_option_chain_payload,
+                )
                 df, spot = parse_dhan_option_chain_payload(resp)
                 if not df.empty:
                     return df, spot

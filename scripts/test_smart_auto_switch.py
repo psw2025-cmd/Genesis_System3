@@ -4,15 +4,16 @@ Quick test to verify auto-switching works
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.utils.market_hours import is_market_open, get_market_status
+from src.utils.market_hours import get_market_status, is_market_open
 
 IST = pytz.timezone("Asia/Kolkata")
 

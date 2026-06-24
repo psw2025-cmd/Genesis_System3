@@ -4,11 +4,11 @@ System3 Phase 150 - Phase Dependency Graph (Static)
 Maps each phase to its inputs/outputs (static mapping).
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

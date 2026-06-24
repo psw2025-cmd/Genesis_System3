@@ -19,10 +19,10 @@ After setup:
   python scripts/dhan_token_auto_refresh.py --verify # check current token
 """
 
-import sys
-import os
 import json
+import os
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -63,6 +63,7 @@ def step_banner():
 
 def step_check_current():
     from core.brokers.dhan.token_manager import verify_token
+
     print("Step 1: Checking current token...")
     v = verify_token()
     if v.get("valid"):
@@ -127,6 +128,7 @@ def step_get_totp_secret():
     # Validate it generates a 6-digit OTP
     try:
         import pyotp
+
         totp = pyotp.TOTP(secret)
         otp = totp.now()
         print(f"  Generated OTP: {otp}")
@@ -147,6 +149,7 @@ def step_get_totp_secret():
 def step_test_generation():
     print("\nStep 4: Testing generate_token(pin, totp) now...")
     from core.brokers.dhan.token_manager import refresh_token
+
     result = refresh_token(force_generate=True)
     if result.get("success"):
         print(f"  ✅ Token generated successfully!")

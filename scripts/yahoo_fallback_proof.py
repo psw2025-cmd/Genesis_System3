@@ -14,9 +14,9 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
-import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -78,7 +78,9 @@ def run_proof() -> dict:
         r = fetch_yahoo(ticker)
         results[name] = r
         if r["ok"]:
-            print(f"  {name} ({ticker}): close={r.get('last_close')} | {r.get('data_points')} days | {r.get('latency_ms')}ms")
+            print(
+                f"  {name} ({ticker}): close={r.get('last_close')} | {r.get('data_points')} days | {r.get('latency_ms')}ms"
+            )
         else:
             print(f"  {name} ({ticker}): FAIL — {r.get('error')}")
 

@@ -10,11 +10,11 @@ UPGRADED FEATURES:
 - Timeframe-specific signal strength analysis
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, Any, List, Optional, Tuple
 from collections import Counter
+from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
+import pandas as pd
 
 # Default timeframes (in minutes): 1m, 3m, 5m, 15m, 30m, 1h, 4h, 1d
 DEFAULT_TIMEFRAMES = [1, 3, 5, 15, 30, 60, 240, 1440]

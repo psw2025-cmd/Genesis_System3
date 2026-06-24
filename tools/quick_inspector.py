@@ -4,9 +4,11 @@
 Quick inspector that writes `SYSTEM3_QUICK_INSPECTION_REPORT.md` in project root.
 Safe, read-only.
 """
-from pathlib import Path
+import csv
+import json
+import sys
 from datetime import datetime
-import sys, csv, json
+from pathlib import Path
 
 KEY_FILES = {
     "heartbeat_json": "storage/meta/system3_daily_heartbeat.json",

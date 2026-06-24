@@ -3,24 +3,25 @@ Optimize Best AI Configuration for Option Chain Trading
 Tests 10,000+ configurations to find the absolute best
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import pytz
 import json
-from itertools import product
 import random
+import sys
+from datetime import datetime
+from itertools import product
+from pathlib import Path
 from typing import Dict
+
+import numpy as np
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.selector.strategy_engine import StrategyEngine
 from src.trading.advanced_position_sizing import AdvancedPositionSizing
 from src.trading.dynamic_risk_management import DynamicRiskManager
-from src.selector.strategy_engine import StrategyEngine
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
 

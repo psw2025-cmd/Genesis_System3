@@ -4,12 +4,13 @@ System3 Phase 307 - Live vs Backtest Consistency Checker
 Ensures that live DRY-RUN behavior matches what backtest/test-mode would do under the same thresholds.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

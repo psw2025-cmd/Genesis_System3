@@ -21,11 +21,11 @@ Usage:
   --strict: Fail on any warning (default: only fail on errors)
 """
 
-import sys
-import os
-from pathlib import Path
 import json
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 ROOT_DIR = Path(__file__).parent.parent.absolute()

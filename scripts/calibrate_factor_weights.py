@@ -43,12 +43,12 @@ SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 
 # Grid of candidate weights (will be normalized to sum=1.0)
 WEIGHT_GRID = {
-    "oi_change_pct":     [0.10, 0.15, 0.20, 0.25, 0.30],
-    "iv_percentile":     [0.05, 0.10, 0.15, 0.20],
-    "volume_surge":      [0.10, 0.15, 0.20],
-    "pcr_divergence":    [0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50],
+    "oi_change_pct": [0.10, 0.15, 0.20, 0.25, 0.30],
+    "iv_percentile": [0.05, 0.10, 0.15, 0.20],
+    "volume_surge": [0.10, 0.15, 0.20],
+    "pcr_divergence": [0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50],
     "atm_premium_ratio": [0.05, 0.10, 0.15],
-    "momentum_score":    [0.03, 0.05, 0.08],
+    "momentum_score": [0.03, 0.05, 0.08],
     # ml_confidence fixed at 0.0 — signal CSV not yet available
 }
 
@@ -57,13 +57,14 @@ WEIGHT_GRID = {
 # Factor extraction from bhavcopy
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _iv_proxy(ce_ltp: float, pe_ltp: float, spot: float, days_to_expiry: int) -> float:
     """Simplified straddle-based IV proxy (annualised)."""
     T = max(days_to_expiry, 0.5) / 365
     straddle = ce_ltp + pe_ltp
     if spot <= 0 or straddle <= 0:
         return 0.0
-    return straddle / spot / (T ** 0.5)
+    return straddle / spot / (T**0.5)
 
 
 def extract_factors(bhavcopy_path: Path, symbol: str) -> dict | None:
@@ -132,6 +133,7 @@ def extract_factors(bhavcopy_path: Path, symbol: str) -> dict | None:
 # Factor → score normalisation (same logic as GainRankEngine, simplified)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def _norm_minmax(values: list[float]) -> list[float]:
     lo, hi = min(values), max(values)
     if hi == lo:
@@ -160,14 +162,16 @@ def compute_scores(factor_rows: list[dict], iv_history: dict[str, list[float]]) 
         else:
             iv_pctile = None  # will be filled with cross-symbol median after loop
 
-        rows.append({
-            "symbol": sym,
-            "oi_change_pct_raw": oi_chg_pct,
-            "volume_raw": r["volume"],
-            "pcr_raw": r["pcr"],
-            "atm_premium_raw": r["atm_premium"],
-            "iv_pctile": iv_pctile,
-        })
+        rows.append(
+            {
+                "symbol": sym,
+                "oi_change_pct_raw": oi_chg_pct,
+                "volume_raw": r["volume"],
+                "pcr_raw": r["pcr"],
+                "atm_premium_raw": r["atm_premium"],
+                "iv_pctile": iv_pctile,
+            }
+        )
 
     if not rows:
         return pd.DataFrame()
@@ -208,13 +212,14 @@ def compute_scores(factor_rows: list[dict], iv_history: dict[str, list[float]]) 
 # Grid search
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def weighted_gain_score(row: pd.Series, w: dict) -> float:
     base = (
-        row["oi_score"]      * w["oi_change_pct"]
-        + row["iv_score"]    * w["iv_percentile"]
-        + row["vol_score"]   * w["volume_surge"]
-        + row["pcr_score"]   * w["pcr_divergence"]
-        + row["atm_score"]   * w["atm_premium_ratio"]
+        row["oi_score"] * w["oi_change_pct"]
+        + row["iv_score"] * w["iv_percentile"]
+        + row["vol_score"] * w["volume_surge"]
+        + row["pcr_score"] * w["pcr_divergence"]
+        + row["atm_score"] * w["atm_premium_ratio"]
         + row["momentum_score"] * w["momentum_score"]
     )
     return base
@@ -275,6 +280,7 @@ def run_grid_search(training_days: list[dict]) -> tuple[dict, float, list[dict]]
 # Load validation data
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def load_validation_days() -> list[dict]:
     """
     Returns list of {date, actual_ranking, bhavcopy_path} for days that have:
@@ -310,6 +316,7 @@ def load_validation_days() -> list[dict]:
 # Build IV history (rolling 5-day lookback)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def build_iv_history(all_bhavcopy_files: list[Path], target_date: str) -> dict[str, list[float]]:
     """
     For a given target_date, build a dict of {symbol: [iv_proxy values from last 5 days]}
@@ -318,9 +325,9 @@ def build_iv_history(all_bhavcopy_files: list[Path], target_date: str) -> dict[s
     history: dict[str, list[float]] = {s: [] for s in SYMBOLS}
     target = datetime.strptime(target_date, "%Y-%m-%d").date()
 
-    prior_files = sorted(
-        [f for f in all_bhavcopy_files if datetime.strptime(f.stem[:8], "%Y%m%d").date() < target]
-    )[-5:]  # last 5 trading days before target
+    prior_files = sorted([f for f in all_bhavcopy_files if datetime.strptime(f.stem[:8], "%Y%m%d").date() < target])[
+        -5:
+    ]  # last 5 trading days before target
 
     for f in prior_files:
         for sym in SYMBOLS:
@@ -334,11 +341,12 @@ def build_iv_history(all_bhavcopy_files: list[Path], target_date: str) -> dict[s
 # Patch gain_rank_engine.py
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def patch_engine_weights(new_weights: dict) -> bool:
     """Replace FACTOR_WEIGHTS block in gain_rank_engine.py."""
     text = GAIN_RANK_ENGINE.read_text()
     lines = [
-        'FACTOR_WEIGHTS = {',
+        "FACTOR_WEIGHTS = {",
         f'    "oi_change_pct":      {new_weights["oi_change_pct"]},',
         f'    "iv_percentile":      {new_weights["iv_percentile"]},',
         f'    "volume_surge":       {new_weights["volume_surge"]},',
@@ -346,11 +354,11 @@ def patch_engine_weights(new_weights: dict) -> bool:
         f'    "atm_premium_ratio":  {new_weights["atm_premium_ratio"]},',
         f'    "momentum_score":     {new_weights["momentum_score"]},',
         f'    "ml_confidence":      {new_weights.get("ml_confidence", 0.20)},',
-        '}',
+        "}",
     ]
     new_block = "\n".join(lines)
     patched = re.sub(
-        r'FACTOR_WEIGHTS\s*=\s*\{[^}]+\}',
+        r"FACTOR_WEIGHTS\s*=\s*\{[^}]+\}",
         new_block,
         text,
         flags=re.DOTALL,
@@ -366,10 +374,11 @@ def patch_engine_weights(new_weights: dict) -> bool:
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def main():
     parser = argparse.ArgumentParser(description="Calibrate GainRankEngine factor weights")
     parser.add_argument("--dry-run", action="store_true", help="Never write changes")
-    parser.add_argument("--force",   action="store_true", help="Write even with <5 days (dev)")
+    parser.add_argument("--force", action="store_true", help="Write even with <5 days (dev)")
     parser.add_argument("--verbose", action="store_true", help="Show top-10 weight combos")
     args = parser.parse_args()
 
@@ -423,11 +432,13 @@ def main():
         if scores_df.empty:
             continue
 
-        training_days.append({
-            "date": vday["date"],
-            "scores_df": scores_df,
-            "actual_ranking": vday["actual_ranking"],
-        })
+        training_days.append(
+            {
+                "date": vday["date"],
+                "scores_df": scores_df,
+                "actual_ranking": vday["actual_ranking"],
+            }
+        )
 
     if not training_days:
         print("\nNo usable training days after factor extraction.")
@@ -447,9 +458,11 @@ def main():
         print(f"\nTop 10 weight combinations:")
         for i, r in enumerate(top_results[:10], 1):
             w = r["weights"]
-            print(f"  #{i} ρ={r['rho']:.4f}  OI={w['oi_change_pct']:.2f} IV={w['iv_percentile']:.2f} "
-                  f"VOL={w['volume_surge']:.2f} PCR={w['pcr_divergence']:.2f} "
-                  f"ATM={w['atm_premium_ratio']:.2f} MOM={w['momentum_score']:.2f}")
+            print(
+                f"  #{i} ρ={r['rho']:.4f}  OI={w['oi_change_pct']:.2f} IV={w['iv_percentile']:.2f} "
+                f"VOL={w['volume_surge']:.2f} PCR={w['pcr_divergence']:.2f} "
+                f"ATM={w['atm_premium_ratio']:.2f} MOM={w['momentum_score']:.2f}"
+            )
 
     # 4. Decision: write or report
     print(f"\n{'─'*70}")

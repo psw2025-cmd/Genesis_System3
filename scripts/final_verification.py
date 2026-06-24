@@ -2,10 +2,11 @@
 Final Verification - Check all logs and outputs
 """
 
-import sys
 import json
-import pandas as pd
+import sys
 from pathlib import Path
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 

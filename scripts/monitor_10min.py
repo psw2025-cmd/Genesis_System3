@@ -2,14 +2,15 @@
 Monitor Paper Trading for 10 Minutes
 """
 
-import sys
-import time
 import json
 import os
-from pathlib import Path
+import sys
+import time
 from datetime import datetime, timedelta
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -5,15 +5,16 @@ Non-destructively repairs signal CSV files with schema mismatches.
 Archives originals with timestamps before any modifications.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-import shutil
-from typing import Dict, Any, List, Tuple
 import logging
+import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

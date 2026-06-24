@@ -70,8 +70,12 @@ def probe_cloud() -> Dict[str, Any]:
     import urllib.request
 
     eps = [
-        "/api/state", "/api/broker/truth", "/api/broker/holdings",
-        "/api/broker/funds", "/api/portfolio/unified", "/api/trader/requirements",
+        "/api/state",
+        "/api/broker/truth",
+        "/api/broker/holdings",
+        "/api/broker/funds",
+        "/api/portfolio/unified",
+        "/api/trader/requirements",
     ]
     out: Dict[str, Any] = {}
     for ep in eps:
@@ -141,14 +145,16 @@ def main() -> int:
     ]
     for r in results:
         lines.append(f"- {r['name']}: {'PASS' if r['passed'] else 'FAIL'}")
-    lines.extend([
-        "",
-        "## Requires market session (cannot automate off-hours)",
-        *[f"- {t}" for t in MARKET_SESSION_TASKS],
-        "",
-        "## Permanent safety (never auto-complete)",
-        *[f"- {g}" for g in PERMANENT_GATES],
-    ])
+    lines.extend(
+        [
+            "",
+            "## Requires market session (cannot automate off-hours)",
+            *[f"- {t}" for t in MARKET_SESSION_TASKS],
+            "",
+            "## Permanent safety (never auto-complete)",
+            *[f"- {g}" for g in PERMANENT_GATES],
+        ]
+    )
     with open(REPORT / "summary.md", "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 

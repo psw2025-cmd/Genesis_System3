@@ -47,9 +47,7 @@ def build_approval_status() -> Dict[str, Any]:
         "live_trading_env_flip_authorized": bool(gate.get("live_trading_env_flip_authorized")),
         "dashboard_status": "PASS" if approved else "PEND",
         "dashboard_reason": (
-            f"Owner approved — {gate.get('approved_by', 'owner')}"
-            if approved
-            else "Required before live"
+            f"Owner approved — {gate.get('approved_by', 'owner')}" if approved else "Required before live"
         ),
         "technical_gates_still_required": tech_gates,
         "technical_gates_pending_count": len(tech_gates),

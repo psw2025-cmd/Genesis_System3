@@ -4,10 +4,10 @@
 System Doctor - Environment and Dependency Validator
 Checks all prerequisites and dependencies for the Genesis System3
 """
-import sys
+import json
 import os
 import subprocess
-import json
+import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 

@@ -6,9 +6,10 @@ Generates report only.
 SAFE MODE ONLY - Read-only classification, no changes.
 """
 
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
+import pandas as pd
 
 from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats
 

@@ -3,11 +3,12 @@ Final Best Strategy Selector
 Compares all optimization results and selects the absolute best
 """
 
+import json
 import sys
 from pathlib import Path
-import pandas as pd
-import json
 from typing import Dict, List
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

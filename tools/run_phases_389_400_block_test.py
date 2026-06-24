@@ -18,9 +18,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+import json
 import logging
 from datetime import datetime
-import json
 
 # Import phase functions
 from core.engine.ai_model.feature_engineering_v2 import run_phase_389

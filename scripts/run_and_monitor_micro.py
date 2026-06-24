@@ -3,14 +3,15 @@ Run System and Monitor at Micro Level
 Starts system, monitors everything, finds and fixes issues
 """
 
-import sys
-import time
 import json
 import subprocess
+import sys
 import threading
-from pathlib import Path
+import time
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List, Optional
+
 import pandas as pd
 import pytz
 
@@ -25,8 +26,8 @@ if sys.platform == "win32":
     except:
         pass
 
-from src.utils.market_hours import is_market_open
 from core.utils.logger import logger
+from src.utils.market_hours import is_market_open
 
 IST = pytz.timezone("Asia/Kolkata")
 

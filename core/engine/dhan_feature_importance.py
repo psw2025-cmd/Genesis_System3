@@ -7,12 +7,11 @@ training data, per underlying.
 
 import os
 import sys
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 from sklearn.feature_selection import mutual_info_classif
-
 
 # ---------------------------------------------------------------------------
 # Path setup (same pattern as other engine scripts)

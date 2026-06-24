@@ -22,7 +22,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-
 INDEX_UNDERLYINGS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"}
 
 
@@ -129,15 +128,17 @@ def load_state_signals(root: Path, api_base: Optional[str]) -> Tuple[List[Dict[s
                 for p in preds[:20]:
                     if not isinstance(p, dict):
                         continue
-                    mapped.append({
-                        "symbol": p.get("underlying") or p.get("symbol"),
-                        "underlying": p.get("underlying") or p.get("symbol"),
-                        "score": p.get("gain_score") or p.get("confidence"),
-                        "option_type": p.get("option_type"),
-                        "strike": p.get("strike"),
-                        "expiry": p.get("expiry") or p.get("expiry_date"),
-                        "instrument_token": p.get("instrument_token") or p.get("security_id"),
-                    })
+                    mapped.append(
+                        {
+                            "symbol": p.get("underlying") or p.get("symbol"),
+                            "underlying": p.get("underlying") or p.get("symbol"),
+                            "score": p.get("gain_score") or p.get("confidence"),
+                            "option_type": p.get("option_type"),
+                            "strike": p.get("strike"),
+                            "expiry": p.get("expiry") or p.get("expiry_date"),
+                            "instrument_token": p.get("instrument_token") or p.get("security_id"),
+                        }
+                    )
                 if mapped:
                     return mapped, f"api:{base}/api/gain_rank"
         scanner = fetch_json(base + "/api/scanner/top_contract_gainers", timeout=30)
@@ -181,7 +182,14 @@ def collect_option_master(root: Path) -> Tuple[Dict[str, List[Dict[str, str]]], 
                     blob = " ".join(str(v) for v in row.values()).upper()
                     if not any(x in blob for x in ["OPT", "CE", "PE", "CALL", "PUT"]):
                         continue
-                    underlying = norm_symbol(row.get("UNDERLYING_SYMBOL") or row.get("underlying") or row.get("SEM_TRADING_SYMBOL") or row.get("symbol") or row.get("SYMBOL_NAME") or "")
+                    underlying = norm_symbol(
+                        row.get("UNDERLYING_SYMBOL")
+                        or row.get("underlying")
+                        or row.get("SEM_TRADING_SYMBOL")
+                        or row.get("symbol")
+                        or row.get("SYMBOL_NAME")
+                        or ""
+                    )
                     if not underlying:
                         # Try to infer from trading symbol.
                         for idx in INDEX_UNDERLYINGS:
@@ -215,7 +223,9 @@ def infer_option_side(signal: Dict[str, Any]) -> str:
     return "UNKNOWN"
 
 
-def pick_contract(rows: List[Dict[str, str]], option_side: str) -> Tuple[str, str, str, Optional[float], Optional[float], Optional[float]]:
+def pick_contract(
+    rows: List[Dict[str, str]], option_side: str
+) -> Tuple[str, str, str, Optional[float], Optional[float], Optional[float]]:
     if not rows:
         return "", "", "", None, None, None
     side_rows = []
@@ -225,16 +235,37 @@ def pick_contract(rows: List[Dict[str, str]], option_side: str) -> Tuple[str, st
             continue
         side_rows.append(r)
     selected = side_rows[0] if side_rows else rows[0]
-    expiry = selected.get("EXPIRY_DATE") or selected.get("expiry") or selected.get("SM_EXPIRY_DATE") or selected.get("SEM_EXPIRY_DATE") or ""
-    strike = selected.get("STRIKE_PRICE") or selected.get("strike") or selected.get("SEM_STRIKE_PRICE") or selected.get("SM_STRIKE_PRICE") or ""
-    token = selected.get("SECURITY_ID") or selected.get("security_id") or selected.get("token") or selected.get("instrument_token") or selected.get("SEM_SMST_SECURITY_ID") or ""
+    expiry = (
+        selected.get("EXPIRY_DATE")
+        or selected.get("expiry")
+        or selected.get("SM_EXPIRY_DATE")
+        or selected.get("SEM_EXPIRY_DATE")
+        or ""
+    )
+    strike = (
+        selected.get("STRIKE_PRICE")
+        or selected.get("strike")
+        or selected.get("SEM_STRIKE_PRICE")
+        or selected.get("SM_STRIKE_PRICE")
+        or ""
+    )
+    token = (
+        selected.get("SECURITY_ID")
+        or selected.get("security_id")
+        or selected.get("token")
+        or selected.get("instrument_token")
+        or selected.get("SEM_SMST_SECURITY_ID")
+        or ""
+    )
     ltp = as_float(selected.get("LTP") or selected.get("ltp") or selected.get("last_price"))
     bid = as_float(selected.get("BID") or selected.get("bid") or selected.get("best_bid"))
     ask = as_float(selected.get("ASK") or selected.get("ask") or selected.get("best_ask"))
     return str(expiry), str(strike), str(token), ltp, bid, ask
 
 
-def make_rows(signals: List[Dict[str, Any]], master: Dict[str, List[Dict[str, str]]], master_source: str, signal_source: str) -> List[VisibilityRow]:
+def make_rows(
+    signals: List[Dict[str, Any]], master: Dict[str, List[Dict[str, str]]], master_source: str, signal_source: str
+) -> List[VisibilityRow]:
     rows: List[VisibilityRow] = []
     for s in signals:
         underlying = norm_symbol(s.get("symbol") or s.get("underlying") or s.get("name"))
@@ -267,47 +298,51 @@ def make_rows(signals: List[Dict[str, Any]], master: Dict[str, List[Dict[str, st
         if liquidity == "FAIL":
             blocker.append("SPREAD_LIQUIDITY_FAIL")
         paper_allowed = not blocker
-        rows.append(VisibilityRow(
-            signal_ts_ist=str(s.get("ts") or s.get("timestamp") or s.get("time") or "UNKNOWN"),
-            underlying=underlying or "UNKNOWN",
-            symbol_type=symbol_type,
-            signal_score=score,
-            signal_side=str(s.get("signal") or s.get("status") or s.get("direction") or "UNKNOWN"),
-            option_side=option_side,
-            option_eligible=option_eligible,
-            eligibility_source=master_source if option_eligible else f"NOT_FOUND_IN_{master_source}",
-            expiry=expiry,
-            strike=strike,
-            instrument_token=token,
-            ltp=ltp,
-            bid=bid,
-            ask=ask,
-            spread_pct=spread_pct,
-            liquidity_status=liquidity,
-            paper_trade_allowed=paper_allowed,
-            blocker_reason=";".join(blocker) if blocker else "PASS",
-        ))
+        rows.append(
+            VisibilityRow(
+                signal_ts_ist=str(s.get("ts") or s.get("timestamp") or s.get("time") or "UNKNOWN"),
+                underlying=underlying or "UNKNOWN",
+                symbol_type=symbol_type,
+                signal_score=score,
+                signal_side=str(s.get("signal") or s.get("status") or s.get("direction") or "UNKNOWN"),
+                option_side=option_side,
+                option_eligible=option_eligible,
+                eligibility_source=master_source if option_eligible else f"NOT_FOUND_IN_{master_source}",
+                expiry=expiry,
+                strike=strike,
+                instrument_token=token,
+                ltp=ltp,
+                bid=bid,
+                ask=ask,
+                spread_pct=spread_pct,
+                liquidity_status=liquidity,
+                paper_trade_allowed=paper_allowed,
+                blocker_reason=";".join(blocker) if blocker else "PASS",
+            )
+        )
     if not rows:
-        rows.append(VisibilityRow(
-            signal_ts_ist="UNKNOWN",
-            underlying="NO_SIGNAL_FOUND",
-            symbol_type="UNKNOWN",
-            signal_score=None,
-            signal_side="UNKNOWN",
-            option_side="UNKNOWN",
-            option_eligible=False,
-            eligibility_source=signal_source,
-            expiry="",
-            strike="",
-            instrument_token="",
-            ltp=None,
-            bid=None,
-            ask=None,
-            spread_pct=None,
-            liquidity_status="UNKNOWN",
-            paper_trade_allowed=False,
-            blocker_reason="NO_SIGNAL_SOURCE_FOUND_OR_NO_SIGNAL_ROWS",
-        ))
+        rows.append(
+            VisibilityRow(
+                signal_ts_ist="UNKNOWN",
+                underlying="NO_SIGNAL_FOUND",
+                symbol_type="UNKNOWN",
+                signal_score=None,
+                signal_side="UNKNOWN",
+                option_side="UNKNOWN",
+                option_eligible=False,
+                eligibility_source=signal_source,
+                expiry="",
+                strike="",
+                instrument_token="",
+                ltp=None,
+                bid=None,
+                ask=None,
+                spread_pct=None,
+                liquidity_status="UNKNOWN",
+                paper_trade_allowed=False,
+                blocker_reason="NO_SIGNAL_SOURCE_FOUND_OR_NO_SIGNAL_ROWS",
+            )
+        )
     return rows
 
 
@@ -323,7 +358,9 @@ def write_reports(root: Path, rows: List[VisibilityRow], signal_source: str, mas
         "blocked_count": sum(1 for r in rows if not r.paper_trade_allowed),
     }
     data = {"summary": summary, "rows": [asdict(r) for r in rows]}
-    (reports / "option_strike_visibility.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    (reports / "option_strike_visibility.json").write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     lines = [
         "# System3 Option Strike Visibility Audit",
         "",
@@ -346,12 +383,14 @@ def write_reports(root: Path, rows: List[VisibilityRow], signal_source: str, mas
         lines.append(
             f"| `{r.underlying}` | `{r.symbol_type}` | `{r.signal_score}` | `{r.option_side}` | `{r.option_eligible}` | `{r.expiry}` | `{r.strike}` | `{r.instrument_token}` | `{r.ltp}` | `{r.spread_pct}` | `{r.paper_trade_allowed}` | `{r.blocker_reason}` |"
         )
-    lines.extend([
-        "",
-        "## Verdict Rule",
-        "",
-        "No row is paper-trade-ready unless option eligibility, expiry, strike, token/security id, quote, and liquidity assumptions are proven.",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Verdict Rule",
+            "",
+            "No row is paper-trade-ready unless option eligibility, expiry, strike, token/security id, quote, and liquidity assumptions are proven.",
+        ]
+    )
     (reports / "option_strike_visibility.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -366,7 +405,9 @@ def main() -> int:
     rows = make_rows(signals, master, master_source, signal_source)
     write_reports(root, rows, signal_source, master_source)
     print("SYSTEM3_OPTION_VISIBILITY_AUDIT_COMPLETE")
-    print(json.dumps({"rows": len(rows), "signal_source": signal_source, "option_master_source": master_source}, indent=2))
+    print(
+        json.dumps({"rows": len(rows), "signal_source": signal_source, "option_master_source": master_source}, indent=2)
+    )
     return 0
 
 

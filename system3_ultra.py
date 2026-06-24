@@ -12,21 +12,22 @@ SAFETY RULES ENFORCED:
 - No auto-execution anywhere
 """
 
-import sys
 import os
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, Optional, Callable
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
 
 # Ensure project root is in path
 ROOT_DIR = Path(__file__).parent.absolute()
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-# Safety imports
-from core.engine.ultra_safety import load_ultra_safety, is_ultra_enabled
 from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+
+# Safety imports
+from core.engine.ultra_safety import is_ultra_enabled, load_ultra_safety
 
 # Logging setup
 LOG_DIR = ROOT_DIR / "storage" / "logs_ultra"
@@ -53,7 +54,7 @@ def _check_safety() -> Dict[str, bool]:
     """Check all safety mechanisms."""
     safety = load_ultra_safety()
     automation = AUTOMATION_CONFIG
-    
+
     return {
         "auto_execute_trades": not automation.auto_execute_trades,
         "auto_simulate_pnl": not automation.auto_simulate_pnl,
@@ -67,7 +68,7 @@ def _check_safety() -> Dict[str, bool]:
 def _safe_execute(module_name: str, function_name: str, *args, **kwargs) -> bool:
     """
     Safe execution wrapper.
-    
+
     Checks safety, logs execution, prevents baseline overwrite.
     """
     try:
@@ -76,18 +77,18 @@ def _safe_execute(module_name: str, function_name: str, *args, **kwargs) -> bool
         if not all(safety_checks.values()):
             _log(f"Safety check failed for {module_name}.{function_name}", "WARN")
             print("[WARN] Some safety mechanisms are not properly configured.")
-        
+
         # Log execution
         _log(f"Executing: {module_name}.{function_name}")
-        
+
         # Import and execute
         module = __import__(module_name, fromlist=[function_name])
         func = getattr(module, function_name)
         result = func(*args, **kwargs)
-        
+
         _log(f"Completed: {module_name}.{function_name}")
         return True
-        
+
     except KeyboardInterrupt:
         _log(f"Interrupted: {module_name}.{function_name}", "WARN")
         print("\n[INFO] Operation interrupted by user.")
@@ -110,31 +111,31 @@ def _safe_execute_phase(phase_module: str, phase_function: str) -> bool:
 
 def show_menu() -> str:
     """Display main menu with all options organized into sections."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SYSTEM3 ULTRA CONTROL PANEL")
-    print("="*70)
+    print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     # Safety status
     safety = _check_safety()
     print("\n[SAFETY STATUS]")
     print(f"  Auto-execute: {'❌ DISABLED' if safety['auto_execute_trades'] else '⚠️  ENABLED'}")
     print(f"  Auto-simulate: {'❌ DISABLED' if safety['auto_simulate_pnl'] else '⚠️  ENABLED'}")
     print(f"  Ultra auto-execute: {'❌ DISABLED' if safety['ultra_auto_execute'] else '⚠️  ENABLED'}")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("OPERATIONAL PHASES (OP)")
-    print("="*70)
+    print("=" * 70)
     print("OP1) Pre-Market Diagnostic")
     print("OP2) Live Signal Generation")
     print("OP3) Trade Decision & Planning")
     print("OP4) Post-Market Analysis")
     print("OP5) Weekly Governance Review")
     print("OP6) Ultra Experiments")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("BASELINE CORE OPERATIONS (1-3 active | 4-50 DISABLED)")
-    print("="*70)
+    print("=" * 70)
     print("1) Core boot (basic startup)")
     print("2) Health check")
     print("3) Test data pipeline")
@@ -142,28 +143,28 @@ def show_menu() -> str:
     print("  [DISABLED — options 4-50] Dhan / DhanHQ broker paths.")
     print("  System3 is Dhan-only. These options are blocked.")
     print("  Choosing 4-50 will print this notice and return to menu.")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("REAL-DATA LEARNING CYCLE (51-64) — DISABLED (Dhan paths)")
-    print("="*70)
+    print("=" * 70)
     print("  [DISABLED — options 51-64] All route to dhan_* modules (Dhan).")
     print("  Choosing 51-64 will print this notice and return to menu.")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("ULTRA OBSERVABILITY (65-69) — DISABLED (Dhan paths)")
-    print("="*70)
+    print("=" * 70)
     print("  [DISABLED — options 65-69] All route to dhan_* modules (Dhan).")
     print("  Choosing 65-69 will print this notice and return to menu.")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("MASTER DATASET & MODEL TOOLS (70-72) — DISABLED (Dhan paths)")
-    print("="*70)
+    print("=" * 70)
     print("  [DISABLED — options 70-72] All route to dhan_* modules (Dhan).")
     print("  Choosing 70-72 will print this notice and return to menu.")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA SHADOW DATA & FEATURES (73-79)")
-    print("="*70)
+    print("=" * 70)
     print("73) Ultra Shadow Data Engine")
     print("74) Ultra Feature Expander")
     print("75) Train Ultra Shadow Models")
@@ -171,18 +172,18 @@ def show_menu() -> str:
     print("77) Ultra Risk Regime Classifier")
     print("78) Ultra Multi-Consensus Analyzer")
     print("79) Ultra Threshold Lab")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA LIVE & SIMULATION (80-83)")
-    print("="*70)
+    print("=" * 70)
     print("  [DISABLED — option 80] Ultra Live Signals uses Dhan broker.")
     print("81) Ultra Trade Simulator")
     print("82) Ultra PnL Analyzer")
     print("83) Ultra Promotion Manager")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA RISK-ADAPTIVE INTELLIGENCE (84-93)")
-    print("="*70)
+    print("=" * 70)
     print("84) Ultra Phase 21: Adaptive Risk Engine (ARE)")
     print("85) Ultra Phase 22: Dynamic Position Sizing")
     print("86) Ultra Phase 23: Volatility Regime Impact")
@@ -193,10 +194,10 @@ def show_menu() -> str:
     print("91) Ultra Phase 28: Failure-Mode Auto-Corrector")
     print("92) Ultra Phase 29: Sensitivity Analyzer")
     print("93) Ultra Phase 30: Real-Time Calibration Engine (RTCE)")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA INTEGRATION & GOVERNANCE (94-101)")
-    print("="*70)
+    print("=" * 70)
     print("94) Ultra Phase 31: Decision Fusion")
     print("95) Ultra Phase 32: vs Baseline Comparator")
     print("96) Ultra Phase 33: Promotion Planner")
@@ -205,20 +206,20 @@ def show_menu() -> str:
     print("99) Ultra Phase 36: Continuous Learning Cycle (CULL)")
     print("100) Ultra Phase 37: Policy & Risk Monitor")
     print("101) Ultra Phase 38: Governance Summary")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA ROLLOUT & SAFETY (102-107)")
-    print("="*70)
+    print("=" * 70)
     print("102) Ultra Phase 39: Shadow Campaign")
     print("103) Ultra Phase 40: Weekly Governance Pack")
     print("104) Ultra Phase 41: Prepare Ultra Promotion (Staging)")
     print("105) Ultra Phase 42: Take Baseline Snapshot")
     print("106) Ultra Phase 42: List / View Snapshots")
     print("107) Ultra Phase 43: Environment & Broker Guard")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA FINAL EVOLUTION (108-117)")
-    print("="*70)
+    print("=" * 70)
     print("108) Ultra Phase 46: Meta Fusion Model")
     print("109) Ultra Phase 47: 7D Confidence Vector Engine")
     print("110) Ultra Phase 48: Real Market Error Scanner")
@@ -229,10 +230,10 @@ def show_menu() -> str:
     print("115) Ultra Phase 53: Ultra Monitoring AI Agent")
     print("116) Ultra Phase 54: Real Outcome Back-Reconstruction")
     print("117) Ultra Phase 55: Ultra Intelligence Dashboard")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA GENI COMPLETION (118-142)")
-    print("="*70)
+    print("=" * 70)
     print("118) Phase 76: GENI Self-Critique Engine")
     print("119) Phase 77: GENI Self-Correction Engine")
     print("120) Phase 78: GENI Multi-Model Consensus Engine")
@@ -258,17 +259,17 @@ def show_menu() -> str:
     print("140) Phase 98: Rollback Mechanism")
     print("141) Phase 99: Version Freeze & Tagging")
     print("142) Phase 100: Final Certification Engine")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("SYSTEM TOOLS")
-    print("="*70)
+    print("=" * 70)
     print("S) Safety Status Check")
     print("V) Run Full Validation")
     print("L) View Latest Logs")
     print("H) Help / Documentation")
     print("0) Exit")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     choice = input("Select option: ").strip().upper()
     return choice
 
@@ -321,9 +322,22 @@ def handle_baseline_core(choice: str) -> bool:
         "9": ("core.engine.build_dhan_training_dataset", "main"),
         "10": ("core.engine.train_dhan_models", "main"),
         "11": ("core.engine.dhan_live_ai_signals", "main"),
-        "12": ("core.engine.dhan_synthetic_backtester", lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(profile="CONSERVATIVE")),
-        "13": ("core.engine.dhan_synthetic_backtester", lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(profile="DEV")),
-        "14": ("core.engine.dhan_trade_executor", lambda: __import__("core.engine.dhan_trade_executor", fromlist=["execute_dry_run"]).execute_dry_run()),
+        "12": (
+            "core.engine.dhan_synthetic_backtester",
+            lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(
+                profile="CONSERVATIVE"
+            ),
+        ),
+        "13": (
+            "core.engine.dhan_synthetic_backtester",
+            lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(
+                profile="DEV"
+            ),
+        ),
+        "14": (
+            "core.engine.dhan_trade_executor",
+            lambda: __import__("core.engine.dhan_trade_executor", fromlist=["execute_dry_run"]).execute_dry_run(),
+        ),
         "15": ("core.engine.dhan_daily_pnl_summary", "main"),
         "16": ("core.engine.dhan_intraday_pnl_monitor", "main"),
         "17": ("core.engine.dhan_daily_report_generator", "main"),
@@ -361,7 +375,7 @@ def handle_baseline_core(choice: str) -> bool:
         "49": ("core.engine.dhan_signal_record_buffer", "main"),
         "50": ("core.engine.dhan_env_consistency_checker", "main"),
     }
-    
+
     if choice in baseline_handlers:
         handler = baseline_handlers[choice]
         if callable(handler[1]):
@@ -401,7 +415,7 @@ def handle_learning_cycle(choice: str) -> bool:
         "63": ("core.engine.dhan_blended_training_orchestrator_dryrun", "main"),
         "64": ("core.engine.dhan_ultra_mode_readiness_report", "main"),
     }
-    
+
     if choice in learning_handlers:
         handler = learning_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -420,7 +434,7 @@ def handle_ultra_observability(choice: str) -> bool:
         "68": ("core.engine.dhan_execution_readiness_auditor", "main"),
         "69": ("core.engine.dhan_ultra_dashboard_readonly", "main"),
     }
-    
+
     if choice in observability_handlers:
         handler = observability_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -434,7 +448,7 @@ def handle_master_dataset(choice: str) -> bool:
         "71": ("core.engine.dhan_blended_training_v3", "main"),
         "72": ("core.engine.dhan_model_selector", "main"),
     }
-    
+
     if choice in dataset_handlers:
         handler = dataset_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -452,7 +466,7 @@ def handle_ultra_shadow(choice: str) -> bool:
         "78": ("core.engine.ultra_multi_consensus", "main"),
         "79": ("core.engine.ultra_threshold_lab", "main"),
     }
-    
+
     if choice in shadow_handlers:
         handler = shadow_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -470,7 +484,7 @@ def handle_ultra_live(choice: str) -> bool:
         "82": ("core.engine.ultra_pnl_analyzer", "main"),
         "83": ("core.engine.ultra_promotion_manager", "main"),
     }
-    
+
     if choice in live_handlers:
         handler = live_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -491,7 +505,7 @@ def handle_ultra_phases_21_30(choice: str) -> bool:
         "92": ("core.ultra.phase29_sensitivity", "main"),
         "93": ("core.ultra.phase30_calibration_engine", "main"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -510,7 +524,7 @@ def handle_ultra_phases_31_38(choice: str) -> bool:
         "100": ("core.engine.system3_phase37_policy_risk_monitor", "run_phase37_policy_risk_dashboard"),
         "101": ("core.engine.system3_phase38_governance_summary", "run_phase38_governance_summary"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -527,7 +541,7 @@ def handle_ultra_phases_39_45(choice: str) -> bool:
         "106": ("core.engine.system3_phase42_snapshot_manager", "run_phase42_snapshot_list"),
         "107": ("core.engine.system3_phase43_env_guard", "run_phase43_env_guard"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -548,7 +562,7 @@ def handle_ultra_phases_46_55(choice: str) -> bool:
         "116": ("core.ultra.phase54_back_reconstruction", "run_phase54_back_reconstruction"),
         "117": ("core.ultra.phase55_intelligence_dashboard", "run_phase55_intelligence_dashboard"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -584,7 +598,7 @@ def handle_ultra_phases_76_100(choice: str) -> bool:
         "141": ("core.engine.system3_phase99_version_freeze", "main"),
         "142": ("core.engine.system3_phase100_final_certification", "main"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -596,6 +610,7 @@ def handle_system_tools(choice: str) -> bool:
     if choice == "S":
         # Safety status check
         from core.engine.ultra_safety import main as safety_main
+
         safety_main()
         return True
     elif choice == "V":
@@ -603,6 +618,7 @@ def handle_system_tools(choice: str) -> bool:
         print("[INFO] Running full validation...")
         try:
             from system3_ultra_validation import run_full_validation
+
             return run_full_validation()
         except ImportError:
             print("[WARN] Validation engine not found. Run: python system3_ultra_validation.py")
@@ -623,7 +639,7 @@ def handle_system_tools(choice: str) -> bool:
     elif choice == "H":
         # Help / Documentation
         print("\n[HELP] System3 Ultra Control Panel")
-        print("="*70)
+        print("=" * 70)
         print("Documentation files:")
         print("  - docs/system3_ultra_menu_structure.md")
         print("  - docs/system3_ultra_safety_matrix.md")
@@ -636,23 +652,23 @@ def handle_system_tools(choice: str) -> bool:
 
 def main():
     """Main entry point for System3 Ultra Control Panel."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SYSTEM3 ULTRA CONTROL PANEL - STARTING")
-    print("="*70)
+    print("=" * 70)
     _log("System3 Ultra Control Panel started")
-    
+
     while True:
         try:
             choice = show_menu()
-            
+
             if choice == "0":
                 print("\n[INFO] Exiting System3 Ultra Control Panel.")
                 _log("System3 Ultra Control Panel exited")
                 break
-            
+
             # Route to appropriate handler
             handled = False
-            
+
             if choice.startswith("OP"):
                 handled = handle_operational_phase(choice)
             elif choice.isdigit():
@@ -681,12 +697,12 @@ def main():
                     handled = handle_ultra_phases_76_100(choice)
             else:
                 handled = handle_system_tools(choice)
-            
+
             if not handled:
                 print(f"[WARN] Unknown option: {choice}")
-            
+
             input("\nPress Enter to continue...")
-            
+
         except KeyboardInterrupt:
             print("\n\n[INFO] Interrupted by user. Exiting...")
             _log("System3 Ultra Control Panel interrupted")
@@ -699,4 +715,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

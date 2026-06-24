@@ -5,10 +5,11 @@ Performs schema audit and generates documentation for dhan_index_ai_signals_with
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

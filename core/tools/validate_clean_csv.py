@@ -5,11 +5,12 @@ Validates the cleaned CSV file and generates validation report.
 """
 
 import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

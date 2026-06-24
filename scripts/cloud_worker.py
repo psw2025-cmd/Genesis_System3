@@ -59,6 +59,7 @@ def _run_token_daemon():
     log.info("[token-daemon] starting")
     try:
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "dhan_token_auto_refresh",
             ROOT / "scripts" / "dhan_token_auto_refresh.py",
@@ -77,6 +78,7 @@ def _run_watchdog():
     log.info("[watchdog] starting")
     try:
         from core.brokers.dhan.token_watchdog import run_watchdog_loop
+
         run_watchdog_loop()
     except Exception as exc:
         log.exception(f"[watchdog] crashed: {exc}")
@@ -89,6 +91,7 @@ def _run_job_scheduler():
     log.info("[job-scheduler] starting")
     try:
         from core.engine.system3_phase82_job_scheduler import run_daemon
+
         run_daemon()
     except Exception as exc:
         log.exception(f"[job-scheduler] crashed: {exc}")
@@ -107,6 +110,7 @@ def _bootstrap_token():
     log.info("[bootstrap] No access token — attempting initial refresh via PIN+TOTP...")
     try:
         from core.brokers.dhan.token_manager import refresh_token
+
         result = refresh_token()
         if result.get("success"):
             log.info(f"[bootstrap] Token obtained via {result['strategy']}")

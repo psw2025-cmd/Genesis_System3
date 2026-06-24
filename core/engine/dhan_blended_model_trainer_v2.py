@@ -5,9 +5,10 @@ Trains models on blended synthetic + real data.
 MANUAL TRIGGER ONLY - Never runs automatically.
 """
 
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 TRAINING_DIR = PROJECT_ROOT / "storage" / "training"
@@ -42,8 +43,8 @@ def train_blended_models() -> Dict[str, Any]:
 
         # Use existing training pipeline
         from core.engine.train_dhan_models import (
-            _train_model_for_underlying,
             _load_top_features_map,
+            _train_model_for_underlying,
         )
 
         # Load feature importance
@@ -71,8 +72,9 @@ def train_blended_models() -> Dict[str, Any]:
                 model_path = MODELS_DIR / f"{underlying}_model.pkl"
                 meta_path = MODELS_DIR / f"{underlying}_model_meta.json"
 
-                import joblib
                 import json
+
+                import joblib
 
                 joblib.dump(model, model_path)
                 with meta_path.open("w", encoding="utf-8") as f:
@@ -137,8 +139,8 @@ def backup_existing_models() -> bool:
     Returns:
         True if backup successful
     """
-    from datetime import datetime
     import shutil
+    from datetime import datetime
 
     backup_dir = MODELS_DIR.parent / "dhan_backup"
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")

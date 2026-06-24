@@ -12,9 +12,10 @@ Menu Option: 102
 
 import json
 import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -72,7 +73,9 @@ def run_campaign_once() -> None:
     try:
         # Import here to avoid circular dependencies
         from core.engine.system3_phase31_ultra_fusion import run_phase31_fusion
-        from core.engine.system3_phase34_ultra_shadow_exec import run_phase34_shadow_once
+        from core.engine.system3_phase34_ultra_shadow_exec import (
+            run_phase34_shadow_once,
+        )
 
         _log("Running Phase 31 fusion...")
         try:

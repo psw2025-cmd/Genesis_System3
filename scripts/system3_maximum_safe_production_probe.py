@@ -78,13 +78,16 @@ def safety_scan(files: list[str]) -> dict[str, Any]:
     render = read_text("render.yaml")
     req = read_text("dashboard/backend/requirements.txt").lower()
     tracked_secret_names = [
-        f for f in files
+        f
+        for f in files
         if re.search(r"(^|/)(\.env($|\.)|.*secret.*\.json$|.*credential.*\.json$|.*private.*key.*|.*\.pem$)", f, re.I)
     ]
     return {
         "render_yaml_exists": (ROOT / "render.yaml").exists(),
-        "live_trading_disabled_in_render": "LIVE_TRADING_ENABLED" in render and re.search(r"LIVE_TRADING_ENABLED[^\n]*(\"0\"|'0'|0|false|False)", render) is not None,
-        "analyze_mode_enabled_in_render": "ANALYZE_MODE" in render and re.search(r"ANALYZE_MODE[^\n]*(\"1\"|'1'|1|true|True)", render) is not None,
+        "live_trading_disabled_in_render": "LIVE_TRADING_ENABLED" in render
+        and re.search(r"LIVE_TRADING_ENABLED[^\n]*(\"0\"|'0'|0|false|False)", render) is not None,
+        "analyze_mode_enabled_in_render": "ANALYZE_MODE" in render
+        and re.search(r"ANALYZE_MODE[^\n]*(\"1\"|'1'|1|true|True)", render) is not None,
         "dhanhq_dependency_present": "dhanhq" in req,
         "tracked_secret_style_file_count": len(tracked_secret_names),
         "tracked_secret_style_files": tracked_secret_names[:50],
@@ -95,14 +98,31 @@ def model_metadata(files: list[str]) -> dict[str, Any]:
     model_files = [f for f in files if re.search(r"core/models/.*\.(pkl|pth|joblib|json)$", f, re.I)]
     meta_files = [f for f in model_files if f.endswith("_meta.json") or f.endswith("meta.json")]
     meta_samples = []
-    metric_keys = {"accuracy", "precision", "recall", "f1", "auc", "win_rate", "sharpe", "trained_at", "training_date", "dataset", "samples"}
+    metric_keys = {
+        "accuracy",
+        "precision",
+        "recall",
+        "f1",
+        "auc",
+        "win_rate",
+        "sharpe",
+        "trained_at",
+        "training_date",
+        "dataset",
+        "samples",
+    }
     metric_hits = []
     for f in meta_files[:80]:
         data = read_json(f)
         if isinstance(data, dict):
             keys = sorted(data.keys())
             meta_samples.append({"file": f, "keys": keys[:40]})
-            hits = sorted(k for k in keys if k.lower() in metric_keys or any(m in k.lower() for m in ["accuracy", "score", "metric", "date", "sample"]))
+            hits = sorted(
+                k
+                for k in keys
+                if k.lower() in metric_keys
+                or any(m in k.lower() for m in ["accuracy", "score", "metric", "date", "sample"])
+            )
             if hits:
                 metric_hits.append({"file": f, "metric_like_keys": hits[:20]})
     return {
@@ -117,7 +137,11 @@ def model_metadata(files: list[str]) -> dict[str, Any]:
 
 
 def backtest_probe(files: list[str]) -> dict[str, Any]:
-    candidates = [f for f in files if re.search(r"(backtest|walk.?forward|slippage|charges|pnl|strategy|validation).*\.py$", f, re.I)]
+    candidates = [
+        f
+        for f in files
+        if re.search(r"(backtest|walk.?forward|slippage|charges|pnl|strategy|validation).*\.py$", f, re.I)
+    ]
     compile_targets = []
     for f in ["dashboard/backend/backtesting.py", "system3_ultra_validation.py", "run_system3.py"]:
         if (ROOT / f).exists():
@@ -137,7 +161,9 @@ def backtest_probe(files: list[str]) -> dict[str, Any]:
 
 
 def paper_lifecycle_probe(files: list[str]) -> dict[str, Any]:
-    reports = [f for f in files if f.startswith("reports/") and re.search(r"(paper|lifecycle|trade|position|pnl)", f, re.I)]
+    reports = [
+        f for f in files if f.startswith("reports/") and re.search(r"(paper|lifecycle|trade|position|pnl)", f, re.I)
+    ]
     modules = [f for f in files if re.search(r"(paper|analyzer|sandbox|order|trade|position|broker).*\.py$", f, re.I)]
     return {
         "paper_module_count": len(modules),
@@ -145,9 +171,23 @@ def paper_lifecycle_probe(files: list[str]) -> dict[str, Any]:
         "existing_report_count": len(reports),
         "existing_report_sample": reports[:100],
         "mandatory_fields": [
-            "signal_id", "symbol", "instrument_token", "expiry", "strike", "option_type",
-            "entry_time", "entry_price", "qty", "order_id", "fill_status",
-            "exit_time", "exit_price", "gross_pnl", "charges", "net_pnl", "proof_status",
+            "signal_id",
+            "symbol",
+            "instrument_token",
+            "expiry",
+            "strike",
+            "option_type",
+            "entry_time",
+            "entry_price",
+            "qty",
+            "order_id",
+            "fill_status",
+            "exit_time",
+            "exit_price",
+            "gross_pnl",
+            "charges",
+            "net_pnl",
+            "proof_status",
         ],
         "full_signal_to_exit_pnl_lifecycle_proven": False,
         "reason": "no fresh analyzer session executed by this safe CI probe",
@@ -199,13 +239,15 @@ def main() -> int:
         blockers.append("critical_compile_failure")
     if not dashboard.get("all_tabs_visual_proof"):
         warnings.append("all_tabs_visual_proof_not_present_or_not_passed")
-    warnings.extend([
-        "fresh_training_execution_not_proven",
-        "fresh_training_accuracy_metric_not_proven",
-        "recent_costed_backtest_not_proven",
-        "walk_forward_cost_slippage_not_proven",
-        "full_analyzer_paper_lifecycle_not_proven",
-    ])
+    warnings.extend(
+        [
+            "fresh_training_execution_not_proven",
+            "fresh_training_accuracy_metric_not_proven",
+            "recent_costed_backtest_not_proven",
+            "walk_forward_cost_slippage_not_proven",
+            "full_analyzer_paper_lifecycle_not_proven",
+        ]
+    )
 
     summary = {
         "generated_utc": utc_now(),

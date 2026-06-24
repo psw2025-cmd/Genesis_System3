@@ -12,13 +12,14 @@ Phase 377 produces:
 - Production readiness determination
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -204,7 +205,9 @@ def assess_production_readiness() -> Dict[str, Any]:
     try:
         # Check 1: All phases callable
         try:
-            from core.engine.system3_phases_361_380_registry import get_phases_by_category
+            from core.engine.system3_phases_361_380_registry import (
+                get_phases_by_category,
+            )
 
             all_phases = (
                 get_phases_by_category("signal_pipeline")

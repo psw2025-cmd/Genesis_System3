@@ -5,15 +5,16 @@ Automatically adjusts thresholds based on real market performance.
 Currently DISABLED - requires manual review and approval.
 """
 
-import os
 import json
-import pandas as pd
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS, TradeThresholds
+import pandas as pd
+
 from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS, TradeThresholds
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"

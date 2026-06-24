@@ -2,11 +2,13 @@
 Tests for OI cache staleness guards and is_expiry_day() in nse_provider.py.
 Uses tmp_path fixture for file isolation — never touches real state/market_cache.json.
 """
+
 import json
-import pytest
 import sys
-from pathlib import Path
 from datetime import date, timedelta
+from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -22,11 +24,15 @@ def isolate_cache(tmp_path, monkeypatch):
 
 def _write_cache(cache_date_str, oi_data, tmp_path):
     path = tmp_path / "market_cache.json"
-    path.write_text(json.dumps({
-        "last_updated": "2026-01-01T00:00:00",
-        "cache_date": cache_date_str,
-        "oi_data": oi_data,
-    }))
+    path.write_text(
+        json.dumps(
+            {
+                "last_updated": "2026-01-01T00:00:00",
+                "cache_date": cache_date_str,
+                "oi_data": oi_data,
+            }
+        )
+    )
 
 
 def _today_str():
@@ -97,6 +103,7 @@ def test_save_and_load_round_trip(tmp_path, monkeypatch):
         @staticmethod
         def today():
             return tomorrow
+
         @staticmethod
         def strptime(s, fmt):
             return date.fromisoformat(s) if fmt == "%Y-%m-%d" else date(*time.strptime(s, fmt)[:3])
@@ -112,7 +119,7 @@ def test_save_and_load_round_trip(tmp_path, monkeypatch):
 # TC-OI-9: is_expiry_day() — Thursday returns True
 def test_expiry_day_thursday():
     import datetime as _dt
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
 
     class _FakeDate(_dt.date):
         @classmethod
@@ -124,12 +131,15 @@ def test_expiry_day_thursday():
 
 
 # TC-OI-10: is_expiry_day() — Mon/Tue/Wed/Fri return False
-@pytest.mark.parametrize("date_str,expected", [
-    ("2026-06-16", False),  # Monday
-    ("2026-06-17", False),  # Tuesday
-    ("2026-06-18", True),   # Thursday (confirm weekday=3)
-    ("2026-06-20", False),  # Friday
-])
+@pytest.mark.parametrize(
+    "date_str,expected",
+    [
+        ("2026-06-16", False),  # Monday
+        ("2026-06-17", False),  # Tuesday
+        ("2026-06-18", True),  # Thursday (confirm weekday=3)
+        ("2026-06-20", False),  # Friday
+    ],
+)
 def test_expiry_day_parametrize(date_str, expected):
     import datetime as _dt
     from unittest.mock import patch
@@ -148,9 +158,13 @@ def test_expiry_day_parametrize(date_str, expected):
 # TC-OI-11: Missing cache_date field — returns oi_data (backward compat)
 def test_missing_cache_date_returns_data(tmp_path):
     path = tmp_path / "market_cache.json"
-    path.write_text(json.dumps({
-        "last_updated": "2026-01-01T00:00:00",
-        "oi_data": {"NIFTY": 999},
-    }))
+    path.write_text(
+        json.dumps(
+            {
+                "last_updated": "2026-01-01T00:00:00",
+                "oi_data": {"NIFTY": 999},
+            }
+        )
+    )
     result = nse_provider.load_oi_cache()
     assert result == {"NIFTY": 999}

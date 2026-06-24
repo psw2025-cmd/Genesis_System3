@@ -13,11 +13,12 @@ Outputs:
 Menu Option: 79
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, List
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"

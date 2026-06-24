@@ -2,11 +2,12 @@
 Verify that background trading process is running and updating files.
 """
 
+import os
 import sys
 import time
-import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

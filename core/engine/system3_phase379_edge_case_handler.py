@@ -13,13 +13,13 @@ Phase 379 detects:
 - Signal conflicts and contradictions
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -110,8 +110,8 @@ def detect_data_anomalies() -> Dict[str, Any]:
     }
 
     try:
-        import pandas as pd
         import numpy as np
+        import pandas as pd
 
         signal_files = [
             STORAGE_LIVE / "dhan_index_ai_signals.csv",

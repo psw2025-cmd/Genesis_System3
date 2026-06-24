@@ -5,10 +5,10 @@ Manages high-level GENI system state persistence.
 """
 
 import json
-from dataclasses import dataclass, asdict
-from pathlib import Path
-from typing import Optional, List
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
 
 from .geni_config import GENI_STATE_FILE
 

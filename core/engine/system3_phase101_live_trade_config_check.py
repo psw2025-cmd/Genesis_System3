@@ -5,11 +5,11 @@ Central config layer for live trading (Mode 1 Angel Only) + a check script
 that can be run before market to verify configuration.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -19,15 +19,15 @@ if str(PROJECT_ROOT) not in sys.path:
 # Import config
 try:
     from config.live_trade_config import (
+        ANGEL_ALLOWED_ORDER_TYPES,
+        ANGEL_ORDER_VARIETY,
+        ANGEL_PRODUCT_TYPE,
+        DEFAULT_LOTS_PER_TRADE,
+        LIVE_ALLOWED_UNDERLYINGS,
         LIVE_TRADING_ENABLED,
         MAX_LIVE_TRADES_PER_DAY,
         MAX_LIVE_TRADES_PER_UNDERLYING,
         MAX_RISK_PER_TRADE_RUPEES,
-        DEFAULT_LOTS_PER_TRADE,
-        LIVE_ALLOWED_UNDERLYINGS,
-        ANGEL_PRODUCT_TYPE,
-        ANGEL_ORDER_VARIETY,
-        ANGEL_ALLOWED_ORDER_TYPES,
     )
 except ImportError as e:
     print(f"[PH101] ERROR: Failed to import live_trade_config: {e}")

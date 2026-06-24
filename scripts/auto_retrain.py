@@ -70,6 +70,7 @@ def _check_prerequisites() -> tuple[bool, str]:
 
     try:
         import pandas as pd
+
         df = pd.read_csv(blended_csv)
         if df.empty:
             return False, "Blended training CSV is empty — run dataset builder first"
@@ -101,8 +102,8 @@ def run_retrain(dry_run: bool = False) -> dict:
 
     try:
         from core.engine.dhan_blended_model_trainer_v2 import (
-            train_blended_models,
             backup_existing_models,
+            train_blended_models,
         )
     except ImportError as e:
         msg = f"Cannot import trainer: {e}"

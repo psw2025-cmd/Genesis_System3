@@ -2,11 +2,12 @@
 Get All Trades from Today (Feb 6, 2026) - Market Hours Only (9:15 AM - 3:30 PM IST)
 """
 
-import json
 import csv
+import json
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 sys.stdout.reconfigure(encoding="utf-8")

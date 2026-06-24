@@ -4,9 +4,10 @@ Dhan Index Options - Premium-to-Spot Behavior Classifier
 Classifies relationship between option premium and underlying spot.
 """
 
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
+import pandas as pd
 
 
 def classify_premium_spot_behavior(

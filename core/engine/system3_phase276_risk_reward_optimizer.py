@@ -5,10 +5,11 @@ Optimizes risk-reward ratios for trades.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

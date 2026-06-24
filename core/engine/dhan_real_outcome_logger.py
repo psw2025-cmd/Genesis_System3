@@ -5,10 +5,11 @@ Logs every trade (even DRY RUN) into persistent learning table.
 AUTO-UPDATE: DISABLED - Only logs, never modifies configs.
 """
 
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
