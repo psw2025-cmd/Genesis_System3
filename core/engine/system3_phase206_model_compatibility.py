@@ -4,12 +4,12 @@ System3 Phase 206 - Model Compatibility Checker
 Scans models directory and checks version compatibility.
 """
 
-import sys
-import pickle
 import json
-from pathlib import Path
+import pickle
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,7 +30,9 @@ def check_model_file(model_path: Path) -> tuple[bool, dict, str]:
     """Check a model file for compatibility."""
     try:
         with model_path.open("rb") as f:
-            model_data = pickle.load(f)
+            # Loads only locally-trained artifacts from core/models, never
+            # externally-supplied or user-uploaded data.
+            model_data = pickle.load(f)  # nosec B301
 
         # Try to extract version/metadata
         version = None

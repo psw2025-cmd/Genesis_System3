@@ -1,18 +1,19 @@
-"""
+﻿"""
 System3 Ultra Dashboard Backend
 FastAPI service for real-time system monitoring and control
 """
 
-import os
-import sys
-import json
 import asyncio
 import hashlib
+import json
+import os
 import re
+import sys
 import time
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -30,6 +31,7 @@ if str(ROOT_DIR / "src") not in sys.path:
 DHAN_AVAILABLE = False
 try:
     from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status_probe
+
     DHAN_AVAILABLE = True
     print(f"[Backend] Dhan broker module imported successfully from {ROOT_DIR}")
 except ImportError as e:
@@ -37,9 +39,15 @@ except ImportError as e:
 except Exception as e:
     print(f"[Backend] Warning: Error importing Dhan broker module: {e}")
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, BackgroundTasks
+from fastapi import (
+    BackgroundTasks,
+    FastAPI,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 try:
@@ -48,11 +56,12 @@ except ImportError:
     pd = None
     print("Warning: pandas not available")
 import sqlite3
+
 import numpy as np
 
 # Import market detection and synthetic data generator
 try:
-    from utils.market_hours import is_market_open, get_market_status
+    from utils.market_hours import get_market_status, is_market_open
 
     MARKET_DETECTION_AVAILABLE = True
 except ImportError as e:
@@ -66,9 +75,9 @@ try:
     from dashboard.backend.synthetic_data_generator import (
         generate_synthetic_chain_data,
         generate_synthetic_health_data,
+        generate_synthetic_perf_data,
         generate_synthetic_qc_data,
         generate_synthetic_signal_data,
-        generate_synthetic_perf_data,
     )
 
     SYNTHETIC_DATA_AVAILABLE = True
@@ -78,9 +87,9 @@ except ImportError:
         from synthetic_data_generator import (
             generate_synthetic_chain_data,
             generate_synthetic_health_data,
+            generate_synthetic_perf_data,
             generate_synthetic_qc_data,
             generate_synthetic_signal_data,
-            generate_synthetic_perf_data,
         )
 
         SYNTHETIC_DATA_AVAILABLE = True
@@ -90,14 +99,14 @@ except ImportError:
 
 # Import performance predictor and live validator
 try:
-    from dashboard.backend.performance_predictor import get_performance_predictor
     from dashboard.backend.live_profit_validator import get_live_validator
+    from dashboard.backend.performance_predictor import get_performance_predictor
 
     PERFORMANCE_PREDICTOR_AVAILABLE = True
 except ImportError:
     try:
-        from performance_predictor import get_performance_predictor
         from live_profit_validator import get_live_validator
+        from performance_predictor import get_performance_predictor
 
         PERFORMANCE_PREDICTOR_AVAILABLE = True
     except ImportError:
@@ -141,24 +150,24 @@ except ImportError:
 try:
     from dashboard.backend.advanced_charting import get_advanced_charting
     from dashboard.backend.advanced_filtering import get_advanced_filtering
-    from dashboard.backend.risk_management import get_risk_management
     from dashboard.backend.backtesting import get_backtesting_engine
-    from dashboard.backend.ml_performance_tracking import get_ml_tracker
-    from dashboard.backend.trade_journal import get_trade_journal
     from dashboard.backend.export_reporting import get_export_reporting
+    from dashboard.backend.ml_performance_tracking import get_ml_tracker
     from dashboard.backend.order_management import get_order_management
+    from dashboard.backend.risk_management import get_risk_management
+    from dashboard.backend.trade_journal import get_trade_journal
 
     ADVANCED_FEATURES_AVAILABLE = True
 except ImportError:
     try:
         from advanced_charting import get_advanced_charting
         from advanced_filtering import get_advanced_filtering
-        from risk_management import get_risk_management
         from backtesting import get_backtesting_engine
-        from ml_performance_tracking import get_ml_tracker
-        from trade_journal import get_trade_journal
         from export_reporting import get_export_reporting
+        from ml_performance_tracking import get_ml_tracker
         from order_management import get_order_management
+        from risk_management import get_risk_management
+        from trade_journal import get_trade_journal
 
         ADVANCED_FEATURES_AVAILABLE = True
     except ImportError:
@@ -167,8 +176,8 @@ except ImportError:
 
 # Try to import watchdog (optional)
 try:
-    from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler
+    from watchdog.observers import Observer
 
     WATCHDOG_AVAILABLE = True
 except ImportError:
@@ -227,7 +236,8 @@ else:
 
 # Warm instruments master — sync from Dhan CDN if stale, then load cache
 try:
-    from scripts.sync_dhan_instruments_master import META_JSON, sync as sync_instruments_master
+    from scripts.sync_dhan_instruments_master import META_JSON
+    from scripts.sync_dhan_instruments_master import sync as sync_instruments_master
 
     _need_sync = True
     if META_JSON.exists():
@@ -237,7 +247,9 @@ try:
         meta = _json.loads(META_JSON.read_text(encoding="utf-8"))
         synced = meta.get("synced_utc")
         if synced:
-            age_h = (datetime.now(timezone.utc) - datetime.fromisoformat(synced.replace("Z", "+00:00"))).total_seconds() / 3600
+            age_h = (
+                datetime.now(timezone.utc) - datetime.fromisoformat(synced.replace("Z", "+00:00"))
+            ).total_seconds() / 3600
             _need_sync = age_h > 24
     if _need_sync and not (ROOT_DIR / "storage" / "instruments" / "api-scrip-master-detailed.csv").exists():
         try:
@@ -252,11 +264,23 @@ try:
 except Exception as _inst_exc:
     print(f"[startup] instruments warm-up skipped: {_inst_exc}")
 
-# CORS - allow localhost and local network IPs
-# For development: allow all origins (change to specific list in production)
+# CORS - explicit allow-list only. Wildcard origins + credentials is an open
+# CORS misconfiguration (any site can read authenticated responses).
+# Override/extend via ALLOWED_ORIGINS env var (comma-separated).
+_default_allowed_origins = [
+    "https://genesis-system3-backend.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "null",  # Electron file:// pages send Origin: null
+]
+_env_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "")
+_allowed_origins = [o.strip() for o in _env_allowed_origins.split(",") if o.strip()] or _default_allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -264,6 +288,7 @@ app.add_middleware(
 
 
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
+
 
 # Root route - helpful message
 @app.api_route("/", methods=["GET", "HEAD"])
@@ -383,7 +408,10 @@ async def get_broker_status():
     """Get broker connection status. Uses Dhan broker (read-only, analyzer mode)."""
     try:
         from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
-        return _dhan_status()
+        status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=5)
+        if SSOT_AVAILABLE and state_store is not None:
+            state_store.update_state({"broker": status})
+        return status
     except Exception as _e:
         return {
             "connected": False,
@@ -401,7 +429,10 @@ async def get_dhan_broker_status():
     """Dhan read-only broker status. Never returns access token. No live trading."""
     try:
         from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
-        return dhan_get_status()
+        status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=5)
+        if SSOT_AVAILABLE and state_store is not None:
+            state_store.update_state({"broker": status})
+        return status
     except ImportError as exc:
         return {
             "broker": "dhan",
@@ -438,11 +469,11 @@ async def get_broker_truth():
 async def get_broker_holdings():
     """Dhan equity holdings — read-only. No orders."""
     try:
-        from core.brokers.dhan.dhan_readonly import get_holdings
         from core.brokers.dhan.dhan_payload_normalizer import (
-            normalize_holdings_payload,
             normalize_holding_row,
+            normalize_holdings_payload,
         )
+        from core.brokers.dhan.dhan_readonly import get_holdings
 
         result = get_holdings()
         raw_rows = normalize_holdings_payload(result.get("data"))
@@ -471,11 +502,11 @@ async def get_broker_holdings():
 async def get_broker_funds():
     """Dhan fund limits / available balance — read-only. No orders."""
     try:
-        from core.brokers.dhan.dhan_readonly import get_funds
         from core.brokers.dhan.dhan_payload_normalizer import (
             normalize_funds_payload,
             normalize_funds_row,
         )
+        from core.brokers.dhan.dhan_readonly import get_funds
 
         result = get_funds()
         raw = normalize_funds_payload(result.get("data"))
@@ -503,11 +534,11 @@ async def get_broker_funds():
 async def get_broker_positions_live():
     """Dhan open positions — read-only. No orders."""
     try:
-        from core.brokers.dhan.dhan_readonly import get_positions
         from core.brokers.dhan.dhan_payload_normalizer import (
-            normalize_positions_payload,
             normalize_position_row,
+            normalize_positions_payload,
         )
+        from core.brokers.dhan.dhan_readonly import get_positions
 
         result = get_positions()
         raw_rows = normalize_positions_payload(result.get("data"))
@@ -546,7 +577,9 @@ async def get_unified_portfolio():
 async def get_trader_requirements():
     """Full trader field audit mapped to available API data."""
     try:
-        from dashboard.backend.trader_requirements_service import build_trader_requirements_report
+        from dashboard.backend.trader_requirements_service import (
+            build_trader_requirements_report,
+        )
     except ImportError:
         from trader_requirements_service import build_trader_requirements_report
     return build_trader_requirements_report(OUTPUTS_DIR)
@@ -572,6 +605,7 @@ async def get_broker_deps():
         dhanhq_version = None
         try:
             import dhanhq
+
             dhanhq_installed = True
             dhanhq_version = getattr(dhanhq, "__version__", "unknown")
         except ImportError:
@@ -695,12 +729,12 @@ async def get_status():
 
 # ─── System3 Analytics Endpoints ─────────────────────────────────────────────
 
-GAIN_RANK_FILE   = ROOT_DIR / "state" / "gain_rank_history.json"
-VALIDATION_DIR   = ROOT_DIR / "state" / "market_validations"
-DS_HEALTH_FILE   = ROOT_DIR / "state" / "datasource_health.json"
-RETRAIN_FLAG     = ROOT_DIR / "state" / "retrain_signal.json"
-WATCHDOG_LOG     = ROOT_DIR / "logs" / "dhan_watchdog.log"
-JOB_SCHED_CFG    = ROOT_DIR / "config" / "system3_job_scheduler.json"
+GAIN_RANK_FILE = ROOT_DIR / "state" / "gain_rank_history.json"
+VALIDATION_DIR = ROOT_DIR / "state" / "market_validations"
+DS_HEALTH_FILE = ROOT_DIR / "state" / "datasource_health.json"
+RETRAIN_FLAG = ROOT_DIR / "state" / "retrain_signal.json"
+WATCHDOG_LOG = ROOT_DIR / "logs" / "dhan_watchdog.log"
+JOB_SCHED_CFG = ROOT_DIR / "config" / "system3_job_scheduler.json"
 
 
 @app.get("/api/instruments/health")
@@ -789,7 +823,9 @@ async def get_top_contract_gainers(top_n: int = 5):
     Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
     """
     try:
-        from dashboard.backend.contract_gain_scanner import build_top_contract_gainers_report
+        from dashboard.backend.contract_gain_scanner import (
+            build_top_contract_gainers_report,
+        )
 
         report = build_top_contract_gainers_report(top_n=min(max(top_n, 1), 20))
         report["status"] = "ok" if report.get("segments_implemented", 0) > 0 else "no_data"
@@ -844,14 +880,16 @@ async def get_accuracy_trend():
             try:
                 d = json.loads(f.read_text())
                 rho = d.get("rank_correlation_spearman") or d.get("spearman_correlation")
-                trend.append({
-                    "date": d.get("date", f.stem.replace("market_validation_", "")),
-                    "rho": round(rho, 4) if rho is not None else None,
-                    "hit_rate": d.get("hit_rate"),
-                    "status": d.get("status", "UNKNOWN"),
-                    "predicted": d.get("predicted_ranking", []),
-                    "actual": d.get("actual_ranking", []),
-                })
+                trend.append(
+                    {
+                        "date": d.get("date", f.stem.replace("market_validation_", "")),
+                        "rho": round(rho, 4) if rho is not None else None,
+                        "hit_rate": d.get("hit_rate"),
+                        "status": d.get("status", "UNKNOWN"),
+                        "predicted": d.get("predicted_ranking", []),
+                        "actual": d.get("actual_ranking", []),
+                    }
+                )
             except Exception:
                 continue
         avg_rho = None
@@ -917,12 +955,7 @@ async def get_system_health():
 
         # Scheduler jobs
         jobs_summary = []
-        scheduler_daemon = {
-            "started_at": None,
-            "heartbeat": None,
-            "pid": None,
-            "active": False
-        }
+        scheduler_daemon = {"started_at": None, "heartbeat": None, "pid": None, "active": False}
         try:
             cfg = json.loads(JOB_SCHED_CFG.read_text())
             scheduler_state = {}
@@ -933,7 +966,7 @@ async def get_system_health():
                     scheduler_daemon["started_at"] = scheduler_state.get("daemon_started_at")
                     scheduler_daemon["heartbeat"] = scheduler_state.get("daemon_heartbeat")
                     scheduler_daemon["pid"] = scheduler_state.get("daemon_pid")
-                    
+
                     if scheduler_daemon["heartbeat"]:
                         try:
                             hb_time = datetime.fromisoformat(scheduler_daemon["heartbeat"])
@@ -949,15 +982,17 @@ async def get_system_health():
             for j in cfg.get("jobs", []):
                 job_id = j.get("id")
                 job_state = scheduler_state.get("jobs", {}).get(job_id, {})
-                jobs_summary.append({
-                    "id": job_id,
-                    "name": j.get("name"),
-                    "schedule_time": j.get("schedule_time", "daily"),
-                    "enabled": j.get("enabled", False),
-                    "last_run_time": job_state.get("last_run_time"),
-                    "last_status": job_state.get("last_status"),
-                    "last_error": job_state.get("last_error"),
-                })
+                jobs_summary.append(
+                    {
+                        "id": job_id,
+                        "name": j.get("name"),
+                        "schedule_time": j.get("schedule_time", "daily"),
+                        "enabled": j.get("enabled", False),
+                        "last_run_time": job_state.get("last_run_time"),
+                        "last_status": job_state.get("last_status"),
+                        "last_error": job_state.get("last_error"),
+                    }
+                )
         except Exception:
             pass
 
@@ -982,7 +1017,10 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
     Supports GET and POST to allow simple integration with external web-cron services (e.g. cron-job.org).
     """
     expected_secret = os.environ.get("SCHEDULER_SECRET")
-    if expected_secret and secret != expected_secret:
+    if not expected_secret:
+        # Fail closed: an unset secret must never mean "no auth required".
+        raise HTTPException(status_code=503, detail="SCHEDULER_SECRET not configured on server")
+    if secret != expected_secret:
         raise HTTPException(status_code=403, detail="Invalid scheduler secret")
 
     # Load scheduler config to verify job ID
@@ -999,10 +1037,15 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
     # Run the job inside BackgroundTasks to return immediate response and avoid timeouts
     def _run_job_bg():
         try:
-            import importlib.util as _ilu, pathlib as _pl
+            import importlib.util as _ilu
+            import pathlib as _pl
+
             _spec = _ilu.spec_from_file_location(
                 "job_scheduler_bg",
-                _pl.Path(__file__).resolve().parent.parent.parent / "core" / "engine" / "system3_phase82_job_scheduler.py",
+                _pl.Path(__file__).resolve().parent.parent.parent
+                / "core"
+                / "engine"
+                / "system3_phase82_job_scheduler.py",
             )
             if _spec and _spec.loader:
                 _js = _ilu.module_from_spec(_spec)
@@ -1017,7 +1060,7 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
         "status": "triggered",
         "job_id": job_id,
         "name": job.get("name"),
-        "message": f"Job '{job_id}' has been scheduled for background execution."
+        "message": f"Job '{job_id}' has been scheduled for background execution.",
     }
 
 
@@ -1382,7 +1425,10 @@ async def get_health():
             _dhan_tok = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
             if _dhan_cid and _dhan_tok:
                 try:
-                    from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status
+                    from core.brokers.dhan.dhan_readonly import (
+                        get_status as _dhan_get_status,
+                    )
+
                     _dhan_result = _dhan_get_status()
                     if _dhan_result.get("connected"):
                         broker_connected = True
@@ -1708,7 +1754,9 @@ async def get_chain(underlying: str):
             try:
                 # Import BASE_SPOT_PRICES (try both import paths)
                 try:
-                    from dashboard.backend.synthetic_data_generator import BASE_SPOT_PRICES
+                    from dashboard.backend.synthetic_data_generator import (
+                        BASE_SPOT_PRICES,
+                    )
                 except ImportError:
                     from synthetic_data_generator import BASE_SPOT_PRICES
 
@@ -1756,7 +1804,9 @@ async def get_chain(underlying: str):
                 # Import BASE_SPOT_PRICES (try both import paths)
                 try:
                     try:
-                        from dashboard.backend.synthetic_data_generator import BASE_SPOT_PRICES
+                        from dashboard.backend.synthetic_data_generator import (
+                            BASE_SPOT_PRICES,
+                        )
                     except ImportError:
                         from synthetic_data_generator import BASE_SPOT_PRICES
                 except ImportError:
@@ -1790,17 +1840,26 @@ async def get_chain(underlying: str):
                 # FALLBACK: state_store may not have broker truth on fresh deploy
                 # Try direct Dhan API check before returning NOT_READY
                 try:
-                    from core.brokers.dhan.dhan_readonly import get_status as _direct_dhan
+                    from core.brokers.dhan.dhan_readonly import (
+                        get_status as _direct_dhan,
+                    )
+
                     _dstatus = _direct_dhan()
                     if _dstatus.get("connected"):
                         broker_connected = True
                         # Update state_store with real truth
                         if SSOT_AVAILABLE and state_store:
-                            state_store.update_state({"broker": {
-                                "connected": True, "name": "dhan",
-                                "status": "connected", "error": None,
-                                "latency_ms": _dstatus.get("latency_ms"),
-                            }})
+                            state_store.update_state(
+                                {
+                                    "broker": {
+                                        "connected": True,
+                                        "name": "dhan",
+                                        "status": "connected",
+                                        "error": None,
+                                        "latency_ms": _dstatus.get("latency_ms"),
+                                    }
+                                }
+                            )
                 except Exception:
                     pass
 
@@ -1821,6 +1880,7 @@ async def get_chain(underlying: str):
             try:
                 from core.data.datasource_manager import DataSourceManager
                 from dashboard.backend.chain_adapter import fetch_chain_for_api
+
                 _dsm = DataSourceManager()
                 _closed = fetch_chain_for_api(_dsm, underlying.upper())
                 if _closed and _closed.get("contracts"):
@@ -1834,8 +1894,9 @@ async def get_chain(underlying: str):
         # chain_raw_live.csv on Render is from repo clone — may be months old
         # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
         try:
-            from dashboard.backend.chain_adapter import fetch_chain_for_api
             from core.data.datasource_manager import DataSourceManager
+            from dashboard.backend.chain_adapter import fetch_chain_for_api
+
             _dsm = DataSourceManager()
             _live = fetch_chain_for_api(_dsm, underlying.upper())
             if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
@@ -1843,7 +1904,9 @@ async def get_chain(underlying: str):
                 _live["source_priority"] = "dhan_p0_live"
                 return _live
             else:
-                print(f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback")
+                print(
+                    f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback"
+                )
         except Exception as _dsm_err:
             print(f"[chain/{underlying}] DSM failed: {_dsm_err} — using CSV fallback")
 
@@ -1854,6 +1917,7 @@ async def get_chain(underlying: str):
             try:
                 from core.data.datasource_manager import DataSourceManager
                 from dashboard.backend.chain_adapter import fetch_chain_for_api
+
                 _dsm = DataSourceManager()
                 _chain_result = fetch_chain_for_api(_dsm, underlying.upper())
                 if _chain_result and _chain_result.get("contracts"):
@@ -2078,8 +2142,8 @@ async def get_chain(underlying: str):
         # Convert to dict, handling NaN values
         # Also map CSV column names to standard dashboard field names
         _col_map = {
-            "dOI": "oi_change",     # OI change from CSV
-            "dVolume": "vol_change", # Volume change
+            "dOI": "oi_change",  # OI change from CSV
+            "dVolume": "vol_change",  # Volume change
             "spot_price": "spot_price",
         }
         contracts = []
@@ -2890,7 +2954,9 @@ async def cloud_paper_trading_loop():
 
                 if chains:
                     engine.step(chains, max_open=3)
-                    print(f"[paper-loop] tick: {len(engine.open_positions)} open, {len(engine.closed_positions)} closed")
+                    print(
+                        f"[paper-loop] tick: {len(engine.open_positions)} open, {len(engine.closed_positions)} closed"
+                    )
 
             await _asyncio.sleep(60)  # tick every 60s
         except Exception as e:
@@ -2898,56 +2964,102 @@ async def cloud_paper_trading_loop():
             await _asyncio.sleep(60)
 
 
+def _refresh_spot_prices_blocking() -> None:
+    """Synchronous network + CSV I/O — only ever called via asyncio.to_thread
+    from background_data_refresh, never inline in the async loop. This used
+    to run directly inside an `async def` task on the single uvicorn event
+    loop: up to 5 sequential HTTP calls (5s timeout each) plus pandas CSV
+    read/write, all blocking the entire server (every request, every other
+    background task) for up to ~25s out of every 30s cycle.
+    """
+    symbols = {
+        "NIFTY": "^NSEI",
+        "BANKNIFTY": "^NSEBANK",
+        "FINNIFTY": "^NSEFINNIFTY",
+        "MIDCPNIFTY": "^NSEMIDCP",
+        "SENSEX": "^BSESN",
+    }
+
+    import requests
+
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+
+    for underlying, yahoo_symbol in symbols.items():
+        try:
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
+            response = session.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                if "chart" in data and "result" in data["chart"]:
+                    result = data["chart"]["result"][0]
+                    meta = result.get("meta", {})
+                    ltp = meta.get("regularMarketPrice")
+                    if ltp and pd is not None:
+                        # Update chain CSV
+                        chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
+                        if chain_file.exists():
+                            try:
+                                df = pd.read_csv(chain_file)
+                                if "underlying" in df.columns and "spot_price" in df.columns:
+                                    mask = df["underlying"].astype(str).str.upper() == underlying.upper()
+                                    if mask.any():
+                                        df.loc[mask, "spot_price"] = ltp
+                                        df.to_csv(chain_file, index=False)
+                            except Exception:
+                                pass
+        except Exception:
+            pass
+
+
 async def background_data_refresh():
     """Background task to refresh spot prices every 30 seconds"""
-    import time
-
     while True:
         try:
-            # Refresh spot prices from live sources
-            symbols = {
-                "NIFTY": "^NSEI",
-                "BANKNIFTY": "^NSEBANK",
-                "FINNIFTY": "^NSEFINNIFTY",
-                "MIDCPNIFTY": "^NSEMIDCP",
-                "SENSEX": "^BSESN",
-            }
-
-            import requests
-
-            session = requests.Session()
-            session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
-
-            for underlying, yahoo_symbol in symbols.items():
-                try:
-                    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
-                    response = session.get(url, timeout=5)
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "chart" in data and "result" in data["chart"]:
-                            result = data["chart"]["result"][0]
-                            meta = result.get("meta", {})
-                            ltp = meta.get("regularMarketPrice")
-                            if ltp and pd is not None:
-                                # Update chain CSV
-                                chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                                if chain_file.exists():
-                                    try:
-                                        df = pd.read_csv(chain_file)
-                                        if "underlying" in df.columns and "spot_price" in df.columns:
-                                            mask = df["underlying"].astype(str).str.upper() == underlying.upper()
-                                            if mask.any():
-                                                df.loc[mask, "spot_price"] = ltp
-                                                df.to_csv(chain_file, index=False)
-                                    except:
-                                        pass
-                except:
-                    pass
-
-            await asyncio.sleep(30)  # Refresh every 30 seconds
+            await asyncio.wait_for(asyncio.to_thread(_refresh_spot_prices_blocking), timeout=25)
+        except asyncio.TimeoutError:
+            print("[background_data_refresh] spot-price refresh exceeded 25s timeout (continuing)")
         except Exception as e:
-            # Log error but continue
-            await asyncio.sleep(30)
+            print(f"[background_data_refresh] error (continuing): {e}")
+        await asyncio.sleep(30)  # Refresh every 30 seconds
+
+
+def _run_startup_token_refresh_blocking() -> None:
+    """Synchronous Dhan token refresh — only ever called via asyncio.to_thread
+    from _startup_token_refresh_task, never awaited directly in the startup
+    event handler. A hang here must never block the server from accepting
+    requests (this previously ran inline in startup(), which could freeze
+    the whole single-process event loop — and the entire app — if Dhan's
+    auth endpoint was slow or unresponsive).
+    """
+    import importlib.util as _ilu
+    import pathlib as _pl
+
+    _spec = _ilu.spec_from_file_location(
+        "token_manager_startup",
+        _pl.Path(__file__).resolve().parent.parent.parent / "core" / "brokers" / "dhan" / "token_manager.py",
+    )
+    if _spec and _spec.loader:
+        _tm = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_tm)  # type: ignore[union-attr]
+        _result = _tm.refresh_token()
+        if _result.get("success"):
+            print(f"[startup] Dhan token refreshed via {_result.get('strategy')}")
+        else:
+            print(f"[startup] Dhan token refresh skipped/failed: {_result.get('message', _result)}")
+
+
+async def _startup_token_refresh_task() -> None:
+    """Background task: refresh the Dhan token without ever blocking server
+    readiness. Bounded by an overall timeout so a hung HTTP call inside the
+    SDK can't hang this task forever either.
+    """
+    try:
+        await asyncio.wait_for(asyncio.to_thread(_run_startup_token_refresh_blocking), timeout=45)
+    except asyncio.TimeoutError:
+        print("[startup] Token refresh timed out after 45s (non-fatal) — continuing with existing token")
+    except Exception as _e:
+        print(f"[startup] Token refresh error (non-fatal): {_e}")
 
 
 @app.on_event("startup")
@@ -2955,27 +3067,13 @@ async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
 
-    # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode)
-    # This ensures the web service has a fresh token after each deploy.
+    # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
+    # Fired as a background task (never awaited here) so a slow/hung Dhan
+    # auth call cannot delay or block the server from accepting requests.
     _pin = os.environ.get("DHAN_PIN", "").strip()
     _totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
     if _pin and _totp:
-        try:
-            import importlib.util as _ilu, pathlib as _pl
-            _spec = _ilu.spec_from_file_location(
-                "token_manager_startup",
-                _pl.Path(__file__).resolve().parent.parent.parent / "core" / "brokers" / "dhan" / "token_manager.py",
-            )
-            if _spec and _spec.loader:
-                _tm = _ilu.module_from_spec(_spec)
-                _spec.loader.exec_module(_tm)  # type: ignore[union-attr]
-                _result = _tm.refresh_token()
-                if _result.get("success"):
-                    print(f"[startup] Dhan token refreshed via {_result.get('strategy')}")
-                else:
-                    print(f"[startup] Dhan token refresh skipped/failed: {_result.get('message', _result)}")
-        except Exception as _e:
-            print(f"[startup] Token refresh error (non-fatal): {_e}")
+        asyncio.create_task(_startup_token_refresh_task())
     else:
         if not os.environ.get("DHAN_ACCESS_TOKEN"):
             print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set — token refresh skipped")
@@ -3996,10 +4094,13 @@ async def get_trade_history(
     """
     try:
         try:
-            from dashboard.backend.trade_logger import get_trades_by_date, get_all_trades
+            from dashboard.backend.trade_logger import (
+                get_all_trades,
+                get_trades_by_date,
+            )
         except ImportError:
             # Fallback to relative import
-            from trade_logger import get_trades_by_date, get_all_trades
+            from trade_logger import get_all_trades, get_trades_by_date
 
         if date:
             trades = get_trades_by_date(date, start_time, end_time)
@@ -4022,6 +4123,7 @@ async def get_today_trades():
             # Fallback to relative import
             from trade_logger import get_trades_by_date
         from datetime import datetime
+
         import pytz
 
         IST = pytz.timezone("Asia/Kolkata")
@@ -4042,35 +4144,33 @@ async def get_today_trades():
                 pid = p.get("position_id")
                 if pid and any(t.get("position_id") == pid for t in trades):
                     continue
-                trades.append({
-                    "timestamp": p.get("timestamp"),
-                    "time_ist": p.get("time_ist"),
-                    "event_type": "POSITION_OPENED",
-                    "position_id": pid,
-                    "underlying": p.get("underlying"),
-                    "symbol": p.get("underlying"),
-                    "strike": p.get("strike"),
-                    "option_type": p.get("option_type"),
-                    "action": "OPEN",
-                    "entry_price": p.get("entry_price"),
-                    "qty": p.get("qty"),
-                    "strategy": p.get("strategy"),
-                    "source": "state_store",
-                })
+                trades.append(
+                    {
+                        "timestamp": p.get("timestamp"),
+                        "time_ist": p.get("time_ist"),
+                        "event_type": "POSITION_OPENED",
+                        "position_id": pid,
+                        "underlying": p.get("underlying"),
+                        "symbol": p.get("underlying"),
+                        "strike": p.get("strike"),
+                        "option_type": p.get("option_type"),
+                        "action": "OPEN",
+                        "entry_price": p.get("entry_price"),
+                        "qty": p.get("qty"),
+                        "strategy": p.get("strategy"),
+                        "source": "state_store",
+                    }
+                )
 
         # Lifecycle proof closed trades from today's artifact
-        lifecycle_summary = (
-            ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
-        )
+        lifecycle_summary = ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
         if lifecycle_summary.exists():
             try:
                 proof = json.loads(lifecycle_summary.read_text(encoding="utf-8"))
                 started = (proof.get("evidence") or {}).get("proof_id") or ""
                 if proof.get("pass") and _today_match(started):
                     proof_file = sorted(
-                        (ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof").glob(
-                            "LIFECYCLE_*.json"
-                        )
+                        (ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof").glob("LIFECYCLE_*.json")
                     )
                     if proof_file:
                         detail = json.loads(proof_file[-1].read_text(encoding="utf-8"))
@@ -4079,23 +4179,25 @@ async def get_today_trades():
                             sig = detail.get("signal") or {}
                             ent = detail.get("entry_order") or {}
                             ext = detail.get("exit_record") or {}
-                            trades.append({
-                                "time_ist": datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST"),
-                                "event_type": "POSITION_CLOSED",
-                                "position_id": oid,
-                                "underlying": sig.get("symbol"),
-                                "symbol": sig.get("symbol"),
-                                "strike": sig.get("strike"),
-                                "option_type": sig.get("option_type"),
-                                "action": "CLOSE",
-                                "entry_price": ent.get("fill_price"),
-                                "exit_price": ext.get("exit_price"),
-                                "qty": ent.get("quantity") or 1,
-                                "pnl": ext.get("pnl_total"),
-                                "strategy": "PAPER_LIFECYCLE_PROOF",
-                                "exit_reason": ext.get("exit_reason"),
-                                "source": "lifecycle_proof",
-                            })
+                            trades.append(
+                                {
+                                    "time_ist": datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST"),
+                                    "event_type": "POSITION_CLOSED",
+                                    "position_id": oid,
+                                    "underlying": sig.get("symbol"),
+                                    "symbol": sig.get("symbol"),
+                                    "strike": sig.get("strike"),
+                                    "option_type": sig.get("option_type"),
+                                    "action": "CLOSE",
+                                    "entry_price": ent.get("fill_price"),
+                                    "exit_price": ext.get("exit_price"),
+                                    "qty": ent.get("quantity") or 1,
+                                    "pnl": ext.get("pnl_total"),
+                                    "strategy": "PAPER_LIFECYCLE_PROOF",
+                                    "exit_reason": ext.get("exit_reason"),
+                                    "source": "lifecycle_proof",
+                                }
+                            )
             except Exception:
                 pass
 
@@ -4486,9 +4588,9 @@ async def get_validation_status():
 async def run_validation():
     """Run validation systems"""
     try:
+        import re
         import subprocess
         import sys
-        import re
 
         result = subprocess.run(
             [sys.executable, str(ROOT_DIR / "complete_end_to_end_validation.py")],
@@ -4551,10 +4653,10 @@ async def run_validation():
 async def run_learning_cycle():
     """Run one learning cycle"""
     try:
-        import subprocess
-        import sys
         import json
         import re
+        import subprocess
+        import sys
 
         result = subprocess.run(
             [sys.executable, str(ROOT_DIR / "continuous_learning_system.py")],

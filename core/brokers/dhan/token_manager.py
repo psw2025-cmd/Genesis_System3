@@ -22,21 +22,23 @@ Required in .secrets/dhan.env:
 One-time setup: python scripts/setup_dhan_automation.py
 """
 
+import logging
 import os
 import re
 import sys
-import logging
 from datetime import datetime
 from pathlib import Path
 
 try:
     import pyotp
+
     _PYOTP_OK = True
 except ImportError:
     _PYOTP_OK = False
 
 try:
     from dhanhq import DhanLogin
+
     _DHAN_SDK_OK = True
 except ImportError:
     _DHAN_SDK_OK = False
@@ -60,8 +62,12 @@ logger = logging.getLogger("dhan_token_manager")
 _CLOUD_MODE = bool(os.environ.get("RENDER") or os.environ.get("CLOUD_WORKER"))
 
 _DHAN_KEYS = (
-    "DHAN_CLIENT_ID", "DHAN_APP_ID", "DHAN_APP_SECRET",
-    "DHAN_ACCESS_TOKEN", "DHAN_PIN", "DHAN_TOTP_SECRET",
+    "DHAN_CLIENT_ID",
+    "DHAN_APP_ID",
+    "DHAN_APP_SECRET",
+    "DHAN_ACCESS_TOKEN",
+    "DHAN_PIN",
+    "DHAN_TOTP_SECRET",
 )
 
 
@@ -131,7 +137,9 @@ def _write_token(new_token: str) -> None:
 
 def _token_expiry(token: str) -> datetime | None:
     """Decode JWT expiry without PyJWT."""
-    import base64, json
+    import base64
+    import json
+
     try:
         parts = token.split(".")
         if len(parts) < 2:
@@ -147,6 +155,7 @@ def _token_expiry(token: str) -> datetime | None:
 # ------------------------------------------------------------------ #
 #  Strategy 1 (primary): generate_token via PIN + TOTP               #
 # ------------------------------------------------------------------ #
+
 
 def _try_generate(client_id: str, pin: str, totp_secret: str) -> str | None:
     """
@@ -177,11 +186,7 @@ def _try_generate(client_id: str, pin: str, totp_secret: str) -> str | None:
         resp = login.generate_token(pin, current_otp)
         logger.info(f"generate_token response keys: {list(resp.keys()) if isinstance(resp, dict) else type(resp)}")
 
-        token = (
-            resp.get("accessToken")
-            or resp.get("access_token")
-            or (resp.get("data") or {}).get("accessToken")
-        )
+        token = resp.get("accessToken") or resp.get("access_token") or (resp.get("data") or {}).get("accessToken")
         if token:
             return token
         logger.error(f"generate_token: no accessToken in response: {resp}")
@@ -194,6 +199,7 @@ def _try_generate(client_id: str, pin: str, totp_secret: str) -> str | None:
 # ------------------------------------------------------------------ #
 #  Strategy 2 (fallback): renew existing token                        #
 # ------------------------------------------------------------------ #
+
 
 def _try_renew(client_id: str, current_token: str) -> str | None:
     """
@@ -209,11 +215,7 @@ def _try_renew(client_id: str, current_token: str) -> str | None:
         login = DhanLogin(client_id)
         resp = login.renew_token(current_token)
         logger.info(f"renew_token response keys: {list(resp.keys()) if isinstance(resp, dict) else type(resp)}")
-        token = (
-            resp.get("accessToken")
-            or resp.get("access_token")
-            or (resp.get("data") or {}).get("accessToken")
-        )
+        token = resp.get("accessToken") or resp.get("access_token") or (resp.get("data") or {}).get("accessToken")
         return token if token else None
     except Exception as e:
         logger.warning(f"renew_token failed: {e}")
@@ -223,6 +225,7 @@ def _try_renew(client_id: str, current_token: str) -> str | None:
 # ------------------------------------------------------------------ #
 #  Strategy 3 (emergency): OAuth manual consent flow                  #
 # ------------------------------------------------------------------ #
+
 
 def _try_oauth_manual(client_id: str, app_id: str, app_secret: str) -> str | None:
     """
@@ -238,10 +241,12 @@ def _try_oauth_manual(client_id: str, app_id: str, app_secret: str) -> str | Non
     try:
         login = DhanLogin(client_id)
         import requests
+
         resp = requests.post(
             f"{login.AUTH_BASE_URL}/app/generate-consent",
             params={"client_id": client_id},
             headers={"app_id": app_id, "app_secret": app_secret},
+            timeout=30,
         )
         data = resp.json()
         if data.get("status") == "success":
@@ -269,8 +274,8 @@ def consume_oauth_token(token_id: str) -> dict:
     Called by: python scripts/dhan_token_auto_refresh.py --consume <tokenId>
     """
     env = _load_env()
-    client_id  = env.get("DHAN_CLIENT_ID", "").strip()
-    app_id     = env.get("DHAN_APP_ID", "").strip()
+    client_id = env.get("DHAN_CLIENT_ID", "").strip()
+    app_id = env.get("DHAN_APP_ID", "").strip()
     app_secret = env.get("DHAN_APP_SECRET", "").strip()
 
     if not all([client_id, app_id, app_secret, token_id]):
@@ -281,11 +286,7 @@ def consume_oauth_token(token_id: str) -> dict:
     try:
         login = DhanLogin(client_id)
         resp = login.consume_token_id(token_id, app_id, app_secret)
-        token = (
-            resp.get("accessToken")
-            or resp.get("access_token")
-            or (resp.get("data") or {}).get("accessToken")
-        )
+        token = resp.get("accessToken") or resp.get("access_token") or (resp.get("data") or {}).get("accessToken")
         if token:
             _write_token(token)
             return {
@@ -304,6 +305,7 @@ def consume_oauth_token(token_id: str) -> dict:
 #  Main refresh logic                                                  #
 # ------------------------------------------------------------------ #
 
+
 def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> dict:
     """
     Refresh the Dhan access token using best available strategy.
@@ -321,12 +323,12 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         dict with keys: success, strategy, message, token_preview
     """
     env = _load_env()
-    client_id   = env.get("DHAN_CLIENT_ID", "").strip()
-    cur_token   = env.get("DHAN_ACCESS_TOKEN", "").strip()
-    pin         = env.get("DHAN_PIN", "").strip()
+    client_id = env.get("DHAN_CLIENT_ID", "").strip()
+    cur_token = env.get("DHAN_ACCESS_TOKEN", "").strip()
+    pin = env.get("DHAN_PIN", "").strip()
     totp_secret = env.get("DHAN_TOTP_SECRET", "").strip()
-    app_id      = env.get("DHAN_APP_ID", "").strip()
-    app_secret  = env.get("DHAN_APP_SECRET", "").strip()
+    app_id = env.get("DHAN_APP_ID", "").strip()
+    app_secret = env.get("DHAN_APP_SECRET", "").strip()
 
     if not client_id:
         return {"success": False, "message": "DHAN_CLIENT_ID missing from .secrets/dhan.env"}
@@ -384,8 +386,8 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
     hint = (
         f"For full automation, add {', '.join(missing)} to .secrets/dhan.env "
         f"then run: python scripts/setup_dhan_automation.py"
-        if missing else
-        "All credentials present but both auto-strategies failed — check logs"
+        if missing
+        else "All credentials present but both auto-strategies failed — check logs"
     )
     return {
         "success": False,
@@ -397,6 +399,7 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
 # ------------------------------------------------------------------ #
 #  Token verification                                                  #
 # ------------------------------------------------------------------ #
+
 
 def verify_token() -> dict:
     """Quick check: is the current token valid? Returns expiry info."""
@@ -416,8 +419,12 @@ def verify_token() -> dict:
     if not _DHAN_SDK_OK:
         # Can't verify via API — check expiry only
         if exp and hours_left > 0:
-            return {"valid": True, "reason": "jwt_expiry_ok", "expires_at": exp.isoformat(),
-                    "hours_remaining": round(hours_left, 1)}
+            return {
+                "valid": True,
+                "reason": "jwt_expiry_ok",
+                "expires_at": exp.isoformat(),
+                "hours_remaining": round(hours_left, 1),
+            }
         return {"valid": False, "reason": "sdk_unavailable_and_no_expiry"}
 
     try:
@@ -443,15 +450,15 @@ def verify_token() -> dict:
 # ------------------------------------------------------------------ #
 
 if __name__ == "__main__":
-    import json
     import argparse
+    import json
 
     parser = argparse.ArgumentParser(description="Dhan Token Manager")
-    parser.add_argument("--verify",   action="store_true", help="Check if current token is valid")
-    parser.add_argument("--refresh",  action="store_true", help="Refresh token (generate first, then renew)")
+    parser.add_argument("--verify", action="store_true", help="Check if current token is valid")
+    parser.add_argument("--refresh", action="store_true", help="Refresh token (generate first, then renew)")
     parser.add_argument("--generate", action="store_true", help="Force generate new token via PIN+TOTP")
-    parser.add_argument("--oauth",    action="store_true", help="Show OAuth consent URL for manual browser login")
-    parser.add_argument("--consume",  metavar="TOKEN_ID",  help="Consume OAuth tokenId from browser redirect")
+    parser.add_argument("--oauth", action="store_true", help="Show OAuth consent URL for manual browser login")
+    parser.add_argument("--consume", metavar="TOKEN_ID", help="Consume OAuth tokenId from browser redirect")
     args = parser.parse_args()
 
     if args.consume:

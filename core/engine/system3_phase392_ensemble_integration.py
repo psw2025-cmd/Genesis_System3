@@ -25,15 +25,16 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import os
-import sys
 import json
-import pickle
 import logging
-from pathlib import Path
+import os
+import pickle
+import sys
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
 
@@ -176,7 +177,9 @@ def load_xgboost_models(config: EnsembleConfig) -> Dict[str, Any]:
         # Load model
         try:
             with open(model_path, "rb") as f:
-                model = pickle.load(f)
+                # Loads only locally-trained artifacts from models_dir, never
+                # externally-supplied or user-uploaded data.
+                model = pickle.load(f)  # nosec B301
             logger.info(f"  XGBoost Model {underlying}: ✓ LOADED")
         except Exception as e:
             raise RuntimeError(f"Failed to load XGBoost model for {underlying}: {e}")

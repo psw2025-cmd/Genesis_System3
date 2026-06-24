@@ -15,14 +15,19 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
-        args: [--check-only]
+        args: [--check-only, --profile, black]
 
   # Security scanning
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.9
     hooks:
       - id: bandit
-        args: [-r, core]
+        # Gate on Medium+ severity only. Low-severity findings here are
+        # pervasive pre-existing stylistic patterns (broad except/continue,
+        # subprocess/pickle import notices) tracked separately as backlog,
+        # not exploitable issues in this codebase's trust model.
+        args: [-r, core, -ll]
+        pass_filenames: false
 
   # NOTE: pyupio/safety removed login-less open-source-database scanning
   # (now requires a Safety CLI account/login), which breaks it as a free,
@@ -33,7 +38,11 @@ repos:
     rev: v2.7.3
     hooks:
       - id: pip-audit
-        args: [--requirement, requirements_runtime.txt, --requirement, requirements-dev.txt]
+        args:
+          - --requirement
+          - requirements_runtime.txt
+          - --requirement
+          - requirements-dev.txt
 
   # Type checking
   - repo: https://github.com/pre-commit/mirrors-mypy

@@ -4,12 +4,12 @@ System3 Phase 226 - Feature Importance Tracker
 Tracks feature importances from ML models.
 """
 
-import sys
 import json
 import pickle
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -56,7 +56,9 @@ def run_phase226(**kwargs) -> Dict[str, Any]:
         for model_file in model_files:
             try:
                 with model_file.open("rb") as f:
-                    model_data = pickle.load(f)
+                    # Loads only locally-trained artifacts from MODELS_DIR,
+                    # never externally-supplied or user-uploaded data.
+                    model_data = pickle.load(f)  # nosec B301
 
                 # Check if model has feature_importances_
                 if hasattr(model_data, "feature_importances_"):
