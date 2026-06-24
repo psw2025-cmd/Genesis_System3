@@ -16,12 +16,14 @@ MAX_AGE_SEC = int(os.environ.get("SYSTEM3_RUNTIME_PROOF_MAX_AGE_SEC", "900"))
 
 
 def _api_base() -> str:
+    port = os.environ.get("PORT")
+    if port:
+        return f"http://127.0.0.1:{port}"
     for key in ("SYSTEM3_INTERNAL_API_BASE", "SYSTEM3_API_BASE", "SYSTEM3_PUBLIC_BACKEND_URL"):
         val = os.environ.get(key)
         if val:
             return val.rstrip("/")
-    port = os.environ.get("PORT", "8000")
-    return f"http://127.0.0.1:{port}"
+    return "https://genesis-system3-backend.onrender.com"
 
 
 def _stale(path: Path, max_age: int = MAX_AGE_SEC) -> bool:

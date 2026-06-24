@@ -115,11 +115,36 @@ def extract_signals_from_state(state: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 def load_state_signals(root: Path, api_base: Optional[str]) -> Tuple[List[Dict[str, Any]], str]:
     if api_base:
-        state = fetch_json(api_base.rstrip("/") + "/api/state")
+        base = api_base.rstrip("/")
+        state = fetch_json(base + "/api/state")
         if isinstance(state, dict):
             sig = extract_signals_from_state(state)
             if sig:
-                return sig, f"api:{api_base.rstrip('/')}/api/state"
+                return sig, f"api:{base}/api/state"
+        gain = fetch_json(base + "/api/gain_rank", timeout=45)
+        if isinstance(gain, dict):
+            preds = (gain.get("latest") or {}).get("predictions") or gain.get("predictions") or []
+            if isinstance(preds, list) and preds:
+                mapped = []
+                for p in preds[:20]:
+                    if not isinstance(p, dict):
+                        continue
+                    mapped.append({
+                        "symbol": p.get("underlying") or p.get("symbol"),
+                        "underlying": p.get("underlying") or p.get("symbol"),
+                        "score": p.get("gain_score") or p.get("confidence"),
+                        "option_type": p.get("option_type"),
+                        "strike": p.get("strike"),
+                        "expiry": p.get("expiry") or p.get("expiry_date"),
+                        "instrument_token": p.get("instrument_token") or p.get("security_id"),
+                    })
+                if mapped:
+                    return mapped, f"api:{base}/api/gain_rank"
+        scanner = fetch_json(base + "/api/scanner/top_contract_gainers", timeout=30)
+        if isinstance(scanner, dict):
+            items = scanner.get("gainers") or scanner.get("contracts") or scanner.get("items") or []
+            if isinstance(items, list) and items:
+                return items[:20], f"api:{base}/api/scanner/top_contract_gainers"
     candidates = [
         root / "state" / "gain_rank_history.json",
         root / "state" / "market_cache.json",
