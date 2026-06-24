@@ -236,7 +236,7 @@
     <!-- ══ MARKET SCANNER ══ -->
     <section v-if="activeTab==='scanner'" class="tab">
       <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank · Live CE/PE gainers · PATH A/B</span></div>
-      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIONS ONLY</span>4 segments: NIFTY · BANKNIFTY · FINNIFTY · MIDCPNIFTY · Cash equity: <strong>FORECAST_ONLY_CASH_EQUITY</strong></div>
+      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIDX</span>4 segments · <span class="sn-badge equity">EQUITY OPTSTK</span>{{ equityOptionsData.universe?.underlying_count||0 }} F&O stocks · Cash: <strong>FORECAST_ONLY</strong></div>
       <div class="panel mt16">
         <div class="ph"><span class="pt">🔥 Highest Gain CE / PE (Live Market)</span><span class="ps">{{ topGainersData.segments_implemented||0 }}/{{ topGainersData.segments_total||4 }} segments · NSE index F&O</span></div>
         <div class="tok-info mb8">
@@ -264,6 +264,26 @@
           </table>
         </div>
         <div v-if="topGainersData.missing_segments?.length" class="fc-note mt8"><span>⚠️</span>Missing chain data: <strong>{{ topGainersData.missing_segments.join(', ') }}</strong></div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🏦 Equity Options (OPTSTK)</span><span class="ps">{{ equityOptionsData.universe?.underlying_count||0 }} NSE F&O stocks · {{ equityOptionsData.scanner?.data_available?'Bhavcopy':'Universe only' }}</span></div>
+        <div class="tok-info mb8">
+          <div class="tok-r"><span>Instrument</span><strong>OPTSTK (stock options)</strong></div>
+          <div class="tok-r"><span>Top CE (OI buildup)</span><strong class="tx-r">{{ equityOptionsData.scanner?.market_top_ce?.underlying||'--' }} {{ equityOptionsData.scanner?.market_top_ce?.gain_pct!=null?equityOptionsData.scanner.market_top_ce.gain_pct.toFixed(1)+'%':'' }}</strong></div>
+          <div class="tok-r"><span>Top PE (OI buildup)</span><strong class="tx-g">{{ equityOptionsData.scanner?.market_top_pe?.underlying||'--' }} {{ equityOptionsData.scanner?.market_top_pe?.gain_pct!=null?equityOptionsData.scanner.market_top_pe.gain_pct.toFixed(1)+'%':'' }}</strong></div>
+          <div class="tok-r"><span>Live chain/stock</span><strong class="tx-a">{{ equityOptionsData.segments?.equity_options?.live_chain_per_stock?'YES':'PENDING' }}</strong></div>
+        </div>
+        <div style="overflow-x:auto" v-if="equityOptionsData.scanner?.top_ce_list?.length">
+          <table class="full-trade-table">
+            <thead><tr><th>TYPE</th><th>STOCK</th><th>STRIKE</th><th>OI BUILDUP%</th><th>LTP</th></tr></thead>
+            <tbody>
+              <tr v-for="r in equityOptionsData.scanner.top_ce_list.slice(0,5)" :key="'ece'+r.underlying+r.strike"><td class="tag-ce">CE</td><td class="sym-tag">{{ r.underlying }}</td><td>{{ formatNum(r.strike) }}</td><td class="tx-r">{{ r.gain_pct?.toFixed(1) }}%</td><td>{{ formatNum(r.ltp) }}</td></tr>
+              <tr v-for="r in equityOptionsData.scanner.top_pe_list.slice(0,5)" :key="'epe'+r.underlying+r.strike"><td class="tag-pe">PE</td><td class="sym-tag">{{ r.underlying }}</td><td>{{ formatNum(r.strike) }}</td><td class="tx-g">{{ r.gain_pct?.toFixed(1) }}%</td><td>{{ formatNum(r.ltp) }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="no-data">Equity F&O universe loaded · bhavcopy scanner runs when EOD file available</div>
+        <div v-if="equityOptionsData.implementation_gaps?.length" class="fc-note mt8"><span>ℹ️</span>Gaps: {{ equityOptionsData.implementation_gaps.join(' · ') }}</div>
       </div>
       <div class="two-col mt16">
         <div class="panel">

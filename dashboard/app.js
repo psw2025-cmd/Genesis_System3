@@ -43,6 +43,7 @@ const app = createApp({
     const brokerFunds = ref({ data: null });
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
     const topGainersData  = ref({ by_segment: {}, market_wide: {}, segments_total: 4 });
+    const equityOptionsData = ref({ universe: {}, scanner: {}, segments: {} });
     const approvalData  = ref({ human_approval: false, dashboard_status: 'PEND' });
     const brokerTruth   = ref({ validation: {}, trader_fields: {} });
 
@@ -311,7 +312,7 @@ const app = createApp({
       if (_polling) return;
       _polling = true;
       try {
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt,tg]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt,tg,eqo]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -331,6 +332,7 @@ const app = createApp({
         fetchJSON('/api/approval/status'),
         fetchJSON('/api/broker/truth'),
         fetchJSON('/api/scanner/top_contract_gainers'),
+        fetchJSON('/api/scanner/equity_options'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -351,6 +353,7 @@ const app = createApp({
       if(appr) approvalData.value=appr;
       if(bt) brokerTruth.value=bt;
       if(tg) topGainersData.value=tg;
+      if(eqo) equityOptionsData.value=eqo;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
         if (st) { connHealth.value = 'live'; failCount.value = 0; }
@@ -437,7 +440,7 @@ const app = createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,topGainersData,approvalData,brokerTruth,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,topGainersData,equityOptionsData,approvalData,brokerTruth,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
       paperPositions,paperSummary,tradeHistory,tradeHistorySubtitle,pnlWithCharges,

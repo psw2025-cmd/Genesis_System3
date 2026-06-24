@@ -39,7 +39,52 @@ _TRADING_SYMBOL_RE = re.compile(
     re.IGNORECASE,
 )
 
-# NSE weekly alternate: NIFTY2610626000CE (YY + M + DD + strike) — parsed for future-proofing
+def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
+    """Parse stock OPTSTK symbol — supports YYMMM and DDMMMYY (OpenAlgo/NSE)."""
+    m = re.match(
+        rf"^(?P<underlying>[A-Z][A-Z0-9&]+?)"
+        rf"(?P<yy>\d{{2}})(?P<mon>{_MONTHS})"
+        rf"(?P<strike>\d+(?:\.\d+)?)"
+        rf"(?P<option_type>CE|PE)$",
+        sym,
+        re.IGNORECASE,
+    )
+    if not m:
+        return None
+    g = m.groupdict()
+    yy = int(g["yy"])
+    mon = g["mon"].upper()
+    strike = float(g["strike"])
+    # Disambiguate DDMMMYY (VEDL25APR24292.5CE) vs YYMMM (RELIANCE25JUN2500CE)
+    underlying = g["underlying"].upper()
+    if len(mon) == 3 and strike > 10000 and yy <= 31:
+        # Likely DDMMMYY merged: 25APR24 + 292.5 misparsed as yy=25 mon=APR strike=24292.5
+        dm = re.match(
+            rf"^(?P<u>[A-Z][A-Z0-9&]+)(?P<dd>\d{{2}})(?P<mon>{_MONTHS})(?P<yy>\d{{2}})(?P<strike>\d+(?:\.\d+)?)(?P<opt>CE|PE)$",
+            sym,
+            re.I,
+        )
+        if dm:
+            dg = dm.groupdict()
+            return {
+                "underlying": dg["u"].upper(),
+                "expiry_date": date(int(dg["yy"]) + 2000, _MONTH_MAP[dg["mon"].upper()], int(dg["dd"])).isoformat(),
+                "strike": float(dg["strike"]),
+                "option_type": dg["opt"].upper(),
+                "trading_symbol": sym,
+                "symbol_format": "DDMMMYY",
+                "instrument_type": "OPTSTK",
+            }
+    return {
+        "underlying": underlying,
+        "expiry_date": date(2000 + yy, _MONTH_MAP[mon], 1).isoformat(),
+        "strike": strike,
+        "option_type": g["option_type"].upper(),
+        "trading_symbol": sym,
+        "symbol_format": "YYMMM",
+        "instrument_type": "OPTSTK",
+    }
+
 _WEEKLY_SYMBOL_RE = re.compile(
     rf"^(?P<underlying>{_UNDERLYINGS})"
     rf"(?P<yy>\d{{2}})(?P<m>\d)(?P<dd>\d{{2}})"
@@ -125,7 +170,12 @@ def parse_trading_symbol(trading_symbol: str) -> Optional[Dict[str, Any]]:
             "option_type": g["option_type"].upper(),
             "trading_symbol": sym,
             "symbol_format": "DDMMMYY",
+            "instrument_type": "OPTIDX",
         }
+
+    stock = _parse_stock_trading_symbol(sym)
+    if stock:
+        return stock
 
     m = _WEEKLY_SYMBOL_RE.match(sym)
     if m:

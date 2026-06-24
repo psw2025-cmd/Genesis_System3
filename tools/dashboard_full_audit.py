@@ -24,6 +24,8 @@ REQUIRED_ENDPOINTS = [
     "/api/paper",
     "/api/gain_rank",
     "/api/scanner/top_contract_gainers",
+    "/api/scanner/equity_options",
+    "/api/scanner/segments",
     "/api/accuracy_trend",
     "/api/chain/NIFTY",
     "/api/portfolio/unified",

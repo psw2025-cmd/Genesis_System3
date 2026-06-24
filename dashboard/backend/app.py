@@ -720,6 +720,34 @@ async def get_top_contract_gainers(top_n: int = 5):
         }
 
 
+@app.get("/api/scanner/equity_options")
+async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = False):
+    """Equity (stock) F&O universe + OPTSTK top CE/PE from bhavcopy."""
+    try:
+        from dashboard.backend.equity_option_scanner import build_equity_options_report
+
+        return build_equity_options_report(top_n=min(max(top_n, 1), 50), priority_only=priority_only)
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:300]}
+
+
+@app.get("/api/scanner/segments")
+async def get_scanner_segments():
+    """Implementation matrix: index OPTIDX vs equity OPTSTK vs cash equity."""
+    try:
+        from dashboard.backend.equity_option_scanner import build_equity_options_report
+
+        report = build_equity_options_report(top_n=5)
+        return {
+            "status": "ok",
+            "segments": report.get("segments", {}),
+            "implementation_gaps": report.get("implementation_gaps", []),
+            "generated_utc": report.get("generated_utc"),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
     """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
