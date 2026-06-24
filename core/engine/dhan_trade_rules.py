@@ -90,6 +90,27 @@ class TradeRuleEngine:
             decision["action"] = label
             return decision
 
+        # ── DATA-INTEGRITY GUARD (real-money safety) ──
+        # Reject phantom-priced contracts: an OTM option whose premium is wildly
+        # higher than plausible extrinsic value indicates a bad bhavcopy row or
+        # wrong strike match. This caught a corrupted BANKNIFTY 60000 CE priced
+        # at ~4440 (15x fair value) that produced a single -1.25L backtest loss.
+        ltp = float(row.get("ltp", 0.0) or row.get("entry_price", 0.0) or 0.0)
+        spot = float(row.get("spot", 0.0) or row.get("underlying_spot", 0.0) or 0.0)
+        strike = float(row.get("strike", 0.0) or 0.0)
+        opt_type = "CE" if label == "BUY_CE" else "PE"
+        if ltp > 0 and spot > 0 and strike > 0:
+            intrinsic = max(0.0, spot - strike) if opt_type == "CE" else max(0.0, strike - spot)
+            # Plausible max premium: intrinsic + 12% of spot as generous extrinsic cap
+            max_plausible = intrinsic + 0.12 * spot
+            if ltp > max_plausible:
+                decision["reason"] = (
+                    f"phantom_premium(ltp={ltp:.1f}>max_plausible={max_plausible:.1f}, "
+                    f"intrinsic={intrinsic:.1f}) — bad data row rejected"
+                )
+                decision["action"] = "AVOID"
+                return decision
+
         trade_score = self._compute_trade_score(row)
         if trade_score <= 0:
             decision["reason"] = "non_positive_trade_score"
