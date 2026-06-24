@@ -1,7 +1,12 @@
 """
-Instruments Cache Singleton
-Loads instruments JSON once and caches in memory for fast access.
-Falls back to security_id_list.csv when OpenAPIScripMaster.json is absent (Render deploy).
+Instruments Cache Singleton — production-grade Dhan master resolution.
+
+Load order:
+  1. OpenAPIScripMaster.json (runtime cache from daily sync)
+  2. api-scrip-master-detailed.csv (official Dhan CDN sync)
+  3. security_id_list.csv (bundled emergency fallback)
+
+Never spam ERROR logs — sync runs at 08:35 IST via scripts/sync_dhan_instruments_master.py
 """
 
 from __future__ import annotations
@@ -13,88 +18,45 @@ from typing import Dict, Optional
 
 import pandas as pd
 
-ROOT_DIR = Path(__file__).parent.parent.parent
-INSTRUMENT_JSON = ROOT_DIR / "storage" / "instruments" / "OpenAPIScripMaster.json"
-SECURITY_CSV = ROOT_DIR / "security_id_list.csv"
-
+from core.data.instruments_master import (
+    BUNDLED_CSV,
+    RUNTIME_JSON,
+    SYNCED_DETAILED,
+    dataframe_from_dhan_csv,
+    resolve_master_csv,
+)
 from core.utils.logger import logger
 
-
-def _map_exchange(exch: str, segment: str) -> str:
-    if exch == "NSE" and segment == "D":
-        return "NFO"
-    if exch == "BSE" and segment == "D":
-        return "BFO"
-    return exch or "NSE"
+ROOT_DIR = Path(__file__).parent.parent.parent
+INSTRUMENT_JSON = RUNTIME_JSON
 
 
-def _load_from_security_csv() -> pd.DataFrame:
-    """Build instruments DataFrame from Dhan security_id_list.csv."""
-    if not SECURITY_CSV.exists():
-        return pd.DataFrame()
-
-    usecols = [
-        "SEM_EXM_EXCH_ID",
-        "SEM_SEGMENT",
-        "SEM_SMST_SECURITY_ID",
-        "SEM_INSTRUMENT_NAME",
-        "SEM_TRADING_SYMBOL",
-        "SEM_LOT_UNITS",
-        "SM_SYMBOL_NAME",
-        "SEM_EXPIRY_DATE",
-        "SEM_STRIKE_PRICE",
-        "SEM_TICK_SIZE",
-    ]
-    df = pd.read_csv(SECURITY_CSV, usecols=usecols, low_memory=False)
-    # NSE/BSE derivatives only — keeps memory reasonable (~90k rows vs 230k+)
-    df = df[df["SEM_SEGMENT"].astype(str).str.upper() == "D"]
-    if df.empty:
-        return pd.DataFrame()
-
-    symbols = df["SEM_TRADING_SYMBOL"].astype(str)
-    underlying = symbols.str.split("-").str[0].str.upper()
-    out = pd.DataFrame(
-        {
-            "token": df["SEM_SMST_SECURITY_ID"].astype(str),
-            "symbol": symbols,
-            "name": underlying,
-            "description": df["SM_SYMBOL_NAME"].astype(str),
-            "expiry": df["SEM_EXPIRY_DATE"].astype(str).str[:10],
-            "strike": pd.to_numeric(df["SEM_STRIKE_PRICE"], errors="coerce").fillna(0),
-            "lotsize": pd.to_numeric(df["SEM_LOT_UNITS"], errors="coerce").fillna(1),
-            "instrumenttype": df["SEM_INSTRUMENT_NAME"].astype(str),
-            "exch_seg": [
-                _map_exchange(str(e), str(s))
-                for e, s in zip(df["SEM_EXM_EXCH_ID"], df["SEM_SEGMENT"])
-            ],
-            "tick_size": pd.to_numeric(df["SEM_TICK_SIZE"], errors="coerce").fillna(0.05),
-        }
-    )
-    return out
+def _load_from_csv(path: Path) -> pd.DataFrame:
+    df = pd.read_csv(path, low_memory=False)
+    return dataframe_from_dhan_csv(df)
 
 
 def _persist_json(df: pd.DataFrame) -> None:
-    """Write compact JSON cache for faster reloads within the same deploy."""
     if df.empty:
         return
     try:
         INSTRUMENT_JSON.parent.mkdir(parents=True, exist_ok=True)
-        records = df.to_dict(orient="records")
-        INSTRUMENT_JSON.write_text(json.dumps(records), encoding="utf-8")
-        logger.info(f"[CACHE] Wrote instruments JSON: {len(records)} rows -> {INSTRUMENT_JSON}")
+        INSTRUMENT_JSON.write_text(
+            json.dumps(df.to_dict(orient="records")),
+            encoding="utf-8",
+        )
+        logger.info(f"[CACHE] Wrote runtime instruments JSON: {len(df)} rows")
     except Exception as exc:
-        logger.warning(f"[CACHE] Could not persist instruments JSON: {exc}")
+        logger.warning(f"[CACHE] Could not persist runtime JSON: {exc}")
 
 
 class InstrumentsCache:
-    """Singleton cache for instruments data"""
-
     _instance = None
     _instruments_df: Optional[pd.DataFrame] = None
     _load_time: float = 0.0
     _load_duration: float = 0.0
     _load_failed: bool = False
-    _missing_logged: bool = False
+    _status_logged: bool = False
     _source: str = "none"
 
     def __new__(cls):
@@ -106,60 +68,77 @@ class InstrumentsCache:
         if self._instruments_df is None and not self._load_failed:
             self._load_instruments()
 
-    def _log_missing_once(self, message: str) -> None:
-        if not self._missing_logged:
+    def _log_status_once(self, level: str, message: str) -> None:
+        if self._status_logged:
+            return
+        self._status_logged = True
+        if level == "error":
+            logger.error(message)
+        elif level == "warning":
             logger.warning(message)
-            self._missing_logged = True
+        else:
+            logger.info(message)
 
     def _load_instruments(self) -> None:
-        """Load instruments JSON or CSV fallback once into memory."""
         if self._load_failed:
             return
 
         start_time = time.time()
+
         if INSTRUMENT_JSON.exists():
             try:
-                with open(INSTRUMENT_JSON, "r", encoding="utf-8") as f:
-                    data = json.load(f)
+                data = json.loads(INSTRUMENT_JSON.read_text(encoding="utf-8"))
                 if isinstance(data, list) and data:
                     self._instruments_df = pd.DataFrame(data)
-                    self._source = "json"
+                    self._source = "runtime_json"
                     self._load_duration = time.time() - start_time
                     self._load_time = time.time()
-                    logger.info(
-                        f"[CACHE] Loaded instruments from JSON: {len(self._instruments_df)} rows "
-                        f"in {self._load_duration:.3f}s"
+                    self._log_status_once(
+                        "info",
+                        f"[CACHE] Instruments loaded from runtime JSON: {len(self._instruments_df)} rows",
                     )
                     return
             except Exception as exc:
-                self._log_missing_once(f"[CACHE] JSON load failed, trying CSV fallback: {exc}")
+                self._log_status_once("warning", f"[CACHE] Runtime JSON invalid, trying CSV: {exc}")
 
-        self._log_missing_once(
-            f"Instrument JSON not found at {INSTRUMENT_JSON}; loading from {SECURITY_CSV.name}"
-        )
+        csv_path = resolve_master_csv()
+        if csv_path is None:
+            self._instruments_df = pd.DataFrame()
+            self._load_failed = True
+            self._log_status_once(
+                "error",
+                "[CACHE] No instrument master — run scripts/sync_dhan_instruments_master.py",
+            )
+            return
+
         try:
-            df = _load_from_security_csv()
+            df = _load_from_csv(csv_path)
             if df.empty:
-                self._instruments_df = pd.DataFrame()
-                self._load_failed = True
-                logger.error("[CACHE] No instruments from JSON or security_id_list.csv")
-                return
+                raise RuntimeError(f"CSV normalized to empty dataframe: {csv_path}")
             self._instruments_df = df
-            self._source = "security_id_list.csv"
+            if csv_path == SYNCED_DETAILED:
+                self._source = "dhan_official_sync"
+            elif csv_path == BUNDLED_CSV:
+                self._source = "bundled_fallback"
+                self._log_status_once(
+                    "warning",
+                    f"[CACHE] Using bundled {BUNDLED_CSV.name} — schedule daily Dhan sync",
+                )
+            else:
+                self._source = csv_path.name
             self._load_duration = time.time() - start_time
             self._load_time = time.time()
             logger.info(
-                f"[CACHE] Loaded instruments from CSV: {len(self._instruments_df)} rows "
+                f"[CACHE] Instruments loaded from {csv_path.name}: {len(df)} rows "
                 f"in {self._load_duration:.3f}s"
             )
             _persist_json(df)
         except Exception as exc:
             self._instruments_df = pd.DataFrame()
             self._load_failed = True
-            logger.error(f"[CACHE] Failed to load instruments from CSV: {exc}")
+            self._log_status_once("error", f"[CACHE] Instrument master load failed: {exc}")
 
     def get_instruments_df(self) -> pd.DataFrame:
-        """Get cached instruments DataFrame (empty if unavailable)."""
         if self._instruments_df is None and not self._load_failed:
             self._load_instruments()
         if self._instruments_df is None:
@@ -196,14 +175,16 @@ class InstrumentsCache:
         return filtered
 
     def get_load_metrics(self) -> Dict:
+        csv_path = resolve_master_csv()
         return {
             "instruments_count": len(self._instruments_df) if self._instruments_df is not None else 0,
             "load_duration_sec": self._load_duration,
             "load_time": self._load_time,
             "cached": self._instruments_df is not None and not self._instruments_df.empty,
             "source": self._source,
-            "json_path": str(INSTRUMENT_JSON),
-            "csv_fallback": str(SECURITY_CSV),
+            "runtime_json": str(INSTRUMENT_JSON),
+            "synced_csv": str(SYNCED_DETAILED) if SYNCED_DETAILED.exists() else None,
+            "csv_resolved": str(csv_path) if csv_path else None,
         }
 
 
@@ -218,7 +199,6 @@ def get_instruments_cache() -> InstrumentsCache:
 
 
 def ensure_instruments_loaded() -> Dict:
-    """Warm instruments cache at app startup; safe to call multiple times."""
     cache = get_instruments_cache()
     df = cache.get_instruments_df()
     metrics = cache.get_load_metrics()

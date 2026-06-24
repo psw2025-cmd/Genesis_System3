@@ -225,13 +225,30 @@ if SSOT_AVAILABLE:
 else:
     state_store = None
 
-# Warm instruments master (CSV fallback on Render when JSON missing)
+# Warm instruments master — sync from Dhan CDN if stale, then load cache
 try:
+    from scripts.sync_dhan_instruments_master import META_JSON, sync as sync_instruments_master
+
+    _need_sync = True
+    if META_JSON.exists():
+        import json as _json
+        from datetime import datetime, timezone
+
+        meta = _json.loads(META_JSON.read_text(encoding="utf-8"))
+        synced = meta.get("synced_utc")
+        if synced:
+            age_h = (datetime.now(timezone.utc) - datetime.fromisoformat(synced.replace("Z", "+00:00"))).total_seconds() / 3600
+            _need_sync = age_h > 24
+    if _need_sync and not (ROOT_DIR / "storage" / "instruments" / "api-scrip-master-detailed.csv").exists():
+        try:
+            sync_instruments_master(force=True)
+        except Exception as _sync_exc:
+            print(f"[startup] instrument sync deferred: {_sync_exc}")
     from core.data.instruments_cache import ensure_instruments_loaded
 
     _inst_metrics = ensure_instruments_loaded()
     if _inst_metrics.get("rows", 0) > 0:
-        print(f"[startup] instruments loaded: {_inst_metrics['rows']} rows from {_inst_metrics.get('source')}")
+        print(f"[startup] instruments: {_inst_metrics['rows']} rows source={_inst_metrics.get('source')}")
 except Exception as _inst_exc:
     print(f"[startup] instruments warm-up skipped: {_inst_exc}")
 
