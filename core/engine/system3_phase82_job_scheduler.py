@@ -10,6 +10,7 @@ import sys
 import json
 import time
 import signal
+import threading
 import argparse
 import subprocess
 from pathlib import Path
@@ -274,15 +275,39 @@ def run_daemon() -> None:
         print(f"[PH82-Daemon] Signal {signum} — shutting down...")
         _stop["flag"] = True
 
-    signal.signal(signal.SIGTERM, _handle)
-    signal.signal(signal.SIGINT, _handle)
+    # signal.signal() only works when called from the main thread of the main
+    # interpreter. cloud_worker.py runs this daemon inside a background
+    # threading.Thread, so registering handlers there raises ValueError before
+    # the loop ever ticks once — silently swallowed by the caller's bare
+    # except Exception, killing the scheduler thread forever with no visible
+    # crash. This was the actual root cause of the 11-day dead job loop.
+    if threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGTERM, _handle)
+        signal.signal(signal.SIGINT, _handle)
+    else:
+        print("[PH82-Daemon] Running in non-main thread — skipping OS signal "
+              "handlers (daemon=True thread exits with the process).")
 
     state = load_state()
     if "jobs" not in state:
         state["jobs"] = {}
+    
+    # Save startup metadata
+    now_ist_str = _now_ist().isoformat()
+    state["daemon_started_at"] = now_ist_str
+    state["daemon_heartbeat"] = now_ist_str
+    state["daemon_pid"] = os.getpid()
+    save_state(state)
 
     while not _stop["flag"]:
         now = _now_ist()
+        
+        # Periodic heartbeat update
+        state = load_state()
+        state["daemon_heartbeat"] = now.isoformat()
+        state["daemon_pid"] = os.getpid()
+        save_state(state)
+        
         today_str = now.strftime("%Y-%m-%d")
         is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
 
