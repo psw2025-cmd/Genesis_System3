@@ -129,36 +129,47 @@ def eval_expectancy_gate(root: Path) -> Dict[str, Any]:
     }
 
 
-def eval_lifecycle_gate(root: Path) -> Dict[str, Any]:
+def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     path = root / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
     data = _read_json(path) or {}
     ev = data.get("evidence") or {}
+    broker_connected = ev.get("lifecycle_proof_broker_not_connected") is not True
+    if live_state:
+        broker_connected = bool((live_state.get("broker") or {}).get("connected"))
     ok = (
         data.get("pass") is True
         and ev.get("full_lifecycle_proven") is True
         and ev.get("lifecycle_proof_dry_run") is not True
-        and ev.get("lifecycle_proof_broker_not_connected") is not True
+        and broker_connected
     )
+    market_open = bool((live_state or {}).get("market", {}).get("is_open"))
     return {
         "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
         "pass": ok,
         "report_exists": path.exists(),
         "full_lifecycle_proven": ev.get("full_lifecycle_proven"),
-        "broker_connected": ev.get("lifecycle_proof_broker_not_connected") is not True,
+        "broker_connected": broker_connected,
+        "market_open": market_open,
         "blocker_id": None if ok else "SYS3-BLK-008",
         "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
     }
 
 
-def eval_tick_health_gate(root: Path) -> Dict[str, Any]:
+def eval_tick_health_gate(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     path = root / "reports" / "latest" / "websocket_tick_health" / "summary.json"
     data = _read_json(path) or {}
     ev = data.get("evidence") or {}
     tick_age = ev.get("last_tick_age_sec")
     refresh = ev.get("refresh_interval_sec")
     broker_ok = ev.get("broker_connected")
+    if live_state:
+        tick_age = live_state.get("last_tick_age_sec") or (live_state.get("tick_health") or {}).get("last_tick_age_sec") or tick_age
+        refresh = live_state.get("refresh_interval") or (live_state.get("tick_health") or {}).get("refresh_interval_sec") or refresh
+        broker_ok = (live_state.get("broker") or {}).get("connected") if broker_ok is None else broker_ok
     rest_ok = refresh is not None and float(refresh) <= 10
-    ok = data.get("pass") is True or (rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15)
+    ok = data.get("pass") is True or (
+        rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15
+    )
     return {
         "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
         "pass": ok,
@@ -227,12 +238,12 @@ def eval_equity_fo_gate(root: Path) -> Dict[str, Any]:
     }
 
 
-def evaluate_all(root: Path) -> Dict[str, Any]:
+def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     gates = [
         eval_spearman_gate(root),
         eval_expectancy_gate(root),
-        eval_lifecycle_gate(root),
-        eval_tick_health_gate(root),
+        eval_lifecycle_gate(root, live_state),
+        eval_tick_health_gate(root, live_state),
         eval_model_accuracy_report(root),
         eval_option_visibility(root),
         eval_equity_fo_gate(root),

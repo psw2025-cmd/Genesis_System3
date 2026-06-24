@@ -102,6 +102,29 @@
       "description": "Transforms today's NSE FO bhavcopy into option chain snapshot and runs system3_signal_engine. Writes storage/live/dhan_index_ai_signals.csv (prob_BUY_CE, expected_move_score per option). Activates the 15% ml_confidence weight in GainRankEngine for next morning's 09:15 ranking. Runs 15 min after bhavcopy_download completes."
     },
     {
+      "id": "ui_market_cross_verify",
+      "name": "UI Market Cross Verify",
+      "script": "scripts/ui_market_cross_verify.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "10:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Cross-verify cloud UI APIs vs IST market session; runs every scheduled slot"
+    },
+    {
+      "id": "ui_market_cross_verify_midday",
+      "name": "UI Market Cross Verify (Midday)",
+      "script": "scripts/ui_market_cross_verify.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "12:30",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true
+    },
+    {
       "id": "paper_lifecycle_proof",
       "name": "Analyzer Paper Lifecycle Proof",
       "script": "scripts/paper_lifecycle_proof.py",

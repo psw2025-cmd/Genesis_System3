@@ -793,7 +793,10 @@ async def get_auto_gates(refresh: bool = False):
             from dashboard.backend.auto_gates_service import build_auto_gates_report
         except ImportError:
             from auto_gates_service import build_auto_gates_report
-        return build_auto_gates_report(refresh=refresh)
+        live_state = None
+        if SSOT_AVAILABLE and state_store is not None:
+            live_state = state_store.get_state()
+        return build_auto_gates_report(refresh=refresh, live_state=live_state)
     except Exception as e:
         return {
             "status": "error",

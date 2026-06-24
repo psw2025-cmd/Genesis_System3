@@ -5,6 +5,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
 const API = window.location.origin;
 const POLL_MS = 10000;
+const POLL_MS_MARKET = 5000;
 
 if (typeof Chart !== 'undefined') {
   Chart.defaults.color = '#3d5870';
@@ -448,7 +449,12 @@ const app = createApp({
     });
 
     let clk=null,poll=null;
-    onMounted(async()=>{updateClock();clk=setInterval(updateClock,1000);await pollAll();poll=setInterval(pollAll,POLL_MS);});
+    function restartPoll(){
+      if(poll) clearInterval(poll);
+      poll=setInterval(pollAll, marketOpen.value ? POLL_MS_MARKET : POLL_MS);
+    }
+    onMounted(async()=>{updateClock();clk=setInterval(updateClock,1000);await pollAll();restartPoll();});
+    watch(marketOpen, ()=> restartPoll());
     onUnmounted(()=>{clearInterval(clk);clearInterval(poll);[cFull,cRank,cPnl,cScanner].forEach(c=>{if(c)c.destroy();});});
 
     return {
@@ -461,7 +467,7 @@ const app = createApp({
       activeAlerts,unreadCount,noTradeReasons,
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
-      factors,proofGates,readinessLadder,
+      factors,proofGates,readinessLadder,autoGatesData,
       connHealth, failCount, unifiedHoldings, unifiedPositions,
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
       holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk, brokerPositionsOk,

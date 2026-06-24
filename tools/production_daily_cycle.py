@@ -81,6 +81,7 @@ def build_steps(fast: bool, deploy_only: bool) -> List[Tuple[str, List[str], int
     if deploy_only:
         return []
     steps: List[Tuple[str, List[str], int]] = [
+        ("ui_market_cross_verify", [py, "scripts/ui_market_cross_verify.py"], 300),
         ("pytest", [py, "-m", "pytest", "tests/", "-q", "--tb=no"], 300),
         ("post_market_pipeline", [py, "scripts/system3_post_market_auto_pipeline.py"], 600),
         ("gate_evaluator", [py, "scripts/system3_gate_evaluator.py", "--sync-gates"], 120),
