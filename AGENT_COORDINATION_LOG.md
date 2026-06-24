@@ -80,3 +80,45 @@ and the connection indicator shows when backend is redeploying.
 node --check dashboard/app.js   # syntax
 grep -c "const portfolioData = ref(" dashboard/app.js   # must be 1
 ```
+
+
+## ════════════════════════════════════════════
+## 2026-06-24 UPDATE — CLOUD PAPER ENGINE (Claude)
+## ════════════════════════════════════════════
+
+### ROOT CAUSE: Paper tab empty during market hours
+The Render backend only ran background_data_refresh (spot price updates).
+It NEVER generated paper trades — the full trading engine only runs on laptop.
+So positions_live.json / paper_pnl_summary.json stayed at stale Feb-1 data.
+
+### FIX: dashboard/backend/cloud_paper_engine.py (NEW)
+A lightweight in-process paper engine wired into startup as a background task:
+- Runs ONLY during market hours (is_market_open gated)
+- Ticks every 60s: reads live chain via get_chain() for all 5 indices
+- Picks one near-ATM contract per index by highest dOI (OI change)
+- B1 phantom-guarded (skips implausible premiums)
+- Single lot, realistic entry/exit + slippage, SL 12% / TP 18% / EOD squareoff
+- Writes positions_live.json, pnl_live.json, paper_pnl_summary.json, paper_trades_live.csv
+- Output format aligned to what /api/paper + Vue computed expect:
+  * positions_live.json has "positions" key (get_positions) + summary.closed_positions (tradeHistory)
+  * paper_pnl_summary.json is the .summary source for get_pnl
+
+### SAFETY
+- PAPER ONLY. No broker order calls anywhere in the engine.
+- LIVE_TRADING_ENABLED never checked True.
+- Disable anytime via env CLOUD_PAPER_ENGINE=0.
+- Files are ephemeral on Render (reset on redeploy) — fine for intraday sim.
+
+### Tested end-to-end (local sim)
+- Real chain format (single-option rows {strike,option_type,ltp,dOI}) → PASS
+- Phantom 25000 CE @ 4000 correctly skipped
+- Highest-dOI pick correct (23850 CE)
+- SL/TP/EOD exits fire correctly
+- All 4 dashboard files written in expected format
+
+### For local agents
+- This is a SIMULATION for dashboard liveness, NOT a profitability signal.
+- The real profitability gate is still scripts/pf_gated_backtest.py (laptop).
+- Do NOT confuse cloud paper sim activity with trade-readiness.
+- Keep CLOUD_PAPER_ENGINE on for demo; the 3 real blockers (B1 data, B2 PF,
+  B3 rho) still gate real money.
