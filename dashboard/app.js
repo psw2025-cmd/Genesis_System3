@@ -44,6 +44,7 @@ const app = createApp({
     const portfolioData = ref({ broker_holdings: [], broker_positions: [], data_transparency: '--' });
     const topGainersData  = ref({ by_segment: {}, market_wide: {}, segments_total: 4 });
     const equityOptionsData = ref({ universe: {}, scanner: {}, segments: {} });
+    const autoGatesData     = ref({ proof_gates: [], gates_passing: 0, gates_total: 0, open_blockers: [], prediction_accuracy_blocked: true, profit_blocked: true });
     const approvalData  = ref({ human_approval: false, dashboard_status: 'PEND' });
     const brokerTruth   = ref({ validation: {}, trader_fields: {} });
 
@@ -67,7 +68,11 @@ const app = createApp({
       { id:'signals',  icon:'⚡',  label:'Signals'          },
       { id:'alerts',   icon:'🔔',  label:'Alerts', badge: computed(()=> alertsData.value.filter(a=>!a.read&&!a.resolved).length || null) },
       { id:'logs',     icon:'📋',  label:'Error Log'        },
-      { id:'proof',    icon:'✅',  label:'Proof Gates', badge:'8/8', badgeClass:'green' },
+      { id:'proof',    icon:'✅',  label:'Proof Gates', badge: computed(() => {
+        const g = autoGatesData.value;
+        if (!g.gates_total) return null;
+        return `${g.gates_passing||0}/${g.gates_total}`;
+      }), badgeClass: computed(() => (autoGatesData.value.gates_passing||0) >= (autoGatesData.value.gates_total||1) ? 'green' : 'amber') },
     ];
 
     const factors = [
@@ -80,19 +85,24 @@ const app = createApp({
       { name:'Greeks Signal',  weight:0.05, color:'#ec4899' },
     ];
 
-    const proofGates = [
-      { name:'Safety & Secrets',      status:'PASS', pass:true,  note:'0 blockers · clean' },
-      { name:'Broker Connectivity',   status:'PASS', pass:true,  note:'Dhan ANALYZER · TOTP auto-refresh' },
-      { name:'Data Automation',       status:'PASS', pass:true,  note:'Dhan P0 + Bhavcopy + fallbacks' },
-      { name:'Model Training',        status:'PASS', pass:true,  note:'7/7 ML files compile · dry-run OK' },
-      { name:'Backtest Walk-Forward', status:'PASS', pass:true,  note:'8 trades · full cost model' },
-      { name:'Paper Lifecycle',       status:'PEND', pass:false, note:'Needs real market session proof' },
-      { name:'Dashboard Truth',       status:'PASS', pass:true,  note:'5/5 required endpoints HTTP 200' },
-      { name:'ML Accuracy',           status:'PEND', pass:false, note:'1/5 days · ρ=0.20 · need ≥0.70' },
-    ];
+    const proofGates = computed(() => {
+      const rows = autoGatesData.value.proof_gates;
+      if (rows && rows.length) return rows;
+      const rho = latestRho.value;
+      const days = accuracyData.value.days_available || 0;
+      return [
+        { name:'ML Accuracy (Spearman ρ)', status: (days>=5 && (rho||0)>=0.70)?'PASS':'PEND', pass: days>=5 && (rho||0)>=0.70, note:`${days}/5 days · ρ=${rho??'--'}` },
+        { name:'Profit / Expectancy', status: autoGatesData.value.profit_blocked?'PEND':'PASS', pass: !autoGatesData.value.profit_blocked, note: autoGatesData.value.friction_expectancy?.net_expectancy_after_costs!=null?`expectancy=${autoGatesData.value.friction_expectancy.net_expectancy_after_costs}`:'loading' },
+        { name:'Paper Lifecycle', status: autoGatesData.value.lifecycle_blocked?'PEND':'PASS', pass: !autoGatesData.value.lifecycle_blocked, note:'runtime /api/auto_gates' },
+      ];
+    });
 
-    const readinessLadder = computed(() => [
-      { label:'All proof gates green',        done:true,  detail:'8/8 PASS' },
+    const readinessLadder = computed(() => {
+      const g = autoGatesData.value;
+      const passN = g.gates_passing || proofGates.value.filter(p=>p.pass).length;
+      const totN = g.gates_total || proofGates.value.length || 7;
+      return [
+      { label:'Runtime proof gates',          done: passN >= totN, detail:`${passN}/${totN} from /api/auto_gates` },
       { label:'Broker connected',             done:broker.value.connected, detail: broker.value.connected?'Dhan ANALYZER':'Awaiting session' },
       { label:'Dhan Data APIs subscribed',    done:true,  detail:'Till 23 Jul 2026' },
       { label:'Costed walk-forward proven',   done:true,  detail:'5 days · cost model' },
@@ -100,7 +110,8 @@ const app = createApp({
       { label:'Paper lifecycle (real broker)',done:false, detail:'09:30 IST market day' },
       { label:'5+ Spearman ρ days',           done:(accuracyData.value.days_available||0)>=5 && (latestRho.value||0)>=0.70, detail:`${accuracyData.value.days_available||1}/5 · need ρ≥0.70` },
       { label:'Human approval to live',       done:!!approvalData.value.human_approval, detail: approvalData.value.human_approval?(approvalData.value.approved_by||'Owner approved'):'Pending sign-off' },
-    ]);
+    ];
+    });
 
     // Computed
     const topSignal     = computed(() => gainRankData.value.latest?.predictions?.[0] || {});
@@ -312,7 +323,7 @@ const app = createApp({
       if (_polling) return;
       _polling = true;
       try {
-      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt,tg,eqo]=await Promise.all([
+      const [st,br,brd,gr,ac,hl,pp,qc,al,tod,pf,lrn,port,hld,pos,funds,appr,bt,tg,eqo,ag]=await Promise.all([
         fetchJSON('/api/state'),
         fetchJSON('/api/broker/status'),
         fetchJSON('/api/broker/dhan/status'),
@@ -333,6 +344,7 @@ const app = createApp({
         fetchJSON('/api/broker/truth'),
         fetchJSON('/api/scanner/top_contract_gainers'),
         fetchJSON('/api/scanner/equity_options'),
+        fetchJSON('/api/auto_gates'),
       ]);
       if(st) state.value=st;
       if(br) broker.value=br;
@@ -354,6 +366,7 @@ const app = createApp({
       if(bt) brokerTruth.value=bt;
       if(tg) topGainersData.value=tg;
       if(eqo) equityOptionsData.value=eqo;
+      if(ag) autoGatesData.value=ag;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
         if (st) { connHealth.value = 'live'; failCount.value = 0; }
@@ -440,11 +453,11 @@ const app = createApp({
 
     return {
       activeTab,tabs,currentTime,marketOpen,marketCountdown,lastSync,
-      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,portfolioData,topGainersData,equityOptionsData,approvalData,brokerTruth,
+      state,broker,brokerDetail,gainRankData,accuracyData,healthData,paperData,topGainersData,equityOptionsData,approvalData,brokerTruth,
       chainData,qcData,alertsData,todayTrades,perfData,learningData,logsData,
       topSignal,latestRho,latestHitRate,rhoClass,
       paperPositions,paperSummary,tradeHistory,tradeHistorySubtitle,pnlWithCharges,
-      brokerHoldings,brokerPositions,portfolioTransparency,
+      portfolioTransparency,
       activeAlerts,unreadCount,noTradeReasons,
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,

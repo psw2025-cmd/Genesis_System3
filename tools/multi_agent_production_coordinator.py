@@ -14,18 +14,27 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest" / "production_grade_readiness"
-BASE_URL = "https://genesis-system3-backend.onrender.com"
+import os
+BASE_URL = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")).rstrip("/")
 
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+def get_python_executable() -> str:
+    venv_exe = ROOT / "venv" / "Scripts" / "python.exe"
+    if not venv_exe.exists():
+        venv_exe = ROOT / "venv" / "bin" / "python"
+    return str(venv_exe) if venv_exe.exists() else sys.executable
+
+py_exe = get_python_executable()
+
 AGENT_RUNS = [
-    ("gate_orchestrator", [sys.executable, "scripts/system3_master_proof_orchestrator.py"], "reports/latest/proof_status_matrix/proof_status_matrix.json"),
-    ("dashboard_audit", [sys.executable, "tools/dashboard_full_audit.py"], "reports/latest/dashboard_full_audit/summary.json"),
-    ("broker_validation", [sys.executable, "tools/broker_trader_validation.py"], "reports/latest/broker_trader_validation/summary.json"),
-    ("audit_reports", [sys.executable, "tools/generate_audit_reports.py"], "reports/latest/dhan_option_chain_schema_audit/summary.json"),
-    ("human_approval", [sys.executable, "tools/record_human_approval.py"], "reports/latest/human_approval_gate/summary.json"),
-    ("control_plane", [sys.executable, "system3_control_plane.py", "proofs"], "reports/latest/system3_master_control_plane/system3_master_control_plane.json"),
+    ("gate_orchestrator", [py_exe, "scripts/system3_master_proof_orchestrator.py"], "reports/latest/proof_status_matrix/proof_status_matrix.json"),
+    ("dashboard_audit", [py_exe, "tools/dashboard_full_audit.py"], "reports/latest/dashboard_full_audit/summary.json"),
+    ("broker_validation", [py_exe, "tools/broker_trader_validation.py"], "reports/latest/broker_trader_validation/summary.json"),
+    ("audit_reports", [py_exe, "tools/generate_audit_reports.py"], "reports/latest/dhan_option_chain_schema_audit/summary.json"),
+    ("human_approval", [py_exe, "tools/record_human_approval.py"], "reports/latest/human_approval_gate/summary.json"),
+    ("control_plane", [py_exe, "system3_control_plane.py", "proofs"], "reports/latest/system3_master_control_plane/system3_master_control_plane.json"),
 ]
 
 
@@ -98,6 +107,7 @@ def main() -> int:
     broker = state_data.get("broker") or {}
     broker_connected = bool(broker.get("connected"))
 
+    gates_path = ROOT / "reports" / "latest" / "system3_auto_gates" / "summary.json"
     blockers = [
         "LIVE_TRADING_DISABLED_BY_DESIGN",
         "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
@@ -105,6 +115,24 @@ def main() -> int:
         "MULTI_DAY_STABILITY_NOT_PROVEN",
         "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
     ]
+    next_actions = [
+        "Run tools/system3_auto_coordinator.py for full auto proof cycle",
+        "Accumulate 5+ prediction days with rho>=0.70",
+        "Prove positive net expectancy after all costs",
+    ]
+    if gates_path.exists():
+        try:
+            gates = json.loads(gates_path.read_text(encoding="utf-8"))
+            blockers = list(gates.get("technical_gates_still_required") or blockers)
+            blockers.append("LIVE_TRADING_DISABLED_BY_DESIGN")
+            blockers = list(dict.fromkeys(blockers))
+            next_actions = list(gates.get("recommended_auto_actions") or next_actions)
+            if gates.get("prediction_accuracy_blocked"):
+                blockers.append("PREDICTION_ACCURACY_BLOCKED")
+            if gates.get("profit_blocked"):
+                blockers.append("PROFIT_EXPECTANCY_BLOCKED")
+        except Exception:
+            pass
     try:
         from dashboard.backend.human_approval_service import load_human_approval
         if not load_human_approval().get("approved"):
@@ -131,13 +159,7 @@ def main() -> int:
             "real_money_ready": False,
         },
         "blockers": blockers,
-        "next_exact_actions": [
-            "Run market-day paper lifecycle proof Mon-Fri 09:15-15:30 IST",
-            "Accumulate 5+ prediction days with rho>=0.70",
-            "Prove positive net expectancy after all costs",
-            "Implement Dhan WebSocket tick health",
-            "ENV flip for live only after all gates + owner final sign-off",
-        ],
+        "next_exact_actions": next_actions,
     }
 
     with open(REPORTS / "summary.json", "w", encoding="utf-8") as f:

@@ -115,6 +115,42 @@
       "timeout_minutes": 10
     },
     {
+      "id": "post_market_auto_pipeline",
+      "name": "Post-Market Auto Pipeline",
+      "script": "scripts/system3_post_market_auto_pipeline.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:50",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "After validation: friction expectancy, model-to-trade gap, gate sync, blocker scan"
+    },
+    {
+      "id": "auto_coordinator_post_market",
+      "name": "Full Auto Coordinator (Post-Market)",
+      "script": "tools/system3_auto_coordinator.py",
+      "args": [
+        "--api-base",
+        "https://genesis-system3-backend.onrender.com"
+      ],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "16:10",
+      "name": "Full Auto Coordinator (Pre-Market)",
+      "script": "tools/system3_auto_coordinator.py",
+      "args": [
+        "--api-base",
+        "https://genesis-system3-backend.onrender.com"
+      ],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "08:10",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "description": "Morning proof refresh before market open."
+    },
+    {
       "id": "dashboard_endpoint_coverage",
       "name": "Dashboard Endpoint Coverage Proof",
       "script": "scripts/dashboard_endpoint_coverage_proof.py",

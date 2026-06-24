@@ -785,6 +785,25 @@ async def get_accuracy_trend():
         return {"status": "error", "error": str(e), "trend": [], "retrain_needed": False}
 
 
+@app.get("/api/auto_gates")
+async def get_auto_gates(refresh: bool = False):
+    """Runtime-driven production/prediction/profit blocker gates (replaces static dashboard proof matrix)."""
+    try:
+        try:
+            from dashboard.backend.auto_gates_service import build_auto_gates_report
+        except ImportError:
+            from auto_gates_service import build_auto_gates_report
+        return build_auto_gates_report(refresh=refresh)
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)[:200],
+            "runtime_driven": False,
+            "proof_gates": [],
+            "live_trading_enabled": False,
+        }
+
+
 @app.get("/api/system_health")
 async def get_system_health():
     """Datasource health, token status, retrain flag, and scheduler job status."""
@@ -885,6 +904,8 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
         job = next((j for j in cfg.get("jobs", []) if j.get("id") == job_id), None)
         if not job:
             raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found in scheduler config")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read scheduler config: {str(e)}")
 
@@ -4631,4 +4652,3 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
-

@@ -56,11 +56,7 @@ def _normalize_broker_rows(raw: Any) -> List[Dict[str, Any]]:
         if not isinstance(item, dict):
             continue
         symbol = (
-            item.get("tradingSymbol")
-            or item.get("symbol")
-            or item.get("securityId")
-            or item.get("name")
-            or "UNKNOWN"
+            item.get("tradingSymbol") or item.get("symbol") or item.get("securityId") or item.get("name") or "UNKNOWN"
         )
         qty = item.get("quantity") or item.get("qty") or item.get("netQty") or 0
         rows.append(
@@ -112,6 +108,7 @@ def _load_paper_fixture_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]
         try:
             session = json.loads(candidate.read_text(encoding="utf-8"))
             session_expiry = session.get("session_expiry")
+            trades = session.get("trades") or []
             trade_list = trades if isinstance(trades, list) else []
             enriched = enrich_option_rows(trade_list, default_expiry=session_expiry)
             meta = {
@@ -146,6 +143,33 @@ def _load_trade_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     except Exception:
         pass
     return _load_paper_fixture_history()
+
+
+def _load_auto_gate_blockers() -> tuple[List[str], List[str]]:
+    """Load dynamic blockers from auto gate evaluator if available."""
+    path = Path(__file__).resolve().parents[2] / "reports" / "latest" / "system3_auto_gates" / "summary.json"
+    if not path.exists():
+        return [], []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        blockers = list(data.get("open_blockers") or [])
+        blockers.extend(data.get("technical_gates_still_required") or [])
+        blockers.append("LIVE_TRADING_DISABLED_BY_DESIGN")
+        actions = list(data.get("recommended_auto_actions") or [])
+        # dedupe preserve order
+        seen: set[str] = set()
+        out_b, out_a = [], []
+        for b in blockers:
+            if b and b not in seen:
+                seen.add(b)
+                out_b.append(b)
+        for a in actions:
+            if a and a not in seen:
+                seen.add(a)
+                out_a.append(a)
+        return out_b, out_a
+    except Exception:
+        return [], []
 
 
 def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
@@ -199,6 +223,20 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
     else:
         transparency = "NO_PORTFOLIO_DATA"
 
+    dynamic_blockers, dynamic_actions = _load_auto_gate_blockers()
+    if not dynamic_blockers:
+        dynamic_blockers = [
+            "LIVE_TRADING_DISABLED_BY_DESIGN",
+            "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+            "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
+            "MULTI_DAY_STABILITY_NOT_PROVEN",
+        ]
+        dynamic_actions = [
+            "Run tools/system3_auto_coordinator.py",
+            "Accumulate 5+ prediction days with rho>=0.70",
+            "Prove positive net expectancy after all costs",
+        ]
+
     return {
         "generated_utc": _utc_now(),
         "live_trading_enabled": False,
@@ -225,16 +263,8 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
         "production_ready_for_real_money": False,
         "human_approval": human_approved,
         "human_approval_by": human_gate.get("approved_by"),
-        "blockers": [
-            "LIVE_TRADING_DISABLED_BY_DESIGN",
-            "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
-            "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
-            "MULTI_DAY_STABILITY_NOT_PROVEN",
-        ],
-        "next_actions": [
-            "Run market-day paper lifecycle proof with broker connected",
-            "Prove positive net expectancy after all costs",
-            "Accumulate 5+ prediction days with rho>=0.70",
-        ]
+        "blockers": dynamic_blockers,
+        "next_actions": dynamic_actions
         + ([] if human_approved else ["Human approval required before any live enablement"]),
+        "auto_gates_report": "reports/latest/system3_auto_gates/summary.json",
     }

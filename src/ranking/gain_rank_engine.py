@@ -103,6 +103,13 @@ class GainRankEngine:
         for underlying, chain_df in all_chain_data.items():
             if chain_df is None or chain_df.empty:
                 continue
+            try:
+                from core.brokers.dhan.equity_fo_universe import is_tradeable_fo_symbol
+                if not is_tradeable_fo_symbol(underlying):
+                    logger.debug("Skipping non-F&O symbol %s", underlying)
+                    continue
+            except ImportError:
+                pass
             spot = spots.get(underlying, 0.0)
             if spot <= 0:
                 continue

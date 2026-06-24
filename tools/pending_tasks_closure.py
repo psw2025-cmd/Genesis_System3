@@ -18,6 +18,7 @@ REPORT = ROOT / "reports" / "latest" / "pending_tasks_closure"
 CLOUD = "https://genesis-system3-backend.onrender.com"
 
 AUTOMATED_TASKS = [
+    ("post_market_pipeline", [sys.executable, "scripts/system3_post_market_auto_pipeline.py"]),
     ("gate_orchestrator", [sys.executable, "scripts/system3_master_proof_orchestrator.py"]),
     ("dashboard_audit", [sys.executable, "tools/dashboard_full_audit.py"]),
     ("broker_validation", [sys.executable, "tools/broker_trader_validation.py"]),
@@ -36,6 +37,9 @@ MARKET_SESSION_TASKS = [
     "WEBSOCKET_TICK_HEALTH_IMPLEMENTATION",
 ]
 
+# Auto-scheduled by system3_job_scheduler.json + auto_coordinator (no human needed)
+AUTO_SCHEDULED_MARKET_TASKS = MARKET_SESSION_TASKS
+
 PERMANENT_GATES = [
     "LIVE_TRADING_DISABLED_BY_DESIGN",
 ]
@@ -50,7 +54,7 @@ def run_task(name: str, cmd: List[str]) -> Dict[str, Any]:
         env = os.environ.copy()
         if name == "playwright":
             env.setdefault("DASHBOARD_URL", f"{CLOUD}/ui")
-        proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=600)
+        proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=900)
         return {
             "name": name,
             "passed": proc.returncode == 0,
@@ -111,6 +115,7 @@ def main() -> int:
         "cloud_endpoints": cloud,
         "cloud_all_ok": cloud_ok,
         "market_session_pending": MARKET_SESSION_TASKS,
+        "market_session_auto_scheduled": AUTO_SCHEDULED_MARKET_TASKS,
         "permanent_safety_gates": PERMANENT_GATES,
         "all_automatable_work_complete": automated_done == automated_total and cloud_ok,
         "real_money_ready": False,

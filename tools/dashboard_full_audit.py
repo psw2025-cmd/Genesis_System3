@@ -13,7 +13,11 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT = ROOT / "reports" / "latest" / "dashboard_full_audit"
-BASE = "https://genesis-system3-backend.onrender.com"
+import os
+
+BASE = os.environ.get(
+    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+).rstrip("/")
 
 REQUIRED_ENDPOINTS = [
     "/api/state",
@@ -27,6 +31,7 @@ REQUIRED_ENDPOINTS = [
     "/api/scanner/equity_options",
     "/api/scanner/segments",
     "/api/accuracy_trend",
+    "/api/auto_gates",
     "/api/chain/NIFTY",
     "/api/portfolio/unified",
     "/api/broker/holdings",
@@ -73,13 +78,18 @@ def probe(url: str, retries: int = 3, timeout: int = 60) -> Dict[str, Any]:
             last_err = str(exc)[:200]
             if attempt < retries:
                 import time
+
                 time.sleep(3 * (attempt + 1))
     return {"ok": False, "status": 0, "error": last_err}
 
 
 def run_pytest() -> Dict[str, Any]:
+    venv_exe = ROOT / "venv" / "Scripts" / "python.exe"
+    if not venv_exe.exists():
+        venv_exe = ROOT / "venv" / "bin" / "python"
+    py_exe = str(venv_exe) if venv_exe.exists() else sys.executable
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/", "-q", "--ignore=tests/dashboard_browser_proof.spec.ts"],
+        [py_exe, "-m", "pytest", "tests/", "-q", "--ignore=tests/dashboard_browser_proof.spec.ts"],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -102,18 +112,18 @@ def main() -> int:
     slow_eps = [e for e in REQUIRED_ENDPOINTS if e in SLOW_ENDPOINTS]
 
     for ep in fast_eps:
-        r = probe(f"{BASE}{ep}", retries=2, timeout=60)
+        r = probe(f"{BASE}{ep}", retries=1, timeout=15)
         endpoints[ep] = r
         if not r.get("ok"):
             missing.append(ep)
 
-    time.sleep(3)
+    time.sleep(1)
     for ep in slow_eps:
-        timeout = SLOW_ENDPOINTS.get(ep, 90)
-        r = probe(f"{BASE}{ep}", retries=5, timeout=timeout)
+        timeout = SLOW_ENDPOINTS.get(ep, 60)
+        r = probe(f"{BASE}{ep}", retries=2, timeout=timeout)
         if not r.get("ok"):
-            time.sleep(10)
-            r = probe(f"{BASE}{ep}", retries=3, timeout=timeout)
+            time.sleep(2)
+            r = probe(f"{BASE}{ep}", retries=1, timeout=timeout)
         endpoints[ep] = r
         if not r.get("ok") and ep not in missing:
             missing.append(ep)
@@ -137,12 +147,22 @@ def main() -> int:
         and qc_status not in ("MARKET_CLOSED", "NOT_READY", "NO_DATA")
         and not qc.get("skipped")
     ):
-        bugs.append({"id": "QC_STALE_FAIL", "severity": "HIGH", "detail": "QC FAIL shown when market closed (stale report)"})
+        bugs.append(
+            {"id": "QC_STALE_FAIL", "severity": "HIGH", "detail": "QC FAIL shown when market closed (stale report)"}
+        )
     if not paper.get("pnl", {}).get("history") and paper.get("pnl", {}).get("summary", {}).get("total_trades"):
-        bugs.append({"id": "PAPER_HISTORY_EMPTY", "severity": "MEDIUM", "detail": "Paper summary exists but trade history empty"})
+        bugs.append(
+            {
+                "id": "PAPER_HISTORY_EMPTY",
+                "severity": "MEDIUM",
+                "detail": "Paper summary exists but trade history empty",
+            }
+        )
     for ep in ["/api/portfolio/unified", "/api/broker/holdings", "/api/trader/requirements"]:
         if ep in missing:
-            bugs.append({"id": "API_404", "severity": "HIGH", "detail": f"{ep} not deployed on cloud (merge main required)"})
+            bugs.append(
+                {"id": "API_404", "severity": "HIGH", "detail": f"{ep} not deployed on cloud (merge main required)"}
+            )
 
     pytest_result = run_pytest()
     real_money_ready = (
@@ -162,6 +182,15 @@ def main() -> int:
     else:
         verdict = "NOT_PROVEN" if missing or bugs else "PASS_WITH_WARNINGS"
 
+    auto_gates = endpoints.get("/api/auto_gates", {}).get("data", {})
+    dynamic_blockers = auto_gates.get("open_blockers") or REAL_MONEY_BLOCKERS
+    if auto_gates.get("technical_gates_still_required"):
+        dynamic_blockers = list(
+            dict.fromkeys(
+                list(auto_gates.get("technical_gates_still_required", [])) + ["LIVE_TRADING_DISABLED_BY_DESIGN"]
+            )
+        )
+
     payload = {
         "generated_utc": utc_now(),
         "cloud_url": BASE,
@@ -171,7 +200,14 @@ def main() -> int:
         "endpoints": {k: {"ok": v.get("ok"), "status": v.get("status")} for k, v in endpoints.items()},
         "bugs_found": bugs,
         "missing_endpoints": missing,
-        "blockers": REAL_MONEY_BLOCKERS,
+        "blockers": dynamic_blockers,
+        "auto_gates": {
+            "gates_passing": auto_gates.get("gates_passing"),
+            "gates_total": auto_gates.get("gates_total"),
+            "runtime_driven": auto_gates.get("runtime_driven"),
+            "prediction_accuracy_blocked": auto_gates.get("prediction_accuracy_blocked"),
+            "profit_blocked": auto_gates.get("profit_blocked"),
+        },
         "pytest": pytest_result,
         "dashboard_tabs_verified": [
             "System Control",

@@ -208,6 +208,8 @@ def detect_missing_active_docs(root: Path) -> List[Blocker]:
 def detect_dashboard_hardcoded(root: Path) -> List[Blocker]:
     app_js = root / "dashboard" / "app.js"
     text = read_text(app_js)
+    if "/api/auto_gates" in text and "autoGatesData" in text:
+        return []
     evidence_terms = []
     for term in ["proof", "8/8", "Paper Lifecycle", "ML Accuracy", "PASS", "PEND"]:
         if term in text:

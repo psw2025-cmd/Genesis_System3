@@ -19,9 +19,26 @@ SECURITY_MASTER = ROOT / "security_id_list.csv"
 
 # Liquid F&O names used for live scanner priority (subset of full universe)
 PRIORITY_EQUITY_FO = [
-    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL",
-    "ITC", "KOTAKBANK", "LT", "AXISBANK", "MARUTI", "TATAMOTORS", "SUNPHARMA",
-    "BAJFINANCE", "HINDUNILVR", "WIPRO", "ADANIENT", "TATASTEEL", "NTPC",
+    "RELIANCE",
+    "TCS",
+    "HDFCBANK",
+    "INFY",
+    "ICICIBANK",
+    "SBIN",
+    "BHARTIARTL",
+    "ITC",
+    "KOTAKBANK",
+    "LT",
+    "AXISBANK",
+    "MARUTI",
+    "TATAMOTORS",
+    "SUNPHARMA",
+    "BAJFINANCE",
+    "HINDUNILVR",
+    "WIPRO",
+    "ADANIENT",
+    "TATASTEEL",
+    "NTPC",
 ]
 
 
@@ -54,7 +71,7 @@ def load_equity_fo_universe() -> Dict[str, Any]:
                 continue
             name = (row.get("SM_SYMBOL_NAME") or row.get("SYMBOL_NAME") or "").strip().upper()
             if not name:
-                sym = (row.get("SEM_TRADING_SYMBOL") or row.get("SEM_CUSTOM_SYMBOL") or "")
+                sym = row.get("SEM_TRADING_SYMBOL") or row.get("SEM_CUSTOM_SYMBOL") or ""
                 if "-" in sym:
                     name = sym.split("-")[0].upper()
             if not name:
@@ -95,3 +112,16 @@ def is_equity_fo_symbol(symbol: str) -> bool:
         return False
     universe = load_equity_fo_universe()
     return sym in set(universe.get("underlyings") or [])
+
+
+INDEX_FO_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"}
+
+
+def is_tradeable_fo_symbol(symbol: str) -> bool:
+    """True for index F&O or NSE equity F&O underlyings; blocks cash-only movers."""
+    sym = (symbol or "").strip().upper()
+    if not sym:
+        return False
+    if sym in INDEX_FO_SYMBOLS:
+        return True
+    return is_equity_fo_symbol(sym)

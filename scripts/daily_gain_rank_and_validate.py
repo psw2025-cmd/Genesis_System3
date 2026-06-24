@@ -34,7 +34,6 @@ from src.ranking.ml_signal_aggregator import load_ml_confidence
 from src.validation.market_result_validator import MarketResultValidator
 
 
-
 def _nse_chain_to_df(chain_json: dict) -> pd.DataFrame:
     """Convert raw NSE option chain JSON to a flat DataFrame."""
     rows = []
@@ -44,14 +43,16 @@ def _nse_chain_to_df(chain_json: dict) -> pd.DataFrame:
             leg = entry.get(key, {})
             if not leg:
                 continue
-            rows.append({
-                "strike": strike,
-                "option_type": opt_type,
-                "oi": leg.get("openInterest", 0),
-                "volume": leg.get("totalTradedVolume", 0),
-                "ltp": leg.get("lastPrice", 0.0),
-                "iv": leg.get("impliedVolatility", 0.0) / 100.0,
-            })
+            rows.append(
+                {
+                    "strike": strike,
+                    "option_type": opt_type,
+                    "oi": leg.get("openInterest", 0),
+                    "volume": leg.get("totalTradedVolume", 0),
+                    "ltp": leg.get("lastPrice", 0.0),
+                    "iv": leg.get("impliedVolatility", 0.0) / 100.0,
+                }
+            )
     return pd.DataFrame(rows) if rows else pd.DataFrame()
 
 
@@ -82,8 +83,7 @@ def load_live_chain_data():
         candidates = []
         if os.path.isdir(storage_dir):
             candidates = sorted(
-                [f for f in os.listdir(storage_dir)
-                 if sym.lower() in f.lower() and f.endswith(".csv")],
+                [f for f in os.listdir(storage_dir) if sym.lower() in f.lower() and f.endswith(".csv")],
                 reverse=True,
             )
         if candidates:
@@ -99,17 +99,18 @@ def load_live_chain_data():
                 print(f"  {sym}: CSV load failed — {e}")
 
         # --- Priority 3: synthetic fallback (LAST RESORT — no real OI) ---
-        spot = {"NIFTY": 23000, "BANKNIFTY": 52000,
-                "FINNIFTY": 23500, "MIDCPNIFTY": 12000}[sym]
+        spot = {"NIFTY": 23000, "BANKNIFTY": 52000, "FINNIFTY": 23500, "MIDCPNIFTY": 12000}[sym]
         strikes = [spot - 500 + i * 50 for i in range(20)]
-        all_data[sym] = pd.DataFrame({
-            "strike": strikes,
-            "option_type": ["CE"] * 10 + ["PE"] * 10,
-            "oi": [100000] * 20,       # flat OI — zero change signal, not random noise
-            "volume": [10000] * 20,
-            "ltp": np.random.uniform(10, 300, 20),
-            "iv": [0.18] * 20,
-        })
+        all_data[sym] = pd.DataFrame(
+            {
+                "strike": strikes,
+                "option_type": ["CE"] * 10 + ["PE"] * 10,
+                "oi": [100000] * 20,  # flat OI — zero change signal, not random noise
+                "volume": [10000] * 20,
+                "ltp": np.random.uniform(10, 300, 20),
+                "iv": [0.18] * 20,
+            }
+        )
         spots[sym] = float(spot)
         print(f"  {sym}: SYNTHETIC fallback — OI change factor will be 0 (no real data)")
 
@@ -134,8 +135,15 @@ def run_ranking(top_n: int = 5) -> None:
         oi_history = {}
         curr_oi_snapshot = {}
         for sym, df in all_data.items():
-            oi_col = next((c for c in df.columns if c.lower() == "oi" or
-                           ("oi" in c.lower() and "change" not in c.lower() and "prev" not in c.lower())), None)
+            oi_col = next(
+                (
+                    c
+                    for c in df.columns
+                    if c.lower() == "oi"
+                    or ("oi" in c.lower() and "change" not in c.lower() and "prev" not in c.lower())
+                ),
+                None,
+            )
             curr_oi = float(df[oi_col].sum()) if oi_col is not None else 0.0
             curr_oi_snapshot[sym] = int(curr_oi)
             if sym in prev_oi_cache and prev_oi_cache[sym] > 0:
@@ -156,8 +164,15 @@ def run_ranking(top_n: int = 5) -> None:
     ranked_df = engine.rank_all(all_data, spots, oi_history, ml_confidence=ml_confidence)
 
     print(f"\n  Ranked {len(ranked_df)} underlyings by predicted gain potential:\n")
-    display_cols = ["rank", "underlying", "gain_score", "ml_confidence_score",
-                    "oi_change_score", "expected_move_pct", "recommendation"]
+    display_cols = [
+        "rank",
+        "underlying",
+        "gain_score",
+        "ml_confidence_score",
+        "oi_change_score",
+        "expected_move_pct",
+        "recommendation",
+    ]
     avail_cols = [c for c in display_cols if c in ranked_df.columns]
     print(ranked_df[avail_cols].to_string(index=False))
 
@@ -165,10 +180,12 @@ def run_ranking(top_n: int = 5) -> None:
     if top:
         print(f"\n  TOP {len(top)} SYMBOLS FOR TODAY:")
         for t in top:
-            print(f"    #{t['rank']}  {t['underlying']:12s}  score={t['gain_score']:.1f}"
-                  f"  ml_conf={t.get('ml_confidence_score', 0):.1f}"
-                  f"  oi={t.get('oi_change_score', 0):.1f}"
-                  f"  move={t['expected_move_pct']*100:.2f}%")
+            print(
+                f"    #{t['rank']}  {t['underlying']:12s}  score={t['gain_score']:.1f}"
+                f"  ml_conf={t.get('ml_confidence_score', 0):.1f}"
+                f"  oi={t.get('oi_change_score', 0):.1f}"
+                f"  move={t['expected_move_pct']*100:.2f}%"
+            )
     else:
         print("\n  WARNING: No symbols met minimum gain score threshold.")
 
@@ -231,10 +248,10 @@ def run_trend() -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Daily gain rank + market validation runner")
-    parser.add_argument("--mode", choices=["rank", "validate", "trend", "full"],
-                        default="full", help="Which step to run")
-    parser.add_argument("--top-n", type=int, default=5,
-                        help="Number of top symbols to rank (default: 5)")
+    parser.add_argument(
+        "--mode", choices=["rank", "validate", "trend", "full"], default="full", help="Which step to run"
+    )
+    parser.add_argument("--top-n", type=int, default=5, help="Number of top symbols to rank (default: 5)")
     args = parser.parse_args()
 
     if args.mode in ("rank", "full"):
@@ -245,6 +262,17 @@ def main():
 
     if args.mode in ("trend", "full"):
         run_trend()
+
+    if args.mode in ("validate", "trend", "full"):
+        print("\n  Running post-market auto pipeline (proofs + gate sync)...")
+        try:
+            import subprocess
+
+            pipeline = os.path.join(ROOT_DIR, "scripts", "system3_post_market_auto_pipeline.py")
+            if os.path.isfile(pipeline):
+                subprocess.run([sys.executable, pipeline], cwd=ROOT_DIR, timeout=900)
+        except Exception as exc:
+            print(f"  Post-market pipeline warning: {exc}")
 
 
 if __name__ == "__main__":
