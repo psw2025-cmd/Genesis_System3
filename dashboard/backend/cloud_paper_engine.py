@@ -117,27 +117,31 @@ class CloudPaperEngine:
             self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Pick one near-ATM contract by highest OI change. Phantom-guarded."""
+        """Pick one near-ATM contract by highest OI change. Phantom-guarded.
+        Chain contracts are single-option rows: {strike, option_type, ltp, oi, dOI, ...}."""
         contracts = chain.get("contracts", [])
-        spot = float(chain.get("spot", 0) or 0)
+        spot = float(chain.get("spot", 0) or chain.get("spot_price", 0) or 0)
         underlying = chain.get("underlying", "NIFTY")
         if spot <= 0 or not contracts:
             return None
         cands = []
         for c in contracts:
             strike = float(c.get("strike", 0) or 0)
-            for ot in ("CE", "PE"):
-                ltp = float(c.get(f"{ot.lower()}_ltp", c.get("ltp", 0)) or 0)
-                if ltp < 10:
-                    continue
-                if _is_phantom(ltp, strike, spot, ot):
-                    continue
-                mny = abs(spot - strike) / spot * 100.0
-                if mny > NEAR_ATM_PCT:
-                    continue
-                oi_chg = abs(float(c.get(f"{ot.lower()}_oi_change", c.get("oi_change", 0)) or 0))
-                cands.append({"underlying": underlying, "strike": strike,
-                              "option_type": ot, "ltp": ltp, "oi_chg": oi_chg})
+            ot = str(c.get("option_type", "") or "").strip().upper()
+            if ot not in ("CE", "PE"):
+                continue
+            ltp = float(c.get("ltp", 0) or c.get("mid_price", 0) or 0)
+            if ltp < 10:
+                continue
+            if _is_phantom(ltp, strike, spot, ot):
+                continue
+            mny = abs(spot - strike) / spot * 100.0
+            if mny > NEAR_ATM_PCT:
+                continue
+            # OI change column is dOI in the chain CSV
+            oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
+            cands.append({"underlying": underlying, "strike": strike,
+                          "option_type": ot, "ltp": ltp, "oi_chg": oi_chg})
         if not cands:
             return None
         cands.sort(key=lambda x: x["oi_chg"], reverse=True)
@@ -153,10 +157,10 @@ class CloudPaperEngine:
         for ch in chains:
             for c in ch.get("contracts", []):
                 strike = float(c.get("strike", 0) or 0)
-                for ot in ("CE", "PE"):
-                    ltp = float(c.get(f"{ot.lower()}_ltp", c.get("ltp", 0)) or 0)
-                    if ltp > 0:
-                        chain_by_key[(ch.get("underlying"), strike, ot)] = ltp
+                ot = str(c.get("option_type", "") or "").strip().upper()
+                ltp = float(c.get("ltp", 0) or c.get("mid_price", 0) or 0)
+                if ot in ("CE", "PE") and ltp > 0:
+                    chain_by_key[(ch.get("underlying"), strike, ot)] = ltp
 
         still_open = []
         for pos in self.open_positions:
