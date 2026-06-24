@@ -225,6 +225,16 @@ if SSOT_AVAILABLE:
 else:
     state_store = None
 
+# Warm instruments master (CSV fallback on Render when JSON missing)
+try:
+    from core.data.instruments_cache import ensure_instruments_loaded
+
+    _inst_metrics = ensure_instruments_loaded()
+    if _inst_metrics.get("rows", 0) > 0:
+        print(f"[startup] instruments loaded: {_inst_metrics['rows']} rows from {_inst_metrics.get('source')}")
+except Exception as _inst_exc:
+    print(f"[startup] instruments warm-up skipped: {_inst_exc}")
+
 # CORS - allow localhost and local network IPs
 # For development: allow all origins (change to specific list in production)
 app.add_middleware(

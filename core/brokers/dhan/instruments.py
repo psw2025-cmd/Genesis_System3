@@ -23,44 +23,12 @@ INSTRUMENT_JSON = os.path.join(ROOT_DIR, "storage", "instruments", "OpenAPIScrip
 
 def load_instruments() -> pd.DataFrame | None:
     """
-    Load Dhan instruments master from local JSON (OpenAPIScripMaster.json).
-    NOW USES CACHE - loads once, returns cached DataFrame.
-
-    JSON is a list of dicts with keys like:
-      token, symbol, name, expiry, strike, lotsize, instrumenttype, exch_seg, tick_size
-
-    Returns:
-        pandas.DataFrame or None on error.
+    Load Dhan instruments master from cache (JSON or security_id_list.csv fallback).
     """
-    # Use cache instead of loading from disk every time
-    return get_instruments_df()
-    """
-    Load Dhan instruments master from local JSON (OpenAPIScripMaster.json).
-
-    JSON is a list of dicts with keys like:
-      token, symbol, name, expiry, strike, lotsize, instrumenttype, exch_seg, tick_size
-
-    Returns:
-        pandas.DataFrame or None on error.
-    """
-    if not os.path.exists(INSTRUMENT_JSON):
-        logger.error(f"Instrument JSON not found: {INSTRUMENT_JSON}")
+    df = get_instruments_df()
+    if df is None or df.empty:
         return None
-
-    try:
-        with open(INSTRUMENT_JSON, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        if not isinstance(data, list):
-            logger.error("Instrument JSON is not a list.")
-            return None
-
-        df = pd.DataFrame(data)
-        logger.info(f"Loaded instruments from JSON: {len(df)} rows")
-        return df
-    except Exception as e:
-        logger.error(f"Failed to read instruments JSON: {e}")
-        return None
+    return df
 
 
 def find_by_tradingsymbol(exchange: str, tradingsymbol: str) -> dict | None:

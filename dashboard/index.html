@@ -811,7 +811,7 @@
     <section v-if="activeTab==='proof'" class="tab">
       <div class="sec-hdr"><h2>Proof Status Matrix</h2><span class="sec-sub">8-Gate Orchestrator</span></div>
       <div class="kpi-row">
-        <div class="kpi kpi-g"><div class="kpi-lbl">GATES</div><div class="kpi-val">8 / 8</div><div class="kpi-sub">0 blockers</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">GATES</div><div class="kpi-val">{{ autoGatesData.gates_passing||0 }} / {{ autoGatesData.gates_total||7 }}</div><div class="kpi-sub">{{ (autoGatesData.open_blockers||[]).length }} blockers</div></div>
         <div class="kpi kpi-a"><div class="kpi-lbl">VERDICT</div><div class="kpi-val" style="font-size:.75rem">ANALYZER_READY</div><div class="kpi-sub">PROOF_INCOMPLETE</div></div>
         <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design</div></div>
         <div class="kpi kpi-g"><div class="kpi-lbl">LIVE</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0</div></div>
