@@ -246,18 +246,28 @@ class CloudPaperEngine:
         total_unreal = sum(p.get("unrealized_pnl", 0) for p in self.open_positions)
         wins = [p for p in self.closed_positions if p.get("realized_pnl", 0) > 0]
         ts = _ist_str()
+        summary_block = {
+            "open_count": len(self.open_positions),
+            "closed_count": len(self.closed_positions),
+            "total_trades": len(self.closed_positions),
+            "winning_trades": len(wins),
+            "losing_trades": len(self.closed_positions) - len(wins),
+            "win_rate": round(len(wins) / len(self.closed_positions) * 100, 2) if self.closed_positions else 0.0,
+            "total_unrealized_pnl": round(total_unreal, 2),
+            "total_realized_pnl": round(total_realized, 2),
+            "total_pnl": round(total_realized + total_unreal, 2),
+            "open_positions": self.open_positions,
+            "closed_positions": self.closed_positions,
+            "data_source": "paper_cloud_sim",
+        }
+        # positions_live.json — get_positions reads data.get("positions") + open_count
         positions_out = {
             "timestamp_ist": ts,
-            "open_positions": self.open_positions,
-            "summary": {
-                "open_count": len(self.open_positions),
-                "closed_count": len(self.closed_positions),
-                "total_unrealized_pnl": round(total_unreal, 2),
-                "total_realized_pnl": round(total_realized, 2),
-                "total_pnl": round(total_realized + total_unreal, 2),
-                "open_positions": self.open_positions,
-                "closed_positions": self.closed_positions,
-            },
+            "positions": self.open_positions,        # get_positions reads this key
+            "open_positions": self.open_positions,   # legacy alias
+            "open_count": len(self.open_positions),
+            "closed_count": len(self.closed_positions),
+            "summary": summary_block,
         }
         pnl_out = {
             "timestamp": _now_ist().isoformat(),
@@ -277,6 +287,8 @@ class CloudPaperEngine:
         try:
             self.positions_file.write_text(json.dumps(positions_out, indent=2))
             self.pnl_file.write_text(json.dumps(pnl_out, indent=2))
+            # paper_pnl_summary.json — get_pnl reads this as the summary source
+            (self.out / "paper_pnl_summary.json").write_text(json.dumps(summary_block, indent=2))
         except Exception:
             pass
 
