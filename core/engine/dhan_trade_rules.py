@@ -101,12 +101,16 @@ class TradeRuleEngine:
         opt_type = "CE" if label == "BUY_CE" else "PE"
         if ltp > 0 and spot > 0 and strike > 0:
             intrinsic = max(0.0, spot - strike) if opt_type == "CE" else max(0.0, strike - spot)
-            # Plausible max premium: intrinsic + 12% of spot as generous extrinsic cap
-            max_plausible = intrinsic + 0.12 * spot
-            if ltp > max_plausible:
+            extrinsic = ltp - intrinsic
+            moneyness_pct = abs(spot - strike) / spot * 100.0
+            # Extrinsic cap: 5% of spot (ATM straddle is ~3-4%); 3% for far-OTM
+            max_extrinsic = 0.05 * spot
+            if intrinsic == 0 and moneyness_pct > 2.0:
+                max_extrinsic = 0.03 * spot
+            if extrinsic > max_extrinsic:
                 decision["reason"] = (
-                    f"phantom_premium(ltp={ltp:.1f}>max_plausible={max_plausible:.1f}, "
-                    f"intrinsic={intrinsic:.1f}) — bad data row rejected"
+                    f"phantom_premium(extrinsic={extrinsic:.1f}>max={max_extrinsic:.1f}, "
+                    f"{moneyness_pct:.1f}%OTM) — bad data row rejected"
                 )
                 decision["action"] = "AVOID"
                 return decision
