@@ -115,13 +115,54 @@ def get_top_signal(dry_run: bool) -> dict:
             "source": "DRY_RUN_SIMULATION",
         }
     try:
+        import urllib.request
+
+        public_url = os.environ.get(
+            "SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com"
+        )
+        with urllib.request.urlopen(public_url.rstrip("/") + "/api/gain_rank", timeout=45) as r:
+            data = json.loads(r.read(65536))
+        preds = (data.get("latest") or {}).get("predictions") or []
+        if preds:
+            p = preds[0]
+            return {
+                "symbol": p.get("underlying") or p.get("symbol") or "NIFTY",
+                "strike": p.get("strike") or 0,
+                "option_type": p.get("option_type") or "CE",
+                "expiry": p.get("expiry") or p.get("expiry_date") or "",
+                "instrument_token": p.get("instrument_token") or p.get("security_id") or "GAIN_RANK_API",
+                "entry_price": float(p.get("ltp") or p.get("entry_price") or 100.0),
+                "target_price": float(p.get("target_price") or 0) or None,
+                "stop_loss": float(p.get("stop_loss") or 0) or None,
+                "confidence": float(p.get("gain_score") or p.get("confidence") or 50) / 100.0,
+                "signal_id": f"GRE_{uuid.uuid4().hex[:8].upper()}",
+                "source": "GAIN_RANK_API",
+            }
+    except Exception as api_err:
+        log.warning(f"Gain rank API unavailable: {api_err}")
+
+    try:
+        from scripts.daily_gain_rank_and_validate import load_live_chain_data
         from src.ranking.gain_rank_engine import GainRankEngine
-        engine = GainRankEngine()
-        signals = engine.rank(top_n=3)
-        if signals:
-            s = signals[0]
-            s.setdefault("signal_id", f"GRE_{uuid.uuid4().hex[:8].upper()}")
-            return s
+
+        all_data, spots = load_live_chain_data()
+        engine = GainRankEngine(top_n=3)
+        top = engine.get_top_n(all_data, spots)
+        if top:
+            s = top[0]
+            return {
+                "symbol": s.get("underlying"),
+                "strike": s.get("strike") or 0,
+                "option_type": s.get("option_type") or "CE",
+                "expiry": s.get("expiry") or "",
+                "instrument_token": s.get("instrument_token") or "GAIN_RANK_LOCAL",
+                "entry_price": float(s.get("ltp") or 100.0),
+                "target_price": None,
+                "stop_loss": None,
+                "confidence": float(s.get("gain_score") or 50) / 100.0,
+                "signal_id": f"GRE_{uuid.uuid4().hex[:8].upper()}",
+                "source": "GAIN_RANK_LOCAL",
+            }
         return {"error": "No signals from GainRankEngine", "signal_id": None}
     except Exception as e:
         log.warning(f"GainRankEngine unavailable: {e} — using bhavcopy fallback")
@@ -239,7 +280,7 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     log.info(f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}")
 
     # Step 5: Reconcile
-    log.info("[Step 5] Reconciling order→fill→exit→P&L")
+    log.info("[Step 5] Reconciling order->fill->exit->P&L")
     reconciled = (
         entry_order["order_id"] == exit_record["order_id"]
         and entry_order["fill_price"] is not None
