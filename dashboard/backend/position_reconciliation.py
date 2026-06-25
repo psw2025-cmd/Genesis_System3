@@ -25,10 +25,37 @@ class PositionReconciliation:
         self.outputs_dir = Path(outputs_dir)
 
     def get_broker_positions(self) -> List[Dict[str, Any]]:
-        """Get positions from broker (when connected)"""
-        # TODO: Implement broker position fetch
-        # For now, return empty list
-        return []
+        """Get positions from broker (when connected). Read-only - no
+        orders are ever placed from this path."""
+        try:
+            from core.brokers.dhan.dhan_payload_normalizer import (
+                normalize_position_row,
+                normalize_positions_payload,
+            )
+            from core.brokers.dhan.dhan_readonly import (
+                get_positions as dhan_get_positions,
+            )
+        except ImportError as e:
+            print(f"Broker positions unavailable (import failed): {e}")
+            return []
+
+        try:
+            result = dhan_get_positions()
+            if not result.get("success", True) and result.get("data") is None:
+                return []
+            raw_rows = normalize_positions_payload(result.get("data"))
+            positions = []
+            for raw in raw_rows:
+                row = normalize_position_row(raw)
+                # reconcile() compares on position_id/qty; trading_symbol is
+                # the closest thing Dhan gives to a stable per-position key.
+                row["position_id"] = row.get("trading_symbol") or row.get("symbol")
+                row["qty"] = row.get("net_qty", 0)
+                positions.append(row)
+            return positions
+        except Exception as e:
+            print(f"Error fetching broker positions: {e}")
+            return []
 
     def get_internal_positions(self) -> List[Dict[str, Any]]:
         """Get positions from internal ledger"""
