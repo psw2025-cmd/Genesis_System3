@@ -1,0 +1,35 @@
+[
+  {
+    "date": "2026-06-13",
+    "timestamp": "2026-06-13T15:30:00+05:30",
+    "rankings": [
+      {
+        "underlying": "NIFTY",
+        "gain_rank": 76.9,
+        "direction": "UP",
+        "option_eligible": true
+      },
+      {
+        "underlying": "BANKNIFTY",
+        "gain_rank": 66.0,
+        "direction": "UP",
+        "option_eligible": true
+      },
+      {
+        "underlying": "MIDCPNIFTY",
+        "gain_rank": 61.7,
+        "direction": "UP",
+        "option_eligible": true
+      },
+      {
+        "underlying": "FINNIFTY",
+        "gain_rank": 34.6,
+        "direction": "DOWN",
+        "option_eligible": true
+      }
+    ],
+    "source": "historical_seed",
+    "stale": true,
+    "note": "Stale seed from Jun 13. Laptop must run gain_rank engine to refresh."
+  }
+]
