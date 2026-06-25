@@ -108,23 +108,33 @@ class RequestIDMiddleware:
         request_id = incoming.decode("latin-1") if incoming else str(uuid.uuid4())
         set_request_id(request_id)
         start = time.monotonic()
+        status_holder = {"status": 0}
 
         async def send_wrapper(message):
             if message["type"] == "http.response.start":
                 message.setdefault("headers", [])
                 message["headers"].append((b"x-request-id", request_id.encode("latin-1")))
+                status_holder["status"] = message.get("status", 0)
             await send(message)
 
         try:
             await self.app(scope, receive, send_wrapper)
         finally:
-            duration_ms = round((time.monotonic() - start) * 1000, 1)
+            duration_s = time.monotonic() - start
+            method = scope.get("method")
+            path = scope.get("path")
             get_logger("system3.access").info(
                 "request",
                 extra={
-                    "method": scope.get("method"),
-                    "path": scope.get("path"),
-                    "duration_ms": duration_ms,
+                    "method": method,
+                    "path": path,
+                    "duration_ms": round(duration_s * 1000, 1),
+                    "status": status_holder["status"],
                 },
             )
+            try:
+                from dashboard.backend.metrics import record_request
+            except ImportError:
+                from metrics import record_request
+            record_request(method or "", path or "", status_holder["status"], duration_s)
             set_request_id(None)

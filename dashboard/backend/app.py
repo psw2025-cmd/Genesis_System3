@@ -91,7 +91,7 @@ from fastapi import (
     WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 try:
@@ -345,7 +345,7 @@ app.add_middleware(
 _REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
 _API_KEY = os.environ.get("API_KEY", "").strip()
 _API_KEY_EXEMPT_PREFIXES = ("/ui", "/docs", "/openapi.json", "/redoc", "/ws")
-_API_KEY_EXEMPT_EXACT = ("/", "/api/health", "/favicon.ico")
+_API_KEY_EXEMPT_EXACT = ("/", "/api/health", "/favicon.ico", "/metrics")
 
 if _REQUIRE_API_KEY and not _API_KEY:
     print("[security] REQUIRE_API_KEY=true but API_KEY is unset - auth will reject all requests")
@@ -691,6 +691,19 @@ async def get_approval_status():
     except ImportError:
         from human_approval_service import build_approval_status
     return build_approval_status()
+
+
+@app.get("/metrics", include_in_schema=False)
+async def get_metrics():
+    """Prometheus text-exposition metrics - request counts/latency
+    histogram recorded by RequestIDMiddleware on every request. Exempt
+    from API-key auth (standard practice - scrapers shouldn't need the
+    dashboard's app key) but not from anything else."""
+    try:
+        from dashboard.backend.metrics import render_prometheus_text
+    except ImportError:
+        from metrics import render_prometheus_text
+    return Response(content=render_prometheus_text(), media_type="text/plain; version=0.0.4")
 
 
 @app.get("/api/kill-switch/status")
