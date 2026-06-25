@@ -213,7 +213,7 @@ jobs:
     needs: [workflow-policy-guard]
     # Only run on push to main (not PRs) to avoid redundant runs
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    continue-on-error: true  # non-blocking — dashboard verify is advisory
+    continue-on-error: true  # non-blocking  dashboard verify is advisory
 
     steps:
       - name: Checkout
@@ -254,11 +254,11 @@ jobs:
 
           const TABS = ['control','health','options','paper','portfolio','accuracy','signals','proof'];
           const HIGH_BUGS = [
-            { re: /Feb[- ]0?1/,          label: 'Stale Feb-1 data' },
+            { re: /Feb[- ]0?1/,          label: 'Stale Feb-1 data' },
             { re: /NO TRADE.*QC failed/,    label: 'Old NO TRADE QC signal' },
             { re: /\[object Object\]/,      label: '[object Object] in UI' },
-            { re: /undefined/,            label: 'undefined value shown' },
-            { re: /NaN/,                label: 'NaN value shown' },
+            { re: /undefined/,            label: 'undefined value shown' },
+            { re: /NaN/,                label: 'NaN value shown' },
             { re: /Cannot read prop/i,      label: 'JS prop error in UI' },
           ];
 
