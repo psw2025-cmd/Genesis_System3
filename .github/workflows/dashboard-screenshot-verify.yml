@@ -1,0 +1,246 @@
+name: Dashboard Auto-Screenshot & Verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Dashboard URL to test'
+        required: false
+        default: 'https://genesis-system3-backend.onrender.com'
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/**'
+      - 'dashboard/backend/**'
+
+concurrency:
+  group: screenshot-verify
+  cancel-in-progress: true
+
+jobs:
+  screenshot-verify:
+    name: Auto Screenshot + Bug Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright @playwright/test
+          npx playwright install chromium --with-deps
+
+      - name: Wait for Render to wake up
+        run: |
+          URL="${{ github.event.inputs.url || 'https://genesis-system3-backend.onrender.com' }}"
+          echo "Waking up Render: $URL"
+          for i in {1..12}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$URL/health" || echo "000")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "307" ]; then
+              echo "✅ Render is up"
+              break
+            fi
+            sleep 15
+          done
+
+      - name: Run Playwright Screenshot + Verify
+        run: |
+          cat > verify.mjs << 'SCRIPT'
+          import { chromium } from 'playwright';
+          import fs from 'fs';
+          import path from 'path';
+
+          const BASE = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com';
+          const OUT  = './ci-screenshots';
+          fs.mkdirSync(OUT, { recursive: true });
+
+          const TABS = [
+            { id: 'control',   name: 'System Control'   },
+            { id: 'health',    name: 'Broker & Data'     },
+            { id: 'options',   name: 'Option Chain'      },
+            { id: 'paper',     name: 'Paper Lifecycle'   },
+            { id: 'portfolio', name: 'Portfolio'         },
+            { id: 'signals',   name: 'Signals'           },
+            { id: 'proof',     name: 'Proof Gates'       },
+          ];
+
+          // BUG DETECTORS — what to look for in each tab
+          const BUG_PATTERNS = [
+            { pattern: /Feb[- ]0?1/i,              severity: 'HIGH',   label: 'Stale Feb-1 data visible'        },
+            { pattern: /NO TRADE.*QC failed/i,     severity: 'HIGH',   label: 'Old NO TRADE QC signal showing'  },
+            { pattern: /error/i,                   severity: 'MEDIUM', label: 'Error text visible'               },
+            { pattern: /undefined/,                severity: 'HIGH',   label: 'Undefined value showing'          },
+            { pattern: /NaN/,                      severity: 'HIGH',   label: 'NaN value showing'                },
+            { pattern: /\[object Object\]/,        severity: 'HIGH',   label: '[object Object] in UI'            },
+            { pattern: /Cannot read/i,             severity: 'HIGH',   label: 'JS error in UI'                   },
+            { pattern: /not found/i,               severity: 'MEDIUM', label: 'Not found message'                },
+            { pattern: /loading\.{3,}/i,           severity: 'MEDIUM', label: 'Stuck loading spinner'            },
+          ];
+
+          // GOOD PATTERNS — what should be present
+          const GOOD_PATTERNS = {
+            control:   [/SYSTEM3/i, /ANALYZER|PAPER/i],
+            health:    [/Dhan|DHAN|broker/i],
+            options:   [/NIFTY|BANKNIFTY/i, /Strike|strike/i],
+            paper:     [/Paper|PAPER/i, /position|trade/i],
+            portfolio: [/Portfolio|PORTFOLIO/i],
+            signals:   [/signal|Signal/i],
+            proof:     [/gate|Gate|proof|PROOF/i],
+          };
+
+          const results = { timestamp: new Date().toISOString(), base: BASE, tabs: [], bugs: [], summary: {} };
+
+          let browser;
+          try {
+            browser = await chromium.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+            const ctx  = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+            const page = await ctx.newPage();
+
+            // Capture console errors
+            const consoleErrors = [];
+            page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+            page.on('pageerror', err => consoleErrors.push(`JS: ${err.message}`));
+
+            console.log(`Loading dashboard: ${BASE}/ui`);
+            await page.goto(`${BASE}/ui`, { waitUntil: 'networkidle', timeout: 30000 });
+            await page.waitForTimeout(3000);
+
+            // Full page screenshot
+            await page.screenshot({ path: `${OUT}/01_full_page.png`, fullPage: true });
+            console.log('✅ Full page screenshot taken');
+
+            // Each tab
+            for (const [i, tab] of TABS.entries()) {
+              try {
+                // Click the tab
+                const tabBtn = page.locator(`[data-tab="${tab.id}"], button:has-text("${tab.name}")`).first();
+                if (await tabBtn.count() > 0) {
+                  await tabBtn.click();
+                } else {
+                  // Try clicking by text partial match
+                  await page.click(`text=${tab.name}`, { timeout: 3000 }).catch(() => {});
+                }
+                await page.waitForTimeout(2000);
+
+                const screenshotPath = `${OUT}/${String(i+2).padStart(2,'0')}_${tab.id}.png`;
+                await page.screenshot({ path: screenshotPath, fullPage: false });
+
+                // Get page text for bug detection
+                const bodyText = await page.locator('body').innerText().catch(() => '');
+                const bugs = BUG_PATTERNS
+                  .filter(b => b.pattern.test(bodyText))
+                  .map(b => ({ ...b, tab: tab.id }));
+
+                const goodPats = GOOD_PATTERNS[tab.id] || [];
+                const goodFound = goodPats.filter(p => p.test(bodyText));
+                const goodMissing = goodPats.filter(p => !p.test(bodyText)).map(p => p.toString());
+
+                results.tabs.push({
+                  tab: tab.id,
+                  name: tab.name,
+                  screenshot: screenshotPath,
+                  bugs_found: bugs.length,
+                  bugs,
+                  expected_content_found: goodFound.length,
+                  expected_content_missing: goodMissing,
+                  status: bugs.filter(b=>b.severity==='HIGH').length > 0 ? 'FAIL' :
+                          goodMissing.length > 0 ? 'WARN' : 'PASS',
+                });
+
+                results.bugs.push(...bugs);
+                console.log(`  ${tab.id}: ${bugs.length} bugs, ${goodMissing.length} missing expected`);
+              } catch (e) {
+                console.warn(`  ${tab.id}: ERROR — ${e.message}`);
+                results.tabs.push({ tab: tab.id, name: tab.name, status: 'ERROR', error: e.message });
+              }
+            }
+
+            // Console errors
+            results.console_errors = consoleErrors;
+            results.summary = {
+              total_tabs: results.tabs.length,
+              passing: results.tabs.filter(t => t.status === 'PASS').length,
+              warnings: results.tabs.filter(t => t.status === 'WARN').length,
+              failing: results.tabs.filter(t => t.status === 'FAIL').length,
+              errors:  results.tabs.filter(t => t.status === 'ERROR').length,
+              high_bugs: results.bugs.filter(b => b.severity === 'HIGH').length,
+              console_errors: consoleErrors.length,
+              overall: results.tabs.every(t => ['PASS','WARN'].includes(t.status)) ? 'HEALTHY' : 'NEEDS_FIX',
+            };
+
+          } finally {
+            if (browser) await browser.close();
+          }
+
+          fs.writeFileSync(`${OUT}/verify_result.json`, JSON.stringify(results, null, 2));
+          console.log('\n=== VERIFICATION SUMMARY ===');
+          console.log(JSON.stringify(results.summary, null, 2));
+          console.log('\nHigh-severity bugs:');
+          results.bugs.filter(b=>b.severity==='HIGH').forEach(b => console.log(`  ❌ [${b.tab}] ${b.label}`));
+
+          // Exit with failure if high bugs found
+          process.exit(results.summary.high_bugs > 0 ? 1 : 0);
+          SCRIPT
+          
+          DASHBOARD_URL="${{ github.event.inputs.url || 'https://genesis-system3-backend.onrender.com' }}" node verify.mjs
+
+        env:
+          DASHBOARD_URL: ${{ github.event.inputs.url || 'https://genesis-system3-backend.onrender.com' }}
+        continue-on-error: true
+
+      - name: Upload Screenshots + Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dashboard-screenshots-${{ github.run_number }}
+          path: ci-screenshots/
+          retention-days: 7
+
+      - name: Parse Results and Comment
+        if: always()
+        run: |
+          if [ -f ci-screenshots/verify_result.json ]; then
+            python3 - << 'PYEOF'
+          import json, sys
+          with open('ci-screenshots/verify_result.json') as f:
+              r = json.load(f)
+          s = r['summary']
+          print(f"Overall: {s['overall']}")
+          print(f"Tabs: {s['passing']} PASS / {s['warnings']} WARN / {s['failing']} FAIL / {s['errors']} ERROR")
+          print(f"High bugs: {s['high_bugs']}")
+          print(f"Console errors: {s['console_errors']}")
+          for tab in r['tabs']:
+              icon = '✅' if tab['status']=='PASS' else '⚠️' if tab['status']=='WARN' else '❌'
+              print(f"  {icon} {tab['name']}: {tab['status']}")
+              for b in tab.get('bugs',[]):
+                  print(f"      BUG [{b['severity']}]: {b['label']}")
+              for m in tab.get('expected_content_missing',[]):
+                  print(f"      MISSING: {m}")
+          PYEOF
+          else
+            echo "No results file found"
+          fi
+
+      - name: Push results to repo
+        if: always()
+        run: |
+          git config user.email "ci@genesis-system3"
+          git config user.name "Genesis CI"
+          git pull --rebase origin main
+          mkdir -p reports/latest/dashboard_ui_proof
+          cp ci-screenshots/verify_result.json reports/latest/dashboard_ui_proof/latest.json 2>/dev/null || true
+          # Note: screenshots are too large for git, available as artifacts
+          git add reports/latest/dashboard_ui_proof/ 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "ci: dashboard screenshot verify results [skip ci]"
+          git push origin main || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
