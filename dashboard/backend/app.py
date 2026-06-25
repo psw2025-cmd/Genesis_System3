@@ -965,8 +965,11 @@ async def get_gain_rank(refresh: bool = False):
 async def get_top_contract_gainers(top_n: int = 5):
     """
     Live market scanner: highest % gain CE and PE per index segment.
-    Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
+    TTL cached 60s to prevent 126s recompute on every dashboard poll.
     """
+    _hit = _cache_get("scanner_gainers", _TTL_SCANNER)
+    if _hit is not None:
+        return _hit
     global _EOD_SCANNER_CACHE
     if not _market_open_from_state():
         cached_at, cached = _EOD_SCANNER_CACHE
@@ -1086,6 +1089,9 @@ async def get_scanner_segments():
 
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
+    _hit = _cache_get("accuracy_trend", _TTL_ACCURACY)
+    if _hit is not None:
+        return _hit
     """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
     try:
         if not VALIDATION_DIR.exists():
