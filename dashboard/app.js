@@ -360,6 +360,7 @@ const app = createApp({
       if(pp){paperData.value=pp;await nextTick();renderPnlChart();}
       if(qc) qcData.value=qc;
       if(al?.alerts) alertsData.value=al.alerts;
+      else if(Array.isArray(al)) alertsData.value=al;
       if(tod) todayTrades.value=tod;
       if(pf) perfData.value=pf;
       if(lrn) learningData.value=lrn;
