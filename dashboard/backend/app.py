@@ -21,7 +21,10 @@ IST = pytz.timezone("Asia/Kolkata")
 # Timeouts for sync broker/scanner work — must not block the asyncio event loop.
 _BROKER_IO_TIMEOUT_S = 8.0
 _SCANNER_IO_TIMEOUT_S = 120.0
-_TRUTH_IO_TIMEOUT_S = 20.0
+_SCANNER_EOD_TIMEOUT_S = 180.0
+_TRUTH_IO_TIMEOUT_S = 45.0
+_EOD_SCANNER_CACHE: tuple[float, Dict[str, Any]] = (0.0, {})
+_EOD_SCANNER_TTL_S = 1800.0
 
 
 def _market_open_from_state() -> bool:
@@ -360,6 +363,18 @@ async def _enforce_api_key(request: Request, call_next):
     if request.headers.get("X-API-Key", "") != _API_KEY:
         return JSONResponse(status_code=401, content={"detail": "Missing or invalid X-API-Key header"})
     return await call_next(request)
+
+
+# Outermost middleware (added last = runs first/wraps everything else, per
+# Starlette's add_middleware ordering) so every request - including ones
+# the API-key check rejects - gets a request_id available to logging and
+# echoed back in the response for client-side correlation.
+try:
+    from dashboard.backend.structured_logging import RequestIDMiddleware
+except ImportError:
+    from structured_logging import RequestIDMiddleware
+
+app.add_middleware(RequestIDMiddleware)
 
 
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
@@ -923,10 +938,16 @@ async def get_top_contract_gainers(top_n: int = 5):
     Live market scanner: highest % gain CE and PE per index segment.
     Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
     """
+    global _EOD_SCANNER_CACHE
     if not _market_open_from_state():
+        cached_at, cached = _EOD_SCANNER_CACHE
+        if cached and (time.time() - cached_at) < _EOD_SCANNER_TTL_S:
+            return cached
         try:
 
             def _eod_scanner():
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+
                 from core.data.datasource_manager import DataSourceManager
                 from dashboard.backend.chain_adapter import fetch_chain_for_api
                 from dashboard.backend.contract_gain_scanner import (
@@ -935,17 +956,27 @@ async def get_top_contract_gainers(top_n: int = 5):
                 )
 
                 dsm = DataSourceManager()
-                chains = {}
-                for underlying in INDEX_SEGMENTS:
+                chains: Dict[str, Any] = {}
+
+                def _fetch_one(underlying: str):
                     ch = fetch_chain_for_api(dsm, underlying, eod_only=True)
-                    chains[underlying] = ch or {"contracts": [], "underlying": underlying}
+                    return underlying, ch or {"contracts": [], "underlying": underlying}
+
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    futs = [pool.submit(_fetch_one, u) for u in INDEX_SEGMENTS]
+                    for fut in as_completed(futs):
+                        underlying, ch = fut.result()
+                        chains[underlying] = ch
                 report = scan_all_segments_from_chains(chains, top_n=min(max(top_n, 1), 20))
                 report["status"] = "eod_snapshot"
                 report["market_open"] = False
-                report["note"] = "After-hours scanner from EOD/bhavcopy chain"
+                report["note"] = "After-hours scanner from NSE EOD chain"
                 return report
 
-            return await _run_blocking(_eod_scanner, timeout=_SCANNER_IO_TIMEOUT_S)
+            result = await _run_blocking(_eod_scanner, timeout=_SCANNER_EOD_TIMEOUT_S)
+            if int(result.get("segments_implemented") or 0) > 0:
+                _EOD_SCANNER_CACHE = (time.time(), result)
+            return result
         except asyncio.TimeoutError:
             return {**_scanner_market_closed_response(), "status": "timeout"}
         except Exception as exc:
