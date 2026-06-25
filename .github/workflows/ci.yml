@@ -205,3 +205,176 @@ jobs:
         # the mypy backlog on the Python side. The build succeeding is
         # the meaningful gate for "is this deployable"; full strict
         # typecheck cleanup is tracked separately, not bundled in here.
+
+  dashboard-screenshot-verify:
+    name: Dashboard Auto Screenshot + Bug Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [workflow-policy-guard]
+    # Only run on push to main (not PRs) to avoid redundant runs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    continue-on-error: true  # non-blocking — dashboard verify is advisory
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright + Chromium
+        run: |
+          cd /tmp
+          npm init -y
+          npm install playwright
+          npx playwright install chromium --with-deps
+        continue-on-error: true
+
+      - name: Wake Render + Screenshot All Tabs
+        run: |
+          BASE="https://genesis-system3-backend.onrender.com"
+          echo "Waking Render..."
+          for i in {1..10}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$BASE/health" 2>/dev/null || echo 000)
+            [ "$STATUS" = "200" ] && echo "Up!" && break
+            echo "Attempt $i: $STATUS (sleeping 20s)"
+            sleep 20
+          done
+
+          mkdir -p ci-screenshots
+          cat > /tmp/verify.mjs << 'SCRIPT'
+          import { chromium } from '/tmp/node_modules/playwright/index.mjs';
+          import fs from 'fs';
+
+          const BASE = 'https://genesis-system3-backend.onrender.com';
+          const OUT  = './ci-screenshots';
+          fs.mkdirSync(OUT, { recursive: true });
+
+          const TABS = ['control','health','options','paper','portfolio','accuracy','signals','proof'];
+          const HIGH_BUGS = [
+            { re: /Feb[- ]0?1/,          label: 'Stale Feb-1 data' },
+            { re: /NO TRADE.*QC failed/,    label: 'Old NO TRADE QC signal' },
+            { re: /\[object Object\]/,      label: '[object Object] in UI' },
+            { re: /undefined/,            label: 'undefined value shown' },
+            { re: /NaN/,                label: 'NaN value shown' },
+            { re: /Cannot read prop/i,      label: 'JS prop error in UI' },
+          ];
+
+          const results = { ts: new Date().toISOString(), tabs: {}, bugs: [], summary: {} };
+          let br;
+          try {
+            br = await chromium.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
+            const page = await br.newPage({ viewport: { width: 1440, height: 900 } });
+            const jsErrs = [];
+            page.on('pageerror', e => jsErrs.push(e.message));
+            page.on('console', m => { if (m.type()==='error') jsErrs.push(m.text()); });
+
+            await page.goto(BASE+'/ui', { waitUntil: 'networkidle', timeout: 30000 }).catch(()=>{});
+            await page.waitForTimeout(4000);
+            await page.screenshot({ path: OUT+'/00_home.png' });
+
+            for (const tab of TABS) {
+              await page.evaluate(t => { window.__setTab && window.__setTab(t); }, tab);
+              // Try sidebar click
+              const btn = page.locator(`[data-tab="${tab}"]`).first();
+              if (await btn.count()) await btn.click().catch(()=>{});
+              await page.waitForTimeout(2500);
+              await page.screenshot({ path: `${OUT}/${tab}.png` });
+              const txt = await page.locator('body').innerText().catch(()=>'');
+              const found = HIGH_BUGS.filter(b => b.re.test(txt)).map(b=>b.label);
+              results.tabs[tab] = { bugs: found, status: found.length ? 'FAIL' : 'PASS' };
+              if (found.length) results.bugs.push(...found.map(l=>({tab,label:l})));
+            }
+            results.jsErrors = jsErrs;
+          } finally { if(br) await br.close(); }
+
+          const failing = Object.values(results.tabs).filter(t=>t.status==='FAIL').length;
+          results.summary = {
+            total: TABS.length,
+            passing: TABS.length - failing,
+            failing,
+            high_bugs: results.bugs.length,
+            js_errors: (results.jsErrors||[]).length,
+            verdict: failing === 0 ? 'HEALTHY' : 'NEEDS_FIX',
+          };
+
+          fs.writeFileSync(OUT+'/result.json', JSON.stringify(results, null, 2));
+          console.log('SUMMARY:', JSON.stringify(results.summary));
+          results.bugs.forEach(b => console.log(`  BUG [${b.tab}]: ${b.label}`));
+          SCRIPT
+
+          node /tmp/verify.mjs 2>&1 || echo "Playwright run finished (errors expected if Render asleep)"
+        continue-on-error: true
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dashboard-screenshots-${{ github.run_number }}
+          path: ci-screenshots/
+          retention-days: 14
+
+      - name: Save verify result to repo
+        if: always()
+        run: |
+          if [ -f ci-screenshots/result.json ]; then
+            mkdir -p reports/latest/dashboard_ui_proof
+            cp ci-screenshots/result.json reports/latest/dashboard_ui_proof/latest.json
+            git config user.email "ci-bot@genesis-system3"
+            git config user.name "Genesis CI Bot"
+            git pull --rebase origin main 2>/dev/null || true
+            git add reports/latest/dashboard_ui_proof/latest.json
+            git diff --staged --quiet || git commit -m "ci: dashboard UI verify result [skip ci]"
+            git push origin main 2>/dev/null || true
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  dashboard-api-verify:
+    name: Dashboard API Verify + Bug Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    needs: [workflow-policy-guard]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Wake Render
+        run: |
+          for i in {1..8}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
+              "https://genesis-system3-backend.onrender.com/health" 2>/dev/null || echo 000)
+            echo "Attempt $i: $STATUS"
+            [ "$STATUS" = "200" ] && echo "Render up!" && break
+            sleep 20
+          done
+
+      - name: Run API Verify
+        run: python scripts/dashboard_api_verify.py
+        env:
+          DASHBOARD_URL: https://genesis-system3-backend.onrender.com
+        continue-on-error: true
+
+      - name: Commit Results to Repo
+        if: always()
+        run: |
+          git config user.email "ci@genesis-system3"
+          git config user.name "Genesis CI"
+          git pull --rebase origin main 2>/dev/null || true
+          git add reports/latest/dashboard_ui_proof/latest.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "ci: dashboard API verify results [skip ci]"
+          git push origin main 2>/dev/null || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
