@@ -4,8 +4,8 @@
 
 const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
 const API = window.location.origin;
-const POLL_MS = 10000;
-const POLL_MS_MARKET = 5000;
+const POLL_MS = 30000;         // REST poll (non-market): 30s — WS covers realtime
+const POLL_MS_MARKET = 20000;  // REST poll (market open): 20s — WS covers health/pnl/positions
 
 if (typeof Chart !== 'undefined') {
   Chart.defaults.color = '#3d5870';
@@ -556,9 +556,20 @@ const app = createApp({
     let clk=null,poll=null;
     function restartPoll(){
       if(poll) clearInterval(poll);
-      poll=setInterval(pollAll, marketOpen.value ? POLL_MS_MARKET : POLL_MS);
+      // When WS is live, REST poll can be slower (WS covers realtime updates)
+      const wsLive = wsStatus.value === 'live';
+      const interval = marketOpen.value
+        ? (wsLive ? POLL_MS_MARKET * 2 : POLL_MS_MARKET)
+        : (wsLive ? POLL_MS * 2 : POLL_MS);
+      poll = setInterval(pollAll, interval);
     }
-    onMounted(async()=>{updateClock();clk=setInterval(updateClock,1000);await pollAll();restartPoll();});
+    onMounted(async()=>{
+      updateClock();
+      clk = setInterval(updateClock, 1000);
+      wsConnect();      // Start WebSocket — real-time health/pnl/positions
+      await pollAll();  // Initial REST poll — state, chain, scanner, broker
+      restartPoll();    // Schedule REST refresh interval (20-30s)
+    });
     watch(marketOpen, ()=> restartPoll());
     onUnmounted(()=>{clearInterval(clk);clearInterval(poll);[cFull,cRank,cPnl,cScanner].forEach(c=>{if(c)c.destroy();});});
 
