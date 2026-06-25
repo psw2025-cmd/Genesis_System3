@@ -37,8 +37,8 @@ jobs:
           printf '%s\n' "${workflows[@]}"
           test "${#workflows[@]}" -eq 1
           test "${workflows[0]}" = ".github/workflows/ci.yml"
-          ! grep -RIn "contents: write" .github/workflows
-          ! grep -RIn -- "--auto-fix" .github/workflows
+          ! grep -RIn "contents: write" .github/workflows | grep -v "grep -RIn"
+          ! grep -RIn -- "--auto-fix" .github/workflows | grep -v "grep -RIn"
           ! grep -RIn "azure/webapps-deploy" .github/workflows
 
   architecture-trading-safety:
