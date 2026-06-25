@@ -678,6 +678,24 @@ async def get_approval_status():
     return build_approval_status()
 
 
+@app.get("/api/kill-switch/status")
+async def get_kill_switch_status():
+    """Kill switch status — the same storage/live/kill_switch.json the batch
+    session loop checks every cycle, and that order_management.create_order
+    now also checks before creating any (currently paper-only) order."""
+    try:
+        from core.engine.system3_phase113_kill_switch_monitor import run_phase113
+    except ImportError as e:
+        return {"status": "ERROR", "kill_active": None, "error": f"monitor unavailable: {e}"}
+    result = run_phase113()
+    return {
+        "status": result.get("status"),
+        "kill_active": result.get("outputs", {}).get("kill_active"),
+        "details": result.get("details"),
+        "kill_switch_path": result.get("outputs", {}).get("kill_switch_path"),
+    }
+
+
 @app.get("/api/broker/deps")
 async def get_broker_deps():
     """Get broker dependency installation status (Dhan)"""
@@ -906,7 +924,32 @@ async def get_top_contract_gainers(top_n: int = 5):
     Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
     """
     if not _market_open_from_state():
-        return _scanner_market_closed_response()
+        try:
+
+            def _eod_scanner():
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+                from dashboard.backend.contract_gain_scanner import (
+                    INDEX_SEGMENTS,
+                    scan_all_segments_from_chains,
+                )
+
+                dsm = DataSourceManager()
+                chains = {}
+                for underlying in INDEX_SEGMENTS:
+                    ch = fetch_chain_for_api(dsm, underlying, eod_only=True)
+                    chains[underlying] = ch or {"contracts": [], "underlying": underlying}
+                report = scan_all_segments_from_chains(chains, top_n=min(max(top_n, 1), 20))
+                report["status"] = "eod_snapshot"
+                report["market_open"] = False
+                report["note"] = "After-hours scanner from EOD/bhavcopy chain"
+                return report
+
+            return await _run_blocking(_eod_scanner, timeout=_SCANNER_IO_TIMEOUT_S)
+        except asyncio.TimeoutError:
+            return {**_scanner_market_closed_response(), "status": "timeout"}
+        except Exception as exc:
+            return {**_scanner_market_closed_response(), "error": str(exc)[:200]}
     try:
         from dashboard.backend.contract_gain_scanner import (
             build_top_contract_gainers_report,
@@ -1943,6 +1986,23 @@ async def get_chain(underlying: str):
                 }
 
         if not market_is_open:
+            try:
+
+                def _eod_chain_fetch():
+                    from core.data.datasource_manager import DataSourceManager
+                    from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                    return fetch_chain_for_api(DataSourceManager(), underlying.upper(), eod_only=True)
+
+                eod = await _run_blocking(_eod_chain_fetch, timeout=45.0)
+                if eod and int(eod.get("total_contracts") or 0) > 0:
+                    eod["status"] = "EOD_SNAPSHOT"
+                    eod["message"] = "After-hours chain from EOD archive (bhavcopy/NSE)"
+                    return eod
+            except asyncio.TimeoutError:
+                pass
+            except Exception as exc:
+                print(f"EOD chain fallback failed: {exc}")
             return {
                 "underlying": underlying.upper(),
                 "contracts": [],
