@@ -60,7 +60,10 @@ google-cloud-sdk/
 *.bak
 
 # Root-level JS/TS scratch files and stale data dumps
-*.tsx
+# (leading slash anchors to repo root only - without it, *.tsx matches
+# at every directory depth and silently blocks any new file under
+# dashboard/frontend/src/components/ from ever being git-added)
+/*.tsx
 COMPLETE_DIAGNOSTIC_SCRIPT.js
 ONE_LINE_TESTS.js
 QUICK_FIX_CONSOLE.js
