@@ -947,3 +947,21 @@ html, body { height: 100%; background: var(--bg); color: var(--txt); font-family
 .conn-connecting { background: rgba(59,130,246,.1); color: var(--blue); border: 1px solid rgba(59,130,246,.3); }
 .conn-connecting .conn-dot { background: var(--blue); animation: pulse 1s ease-in-out infinite; }
 @media (max-width: 768px) { .conn-health { font-size: .5rem; padding: 3px 6px; } }
+
+/* ── WEBSOCKET STATUS PILL ── */
+.ws-pill {
+  display: flex; align-items: center; gap: 4px; cursor: pointer;
+  padding: 3px 8px; border-radius: 4px;
+  font-family: var(--mono); font-size: .58rem; font-weight: 700;
+  letter-spacing: .06em; transition: opacity .2s;
+}
+.ws-pill:hover { opacity: .8; }
+.ws-dot { width: 5px; height: 5px; border-radius: 50%; }
+.ws-live { background: rgba(0,232,122,.1); color: var(--green); border: 1px solid rgba(0,232,122,.25); }
+.ws-live .ws-dot { background: var(--green); box-shadow: 0 0 4px var(--green); animation: pulse 1.5s ease-in-out infinite; }
+.ws-connecting { background: rgba(59,130,246,.1); color: var(--blue); border: 1px solid rgba(59,130,246,.25); }
+.ws-connecting .ws-dot { background: var(--blue); animation: pulse .8s ease-in-out infinite; }
+.ws-closed { background: rgba(255,184,48,.1); color: var(--amber); border: 1px solid rgba(255,184,48,.25); }
+.ws-closed .ws-dot { background: var(--amber); }
+.ws-off { background: rgba(100,116,139,.1); color: #64748b; border: 1px solid rgba(100,116,139,.25); }
+.ws-off .ws-dot { background: #64748b; }
