@@ -1,0 +1,16 @@
+{
+  "open_count": 0,
+  "closed_count": 0,
+  "total_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "win_rate": 0.0,
+  "total_unrealized_pnl": 0.0,
+  "total_realized_pnl": 0.0,
+  "total_pnl": 0.0,
+  "open_positions": [],
+  "closed_positions": [],
+  "data_source": "paper_cloud_sim",
+  "note": "Cloud paper engine populates during market hours (09:15-15:30 IST).",
+  "timestamp_ist": "2026-06-25 09:22:47 IST"
+}
