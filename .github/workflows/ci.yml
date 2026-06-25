@@ -145,6 +145,17 @@ jobs:
           print("dashboard_backend_import_smoke=PASS")
           PY
 
+      - name: Dashboard backend pytest suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Scoped to this one file deliberately, not the whole suite:
+          # tests/test_dhan_payload_normalizer.py has a pre-existing,
+          # unrelated failure (stale instrument-cache data resolving an
+          # expired option symbol - tracked separately) that --maxfail=1
+          # would let block every CI run on unrelated content.
+          python -m pytest tests/test_dashboard_app.py -v
+
       - name: Run issue 24 26 27 28 proof batch
         shell: bash
         run: |
@@ -162,3 +173,35 @@ jobs:
           name: system3-proof-pack
           path: reports/latest/
           if-no-files-found: error
+
+  frontend-build:
+    name: BLOCKING - frontend production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: workflow-policy-guard
+    defaults:
+      run:
+        working-directory: dashboard/frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: dashboard/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build (vite build)
+        run: npm run build
+        # Deliberately not a blocking `tsc --noEmit` here: this codebase
+        # has ~30 pre-existing type errors (unused React imports from an
+        # older JSX transform, a couple of real bugs unrelated to CI
+        # infra) that predate this workflow change - same treatment as
+        # the mypy backlog on the Python side. The build succeeding is
+        # the meaningful gate for "is this deployable"; full strict
+        # typecheck cleanup is tracked separately, not bundled in here.
