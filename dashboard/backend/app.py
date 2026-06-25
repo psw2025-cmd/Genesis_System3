@@ -20,7 +20,7 @@ IST = pytz.timezone("Asia/Kolkata")
 
 # Timeouts for sync broker/scanner work — must not block the asyncio event loop.
 _BROKER_IO_TIMEOUT_S = 8.0
-_SCANNER_IO_TIMEOUT_S = 5.0
+_SCANNER_IO_TIMEOUT_S = 120.0
 _TRUTH_IO_TIMEOUT_S = 20.0
 
 
@@ -4213,10 +4213,41 @@ async def generate_report():
 
 @app.post("/api/orders/create")
 async def create_order(order_data: Dict[str, Any]):
-    """Create a new order"""
+    """Create a new order. Gated on: kill switch (inside
+    OrderManagement.create_order itself), human approval, and portfolio
+    risk limits - previously all three existed but only the dashboard's
+    read-only status endpoints ever consulted them; nothing in the
+    order-creation path did."""
     try:
         if not ADVANCED_FEATURES_AVAILABLE:
             return {"status": "ERROR", "message": "Order management not available"}
+
+        try:
+            from dashboard.backend.human_approval_service import build_approval_status
+        except ImportError:
+            from human_approval_service import build_approval_status
+        approval = build_approval_status()
+        if not approval.get("human_approval"):
+            return {
+                "status": "ERROR",
+                "message": "Order rejected: human approval gate not signed off",
+                "approval": approval,
+            }
+
+        try:
+            live_cfg = json.loads((ROOT_DIR / "config" / "live_trade_config.json").read_text())
+        except Exception:
+            live_cfg = {}
+        risk_limits = {
+            "max_positions": live_cfg.get("MAX_OPEN_POSITIONS", 5),
+            "max_exposure": live_cfg.get("MAX_EXPOSURE", 100000),
+            "max_loss": -abs(live_cfg.get("MAX_DAILY_LOSS", 5000)),
+            "max_concentration_pct": live_cfg.get("MAX_CONCENTRATION_PCT", 50),
+        }
+        positions_data = await get_positions()
+        risk_check = get_risk_management().check_risk_limits(positions_data.get("positions", []), risk_limits)
+        if risk_check.get("status") == "FAIL":
+            return {"status": "ERROR", "message": "Order rejected: risk limits breached", "risk_check": risk_check}
 
         order_mgmt = get_order_management()
         order = order_mgmt.create_order(
