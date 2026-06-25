@@ -306,9 +306,18 @@ def consume_oauth_token(token_id: str) -> dict:
 # ------------------------------------------------------------------ #
 
 
+# Cooldown lock: prevent Dhan 2-minute rate limit on rapid restarts
+# (Render restarts can trigger multiple quick token refresh calls)
+import threading as _threading
+_TOKEN_REFRESH_LOCK = _threading.Lock()
+_TOKEN_LAST_REFRESH_TS = 0.0
+_TOKEN_COOLDOWN_S = 90.0  # Dhan rate limit is 2 min; use 90s to be safe
+
+
 def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> dict:
     """
     Refresh the Dhan access token using best available strategy.
+    Includes a 90s cooldown to prevent Dhan 2-minute rate limit on Render restarts.
 
     Strategy order:
       1. generate_token(pin, totp) — if DHAN_PIN + DHAN_TOTP_SECRET set
@@ -322,6 +331,25 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
     Returns:
         dict with keys: success, strategy, message, token_preview
     """
+    global _TOKEN_LAST_REFRESH_TS
+    import time as _time_mod
+
+    # Cooldown check (skip if force)
+    if not force_generate and not force_oauth:
+        if not _TOKEN_REFRESH_LOCK.acquire(blocking=False):
+            return {"success": False, "strategy": "cooldown_lock",
+                    "message": "Token refresh already in progress (concurrent call blocked)"}
+        try:
+            elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
+            if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
+                remaining = int(_TOKEN_COOLDOWN_S - elapsed)
+                logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
+                return {"success": False, "strategy": "cooldown",
+                        "message": f"Cooldown active ({remaining}s left) — Dhan 2-min rate limit protection"}
+        finally:
+            _TOKEN_REFRESH_LOCK.release()
+
+    _TOKEN_LAST_REFRESH_TS = _time_mod.time()
     env = _load_env()
     client_id = env.get("DHAN_CLIENT_ID", "").strip()
     cur_token = env.get("DHAN_ACCESS_TOKEN", "").strip()
@@ -336,8 +364,11 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
     logger.info(f"Starting token refresh for client_id=...{client_id[-4:]}")
 
     if force_oauth:
-        _try_oauth_manual(client_id, app_id, app_secret)
-        return {"success": False, "strategy": "oauth_manual", "message": "Browser action required — see console"}
+        # Never auto-print OAuth URL in cloud mode (Render logs are public)
+        if not os.environ.get("RENDER") and not os.environ.get("CLOUD_MODE"):
+            _try_oauth_manual(client_id, app_id, app_secret)
+        return {"success": False, "strategy": "oauth_manual",
+                "message": "OAuth manual required — not auto-triggered in cloud mode"}
 
     # Strategy 1: generate_token via PIN + TOTP (primary — fastest, fully automated)
     if not force_generate or (pin and totp_secret):
