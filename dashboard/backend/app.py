@@ -3089,15 +3089,27 @@ async def audit_secrets():
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket for real-time updates - Only active during market hours (Mon-Fri, 9:15 AM - 3:30 PM IST)"""
-    # Check if market is open before accepting connection
-    if MARKET_DETECTION_AVAILABLE:
-        is_open, reason = is_market_open()
-        if not is_open:
-            # Reject connection outside market hours
-            await websocket.close(code=1008, reason=f"Market closed: {reason}")
-            return
-
+    # Accept WS connection always — market status sent in first message
+    # (Previously rejected outside hours with 1008 — this broke testing and
+    # prevented the dashboard from showing WS as connected during dev)
     await websocket.accept()
+    market_open_now = False
+    market_close_reason = "unknown"
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            market_open_now, market_close_reason = is_market_open()
+        except Exception:
+            pass
+    # Send market status immediately on connect
+    try:
+        await websocket.send_json({
+            "type": "market_status",
+            "market_open": market_open_now,
+            "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
+            "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+        })
+    except Exception:
+        pass
     active_connections.append(websocket)
 
     try:
@@ -3130,6 +3142,21 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(1)  # Check every second
 
             now = datetime.now(pytz.timezone("Asia/Kolkata")).timestamp()
+
+            # Send state+signal update every 5 seconds (market only)
+            if market_open_now and now - last_health_send >= 5:
+                try:
+                    state_store_data = _state_store.get_state() if SSOT_AVAILABLE and _state_store else {}
+                    if state_store_data:
+                        await websocket.send_json({
+                            "type": "state_update",
+                            "data": state_store_data,
+                            "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+                        })
+                except (WebSocketDisconnect, ConnectionError):
+                    raise
+                except Exception:
+                    pass
 
             # Send health update every 3 seconds
             if now - last_health_send >= 3:
