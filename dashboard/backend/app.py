@@ -550,6 +550,10 @@ async def get_dhan_broker_status():
 @app.get("/api/broker/truth")
 async def get_broker_truth():
     """Multi-validated broker trader truth — holdings, positions, funds."""
+    _hit = _cache_get("broker_truth", _TTL_BROKER_TRUTH)
+    if _hit is not None:
+        return _hit
+
     try:
         from dashboard.backend.broker_truth_validator import build_broker_truth_report
     except ImportError:
@@ -563,6 +567,10 @@ async def get_broker_truth():
 @app.get("/api/broker/holdings")
 async def get_broker_holdings():
     """Dhan equity holdings — read-only. No orders."""
+    _hit = _cache_get("broker_holdings", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
+
     try:
         from core.brokers.dhan.dhan_payload_normalizer import (
             normalize_holding_row,
@@ -596,6 +604,10 @@ async def get_broker_holdings():
 @app.get("/api/broker/funds")
 async def get_broker_funds():
     """Dhan fund limits / available balance — read-only. No orders."""
+    _hit = _cache_get("broker_funds", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
+
     try:
         from core.brokers.dhan.dhan_payload_normalizer import (
             normalize_funds_payload,
@@ -661,6 +673,10 @@ async def get_broker_positions_live():
 @app.get("/api/portfolio/unified")
 async def get_unified_portfolio():
     """Paper + broker read-only portfolio truth. Never enables live trading."""
+    _hit = _cache_get("portfolio", _TTL_PORTFOLIO)
+    if _hit is not None:
+        return _hit
+
     try:
         from dashboard.backend.portfolio_truth_service import build_unified_portfolio
     except ImportError:
@@ -1110,6 +1126,10 @@ async def get_accuracy_trend():
 @app.get("/api/auto_gates")
 async def get_auto_gates(refresh: bool = False):
     """Runtime-driven production/prediction/profit blocker gates (replaces static dashboard proof matrix)."""
+    _hit = _cache_get("auto_gates", _TTL_AUTO_GATES)
+    if _hit is not None:
+        return _hit
+
     try:
         try:
             from dashboard.backend.auto_gates_service import build_auto_gates_report
@@ -1557,6 +1577,38 @@ class HealthResponse(BaseModel):
     total_pnl: float
     daily_pnl: float
     performance_sla: Dict[str, Any]
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TTL CACHE — Prevents Render 503 cascade on cold-start and poll overload
+# Heavy APIs cache their results. Cache is in-process dict (no Redis needed).
+# TTLs chosen for trading: broker data 30s, scanner 60s, accuracy 120s.
+# ═══════════════════════════════════════════════════════════════════════════
+import time as _time_module
+
+_API_CACHE: dict = {}  # {key: (timestamp, data)}
+
+def _cache_get(key: str, ttl_s: float):
+    """Return cached value if fresh, else None."""
+    entry = _API_CACHE.get(key)
+    if entry and (_time_module.time() - entry[0]) < ttl_s:
+        return entry[1]
+    return None
+
+def _cache_set(key: str, value):
+    """Store value with current timestamp."""
+    _API_CACHE[key] = (_time_module.time(), value)
+    return value
+
+# TTL constants (seconds)
+_TTL_BROKER      = 30    # holdings, positions, funds — Dhan API calls
+_TTL_PAPER       = 15    # paper positions/pnl — changes each tick
+_TTL_SCANNER     = 60    # contract gainers, equity_options — heavy compute
+_TTL_ACCURACY    = 120   # accuracy trend — file read, slow
+_TTL_PERF        = 120   # performance data
+_TTL_PORTFOLIO   = 30    # portfolio/unified
+_TTL_AUTO_GATES  = 60    # auto gates — reads several files
+_TTL_BROKER_TRUTH= 30    # broker truth validator
 
 
 # API Endpoints
@@ -2855,6 +2907,10 @@ async def get_enhanced_signals(limit: int = 10):
 @app.get("/api/paper")
 async def get_paper():
     """Get paper trading data (combines positions and PnL)"""
+    _hit = _cache_get("paper", _TTL_PAPER)
+    if _hit is not None:
+        return _hit
+
     try:
         positions_data = await get_positions()
         pnl_data = await get_pnl()
