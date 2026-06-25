@@ -16,6 +16,7 @@ import os
 import sys
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT)
@@ -29,6 +30,44 @@ from core.brokers.dhan.token_manager import (
 REFRESH_HOUR = 8
 REFRESH_MINUTE = 30
 RETRY_DELAY_S = 300  # retry every 5 min if first attempt fails
+MIN_CLOUD_REFRESH_INTERVAL_S = 130  # Dhan generate token limit is roughly once every 2 minutes
+COOLDOWN_FILE = Path(ROOT) / "reports" / "latest" / "render_token_audit" / "last_refresh_attempt.txt"
+
+
+def _is_cloud() -> bool:
+    return bool(os.environ.get("RENDER") or os.environ.get("CLOUD_WORKER"))
+
+
+def _cooldown_active() -> bool:
+    if not _is_cloud() or not COOLDOWN_FILE.exists():
+        return False
+    try:
+        last = float(COOLDOWN_FILE.read_text(encoding="utf-8").strip())
+        return (time.time() - last) < MIN_CLOUD_REFRESH_INTERVAL_S
+    except Exception:
+        return False
+
+
+def _record_attempt() -> None:
+    if not _is_cloud():
+        return
+    try:
+        COOLDOWN_FILE.parent.mkdir(parents=True, exist_ok=True)
+        COOLDOWN_FILE.write_text(str(time.time()), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _safe_refresh(reason: str) -> dict:
+    if _cooldown_active():
+        return {
+            "success": False,
+            "strategy": "cloud_cooldown",
+            "message": "Skipped duplicate Dhan token refresh inside 130s cooldown",
+            "reason": reason,
+        }
+    _record_attempt()
+    return refresh_token()
 
 
 def seconds_until_next_refresh() -> float:
@@ -43,7 +82,7 @@ def run_daemon():
     print(f"[TokenDaemon] Started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"[TokenDaemon] Will refresh token daily at {REFRESH_HOUR:02d}:{REFRESH_MINUTE:02d}")
 
-    # Verify on startup
+    # Verify on startup. In cloud, avoid repeated generate_token storms during Render redeploy/restart.
     v = verify_token()
     if v.get("valid"):
         hrs = v.get("hours_remaining", "?")
@@ -51,14 +90,14 @@ def run_daemon():
         name = v.get("name") or f"client ...{v.get('client_id','?')}"
         print(f"[TokenDaemon] Token VALID for {name} — expires in {hrs}h ({exp})")
     else:
-        print(f"[TokenDaemon] Token INVALID ({v.get('reason')}) — refreshing now...")
-        result = refresh_token()
-        if result["success"]:
+        print(f"[TokenDaemon] Token INVALID ({v.get('reason')}) — refresh guarded by cloud cooldown...")
+        result = _safe_refresh("startup_invalid_token")
+        if result.get("success"):
             print(
                 f"[TokenDaemon] Refreshed via {result['strategy']} — {result['token_preview']} expires {result.get('expires_at','?')}"
             )
         else:
-            print(f"[TokenDaemon] FAILED: {result['message']}")
+            print(f"[TokenDaemon] STARTUP REFRESH SKIPPED/FAILED: {result.get('message')}")
 
     while True:
         wait = seconds_until_next_refresh()
@@ -68,17 +107,17 @@ def run_daemon():
 
         print(f"[TokenDaemon] {datetime.now().strftime('%H:%M:%S')} — refreshing token...")
         for attempt in range(1, 4):
-            result = refresh_token()
-            if result["success"]:
+            result = _safe_refresh(f"scheduled_attempt_{attempt}")
+            if result.get("success"):
                 print(f"[TokenDaemon] ✅ Token refreshed via {result['strategy']} — {result['token_preview']}")
                 break
             else:
-                print(f"[TokenDaemon] ❌ Attempt {attempt}/3 failed: {result['message']}")
+                print(f"[TokenDaemon] ❌ Attempt {attempt}/3 skipped/failed: {result.get('message')}")
                 if attempt < 3:
                     print(f"[TokenDaemon] Retrying in {RETRY_DELAY_S}s...")
                     time.sleep(RETRY_DELAY_S)
         else:
-            print("[TokenDaemon] All 3 attempts failed — check DHAN_PIN and DHAN_TOTP_SECRET")
+            print("[TokenDaemon] All 3 attempts failed — check Dhan token automation configuration")
 
 
 if __name__ == "__main__":
@@ -96,7 +135,7 @@ if __name__ == "__main__":
         v = verify_token()
         print(json.dumps(v, indent=2))
     elif args.now:
-        r = refresh_token()
+        r = _safe_refresh("manual_now")
         print(json.dumps(r, indent=2))
     elif args.oauth:
         from core.brokers.dhan.token_manager import refresh_token as _rt
