@@ -2677,8 +2677,6 @@ async def get_pnl():
         # Fix: honest empty state — no trades until cloud paper engine generates them.
         if not processed_history:
             pass  # Honest: no historical trades yet — engine will populate during market hours
-                except Exception:
-                    pass
 
         # Keep /api/pnl fast for dashboard health checks. Symbol enrichment loads the
         # instrument master and can exceed the verifier timeout when no live PnL file exists.
