@@ -2,6 +2,11 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Already configurable via DASHBOARD_URL - not hardcoded. Falls back to
+// production only because no staging environment exists yet (tracked
+// separately). Once one does: DASHBOARD_URL=https://<staging-host>/ui
+// npx playwright test, or set it in CI as a job env var - no code
+// change needed here when that happens.
 const DASHBOARD_URL = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com/ui';
 const REPORT_DIR = path.join('reports', 'latest', 'dashboard_browser_proof');
 const SCREENSHOT_DIR = path.join(REPORT_DIR, 'screenshots');
@@ -165,4 +170,8 @@ test.afterAll(() => {
     ...(consoleErrors.length ? consoleErrors.map((e) => `- ${e}`) : ['- none']),
   ].join('\n');
   fs.writeFileSync(path.join(REPORT_DIR, 'summary.md'), md);
+
+  if (verdict === 'FAIL') {
+    throw new Error(`Dashboard browser proof failed. See ${path.join(REPORT_DIR, 'summary.json')}`);
+  }
 });
