@@ -19,6 +19,9 @@ const app = createApp({
     const activeTab   = ref('control');
     const lastSync    = ref('--');
     const connHealth  = ref('connecting');  // connecting | live | reconnecting
+    const wsStatus    = ref('off');        // off | connecting | live | error | market_closed
+    const wsLatency   = ref(null);         // ms round-trip
+    const lastWsTick  = ref(null);         // IST string of last WS message
     const failCount   = ref(0);
     const currentTime = ref('');
     const marketOpen  = ref(false);
@@ -321,6 +324,102 @@ const app = createApp({
     function selectChainSymbol(sym){chainSymbol.value=sym;loadChain();}
     async function loadLogs(){const d=await fetchJSON('/api/logs/tail?lines=150');if(d?.logs)logsData.value=d.logs;}
 
+
+    // ════════════════════════════════════════════════════════════
+    // WEBSOCKET CLIENT — real-time updates from /ws/stream
+    // Server sends: health_update, positions_update, pnl_update, heartbeat
+    // Falls back to REST poll gracefully if WS unavailable.
+    // ════════════════════════════════════════════════════════════
+    let _ws = null;
+    let _wsReconnectTimer = null;
+    let _wsReconnectDelay = 3000;
+    const _WS_MAX_DELAY = 30000;
+
+    function _wsUrl() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${proto}//${location.host}/ws/stream`;
+    }
+
+    function _wsTick(msg) {
+      lastWsTick.value = new Date().toLocaleTimeString('en-IN', { hour12: false, timeZone: 'Asia/Kolkata' });
+      _wsReconnectDelay = 3000; // reset on success
+      connHealth.value = 'live';
+      failCount.value  = 0;
+      wsStatus.value   = 'live';
+
+      try {
+        const m = JSON.parse(msg.data);
+        switch (m.type) {
+          case 'health_update':
+            if (m.data) healthData.value = m.data;
+            break;
+          case 'positions_update':
+            if (m.data) {
+              // Update paperData positions in-place
+              if (paperData.value && m.data) {
+                paperData.value = { ...paperData.value, positions: m.data };
+              }
+            }
+            break;
+          case 'pnl_update':
+            if (m.data) {
+              if (paperData.value) {
+                paperData.value = { ...paperData.value, pnl: m.data };
+              }
+            }
+            break;
+          case 'heartbeat':
+            // Heartbeat received — WS alive, no state change needed
+            wsLatency.value = m.latency_ms || null;
+            break;
+          default:
+            break;
+        }
+      } catch(e) {
+        console.warn('[ws] parse error:', e?.message);
+      }
+    }
+
+    function wsConnect() {
+      if (_ws && _ws.readyState <= 1) return; // already connecting/open
+      wsStatus.value = 'connecting';
+      try {
+        _ws = new WebSocket(_wsUrl());
+        _ws.onopen  = () => {
+          wsStatus.value = 'live';
+          _wsReconnectDelay = 3000;
+          console.info('[ws] connected');
+        };
+        _ws.onmessage = _wsTick;
+        _ws.onerror = (e) => {
+          wsStatus.value = 'error';
+          console.warn('[ws] error');
+        };
+        _ws.onclose = (e) => {
+          wsStatus.value = e.code === 1008 ? 'market_closed' : 'off';
+          console.info(`[ws] closed: ${e.code} ${e.reason}`);
+          // Auto-reconnect unless market closed (1008)
+          if (e.code !== 1008) {
+            _wsReconnectTimer = setTimeout(() => {
+              _wsReconnectDelay = Math.min(_wsReconnectDelay * 1.5, _WS_MAX_DELAY);
+              wsConnect();
+            }, _wsReconnectDelay);
+          } else {
+            // Market closed — retry in 5 min
+            _wsReconnectTimer = setTimeout(wsConnect, 300000);
+          }
+        };
+      } catch(e) {
+        wsStatus.value = 'error';
+        console.warn('[ws] init error:', e?.message);
+      }
+    }
+
+    // Start WS on mount
+    onMounted(() => {
+      wsConnect();
+    });
+
     let _polling = false;
     async function pollAll(){
       if (_polling) return;
@@ -474,7 +573,7 @@ const app = createApp({
       chainSymbols,chainSymbol,chainStrikeFilter,chainLoading,
       filteredChainRows,chainCeOI,chainPeOI,ceOIPct,peOIPct,maxPainStrike,atmIV,
       factors,proofGates,readinessLadder,autoGatesData,
-      connHealth, failCount, unifiedHoldings, unifiedPositions,
+      connHealth, failCount, wsStatus, wsLatency, lastWsTick, wsConnect, unifiedHoldings, unifiedPositions,
       portfolioData, brokerHoldings, brokerPositions, brokerFunds,
       holdingRows, positionRows, fundsInfo, brokerHoldingsOk, brokerFundsOk, brokerPositionsOk,
       brokerValidation, brokerTraderFields, brokerDataSource,
