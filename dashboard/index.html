@@ -43,6 +43,12 @@
       <div class="conn-health" :class="'conn-'+connHealth" :title="'Connection: '+connHealth">
         <span class="conn-dot"></span>{{ connHealth==='live'?'LIVE':connHealth==='reconnecting'?'RECONNECTING':'CONNECTING' }}
       </div>
+      <div class="ws-pill"
+           :class="wsStatus==='live'?'ws-live':wsStatus==='connecting'?'ws-connecting':wsStatus==='market_closed'?'ws-closed':'ws-off'"
+           :title="'WebSocket: '+wsStatus+(lastWsTick?' | Last tick: '+lastWsTick:'')"
+           @click="wsConnect()">
+        <span class="ws-dot"></span>WS {{ wsStatus==='live'?'●':wsStatus==='connecting'?'…':wsStatus==='market_closed'?'MKT-CLOSED':'○' }}
+      </div>
       <div class="rho-pill" :class="rhoClass">ρ {{ latestRho!==null?latestRho.toFixed(2):'--' }}</div>
     </div>
   </header>
@@ -181,7 +187,13 @@
             <div class="tok-r"><span>Chain Source</span><strong>{{ chainData.data_source||'--' }}</strong></div>
             <div class="tok-r"><span>Chain Status</span><strong :class="chainData.status==='MARKET_OPEN'?'tx-g':'tx-a'">{{ chainData.status||'--' }}</strong></div>
             <div class="tok-r"><span>Contracts</span><strong>{{ chainData.total_contracts||0 }} loaded</strong></div>
-            <div class="tok-r"><span>WebSocket</span><strong class="tx-a">N/A — Dhan WS setup pending</strong></div>
+            <div class="tok-r">
+              <span>WebSocket</span>
+              <strong :class="wsStatus==='live'?'tx-g':wsStatus==='market_closed'?'tx-a':'tx-r'">
+                {{ wsStatus==='live'?'CONNECTED (live ticks)':wsStatus==='connecting'?'CONNECTING...':wsStatus==='market_closed'?'MARKET CLOSED (will reconnect)':wsStatus==='error'?'ERROR':'DISCONNECTED' }}
+                <span v-if="wsLatency"> | {{ wsLatency }}ms</span>
+              </strong>
+            </div>
             <div class="tok-r"><span>REST Fallback</span><strong class="tx-g">NSE Public → nsepython</strong></div>
             <div class="tok-r"><span>Bhavcopy EOD</span><strong class="tx-g">Jun 8–12 cached ✓</strong></div>
             <div class="tok-r"><span>Last GainRank</span><strong>{{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : '--' }}</strong></div>
