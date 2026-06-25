@@ -1,4 +1,4 @@
-﻿"""
+"""
 System3 Ultra Dashboard Backend
 FastAPI service for real-time system monitoring and control
 """
@@ -17,6 +17,46 @@ from typing import Any, Dict, List, Optional
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
+
+# Timeouts for sync broker/scanner work — must not block the asyncio event loop.
+_BROKER_IO_TIMEOUT_S = 8.0
+_SCANNER_IO_TIMEOUT_S = 5.0
+_TRUTH_IO_TIMEOUT_S = 20.0
+
+
+def _market_open_from_state() -> bool:
+    """Use real market-hours truth first; SSOT can be stale after a wedged loop."""
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            open_now, _reason = is_market_open()
+            return bool(open_now)
+        except Exception:
+            pass
+    if SSOT_AVAILABLE and state_store is not None:
+        try:
+            return bool((state_store.get_state().get("market") or {}).get("is_open"))
+        except Exception:
+            pass
+    return False
+
+
+async def _run_blocking(fn, *args, timeout: float = 15.0, **kwargs):
+    """Run sync I/O in a worker thread with a hard timeout."""
+    return await asyncio.wait_for(asyncio.to_thread(fn, *args, **kwargs), timeout=timeout)
+
+
+def _scanner_market_closed_response() -> Dict[str, Any]:
+    return {
+        "status": "market_closed",
+        "market_open": False,
+        "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+        "segments_implemented": 0,
+        "segments_total": 4,
+        "by_segment": {},
+        "market_wide": {"top_ce": None, "top_pe": None},
+        "note": "Live scanner skipped while market is closed",
+    }
+
 
 # CRITICAL: Add project root to Python path FIRST, before any core module imports
 # This allows the backend to import core.brokers.dhan.dhan_readonly and other core modules
@@ -43,6 +83,7 @@ from fastapi import (
     BackgroundTasks,
     FastAPI,
     HTTPException,
+    Request,
     WebSocket,
     WebSocketDisconnect,
 )
@@ -286,6 +327,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# API-key auth, OFF by default. Every route is currently reachable by
+# anyone who finds this URL - that's a real gap - but flipping this on
+# unconditionally would lock out the live frontend the instant it
+# deploys, since the frontend has no way to send a key until it is
+# rebuilt with a matching VITE_API_KEY baked in. Enable deliberately:
+#   1. Set API_KEY=<random-secret> and REQUIRE_API_KEY=true on the
+#      backend (Render dashboard env vars).
+#   2. Set the same value as VITE_API_KEY in the frontend's build env
+#      and rebuild/redeploy the frontend.
+#   3. Only then does this actually enforce - until both sides are
+#      updated, requests proceed exactly as before (fail open, with a
+#      one-time startup warning so the gap is visible in logs).
+_REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
+_API_KEY = os.environ.get("API_KEY", "").strip()
+_API_KEY_EXEMPT_PREFIXES = ("/ui", "/docs", "/openapi.json", "/redoc", "/ws")
+_API_KEY_EXEMPT_EXACT = ("/", "/api/health", "/favicon.ico")
+
+if _REQUIRE_API_KEY and not _API_KEY:
+    print("[security] REQUIRE_API_KEY=true but API_KEY is unset - auth will reject all requests")
+elif not _REQUIRE_API_KEY:
+    print("[security] API key auth is DISABLED (set REQUIRE_API_KEY=true and API_KEY to enable)")
+
+
+@app.middleware("http")
+async def _enforce_api_key(request: Request, call_next):
+    if not _REQUIRE_API_KEY:
+        return await call_next(request)
+    path = request.url.path
+    if path in _API_KEY_EXEMPT_EXACT or path.startswith(_API_KEY_EXEMPT_PREFIXES):
+        return await call_next(request)
+    if request.headers.get("X-API-Key", "") != _API_KEY:
+        return JSONResponse(status_code=401, content={"detail": "Missing or invalid X-API-Key header"})
+    return await call_next(request)
+
 
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
 
@@ -361,7 +436,7 @@ async def get_state():
     if not SSOT_AVAILABLE or state_store is None:
         raise HTTPException(status_code=503, detail="State store not available")
 
-    state = state_store.get_state()
+    state = await asyncio.to_thread(state_store.get_state)
     # Gate: if broker not connected or data not real, force mode to PAPER for UI consistency
     broker_connected = state.get("broker", {}).get("connected", False)
     ds = (state.get("data_source") or "").upper()
@@ -408,6 +483,7 @@ async def get_broker_status():
     """Get broker connection status. Uses Dhan broker (read-only, analyzer mode)."""
     try:
         from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+
         status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=5)
         if SSOT_AVAILABLE and state_store is not None:
             state_store.update_state({"broker": status})
@@ -429,6 +505,7 @@ async def get_dhan_broker_status():
     """Dhan read-only broker status. Never returns access token. No live trading."""
     try:
         from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
+
         status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=5)
         if SSOT_AVAILABLE and state_store is not None:
             state_store.update_state({"broker": status})
@@ -462,7 +539,10 @@ async def get_broker_truth():
         from dashboard.backend.broker_truth_validator import build_broker_truth_report
     except ImportError:
         from broker_truth_validator import build_broker_truth_report
-    return build_broker_truth_report()
+    try:
+        return await _run_blocking(build_broker_truth_report, timeout=_TRUTH_IO_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        return {"success": False, "error": "broker_truth_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
 
 
 @app.get("/api/broker/holdings")
@@ -475,7 +555,7 @@ async def get_broker_holdings():
         )
         from core.brokers.dhan.dhan_readonly import get_holdings
 
-        result = get_holdings()
+        result = await _run_blocking(get_holdings, timeout=_BROKER_IO_TIMEOUT_S)
         raw_rows = normalize_holdings_payload(result.get("data"))
         normalized = [normalize_holding_row(r) for r in raw_rows]
         return {
@@ -508,7 +588,7 @@ async def get_broker_funds():
         )
         from core.brokers.dhan.dhan_readonly import get_funds
 
-        result = get_funds()
+        result = await _run_blocking(get_funds, timeout=_BROKER_IO_TIMEOUT_S)
         raw = normalize_funds_payload(result.get("data"))
         normalized = normalize_funds_row(raw)
         return {
@@ -540,7 +620,7 @@ async def get_broker_positions_live():
         )
         from core.brokers.dhan.dhan_readonly import get_positions
 
-        result = get_positions()
+        result = await _run_blocking(get_positions, timeout=_BROKER_IO_TIMEOUT_S)
         raw_rows = normalize_positions_payload(result.get("data"))
         normalized = [normalize_position_row(r) for r in raw_rows]
         return {
@@ -570,7 +650,10 @@ async def get_unified_portfolio():
         from dashboard.backend.portfolio_truth_service import build_unified_portfolio
     except ImportError:
         from portfolio_truth_service import build_unified_portfolio
-    return build_unified_portfolio(OUTPUTS_DIR)
+    try:
+        return await _run_blocking(build_unified_portfolio, OUTPUTS_DIR, timeout=_TRUTH_IO_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        return {"error": "portfolio_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
 
 
 @app.get("/api/trader/requirements")
@@ -786,7 +869,7 @@ async def get_gain_rank(refresh: bool = False):
             try:
                 from scripts.daily_gain_rank_and_validate import run_ranking
 
-                run_ranking(top_n=5)
+                await _run_blocking(run_ranking, top_n=5, timeout=120.0)
                 history = json.loads(GAIN_RANK_FILE.read_text())
                 if not isinstance(history, list):
                     history = []
@@ -822,14 +905,28 @@ async def get_top_contract_gainers(top_n: int = 5):
     Live market scanner: highest % gain CE and PE per index segment.
     Segments: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.
     """
+    if not _market_open_from_state():
+        return _scanner_market_closed_response()
     try:
         from dashboard.backend.contract_gain_scanner import (
             build_top_contract_gainers_report,
         )
 
-        report = build_top_contract_gainers_report(top_n=min(max(top_n, 1), 20))
+        report = await _run_blocking(
+            build_top_contract_gainers_report,
+            min(max(top_n, 1), 20),
+            timeout=_SCANNER_IO_TIMEOUT_S,
+        )
         report["status"] = "ok" if report.get("segments_implemented", 0) > 0 else "no_data"
         return report
+    except asyncio.TimeoutError:
+        return {
+            "status": "timeout",
+            "error": f"scanner exceeded {_SCANNER_IO_TIMEOUT_S}s",
+            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "segments_implemented": 0,
+            "by_segment": {},
+        }
     except Exception as e:
         return {
             "status": "error",
@@ -843,10 +940,26 @@ async def get_top_contract_gainers(top_n: int = 5):
 @app.get("/api/scanner/equity_options")
 async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = False):
     """Equity (stock) F&O universe + OPTSTK top CE/PE from bhavcopy."""
+    if not _market_open_from_state():
+        return {
+            "status": "market_closed",
+            "market_open": False,
+            "scanner": {"data_available": False, "market_top_ce": None, "market_top_pe": None},
+            "segments": {"equity_options": {"implemented": True, "live_chain_per_stock": False}},
+            "implementation_gaps": ["MARKET_CLOSED", "LIVE_PER_STOCK_DHAN_CHAIN"],
+            "note": "Equity option scanner skipped while market is closed",
+        }
     try:
         from dashboard.backend.equity_option_scanner import build_equity_options_report
 
-        return build_equity_options_report(top_n=min(max(top_n, 1), 50), priority_only=priority_only)
+        return await _run_blocking(
+            build_equity_options_report,
+            min(max(top_n, 1), 50),
+            priority_only,
+            timeout=_SCANNER_IO_TIMEOUT_S,
+        )
+    except asyncio.TimeoutError:
+        return {"status": "timeout", "error": f"equity_scanner exceeded {_SCANNER_IO_TIMEOUT_S}s"}
     except Exception as e:
         return {"status": "error", "error": str(e)[:300]}
 
@@ -1420,23 +1533,28 @@ async def get_health():
             mode = "PAPER"
             broker_name = "unknown"
 
-            # Check Dhan first — takes priority when DHAN credentials are present
-            _dhan_cid = os.getenv("DHAN_CLIENT_ID", "").strip()
-            _dhan_tok = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
-            if _dhan_cid and _dhan_tok:
-                try:
-                    from core.brokers.dhan.dhan_readonly import (
-                        get_status as _dhan_get_status,
+            # Health is polled frequently by dashboard/verifiers; use cached SSOT truth.
+            # Live Dhan probing belongs to /api/broker/status so a slow broker call cannot
+            # block /api/health and cascade into /api/state timeouts.
+            try:
+                if SSOT_AVAILABLE and state_store is not None:
+                    cached_broker = state_store.get_state().get("broker") or {}
+                    broker_connected = bool(cached_broker.get("connected"))
+                    broker_status_str = cached_broker.get("status") or (
+                        "connected" if broker_connected else "disconnected"
                     )
-
-                    _dhan_result = _dhan_get_status()
-                    if _dhan_result.get("connected"):
-                        broker_connected = True
-                        broker_status_str = "connected"
+                    broker_name = cached_broker.get("name") or "dhan"
+                else:
+                    health_file = OUTPUTS_DIR / "health.json"
+                    if health_file.exists():
+                        health_cached = json.loads(health_file.read_text())
+                        broker_connected = bool(
+                            health_cached.get("is_connected") or health_cached.get("broker_status") == "connected"
+                        )
+                        broker_status_str = "connected" if broker_connected else "disconnected"
                         broker_name = "dhan"
-                        mode = "PAPER"
-                except Exception:
-                    pass
+            except Exception:
+                pass
 
             # Dhan is the only broker — no AngelOne fallback
 
@@ -1824,6 +1942,18 @@ async def get_chain(underlying: str):
                     "message": f"Using synthetic data (market closed) - Error: {str(e)}",
                 }
 
+        if not market_is_open:
+            return {
+                "underlying": underlying.upper(),
+                "contracts": [],
+                "spot": 0,
+                "pcr": 1.0,
+                "total_contracts": 0,
+                "data_source": "closed",
+                "status": "MARKET_CLOSED",
+                "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+            }
+
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
             broker_connected = False
@@ -2206,6 +2336,15 @@ async def get_top_signal():
             signal["data_source"] = "synthetic"
             return signal
 
+        if not market_is_open:
+            return {
+                "action": "NO_TRADE",
+                "status": "MARKET_CLOSED",
+                "reason": "Market closed - live signal unavailable",
+                "data_source": "closed",
+                "confidence": 0,
+            }
+
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
             broker_connected = False
@@ -2384,17 +2523,8 @@ async def get_pnl():
                 except Exception:
                     pass
 
-        try:
-            from core.brokers.dhan.nse_option_symbol import enrich_option_rows
-
-            session_expiry = None
-            if not processed_history:
-                pass
-            else:
-                session_expiry = processed_history[0].get("expiry_date")
-            processed_history = enrich_option_rows(processed_history, default_expiry=session_expiry)
-        except Exception:
-            pass
+        # Keep /api/pnl fast for dashboard health checks. Symbol enrichment loads the
+        # instrument master and can exceed the verifier timeout when no live PnL file exists.
 
         return {
             "history": processed_history,
@@ -2447,6 +2577,15 @@ async def get_performance():
         if not market_is_open and not REAL_ONLY and SYNTHETIC_DATA_AVAILABLE:
             synthetic_perf = generate_synthetic_perf_data()
             return {"status": "OK", "current": synthetic_perf, "history": [], "data_source": "synthetic"}
+
+        if not market_is_open:
+            return {
+                "status": "MARKET_CLOSED",
+                "current": {},
+                "history": [],
+                "data_source": "closed",
+                "message": "Market closed - live performance data unavailable",
+            }
 
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
