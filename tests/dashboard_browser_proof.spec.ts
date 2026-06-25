@@ -2,24 +2,20 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Already configurable via DASHBOARD_URL - not hardcoded. Falls back to
-// production only because no staging environment exists yet (tracked
-// separately). Once one does: DASHBOARD_URL=https://<staging-host>/ui
-// npx playwright test, or set it in CI as a job env var - no code
-// change needed here when that happens.
 const DASHBOARD_URL = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com/ui';
 const REPORT_DIR = path.join('reports', 'latest', 'dashboard_browser_proof');
 const SCREENSHOT_DIR = path.join(REPORT_DIR, 'screenshots');
 
 type FieldResult = {
   field: string;
-  status: 'PASS' | 'NOT_PROVEN' | 'MISSING_FIELD' | 'UI_NOT_VISIBLE' | 'PASS_WITH_WARNINGS';
+  status: 'PASS' | 'NOT_PROVEN' | 'MISSING_FIELD' | 'UI_NOT_VISIBLE' | 'PASS_WITH_WARNINGS' | 'FAIL';
   detail: string;
 };
 
 const fieldResults: FieldResult[] = [];
 const consoleErrors: string[] = [];
 let loadResult: 'PASS' | 'DASHBOARD_LOAD_FAILED' | 'PASS_WITH_WARNINGS' = 'PASS';
+let rawTemplateDetected = false;
 
 function ensureDirs() {
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
@@ -33,6 +29,11 @@ function checkField(pageText: string, field: string, patterns: RegExp[]): FieldR
     }
   }
   return { field, status: 'UI_NOT_VISIBLE', detail: 'Not found in rendered page text' };
+}
+
+function findRawTemplateTokens(pageText: string): string[] {
+  const matches = pageText.match(/\{\{[^}]+\}\}/g) || [];
+  return Array.from(new Set(matches)).slice(0, 25);
 }
 
 test.beforeAll(() => {
@@ -88,6 +89,22 @@ for (const viewport of [
       loadResult = 'PASS_WITH_WARNINGS';
     }
 
+    const rawTokens = findRawTemplateTokens(bodyText);
+    if (rawTokens.length > 0) {
+      rawTemplateDetected = true;
+      fieldResults.push({
+        field: `raw_vue_template_tokens_${viewport.name}`,
+        status: 'FAIL',
+        detail: `Vue did not mount or app JS failed. Visible tokens: ${rawTokens.join(' | ')}`,
+      });
+    } else {
+      fieldResults.push({
+        field: `raw_vue_template_tokens_${viewport.name}`,
+        status: 'PASS',
+        detail: 'No visible raw {{ ... }} Vue template tokens',
+      });
+    }
+
     const checks: Array<[string, RegExp[]]> = [
       ['analyzer_paper_mode', [/ANALYZER\s*\/\s*PAPER/i, /PAPER ONLY/i, /PAPER MODE/i]],
       ['live_trading_disabled', [/LIVE DISABLED/i, /LIVE TRADING[\s\S]{0,20}DISABLED/i, /LIVE TRADING KILL SWITCH/i, /BLOCKED/i]],
@@ -126,7 +143,7 @@ test.afterAll(() => {
   const fieldsMissing = fieldResults.filter((f) => f.status !== 'PASS');
 
   let verdict: string = 'PASS';
-  if (loadResult === 'DASHBOARD_LOAD_FAILED') {
+  if (loadResult === 'DASHBOARD_LOAD_FAILED' || rawTemplateDetected) {
     verdict = 'FAIL';
   } else if (fieldsMissing.length > 0 || consoleErrors.length > 0) {
     verdict = 'PASS_WITH_WARNINGS';
@@ -140,6 +157,7 @@ test.afterAll(() => {
       : [],
     fields_found: fieldsFound,
     fields_missing: fieldsMissing,
+    raw_template_detected: rawTemplateDetected,
     load_result: loadResult,
     console_errors: consoleErrors,
     final_verdict: verdict,
@@ -155,6 +173,7 @@ test.afterAll(() => {
     `URL: ${DASHBOARD_URL}`,
     '',
     `Load result: **${loadResult}**`,
+    `Raw Vue template detected: **${rawTemplateDetected ? 'YES' : 'NO'}**`,
     `Final verdict: **${verdict}**`,
     '',
     '## Viewports',
@@ -163,7 +182,7 @@ test.afterAll(() => {
     '## Screenshots',
     ...summary.screenshots_created.map((s) => `- screenshots/${s}`),
     '',
-    '## Fields missing / not proven',
+    '## Fields missing / not proven / failed',
     ...fieldsMissing.map((f) => `- ${f.field}: ${f.status} — ${f.detail}`),
     '',
     '## Console errors',
