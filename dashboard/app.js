@@ -377,11 +377,11 @@ const app = createApp({
         // Connection health: if state came back, we're live
         // Mark live if core APIs respond (state, broker, health are most reliable)
         if (st || br || hl) { connHealth.value = 'live'; failCount.value = 0; }
-        else { failCount.value++; if (failCount.value >= 4) connHealth.value = 'reconnecting';  // grace: 2 full poll cycles }
+        else { failCount.value++; if (failCount.value >= 4) connHealth.value = 'reconnecting'; }
       } catch(e) {
         console.warn('[dashboard] poll error (will retry next cycle):', e?.message);
         failCount.value++;
-        if (failCount.value >= 4) connHealth.value = 'reconnecting';  // grace: 2 full poll cycles
+        if (failCount.value >= 4) connHealth.value = 'reconnecting';
       } finally {
         _polling = false;
       }
