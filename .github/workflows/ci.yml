@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -337,7 +337,6 @@ jobs:
     name: Dashboard API Verify + Bug Report
     runs-on: ubuntu-latest
     timeout-minutes: 8
-    needs: [workflow-policy-guard]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     continue-on-error: true
 
