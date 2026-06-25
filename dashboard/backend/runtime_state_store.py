@@ -145,18 +145,26 @@ class RuntimeStateStore:
         """Get current state version"""
         return self._state_version
 
+    def _atomic_write_json(self, path: Path, data: Any) -> None:
+        """Write-temp-then-rename so a crash mid-write can never leave a
+        truncated/corrupt file at `path` - os.replace is atomic on both
+        POSIX and Windows (unlike a direct open(path, "w") write, which a
+        crash partway through leaves as a partial, unparseable file)."""
+        tmp_path = path.with_suffix(path.suffix + f".tmp{os.getpid()}")
+        with open(tmp_path, "w") as f:
+            json.dump(data, f, indent=2)
+        os.replace(tmp_path, path)
+
     def _save_state(self):
         """Save state to file for persistence"""
         try:
             state_file = self.outputs_dir / "runtime_state.json"
-            with open(state_file, "w") as f:
-                json.dump(self._state, f, indent=2)
+            self._atomic_write_json(state_file, self._state)
 
             snapshots_dir = self.outputs_dir / "state_snapshots"
             snapshots_dir.mkdir(exist_ok=True)
             snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-            with open(snapshot_file, "w") as f:
-                json.dump(self._state, f, indent=2)
+            self._atomic_write_json(snapshot_file, self._state)
 
             snapshot_files = sorted(
                 snapshots_dir.glob("state_*.json"),
@@ -172,17 +180,32 @@ class RuntimeStateStore:
             print(f"Warning: Failed to save state: {e}")
 
     def load_state(self):
-        """Load state from file if exists"""
+        """Load state from file if exists. On a corrupt/unparseable file,
+        this previously printed a one-line warning and silently kept
+        running on the freshly-initialized default state - indistinguishable
+        in logs from a normal first boot, and easy to miss. Now renames the
+        corrupt file aside for forensics and prints a loud, unmissable
+        marker so this shows up in any log-based alerting."""
+        state_file = self.outputs_dir / "runtime_state.json"
+        if not state_file.exists():
+            return
         try:
-            state_file = self.outputs_dir / "runtime_state.json"
-            if state_file.exists():
-                with open(state_file, "r") as f:
-                    loaded = json.load(f)
-                    with self._lock:
-                        self._state = loaded
-                        self._state_version = loaded.get("state_version", 0)
+            with open(state_file, "r") as f:
+                loaded = json.load(f)
+            with self._lock:
+                self._state = loaded
+                self._state_version = loaded.get("state_version", 0)
         except Exception as e:
-            print(f"Warning: Failed to load state: {e}")
+            quarantine_path = state_file.with_suffix(f".corrupt.{int(time.time())}.json")
+            try:
+                os.replace(state_file, quarantine_path)
+            except OSError:
+                quarantine_path = None
+            print(
+                f"[CRITICAL][state_store] runtime_state.json was corrupt/unparseable ({e}). "
+                f"Falling back to default state - this is data loss, not a normal startup. "
+                f"Corrupt file preserved at: {quarantine_path}"
+            )
 
     def sync_from_files(self):
         """

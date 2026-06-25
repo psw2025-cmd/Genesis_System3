@@ -71,6 +71,15 @@ def _compute_net_pnl(entry: float, exit_p: float, symbol: str) -> float:
     return round(gross - (brokerage + stt + exc + gst + slip), 2)
 
 
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write-temp-then-rename so a crash mid-write (this runs on a 60s
+    background loop) can never leave positions_live.json/pnl_live.json
+    truncated or half-written for the dashboard to read."""
+    tmp_path = path.with_suffix(path.suffix + f".tmp{os.getpid()}")
+    tmp_path.write_text(text)
+    os.replace(tmp_path, path)
+
+
 class CloudPaperEngine:
     """Lightweight in-process paper trading. State persisted to JSON/CSV."""
 
@@ -100,7 +109,8 @@ class CloudPaperEngine:
 
     def _save_state(self):
         try:
-            self.state_file.write_text(
+            _atomic_write_text(
+                self.state_file,
                 json.dumps(
                     {
                         "open_positions": self.open_positions,
@@ -109,7 +119,7 @@ class CloudPaperEngine:
                         "session_date": self.session_date,
                     },
                     indent=2,
-                )
+                ),
             )
         except Exception:
             pass
@@ -328,10 +338,10 @@ class CloudPaperEngine:
             "live_trading_enabled": False,
         }
         try:
-            self.positions_file.write_text(json.dumps(positions_out, indent=2))
-            self.pnl_file.write_text(json.dumps(pnl_out, indent=2))
+            _atomic_write_text(self.positions_file, json.dumps(positions_out, indent=2))
+            _atomic_write_text(self.pnl_file, json.dumps(pnl_out, indent=2))
             # paper_pnl_summary.json — get_pnl reads this as the summary source
-            (self.out / "paper_pnl_summary.json").write_text(json.dumps(summary_block, indent=2))
+            _atomic_write_text(self.out / "paper_pnl_summary.json", json.dumps(summary_block, indent=2))
         except Exception:
             pass
 
