@@ -332,3 +332,49 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
+
+  dashboard-api-verify:
+    name: Dashboard API Verify + Bug Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    needs: [workflow-policy-guard]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Wake Render
+        run: |
+          for i in {1..8}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
+              "https://genesis-system3-backend.onrender.com/health" 2>/dev/null || echo 000)
+            echo "Attempt $i: $STATUS"
+            [ "$STATUS" = "200" ] && echo "Render up!" && break
+            sleep 20
+          done
+
+      - name: Run API Verify
+        run: python scripts/dashboard_api_verify.py
+        env:
+          DASHBOARD_URL: https://genesis-system3-backend.onrender.com
+        continue-on-error: true
+
+      - name: Commit Results to Repo
+        if: always()
+        run: |
+          git config user.email "ci@genesis-system3"
+          git config user.name "Genesis CI"
+          git pull --rebase origin main 2>/dev/null || true
+          git add reports/latest/dashboard_ui_proof/latest.json 2>/dev/null || true
+          git diff --staged --quiet || git commit -m "ci: dashboard API verify results [skip ci]"
+          git push origin main 2>/dev/null || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
