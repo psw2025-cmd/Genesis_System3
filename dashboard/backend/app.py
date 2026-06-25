@@ -637,6 +637,73 @@ async def get_broker_funds():
         }
 
 
+@app.get("/api/broker/diagnose")
+async def get_broker_diagnose():
+    """Diagnose exactly WHY broker is disconnected. Key for Render setup."""
+    import os as _os
+    issues = []
+    hints  = []
+    env_checks = {
+        "DHAN_CLIENT_ID":      _os.environ.get("DHAN_CLIENT_ID","").strip(),
+        "DHAN_ACCESS_TOKEN":   _os.environ.get("DHAN_ACCESS_TOKEN","").strip(),
+        "DHAN_PIN":            _os.environ.get("DHAN_PIN","").strip(),
+        "DHAN_TOTP_SECRET":    _os.environ.get("DHAN_TOTP_SECRET","").strip(),
+    }
+    for key, val in env_checks.items():
+        if not val:
+            issues.append(f"MISSING: {key} env var not set in Render")
+            hints.append(f"Set {key} in Render → Environment → Add Env Var")
+    
+    # Check token validity
+    token = env_checks["DHAN_ACCESS_TOKEN"]
+    token_status = "not_set"
+    if token:
+        if len(token) < 20:
+            issues.append("DHAN_ACCESS_TOKEN too short — likely invalid")
+            token_status = "too_short"
+        elif token.startswith("Bearer "):
+            issues.append("DHAN_ACCESS_TOKEN has 'Bearer ' prefix — remove it")
+            token_status = "has_bearer_prefix"
+        else:
+            token_status = "present"
+
+    client_id = env_checks["DHAN_CLIENT_ID"]
+    
+    # Try a real Dhan API call if credentials present
+    api_test = None
+    if token and client_id:
+        try:
+            from core.brokers.dhan.dhan_readonly import get_funds
+            result = get_funds()
+            api_test = {"success": result.get("success"), "data": result.get("data")}
+            if result.get("success"):
+                issues.clear()
+                hints = ["Token valid and working!"]
+        except Exception as e:
+            api_test = {"success": False, "error": str(e)[:100]}
+            issues.append(f"Dhan API call failed: {str(e)[:80]}")
+
+    return {
+        "env_vars": {
+            "DHAN_CLIENT_ID_present":    bool(client_id),
+            "DHAN_CLIENT_ID_preview":    client_id[-4:] if client_id else "NOT_SET",
+            "DHAN_ACCESS_TOKEN_present": bool(token),
+            "DHAN_ACCESS_TOKEN_status":  token_status,
+            "DHAN_ACCESS_TOKEN_length":  len(token) if token else 0,
+            "DHAN_PIN_present":          bool(env_checks["DHAN_PIN"]),
+            "DHAN_TOTP_present":         bool(env_checks["DHAN_TOTP_SECRET"]),
+        },
+        "issues": issues,
+        "hints":  hints,
+        "api_probe": api_test,
+        "fix_action": (
+            "Update DHAN_ACCESS_TOKEN in Render Environment Variables. "
+            "Get fresh token from https://login.dhan.co → Profile → API. "
+            "Token expires daily — use DHAN_PIN + DHAN_TOTP_SECRET for auto-refresh."
+            if issues else "No issues found"
+        ),
+    }
+
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
     _hit = _cache_get("broker_positions", _TTL_BROKER)
