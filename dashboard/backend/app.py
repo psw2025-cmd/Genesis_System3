@@ -639,6 +639,9 @@ async def get_broker_funds():
 
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
+    _hit = _cache_get("broker_positions", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
     """Dhan open positions — read-only. No orders."""
     try:
         from core.brokers.dhan.dhan_payload_normalizer import (
@@ -4809,6 +4812,9 @@ async def get_learning_insights():
 
 @app.get("/api/learning/status")
 async def get_learning_status():
+    _hit = _cache_get("learning_status", 60.0)
+    if _hit is not None:
+        return _hit
     """Get learning system status - Always returns HTTP 200"""
     try:
         learning_log = ROOT_DIR / "storage" / "learning" / "continuous_learning_log.json"
