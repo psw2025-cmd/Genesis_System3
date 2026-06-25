@@ -375,12 +375,13 @@ const app = createApp({
       if(ag) autoGatesData.value=ag;
       const n=new Date();lastSync.value=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
         // Connection health: if state came back, we're live
-        if (st) { connHealth.value = 'live'; failCount.value = 0; }
-        else { failCount.value++; if (failCount.value >= 2) connHealth.value = 'reconnecting'; }
+        // Mark live if core APIs respond (state, broker, health are most reliable)
+        if (st || br || hl) { connHealth.value = 'live'; failCount.value = 0; }
+        else { failCount.value++; if (failCount.value >= 4) connHealth.value = 'reconnecting';  // grace: 2 full poll cycles }
       } catch(e) {
         console.warn('[dashboard] poll error (will retry next cycle):', e?.message);
         failCount.value++;
-        if (failCount.value >= 2) connHealth.value = 'reconnecting';
+        if (failCount.value >= 4) connHealth.value = 'reconnecting';  // grace: 2 full poll cycles
       } finally {
         _polling = false;
       }
