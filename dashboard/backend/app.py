@@ -2671,20 +2671,12 @@ async def get_pnl():
                 processed_item["timestamp"] = datetime.now(IST).isoformat()
             processed_history.append(processed_item)
 
+        # ── REMOVED Feb-2026 fixture fallback ──────────────────────────────────
+        # Previously: loaded paper_closed_trades_feb2026.json when no real trades.
+        # This caused FAKE Feb-1 data to appear in the Paper tab as if real trades.
+        # Fix: honest empty state — no trades until cloud paper engine generates them.
         if not processed_history:
-            for session_file in [
-                ROOT_DIR / "tests" / "fixtures" / "paper_closed_trades_feb2026.json",
-                ROOT_DIR / "storage" / "paper" / "closed_trades_feb2026.json",
-            ]:
-                if not session_file.exists():
-                    continue
-                try:
-                    session = json.loads(session_file.read_text(encoding="utf-8"))
-                    processed_history = session.get("trades", [])
-                    if summary and not summary.get("data_source"):
-                        summary["data_source"] = session.get("data_source", "paper_simulation")
-                    if processed_history:
-                        break
+            pass  # Honest: no historical trades yet — engine will populate during market hours
                 except Exception:
                     pass
 
