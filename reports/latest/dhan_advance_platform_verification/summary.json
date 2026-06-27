@@ -1,7 +1,12 @@
 {
-  "authority": "Official DhanHQ API v2 documentation",
+  "authority": "Official DhanHQ API v2 documentation for current System3 integration; Dhan Cloud is separate future evaluation.",
   "broker_mode": "ANALYZER",
   "dhan_advance_platform_officially_verified": false,
+  "dhan_advance_platform_status": "NOT_OFFICIAL_EXACT_NAME",
+  "dhan_cloud_officially_verified": true,
+  "dhan_cloud_strategy_templates_scope": "strategy-code starting templates, not frontend dashboard templates",
+  "dhan_cloud_strategy_templates_verified": true,
+  "dhanhq_api_v2_officially_verified": true,
   "endpoint_results": [
     {
       "endpoint": "/api/health",
@@ -92,6 +97,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/paper"
     }
   ],
+  "evaluate_dhan_cloud_later": true,
   "files_generated": [
     "summary.md",
     "summary.json",
@@ -100,19 +106,21 @@
     "system3_mapping_matrix.csv",
     "recommendation.md"
   ],
-  "generated_utc": "2026-06-27T21:07:15.551366Z",
+  "frontend_header": "react",
+  "generated_utc": "2026-06-27T21:34:40.931935Z",
   "live_trading_enabled": false,
   "market_closed_verdict": "MARKET_CLOSED_EXPECTED",
   "mode": "PAPER",
-  "official_claim_percentage": 66.67,
+  "official_claim_percentage": 88.89,
+  "online_verification_reachable": true,
   "order_placement_allowed": false,
+  "react_typescript_dashboard_templates_verified": false,
   "recommend_migration": false,
   "safety_failures": [],
   "safety_verdict": "PASS_ANALYZER_PAPER_ONLY",
+  "strategy_hosting_under_dhan_cloud_officially_verified": true,
   "system3_current_match_percentage": 100.0,
   "unsupported_claims": [
-    "Frontend dashboard templates or React/TypeScript templates",
-    "Dhan Cloud / hosted strategy platform",
-    "Strategy hosting"
+    "Frontend dashboard templates or React/TypeScript templates"
   ]
 }

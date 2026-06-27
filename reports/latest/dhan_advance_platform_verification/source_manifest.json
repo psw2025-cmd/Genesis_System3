@@ -2,126 +2,128 @@
   "exact_term": "Dhan Advance Platform",
   "exact_term_officially_documented": false,
   "excluded_sources": [
-    "LinkedIn/marketing text without official Dhan docs"
+    "LinkedIn/marketing text without official Dhan docs",
+    "non-Dhan third-party product listings"
   ],
-  "generated_utc": "2026-06-27T21:07:15.551366Z",
+  "generated_utc": "2026-06-27T21:34:40.931935Z",
+  "local_dhan_docs_export": "C:\\System3\\Genesis_System3\\dhan-api-docs.md",
+  "local_dhan_docs_export_exists": true,
+  "local_export_evidence": {
+    "contains_dhan_cloud": true,
+    "contains_exact_dhan_advance_platform": false,
+    "contains_pine_script_to_python": true,
+    "contains_react_typescript_dashboard_templates": false,
+    "contains_security_scanner": true,
+    "contains_strategy_hosting_phrase": true,
+    "contains_strategy_template_evidence": true
+  },
   "official_sources": [
     {
-      "evidence": "DhanHQ API v2 documents REST-like trading/data APIs for trading services and strategies.",
+      "evidence": "Official DhanHQ documentation root for API, Cloud, MCP, and skills documentation.",
+      "id": "dhanhq_docs_home",
+      "priority": 1,
+      "supports": [
+        "DhanHQ docs",
+        "Dhan Cloud",
+        "Dhan MCP",
+        "DhanHQ Agent Skills"
+      ],
+      "type": "official_live_dhan_docs",
+      "url": "https://docs.dhanhq.co/"
+    },
+    {
+      "evidence": "Official Dhan Cloud docs describe deploying, running, scheduling, and scaling Python trading strategies on Dhan Cloud.",
+      "id": "dhan_cloud_docs",
+      "priority": 1,
+      "supports": [
+        "Dhan Cloud",
+        "strategy hosting",
+        "strategy-code templates",
+        "Pine Script to Python",
+        "dependencies",
+        "variables",
+        "logs",
+        "compute tiers",
+        "security scanner",
+        "deployment workflow",
+        "low-latency infrastructure"
+      ],
+      "type": "official_live_dhan_docs",
+      "url": "https://docs.dhanhq.co/cloud/"
+    },
+    {
+      "evidence": "Official DhanHQ API v2 documentation for trading and data APIs.",
       "id": "dhanhq_api_v2_intro",
       "priority": 1,
       "supports": [
         "DhanHQ API v2",
-        "REST APIs",
-        "trading strategies",
+        "orders",
         "portfolio",
-        "live market data"
+        "funds",
+        "market quote",
+        "option chain",
+        "historical data",
+        "live feeds",
+        "instrument master",
+        "trader controls"
       ],
-      "type": "official_dhanhq_docs",
+      "type": "official_live_dhan_docs",
       "url": "https://dhanhq.co/docs/v2/"
     },
     {
-      "evidence": "Official Orders page documents place/modify/cancel plus read-only order/trade book endpoints and static IP whitelisting requirement for write APIs.",
-      "id": "dhanhq_orders",
+      "evidence": "Local full Dhan docs export used as fallback evidence if live documentation is not reachable.",
+      "id": "local_dhan_docs_export",
       "priority": 1,
       "supports": [
-        "orders",
-        "order book",
-        "trades",
-        "static IP whitelisting"
+        "DhanHQ API v2",
+        "Dhan Cloud",
+        "strategy hosting",
+        "strategy-code templates",
+        "guardrails"
       ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/orders/"
-    },
-    {
-      "evidence": "Official Portfolio and Positions page documents holdings and positions APIs.",
-      "id": "dhanhq_portfolio",
-      "priority": 1,
-      "supports": [
-        "holdings",
-        "positions",
-        "portfolio"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/portfolio/"
-    },
-    {
-      "evidence": "Official Funds & Margin page documents margin calculator and fund limit APIs.",
-      "id": "dhanhq_funds",
-      "priority": 1,
-      "supports": [
-        "funds",
-        "margin",
-        "fund limit"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/funds/"
-    },
-    {
-      "evidence": "Official Historical Data page is listed under DhanHQ API v2 Data APIs.",
-      "id": "dhanhq_historical",
-      "priority": 1,
-      "supports": [
-        "historical data"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/historical-data/"
-    },
-    {
-      "evidence": "Official Option Chain page documents real-time option chain and expiry list APIs.",
-      "id": "dhanhq_option_chain",
-      "priority": 1,
-      "supports": [
-        "option chain",
-        "expiry list",
-        "OI",
-        "greeks",
-        "bid ask"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/option-chain/"
-    },
-    {
-      "evidence": "Official Live Market Feed page documents WebSocket market feeds and feed speed characteristics.",
-      "id": "dhanhq_live_market_feed",
-      "priority": 1,
-      "supports": [
-        "WebSocket feeds",
-        "real-time market data",
-        "low-latency feed"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/live-market-feed/"
-    },
-    {
-      "evidence": "Official Instrument List page documents compact/detailed CSV masters and segmentwise instrument fetch.",
-      "id": "dhanhq_instruments",
-      "priority": 1,
-      "supports": [
-        "instrument master",
-        "security id",
-        "CSV master"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/instruments/"
-    },
-    {
-      "evidence": "Official Trader's Control page documents kill switch and P&L based exit APIs.",
-      "id": "dhanhq_traders_control",
-      "priority": 1,
-      "supports": [
-        "kill switch",
-        "P&L based exit",
-        "risk controls",
-        "compliance guardrails"
-      ],
-      "type": "official_dhanhq_docs",
-      "url": "https://dhanhq.co/docs/v2/traders-control/"
+      "type": "local_official_docs_export",
+      "url": "C:\\System3\\Genesis_System3\\dhan-api-docs.md"
     }
   ],
+  "online_sources_checked": [
+    {
+      "bytes": 33796,
+      "contains_dhan_cloud": true,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html",
+      "error": null,
+      "reachable": true,
+      "sha256": "82e5cb470ad448651a5198f2385a6f9bbca437cdce9cf5e215ae0904d09e9516",
+      "status": 200,
+      "url": "https://docs.dhanhq.co/"
+    },
+    {
+      "bytes": 33796,
+      "contains_dhan_cloud": true,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html",
+      "error": null,
+      "reachable": true,
+      "sha256": "82e5cb470ad448651a5198f2385a6f9bbca437cdce9cf5e215ae0904d09e9516",
+      "status": 200,
+      "url": "https://docs.dhanhq.co/cloud/"
+    },
+    {
+      "bytes": 28904,
+      "contains_dhan_cloud": false,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html; charset=utf-8",
+      "error": null,
+      "reachable": true,
+      "sha256": "d777e13931eef180b47f0035492c2232563347b9f4efe69d00b4999f15049f82",
+      "status": 200,
+      "url": "https://dhanhq.co/docs/v2/"
+    }
+  ],
+  "online_verification_reachable": true,
   "research_priority": [
-    "Official Dhan website / DhanHQ docs only",
-    "DhanHQ Agent Skill repo only as secondary reference",
+    "Official live Dhan docs",
+    "Local Dhan full export",
     "System3 repo and Render proof"
   ],
   "secondary_sources": [],

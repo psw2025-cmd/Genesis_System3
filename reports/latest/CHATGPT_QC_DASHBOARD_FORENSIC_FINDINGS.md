@@ -22,6 +22,22 @@ LIVE_TRADING_READY = false
 
 ---
 
+## Dhan naming and platform truth
+
+```text
+Dhan Advance Platform: NOT_OFFICIAL_EXACT_NAME
+DhanHQ API v2: OFFICIAL_SUPPORTED and current System3 authority
+Dhan Cloud: OFFICIAL_SUPPORTED, separate future evaluation
+Strategy hosting under Dhan Cloud: OFFICIAL_SUPPORTED
+Dhan Cloud strategy templates: OFFICIAL_SUPPORTED as strategy-code starting templates
+React/TypeScript frontend dashboard templates: NOT_VERIFIED
+System3 migration recommendation: DO_NOT_MIGRATE_NOW
+Current System3 mode: Analyzer/Paper only
+```
+
+System3 should continue as a DhanHQ API v2 integration in Analyzer/Paper mode. Dhan Cloud can be evaluated separately later after the Analyzer/Paper proof chain is stable. Do not enable live trading or order writes in this branch.
+---
+
 ## 1. High-Level Findings
 
 | Area | Finding | Severity | Status |
@@ -508,3 +524,4 @@ Scope:
 Document created by ChatGPT as living forensic tracker.
 Next action: create auto snapshot script and QC runtime anomaly proof.
 ```
+

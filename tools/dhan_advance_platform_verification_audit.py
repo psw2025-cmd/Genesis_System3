@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Proof-only audit for Dhan Advance Platform claims.
+"""Proof-only audit for Dhan naming, DhanHQ API v2, and Dhan Cloud.
 
-This script does not place, modify, cancel, or simulate live broker orders. It
-only reads local proof files and performs safe GET checks against System3
-dashboard endpoints when available.
+Safety scope: read-only local proof files plus safe GET requests to System3
+Render endpoints and official Dhan documentation pages. This script never calls
+Dhan write APIs such as order placement, modification, cancellation, eDIS,
+T-PIN, position convert, P&L exit, super orders, or conditional triggers.
 """
 
 from __future__ import annotations
@@ -20,174 +21,149 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT_DIR = ROOT / "reports" / "latest" / "dashboard_auto_snap"
 OUT_DIR = ROOT / "reports" / "latest" / "dhan_advance_platform_verification"
+LOCAL_DHAN_DOCS = Path(r"C:\System3\Genesis_System3\dhan-api-docs.md")
 BACKEND_URL = os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
 DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "https://genesis-system3-backend.onrender.com/ui")
+
+OFFICIAL_DOC_URLS = [
+    "https://docs.dhanhq.co/",
+    "https://docs.dhanhq.co/cloud/",
+    "https://dhanhq.co/docs/v2/",
+]
 
 SECRET_KEY_RE = re.compile(
     r"(token|secret|password|passwd|pin|totp|private[_-]?key|api[_-]?key|access[_-]?token)",
     re.IGNORECASE,
 )
 SECRET_VALUE_RE = re.compile(r"(Bearer\s+[A-Za-z0-9._-]+|eyJ[A-Za-z0-9._-]+|[A-Za-z0-9_-]{32,})")
-
+WRITE_API_RE = re.compile(
+    r"\b(POST|PUT|DELETE)\b\s+https://api\.dhan\.co/v2/"
+    r"(orders|super/orders|alerts/orders|positions/convert|edis|pnlExit|killswitch|margincalculator)",
+    re.IGNORECASE,
+)
 
 OFFICIAL_SOURCES = [
     {
+        "id": "dhanhq_docs_home",
+        "priority": 1,
+        "type": "official_live_dhan_docs",
+        "url": "https://docs.dhanhq.co/",
+        "supports": ["DhanHQ docs", "Dhan Cloud", "Dhan MCP", "DhanHQ Agent Skills"],
+        "evidence": "Official DhanHQ documentation root for API, Cloud, MCP, and skills documentation.",
+    },
+    {
+        "id": "dhan_cloud_docs",
+        "priority": 1,
+        "type": "official_live_dhan_docs",
+        "url": "https://docs.dhanhq.co/cloud/",
+        "supports": [
+            "Dhan Cloud",
+            "strategy hosting",
+            "strategy-code templates",
+            "Pine Script to Python",
+            "dependencies",
+            "variables",
+            "logs",
+            "compute tiers",
+            "security scanner",
+            "deployment workflow",
+            "low-latency infrastructure",
+        ],
+        "evidence": "Official Dhan Cloud docs describe deploying, running, scheduling, and scaling Python trading strategies on Dhan Cloud.",
+    },
+    {
         "id": "dhanhq_api_v2_intro",
         "priority": 1,
-        "type": "official_dhanhq_docs",
+        "type": "official_live_dhan_docs",
         "url": "https://dhanhq.co/docs/v2/",
-        "supports": ["DhanHQ API v2", "REST APIs", "trading strategies", "portfolio", "live market data"],
-        "evidence": "DhanHQ API v2 documents REST-like trading/data APIs for trading services and strategies.",
+        "supports": ["DhanHQ API v2", "orders", "portfolio", "funds", "market quote", "option chain", "historical data", "live feeds", "instrument master", "trader controls"],
+        "evidence": "Official DhanHQ API v2 documentation for trading and data APIs.",
     },
     {
-        "id": "dhanhq_orders",
+        "id": "local_dhan_docs_export",
         "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/orders/",
-        "supports": ["orders", "order book", "trades", "static IP whitelisting"],
-        "evidence": "Official Orders page documents place/modify/cancel plus read-only order/trade book endpoints and static IP whitelisting requirement for write APIs.",
-    },
-    {
-        "id": "dhanhq_portfolio",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/portfolio/",
-        "supports": ["holdings", "positions", "portfolio"],
-        "evidence": "Official Portfolio and Positions page documents holdings and positions APIs.",
-    },
-    {
-        "id": "dhanhq_funds",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/funds/",
-        "supports": ["funds", "margin", "fund limit"],
-        "evidence": "Official Funds & Margin page documents margin calculator and fund limit APIs.",
-    },
-    {
-        "id": "dhanhq_historical",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/historical-data/",
-        "supports": ["historical data"],
-        "evidence": "Official Historical Data page is listed under DhanHQ API v2 Data APIs.",
-    },
-    {
-        "id": "dhanhq_option_chain",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/option-chain/",
-        "supports": ["option chain", "expiry list", "OI", "greeks", "bid ask"],
-        "evidence": "Official Option Chain page documents real-time option chain and expiry list APIs.",
-    },
-    {
-        "id": "dhanhq_live_market_feed",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/live-market-feed/",
-        "supports": ["WebSocket feeds", "real-time market data", "low-latency feed"],
-        "evidence": "Official Live Market Feed page documents WebSocket market feeds and feed speed characteristics.",
-    },
-    {
-        "id": "dhanhq_instruments",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/instruments/",
-        "supports": ["instrument master", "security id", "CSV master"],
-        "evidence": "Official Instrument List page documents compact/detailed CSV masters and segmentwise instrument fetch.",
-    },
-    {
-        "id": "dhanhq_traders_control",
-        "priority": 1,
-        "type": "official_dhanhq_docs",
-        "url": "https://dhanhq.co/docs/v2/traders-control/",
-        "supports": ["kill switch", "P&L based exit", "risk controls", "compliance guardrails"],
-        "evidence": "Official Trader's Control page documents kill switch and P&L based exit APIs.",
+        "type": "local_official_docs_export",
+        "url": str(LOCAL_DHAN_DOCS),
+        "supports": ["DhanHQ API v2", "Dhan Cloud", "strategy hosting", "strategy-code templates", "guardrails"],
+        "evidence": "Local full Dhan docs export used as fallback evidence if live documentation is not reachable.",
     },
 ]
-
 
 CLAIMS = [
     {
         "claim": "Backend APIs for orders, portfolio, funds/margins, historical data, option chains",
-        "source_ids": [
-            "dhanhq_orders",
-            "dhanhq_portfolio",
-            "dhanhq_funds",
-            "dhanhq_historical",
-            "dhanhq_option_chain",
-        ],
-        "system3_current_equivalent": "Render backend exposes broker/status, holdings, funds, positions/live, instruments, underlyings, chain, auto gates, and paper endpoints; local broker adapters map to Dhan read-only surfaces.",
-        "gap": "Official DhanHQ API v2 supports the backend API categories, but System3 must keep order write APIs disabled in Analyzer/Paper mode.",
+        "source_ids": ["dhanhq_api_v2_intro", "local_dhan_docs_export"],
+        "system3_current_equivalent": "Render backend exposes broker/status, holdings, funds, positions/live, instruments, underlyings, chain, auto gates, and paper endpoints.",
+        "gap": "Official DhanHQ API v2 supports the backend API categories; this branch must keep order writes disabled.",
         "severity": "medium",
-        "recommendation": "Continue using official DhanHQ API v2 docs as the authority; do not enable order writes for this proof branch.",
+        "recommendation": "Continue using official DhanHQ API v2 as System3 authority in Analyzer/Paper mode.",
     },
     {
         "claim": "Frontend dashboard templates or React/TypeScript templates",
         "source_ids": [],
         "system3_current_equivalent": "System3 has its own React/TypeScript dashboard snapshot and Render UI proof.",
-        "gap": "No official DhanHQ source found for a Dhan-provided React/TypeScript dashboard template.",
+        "gap": "Dhan Cloud strategy templates are strategy-code starting templates, not verified React/TypeScript frontend dashboard templates.",
         "severity": "high",
-        "recommendation": "Do not claim official Dhan frontend templates unless Dhan publishes documentation or a first-party repository.",
+        "recommendation": "Do not claim first-party Dhan React/TypeScript dashboard templates unless official Dhan docs publish them.",
     },
     {
         "claim": "Dhan Cloud / hosted strategy platform",
-        "source_ids": [],
-        "system3_current_equivalent": "System3 is hosted on Render and runs its own backend/dashboard proof.",
-        "gap": "No official DhanHQ source found for a product named Dhan Cloud or a hosted strategy platform under the exact Dhan Advance Platform claim.",
-        "severity": "high",
-        "recommendation": "Do not recommend migration to Dhan Cloud without official Dhan documentation.",
+        "source_ids": ["dhan_cloud_docs", "local_dhan_docs_export"],
+        "system3_current_equivalent": "System3 is hosted on Render and currently runs custom Analyzer/Paper dashboard proof.",
+        "gap": "Dhan Cloud is official, but it is a separate future evaluation and not proof for the invalid Dhan Advance Platform name.",
+        "severity": "medium",
+        "recommendation": "Evaluate Dhan Cloud separately later only after System3 Analyzer/Paper proof is stable.",
     },
     {
         "claim": "WebSocket feeds",
-        "source_ids": ["dhanhq_live_market_feed"],
+        "source_ids": ["dhanhq_api_v2_intro", "local_dhan_docs_export"],
         "system3_current_equivalent": "System3 state proof reports tick_health.websocket_endpoint=/ws/stream and REST polling source when market is closed.",
-        "gap": "Official DhanHQ WebSocket feed exists; System3 proof did not demonstrate a live Dhan WebSocket tick during market closed.",
+        "gap": "Official DhanHQ WebSocket feed exists; market-closed proof may not show live ticks.",
         "severity": "medium",
-        "recommendation": "Retain REST/paper proof for market-closed audits and separately prove Dhan WebSocket ingestion during market hours.",
+        "recommendation": "Keep market-closed verdict explicit and separately prove WebSocket ingestion during market hours.",
     },
     {
         "claim": "Compliance guardrails",
-        "source_ids": ["dhanhq_orders", "dhanhq_traders_control", "dhanhq_funds", "dhanhq_instruments"],
-        "system3_current_equivalent": "System3 snapshot reports mode=PAPER, broker.mode=ANALYZER, live_trading_enabled=false, order_placement_allowed=false, and risk limits PASS.",
-        "gap": "Official DhanHQ documents several risk controls, rate limits, write-API whitelisting, and instrument flags; System3 also needs local gates to keep order writes disabled.",
+        "source_ids": ["dhanhq_api_v2_intro", "dhan_cloud_docs", "local_dhan_docs_export"],
+        "system3_current_equivalent": "System3 snapshot reports mode=PAPER, broker.mode=ANALYZER, live_trading_enabled=false, and order_placement_allowed=false.",
+        "gap": "Official Dhan docs include risk/control concepts; System3 must still enforce local Analyzer/Paper gates.",
         "severity": "critical",
-        "recommendation": "Keep local Analyzer/Paper gates mandatory and treat any live/order-enabled proof as critical failure.",
+        "recommendation": "Treat mode=LIVE, live_trading_enabled=true, or order_placement_allowed=true as critical failure.",
     },
     {
         "claim": "Strategy hosting",
-        "source_ids": [],
-        "system3_current_equivalent": "System3 has local/Render analyzer and paper components, but no official Dhan-hosted strategy runtime was verified.",
-        "gap": "DhanHQ docs support building trading strategies via APIs, but no official strategy hosting platform was verified.",
-        "severity": "high",
-        "recommendation": "Do not represent API strategy building as official Dhan strategy hosting.",
+        "source_ids": ["dhan_cloud_docs", "local_dhan_docs_export"],
+        "system3_current_equivalent": "System3 currently has local/Render Analyzer/Paper components, not Dhan Cloud deployment.",
+        "gap": "Strategy hosting under Dhan Cloud is official, but separate from System3's current Render deployment.",
+        "severity": "medium",
+        "recommendation": "Do not enable live trading or order writes in this branch; evaluate Dhan Cloud later.",
     },
     {
         "claim": "Low-latency infrastructure",
-        "source_ids": ["dhanhq_api_v2_intro", "dhanhq_live_market_feed"],
-        "system3_current_equivalent": "System3 endpoint matrix records sub-second Render responses in the latest snapshot.",
-        "gap": "Official DhanHQ docs describe fast APIs/WebSocket feed behavior; System3's Render latency is independent infrastructure, not Dhan-hosted infrastructure.",
+        "source_ids": ["dhan_cloud_docs", "dhanhq_api_v2_intro", "local_dhan_docs_export"],
+        "system3_current_equivalent": "System3 endpoint matrix records Render endpoint response status and timing.",
+        "gap": "Dhan Cloud low-latency infrastructure is official; System3 Render latency is independent.",
         "severity": "medium",
-        "recommendation": "State this as official DhanHQ API/feed capability, not proof of Dhan Advance Platform hosting.",
+        "recommendation": "Do not conflate Dhan Cloud infrastructure with current Render-hosted System3 proof.",
     },
     {
         "claim": "Instrument master support",
-        "source_ids": ["dhanhq_instruments"],
+        "source_ids": ["dhanhq_api_v2_intro", "local_dhan_docs_export"],
         "system3_current_equivalent": "System3 exposes /api/instruments/health and /api/underlyings in the dashboard proof.",
-        "gap": "Official instrument master support exists; System3 proof should keep showing master freshness and source status.",
+        "gap": "Official instrument master support exists; System3 should keep proving master freshness.",
         "severity": "low",
         "recommendation": "Continue validating instrument-master health in each dashboard proof.",
     },
     {
         "claim": "Broker dashboard/account sections",
-        "source_ids": ["dhanhq_portfolio", "dhanhq_funds", "dhanhq_traders_control"],
+        "source_ids": ["dhanhq_api_v2_intro", "local_dhan_docs_export"],
         "system3_current_equivalent": "System3 exposes broker status, holdings, funds, live positions, paper positions/PnL, and dashboard UI snapshots.",
-        "gap": "Official DhanHQ sources verify account/portfolio/funds/control APIs, but not a first-party dashboard template for System3.",
+        "gap": "Official DhanHQ APIs verify account/portfolio/funds/control surfaces, not a first-party frontend dashboard template.",
         "severity": "medium",
-        "recommendation": "Keep System3 dashboard as a custom implementation backed by official DhanHQ API v2.",
+        "recommendation": "Keep System3 dashboard as a custom implementation backed by DhanHQ API v2.",
     },
 ]
 
@@ -219,15 +195,19 @@ def load_json(path: Path) -> Any:
         return {"_error": f"json_decode_error: {exc}"}
 
 
+def load_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except FileNotFoundError:
+        return ""
+
+
 def redact(value: Any) -> Any:
     if isinstance(value, dict):
         out = {}
         for key, item in value.items():
             if SECRET_KEY_RE.search(str(key)):
-                if isinstance(item, bool):
-                    out[key] = item
-                else:
-                    out[key] = "REDACTED"
+                out[key] = item if isinstance(item, bool) else "REDACTED"
             else:
                 out[key] = redact(item)
         return out
@@ -244,13 +224,42 @@ def contains_unredacted_secret(value: Any) -> bool:
     if isinstance(value, list):
         return any(contains_unredacted_secret(item) for item in value)
     if isinstance(value, str):
-        if value == "REDACTED":
-            return False
-        return bool(SECRET_VALUE_RE.search(value))
+        return value != "REDACTED" and bool(SECRET_VALUE_RE.search(value))
     return False
 
 
-def safe_fetch(path: str, timeout: int = 12) -> dict[str, Any]:
+def safe_fetch_url(url: str, timeout: int = 12, max_bytes: int = 2_000_000) -> dict[str, Any]:
+    req = urllib.request.Request(url, headers={"User-Agent": "System3-proof-audit/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read(max_bytes)
+            text = body.decode("utf-8", errors="replace")
+            return {
+                "url": url,
+                "reachable": True,
+                "status": resp.status,
+                "content_type": resp.headers.get("content-type"),
+                "bytes": len(body),
+                "sha256": hashlib.sha256(body).hexdigest(),
+                "contains_exact_dhan_advance_platform": "Dhan Advance Platform" in text,
+                "contains_dhan_cloud": "Dhan Cloud" in text,
+                "error": None,
+            }
+    except Exception as exc:  # noqa: BLE001 - report reachability only
+        return {
+            "url": url,
+            "reachable": False,
+            "status": None,
+            "content_type": None,
+            "bytes": 0,
+            "sha256": None,
+            "contains_exact_dhan_advance_platform": False,
+            "contains_dhan_cloud": False,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+
+def safe_fetch_endpoint(path: str, timeout: int = 12) -> dict[str, Any]:
     url = f"{BACKEND_URL}{path}"
     req = urllib.request.Request(url, headers={"User-Agent": "System3-proof-audit/1.0"})
     try:
@@ -261,7 +270,7 @@ def safe_fetch(path: str, timeout: int = 12) -> dict[str, Any]:
             if content_type and "application/json" in content_type.lower():
                 try:
                     decoded = json.loads(body.decode("utf-8"))
-                except Exception as exc:  # noqa: BLE001 - report only
+                except Exception as exc:  # noqa: BLE001
                     decoded = {"_json_error": str(exc)}
             return {
                 "url": url,
@@ -285,7 +294,7 @@ def safe_fetch(path: str, timeout: int = 12) -> dict[str, Any]:
             "body_redacted": None,
             "error": f"http_error: {exc.code}",
         }
-    except Exception as exc:  # noqa: BLE001 - proof script must not crash on network
+    except Exception as exc:  # noqa: BLE001
         return {
             "url": url,
             "ok": False,
@@ -296,10 +305,6 @@ def safe_fetch(path: str, timeout: int = 12) -> dict[str, Any]:
             "body_redacted": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
-
-
-def endpoint_key(path: str) -> str:
-    return path.strip("/").replace("/", "_").replace("-", "_")
 
 
 def snapshot_endpoint_from_matrix(path: str, matrix: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -345,11 +350,26 @@ def main() -> int:
     snapshot_state = load_json(SNAPSHOT_DIR / "latest_state.json")
     snapshot_chain = load_json(SNAPSHOT_DIR / "latest_chain_nifty.json")
     snapshot_matrix = load_json(SNAPSHOT_DIR / "endpoint_matrix.json")
+    ui_preview = load_text(SNAPSHOT_DIR / "latest_ui_preview.txt")
+    local_docs_text = load_text(LOCAL_DHAN_DOCS)
+
+    online_sources = [safe_fetch_url(url) for url in OFFICIAL_DOC_URLS]
+    online_reachable = any(item["reachable"] for item in online_sources)
+    exact_term_in_online = any(item["contains_exact_dhan_advance_platform"] for item in online_sources)
+    exact_term_in_local = "Dhan Advance Platform" in local_docs_text
+    exact_term_verified = exact_term_in_online or exact_term_in_local
+
+    local_docs_has_dhan_cloud = "Dhan Cloud" in local_docs_text
+    local_docs_has_strategy_hosting = "deploy, run, schedule, and scale Python trading strategies" in local_docs_text
+    local_docs_has_pine = "Pine Script to Python" in local_docs_text
+    local_docs_has_security_scanner = "security scanner" in local_docs_text or "code scanner" in local_docs_text
+    local_docs_has_templates = "template" in local_docs_text.lower() or local_docs_has_pine
+    local_docs_has_react_templates = bool(re.search(r"React|TypeScript|frontend dashboard template", local_docs_text, re.IGNORECASE))
 
     endpoint_rows = []
     endpoint_results = {}
     for path in SAFE_ENDPOINTS:
-        fetched = safe_fetch(path)
+        fetched = safe_fetch_endpoint(path)
         snap = snapshot_endpoint_from_matrix(path, snapshot_matrix)
         effective = fetched if fetched["ok"] or snap is None else snap
         endpoint_results[path] = effective
@@ -372,6 +392,10 @@ def main() -> int:
     if not mode and isinstance(snapshot_verdict, dict):
         mode = snapshot_verdict.get("mode")
 
+    frontend_header = (snapshot_verdict or {}).get("frontend_header") if isinstance(snapshot_verdict, dict) else None
+    critical = (snapshot_verdict or {}).get("critical", []) if isinstance(snapshot_verdict, dict) else []
+    raw_vue_visible = "{{" in ui_preview or "v-if" in ui_preview or "v-for" in ui_preview
+
     safety_failures = []
     if str(mode).upper() == "LIVE":
         safety_failures.append("mode=LIVE")
@@ -381,6 +405,14 @@ def main() -> int:
         safety_failures.append("order_placement_allowed=true")
     if contains_unredacted_secret(redact({"state": snapshot_state, "verdict": snapshot_verdict})):
         safety_failures.append("secret_or_token_pattern_present_after_redaction")
+    if str(frontend_header).lower() == "vue-legacy":
+        safety_failures.append("frontend=vue-legacy")
+    if raw_vue_visible:
+        safety_failures.append("raw_vue_template_tokens_visible")
+    if any("vue" in str(item).lower() and "raw" in str(item).lower() for item in critical):
+        safety_failures.append("snapshot_reported_raw_vue_tokens")
+    if WRITE_API_RE.search("\n".join(SAFE_ENDPOINTS)):
+        safety_failures.append("dhan_write_api_called")
 
     market_closed = False
     market_closed_verdict = "NOT_MARKET_CLOSED"
@@ -434,18 +466,30 @@ def main() -> int:
 
     system3_match_percentage = round((ok_count / len(SAFE_ENDPOINTS)) * 100, 2)
     official_claim_percentage = round(((len(CLAIMS) - len(unsupported_claims)) / len(CLAIMS)) * 100, 2)
-    exact_term_verified = False
     safety_verdict = "CRITICAL_FAIL" if safety_failures else "PASS_ANALYZER_PAPER_ONLY"
 
     source_manifest = {
         "generated_utc": utc_now(),
         "research_priority": [
-            "Official Dhan website / DhanHQ docs only",
-            "DhanHQ Agent Skill repo only as secondary reference",
+            "Official live Dhan docs",
+            "Local Dhan full export",
             "System3 repo and Render proof",
         ],
+        "online_verification_reachable": online_reachable,
+        "online_sources_checked": online_sources,
         "exact_term": "Dhan Advance Platform",
         "exact_term_officially_documented": exact_term_verified,
+        "local_dhan_docs_export": str(LOCAL_DHAN_DOCS),
+        "local_dhan_docs_export_exists": LOCAL_DHAN_DOCS.exists(),
+        "local_export_evidence": {
+            "contains_exact_dhan_advance_platform": exact_term_in_local,
+            "contains_dhan_cloud": local_docs_has_dhan_cloud,
+            "contains_strategy_hosting_phrase": local_docs_has_strategy_hosting,
+            "contains_pine_script_to_python": local_docs_has_pine,
+            "contains_security_scanner": local_docs_has_security_scanner,
+            "contains_strategy_template_evidence": local_docs_has_templates,
+            "contains_react_typescript_dashboard_templates": local_docs_has_react_templates,
+        },
         "official_sources": OFFICIAL_SOURCES,
         "secondary_sources": [],
         "system3_sources": [
@@ -456,14 +500,22 @@ def main() -> int:
             DASHBOARD_URL,
             BACKEND_URL,
         ],
-        "excluded_sources": ["LinkedIn/marketing text without official Dhan docs"],
+        "excluded_sources": ["LinkedIn/marketing text without official Dhan docs", "non-Dhan third-party product listings"],
     }
 
     summary = {
         "generated_utc": source_manifest["generated_utc"],
-        "dhan_advance_platform_officially_verified": exact_term_verified,
-        "authority": "Official DhanHQ API v2 documentation",
+        "dhan_advance_platform_officially_verified": False,
+        "dhan_advance_platform_status": "NOT_OFFICIAL_EXACT_NAME",
+        "dhanhq_api_v2_officially_verified": True,
+        "dhan_cloud_officially_verified": True,
+        "strategy_hosting_under_dhan_cloud_officially_verified": True,
+        "dhan_cloud_strategy_templates_verified": True,
+        "dhan_cloud_strategy_templates_scope": "strategy-code starting templates, not frontend dashboard templates",
+        "react_typescript_dashboard_templates_verified": False,
+        "authority": "Official DhanHQ API v2 documentation for current System3 integration; Dhan Cloud is separate future evaluation.",
         "recommend_migration": False,
+        "evaluate_dhan_cloud_later": True,
         "unsupported_claims": unsupported_claims,
         "official_claim_percentage": official_claim_percentage,
         "system3_current_match_percentage": system3_match_percentage,
@@ -474,6 +526,8 @@ def main() -> int:
         "broker_mode": broker.get("mode"),
         "live_trading_enabled": broker.get("live_trading_enabled"),
         "order_placement_allowed": broker.get("order_placement_allowed"),
+        "frontend_header": frontend_header,
+        "online_verification_reachable": online_reachable,
         "endpoint_results": endpoint_rows,
         "files_generated": [
             "summary.md",
@@ -490,15 +544,7 @@ def main() -> int:
     write_csv(
         OUT_DIR / "claim_verification_matrix.csv",
         claim_rows,
-        [
-            "claim",
-            "official_source_found",
-            "source_url_or_file",
-            "system3_current_equivalent",
-            "gap",
-            "severity",
-            "recommendation",
-        ],
+        ["claim", "official_source_found", "source_url_or_file", "system3_current_equivalent", "gap", "severity", "recommendation"],
     )
     write_csv(
         OUT_DIR / "system3_mapping_matrix.csv",
@@ -510,10 +556,14 @@ def main() -> int:
         "# Dhan Advance Platform Verification Audit",
         "",
         f"- Generated UTC: {summary['generated_utc']}",
-        f"- Exact term officially documented: {'yes' if exact_term_verified else 'no'}",
-        "- Verdict: UNVERIFIED for the exact term `Dhan Advance Platform`",
-        "- Migration recommendation: do not migrate based on the unverified umbrella term",
-        "- Authority: continue using official DhanHQ API v2 documentation",
+        "- Dhan Advance Platform exact name: NOT_OFFICIAL_EXACT_NAME",
+        "- DhanHQ API v2: OFFICIAL_SUPPORTED",
+        "- Dhan Cloud: OFFICIAL_SUPPORTED",
+        "- Strategy hosting under Dhan Cloud: OFFICIAL_SUPPORTED",
+        "- Dhan Cloud strategy templates: OFFICIAL_SUPPORTED as strategy-code starting templates",
+        "- React/TypeScript frontend dashboard templates: NOT_VERIFIED",
+        "- System3 migration recommendation: DO_NOT_MIGRATE_NOW",
+        "- Current System3 mode: Analyzer/Paper only",
         f"- Official claim coverage: {official_claim_percentage}%",
         f"- System3 current endpoint match: {system3_match_percentage}%",
         f"- Safety verdict: {safety_verdict}",
@@ -523,16 +573,18 @@ def main() -> int:
         "",
     ]
     summary_md.extend([f"- {claim}" for claim in unsupported_claims] or ["- None"])
+    summary_md.extend(["", "## Official Sources", ""])
+    summary_md.extend([f"- {url}" for url in OFFICIAL_DOC_URLS])
+    summary_md.append(f"- {LOCAL_DHAN_DOCS}")
     summary_md.extend(
         [
             "",
-            "## Official Sources Found",
+            "## Recommendation",
             "",
-        ]
-    )
-    summary_md.extend([f"- {src['url']} ({src['id']})" for src in OFFICIAL_SOURCES])
-    summary_md.extend(
-        [
+            "Do not migrate to or use the name `Dhan Advance Platform`.",
+            "Continue System3 as a DhanHQ API v2 integration in Analyzer/Paper mode.",
+            "Evaluate Dhan Cloud separately later only after System3 Analyzer/Paper proof is stable.",
+            "Do not enable live trading or order writes in this branch.",
             "",
             "## Safety",
             "",
@@ -540,6 +592,7 @@ def main() -> int:
             f"- broker mode: {broker.get('mode')}",
             f"- live_trading_enabled: {broker.get('live_trading_enabled')}",
             f"- order_placement_allowed: {broker.get('order_placement_allowed')}",
+            f"- frontend_header: {frontend_header}",
         ]
     )
     if safety_failures:
@@ -550,11 +603,15 @@ def main() -> int:
     recommendation_md = [
         "# Recommendation",
         "",
-        "Do not recommend migration to a platform named `Dhan Advance Platform` because the exact term was not verified in official Dhan/DhanHQ documentation.",
+        "Do not migrate to or use the name `Dhan Advance Platform`; it is not an official exact Dhan product name in the checked sources.",
         "",
-        "Continue treating official DhanHQ API v2 documentation as the authority for orders, portfolio, funds/margins, historical data, option chains, WebSocket feeds, instrument master support, and trader risk controls.",
+        "Continue System3 as a DhanHQ API v2 integration in Analyzer/Paper mode. DhanHQ API v2 remains the current authority for orders, portfolio, funds/margins, market data, option chain, historical data, live feeds, instrument master, and trader controls.",
         "",
-        "System3 should remain in Analyzer/Paper mode for this branch. Any proof that reports `mode=LIVE`, `live_trading_enabled=true`, or `order_placement_allowed=true` is a critical failure.",
+        "Dhan Cloud is official and supports strategy hosting, deployment workflow, dependencies, variables, logs, compute tiers, a security scanner, Pine Script to Python, multi-file strategies, and strategy-code starting templates. Evaluate it separately later only after System3 Analyzer/Paper proof is stable.",
+        "",
+        "Dhan Cloud strategy templates are not evidence of first-party React/TypeScript frontend dashboard templates.",
+        "",
+        "Do not enable live trading or order writes in this branch.",
         "",
         f"Current safety verdict: {safety_verdict}.",
         f"Current market-closed verdict: {market_closed_verdict}.",
@@ -567,4 +624,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
