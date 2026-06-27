@@ -1,0 +1,11 @@
+{
+  "status": "MARKET_CLOSED",
+  "skipped": true,
+  "overall_passed": null,
+  "qc_passed": null,
+  "message": "QC skipped — market closed (stale spread checks not applied)",
+  "data_source": "skipped",
+  "total_contracts": 0,
+  "underlying_count": 0,
+  "underlying_results": {}
+}

@@ -1,0 +1,93 @@
+{
+  "state_version": 181,
+  "timestamp_utc": "2026-06-27T20:35:34.642742Z",
+  "timestamp_ist": "2026-06-28T02:05:34.642743+05:30",
+  "mode": "PAPER",
+  "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
+  "market": {
+    "is_open": false,
+    "reason": "Market closed: Weekend (Sunday)",
+    "next_open": "2026-06-29 09:15:00 IST",
+    "current_time_ist": "2026-06-28T02:05:34.641578+05:30"
+  },
+  "broker": {
+    "broker": "dhan",
+    "mode": "ANALYZER",
+    "connected": true,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "credentials_present": true,
+    "client_id_present": true,
+    "access_token_present": true,
+    "latency_ms": 289,
+    "error": null,
+    "auto_refresh": {
+      "attempted": false,
+      "success": false
+    },
+    "sdk_available": true,
+    "env_source": "core.utils.env_loader"
+  },
+  "qc": {
+    "status": "PASS",
+    "reasons": [],
+    "contracts_total": 0,
+    "underlyings": 0,
+    "failures": []
+  },
+  "signals": {
+    "status": "NO_TRADE",
+    "underlying": null,
+    "confidence": 0,
+    "reason": "No signal generated",
+    "last_signal": null
+  },
+  "positions": [],
+  "pnl": {
+    "unrealized": 0.0,
+    "realized": 0.0,
+    "total": 0.0,
+    "day_total": 0.0
+  },
+  "risk": {
+    "var95": 0.0,
+    "es95": 0.0,
+    "exposure": 0.0,
+    "concentration": 0.0,
+    "greeks": {
+      "delta": 0.0,
+      "gamma": 0.0,
+      "theta": 0.0,
+      "vega": 0.0
+    },
+    "limits": {
+      "status": "PASS",
+      "breaches": []
+    }
+  },
+  "model": {
+    "active": null,
+    "type": null,
+    "fallback_used": false,
+    "metrics": {}
+  },
+  "alerts": [],
+  "cycle_count": 181,
+  "last_cycle_ts_iso": "2026-06-28T02:05:34.642743+05:30",
+  "last_fetch_ts_iso": "2026-06-28T02:05:34.642743+05:30",
+  "positions_source": "INTERNAL_UNVERIFIED",
+  "reconciliation": {
+    "status": "OK",
+    "mismatches": [],
+    "timestamp": "2026-06-28T01:53:14.115865+05:30"
+  },
+  "refresh_interval": 5,
+  "last_tick_age_sec": 5.29,
+  "tick_health": {
+    "last_tick_age_sec": 5.29,
+    "refresh_interval_sec": 5,
+    "source": "rest_poll_ssot",
+    "websocket_endpoint": "/ws/stream",
+    "market_open": false
+  }
+}

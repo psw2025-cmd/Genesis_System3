@@ -1,0 +1,138 @@
+{
+  "exact_term": "Dhan Advance Platform",
+  "exact_term_officially_documented": false,
+  "excluded_sources": [
+    "LinkedIn/marketing text without official Dhan docs",
+    "non-Dhan third-party product listings"
+  ],
+  "generated_utc": "2026-06-27T21:34:40.931935Z",
+  "local_dhan_docs_export": "C:\\System3\\Genesis_System3\\dhan-api-docs.md",
+  "local_dhan_docs_export_exists": true,
+  "local_export_evidence": {
+    "contains_dhan_cloud": true,
+    "contains_exact_dhan_advance_platform": false,
+    "contains_pine_script_to_python": true,
+    "contains_react_typescript_dashboard_templates": false,
+    "contains_security_scanner": true,
+    "contains_strategy_hosting_phrase": true,
+    "contains_strategy_template_evidence": true
+  },
+  "official_sources": [
+    {
+      "evidence": "Official DhanHQ documentation root for API, Cloud, MCP, and skills documentation.",
+      "id": "dhanhq_docs_home",
+      "priority": 1,
+      "supports": [
+        "DhanHQ docs",
+        "Dhan Cloud",
+        "Dhan MCP",
+        "DhanHQ Agent Skills"
+      ],
+      "type": "official_live_dhan_docs",
+      "url": "https://docs.dhanhq.co/"
+    },
+    {
+      "evidence": "Official Dhan Cloud docs describe deploying, running, scheduling, and scaling Python trading strategies on Dhan Cloud.",
+      "id": "dhan_cloud_docs",
+      "priority": 1,
+      "supports": [
+        "Dhan Cloud",
+        "strategy hosting",
+        "strategy-code templates",
+        "Pine Script to Python",
+        "dependencies",
+        "variables",
+        "logs",
+        "compute tiers",
+        "security scanner",
+        "deployment workflow",
+        "low-latency infrastructure"
+      ],
+      "type": "official_live_dhan_docs",
+      "url": "https://docs.dhanhq.co/cloud/"
+    },
+    {
+      "evidence": "Official DhanHQ API v2 documentation for trading and data APIs.",
+      "id": "dhanhq_api_v2_intro",
+      "priority": 1,
+      "supports": [
+        "DhanHQ API v2",
+        "orders",
+        "portfolio",
+        "funds",
+        "market quote",
+        "option chain",
+        "historical data",
+        "live feeds",
+        "instrument master",
+        "trader controls"
+      ],
+      "type": "official_live_dhan_docs",
+      "url": "https://dhanhq.co/docs/v2/"
+    },
+    {
+      "evidence": "Local full Dhan docs export used as fallback evidence if live documentation is not reachable.",
+      "id": "local_dhan_docs_export",
+      "priority": 1,
+      "supports": [
+        "DhanHQ API v2",
+        "Dhan Cloud",
+        "strategy hosting",
+        "strategy-code templates",
+        "guardrails"
+      ],
+      "type": "local_official_docs_export",
+      "url": "C:\\System3\\Genesis_System3\\dhan-api-docs.md"
+    }
+  ],
+  "online_sources_checked": [
+    {
+      "bytes": 33796,
+      "contains_dhan_cloud": true,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html",
+      "error": null,
+      "reachable": true,
+      "sha256": "82e5cb470ad448651a5198f2385a6f9bbca437cdce9cf5e215ae0904d09e9516",
+      "status": 200,
+      "url": "https://docs.dhanhq.co/"
+    },
+    {
+      "bytes": 33796,
+      "contains_dhan_cloud": true,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html",
+      "error": null,
+      "reachable": true,
+      "sha256": "82e5cb470ad448651a5198f2385a6f9bbca437cdce9cf5e215ae0904d09e9516",
+      "status": 200,
+      "url": "https://docs.dhanhq.co/cloud/"
+    },
+    {
+      "bytes": 28904,
+      "contains_dhan_cloud": false,
+      "contains_exact_dhan_advance_platform": false,
+      "content_type": "text/html; charset=utf-8",
+      "error": null,
+      "reachable": true,
+      "sha256": "d777e13931eef180b47f0035492c2232563347b9f4efe69d00b4999f15049f82",
+      "status": 200,
+      "url": "https://dhanhq.co/docs/v2/"
+    }
+  ],
+  "online_verification_reachable": true,
+  "research_priority": [
+    "Official live Dhan docs",
+    "Local Dhan full export",
+    "System3 repo and Render proof"
+  ],
+  "secondary_sources": [],
+  "system3_sources": [
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_verdict.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_state.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\endpoint_matrix.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_chain_nifty.json",
+    "https://genesis-system3-backend.onrender.com/ui",
+    "https://genesis-system3-backend.onrender.com"
+  ]
+}

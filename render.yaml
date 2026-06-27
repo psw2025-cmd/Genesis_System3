@@ -28,7 +28,7 @@ services:
     dockerfilePath: ./dashboard/backend/Dockerfile
     dockerContext: .
     autoDeploy: true
-    healthCheckPath: /health
+    healthCheckPath: /api/health
 
     envVars:
       # --- Deploy identity ---
@@ -45,6 +45,12 @@ services:
       - key: LIVE_TRADING_ENABLED
         value: "0"
       - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+
+      # --- Memory stabilization ---
+      - key: DEFER_INSTRUMENT_WARMUP
+        value: "1"
+      - key: CLOUD_PAPER_ENGINE
         value: "0"
 
       # --- Dhan credentials (set in Render dashboard) ---
