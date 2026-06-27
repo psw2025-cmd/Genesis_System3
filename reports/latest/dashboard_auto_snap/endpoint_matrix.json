@@ -1,0 +1,101 @@
+{
+  "health": {
+    "url": "https://genesis-system3-backend.onrender.com/api/health",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.406,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 682,
+    "sha256": "c090861600741614124d47a4734088e48df36e29bab83a6abaa9844e81d99c8b",
+    "error": null
+  },
+  "state": {
+    "url": "https://genesis-system3-backend.onrender.com/api/state",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.405,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 1674,
+    "sha256": "6a0473ce69b69672718527e3634917432d282ba8d4628a2cac9eead606eda6b6",
+    "error": null
+  },
+  "qc": {
+    "url": "https://genesis-system3-backend.onrender.com/api/qc",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.881,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 244,
+    "sha256": "12754a2713fd47cccb78b57a2f8e4e3f786de2bc64970486368dd9746a9b2624",
+    "error": null
+  },
+  "broker_status": {
+    "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.66,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 332,
+    "sha256": "a385f40f2af4c3c8da2c9b6b17aa28c8b019e8b1e80119388a44f39d8b758487",
+    "error": null
+  },
+  "instruments_health": {
+    "url": "https://genesis-system3-backend.onrender.com/api/instruments/health",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.917,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 516,
+    "sha256": "2575a751f508500e6ee78a97351ee228f3987dae0b0021af720fac1bfe1ac585",
+    "error": null
+  },
+  "underlyings": {
+    "url": "https://genesis-system3-backend.onrender.com/api/underlyings",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.409,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 61,
+    "sha256": "c5ba248cb30b1e268528966811c33c956c4c6a4c7c4ac95317aaafd7eeb49077",
+    "error": null
+  },
+  "chain_nifty": {
+    "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.846,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 195,
+    "sha256": "3cc0e14aa297b37b5636e0dd9f8b27c368ec280f4811907d7894afbd5254d44b",
+    "error": null
+  },
+  "auto_gates": {
+    "url": "https://genesis-system3-backend.onrender.com/api/auto_gates",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.41,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 4743,
+    "sha256": "d028e0c4730eb1e13617cfeb2c283c1e53e36f3c1b2c81ab2ad537b99c85c541",
+    "error": null
+  },
+  "paper": {
+    "url": "https://genesis-system3-backend.onrender.com/api/paper",
+    "ok": true,
+    "status": 200,
+    "elapsed_s": 0.413,
+    "content_type": "application/json",
+    "x_frontend": null,
+    "bytes": 474,
+    "sha256": "7e6bdf0c595e0849d3f9aba5513f671bfd86205cb6658a7482a7fa9968705bb8",
+    "error": null
+  }
+}

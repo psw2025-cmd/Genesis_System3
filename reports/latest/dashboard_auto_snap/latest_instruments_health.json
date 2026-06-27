@@ -1,0 +1,18 @@
+{
+  "status": "ok",
+  "rows": 132953,
+  "source": "runtime_json",
+  "stale": false,
+  "meta": {
+    "synced_utc": "2026-06-27T12:58:47.534173Z",
+    "source": "dhan_detailed_csv",
+    "source_url": "https://images.dhan.co/api-data/api-scrip-master-detailed.csv",
+    "csv_path": "storage/instruments/api-scrip-master-detailed.csv",
+    "runtime_json": "storage/instruments/OpenAPIScripMaster.json",
+    "row_count": 225632,
+    "runtime_rows": 132953,
+    "sha256": "2c0dbdac72a71cd47c5140c509d95d821eb38fd14656d335e8f83a106fca2311",
+    "vendor": "dhan",
+    "refresh_policy": "daily_0835_ist"
+  }
+}

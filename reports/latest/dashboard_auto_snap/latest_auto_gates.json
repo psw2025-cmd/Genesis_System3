@@ -1,0 +1,185 @@
+{
+  "generated_utc": "2026-06-27T20:34:45.318523Z",
+  "status": "ok",
+  "source": "inline_gate_evaluator",
+  "runtime_driven": true,
+  "market_open": false,
+  "market_reason": "Market closed: Weekend (Sunday)",
+  "broker_connected": true,
+  "gates": {
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
+      "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+      "pass": false,
+      "days_recorded": 1,
+      "days_passing_threshold": 0,
+      "days_required": 5,
+      "threshold": 0.7,
+      "latest_rho": 0.2,
+      "consecutive_pass_days": 0,
+      "blocker_id": "SYS3-BLK-005",
+      "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+      "days": [
+        {
+          "date": "2026-06-12",
+          "rho": 0.2,
+          "hit_rate": 0.6667,
+          "status": "RETRAIN_NEEDED",
+          "pass": false
+        }
+      ]
+    },
+    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
+      "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+      "pass": false,
+      "report_exists": true,
+      "net_expectancy_after_costs": -196.14,
+      "win_rate": 0.3333,
+      "trade_count": 9,
+      "blocker_id": "PROFIT_BLOCKER",
+      "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate"
+    },
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
+      "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+      "pass": false,
+      "report_exists": false,
+      "full_lifecycle_proven": false,
+      "broker_connected": true,
+      "market_open": false,
+      "blocker_id": "SYS3-BLK-008",
+      "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+    },
+    "WEBSOCKET_TICK_HEALTH_PROVEN": {
+      "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+      "pass": true,
+      "report_exists": false,
+      "last_tick_age_sec": 5.0,
+      "refresh_interval_sec": 5,
+      "blocker_id": null,
+      "auto_action": "REST poll ≤10s counts for analyzer; WebSocket stream for live execution"
+    },
+    "MODEL_ACCURACY_REPORT_PRESENT": {
+      "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+      "pass": true,
+      "report_exists": true,
+      "rows": 1,
+      "validation_days": 1,
+      "spearman_days_passing": 0,
+      "blocker_id": null,
+      "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
+    },
+    "OPTION_STRIKE_VISIBILITY_PROVEN": {
+      "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+      "pass": false,
+      "rows": 1,
+      "paper_trade_allowed_count": 0,
+      "blocker_id": "SYS3-BLK-003",
+      "auto_action": "Run scripts/system3_option_visibility_audit.py"
+    },
+    "EQUITY_FO_ELIGIBILITY_PROVEN": {
+      "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+      "pass": true,
+      "underlying_count": 211,
+      "blocker_id": null,
+      "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+    }
+  },
+  "gates_passing": 3,
+  "gates_total": 7,
+  "proof_gates": [
+    {
+      "name": "ML Accuracy (Spearman ρ)",
+      "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+      "status": "PEND",
+      "pass": false,
+      "note": "1/5 days · ρ=0.2 · need ≥0.7",
+      "blocker_id": "SYS3-BLK-005"
+    },
+    {
+      "name": "Profit / Expectancy",
+      "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+      "status": "PEND",
+      "pass": false,
+      "note": "expectancy=-196.14 · win_rate=0.3333",
+      "blocker_id": "PROFIT_BLOCKER"
+    },
+    {
+      "name": "Paper Lifecycle",
+      "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+      "status": "PEND",
+      "pass": false,
+      "note": "market-session proof pending",
+      "blocker_id": "SYS3-BLK-008"
+    },
+    {
+      "name": "Tick / Data Freshness",
+      "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+      "status": "PASS",
+      "pass": true,
+      "note": "tick_age=5.0s refresh=5s",
+      "blocker_id": null
+    },
+    {
+      "name": "Model Accuracy Report",
+      "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+      "status": "PASS",
+      "pass": true,
+      "note": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD",
+      "blocker_id": null
+    },
+    {
+      "name": "Option Strike Visibility",
+      "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+      "status": "PEND",
+      "pass": false,
+      "note": "Run scripts/system3_option_visibility_audit.py",
+      "blocker_id": "SYS3-BLK-003"
+    },
+    {
+      "name": "Equity F&O Eligibility",
+      "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+      "status": "PASS",
+      "pass": true,
+      "note": "Wire is_tradeable_fo_symbol() in ranking/paper trade path",
+      "blocker_id": null
+    }
+  ],
+  "open_blockers": [
+    "PROFIT_BLOCKER",
+    "SYS3-BLK-003",
+    "SYS3-BLK-005",
+    "SYS3-BLK-008"
+  ],
+  "prediction_accuracy_blocked": true,
+  "profit_blocked": true,
+  "lifecycle_blocked": true,
+  "trade_ready": false,
+  "analyzer_ready": false,
+  "technical_gates_still_required": [
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF"
+  ],
+  "recommended_auto_actions": [
+    "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+    "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
+    "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
+    "Run scripts/system3_option_visibility_audit.py"
+  ],
+  "friction_expectancy": {
+    "trade_count": 9,
+    "wins": 3,
+    "losses": 6,
+    "win_rate": 0.3333,
+    "gross_pnl_total": -1120.0,
+    "net_pnl_total": -1765.3,
+    "net_expectancy_after_costs": -196.14,
+    "min_trades_required": 5,
+    "note": "PASS requires >=5 closed paper trades with positive per-trade net expectancy after brokerage, STT, exchange, GST, slippage (Dhan cost model)."
+  },
+  "strategy_quarantined": true,
+  "production_live_ready": false,
+  "live_trading_enabled": false,
+  "permanent_safety": [
+    "LIVE_TRADING_DISABLED_BY_DESIGN"
+  ]
+}

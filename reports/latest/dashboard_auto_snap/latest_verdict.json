@@ -1,0 +1,24 @@
+{
+  "generated_utc": "2026-06-27T20:36:03.135690Z",
+  "dashboard_url": "https://genesis-system3-backend.onrender.com/ui",
+  "backend_url": "https://genesis-system3-backend.onrender.com",
+  "frontend_header": "react",
+  "critical": [],
+  "warnings": [],
+  "final_verdict": "PASS",
+  "mode": "PAPER",
+  "broker_connected": true,
+  "market_open": false,
+  "qc_status": "MARKET_CLOSED",
+  "chain_status": "MARKET_CLOSED",
+  "chain_source": "closed",
+  "chain_contracts": 0,
+  "live_trading_hits": [],
+  "order_allowed_hits": [],
+  "screenshot": {
+    "enabled": true,
+    "desktop": "latest_dashboard.png",
+    "mobile": "latest_mobile.png",
+    "errors": []
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "underlying": "NIFTY",
+  "contracts": [],
+  "spot": 0,
+  "pcr": 1.0,
+  "total_contracts": 0,
+  "data_source": "closed",
+  "status": "MARKET_CLOSED",
+  "message": "Market closed - live chain fetch skipped in REAL_ONLY mode"
+}
