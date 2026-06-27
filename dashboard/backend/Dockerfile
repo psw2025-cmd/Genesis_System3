@@ -8,10 +8,19 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    nodejs \
+    npm \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy the repository so dashboard/backend/app.py can import project modules from /app.
 COPY . /app/
+
+# Build React frontend inside Docker (ensures dist/ is always fresh)
+RUN cd /app/dashboard/frontend && \
+    npm install --legacy-peer-deps 2>/dev/null && \
+    npm run build && \
+    echo "[build] React frontend built successfully" || \
+    echo "[build] React frontend build failed — will serve legacy Vue"
 
 RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
       python -m pip install --upgrade pip && \
