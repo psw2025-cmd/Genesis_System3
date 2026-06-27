@@ -377,7 +377,19 @@ except ImportError:
 app.add_middleware(RequestIDMiddleware)
 
 
-_DASHBOARD_DIR = ROOT_DIR / "dashboard"
+_DASHBOARD_DIR   = ROOT_DIR / "dashboard"
+_REACT_DIST_DIR  = ROOT_DIR / "dashboard" / "frontend" / "dist"
+
+# Mount React frontend static assets (JS/CSS bundles)
+if _REACT_DIST_DIR.exists():
+    app.mount(
+        "/ui/assets",
+        StaticFiles(directory=str(_REACT_DIST_DIR / "assets")),
+        name="ui-assets",
+    )
+    print(f"[frontend] React dist mounted from {_REACT_DIST_DIR}")
+else:
+    print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} — serving legacy Vue")
 
 
 # Root route - helpful message
@@ -405,10 +417,19 @@ async def root():
 
 @app.get("/ui", include_in_schema=False)
 @app.get("/ui/", include_in_schema=False)
-async def serve_dashboard_index():
-    f = _DASHBOARD_DIR / "index.html"
-    if f.exists():
-        return FileResponse(str(f), media_type="text/html", headers=_NO_CACHE_HEADERS)
+@app.get("/ui/{path:path}", include_in_schema=False)
+async def serve_dashboard_index(path: str = ""):
+    """Serve React SPA — React dist takes priority over legacy Vue."""
+    # Try React dist first
+    react_index = _REACT_DIST_DIR / "index.html"
+    if react_index.exists():
+        return FileResponse(str(react_index), media_type="text/html",
+                           headers={**_NO_CACHE_HEADERS, "X-Frontend": "react"})
+    # Fallback to legacy Vue
+    vue_index = _DASHBOARD_DIR / "index.html"
+    if vue_index.exists():
+        return FileResponse(str(vue_index), media_type="text/html",
+                           headers={**_NO_CACHE_HEADERS, "X-Frontend": "vue-legacy"})
     raise HTTPException(status_code=404, detail="Dashboard not found")
 
 
