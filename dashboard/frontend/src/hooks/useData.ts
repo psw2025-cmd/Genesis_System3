@@ -12,29 +12,41 @@ async function fetchJSON(path: string) {
 export function useData() {
   const {
     setHealth, setState, setPaper, setGainRank,
-    setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain
+    setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
+    setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
   } = useStore()
 
   const wsRef   = useRef<WebSocket | null>(null)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // ── REST poll (core data) ─────────────────────────────────────────────
+  // ── BROKER data — works even when market closed ───────────────────────────
+  const pollBroker = useCallback(async () => {
+    const [status, holdings, funds, positions] = await Promise.allSettled([
+      fetchJSON('/api/broker/dhan/status'),
+      fetchJSON('/api/broker/holdings'),
+      fetchJSON('/api/broker/funds'),
+      fetchJSON('/api/broker/positions/live'),
+    ])
+    if (status.status   === 'fulfilled') setBrokerStatus(status.value)
+    if (holdings.status === 'fulfilled') setBrokerHoldings(holdings.value)
+    if (funds.status    === 'fulfilled') setBrokerFunds(funds.value)
+    if (positions.status=== 'fulfilled') setBrokerPositions(positions.value)
+  }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions])
+
+  // ── Core REST poll ────────────────────────────────────────────────────────
   const poll = useCallback(async () => {
-    try {
-      const [health, state, paper, gainRank] = await Promise.allSettled([
-        fetchJSON('/api/health'),
-        fetchJSON('/api/state'),
-        fetchJSON('/api/paper'),
-        fetchJSON('/api/gain_rank'),
-      ])
-      if (health.status === 'fulfilled')   setHealth(health.value)
-      if (state.status === 'fulfilled')    setState(state.value)
-      if (paper.status === 'fulfilled')    setPaper(paper.value)
-      if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
-    } catch { /* ignore individual failures */ }
+    const [health, state, paper, gainRank] = await Promise.allSettled([
+      fetchJSON('/api/health'),
+      fetchJSON('/api/state'),
+      fetchJSON('/api/paper'),
+      fetchJSON('/api/gain_rank'),
+    ])
+    if (health.status   === 'fulfilled') setHealth(health.value)
+    if (state.status    === 'fulfilled') setState(state.value)
+    if (paper.status    === 'fulfilled') setPaper(paper.value)
+    if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
   }, [setHealth, setState, setPaper, setGainRank])
 
-  // ── Chain poll (separate — only when tab active) ──────────────────────
+  // ── Chain poll ────────────────────────────────────────────────────────────
   const pollChain = useCallback(async (sym: string) => {
     try {
       const data = await fetchJSON(`/api/chain/${sym}`)
@@ -42,19 +54,17 @@ export function useData() {
     } catch { /* ignore */ }
   }, [setChain])
 
-  // ── Secondary data ────────────────────────────────────────────────────
+  // ── Secondary data ────────────────────────────────────────────────────────
   const pollSecondary = useCallback(async () => {
-    try {
-      const [alerts, gates] = await Promise.allSettled([
-        fetchJSON('/api/alerts/recent?limit=30'),
-        fetchJSON('/api/auto_gates'),
-      ])
-      if (alerts.status === 'fulfilled') setAlerts(Array.isArray(alerts.value?.alerts) ? alerts.value.alerts : [])
-      if (gates.status === 'fulfilled')  setAutoGates(gates.value)
-    } catch { /* ignore */ }
+    const [alerts, gates] = await Promise.allSettled([
+      fetchJSON('/api/alerts/recent?limit=30'),
+      fetchJSON('/api/auto_gates'),
+    ])
+    if (alerts.status === 'fulfilled') setAlerts(Array.isArray(alerts.value?.alerts) ? alerts.value.alerts : [])
+    if (gates.status  === 'fulfilled') setAutoGates(gates.value)
   }, [setAlerts, setAutoGates])
 
-  // ── WebSocket ─────────────────────────────────────────────────────────
+  // ── WebSocket ─────────────────────────────────────────────────────────────
   const wsConnect = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState <= 1) return
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -65,43 +75,39 @@ export function useData() {
 
     ws.onopen  = () => setWsStatus('live')
     ws.onerror = () => setWsStatus('error')
-    ws.onclose = (e) => {
+    ws.onclose = () => {
       setWsStatus('off')
-      // Auto-reconnect after 5s (3s if market closed)
-      setTimeout(wsConnect, e.code === 1008 ? 300000 : 5000)
+      setTimeout(wsConnect, 5000)  // auto-reconnect 5s
     }
     ws.onmessage = (ev) => {
       try {
         const m = JSON.parse(ev.data)
-        switch (m.type) {
-          case 'health_update':    if (m.data) setHealth(m.data);   break
-          case 'positions_update': break  // handled via REST
-          case 'pnl_update':       break  // handled via REST
-        }
+        if (m.type === 'health_update' && m.data) setHealth(m.data)
       } catch { /* ignore */ }
     }
   }, [setHealth, setWsStatus])
 
   useEffect(() => {
-    // Initial load
+    // Load everything immediately on mount
     poll()
+    pollBroker()     // broker data — market-independent
     pollSecondary()
     wsConnect()
 
-    // REST: 20s market, 30s closed
-    pollRef.current = setInterval(() => {
-      poll()
-    }, 20000)
-
-    // Secondary every 60s
-    const secInterval = setInterval(pollSecondary, 60000)
+    // Core: every 20s
+    const coreTimer = setInterval(poll, 20000)
+    // Broker: every 30s (rate-limited by backend TTL cache)
+    const brokerTimer = setInterval(pollBroker, 30000)
+    // Secondary: every 60s
+    const secTimer = setInterval(pollSecondary, 60000)
 
     return () => {
-      clearInterval(pollRef.current!)
-      clearInterval(secInterval)
+      clearInterval(coreTimer)
+      clearInterval(brokerTimer)
+      clearInterval(secTimer)
       wsRef.current?.close()
     }
-  }, [poll, pollSecondary, wsConnect])
+  }, [poll, pollBroker, pollSecondary, wsConnect])
 
   // Chain poll when symbol changes
   useEffect(() => {
