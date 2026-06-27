@@ -336,19 +336,18 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
 
     # Cooldown check (skip if force)
     if not force_generate and not force_oauth:
+        elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
+        if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
+            remaining = int(_TOKEN_COOLDOWN_S - elapsed)
+            logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
+            return {"success": True, "strategy": "cooldown_skip",
+                    "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed"}
         if not _TOKEN_REFRESH_LOCK.acquire(blocking=False):
             return {"success": False, "strategy": "cooldown_lock",
                     "message": "Token refresh already in progress (concurrent call blocked)"}
-        try:
-            elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
-            if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
-                remaining = int(_TOKEN_COOLDOWN_S - elapsed)
-                logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
-                return {"success": False, "strategy": "cooldown",
-                        "message": f"Cooldown active ({remaining}s left) — Dhan 2-min rate limit protection"}
-        finally:
-            _TOKEN_REFRESH_LOCK.release()
+        _TOKEN_REFRESH_LOCK.release()
 
+    # Mark refresh timestamp BEFORE the API call to prevent race
     _TOKEN_LAST_REFRESH_TS = _time_mod.time()
     env = _load_env()
     client_id = env.get("DHAN_CLIENT_ID", "").strip()
