@@ -406,7 +406,11 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
 
     # Strategy 3: OAuth manual flow (requires browser action)
     logger.warning("Automated strategies failed — initiating OAuth manual flow")
-    _try_oauth_manual(client_id, app_id, app_secret)
+    if _CLOUD_MODE:
+        logger.warning("CLOUD_MODE: OAuth URL suppressed (Render logs are public). "
+                       "Check Render env vars: DHAN_ACCESS_TOKEN, DHAN_PIN, DHAN_TOTP_SECRET")
+    else:
+        _try_oauth_manual(client_id, app_id, app_secret)
 
     missing = []
     if not pin:
