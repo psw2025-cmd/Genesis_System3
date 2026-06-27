@@ -381,15 +381,19 @@ _DASHBOARD_DIR   = ROOT_DIR / "dashboard"
 _REACT_DIST_DIR  = ROOT_DIR / "dashboard" / "frontend" / "dist"
 
 # Mount React frontend static assets (JS/CSS bundles)
-if _REACT_DIST_DIR.exists():
-    app.mount(
-        "/ui/assets",
-        StaticFiles(directory=str(_REACT_DIST_DIR / "assets")),
-        name="ui-assets",
-    )
-    print(f"[frontend] React dist mounted from {_REACT_DIST_DIR}")
-else:
-    print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} — serving legacy Vue")
+try:
+    from fastapi.staticfiles import StaticFiles as _StaticFiles
+    if _REACT_DIST_DIR.exists() and (_REACT_DIST_DIR / "assets").exists():
+        app.mount(
+            "/ui/assets",
+            _StaticFiles(directory=str(_REACT_DIST_DIR / "assets")),
+            name="ui-assets",
+        )
+        print(f"[frontend] React dist mounted from {_REACT_DIST_DIR}")
+    else:
+        print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} — serving legacy Vue")
+except Exception as _e:
+    print(f"[frontend] StaticFiles mount failed: {_e} — serving legacy Vue")
 
 
 # Root route - helpful message
