@@ -5,7 +5,6 @@ interface DashboardState {
   wsStatus: 'connecting' | 'live' | 'error' | 'off'
   brokerConnected: boolean
   marketOpen: boolean
-  marketCountdown: string
   lastSync: string
 
   // Live data
@@ -16,6 +15,12 @@ interface DashboardState {
   gainRank: any
   alerts: any[]
   autoGates: any
+
+  // Broker real data (market-independent — works anytime)
+  brokerStatus: any
+  brokerHoldings: any
+  brokerFunds: any
+  brokerPositions: any
 
   // UI
   activeTab: string
@@ -30,6 +35,10 @@ interface DashboardState {
   setGainRank: (d: any) => void
   setAlerts: (d: any[]) => void
   setAutoGates: (d: any) => void
+  setBrokerStatus: (d: any) => void
+  setBrokerHoldings: (d: any) => void
+  setBrokerFunds: (d: any) => void
+  setBrokerPositions: (d: any) => void
   setActiveTab: (t: string) => void
   setChainSymbol: (s: string) => void
 }
@@ -38,7 +47,6 @@ export const useStore = create<DashboardState>((set) => ({
   wsStatus: 'connecting',
   brokerConnected: false,
   marketOpen: false,
-  marketCountdown: '--',
   lastSync: '--',
   health: null,
   state: null,
@@ -47,6 +55,10 @@ export const useStore = create<DashboardState>((set) => ({
   gainRank: null,
   alerts: [],
   autoGates: null,
+  brokerStatus: null,
+  brokerHoldings: null,
+  brokerFunds: null,
+  brokerPositions: null,
   activeTab: 'trade',
   chainSymbol: 'NIFTY',
 
@@ -62,6 +74,10 @@ export const useStore = create<DashboardState>((set) => ({
   setGainRank: (gainRank) => set({ gainRank }),
   setAlerts: (alerts) => set({ alerts }),
   setAutoGates: (autoGates) => set({ autoGates }),
+  setBrokerStatus: (brokerStatus) => set({ brokerStatus, brokerConnected: brokerStatus?.connected ?? false }),
+  setBrokerHoldings: (brokerHoldings) => set({ brokerHoldings }),
+  setBrokerFunds: (brokerFunds) => set({ brokerFunds }),
+  setBrokerPositions: (brokerPositions) => set({ brokerPositions }),
   setActiveTab: (activeTab) => set({ activeTab }),
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
 }))
