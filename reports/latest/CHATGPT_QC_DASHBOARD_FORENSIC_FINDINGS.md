@@ -22,6 +22,21 @@ LIVE_TRADING_READY = false
 
 ---
 
+## Patch Pack 3 status
+
+```text
+Render OOM root cause: 512Mi OOM kills observed from Render events API (oomKilled every server_failed event)
+Startup instrument warm-up: deferred by DEFER_INSTRUMENT_WARMUP env guard in app.py
+Cloud paper loop on web: disabled via CLOUD_PAPER_ENGINE=0 in render.yaml
+Uvicorn request recycle: --limit-max-requests 200 added to Dockerfile CMD
+Render healthCheckPath: fixed from /health to /api/health in render.yaml
+Render deploy branch gap: production tracks main (325cb483), PR branch not deployed yet
+/api/qc/runtime cloud status: pending merge to main (route implemented at 6bf236d on this branch)
+Live trading/order APIs: not touched
+Safety flags: LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0 preserved
+```
+---
+
 ## Patch Pack 2 status
 
 ```text

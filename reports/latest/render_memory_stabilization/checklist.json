@@ -1,0 +1,92 @@
+[
+  {
+    "section": "app_py",
+    "check": "defer_guard_exists",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "app_py",
+    "check": "defer_else_message",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "app_py",
+    "check": "instruments_health_lazy_load_present",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "app_py",
+    "check": "guard_before_startup_ensure",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "dockerfile",
+    "check": "limit_max_requests_200",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "dockerfile",
+    "check": "no_workers_flag",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "dockerfile",
+    "check": "single_worker_cmd",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "dockerfile",
+    "check": "healthcheck_present",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "healthcheck_path_api_health",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "healthcheck_not_bare_health",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "defer_instrument_warmup_1",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "cloud_paper_engine_0",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "live_trading_enabled_0",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "system3_live_trading_allowed_0",
+    "pass": true,
+    "status": "PASS"
+  },
+  {
+    "section": "render_yaml",
+    "check": "dhan_creds_sync_false_present",
+    "pass": true,
+    "status": "PASS"
+  }
+]
