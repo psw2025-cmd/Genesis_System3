@@ -1,0 +1,136 @@
+{
+  "exact_term": "Dhan Advance Platform",
+  "exact_term_officially_documented": false,
+  "excluded_sources": [
+    "LinkedIn/marketing text without official Dhan docs"
+  ],
+  "generated_utc": "2026-06-27T21:07:15.551366Z",
+  "official_sources": [
+    {
+      "evidence": "DhanHQ API v2 documents REST-like trading/data APIs for trading services and strategies.",
+      "id": "dhanhq_api_v2_intro",
+      "priority": 1,
+      "supports": [
+        "DhanHQ API v2",
+        "REST APIs",
+        "trading strategies",
+        "portfolio",
+        "live market data"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/"
+    },
+    {
+      "evidence": "Official Orders page documents place/modify/cancel plus read-only order/trade book endpoints and static IP whitelisting requirement for write APIs.",
+      "id": "dhanhq_orders",
+      "priority": 1,
+      "supports": [
+        "orders",
+        "order book",
+        "trades",
+        "static IP whitelisting"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/orders/"
+    },
+    {
+      "evidence": "Official Portfolio and Positions page documents holdings and positions APIs.",
+      "id": "dhanhq_portfolio",
+      "priority": 1,
+      "supports": [
+        "holdings",
+        "positions",
+        "portfolio"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/portfolio/"
+    },
+    {
+      "evidence": "Official Funds & Margin page documents margin calculator and fund limit APIs.",
+      "id": "dhanhq_funds",
+      "priority": 1,
+      "supports": [
+        "funds",
+        "margin",
+        "fund limit"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/funds/"
+    },
+    {
+      "evidence": "Official Historical Data page is listed under DhanHQ API v2 Data APIs.",
+      "id": "dhanhq_historical",
+      "priority": 1,
+      "supports": [
+        "historical data"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/historical-data/"
+    },
+    {
+      "evidence": "Official Option Chain page documents real-time option chain and expiry list APIs.",
+      "id": "dhanhq_option_chain",
+      "priority": 1,
+      "supports": [
+        "option chain",
+        "expiry list",
+        "OI",
+        "greeks",
+        "bid ask"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/option-chain/"
+    },
+    {
+      "evidence": "Official Live Market Feed page documents WebSocket market feeds and feed speed characteristics.",
+      "id": "dhanhq_live_market_feed",
+      "priority": 1,
+      "supports": [
+        "WebSocket feeds",
+        "real-time market data",
+        "low-latency feed"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/live-market-feed/"
+    },
+    {
+      "evidence": "Official Instrument List page documents compact/detailed CSV masters and segmentwise instrument fetch.",
+      "id": "dhanhq_instruments",
+      "priority": 1,
+      "supports": [
+        "instrument master",
+        "security id",
+        "CSV master"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/instruments/"
+    },
+    {
+      "evidence": "Official Trader's Control page documents kill switch and P&L based exit APIs.",
+      "id": "dhanhq_traders_control",
+      "priority": 1,
+      "supports": [
+        "kill switch",
+        "P&L based exit",
+        "risk controls",
+        "compliance guardrails"
+      ],
+      "type": "official_dhanhq_docs",
+      "url": "https://dhanhq.co/docs/v2/traders-control/"
+    }
+  ],
+  "research_priority": [
+    "Official Dhan website / DhanHQ docs only",
+    "DhanHQ Agent Skill repo only as secondary reference",
+    "System3 repo and Render proof"
+  ],
+  "secondary_sources": [],
+  "system3_sources": [
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_verdict.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_state.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\endpoint_matrix.json",
+    "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_chain_nifty.json",
+    "https://genesis-system3-backend.onrender.com/ui",
+    "https://genesis-system3-backend.onrender.com"
+  ]
+}

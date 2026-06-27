@@ -1,0 +1,118 @@
+{
+  "authority": "Official DhanHQ API v2 documentation",
+  "broker_mode": "ANALYZER",
+  "dhan_advance_platform_officially_verified": false,
+  "endpoint_results": [
+    {
+      "endpoint": "/api/health",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/health"
+    },
+    {
+      "endpoint": "/api/state",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/state"
+    },
+    {
+      "endpoint": "/api/broker/dhan/status",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status"
+    },
+    {
+      "endpoint": "/api/broker/holdings",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings"
+    },
+    {
+      "endpoint": "/api/broker/funds",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/funds"
+    },
+    {
+      "endpoint": "/api/broker/positions/live",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/positions/live"
+    },
+    {
+      "endpoint": "/api/instruments/health",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/instruments/health"
+    },
+    {
+      "endpoint": "/api/underlyings",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/underlyings"
+    },
+    {
+      "endpoint": "/api/chain/NIFTY",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY"
+    },
+    {
+      "endpoint": "/api/auto_gates",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/auto_gates"
+    },
+    {
+      "endpoint": "/api/paper",
+      "error": null,
+      "ok": true,
+      "source": "live_safe_get",
+      "status": 200,
+      "url": "https://genesis-system3-backend.onrender.com/api/paper"
+    }
+  ],
+  "files_generated": [
+    "summary.md",
+    "summary.json",
+    "source_manifest.json",
+    "claim_verification_matrix.csv",
+    "system3_mapping_matrix.csv",
+    "recommendation.md"
+  ],
+  "generated_utc": "2026-06-27T21:07:15.551366Z",
+  "live_trading_enabled": false,
+  "market_closed_verdict": "MARKET_CLOSED_EXPECTED",
+  "mode": "PAPER",
+  "official_claim_percentage": 66.67,
+  "order_placement_allowed": false,
+  "recommend_migration": false,
+  "safety_failures": [],
+  "safety_verdict": "PASS_ANALYZER_PAPER_ONLY",
+  "system3_current_match_percentage": 100.0,
+  "unsupported_claims": [
+    "Frontend dashboard templates or React/TypeScript templates",
+    "Dhan Cloud / hosted strategy platform",
+    "Strategy hosting"
+  ]
+}
