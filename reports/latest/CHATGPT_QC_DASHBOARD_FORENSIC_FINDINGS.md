@@ -22,6 +22,18 @@ LIVE_TRADING_READY = false
 
 ---
 
+## Patch Pack 1 status
+
+```text
+QCValidator init-order bug: fixed
+Dhan bid/ask aliases: fixed
+OI-change aliases: helper/compatibility added
+Tests added: tests/test_qc_validator_dhan_aliases.py
+Live trading: unchanged disabled
+Broker write APIs: not touched
+```
+---
+
 ## Dhan naming and platform truth
 
 ```text
@@ -524,4 +536,5 @@ Scope:
 Document created by ChatGPT as living forensic tracker.
 Next action: create auto snapshot script and QC runtime anomaly proof.
 ```
+
 

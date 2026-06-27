@@ -4,7 +4,7 @@ QC Validator for Option Chain Data
 
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -43,13 +43,6 @@ class QCValidator:
         self.sim_mode = sim_mode
         self.paper_sanity_mode = paper_sanity_mode
 
-        # PAPER_SANITY: Lower thresholds by 20-30%
-        if paper_sanity_mode:
-            self.min_data_completeness = max(0.6, min_data_completeness * 0.8)  # Lower to 60% or 80% of original
-            # Reduce min_contracts by 20%
-            for key in self.underlying_min_contracts:
-                self.underlying_min_contracts[key] = max(10, int(self.underlying_min_contracts[key] * 0.8))
-
         # Per-underlying contract thresholds (some indices have fewer contracts)
         self.underlying_min_contracts = {
             "SENSEX": 30,  # SENSEX typically has fewer contracts
@@ -58,6 +51,39 @@ class QCValidator:
             "NIFTY": 50,  # Standard threshold
             "BANKNIFTY": 50,  # Standard threshold
         }
+
+        # PAPER_SANITY: Lower thresholds by 20-30%
+        if paper_sanity_mode:
+            self.min_data_completeness = max(0.6, min_data_completeness * 0.8)  # Lower to 60% or 80% of original
+            # Reduce min_contracts by 20%
+            for key in self.underlying_min_contracts:
+                self.underlying_min_contracts[key] = max(10, int(self.underlying_min_contracts[key] * 0.8))
+
+    @staticmethod
+    def _first_present_column(df: pd.DataFrame, candidates: List[str]) -> Optional[str]:
+        for col in candidates:
+            if col in df.columns:
+                return col
+        return None
+
+    @classmethod
+    def _bid_ask_columns(cls, df: pd.DataFrame) -> Tuple[Optional[str], Optional[str]]:
+        bid_col = cls._first_present_column(df, ["bidPrice", "top_bid_price", "bid"])
+        ask_col = cls._first_present_column(df, ["offerPrice", "top_ask_price", "ask"])
+        return bid_col, ask_col
+
+    @classmethod
+    def normalize_oi_change_alias(cls, df: pd.DataFrame) -> pd.Series:
+        """
+        Return OI-change values using the first supported alias.
+
+        Supported aliases are dOI, oi_change, and change_in_oi. The input
+        DataFrame is not mutated.
+        """
+        oi_col = cls._first_present_column(df, ["dOI", "oi_change", "change_in_oi"])
+        if oi_col is None:
+            return pd.Series([pd.NA] * len(df), index=df.index, dtype="object")
+        return df[oi_col]
 
     def validate_snapshot(self, df: pd.DataFrame, underlying: str) -> Tuple[bool, List[str]]:
         """
@@ -86,9 +112,10 @@ class QCValidator:
                     failures.append(f"{col} completeness {completeness:.1%} < {self.min_data_completeness:.1%}")
 
         # Check 3: Bid/Ask validity (ask >= bid)
-        if "bidPrice" in df.columns and "offerPrice" in df.columns:
+        bid_col, ask_col = self._bid_ask_columns(df)
+        if bid_col and ask_col:
             invalid_spreads = df[
-                (df["bidPrice"].notna()) & (df["offerPrice"].notna()) & (df["offerPrice"] < df["bidPrice"])
+                (df[bid_col].notna()) & (df[ask_col].notna()) & (df[ask_col] < df[bid_col])
             ]
             if len(invalid_spreads) > 0:
                 failures.append(f"{len(invalid_spreads)} contracts have ask < bid (invalid)")
@@ -202,3 +229,4 @@ class QCValidator:
             "underlying_results": results,
             "timestamp": pd.Timestamp.now().isoformat(),
         }
+
