@@ -22,6 +22,17 @@ LIVE_TRADING_READY = false
 
 ---
 
+## Patch Pack 2 status
+
+```text
+Runtime QC endpoint: added
+Runtime QC validates same chain path as /api/chain: yes
+Market-closed zero-contract behavior: expected skip, not failure
+Anomaly proof script: added
+Live trading/order APIs: not touched
+```
+---
+
 ## Patch Pack 1 status
 
 ```text
@@ -536,5 +547,6 @@ Scope:
 Document created by ChatGPT as living forensic tracker.
 Next action: create auto snapshot script and QC runtime anomaly proof.
 ```
+
 
 

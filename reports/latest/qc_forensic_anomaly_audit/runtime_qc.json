@@ -1,0 +1,14 @@
+{
+  "bytes": 22,
+  "content_type": "application/json",
+  "data": null,
+  "elapsed_s": 0.408,
+  "endpoint": "/api/qc/runtime",
+  "error": "http_error:404",
+  "name": "qc_runtime",
+  "ok": false,
+  "sha256": "<redacted>",
+  "status": 404,
+  "text_preview": "{\"detail\":\"Not Found\"}",
+  "url": "https://genesis-system3-backend.onrender.com/api/qc/runtime"
+}

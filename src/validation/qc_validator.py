@@ -68,6 +68,14 @@ class QCValidator:
 
     @classmethod
     def _bid_ask_columns(cls, df: pd.DataFrame) -> Tuple[Optional[str], Optional[str]]:
+        alias_pairs = [
+            ("bidPrice", "offerPrice"),
+            ("top_bid_price", "top_ask_price"),
+            ("bid", "ask"),
+        ]
+        for bid_col, ask_col in alias_pairs:
+            if bid_col in df.columns and ask_col in df.columns:
+                return bid_col, ask_col
         bid_col = cls._first_present_column(df, ["bidPrice", "top_bid_price", "bid"])
         ask_col = cls._first_present_column(df, ["offerPrice", "top_ask_price", "ask"])
         return bid_col, ask_col
@@ -97,6 +105,8 @@ class QCValidator:
             Tuple of (passed, reasons)
         """
         failures = []
+        if df is None or df.empty:
+            return False, ["No contracts to validate"]
 
         # Check 1: Minimum contracts (per-underlying threshold)
         min_contracts_for_underlying = self.underlying_min_contracts.get(underlying, self.min_contracts)
@@ -229,4 +239,5 @@ class QCValidator:
             "underlying_results": results,
             "timestamp": pd.Timestamp.now().isoformat(),
         }
+
 

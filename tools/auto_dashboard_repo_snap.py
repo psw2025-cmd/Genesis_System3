@@ -31,6 +31,7 @@ API_ENDPOINTS = {
     "health": "/api/health",
     "state": "/api/state",
     "qc": "/api/qc",
+    "qc_runtime": "/api/qc/runtime",
     "broker_status": "/api/broker/dhan/status",
     "instruments_health": "/api/instruments/health",
     "underlyings": "/api/underlyings",
@@ -351,3 +352,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pytz
 
@@ -2087,6 +2087,221 @@ async def get_qc():
 
 # Default underlyings for discovery (validator and UI)
 DEFAULT_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+
+
+def _runtime_qc_chain_to_df(chain: Dict[str, Any]):
+    if pd is None:
+        return None
+    contracts = chain.get("contracts") or []
+    if not contracts:
+        return pd.DataFrame()
+    return pd.DataFrame(contracts)
+
+
+def _runtime_qc_source_is_synthetic(source: Any) -> bool:
+    return "synthetic" in str(source or "").lower() or "fake" in str(source or "").lower()
+
+
+def _runtime_qc_trade_ready(chain: Dict[str, Any]) -> bool:
+    if bool(chain.get("trade_ready") or chain.get("tradeable") or chain.get("ready_for_trade")):
+        return True
+    status = str(chain.get("status") or "").upper()
+    return status in {"MARKET_OPEN", "LIVE", "TRADE_READY"}
+
+
+def _runtime_qc_market_closed_zero_ok(result: Dict[str, Any]) -> bool:
+    status = str(result.get("status") or "").upper()
+    return bool(
+        result.get("market_open") is False
+        and int(result.get("total_contracts") or 0) == 0
+        and (result.get("skipped") is True or status in {"MARKET_CLOSED", "MARKET_CLOSED_EXPECTED"})
+    )
+
+
+def _runtime_qc_anomalies(df, market_open: bool) -> Tuple[List[str], List[str]]:
+    critical: List[str] = []
+    warnings: List[str] = []
+    if df is None or df.empty:
+        return critical, warnings
+
+    def _series(name: str):
+        return pd.to_numeric(df[name], errors="coerce") if name in df.columns else None
+
+    bid_col = ask_col = None
+    try:
+        from src.validation.qc_validator import QCValidator
+
+        bid_col, ask_col = QCValidator._bid_ask_columns(df)
+    except Exception:
+        pass
+    if bid_col and ask_col:
+        bid = pd.to_numeric(df[bid_col], errors="coerce")
+        ask = pd.to_numeric(df[ask_col], errors="coerce")
+        bad = ((bid.notna()) & (ask.notna()) & (ask < bid)).sum()
+        if bad:
+            critical.append(f"{int(bad)} contracts have ask < bid")
+
+    ltp = _series("ltp")
+    if ltp is not None:
+        negative_ltp = ((ltp.notna()) & (ltp < 0)).sum()
+        if negative_ltp:
+            critical.append(f"{int(negative_ltp)} contracts have negative LTP")
+        zero_ltp = ((ltp.notna()) & (ltp == 0)).sum()
+        if len(df) and zero_ltp > len(df) * 0.2:
+            warnings.append(f"{int(zero_ltp)} contracts have zero LTP")
+
+    iv = _series("iv")
+    if iv is not None:
+        invalid_iv = ((iv.notna()) & ((iv < 0) | (iv > 3))).sum()
+        if invalid_iv:
+            warnings.append(f"{int(invalid_iv)} contracts have IV outside 0-3 range")
+
+    for col in ("strike", "option_type"):
+        if col not in df.columns:
+            warnings.append(f"missing {col}")
+        else:
+            missing = df[col].isna().sum()
+            if len(df) and missing > len(df) * 0.1:
+                warnings.append(f"{int(missing)} contracts missing {col}")
+
+    if market_open and "fetch_timestamp" in df.columns:
+        try:
+            now = datetime.now(IST)
+            ts = pd.to_datetime(
+                df["fetch_timestamp"].astype(str).str.replace(" IST", "", regex=False),
+                errors="coerce",
+            )
+            if getattr(ts.dt, "tz", None) is None:
+                ts = ts.dt.tz_localize(IST, nonexistent="NaT", ambiguous="NaT")
+            age = (now - ts).dt.total_seconds()
+            stale = ((age.notna()) & (age > 60)).sum()
+            if stale > len(df) * 0.1:
+                warnings.append(f"{int(stale)} contracts have stale timestamps >60s")
+        except Exception:
+            pass
+    return critical, warnings
+
+
+@app.get("/api/qc/runtime")
+async def get_qc_runtime():
+    """Read-only runtime QC over the same chain adapter used by /api/chain."""
+    market_is_open = False
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            market_is_open, _reason = is_market_open()
+        except Exception:
+            market_is_open = False
+
+    critical_failures: List[str] = []
+    warnings: List[str] = []
+    underlying_results: Dict[str, Any] = {}
+    total_contracts = 0
+    data_sources: List[str] = []
+
+    try:
+        from core.data.datasource_manager import DataSourceManager
+        from dashboard.backend.chain_adapter import fetch_chain_for_api
+        from src.validation.qc_validator import QCValidator
+    except Exception as exc:
+        return {
+            "status": "ERROR",
+            "overall_passed": False,
+            "market_open": market_is_open,
+            "skipped": False,
+            "data_source": "import_error",
+            "total_contracts": 0,
+            "underlying_count": 0,
+            "underlying_results": {},
+            "critical_failures": [f"runtime QC import failed: {exc}"],
+            "warnings": [],
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+    validator = QCValidator(paper_sanity_mode=True)
+
+    for underlying in DEFAULT_UNDERLYINGS:
+        chain: Dict[str, Any] = {
+            "underlying": underlying,
+            "contracts": [],
+            "total_contracts": 0,
+            "status": "MARKET_CLOSED" if not market_is_open else "NO_DATA",
+            "data_source": "closed" if not market_is_open else "live",
+        }
+        fetch_error = None
+        try:
+            def _fetch_chain():
+                return fetch_chain_for_api(DataSourceManager(), underlying)
+
+            fetched = await _run_blocking(_fetch_chain, timeout=45.0)
+            if fetched:
+                chain.update(fetched)
+                if not market_is_open and not chain.get("status"):
+                    chain["status"] = "MARKET_CLOSED"
+        except asyncio.TimeoutError:
+            fetch_error = "timeout"
+        except Exception as exc:
+            fetch_error = str(exc)
+
+        contracts_count = int(chain.get("total_contracts") or len(chain.get("contracts") or []))
+        source = chain.get("data_source") or chain.get("source") or "unknown"
+        data_sources.append(str(source))
+        total_contracts += contracts_count
+        df = _runtime_qc_chain_to_df(chain)
+        skipped = bool(not market_is_open and contracts_count == 0)
+        result_status = "MARKET_CLOSED_EXPECTED" if skipped else str(chain.get("status") or "OK")
+
+        if _runtime_qc_source_is_synthetic(source) and _runtime_qc_trade_ready(chain):
+            critical_failures.append(f"{underlying}: synthetic/fake data marked trade-ready")
+
+        qc_passed = None
+        qc_reasons: List[str] = []
+        underlying_critical: List[str] = []
+        underlying_warnings: List[str] = []
+        if skipped:
+            qc_passed = None
+        elif df is not None:
+            qc_passed, qc_reasons = validator.validate_snapshot(df, underlying)
+            underlying_critical, underlying_warnings = _runtime_qc_anomalies(df, market_is_open)
+            critical_failures.extend([f"{underlying}: {item}" for item in underlying_critical])
+            warnings.extend([f"{underlying}: {item}" for item in underlying_warnings])
+            if not qc_passed:
+                warnings.extend([f"{underlying}: {item}" for item in qc_reasons])
+
+        if fetch_error and market_is_open:
+            critical_failures.append(f"{underlying}: chain fetch failed: {fetch_error}")
+        elif fetch_error:
+            warnings.append(f"{underlying}: after-hours chain fetch skipped/failed: {fetch_error}")
+
+        underlying_results[underlying] = {
+            "status": result_status,
+            "passed": qc_passed,
+            "skipped": skipped,
+            "market_open": market_is_open,
+            "total_contracts": contracts_count,
+            "data_source": source,
+            "qc_reasons": qc_reasons,
+            "critical_failures": underlying_critical,
+            "warnings": underlying_warnings,
+            "fetch_error": fetch_error,
+        }
+
+    skipped_all = bool(not market_is_open and total_contracts == 0)
+    status = "MARKET_CLOSED_EXPECTED" if skipped_all else ("FAIL" if critical_failures else "PASS")
+    return {
+        "status": status,
+        "overall_passed": False if critical_failures else (None if skipped_all else True),
+        "market_open": market_is_open,
+        "skipped": skipped_all,
+        "data_source": ",".join(sorted(set(data_sources))) if data_sources else "unknown",
+        "total_contracts": total_contracts,
+        "underlying_count": len(DEFAULT_UNDERLYINGS),
+        "underlying_results": underlying_results,
+        "critical_failures": critical_failures,
+        "warnings": warnings,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
 
 
 @app.get("/api/underlyings")
@@ -5383,3 +5598,5 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
+

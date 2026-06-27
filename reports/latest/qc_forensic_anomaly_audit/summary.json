@@ -1,0 +1,25 @@
+{
+  "anomaly_audit_verdict": "PASS_ANALYZER_PAPER_ONLY",
+  "backend_url": "https://genesis-system3-backend.onrender.com",
+  "critical_failures": [],
+  "dashboard_url": "https://genesis-system3-backend.onrender.com/ui",
+  "endpoint_count": 8,
+  "endpoint_ok_count": 7,
+  "files_generated": [
+    "summary.md",
+    "summary.json",
+    "endpoint_matrix.json",
+    "runtime_qc.json",
+    "chain_matrix.json",
+    "anomaly_matrix.csv",
+    "safety_verdict.json"
+  ],
+  "generated_utc": "2026-06-27T21:57:26.771039Z",
+  "market_closed_zero_contract_policy": "zero contracts accepted when status is MARKET_CLOSED/MARKET_CLOSED_EXPECTED or skipped=true",
+  "runtime_qc_available": false,
+  "safety_verdict": "PASS_ANALYZER_PAPER_ONLY",
+  "status": "WARN",
+  "warnings": [
+    "qc_runtime: endpoint not ok (404)"
+  ]
+}
