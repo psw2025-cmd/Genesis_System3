@@ -134,6 +134,7 @@ jobs:
           python -m py_compile system3_control_plane.py
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
+          python -m py_compile scripts/system3_proof_pack_closure_gate.py
           echo "compile_proof=PASS"
 
   # -----------------------------------------------------------------------
@@ -181,6 +182,7 @@ jobs:
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
           python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
+          python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile dashboard/backend/app.py
           echo "compile_expanded=PASS"
 
@@ -224,6 +226,15 @@ jobs:
           test -f reports/latest/implementation_batch/status_matrix.json
           test -f reports/latest/implementation_batch/unresolved_blockers.md
           echo "proof_batch=PASS"
+
+      - name: Run proof pack closure gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f scripts/system3_proof_pack_closure_gate.py
+          python scripts/system3_proof_pack_closure_gate.py
+          test -f reports/latest/proof_pack_closure_gate/summary.json
+          echo "proof_pack_closure_gate=PASS"
 
       - name: Upload proof pack artifact
         uses: actions/upload-artifact@v4
