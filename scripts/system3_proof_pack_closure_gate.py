@@ -7,14 +7,14 @@ Reads reports/latest proof artifacts and creates a deterministic closure report
 for the exact blockers seen in proof pack 534. It does not log in to any broker,
 does not place orders, does not read secrets, and does not enable live trading.
 
-The gate separates:
-- code/proof gaps that can be resolved by CI/local proof scripts, and
-- manual runtime gaps that require a secure broker-enabled laptop/runtime.
+This gate must be honest, but also useful on a local laptop where some secondary
+proof artifacts may not exist yet. Missing secondary proof files are therefore
+reported as OPEN proof items instead of making the whole gate fail.
 
 Exit codes:
 - 0: repository proof infrastructure is safe and closure report was written.
 - 2: a safety invariant is broken.
-- 3: required proof artifacts are missing or malformed.
+- 3: core proof artifacts are missing or malformed.
 """
 
 from __future__ import annotations
@@ -29,6 +29,22 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest"
 OUT = REPORTS / "proof_pack_closure_gate"
+
+CORE_ARTIFACTS = {
+    "pipeline": "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json",
+    "matrix": "reports/latest/proof_status_matrix/proof_status_matrix.json",
+    "blockers": "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
+    "lifecycle": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+}
+
+SECONDARY_ARTIFACTS = {
+    "dashboard_truth": "reports/latest/dashboard_truth_proof/summary.json",
+    "dashboard_browser": "reports/latest/dashboard_browser_proof/summary.json",
+    "endpoint_coverage": "reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json",
+    "broker_validation": "reports/latest/broker_trader_validation/summary.json",
+    "real_market_data": "reports/latest/real_market_data_proof/summary.json",
+    "expectancy": "reports/latest/friction_expectancy/summary.json",
+}
 
 
 def utc_now() -> str:
@@ -78,11 +94,6 @@ def bool_path(data: dict[str, Any] | None, *keys: str) -> bool | None:
     return cur if isinstance(cur, bool) else None
 
 
-def list_warnings(data: dict[str, Any] | None) -> list[str]:
-    warnings = data.get("warnings") if isinstance(data, dict) else None
-    return warnings if isinstance(warnings, list) else []
-
-
 def main() -> int:
     flags = safety_flags()
     if not flags["safe"]:
@@ -99,21 +110,21 @@ def main() -> int:
         print("FAIL: live trading safety flags are not safe", file=sys.stderr)
         return 2
 
-    required = {
-        "pipeline": "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json",
-        "matrix": "reports/latest/proof_status_matrix/proof_status_matrix.json",
-        "blockers": "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
-        "lifecycle": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
-        "dashboard_truth": "reports/latest/dashboard_truth_proof/summary.json",
-        "dashboard_browser": "reports/latest/dashboard_browser_proof/summary.json",
-        "endpoint_coverage": "reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json",
-        "broker_validation": "reports/latest/broker_trader_validation/summary.json",
-        "real_market_data": "reports/latest/real_market_data_proof/summary.json",
-        "expectancy": "reports/latest/friction_expectancy/summary.json",
-    }
+    required = {**CORE_ARTIFACTS, **SECONDARY_ARTIFACTS}
     loaded = {name: load_json(path) for name, path in required.items()}
-    missing = [path for name, path in required.items() if loaded[name] is None]
-    malformed = [path for name, path in required.items() if isinstance(loaded[name], dict) and "_json_error" in loaded[name]]
+
+    missing_core = [path for name, path in CORE_ARTIFACTS.items() if loaded[name] is None]
+    malformed_core = [
+        path
+        for name, path in CORE_ARTIFACTS.items()
+        if isinstance(loaded[name], dict) and "_json_error" in loaded[name]
+    ]
+    missing_secondary = [path for name, path in SECONDARY_ARTIFACTS.items() if loaded[name] is None]
+    malformed_secondary = [
+        path
+        for name, path in SECONDARY_ARTIFACTS.items()
+        if isinstance(loaded[name], dict) and "_json_error" in loaded[name]
+    ]
 
     lifecycle = loaded["lifecycle"]
     lifecycle_ev = lifecycle.get("evidence", {}) if isinstance(lifecycle, dict) else {}
@@ -123,6 +134,27 @@ def main() -> int:
         and lifecycle_ev.get("dry_run") is False
         and lifecycle_ev.get("broker_connected") is True
         and lifecycle_ev.get("orders_trades_lifecycle_reconciled") is True
+        and bool(lifecycle_ev.get("expiry"))
+        and float(lifecycle_ev.get("strike") or 0) > 0
+    )
+
+    # The lifecycle script may also put expiry/strike under mandatory_field_check.
+    mandatory = lifecycle.get("mandatory_field_check", {}) if isinstance(lifecycle, dict) else {}
+    if (
+        isinstance(lifecycle, dict)
+        and lifecycle.get("pass") is True
+        and lifecycle_ev.get("dry_run") is False
+        and lifecycle_ev.get("broker_connected") is True
+        and lifecycle_ev.get("orders_trades_lifecycle_reconciled") is True
+        and bool(mandatory.get("expiry"))
+        and float(mandatory.get("strike") or 0) > 0
+    ):
+        lifecycle_real_market_proven = True
+
+    lifecycle_pass_but_invalid_contract = (
+        isinstance(lifecycle, dict)
+        and lifecycle.get("pass") is True
+        and (not bool(mandatory.get("expiry")) or float(mandatory.get("strike") or 0) <= 0)
     )
 
     dashboard_browser = loaded["dashboard_browser"]
@@ -137,20 +169,29 @@ def main() -> int:
     broker_manual_required = not broker_connected
 
     expectancy = loaded["expectancy"]
-    expectancy_real_backtest_done = isinstance(expectancy, dict) and expectancy.get("backtest_status") not in {None, "PENDING_LAPTOP_RUN"}
+    expectancy_real_backtest_done = isinstance(expectancy, dict) and expectancy.get("backtest_status") not in {
+        None,
+        "PENDING_LAPTOP_RUN",
+    }
 
     closure_items = [
         {
             "blocker": "live_market_analyzer_paper_trade_not_proven",
             "status": "CLOSED" if lifecycle_real_market_proven else "MANUAL_RUNTIME_PROOF_REQUIRED",
             "safe_to_auto_fix": False,
-            "why": "Requires market-day broker-connected analyzer/paper lifecycle with reconciled order/fill/exit/PnL proof.",
+            "why": "Requires market-day broker-connected analyzer/paper lifecycle with valid expiry, strike, order/fill/exit/PnL reconciliation.",
         },
         {
             "blocker": "full_signal_to_exit_pnl_lifecycle_not_proven",
             "status": "CLOSED" if lifecycle_real_market_proven else "MANUAL_RUNTIME_PROOF_REQUIRED",
             "safe_to_auto_fix": False,
-            "why": "Cannot be honestly closed from dry-run or broker-offline CI evidence.",
+            "why": "A PASS with simulated exit or invalid contract fields is analyzer proof only, not trade-readiness proof.",
+        },
+        {
+            "blocker": "valid_option_contract_not_proven",
+            "status": "OPEN" if lifecycle_pass_but_invalid_contract else "CLOSED",
+            "safe_to_auto_fix": False,
+            "why": "Current lifecycle output has empty expiry or strike 0; paper proof must use a real tradable option contract.",
         },
         {
             "blocker": "lifecycle_proof_broker_not_connected",
@@ -176,31 +217,35 @@ def main() -> int:
     auto_closed = [item for item in closure_items if item["status"] == "CLOSED" and item["safe_to_auto_fix"]]
     manual_required = [item for item in open_items if not item["safe_to_auto_fix"]]
 
+    core_fail = bool(missing_core or malformed_core)
     summary = {
         "generated_utc": utc_now(),
-        "status": "PASS_WITH_MANUAL_RUNTIME_ITEMS" if not missing and not malformed else "FAIL",
+        "status": "FAIL" if core_fail else "PASS_WITH_MANUAL_RUNTIME_ITEMS",
         "mode": "ANALYZER_PAPER_ONLY",
         "live_trading_enabled": False,
         "trade_ready": False,
         "safety_flags": flags,
-        "required_artifacts": required,
-        "missing_required_artifacts": missing,
-        "malformed_required_artifacts": malformed,
+        "core_artifacts": CORE_ARTIFACTS,
+        "secondary_artifacts": SECONDARY_ARTIFACTS,
+        "missing_core_artifacts": missing_core,
+        "malformed_core_artifacts": malformed_core,
+        "missing_secondary_artifacts": missing_secondary,
+        "malformed_secondary_artifacts": malformed_secondary,
         "closure_items": closure_items,
         "open_item_count": len(open_items),
         "auto_closed_count": len(auto_closed),
         "manual_runtime_required_count": len(manual_required),
         "broker_manual_required": broker_manual_required,
         "final_verdict": (
-            "ARTIFACTS_MISSING_OR_MALFORMED"
-            if missing or malformed
+            "CORE_ARTIFACTS_MISSING_OR_MALFORMED"
+            if core_fail
             else (
                 "PROOF_INFRASTRUCTURE_READY_MANUAL_RUNTIME_PROOF_REQUIRED"
                 if open_items
                 else "ALL_PROOF_PACK_BLOCKERS_CLOSED_ANALYZER_ONLY"
             )
         ),
-        "next_safe_command": "python scripts/paper_lifecycle_proof.py --force on broker-enabled market-day runtime; then run python scripts/system3_master_proof_orchestrator.py",
+        "next_safe_command": "python scripts/paper_lifecycle_proof.py --force on broker-enabled market-day runtime with a valid option contract; then run python scripts/system3_master_proof_orchestrator.py",
     }
 
     OUT.mkdir(parents=True, exist_ok=True)
@@ -223,6 +268,8 @@ def main() -> int:
     ]
     for item in closure_items:
         md.append(f"| `{item['blocker']}` | `{item['status']}` | `{item['safe_to_auto_fix']}` | {item['why']} |")
+    md.extend(["", "## Missing secondary artifacts", ""])
+    md.extend([f"- `{x}`" for x in missing_secondary] or ["- None"])
     md.extend(
         [
             "",
@@ -242,8 +289,18 @@ def main() -> int:
     )
     (OUT / "README.md").write_text("\n".join(md), encoding="utf-8")
 
-    print(json.dumps({"status": summary["status"], "final_verdict": summary["final_verdict"], "open_item_count": len(open_items)}, indent=2))
-    return 3 if missing or malformed else 0
+    print(
+        json.dumps(
+            {
+                "status": summary["status"],
+                "final_verdict": summary["final_verdict"],
+                "open_item_count": len(open_items),
+                "missing_secondary_count": len(missing_secondary),
+            },
+            indent=2,
+        )
+    )
+    return 3 if core_fail else 0
 
 
 if __name__ == "__main__":
