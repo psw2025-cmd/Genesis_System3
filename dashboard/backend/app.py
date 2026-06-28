@@ -4287,116 +4287,6 @@ async def check_risk_limits(risk_limits: Dict[str, float]):
         return {"status": "ERROR", "message": str(e)}
 
 
-@app.get("/api/charting/heatmap/{underlying}")
-async def get_heatmap(underlying: str, metric: str = "oi"):
-    """Get option chain heatmap data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        heatmap = charting.generate_option_chain_heatmap(chain_data, metric)
-
-        return {"status": "ok", "heatmap": heatmap}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/iv-surface/{underlying}")
-async def get_iv_surface(underlying: str):
-    """Get IV surface data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        surface = charting.generate_iv_surface(chain_data)
-
-        return {"status": "ok", "surface": surface}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/greeks/{underlying}")
-async def get_greeks_chart(underlying: str, greek: str = "delta"):
-    """Get Greeks chart data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        greeks_data = charting.generate_greeks_chart(chain_data, greek)
-
-        return {"status": "ok", "greeks": greeks_data}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/pcr/{underlying}")
-async def get_pcr_chart(underlying: str):
-    """Get Put-Call Ratio chart data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        pcr_data = charting.generate_pcr_chart(chain_data)
-
-        return {"status": "ok", "pcr": pcr_data}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.post("/api/filter/chain/{underlying}")
-async def filter_option_chain_endpoint(underlying: str, filters: Dict[str, Any]):
-    """Filter option chain"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced filtering not available"}
-
-        chain_data = await get_chain(underlying)
-        contracts = chain_data.get("contracts", [])
-
-        filtering = get_advanced_filtering()
-        filtered = filtering.filter_option_chain(contracts, filters)
-
-        return {
-            "status": "ok",
-            "original_count": len(contracts),
-            "filtered_count": len(filtered),
-            "contracts": filtered,
-        }
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.post("/api/filter/positions")
-async def filter_positions_endpoint(filters: Dict[str, Any]):
-    """Filter positions"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced filtering not available"}
-
-        positions_data = await get_positions()
-        positions = positions_data.get("positions", [])
-
-        filtering = get_advanced_filtering()
-        filtered = filtering.filter_positions(positions, filters)
-
-        return {
-            "status": "ok",
-            "original_count": len(positions),
-            "filtered_count": len(filtered),
-            "positions": filtered,
-        }
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
 @app.post("/api/backtest/run")
 async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data: List[Dict[str, Any]] = None):
     """Run backtest"""
@@ -4577,6 +4467,9 @@ async def export_positions(format: str = "csv"):
 
         positions_data = await get_positions()
         positions = positions_data.get("positions", [])
+
+        if not positions:
+            return {"status": "ok", "file": None, "format": format, "count": 0, "message": "No open positions to export"}
 
         export_system = get_export_reporting()
         timestamp = datetime.now(IST).strftime("%Y%m%d_%H%M%S")
@@ -5514,39 +5407,10 @@ async def runner_stop():
 @app.get("/api/runner/status")
 async def runner_status():
     """Get runner status via runner.py CLI"""
+    import time
     try:
-        import subprocess
-        import time
-
-        runner_script = ROOT_DIR / "runner.py"
-        if not runner_script.exists():
-            return {"runner": "ERROR", "error": "runner.py not found"}
-
-        result = subprocess.run(
-            [sys.executable, str(runner_script), "status"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            cwd=str(ROOT_DIR),
-        )
-
-        # Parse JSON output from runner.py
-        try:
-            output_lines = result.stdout.split("\n")
-            json_start = None
-            for i, line in enumerate(output_lines):
-                if line.strip().startswith("{"):
-                    json_start = i
-                    break
-            if json_start is not None:
-                json_output = "\n".join(output_lines[json_start:])
-                status_data = json.loads(json_output)
-                return status_data
-        except Exception as parse_err:
-            # If parsing fails, try heartbeat fallback
-            pass
-
-        # Fallback: try to read heartbeat directly
+        # Read heartbeat file directly — spawning runner.py as subprocess is
+        # unsafe on 512Mi Render (imports all modules, spikes RAM to OOM).
         heartbeat_file = ROOT_DIR / "system3_daily_heartbeat.json"
         if heartbeat_file.exists():
             try:
@@ -5561,9 +5425,14 @@ async def runner_status():
                     "uptime_seconds": hb.get("system_info", {}).get("uptime_seconds"),
                 }
             except Exception as hb_err:
-                pass
+                return {"runner": "ERROR", "error": f"heartbeat parse error: {hb_err}"}
 
-        return {"runner": "STOPPED", "error": "Could not parse status"}
+        runner_script = ROOT_DIR / "runner.py"
+        return {
+            "runner": "NOT_STARTED",
+            "runner_script_exists": runner_script.exists(),
+            "message": "No heartbeat file found — runner has not run yet",
+        }
     except Exception as e:
         return {"runner": "ERROR", "error": str(e)}
 
