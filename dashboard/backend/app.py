@@ -1313,6 +1313,23 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
     return {"accepted": True}
 
 
+@app.get("/api/deploy/info")
+async def get_deploy_info():
+    """
+    Exposes the deployed commit SHA so external proof scripts (e.g.
+    scripts/paper_day_proof_pack.py) can verify Render is actually
+    running the expected commit, without needing a Render API key.
+    Render auto-injects RENDER_GIT_COMMIT on every deploy — this just
+    surfaces it. No secrets involved.
+    """
+    return {
+        "git_sha": os.environ.get("RENDER_GIT_COMMIT", ""),
+        "git_branch": os.environ.get("RENDER_GIT_BRANCH", ""),
+        "service_name": os.environ.get("RENDER_SERVICE_NAME", ""),
+        "deployed_at_known": bool(os.environ.get("RENDER_GIT_COMMIT")),
+    }
+
+
 @app.get("/api/scheduler/health")
 async def get_scheduler_health():
     """
