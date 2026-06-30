@@ -13,7 +13,7 @@ import subprocess
 import sys
 import threading
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import date as _date_cls, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -21,6 +21,20 @@ from typing import Any, Dict, List, Optional
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _is_today_market_holiday(d) -> tuple:
+    """Wraps core.utils.nse_holidays.is_trading_holiday; fails open
+    (treats as non-holiday) with a printed warning if the module or
+    that year's data is unavailable, so a missing/broken calendar
+    cannot silently block ALL market-dependent jobs forever."""
+    try:
+        from core.utils.nse_holidays import is_trading_holiday
+        return is_trading_holiday(d)
+    except Exception as exc:
+        print(f"[PH82] WARNING: nse_holidays check failed ({exc}) — "
+              f"treating {d} as non-holiday (fail-open)")
+        return False, None
 
 # Paths
 CONFIG_DIR = PROJECT_ROOT / "config"
@@ -372,6 +386,27 @@ def run_daemon() -> None:
             if named_days and isinstance(named_days, list):
                 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
                 if day_names[now.weekday()] not in named_days:
+                    continue
+
+            # NSE/BSE holiday filtering: jobs flagged market_dependent must
+            # also be skipped (and explicitly logged, not silently) on
+            # exchange holidays — weekdays_only alone fires on Diwali,
+            # Republic Day, etc, which produces misleading "validated"
+            # output for a day with no real market data.
+            if job.get("market_dependent", False):
+                is_holiday, holiday_name = _is_today_market_holiday(now.date())
+                if is_holiday:
+                    if last_fired_date.get(job_id) != today_str:
+                        print(f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — SKIPPING "
+                              f"{job.get('name', job_id)}: NSE/BSE holiday ({holiday_name})")
+                        state["jobs"][job_id] = {
+                            "last_run_time": now.isoformat(),
+                            "last_status": "MARKET_CLOSED_OR_HOLIDAY",
+                            "last_error": None,
+                            "holiday_name": holiday_name,
+                        }
+                        save_state(state)
+                        last_fired_date[job_id] = today_str  # don't re-check all day
                     continue
 
             should_fire = False
