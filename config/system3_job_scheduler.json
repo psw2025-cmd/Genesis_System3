@@ -30,7 +30,10 @@
       "id": "auto_coordinator_premarket",
       "name": "Full Auto Coordinator (Pre-Market)",
       "script": "tools/system3_auto_coordinator.py",
-      "args": ["--api-base", "https://genesis-system3-backend.onrender.com"],
+      "args": [
+        "--api-base",
+        "https://genesis-system3-backend.onrender.com"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "08:10",
@@ -43,7 +46,9 @@
       "id": "dhan_instruments_sync",
       "name": "Dhan Instrument Master Sync",
       "script": "scripts/sync_dhan_instruments_master.py",
-      "args": ["--force"],
+      "args": [
+        "--force"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "08:35",
@@ -56,14 +61,18 @@
       "id": "daily_gain_rank",
       "name": "Daily Gain Rank (Pre-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "rank"],
+      "args": [
+        "--mode",
+        "rank"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "09:15",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Ranks all tracked underlyings by predicted gain potential at market open"
+      "description": "Ranks all tracked underlyings by predicted gain potential at market open",
+      "market_dependent": true
     },
     {
       "id": "paper_lifecycle_proof",
@@ -76,7 +85,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Runs analyzer/paper lifecycle proof on market days."
+      "description": "Runs analyzer/paper lifecycle proof on market days.",
+      "market_dependent": true
     },
     {
       "id": "ui_market_cross_verify",
@@ -89,7 +99,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 5,
-      "description": "Cross-verify cloud UI APIs vs IST market session"
+      "description": "Cross-verify cloud UI APIs vs IST market session",
+      "market_dependent": true
     },
     {
       "id": "paper_lifecycle_proof_midday",
@@ -101,7 +112,8 @@
       "schedule_time": "12:00",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 10
+      "timeout_minutes": 10,
+      "market_dependent": true
     },
     {
       "id": "ui_market_cross_verify_midday",
@@ -113,7 +125,8 @@
       "schedule_time": "12:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 5
+      "timeout_minutes": 5,
+      "market_dependent": true
     },
     {
       "id": "paper_lifecycle_proof_afternoon",
@@ -125,7 +138,8 @@
       "schedule_time": "14:00",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 10
+      "timeout_minutes": 10,
+      "market_dependent": true
     },
     {
       "id": "ui_market_cross_verify_afternoon",
@@ -137,33 +151,42 @@
       "schedule_time": "14:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 5
+      "timeout_minutes": 5,
+      "market_dependent": true
     },
     {
       "id": "daily_gain_validate",
       "name": "Daily Gain Validate (Post-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "validate"],
+      "args": [
+        "--mode",
+        "validate"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "15:35",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Validates predictions vs NSE actual results, saves OI snapshot for next session"
+      "description": "Validates predictions vs NSE actual results, saves OI snapshot for next session",
+      "market_dependent": true
     },
     {
       "id": "daily_gain_trend",
       "name": "Daily Accuracy Trend (Post-Market)",
       "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": ["--mode", "trend"],
+      "args": [
+        "--mode",
+        "trend"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "15:40",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Prints 14-day accuracy trend, fires retrain signal if Spearman rho < 0.40 for 3 days"
+      "description": "Prints 14-day accuracy trend, fires retrain signal if Spearman rho < 0.40 for 3 days",
+      "market_dependent": true
     },
     {
       "id": "daily_prediction_benchmark",
@@ -176,7 +199,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Writes reports/latest/prediction_benchmark/{prediction_vs_actual.csv, top_mover_match.csv, missed_opportunities.md, benchmark_summary.md} per GitHub issue #26."
+      "description": "Writes reports/latest/prediction_benchmark/{prediction_vs_actual.csv, top_mover_match.csv, missed_opportunities.md, benchmark_summary.md} per GitHub issue #26.",
+      "market_dependent": true
     },
     {
       "id": "system3_post_market_pipeline",
@@ -189,7 +213,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "After validation: friction expectancy, model-to-trade gap, gate sync, blocker scan"
+      "description": "After validation: friction expectancy, model-to-trade gap, gate sync, blocker scan",
+      "market_dependent": true
     },
     {
       "id": "auto_retrain",
@@ -208,7 +233,10 @@
       "id": "auto_coordinator_post_market",
       "name": "Full Auto Coordinator (Post-Market)",
       "script": "tools/system3_auto_coordinator.py",
-      "args": ["--api-base", "https://genesis-system3-backend.onrender.com"],
+      "args": [
+        "--api-base",
+        "https://genesis-system3-backend.onrender.com"
+      ],
       "enabled": true,
       "type": "daily",
       "schedule_time": "16:10",
@@ -228,7 +256,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Downloads NSE F&O bhavcopy EOD archive after market close."
+      "description": "Downloads NSE F&O bhavcopy EOD archive after market close.",
+      "market_dependent": true
     },
     {
       "id": "signal_engine_bhavcopy",
@@ -241,7 +270,8 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Transforms bhavcopy into option chain snapshot, runs signal engine."
+      "description": "Transforms bhavcopy into option chain snapshot, runs signal engine.",
+      "market_dependent": true
     },
     {
       "id": "weekly_repo_authority_audit",
@@ -252,7 +282,9 @@
       "type": "daily",
       "schedule_time": "19:00",
       "timezone": "Asia/Kolkata",
-      "days": ["Friday"],
+      "days": [
+        "Friday"
+      ],
       "timeout_minutes": 10,
       "description": "Weekly scan for duplicate/orphan modules vs declared authoritative entrypoints. Writes reports/latest/repo_authority/."
     }
