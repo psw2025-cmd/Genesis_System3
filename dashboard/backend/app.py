@@ -1255,6 +1255,48 @@ async def get_auto_gates(refresh: bool = False):
         }
 
 
+
+@app.get("/api/scheduler/health")
+async def get_scheduler_health():
+    """
+    Job scheduler health — surfaces config parse failures and job-firing
+    state to the dashboard. Reads state/scheduler_config_alert.json
+    (written by core/engine/system3_phase82_job_scheduler.py whenever
+    its config is invalid JSON or contains zero jobs) and the phase82
+    scheduler state file (heartbeat + per-job last-run status).
+    Read-only; never blocks; safe to poll frequently.
+    """
+    alert_path = STATE_DIR / "scheduler_config_alert.json" if "STATE_DIR" in dir() else ROOT_DIR / "state" / "scheduler_config_alert.json"
+    state_path = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+
+    result = {
+        "config_alert": None,
+        "daemon_heartbeat": None,
+        "daemon_pid": None,
+        "jobs": {},
+        "healthy": True,
+    }
+
+    try:
+        if alert_path.exists():
+            result["config_alert"] = json.loads(alert_path.read_text())
+            result["healthy"] = False
+    except Exception as e:
+        result["config_alert"] = {"error": f"could not read alert file: {e}"}
+
+    try:
+        if state_path.exists():
+            state = json.loads(state_path.read_text())
+            result["daemon_heartbeat"] = state.get("daemon_heartbeat")
+            result["daemon_pid"] = state.get("daemon_pid")
+            result["jobs"] = state.get("jobs", {})
+            if not result["jobs"]:
+                result["healthy"] = False
+    except Exception as e:
+        result["jobs"] = {"error": f"could not read scheduler state: {e}"}
+
+    return result
+
 @app.get("/api/system_health")
 async def get_system_health():
     """Datasource health, token status, retrain flag, and scheduler job status."""
