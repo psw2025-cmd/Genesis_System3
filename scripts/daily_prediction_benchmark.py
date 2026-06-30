@@ -6,26 +6,36 @@ validation reports (state/market_validations/*.json) already produced by
 daily_gain_rank_and_validate.py + MarketResultValidator, and reshapes them
 into the exact deliverables Issue #26 requires:
 
-  reports/latest/prediction_benchmark/
+  reports/latest/performance_benchmark/
     prediction_vs_actual.csv   — every prediction vs market result
     top_mover_match.csv        — did System3 predict actual movers?
     missed_opportunities.md    — what profitable moves were missed
     benchmark_summary.md       — daily scorecard
 
+  reports/archive/performance_benchmark/YYYYMMDD/
+    (dated copy of all four files above, per Issue #26's archive requirement)
+
+DEPENDENCY GATE: only proceeds if today's daily_gain_validate run actually
+succeeded for today's date (checked via the phase82 scheduler state file).
+If validation has not run yet or failed, this writes an explicit
+"skipped — validation not complete" status instead of silently running
+on stale/partial data.
+
 This script does NOT invent or simulate data. If no validation report
 exists for a date, that date is skipped with an explicit note — never
-backfilled with synthetic numbers. Designed to run unattended via the
-job scheduler at 15:45 IST on trading days (after daily_gain_validate).
+backfilled with synthetic numbers.
 
 Usage:
     python scripts/daily_prediction_benchmark.py
     python scripts/daily_prediction_benchmark.py --days 30
+    python scripts/daily_prediction_benchmark.py --skip-dependency-check
 """
 
 import argparse
 import csv
 import json
 import os
+import shutil
 import sys
 from datetime import datetime, date
 from pathlib import Path
@@ -35,7 +45,11 @@ sys.path.insert(0, str(ROOT_DIR))
 
 RANK_HISTORY_FILE = ROOT_DIR / "state" / "gain_rank_history.json"
 VALIDATION_DIR = ROOT_DIR / "state" / "market_validations"
-OUT_DIR = ROOT_DIR / "reports" / "latest" / "prediction_benchmark"
+SCHEDULER_STATE_FILE = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+
+# Issue #26 specifies this exact path — do not rename without updating the issue.
+OUT_DIR = ROOT_DIR / "reports" / "latest" / "performance_benchmark"
+ARCHIVE_BASE = ROOT_DIR / "reports" / "archive" / "performance_benchmark"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -48,8 +62,32 @@ def load_json(path: Path, default):
         return default
 
 
+def check_validation_dependency(today_str: str) -> tuple:
+    """
+    Issue #26 dependency gate: only run if daily_gain_validate succeeded
+    for today's trading date. Returns (ok: bool, reason: str).
+    """
+    state = load_json(SCHEDULER_STATE_FILE, {})
+    job_state = state.get("jobs", {}).get("daily_gain_validate", {})
+    last_status = job_state.get("last_status")
+    last_run_time = job_state.get("last_run_time", "")
+
+    if not job_state:
+        return False, "daily_gain_validate has never run (no scheduler state found)"
+    if last_status != "SUCCESS":
+        return False, f"daily_gain_validate last_status={last_status!r}, not SUCCESS"
+    if not last_run_time.startswith(today_str):
+        return False, f"daily_gain_validate last ran {last_run_time}, not today ({today_str})"
+
+    # Also confirm a validation report actually landed for today
+    today_validation = VALIDATION_DIR / f"market_validation_{today_str}.json"
+    if not today_validation.exists():
+        return False, f"validation succeeded per scheduler state but {today_validation.name} not found on disk"
+
+    return True, "daily_gain_validate succeeded today and report file confirmed"
+
+
 def load_all_validations() -> list:
-    """Load every market_validation_*.json report, sorted by date."""
     if not VALIDATION_DIR.exists():
         return []
     reports = []
@@ -62,7 +100,6 @@ def load_all_validations() -> list:
 
 
 def load_predictions_by_date() -> dict:
-    """state/gain_rank_history.json -> {date: [predictions]}."""
     history = load_json(RANK_HISTORY_FILE, [])
     if not isinstance(history, list):
         return {}
@@ -76,7 +113,6 @@ def load_predictions_by_date() -> dict:
 
 
 def write_prediction_vs_actual_csv(validations: list, predictions_by_date: dict) -> int:
-    """One row per (date, underlying): predicted rank/score vs actual rank."""
     out_path = OUT_DIR / "prediction_vs_actual.csv"
     rows = []
     for v in validations:
@@ -112,7 +148,6 @@ def write_prediction_vs_actual_csv(validations: list, predictions_by_date: dict)
 
 
 def write_top_mover_match_csv(validations: list) -> int:
-    """One row per day: did predicted top-N overlap with actual top-N movers?"""
     out_path = OUT_DIR / "top_mover_match.csv"
     rows = []
     for v in validations:
@@ -143,7 +178,6 @@ def write_top_mover_match_csv(validations: list) -> int:
 
 
 def write_missed_opportunities_md(validations: list) -> int:
-    """Days where an actual top mover was NOT in the predicted top-N."""
     out_path = OUT_DIR / "missed_opportunities.md"
     lines = ["# Missed Opportunities — Daily Top-Mover Misses\n",
              f"_Generated {datetime.now().isoformat()}_\n",
@@ -168,8 +202,7 @@ def write_missed_opportunities_md(validations: list) -> int:
     return miss_count
 
 
-def write_benchmark_summary_md(validations: list, predictions_by_date: dict) -> dict:
-    """Daily scorecard + rolling stats."""
+def write_benchmark_summary_md(validations: list, dep_ok: bool, dep_reason: str) -> dict:
     out_path = OUT_DIR / "benchmark_summary.md"
 
     if not validations:
@@ -194,6 +227,7 @@ def write_benchmark_summary_md(validations: list, predictions_by_date: dict) -> 
     lines = [
         "# Prediction Benchmark Summary — Issue #26 Proof",
         f"\n_Generated {datetime.now().isoformat()}_\n",
+        f"- Dependency gate (today's validate run): {'✅ ' if dep_ok else '⚠️ '}{dep_reason}",
         f"- Trading days with validation data: **{len(validations)}**",
         f"- Date range: {validations[0]['date']} → {validations[-1]['date']}",
         f"- Average Spearman ρ: **{avg_rho:.3f}**" if avg_rho is not None else "- Average Spearman ρ: N/A",
@@ -213,30 +247,63 @@ def write_benchmark_summary_md(validations: list, predictions_by_date: dict) -> 
             f"{rho:.3f} | {hit:.1%} | {v.get('status', '--')} |"
         )
 
+    verdict = "BELOW THRESHOLD — more trading days of data needed, or model retrain required"
+    if avg_rho is not None and avg_rho >= 0.70:
+        verdict = "THRESHOLD MET"
     lines.append(
         "\n## Readiness Gate (per master roadmap)\n"
-        f"- Threshold: Spearman ρ ≥ 0.70 required for live-trading readiness\n"
-        f"- Current average: {avg_rho:.3f}" if avg_rho is not None else "N/A"
-    )
-    lines.append(
-        "- **Verdict**: " +
-        ("BELOW THRESHOLD — more trading days of data needed, or model retrain required"
-         if (avg_rho is None or avg_rho < 0.70) else "THRESHOLD MET")
+        "- Threshold: Spearman ρ ≥ 0.70 required for live-trading readiness\n"
+        + (f"- Current average: {avg_rho:.3f}\n" if avg_rho is not None else "- Current average: N/A\n")
+        + f"- **Verdict**: {verdict}"
     )
 
     out_path.write_text("\n".join(lines), encoding="utf-8")
     return {"days": len(validations), "avg_rho": avg_rho, "avg_hit_rate": avg_hit}
 
 
+def archive_today(today_str: str) -> Path:
+    """Issue #26 requires a dated archive copy alongside the 'latest' set."""
+    dest = ARCHIVE_BASE / today_str.replace("-", "")
+    dest.mkdir(parents=True, exist_ok=True)
+    for fname in ["prediction_vs_actual.csv", "top_mover_match.csv",
+                  "missed_opportunities.md", "benchmark_summary.md"]:
+        src = OUT_DIR / fname
+        if src.exists():
+            shutil.copy2(src, dest / fname)
+    return dest
+
+
 def main():
     parser = argparse.ArgumentParser(description="Daily Prediction-vs-Actual Benchmark (Issue #26)")
     parser.add_argument("--days", type=int, default=90, help="Max trading days to include")
+    parser.add_argument("--skip-dependency-check", action="store_true",
+                         help="Run even if today's daily_gain_validate has not succeeded yet (manual/proof runs)")
     args = parser.parse_args()
 
     print("=" * 70)
     print("DAILY PREDICTION-VS-ACTUAL BENCHMARK — Issue #26")
     print("=" * 70)
-    print(f"Run time: {datetime.now().isoformat()}")
+    today_str = date.today().isoformat()
+    print(f"Run time: {datetime.now().isoformat()}  (trading date: {today_str})")
+
+    dep_ok, dep_reason = check_validation_dependency(today_str)
+    print(f"Dependency gate: {'PASS' if dep_ok else 'NOT MET'} — {dep_reason}")
+
+    if not dep_ok and not args.skip_dependency_check:
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        skip_msg = (
+            f"# Prediction Benchmark — SKIPPED\n\n"
+            f"_Checked {datetime.now().isoformat()}_\n\n"
+            f"Dependency gate not met: **{dep_reason}**\n\n"
+            f"This job depends on `daily_gain_validate` (15:35 IST) completing "
+            f"successfully for today before it runs, per Issue #26's job-dependency "
+            f"requirement. Re-run with `--skip-dependency-check` to force a run "
+            f"on historical data anyway (e.g. for proof/testing purposes).\n"
+        )
+        (OUT_DIR / "benchmark_summary.md").write_text(skip_msg, encoding="utf-8")
+        print(f"\n⏭️  SKIPPED — wrote explicit skip notice to {OUT_DIR / 'benchmark_summary.md'}")
+        print("    (use --skip-dependency-check to force run on existing history)")
+        return 0
 
     validations = load_all_validations()
     if args.days and len(validations) > args.days:
@@ -255,19 +322,24 @@ def main():
     n3 = write_missed_opportunities_md(validations)
     print(f"  missed_opportunities.md   — {n3} days with misses")
 
-    summary = write_benchmark_summary_md(validations, predictions_by_date)
+    summary = write_benchmark_summary_md(validations, dep_ok, dep_reason)
     print(f"  benchmark_summary.md      — {summary['days']} days summarized")
+
+    archive_dest = archive_today(today_str)
+    print(f"  archived dated copy       — {archive_dest}")
 
     if summary["days"] == 0:
         print("\n⚠️  No validation data yet. Files written with honest "
-              "'no data' message. This is expected until the validate "
-              "job has run on at least one trading day after this fix.")
+              "'no data' message.")
     else:
         avg_rho = summary.get("avg_rho")
-        print(f"\n✅ Benchmark complete. Avg Spearman ρ over {summary['days']} days: "
-              f"{avg_rho:.3f}" if avg_rho is not None else "N/A")
+        if avg_rho is not None:
+            print(f"\n✅ Benchmark complete. Avg Spearman ρ over {summary['days']} days: {avg_rho:.3f}")
+        else:
+            print(f"\n✅ Benchmark complete. {summary['days']} days, ρ: N/A")
 
-    print(f"\nAll outputs written to: {OUT_DIR}")
+    print(f"\nLatest outputs:  {OUT_DIR}")
+    print(f"Archived copy:   {archive_dest}")
     return 0
 
 
