@@ -6,6 +6,7 @@ import { Overview } from './components/Overview'
 import { TradeTab } from './components/TradeTab'
 import { Positions } from './components/Positions'
 import { BrokerPanel } from './components/BrokerPanel'
+import { PerformanceTab } from './components/PerformanceTab'
 import { AlertsTab } from './components/AlertsTab'
 import { SystemTab } from './components/SystemTab'
 
@@ -16,12 +17,7 @@ function Content() {
     case 'trade':       return <TradeTab />
     case 'positions':   return <Positions />
     case 'broker':      return <BrokerPanel />
-    case 'performance': return (
-      <div style={{ padding: '24px', color: 'var(--text-mut)', fontSize: '.85rem' }}>
-        <h2 style={{ color: 'var(--text-pri)', fontWeight: 600, marginBottom: '8px' }}>Performance</h2>
-        <p>ML accuracy charts, ρ history, equity curve — coming next iteration.</p>
-      </div>
-    )
+    case 'performance': return <PerformanceTab />
     case 'alerts':      return <AlertsTab />
     case 'system':      return <SystemTab />
     case 'gates':       return <Overview />
