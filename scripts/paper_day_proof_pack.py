@@ -215,11 +215,40 @@ def check_5_worker_threads() -> Dict[str, Any]:
 
 
 def check_6_dashboard_screenshots() -> Dict[str, Any]:
-    return {"item": 6, "name": "Dashboard screenshots", "status": "UNVERIFIABLE",
-            "detail": "Screenshot capture requires a real browser (Playwright). This script runs "
-                      "headless inside the worker container with no display/browser binary "
-                      "installed. Run tools/playwright-setup/verify_all_ui_tabs.spec.ts "
-                      "separately (CI or local) for this item."}
+    """
+    Reads the status written by scripts/run_dashboard_browser_proof.py
+    (the Playwright wrapper, scheduled separately at 16:05 IST — before
+    this proof pack runs at 16:15 — so its result file exists by the
+    time this check runs). If that job hasn't run yet today, this is
+    UNVERIFIABLE rather than a guessed PASS/FAIL.
+    """
+    status_file = ROOT / "reports" / "latest" / "dashboard_browser_proof" / "status.json"
+    if not status_file.exists():
+        return {"item": 6, "name": "Dashboard screenshots", "status": "UNVERIFIABLE",
+                "detail": "dashboard_browser_proof has not run yet (no status.json found). "
+                          "Scheduled separately at 16:05 IST via run_dashboard_browser_proof job."}
+    try:
+        data = json.loads(status_file.read_text())
+    except Exception as exc:
+        return {"item": 6, "name": "Dashboard screenshots", "status": "FAIL",
+                "detail": f"status.json unreadable: {exc}"}
+
+    today_str = date.today().isoformat()
+    generated_today = str(data.get("generated_at", "")).startswith(today_str)
+    browser_status = data.get("status")
+
+    if browser_status == "NODE_NOT_AVAILABLE":
+        return {"item": 6, "name": "Dashboard screenshots", "status": "UNVERIFIABLE",
+                "detail": "Node.js not available in this runtime — browser proof cannot run here."}
+    if not generated_today:
+        return {"item": 6, "name": "Dashboard screenshots", "status": "UNVERIFIABLE",
+                "detail": f"Last browser proof run was {data.get('generated_at')}, not today."}
+
+    ok = browser_status == "PASS"
+    return {"item": 6, "name": "Dashboard screenshots", "status": "PASS" if ok else "FAIL",
+            "detail": f"playwright_status={browser_status} "
+                      f"overall_pass_from_spec={data.get('overall_pass_from_spec')} "
+                      f"exit_code={data.get('playwright_exit_code')}"}
 
 
 def check_7_no_placeholders() -> Dict[str, Any]:
