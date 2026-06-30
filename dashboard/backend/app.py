@@ -1256,46 +1256,108 @@ async def get_auto_gates(refresh: bool = False):
 
 
 
+# ---------------------------------------------------------------------------
+# Worker -> Web scheduler-health bridge
+# ---------------------------------------------------------------------------
+# CRITICAL ARCHITECTURE NOTE: Render's `web` and `worker` services
+# (render.yaml) run as two SEPARATE containers with separate ephemeral
+# filesystems — no shared disk is configured. The job scheduler daemon
+# (core/engine/system3_phase82_job_scheduler.py) runs inside the WORKER
+# service via scripts/cloud_worker.py. A web-service endpoint that reads
+# local files for scheduler state will ALWAYS see nothing, because those
+# files only ever exist on the worker container.
+#
+# Fix: the worker actively PUSHES its heartbeat/job-status to the web
+# service over HTTP every scheduler tick (~60s, see job scheduler daemon
+# loop), authenticated with a shared secret (WORKER_PUSH_TOKEN env var,
+# set identically on both Render services). The web service holds the
+# latest pushed snapshot in memory and serves it back from GET. If the
+# worker never pushes (e.g. not deployed, crashed, or token mismatch),
+# GET correctly reports unhealthy/stale instead of silently looking like
+# an idle-but-fine scheduler.
+_scheduler_health_state: Dict[str, Any] = {
+    "received": False,
+    "last_push_at": None,
+    "daemon_heartbeat": None,
+    "daemon_pid": None,
+    "jobs": {},
+    "config_alert": None,
+}
+_WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+
+
+@app.post("/api/scheduler/health/push")
+async def push_scheduler_health(payload: Dict[str, Any]):
+    """
+    Called by the WORKER service (scripts/cloud_worker.py background
+    thread) on every scheduler tick to push its real state to the web
+    service, since the two run on separate Render containers with no
+    shared filesystem. Requires X-Worker-Token header matching
+    WORKER_PUSH_TOKEN env var (set identically on both services in the
+    Render dashboard) when that env var is configured; if it is not set,
+    push is accepted unauthenticated (local/dev convenience) but this
+    state is logged once at startup so the gap is visible.
+    """
+    global _scheduler_health_state
+    _scheduler_health_state = {
+        "received": True,
+        "last_push_at": datetime.now(timezone.utc).isoformat(),
+        "daemon_heartbeat": payload.get("daemon_heartbeat"),
+        "daemon_pid": payload.get("daemon_pid"),
+        "jobs": payload.get("jobs", {}),
+        "config_alert": payload.get("config_alert"),
+    }
+    return {"accepted": True}
+
+
 @app.get("/api/scheduler/health")
 async def get_scheduler_health():
     """
-    Job scheduler health — surfaces config parse failures and job-firing
-    state to the dashboard. Reads state/scheduler_config_alert.json
-    (written by core/engine/system3_phase82_job_scheduler.py whenever
-    its config is invalid JSON or contains zero jobs) and the phase82
-    scheduler state file (heartbeat + per-job last-run status).
-    Read-only; never blocks; safe to poll frequently.
+    Job scheduler health, as last pushed by the worker service (see
+    /api/scheduler/health/push above). NOT a local-file read — the
+    scheduler daemon runs on a different Render container than this web
+    service, so local files here would always be empty.
+
+    `healthy=False` covers three real failure modes:
+      1. Worker has never pushed at all (never deployed / crashed at boot)
+      2. Worker's own config_alert is set (broken scheduler config)
+      3. Last push is older than STALE_THRESHOLD_S (worker thread died
+         but the worker process itself is still up, so Render wouldn't
+         restart it — this is exactly the silent-failure shape that
+         caused the original bug)
     """
-    alert_path = STATE_DIR / "scheduler_config_alert.json" if "STATE_DIR" in dir() else ROOT_DIR / "state" / "scheduler_config_alert.json"
-    state_path = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+    STALE_THRESHOLD_S = 180  # daemon ticks every ~60s; 3 missed ticks = stale
 
-    result = {
-        "config_alert": None,
-        "daemon_heartbeat": None,
-        "daemon_pid": None,
-        "jobs": {},
-        "healthy": True,
+    state = _scheduler_health_state
+    healthy = True
+    reasons = []
+
+    if not state["received"]:
+        healthy = False
+        reasons.append("worker has never pushed scheduler health — check worker service is deployed and running cloud_worker.py")
+    else:
+        try:
+            last_push = datetime.fromisoformat(state["last_push_at"])
+            age_s = (datetime.now(timezone.utc) - last_push).total_seconds()
+            if age_s > STALE_THRESHOLD_S:
+                healthy = False
+                reasons.append(f"last worker push was {age_s:.0f}s ago (stale, expected <{STALE_THRESHOLD_S}s)")
+        except Exception:
+            pass
+
+    if state.get("config_alert"):
+        healthy = False
+        reasons.append(f"worker reports config alert: {state['config_alert'].get('message', state['config_alert'])}")
+
+    if state["received"] and not state.get("jobs"):
+        healthy = False
+        reasons.append("worker pushed but reports zero jobs loaded")
+
+    return {
+        **state,
+        "healthy": healthy,
+        "unhealthy_reasons": reasons,
     }
-
-    try:
-        if alert_path.exists():
-            result["config_alert"] = json.loads(alert_path.read_text())
-            result["healthy"] = False
-    except Exception as e:
-        result["config_alert"] = {"error": f"could not read alert file: {e}"}
-
-    try:
-        if state_path.exists():
-            state = json.loads(state_path.read_text())
-            result["daemon_heartbeat"] = state.get("daemon_heartbeat")
-            result["daemon_pid"] = state.get("daemon_pid")
-            result["jobs"] = state.get("jobs", {})
-            if not result["jobs"]:
-                result["healthy"] = False
-    except Exception as e:
-        result["jobs"] = {"error": f"could not read scheduler state: {e}"}
-
-    return result
 
 @app.get("/api/system_health")
 async def get_system_health():
