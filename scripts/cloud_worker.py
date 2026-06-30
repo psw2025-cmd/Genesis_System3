@@ -2,17 +2,34 @@
 Genesis System3 — Cloud Worker
 ================================
 Single-process entrypoint for Render worker service.
-Runs three background daemons as threads:
+Runs four background daemons as threads:
 
-  Thread 1 — Token daemon      : refreshes DHAN_ACCESS_TOKEN daily at 08:30 IST
-  Thread 2 — Token watchdog    : checks token validity every CHECK_INTERVAL_S
-  Thread 3 — Job scheduler     : fires the 8 weekday analysis jobs on schedule
+  Thread 1 — Token daemon       : refreshes DHAN_ACCESS_TOKEN daily at 08:30 IST
+  Thread 2 — Token watchdog     : checks token validity every CHECK_INTERVAL_S
+  Thread 3 — Job scheduler      : fires the scheduled weekday analysis jobs
+  Thread 4 — Health push        : pushes scheduler heartbeat/job-status to the
+                                   web service every ~30s (see ARCHITECTURE note)
+
+ARCHITECTURE NOTE: Render's `web` and `worker` services run as separate
+containers with separate ephemeral filesystems — no shared disk. The
+job scheduler (Thread 3) writes its state to LOCAL files on THIS
+(worker) container. The web service's /api/scheduler/health endpoint
+cannot read those files directly, so Thread 4 actively pushes the
+state over HTTP to the web service's /api/scheduler/health/push
+endpoint instead. If WEB_SERVICE_URL is not set, Thread 4 logs a
+warning once and stays idle (does not crash the worker).
 
 Requires these env vars (set in Render dashboard → Environment):
   DHAN_CLIENT_ID, DHAN_APP_ID, DHAN_APP_SECRET
   DHAN_PIN, DHAN_TOTP_SECRET
-  DHAN_ACCESS_TOKEN  (initial; auto-refreshed afterward)
-  CLOUD_WORKER=true  (set automatically in render.yaml — enables cloud fallback path)
+  DHAN_ACCESS_TOKEN     (initial; auto-refreshed afterward)
+  CLOUD_WORKER=true     (set automatically in render.yaml)
+  WEB_SERVICE_URL        e.g. https://genesis-system3-backend.onrender.com
+                          (defaults to the production URL if unset)
+  WORKER_PUSH_TOKEN      shared secret; must match the web service's
+                          WORKER_PUSH_TOKEN env var exactly. If unset on
+                          either side, push proceeds unauthenticated
+                          (logged once, for local/dev use only).
 
 Safety gate: LIVE_TRADING_ENABLED must be 0 (default). Do NOT change until
 paper/analyzer proof passes and CI is fully green.
@@ -98,6 +115,68 @@ def _run_job_scheduler():
 
 
 # ---------------------------------------------------------------------------
+# Thread 4: Scheduler health push (worker -> web, see ARCHITECTURE note above)
+# ---------------------------------------------------------------------------
+_DEFAULT_WEB_URL = "https://genesis-system3-backend.onrender.com"
+_SCHEDULER_STATE_FILE = ROOT / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+_SCHEDULER_ALERT_FILE = ROOT / "state" / "scheduler_config_alert.json"
+_PUSH_INTERVAL_S = 30
+
+
+def _run_health_push():
+    log.info("[health-push] starting")
+    web_url = os.environ.get("WEB_SERVICE_URL", _DEFAULT_WEB_URL).rstrip("/")
+    push_token = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+
+    if not push_token:
+        log.warning(
+            "[health-push] WORKER_PUSH_TOKEN not set — pushes will be "
+            "unauthenticated. Set this env var identically on both the "
+            "web and worker Render services for production."
+        )
+
+    try:
+        import json as _json
+        import urllib.request as _urlreq
+        import urllib.error as _urlerr
+    except Exception as exc:
+        log.exception(f"[health-push] import failed, thread exiting: {exc}")
+        return
+
+    while True:
+        try:
+            payload = {"daemon_heartbeat": None, "daemon_pid": None, "jobs": {}, "config_alert": None}
+
+            if _SCHEDULER_STATE_FILE.exists():
+                state = _json.loads(_SCHEDULER_STATE_FILE.read_text(encoding="utf-8"))
+                payload["daemon_heartbeat"] = state.get("daemon_heartbeat")
+                payload["daemon_pid"] = state.get("daemon_pid")
+                payload["jobs"] = state.get("jobs", {})
+
+            if _SCHEDULER_ALERT_FILE.exists():
+                payload["config_alert"] = _json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))
+
+            body = _json.dumps(payload).encode("utf-8")
+            headers = {"Content-Type": "application/json"}
+            if push_token:
+                headers["X-Worker-Token"] = push_token
+
+            req = _urlreq.Request(
+                f"{web_url}/api/scheduler/health/push",
+                data=body, headers=headers, method="POST",
+            )
+            with _urlreq.urlopen(req, timeout=10) as resp:
+                if resp.status != 200:
+                    log.warning(f"[health-push] non-200 response: {resp.status}")
+        except _urlerr.URLError as exc:
+            log.warning(f"[health-push] could not reach web service ({web_url}): {exc}")
+        except Exception as exc:
+            log.warning(f"[health-push] push failed: {exc}")
+
+        time.sleep(_PUSH_INTERVAL_S)
+
+
+# ---------------------------------------------------------------------------
 # Startup: bootstrap token from PIN+TOTP before threads start
 # ---------------------------------------------------------------------------
 def _bootstrap_token():
@@ -136,6 +215,7 @@ def main():
         threading.Thread(target=_run_token_daemon, name="token-daemon", daemon=True),
         threading.Thread(target=_run_watchdog, name="watchdog", daemon=True),
         threading.Thread(target=_run_job_scheduler, name="job-scheduler", daemon=True),
+        threading.Thread(target=_run_health_push, name="health-push", daemon=True),
     ]
 
     for t in threads:
