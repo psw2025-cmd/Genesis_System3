@@ -1287,18 +1287,21 @@ _WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
 
 @app.post("/api/scheduler/health/push")
-async def push_scheduler_health(payload: Dict[str, Any]):
+async def push_scheduler_health(payload: Dict[str, Any], request: Request):
     """
-    Called by the WORKER service (scripts/cloud_worker.py background
-    thread) on every scheduler tick to push its real state to the web
-    service, since the two run on separate Render containers with no
-    shared filesystem. Requires X-Worker-Token header matching
-    WORKER_PUSH_TOKEN env var (set identically on both services in the
-    Render dashboard) when that env var is configured; if it is not set,
-    push is accepted unauthenticated (local/dev convenience) but this
-    state is logged once at startup so the gap is visible.
+    Called by the WORKER service (scripts/cloud_worker.py Thread 4) on
+    every scheduler tick to push its real state to the web service,
+    since the two run on separate Render containers with no shared
+    filesystem. Requires X-Worker-Token header matching WORKER_PUSH_TOKEN
+    env var (set identically on both services in the Render dashboard)
+    when that env var is configured; if it is not set on this (web)
+    side, push is accepted unauthenticated (local/dev convenience).
     """
     global _scheduler_health_state
+    if _WORKER_PUSH_TOKEN:
+        sent_token = request.headers.get("X-Worker-Token", "")
+        if sent_token != _WORKER_PUSH_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing X-Worker-Token")
     _scheduler_health_state = {
         "received": True,
         "last_push_at": datetime.now(timezone.utc).isoformat(),
