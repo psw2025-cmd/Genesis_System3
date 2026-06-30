@@ -1,81 +1,43 @@
 {
   "jobs": [
     {
-      "id": "daily_status",
-      "name": "Daily Status Check",
-      "module": "core.engine.check_system3_status",
-      "enabled": false,
-      "type": "daily",
-      "note": "disabled - module core.engine.check_system3_status does not exist; no schedule_time caused it to fire on every scheduler start"
-    },
-    {
-      "id": "daily_gain_rank",
-      "name": "Daily Gain Rank (Pre-Market)",
-      "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": [
-        "--mode",
-        "rank"
-      ],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "09:15",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Ranks all tracked underlyings by predicted gain potential at market open"
-    },
-    {
-      "id": "daily_gain_validate",
-      "name": "Daily Gain Validate (Post-Market)",
-      "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": [
-        "--mode",
-        "validate"
-      ],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "15:35",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Validates predictions vs NSE actual results, saves OI snapshot for next session"
-    },
-    {
-      "id": "daily_gain_trend",
-      "name": "Daily Accuracy Trend (Post-Market)",
-      "script": "scripts/daily_gain_rank_and_validate.py",
-      "args": [
-        "--mode",
-        "trend"
-      ],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "15:40",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Prints 14-day accuracy trend, fires retrain signal if Spearman rho < 0.40 for 3 days"
-    },
-    {
-      "id": "auto_retrain",
-      "name": "Auto Model Retrain (Post-Market)",
-      "script": "scripts/auto_retrain.py",
+      "id": "datasource_health_check",
+      "name": "Data Source Health Check (Pre-Market)",
+      "script": "scripts/datasource_health_check.py",
       "args": [],
       "enabled": true,
       "type": "daily",
-      "schedule_time": "16:00",
+      "schedule_time": "08:00",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Reads state/retrain_signal.json; if present, retrains ensemble_predictor models and clears signal"
+      "timeout_minutes": 5,
+      "description": "Probes all data sources (NSE, bhavcopy, nsepython, jugaad, yfinance). Saves state/datasource_health.json."
     },
     {
-      "id": "bhavcopy_download",
-      "name": "NSE FO Bhavcopy Download (Post-Market)",
-      "script": "scripts/bhavcopy_downloader.py",
+      "id": "dashboard_endpoint_coverage",
+      "name": "Dashboard Endpoint Coverage Proof",
+      "script": "scripts/dashboard_endpoint_coverage_proof.py",
       "args": [],
       "enabled": true,
       "type": "daily",
-      "schedule_time": "18:30",
+      "schedule_time": "08:05",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Downloads NSE F&O bhavcopy EOD archive after market close. Stores to storage/bhavcopy/. Used as P3 fallback source with real OI change data (CHG_IN_OI)."
+      "timeout_minutes": 5,
+      "description": "Probes all dashboard API endpoints, writes coverage report to reports/latest/dashboard_endpoint_coverage/"
+    },
+    {
+      "id": "auto_coordinator_premarket",
+      "name": "Full Auto Coordinator (Pre-Market)",
+      "script": "tools/system3_auto_coordinator.py",
+      "args": ["--api-base", "https://genesis-system3-backend.onrender.com"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "08:10",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Morning proof refresh before market open."
     },
     {
       "id": "dhan_instruments_sync",
@@ -87,54 +49,21 @@
       "schedule_time": "08:35",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Download official Dhan scrip master CSV (~08:30 IST vendor update) and rebuild runtime cache"
+      "timeout_minutes": 5,
+      "description": "Download official Dhan scrip master CSV and rebuild runtime cache"
     },
     {
-      "id": "datasource_health_check",
-      "name": "Data Source Health Check (Pre-Market)",
-      "script": "scripts/datasource_health_check.py",
-      "args": [],
+      "id": "daily_gain_rank",
+      "name": "Daily Gain Rank (Pre-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "rank"],
       "enabled": true,
       "type": "daily",
-      "schedule_time": "08:00",
+      "schedule_time": "09:15",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Probes all data sources (NSE, bhavcopy, nsepython, jugaad, yfinance). Saves state/datasource_health.json. Alerts CHANGE_LOG if resilience CRITICAL or LOW."
-    },
-    {
-      "id": "signal_engine_bhavcopy",
-      "name": "Signal Engine - Bhavcopy Runner (Post-Market)",
-      "script": "scripts/run_signal_engine_from_bhavcopy.py",
-      "args": [],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "18:45",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Transforms today's NSE FO bhavcopy into option chain snapshot and runs system3_signal_engine. Writes storage/live/dhan_index_ai_signals.csv (prob_BUY_CE, expected_move_score per option). Activates the 15% ml_confidence weight in GainRankEngine for next morning's 09:15 ranking. Runs 15 min after bhavcopy_download completes."
-    },
-    {
-      "id": "ui_market_cross_verify",
-      "name": "UI Market Cross Verify",
-      "script": "scripts/ui_market_cross_verify.py",
-      "args": [],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "10:00",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Cross-verify cloud UI APIs vs IST market session; runs every scheduled slot"
-    },
-    {
-      "id": "ui_market_cross_verify_midday",
-      "name": "UI Market Cross Verify (Midday)",
-      "script": "scripts/ui_market_cross_verify.py",
-      "args": [],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "12:30",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true
+      "timeout_minutes": 10,
+      "description": "Ranks all tracked underlyings by predicted gain potential at market open"
     },
     {
       "id": "paper_lifecycle_proof",
@@ -146,8 +75,21 @@
       "schedule_time": "09:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "description": "Runs analyzer/paper lifecycle proof on market days.",
-      "timeout_minutes": 10
+      "timeout_minutes": 10,
+      "description": "Runs analyzer/paper lifecycle proof on market days."
+    },
+    {
+      "id": "ui_market_cross_verify",
+      "name": "UI Market Cross Verify",
+      "script": "scripts/ui_market_cross_verify.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "10:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 5,
+      "description": "Cross-verify cloud UI APIs vs IST market session"
     },
     {
       "id": "paper_lifecycle_proof_midday",
@@ -160,6 +102,18 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10
+    },
+    {
+      "id": "ui_market_cross_verify_midday",
+      "name": "UI Market Cross Verify (Midday)",
+      "script": "scripts/ui_market_cross_verify.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "12:30",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 5
     },
     {
       "id": "paper_lifecycle_proof_afternoon",
@@ -182,8 +136,50 @@
       "type": "daily",
       "schedule_time": "14:30",
       "timezone": "Asia/Kolkata",
-      "weekdays_only": true
+      "weekdays_only": true,
+      "timeout_minutes": 5
     },
+    {
+      "id": "daily_gain_validate",
+      "name": "Daily Gain Validate (Post-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "validate"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:35",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Validates predictions vs NSE actual results, saves OI snapshot for next session"
+    },
+    {
+      "id": "daily_gain_trend",
+      "name": "Daily Accuracy Trend (Post-Market)",
+      "script": "scripts/daily_gain_rank_and_validate.py",
+      "args": ["--mode", "trend"],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:40",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Prints 14-day accuracy trend, fires retrain signal if Spearman rho < 0.40 for 3 days"
+    },
+    {
+      "id": "daily_prediction_benchmark",
+      "name": "Daily Prediction-vs-Actual Benchmark (Issue #26)",
+      "script": "scripts/daily_prediction_benchmark.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "15:45",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Writes reports/latest/prediction_benchmark/{prediction_vs_actual.csv, top_mover_match.csv, missed_opportunities.md, benchmark_summary.md} per GitHub issue #26."
+    },
+    {
+      "id": "system3_post_market_pipeline",
       "name": "Post-Market Auto Pipeline",
       "script": "scripts/system3_post_market_auto_pipeline.py",
       "args": [],
@@ -192,50 +188,73 @@
       "schedule_time": "15:50",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
+      "timeout_minutes": 10,
       "description": "After validation: friction expectancy, model-to-trade gap, gate sync, blocker scan"
+    },
+    {
+      "id": "auto_retrain",
+      "name": "Auto Model Retrain (Post-Market)",
+      "script": "scripts/auto_retrain.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "16:00",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 15,
+      "description": "Reads state/retrain_signal.json; if present, retrains ensemble_predictor models and clears signal"
     },
     {
       "id": "auto_coordinator_post_market",
       "name": "Full Auto Coordinator (Post-Market)",
       "script": "tools/system3_auto_coordinator.py",
-      "args": [
-        "--api-base",
-        "https://genesis-system3-backend.onrender.com"
-      ],
+      "args": ["--api-base", "https://genesis-system3-backend.onrender.com"],
       "enabled": true,
       "type": "daily",
       "schedule_time": "16:10",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
+      "timeout_minutes": 10,
       "description": "Evening proof refresh after validation and friction reports."
     },
     {
-      "id": "auto_coordinator_premarket",
-      "name": "Full Auto Coordinator (Pre-Market)",
-      "script": "tools/system3_auto_coordinator.py",
-      "args": [
-        "--api-base",
-        "https://genesis-system3-backend.onrender.com"
-      ],
-      "enabled": true,
-      "type": "daily",
-      "schedule_time": "08:10",
-      "timezone": "Asia/Kolkata",
-      "weekdays_only": true,
-      "description": "Morning proof refresh before market open."
-    },
-    {
-      "id": "dashboard_endpoint_coverage",
-      "name": "Dashboard Endpoint Coverage Proof",
-      "script": "scripts/dashboard_endpoint_coverage_proof.py",
+      "id": "bhavcopy_download",
+      "name": "NSE FO Bhavcopy Download (Post-Market)",
+      "script": "scripts/bhavcopy_downloader.py",
       "args": [],
       "enabled": true,
       "type": "daily",
-      "schedule_time": "08:05",
+      "schedule_time": "18:30",
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
-      "timeout_minutes": 5,
-      "description": "Probes all dashboard API endpoints, writes coverage report to reports/latest/dashboard_endpoint_coverage/"
+      "timeout_minutes": 10,
+      "description": "Downloads NSE F&O bhavcopy EOD archive after market close."
+    },
+    {
+      "id": "signal_engine_bhavcopy",
+      "name": "Signal Engine - Bhavcopy Runner (Post-Market)",
+      "script": "scripts/run_signal_engine_from_bhavcopy.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "18:45",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": true,
+      "timeout_minutes": 10,
+      "description": "Transforms bhavcopy into option chain snapshot, runs signal engine."
+    },
+    {
+      "id": "weekly_repo_authority_audit",
+      "name": "Weekly Repo Authority Audit (Issue #28)",
+      "script": "scripts/repo_authority_audit.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "19:00",
+      "timezone": "Asia/Kolkata",
+      "days": ["Friday"],
+      "timeout_minutes": 10,
+      "description": "Weekly scan for duplicate/orphan modules vs declared authoritative entrypoints. Writes reports/latest/repo_authority/."
     }
   ]
 }
