@@ -60,15 +60,60 @@ def create_default_config() -> None:
 
 
 def load_config() -> Dict[str, Any]:
-    """Load job scheduler config."""
+    """
+    Load job scheduler config.
+
+    SAFETY: a JSON parse failure here used to be silently swallowed,
+    returning {"jobs": []} — which meant the daemon kept running and
+    logging heartbeats normally while firing ZERO scheduled jobs. That
+    exact failure mode went undetected for weeks (see CHANGE_LOG entry
+    on the 2026-06-30 config repair). Now any parse failure is loud:
+    written to CHANGE_LOG.md and to a dedicated alert file the
+    dashboard/health endpoint can surface, instead of disappearing into
+    stdout that nobody was tailing.
+    """
     create_default_config()
 
     try:
         with CONFIG_JSON.open("r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            jobs = data.get("jobs", [])
+            if not jobs:
+                _alert_scheduler_config_issue(
+                    "Config loaded but contains zero jobs — scheduler will do nothing."
+                )
+            return data
     except Exception as e:
-        print(f"[PH82] Error loading config: {e}")
+        msg = f"Job scheduler config is invalid JSON — ALL jobs are dead: {e}"
+        print(f"[PH82] {msg}")
+        _alert_scheduler_config_issue(msg)
         return {"jobs": []}
+
+
+def _alert_scheduler_config_issue(message: str) -> None:
+    """Write a loud, visible alert when the scheduler config is broken
+    or empty, so this can never again fail silently for weeks."""
+    try:
+        alert_path = PROJECT_ROOT / "state" / "scheduler_config_alert.json"
+        alert_path.parent.mkdir(parents=True, exist_ok=True)
+        alert_path.write_text(
+            json.dumps({
+                "alert": True,
+                "message": message,
+                "detected_at": datetime.now().isoformat(),
+                "config_path": str(CONFIG_JSON),
+            }, indent=2),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+    try:
+        log_path = PROJECT_ROOT / "CHANGE_LOG.md"
+        if log_path.exists():
+            with log_path.open("a", encoding="utf-8") as f:
+                f.write(f"\n- [SCHEDULER ALERT] {datetime.now().isoformat()} — {message}\n")
+    except Exception:
+        pass
 
 
 def load_state() -> Dict[str, Any]:
