@@ -184,6 +184,18 @@ jobs:
           python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile dashboard/backend/app.py
+          # Paper-day proof pack chain (2026-06-30/07-01 work) — these were
+          # never in this list and CI "passing" never actually validated
+          # them; closing that gap here rather than relying solely on
+          # out-of-band py_compile checks done outside CI.
+          python -m py_compile scripts/paper_day_proof_pack.py
+          python -m py_compile scripts/run_dashboard_browser_proof.py
+          python -m py_compile scripts/daily_prediction_benchmark.py
+          python -m py_compile scripts/repo_authority_audit.py
+          python -m py_compile core/utils/nse_holidays.py
+          python -m py_compile scripts/cloud_worker.py
+          python -m py_compile core/engine/system3_phase82_job_scheduler.py
+          python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           echo "compile_expanded=PASS"
 
       - name: Dashboard backend import smoke
