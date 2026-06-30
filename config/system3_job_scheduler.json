@@ -199,7 +199,7 @@
       "timezone": "Asia/Kolkata",
       "weekdays_only": true,
       "timeout_minutes": 10,
-      "description": "Writes reports/latest/prediction_benchmark/{prediction_vs_actual.csv, top_mover_match.csv, missed_opportunities.md, benchmark_summary.md} per GitHub issue #26.",
+      "description": "Writes reports/latest/performance_benchmark/{prediction_vs_actual.csv, top_mover_match.csv, missed_opportunities.md, benchmark_summary.md} + archived copy under reports/archive/performance_benchmark/YYYYMMDD/, per GitHub issue #26. Skips with explicit notice if daily_gain_validate did not succeed for today first.",
       "market_dependent": true
     },
     {
