@@ -382,12 +382,13 @@ except ImportError:
 app.add_middleware(RequestIDMiddleware)
 
 
-_DASHBOARD_DIR   = ROOT_DIR / "dashboard"
-_REACT_DIST_DIR  = ROOT_DIR / "dashboard" / "frontend" / "dist"
+_DASHBOARD_DIR = ROOT_DIR / "dashboard"
+_REACT_DIST_DIR = ROOT_DIR / "dashboard" / "frontend" / "dist"
 
 # Mount React frontend static assets (JS/CSS bundles)
 try:
     from fastapi.staticfiles import StaticFiles as _StaticFiles
+
     if _REACT_DIST_DIR.exists() and (_REACT_DIST_DIR / "assets").exists():
         app.mount(
             "/ui/assets",
@@ -432,13 +433,15 @@ async def serve_dashboard_index(path: str = ""):
     # Try React dist first
     react_index = _REACT_DIST_DIR / "index.html"
     if react_index.exists():
-        return FileResponse(str(react_index), media_type="text/html",
-                           headers={**_NO_CACHE_HEADERS, "X-Frontend": "react"})
+        return FileResponse(
+            str(react_index), media_type="text/html", headers={**_NO_CACHE_HEADERS, "X-Frontend": "react"}
+        )
     # Fallback to legacy Vue
     vue_index = _DASHBOARD_DIR / "index.html"
     if vue_index.exists():
-        return FileResponse(str(vue_index), media_type="text/html",
-                           headers={**_NO_CACHE_HEADERS, "X-Frontend": "vue-legacy"})
+        return FileResponse(
+            str(vue_index), media_type="text/html", headers={**_NO_CACHE_HEADERS, "X-Frontend": "vue-legacy"}
+        )
     raise HTTPException(status_code=404, detail="Dashboard not found")
 
 
@@ -671,19 +674,20 @@ async def get_broker_funds():
 async def get_broker_diagnose():
     """Diagnose exactly WHY broker is disconnected. Key for Render setup."""
     import os as _os
+
     issues = []
-    hints  = []
+    hints = []
     env_checks = {
-        "DHAN_CLIENT_ID":      _os.environ.get("DHAN_CLIENT_ID","").strip(),
-        "DHAN_ACCESS_TOKEN":   _os.environ.get("DHAN_ACCESS_TOKEN","").strip(),
-        "DHAN_PIN":            _os.environ.get("DHAN_PIN","").strip(),
-        "DHAN_TOTP_SECRET":    _os.environ.get("DHAN_TOTP_SECRET","").strip(),
+        "DHAN_CLIENT_ID": _os.environ.get("DHAN_CLIENT_ID", "").strip(),
+        "DHAN_ACCESS_TOKEN": _os.environ.get("DHAN_ACCESS_TOKEN", "").strip(),
+        "DHAN_PIN": _os.environ.get("DHAN_PIN", "").strip(),
+        "DHAN_TOTP_SECRET": _os.environ.get("DHAN_TOTP_SECRET", "").strip(),
     }
     for key, val in env_checks.items():
         if not val:
             issues.append(f"MISSING: {key} env var not set in Render")
             hints.append(f"Set {key} in Render → Environment → Add Env Var")
-    
+
     # Check token validity
     token = env_checks["DHAN_ACCESS_TOKEN"]
     token_status = "not_set"
@@ -698,12 +702,13 @@ async def get_broker_diagnose():
             token_status = "present"
 
     client_id = env_checks["DHAN_CLIENT_ID"]
-    
+
     # Try a real Dhan API call if credentials present
     api_test = None
     if token and client_id:
         try:
             from core.brokers.dhan.dhan_readonly import get_funds
+
             result = get_funds()
             api_test = {"success": result.get("success"), "data": result.get("data")}
             if result.get("success"):
@@ -715,24 +720,26 @@ async def get_broker_diagnose():
 
     return {
         "env_vars": {
-            "DHAN_CLIENT_ID_present":    bool(client_id),
-            "DHAN_CLIENT_ID_preview":    client_id[-4:] if client_id else "NOT_SET",
+            "DHAN_CLIENT_ID_present": bool(client_id),
+            "DHAN_CLIENT_ID_preview": client_id[-4:] if client_id else "NOT_SET",
             "DHAN_ACCESS_TOKEN_present": bool(token),
-            "DHAN_ACCESS_TOKEN_status":  token_status,
-            "DHAN_ACCESS_TOKEN_length":  len(token) if token else 0,
-            "DHAN_PIN_present":          bool(env_checks["DHAN_PIN"]),
-            "DHAN_TOTP_present":         bool(env_checks["DHAN_TOTP_SECRET"]),
+            "DHAN_ACCESS_TOKEN_status": token_status,
+            "DHAN_ACCESS_TOKEN_length": len(token) if token else 0,
+            "DHAN_PIN_present": bool(env_checks["DHAN_PIN"]),
+            "DHAN_TOTP_present": bool(env_checks["DHAN_TOTP_SECRET"]),
         },
         "issues": issues,
-        "hints":  hints,
+        "hints": hints,
         "api_probe": api_test,
         "fix_action": (
             "Update DHAN_ACCESS_TOKEN in Render Environment Variables. "
             "Get fresh token from https://login.dhan.co → Profile → API. "
             "Token expires daily — use DHAN_PIN + DHAN_TOTP_SECRET for auto-refresh."
-            if issues else "No issues found"
+            if issues
+            else "No issues found"
         ),
     }
+
 
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
@@ -1091,7 +1098,7 @@ async def get_top_contract_gainers(top_n: int = 5):
                 chains: Dict[str, Any] = {}
 
                 def _fetch_one(underlying: str):
-                    ch = fetch_chain_for_api(dsm, underlying, eod_only=True)
+                    ch = fetch_chain_for_api(dsm, underlying)
                     return underlying, ch or {"contracts": [], "underlying": underlying}
 
                 with ThreadPoolExecutor(max_workers=4) as pool:
@@ -1255,7 +1262,6 @@ async def get_auto_gates(refresh: bool = False):
         }
 
 
-
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------
@@ -1354,7 +1360,9 @@ async def get_scheduler_health():
 
     if not state["received"]:
         healthy = False
-        reasons.append("worker has never pushed scheduler health — check worker service is deployed and running cloud_worker.py")
+        reasons.append(
+            "worker has never pushed scheduler health — check worker service is deployed and running cloud_worker.py"
+        )
     else:
         try:
             last_push = datetime.fromisoformat(state["last_push_at"])
@@ -1378,6 +1386,7 @@ async def get_scheduler_health():
         "healthy": healthy,
         "unhealthy_reasons": reasons,
     }
+
 
 @app.get("/api/system_health")
 async def get_system_health():
@@ -1818,6 +1827,7 @@ import time as _time_module
 
 _API_CACHE: dict = {}  # {key: (timestamp, data)}
 
+
 def _cache_get(key: str, ttl_s: float):
     """Return cached value if fresh, else None."""
     entry = _API_CACHE.get(key)
@@ -1825,20 +1835,22 @@ def _cache_get(key: str, ttl_s: float):
         return entry[1]
     return None
 
+
 def _cache_set(key: str, value):
     """Store value with current timestamp."""
     _API_CACHE[key] = (_time_module.time(), value)
     return value
 
+
 # TTL constants (seconds)
-_TTL_BROKER      = 30    # holdings, positions, funds — Dhan API calls
-_TTL_PAPER       = 15    # paper positions/pnl — changes each tick
-_TTL_SCANNER     = 60    # contract gainers, equity_options — heavy compute
-_TTL_ACCURACY    = 120   # accuracy trend — file read, slow
-_TTL_PERF        = 120   # performance data
-_TTL_PORTFOLIO   = 30    # portfolio/unified
-_TTL_AUTO_GATES  = 60    # auto gates — reads several files
-_TTL_BROKER_TRUTH= 30    # broker truth validator
+_TTL_BROKER = 30  # holdings, positions, funds — Dhan API calls
+_TTL_PAPER = 15  # paper positions/pnl — changes each tick
+_TTL_SCANNER = 60  # contract gainers, equity_options — heavy compute
+_TTL_ACCURACY = 120  # accuracy trend — file read, slow
+_TTL_PERF = 120  # performance data
+_TTL_PORTFOLIO = 30  # portfolio/unified
+_TTL_AUTO_GATES = 60  # auto gates — reads several files
+_TTL_BROKER_TRUTH = 30  # broker truth validator
 
 
 # API Endpoints
@@ -2359,6 +2371,7 @@ async def get_qc_runtime():
         }
         fetch_error = None
         try:
+
             def _fetch_chain():
                 return fetch_chain_for_api(DataSourceManager(), underlying)
 
@@ -2533,7 +2546,7 @@ async def get_chain(underlying: str):
                     from core.data.datasource_manager import DataSourceManager
                     from dashboard.backend.chain_adapter import fetch_chain_for_api
 
-                    return fetch_chain_for_api(DataSourceManager(), underlying.upper(), eod_only=True)
+                    return fetch_chain_for_api(DataSourceManager(), underlying.upper())
 
                 eod = await _run_blocking(_eod_chain_fetch, timeout=45.0)
                 if eod and int(eod.get("total_contracts") or 0) > 0:
@@ -3528,12 +3541,14 @@ async def websocket_endpoint(websocket: WebSocket):
             pass
     # Send market status immediately on connect
     try:
-        await websocket.send_json({
-            "type": "market_status",
-            "market_open": market_open_now,
-            "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
-            "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
-        })
+        await websocket.send_json(
+            {
+                "type": "market_status",
+                "market_open": market_open_now,
+                "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
+                "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+            }
+        )
     except Exception:
         pass
     active_connections.append(websocket)
@@ -3572,13 +3587,15 @@ async def websocket_endpoint(websocket: WebSocket):
             # Send state+signal update every 5 seconds (market only)
             if market_open_now and now - last_health_send >= 5:
                 try:
-                    state_store_data = _state_store.get_state() if SSOT_AVAILABLE and _state_store else {}
+                    state_store_data = state_store.get_state() if SSOT_AVAILABLE and state_store else {}
                     if state_store_data:
-                        await websocket.send_json({
-                            "type": "state_update",
-                            "data": state_store_data,
-                            "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
-                        })
+                        await websocket.send_json(
+                            {
+                                "type": "state_update",
+                                "data": state_store_data,
+                                "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+                            }
+                        )
                 except (WebSocketDisconnect, ConnectionError):
                     raise
                 except Exception:
@@ -4593,7 +4610,13 @@ async def export_positions(format: str = "csv"):
         positions = positions_data.get("positions", [])
 
         if not positions:
-            return {"status": "ok", "file": None, "format": format, "count": 0, "message": "No open positions to export"}
+            return {
+                "status": "ok",
+                "file": None,
+                "format": format,
+                "count": 0,
+                "message": "No open positions to export",
+            }
 
         export_system = get_export_reporting()
         timestamp = datetime.now(IST).strftime("%Y%m%d_%H%M%S")
@@ -5532,6 +5555,7 @@ async def runner_stop():
 async def runner_status():
     """Get runner status via runner.py CLI"""
     import time
+
     try:
         # Read heartbeat file directly — spawning runner.py as subprocess is
         # unsafe on 512Mi Render (imports all modules, spikes RAM to OOM).
@@ -5596,5 +5620,3 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
