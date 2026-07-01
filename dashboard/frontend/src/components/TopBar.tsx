@@ -33,7 +33,7 @@ function IndexChip({ symbol, spot, chg }: { symbol:string; spot?:number; chg?:nu
 }
 
 export function TopBar() {
-  const { wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state } = useStore()
+  const { wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain } = useStore()
   const rho = state?.signals?.spearman_rho ?? null
 
   // Spot prices come from gain_rank.latest.rankings — this is the ONLY endpoint
