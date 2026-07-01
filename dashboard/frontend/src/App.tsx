@@ -7,6 +7,7 @@ import { TradeTab } from './components/TradeTab'
 import { Positions } from './components/Positions'
 import { BrokerPanel } from './components/BrokerPanel'
 import { PerformanceTab } from './components/PerformanceTab'
+import { LiveTradingGate } from './components/LiveTradingGate'
 import { AlertsTab } from './components/AlertsTab'
 import { SystemTab } from './components/SystemTab'
 
@@ -20,7 +21,7 @@ function Content() {
     case 'performance': return <PerformanceTab />
     case 'alerts':      return <AlertsTab />
     case 'system':      return <SystemTab />
-    case 'gates':       return <Overview />
+    case 'gates':       return <LiveTradingGate />
     default:            return <TradeTab />
   }
 }
