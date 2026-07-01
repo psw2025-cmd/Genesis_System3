@@ -1035,16 +1035,15 @@ async def get_gain_rank(refresh: bool = False):
         if SSOT_AVAILABLE and state_store is not None:
             market_open = bool((state_store.get_state().get("market") or {}).get("is_open"))
         if (refresh or stale) and market_open:
+            # NOTE: run_ranking imports pandas/numpy/ML models which
+            # causes OOM on 512MB Render Starter instances when run in
+            # the web process. The scheduler (worker service) runs
+            # daily_gain_rank_and_validate.py at 09:15 IST instead.
+            # This web endpoint is read-only — never trigger inline.
+            pass
+        if False and market_open:  # disabled — kept for syntax compatibility
             try:
-                from scripts.daily_gain_rank_and_validate import run_ranking
-
-                await _run_blocking(run_ranking, top_n=5, timeout=120.0)
-                history = json.loads(GAIN_RANK_FILE.read_text())
-                if not isinstance(history, list):
-                    history = []
-                today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
-                latest = today_entry or (history[-1] if history else None)
-                stale = latest is None or latest.get("date") != today
+                pass
             except Exception as rank_err:
                 return {
                     "status": "ok",
