@@ -346,27 +346,35 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
     global _TOKEN_LAST_REFRESH_TS
     import time as _time_mod
 
-    # Cooldown check (skip if force)
+    # Cooldown + lock check (skip if force). The check-and-mark below must be
+    # atomic under the lock: releasing the lock before marking the timestamp
+    # let two near-simultaneous callers (e.g. Render startup) both pass the
+    # checks and both hit Dhan's generateAccessToken endpoint, tripping its
+    # "once every 2 minutes" rate limit on the second call.
     if not force_generate and not force_oauth:
-        elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
-        if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
-            remaining = int(_TOKEN_COOLDOWN_S - elapsed)
-            logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
-            return {
-                "success": True,
-                "strategy": "cooldown_skip",
-                "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed",
-            }
-        if not _TOKEN_REFRESH_LOCK.acquire(blocking=False):
+        if not _TOKEN_REFRESH_LOCK.acquire(timeout=5):
             return {
                 "success": False,
                 "strategy": "cooldown_lock",
                 "message": "Token refresh already in progress (concurrent call blocked)",
             }
-        _TOKEN_REFRESH_LOCK.release()
-
-    # Mark refresh timestamp BEFORE the API call to prevent race
-    _TOKEN_LAST_REFRESH_TS = _time_mod.time()
+        try:
+            elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
+            if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
+                remaining = int(_TOKEN_COOLDOWN_S - elapsed)
+                logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
+                return {
+                    "success": True,
+                    "strategy": "cooldown_skip",
+                    "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed",
+                }
+            # Mark refresh timestamp BEFORE the API call, still under the
+            # lock, to prevent race
+            _TOKEN_LAST_REFRESH_TS = _time_mod.time()
+        finally:
+            _TOKEN_REFRESH_LOCK.release()
+    else:
+        _TOKEN_LAST_REFRESH_TS = _time_mod.time()
     env = _load_env()
     client_id = env.get("DHAN_CLIENT_ID", "").strip()
     cur_token = env.get("DHAN_ACCESS_TOKEN", "").strip()
