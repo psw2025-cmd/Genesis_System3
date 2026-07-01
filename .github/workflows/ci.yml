@@ -196,6 +196,8 @@ jobs:
           python -m py_compile scripts/cloud_worker.py
           python -m py_compile core/engine/system3_phase82_job_scheduler.py
           python -m py_compile scripts/system3_self_healing_watchdog.py
+          # Frontend TypeScript check for new components (syntax only)
+          test -f dashboard/frontend/src/components/LiveTradingGate.tsx && echo 'LiveTradingGate.tsx exists' || exit 1
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           echo "compile_expanded=PASS"
 
