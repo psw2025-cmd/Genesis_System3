@@ -323,7 +323,7 @@ import threading as _threading
 
 _TOKEN_REFRESH_LOCK = _threading.Lock()
 _TOKEN_LAST_REFRESH_TS = 0.0
-_TOKEN_COOLDOWN_S = 90.0  # Dhan rate limit is 2 min; use 90s to be safe
+_TOKEN_COOLDOWN_S = 130.0  # Dhan rate limit is 2 min; use 130s to be safe above limit
 
 
 def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> dict:
