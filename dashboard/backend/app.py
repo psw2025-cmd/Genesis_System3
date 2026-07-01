@@ -1336,6 +1336,130 @@ async def get_deploy_info():
     }
 
 
+
+
+# ---------------------------------------------------------------------------
+# Live Trading Gate — evaluates ALL conditions before allowing live mode
+# ---------------------------------------------------------------------------
+
+_LIVE_APPROVAL_FILE = ROOT_DIR / "config" / "kill_switch.json"
+_RISK_CONFIG_FILE   = ROOT_DIR / "config" / "system3_risk_config.yml"
+_GAIN_RANK_HISTORY  = ROOT_DIR / "state" / "gain_rank_history.json"
+_VAL_DIR            = ROOT_DIR / "state" / "market_validations"
+
+@app.get("/api/live-trading/gate")
+async def get_live_trading_gate():
+    """
+    Evaluates every condition required before live trading is allowed.
+    Returns gate_open=true ONLY when ALL pass.
+    This is what the dashboard "Go Live" button checks first.
+    Live trading remains OFF until human gives explicit approval phrase.
+    """
+    gates = []
+    gate_open = True
+
+    def gate(name: str, passed: bool, detail: str):
+        nonlocal gate_open
+        if not passed:
+            gate_open = False
+        gates.append({"gate": name, "passed": passed, "detail": detail})
+
+    # Gate 1: Safety env vars
+    live_env = os.environ.get("LIVE_TRADING_ENABLED", "0")
+    gate("env_live_disabled", live_env == "0",
+         f"LIVE_TRADING_ENABLED={live_env} (must be 0 for paper, 1 for live)")
+
+    # Gate 2: Kill switch
+    try:
+        ks = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        gate("kill_switch_off", not ks.get("kill_switch_activated", False),
+             "Kill switch not activated" if not ks.get("kill_switch_activated") else "KILL SWITCH ACTIVE")
+        gate("human_approved", ks.get("live_trading_approved", False),
+             "Human approval given" if ks.get("live_trading_approved") else
+             "NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json")
+    except Exception as e:
+        gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
+
+    # Gate 3: ML accuracy — Spearman rho >= 0.70 over 10+ days
+    try:
+        history = json.loads((_VAL_DIR.parent / "gain_rank_history.json").read_text()
+                             ) if (_VAL_DIR.parent / "gain_rank_history.json").exists() else []
+        val_files = list(_VAL_DIR.glob("market_validation_*.json")) if _VAL_DIR.exists() else []
+        rhos = []
+        for vf in val_files:
+            v = json.loads(vf.read_text())
+            rho = v.get("spearman_correlation")
+            if rho is not None:
+                rhos.append(rho)
+        avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
+        gate("validation_days", len(val_files) >= 10,
+             f"{len(val_files)} validation days (need ≥10)")
+        gate("ml_accuracy_rho", avg_rho >= 0.70,
+             f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
+    except Exception as e:
+        gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
+
+    # Gate 4: Max daily loss set
+    try:
+        import yaml
+        rc = yaml.safe_load(_RISK_CONFIG_FILE.read_text()) if _RISK_CONFIG_FILE.exists() else {}
+        max_loss = rc.get("risk", {}).get("max_daily_loss_inr", 0)
+        gate("max_loss_configured", max_loss > 0 and max_loss <= 10000,
+             f"Max daily loss = ₹{max_loss} (configured)")
+    except Exception:
+        gate("max_loss_configured", False, "Risk config unreadable")
+
+    return {
+        "gate_open": gate_open,
+        "gates": gates,
+        "summary": f"{sum(1 for g in gates if g['passed'])}/{len(gates)} gates passed",
+        "verdict": "LIVE_TRADING_ALLOWED" if gate_open else "LIVE_TRADING_BLOCKED",
+        "message": (
+            "All gates pass — ready for live trading after human approval"
+            if gate_open else
+            "Live trading blocked — see failed gates above"
+        ),
+        "live_trading_status": "OFF — remains off until all gates pass",
+    }
+
+
+@app.post("/api/live-trading/approve")
+async def approve_live_trading(payload: Dict[str, Any]):
+    """
+    Human approval endpoint. Requires exact phrase to prevent accidental activation.
+    Even after approval, LIVE_TRADING_ENABLED env var must be manually set to 1
+    on Render dashboard — this cannot be done via API.
+    """
+    REQUIRED_PHRASE = "I APPROVE LIVE TRADING WITH MAX LOSS RS 5000"
+    phrase = payload.get("approval_phrase", "").strip().upper()
+
+    if phrase != REQUIRED_PHRASE:
+        return {
+            "approved": False,
+            "message": f"Wrong phrase. Required: '{REQUIRED_PHRASE}'",
+            "note": "Exact phrase required to prevent accidental activation"
+        }
+
+    try:
+        ks_path = ROOT_DIR / "config" / "kill_switch.json"
+        ks = json.loads(ks_path.read_text()) if ks_path.exists() else {}
+        ks["live_trading_approved"] = True
+        ks["live_trading_approval_phrase"] = phrase
+        ks["approval_timestamp"] = datetime.now(timezone.utc).isoformat()
+        ks["approver_note"] = "Human approval given via dashboard"
+        ks_path.write_text(json.dumps(ks, indent=2))
+        return {
+            "approved": True,
+            "message": "Approval recorded. IMPORTANT: You must STILL manually set "
+                       "LIVE_TRADING_ENABLED=1 on Render dashboard to actually enable live trading. "
+                       "This approval alone does NOT enable live trading.",
+            "next_step": "Render dashboard → genesis-system3-backend → Environment → "
+                         "LIVE_TRADING_ENABLED → change to 1 → Save"
+        }
+    except Exception as e:
+        return {"approved": False, "message": f"Failed to save approval: {e}"}
+
+
 @app.get("/api/scheduler/health")
 async def get_scheduler_health():
     """
