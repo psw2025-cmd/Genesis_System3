@@ -1,0 +1,65 @@
+{
+  "generated_utc": "2026-07-01T08:05:00Z",
+  "mode": "cloud_triage_read_only_plus_report",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "observed_from_user_screenshot": {
+    "page": "GitHub notifications",
+    "main_symptom": "Genesis System3 Global Safety CI workflow failures on recent PR/branch runs",
+    "visible_runs_include": [
+      "PR #50 fix/token-lock-race",
+      "PR #49 fix/totp-window-race",
+      "PR #48 fix/remove-invalid-eod-only-kwarg"
+    ]
+  },
+  "verified_cloud_run": {
+    "pr": 50,
+    "head_branch": "fix/token-lock-race",
+    "head_sha": "e4548efed59719c7b563c85ebedf00fee564e8f2",
+    "workflow_run_id": 28491488034,
+    "workflow_name": "Genesis System3 Global Safety CI",
+    "conclusion": "failure",
+    "failed_job": "BLOCKING - architecture and trading safety gate",
+    "failed_step": "Run root architecture gate"
+  },
+  "jobs_verified": [
+    {"job": "workflow policy and trading safety guard", "status": "PASS"},
+    {"job": "Python compile proof", "status": "PASS"},
+    {"job": "frontend production build", "status": "PASS"},
+    {"job": "full proof pack validation", "status": "PASS"},
+    {"job": "architecture and trading safety gate", "status": "FAIL"}
+  ],
+  "artifact_verified": {
+    "artifact_id": 7999447919,
+    "name": "system3-proof-pack-575",
+    "digest": "sha256:8c740249fc3f6d016b2020792623fa085b2a93a29fa2f3e2eaa47d1745c76e52",
+    "not_trade_ready_reason": "live_market_analyzer_paper_trade_not_proven",
+    "live_trading_disabled": true,
+    "order_placement_allowed": false
+  },
+  "root_cause_candidates": [
+    {
+      "type": "expected_architecture_gate_block",
+      "detail": "PR #50 touched protected runtime path core/brokers/dhan/token_manager.py; PR body states protected_runtime_paths_not_changed gate is blunt and failed despite safety checks passing."
+    },
+    {
+      "type": "copilot_review_issue",
+      "detail": "PR #49 TOTP seconds-left calculation used int(timestamp), which can miss fractional seconds near window expiry."
+    },
+    {
+      "type": "copilot_review_issue",
+      "detail": "PR #50 cooldown branch can return success before token is actually written; force path updates shared timestamp outside lock."
+    }
+  ],
+  "safety_verdict": {
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "analyzer_paper_only": true,
+    "safe_to_continue_cloud_code_review": true,
+    "safe_to_trade_live": false
+  },
+  "recommended_resolution": [
+    "Create follow-up branch/PR that addresses Copilot comments without enabling live trading.",
+    "Keep architecture gate blocked for protected runtime paths unless explicitly approved with safety proof.",
+    "Do not merge to live path automatically from ChatGPT; require owner review."
+  ]
+}
