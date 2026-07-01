@@ -3,9 +3,14 @@
   "emergency_stop": false,
   "trading_paused": false,
   "system_shutdown": false,
-  "last_updated": "2025-12-09T09:00:00Z",
-  "reason": "System operating normally",
-  "auto_resume_enabled": true,
+  "last_updated": "2026-07-01T12:00:00Z",
+  "reason": "System operating normally \u2014 PAPER/ANALYZER mode",
+  "auto_resume_enabled": false,
   "manual_override": false,
-  "version": "3.0.0"
+  "version": "3.0.0",
+  "max_daily_loss_inr": 5000,
+  "daily_loss_so_far_inr": 0,
+  "live_trading_approved": false,
+  "live_trading_approval_phrase": null,
+  "notes": "auto_resume_enabled=false: system never auto-resumes after kill. Human must explicitly resume."
 }
