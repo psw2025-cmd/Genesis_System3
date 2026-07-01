@@ -1,6 +1,20 @@
 {
   "jobs": [
     {
+      "id": "self_healing_watchdog",
+      "name": "Self-Healing Watchdog (Auto-Fix)",
+      "script": "scripts/system3_self_healing_watchdog.py",
+      "args": [],
+      "enabled": true,
+      "type": "daily",
+      "schedule_time": "08:30",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": false,
+      "market_dependent": false,
+      "timeout_minutes": 5,
+      "description": "Auto-detects and fixes: stale token, broken config, disk pressure. Runs daily at 08:30 IST including weekends/holidays."
+    },
+    {
       "id": "datasource_health_check",
       "name": "Data Source Health Check (Pre-Market)",
       "script": "scripts/datasource_health_check.py",
