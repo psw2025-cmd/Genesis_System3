@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -25,6 +26,18 @@ _SCANNER_EOD_TIMEOUT_S = 180.0
 _TRUTH_IO_TIMEOUT_S = 45.0
 _EOD_SCANNER_CACHE: tuple[float, Dict[str, Any]] = (0.0, {})
 _EOD_SCANNER_TTL_S = 1800.0
+
+# Dedicated small executor for the spot-price background refresh, isolated
+# from the shared default asyncio.to_thread() executor. asyncio.wait_for()
+# timing out does NOT cancel the underlying OS thread — it just stops
+# waiting on it. If the Yahoo Finance calls inside hang (rate-limited cloud
+# IPs, slow socket), previously that orphaned thread piled up in the SAME
+# shared executor pool every other blocking call in this app depends on
+# (_run_blocking for broker/chain/scanner work), starving all of them and
+# growing memory unbounded until OOM. A small dedicated pool caps how many
+# stuck Yahoo-fetch threads can accumulate and stops them from starving
+# unrelated request handling.
+_SPOT_REFRESH_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="spot-refresh")
 
 
 def _market_open_from_state() -> bool:
@@ -3898,38 +3911,55 @@ def _refresh_spot_prices_blocking() -> None:
     session = requests.Session()
     session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
 
-    for underlying, yahoo_symbol in symbols.items():
-        try:
-            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
-            response = session.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                if "chart" in data and "result" in data["chart"]:
-                    result = data["chart"]["result"][0]
-                    meta = result.get("meta", {})
-                    ltp = meta.get("regularMarketPrice")
-                    if ltp and pd is not None:
-                        # Update chain CSV
-                        chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                        if chain_file.exists():
-                            try:
-                                df = pd.read_csv(chain_file)
-                                if "underlying" in df.columns and "spot_price" in df.columns:
-                                    mask = df["underlying"].astype(str).str.upper() == underlying.upper()
-                                    if mask.any():
-                                        df.loc[mask, "spot_price"] = ltp
-                                        df.to_csv(chain_file, index=False)
-                            except Exception:
-                                pass
-        except Exception:
-            pass
+    try:
+        for underlying, yahoo_symbol in symbols.items():
+            try:
+                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
+                response = session.get(url, timeout=(3, 4))
+                if response.status_code == 200:
+                    data = response.json()
+                    if "chart" in data and "result" in data["chart"]:
+                        result = data["chart"]["result"][0]
+                        meta = result.get("meta", {})
+                        ltp = meta.get("regularMarketPrice")
+                        if ltp and pd is not None:
+                            # Update chain CSV
+                            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
+                            if chain_file.exists():
+                                try:
+                                    df = pd.read_csv(chain_file)
+                                    if "underlying" in df.columns and "spot_price" in df.columns:
+                                        mask = df["underlying"].astype(str).str.upper() == underlying.upper()
+                                        if mask.any():
+                                            df.loc[mask, "spot_price"] = ltp
+                                            df.to_csv(chain_file, index=False)
+                                except Exception:
+                                    pass
+            except Exception:
+                pass
+    finally:
+        # Release the connection pool promptly if this call does eventually
+        # return after the caller's asyncio.wait_for() already gave up on it.
+        session.close()
 
 
 async def background_data_refresh():
-    """Background task to refresh spot prices every 30 seconds"""
+    """Background task to refresh spot prices every 30 seconds.
+
+    Runs the blocking Yahoo Finance fetch on a small DEDICATED executor
+    (_SPOT_REFRESH_EXECUTOR), not the shared default asyncio.to_thread()
+    pool. asyncio.wait_for() timing out only stops waiting — it cannot
+    cancel the underlying OS thread, so a hung fetch keeps running
+    regardless. Isolating it here means a pile-up of hung threads is
+    capped at 2 and can no longer starve every other blocking call in
+    this app (_run_blocking) that shares the default executor.
+    """
+    loop = asyncio.get_event_loop()
     while True:
         try:
-            await asyncio.wait_for(asyncio.to_thread(_refresh_spot_prices_blocking), timeout=25)
+            await asyncio.wait_for(
+                loop.run_in_executor(_SPOT_REFRESH_EXECUTOR, _refresh_spot_prices_blocking), timeout=25
+            )
         except asyncio.TimeoutError:
             print("[background_data_refresh] spot-price refresh exceeded 25s timeout (continuing)")
         except Exception as e:
