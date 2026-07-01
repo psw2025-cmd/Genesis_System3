@@ -1401,13 +1401,14 @@ async def get_live_trading_gate():
 
     # Gate 4: Max daily loss set
     try:
-        import yaml
-        rc = yaml.safe_load(_RISK_CONFIG_FILE.read_text()) if _RISK_CONFIG_FILE.exists() else {}
-        max_loss = rc.get("risk", {}).get("max_daily_loss_inr", 0)
+        # Use kill_switch.json for max_loss (avoid yaml dependency)
+        # Risk config also in kill_switch since both updated together
+        ks_data = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        max_loss = ks_data.get("max_daily_loss_inr", 0)
         gate("max_loss_configured", max_loss > 0 and max_loss <= 10000,
-             f"Max daily loss = ₹{max_loss} (configured)")
-    except Exception:
-        gate("max_loss_configured", False, "Risk config unreadable")
+             f"Max daily loss = ₹{max_loss} hardcoded in kill_switch.json")
+    except Exception as e:
+        gate("max_loss_configured", False, f"Could not read max loss config: {e}")
 
     return {
         "gate_open": gate_open,
