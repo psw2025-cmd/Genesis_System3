@@ -66,6 +66,8 @@ services:
         sync: false
       - key: DHAN_TOTP_SECRET
         sync: false
+      - key: WORKER_PUSH_TOKEN
+        sync: false
 
       # --- Worker -> web scheduler-health push auth ---
       # Set the SAME value on both services in the Render dashboard.
