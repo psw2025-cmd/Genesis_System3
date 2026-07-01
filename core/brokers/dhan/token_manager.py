@@ -177,9 +177,20 @@ def _try_generate(client_id: str, pin: str, totp_secret: str) -> str | None:
         return None
 
     try:
+        import time as _time_mod
+
         totp = pyotp.TOTP(totp_secret)
-        current_otp = totp.now()
         seconds_left = 30 - (int(datetime.now().timestamp()) % 30)
+        if seconds_left < 5:
+            # A code generated this close to rotation can expire in transit
+            # before Dhan validates it, causing a spurious "Invalid TOTP".
+            # Wait for a fresh 30s window instead of racing the clock.
+            wait_s = seconds_left + 0.5
+            logger.info(f"TOTP window has only {seconds_left}s left — waiting {wait_s:.1f}s for a fresh window")
+            _time_mod.sleep(wait_s)
+            seconds_left = 30 - (int(datetime.now().timestamp()) % 30)
+
+        current_otp = totp.now()
         logger.info(f"Generated TOTP (valid {seconds_left}s more)")
 
         login = DhanLogin(client_id)
@@ -309,6 +320,7 @@ def consume_oauth_token(token_id: str) -> dict:
 # Cooldown lock: prevent Dhan 2-minute rate limit on rapid restarts
 # (Render restarts can trigger multiple quick token refresh calls)
 import threading as _threading
+
 _TOKEN_REFRESH_LOCK = _threading.Lock()
 _TOKEN_LAST_REFRESH_TS = 0.0
 _TOKEN_COOLDOWN_S = 90.0  # Dhan rate limit is 2 min; use 90s to be safe
@@ -340,11 +352,17 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
             remaining = int(_TOKEN_COOLDOWN_S - elapsed)
             logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
-            return {"success": True, "strategy": "cooldown_skip",
-                    "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed"}
+            return {
+                "success": True,
+                "strategy": "cooldown_skip",
+                "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed",
+            }
         if not _TOKEN_REFRESH_LOCK.acquire(blocking=False):
-            return {"success": False, "strategy": "cooldown_lock",
-                    "message": "Token refresh already in progress (concurrent call blocked)"}
+            return {
+                "success": False,
+                "strategy": "cooldown_lock",
+                "message": "Token refresh already in progress (concurrent call blocked)",
+            }
         _TOKEN_REFRESH_LOCK.release()
 
     # Mark refresh timestamp BEFORE the API call to prevent race
@@ -366,8 +384,11 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         # Never auto-print OAuth URL in cloud mode (Render logs are public)
         if not os.environ.get("RENDER") and not os.environ.get("CLOUD_MODE"):
             _try_oauth_manual(client_id, app_id, app_secret)
-        return {"success": False, "strategy": "oauth_manual",
-                "message": "OAuth manual required — not auto-triggered in cloud mode"}
+        return {
+            "success": False,
+            "strategy": "oauth_manual",
+            "message": "OAuth manual required — not auto-triggered in cloud mode",
+        }
 
     # Strategy 1: generate_token via PIN + TOTP (primary — fastest, fully automated)
     if not force_generate or (pin and totp_secret):
@@ -407,8 +428,10 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
     # Strategy 3: OAuth manual flow (requires browser action)
     logger.warning("Automated strategies failed — initiating OAuth manual flow")
     if _CLOUD_MODE:
-        logger.warning("CLOUD_MODE: OAuth URL suppressed (Render logs are public). "
-                       "Check Render env vars: DHAN_ACCESS_TOKEN, DHAN_PIN, DHAN_TOTP_SECRET")
+        logger.warning(
+            "CLOUD_MODE: OAuth URL suppressed (Render logs are public). "
+            "Check Render env vars: DHAN_ACCESS_TOKEN, DHAN_PIN, DHAN_TOTP_SECRET"
+        )
     else:
         _try_oauth_manual(client_id, app_id, app_secret)
 
