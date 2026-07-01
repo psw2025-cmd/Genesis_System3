@@ -194,7 +194,8 @@ def _bootstrap_token():
         if result.get("success"):
             log.info(f"[bootstrap] Token obtained via {result['strategy']}")
         else:
-            log.warning(f"[bootstrap] refresh_token failed: {result}")
+            log.warning(f"[bootstrap] refresh_token failed: {result.get('message', result)}")
+            log.warning("[bootstrap] Add DHAN_CLIENT_ID/DHAN_ACCESS_TOKEN/DHAN_PIN/DHAN_TOTP_SECRET to worker env vars")
     except Exception as exc:
         log.warning(f"[bootstrap] Could not refresh token at startup: {exc}")
 
