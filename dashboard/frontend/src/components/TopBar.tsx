@@ -42,6 +42,15 @@ export function TopBar() {
   // for spot prices. gain_rank is file-based and persists across market hours,
   // so this also satisfies "show last known data when market is closed".
   const getSpot = (sym: string) => {
+    // Handle multiple data shapes from gain_rank API:
+    // Shape 1: {latest: {rankings: [{underlying, spot_price, change_pct}]}}
+    // Shape 2: {rankings: [{underlying, spot_price}]}
+    // Shape 3 (actual): [{date, predictions: [{underlying, gain_score}]}]
+    // Also try chain data for live spot when market open
+    const chainData = chain[sym]
+    if (chainData?.spot && chainData.spot > 0) {
+      return { spot: chainData.spot, chg: null }
+    }
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
     const entry = rankings.find((r: any) => r.underlying === sym)
     if (entry?.spot_price) return { spot: entry.spot_price, chg: entry.change_pct ?? null }
