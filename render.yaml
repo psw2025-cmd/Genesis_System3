@@ -125,6 +125,12 @@ services:
       - key: WORKER_PUSH_TOKEN
         sync: false
 
+      # --- Memory stabilization (worker is lightweight but still bounded) ---
+      - key: DEFER_INSTRUMENT_WARMUP
+        value: "1"
+      - key: CLOUD_PAPER_ENGINE
+        value: "0"
+
     # --- Persistent disk (uncomment when ready — requires paid plan) ---
     # disk:
     #   name: genesis-data
