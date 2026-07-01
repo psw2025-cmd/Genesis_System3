@@ -119,20 +119,6 @@ services:
       - key: DHAN_TOTP_SECRET
         sync: false
 
-      # --- Dhan broker credentials (same as web service) ---
-      - key: DHAN_CLIENT_ID
-        sync: false
-      - key: DHAN_ACCESS_TOKEN
-        sync: false
-      - key: DHAN_PIN
-        sync: false
-      - key: DHAN_TOTP_SECRET
-        sync: false
-      - key: DHAN_APP_ID
-        sync: false
-      - key: DHAN_APP_SECRET
-        sync: false
-
       # --- Web service URL + push auth (Thread 4 in cloud_worker.py) ---
       - key: WEB_SERVICE_URL
         value: https://genesis-system3-backend.onrender.com
