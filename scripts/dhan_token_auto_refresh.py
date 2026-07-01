@@ -93,8 +93,9 @@ def run_daemon():
         print(f"[TokenDaemon] Token INVALID ({v.get('reason')}) — refresh guarded by cloud cooldown...")
         result = _safe_refresh("startup_invalid_token")
         if result.get("success"):
+            preview = result.get('token_preview', result.get('token', '???')[:8] + '...' if result.get('token') else '???')
             print(
-                f"[TokenDaemon] Refreshed via {result['strategy']} — {result['token_preview']} expires {result.get('expires_at','?')}"
+                f"[TokenDaemon] Refreshed via {result.get('strategy','?')} — {preview} expires {result.get('expires_at','?')}"
             )
         else:
             print(f"[TokenDaemon] STARTUP REFRESH SKIPPED/FAILED: {result.get('message')}")
