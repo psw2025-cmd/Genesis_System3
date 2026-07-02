@@ -1302,6 +1302,8 @@ _scheduler_health_state: Dict[str, Any] = {
     "config_alert": None,
     "config_jobs_total": None,
     "config_jobs_enabled": None,
+    "jobs_status_today": {},
+    "fired_keys_today": [],
 }
 _WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
@@ -1331,6 +1333,8 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
         "config_alert": payload.get("config_alert"),
         "config_jobs_total": payload.get("config_jobs_total"),
         "config_jobs_enabled": payload.get("config_jobs_enabled"),
+        "jobs_status_today": payload.get("jobs_status_today", {}),
+        "fired_keys_today": payload.get("fired_keys_today", []),
     }
     return {"accepted": True}
 
@@ -1354,7 +1358,9 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 # data at all, even though EOD data was available). Each push carries a
 # `market_open` flag so we know which freshness window applies.
 # ---------------------------------------------------------------------------
-_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = {}  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
+_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = (
+    {}
+)  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
 _PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s during market hours; treat
 # anything older than this as stale and fall back to the inline live fetch.
 _PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker pushes every ~300s off-hours (cloud_worker.py
@@ -1587,8 +1593,61 @@ async def get_scheduler_health():
         healthy = False
         reasons.append("worker's job scheduler config has zero enabled jobs")
 
+    # Richer breakdown on top of the checks above: classifies every enabled
+    # job into fired/pending/missed/catchup_eligible/skipped for today,
+    # re-evaluating live against the current moment for jobs not yet fired
+    # (see core/engine/system3_scheduler_catchup.py). jobs={} alone is never
+    # treated as fatal here if nothing was due yet — only a genuine
+    # missed_jobs_today entry (past its catch-up window, never fired) marks
+    # unhealthy.
+    try:
+        from core.engine.system3_phase82_job_scheduler import (
+            load_config as _load_scheduler_config,
+        )
+        from core.engine.system3_scheduler_catchup import (
+            load_policy as _load_catchup_policy,
+        )
+        from core.engine.system3_scheduler_catchup import summarize_scheduler_status
+
+        now_ist = datetime.now(IST)
+        is_weekend = now_ist.weekday() >= 5
+        is_holiday = False
+        try:
+            from core.utils.nse_holidays import is_trading_holiday
+
+            is_holiday, _ = is_trading_holiday(now_ist.date())
+        except Exception:
+            pass
+
+        config = _load_scheduler_config()
+        policy = _load_catchup_policy()
+        summary = summarize_scheduler_status(
+            config,
+            state,
+            now=now_ist,
+            policy=policy,
+            is_holiday=is_holiday,
+            is_weekend=is_weekend,
+            api_health_ok=True,  # this endpoint answering IS proof the API is running
+        )
+        if state["received"] and summary.get("missed_jobs_today"):
+            healthy = False
+            reasons.append(f"jobs missed today (past catch-up window, never fired): {summary['missed_jobs_today']}")
+    except Exception as e:
+        summary = {
+            "configured_jobs_count": None,
+            "enabled_jobs_count": None,
+            "fired_jobs_today": [],
+            "pending_jobs_today": [],
+            "missed_jobs_today": [],
+            "catchup_eligible_jobs": [],
+            "skipped_jobs_today": [],
+        }
+        reasons.append(f"could not compute job status summary: {e}")
+
     return {
         **state,
+        **summary,
         "healthy": healthy,
         "unhealthy_reasons": reasons,
     }

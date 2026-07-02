@@ -14,6 +14,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank,
     setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
+    setPnl,
   } = useStore()
 
   const wsRef   = useRef<WebSocket | null>(null)
@@ -34,16 +35,18 @@ export function useData() {
 
   // ── Core REST poll ────────────────────────────────────────────────────────
   const poll = useCallback(async () => {
-    const [health, state, paper, gainRank] = await Promise.allSettled([
+    const [health, state, paper, gainRank, pnl] = await Promise.allSettled([
       fetchJSON('/api/health'),
       fetchJSON('/api/state'),
       fetchJSON('/api/paper'),
       fetchJSON('/api/gain_rank'),
+      fetchJSON('/api/pnl'),
     ])
     if (health.status   === 'fulfilled') setHealth(health.value)
     if (state.status    === 'fulfilled') setState(state.value)
     if (paper.status    === 'fulfilled') setPaper(paper.value)
     if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
+    if (pnl.status      === 'fulfilled') setPnl(pnl.value)
   }, [setHealth, setState, setPaper, setGainRank])
 
   // ── Chain poll ────────────────────────────────────────────────────────────
@@ -109,10 +112,24 @@ export function useData() {
     }
   }, [poll, pollBroker, pollSecondary, wsConnect])
 
-  // Chain poll when symbol changes
+  // Chain poll — selected symbol every 5s + TopBar symbols every 30s
   useEffect(() => {
+    const TOP_BAR_SYMS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY']
+
+    // Poll selected chain symbol fast (5s) for option chain tab
     pollChain(chainSymbol)
-    const t = setInterval(() => pollChain(chainSymbol), 5000)
-    return () => clearInterval(t)
+    const fastTimer = setInterval(() => pollChain(chainSymbol), 5000)
+
+    // Poll all TopBar symbols at startup for spot prices
+    TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
+    // Refresh TopBar spots every 30s (just need spot price, not full chain)
+    const topBarTimer = setInterval(() => {
+      TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
+    }, 30000)
+
+    return () => {
+      clearInterval(fastTimer)
+      clearInterval(topBarTimer)
+    }
   }, [chainSymbol, pollChain])
 }

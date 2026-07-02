@@ -1,0 +1,29 @@
+{
+  "generated_at_utc": "2026-07-01T19:10:00+00:00",
+  "generated_at_ist": "2026-07-02T00:40:00+05:30",
+  "command": "python -m pytest tests/test_scheduler_catchup.py tests/test_dashboard_app.py tests/test_qc_validator_dhan_aliases.py tests/test_qc_runtime_anomaly.py -v",
+  "total_tests": 33,
+  "passed": 33,
+  "failed": 0,
+  "new_catchup_tests": 14,
+  "existing_regression_tests": 19,
+  "required_scenarios_covered": [
+    {"n": 1, "scenario": "Exact-time job still fires", "test": "test_exact_time_job_still_fires", "status": "PASS"},
+    {"n": 2, "scenario": "Missed job within catch-up window fires once", "test": "test_missed_job_within_catchup_window_fires_once", "status": "PASS"},
+    {"n": 3, "scenario": "Missed job outside catch-up window does not fire", "test": "test_missed_job_outside_catchup_window_does_not_fire", "status": "PASS"},
+    {"n": 4, "scenario": "Restart after scheduled time does not permanently hide job status", "test": "test_restart_after_scheduled_time_does_not_permanently_hide_status", "status": "PASS"},
+    {"n": 5, "scenario": "Same job does not fire twice for same date/time", "test": "test_same_job_does_not_fire_twice_for_same_date_time", "status": "PASS"},
+    {"n": 6, "scenario": "Market-dependent job does not catch up when market closed", "test": "test_market_dependent_job_does_not_catchup_when_market_closed", "status": "PASS"},
+    {"n": 7, "scenario": "Paper lifecycle job does not run without broker proof", "test": "test_paper_lifecycle_does_not_run_without_broker_proof", "status": "PASS"},
+    {"n": 8, "scenario": "Paper lifecycle job does not run without valid option contract proof", "test": "test_paper_lifecycle_does_not_run_without_valid_option_contract_proof", "status": "PASS"},
+    {"n": 9, "scenario": "Post-market proof pack does not run before upstream artifacts exist", "test": "test_post_market_proof_pack_does_not_run_before_upstream_exists", "status": "PASS"},
+    {"n": 10, "scenario": "Scheduler health reports pending/missed/catchup status instead of empty jobs when applicable", "test": "test_scheduler_health_reports_honest_status_not_empty_jobs", "status": "PASS"}
+  ],
+  "additional_tests": [
+    "test_make_fire_key_uniqueness",
+    "test_pending_job_not_yet_due_is_not_misreported_as_missed",
+    "test_auto_retrain_does_not_fire_without_retrain_signal",
+    "test_no_policy_entry_defaults_to_never_catchup"
+  ],
+  "regression_check": "All 19 pre-existing tests (test_dashboard_app.py, test_qc_validator_dhan_aliases.py, test_qc_runtime_anomaly.py) still pass unchanged — scheduler catch-up changes introduced no regressions."
+}

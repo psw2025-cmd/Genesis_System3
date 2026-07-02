@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-07-02T15:22:00+00:00",
+  "generated_at_ist": "2026-07-02T20:52:00+05:30",
+  "underlying_tested": "NIFTY",
+  "valid_option_contract_proven": true,
+  "status": "OK_EOD_DATA_NO_LIVE_ORDERBOOK",
+  "evidence": {
+    "endpoint": "/api/chain/NIFTY",
+    "spot": 24175.7,
+    "total_contracts": 200,
+    "data_source": "nse",
+    "response_status": "OK",
+    "sample_contract_raw_api_fields": {
+      "underlying": "NIFTY",
+      "exchange_segment": "NSE_FNO",
+      "expiry_date": "2026-07-07",
+      "strike": 21350.0,
+      "option_type": "PE",
+      "trading_symbol": "NIFTY-Jul2026-21350-PE",
+      "security_id": "44455",
+      "lot_size": 65,
+      "ltp": 0.75,
+      "top_bid_price": 0.0,
+      "top_ask_price": 0.0,
+      "volume": 37778,
+      "oi": 32419,
+      "source": "nse"
+    },
+    "assessment_derived_by_this_report_not_from_api": {
+      "exchange": "NSE (inferred from exchange_segment=NSE_FNO)",
+      "segment": "F&O (inferred from exchange_segment)",
+      "tick_size": "absent from the API response entirely - not inferrable, real gap",
+      "spread": "not computable - top_bid_price and top_ask_price are both 0.0",
+      "tradable_assessment_by_this_report": true,
+      "tradable_assessment_reasoning": "Has a resolved security_id and trading_symbol via the instrument master (symbol_resolved_from: instrument_master in the raw response), non-zero LTP/OI/volume - this report's own judgment, not a field the API itself returns.",
+      "rejection_reason": null
+    }
+  },
+  "honest_caveat": "This is bhavcopy/EOD-sourced data (data_source: nse), not a live order book snapshot - confirmed by checking all 200 contracts in the response: zero have a nonzero top_bid_price. LTP, OI, volume, and all identifying fields (security_id, trading_symbol, expiry, strike, lot_size) are real and correctly resolved via the instrument master. bid/ask/spread are genuinely unavailable from this data source, not a bug - EOD/bhavcopy snapshots do not carry live order-book depth. tick_size is not present anywhere in the /api/chain response schema (a real, separate gap, not investigated further this session).",
+  "required_fields_status": "Against the 17 required fields (exchange, underlying, segment, expiry, strike, CE/PE, trading symbol, security ID, lot size, tick size, LTP, bid, ask, spread, volume/liquidity, tradable, rejection reason): 13 are present with real values or a defensible assessment (exchange and segment are inferred from exchange_segment, not literal API fields). 4 are genuinely unavailable - bid, ask, and derived spread (EOD data source has no live order-book depth, confirmed across all 200 contracts in the response) and tick_size (absent from the API response schema entirely, a separate real gap not investigated further this session).",
+  "equity_forecast_path_note": "This blocker is specific to the OPTIONS trade path. It does not block the separate equity forecast/prediction path, which uses gain_rank data independently (see analyzer_signal_summary.json).",
+  "how_this_became_available": "Became available after 18:30/18:45 IST (bhavcopy_download and signal_engine_bhavcopy scheduled jobs) fired for the first time today following this session's scheduler catch-up fix. At the time of the original 17:25 IST check, this data did not exist yet (see original finding below).",
+  "original_1725_ist_finding_preserved": {
+    "status": "MARKET_CLOSED_NO_EOD_DATA_YET",
+    "raw_response": {"underlying": "NIFTY", "contracts": [], "spot": 0, "pcr": 1.0, "total_contracts": 0, "data_source": "closed", "status": "MARKET_CLOSED", "message": "Market closed - live chain fetch skipped in REAL_ONLY mode"}
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-07-01T17:15:00+00:00",
+  "generated_at_ist": "2026-07-01T22:45:00+05:30",
+  "branch": "fix/scheduler-catchup-and-market-proof",
+  "base_commit_sha": "95dbec4464693d5d6d1976f1810164474a09fdf9",
+  "base_commit_subject": "fix: add missing timezone import causing scheduler-health-push to crash (#52)",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "authoritative_runtime_paths": {
+    "backend_web_service": {
+      "entrypoint": "dashboard/backend/app.py",
+      "dockerfile": "dashboard/backend/Dockerfile",
+      "render_service": "genesis-system3-backend"
+    },
+    "worker_service": {
+      "entrypoint": "scripts/cloud_worker.py",
+      "dockerfile": "dashboard/backend/Dockerfile",
+      "docker_command": "python scripts/cloud_worker.py",
+      "render_service": "genesis-system3-worker"
+    },
+    "scheduler": {
+      "entrypoint": "core/engine/system3_phase82_job_scheduler.py",
+      "config": "config/system3_job_scheduler.json",
+      "state_file": "storage/ultra/ph76_ph100/phase82_job_scheduler_state.json"
+    },
+    "db_state": {
+      "note": "No relational DB in this deployment; state is JSON-file-based under storage/ and state/",
+      "scheduler_state": "storage/ultra/ph76_ph100/phase82_job_scheduler_state.json",
+      "scheduler_config_alert": "state/scheduler_config_alert.json"
+    },
+    "frontend": {
+      "root": "dashboard/frontend",
+      "build_tool": "vite",
+      "dist_served_from": "dashboard/frontend/dist",
+      "route": "/ui"
+    },
+    "reports_output": "reports/latest"
+  },
+  "duplicate_or_stale_paths_checked": [
+    {"path": "proof/archive", "status": "not imported by any runtime entrypoint, historical archive only"},
+    {"path": "scripts/proof_run.ps1.backup", "status": "backup file, not imported"},
+    {"path": "scripts/verify_proof_pack.ps1.backup", "status": "backup file, not imported"},
+    {"path": "system3_autorun_master.py.backup", "status": "backup file, not imported, superseded by cloud_worker.py in cloud deployment"},
+    {"path": "system3_watchdog.py.backup", "status": "backup file, not imported, superseded by watchdog thread in cloud_worker.py"}
+  ],
+  "verification_method": "grep for imports of each backup/archive path across app.py, cloud_worker.py, token_manager.py, system3_phase82_job_scheduler.py — zero matches",
+  "conclusion": "No archive/backup/stale duplicate runtime path is imported by any active service entrypoint."
+}
