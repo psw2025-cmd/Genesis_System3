@@ -92,8 +92,16 @@ def run_daemon():
     else:
         print(f"[TokenDaemon] Token INVALID ({v.get('reason')}) — refresh guarded by cloud cooldown...")
         result = _safe_refresh("startup_invalid_token")
-        if result.get("success"):
-            preview = result.get('token_preview', result.get('token', '???')[:8] + '...' if result.get('token') else '???')
+        if result.get("success") and result.get("strategy") == "cooldown_skip":
+            # cooldown_skip means no refresh actually happened - we just
+            # deferred to avoid hammering Dhan's rate limit. The existing
+            # token may still be invalid; log that honestly instead of
+            # claiming it was "refreshed".
+            print(f"[TokenDaemon] Refresh deferred (cooldown active) — {result.get('message', '')}")
+        elif result.get("success"):
+            preview = result.get(
+                "token_preview", result.get("token", "???")[:8] + "..." if result.get("token") else "???"
+            )
             print(
                 f"[TokenDaemon] Refreshed via {result.get('strategy','?')} — {preview} expires {result.get('expires_at','?')}"
             )
@@ -109,7 +117,10 @@ def run_daemon():
         print(f"[TokenDaemon] {datetime.now().strftime('%H:%M:%S')} — refreshing token...")
         for attempt in range(1, 4):
             result = _safe_refresh(f"scheduled_attempt_{attempt}")
-            if result.get("success"):
+            if result.get("success") and result.get("strategy") == "cooldown_skip":
+                print(f"[TokenDaemon] Refresh deferred (cooldown active) — {result.get('message', '')}")
+                break
+            elif result.get("success"):
                 print(f"[TokenDaemon] ✅ Token refreshed via {result['strategy']} — {result['token_preview']}")
                 break
             else:

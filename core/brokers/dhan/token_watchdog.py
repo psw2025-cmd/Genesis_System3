@@ -39,22 +39,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger("dhan_watchdog")
 
-CHECK_INTERVAL_S   = 30 * 60   # check every 30 minutes
-PROACTIVE_HOURS    = 2.0        # refresh if < 2h left
-PREVENTIVE_HOURS   = 22.0       # refresh if token > 22h old (before 24h expiry)
-MAX_FAIL_STREAK    = 3          # CRITICAL alert after 3 consecutive failures
-_fail_streak       = 0
+CHECK_INTERVAL_S = 30 * 60  # check every 30 minutes
+PROACTIVE_HOURS = 2.0  # refresh if < 2h left
+PREVENTIVE_HOURS = 22.0  # refresh if token > 22h old (before 24h expiry)
+MAX_FAIL_STREAK = 3  # CRITICAL alert after 3 consecutive failures
+_fail_streak = 0
 
 
 def _token_hours_remaining() -> float | None:
     """Returns hours left on current token, or None if can't determine."""
     import base64
     import json
+
     try:
         from core.utils.env_loader import get_dhan_credentials
+
         creds = get_dhan_credentials()
     except ImportError:
         from dotenv import load_dotenv
+
         load_dotenv(ROOT_DIR / ".secrets" / "dhan.env", override=False)
         creds = {
             "client_id": os.getenv("DHAN_CLIENT_ID", ""),
@@ -79,15 +82,14 @@ def _token_hours_remaining() -> float | None:
 
 def _daemon_running() -> bool:
     import subprocess
-    result = subprocess.run(
-        ["pgrep", "-f", "dhan_token_auto_refresh.py"],
-        capture_output=True
-    )
+
+    result = subprocess.run(["pgrep", "-f", "dhan_token_auto_refresh.py"], capture_output=True)
     return result.returncode == 0
 
 
 def _restart_daemon() -> None:
     import subprocess
+
     daemon_script = ROOT_DIR / "scripts" / "dhan_token_auto_refresh.py"
     python = sys.executable
     p = subprocess.Popen(
@@ -105,10 +107,19 @@ def _do_refresh() -> bool:
     try:
         # Reload env fresh before refresh (picks up latest token)
         from dotenv import load_dotenv
+
         load_dotenv(ROOT_DIR / ".secrets" / "dhan.env", override=True)
         from core.brokers.dhan.token_manager import refresh_token
+
         result = refresh_token()
-        if result.get("success"):
+        if result.get("success") and result.get("strategy") == "cooldown_skip":
+            # cooldown_skip means no refresh actually happened - we just
+            # deferred to avoid hammering Dhan's rate limit. The existing
+            # token may still be invalid; log that honestly instead of
+            # claiming it was "refreshed".
+            logger.info(f"Refresh deferred (cooldown active) — {result.get('message', '')}")
+            return False
+        elif result.get("success"):
             logger.info(f"Token refreshed via {result['strategy']} — expires {result.get('expires_at','?')}")
             _fail_streak = 0
             return True
@@ -186,9 +197,10 @@ def start_watchdog_thread() -> threading.Thread:
 if __name__ == "__main__":
     import argparse
     import json
+
     parser = argparse.ArgumentParser(description="Dhan Token Watchdog")
-    parser.add_argument("--once",  action="store_true", help="Run one check cycle and exit")
-    parser.add_argument("--loop",  action="store_true", help="Run watchdog loop forever")
+    parser.add_argument("--once", action="store_true", help="Run one check cycle and exit")
+    parser.add_argument("--loop", action="store_true", help="Run watchdog loop forever")
     parser.add_argument("--hours", action="store_true", help="Print hours remaining on current token")
     args = parser.parse_args()
 
