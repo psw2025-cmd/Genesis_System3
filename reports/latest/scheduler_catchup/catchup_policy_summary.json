@@ -1,0 +1,29 @@
+{
+  "generated_at_utc": "2026-07-01T19:12:00+00:00",
+  "generated_at_ist": "2026-07-02T00:42:00+05:30",
+  "policy_file": "config/system3_scheduler_catchup_policy.json",
+  "engine_file": "core/engine/system3_scheduler_catchup.py",
+  "wired_into": "core/engine/system3_phase82_job_scheduler.py run_daemon()",
+  "design_summary": {
+    "fire_key_format": "{date}|{schedule_time}|{job_id}",
+    "fire_key_persistence": "Stored in state['fired_keys_today'], reloaded from disk every daemon tick, reset on date rollover. Replaces the old in-memory-only last_fired/last_fired_date dicts, which reset to empty on every process restart.",
+    "default_policy": "No catch-up (condition='never', window=0 minutes) for any job without an explicit policy entry — requirement 2 (conservative default).",
+    "double_fire_prevention": "SKIPPED_ALREADY_FIRED status returned whenever fire_key is already in fired_keys_today, regardless of how many times evaluate_job_fire is called for the same slot — requirement 6.",
+    "fire_status_values": ["ON_TIME", "CATCH_UP", "PENDING", "SKIPPED_MARKET_CLOSED", "SKIPPED_TOO_LATE", "SKIPPED_UPSTREAM_MISSING", "SKIPPED_ALREADY_FIRED", "FAILED"]
+  },
+  "condition_handlers_implemented": [
+    "always", "never", "before_market_open", "before_market_open_or_before_first_lifecycle",
+    "within_window_trading_day", "market_open", "market_open_and_broker_and_contract_proven",
+    "post_market_close", "post_market_upstream_exists", "post_market_api_running",
+    "retrain_signal_exists", "bhavcopy_available"
+  ],
+  "jobs_covered": 23,
+  "policy_highlights": {
+    "paper_lifecycle_proof_family": "Catch-up requires market open AND both reports/latest/broker_truth/broker_truth_summary.json AND reports/latest/instrument_tradability/instrument_tradability_summary.json to exist — never catches up on broker/contract assumption alone.",
+    "auto_retrain": "Catch-up requires state/retrain_signal.json to actually exist — never blindly retrains.",
+    "paper_day_proof_pack": "Requires dashboard_browser_proof/status.json AND performance_benchmark artifacts to exist first.",
+    "pre_market_jobs": "Hard-blocked from catching up once market has opened (09:15 IST) — never run stale pre-market checks mid-session.",
+    "no_policy_default": "Any job added to system3_job_scheduler.json without a corresponding entry in the catch-up policy gets zero catch-up window by default — fails safe, not open."
+  },
+  "verification": "14 new unit tests in tests/test_scheduler_catchup.py, all passing. See test_summary.json."
+}

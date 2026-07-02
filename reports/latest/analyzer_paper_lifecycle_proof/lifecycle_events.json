@@ -1,0 +1,6 @@
+{
+  "generated_at_utc": "2026-07-02T12:05:00+00:00",
+  "todays_lifecycle_events": [],
+  "note": "No fresh lifecycle events captured today (2026-07-02) - market closed before a genuine live-data run could be executed. This is an honest empty result, not a fabricated one.",
+  "historical_events_reference": "See LIFECYCLE_20260614_142129.json, LIFECYCLE_20260614_162724.json, LIFECYCLE_20260614_162812.json in this same directory for prior mechanism self-test runs (fallback-token based, not genuine live trades - see summary.json historical_evidence_preserved field)."
+}
