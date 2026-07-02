@@ -1,0 +1,22 @@
+{
+  "generated_at_utc": "2026-07-02T11:58:00+00:00",
+  "generated_at_ist": "2026-07-02T17:28:00+05:30",
+  "analyzer_signal_mechanism_proven": true,
+  "latest_signal_fresh": false,
+  "evidence": {
+    "endpoint": "/api/gain_rank",
+    "latest_date_in_response": "2026-06-13",
+    "latest_time_in_response": "19:07:05",
+    "days_stale": 19,
+    "sample_predictions": [
+      {"rank": 1, "underlying": "NIFTY", "gain_score": 76.93, "expected_move_pct": 0.032, "recommendation": "TRADE"},
+      {"rank": 2, "underlying": "BANKNIFTY", "gain_score": 66.04, "expected_move_pct": 0.099, "recommendation": "TRADE"},
+      {"rank": 3, "underlying": "MIDCPNIFTY", "gain_score": 61.7, "expected_move_pct": 0.147, "recommendation": "TRADE"},
+      {"rank": 4, "underlying": "FINNIFTY", "gain_score": 34.58, "expected_move_pct": 0.031, "recommendation": "SKIP"}
+    ]
+  },
+  "finding": "The analyzer/ranking mechanism itself is real and functional - it has genuine historical signal data with the correct fields (rank, underlying, gain_score, expected_move_pct, recommendation), not fabricated. But the CURRENT 'latest' snapshot is 19 days stale (2026-06-13), because the daily_gain_rank scheduled job (09:15 IST) has not successfully fired since - the exact silent-scheduler-failure this session's Phase 2-4 catch-up fix addresses.",
+  "self_heal_expectation": "Once the scheduler catch-up fix (this session's PR, pending merge) is deployed, daily_gain_rank should fire again at its next scheduled window (09:15 IST tomorrow, 2026-07-03, or via catch-up if the worker restarts within its 30-minute post-09:15 window). Not verified in this session since market closed before deploy could be confirmed against a live 09:15 firing.",
+  "gate_score_reject_reason_fields": "Present in sample data (recommendation: TRADE/SKIP acts as the gate). No explicit numeric 'gate_score' or 'reject_reason' field beyond gain_score/recommendation in this endpoint's schema.",
+  "db_api_dashboard_match": "Not independently cross-checked against a raw DB row in this session (no direct DB/file access to the worker container's local state from this environment); API response is the source of truth used here."
+}
