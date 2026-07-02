@@ -109,10 +109,24 @@ export function useData() {
     }
   }, [poll, pollBroker, pollSecondary, wsConnect])
 
-  // Chain poll when symbol changes
+  // Chain poll — selected symbol every 5s + TopBar symbols every 30s
   useEffect(() => {
+    const TOP_BAR_SYMS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY']
+
+    // Poll selected chain symbol fast (5s) for option chain tab
     pollChain(chainSymbol)
-    const t = setInterval(() => pollChain(chainSymbol), 5000)
-    return () => clearInterval(t)
+    const fastTimer = setInterval(() => pollChain(chainSymbol), 5000)
+
+    // Poll all TopBar symbols at startup for spot prices
+    TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
+    // Refresh TopBar spots every 30s (just need spot price, not full chain)
+    const topBarTimer = setInterval(() => {
+      TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
+    }, 30000)
+
+    return () => {
+      clearInterval(fastTimer)
+      clearInterval(topBarTimer)
+    }
   }, [chainSymbol, pollChain])
 }
