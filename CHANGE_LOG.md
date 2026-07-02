@@ -886,3 +886,51 @@ worker push post-deploy — please watch `/api/chain/NIFTY` after-hours and conf
 once this ships.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
+### [2026-07-03] [Claude] INVESTIGATION: live 502s + Overview tab crash on production, both traced to stale deploy
+
+**Found via:** user reported a 502 Bad Gateway screenshot on `/ui`. Built a working visual-proof pipeline
+(`tools/playwright-setup/verify_all_ui_tabs.spec.ts`, Chromium via Playwright) to actually screenshot the
+live site rather than trust status codes or test-log text alone.
+
+**Finding 1 — the spec itself was silently broken.** It selected `.nav-item` to click through tabs, but
+`Sidebar.tsx` was rebuilt (React rewrite) to use unclassed `<button title={label}>` elements — every
+`querySelectorAll('.nav-item')` returned zero matches, every "click" silently no-op'd, and the test reported
+`overallPass: true` while only ever screenshotting the same initial page 8 times. Fixed to click by
+`page.getByTitle(label)`, updated the tab list to the current 12 tabs (was missing `chain`, `signals`,
+`paper`, `ml`), and made a failed click count as a real failure instead of being ignored.
+
+**Finding 2 — production really is intermittently 502ing.** Screenshotted Render's own error page live
+(`reports/latest/ui_route_verification/screenshots/00_initial_overview.png` from one run genuinely shows
+Render's "502 Bad Gateway" page, not app content). Polled `/ui` and `/api/health` repeatedly: down for
+several consecutive checks, then recovered to 200 on its own within minutes — consistent with the
+self-recovering crash-loop pattern already flagged as a residual risk in the PR #58 CHANGE_LOG entry
+(worker's chain-push thread on the shared 512MB Starter tier). Scheduled a 10-minute recurring check
+(cron job, session-local) to track outage frequency going forward.
+
+**Finding 3 — when up, clicking the "Overview" tab reliably crashes the whole page.** Reproduced 3/3 times
+against the live site: `TypeError: t.toUpperCase is not a function`, thrown repeatedly inside
+`index-BYrFffhg.js`, ending in a full page crash (blank screen, `pageerror`, browser context closes).
+Screenshot evidence: `reports/latest/ui_route_verification/screenshots/overview.png` (solid blank) vs
+`00_initial_overview.png` (real content) from the same run.
+
+**Root-caused by rebuilding current `main` locally** (`npm run build` in `dashboard/frontend`, wired to the
+real production API via `VITE_API_BASE_URL`) and running the same Playwright spec against that local build:
+all 12 tabs, including Overview, loaded cleanly with zero crashes. The locally-built bundle's content hash
+(`index-T9P-DF3u.js`) does not match what's actually live (`index-BYrFffhg.js`) or even what's committed in
+`dashboard/frontend/dist/` (`index-OV3vZTVW.js` — dead weight, the Dockerfile's `frontend-builder` stage
+rebuilds from source on every deploy and never reads the committed `dist/`, so that checked-in folder is
+stale cruft, not a discrepancy). Three different hashes across live / committed-dist / fresh-local strongly
+suggests the Render web service is currently serving a build older than current `main`, not that current
+source has this bug.
+
+**Action taken:** none to application code — current `main` was not shown to reproduce the crash. Pushing
+this commit (spec fix + proof screenshots) to trigger Render's `autoDeploy` for a fresh build, then
+re-running the same visual verification against the redeployed site to confirm both the 502s and the
+Overview crash are gone. If the crash reproduces again post-redeploy, the hash-mismatch theory is wrong and
+the bug is real and data-dependent — next step would be enabling `build.sourcemap` in `vite.config.ts` to
+get a readable production stack trace instead of guessing from minified names.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
