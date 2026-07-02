@@ -1673,6 +1673,12 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
 
 # WebSocket connections
 active_connections: List[WebSocket] = []
+_MAX_WS_CONNECTIONS = 20  # hard cap — this is a small-team dashboard, not a
+# consumer product. Each open connection runs its own dedicated per-second
+# loop on the single Render worker process (--workers 1, 512MB Starter box);
+# an unbounded number of stale/reconnecting tabs is an unbounded amount of
+# background work with no ceiling. Rejecting past this cap is a cheap safety
+# net against that becoming an OOM source (2026-07-02 forensic investigation).
 
 # File watcher for real-time updates
 # Store the event loop for use in file watcher thread
@@ -2600,8 +2606,25 @@ async def get_underlyings():
     return {"underlyings": DEFAULT_UNDERLYINGS}
 
 
+_TTL_CHAIN = 8  # option chain — frontend polls every 5s per client; DataSourceManager()
+# construction + live Dhan fetch inside is expensive (instrument master lookup +
+# network call). Without this cache, every open browser tab re-triggers that full
+# cost every 5s, which was a leading suspect for OOM-driven 502 crash loops on the
+# 512MB Render Starter box during market hours (2026-07-02 forensic investigation).
+
+
 @app.get("/api/chain/{underlying}")
 async def get_chain(underlying: str):
+    """Get option chain for specific underlying (TTL-cached, see _TTL_CHAIN)."""
+    cache_key = f"chain_{underlying.upper()}"
+    _hit = _cache_get(cache_key, _TTL_CHAIN)
+    if _hit is not None:
+        return _hit
+    result = await _get_chain_uncached(underlying)
+    return _cache_set(cache_key, result)
+
+
+async def _get_chain_uncached(underlying: str):
     """Get option chain for specific underlying"""
     try:
         # Check market status first
@@ -3680,6 +3703,9 @@ async def websocket_endpoint(websocket: WebSocket):
     # (Previously rejected outside hours with 1008 — this broke testing and
     # prevented the dashboard from showing WS as connected during dev)
     await websocket.accept()
+    if len(active_connections) >= _MAX_WS_CONNECTIONS:
+        await websocket.close(code=1013, reason="Too many live connections — try again shortly")
+        return
     market_open_now = False
     market_close_reason = "unknown"
     if MARKET_DETECTION_AVAILABLE:
