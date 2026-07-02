@@ -164,13 +164,22 @@ def _run_health_push():
 
     while True:
         try:
-            payload = {"daemon_heartbeat": None, "daemon_pid": None, "jobs": {}, "config_alert": None}
+            payload = {
+                "daemon_heartbeat": None,
+                "daemon_pid": None,
+                "jobs": {},
+                "config_alert": None,
+                "config_jobs_total": None,
+                "config_jobs_enabled": None,
+            }
 
             if _SCHEDULER_STATE_FILE.exists():
                 state = _json.loads(_SCHEDULER_STATE_FILE.read_text(encoding="utf-8"))
                 payload["daemon_heartbeat"] = state.get("daemon_heartbeat")
                 payload["daemon_pid"] = state.get("daemon_pid")
                 payload["jobs"] = state.get("jobs", {})
+                payload["config_jobs_total"] = state.get("config_jobs_total")
+                payload["config_jobs_enabled"] = state.get("config_jobs_enabled")
 
             if _SCHEDULER_ALERT_FILE.exists():
                 payload["config_alert"] = _json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))

@@ -1,0 +1,71 @@
+=== GIT ===
+865bb696
+## main...origin/main
+?? reports/latest/live_cloud_endpoint_truth/
+?? reports/latest/scheduler_zero_jobs_forensic/
+
+=== CONFIG EXISTS ===
+-rw-rw-rw- 1 codespace codespace 11591 Jul  1 18:16 config/system3_job_scheduler.json
+
+=== CONFIG JSON LOAD ===
+config_path= config/system3_job_scheduler.json
+jobs_total= 23
+jobs_enabled= 23
+first_10_job_ids= ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday']
+
+=== SCHEDULER --list ===
+
+======================================================================
+SYSTEM3 PHASE 82 - JOB SCHEDULER - LIST
+======================================================================
+Date: 2026-07-01 19:41:41
+
+[PH82] Loaded 23 jobs from /workspaces/Genesis_System3/config/system3_job_scheduler.json
+
+| ID | Name | Enabled | Last Status | Last Run Time |
+|----|------|---------|-------------|---------------|
+| self_healing_watchdog | Self-Healing Watchdog (Auto-Fix) | True | NEVER_RUN | N/A |
+| datasource_health_check | Data Source Health Check (Pre-Market) | True | NEVER_RUN | N/A |
+| dashboard_endpoint_coverage | Dashboard Endpoint Coverage Proof | True | NEVER_RUN | N/A |
+| auto_coordinator_premarket | Full Auto Coordinator (Pre-Market) | True | NEVER_RUN | N/A |
+| dhan_instruments_sync | Dhan Instrument Master Sync | True | NEVER_RUN | N/A |
+| daily_gain_rank | Daily Gain Rank (Pre-Market) | True | NEVER_RUN | N/A |
+| paper_lifecycle_proof | Analyzer Paper Lifecycle Proof | True | NEVER_RUN | N/A |
+| ui_market_cross_verify | UI Market Cross Verify | True | NEVER_RUN | N/A |
+| paper_lifecycle_proof_midday | Analyzer Paper Lifecycle Proof (Midday) | True | NEVER_RUN | N/A |
+| ui_market_cross_verify_midday | UI Market Cross Verify (Midday) | True | NEVER_RUN | N/A |
+| paper_lifecycle_proof_afternoon | Analyzer Paper Lifecycle Proof (Afternoon) | True | NEVER_RUN | N/A |
+| ui_market_cross_verify_afternoon | UI Market Cross Verify (Afternoon) | True | NEVER_RUN | N/A |
+| daily_gain_validate | Daily Gain Validate (Post-Market) | True | NEVER_RUN | N/A |
+| daily_gain_trend | Daily Accuracy Trend (Post-Market) | True | NEVER_RUN | N/A |
+| daily_prediction_benchmark | Daily Prediction-vs-Actual Benchmark (Issue #26) | True | NEVER_RUN | N/A |
+| dashboard_browser_proof | Dashboard Browser Proof (Playwright) | True | NEVER_RUN | N/A |
+| system3_post_market_pipeline | Post-Market Auto Pipeline | True | NEVER_RUN | N/A |
+| paper_day_proof_pack | Paper Day Proof Pack (Human-Requested 14-Point Checklist) | True | NEVER_RUN | N/A |
+| auto_retrain | Auto Model Retrain (Post-Market) | True | NEVER_RUN | N/A |
+| auto_coordinator_post_market | Full Auto Coordinator (Post-Market) | True | NEVER_RUN | N/A |
+| bhavcopy_download | NSE FO Bhavcopy Download (Post-Market) | True | NEVER_RUN | N/A |
+| signal_engine_bhavcopy | Signal Engine - Bhavcopy Runner (Post-Market) | True | NEVER_RUN | N/A |
+| weekly_repo_authority_audit | Weekly Repo Authority Audit (Issue #28) | True | NEVER_RUN | N/A |
+
+=== STATE FILE BEFORE ===
+-rw-rw-rw- 1 codespace codespace 388 Jul  1 19:40 storage/ultra/ph76_ph100/phase82_job_scheduler_state.json
+state_keys= ['daemon_heartbeat', 'daemon_pid', 'daemon_started_at', 'jobs']
+jobs_count= 1
+jobs_keys_first_20= ['daily_status']
+daemon_heartbeat= 2026-07-02T01:10:48.434795+05:30
+daemon_pid= 1626
+
+=== CLOUD SCHEDULER HEALTH NOW ===
+{
+    "received": false,
+    "last_push_at": null,
+    "daemon_heartbeat": null,
+    "daemon_pid": null,
+    "jobs": {},
+    "config_alert": null,
+    "healthy": false,
+    "unhealthy_reasons": [
+        "worker has never pushed scheduler health \u2014 check worker service is deployed and running cloud_worker.py"
+    ]
+}
