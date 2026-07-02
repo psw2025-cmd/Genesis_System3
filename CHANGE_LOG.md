@@ -748,3 +748,44 @@ stayed alive, `config_jobs_enabled=23` while `jobs={}` (no job fired yet), confi
 have false-alarmed here and the new logic does not.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
+### [2026-07-02] [Claude] MITIGATION: live 502 crash-loop on genesis-system3-backend.onrender.com — two safety nets shipped, real fix (worker split) still pending
+
+**Found via:** live polling of the deployed `/api/health` endpoint during market hours — service pattern was
+UP ~5s, DOWN ~40s, repeating (Render killing + restarting the single web container, `--workers 1` on the
+512MB Starter plan). User confirmed they don't want to upgrade the Render plan; wants a modular/code fix.
+
+**Ruled out:** `cloud_paper_trading_loop()` — already disabled via `CLOUD_PAPER_ENGINE=0` in `render.yaml`
+on both services (a prior modular split that already worked). `/api/gain_rank` — already file-read only,
+inline `run_ranking()` explicitly disabled with a comment citing prior OOM. Frontend tab rendering — `App.tsx`
+correctly unmounts inactive tabs (`switch (activeTab)`), so only the active tab's polling runs; several
+components with aggressive polling (`RiskDashboard`, `AdvancedCharts`, `ControlPlane`, `Backtest`,
+`AgentConsole`, `ModelBehavior`, `ChainAnalytics`) are dead code, imported nowhere in `App.tsx` — not
+contributing load.
+
+**Leading suspect, addressed:** `GET /api/chain/{underlying}` (`dashboard/backend/app.py`) had NO caching,
+unlike every sibling endpoint (`_cache_get`/`_cache_set` + a `_TTL_*` constant is the established pattern
+for `broker_*`, `portfolio`, `scanner_gainers`, `accuracy_trend`, `paper`, `auto_gates`). It constructs a
+fresh `DataSourceManager()` and does a live Dhan fetch on every call. The frontend's global `useData()` hook
+polls `/api/chain/{symbol}` every 5s from every open browser tab, and 6 other endpoints internally call
+`get_chain(...)` too (lines ~4382-4515) — so this was the single most-repeated expensive code path in the
+whole app during market hours, with zero caching.
+
+**Fix 1 — cache `/api/chain/{underlying}`:** Renamed the original body to `_get_chain_uncached()`; `get_chain()`
+is now a thin `_cache_get`/`_cache_set` wrapper with `_TTL_CHAIN=8s`. All 6 internal callers of `get_chain(...)`
+automatically inherit the cache since they were already calling the function by name, not the route directly.
+
+**Fix 2 — cap concurrent WebSocket connections:** `/ws/stream` had no limit on simultaneous connections; each
+one runs its own dedicated per-second loop on the same single worker process. Added `_MAX_WS_CONNECTIONS=20`
+— new connections beyond that get accepted then immediately closed with code 1013 ("try again shortly")
+instead of piling up unboundedly.
+
+**Still pending (real fix, larger change, follow-up):** move heavy/live computation (chain fetch, any future
+chart/analytics endpoints) off the web dyno entirely — have the worker service (`scripts/cloud_worker.py`,
+already running the job scheduler) precompute and push results the same way it already pushes scheduler
+health (`POST /api/scheduler/health/push` pattern), so the web dyno only ever serves already-computed JSON
+and never blocks on a live network/DataSourceManager call inline. Scoped but not yet built.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
