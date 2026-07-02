@@ -1,0 +1,25 @@
+{
+  "generated_at_utc": "2026-07-02T10:56:00+00:00",
+  "generated_at_ist": "2026-07-02T16:26:00+05:30",
+  "broker_status_classification": "BROKER_CONNECTED_REAL",
+  "evidence": {
+    "api_broker_status": {"broker": "dhan", "connected": true, "live_trading_enabled": false, "order_placement_allowed": false, "credentials_present": true, "client_id_present": true, "access_token_present": true, "latency_ms": 267, "error": null, "sdk_available": true},
+    "api_health_broker_block": {"connected": true, "name": "dhan", "status": "connected", "error": null}
+  },
+  "dhan_token_status": {
+    "worker_side": "Worker's own token watchdog reported 'Token OK - 12.00h remaining' at 06:22 and 06:52 UTC (11:52/12:22 IST) via its own successful TOTP-based refresh.",
+    "web_side": "Web service's own independent token refresh (it also runs refresh_token() at startup, separate from the worker's) has succeeded as of this snapshot (connected:true, error:null) - was previously TOKEN_EXPIRED_OR_INVALID earlier in this session before a restart-triggered refresh succeeded.",
+    "architecture_gap_found": "Web and worker each maintain their OWN independent copy of DHAN_ACCESS_TOKEN and each independently calls refresh_token() - there is no mechanism for the worker's successfully-refreshed token to propagate to the web service, or vice versa. Each side can independently go stale between its own refresh attempts. Not fixed this session (would require a new sync mechanism); documented as a real finding, not silently patched."
+  },
+  "totp_race_fix_confirmation": {
+    "pr_49_totp_window_fix": "Deployed and confirmed working - production logs after deploy showed no more 'Invalid TOTP' errors (previously caused by generating a TOTP code with <5s left in its validity window).",
+    "pr_50_lock_race_fix": "Deployed. Confirmed the specific double-call-within-0.3s race this fixed no longer reproduces in logs checked this session.",
+    "once_every_2_minutes_error": "Was observed once during this session (immediately after the credential-sync redeploy, before the lock-race fix's atomic check-and-mark took effect in a fresh boot) - not observed in the most recent logs checked."
+  },
+  "pr_52_timezone_fix_confirmation": {
+    "status": "CONFIRMED WORKING",
+    "evidence": "POST /api/scheduler/health/push no longer crashes with NameError: name 'timezone' is not defined. GET /api/scheduler/health showed received:true with real job data after the fix deployed, versus received:false / worker-never-pushed before."
+  },
+  "no_duplicate_token_refresh_race": "Confirmed via PR #50 fix and absence of the 'once every 2 minutes' error in the most recent log window checked.",
+  "secrets_redaction": "All log excerpts and evidence in this report and throughout this session were reviewed with actual token/PIN/TOTP/secret VALUES never printed or included - only keys, presence booleans, lengths, and status strings."
+}

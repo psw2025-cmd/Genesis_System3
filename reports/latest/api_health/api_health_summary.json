@@ -1,0 +1,19 @@
+{
+  "generated_at_utc": "2026-07-02T10:56:00+00:00",
+  "generated_at_ist": "2026-07-02T16:26:00+05:30",
+  "endpoints": [
+    {"url": "/", "status": 200, "fresh": true},
+    {"url": "/docs", "status": 200, "fresh": true},
+    {"url": "/api/health", "status": 200, "fresh": true, "body_summary": {"status": "ok", "mode": "PAPER", "broker_status": "connected", "market_status": "closed", "live_allowed": false}},
+    {"url": "/api/state", "status": 200, "fresh": true},
+    {"url": "/api/broker/status", "status": 200, "fresh": true, "body_summary": {"connected": true, "live_trading_enabled": false, "order_placement_allowed": false, "error": null}},
+    {"url": "/api/scheduler/health", "status": 200, "fresh": true},
+    {"url": "/ui", "status": 200, "fresh": true}
+  ],
+  "reliability_note": {
+    "finding": "All 7 required endpoints returned 200 in this snapshot, but the backend is exhibiting an intermittent crash-restart cycle (~5 min period) under real market-hours load, separate from the OOM bug already fixed in this session (PR #53). Multiple capture attempts during this proof session returned 502/000 before this successful snapshot.",
+    "root_cause_hypothesis": "core/data/instruments_cache.py's InstrumentsCache is a correct singleton (loads once, no per-request leak) but permanently holds a 121,152-row pandas DataFrame in memory once triggered by a real chain/instrument lookup — only happens during actual market hours, not during off-hours testing. Combined with FastAPI baseline + per-request pandas processing, this appears to push a 512Mi container close to its ceiling; any additional transient load then triggers an OOM kill.",
+    "not_fixed_this_session": "This is a capacity-shaped issue, not a discrete bug like the zombie-thread fix (PR #53). Recommended follow-up: upgrade the Render plan for more RAM, or a separate effort to reduce the instrument DataFrame's memory footprint (column pruning, more efficient dtypes).",
+    "evidence": "Render memory metrics showed repeated climbs to 250-380MB (down from ~500MB pre-fix) followed by resets, on a roughly 5-minute cycle during live market hours (2026-07-02 ~12:00-16:25 IST)."
+  }
+}

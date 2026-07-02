@@ -1,0 +1,14 @@
+{
+  "generated_at_utc": "2026-07-02T10:57:16+00:00",
+  "generated_at_ist": "2026-07-02T16:27:16+05:30",
+  "date": "2026-07-02",
+  "day_of_week": "Thursday",
+  "is_trading_day": true,
+  "is_weekend": false,
+  "is_nse_holiday": false,
+  "market_hours_ist": "09:15-15:30",
+  "current_session": "POST_MARKET_CLOSED",
+  "paper_lifecycle_allowed_now": false,
+  "reason_not_allowed": "Market closed for the day (current time 16:27 IST is past the 15:30 IST close). Market WAS open earlier today (confirmed via /api/health showing market_status:open and broker connected during this session's investigation, roughly 12:00-16:25 IST window), but backend instability (see api_health_summary.md) during that window prevented reliable capture of a complete paper lifecycle proof before close.",
+  "next_market_day_command": "Re-run this proof pack tomorrow (2026-07-03, Friday, confirmed a trading day) between 09:15-15:30 IST: python core/engine/system3_phase82_job_scheduler.py --job-id paper_lifecycle_proof, or wait for the scheduled 09:30/12:00/14:00 IST runs, then re-check reports/latest/analyzer_paper_lifecycle_proof/."
+}

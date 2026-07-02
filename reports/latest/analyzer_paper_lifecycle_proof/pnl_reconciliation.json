@@ -1,0 +1,9 @@
+{
+  "generated_at_utc": "2026-07-02T12:05:00+00:00",
+  "pnl_reconciliation_proven": false,
+  "gross_pnl": null,
+  "charges": null,
+  "slippage": null,
+  "net_pnl": null,
+  "note": "No fresh trade to reconcile today - no genuine paper lifecycle run completed (see summary.json). Historical self-test run (LIFECYCLE_20260614_162812.json) shows the reconciliation CALCULATION mechanism works (pnl_per_unit=5.0, brokerage_estimate=20.0, slippage_estimate=0.1, net_pnl=-15.0, reconciled=true) but against fallback-token synthetic prices, not a real market trade - not counted as proof of a positive costed expectancy."
+}
