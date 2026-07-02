@@ -13,7 +13,8 @@ import subprocess
 import sys
 import threading
 import time
-from datetime import date as _date_cls, datetime, timedelta, timezone
+from datetime import date as _date_cls
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -30,11 +31,12 @@ def _is_today_market_holiday(d) -> tuple:
     cannot silently block ALL market-dependent jobs forever."""
     try:
         from core.utils.nse_holidays import is_trading_holiday
+
         return is_trading_holiday(d)
     except Exception as exc:
-        print(f"[PH82] WARNING: nse_holidays check failed ({exc}) — "
-              f"treating {d} as non-holiday (fail-open)")
+        print(f"[PH82] WARNING: nse_holidays check failed ({exc}) — " f"treating {d} as non-holiday (fail-open)")
         return False, None
+
 
 # Paths
 CONFIG_DIR = PROJECT_ROOT / "config"
@@ -93,9 +95,7 @@ def load_config() -> Dict[str, Any]:
             data = json.load(f)
             jobs = data.get("jobs", [])
             if not jobs:
-                _alert_scheduler_config_issue(
-                    "Config loaded but contains zero jobs — scheduler will do nothing."
-                )
+                _alert_scheduler_config_issue("Config loaded but contains zero jobs — scheduler will do nothing.")
             return data
     except Exception as e:
         msg = f"Job scheduler config is invalid JSON — ALL jobs are dead: {e}"
@@ -111,12 +111,15 @@ def _alert_scheduler_config_issue(message: str) -> None:
         alert_path = PROJECT_ROOT / "state" / "scheduler_config_alert.json"
         alert_path.parent.mkdir(parents=True, exist_ok=True)
         alert_path.write_text(
-            json.dumps({
-                "alert": True,
-                "message": message,
-                "detected_at": datetime.now().isoformat(),
-                "config_path": str(CONFIG_JSON),
-            }, indent=2),
+            json.dumps(
+                {
+                    "alert": True,
+                    "message": message,
+                    "detected_at": datetime.now().isoformat(),
+                    "config_path": str(CONFIG_JSON),
+                },
+                indent=2,
+            ),
             encoding="utf-8",
         )
     except Exception:
@@ -292,15 +295,24 @@ def _now_ist() -> datetime:
     return datetime.now(_IST)
 
 
-def _time_matches(schedule_time: str, now: datetime, window_seconds: int = 60) -> bool:
-    if not schedule_time or schedule_time.lower() == "daily":
+def _check_web_service_health(timeout_s: float = 5.0) -> bool:
+    """Best-effort check that the web service is reachable, used only to
+    gate the post_market_api_running catch-up condition. Fails closed
+    (returns False) on any error — a catch-up job that needs the API
+    running must never fire just because we couldn't tell."""
+    web_url = os.environ.get("WEB_SERVICE_URL", "").strip().rstrip("/")
+    if not web_url.lower().startswith(("http://", "https://")):
+        # Reject file:// and any other scheme outright — this must only
+        # ever reach the configured web service over HTTP(S).
         return False
     try:
-        h, m = map(int, schedule_time.split(":"))
-    except ValueError:
+        import urllib.request
+
+        req = urllib.request.Request(f"{web_url}/api/health", method="GET")
+        with urllib.request.urlopen(req, timeout=timeout_s) as resp:  # nosec B310 - scheme validated above
+            return resp.status == 200
+    except Exception:
         return False
-    target = now.replace(hour=h, minute=m, second=0, microsecond=0)
-    return abs((now - target).total_seconds()) <= window_seconds
 
 
 def _append_daemon_log(message: str) -> None:
@@ -326,8 +338,6 @@ def run_daemon() -> None:
     pid_file.write_text(str(os.getpid()))
     print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
 
-    last_fired: Dict[str, str] = {}  # job_id → "YYYY-MM-DD HH:MM"
-    last_fired_date: Dict[str, str] = {}  # job_id → "YYYY-MM-DD" (for daily jobs)
     _stop = {"flag": False}
 
     def _handle(signum, frame):
@@ -360,6 +370,14 @@ def run_daemon() -> None:
     state["daemon_pid"] = os.getpid()
     save_state(state)
 
+    from core.engine.system3_scheduler_catchup import (
+        FireStatus,
+        evaluate_job_fire,
+        load_policy,
+    )
+
+    catchup_policy = load_policy()
+
     while not _stop["flag"]:
         now = _now_ist()
 
@@ -367,10 +385,31 @@ def run_daemon() -> None:
         state = load_state()
         state["daemon_heartbeat"] = now.isoformat()
         state["daemon_pid"] = os.getpid()
-        save_state(state)
 
         today_str = now.strftime("%Y-%m-%d")
         is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
+        is_weekend = not is_weekday
+
+        # fired_keys_today is the SOLE source of truth for "already fired" —
+        # persisted in state, reloaded fresh every tick, reset on date
+        # rollover. Replaces the old in-memory last_fired/last_fired_date
+        # dicts, which reset to empty on every restart: a restart landing
+        # after a job's exact window meant should_fire stayed False for the
+        # rest of the day (missed window, no catch-up) AND, separately, a
+        # restart landing on the SAME day for a "daily" job could refire it
+        # a second time since the in-memory dedup was gone. Persisting this
+        # fixes both failure modes at once.
+        if state.get("fired_keys_date") != today_str:
+            state["fired_keys_date"] = today_str
+            state["fired_keys_today"] = []
+        fired_keys_today = set(state.get("fired_keys_today", []))
+
+        state["jobs_status_today"] = state.get("jobs_status_today", {})
+        if state.get("jobs_status_date") != today_str:
+            state["jobs_status_date"] = today_str
+            state["jobs_status_today"] = {}
+
+        save_state(state)
 
         config = load_config()  # hot-reload each tick
         for job in config.get("jobs", []):
@@ -388,48 +427,77 @@ def run_daemon() -> None:
                 if day_names[now.weekday()] not in named_days:
                     continue
 
+            is_holiday, holiday_name = (False, None)
+            if job.get("market_dependent", False):
+                is_holiday, holiday_name = _is_today_market_holiday(now.date())
+
             # NSE/BSE holiday filtering: jobs flagged market_dependent must
             # also be skipped (and explicitly logged, not silently) on
             # exchange holidays — weekdays_only alone fires on Diwali,
             # Republic Day, etc, which produces misleading "validated"
             # output for a day with no real market data.
-            if job.get("market_dependent", False):
-                is_holiday, holiday_name = _is_today_market_holiday(now.date())
-                if is_holiday:
-                    if last_fired_date.get(job_id) != today_str:
-                        print(f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — SKIPPING "
-                              f"{job.get('name', job_id)}: NSE/BSE holiday ({holiday_name})")
-                        state["jobs"][job_id] = {
-                            "last_run_time": now.isoformat(),
-                            "last_status": "MARKET_CLOSED_OR_HOLIDAY",
-                            "last_error": None,
-                            "holiday_name": holiday_name,
-                        }
-                        save_state(state)
-                        last_fired_date[job_id] = today_str  # don't re-check all day
-                    continue
+            if job.get("market_dependent", False) and is_holiday:
+                holiday_key = f"{today_str}|holiday|{job_id}"
+                if holiday_key not in fired_keys_today:
+                    print(
+                        f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — SKIPPING "
+                        f"{job.get('name', job_id)}: NSE/BSE holiday ({holiday_name})"
+                    )
+                    state["jobs"][job_id] = {
+                        "last_run_time": now.isoformat(),
+                        "last_status": "MARKET_CLOSED_OR_HOLIDAY",
+                        "last_error": None,
+                        "holiday_name": holiday_name,
+                    }
+                    state["jobs_status_today"][job_id] = FireStatus.SKIPPED_MARKET_CLOSED
+                    fired_keys_today.add(holiday_key)
+                    state["fired_keys_today"] = sorted(fired_keys_today)
+                    save_state(state)
+                continue
 
-            should_fire = False
             if sched.lower() == "daily":
-                if last_fired_date.get(job_id) != today_str:
-                    should_fire = True
+                daily_key = f"{today_str}|daily|{job_id}"
+                if daily_key in fired_keys_today:
+                    continue
+                should_fire, fire_status, fire_key = True, FireStatus.ON_TIME, daily_key
             else:
-                if _time_matches(sched, now):
-                    fire_key = f"{today_str} {sched}"
-                    if last_fired.get(job_id) != fire_key:
-                        should_fire = True
-                        last_fired[job_id] = fire_key
+                decision = evaluate_job_fire(
+                    job=job,
+                    now=now,
+                    policy=catchup_policy,
+                    state={"fired_keys_today": list(fired_keys_today)},
+                    is_holiday=is_holiday,
+                    is_weekend=is_weekend,
+                    api_health_ok=_check_web_service_health(),
+                )
+                should_fire = decision["should_fire"]
+                fire_status = decision["status"]
+                fire_key = decision["fire_key"]
+                if fire_status not in (FireStatus.PENDING, FireStatus.SKIPPED_ALREADY_FIRED):
+                    state["jobs_status_today"][job_id] = fire_status
+                    if fire_status not in (FireStatus.ON_TIME, FireStatus.CATCH_UP):
+                        print(
+                            f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — {fire_status}: "
+                            f"{job.get('name', job_id)} — {decision['reason']}"
+                        )
 
             if should_fire:
-                print(f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — FIRING: {job.get('name', job_id)}")
+                print(
+                    f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — FIRING ({fire_status}): "
+                    f"{job.get('name', job_id)}"
+                )
                 result = run_job(job)
+                result["fire_status"] = fire_status
                 state["jobs"][job_id] = result
+                state["jobs_status_today"][job_id] = (
+                    FireStatus.FAILED if result.get("last_status") in ("FAILED", "ERROR", "TIMEOUT") else fire_status
+                )
+                fired_keys_today.add(fire_key)
+                state["fired_keys_today"] = sorted(fired_keys_today)
                 save_state(state)
-                if sched.lower() == "daily":
-                    last_fired_date[job_id] = today_str
                 _append_daemon_log(
                     f"[{now.strftime('%Y-%m-%d %H:%M')} IST] [Scheduler-Daemon] "
-                    f"JOB FIRED: {job_id} — status={result.get('last_status', 'UNKNOWN')}"
+                    f"JOB FIRED ({fire_status}): {job_id} — status={result.get('last_status', 'UNKNOWN')}"
                 )
                 print(f"[PH82-Daemon] {job_id} done — {result.get('last_status')}")
 

@@ -1300,6 +1300,8 @@ _scheduler_health_state: Dict[str, Any] = {
     "daemon_pid": None,
     "jobs": {},
     "config_alert": None,
+    "jobs_status_today": {},
+    "fired_keys_today": [],
 }
 _WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
@@ -1327,6 +1329,8 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
         "daemon_pid": payload.get("daemon_pid"),
         "jobs": payload.get("jobs", {}),
         "config_alert": payload.get("config_alert"),
+        "jobs_status_today": payload.get("jobs_status_today", {}),
+        "fired_keys_today": payload.get("fired_keys_today", []),
     }
     return {"accepted": True}
 
@@ -1488,18 +1492,33 @@ async def approve_live_trading(payload: Dict[str, Any]):
 async def get_scheduler_health():
     """
     Job scheduler health, as last pushed by the worker service (see
-    /api/scheduler/health/push above). NOT a local-file read — the
-    scheduler daemon runs on a different Render container than this web
-    service, so local files here would always be empty.
+    /api/scheduler/health/push above). NOT a local-file read for daemon
+    heartbeat/job-run-results — the scheduler daemon runs on a different
+    Render container than this web service, so local files here would
+    always be empty for THAT data. config/system3_job_scheduler.json and
+    config/system3_scheduler_catchup_policy.json ARE local-readable here
+    since both services build from the same repo checkout — used only to
+    classify jobs into fired/pending/missed/catchup-eligible/skipped.
 
-    `healthy=False` covers three real failure modes:
+    `healthy=False` covers real failure modes:
       1. Worker has never pushed at all (never deployed / crashed at boot)
       2. Worker's own config_alert is set (broken scheduler config)
       3. Last push is older than STALE_THRESHOLD_S (worker thread died
          but the worker process itself is still up, so Render wouldn't
          restart it — this is exactly the silent-failure shape that
          caused the original bug)
+      4. A job is genuinely missed_jobs_today (past its catch-up window,
+         never fired) — NOT just jobs={} alone, which is the honest and
+         expected state before anything has come due yet today.
     """
+    from core.engine.system3_phase82_job_scheduler import (
+        load_config as _load_scheduler_config,
+    )
+    from core.engine.system3_scheduler_catchup import (
+        load_policy as _load_catchup_policy,
+    )
+    from core.engine.system3_scheduler_catchup import summarize_scheduler_status
+
     STALE_THRESHOLD_S = 180  # daemon ticks every ~60s; 3 missed ticks = stale
 
     state = _scheduler_health_state
@@ -1525,12 +1544,47 @@ async def get_scheduler_health():
         healthy = False
         reasons.append(f"worker reports config alert: {state['config_alert'].get('message', state['config_alert'])}")
 
-    if state["received"] and not state.get("jobs"):
+    now_ist = datetime.now(IST)
+    is_weekend = now_ist.weekday() >= 5
+    is_holiday = False
+    try:
+        from core.utils.nse_holidays import is_trading_holiday
+
+        is_holiday, _ = is_trading_holiday(now_ist.date())
+    except Exception:
+        pass
+
+    try:
+        config = _load_scheduler_config()
+        policy = _load_catchup_policy()
+        summary = summarize_scheduler_status(
+            config,
+            state,
+            now=now_ist,
+            policy=policy,
+            is_holiday=is_holiday,
+            is_weekend=is_weekend,
+            api_health_ok=True,  # this endpoint answering IS proof the API is running
+        )
+    except Exception as e:
+        summary = {
+            "configured_jobs_count": None,
+            "enabled_jobs_count": None,
+            "fired_jobs_today": [],
+            "pending_jobs_today": [],
+            "missed_jobs_today": [],
+            "catchup_eligible_jobs": [],
+            "skipped_jobs_today": [],
+        }
+        reasons.append(f"could not compute job status summary: {e}")
+
+    if state["received"] and summary.get("missed_jobs_today"):
         healthy = False
-        reasons.append("worker pushed but reports zero jobs loaded")
+        reasons.append(f"jobs missed today (past catch-up window, never fired): {summary['missed_jobs_today']}")
 
     return {
         **state,
+        **summary,
         "healthy": healthy,
         "unhealthy_reasons": reasons,
     }

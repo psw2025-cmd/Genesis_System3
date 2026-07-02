@@ -126,6 +126,9 @@ _PUSH_INTERVAL_S = 30
 def _run_health_push():
     log.info("[health-push] starting")
     web_url = os.environ.get("WEB_SERVICE_URL", _DEFAULT_WEB_URL).rstrip("/")
+    if not web_url.lower().startswith(("http://", "https://")):
+        log.error(f"[health-push] WEB_SERVICE_URL has an unexpected scheme ({web_url!r}) — thread exiting")
+        return
     push_token = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
     if not push_token:
@@ -137,21 +140,30 @@ def _run_health_push():
 
     try:
         import json as _json
-        import urllib.request as _urlreq
         import urllib.error as _urlerr
+        import urllib.request as _urlreq
     except Exception as exc:
         log.exception(f"[health-push] import failed, thread exiting: {exc}")
         return
 
     while True:
         try:
-            payload = {"daemon_heartbeat": None, "daemon_pid": None, "jobs": {}, "config_alert": None}
+            payload = {
+                "daemon_heartbeat": None,
+                "daemon_pid": None,
+                "jobs": {},
+                "config_alert": None,
+                "jobs_status_today": {},
+                "fired_keys_today": [],
+            }
 
             if _SCHEDULER_STATE_FILE.exists():
                 state = _json.loads(_SCHEDULER_STATE_FILE.read_text(encoding="utf-8"))
                 payload["daemon_heartbeat"] = state.get("daemon_heartbeat")
                 payload["daemon_pid"] = state.get("daemon_pid")
                 payload["jobs"] = state.get("jobs", {})
+                payload["jobs_status_today"] = state.get("jobs_status_today", {})
+                payload["fired_keys_today"] = state.get("fired_keys_today", [])
 
             if _SCHEDULER_ALERT_FILE.exists():
                 payload["config_alert"] = _json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))
@@ -163,9 +175,11 @@ def _run_health_push():
 
             req = _urlreq.Request(
                 f"{web_url}/api/scheduler/health/push",
-                data=body, headers=headers, method="POST",
+                data=body,
+                headers=headers,
+                method="POST",
             )
-            with _urlreq.urlopen(req, timeout=10) as resp:
+            with _urlreq.urlopen(req, timeout=10) as resp:  # nosec B310 - scheme validated at thread start
                 if resp.status != 200:
                     log.warning(f"[health-push] non-200 response: {resp.status}")
         except _urlerr.URLError as exc:

@@ -1,0 +1,51 @@
+{
+  "generated_at_utc": "2026-07-01T18:35:00+00:00",
+  "generated_at_ist": "2026-07-02T00:05:00+05:30",
+  "branch": "fix/scheduler-catchup-and-market-proof",
+  "checks": [
+    {
+      "name": "ANALYZE_MODE",
+      "required_value": "1",
+      "status": "PASS",
+      "evidence": "render.yaml: hardcoded ANALYZE_MODE=1 on both genesis-system3-backend and genesis-system3-worker service definitions (not sync:false — cannot be silently changed via dashboard without editing render.yaml)"
+    },
+    {
+      "name": "LIVE_TRADING_ENABLED",
+      "required_value": "0",
+      "status": "PASS",
+      "evidence": "render.yaml: hardcoded LIVE_TRADING_ENABLED=0 on both services. Also confirmed live via GET /api/health at 2026-07-01T18:35Z: live_allowed=false."
+    },
+    {
+      "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+      "required_value": "0",
+      "status": "PASS",
+      "evidence": "render.yaml: hardcoded SYSTEM3_LIVE_TRADING_ALLOWED=0 on both services."
+    },
+    {
+      "name": "SYSTEM3_REAL_ONLY",
+      "required_value": "1",
+      "status": "PASS_BY_DEFAULT",
+      "evidence": "NOT explicitly set as an env var in render.yaml. dashboard/backend/app.py:369 — REAL_ONLY = os.environ.get('SYSTEM3_REAL_ONLY', '1')... defaults to '1' (True) when unset, which is the required safe value. Actual runtime behavior is correct, but this is a default fallback, not an explicit hardcoded config value like the other three. Recommend adding it explicitly to render.yaml for the same tamper-resistance as the other three flags.",
+      "honest_caveat": "Not literally 'set' on Render — verified via source code default, not via an explicit env var read."
+    },
+    {
+      "name": "real_order_placement_blocked",
+      "status": "PASS",
+      "evidence": "core/brokers/dhan/dhan_readonly.py: place_order(), modify_order(), cancel_order(), place_super_order(), modify_super_order(), cancel_super_order() all unconditionally raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG) — not gated on any env var, hardcoded block regardless of flag state.",
+      "additional_evidence": "dashboard/backend/order_management.py OrderManagement.create_order() (used by POST /api/orders/create) is paper-only by design per its own docstring: writes an order record to a local JSON-lines file only, never calls any broker API. No code path from /api/orders/create reaches dhan_readonly.place_order() or any real broker order endpoint."
+    },
+    {
+      "name": "dashboard_shows_paper_live_disabled_banner",
+      "status": "PASS",
+      "evidence": "Live screenshot of /ui (2026-07-02 00:05 IST, after PR #54 frontend fix deployed) shows: 'PAPER TRADING MODE (NO REAL ORDERS)' banner text, top-bar badges 'PAPER' and 'LIVE OFF', 'MARKET CLOSED' badge. Screenshot provided by user during this session."
+    },
+    {
+      "name": "no_code_path_places_real_orders_when_live_flags_off",
+      "status": "PASS",
+      "evidence": "Combination of the two findings above: the only order-creation endpoint (/api/orders/create -> OrderManagement.create_order) never calls a broker API at all (paper-only), and the underlying Dhan SDK wrapper independently hard-blocks all order/modify/cancel methods unconditionally. Two independent layers, neither gated on a flag that could be flipped to accidentally enable real orders — the block in dhan_readonly.py has no flag check at all, it always raises."
+    }
+  ],
+  "overall_status": "PASS",
+  "live_trading_enabled": false,
+  "notes": "SYSTEM3_REAL_ONLY relies on a code default rather than an explicit render.yaml value. Recommend adding it explicitly for consistency with the other three hardcoded safety flags — filed as a minor follow-up, not a blocker (current behavior is already safe)."
+}
