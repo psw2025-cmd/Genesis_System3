@@ -15,8 +15,9 @@
   "broker_connected": true,
   "market_open": false,
   "market_was_open_today": true,
-  "valid_option_contract_proven": false,
-  "analyzer_signal_proven": "PARTIAL - mechanism proven, latest data stale (19 days)",
+  "valid_option_contract_proven": true,
+  "valid_option_contract_caveat": "Proven via EOD/bhavcopy data (post-18:30/18:45 IST catch-up jobs firing) - real security_id, trading_symbol, expiry, strike, lot_size, LTP, OI, volume. bid/ask/spread unavailable (EOD source has no live order-book depth, confirmed across all 200 contracts checked) - will only be provable during live market hours.",
+  "analyzer_signal_proven": "PARTIAL - mechanism proven, latest data stale (19 days) - daily_gain_rank's catch-up window (09:15-09:45 IST) had already passed by the time this session's fix merged (15:10 IST), so it could not catch up today; expected to resolve tomorrow (2026-07-03) at its normal 09:15 IST firing",
   "paper_order_lifecycle_proven": false,
   "pnl_reconciliation_proven": false,
   "dashboard_truth_proven": "PARTIAL - 1 of 10 required panels captured with API cross-check",
@@ -29,12 +30,14 @@
   "blockers": [
     "live_market_analyzer_paper_trade_not_proven",
     "full_signal_to_exit_pnl_lifecycle_not_proven",
-    "valid_option_contract_not_proven",
-    "lifecycle_proof_broker_not_connected_for_genuine_run (historical evidence is a fallback-token self-test only)",
     "positive_costed_expectancy_not_proven",
     "browser_screenshot_truth_not_proven_in_ci",
-    "backend_memory_pressure_under_real_market_load_not_fully_resolved (secondary OOM pattern, distinct from the zombie-thread bug this session fixed in PR #53)",
-    "web_worker_dhan_token_divergence_not_synced (architecture gap found this session - each service independently refreshes its own token copy with no sync mechanism)"
+    "backend_memory_pressure_under_real_market_load_not_fully_resolved (secondary OOM pattern, distinct from the zombie-thread bug this session fixed in PR #53; likely improved by the parallel session's PRs #56/#58/#59 moving chain computation off the web dyno, not independently re-verified)",
+    "web_worker_dhan_token_divergence_not_synced (architecture gap found this session, now confirmed live: worker's token expired at 20:55 IST and failed to refresh - DH-901/2-min-cooldown collision - while web service's separately-cached token remained connected throughout; each service independently manages its own token copy with no sync mechanism)"
+  ],
+  "resolved_since_original_report": [
+    "valid_option_contract_not_proven -> now proven (EOD data became available after 18:30/18:45 IST jobs fired for the first time today, confirming the scheduler catch-up fix works end-to-end in production)",
+    "lifecycle_proof_broker_not_connected_for_genuine_run -> removed as a standalone blocker; broker IS connected (web side) as of this update, the remaining gap is purely live_market_analyzer_paper_trade_not_proven"
   ],
   "prior_known_state_reconciliation": {
     "prior_verdict_2026_06_23": "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR",
