@@ -833,3 +833,56 @@ Render itself runs Python 3.11 per the Dockerfile). Please watch `/api/health` a
 a few minutes after this deploys.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
+### [2026-07-02] [Claude] FIX: Option Chain tab showed a permanent "Market Closed" lock screen with zero data after hours
+
+**Found via:** user-reported screenshot of `/ui` at 17:44 IST (market closed) showing the "🔒 Market
+Closed / Option chain unavailable outside trading hours" lock screen. Live-polled the deployed backend
+directly: `GET /api/chain/NIFTY` returned `{"contracts": [], "status": "MARKET_CLOSED", "message": "Market
+closed - live chain fetch skipped in REAL_ONLY mode"}` — confirming the backend itself, not just the
+frontend, had no chain data to serve.
+
+**Root cause:** Thread 5 (chain push, added in the prior FOLLOW-UP entry above) only fetched and pushed
+chain snapshots `if mkt_open`. The instant the market closed, `_PUSHED_CHAIN_CACHE` on the web dyno went
+permanently stale, so `GET /api/chain/{underlying}` (`dashboard/backend/app.py`) fell through to its
+inline `_eod_chain_fetch` fallback — the exact expensive `DataSourceManager()` + full live-source waterfall
+(Dhan → NSE → nsepython → bhavcopy → jugaad → yfinance) that Thread 5 was built specifically to move off
+the request-serving web dyno. Run inline with a 45s timeout on every cache-miss request, it was slow and/or
+timed out often enough that the frontend (`OptionChain.tsx`, gated on `!marketOpen && (!data ||
+contracts.length === 0)`) usually saw zero contracts and showed the closed-market lock screen — even though
+real EOD/bhavcopy data for the day was available and the whole point of the lock screen (per its own copy,
+"unavailable outside trading hours") was never actually a hard requirement, just a side effect of the
+worker not bothering to compute it off-hours.
+
+**Fix:**
+- `scripts/cloud_worker.py` Thread 5 (`_run_chain_push`): removed the `if mkt_open` gate. It now pushes
+  during market hours (every ~20s, unchanged) AND while the market is closed, throttled to every ~5min
+  (`_CHAIN_PUSH_CLOSED_INTERVAL_S`) since the EOD/bhavcopy snapshot the same waterfall falls back to
+  doesn't change between market close and the next pre-market session — no reason to hit Dhan/NSE every
+  20s for data that's frozen until 09:15 IST tomorrow. The outer loop still ticks every 20s so it reacts
+  promptly once the market reopens. Each push now also carries a `market_open` flag.
+- `dashboard/backend/app.py`: `push_chain_snapshots` stores the `market_open` flag per pushed snapshot.
+  `get_chain()` now picks the freshness window based on it — `_PUSHED_CHAIN_FRESH_S=30s` during market
+  hours (unchanged), `_PUSHED_CHAIN_FRESH_S_CLOSED=600s` off-hours (2x the worker's 5min off-hours push
+  cadence). Without this, a 5-minute-old off-hours push would have been treated as stale under the old
+  flat 30s window and the web dyno would fall back to the slow inline fetch anyway, defeating the point.
+
+**Net effect:** after-hours page loads now serve the worker-pushed EOD/bhavcopy snapshot from memory —
+same zero-cost pattern as market-hours chain requests — instead of triggering a slow/unreliable inline
+fetch on the web dyno. The "Market Closed" lock screen in `OptionChain.tsx` still exists as a fallback for
+the case data is genuinely unavailable (worker down/redeploying, or an underlying outside the pushed set),
+but should no longer be the default after-hours experience.
+
+**Verification done:** reproduced the bug live against `genesis-system3-backend.onrender.com` before the
+fix (`/api/chain/NIFTY` → empty `MARKET_CLOSED` stub as above; also caught the backend mid-502-crash-loop
+restart cycle, unrelated pre-existing symptom, self-recovered within ~40s). `ast.parse` syntax check on
+both changed files. Manually traced the throttle logic (`last_closed_push` epoch-0 initialization fires
+the first off-hours push immediately, then gates to 300s) — confirmed with a standalone script since this
+sandbox's Python 3.14 has a broken pandas/numpy ABI and can't run `DataSourceManager()` directly (same
+known limitation noted in the prior entry; Render runs Python 3.11). Could not verify a live end-to-end
+worker push post-deploy — please watch `/api/chain/NIFTY` after-hours and confirm `contracts.length > 0`
+once this ships.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
