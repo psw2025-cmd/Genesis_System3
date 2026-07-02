@@ -12,8 +12,8 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': { target: 'http://localhost:8000', changeOrigin: true },
-      '/ws':  { target: 'ws://localhost:8000',   ws: true },
+      '/api': { target: process.env.DEV_PROXY_TARGET || 'http://localhost:8000', changeOrigin: true, secure: false },
+      '/ws':  { target: (process.env.DEV_PROXY_TARGET || 'http://localhost:8000').replace('http', 'ws'), ws: true },
     }
   }
 })

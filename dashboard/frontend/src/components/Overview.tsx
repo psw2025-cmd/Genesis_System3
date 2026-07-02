@@ -15,8 +15,14 @@ function KPI({ label, value, sub, color }: {
 }
 
 function GateRow({ label, status, note }: { label: string; status: string; note?: string }) {
-  const isPASS = status === 'PASS' || status === 'pass'
-  const isPEND = status === 'PEND' || status === 'PENDING' || status === 'pending'
+  // status must always be a plain string by the time it gets here (see
+  // displayGates below) — this coercion is a second line of defense, not
+  // the fix: a non-string status (e.g. a nested gate object) previously
+  // reached `.toUpperCase()` here directly and crashed the entire Overview
+  // tab to a blank page on every load.
+  const statusText = typeof status === 'string' ? status : 'PEND'
+  const isPASS = statusText === 'PASS' || statusText === 'pass'
+  const isPEND = statusText === 'PEND' || statusText === 'PENDING' || statusText === 'pending'
   return (
     <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
       <span className={cn(
@@ -24,7 +30,7 @@ function GateRow({ label, status, note }: { label: string; status: string; note?
         isPASS ? 'bg-up/10 text-up border border-up/20' :
         isPEND ? 'bg-amber/10 text-amber border border-amber/20' :
                  'bg-down/10 text-down border border-down/20'
-      )}>{status.toUpperCase()}</span>
+      )}>{statusText.toUpperCase()}</span>
       <span className="text-sm text-text-primary flex-1">{label}</span>
       {note && <span className="text-xs text-text-muted font-mono truncate max-w-48">{note}</span>}
     </div>
@@ -39,9 +45,16 @@ export function Overview() {
   const openPos     = paper?.positions?.open_count ?? 0
   const cycleCount  = health?.cycle_count ?? 0
 
-  // Use dynamic gates from /api/auto_gates if available, else show static
-  const gates = autoGates?.gates ?? {}
-  const gateEntries = Object.entries(gates)
+  // /api/auto_gates returns two shapes for the same data: raw `gates`
+  // (keyed by gate_id, entries look like { pass: boolean, ... } — NO
+  // `status` field) and `proof_gates` (an array already carrying a real
+  // `status` string, human-readable `name`, and `note` per gate). This used
+  // to read `gates` and reach for `val.status`, which never exists there —
+  // `val?.status ?? val ?? 'PEND'` then fell through to `val` itself (the
+  // whole gate object) as the "status", which crashed GateRow's
+  // `.toUpperCase()` on every single gate, every load. `proof_gates` is the
+  // shape actually meant for display; use it directly.
+  const proofGates = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
 
   // Static fallback gates when autoGates not loaded yet
   const staticGates = [
@@ -53,11 +66,11 @@ export function Overview() {
     { label: 'Paper Mode Active', status: 'PASS', note: 'CLOUD_PAPER_ENGINE=0, analyzer mode' },
   ]
 
-  const displayGates = gateEntries.length > 0
-    ? gateEntries.map(([key, val]: [string, any]) => ({
-        label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-        status: val?.status ?? val ?? 'PEND',
-        note: val?.note ?? val?.detail ?? undefined,
+  const displayGates = proofGates.length > 0
+    ? proofGates.map((g: any) => ({
+        label: typeof g?.name === 'string' ? g.name : String(g?.gate_id ?? 'Gate'),
+        status: typeof g?.status === 'string' ? g.status : (g?.pass ? 'PASS' : 'PEND'),
+        note: typeof g?.note === 'string' ? g.note : undefined,
       }))
     : staticGates
 

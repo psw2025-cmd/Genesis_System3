@@ -934,3 +934,49 @@ the bug is real and data-dependent — next step would be enabling `build.source
 get a readable production stack trace instead of guessing from minified names.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
+### [2026-07-03] [Claude] FOLLOW-UP: found and fixed the real Overview-tab crash — no `status` field on live gate data
+
+Continues the investigation above. After that entry was written, `git pull` brought in 20 commits already on
+`origin/main` (other agents' work, including `feat(after-market): Overview dynamic gates from API`) that my
+local checkout had been missing — which invalidated the "stale deploy" theory: the committed
+`dashboard/frontend/dist/assets/index-BYrFffhg.js` turned out to byte-match what's live on Render exactly,
+so production is not behind `main`. Re-read the actual current `Overview.tsx` post-pull instead.
+
+**Root cause, confirmed against the real `/api/auto_gates` response:** `Overview.tsx` read the raw `gates`
+object (`{ "GATE_ID": { pass: boolean, ... } }` — no `status` field anywhere) and computed
+`status: val?.status ?? val ?? 'PEND'`. Since `val.status` is always `undefined` on every real gate,
+`??` fell through to `val` itself — the whole nested object — as the "status". `GateRow` then called
+`status.toUpperCase()` on that object, which throws `TypeError: t.toUpperCase is not a function` on
+literally every page load, 100% deterministic, not an edge case. This matches the exact live crash traced
+in the prior entry (3/3 reproductions, `index-BYrFffhg.js:120:2884`).
+
+The API already returns a second, correctly-shaped field for exactly this purpose —
+`proof_gates: [{ name, status: "PEND"|"PASS"|"FAIL", note, ... }]` — that the component wasn't using.
+
+**Fix (`dashboard/frontend/src/components/Overview.tsx`):**
+- `displayGates` now maps `autoGates.proof_gates` (real `status` strings) instead of hand-transforming the
+  raw `gates` object.
+- `GateRow` coerces `status` to a string before calling `.toUpperCase()` as a second line of defense, so a
+  future shape mismatch degrades to a "PEND" pill instead of crashing the whole tab again.
+
+**Also (`dashboard/frontend/vite.config.ts`):** dev server's `/api` and `/ws` proxy target is now
+`process.env.DEV_PROXY_TARGET`-overridable (defaults unchanged). This is what made verification below
+possible — it let a locally-built, sourcemapped, real-git-HEAD frontend talk to the actual production
+backend same-origin, avoiding the CORS wall that blocks a cross-origin `VITE_API_BASE_URL` override.
+
+**Verification done (real browser, not text-only):** rebuilt current `main` locally with sourcemaps, served
+via `vite --port 5174` proxying to `https://genesis-system3-backend.onrender.com`, ran
+`tools/playwright-setup/verify_all_ui_tabs.spec.ts` against it. Overview tab rendered the live dynamic gate
+data (`3/7 PASS`, real expectancy/rho numbers matching the curl'd API response) with zero console errors and
+zero crash — screenshot: `reports/latest/ui_route_verification/screenshots/overview.png`. All 12 tabs
+clicked and rendered. Before the fix, the identical harness against the identical live API reproduced the
+crash 3/3 times.
+
+**Not fixed by this change:** the intermittent Render 502s from the prior entry are a separate, still-open
+issue (502 responses were visible in this same verification run's console log, mid-session, on unrelated
+endpoints) — tracked by the 10-minute recurring check already scheduled.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**

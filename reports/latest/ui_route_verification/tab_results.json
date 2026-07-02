@@ -1,122 +1,172 @@
 {
-  "generatedAt": "2026-07-02T19:35:23.782Z",
-  "baseUrl": "https://genesis-system3-backend.onrender.com/ui",
-  "overallPass": false,
+  "generatedAt": "2026-07-02T19:47:52.131Z",
+  "baseUrl": "http://127.0.0.1:5174/ui/",
+  "overallPass": true,
   "anyForbiddenStringsFound": false,
   "anyTabStillLoadingAfterWait": false,
-  "anyTabFailedToClick": true,
-  "totalConsoleErrors": 8,
+  "anyRequiredStringsMissing": false,
+  "anyTabFailedToClick": false,
+  "totalConsoleErrors": 76,
   "tabs": [
     {
       "tab": "00_initial",
       "forbiddenFound": [],
       "missingRequired": [],
-      "bodyTextLength": 1789
+      "bodyTextLength": 237
     },
     {
       "tab": "overview",
       "label": "Overview",
       "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 806,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:21 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 BROKER CONNECTED Dhan read-only PAPER P&L ₹0 Cloud sim OPEN POSITIONS 0 Paper only CYCLES 0 Engine ticks Gate Matrix 3/7 PASS PEND ML Accuracy (Spearman ρ) 1/5 days · ρ=0.2 · need ≥0.7 PEND Profit / ",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
       "newConsoleErrors": [
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "TypeError: t.toUpperCase is not a function\n    at K$ (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:120:2884)\n    at Ey (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:16998)\n    at qO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:43963)\n    at VO (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39727)\n    at $N (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39655)\n    at Ku (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:39508)\n    at hh (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:35875)\n    at c0 (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:36678)\n    at Vn (https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:38:3274)\n    at https://genesis-system3-backend.onrender.com/ui/assets/index-BYrFffhg.js:40:34207",
-        "pageerror: t.toUpperCase is not a function"
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
       ]
     },
     {
       "tab": "chain",
       "label": "Option Chain",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 191,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:24 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 🔒 Market Closed Option chain unavailable outside trading hours Opens Mon–Fri 09:15 IST",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response"
+      ]
     },
     {
       "tab": "signals",
       "label": "Signals",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 327,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:26 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 Signals & Recommendations ❌ Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry 📡 Signal data unavailable Unable to load trading signals. Pleas",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Error fetching signals: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Fallback also failed: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)\n    at Axios.request (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:2930:41)\n    at async Promise.all (index 1)\n    at async fetchData (http://127.0.0.1:5174/ui/src/components/Signals.tsx:63:38)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Error fetching signals: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)"
+      ]
     },
     {
       "tab": "trade",
       "label": "Trade",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 237,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:29 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 OPTION CHAIN 🔒 Market Closed Option chain unavailable outside trading hours Opens Mon–Fri 09:15 IST INDEX SCANNER Loading rankings…",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Fallback also failed: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)\n    at Axios.request (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:2930:41)\n    at async Promise.all (index 0)\n    at async fetchData (http://127.0.0.1:5174/ui/src/components/Signals.tsx:63:38)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response"
+      ]
     },
     {
       "tab": "paper",
       "label": "Paper Trades",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 213,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:32 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 Paper Trading Console ❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Error fetching trading data: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)\n    at Axios.request (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:2930:41)\n    at async Promise.all (index 0)\n    at async fetchData (http://127.0.0.1:5174/ui/src/components/PaperTrading.tsx:32:36)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Error fetching trading data: AxiosError: Request failed with status code 502\n    at settle (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1534:12)\n    at XMLHttpRequest.onloadend (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:1997:7)\n    at Axios.request (http://127.0.0.1:5174/ui/node_modules/.vite/deps/axios.js?v=f6e1c1f8:2930:41)\n    at async Promise.all (index 1)\n    at async fetchData (http://127.0.0.1:5174/ui/src/components/PaperTrading.tsx:32:36)"
+      ]
     },
     {
       "tab": "positions",
       "label": "Positions",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 260,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:35 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 NET P&L ₹0 WIN RATE 0.0% TRADES 0 OPEN 0 PAPER ONLY — NO REAL MONEY OPEN POSITIONS (0) No open positions Paper engine generates positions during market hours",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ]
     },
     {
       "tab": "performance",
       "label": "Performance",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 305,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:37 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 Performance last checked 01:17:38 IST Failed to load performance data: 502 TOTAL P&L ₹0 Realized + Unrealized WIN RATE 0.0% TOTAL TRADES 0 0W / 0L EXPECTANCY -- ML ACCURACY (SPEARMAN Ρ) — 12 DAY HI",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ]
     },
     {
       "tab": "ml",
       "label": "ML Model",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 264,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:40 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 ML Model Performance Model Comparison No model comparison data available. Models will appear here once training data is available. No ML performance data available",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ]
     },
     {
       "tab": "broker",
       "label": "Broker",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 929,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:43 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 🔗 BROKER CONNECTION — DHAN Status CONNECTED Mode READ-ONLY (Analyzer) Client ID ...3741 Token Status VALID Holdings API VALID ✓ Funds API VALID ✓ Live Trading DISABLED (hardcoded 0) 💰 ACCOUNT FUNDS",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
       "newConsoleErrors": []
@@ -124,24 +174,50 @@
     {
       "tab": "alerts",
       "label": "Alerts",
-      "clicked": false,
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 111,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:45 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 No alerts",
+      "forbiddenFound": [],
+      "stillLoadingAfterWait": false,
+      "newConsoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ]
+    },
+    {
+      "tab": "system",
+      "label": "System",
+      "clicked": true,
+      "screenshotOk": true,
+      "bodyTextLength": 434,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:48 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 Connection Status Broker (Dhan) CONNECTED WebSocket OFF Live Trading DISABLED (hardcoded) Mode PAPER Data Source live Performance Cycle Count 0 Cycle Duration 0.00s SLA Pass true QC Status PASS Safet",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
       "newConsoleErrors": []
     },
     {
-      "tab": "system",
-      "label": "System",
-      "clicked": false,
+      "tab": "gates",
+      "label": "Live Gate",
+      "clicked": true,
       "screenshotOk": true,
-      "bodyTextLength": 0,
-      "bodyTextSample": "",
+      "bodyTextLength": 350,
+      "bodyTextSample": "SYSTEM3 PSW 01:17:51 IST NIFTY -- BNFTY -- FINNIFTY -- MARKET CLOSED DHAN ✓ PAPER LIVE OFF WS OFF 🔒 Live Trading Gate — CHECKING GATE CHECKLIST Live trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: ₹5,",
       "forbiddenFound": [],
       "stillLoadingAfterWait": false,
-      "newConsoleErrors": []
+      "newConsoleErrors": [
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response",
+        "WebSocket connection to 'ws://127.0.0.1:5174/ws/stream' failed: Connection closed before receiving a handshake response"
+      ]
     }
   ]
 }
