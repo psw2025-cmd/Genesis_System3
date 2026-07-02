@@ -229,6 +229,7 @@ jobs:
             tests/test_dashboard_app.py \
             tests/test_qc_validator_dhan_aliases.py \
             tests/test_qc_runtime_anomaly.py \
+            tests/test_scheduler_catchup.py \
             -v --tb=short
 
       - name: Run proof batch
