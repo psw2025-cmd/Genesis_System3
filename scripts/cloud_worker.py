@@ -2,13 +2,17 @@
 Genesis System3 — Cloud Worker
 ================================
 Single-process entrypoint for Render worker service.
-Runs four background daemons as threads:
+Runs five background daemons as threads:
 
   Thread 1 — Token daemon       : refreshes DHAN_ACCESS_TOKEN daily at 08:30 IST
   Thread 2 — Token watchdog     : checks token validity every CHECK_INTERVAL_S
   Thread 3 — Job scheduler      : fires the scheduled weekday analysis jobs
   Thread 4 — Health push        : pushes scheduler heartbeat/job-status to the
                                    web service every ~30s (see ARCHITECTURE note)
+  Thread 5 — Chain push         : precomputes option chains for the default
+                                   underlyings and pushes them to the web
+                                   service every ~20s during market hours
+                                   (see ARCHITECTURE note)
 
 ARCHITECTURE NOTE: Render's `web` and `worker` services run as separate
 containers with separate ephemeral filesystems — no shared disk. The
@@ -18,6 +22,17 @@ cannot read those files directly, so Thread 4 actively pushes the
 state over HTTP to the web service's /api/scheduler/health/push
 endpoint instead. If WEB_SERVICE_URL is not set, Thread 4 logs a
 warning once and stays idle (does not crash the worker).
+
+Thread 5 exists because GET /api/chain/{underlying} on the web service used
+to do its DataSourceManager() + live Dhan fetch INLINE on the request path —
+polled every 5s by every open browser tab, on the same single-worker
+(--workers 1) 512MB web container that also has to stay responsive for
+Render's own health checks. That was a leading suspect for the web dyno's
+502 crash-loop during market hours (2026-07-02 forensic investigation, see
+CHANGE_LOG.md). Thread 5 moves that cost here instead: this worker container
+is not request-serving, so a slow/heavy tick here never produces a 502 for a
+real user, and if this thread's own memory use becomes a problem it can be
+tuned/throttled independently of the user-facing web dyno.
 
 Requires these env vars (set in Render dashboard → Environment):
   DHAN_CLIENT_ID, DHAN_APP_ID, DHAN_APP_SECRET
@@ -47,6 +62,10 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "src"))  # needed for `from utils.market_hours import ...`
+# (dashboard/backend/app.py adds this same path for the same reason — see its
+# sys.path.insert(0, str(ROOT_DIR / "src")) — this worker needs it too for
+# Thread 5's is_market_open() check below.)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -186,6 +205,82 @@ def _run_health_push():
 
 
 # ---------------------------------------------------------------------------
+# Thread 5: Chain push (worker -> web, see ARCHITECTURE note above)
+# ---------------------------------------------------------------------------
+# Must match dashboard/backend/app.py's DEFAULT_UNDERLYINGS. GET
+# /api/chain/{underlying} on the web service only serves from this push for
+# exactly these symbols; anything else still falls back to an inline fetch
+# on the web dyno (rare — the dashboard's default watchlist is these four).
+_CHAIN_PUSH_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+_CHAIN_PUSH_INTERVAL_S = 20
+
+
+def _run_chain_push():
+    log.info("[chain-push] starting")
+    web_url = os.environ.get("WEB_SERVICE_URL", _DEFAULT_WEB_URL).rstrip("/")
+    push_token = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+
+    try:
+        import json as _json
+        import urllib.request as _urlreq
+        import urllib.error as _urlerr
+    except Exception as exc:
+        log.exception(f"[chain-push] import failed, thread exiting: {exc}")
+        return
+
+    while True:
+        try:
+            mkt_open = False
+            try:
+                from utils.market_hours import is_market_open
+
+                mkt_open, _reason = is_market_open()
+            except Exception as exc:
+                log.warning(f"[chain-push] market-hours check failed: {exc}")
+
+            if mkt_open:
+                try:
+                    from core.data.datasource_manager import DataSourceManager
+                    from dashboard.backend.chain_adapter import fetch_chain_for_api
+                except Exception as exc:
+                    log.warning(f"[chain-push] import failed: {exc}")
+                    time.sleep(_CHAIN_PUSH_INTERVAL_S)
+                    continue
+
+                # One DataSourceManager for the whole tick — avoid reconstructing
+                # it (instrument master lookup etc.) per symbol.
+                dsm = DataSourceManager()
+                chains = {}
+                for sym in _CHAIN_PUSH_SYMBOLS:
+                    try:
+                        data = fetch_chain_for_api(dsm, sym)
+                        if data and data.get("contracts"):
+                            chains[sym] = data
+                    except Exception as exc:
+                        log.warning(f"[chain-push] fetch failed for {sym}: {exc}")
+
+                if chains:
+                    body = _json.dumps({"chains": chains}).encode("utf-8")
+                    headers = {"Content-Type": "application/json"}
+                    if push_token:
+                        headers["X-Worker-Token"] = push_token
+                    req = _urlreq.Request(
+                        f"{web_url}/api/chain/push",
+                        data=body, headers=headers, method="POST",
+                    )
+                    try:
+                        with _urlreq.urlopen(req, timeout=15) as resp:
+                            if resp.status != 200:
+                                log.warning(f"[chain-push] non-200 response: {resp.status}")
+                    except _urlerr.URLError as exc:
+                        log.warning(f"[chain-push] could not reach web service ({web_url}): {exc}")
+        except Exception as exc:
+            log.warning(f"[chain-push] error (continuing): {exc}")
+
+        time.sleep(_CHAIN_PUSH_INTERVAL_S)
+
+
+# ---------------------------------------------------------------------------
 # Startup: bootstrap token from PIN+TOTP before threads start
 # ---------------------------------------------------------------------------
 def _bootstrap_token():
@@ -226,6 +321,7 @@ def main():
         threading.Thread(target=_run_watchdog, name="watchdog", daemon=True),
         threading.Thread(target=_run_job_scheduler, name="job-scheduler", daemon=True),
         threading.Thread(target=_run_health_push, name="health-push", daemon=True),
+        threading.Thread(target=_run_chain_push, name="chain-push", daemon=True),
     ]
 
     for t in threads:
