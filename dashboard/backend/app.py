@@ -1331,6 +1331,40 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
     return {"accepted": True}
 
 
+# ---------------------------------------------------------------------------
+# Chain push — worker precomputes the small set of default-underlying option
+# chains and pushes them here, same pattern as scheduler health push above.
+# GET /api/chain/{underlying} (see _get_chain_uncached) serves straight from
+# this in-memory snapshot for anything fresh enough, instead of doing the
+# expensive DataSourceManager() + live Dhan fetch inline on the web dyno —
+# that inline path is what was crash-looping the 512MB web container during
+# market hours (2026-07-02 forensic investigation, see CHANGE_LOG.md).
+# Falls back to the old inline fetch only for underlyings the worker doesn't
+# push, or if the push has gone stale (worker down/redeploying).
+# ---------------------------------------------------------------------------
+_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = {}  # {UNDERLYING: {"data": ..., "received_at": float}}
+_PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s (see cloud_worker.py); treat
+# anything older than this as stale and fall back to the inline live fetch.
+
+
+@app.post("/api/chain/push")
+async def push_chain_snapshots(payload: Dict[str, Any], request: Request):
+    """Called by scripts/cloud_worker.py's chain-push thread. Same auth as
+    /api/scheduler/health/push. Body: {"chains": {"NIFTY": {...}, ...}}."""
+    if _WORKER_PUSH_TOKEN:
+        sent_token = request.headers.get("X-Worker-Token", "")
+        if sent_token != _WORKER_PUSH_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing X-Worker-Token")
+    chains = payload.get("chains", {})
+    if not isinstance(chains, dict):
+        raise HTTPException(status_code=400, detail="'chains' must be an object")
+    now = _time_module.time()
+    for symbol, data in chains.items():
+        if isinstance(data, dict):
+            _PUSHED_CHAIN_CACHE[symbol.upper()] = {"data": data, "received_at": now}
+    return {"accepted": True, "symbols": list(chains.keys())}
+
+
 @app.get("/api/deploy/info")
 async def get_deploy_info():
     """
@@ -2615,8 +2649,20 @@ _TTL_CHAIN = 8  # option chain — frontend polls every 5s per client; DataSourc
 
 @app.get("/api/chain/{underlying}")
 async def get_chain(underlying: str):
-    """Get option chain for specific underlying (TTL-cached, see _TTL_CHAIN)."""
-    cache_key = f"chain_{underlying.upper()}"
+    """Get option chain for specific underlying.
+
+    Preference order: (1) fresh worker-pushed snapshot — precomputed off-dyno,
+    zero cost to this process, see push_chain_snapshots above; (2) short local
+    TTL cache (_TTL_CHAIN) of a prior inline fetch on THIS dyno; (3) inline
+    live fetch (_get_chain_uncached) as the last resort, for underlyings the
+    worker doesn't push or when the worker itself is down/stale.
+    """
+    sym = underlying.upper()
+    pushed = _PUSHED_CHAIN_CACHE.get(sym)
+    if pushed and (_time_module.time() - pushed["received_at"]) < _PUSHED_CHAIN_FRESH_S:
+        return pushed["data"]
+
+    cache_key = f"chain_{sym}"
     _hit = _cache_get(cache_key, _TTL_CHAIN)
     if _hit is not None:
         return _hit

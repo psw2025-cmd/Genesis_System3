@@ -755,3 +755,47 @@ health (`POST /api/scheduler/health/push` pattern), so the web dyno only ever se
 and never blocks on a live network/DataSourceManager call inline. Scoped but not yet built.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
+### [2026-07-02] [Claude] FOLLOW-UP: real fix for the 502 crash loop — chain computation moved off the web dyno
+
+Builds on the mitigation above (PR #56). That PR cached `/api/chain/{underlying}` for 8s on the web dyno
+itself — a real improvement, but the web dyno still does the expensive `DataSourceManager()` + live Dhan
+fetch inline on a cache miss, on the same `--workers 1` process that also has to answer Render's own health
+checks and every other request. This entry is the "real split" flagged as pending above.
+
+**Change — worker-side (`scripts/cloud_worker.py`):**
+- New **Thread 5 — Chain push**: during market hours, every ~20s, builds ONE `DataSourceManager()` and
+  fetches the chain for `NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY` (must match `dashboard/backend/app.py`'s
+  `DEFAULT_UNDERLYINGS`), then `POST`s the results to the web service's new `/api/chain/push` endpoint —
+  same auth (`X-Worker-Token` / `WORKER_PUSH_TOKEN`) and resilience pattern (catch-and-continue, never
+  crash the thread) as the existing scheduler-health-push (Thread 4).
+- Added `sys.path.insert(0, str(ROOT / "src"))` — needed for `from utils.market_hours import is_market_open`,
+  which `dashboard/backend/app.py` already does for the same reason but `cloud_worker.py` didn't yet.
+
+**Change — web-side (`dashboard/backend/app.py`):**
+- New `POST /api/chain/push` endpoint (mirrors `push_scheduler_health`) storing pushed chains in
+  `_PUSHED_CHAIN_CACHE` keyed by underlying, with a received-at timestamp.
+- `GET /api/chain/{underlying}` (the `get_chain` wrapper added in PR #56) now checks, in order: (1) a
+  fresh (<30s) worker-pushed snapshot — zero cost to this process; (2) the existing 8s local TTL cache;
+  (3) the inline live fetch — only reached for underlyings the worker doesn't push, or if the worker's
+  push has gone stale (worker down/redeploying). For the four default underlyings during market hours,
+  the web dyno should now almost never take the expensive inline path at all.
+
+**Known residual risk, worth watching after deploy:** this moves the DataSourceManager()/live-fetch cost
+to the WORKER container instead of eliminating it — the worker is not request-serving, so a heavy tick
+there can't produce a user-visible 502 the way it could on the web dyno, and Render's own restart-on-crash
+already self-heals worker threads (see `main()`'s dead-thread restart loop). But the worker is also on the
+same 512MB Starter tier, and now runs a 5th always-on thread. If worker memory becomes a problem next,
+the fix is throttling/reducing `_CHAIN_PUSH_SYMBOLS` or `_CHAIN_PUSH_INTERVAL_S`, not reverting this split.
+
+**Verification done:** `ast.parse` syntax check on both changed files; confirmed `fetch_chain_for_api(dsm,
+underlying)` signature match against `dashboard/backend/chain_adapter.py`; confirmed the new
+`sys.path` line actually resolves `from utils.market_hours import is_market_open` (ran it standalone,
+returned `(True, 'Market open')`). Could NOT run a live end-to-end worker/web test — this dev sandbox's
+Python 3.14 has a broken pandas/numpy ABI (`import pandas` fails standalone, unrelated to this change;
+Render itself runs Python 3.11 per the Dockerfile). Please watch `/api/health` and Render worker logs for
+a few minutes after this deploys.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
