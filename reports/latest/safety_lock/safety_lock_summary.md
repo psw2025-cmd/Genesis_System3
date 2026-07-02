@@ -15,10 +15,10 @@
 
 ## Order Placement Blocked — Two Independent Layers
 
-1. **Broker SDK layer** (`core/brokers/dhan/dhan_readonly.py`): `place_order`, `modify_order`, `cancel_order`, `place_super_order`, `modify_super_order`, `cancel_super_order` all **unconditionally** raise `RuntimeError` — this is not gated on any flag, it always blocks.
-2. **API layer** (`dashboard/backend/order_management.py`): `OrderManagement.create_order()` (the only order-creation code path, behind `POST /api/orders/create`) is paper-only by design — it writes a simulated order record to a local file and **never calls any broker API at all**.
+1. **Broker SDK layer** (`core/brokers/dhan/dhan_readonly.py`): `place_order`, `modify_order`, `cancel_order`, `place_super_order`, `modify_super_order`, `cancel_super_order` all **unconditionally** raise `RuntimeError` when called — this is not gated on any flag, it always blocks.
+2. **API layer** (`dashboard/backend/order_management.py`): `OrderManagement.create_order` (the only order-creation code path, behind `POST /api/orders/create`) is paper-only by design — it writes a simulated order record to a local file and **never calls any broker API at all**.
 
-No code path connects `/api/orders/create` to `dhan_readonly.place_order()`. Real trading would require deliberate new code, not a flag flip.
+No code path connects `/api/orders/create` to the blocked `dhan_readonly` order methods. Real trading would require deliberate new code, not a flag flip.
 
 ## Dashboard Truth
 

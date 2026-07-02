@@ -31,8 +31,8 @@
     {
       "name": "real_order_placement_blocked",
       "status": "PASS",
-      "evidence": "core/brokers/dhan/dhan_readonly.py: place_order(), modify_order(), cancel_order(), place_super_order(), modify_super_order(), cancel_super_order() all unconditionally raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG) — not gated on any env var, hardcoded block regardless of flag state.",
-      "additional_evidence": "dashboard/backend/order_management.py OrderManagement.create_order() (used by POST /api/orders/create) is paper-only by design per its own docstring: writes an order record to a local JSON-lines file only, never calls any broker API. No code path from /api/orders/create reaches dhan_readonly.place_order() or any real broker order endpoint."
+      "evidence": "core/brokers/dhan/dhan_readonly.py: the place_order, modify_order, cancel_order, place_super_order, modify_super_order, and cancel_super_order methods all unconditionally raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG) when called — not gated on any env var, hardcoded block regardless of flag state.",
+      "additional_evidence": "dashboard/backend/order_management.py OrderManagement.create_order (used by POST /api/orders/create) is paper-only by design per its own docstring: writes an order record to a local JSON-lines file only, never calls any broker API. No code path from /api/orders/create reaches the blocked dhan_readonly order methods or any real broker order endpoint."
     },
     {
       "name": "dashboard_shows_paper_live_disabled_banner",
