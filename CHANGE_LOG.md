@@ -717,6 +717,40 @@ print('OK: daemon survives in a background thread')
 
 ---
 
+### [2026-07-02] [Claude] FIX: false "worker pushed but reports zero jobs loaded" alarm on `/api/scheduler/health`
+
+**Found via:** `reports/latest/scheduler_zero_jobs_forensic/` + `reports/latest/live_cloud_endpoint_truth/`
+(untracked forensic logs from a prior investigation session). Cloud check at 2026-07-01T19:35Z showed
+`/api/scheduler/health` returning `healthy:false, unhealthy_reasons:["worker pushed but reports zero jobs
+loaded"]` even though the worker's `config/system3_job_scheduler.json` correctly loads all 23 jobs
+(verified locally: `jobs_total=23, jobs_enabled=23`).
+
+**Root cause:** `dashboard/backend/app.py` `get_scheduler_health()` flagged unhealthy whenever the pushed
+`state["jobs"]` dict was empty. But `state["jobs"]` (in
+`core/engine/system3_phase82_job_scheduler.py::run_daemon()`) is EXECUTION HISTORY — a job_id is only
+added to it the first time that job actually fires. A freshly (re)started worker legitimately has
+`jobs={}` for hours outside its jobs' scheduled windows (e.g. restarted 01:05 IST, no job scheduled until
+pre-market ~09:00 IST) even though its config has all 23 jobs enabled. This produced a false "zero jobs
+loaded" alarm on every worker restart/redeploy that happened outside market hours — exactly what today's
+b3a4c8b2 / 95dbec44 / 865bb696 redeploys triggered.
+
+**Fix:**
+- `run_daemon()` now computes and persists `state["config_jobs_total"]` / `state["config_jobs_enabled"]`
+  from the freshly-loaded config every tick (separate from the fired-job history dict).
+- `scripts/cloud_worker.py` Thread 4 pushes these two new fields alongside `jobs`.
+- `dashboard/backend/app.py` `push_scheduler_health` stores them; `get_scheduler_health` now flags
+  unhealthy only when `config_jobs_enabled == 0` (a REAL "nothing configured" problem), not when the
+  fired-history dict is merely empty. `None` (old worker build, field not yet present) is treated as
+  unknown, not unhealthy.
+
+Verified locally: cleared local state file, ran `run_daemon()` in a background thread for 3s — daemon
+stayed alive, `config_jobs_enabled=23` while `jobs={}` (no job fired yet), confirming the old logic would
+have false-alarmed here and the new logic does not.
+
+**Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+---
+
 ### [2026-07-02] [Claude] MITIGATION: live 502 crash-loop on genesis-system3-backend.onrender.com — two safety nets shipped, real fix (worker split) still pending
 
 **Found via:** live polling of the deployed `/api/health` endpoint during market hours — service pattern was

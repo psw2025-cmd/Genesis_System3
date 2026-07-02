@@ -1300,6 +1300,8 @@ _scheduler_health_state: Dict[str, Any] = {
     "daemon_pid": None,
     "jobs": {},
     "config_alert": None,
+    "config_jobs_total": None,
+    "config_jobs_enabled": None,
 }
 _WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
@@ -1327,6 +1329,8 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
         "daemon_pid": payload.get("daemon_pid"),
         "jobs": payload.get("jobs", {}),
         "config_alert": payload.get("config_alert"),
+        "config_jobs_total": payload.get("config_jobs_total"),
+        "config_jobs_enabled": payload.get("config_jobs_enabled"),
     }
     return {"accepted": True}
 
@@ -1525,9 +1529,18 @@ async def get_scheduler_health():
         healthy = False
         reasons.append(f"worker reports config alert: {state['config_alert'].get('message', state['config_alert'])}")
 
-    if state["received"] and not state.get("jobs"):
+    # NOTE: state["jobs"] is execution HISTORY — it only gains an entry for
+    # a job_id once that job fires for the first time since daemon start.
+    # A freshly (re)started worker legitimately has jobs={} for hours
+    # (e.g. restarted at 01:00 IST, next job doesn't fire until pre-market)
+    # even though its config has 23 enabled jobs. Checking config_jobs_enabled
+    # (pushed separately, reflects config load result each tick) instead of
+    # the fired-history dict avoids false "zero jobs loaded" alarms on every
+    # worker restart outside market hours. config_jobs_enabled is None only
+    # when talking to an older worker build that predates this field.
+    if state["received"] and state.get("config_jobs_enabled") == 0:
         healthy = False
-        reasons.append("worker pushed but reports zero jobs loaded")
+        reasons.append("worker's job scheduler config has zero enabled jobs")
 
     return {
         **state,

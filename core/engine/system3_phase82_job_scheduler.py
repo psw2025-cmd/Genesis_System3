@@ -373,6 +373,18 @@ def run_daemon() -> None:
         is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
 
         config = load_config()  # hot-reload each tick
+
+        # Distinct from state["jobs"] (execution history, keyed by job_id,
+        # only populated once a job actually FIRES for the first time).
+        # A freshly (re)started daemon legitimately has state["jobs"] == {}
+        # for hours until the next scheduled job time — that is NOT the
+        # same as "config has zero jobs configured". Pushed separately so
+        # the web dashboard's health check can tell the two apart instead
+        # of raising a false "zero jobs loaded" alarm on every restart.
+        state["config_jobs_total"] = len(config.get("jobs", []))
+        state["config_jobs_enabled"] = sum(1 for j in config.get("jobs", []) if j.get("enabled", False))
+        save_state(state)
+
         for job in config.get("jobs", []):
             if not job.get("enabled", False):
                 continue
