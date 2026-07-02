@@ -82,13 +82,14 @@ Plus this session's main deliverable: a **scheduler missed-job catch-up policy**
 
 ## 14. Exact remaining blocker list
 
+**Update (20:52 IST, post-merge):** `valid_option_contract_not_proven` is now **resolved** — real EOD option chain data (200 contracts, real security IDs/trading symbols/expiry/strike/LTP/OI/volume) became available once `bhavcopy_download`/`signal_engine_bhavcopy` fired for the first time today, live confirmation that the merged scheduler catch-up fix works end-to-end in production. bid/ask/spread remain unavailable (EOD data has no live order-book depth — not provable outside market hours). Also live-confirmed: the worker's Dhan token expired and failed to refresh at 20:55 IST while the web service's independently-cached token stayed connected — concrete evidence of blocker #7 below, not just a diagnosed risk.
+
 1. `live_market_analyzer_paper_trade_not_proven`
 2. `full_signal_to_exit_pnl_lifecycle_not_proven`
-3. `valid_option_contract_not_proven`
-4. `positive_costed_expectancy_not_proven`
-5. `browser_screenshot_truth_not_proven_in_ci`
-6. `backend_memory_pressure_under_real_market_load_not_fully_resolved` (new finding — secondary OOM pattern, distinct from PR #53's fix, likely needs a Render plan upgrade or instrument-cache memory optimization)
-7. `web_worker_dhan_token_divergence_not_synced` (new finding — architecture gap)
+3. `positive_costed_expectancy_not_proven`
+4. `browser_screenshot_truth_not_proven_in_ci`
+5. `backend_memory_pressure_under_real_market_load_not_fully_resolved` (secondary OOM pattern, distinct from PR #53's fix; likely improved by the parallel session's chain-computation-to-worker move, PRs #56/#58/#59, not independently re-verified)
+6. `web_worker_dhan_token_divergence_not_synced` (architecture gap, now confirmed live as described above)
 
 ## 15. Exact next command for the next market day
 
