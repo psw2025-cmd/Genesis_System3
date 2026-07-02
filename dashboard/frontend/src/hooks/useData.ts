@@ -14,6 +14,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank,
     setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
+    setPnl,
   } = useStore()
 
   const wsRef   = useRef<WebSocket | null>(null)
@@ -34,16 +35,18 @@ export function useData() {
 
   // ── Core REST poll ────────────────────────────────────────────────────────
   const poll = useCallback(async () => {
-    const [health, state, paper, gainRank] = await Promise.allSettled([
+    const [health, state, paper, gainRank, pnl] = await Promise.allSettled([
       fetchJSON('/api/health'),
       fetchJSON('/api/state'),
       fetchJSON('/api/paper'),
       fetchJSON('/api/gain_rank'),
+      fetchJSON('/api/pnl'),
     ])
     if (health.status   === 'fulfilled') setHealth(health.value)
     if (state.status    === 'fulfilled') setState(state.value)
     if (paper.status    === 'fulfilled') setPaper(paper.value)
     if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
+    if (pnl.status      === 'fulfilled') setPnl(pnl.value)
   }, [setHealth, setState, setPaper, setGainRank])
 
   // ── Chain poll ────────────────────────────────────────────────────────────
