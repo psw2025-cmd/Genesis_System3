@@ -11,8 +11,11 @@ Runs five background daemons as threads:
                                    web service every ~30s (see ARCHITECTURE note)
   Thread 5 — Chain push         : precomputes option chains for the default
                                    underlyings and pushes them to the web
-                                   service every ~20s during market hours
-                                   (see ARCHITECTURE note)
+                                   service every ~20s during market hours,
+                                   and every ~5min while the market is closed
+                                   (EOD/bhavcopy snapshot barely changes
+                                   between pushes off-hours — see ARCHITECTURE
+                                   note)
 
 ARCHITECTURE NOTE: Render's `web` and `worker` services run as separate
 containers with separate ephemeral filesystems — no shared disk. The
@@ -33,6 +36,15 @@ CHANGE_LOG.md). Thread 5 moves that cost here instead: this worker container
 is not request-serving, so a slow/heavy tick here never produces a 502 for a
 real user, and if this thread's own memory use becomes a problem it can be
 tuned/throttled independently of the user-facing web dyno.
+
+Thread 5 originally only ran `if mkt_open`, which meant the pushed snapshot
+went stale the instant the market closed and every after-hours page view fell
+back to the same expensive inline DataSourceManager() fetch on the web dyno
+that this thread exists to avoid — reproduced live on 2026-07-02: /api/chain
+returned an empty MARKET_CLOSED stub and the dashboard showed a permanent
+"Market Closed" lock screen even though bhavcopy/EOD data was available. It
+now also pushes off-hours, just far less often (`_CHAIN_PUSH_CLOSED_INTERVAL_S`)
+since EOD data doesn't change between pushes.
 
 Requires these env vars (set in Render dashboard → Environment):
   DHAN_CLIENT_ID, DHAN_APP_ID, DHAN_APP_SECRET
@@ -213,6 +225,14 @@ def _run_health_push():
 # on the web dyno (rare — the dashboard's default watchlist is these four).
 _CHAIN_PUSH_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 _CHAIN_PUSH_INTERVAL_S = 20
+# EOD/bhavcopy data doesn't change between market close and the next
+# pre-market session, so off-hours pushes happen far less often than the
+# 20s live cadence — this is a throttle on the *fetch+push*, the outer loop
+# still ticks every _CHAIN_PUSH_INTERVAL_S so it reacts quickly once the
+# market reopens. Must stay well under _PUSHED_CHAIN_FRESH_S_CLOSED in
+# dashboard/backend/app.py or the web dyno will treat pushes as stale between
+# ticks and fall back to the (slow) inline fetch anyway.
+_CHAIN_PUSH_CLOSED_INTERVAL_S = 300
 
 
 def _run_chain_push():
@@ -228,6 +248,7 @@ def _run_chain_push():
         log.exception(f"[chain-push] import failed, thread exiting: {exc}")
         return
 
+    last_closed_push = 0.0
     while True:
         try:
             mkt_open = False
@@ -238,7 +259,8 @@ def _run_chain_push():
             except Exception as exc:
                 log.warning(f"[chain-push] market-hours check failed: {exc}")
 
-            if mkt_open:
+            due_for_closed_push = (time.time() - last_closed_push) >= _CHAIN_PUSH_CLOSED_INTERVAL_S
+            if mkt_open or due_for_closed_push:
                 try:
                     from core.data.datasource_manager import DataSourceManager
                     from dashboard.backend.chain_adapter import fetch_chain_for_api
@@ -259,8 +281,11 @@ def _run_chain_push():
                     except Exception as exc:
                         log.warning(f"[chain-push] fetch failed for {sym}: {exc}")
 
+                if not mkt_open:
+                    last_closed_push = time.time()
+
                 if chains:
-                    body = _json.dumps({"chains": chains}).encode("utf-8")
+                    body = _json.dumps({"chains": chains, "market_open": mkt_open}).encode("utf-8")
                     headers = {"Content-Type": "application/json"}
                     if push_token:
                         headers["X-Worker-Token"] = push_token

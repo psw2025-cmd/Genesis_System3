@@ -1345,16 +1345,26 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 # market hours (2026-07-02 forensic investigation, see CHANGE_LOG.md).
 # Falls back to the old inline fetch only for underlyings the worker doesn't
 # push, or if the push has gone stale (worker down/redeploying).
+#
+# The worker pushes off-hours too, at a much slower cadence, since the
+# EOD/bhavcopy snapshot it fetches then barely changes between ticks (see
+# cloud_worker.py's Thread 5 docstring — this used to be market-hours-only,
+# which meant every after-hours page view fell back to the slow inline fetch
+# below and frequently surfaced as a permanent "Market Closed" screen with no
+# data at all, even though EOD data was available). Each push carries a
+# `market_open` flag so we know which freshness window applies.
 # ---------------------------------------------------------------------------
-_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = {}  # {UNDERLYING: {"data": ..., "received_at": float}}
-_PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s (see cloud_worker.py); treat
+_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = {}  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
+_PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s during market hours; treat
 # anything older than this as stale and fall back to the inline live fetch.
+_PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker pushes every ~300s off-hours (cloud_worker.py
+# _CHAIN_PUSH_CLOSED_INTERVAL_S) — give it 2x that before treating it as stale.
 
 
 @app.post("/api/chain/push")
 async def push_chain_snapshots(payload: Dict[str, Any], request: Request):
     """Called by scripts/cloud_worker.py's chain-push thread. Same auth as
-    /api/scheduler/health/push. Body: {"chains": {"NIFTY": {...}, ...}}."""
+    /api/scheduler/health/push. Body: {"chains": {"NIFTY": {...}, ...}, "market_open": bool}."""
     if _WORKER_PUSH_TOKEN:
         sent_token = request.headers.get("X-Worker-Token", "")
         if sent_token != _WORKER_PUSH_TOKEN:
@@ -1362,10 +1372,11 @@ async def push_chain_snapshots(payload: Dict[str, Any], request: Request):
     chains = payload.get("chains", {})
     if not isinstance(chains, dict):
         raise HTTPException(status_code=400, detail="'chains' must be an object")
+    market_open = bool(payload.get("market_open", True))
     now = _time_module.time()
     for symbol, data in chains.items():
         if isinstance(data, dict):
-            _PUSHED_CHAIN_CACHE[symbol.upper()] = {"data": data, "received_at": now}
+            _PUSHED_CHAIN_CACHE[symbol.upper()] = {"data": data, "received_at": now, "market_open": market_open}
     return {"accepted": True, "symbols": list(chains.keys())}
 
 
@@ -2672,8 +2683,10 @@ async def get_chain(underlying: str):
     """
     sym = underlying.upper()
     pushed = _PUSHED_CHAIN_CACHE.get(sym)
-    if pushed and (_time_module.time() - pushed["received_at"]) < _PUSHED_CHAIN_FRESH_S:
-        return pushed["data"]
+    if pushed:
+        fresh_window = _PUSHED_CHAIN_FRESH_S if pushed.get("market_open", True) else _PUSHED_CHAIN_FRESH_S_CLOSED
+        if (_time_module.time() - pushed["received_at"]) < fresh_window:
+            return pushed["data"]
 
     cache_key = f"chain_{sym}"
     _hit = _cache_get(cache_key, _TTL_CHAIN)
