@@ -69,6 +69,10 @@ jobs:
             echo "No report changes to commit."
           else
             git commit -m "Update cloud runtime check report [skip ci]"
-            git pull --rebase origin main
-            git push
+            for attempt in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              git rebase --abort 2>/dev/null || true
+              echo "Push attempt $attempt failed, retrying in 5s..."
+              sleep 5
+            done
           fi
