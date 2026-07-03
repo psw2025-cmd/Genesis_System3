@@ -2856,12 +2856,14 @@ async def _get_chain_uncached(underlying: str):
                                 if row.get("underlying","").upper() == underlying.upper():
                                     filtered_rows.append(row)
                         if filtered_rows and "spot_price" in filtered_rows[0]:
-                            filtered = type("DF", (), {"empty": not filtered_rows,
-                                "_rows": filtered_rows})()
-                            if not filtered.empty:
-                                spot_vals = pd.to_numeric(filtered["spot_price"], errors="coerce").dropna()
-                                if not spot_vals.empty:
-                                    spot_price = float(spot_vals.iloc[0])
+                            for _r in filtered_rows:
+                                try:
+                                    _sv = float(_r.get("spot_price") or 0)
+                                    if _sv > 0:
+                                        spot_price = _sv
+                                        break
+                                except (ValueError, TypeError):
+                                    continue
                     except:
                         pass
 
@@ -2915,6 +2917,20 @@ async def _get_chain_uncached(underlying: str):
                 }
 
         if not market_is_open:
+            # LAST-SESSION SNAPSHOT: persisted during live hours (see snapshot write)
+            try:
+                _snap_file = ROOT_DIR / "state" / "chain_cache" / f"{underlying.upper()}.json"
+                if _snap_file.exists():
+                    _snap = json.loads(_snap_file.read_text())
+                    if _snap.get("contracts"):
+                        _snap["status"] = "MARKET_CLOSED"
+                        _snap["stale"] = True
+                        _snap["message"] = (
+                            f"Last session snapshot ({_snap.get('snapshot_time', 'unknown')})"
+                        )
+                        return _snap
+            except Exception as _se:
+                print(f"[chain] snapshot read failed: {_se}")
             try:
 
                 def _eod_chain_fetch():
@@ -3021,6 +3037,17 @@ async def _get_chain_uncached(underlying: str):
             if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
                 _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
                 _live["source_priority"] = "dhan_p0_live"
+                # PERSIST last-session snapshot for after-hours display
+                try:
+                    _snap_dir = ROOT_DIR / "state" / "chain_cache"
+                    _snap_dir.mkdir(parents=True, exist_ok=True)
+                    _snap_out = dict(_live)
+                    _snap_out["snapshot_time"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M IST")
+                    (_snap_dir / f"{underlying.upper()}.json").write_text(
+                        json.dumps(_snap_out, default=str)
+                    )
+                except Exception as _we:
+                    print(f"[chain] snapshot write failed: {_we}")
                 return _live
             else:
                 print(
