@@ -294,10 +294,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(title="System3 Ultra Dashboard API")
 
-# ── Register modular routers (memory-efficient, lazy imports) ─────────────
-app.include_router(broker_router.router)
-app.include_router(chain_router.router)
-app.include_router(ml_router.router)
+# ── Modular routers DISABLED — they duplicated 19 existing routes and
+# overrode the rich endpoint versions the frontend depends on, breaking
+# all dashboard tabs. Proper modularization requires MOVING code out of
+# app.py (delete old versions), not adding parallel simplified copies.
+# app.include_router(broker_router.router)   # disabled — duplicate routes
+# app.include_router(chain_router.router)    # disabled — duplicate routes
+# app.include_router(ml_router.router)       # disabled — duplicate routes
 
 # ── MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) ─────────────
 from starlette.middleware.base import BaseHTTPMiddleware
