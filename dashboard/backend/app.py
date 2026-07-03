@@ -37,7 +37,7 @@ _EOD_SCANNER_TTL_S = 1800.0
 # growing memory unbounded until OOM. A small dedicated pool caps how many
 # stuck Yahoo-fetch threads can accumulate and stops them from starving
 # unrelated request handling.
-_SPOT_REFRESH_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="spot-refresh")
+_SPOT_REFRESH_EXECUTOR = None  # Yahoo Finance disabled — ThreadPoolExecutor no longer needed
 
 
 def _market_open_from_state() -> bool:
