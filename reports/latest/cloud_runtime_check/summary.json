@@ -4,38 +4,22 @@
   "deployed_commit": "[REDACTED]",
   "endpoints": {
     "broker_deps": {
-      "error": null,
-      "json": {
-        "broker_module_available": true,
-        "dhanhq_installed": true,
-        "dhanhq_version": "unknown",
-        "pip_freeze_hit": true,
-        "python_path": "/usr/local/bin/python"
-      },
-      "latency_ms": 1696.9,
-      "ok": true,
-      "status_code": 200,
-      "text_preview": null,
+      "error": "HTTPError: 503",
+      "json": null,
+      "latency_ms": 561.7,
+      "ok": false,
+      "status_code": 503,
+      "text_preview": "Service Unavailable",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/deps",
       "url_path": "/api/broker/deps"
     },
     "broker_dhan_status": {
-      "error": null,
-      "json": {
-        "broker": "dhan",
-        "connected": true,
-        "error": null,
-        "latency_ms": 266,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "source": "dhan_readonly",
-        "status": "connected"
-      },
-      "latency_ms": 498.9,
-      "ok": true,
-      "status_code": 200,
-      "text_preview": null,
+      "error": "HTTPError: 503",
+      "json": null,
+      "latency_ms": 391.5,
+      "ok": false,
+      "status_code": 503,
+      "text_preview": "Service Unavailable",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
       "url_path": "/api/broker/dhan/status"
     },
@@ -45,14 +29,14 @@
         "broker": "dhan",
         "connected": true,
         "error": null,
-        "latency_ms": 270,
+        "latency_ms": 288,
         "live_trading_enabled": false,
         "mode": "ANALYZER",
         "order_placement_allowed": false,
         "source": "dhan_readonly",
         "status": "connected"
       },
-      "latency_ms": 600.6,
+      "latency_ms": 479.9,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -71,7 +55,7 @@
         "total_contracts": 0,
         "underlying": "NIFTY"
       },
-      "latency_ms": 210.4,
+      "latency_ms": 189.9,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -86,7 +70,7 @@
         "git_sha": "[REDACTED]",
         "service_name": "genesis-system3-backend"
       },
-      "latency_ms": 335.8,
+      "latency_ms": 353.1,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -106,7 +90,7 @@
         "cycle_count": 0,
         "daily_pnl": 0.0,
         "data_source": "live",
-        "last_fetch": "2026-07-03T17:16:42.407015+05:30",
+        "last_fetch": "2026-07-03T23:16:54.364234+05:30",
         "live_allowed": false,
         "live_blockers": [
           "Live trading permanently disabled in analyzer mode"
@@ -132,7 +116,7 @@
         "total_pnl": 0.0,
         "trades_executed": 0
       },
-      "latency_ms": 179.9,
+      "latency_ms": 147.2,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -143,13 +127,13 @@
       "error": null,
       "json": {
         "gc_triggered": false,
-        "headroom_mb": 207.0,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 56.9,
-        "rss_mb": 273.0,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "latency_ms": 159.8,
+      "latency_ms": 138.7,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -160,13 +144,13 @@
       "error": null,
       "json": {
         "gc_triggered": false,
-        "headroom_mb": 207.0,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 56.9,
-        "rss_mb": 273.0,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "latency_ms": 137.6,
+      "latency_ms": 127.8,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -177,13 +161,13 @@
       "error": null,
       "json": {
         "gc_triggered": false,
-        "headroom_mb": 366.9,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 23.6,
-        "rss_mb": 113.1,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "latency_ms": 174.6,
+      "latency_ms": 130.6,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -195,10 +179,14 @@
       "json": {
         "auto_gates_report": "reports/latest/system3_auto_gates/summary.json",
         "blockers": [
-          "LIVE_TRADING_DISABLED_BY_DESIGN",
-          "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+          "PROFIT_BLOCKER",
+          "SYS3-BLK-003",
+          "SYS3-BLK-005",
+          "SYS3-BLK-008",
           "[REDACTED]",
-          "MULTI_DAY_STABILITY_NOT_PROVEN"
+          "[REDACTED]",
+          "[REDACTED]",
+          "LIVE_TRADING_DISABLED_BY_DESIGN"
         ],
         "broker": {
           "connected": true,
@@ -212,14 +200,15 @@
         "broker_holdings": [],
         "broker_positions": [],
         "data_transparency": "PAPER_INTERNAL",
-        "generated_utc": "2026-07-03T11:46:50.924519Z",
+        "generated_utc": "2026-07-03T17:47:02.024831Z",
         "human_approval": true,
         "human_approval_by": "PRITAM S. WARGHADE",
         "live_trading_enabled": false,
         "next_actions": [
-          "Run tools/system3_auto_coordinator.py",
-          "Accumulate 5+ prediction days with rho>=0.70",
-          "Prove positive net expectancy after all costs"
+          "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+          "Run scripts/[REDACTED].py after paper trades accumulate",
+          "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
+          "Run scripts/system3_option_visibility_audit.py"
         ],
         "order_placement_allowed": false,
         "paper": {
@@ -435,7 +424,7 @@
           "session_expiry": "2026-02-05"
         }
       },
-      "latency_ms": 3755.2,
+      "latency_ms": 4412.5,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -450,48 +439,80 @@
         "config_jobs_enabled": 23,
         "config_jobs_total": 23,
         "configured_jobs_count": 23,
-        "daemon_heartbeat": "2026-07-03T17:15:45.384368+05:30",
+        "daemon_heartbeat": "2026-07-03T23:16:52.518133+05:30",
         "daemon_pid": 1,
         "enabled_jobs_count": 23,
-        "fired_jobs_today": [],
+        "fired_jobs_today": [
+          "bhavcopy_download",
+          "signal_engine_bhavcopy",
+          "weekly_repo_authority_audit"
+        ],
         "fired_keys_today": [
           "2026-07-03|15:35|daily_gain_validate",
-          "2026-07-03|16:05|dashboard_browser_proof"
+          "2026-07-03|16:05|dashboard_browser_proof",
+          "2026-07-03|18:30|bhavcopy_download",
+          "2026-07-03|18:45|signal_engine_bhavcopy",
+          "2026-07-03|19:00|weekly_repo_authority_audit"
         ],
         "healthy": false,
         "jobs": {
+          "bhavcopy_download": {
+            "fire_status": "ON_TIME",
+            "last_error": null,
+            "last_run_time": "2026-07-03T12:59:58.260046",
+            "last_status": "SUCCESS"
+          },
           "daily_gain_validate": {
             "fire_status": "CATCH_UP",
             "last_error": "Traceback (most recent call last):\n  File \"/app/scripts/daily_gain_rank_and_validate.py\", line 30, in <module>\n    from core.data.nse_provider import (\nImportError: cannot import name 'is_expiry_day' from 'core.data.nse_provider' (/app/core/data/nse_provider.py)\n",
-            "last_run_time": "2026-07-03T11:01:53.115599",
+            "last_run_time": "2026-07-03T11:47:28.749423",
             "last_status": "FAILED"
           },
           "dashboard_browser_proof": {
             "fire_status": "CATCH_UP",
             "last_error": "",
-            "last_run_time": "2026-07-03T11:01:54.229975",
+            "last_run_time": "2026-07-03T11:47:29.928866",
             "last_status": "FAILED"
+          },
+          "signal_engine_bhavcopy": {
+            "fire_status": "ON_TIME",
+            "last_error": null,
+            "last_run_time": "2026-07-03T13:14:18.145042",
+            "last_status": "SUCCESS"
+          },
+          "weekly_repo_authority_audit": {
+            "fire_status": "ON_TIME",
+            "last_error": null,
+            "last_run_time": "2026-07-03T13:29:36.923487",
+            "last_status": "SUCCESS"
           }
         },
         "jobs_status_today": {
+          "auto_coordinator_post_market": "SKIPPED_TOO_LATE",
           "auto_coordinator_premarket": "SKIPPED_TOO_LATE",
+          "auto_retrain": "SKIPPED_UPSTREAM_MISSING",
+          "bhavcopy_download": "ON_TIME",
           "daily_gain_rank": "SKIPPED_TOO_LATE",
-          "daily_gain_trend": "SKIPPED_UPSTREAM_MISSING",
+          "daily_gain_trend": "SKIPPED_TOO_LATE",
           "daily_gain_validate": "FAILED",
-          "daily_prediction_benchmark": "SKIPPED_UPSTREAM_MISSING",
+          "daily_prediction_benchmark": "SKIPPED_TOO_LATE",
           "dashboard_browser_proof": "FAILED",
           "dashboard_endpoint_coverage": "SKIPPED_TOO_LATE",
           "datasource_health_check": "SKIPPED_TOO_LATE",
           "dhan_instruments_sync": "SKIPPED_TOO_LATE",
+          "paper_day_proof_pack": "SKIPPED_TOO_LATE",
           "paper_lifecycle_proof": "SKIPPED_TOO_LATE",
           "paper_lifecycle_proof_afternoon": "SKIPPED_TOO_LATE",
           "paper_lifecycle_proof_midday": "SKIPPED_TOO_LATE",
           "self_healing_watchdog": "SKIPPED_TOO_LATE",
+          "signal_engine_bhavcopy": "ON_TIME",
+          "system3_post_market_pipeline": "SKIPPED_TOO_LATE",
           "ui_market_cross_verify": "SKIPPED_TOO_LATE",
           "ui_market_cross_verify_afternoon": "SKIPPED_TOO_LATE",
-          "ui_market_cross_verify_midday": "SKIPPED_TOO_LATE"
+          "ui_market_cross_verify_midday": "SKIPPED_TOO_LATE",
+          "weekly_repo_authority_audit": "ON_TIME"
         },
-        "last_push_at": "2026-07-03T11:46:29.028689+00:00",
+        "last_push_at": "2026-07-03T17:46:53.583031+00:00",
         "missed_jobs_today": [
           "self_healing_watchdog",
           "datasource_health_check",
@@ -506,27 +527,22 @@
           "paper_lifecycle_proof_afternoon",
           "[REDACTED]",
           "daily_gain_validate",
-          "dashboard_browser_proof"
-        ],
-        "pending_jobs_today": [
-          "bhavcopy_download",
-          "signal_engine_bhavcopy",
-          "weekly_repo_authority_audit"
-        ],
-        "received": true,
-        "skipped_jobs_today": [
           "daily_gain_trend",
           "daily_prediction_benchmark",
+          "dashboard_browser_proof",
           "system3_post_market_pipeline",
           "paper_day_proof_pack",
           "auto_retrain",
           "auto_coordinator_post_market"
         ],
+        "pending_jobs_today": [],
+        "received": true,
+        "skipped_jobs_today": [],
         "unhealthy_reasons": [
-          "jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'dashboard_browser_proof']"
+          "jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'daily_gain_trend', 'daily_prediction_benchmark', 'dashboard_browser_proof', 'system3_post_market_pipeline', 'paper_day_proof_pack', 'auto_retrain', 'auto_coordinator_post_market']"
         ]
       },
-      "latency_ms": 291.7,
+      "latency_ms": 180.8,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -549,19 +565,19 @@
           "credentials_present": true,
           "env_source": "core.utils.env_loader",
           "error": null,
-          "latency_ms": 316,
+          "latency_ms": 273,
           "live_trading_enabled": false,
           "mode": "ANALYZER",
           "order_placement_allowed": false,
           "sdk_available": true
         },
-        "cycle_count": 15,
+        "cycle_count": 144,
         "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
-        "last_cycle_ts_iso": "2026-07-03T17:16:51.743800+05:30",
-        "last_fetch_ts_iso": "2026-07-03T17:16:51.743800+05:30",
-        "last_tick_age_sec": 5.0,
+        "last_cycle_ts_iso": "2026-07-03T23:17:00.848650+05:30",
+        "last_fetch_ts_iso": "2026-07-03T23:17:00.848650+05:30",
+        "last_tick_age_sec": 5.04,
         "market": {
-          "current_time_ist": "2026-07-03T17:16:51.742600+05:30",
+          "current_time_ist": "2026-07-03T23:17:00.817224+05:30",
           "is_open": false,
           "next_open": "2026-07-06 09:15:00 IST",
           "reason": "Market closed: After hours (closed at 15:30)"
@@ -591,7 +607,7 @@
         "reconciliation": {
           "mismatches": [],
           "status": "OK",
-          "timestamp": "2026-07-03T17:15:50.191421+05:30"
+          "timestamp": "2026-07-03T23:05:06.846329+05:30"
         },
         "refresh_interval": 5,
         "risk": {
@@ -617,18 +633,18 @@
           "status": "NO_TRADE",
           "underlying": null
         },
-        "state_version": 15,
+        "state_version": 144,
         "tick_health": {
-          "last_tick_age_sec": 5.0,
+          "last_tick_age_sec": 5.04,
           "market_open": false,
           "refresh_interval_sec": 5,
           "source": "rest_poll_ssot",
           "websocket_endpoint": "/ws/stream"
         },
-        "timestamp_ist": "2026-07-03T17:16:51.743800+05:30",
-        "timestamp_utc": "2026-07-03T11:46:51.743799Z"
+        "timestamp_ist": "2026-07-03T23:17:00.848650+05:30",
+        "timestamp_utc": "2026-07-03T17:47:00.848649Z"
       },
-      "latency_ms": 153.6,
+      "latency_ms": 118.7,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -649,7 +665,7 @@
           "SENSEX"
         ]
       },
-      "latency_ms": 135.3,
+      "latency_ms": 118.1,
       "ok": true,
       "status_code": 200,
       "text_preview": null,
@@ -657,8 +673,8 @@
       "url_path": "/api/underlyings"
     }
   },
-  "expected_commit": "19e3208364f4711b7212662bd260a47c0e14ba46",
-  "generated_utc": "2026-07-03T11:46:41.678482Z",
+  "expected_commit": "4f44d1945f676813beb098ae4282983f861a33a5",
+  "generated_utc": "2026-07-03T17:46:53.654103Z",
   "key_facts": {
     "broker_connected": true,
     "chain_nifty_contracts": 0,
@@ -669,51 +685,49 @@
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 56.9,
+      "pct_used": 83.0,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 207.0,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 56.9,
-        "rss_mb": 273.0,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "rss_mb": 273.0,
-      "status": "OK"
+      "rss_mb": 398.5,
+      "status": "WARN"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 56.9,
+      "pct_used": 83.0,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 207.0,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 56.9,
-        "rss_mb": 273.0,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "rss_mb": 273.0,
-      "status": "OK"
+      "rss_mb": 398.5,
+      "status": "WARN"
     },
     "before": {
       "available": true,
-      "pct_used": 23.6,
+      "pct_used": 83.0,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 366.9,
+        "headroom_mb": 81.5,
         "limit_mb": 480,
-        "pct_used": 23.6,
-        "rss_mb": 113.1,
-        "status": "OK"
+        "pct_used": 83.0,
+        "rss_mb": 398.5,
+        "status": "WARN"
       },
-      "rss_mb": 113.1,
-      "status": "OK"
+      "rss_mb": 398.5,
+      "status": "WARN"
     }
   },
   "passed": [
     "broker_connected",
-    "endpoint_broker_deps",
-    "endpoint_broker_dhan_status",
     "endpoint_broker_status",
     "endpoint_chain_nifty",
     "endpoint_deploy_info",
@@ -735,14 +749,24 @@
   "verdict": "WARN",
   "warnings": [
     {
+      "key": "endpoint_broker_dhan_status",
+      "level": "WARNING",
+      "message": "broker_dhan_status failed: 503 HTTPError: 503"
+    },
+    {
+      "key": "endpoint_broker_deps",
+      "level": "WARNING",
+      "message": "broker_deps failed: 503 HTTPError: 503"
+    },
+    {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=19e3208364f4"
+      "message": "Render git_sha=[REDACTED] expected=4f44d1945f67"
     },
     {
       "key": "scheduler_not_healthy",
       "level": "WARNING",
-      "message": "worker push received but unhealthy: [\"jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'dashboard_browser_proof']\"]"
+      "message": "worker push received but unhealthy: [\"jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'daily_gain_trend', 'daily_prediction_benchmark', 'dashboard_browser_proof', 'system3_post_market_pipeline', 'paper_day_proof_pack', 'auto_retrain', 'auto_coordinator_post_market']\"]"
     },
     {
       "key": "chain_nifty_empty",
