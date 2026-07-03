@@ -2151,6 +2151,33 @@ _TTL_BROKER_TRUTH = 30  # broker truth validator
 
 
 # API Endpoints
+@app.get("/api/memory")
+async def get_memory():
+    """Real-time memory usage — RSS vs Starter limit (512MB)."""
+    try:
+        import resource, gc
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        limit_mb = int(os.environ.get("MEM_LIMIT_MB", "480"))
+        pct = rss_mb / limit_mb * 100
+        status = "OK" if pct < 75 else "WARN" if pct < 85 else "HIGH"
+        if status == "HIGH":
+            before = rss_mb
+            gc.collect()
+            rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            freed = before - rss_mb
+            print(f"[/api/memory] GC triggered: freed {freed:.0f}MB")
+        return {
+            "rss_mb": round(rss_mb, 1),
+            "limit_mb": limit_mb,
+            "pct_used": round(pct, 1),
+            "headroom_mb": round(limit_mb - rss_mb, 1),
+            "status": status,
+            "gc_triggered": status == "HIGH",
+        }
+    except Exception as e:
+        return {"error": str(e), "status": "UNKNOWN"}
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
