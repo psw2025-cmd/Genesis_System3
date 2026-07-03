@@ -107,14 +107,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-    print("Warning: pandas not available")
+# pandas lazy-loaded — only import when actually needed
+# Saves ~45MB at startup
+pd = None  # Will be imported lazily when needed
+
+def _get_pd():
+    """Lazy pandas import — call this instead of using pd directly."""
+    global pd
+    if pd is None:
+        try:
+            import pandas as _pd
+            pd = _pd
+        except ImportError:
+            pass
+    return pd
 import sqlite3
 
-import numpy as np
+# numpy removed — was only used for synthetic data (np.random.normal)
+# Use random.gauss() instead — saves ~25MB
 
 # Import market detection and synthetic data generator
 try:
@@ -4195,7 +4205,11 @@ async def startup():
     asyncio.create_task(background_data_refresh())
 
     # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
-    asyncio.create_task(cloud_paper_trading_loop())
+    # cloud_paper_trading_loop: only start if CLOUD_PAPER_ENGINE=1
+    if os.environ.get("CLOUD_PAPER_ENGINE", "0") not in ("0", "false", "False"):
+        asyncio.create_task(cloud_paper_trading_loop())
+    else:
+        print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0 (not started)")
 
     # Start state sync service if SSOT is available
     if SSOT_AVAILABLE and state_store is not None:
@@ -4781,8 +4795,8 @@ async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data
                         "timestamp": (
                             datetime.now(pytz.timezone("Asia/Kolkata")) - timedelta(days=100 - i)
                         ).isoformat(),
-                        "price": base_price + np.random.normal(0, 100),
-                        "ltp": base_price + np.random.normal(0, 100),
+                        "price": base_price + __import__("random").gauss(0, 100),
+                        "ltp": base_price + __import__("random").gauss(0, 100),
                     }
                 )
 
