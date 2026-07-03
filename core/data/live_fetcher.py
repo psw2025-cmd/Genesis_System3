@@ -1,15 +1,7 @@
-from core.utils.http_client import HttpClient
-
-
+"""
+live_fetcher.py — REMOVED.
+Was fetching from Binance (crypto) — not relevant for NSE options.
+All live data from DhanHQ API now.
+"""
 def get_live_price(symbol="BTCUSDT"):
-    """
-    Dummy live price using Binance public API.
-    Works without API key.
-    """
-    url = "https://api.binance.com/api/v3/ticker/price"
-    data = HttpClient.get(url, params={"symbol": symbol})
-
-    if not data or "price" not in data:
-        return None
-
-    return {"symbol": symbol, "price": float(data["price"])}
+    raise NotImplementedError("Binance fetcher removed. Use Dhan API.")
