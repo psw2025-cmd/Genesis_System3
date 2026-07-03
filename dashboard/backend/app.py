@@ -4108,81 +4108,21 @@ async def cloud_paper_trading_loop():
 
 
 def _refresh_spot_prices_blocking() -> None:
-    """Synchronous network + CSV I/O — only ever called via asyncio.to_thread
-    from background_data_refresh, never inline in the async loop. This used
-    to run directly inside an `async def` task on the single uvicorn event
-    loop: up to 5 sequential HTTP calls (5s timeout each) plus pandas CSV
-    read/write, all blocking the entire server (every request, every other
-    background task) for up to ~25s out of every 30s cycle.
     """
-    symbols = {
-        "NIFTY": "^NSEI",
-        "BANKNIFTY": "^NSEBANK",
-        "FINNIFTY": "^NSEFINNIFTY",
-        "MIDCPNIFTY": "^NSEMIDCP",
-        "SENSEX": "^BSESN",
-    }
+    Spot price refresh — DISABLED in web process.
 
-    import requests
+    Yahoo Finance via requests library was using ~150MB RAM
+    (requests.Session + urllib3 connection pool stays alive).
 
-    session = requests.Session()
-    session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+    Spot prices now come from:
+    1. /api/chain/{sym} — NSE direct, polled every 5s by frontend useData
+    2. gain_rank_history.json — written by worker scheduler at 09:15 IST
 
-    try:
-        for underlying, yahoo_symbol in symbols.items():
-            try:
-                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
-                response = session.get(url, timeout=(3, 4))
-                if response.status_code == 200:
-                    data = response.json()
-                    if "chart" in data and "result" in data["chart"]:
-                        result = data["chart"]["result"][0]
-                        meta = result.get("meta", {})
-                        ltp = meta.get("regularMarketPrice")
-                        if ltp and pd is not None:
-                            # Update chain CSV
-                            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                            if chain_file.exists():
-                                try:
-                                    df = pd.read_csv(chain_file)
-                                    if "underlying" in df.columns and "spot_price" in df.columns:
-                                        mask = df["underlying"].astype(str).str.upper() == underlying.upper()
-                                        if mask.any():
-                                            df.loc[mask, "spot_price"] = ltp
-                                            df.to_csv(chain_file, index=False)
-                                except Exception:
-                                    pass
-            except Exception:
-                pass
-    finally:
-        # Release the connection pool promptly if this call does eventually
-        # return after the caller's asyncio.wait_for() already gave up on it.
-        session.close()
-
-
-async def background_data_refresh():
-    """Background task to refresh spot prices every 30 seconds.
-
-    Runs the blocking Yahoo Finance fetch on a small DEDICATED executor
-    (_SPOT_REFRESH_EXECUTOR), not the shared default asyncio.to_thread()
-    pool. asyncio.wait_for() timing out only stops waiting — it cannot
-    cancel the underlying OS thread, so a hung fetch keeps running
-    regardless. Isolating it here means a pile-up of hung threads is
-    capped at 2 and can no longer starve every other blocking call in
-    this app (_run_blocking) that shares the default executor.
+    This function is kept as a no-op so the executor call in
+    background_data_refresh() doesn't crash. The background task
+    itself now sleeps for 5 minutes between no-op calls to save CPU.
     """
-    loop = asyncio.get_event_loop()
-    while True:
-        try:
-            await asyncio.wait_for(
-                loop.run_in_executor(_SPOT_REFRESH_EXECUTOR, _refresh_spot_prices_blocking), timeout=25
-            )
-        except asyncio.TimeoutError:
-            print("[background_data_refresh] spot-price refresh exceeded 25s timeout (continuing)")
-        except Exception as e:
-            print(f"[background_data_refresh] error (continuing): {e}")
-        await asyncio.sleep(30)  # Refresh every 30 seconds
-
+    pass  # Yahoo Finance disabled — NSE data used instead
 
 def _run_startup_token_refresh_blocking() -> None:
     """Synchronous Dhan token refresh — only ever called via asyncio.to_thread
