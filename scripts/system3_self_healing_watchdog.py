@@ -42,8 +42,8 @@ def check_broker_token() -> dict:
     """Check if Dhan token is valid — trigger refresh if not."""
     try:
         sys.path.insert(0, str(ROOT))
-        from core.brokers.dhan.token_manager import refresh_token, get_token_status
-        status = get_token_status()
+        from core.brokers.dhan.token_manager import refresh_token, verify_token
+        status = verify_token()
         if status.get("valid"):
             return {"check": "broker_token", "status": "OK",
                     "detail": f"token valid, expires {status.get('expires_at', 'unknown')}"}

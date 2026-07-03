@@ -64,16 +64,26 @@ def check_npm() -> Tuple[bool, str]:
 
 def check_python_packages() -> Dict[str, Tuple[bool, str]]:
     """Check critical Python packages"""
-    critical = ["pandas", "numpy", "scipy", "scikit-learn", "fastapi", "uvicorn", "requests", "pytz"]
+    # Map display name → actual importable module name
+    critical = [
+        ("pandas", "pandas"),
+        ("numpy", "numpy"),
+        ("scipy", "scipy"),
+        ("scikit-learn", "sklearn"),
+        ("fastapi", "fastapi"),
+        ("uvicorn", "uvicorn"),
+        ("requests", "requests"),
+        ("pytz", "pytz"),
+    ]
     results = {}
-    for pkg in critical:
+    for display_name, import_name in critical:
         try:
-            __import__(pkg.replace("-", "_"))
-            results[pkg] = (True, "Installed")
+            __import__(import_name)
+            results[display_name] = (True, "Installed")
         except ImportError:
-            results[pkg] = (False, "Missing")
+            results[display_name] = (False, "Missing")
         except Exception as e:
-            results[pkg] = (False, f"Error: {e}")
+            results[display_name] = (False, f"Error: {e}")
     return results
 
 

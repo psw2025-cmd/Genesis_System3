@@ -78,15 +78,16 @@ class DataSourceManager:
 
     def get_option_chain(self, symbol: str, expiry: str = "") -> Dict[str, Any]:
         """New-style API — returns dict directly."""
-        result = self.fetch_option_chain(symbol, expiry)
+        sym = symbol.upper().strip()
+        result = self.fetch_option_chain(sym, expiry)
         if result is None or result[0] is None:
             return {
-                "underlying": symbol, "spot": 0, "pcr": 0,
+                "underlying": sym, "spot": 0, "pcr": 0,
                 "strikes": [], "error": "No data available",
             }
         df, spot = result
         return {
-            "underlying": symbol,
+            "underlying": sym,
             "spot": spot,
             "strikes": df.to_dict("records") if hasattr(df, "to_dict") else [],
             "source": "dhan",
