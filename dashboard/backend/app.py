@@ -269,6 +269,11 @@ DB_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ── Modular routers (memory-efficient, lazy imports) ─────────────────────
+import sys as _sys
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in _sys.path:
+    _sys.path.insert(0, _backend_dir)
+
 from routers import broker as broker_router
 from routers import chain as chain_router
 from routers import ml as ml_router
