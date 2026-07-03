@@ -1,0 +1,70 @@
+name: Cloud Runtime Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Render backend base URL"
+        required: false
+        default: "https://genesis-system3-backend.onrender.com"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "reports/latest/cloud_runtime_check/**"
+  schedule:
+    # IST market coverage: 08:30-16:30 IST ~= 03:00-11:00 UTC, Mon-Fri.
+    # Runs every 15 minutes while market/pre-post monitoring is useful.
+    - cron: "*/15 3-11 * * 1-5"
+
+# READ-ONLY: no repo mutations allowed. Reports are stored as workflow artifacts.
+permissions:
+  contents: read
+
+concurrency:
+  group: cloud-runtime-check
+  cancel-in-progress: true
+
+jobs:
+  cloud-runtime-check:
+    name: Check Render runtime and save latest report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run cloud runtime check
+        env:
+          CLOUD_RUNTIME_BASE_URL: ${{ github.event.inputs.base_url || 'https://genesis-system3-backend.onrender.com' }}
+          CLOUD_RUNTIME_TIMEOUT_S: "20"
+          # Keep checks read-only/analyzer-only. These envs do not enable live.
+          LIVE_TRADING_ENABLED: "0"
+          SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+          ANALYZE_MODE: "1"
+        run: |
+          python tools/cloud_runtime_check.py \
+            --base-url "$CLOUD_RUNTIME_BASE_URL" \
+            --expected-commit "$(git rev-parse HEAD)"
+
+      - name: Show summary
+        if: always()
+        run: |
+          echo "===== reports/latest/cloud_runtime_check/summary.md ====="
+          cat reports/latest/cloud_runtime_check/summary.md || true
+
+      - name: Upload runtime report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-runtime-check-report-${{ github.run_number }}
+          path: reports/latest/cloud_runtime_check/
+          if-no-files-found: warn
+          retention-days: 30
