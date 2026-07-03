@@ -37,4 +37,8 @@ EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3   CMD curl -fsS http://localhost:8000/api/health || exit 1
 
-CMD ["uvicorn", "dashboard.backend.app:app", "--host", "0.0.0.0", "--port", "8000",      "--workers", "1", "--timeout-keep-alive", "30"]
+# Memory-safe uvicorn config:
+# --limit-max-requests 1000: restart after 1000 requests (prevents leaks)
+# --timeout-keep-alive 20: faster connection cleanup
+# --limit-concurrency 10: prevent memory spike from concurrent requests
+CMD ["uvicorn", "dashboard.backend.app:app",      "--host", "0.0.0.0", "--port", "8000",      "--workers", "1",      "--timeout-keep-alive", "20",      "--limit-max-requests", "1000",      "--limit-concurrency", "10"]
