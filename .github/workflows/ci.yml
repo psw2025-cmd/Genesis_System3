@@ -62,16 +62,17 @@ jobs:
           # --- 1. Only the two approved workflow files must exist ---
           # Allowed: ci.yml (safety gate) and cloud-runtime-check.yml (read-only
           # health probe; stores reports as artifacts, never pushes to the repo).
-          allowed=(".github/workflows/ci.yml" ".github/workflows/cloud-runtime-check.yml")
           mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
           printf 'Workflow files found:\n'
           printf '  %s\n' "${workflows[@]}"
+          declare -A allowed_set=(
+            [".github/workflows/ci.yml"]=1
+            [".github/workflows/cloud-runtime-check.yml"]=1
+          )
           for wf in "${workflows[@]}"; do
-            found=0
-            for a in "${allowed[@]}"; do [[ "$wf" == "$a" ]] && found=1 && break; done
-            [[ $found -eq 1 ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
+            [[ -n "${allowed_set[$wf]+x}" ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
           done
-          for a in "${allowed[@]}"; do
+          for a in "${!allowed_set[@]}"; do
             found=0
             for wf in "${workflows[@]}"; do [[ "$wf" == "$a" ]] && found=1 && break; done
             [[ $found -eq 1 ]] || { echo "FAIL: required workflow file missing: $a"; exit 1; }
