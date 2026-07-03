@@ -42,7 +42,7 @@ jobs:
   # -----------------------------------------------------------------------
   # GATE 1 — Workflow policy + trading safety guard (BLOCKING)
   # Must be first. All other jobs depend on this passing.
-  # Verifies: exactly 1 workflow file, no contents:write, no auto-fix,
+  # Verifies: exactly 2 workflow files (ci.yml + cloud-runtime-check.yml), no contents:write, no auto-fix,
   #           LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0
   #           hardcoded in this file.
   # -----------------------------------------------------------------------
@@ -59,12 +59,24 @@ jobs:
         run: |
           set -euo pipefail
 
-          # --- 1. Exactly one workflow file must exist ---
+          # --- 1. Only the two approved workflow files must exist ---
+          # Allowed: ci.yml (safety gate) and cloud-runtime-check.yml (read-only
+          # health probe; stores reports as artifacts, never pushes to the repo).
           mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
           printf 'Workflow files found:\n'
           printf '  %s\n' "${workflows[@]}"
-          test "${#workflows[@]}" -eq 1 || { echo "FAIL: expected 1 workflow file, found ${#workflows[@]}"; exit 1; }
-          test "${workflows[0]}" = ".github/workflows/ci.yml" || { echo "FAIL: unexpected workflow file: ${workflows[0]}"; exit 1; }
+          declare -A allowed_set=(
+            [".github/workflows/ci.yml"]=1
+            [".github/workflows/cloud-runtime-check.yml"]=1
+          )
+          for wf in "${workflows[@]}"; do
+            [[ -n "${allowed_set[$wf]+x}" ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
+          done
+          for a in "${!allowed_set[@]}"; do
+            found=0
+            for wf in "${workflows[@]}"; do [[ "$wf" == "$a" ]] && found=1 && break; done
+            [[ $found -eq 1 ]] || { echo "FAIL: required workflow file missing: $a"; exit 1; }
+          done
 
           # --- 2. No contents:write (would allow repo mutations from CI) ---
           if grep -RIn "contents[:][ ]write" .github/workflows; then
