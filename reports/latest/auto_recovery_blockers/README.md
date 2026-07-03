@@ -1,8 +1,8 @@
 # Auto-Recovery Blocker Classification
 
-Generated UTC: 2026-06-23T21:26:07.513141+00:00
+Generated UTC: 2026-07-03T18:04:21.179214+00:00
 
-- Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
+- Verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
 
 ## Categories
@@ -41,5 +41,6 @@ Generated UTC: 2026-06-23T21:26:07.513141+00:00
 
 ### PROOF_REQUIRED
 
+- `deployment_and_endpoint_proof:one_or_more_backend_endpoints_failed`
 - `model_training_load_proof:model_promotion_remains_blocked_without_policy`
 - `analyzer_paper_lifecycle_proof:full_signal_to_exit_pnl_lifecycle_not_proven`

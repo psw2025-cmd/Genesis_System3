@@ -9,7 +9,7 @@
       "20260611",
       "20260612"
     ],
-    "candidate_count": 127,
+    "candidate_count": 132,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       "complete_end_to_end_validation.py",
@@ -64,6 +64,7 @@
       "dashboard/backend/performance_predictor.py",
       "dashboard/frontend/src/components/Backtest.tsx",
       "dashboard/frontend/src/components/MLPerformance.tsx",
+      "dashboard/frontend/src/components/PerformanceTab.tsx",
       "docs/COMPLETE_VALIDATION_REPORT.md",
       "docs/CSV_VALIDATION_AND_IMPROVEMENTS.md",
       "docs/SYSTEM3_AUTORUN_MULTI_VALIDATION.md",
@@ -104,11 +105,13 @@
       "final_system_validation_test.py",
       "paper_pnl_summary.json",
       "production_grade_validation.py",
+      "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
       "reports/latest/broker_trader_validation/summary.json",
       "reports/latest/broker_trader_validation/summary.md",
       "reports/latest/recent_backtest_walkforward_proof/README.md",
       "reports/latest/recent_backtest_walkforward_proof/costed_walkforward_proof.json",
       "reports/latest/recent_backtest_walkforward_proof/summary.json",
+      "reports/latest/ui_route_verification/screenshots/performance.png",
       "runtime_reports/PHASE220_VALIDATION_RUNTIME.md",
       "runtime_reports/PHASE221_FORWARDRET_RUNTIME.md",
       "runtime_reports/PHASE239_PNL_RUNTIME.md",
@@ -121,16 +124,13 @@
       "scripts/investigate_pnl_discrepancy.py",
       "scripts/monitor_optionchain_performance.py",
       "scripts/performance_metrics.py",
+      "scripts/pf_gated_backtest.py",
       "scripts/pre_trading_validation.py",
       "scripts/run_three_validation_cycles.py",
       "scripts/test_performance_prediction.py",
       "scripts/test_trade_logging_and_pnl.py",
       "src/analytics/performance_metrics.py",
-      "src/outputs/pnl_live.json",
-      "src/selector/strategy_engine.py",
-      "src/trading/pnl_tracker.py",
-      "src/validation/__init__.py",
-      "src/validation/market_result_validator.py"
+      "src/outputs/paper_pnl_summary.json"
     ],
     "compile_results": [
       {

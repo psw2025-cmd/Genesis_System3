@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "generated_at_utc": "2026-07-03T18:04:50.495453+00:00",
+    "signal_source": "no-signal-source-found",
+    "option_master_source": "security_id_list.csv",
+    "rows": 1,
+    "paper_trade_allowed_count": 0,
+    "blocked_count": 1
+  },
+  "rows": [
+    {
+      "signal_ts_ist": "UNKNOWN",
+      "underlying": "NO_SIGNAL_FOUND",
+      "symbol_type": "UNKNOWN",
+      "signal_score": null,
+      "signal_side": "UNKNOWN",
+      "option_side": "UNKNOWN",
+      "option_eligible": false,
+      "eligibility_source": "no-signal-source-found",
+      "expiry": "",
+      "strike": "",
+      "instrument_token": "",
+      "ltp": null,
+      "bid": null,
+      "ask": null,
+      "spread_pct": null,
+      "liquidity_status": "UNKNOWN",
+      "paper_trade_allowed": false,
+      "blocker_reason": "NO_SIGNAL_SOURCE_FOUND_OR_NO_SIGNAL_ROWS"
+    }
+  ]
+}

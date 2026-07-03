@@ -30,6 +30,7 @@
     "MARKET_CLOSED_OR_HOLIDAY": [],
     "MODEL_NOT_GOOD_ENOUGH": [],
     "PROOF_REQUIRED": [
+      "deployment_and_endpoint_proof:one_or_more_backend_endpoints_failed",
       "model_training_load_proof:model_promotion_remains_blocked_without_policy",
       "analyzer_paper_lifecycle_proof:full_signal_to_exit_pnl_lifecycle_not_proven"
     ],
@@ -37,7 +38,7 @@
       "repo_authority_and_duplicate_control:duplicate_basename_candidates_need_runtime_classification"
     ]
   },
-  "generated_utc": "2026-06-23T21:26:07.513141+00:00",
+  "generated_utc": "2026-07-03T18:04:21.179214+00:00",
   "trade_ready": false,
-  "verdict": "ANALYZER_READY_PROOF_INCOMPLETE"
+  "verdict": "TRADE_READY_BLOCKED"
 }

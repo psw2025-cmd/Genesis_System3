@@ -1,10 +1,10 @@
 # System3 Master Status
 
-Generated UTC: 2026-06-14T16:28:41.275183+00:00
+Generated UTC: 2026-07-03T18:04:21.179019+00:00
 
 ## Current verified status
 
-- Master verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
+- Master verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
 - Live trading enabled: `False`
 - Mode: `Analyzer/Paper only`
@@ -15,16 +15,16 @@ Generated UTC: 2026-06-14T16:28:41.275183+00:00
 |---|---|---:|
 | `safety_and_secrets` | `PASS` | `True` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` |
-| `deployment_and_endpoint_proof` | `PASS` | `True` |
+| `deployment_and_endpoint_proof` | `FAIL` | `False` |
 | `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `recent_backtest_walkforward_proof` | `PASS` | `True` |
-| `analyzer_paper_lifecycle_proof` | `PASS` | `True` |
+| `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` |
 | `dashboard_truth_proof` | `PASS_WITH_WARNINGS` | `True` |
 
 ## Open blockers
 
-- None
+- `deployment_and_endpoint_proof:one_or_more_backend_endpoints_failed`
 
 ## Operating rule
 

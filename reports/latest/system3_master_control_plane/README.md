@@ -1,8 +1,8 @@
 # System3 Master Control Plane
 
-Generated UTC: 2026-06-23T21:26:07.490926+00:00
+Generated UTC: 2026-07-03T18:04:21.176751+00:00
 
-- Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
+- Verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
 - Live trading enabled: `False`
 - Mode: `Analyzer/Paper only`
@@ -13,7 +13,7 @@ Generated UTC: 2026-06-23T21:26:07.490926+00:00
 |---|---|---:|---:|---:|
 | `safety_and_secrets` | `PASS` | `True` | `0` | `0` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
-| `deployment_and_endpoint_proof` | `PASS` | `True` | `0` | `0` |
+| `deployment_and_endpoint_proof` | `FAIL` | `False` | `1` | `0` |
 | `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `recent_backtest_walkforward_proof` | `PASS` | `True` | `0` | `0` |
@@ -22,7 +22,7 @@ Generated UTC: 2026-06-23T21:26:07.490926+00:00
 
 ## Active blockers
 
-- None
+- `deployment_and_endpoint_proof:one_or_more_backend_endpoints_failed`
 
 ## Manual-only items
 
