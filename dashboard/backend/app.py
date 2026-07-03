@@ -267,6 +267,16 @@ if not REAL_ONLY:
 AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 DB_DIR.mkdir(parents=True, exist_ok=True)
 
+
+# ── Modular routers (memory-efficient, lazy imports) ─────────────────────
+from routers import broker as broker_router
+from routers import chain as chain_router
+from routers import ml as ml_router
+
+# ── Memory guard middleware ────────────────────────────────────────────────
+from middleware.memory_guard import memory_guard_middleware, get_memory_stats
+from starlette.middleware.base import BaseHTTPMiddleware
+
 app = FastAPI(title="System3 Ultra Dashboard API")
 
 
