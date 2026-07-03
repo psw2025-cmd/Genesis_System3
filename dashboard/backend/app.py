@@ -279,6 +279,15 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(title="System3 Ultra Dashboard API")
 
+# ── Register modular routers (memory-efficient, lazy imports) ─────────────
+app.include_router(broker_router.router)
+app.include_router(chain_router.router)
+app.include_router(ml_router.router)
+
+# ── MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) ─────────────
+from starlette.middleware.base import BaseHTTPMiddleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=memory_guard_middleware)
+
 
 # Rate limiting middleware to prevent excessive API calls
 @app.middleware("http")
