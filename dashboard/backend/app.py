@@ -300,9 +300,11 @@ async def rate_limit_middleware(request, call_next):
     """Add small delay to throttle external API calls and prevent rate limiting"""
     import time
 
-    # Small delay to prevent rapid-fire requests (especially during startup)
-    # This helps avoid Angel One rate limits
-    time.sleep(0.1)
+    # Rate limiting: only apply to external API calls, not all requests
+    # time.sleep(0.1) on ALL requests was causing request queue buildup = memory spike
+    _ext_paths = {"/api/broker", "/api/chain"}
+    if any(request.url.path.startswith(p) for p in _ext_paths):
+        await asyncio.sleep(0.05)  # Async sleep - doesn't block event loop
     response = await call_next(request)
     return response
 
@@ -2804,11 +2806,18 @@ async def _get_chain_uncached(underlying: str):
                 # Try to get last known spot price from real data if available
                 spot_price = None
                 chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                if chain_file.exists() and pd is not None:
+                if chain_file.exists():
                     try:
-                        df = pd.read_csv(chain_file)
-                        if "underlying" in df.columns and "spot_price" in df.columns:
-                            filtered = df[df["underlying"].astype(str).str.upper() == underlying.upper()]
+                        import csv as _csv
+                        filtered_rows = []
+                        with open(chain_file, newline="") as _f:
+                            reader = _csv.DictReader(_f)
+                            for row in reader:
+                                if row.get("underlying","").upper() == underlying.upper():
+                                    filtered_rows.append(row)
+                        if filtered_rows and "spot_price" in filtered_rows[0]:
+                            filtered = type("DF", (), {"empty": not filtered_rows,
+                                "_rows": filtered_rows})()
                             if not filtered.empty:
                                 spot_vals = pd.to_numeric(filtered["spot_price"], errors="coerce").dropna()
                                 if not spot_vals.empty:
@@ -4190,6 +4199,19 @@ async def _startup_token_refresh_task() -> None:
 async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
+
+    # Log startup memory so we know baseline RSS
+    try:
+        import resource, gc
+        gc.collect()  # Clean up before measuring
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
+        if rss_mb > 350:
+            print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
+        else:
+            print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
+    except Exception as e:
+        print(f"[startup] Memory check skipped: {e}")
 
     # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
     # Fired as a background task (never awaited here) so a slow/hung Dhan
