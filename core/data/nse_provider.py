@@ -1,184 +1,100 @@
 """
-Shared NSE public API provider for option chain data.
-Used by both the gain ranking pipeline (morning) and market validation (evening).
-
-v2: Now backed by DataSourceManager — tries NSE live API first, then falls
-    back through nsepython → bhavcopy archive → jugaad-data → yfinance → synthetic.
-    Direct NSE fetch functions preserved for backward compatibility.
+Data Provider — Dhan Only.
+All market data comes from DhanHQ API.
+NSE scraping, Yahoo Finance, bhavcopy — all removed.
+Saves ~150MB RAM (no requests.Session pool).
 """
-
+from __future__ import annotations
 import json
 import logging
 import os
-from typing import Dict, Optional
-
-import requests
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-_NSE_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.nseindia.com/",
-}
-
-_OPTION_CHAIN_URL = "https://www.nseindia.com/api/option-chain-indices?symbol={symbol}"
-
-_session: Optional[requests.Session] = None
+ROOT = Path(__file__).resolve().parents[2]
 
 
-def _get_session() -> requests.Session:
-    global _session
-    if _session is None:
-        s = requests.Session()
-        s.headers.update(_NSE_HEADERS)
-        try:
-            s.get("https://www.nseindia.com", timeout=8)
-        except Exception as e:
-            logger.warning(f"NSE homepage warm-up failed: {e}")
-        _session = s
-    return _session
+def _get_dhan_client():
+    """Get DhanHQ client with current credentials."""
+    from dhanhq import DhanHQ
+    client_id = os.environ.get("DHAN_CLIENT_ID", "")
+    access_token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+    if not client_id or not access_token:
+        raise ValueError("DHAN_CLIENT_ID / DHAN_ACCESS_TOKEN not set")
+    return DhanHQ(client_id=client_id, access_token=access_token)
 
 
-def reset_session() -> None:
-    global _session
-    _session = None
-
-
-def fetch_option_chain(symbol: str) -> Optional[Dict]:
+async def get_option_chain(symbol: str) -> Dict[str, Any]:
     """
-    Returns raw NSE option chain JSON for the given index symbol (e.g. 'NIFTY').
-    Returns None on failure. Uses hardened session warm-up + JSON validation.
+    Get option chain from Dhan API.
+    Falls back to cached file if Dhan unavailable.
+    NO NSE scraping, NO Yahoo Finance, NO requests.Session.
     """
-    from core.data.nse_session import NSEFetchError, fetch_option_chain_json
+    sym = symbol.upper().strip()
 
     try:
-        return fetch_option_chain_json(symbol)
-    except NSEFetchError as exc:
-        logger.info(f"NSE option chain fetch failed [{symbol}]: {exc}")
-        reset_session()
-        return None
+        dhan = _get_dhan_client()
+        # Dhan option chain API
+        resp = dhan.get_option_chain(
+            UnderlyingScrip=sym,
+            UnderlyingSeg="IDX_I",
+            Expiry=""
+        )
+        if resp and isinstance(resp, dict) and resp.get("status") == "success":
+            from core.data.dhan_option_chain_parser import parse_chain
+            return parse_chain(resp, sym)
     except Exception as e:
-        logger.warning(f"NSE option chain fetch failed [{symbol}]: {e}")
-        reset_session()
-        return None
+        logger.warning(f"Dhan option chain failed for {sym}: {e}")
+
+    # Fallback: read from cached file (written by worker scheduler)
+    return _read_cached_chain(sym)
 
 
-def fetch_option_chain_smart(symbol: str):
-    """
-    Smart multi-source fetch with auto-fallback.
-    Returns (chain_df: pd.DataFrame | None, spot_price: float).
-    chain_df uses standard schema: [strike, option_type, oi, volume, ltp, iv, source]
-    Falls back through: NSE → nsepython → bhavcopy → jugaad → yfinance → synthetic.
-    """
-    from core.data.datasource_manager import fetch_option_chain_smart as _smart_fetch
-
-    return _smart_fetch(symbol)
-
-
-def total_oi_from_chain(chain_json: Dict) -> int:
-    """
-    Sums total open interest (calls + puts) across all strikes from NSE JSON.
-    Returns 0 if data is malformed.
-    """
-    try:
-        records = chain_json["records"]["data"]
-        total = 0
-        for row in records:
-            total += row.get("CE", {}).get("openInterest", 0)
-            total += row.get("PE", {}).get("openInterest", 0)
-        return total
-    except Exception:
-        return 0
-
-
-def spot_price_from_chain(chain_json: Dict) -> float:
-    """Extracts underlying spot price from NSE option chain JSON."""
-    try:
-        return float(chain_json["records"]["underlyingValue"])
-    except Exception:
-        return 0.0
-
-
-MARKET_CACHE_FILE = os.path.join(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
-    "state",
-    "market_cache.json",
-)
-
-
-MAX_OI_CACHE_AGE_DAYS = 3  # Stale after 3 calendar days (handles long weekends)
-
-
-def load_oi_cache() -> Dict[str, int]:
-    """
-    Loads previous session OI totals from state/market_cache.json.
-
-    Safety rules (Codex audit 2026-06-13):
-    - Stale after MAX_OI_CACHE_AGE_DAYS (avoids holiday/weekend stale data)
-    - Returns {} if cache date == today (guards against same-day overwrite)
-    - Returns {} if file missing/corrupt
-    """
-    from datetime import date, datetime
-
-    try:
-        with open(MARKET_CACHE_FILE) as f:
-            data = json.load(f)
-
-        cache_date_str = data.get("cache_date")
-        if cache_date_str:
-            cache_date = datetime.strptime(cache_date_str, "%Y-%m-%d").date()
-            today = date.today()
-            age_days = (today - cache_date).days
-
-            if age_days == 0:
-                # Same day — don't use as prev_oi (morning run guard)
-                logger.info("OI cache is from today — skipping as prev_oi (same-day guard)")
-                return {}
-            if age_days > MAX_OI_CACHE_AGE_DAYS:
-                logger.warning(f"OI cache is {age_days} days old — treating as stale (holiday guard)")
-                return {}
-
-        return data.get("oi_data", {})
-    except Exception:
-        return {}
-
-
-def load_oi_cache_raw() -> Dict:
-    """Returns the full cache dict including metadata. Used by dashboard."""
-    try:
-        with open(MARKET_CACHE_FILE) as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-
-def save_oi_cache(oi_data: Dict[str, int]) -> None:
-    """
-    Saves current OI totals to state/market_cache.json for next session's prev_oi.
-    Stores cache_date so staleness can be detected on next read.
-    """
-    from datetime import date, datetime
-
-    os.makedirs(os.path.dirname(MARKET_CACHE_FILE), exist_ok=True)
-    payload = {
-        "last_updated": datetime.now().isoformat(timespec="seconds"),
-        "cache_date": date.today().isoformat(),
-        "oi_data": oi_data,
+def _read_cached_chain(sym: str) -> Dict[str, Any]:
+    """Read cached chain data written by worker scheduler."""
+    cache_file = ROOT / "state" / "chain_cache" / f"{sym}.json"
+    if cache_file.exists():
+        try:
+            data = json.loads(cache_file.read_text())
+            data["cached"] = True
+            return data
+        except Exception:
+            pass
+    return {
+        "underlying": sym, "spot": 0, "pcr": 0,
+        "strikes": [], "error": "No data available",
+        "source": "none", "cached": False,
     }
-    with open(MARKET_CACHE_FILE, "w") as f:
-        json.dump(payload, f, indent=2)
-    logger.info(f"OI cache saved for {payload['cache_date']}: {list(oi_data.keys())}")
 
 
-def is_expiry_day() -> bool:
-    """
-    Returns True if today is a Thursday (weekly NSE expiry day).
-    On expiry day, OI change scores should be disabled to avoid rollover distortion.
-    """
-    from datetime import date
+def get_spot_price(symbol: str) -> Optional[float]:
+    """Get spot price from Dhan — synchronous version for workers."""
+    try:
+        dhan = _get_dhan_client()
+        # Use Dhan LTP API
+        resp = dhan.get_ltp_data(
+            securities={"IDX_I": [symbol]}
+        )
+        if resp and isinstance(resp, dict):
+            data = resp.get("data", {})
+            if data:
+                return float(list(data.values())[0].get("last_price", 0))
+    except Exception as e:
+        logger.warning(f"Dhan spot price failed for {symbol}: {e}")
+    return None
 
-    return date.today().weekday() == 3  # Thursday = 3
+
+# ── Backward compatibility aliases ───────────────────────────────────────
+def fetch_option_chain(symbol: str, expiry: str = "") -> Dict[str, Any]:
+    """Sync wrapper for backward compatibility."""
+    import asyncio
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # Can't run async in sync context — return cached
+            return _read_cached_chain(symbol)
+        return loop.run_until_complete(get_option_chain(symbol))
+    except Exception:
+        return _read_cached_chain(symbol)

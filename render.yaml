@@ -74,6 +74,14 @@ services:
       - key: CLOUD_PAPER_ENGINE
         value: "0"
 
+      # --- Memory guard thresholds (512MB Starter) ---
+      - key: MEM_WARN_MB
+        value: "380"
+      - key: MEM_GC_MB
+        value: "420"
+      - key: MEM_LIMIT_MB
+        value: "480"
+
       # --- Dhan credentials (set in Render dashboard) ---
       - key: DHAN_CLIENT_ID
         sync: false
@@ -153,6 +161,14 @@ services:
         value: "1"
       - key: CLOUD_PAPER_ENGINE
         value: "0"
+
+      # --- Memory guard thresholds (512MB Starter) ---
+      - key: MEM_WARN_MB
+        value: "380"
+      - key: MEM_GC_MB
+        value: "420"
+      - key: MEM_LIMIT_MB
+        value: "480"
 
     # --- Persistent disk (uncomment when ready — requires paid plan) ---
     # disk:

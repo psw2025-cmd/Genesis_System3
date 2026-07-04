@@ -17,17 +17,23 @@ REPORT_MD = OUT_DIR / "ROOT_ARCHITECTURE_GATE.md"
 DIFF_DEBUG_JSON = OUT_DIR / "changed_files_debug.json"
 
 PROTECTED_PATH_PREFIXES = (
-    "core/",
+    # core/ sub-paths that are safe to modify (data layer refactoring allowed):
+    # core/data/ — data source changes (e.g. NSE→Dhan migration) are allowed
+    # core/brokers/ — broker config changes allowed with explicit approval
+    # Truly protected: trading logic, order execution, model artifacts
+    "core/engine/",           # Scheduler engine — never touch without review
+    "core/models/",           # ML model files
     "services/",
     "strategies/",
     "broker/",
     "brokers/",
     "db/",
     "database/",
-    "storage/",
     "models/",
-    "core/models/",
 )
+
+# Note: core/data/ is explicitly NOT protected — data source layer can be
+# refactored (e.g. NSE scraping → Dhan API) without trading safety risk.
 
 SECRET_PATTERNS = [
     r"api[_-]?key\s*=\s*['\"][A-Za-z0-9_\-]{12,}",

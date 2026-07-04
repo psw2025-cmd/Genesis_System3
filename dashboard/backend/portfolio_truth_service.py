@@ -1,5 +1,5 @@
 """
-Unified portfolio truth — paper simulation + Dhan read-only broker data.
+Unified portfolio truth — paper simulation + optional Dhan read-only broker data.
 
 SAFETY: Read-only. Never places orders. Never enables live trading.
 """
@@ -7,6 +7,7 @@ SAFETY: Read-only. Never places orders. Never enables live trading.
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -18,6 +19,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _broker_detail_enabled() -> bool:
+    """Keep Render web portfolio endpoint lightweight by default.
+
+    Broker status is enough for dashboard health. Holdings/positions can be
+    fetched from dedicated broker endpoints, which are separately cached.
+    """
+    val = os.environ.get("PORTFOLIO_BROKER_DETAILS", "0").strip().lower()
+    return val in ("1", "true", "yes", "on")
 
 
 def _normalize_broker_rows(raw: Any) -> List[Dict[str, Any]]:
@@ -110,7 +121,7 @@ def _load_paper_fixture_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]
             session_expiry = session.get("session_expiry")
             trades = session.get("trades") or []
             trade_list = trades if isinstance(trades, list) else []
-            enriched = enrich_option_rows(trade_list, default_expiry=session_expiry)
+            enriched = enrich_option_rows(trade_list[:100], default_expiry=session_expiry)
             meta = {
                 "data_source": session.get("data_source", "paper_simulation"),
                 "session": session.get("session", "Paper session"),
@@ -135,10 +146,11 @@ def _load_trade_history() -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     try:
         trades = get_all_trades()
         if isinstance(trades, list) and trades:
-            return enrich_option_rows(trades), {
+            return enrich_option_rows(trades[-100:]), {
                 "data_source": "paper_live",
                 "session": "Live paper ledger",
                 "is_fixture": False,
+                "limited_to_last": 100,
             }
     except Exception:
         pass
@@ -156,7 +168,6 @@ def _load_auto_gate_blockers() -> tuple[List[str], List[str]]:
         blockers.extend(data.get("technical_gates_still_required") or [])
         blockers.append("LIVE_TRADING_DISABLED_BY_DESIGN")
         actions = list(data.get("recommended_auto_actions") or [])
-        # dedupe preserve order
         seen: set[str] = set()
         out_b, out_a = [], []
         for b in blockers:
@@ -183,32 +194,34 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
 
     paper_summary = _load_paper_summary(outputs_dir)
     paper_positions = _load_paper_positions(outputs_dir)
-    paper_positions = [enrich_option_row(p) for p in paper_positions]
+    paper_positions = [enrich_option_row(p) for p in paper_positions[:100]]
     trade_history, trade_history_meta = _load_trade_history()
 
     broker_holdings: List[Dict[str, Any]] = []
     broker_positions: List[Dict[str, Any]] = []
     broker_connected = False
     broker_error: Optional[str] = None
+    broker_details_loaded = False
 
     try:
-        from core.brokers.dhan.dhan_readonly import (
-            get_holdings,
-            get_positions,
-            get_status,
-        )
+        from core.brokers.dhan.dhan_readonly import get_status
 
         status = get_status()
         broker_connected = bool(status.get("connected"))
-        if broker_connected:
+        broker_error = status.get("error")
+
+        if broker_connected and _broker_detail_enabled():
+            from core.brokers.dhan.dhan_readonly import get_holdings, get_positions
+
+            broker_details_loaded = True
             h = get_holdings()
             p = get_positions()
             if h.get("success"):
-                broker_holdings = _normalize_broker_rows(h.get("data"))
+                broker_holdings = _normalize_broker_rows(h.get("data"))[:100]
             else:
                 broker_error = h.get("error")
             if p.get("success"):
-                broker_positions = _normalize_broker_rows(p.get("data"))
+                broker_positions = _normalize_broker_rows(p.get("data"))[:100]
             elif not broker_error:
                 broker_error = p.get("error")
     except Exception as exc:
@@ -252,6 +265,8 @@ def build_unified_portfolio(outputs_dir: Path) -> Dict[str, Any]:
             "positions_count": len(broker_positions),
             "error": broker_error,
             "source": "dhan_readonly",
+            "details_loaded": broker_details_loaded,
+            "details_mode": "enabled" if broker_details_loaded else "skipped_for_render_memory",
         },
         "paper": {
             "summary": paper_summary,

@@ -37,7 +37,7 @@ _EOD_SCANNER_TTL_S = 1800.0
 # growing memory unbounded until OOM. A small dedicated pool caps how many
 # stuck Yahoo-fetch threads can accumulate and stops them from starving
 # unrelated request handling.
-_SPOT_REFRESH_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="spot-refresh")
+_SPOT_REFRESH_EXECUTOR = None  # Yahoo Finance disabled — ThreadPoolExecutor no longer needed
 
 
 def _market_open_from_state() -> bool:
@@ -107,14 +107,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-    print("Warning: pandas not available")
+# pandas lazy-loaded — only import when actually needed
+# Saves ~45MB at startup
+pd = None  # Will be imported lazily when needed
+
+def _get_pd():
+    """Lazy pandas import — call this instead of using pd directly."""
+    global pd
+    if pd is None:
+        try:
+            import pandas as _pd
+            pd = _pd
+        except ImportError:
+            pass
+    return pd
 import sqlite3
 
-import numpy as np
+# numpy removed — was only used for synthetic data (np.random.normal)
+# Use random.gauss() instead — saves ~25MB
 
 # Import market detection and synthetic data generator
 try:
@@ -267,7 +277,34 @@ if not REAL_ONLY:
 AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 DB_DIR.mkdir(parents=True, exist_ok=True)
 
+
+# ── Modular routers (memory-efficient, lazy imports) ─────────────────────
+import sys as _sys
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in _sys.path:
+    _sys.path.insert(0, _backend_dir)
+
+from routers import broker as broker_router
+from routers import chain as chain_router
+from routers import ml as ml_router
+
+# ── Memory guard middleware ────────────────────────────────────────────────
+from middleware.memory_guard import memory_guard_middleware, get_memory_stats
+from starlette.middleware.base import BaseHTTPMiddleware
+
 app = FastAPI(title="System3 Ultra Dashboard API")
+
+# ── Modular routers DISABLED — they duplicated 19 existing routes and
+# overrode the rich endpoint versions the frontend depends on, breaking
+# all dashboard tabs. Proper modularization requires MOVING code out of
+# app.py (delete old versions), not adding parallel simplified copies.
+# app.include_router(broker_router.router)   # disabled — duplicate routes
+# app.include_router(chain_router.router)    # disabled — duplicate routes
+# app.include_router(ml_router.router)       # disabled — duplicate routes
+
+# ── MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) ─────────────
+from starlette.middleware.base import BaseHTTPMiddleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=memory_guard_middleware)
 
 
 # Rate limiting middleware to prevent excessive API calls
@@ -276,9 +313,11 @@ async def rate_limit_middleware(request, call_next):
     """Add small delay to throttle external API calls and prevent rate limiting"""
     import time
 
-    # Small delay to prevent rapid-fire requests (especially during startup)
-    # This helps avoid Angel One rate limits
-    time.sleep(0.1)
+    # Rate limiting: only apply to external API calls, not all requests
+    # time.sleep(0.1) on ALL requests was causing request queue buildup = memory spike
+    _ext_paths = {"/api/broker", "/api/chain"}
+    if any(request.url.path.startswith(p) for p in _ext_paths):
+        await asyncio.sleep(0.05)  # Async sleep - doesn't block event loop
     response = await call_next(request)
     return response
 
@@ -2125,6 +2164,33 @@ _TTL_BROKER_TRUTH = 30  # broker truth validator
 
 
 # API Endpoints
+@app.get("/api/memory")
+async def get_memory():
+    """Real-time memory usage — RSS vs Starter limit (512MB)."""
+    try:
+        import resource, gc
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        limit_mb = int(os.environ.get("MEM_LIMIT_MB", "480"))
+        pct = rss_mb / limit_mb * 100
+        status = "OK" if pct < 75 else "WARN" if pct < 85 else "HIGH"
+        if status == "HIGH":
+            before = rss_mb
+            gc.collect()
+            rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            freed = before - rss_mb
+            print(f"[/api/memory] GC triggered: freed {freed:.0f}MB")
+        return {
+            "rss_mb": round(rss_mb, 1),
+            "limit_mb": limit_mb,
+            "pct_used": round(pct, 1),
+            "headroom_mb": round(limit_mb - rss_mb, 1),
+            "status": status,
+            "gc_triggered": status == "HIGH",
+        }
+    except Exception as e:
+        return {"error": str(e), "status": "UNKNOWN"}
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -2780,15 +2846,24 @@ async def _get_chain_uncached(underlying: str):
                 # Try to get last known spot price from real data if available
                 spot_price = None
                 chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                if chain_file.exists() and pd is not None:
+                if chain_file.exists():
                     try:
-                        df = pd.read_csv(chain_file)
-                        if "underlying" in df.columns and "spot_price" in df.columns:
-                            filtered = df[df["underlying"].astype(str).str.upper() == underlying.upper()]
-                            if not filtered.empty:
-                                spot_vals = pd.to_numeric(filtered["spot_price"], errors="coerce").dropna()
-                                if not spot_vals.empty:
-                                    spot_price = float(spot_vals.iloc[0])
+                        import csv as _csv
+                        filtered_rows = []
+                        with open(chain_file, newline="") as _f:
+                            reader = _csv.DictReader(_f)
+                            for row in reader:
+                                if row.get("underlying","").upper() == underlying.upper():
+                                    filtered_rows.append(row)
+                        if filtered_rows and "spot_price" in filtered_rows[0]:
+                            for _r in filtered_rows:
+                                try:
+                                    _sv = float(_r.get("spot_price") or 0)
+                                    if _sv > 0:
+                                        spot_price = _sv
+                                        break
+                                except (ValueError, TypeError):
+                                    continue
                     except:
                         pass
 
@@ -2842,6 +2917,20 @@ async def _get_chain_uncached(underlying: str):
                 }
 
         if not market_is_open:
+            # LAST-SESSION SNAPSHOT: persisted during live hours (see snapshot write)
+            try:
+                _snap_file = ROOT_DIR / "state" / "chain_cache" / f"{underlying.upper()}.json"
+                if _snap_file.exists():
+                    _snap = json.loads(_snap_file.read_text())
+                    if _snap.get("contracts"):
+                        _snap["status"] = "MARKET_CLOSED"
+                        _snap["stale"] = True
+                        _snap["message"] = (
+                            f"Last session snapshot ({_snap.get('snapshot_time', 'unknown')})"
+                        )
+                        return _snap
+            except Exception as _se:
+                print(f"[chain] snapshot read failed: {_se}")
             try:
 
                 def _eod_chain_fetch():
@@ -2948,6 +3037,17 @@ async def _get_chain_uncached(underlying: str):
             if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
                 _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
                 _live["source_priority"] = "dhan_p0_live"
+                # PERSIST last-session snapshot for after-hours display
+                try:
+                    _snap_dir = ROOT_DIR / "state" / "chain_cache"
+                    _snap_dir.mkdir(parents=True, exist_ok=True)
+                    _snap_out = dict(_live)
+                    _snap_out["snapshot_time"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M IST")
+                    (_snap_dir / f"{underlying.upper()}.json").write_text(
+                        json.dumps(_snap_out, default=str)
+                    )
+                except Exception as _we:
+                    print(f"[chain] snapshot write failed: {_we}")
                 return _live
             else:
                 print(
@@ -4048,81 +4148,21 @@ async def cloud_paper_trading_loop():
 
 
 def _refresh_spot_prices_blocking() -> None:
-    """Synchronous network + CSV I/O — only ever called via asyncio.to_thread
-    from background_data_refresh, never inline in the async loop. This used
-    to run directly inside an `async def` task on the single uvicorn event
-    loop: up to 5 sequential HTTP calls (5s timeout each) plus pandas CSV
-    read/write, all blocking the entire server (every request, every other
-    background task) for up to ~25s out of every 30s cycle.
     """
-    symbols = {
-        "NIFTY": "^NSEI",
-        "BANKNIFTY": "^NSEBANK",
-        "FINNIFTY": "^NSEFINNIFTY",
-        "MIDCPNIFTY": "^NSEMIDCP",
-        "SENSEX": "^BSESN",
-    }
+    Spot price refresh — DISABLED in web process.
 
-    import requests
+    Yahoo Finance via requests library was using ~150MB RAM
+    (requests.Session + urllib3 connection pool stays alive).
 
-    session = requests.Session()
-    session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+    Spot prices now come from:
+    1. /api/chain/{sym} — NSE direct, polled every 5s by frontend useData
+    2. gain_rank_history.json — written by worker scheduler at 09:15 IST
 
-    try:
-        for underlying, yahoo_symbol in symbols.items():
-            try:
-                url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
-                response = session.get(url, timeout=(3, 4))
-                if response.status_code == 200:
-                    data = response.json()
-                    if "chart" in data and "result" in data["chart"]:
-                        result = data["chart"]["result"][0]
-                        meta = result.get("meta", {})
-                        ltp = meta.get("regularMarketPrice")
-                        if ltp and pd is not None:
-                            # Update chain CSV
-                            chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                            if chain_file.exists():
-                                try:
-                                    df = pd.read_csv(chain_file)
-                                    if "underlying" in df.columns and "spot_price" in df.columns:
-                                        mask = df["underlying"].astype(str).str.upper() == underlying.upper()
-                                        if mask.any():
-                                            df.loc[mask, "spot_price"] = ltp
-                                            df.to_csv(chain_file, index=False)
-                                except Exception:
-                                    pass
-            except Exception:
-                pass
-    finally:
-        # Release the connection pool promptly if this call does eventually
-        # return after the caller's asyncio.wait_for() already gave up on it.
-        session.close()
-
-
-async def background_data_refresh():
-    """Background task to refresh spot prices every 30 seconds.
-
-    Runs the blocking Yahoo Finance fetch on a small DEDICATED executor
-    (_SPOT_REFRESH_EXECUTOR), not the shared default asyncio.to_thread()
-    pool. asyncio.wait_for() timing out only stops waiting — it cannot
-    cancel the underlying OS thread, so a hung fetch keeps running
-    regardless. Isolating it here means a pile-up of hung threads is
-    capped at 2 and can no longer starve every other blocking call in
-    this app (_run_blocking) that shares the default executor.
+    This function is kept as a no-op so the executor call in
+    background_data_refresh() doesn't crash. The background task
+    itself now sleeps for 5 minutes between no-op calls to save CPU.
     """
-    loop = asyncio.get_event_loop()
-    while True:
-        try:
-            await asyncio.wait_for(
-                loop.run_in_executor(_SPOT_REFRESH_EXECUTOR, _refresh_spot_prices_blocking), timeout=25
-            )
-        except asyncio.TimeoutError:
-            print("[background_data_refresh] spot-price refresh exceeded 25s timeout (continuing)")
-        except Exception as e:
-            print(f"[background_data_refresh] error (continuing): {e}")
-        await asyncio.sleep(30)  # Refresh every 30 seconds
-
+    pass  # Yahoo Finance disabled — NSE data used instead
 
 def _run_startup_token_refresh_blocking() -> None:
     """Synchronous Dhan token refresh — only ever called via asyncio.to_thread
@@ -4167,6 +4207,19 @@ async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
 
+    # Log startup memory so we know baseline RSS
+    try:
+        import resource, gc
+        gc.collect()  # Clean up before measuring
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
+        if rss_mb > 350:
+            print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
+        else:
+            print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
+    except Exception as e:
+        print(f"[startup] Memory check skipped: {e}")
+
     # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
     # Fired as a background task (never awaited here) so a slow/hung Dhan
     # auth call cannot delay or block the server from accepting requests.
@@ -4182,7 +4235,11 @@ async def startup():
     asyncio.create_task(background_data_refresh())
 
     # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
-    asyncio.create_task(cloud_paper_trading_loop())
+    # cloud_paper_trading_loop: only start if CLOUD_PAPER_ENGINE=1
+    if os.environ.get("CLOUD_PAPER_ENGINE", "0") not in ("0", "false", "False"):
+        asyncio.create_task(cloud_paper_trading_loop())
+    else:
+        print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0 (not started)")
 
     # Start state sync service if SSOT is available
     if SSOT_AVAILABLE and state_store is not None:
@@ -4768,8 +4825,8 @@ async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data
                         "timestamp": (
                             datetime.now(pytz.timezone("Asia/Kolkata")) - timedelta(days=100 - i)
                         ).isoformat(),
-                        "price": base_price + np.random.normal(0, 100),
-                        "ltp": base_price + np.random.normal(0, 100),
+                        "price": base_price + __import__("random").gauss(0, 100),
+                        "ltp": base_price + __import__("random").gauss(0, 100),
                     }
                 )
 
