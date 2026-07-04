@@ -28,11 +28,14 @@ class DataSourceManager:
     def _get_client(self):
         if self._client is None:
             try:
-                from dhanhq import DhanHQ
+                from dhanhq import dhanhq
+                from dhanhq.dhan_context import DhanContext
+
                 client_id = os.environ.get("DHAN_CLIENT_ID", "")
                 token = os.environ.get("DHAN_ACCESS_TOKEN", "")
                 if client_id and token:
-                    self._client = DhanHQ(client_id=client_id, access_token=token)
+                    ctx = DhanContext(client_id, token)
+                    self._client = dhanhq(ctx)
             except Exception as e:
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client

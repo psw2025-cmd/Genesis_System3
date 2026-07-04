@@ -36,12 +36,14 @@ def _load_dhan():
     try:
         import dotenv
         from dhanhq import dhanhq
+        from dhanhq.dhan_context import DhanContext
         dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
         token = os.environ.get("DHAN_ACCESS_TOKEN", "")
         client_id = os.environ.get("DHAN_CLIENT_ID", "")
         if not token or not client_id:
             return None
-        return dhanhq(client_id, token)
+        ctx = DhanContext(client_id, token)
+        return dhanhq(ctx)
     except Exception as e:
         logger.warning(f"Dhan init failed: {e}")
         return None
