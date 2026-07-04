@@ -284,13 +284,15 @@ class DataSourceManager:
         try:
             import dotenv
             from dhanhq import dhanhq
+            from dhanhq.dhan_context import DhanContext
 
             dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
             token = os.environ.get("DHAN_ACCESS_TOKEN", "")
             client_id = os.environ.get("DHAN_CLIENT_ID", "")
             if not token or not client_id:
                 return None
-            dhan = dhanhq(client_id, token)
+            ctx = DhanContext(client_id, token)
+            dhan = dhanhq(ctx)
             sec_id = self._DHAN_SECURITY_IDS.get(symbol.upper(), "13")
             expiry = self._nearest_expiry()
             logger.info(f"[Dhan P0] Fetching option chain: {symbol} sec_id={sec_id} expiry={expiry}")
