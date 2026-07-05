@@ -36,9 +36,11 @@ async def _run_readonly_call(fn, *args, timeout: float = BROKER_API_TIMEOUT_S, *
 
 
 def _token_status() -> Dict[str, Any]:
-    from core.brokers.dhan.token_manager import get_token_status
+    from core.brokers.dhan.dhan_readonly import get_status
 
-    return get_token_status()
+    s = get_status()
+    # Keep a stable shape for callers in this router.
+    return {"valid": bool(s.get("connected", False)), **s}
 
 
 def _get_dhan_client():
