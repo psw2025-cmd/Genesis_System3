@@ -1,0 +1,33 @@
+{
+  "summary": {
+    "generated_at_utc": "2026-07-03T18:04:50.503736+00:00",
+    "sources": [],
+    "rows": 1,
+    "proof_pass_count": 0,
+    "blocked_count": 1,
+    "direction_known_count": 0,
+    "direction_hit_rate": null,
+    "option_profitable_known_count": 0
+  },
+  "rows": [
+    {
+      "prediction_ts_ist": "UNKNOWN",
+      "symbol": "NO_PREDICTION_FOUND",
+      "symbol_type": "UNKNOWN",
+      "direction": "UNKNOWN",
+      "option_side": "UNKNOWN",
+      "confidence": null,
+      "selected_strike": "",
+      "actual_5m": null,
+      "actual_15m": null,
+      "actual_30m": null,
+      "actual_eod": null,
+      "direction_correct": null,
+      "option_profitable": null,
+      "max_favorable_move": null,
+      "max_adverse_move": null,
+      "proof_status": "BLOCKED",
+      "blocker_reason": "NO_PREDICTION_SOURCE_FOUND"
+    }
+  ]
+}

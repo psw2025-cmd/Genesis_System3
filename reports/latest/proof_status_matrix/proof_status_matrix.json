@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-23T21:26:07.501886+00:00",
+  "generated_utc": "2026-07-03T18:04:21.177841+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "optional_missing_count": 0,
   "pending_count": 0,
@@ -27,12 +27,14 @@
       ]
     },
     {
-      "blockers": [],
+      "blockers": [
+        "one_or_more_backend_endpoints_failed"
+      ],
       "name": "deployment_and_endpoint_proof",
-      "pass": true,
+      "pass": false,
       "path": "reports/latest/deployment_and_endpoint_proof/summary.json",
       "required": true,
-      "status": "PASS",
+      "status": "FAIL",
       "warnings": []
     },
     {
@@ -91,5 +93,5 @@
     }
   ],
   "trade_ready": false,
-  "verdict": "ANALYZER_READY_PROOF_INCOMPLETE"
+  "verdict": "TRADE_READY_BLOCKED"
 }

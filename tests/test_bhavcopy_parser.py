@@ -1,12 +1,14 @@
 """
-Tests for DataSourceManager bhavcopy parser.
-No network calls — all tests use in-memory DataFrames.
+Tests for DataSourceManager (Dhan-only, post-simplification).
+Covers: no-credentials fallback, cached-file fallback, API helpers.
+No network calls — Dhan client patched throughout.
 """
 
+import json
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
-import pandas as pd
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -19,197 +21,145 @@ def dsm():
     return DataSourceManager()
 
 
-def _udiif_df(
-    symbol="NIFTY", opt_type="CE", strike=23000, oi=61295, oi_change=60905, volume=1500, ltp=350.0, fin_instrm_tp="IDO"
-):
-    return pd.DataFrame(
-        [
+@pytest.fixture
+def chain_cache_dir(tmp_path):
+    """Return a tmp chain_cache directory whose path is monkey-patched into DataSourceManager."""
+    return tmp_path / "chain_cache"
+
+
+# ── TC-DM-1: No credentials → (None, 0.0) ────────────────────────────────
+def test_no_credentials_returns_none(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    result = dsm.fetch_option_chain("NIFTY")
+    assert result == (None, 0.0)
+
+
+# ── TC-DM-2: Dhan SDK success → (DataFrame, spot) ───────────────────────
+def test_dhan_success_returns_df(dsm):
+    import pandas as pd
+
+    mock_client = MagicMock()
+    mock_client.get_option_chain.return_value = {"status": "success", "data": {}}
+    dsm._client = mock_client
+
+    fake_df = pd.DataFrame([{"strike": 23000, "option_type": "CE", "oi": 5000}])
+    with patch("core.data.dhan_option_chain_parser.parse_option_chain_to_df", return_value=(fake_df, 23500.0)):
+        df, spot = dsm.fetch_option_chain("NIFTY")
+
+    assert df is not None
+    assert len(df) == 1
+    assert spot == 23500.0
+
+
+# ── TC-DM-3: Dhan SDK error → cached JSON fallback ───────────────────────
+def test_dhan_error_falls_to_cache(dsm, tmp_path, monkeypatch):
+    cache_dir = tmp_path / "state" / "chain_cache"
+    cache_dir.mkdir(parents=True)
+    (cache_dir / "NIFTY.json").write_text(
+        json.dumps(
             {
-                "TckrSymb": symbol,
-                "OptnTp": opt_type,
-                "StrkPric": strike,
-                "OpnIntrst": oi,
-                "ChngInOpnIntrst": oi_change,
-                "TtlTradgVol": volume,
-                "ClsPric": ltp,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": fin_instrm_tp,
-                "UndrlygPric": 23622.9,
+                "spot": 23400.0,
+                "strikes": [{"strike": 23000, "option_type": "CE", "oi": 100}],
             }
-        ]
+        )
     )
 
+    mock_client = MagicMock()
+    mock_client.get_option_chain.side_effect = Exception("API error")
+    dsm._client = mock_client
 
-def _old_fmt_df(symbol="NIFTY", opt_type="PE", strike=22500, oi=50000, oi_change=-3000, volume=800, ltp=120.5):
-    return pd.DataFrame(
-        [
+    import core.data.datasource_manager as mod
+    monkeypatch.setattr(mod, "ROOT", tmp_path)
+
+    df, spot = dsm.fetch_option_chain("NIFTY")
+    assert df is not None
+    assert len(df) == 1
+    assert spot == 23400.0
+
+
+# ── TC-DM-4: Cache file present, no Dhan client → cache used ─────────────
+def test_no_client_uses_cache(dsm, tmp_path, monkeypatch):
+    cache_dir = tmp_path / "state" / "chain_cache"
+    cache_dir.mkdir(parents=True)
+    (cache_dir / "BANKNIFTY.json").write_text(
+        json.dumps(
             {
-                "SYMBOL": symbol,
-                "OPTION_TYP": opt_type,
-                "STRIKE_PR": strike,
-                "OPEN_INT": oi,
-                "CHG_IN_OI": oi_change,
-                "CONTRACTS": volume,
-                "CLOSE": ltp,
-                "INSTRUMENT": "OPTIDX",
-                "EXPIRY_DT": "26-Jun-2026",
+                "spot": 54000.0,
+                "strikes": [
+                    {"strike": 53000, "option_type": "PE", "oi": 200},
+                    {"strike": 55000, "option_type": "CE", "oi": 300},
+                ],
             }
-        ]
+        )
     )
 
+    dsm._client = None
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
 
-# TC-BP-1: UDiFF format — correct schema returned
-def test_udiif_basic_parse(dsm):
-    df = _udiif_df()
-    result, spot = dsm._parse_bhavcopy(df, "NIFTY")
-    assert result is not None
-    assert len(result) == 1
-    row = result.iloc[0]
-    assert row["strike"] == 23000.0
-    assert row["option_type"] == "CE"
-    assert row["oi"] == 61295
-    assert row["oi_change"] == 60905
-    assert row["prev_oi"] == 61295 - 60905
+    import core.data.datasource_manager as mod
+    monkeypatch.setattr(mod, "ROOT", tmp_path)
+
+    df, spot = dsm.fetch_option_chain("BANKNIFTY")
+    assert df is not None
+    assert len(df) == 2
+    assert spot == 54000.0
 
 
-# TC-BP-2: UDiFF symbol filter — wrong symbol excluded, FinInstrmTp NOT used as filter
-def test_udiif_symbol_filter(dsm):
-    rows = pd.DataFrame(
-        [
-            {
-                "TckrSymb": "NIFTY",
-                "OptnTp": "CE",
-                "StrkPric": 23000,
-                "OpnIntrst": 100,
-                "ChngInOpnIntrst": 50,
-                "TtlTradgVol": 10,
-                "ClsPric": 100.0,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": "IDO",
-                "UndrlygPric": 23622.9,
-            },
-            {
-                "TckrSymb": "BANKNIFTY",
-                "OptnTp": "CE",
-                "StrkPric": 48000,
-                "OpnIntrst": 200,
-                "ChngInOpnIntrst": 10,
-                "TtlTradgVol": 20,
-                "ClsPric": 200.0,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": "IDO",
-                "UndrlygPric": 54000.0,
-            },
-        ]
-    )
-    result, _ = dsm._parse_bhavcopy(rows, "NIFTY")
-    assert result is not None
-    assert len(result) == 1
-    assert result.iloc[0]["option_type"] == "CE"
+# ── TC-DM-5: get_option_chain returns dict with required keys ─────────────
+def test_get_option_chain_returns_dict(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    result = dsm.get_option_chain("NIFTY")
+    assert isinstance(result, dict)
+    assert "underlying" in result
+    assert "spot" in result
+    assert "strikes" in result
 
 
-# TC-BP-3: Both CE and PE returned; non-CE/PE rows dropped
-def test_udiif_ce_pe_only(dsm):
-    rows = pd.DataFrame(
-        [
-            {
-                "TckrSymb": "NIFTY",
-                "OptnTp": "CE",
-                "StrkPric": 23000,
-                "OpnIntrst": 100,
-                "ChngInOpnIntrst": 10,
-                "TtlTradgVol": 10,
-                "ClsPric": 100.0,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": "IDO",
-                "UndrlygPric": 23622.9,
-            },
-            {
-                "TckrSymb": "NIFTY",
-                "OptnTp": "PE",
-                "StrkPric": 23000,
-                "OpnIntrst": 200,
-                "ChngInOpnIntrst": -10,
-                "TtlTradgVol": 20,
-                "ClsPric": 80.0,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": "IDO",
-                "UndrlygPric": 23622.9,
-            },
-            {
-                "TckrSymb": "NIFTY",
-                "OptnTp": "FUT",
-                "StrkPric": 0,
-                "OpnIntrst": 5000,
-                "ChngInOpnIntrst": 100,
-                "TtlTradgVol": 500,
-                "ClsPric": 23600.0,
-                "XpryDt": "2026-06-26",
-                "FinInstrmTp": "IDX",
-                "UndrlygPric": 23622.9,
-            },
-        ]
-    )
-    result, _ = dsm._parse_bhavcopy(rows, "NIFTY")
-    assert result is not None
-    assert len(result) == 2
-    assert set(result["option_type"]) == {"CE", "PE"}
+# ── TC-DM-6: get_option_chain underlying is uppercased ───────────────────
+def test_get_option_chain_uppercase_symbol(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    result = dsm.get_option_chain("nifty")
+    assert result["underlying"] == "NIFTY"
 
 
-# TC-BP-4: Old format (pre-Jul 2024) — correct parse
-def test_old_format_parse(dsm):
-    df = _old_fmt_df()
-    result, _ = dsm._parse_bhavcopy(df, "NIFTY")
-    assert result is not None
-    assert len(result) == 1
-    row = result.iloc[0]
-    assert row["oi"] == 50000
-    assert row["oi_change"] == -3000
-    assert row["volume"] == 800
-    assert row["ltp"] == 120.5
+# ── TC-DM-7: get_spot_price returns 0.0 without credentials ──────────────
+def test_get_spot_price_no_credentials(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    price = dsm.get_spot_price("NIFTY")
+    assert price == 0.0
 
 
-# TC-BP-5: Old format — negative oi_change preserved; prev_oi computed correctly
-def test_old_format_negative_oi_change(dsm):
-    df = _old_fmt_df(oi=50000, oi_change=-3000)
-    result, _ = dsm._parse_bhavcopy(df, "NIFTY")
-    row = result.iloc[0]
-    assert row["oi_change"] == -3000
-    assert row["prev_oi"] == max(0, 50000 - (-3000))  # = 53000
+# ── TC-DM-8: health_check returns dict with status key ───────────────────
+def test_health_check_returns_status(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    result = dsm.health_check()
+    assert isinstance(result, dict)
+    assert "status" in result
+    assert result["status"] in ("OK", "ERROR", "NO_CREDENTIALS")
 
 
-# TC-BP-6: Symbol mismatch — returns None
-def test_symbol_mismatch_returns_none(dsm):
-    df = _udiif_df(symbol="BANKNIFTY")
-    out = dsm._parse_bhavcopy(df, "NIFTY")
-    assert out is None or (isinstance(out, tuple) and out[0] is None)
+# ── TC-DM-9: health_check returns NO_CREDENTIALS without env vars ─────────
+def test_health_check_no_credentials(dsm, monkeypatch):
+    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
+    dsm._client = None
+    result = dsm.health_check()
+    assert result["status"] == "NO_CREDENTIALS"
 
 
-# TC-BP-7: Case-insensitive symbol matching
-def test_case_insensitive_symbol(dsm):
-    df = _udiif_df(symbol="nifty")
-    result, _ = dsm._parse_bhavcopy(df, "NIFTY")
-    assert result is not None
-    assert len(result) == 1
-
-
-# TC-BP-8: oi_change comes directly from column, not computed from two sessions
-def test_oi_change_from_column(dsm):
-    df = _udiif_df(oi=100000, oi_change=5000)
-    result, _ = dsm._parse_bhavcopy(df, "NIFTY")
-    assert result.iloc[0]["oi_change"] == 5000
-
-
-# TC-BP-9: Unknown format — returns None (bare None, not a tuple)
-def test_unknown_format_returns_none(dsm):
-    df = pd.DataFrame([{"A": 1, "B": 2, "C": 3}])
-    out = dsm._parse_bhavcopy(df, "NIFTY")
-    assert out is None or (isinstance(out, tuple) and out[0] is None)
-
-
-# TC-BP-10: Empty result after filter — returns None
-def test_empty_after_filter_returns_none(dsm):
-    df = _udiif_df(symbol="NIFTY", opt_type="CE")
-    df["OptnTp"] = "FUT"  # invalidate option type so all rows are filtered out
-    out = dsm._parse_bhavcopy(df, "NIFTY")
-    assert out is None or (isinstance(out, tuple) and out[0] is None)
+# ── TC-DM-10: get_datasource_manager returns DataSourceManager instance ───
+def test_get_datasource_manager():
+    from core.data.datasource_manager import get_datasource_manager
+    mgr = get_datasource_manager()
+    assert isinstance(mgr, DataSourceManager)
