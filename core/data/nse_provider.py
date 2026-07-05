@@ -110,10 +110,9 @@ def get_spot_price(symbol: str) -> Optional[float]:
 def fetch_option_chain(symbol: str, expiry: str = "") -> Dict[str, Any]:
     """Sync wrapper for backward compatibility."""
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            # Can't run async from a running loop — return cached immediately.
-            return _read_cached_chain(symbol)
+        asyncio.get_running_loop()
+        # Can't run async from a running loop — return cached immediately.
+        return _read_cached_chain(symbol)
     except RuntimeError:
         pass
 
