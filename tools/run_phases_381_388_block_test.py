@@ -13,16 +13,14 @@ Safety:
     - Uses venv Python interpreter
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
-
-from core.utils.logger import logger
 
 # Import all phase modules
 from core.engine.system3_phase381_ultra_models_scanner import run_phase_381
@@ -34,6 +32,7 @@ from core.engine.system3_phase386_failsafe_guard import run_phase_386
 from core.engine.system3_phase387_impact_preview import run_phase_387
 from core.engine.system3_phase388_health_gate import run_phase_388
 from core.engine.system3_phases_381_388_registry import PHASES_381_388
+from core.utils.logger import logger
 
 # Output paths
 STORAGE_DIR = ROOT_DIR / "storage"
@@ -72,16 +71,16 @@ def verify_safety_configs():
                 logger.error("❌ live_trade_config.py: LIVE_TRADING_ENABLED is NOT False")
                 safety_verified = False
 
-    # Check angel_automation_config.json
-    angel_config = config_dir / "angel_automation_config.json"
-    if angel_config.exists():
-        with open(angel_config, "r") as f:
+    # Check dhan_automation_config.json
+    dhan_config = config_dir / "dhan_automation_config.json"
+    if dhan_config.exists():
+        with open(dhan_config, "r") as f:
             config = json.load(f)
             dry_run = config.get("DRY_RUN", config.get("dry_run"))
             if dry_run is True:
-                logger.info("✓ angel_automation_config.json: DRY_RUN = true")
+                logger.info("✓ dhan_automation_config.json: DRY_RUN = true")
             else:
-                logger.error("❌ angel_automation_config.json: DRY_RUN is NOT true")
+                logger.error("❌ dhan_automation_config.json: DRY_RUN is NOT true")
                 safety_verified = False
 
     return safety_verified

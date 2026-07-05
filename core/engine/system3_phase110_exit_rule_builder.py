@@ -4,12 +4,13 @@ System3 Phase 110 - Stop-Loss & Exit Rule Builder (Static)
 Build conservative SL/TP rules per trade from existing AI signals.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -20,7 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_LIVE.mkdir(parents=True, exist_ok=True)
 
-TRADE_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
+TRADE_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
 LEDGER_CSV = STORAGE_LIVE / "live_orders_ledger.csv"
 EXIT_RULES_JSON = STORAGE_LIVE / "phase110_exit_rules_pending.json"
 

@@ -1,0 +1,52 @@
+=== ENDPOINT CHECK ===
+BASE=https://genesis-system3-backend.onrender.com
+UTC=2026-07-01T19:35:24Z
+
+---- / ----
+{"message":"System3 Ultra Dashboard API","status":"running","backend_url":"https://genesis-system3-backend.onrender.com","dashboard_url":"https://genesis-system3-backend.onrender.com","api_docs":"https://genesis-system3-backend.onrender.com/docs","health":"https://genesis-system3-backend.onrender.com/api/health","state":"https://genesis-system3-backend.onrender.com/api/state","relative_paths":{"api_docs":"/docs","health":"/api/health","state":"/api/state","broker_status":"/api/broker/status","dashboard":"/ui"}}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.513813
+
+
+---- /api/health ----
+{"status":"not_ready","mode":"PAPER","broker_status":"disconnected","market_status":"closed","data_source":"live","live_allowed":false,"live_blockers":["Broker not connected - real data unavailable"],"broker":{"connected":false,"status":"disconnected","error":"Broker not connected"},"market":{"is_open":false,"reason":"closed"},"cycle_count":0,"refresh_interval":5,"last_fetch":null,"qc_status":"NOT_READY","qc_failures":["Broker not connected - real data unavailable"],"trades_executed":0,"open_positions":0,"total_pnl":0.0,"daily_pnl":0.0,"performance_sla":{"cycle_duration_sec":0,"fetch_duration_sec":0,"strategy_duration_sec":0,"sla_pass":false},"message":"BROKER_NOT_READY - Real data unavailable"}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.506509
+
+
+---- /api/state ----
+{"state_version":38,"timestamp_utc":"2026-07-01T19:35:21.754104Z","timestamp_ist":"2026-07-02T01:05:21.754105+05:30","mode":"PAPER","data_source":"MARKET_CLOSED_NO_BROKER","market":{"is_open":false,"reason":"Market closed: Before pre-market (opens at 09:15)","next_open":"2026-07-02 09:15:00 IST","current_time_ist":"2026-07-02T01:05:21.641643+05:30"},"broker":{"broker":"dhan","mode":"ANALYZER","connected":false,"live_trading_enabled":false,"order_placement_allowed":false,"credentials_present":true,"client_id_present":true,"access_token_present":true,"latency_ms":674,"error":"TOKEN_EXPIRED_OR_INVALID","auto_refresh":{"attempted":false,"success":false,"reason":"TOKEN_EXPIRED_OR_INVALID","cooldown_s":300,"skipped":"COOLDOWN","cooldown_remaining_s":153},"sdk_available":true,"env_source":"core.utils.env_loader"},"qc":{"status":"PASS","reasons":[],"contracts_total":0,"underlyings":0,"failures":[]},"signals":{"status":"NO_TRADE","underlying":null,"confidence":0,"reason":"No signal generated","last_signal":null},"positions":[],"pnl":{"unrealized":0.0,"realized":0.0,"total":0.0,"day_total":0.0},"risk":{"var95":0.0,"es95":0.0,"exposure":0.0,"concentration":0.0,"greeks":{"delta":0.0,"gamma":0.0,"theta":0.0,"vega":0.0},"limits":{"status":"PASS","breaches":[]}},"model":{"active":null,"type":null,"fallback_used":false,"metrics":{}},"alerts":[],"cycle_count":38,"last_cycle_ts_iso":"2026-07-02T01:05:21.754105+05:30","last_fetch_ts_iso":"2026-07-02T01:05:21.754105+05:30","positions_source":"INTERNAL_UNVERIFIED","reconciliation":{"status":"OK","mismatches":[],"timestamp":"2026-07-02T01:02:07.129560+05:30"},"refresh_interval":5,"last_tick_age_sec":6.03,"tick_health":{"last_tick_age_sec":6.03,"refresh_interval_sec":5,"source":"rest_poll_ssot","websocket_endpoint":"/ws/stream","market_open":false}}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.455661
+
+
+---- /api/broker/status ----
+{"broker":"dhan","mode":"ANALYZER","connected":false,"live_trading_enabled":false,"order_placement_allowed":false,"credentials_present":true,"client_id_present":true,"access_token_present":true,"latency_ms":370,"error":"TOKEN_EXPIRED_OR_INVALID","auto_refresh":{"attempted":false,"success":false,"reason":"TOKEN_EXPIRED_OR_INVALID","cooldown_s":300,"skipped":"COOLDOWN","cooldown_remaining_s":99},"sdk_available":true,"env_source":"core.utils.env_loader"}
+__HTTP_CODE__:200
+__TIME_TOTAL__:2.850092
+
+
+---- /api/scheduler/health ----
+{"received":true,"last_push_at":"2026-07-01T19:35:12.930776+00:00","daemon_heartbeat":"2026-07-02T01:04:12.729481+05:30","daemon_pid":1,"jobs":{},"config_alert":null,"healthy":false,"unhealthy_reasons":["worker pushed but reports zero jobs loaded"]}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.947792
+
+
+---- /api/paper ----
+{"positions":{"positions":[],"open_count":0,"closed_count":0,"timestamp":null},"pnl":{"history":[],"summary":{"open_count":0,"closed_count":0,"total_trades":0,"winning_trades":0,"losing_trades":0,"win_rate":0.0,"total_unrealized_pnl":0.0,"total_realized_pnl":0.0,"total_pnl":0.0,"open_positions":[],"closed_positions":[],"data_source":"paper_cloud_sim","note":"Cloud paper engine populates during market hours (09:15-15:30 IST).","timestamp_ist":"2026-06-25 09:22:47 IST"}}}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.709741
+
+
+---- /api/trades/today ----
+{"date":"2026-07-02","market_hours":"09:15 - 15:30 IST","total_trades":0,"entries":[],"exits":[],"count":0,"sources":[]}
+__HTTP_CODE__:200
+__TIME_TOTAL__:0.905127
+
+
+---- /api/deploy/info ----
+{"git_sha":"865bb69694b6a4a84b0e2c128097d1de90ad20d1","git_branch":"main","service_name":"genesis-system3-backend","deployed_at_known":true}
+__HTTP_CODE__:200
+__TIME_TOTAL__:1.751807
+
+

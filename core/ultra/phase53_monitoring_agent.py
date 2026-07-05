@@ -10,12 +10,13 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 115
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional, List
 import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -39,7 +40,7 @@ def check_system_health() -> Dict[str, Any]:
     }
 
     # Check 2: Recent signals
-    signals_path = LIVE_DIR / "angel_index_ai_signals.csv"
+    signals_path = LIVE_DIR / "dhan_index_ai_signals.csv"
     if signals_path.exists():
         try:
             df = pd.read_csv(signals_path)
@@ -61,7 +62,7 @@ def check_system_health() -> Dict[str, Any]:
         }
 
     # Check 3: Model files
-    models_dir = PROJECT_ROOT / "core" / "models" / "angel_one"
+    models_dir = PROJECT_ROOT / "core" / "models" / "dhan"
     model_count = len(list(models_dir.glob("*.pkl"))) if models_dir.exists() else 0
     health["checks"]["models"] = {
         "status": "OK" if model_count > 0 else "WARN",

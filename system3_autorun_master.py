@@ -16,8 +16,8 @@ SAFETY: DRY-RUN ONLY - No real trading functions ever triggered.
 HARDENED: Enhanced error handling, retry logic, self-healing.
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # VENV ENFORCEMENT: Verify running inside System3 venv
@@ -28,6 +28,7 @@ if "venv" not in sys.executable and "virtualenv" not in sys.executable:
     if venv_python.exists():
         print(f"⚠️ Not running in venv - restarting with {venv_python}")
         import subprocess
+
         sys.exit(subprocess.call([str(venv_python), __file__] + sys.argv[1:]))
     else:
         raise EnvironmentError(
@@ -47,19 +48,23 @@ if VENV_SITE_PACKAGES.exists() and str(VENV_SITE_PACKAGES) not in sys.path:
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-import time
 import json
 import logging
-from system3_ultimate_heartbeat_manager import UltimateHeartbeatManager
 import subprocess
 import threading
+import time
 import traceback
-from datetime import datetime, time as dt_time, timedelta
-from typing import Dict, Any, Optional
+from datetime import datetime
+from datetime import time as dt_time
+from datetime import timedelta
+from typing import Any, Dict, Optional
+
+from system3_ultimate_heartbeat_manager import UltimateHeartbeatManager
 
 # Optional psutil (used for PID/health guards)
 try:
     import psutil
+
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
@@ -70,6 +75,7 @@ LOGS_DIR.mkdir(parents=True, exist_ok=True)
 LOG_FILE = LOGS_DIR / f"system3_autorun_master_{datetime.now().strftime('%Y%m%d')}.log"
 
 EXPECTED_VENV_PYTHON = ROOT_DIR / "venv" / "Scripts" / "python.exe"
+
 
 def _configure_logging() -> logging.Logger:
     root = logging.getLogger()
@@ -85,6 +91,7 @@ def _configure_logging() -> logging.Logger:
     root.addHandler(sh)
     return logging.getLogger(__name__)
 
+
 logger = _configure_logging()
 
 # Forward pipeline guard (non-fatal): detect forward-signal corruption early
@@ -93,9 +100,7 @@ try:
 
     guard_result = forward_guard(auto_heal=True)
     if guard_result.get("status") != "OK":
-        logger.warning(
-            "Forward pipeline guard warnings: %s", guard_result.get("details", "unknown")
-        )
+        logger.warning("Forward pipeline guard warnings: %s", guard_result.get("details", "unknown"))
     else:
         logger.info("Forward pipeline guard passed: %s", guard_result.get("details", ""))
 except Exception as e:
@@ -103,7 +108,12 @@ except Exception as e:
 
 # Import market calendar for intelligent market state detection
 try:
-    from core.utils.market_calendar import get_market_state, should_run_autopilot, MarketState
+    from core.utils.market_calendar import (
+        MarketState,
+        get_market_state,
+        should_run_autopilot,
+    )
+
     MARKET_CALENDAR_AVAILABLE = True
 except ImportError:
     MARKET_CALENDAR_AVAILABLE = False
@@ -117,14 +127,14 @@ STATE_DIR.mkdir(parents=True, exist_ok=True)
 MASTER_PID_FILE = STATE_DIR / "system3_master.pid"
 WATCHDOG_PID_FILE = STATE_DIR / "system3_watchdog.pid"
 
-SIGNALS_FILE = ROOT_DIR / "angel_index_ai_signals.csv"
+SIGNALS_FILE = ROOT_DIR / "dhan_index_ai_signals.csv"
 
 # Thresholds and intervals
-OP2_STALL_THRESHOLD = 300          # seconds without activity before considering OP2 stalled
-OP2_STALL_BACKOFF = 120            # seconds to wait after a stall-triggered restart attempt
-OP2_RESTART_CAP = 3                # max OP2 restarts per day
-STATUS_LOG_INTERVAL = 300          # structured status line every 5 minutes
-HEARTBEAT_STALE_THRESHOLD = 240    # guard against reusing stale masters
+OP2_STALL_THRESHOLD = 300  # seconds without activity before considering OP2 stalled
+OP2_STALL_BACKOFF = 120  # seconds to wait after a stall-triggered restart attempt
+OP2_RESTART_CAP = 3  # max OP2 restarts per day
+STATUS_LOG_INTERVAL = 300  # structured status line every 5 minutes
+HEARTBEAT_STALE_THRESHOLD = 240  # guard against reusing stale masters
 
 # State tracking
 STATE = {
@@ -150,6 +160,7 @@ PHASE_IMPORTS = {}
 # Load phases 201-230 from diagnostics
 try:
     from system3_phase_201_230_diagnostics import PHASE_IMPORTS as DIAG_IMPORTS
+
     for phase_num in range(201, 231):
         if phase_num in DIAG_IMPORTS:
             module_name, func_name = DIAG_IMPORTS[phase_num]
@@ -164,6 +175,7 @@ except Exception as e:
 # Load phases 231-260
 try:
     from system3_phase_231_260_diagnostics import PHASE_MODULES as DIAG_MODULES
+
     for phase_num in range(231, 261):
         if phase_num in DIAG_MODULES:
             PHASE_IMPORTS[phase_num] = DIAG_MODULES[phase_num]
@@ -173,6 +185,7 @@ except Exception as e:
 # Load phases 261-300
 try:
     from system3_phase_261_300_diagnostics import PHASE_MODULES as DIAG_MODULES
+
     for phase_num in range(261, 301):
         if phase_num in DIAG_MODULES:
             PHASE_IMPORTS[phase_num] = DIAG_MODULES[phase_num]
@@ -182,6 +195,7 @@ except Exception as e:
 # Load phases 301-310
 try:
     from system3_phases_301_310_diagnostics import PHASE_MODULES as DIAG_MODULES
+
     for phase_num in range(301, 311):
         if phase_num in DIAG_MODULES:
             PHASE_IMPORTS[phase_num] = DIAG_MODULES[phase_num]
@@ -222,6 +236,7 @@ except Exception as e:
 # Load phases 331-340
 try:
     from system3_phase_331_340_diagnostics import PHASE_IMPORTS as DIAG_IMPORTS
+
     for phase_num in range(331, 341):
         if phase_num in DIAG_IMPORTS:
             module_name, func_name = DIAG_IMPORTS[phase_num]
@@ -236,6 +251,7 @@ except Exception as e:
 # Load phases 361-380 from registry (includes signal pipeline, strategy analysis, data quality, self-test)
 try:
     from core.engine.system3_phases_361_380_registry import PHASES_361_380_REGISTRY
+
     for phase_num, (module_name, func_name, category, mode) in PHASES_361_380_REGISTRY.items():
         try:
             module = __import__(f"core.engine.{module_name}", fromlist=[func_name])
@@ -247,7 +263,9 @@ except Exception as e:
     logger.warning(f"Failed to load phase imports from 361-380 registry: {e}")
 
 if PHASE_IMPORTS:
-    logger.info(f"Loaded {len(PHASE_IMPORTS)} phases into autorun master (range: {min(PHASE_IMPORTS.keys())}-{max(PHASE_IMPORTS.keys())})")
+    logger.info(
+        f"Loaded {len(PHASE_IMPORTS)} phases into autorun master (range: {min(PHASE_IMPORTS.keys())}-{max(PHASE_IMPORTS.keys())})"
+    )
 else:
     logger.warning("No phases loaded into autorun master!")
 
@@ -272,7 +290,7 @@ def write_shutdown_flag():
         flag_data = {
             "shutdown_date": datetime.now().strftime("%Y-%m-%d"),
             "shutdown_time": datetime.now().isoformat(),
-            "reason": "scheduled_shutdown_4pm"
+            "reason": "scheduled_shutdown_4pm",
         }
         with SHUTDOWN_FLAG_FILE.open("w", encoding="utf-8") as f:
             json.dump(flag_data, f, indent=2)
@@ -284,6 +302,7 @@ def write_shutdown_flag():
 def _module_origin(mod_name: str) -> Optional[str]:
     try:
         import importlib.util
+
         spec = importlib.util.find_spec(mod_name)
         return spec.origin if spec and spec.origin else None
     except Exception:
@@ -371,9 +390,7 @@ def _heartbeat_age_seconds() -> Optional[float]:
         with HEARTBEAT_FILE.open("r", encoding="utf-8") as f:
             data = json.load(f)
         timestamp_str = (
-            data.get("_last_updated")
-            or data.get("timestamp")
-            or data.get("system_info", {}).get("timestamp")
+            data.get("_last_updated") or data.get("timestamp") or data.get("system_info", {}).get("timestamp")
         )
         if not timestamp_str:
             return None
@@ -427,7 +444,11 @@ def _record_interpreter_telemetry():
         "python_executable": sys.executable,
         "expected_python": str(EXPECTED_VENV_PYTHON),
         "venv_active": os.environ.get("VIRTUAL_ENV") is not None,
-        "site_packages_source": str(VENV_SITE_PACKAGES) if VENV_SITE_PACKAGES in [Path(p) for p in sys.path if Path(p).exists()] else "unknown",
+        "site_packages_source": (
+            str(VENV_SITE_PACKAGES)
+            if VENV_SITE_PACKAGES in [Path(p) for p in sys.path if Path(p).exists()]
+            else "unknown"
+        ),
     }
     telemetry_file = STATE_DIR / "runtime_interpreter_telemetry.json"
     try:
@@ -496,7 +517,9 @@ def _check_op2_stall(now: datetime) -> None:
         return
 
     if STATE["op2_restart_count"] >= OP2_RESTART_CAP:
-        logger.critical(f"OP2 stall detected but restart cap reached ({OP2_RESTART_CAP}). Manual intervention required.")
+        logger.critical(
+            f"OP2 stall detected but restart cap reached ({OP2_RESTART_CAP}). Manual intervention required."
+        )
         STATE["last_error_type"] = "op2_stall_cap"
         return
 
@@ -525,7 +548,9 @@ def _ensure_singleton_master() -> bool:
                 logger.info(f"Existing master already running (PID {pid}, heartbeat {hb_age:.0f}s). Idempotent exit.")
                 return False
             else:
-                logger.warning(f"Existing master PID {pid} looks stale (heartbeat age: {hb_age}). Attempting controlled takeover.")
+                logger.warning(
+                    f"Existing master PID {pid} looks stale (heartbeat age: {hb_age}). Attempting controlled takeover."
+                )
                 try:
                     proc = psutil.Process(pid) if PSUTIL_AVAILABLE else None
                     if proc:
@@ -546,12 +571,16 @@ def enforce_safety_checks() -> bool:
     logger.info("=" * 70)
     logger.info("SAFETY ENFORCEMENT CHECK")
     logger.info("=" * 70)
-    
+
     errors = []
-    
+
     # Check 1: LIVE_TRADING_ENABLED
     try:
-        from config.live_trade_config import LIVE_TRADING_ENABLED, USE_LIVE_EXECUTION_ENGINE
+        from config.live_trade_config import (
+            LIVE_TRADING_ENABLED,
+            USE_LIVE_EXECUTION_ENGINE,
+        )
+
         if LIVE_TRADING_ENABLED:
             errors.append("LIVE_TRADING_ENABLED is True (must be False)")
         if USE_LIVE_EXECUTION_ENGINE:
@@ -560,16 +589,17 @@ def enforce_safety_checks() -> bool:
         logger.info(f"USE_LIVE_EXECUTION_ENGINE: {USE_LIVE_EXECUTION_ENGINE}")
     except Exception as e:
         errors.append(f"Failed to read live_trade_config: {e}")
-    
+
     # Check 2: Automation config
     try:
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+
         if AUTOMATION_CONFIG.auto_execute_trades:
             errors.append("AUTOMATION_CONFIG.auto_execute_trades is True (must be False)")
         logger.info(f"auto_execute_trades: {AUTOMATION_CONFIG.auto_execute_trades}")
     except Exception as e:
         errors.append(f"Failed to read automation_config: {e}")
-    
+
     # Check 3: Ultra safety
     try:
         ultra_safety_path = ROOT_DIR / "core" / "config" / "system3_ultra_safety.json"
@@ -581,7 +611,7 @@ def enforce_safety_checks() -> bool:
             logger.info(f"Ultra AUTO_EXECUTE_TRADES: {safety.get('AUTO_EXECUTE_TRADES', False)}")
     except Exception as e:
         logger.warning(f"Could not load ultra_safety: {e}")
-    
+
     if errors:
         logger.error("=" * 70)
         logger.error("SAFETY CHECK FAILED - ABORTING")
@@ -590,7 +620,7 @@ def enforce_safety_checks() -> bool:
             logger.error(f"  ❌ {error}")
         logger.error("\n[ABORT] System is not in safe DRY-RUN mode. Fix configs before running.")
         return False
-    
+
     logger.info("=" * 70)
     logger.info("✓ All safety checks passed - DRY-RUN mode confirmed")
     logger.info("=" * 70)
@@ -633,7 +663,7 @@ def run_phases_range(start: int, end: int) -> Dict[str, Any]:
     """Run phases in a range with retry logic."""
     logger.info(f"Running phases {start}-{end}...")
     results = {"ok": 0, "warn": 0, "error": 0, "skipped": 0}
-    
+
     for phase_num in range(start, end + 1):
         if phase_num in PHASE_IMPORTS:
             try:
@@ -654,7 +684,9 @@ def run_phases_range(start: int, end: int) -> Dict[str, Any]:
                         break
                     except (ConnectionError, TimeoutError, OSError) as e:
                         if attempt < max_retries - 1:
-                            logger.warning(f"Phase {phase_num} network error (attempt {attempt + 1}/{max_retries}), retrying...")
+                            logger.warning(
+                                f"Phase {phase_num} network error (attempt {attempt + 1}/{max_retries}), retrying..."
+                            )
                             time.sleep(2)
                             continue
                         else:
@@ -665,7 +697,7 @@ def run_phases_range(start: int, end: int) -> Dict[str, Any]:
                 results["error"] += 1
         else:
             results["skipped"] += 1
-    
+
     STATE["last_phase_run"] = datetime.now().isoformat()
     logger.info(f"Phase run complete: {results}")
     return results
@@ -678,6 +710,7 @@ def refresh_curated_file():
     for attempt in range(max_retries):
         try:
             from system3_prep_for_new_day import build_curated_training_from_archive
+
             root = Path(__file__).parent.absolute()
             build_curated_training_from_archive(root)
             STATE["last_curated_refresh"] = datetime.now().isoformat()
@@ -697,7 +730,8 @@ def run_op1():
     """OP1: Pre-Market Diagnostic with retry logic."""
     logger.info("Running OP1: Pre-Market Diagnostic...")
     try:
-        from core.engine.angel_market_warmup_scanner import scan_market_warmup
+        from core.engine.dhan_market_warmup_scanner import scan_market_warmup
+
         result = scan_market_warmup()
         logger.info(f"OP1 complete: {result.get('status', 'UNKNOWN')}")
         return True
@@ -711,7 +745,7 @@ def run_op2():
     if STATE["autopilot_running"]:
         logger.info("OP2: Autopilot already running")
         return True
-    
+
     logger.info("Starting OP2: Live Signal Generation (DRY-RUN autopilot)...")
     max_retries = 3
     for attempt in range(max_retries):
@@ -748,7 +782,8 @@ def run_op3():
     """OP3: Trade Decision & Planning with retry logic."""
     logger.info("Running OP3: Trade Decision & Planning...")
     try:
-        from core.engine.angel_trade_decision import main as op3_main
+        from core.engine.dhan_trade_decision import main as op3_main
+
         op3_main()
         logger.info("OP3 complete")
         return True
@@ -762,15 +797,15 @@ def run_op_cycle():
     logger.info("=" * 70)
     logger.info("Running OP Cycle (OP1 -> OP2 -> OP3)")
     logger.info("=" * 70)
-    
+
     op1_ok = run_op1()
     op2_ok = run_op2()
     op3_ok = run_op3()
-    
+
     now_iso = datetime.now().isoformat()
     STATE["last_op_cycle"] = now_iso
     STATE["last_op2_activity"] = now_iso
-    
+
     if op1_ok and op2_ok and op3_ok:
         logger.info("OP Cycle complete: All OK")
         return True
@@ -786,6 +821,7 @@ def archive_signals():
     for attempt in range(max_retries):
         try:
             from system3_prep_for_new_day import archive_old_live_signals
+
             result = archive_old_live_signals()
             logger.info(f"Signals archived: {result}")
             return True
@@ -805,7 +841,8 @@ def run_eod_learning():
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            from core.engine.angel_daily_learning_digest import main as eod_main
+            from core.engine.dhan_daily_learning_digest import main as eod_main
+
             eod_main()
             logger.info("EOD Learning complete")
             return True
@@ -851,7 +888,7 @@ def main():
     # Enforce continuous heartbeat updates for the UltimateHeartbeatManager.
     os.environ.setdefault("HEARTBEAT_CONTINUOUS", "1")
     os.environ.setdefault("HEARTBEAT_INTERVAL_SECONDS", "60")
-    
+
     # Check if shutdown flag exists (prevent restart after shutdown)
     if check_shutdown_flag():
         logger.info("=" * 70)
@@ -859,12 +896,12 @@ def main():
         logger.info("Exiting to prevent restart loop.")
         logger.info("=" * 70)
         return 0
-    
+
     # Safety check
     if not enforce_safety_checks():
         logger.error("Safety checks failed. Aborting.")
         return 1
-    
+
     # Start heartbeat thread
     heartbeat_thread = threading.Thread(target=update_heartbeat, daemon=True)
     heartbeat_thread.start()
@@ -881,20 +918,20 @@ def main():
         logger.info("PRE-MARKET: Running phases 201-310")
         logger.info("=" * 70)
         run_phases_range(201, 310)
-    
+
     # Pre-market: Run new phases 361-375 (signal pipeline, strategy analysis, data quality)
     if is_weekday():
         logger.info("=" * 70)
         logger.info("PRE-MARKET: Running phases 361-375 (new system3 block)")
         logger.info("=" * 70)
         run_phases_range(361, 375)
-    
+
     # Main loop
     last_phase_run_time = None
     last_curated_refresh_time = None
     last_op_cycle_time = None
     restart_count_today = 0
-    
+
     try:
         while not STATE["shutdown_requested"]:
             now = datetime.now()
@@ -909,20 +946,23 @@ def main():
                 logger.info("9:15 AM: Starting DRY-RUN Autopilot")
                 logger.info("=" * 70)
                 run_op2()
-            
+
             # Every 30 minutes: Run phases 220-260 with production pipeline
-            if (last_phase_run_time is None or 
-                (now - last_phase_run_time).total_seconds() >= 1800):
+            if last_phase_run_time is None or (now - last_phase_run_time).total_seconds() >= 1800:
                 if is_market_time() and is_weekday():
                     logger.info("=" * 70)
                     logger.info("30-MIN INTERVAL: Generating signals BEFORE phases 220-260")
                     logger.info("=" * 70)
-                    
+
                     # CRITICAL FIX: Generate signals BEFORE running analysis phases
                     try:
-                        from core.engine.angel_options_watch_loop import load_latest_watch_snapshot
-                        from core.engine.angel_live_ai_signals import run_once_with_snapshot
-                        
+                        from core.engine.dhan_live_ai_signals import (
+                            run_once_with_snapshot,
+                        )
+                        from core.engine.dhan_options_watch_loop import (
+                            load_latest_watch_snapshot,
+                        )
+
                         # Load latest snapshot from watch file
                         df_snapshot = load_latest_watch_snapshot()
                         if df_snapshot is not None and not df_snapshot.empty:
@@ -935,16 +975,18 @@ def main():
                     except Exception as e:
                         logger.error(f"  → Signal generation failed: {e}")
                         import traceback
+
                         logger.error(traceback.format_exc())
-                    
+
                     # PRODUCTION PIPELINE: Run Phase 220 → 221 → 239 BEFORE OP2
                     logger.info("=" * 70)
                     logger.info("30-MIN INTERVAL: Running Production Pipeline (220→221→239)")
                     logger.info("=" * 70)
                     try:
                         from system3_production_pipeline import run_production_pipeline
+
                         pipeline_report = run_production_pipeline(verbose=True)
-                        
+
                         if pipeline_report.get("errors"):
                             logger.error(f"Production pipeline had {len(pipeline_report['errors'])} errors")
                             for error in pipeline_report["errors"]:
@@ -953,7 +995,7 @@ def main():
                             logger.info("✓ Production pipeline completed successfully")
                             logger.info(f"  → Phases: {', '.join(pipeline_report.get('phases_executed', []))}")
                             logger.info(f"  → Duration: {pipeline_report.get('total_duration_seconds', 0):.2f}s")
-                            
+
                             # Log performance alerts
                             if pipeline_report.get("performance_alerts"):
                                 for alert in pipeline_report["performance_alerts"]:
@@ -961,34 +1003,33 @@ def main():
                     except Exception as e:
                         logger.error(f"Production pipeline failed: {e}")
                         import traceback
+
                         logger.error(traceback.format_exc())
-                    
+
                     logger.info("=" * 70)
                     logger.info("30-MIN INTERVAL: Running phases 220-260")
                     logger.info("=" * 70)
                     run_phases_range(220, 260)
                     last_phase_run_time = now
-            
+
             # Every 2 hours: Refresh curated file
-            if (last_curated_refresh_time is None or 
-                (now - last_curated_refresh_time).total_seconds() >= 7200):
+            if last_curated_refresh_time is None or (now - last_curated_refresh_time).total_seconds() >= 7200:
                 if is_market_time() and is_weekday():
                     logger.info("=" * 70)
                     logger.info("2-HOUR INTERVAL: Refreshing curated file")
                     logger.info("=" * 70)
                     refresh_curated_file()
                     last_curated_refresh_time = now
-            
+
             # Periodic: Run OP cycles (every hour during market hours)
-            if (last_op_cycle_time is None or 
-                (now - last_op_cycle_time).total_seconds() >= 3600):
+            if last_op_cycle_time is None or (now - last_op_cycle_time).total_seconds() >= 3600:
                 if is_market_time() and is_weekday():
                     logger.info("=" * 70)
                     logger.info("HOURLY: Running OP Cycle")
                     logger.info("=" * 70)
                     run_op_cycle()
                     last_op_cycle_time = now
-            
+
             # 3:30pm: Archive signals
             if current_time >= dt_time(15, 30) and current_time < dt_time(15, 31):
                 if is_weekday() and not STATE.get("archived_today", False):
@@ -997,7 +1038,7 @@ def main():
                     logger.info("=" * 70)
                     archive_signals()
                     STATE["archived_today"] = True
-            
+
             # 3:35pm: EOD Learning
             if current_time >= dt_time(15, 35) and current_time < dt_time(15, 36):
                 if is_weekday() and not STATE.get("eod_learning_done", False):
@@ -1006,7 +1047,7 @@ def main():
                     logger.info("=" * 70)
                     run_eod_learning()
                     STATE["eod_learning_done"] = True
-            
+
             # 3:40pm: Post-Close Audit (before shutdown)
             if current_time >= dt_time(15, 40) and current_time < dt_time(15, 41):
                 if is_weekday() and not STATE.get("post_close_audit_done", False):
@@ -1014,8 +1055,12 @@ def main():
                     logger.info("3:40 PM: Running Post-Close Signal Audit")
                     logger.info("=" * 70)
                     try:
-                        from core.validation.post_close_signal_audit import main as run_post_close_audit
                         from datetime import date
+
+                        from core.validation.post_close_signal_audit import (
+                            main as run_post_close_audit,
+                        )
+
                         audit_result = run_post_close_audit(target_date=date.today())
                         if audit_result == 0:
                             logger.info("Post-close audit completed successfully")
@@ -1025,9 +1070,10 @@ def main():
                     except Exception as e:
                         logger.error(f"Post-close audit failed: {e}")
                         import traceback
+
                         logger.error(traceback.format_exc())
                     logger.info("=" * 70)
-            
+
             # 4:00pm: Shutdown (only once per day, or exit immediately if past 4 PM)
             if current_time >= dt_time(16, 0):
                 if is_weekday():
@@ -1054,7 +1100,7 @@ def main():
                 _log_status_line(start_time, restart_count_today)
 
             time.sleep(60)
-    
+
     except KeyboardInterrupt:
         logger.info("\n[INFO] Interrupted by user (Ctrl+C).")
         STATE["shutdown_requested"] = True
@@ -1063,7 +1109,7 @@ def main():
         STATE["last_error_type"] = "fatal"
         write_shutdown_flag()  # Write flag on fatal error
         return 1
-    
+
     # Cleanup
     if STATE["autopilot_process"]:
         logger.info("Stopping autopilot...")
@@ -1072,16 +1118,15 @@ def main():
             STATE["autopilot_running"] = False
         except Exception as e:
             logger.error(f"Error stopping autopilot: {e}")
-    
+
     _remove_pid(MASTER_PID_FILE)
 
     logger.info("=" * 70)
     logger.info("SYSTEM3 AUTORUN MASTER - SHUTDOWN COMPLETE")
     logger.info("=" * 70)
-    
+
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

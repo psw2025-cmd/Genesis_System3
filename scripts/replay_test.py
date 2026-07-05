@@ -2,23 +2,25 @@
 Replay Test - Run all simulation scenarios
 """
 
-import sys
 import argparse
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List
-import pytz
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
+
 import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from core.utils.logger import logger
+
 # Import after path setup - use direct import
 from scripts.run_live_chain import LiveChainRunner
 from src.sim.replay_engine import ReplayEngine
-from core.utils.logger import logger
 
 # All scenarios to test
 ALL_SCENARIOS: List[str] = [

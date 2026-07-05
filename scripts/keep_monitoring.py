@@ -2,11 +2,12 @@
 Keep Monitoring - Continuously monitor and restart if needed
 """
 
+import subprocess
 import sys
 import time
-import subprocess
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

@@ -1,20 +1,21 @@
 """
 System3 CSV Schema Audit Module
 
-Performs schema audit and generates documentation for angel_index_ai_signals_with_forward.csv
+Performs schema audit and generates documentation for dhan_index_ai_signals_with_forward.csv
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-CSV_FILE = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+CSV_FILE = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 OUTPUT_REPORT = PROJECT_ROOT / "docs" / "SYSTEM3_CSV_SCHEMA_AUTOMATED.md"
 
 

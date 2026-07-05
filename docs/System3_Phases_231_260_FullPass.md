@@ -1,6 +1,6 @@
 ﻿System3 Phases 231–260 – Full-Pass Implementation Specification
 
-AngelOne-only • DRY-RUN • Virtual Execution + Threshold Integration
+Dhan-only • DRY-RUN • Virtual Execution + Threshold Integration
 
 This document defines concrete, implementation-ready specs for System3 Phases 231–260 in C:\Genesis_System3.
 
@@ -8,19 +8,19 @@ Assumptions:
 
 Phases 1–230 are already implemented and passing diagnostics.
 
-System is AngelOne-only (no Binance/crypto in this project).
+System is Dhan-only (no Binance/crypto in this project).
 
 System is currently DRY-RUN only (no real orders).
 
 Existing files from earlier phases (already present):
 
-storage/live/angel_index_ai_signals.csv
+storage/live/dhan_index_ai_signals.csv
 
-storage/live/angel_index_ai_signals_curated.csv
+storage/live/dhan_index_ai_signals_curated.csv
 
-storage/live/angel_index_ai_signals_with_forward.csv
+storage/live/dhan_index_ai_signals_with_forward.csv
 
-storage/live/angel_index_ai_signals_reconciled.csv
+storage/live/dhan_index_ai_signals_reconciled.csv
 
 storage/meta/system3_threshold_candidates.json
 
@@ -36,7 +36,7 @@ Add PnL + diagnostics for virtual trades.
 
 Provide a single diagnostics script for phases 231–260.
 
-All changes must be DRY-RUN safe and AngelOne-only.
+All changes must be DRY-RUN safe and Dhan-only.
 
 PHASE 231 – Threshold Loader & Registry
 
@@ -284,7 +284,7 @@ Files:
 
 New: core/execution/live_execution_engine.py
 
-Store: storage/live/angel_virtual_orders.csv
+Store: storage/live/dhan_virtual_orders.csv
 
 Log: logs/execution/system3_virtual_execution.log
 
@@ -310,7 +310,7 @@ def run_risk_checks_on_orders(planned_orders: List[PlannedOrder],
 
 def log_virtual_orders(planned_orders: List[PlannedOrder],
                        risk_decisions: List[RiskDecision],
-                       csv_path: str = "storage/live/angel_virtual_orders.csv") -> None:
+                       csv_path: str = "storage/live/dhan_virtual_orders.csv") -> None:
     ...
 
 
@@ -328,7 +328,7 @@ Ignore HOLD rows.
 
 log_virtual_orders:
 
-Append to storage/live/angel_virtual_orders.csv with columns:
+Append to storage/live/dhan_virtual_orders.csv with columns:
 
 ts, underlying, strike, option_type, side, expiry,
 ltp, final_score, ai_score, lots, approved, adjusted_lots,
@@ -341,7 +341,7 @@ Must handle file lock / IO errors gracefully: log WARN and continue.
 
 All of this is virtual only:
 
-No AngelOne SmartAPI imports here.
+No Dhan DhanHQ imports here.
 
 No network calls inside this module.
 
@@ -361,7 +361,7 @@ Reuse: load_thresholds, load_live_trade_config, live_execution_engine.
 
 Spec:
 
-After a snapshot’s signals are computed and written to angel_index_ai_signals.csv:
+After a snapshot’s signals are computed and written to dhan_index_ai_signals.csv:
 
 Build a DataFrame for that snapshot only (e.g. the last 30 rows you just generated).
 
@@ -399,7 +399,7 @@ It is pure virtual trade logging.
 
 PHASE 238 – Virtual Orders Store & Schema Guard
 
-Objective: Ensure angel_virtual_orders.csv is consistent and well-formed.
+Objective: Ensure dhan_virtual_orders.csv is consistent and well-formed.
 
 Files:
 
@@ -411,7 +411,7 @@ Spec:
 
 Script behavior:
 
-Open storage/live/angel_virtual_orders.csv if it exists.
+Open storage/live/dhan_virtual_orders.csv if it exists.
 
 Validate columns:
 
@@ -452,13 +452,13 @@ New script: system3_virtual_trades_enrichment.py
 
 Inputs:
 
-storage/live/angel_virtual_orders.csv
+storage/live/dhan_virtual_orders.csv
 
-storage/live/angel_index_ai_signals_with_forward.csv
+storage/live/dhan_index_ai_signals_with_forward.csv
 
 Output:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
 Log:
 
@@ -484,7 +484,7 @@ option_type
 
 expiry
 
-From angel_index_ai_signals_with_forward.csv expect columns like:
+From dhan_index_ai_signals_with_forward.csv expect columns like:
 
 forward_ret_1, forward_ret_3, forward_ret_5 (example names from Phase 221).
 
@@ -498,7 +498,7 @@ etc. (if available).
 
 Write enriched CSV:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
 Handle missing forward rows:
 
@@ -526,7 +526,7 @@ New script: system3_virtual_trades_summary.py
 
 Input:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
 Output:
 
@@ -582,7 +582,7 @@ Spec:
 
 Use data from:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
 Check for:
 
@@ -684,9 +684,9 @@ New script: system3_score_to_trade_attribution.py
 
 Input:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
-storage/live/angel_index_ai_signals.csv (for score components)
+storage/live/dhan_index_ai_signals.csv (for score components)
 
 Output:
 
@@ -718,7 +718,7 @@ New script: system3_symbol_participation_summary.py
 
 Input:
 
-storage/live/angel_virtual_orders.csv
+storage/live/dhan_virtual_orders.csv
 
 Output:
 
@@ -746,7 +746,7 @@ New script: system3_trade_density_vs_regime.py
 
 Inputs:
 
-storage/live/angel_virtual_orders.csv
+storage/live/dhan_virtual_orders.csv
 
 storage/meta/system3_vol_regimes.csv
 
@@ -776,7 +776,7 @@ New script: system3_edge_by_score_bucket_tracker.py
 
 Input:
 
-storage/live/angel_virtual_orders_with_pnl.csv
+storage/live/dhan_virtual_orders_with_pnl.csv
 
 Output:
 
@@ -907,9 +907,9 @@ Expect all phases OK or benign WARN (e.g., “no virtual trades yet”).
 
 Confirm that:
 
-storage/live/angel_virtual_orders.csv is created and updated during live DRY-RUN.
+storage/live/dhan_virtual_orders.csv is created and updated during live DRY-RUN.
 
-storage/live/angel_virtual_orders_with_pnl.csv is created once forward data exists.
+storage/live/dhan_virtual_orders_with_pnl.csv is created once forward data exists.
 
 logs/research/system3_virtual_trades_pnl_report.md and other reports are generated.
 

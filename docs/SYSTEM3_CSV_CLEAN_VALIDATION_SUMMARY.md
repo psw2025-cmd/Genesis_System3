@@ -62,7 +62,7 @@
 
 ### SELL Signal Anomalies
 - ⚠️ Anomalies detected: 2 rows
-- Saved to: `storage/clean/angel_index_ai_signals_sell_anomalies.csv`
+- Saved to: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`
 - **Action Required**: Review these rows manually
 
 ## Overall Status
@@ -72,5 +72,5 @@
 ## Next Steps
 
 1. Review SELL anomalies if any detected
-2. Use `storage/clean/angel_index_ai_signals_with_forward_clean.csv` for general analysis
-3. Use `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` for EV analysis and training
+2. Use `storage/clean/dhan_index_ai_signals_with_forward_clean.csv` for general analysis
+3. Use `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` for EV analysis and training

@@ -5,23 +5,24 @@ Builds shadow learning datasets for Ultra profile using real signals, trade plan
 All operations are shadow/experimental only - no changes to baseline.
 
 Inputs:
-- storage/live/angel_index_ai_signals.csv
-- storage/live/angel_index_ai_trades_plan.csv
-- storage/live/angel_index_ai_pnl_log.csv
-- storage/learning/angel_index_real_master_dataset.parquet (optional)
+- storage/live/dhan_index_ai_signals.csv
+- storage/live/dhan_index_ai_trades_plan.csv
+- storage/live/dhan_index_ai_pnl_log.csv
+- storage/learning/dhan_index_real_master_dataset.parquet (optional)
 
 Outputs:
-- storage/learning_ultra/angel_ultra_shadow_master.parquet
-- storage/learning_ultra/angel_ultra_shadow_master.csv
+- storage/learning_ultra/dhan_ultra_shadow_master.parquet
+- storage/learning_ultra/dhan_ultra_shadow_master.csv
 
 Menu Option: 73
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"
@@ -29,14 +30,14 @@ LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"
 
 # Input files (from baseline)
-SIGNALS_CSV = LIVE_DIR / "angel_index_ai_signals.csv"
-TRADES_PLAN_CSV = LIVE_DIR / "angel_index_ai_trades_plan.csv"
-PNL_LOG_CSV = LIVE_DIR / "angel_index_ai_pnl_log.csv"
-REAL_MASTER_PARQUET = LEARNING_DIR / "angel_index_real_master_dataset.parquet"
+SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
+TRADES_PLAN_CSV = LIVE_DIR / "dhan_index_ai_trades_plan.csv"
+PNL_LOG_CSV = LIVE_DIR / "dhan_index_ai_pnl_log.csv"
+REAL_MASTER_PARQUET = LEARNING_DIR / "dhan_index_real_master_dataset.parquet"
 
 # Output files (Ultra shadow)
-SHADOW_PARQUET = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.parquet"
-SHADOW_CSV = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+SHADOW_PARQUET = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.parquet"
+SHADOW_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 
 LEARNING_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -103,7 +104,7 @@ def build_shadow_master() -> Dict[str, Any]:
             print(f"[LOAD] Real master dataset: {len(df_master)} rows")
         except Exception:
             # Try CSV fallback
-            master_csv = LEARNING_DIR / "angel_index_real_master_dataset.csv"
+            master_csv = LEARNING_DIR / "dhan_index_real_master_dataset.csv"
             if master_csv.exists():
                 try:
                     df_master = pd.read_csv(master_csv)

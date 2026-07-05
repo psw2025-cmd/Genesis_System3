@@ -12,21 +12,22 @@ SAFETY RULES ENFORCED:
 - No auto-execution anywhere
 """
 
-import sys
 import os
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, Optional, Callable
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
 
 # Ensure project root is in path
 ROOT_DIR = Path(__file__).parent.absolute()
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+
 # Safety imports
-from core.engine.ultra_safety import load_ultra_safety, is_ultra_enabled
-from core.engine.angel_automation_config import AUTOMATION_CONFIG
+from core.engine.ultra_safety import is_ultra_enabled, load_ultra_safety
 
 # Logging setup
 LOG_DIR = ROOT_DIR / "storage" / "logs_ultra"
@@ -53,7 +54,7 @@ def _check_safety() -> Dict[str, bool]:
     """Check all safety mechanisms."""
     safety = load_ultra_safety()
     automation = AUTOMATION_CONFIG
-    
+
     return {
         "auto_execute_trades": not automation.auto_execute_trades,
         "auto_simulate_pnl": not automation.auto_simulate_pnl,
@@ -67,7 +68,7 @@ def _check_safety() -> Dict[str, bool]:
 def _safe_execute(module_name: str, function_name: str, *args, **kwargs) -> bool:
     """
     Safe execution wrapper.
-    
+
     Checks safety, logs execution, prevents baseline overwrite.
     """
     try:
@@ -76,18 +77,18 @@ def _safe_execute(module_name: str, function_name: str, *args, **kwargs) -> bool
         if not all(safety_checks.values()):
             _log(f"Safety check failed for {module_name}.{function_name}", "WARN")
             print("[WARN] Some safety mechanisms are not properly configured.")
-        
+
         # Log execution
         _log(f"Executing: {module_name}.{function_name}")
-        
+
         # Import and execute
         module = __import__(module_name, fromlist=[function_name])
         func = getattr(module, function_name)
         result = func(*args, **kwargs)
-        
+
         _log(f"Completed: {module_name}.{function_name}")
         return True
-        
+
     except KeyboardInterrupt:
         _log(f"Interrupted: {module_name}.{function_name}", "WARN")
         print("\n[INFO] Operation interrupted by user.")
@@ -110,119 +111,60 @@ def _safe_execute_phase(phase_module: str, phase_function: str) -> bool:
 
 def show_menu() -> str:
     """Display main menu with all options organized into sections."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SYSTEM3 ULTRA CONTROL PANEL")
-    print("="*70)
+    print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     # Safety status
     safety = _check_safety()
     print("\n[SAFETY STATUS]")
     print(f"  Auto-execute: {'❌ DISABLED' if safety['auto_execute_trades'] else '⚠️  ENABLED'}")
     print(f"  Auto-simulate: {'❌ DISABLED' if safety['auto_simulate_pnl'] else '⚠️  ENABLED'}")
     print(f"  Ultra auto-execute: {'❌ DISABLED' if safety['ultra_auto_execute'] else '⚠️  ENABLED'}")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("OPERATIONAL PHASES (OP)")
-    print("="*70)
+    print("=" * 70)
     print("OP1) Pre-Market Diagnostic")
     print("OP2) Live Signal Generation")
     print("OP3) Trade Decision & Planning")
     print("OP4) Post-Market Analysis")
     print("OP5) Weekly Governance Review")
     print("OP6) Ultra Experiments")
-    
-    print("\n" + "="*70)
-    print("BASELINE CORE OPERATIONS (1-50)")
-    print("="*70)
+
+    print("\n" + "=" * 70)
+    print("BASELINE CORE OPERATIONS (1-3 active | 4-50 DISABLED)")
+    print("=" * 70)
     print("1) Core boot (basic startup)")
     print("2) Health check")
     print("3) Test data pipeline")
-    print("4) Test Angel One API")
-    print("5) Test Angel One instruments")
-    print("6) Angel One index options watch (single snapshot)")
-    print("7) Angel One index options LIVE watch loop")
-    print("8) Analyze Angel One index options log")
-    print("9) Build Angel One index options training dataset")
-    print("10) Train Angel One index options models")
-    print("11) Angel One index options LIVE AI signals")
-    print("12) Angel One SYNTHETIC backtest (CONSERVATIVE)")
-    print("13) Angel One SYNTHETIC backtest (DEV)")
-    print("14) Angel One trade EXECUTOR (DRY RUN)")
-    print("15) Angel One DAILY PnL SUMMARY")
-    print("16) Angel One INTRADAY PnL MONITOR")
-    print("17) Angel One DAILY REPORT GENERATOR")
-    print("18) Angel One SYSTEM HEALTH CHECK")
-    print("19) Angel One AUTO THRESHOLD ADJUSTER")
-    print("20) Angel One CONFIDENCE CALIBRATOR")
-    print("21) Angel One STRATEGY OPTIMIZER")
-    print("22) Angel One ADVANCED FEATURE RANKER")
-    print("23) Angel One BLENDED MODEL TRAINER")
-    print("24) Angel One MARKET INTELLIGENCE DASHBOARD")
-    print("25) Angel One ACTION LAYER VALIDATOR")
-    print("26) Angel One MARKET PROFILE ANALYZER")
-    print("27) Angel One SAFETY LAYER V2 CHECK")
-    print("28) Angel One REAL OUTCOME LOGGER")
-    print("29) Angel One SIGNAL VS OUTCOME ANALYZER")
-    print("30) Angel One MISFIRE DETECTOR")
-    print("31) Angel One REAL THRESHOLD RECOMMENDER")
-    print("32) Angel One RISK PROFILE OPTIMIZER")
-    print("33) Angel One REAL DATA EXTRACTOR")
-    print("34) Angel One BLENDED DATASET BUILDER")
-    print("35) Angel One BLENDED MODEL TRAINER (V2)")
-    print("36) Angel One DAILY LEARNING REPORT")
-    print("37) Angel One ROLLING 7-DAY LEARNING DASHBOARD")
-    print("38) Angel One BLENDED MODEL TRAINER V2 (Enhanced)")
-    print("39) Angel One ULTRA-MODE PREP LAYER")
-    print("40) Angel One DAILY AUTO-REPORTS")
-    print("41) Angel One WEEKLY SUMMARY REPORT")
-    print("42) Angel One MONDAY MORNING PRE-MARKET DIAGNOSTIC")
-    print("43) Angel One REPORT AUTO-SCHEDULER")
-    print("44) Angel One LIVE SNAPSHOT REASONER")
-    print("45) Angel One OUTCOME CONFIDENCE CURVE ANALYZER")
-    print("46) Angel One ADAPTIVE VOLATILITY MAP")
-    print("47) Angel One SAFETY LAYER V3")
-    print("48) Angel One MARKET WARMUP SCANNER")
-    print("49) Angel One SIGNAL RECORD BUFFER")
-    print("50) Angel One ENVIRONMENT CONSISTENCY CHECKER")
-    
-    print("\n" + "="*70)
-    print("REAL-DATA LEARNING CYCLE (51-64)")
-    print("="*70)
-    print("51) Real Data Capture Starter")
-    print("52) Real Signal Collector V2")
-    print("53) Outcome Placeholder Generator")
-    print("54) Market Regime Recorder")
-    print("55) Unified Outcome Logger V3")
-    print("56) Misfire Classifier V2")
-    print("57) Daily Learning Digest")
-    print("58) Real Threshold Recommender V3")
-    print("59) Risk Profile Optimizer V3")
-    print("60) Feature Drift Analyzer")
-    print("61) Performance Consistency Checker")
-    print("62) Dataset Merger (Real + Synthetic)")
-    print("63) Blended Training Orchestrator (Dry-Run)")
-    print("64) Ultra-Mode Readiness Report")
-    
-    print("\n" + "="*70)
-    print("ULTRA OBSERVABILITY (65-69)")
-    print("="*70)
-    print("65) Ultra Health Tree")
-    print("66) Latency Drift Observatory")
-    print("67) Failure Point Predictor")
-    print("68) Execution Readiness Auditor")
-    print("69) Ultra Dashboard (Read-Only)")
-    
-    print("\n" + "="*70)
-    print("MASTER DATASET & MODEL TOOLS (70-72)")
-    print("="*70)
-    print("70) Build Real Master Dataset")
-    print("71) Train Real+Synthetic Blended Models (V3)")
-    print("72) Show Live Profiles & Model Sources")
-    
-    print("\n" + "="*70)
+    print()
+    print("  [DISABLED — options 4-50] Dhan / DhanHQ broker paths.")
+    print("  System3 is Dhan-only. These options are blocked.")
+    print("  Choosing 4-50 will print this notice and return to menu.")
+
+    print("\n" + "=" * 70)
+    print("REAL-DATA LEARNING CYCLE (51-64) — DISABLED (Dhan paths)")
+    print("=" * 70)
+    print("  [DISABLED — options 51-64] All route to dhan_* modules (Dhan).")
+    print("  Choosing 51-64 will print this notice and return to menu.")
+
+    print("\n" + "=" * 70)
+    print("ULTRA OBSERVABILITY (65-69) — DISABLED (Dhan paths)")
+    print("=" * 70)
+    print("  [DISABLED — options 65-69] All route to dhan_* modules (Dhan).")
+    print("  Choosing 65-69 will print this notice and return to menu.")
+
+    print("\n" + "=" * 70)
+    print("MASTER DATASET & MODEL TOOLS (70-72) — DISABLED (Dhan paths)")
+    print("=" * 70)
+    print("  [DISABLED — options 70-72] All route to dhan_* modules (Dhan).")
+    print("  Choosing 70-72 will print this notice and return to menu.")
+
+    print("\n" + "=" * 70)
     print("ULTRA SHADOW DATA & FEATURES (73-79)")
-    print("="*70)
+    print("=" * 70)
     print("73) Ultra Shadow Data Engine")
     print("74) Ultra Feature Expander")
     print("75) Train Ultra Shadow Models")
@@ -230,18 +172,18 @@ def show_menu() -> str:
     print("77) Ultra Risk Regime Classifier")
     print("78) Ultra Multi-Consensus Analyzer")
     print("79) Ultra Threshold Lab")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA LIVE & SIMULATION (80-83)")
-    print("="*70)
-    print("80) Ultra Live Signals (Shadow)")
+    print("=" * 70)
+    print("  [DISABLED — option 80] Ultra Live Signals uses Dhan broker.")
     print("81) Ultra Trade Simulator")
     print("82) Ultra PnL Analyzer")
     print("83) Ultra Promotion Manager")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA RISK-ADAPTIVE INTELLIGENCE (84-93)")
-    print("="*70)
+    print("=" * 70)
     print("84) Ultra Phase 21: Adaptive Risk Engine (ARE)")
     print("85) Ultra Phase 22: Dynamic Position Sizing")
     print("86) Ultra Phase 23: Volatility Regime Impact")
@@ -252,10 +194,10 @@ def show_menu() -> str:
     print("91) Ultra Phase 28: Failure-Mode Auto-Corrector")
     print("92) Ultra Phase 29: Sensitivity Analyzer")
     print("93) Ultra Phase 30: Real-Time Calibration Engine (RTCE)")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA INTEGRATION & GOVERNANCE (94-101)")
-    print("="*70)
+    print("=" * 70)
     print("94) Ultra Phase 31: Decision Fusion")
     print("95) Ultra Phase 32: vs Baseline Comparator")
     print("96) Ultra Phase 33: Promotion Planner")
@@ -264,20 +206,20 @@ def show_menu() -> str:
     print("99) Ultra Phase 36: Continuous Learning Cycle (CULL)")
     print("100) Ultra Phase 37: Policy & Risk Monitor")
     print("101) Ultra Phase 38: Governance Summary")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA ROLLOUT & SAFETY (102-107)")
-    print("="*70)
+    print("=" * 70)
     print("102) Ultra Phase 39: Shadow Campaign")
     print("103) Ultra Phase 40: Weekly Governance Pack")
     print("104) Ultra Phase 41: Prepare Ultra Promotion (Staging)")
     print("105) Ultra Phase 42: Take Baseline Snapshot")
     print("106) Ultra Phase 42: List / View Snapshots")
     print("107) Ultra Phase 43: Environment & Broker Guard")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA FINAL EVOLUTION (108-117)")
-    print("="*70)
+    print("=" * 70)
     print("108) Ultra Phase 46: Meta Fusion Model")
     print("109) Ultra Phase 47: 7D Confidence Vector Engine")
     print("110) Ultra Phase 48: Real Market Error Scanner")
@@ -288,10 +230,10 @@ def show_menu() -> str:
     print("115) Ultra Phase 53: Ultra Monitoring AI Agent")
     print("116) Ultra Phase 54: Real Outcome Back-Reconstruction")
     print("117) Ultra Phase 55: Ultra Intelligence Dashboard")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("ULTRA GENI COMPLETION (118-142)")
-    print("="*70)
+    print("=" * 70)
     print("118) Phase 76: GENI Self-Critique Engine")
     print("119) Phase 77: GENI Self-Correction Engine")
     print("120) Phase 78: GENI Multi-Model Consensus Engine")
@@ -317,17 +259,17 @@ def show_menu() -> str:
     print("140) Phase 98: Rollback Mechanism")
     print("141) Phase 99: Version Freeze & Tagging")
     print("142) Phase 100: Final Certification Engine")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     print("SYSTEM TOOLS")
-    print("="*70)
+    print("=" * 70)
     print("S) Safety Status Check")
     print("V) Run Full Validation")
     print("L) View Latest Logs")
     print("H) Help / Documentation")
     print("0) Exit")
-    
-    print("\n" + "="*70)
+
+    print("\n" + "=" * 70)
     choice = input("Select option: ").strip().upper()
     return choice
 
@@ -336,17 +278,17 @@ def handle_operational_phase(choice: str) -> bool:
     """Handle operational phase shortcuts."""
     if choice == "OP1":
         # Pre-Market Diagnostic
-        return _safe_execute_main("core.engine.angel_market_warmup_scanner")
+        return _safe_execute_main("core.engine.dhan_market_warmup_scanner")
     elif choice == "OP2":
         # Live Signal Generation
         print("[INFO] Starting live signal generation loop...")
-        return _safe_execute_main("core.engine.angel_live_ai_signals")
+        return _safe_execute_main("core.engine.dhan_live_ai_signals")
     elif choice == "OP3":
         # Trade Decision & Planning
-        return _safe_execute_main("core.engine.angel_trade_decision")
+        return _safe_execute_main("core.engine.dhan_trade_decision")
     elif choice == "OP4":
         # Post-Market Analysis
-        return _safe_execute_main("core.engine.angel_daily_learning_digest")
+        return _safe_execute_main("core.engine.dhan_daily_learning_digest")
     elif choice == "OP5":
         # Weekly Governance Review
         return _safe_execute_phase("core.engine.system3_phase40_weekly_governance_pack", "run_phase40_weekly_pack")
@@ -357,62 +299,83 @@ def handle_operational_phase(choice: str) -> bool:
     return False
 
 
+_ANGEL_BASELINE_CHOICES = {str(n) for n in range(4, 51)}
+
+
 def handle_baseline_core(choice: str) -> bool:
     """Handle baseline core operations (1-50)."""
+    if choice in _ANGEL_BASELINE_CHOICES:
+        print(f"[DISABLED] Option {choice} targets Dhan / DhanHQ — blocked in Dhan-only mode.")
+        return False
+
     # Import all baseline modules dynamically
     baseline_handlers = {
         "1": ("core.engine.main_launcher", "main"),
         "2": ("core.engine.health_check", "main"),
         "3": ("core.engine.test_data_pipeline", "main"),
+        # 4-50: Dhan paths — removed from dispatch (blocked above)
         "4": ("core.engine.test_angelone_api", "main"),
         "5": ("core.engine.test_angelone_instruments", "main"),
-        "6": ("core.engine.angel_options_watch", "main"),
-        "7": ("core.engine.angel_options_watch_loop", "main"),
-        "8": ("core.engine.angel_options_analyze", "main"),
-        "9": ("core.engine.build_angel_training_dataset", "main"),
-        "10": ("core.engine.train_angel_models", "main"),
-        "11": ("core.engine.angel_live_ai_signals", "main"),
-        "12": ("core.engine.angel_synthetic_backtester", lambda: __import__("core.engine.angel_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(profile="CONSERVATIVE")),
-        "13": ("core.engine.angel_synthetic_backtester", lambda: __import__("core.engine.angel_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(profile="DEV")),
-        "14": ("core.engine.angel_trade_executor", lambda: __import__("core.engine.angel_trade_executor", fromlist=["execute_dry_run"]).execute_dry_run()),
-        "15": ("core.engine.angel_daily_pnl_summary", "main"),
-        "16": ("core.engine.angel_intraday_pnl_monitor", "main"),
-        "17": ("core.engine.angel_daily_report_generator", "main"),
-        "18": ("core.engine.angel_watchdog_recovery", "main"),
-        "19": ("core.engine.angel_auto_threshold_adjuster", "main"),
-        "20": ("core.engine.angel_confidence_calibrator", "main"),
-        "21": ("core.engine.angel_strategy_optimizer", "main"),
-        "22": ("core.engine.angel_feature_ranker", "main"),
-        "23": ("core.engine.angel_blended_model_trainer", "main"),
-        "24": ("core.engine.angel_market_intelligence_dashboard", "main"),
-        "25": ("core.engine.angel_trade_validator_v2", "main"),
-        "26": ("core.engine.angel_market_profile", "main"),
-        "27": ("core.engine.angel_safety_layer_v3", "main"),
-        "28": ("core.engine.angel_real_outcome_logger", "main"),
-        "29": ("core.engine.angel_signal_outcome_analyzer", "main"),
-        "30": ("core.engine.angel_misfire_detector", "main"),
-        "31": ("core.engine.angel_real_threshold_recommender", "main"),
-        "32": ("core.engine.angel_risk_profile_optimizer", "main"),
-        "33": ("core.engine.angel_real_data_extractor", "main"),
-        "34": ("core.engine.angel_blended_dataset_builder", "main"),
-        "35": ("core.engine.angel_blended_model_trainer_v2", "main"),
-        "36": ("core.engine.angel_daily_learning_report", "main"),
-        "37": ("core.engine.angel_rolling_learning_dashboard", "main"),
-        "38": ("core.engine.angel_blended_model_trainer_v2", "main"),
-        "39": ("core.engine.angel_ultramode_prep", "main"),
-        "40": ("core.engine.angel_daily_auto_reports", "main"),
-        "41": ("core.engine.angel_weekly_summary_report", "main"),
-        "42": ("core.engine.angel_monday_diagnostic", "main"),
-        "43": ("core.engine.angel_report_scheduler", "main"),
-        "44": ("core.engine.angel_live_snapshot_reasoner", "main"),
-        "45": ("core.engine.angel_outcome_confidence_analyzer", "main"),
-        "46": ("core.engine.angel_adaptive_volatility_map", "main"),
-        "47": ("core.engine.angel_safety_layer_v3", "main"),
-        "48": ("core.engine.angel_market_warmup_scanner", "main"),
-        "49": ("core.engine.angel_signal_record_buffer", "main"),
-        "50": ("core.engine.angel_env_consistency_checker", "main"),
+        "6": ("core.engine.dhan_options_watch", "main"),
+        "7": ("core.engine.dhan_options_watch_loop", "main"),
+        "8": ("core.engine.dhan_options_analyze", "main"),
+        "9": ("core.engine.build_dhan_training_dataset", "main"),
+        "10": ("core.engine.train_dhan_models", "main"),
+        "11": ("core.engine.dhan_live_ai_signals", "main"),
+        "12": (
+            "core.engine.dhan_synthetic_backtester",
+            lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(
+                profile="CONSERVATIVE"
+            ),
+        ),
+        "13": (
+            "core.engine.dhan_synthetic_backtester",
+            lambda: __import__("core.engine.dhan_synthetic_backtester", fromlist=["run_backtest"]).run_backtest(
+                profile="DEV"
+            ),
+        ),
+        "14": (
+            "core.engine.dhan_trade_executor",
+            lambda: __import__("core.engine.dhan_trade_executor", fromlist=["execute_dry_run"]).execute_dry_run(),
+        ),
+        "15": ("core.engine.dhan_daily_pnl_summary", "main"),
+        "16": ("core.engine.dhan_intraday_pnl_monitor", "main"),
+        "17": ("core.engine.dhan_daily_report_generator", "main"),
+        "18": ("core.engine.dhan_watchdog_recovery", "main"),
+        "19": ("core.engine.dhan_auto_threshold_adjuster", "main"),
+        "20": ("core.engine.dhan_confidence_calibrator", "main"),
+        "21": ("core.engine.dhan_strategy_optimizer", "main"),
+        "22": ("core.engine.dhan_feature_ranker", "main"),
+        "23": ("core.engine.dhan_blended_model_trainer", "main"),
+        "24": ("core.engine.dhan_market_intelligence_dashboard", "main"),
+        "25": ("core.engine.dhan_trade_validator_v2", "main"),
+        "26": ("core.engine.dhan_market_profile", "main"),
+        "27": ("core.engine.dhan_safety_layer_v3", "main"),
+        "28": ("core.engine.dhan_real_outcome_logger", "main"),
+        "29": ("core.engine.dhan_signal_outcome_analyzer", "main"),
+        "30": ("core.engine.dhan_misfire_detector", "main"),
+        "31": ("core.engine.dhan_real_threshold_recommender", "main"),
+        "32": ("core.engine.dhan_risk_profile_optimizer", "main"),
+        "33": ("core.engine.dhan_real_data_extractor", "main"),
+        "34": ("core.engine.dhan_blended_dataset_builder", "main"),
+        "35": ("core.engine.dhan_blended_model_trainer_v2", "main"),
+        "36": ("core.engine.dhan_daily_learning_report", "main"),
+        "37": ("core.engine.dhan_rolling_learning_dashboard", "main"),
+        "38": ("core.engine.dhan_blended_model_trainer_v2", "main"),
+        "39": ("core.engine.dhan_ultramode_prep", "main"),
+        "40": ("core.engine.dhan_daily_auto_reports", "main"),
+        "41": ("core.engine.dhan_weekly_summary_report", "main"),
+        "42": ("core.engine.dhan_monday_diagnostic", "main"),
+        "43": ("core.engine.dhan_report_scheduler", "main"),
+        "44": ("core.engine.dhan_live_snapshot_reasoner", "main"),
+        "45": ("core.engine.dhan_outcome_confidence_analyzer", "main"),
+        "46": ("core.engine.dhan_adaptive_volatility_map", "main"),
+        "47": ("core.engine.dhan_safety_layer_v3", "main"),
+        "48": ("core.engine.dhan_market_warmup_scanner", "main"),
+        "49": ("core.engine.dhan_signal_record_buffer", "main"),
+        "50": ("core.engine.dhan_env_consistency_checker", "main"),
     }
-    
+
     if choice in baseline_handlers:
         handler = baseline_handlers[choice]
         if callable(handler[1]):
@@ -427,25 +390,32 @@ def handle_baseline_core(choice: str) -> bool:
     return False
 
 
+_ANGEL_LEARNING_CHOICES = {str(n) for n in range(51, 65)}
+_ANGEL_OBSERVABILITY_CHOICES = {str(n) for n in range(65, 73)}  # 65-72 incl.
+
+
 def handle_learning_cycle(choice: str) -> bool:
     """Handle real-data learning cycle (51-64)."""
+    if choice in _ANGEL_LEARNING_CHOICES:
+        print(f"[DISABLED] Option {choice} routes to an Dhan module — blocked in Dhan-only mode.")
+        return False
     learning_handlers = {
-        "51": ("core.engine.angel_real_data_capture_starter", "main"),
-        "52": ("core.engine.angel_real_signal_collector_v2", "main"),
-        "53": ("core.engine.angel_outcome_placeholder_generator", "main"),
-        "54": ("core.engine.angel_market_regime_recorder", "main"),
-        "55": ("core.engine.angel_unified_outcome_logger_v3", "main"),
-        "56": ("core.engine.angel_misfire_classifier_v2", "main"),
-        "57": ("core.engine.angel_daily_learning_digest", "main"),
-        "58": ("core.engine.angel_real_threshold_reco_v3", "main"),
-        "59": ("core.engine.angel_risk_profile_optimizer_v3", "main"),
-        "60": ("core.engine.angel_feature_drift_analyzer", "main"),
-        "61": ("core.engine.angel_performance_consistency_checker", "main"),
-        "62": ("core.engine.angel_dataset_merger_real_synth_v1", "main"),
-        "63": ("core.engine.angel_blended_training_orchestrator_dryrun", "main"),
-        "64": ("core.engine.angel_ultra_mode_readiness_report", "main"),
+        "51": ("core.engine.dhan_real_data_capture_starter", "main"),
+        "52": ("core.engine.dhan_real_signal_collector_v2", "main"),
+        "53": ("core.engine.dhan_outcome_placeholder_generator", "main"),
+        "54": ("core.engine.dhan_market_regime_recorder", "main"),
+        "55": ("core.engine.dhan_unified_outcome_logger_v3", "main"),
+        "56": ("core.engine.dhan_misfire_classifier_v2", "main"),
+        "57": ("core.engine.dhan_daily_learning_digest", "main"),
+        "58": ("core.engine.dhan_real_threshold_reco_v3", "main"),
+        "59": ("core.engine.dhan_risk_profile_optimizer_v3", "main"),
+        "60": ("core.engine.dhan_feature_drift_analyzer", "main"),
+        "61": ("core.engine.dhan_performance_consistency_checker", "main"),
+        "62": ("core.engine.dhan_dataset_merger_real_synth_v1", "main"),
+        "63": ("core.engine.dhan_blended_training_orchestrator_dryrun", "main"),
+        "64": ("core.engine.dhan_ultra_mode_readiness_report", "main"),
     }
-    
+
     if choice in learning_handlers:
         handler = learning_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -453,15 +423,18 @@ def handle_learning_cycle(choice: str) -> bool:
 
 
 def handle_ultra_observability(choice: str) -> bool:
-    """Handle Ultra observability (65-69)."""
+    """Handle Ultra observability (65-69) and master dataset (70-72) — all disabled."""
+    if choice in _ANGEL_OBSERVABILITY_CHOICES:
+        print(f"[DISABLED] Option {choice} routes to an Dhan module — blocked in Dhan-only mode.")
+        return False
     observability_handlers = {
-        "65": ("core.engine.angel_ultra_health_tree", "main"),
-        "66": ("core.engine.angel_latency_drift_observatory", "main"),
-        "67": ("core.engine.angel_failure_point_predictor", "main"),
-        "68": ("core.engine.angel_execution_readiness_auditor", "main"),
-        "69": ("core.engine.angel_ultra_dashboard_readonly", "main"),
+        "65": ("core.engine.dhan_ultra_health_tree", "main"),
+        "66": ("core.engine.dhan_latency_drift_observatory", "main"),
+        "67": ("core.engine.dhan_failure_point_predictor", "main"),
+        "68": ("core.engine.dhan_execution_readiness_auditor", "main"),
+        "69": ("core.engine.dhan_ultra_dashboard_readonly", "main"),
     }
-    
+
     if choice in observability_handlers:
         handler = observability_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -471,11 +444,11 @@ def handle_ultra_observability(choice: str) -> bool:
 def handle_master_dataset(choice: str) -> bool:
     """Handle master dataset & model tools (70-72)."""
     dataset_handlers = {
-        "70": ("core.engine.angel_real_master_dataset", "main"),
-        "71": ("core.engine.angel_blended_training_v3", "main"),
-        "72": ("core.engine.angel_model_selector", "main"),
+        "70": ("core.engine.dhan_real_master_dataset", "main"),
+        "71": ("core.engine.dhan_blended_training_v3", "main"),
+        "72": ("core.engine.dhan_model_selector", "main"),
     }
-    
+
     if choice in dataset_handlers:
         handler = dataset_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -493,7 +466,7 @@ def handle_ultra_shadow(choice: str) -> bool:
         "78": ("core.engine.ultra_multi_consensus", "main"),
         "79": ("core.engine.ultra_threshold_lab", "main"),
     }
-    
+
     if choice in shadow_handlers:
         handler = shadow_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -502,13 +475,16 @@ def handle_ultra_shadow(choice: str) -> bool:
 
 def handle_ultra_live(choice: str) -> bool:
     """Handle Ultra live & simulation (80-83)."""
+    if choice == "80":
+        print("[DISABLED] Option 80 (Ultra Live Signals) uses Dhan broker — blocked in Dhan-only mode.")
+        return False
     live_handlers = {
-        "80": ("core.engine.ultra_live_signals_shadow", "main"),
+        "80": ("core.engine.ultra_live_signals_shadow", "main"),  # unreachable — guarded above
         "81": ("core.engine.ultra_trade_simulator", "main"),
         "82": ("core.engine.ultra_pnl_analyzer", "main"),
         "83": ("core.engine.ultra_promotion_manager", "main"),
     }
-    
+
     if choice in live_handlers:
         handler = live_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -529,7 +505,7 @@ def handle_ultra_phases_21_30(choice: str) -> bool:
         "92": ("core.ultra.phase29_sensitivity", "main"),
         "93": ("core.ultra.phase30_calibration_engine", "main"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -548,7 +524,7 @@ def handle_ultra_phases_31_38(choice: str) -> bool:
         "100": ("core.engine.system3_phase37_policy_risk_monitor", "run_phase37_policy_risk_dashboard"),
         "101": ("core.engine.system3_phase38_governance_summary", "run_phase38_governance_summary"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -565,7 +541,7 @@ def handle_ultra_phases_39_45(choice: str) -> bool:
         "106": ("core.engine.system3_phase42_snapshot_manager", "run_phase42_snapshot_list"),
         "107": ("core.engine.system3_phase43_env_guard", "run_phase43_env_guard"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -586,7 +562,7 @@ def handle_ultra_phases_46_55(choice: str) -> bool:
         "116": ("core.ultra.phase54_back_reconstruction", "run_phase54_back_reconstruction"),
         "117": ("core.ultra.phase55_intelligence_dashboard", "run_phase55_intelligence_dashboard"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_phase(handler[0], handler[1])
@@ -622,7 +598,7 @@ def handle_ultra_phases_76_100(choice: str) -> bool:
         "141": ("core.engine.system3_phase99_version_freeze", "main"),
         "142": ("core.engine.system3_phase100_final_certification", "main"),
     }
-    
+
     if choice in phase_handlers:
         handler = phase_handlers[choice]
         return _safe_execute_main(handler[0])
@@ -634,6 +610,7 @@ def handle_system_tools(choice: str) -> bool:
     if choice == "S":
         # Safety status check
         from core.engine.ultra_safety import main as safety_main
+
         safety_main()
         return True
     elif choice == "V":
@@ -641,6 +618,7 @@ def handle_system_tools(choice: str) -> bool:
         print("[INFO] Running full validation...")
         try:
             from system3_ultra_validation import run_full_validation
+
             return run_full_validation()
         except ImportError:
             print("[WARN] Validation engine not found. Run: python system3_ultra_validation.py")
@@ -661,7 +639,7 @@ def handle_system_tools(choice: str) -> bool:
     elif choice == "H":
         # Help / Documentation
         print("\n[HELP] System3 Ultra Control Panel")
-        print("="*70)
+        print("=" * 70)
         print("Documentation files:")
         print("  - docs/system3_ultra_menu_structure.md")
         print("  - docs/system3_ultra_safety_matrix.md")
@@ -674,23 +652,23 @@ def handle_system_tools(choice: str) -> bool:
 
 def main():
     """Main entry point for System3 Ultra Control Panel."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SYSTEM3 ULTRA CONTROL PANEL - STARTING")
-    print("="*70)
+    print("=" * 70)
     _log("System3 Ultra Control Panel started")
-    
+
     while True:
         try:
             choice = show_menu()
-            
+
             if choice == "0":
                 print("\n[INFO] Exiting System3 Ultra Control Panel.")
                 _log("System3 Ultra Control Panel exited")
                 break
-            
+
             # Route to appropriate handler
             handled = False
-            
+
             if choice.startswith("OP"):
                 handled = handle_operational_phase(choice)
             elif choice.isdigit():
@@ -719,12 +697,12 @@ def main():
                     handled = handle_ultra_phases_76_100(choice)
             else:
                 handled = handle_system_tools(choice)
-            
+
             if not handled:
                 print(f"[WARN] Unknown option: {choice}")
-            
+
             input("\nPress Enter to continue...")
-            
+
         except KeyboardInterrupt:
             print("\n\n[INFO] Interrupted by user. Exiting...")
             _log("System3 Ultra Control Panel interrupted")
@@ -737,4 +715,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

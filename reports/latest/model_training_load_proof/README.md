@@ -1,6 +1,6 @@
 # model_training_load_proof
 
-Generated UTC: 2026-06-11T17:10:55.739001+00:00
+Generated UTC: 2026-06-23T21:26:07.468580+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -12,9 +12,8 @@ Generated UTC: 2026-06-11T17:10:55.739001+00:00
 
 ## Warnings
 
-- `fresh_training_accuracy_metrics_not_proven`
 - `model_promotion_remains_blocked_without_policy`
 
 ## Next action
 
-Create secure dry-run training/load proof with metrics; do not promote/overwrite models until explicit policy passes.
+Run scripts/model_training_dryrun_proof.py to prove pipeline; promotion requires signal_csv + model files + 5+ validation days.

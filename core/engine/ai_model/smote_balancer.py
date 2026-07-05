@@ -18,13 +18,14 @@ Date: 2025-12-08
 Phase: 390/400
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Any, Tuple
-from pathlib import Path
+import json
 import logging
 from datetime import datetime
-import json
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -220,7 +221,7 @@ def run_phase_390() -> Dict[str, Any]:
         if not input_path.exists():
             logger.warning(f"Phase 389 output not found: {input_path}")
             # Fallback to curated dataset
-            input_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+            input_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
 
             if not input_path.exists():
                 # Generate sample data for testing

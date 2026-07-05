@@ -5,16 +5,17 @@ Tests everything with virtual live data in multiple conditions
 
 import sys
 from pathlib import Path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from scripts.test_excel_with_virtual_live_data import generate_virtual_live_data
-from scripts.enhance_optionchain_with_predictions import EnhancedOptionChainBuilder
 from scripts.comprehensive_excel_audit import ExcelComprehensiveAudit
+from scripts.enhance_optionchain_with_predictions import EnhancedOptionChainBuilder
+from scripts.test_excel_with_virtual_live_data import generate_virtual_live_data
 
 
 def run_final_verification():

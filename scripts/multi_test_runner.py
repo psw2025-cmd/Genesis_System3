@@ -2,11 +2,11 @@
 Multi-Test Runner - Run tests multiple times and verify
 """
 
-import sys
-from pathlib import Path
-import subprocess
 import json
+import subprocess
+import sys
 from datetime import datetime
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

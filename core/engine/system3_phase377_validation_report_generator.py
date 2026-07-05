@@ -12,13 +12,14 @@ Phase 377 produces:
 - Production readiness determination
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -93,9 +94,9 @@ def validate_data_integrity() -> Dict[str, Any]:
         import pandas as pd
 
         signal_files = [
-            "angel_index_ai_signals.csv",
-            "angel_index_ai_signals_curated.csv",
-            "angel_index_ai_signals_with_forward.csv",
+            "dhan_index_ai_signals.csv",
+            "dhan_index_ai_signals_curated.csv",
+            "dhan_index_ai_signals_with_forward.csv",
         ]
 
         required_columns = ["symbol", "signal", "signal_type"]
@@ -204,7 +205,9 @@ def assess_production_readiness() -> Dict[str, Any]:
     try:
         # Check 1: All phases callable
         try:
-            from core.engine.system3_phases_361_380_registry import get_phases_by_category
+            from core.engine.system3_phases_361_380_registry import (
+                get_phases_by_category,
+            )
 
             all_phases = (
                 get_phases_by_category("signal_pipeline")
@@ -231,9 +234,9 @@ def assess_production_readiness() -> Dict[str, Any]:
 
         # Check 3: Required data files exist
         required_files = [
-            "angel_index_ai_signals.csv",
-            "angel_index_ai_signals_curated.csv",
-            "angel_index_ai_signals_with_forward.csv",
+            "dhan_index_ai_signals.csv",
+            "dhan_index_ai_signals_curated.csv",
+            "dhan_index_ai_signals_with_forward.csv",
         ]
 
         files_exist = sum(1 for f in required_files if (STORAGE_LIVE / f).exists())

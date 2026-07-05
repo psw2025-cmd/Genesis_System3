@@ -4,11 +4,11 @@ System3 Phase 310 - Ultra Health Monitor
 Overall health check for phases 301-310 and their integration with the system.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -42,7 +42,7 @@ PHASE_OUTPUTS = {
     ],
     305: [
         "logs/ml/system3_confidence_tiering_305.md",
-        "storage/live/angel_index_ai_signals_confidence_tagged_305.csv",
+        "storage/live/dhan_index_ai_signals_confidence_tagged_305.csv",
     ],
     306: [
         "logs/performance/system3_staleness_guard_306.md",

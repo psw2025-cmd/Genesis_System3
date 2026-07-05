@@ -3,7 +3,7 @@
 # System3 Configuration
 
 broker:
-  name: Angel One
+  name: Dhan
   api_version: v1
   api_timeout_seconds: 30
   retry_attempts: 3

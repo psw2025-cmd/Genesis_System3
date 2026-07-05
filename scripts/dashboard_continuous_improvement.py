@@ -5,8 +5,9 @@ Analyzes issues, identifies improvements, and implements fixes
 
 import json
 import sys
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+
 import pytz
 
 sys.stdout.reconfigure(encoding="utf-8")

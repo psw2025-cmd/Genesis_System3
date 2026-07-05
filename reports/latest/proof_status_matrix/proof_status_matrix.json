@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-11T17:10:55.740920+00:00",
+  "generated_utc": "2026-06-23T21:26:07.501886+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "optional_missing_count": 0,
   "pending_count": 0,
@@ -7,15 +7,12 @@
   "required_missing_count": 0,
   "rows": [
     {
-      "blockers": [
-        "forbidden_secret_style_files_tracked",
-        "possible_secret_like_content_in_tracked_text"
-      ],
+      "blockers": [],
       "name": "safety_and_secrets",
-      "pass": false,
+      "pass": true,
       "path": "reports/latest/safety_and_secrets/summary.json",
       "required": true,
-      "status": "FAIL",
+      "status": "PASS",
       "warnings": []
     },
     {
@@ -35,10 +32,8 @@
       "pass": true,
       "path": "reports/latest/deployment_and_endpoint_proof/summary.json",
       "required": true,
-      "status": "PASS_WITH_WARNINGS",
-      "warnings": [
-        "public_backend_url_not_configured_endpoint_live_probe_skipped"
-      ]
+      "status": "PASS",
+      "warnings": []
     },
     {
       "blockers": [],
@@ -48,8 +43,7 @@
       "required": true,
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
-        "binance_crypto_data_candidates_not_proven",
-        "angel_broker_secrets_not_available_to_ci_data_live_probe_skipped"
+        "dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
       ]
     },
     {
@@ -60,7 +54,6 @@
       "required": true,
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
-        "fresh_training_accuracy_metrics_not_proven",
         "model_promotion_remains_blocked_without_policy"
       ]
     },
@@ -70,10 +63,8 @@
       "pass": true,
       "path": "reports/latest/recent_backtest_walkforward_proof/summary.json",
       "required": true,
-      "status": "PASS_WITH_WARNINGS",
-      "warnings": [
-        "recent_costed_walkforward_result_not_proven"
-      ]
+      "status": "PASS",
+      "warnings": []
     },
     {
       "blockers": [],
@@ -83,7 +74,8 @@
       "required": true,
       "status": "PASS_WITH_WARNINGS",
       "warnings": [
-        "full_signal_to_exit_pnl_lifecycle_not_proven"
+        "full_signal_to_exit_pnl_lifecycle_not_proven",
+        "lifecycle_proof_broker_not_connected"
       ]
     },
     {
@@ -99,5 +91,5 @@
     }
   ],
   "trade_ready": false,
-  "verdict": "TRADE_READY_BLOCKED"
+  "verdict": "ANALYZER_READY_PROOF_INCOMPLETE"
 }

@@ -25,14 +25,15 @@ Status: OPERATIONAL
 Date: 2025-12-06
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Tuple, Any
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -43,12 +44,12 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 # Directories
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 STORAGE_DIR = PROJECT_ROOT / "storage" / "live"
 
 # Input: Recent data (from Phase 221)
-INPUT_CSV = STORAGE_DIR / "angel_index_ai_signals_with_forward.csv"
+INPUT_CSV = STORAGE_DIR / "dhan_index_ai_signals_with_forward.csv"
 
 # Configuration
 SEQUENCE_LENGTH = 20  # Same as Phase 249

@@ -5,10 +5,10 @@
 
 ### Pipeline Component Status
 
-✅ **Virtual Orders (Healed)**: angel_virtual_orders_healed.csv (2,950 rows, 519,213 bytes)
+✅ **Virtual Orders (Healed)**: dhan_virtual_orders_healed.csv (2,950 rows, 519,213 bytes)
 ✅ **Phase 220 Output**: phase220_aggregated_signals.csv (650 rows, 499,049 bytes)
 ✅ **Phase 221 Output**: phase221_forward_returns.csv (650 rows, 526,752 bytes)
-✅ **Phase 239 Output**: angel_virtual_orders_with_pnl.csv (2,950 rows, 597,839 bytes)
+✅ **Phase 239 Output**: dhan_virtual_orders_with_pnl.csv (2,950 rows, 597,839 bytes)
 
 ### Latest Pipeline Execution
 

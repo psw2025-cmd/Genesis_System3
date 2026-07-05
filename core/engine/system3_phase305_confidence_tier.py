@@ -4,12 +4,13 @@ System3 Phase 305 - Confidence Tier Tagger (High/Medium/Low)
 Tags each past signal with a confidence tier based on score, edge, and context.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,8 +20,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-RECONCILED_CSV = STORAGE_LIVE / "angel_index_ai_signals_reconciled.csv"
-FALLBACK_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
+RECONCILED_CSV = STORAGE_LIVE / "dhan_index_ai_signals_reconciled.csv"
+FALLBACK_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
 
 DECAY_303_JSON = STORAGE_META / "system3_edge_decay_profile_303.json"
 REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
@@ -28,7 +29,7 @@ REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
 LOG_DIR = PROJECT_ROOT / "logs" / "ml"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_confidence_tiering_305.md"
-OUTPUT_CSV = STORAGE_LIVE / "angel_index_ai_signals_confidence_tagged_305.csv"
+OUTPUT_CSV = STORAGE_LIVE / "dhan_index_ai_signals_confidence_tagged_305.csv"
 
 
 def load_csv_robust(path: Path) -> pd.DataFrame:

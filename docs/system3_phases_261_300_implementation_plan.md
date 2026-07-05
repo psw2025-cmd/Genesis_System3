@@ -9,7 +9,7 @@
 
 **Total Phases**: 40 (261-300)  
 **Goal**: Extend System3 with advanced analytics, optimization, and monitoring  
-**Safety**: 100% DRY-RUN safe, AngelOne-only
+**Safety**: 100% DRY-RUN safe, Dhan-only
 
 ---
 

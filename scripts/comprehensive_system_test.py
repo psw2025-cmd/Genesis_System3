@@ -3,21 +3,22 @@ Comprehensive System Test - End-to-End Validation
 Tests all components with world-class configuration
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import pytz
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.selector.strategy_engine import StrategyEngine
 from src.trading.advanced_position_sizing import AdvancedPositionSizing
 from src.trading.dynamic_risk_management import DynamicRiskManager
-from src.selector.strategy_engine import StrategyEngine
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
 

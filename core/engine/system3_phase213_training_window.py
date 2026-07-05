@@ -4,12 +4,13 @@ System3 Phase 213 - Training Window Selector
 Evaluates candidate training windows and selects preferred window.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,7 +24,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "ml"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_training_window_selection.log"
 
-CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 ARCHIVE_DIR = PROJECT_ROOT / "storage" / "live" / "archive"
 
 

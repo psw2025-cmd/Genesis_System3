@@ -26,8 +26,8 @@
 - ✅ All model metadata files
 
 ### Configuration (Frozen)
-- ✅ `angel_trade_config.py` - Thresholds frozen (conf=0.8, score=0.3)
-- ✅ `angel_automation_config.py` - Auto-execute OFF, Auto-PnL OFF
+- ✅ `dhan_trade_config.py` - Thresholds frozen (conf=0.8, score=0.3)
+- ✅ `dhan_automation_config.py` - Auto-execute OFF, Auto-PnL OFF
 - ✅ `ultramode_config.json` - All features DISABLED
 - ✅ All threshold JSON files
 

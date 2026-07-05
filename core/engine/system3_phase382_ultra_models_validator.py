@@ -7,20 +7,21 @@ Outputs: JSON metrics + Markdown report
 Safety: DRY-RUN only, uses synthetic data, no live trading
 """
 
-import sys
-from pathlib import Path
 import json
+import sys
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.utils.logger import logger
-from core.engine.ultra_models_loader import load_ultra_model, SUPPORTED_UNDERLYINGS
 from core.engine.ai_model import predict_direction
+from core.engine.ultra_models_loader import SUPPORTED_UNDERLYINGS, load_ultra_model
+from core.utils.logger import logger
 
 # Output paths
 METRICS_DIR = ROOT_DIR / "storage" / "metrics"

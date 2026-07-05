@@ -35,6 +35,7 @@ print(f"ENV_FILE_USED: {ENV_FILE_USED}")
 # ── Load env ──────────────────────────────────────────────────────────────────
 try:
     from dotenv import load_dotenv
+
     if ENV_FILE_USED != "<none>":
         load_dotenv(ENV_FILE_USED, override=False)
 except ImportError:
@@ -63,9 +64,11 @@ if not DHAN_CLIENT_ID or not DHAN_ACCESS_TOKEN:
 # ── dhanhq import check ───────────────────────────────────────────────────────
 try:
     import inspect
+
     import dhanhq as _pkg
     from dhanhq import dhanhq as _dhanhq_class
     from dhanhq.dhan_context import DhanContext as _DhanContext
+
     _sdk_sig = str(inspect.signature(_dhanhq_class))
     print(f"DHANHQ_IMPORT: PASS")
     print(f"DHAN_SDK_SIGNATURE: {_sdk_sig}")
@@ -81,11 +84,12 @@ except ImportError as exc:
 ADAPTER_OK = False
 try:
     from core.brokers.dhan.dhan_readonly import (
+        _LIVE_TRADING_BLOCKED_MSG,
         get_dhan_credentials_masked,
         get_profile,
         get_status,
-        _LIVE_TRADING_BLOCKED_MSG,
     )
+
     ADAPTER_OK = True
 except Exception as exc:
     print(f"ADAPTER_IMPORT: FAIL — {exc}")
@@ -133,6 +137,7 @@ ORDER_BLOCK_OK = False
 if ADAPTER_OK:
     try:
         from core.brokers.dhan.dhan_readonly import DhanReadOnly
+
         _ro = DhanReadOnly()
         try:
             _ro.place_order(test=True)
@@ -159,10 +164,7 @@ print("TOKEN_VALUE_PRINTED: NO")
 
 # Exit code
 if not PROFILE_PASS:
-    print(
-        f"\nVERIFICATION_RESULT: FAIL\n"
-        f"REASON: Token present but profile check failed — {PROFILE_ERROR}"
-    )
+    print(f"\nVERIFICATION_RESULT: FAIL\n" f"REASON: Token present but profile check failed — {PROFILE_ERROR}")
     sys.exit(1)
 
 print("\nVERIFICATION_RESULT: PASS")

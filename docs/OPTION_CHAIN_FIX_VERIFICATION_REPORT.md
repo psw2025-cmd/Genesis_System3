@@ -9,11 +9,11 @@
 
 ### Fix 1: `get_quote()` Method - ✅ COMPLETE
 
-**File**: `core/brokers/angel_one/broker.py`  
+**File**: `core/brokers/dhan/broker.py`  
 **Lines Changed**: ~70 lines (method completely rewritten)
 
 **Changes**:
-- ✅ Replaced `getQuote()` (non-existent) with `getMarketData()` (actual SmartAPI method)
+- ✅ Replaced `getQuote()` (non-existent) with `getMarketData()` (actual DhanHQ method)
 - ✅ Fixed response parsing to handle `data.fetched` list structure
 - ✅ Updated field name mappings:
   - `tradeVolume` → `volume`
@@ -43,7 +43,7 @@
 
 ### Fix 2: `getOptionGreeks()` Method - ✅ COMPLETE
 
-**File**: `core/brokers/angel_one/broker.py`  
+**File**: `core/brokers/dhan/broker.py`  
 **Lines Changed**: ~100 lines (method rewritten + new wrapper added)
 
 **Changes**:
@@ -178,7 +178,7 @@ venv\Scripts\python.exe storage/fix_option_chain.py storage/live/option_chain_NI
 
 ### Files Modified
 
-1. **`core/brokers/angel_one/broker.py`**
+1. **`core/brokers/dhan/broker.py`**
    - `get_quote()` method: Complete rewrite (~70 lines)
    - `get_option_greeks()` method: Updated (~100 lines)
    - `getOptionGreeks()` wrapper: New method added

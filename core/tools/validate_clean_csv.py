@@ -5,11 +5,12 @@ Validates the cleaned CSV file and generates validation report.
 """
 
 import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -17,9 +18,9 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Paths
 CLEAN_DIR = PROJECT_ROOT / "storage" / "clean"
-CSV_CLEAN = CLEAN_DIR / "angel_index_ai_signals_with_forward_clean.csv"
-CSV_EV_READY = CLEAN_DIR / "angel_index_ai_signals_with_forward_ev_ready.csv"
-CSV_SELL_ANOMALIES = CLEAN_DIR / "angel_index_ai_signals_sell_anomalies.csv"
+CSV_CLEAN = CLEAN_DIR / "dhan_index_ai_signals_with_forward_clean.csv"
+CSV_EV_READY = CLEAN_DIR / "dhan_index_ai_signals_with_forward_ev_ready.csv"
+CSV_SELL_ANOMALIES = CLEAN_DIR / "dhan_index_ai_signals_sell_anomalies.csv"
 
 OUTPUT_REPORT = PROJECT_ROOT / "docs" / "SYSTEM3_CSV_CLEAN_VALIDATION_SUMMARY.md"
 
@@ -328,7 +329,7 @@ def generate_report(results: Dict, clean_rows: int, ev_rows: int, anomaly_rows: 
         "",
         "### SELL Signal Anomalies",
         f"- ⚠️ Anomalies detected: {anomaly_rows} rows",
-        f"- Saved to: `storage/clean/angel_index_ai_signals_sell_anomalies.csv`",
+        f"- Saved to: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`",
         f"- **Action Required**: Review these rows manually",
         "",
         "## Overall Status",
@@ -358,8 +359,8 @@ def generate_report(results: Dict, clean_rows: int, ev_rows: int, anomaly_rows: 
             "## Next Steps",
             "",
             "1. Review SELL anomalies if any detected",
-            "2. Use `storage/clean/angel_index_ai_signals_with_forward_clean.csv` for general analysis",
-            "3. Use `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` for EV analysis and training",
+            "2. Use `storage/clean/dhan_index_ai_signals_with_forward_clean.csv` for general analysis",
+            "3. Use `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` for EV analysis and training",
             "",
         ]
     )

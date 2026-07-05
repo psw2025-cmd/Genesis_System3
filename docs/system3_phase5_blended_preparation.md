@@ -7,7 +7,7 @@
 ## Modules Implemented
 
 ### 1. Dataset Merger Real + Synthetic V1
-- **File**: `core/engine/angel_dataset_merger_real_synth_v1.py`
+- **File**: `core/engine/dhan_dataset_merger_real_synth_v1.py`
 - **Menu**: Option 62
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Merging only, NO training
@@ -25,7 +25,7 @@
 ---
 
 ### 2. Blended Training Orchestrator (Dry-Run)
-- **File**: `core/engine/angel_blended_training_orchestrator_dryrun.py`
+- **File**: `core/engine/dhan_blended_training_orchestrator_dryrun.py`
 - **Menu**: Option 63
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Plan creation only, NO training
@@ -44,7 +44,7 @@
 ---
 
 ### 3. Ultra-Mode Readiness Report
-- **File**: `core/engine/angel_ultra_mode_readiness_report.py`
+- **File**: `core/engine/dhan_ultra_mode_readiness_report.py`
 - **Menu**: Option 64
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Report only, does NOT enable Ultra-Mode
@@ -87,9 +87,9 @@
 ## Files Created
 
 ### Engine Modules
-1. `core/engine/angel_dataset_merger_real_synth_v1.py`
-2. `core/engine/angel_blended_training_orchestrator_dryrun.py`
-3. `core/engine/angel_ultra_mode_readiness_report.py`
+1. `core/engine/dhan_dataset_merger_real_synth_v1.py`
+2. `core/engine/dhan_blended_training_orchestrator_dryrun.py`
+3. `core/engine/dhan_ultra_mode_readiness_report.py`
 
 ### Documentation
 1. `docs/system3_phase5_blended_preparation.md` (this file)

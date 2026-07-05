@@ -47,7 +47,7 @@ else:
 
 ---
 
-### ✅ 2. `core/engine/angel_market_warmup_scanner.py`
+### ✅ 2. `core/engine/dhan_market_warmup_scanner.py`
 
 **Location**: Lines 137, 143, 148, 160, 162, 164
 
@@ -143,7 +143,7 @@ The following files also contain Unicode characters but are **not critical** for
 ## Verification Steps
 
 1. ✅ **Fixed**: `system3_ultra_validation.py`
-2. ✅ **Fixed**: `core/engine/angel_market_warmup_scanner.py`
+2. ✅ **Fixed**: `core/engine/dhan_market_warmup_scanner.py`
 3. ⏳ **Test**: Run `python system3_geni_master.py panel-test`
 4. ⏳ **Test**: Run `python system3_geni_master.py daily-ultra`
 5. ⏳ **Verify**: No Unicode encoding errors in output

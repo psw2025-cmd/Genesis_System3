@@ -1,215 +1,42 @@
 {
-  "analyzer_only": true,
-  "generated_utc": "2026-06-11T05:13:02.165033+00:00",
-  "live_trading_enabled": false,
-  "purpose": "secondary public OHLC fallback proof; not authoritative for options execution",
-  "results": [
-    {
-      "last_row": {
-        "('Adj Close', '^NSEI')": 23202.30078125,
-        "('Close', '^NSEI')": 23202.30078125,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', '^NSEI')": 23213.44921875,
-        "('Low', '^NSEI')": 23072.05078125,
-        "('Open', '^NSEI')": 23104.400390625,
-        "('Volume', '^NSEI')": 0.0
-      },
+  "generated_utc": "2026-06-14T15:11:23.544441+00:00",
+  "completed_utc": "2026-06-14T15:11:24.077944+00:00",
+  "gate": "external_data_yahoo_fallback",
+  "pass": true,
+  "status": "PASS",
+  "tickers_tested": 3,
+  "tickers_ok": 3,
+  "yahoo_api_reachable": true,
+  "results": {
+    "NIFTY50": {
+      "ticker": "^NSEI",
       "ok": true,
-      "rows": 9,
-      "symbol": "^NSEI"
+      "latency_ms": 291,
+      "last_close": 23622.900390625,
+      "currency": "INR",
+      "exchange": "NSI",
+      "data_points": 5
     },
-    {
-      "last_row": {
-        "('Adj Close', '^NSEBANK')": 55231.25,
-        "('Close', '^NSEBANK')": 55231.25,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', '^NSEBANK')": 55311.8515625,
-        "('Low', '^NSEBANK')": 54753.1484375,
-        "('Open', '^NSEBANK')": 54779.6484375,
-        "('Volume', '^NSEBANK')": 0.0
-      },
+    "BANKNIFTY": {
+      "ticker": "^NSEBANK",
       "ok": true,
-      "rows": 9,
-      "symbol": "^NSEBANK"
+      "latency_ms": 91,
+      "last_close": 56814.80078125,
+      "currency": "INR",
+      "exchange": "NSI",
+      "data_points": 5
     },
-    {
-      "last_row": {
-        "('Adj Close', 'RELIANCE.NS')": 1265.5999755859375,
-        "('Close', 'RELIANCE.NS')": 1265.5999755859375,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'RELIANCE.NS')": 1267.5,
-        "('Low', 'RELIANCE.NS')": 1253.199951171875,
-        "('Open', 'RELIANCE.NS')": 1258.0,
-        "('Volume', 'RELIANCE.NS')": 2982319.0
-      },
+    "SENSEX": {
+      "ticker": "^BSESN",
       "ok": true,
-      "rows": 10,
-      "symbol": "RELIANCE.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'TCS.NS')": 2137.0,
-        "('Close', 'TCS.NS')": 2137.0,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'TCS.NS')": 2147.800048828125,
-        "('Low', 'TCS.NS')": 2110.0,
-        "('Open', 'TCS.NS')": 2127.0,
-        "('Volume', 'TCS.NS')": 1319622.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "TCS.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'HDFCBANK.NS')": 744.4000244140625,
-        "('Close', 'HDFCBANK.NS')": 744.4000244140625,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'HDFCBANK.NS')": 746.0,
-        "('Low', 'HDFCBANK.NS')": 740.0999755859375,
-        "('Open', 'HDFCBANK.NS')": 743.0,
-        "('Volume', 'HDFCBANK.NS')": 7085986.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "HDFCBANK.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'ICICIBANK.NS')": 1320.5999755859375,
-        "('Close', 'ICICIBANK.NS')": 1320.5999755859375,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'ICICIBANK.NS')": 1320.9000244140625,
-        "('Low', 'ICICIBANK.NS')": 1286.5,
-        "('Open', 'ICICIBANK.NS')": 1286.5,
-        "('Volume', 'ICICIBANK.NS')": 13902459.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "ICICIBANK.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'INFY.NS')": 1119.0,
-        "('Close', 'INFY.NS')": 1119.0,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'INFY.NS')": 1133.699951171875,
-        "('Low', 'INFY.NS')": 1109.0,
-        "('Open', 'INFY.NS')": 1129.699951171875,
-        "('Volume', 'INFY.NS')": 3903395.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "INFY.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'SBIN.NS')": 1002.5999755859375,
-        "('Close', 'SBIN.NS')": 1002.5999755859375,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'SBIN.NS')": 1005.9000244140625,
-        "('Low', 'SBIN.NS')": 993.0,
-        "('Open', 'SBIN.NS')": 998.0999755859375,
-        "('Volume', 'SBIN.NS')": 3547440.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "SBIN.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'AXISBANK.NS')": 1321.5999755859375,
-        "('Close', 'AXISBANK.NS')": 1321.5999755859375,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'AXISBANK.NS')": 1325.5,
-        "('Low', 'AXISBANK.NS')": 1307.300048828125,
-        "('Open', 'AXISBANK.NS')": 1308.800048828125,
-        "('Volume', 'AXISBANK.NS')": 1627246.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "AXISBANK.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'LT.NS')": 3883.5,
-        "('Close', 'LT.NS')": 3883.5,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'LT.NS')": 3909.800048828125,
-        "('Low', 'LT.NS')": 3868.39990234375,
-        "('Open', 'LT.NS')": 3900.0,
-        "('Volume', 'LT.NS')": 633160.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "LT.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'BHARTIARTL.NS')": 1790.300048828125,
-        "('Close', 'BHARTIARTL.NS')": 1790.300048828125,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'BHARTIARTL.NS')": 1792.0,
-        "('Low', 'BHARTIARTL.NS')": 1768.5999755859375,
-        "('Open', 'BHARTIARTL.NS')": 1773.0,
-        "('Volume', 'BHARTIARTL.NS')": 884314.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "BHARTIARTL.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'KOTAKBANK.NS')": 389.95001220703125,
-        "('Close', 'KOTAKBANK.NS')": 389.95001220703125,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'KOTAKBANK.NS')": 390.6499938964844,
-        "('Low', 'KOTAKBANK.NS')": 384.54998779296875,
-        "('Open', 'KOTAKBANK.NS')": 386.0,
-        "('Volume', 'KOTAKBANK.NS')": 1462135.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "KOTAKBANK.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'ADANIENT.NS')": 2962.0,
-        "('Close', 'ADANIENT.NS')": 2962.0,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'ADANIENT.NS')": 2966.800048828125,
-        "('Low', 'ADANIENT.NS')": 2895.10009765625,
-        "('Open', 'ADANIENT.NS')": 2895.10009765625,
-        "('Volume', 'ADANIENT.NS')": 499195.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "ADANIENT.NS"
-    },
-    {
-      "last_row": null,
-      "ok": false,
-      "rows": 0,
-      "symbol": "TATAMOTORS.NS"
-    },
-    {
-      "last_row": {
-        "('Adj Close', 'BPCL.NS')": 282.54998779296875,
-        "('Close', 'BPCL.NS')": 282.54998779296875,
-        "('Date', '')": "2026-06-11T00:00:00",
-        "('High', 'BPCL.NS')": 285.45001220703125,
-        "('Low', 'BPCL.NS')": 281.3999938964844,
-        "('Open', 'BPCL.NS')": 285.0,
-        "('Volume', 'BPCL.NS')": 1681888.0
-      },
-      "ok": true,
-      "rows": 10,
-      "symbol": "BPCL.NS"
+      "latency_ms": 150,
+      "last_close": 75527.953125,
+      "currency": "INR",
+      "exchange": "BSE",
+      "data_points": 5
     }
-  ],
-  "rows_total": 138,
-  "source": "Yahoo Finance via yfinance",
-  "symbols_failed": 1,
-  "symbols_ok": 14,
-  "symbols_requested": 15
+  },
+  "blockers": [],
+  "warnings": [],
+  "note": "yfinance provides NIFTY/BANKNIFTY spot prices as P5 fallback in DataSourceManager. Does NOT provide Indian options data (IV, OI, Greeks). NSE bhavcopy is primary OI source."
 }

@@ -5,7 +5,7 @@ Advanced analysis of Ultra simulator PnL.
 Shadow mode only.
 
 Inputs:
-- storage/ultra/angel_ultra_pnl_sim.csv
+- storage/ultra/dhan_ultra_pnl_sim.csv
 
 Outputs:
 - storage/reports_ultra/ultra_pnl_report.csv
@@ -13,16 +13,17 @@ Outputs:
 Menu Option: 82
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 
-PNL_SIM_CSV = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
+PNL_SIM_CSV = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
 PNL_REPORT_CSV = REPORTS_ULTRA_DIR / "ultra_pnl_report.csv"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)

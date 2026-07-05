@@ -4,13 +4,14 @@ System3 Phase 332 - Signal Volume & Coverage Monitor
 Monitors signal volume and coverage across indices/options to ensure meaningful operation.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -41,7 +42,7 @@ def run_phase332_signal_volume_coverage(root_path: str = None, **kwargs) -> Dict
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load curated signals
-    signals_file = root / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+    signals_file = root / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
     warnings = []
 

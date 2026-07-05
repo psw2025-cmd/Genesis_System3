@@ -5,9 +5,10 @@ Automatically switches between virtual and live data based on market status
 
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Tuple
+
 import pytz
 
 # IMMEDIATE OUTPUT - Script is loading
@@ -235,9 +236,11 @@ class SmartLiveChainRunner:
 
     def _write_market_closed_heartbeat(self, cycle_count: int):
         """Write heartbeat files when market is closed and simulation is disabled."""
-        from pathlib import Path
-        import pandas as pd
         import json
+        from pathlib import Path
+
+        import pandas as pd
+
         from src.output.export_csv import CSVExporter
 
         outputs_dir = ROOT_DIR / "outputs"

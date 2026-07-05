@@ -5,12 +5,13 @@ Verifies that logged signals are consistent with thresholds and scores.
 Performs daily diagnostics and anomaly detection.
 """
 
-import sys
 import json
-import pandas as pd
+import sys
+from datetime import date, datetime
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Optional
-from datetime import datetime, date
+from typing import Any, Dict, List, Optional, Tuple
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -22,7 +23,7 @@ META_DIR = PROJECT_ROOT / "storage" / "meta"
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 LOGS_DIR = PROJECT_ROOT / "storage" / "logs"
 THRESHOLDS_JSON = META_DIR / "system3_live_thresholds.json"
-SIGNALS_CSV = LIVE_DIR / "angel_index_ai_signals.csv"
+SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 
 # Required columns for signal audit
 REQUIRED_COLUMNS = ["underlying", "ts", "final_score", "signal", "side", "strike", "expiry"]

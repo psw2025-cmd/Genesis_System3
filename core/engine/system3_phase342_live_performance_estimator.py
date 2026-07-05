@@ -7,14 +7,15 @@ Computes hit-rate, average returns, max drawdown, and realized vs predicted metr
 Mode: Live, each OP cycle (hourly).
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -40,8 +41,8 @@ def run_phase_342_live_performance_estimator(root_path: str = None, logger_obj=N
 
     try:
         # Load virtual orders and forward returns
-        virt_orders_file = root / "storage" / "live" / "angel_virtual_orders.csv"
-        signals_forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+        virt_orders_file = root / "storage" / "live" / "dhan_virtual_orders.csv"
+        signals_forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
         diag_dir = root / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 

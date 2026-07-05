@@ -85,7 +85,7 @@ Quantitatively score each live signal row for quality (data completeness, recenc
 
 Where / Files
 
-Input: storage/live/angel_index_ai_signals_with_forward.csv
+Input: storage/live/dhan_index_ai_signals_with_forward.csv
 
 Output: same file (with new column, safe overwrite using temp file pattern).
 
@@ -140,7 +140,7 @@ Add derived features for each signal: volatility regime, short/medium trend dire
 
 Where / Files
 
-Input/Output: storage/live/angel_index_ai_signals_with_forward.csv
+Input/Output: storage/live/dhan_index_ai_signals_with_forward.csv
 
 New module: phases/phase_332_meta_feature_enrichment.py
 
@@ -211,7 +211,7 @@ Inputs
 
 Last N days of forward-return data from:
 
-storage/live/history/angel_index_ai_signals_with_forward_*.csv (or equivalent).
+storage/live/history/dhan_index_ai_signals_with_forward_*.csv (or equivalent).
 
 Current thresholds from config.
 
@@ -319,7 +319,7 @@ Evaluate how stable forward returns are over rolling windows per symbol/expiry a
 
 Where / Files
 
-Input: storage/live/angel_index_ai_signals_with_forward.csv + history.
+Input: storage/live/dhan_index_ai_signals_with_forward.csv + history.
 
 New module: phases/phase_335_forward_return_stability.py
 
@@ -376,7 +376,7 @@ Inputs:
 
 Main signals CSV.
 
-If a second model or variant exists (e.g. angel_index_ai_signals_modelB.csv), incorporate.
+If a second model or variant exists (e.g. dhan_index_ai_signals_modelB.csv), incorporate.
 
 New module: phases/phase_336_signal_consistency_checker.py
 
@@ -717,7 +717,7 @@ These phases focus on your existing WARN-heavy zones (220–270, signals CSV mis
 Phase 343 – Signals Existence & Freshness Enforcer
 
 Objective
-Guarantee that angel_index_ai_signals.csv and angel_index_ai_signals_with_forward.csv always exist and are fresh enough, or else force OP3 into NO-TRADE with clear logs.
+Guarantee that dhan_index_ai_signals.csv and dhan_index_ai_signals_with_forward.csv always exist and are fresh enough, or else force OP3 into NO-TRADE with clear logs.
 
 Where / Files
 
@@ -772,9 +772,9 @@ Inputs
 
 List of critical CSVs:
 
-angel_index_ai_signals.csv
+dhan_index_ai_signals.csv
 
-angel_index_ai_signals_with_forward.csv
+dhan_index_ai_signals_with_forward.csv
 
 curated, pnl, virtual orders, etc.
 
@@ -852,7 +852,7 @@ Off-line.
 Phase 346 – Live Data Integrity Checker (Option Chain Feeds)
 
 Objective
-Verify that live option chain data from AngelOne (or cached local source) is internally consistent (no impossible values, mis-sorted strikes, etc.).
+Verify that live option chain data from Dhan (or cached local source) is internally consistent (no impossible values, mis-sorted strikes, etc.).
 
 Where / Files
 
@@ -1140,7 +1140,7 @@ Quick, can be inserted in OP3 pre-trade planning.
 Phase 353 – Broker Connectivity Health Monitor (Read-Only)
 
 Objective
-Monitor AngelOne API connectivity and record any outages or latency spikes.
+Monitor Dhan API connectivity and record any outages or latency spikes.
 
 Where / Files
 

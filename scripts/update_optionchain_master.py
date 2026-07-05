@@ -4,11 +4,12 @@ Fetches fresh data, rebuilds Excel, verifies, and shows performance
 """
 
 import sys
-from pathlib import Path
-import pandas as pd
-from datetime import datetime
-import pytz
 import time
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -4,12 +4,13 @@ System3 Threshold Proposer
 Automatically proposes BUY/SELL thresholds based on EV tables from Phase 222.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

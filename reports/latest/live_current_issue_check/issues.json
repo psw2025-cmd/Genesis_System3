@@ -1,0 +1,107 @@
+[
+  {
+    "severity": "HIGH",
+    "area": "data",
+    "issue": "Dashboard state is not using proven real broker data",
+    "proof": "data_source=SYNTHETIC",
+    "action": "Run broker-connected real data proof."
+  },
+  {
+    "severity": "HIGH",
+    "area": "data",
+    "issue": "Fresh broker live data is not proven",
+    "proof": "Run broker data proof only in secure runtime with Angel/Binance secrets; fallback data must remain labelled as fallback, not broker-live proof.",
+    "action": "Run secure broker data proof in cloud with valid Dhan token."
+  },
+  {
+    "severity": "HIGH",
+    "area": "paper_lifecycle",
+    "issue": "Signal\u2192order\u2192fill\u2192exit\u2192P&L lifecycle not proven/reconciled",
+    "proof": "mandatory_fields=['signal_id', 'symbol', 'instrument_token', 'expiry', 'strike', 'option_type', 'entry_time', 'entry_price', 'qty', 'order_id', 'fill_status', 'exit_time', 'exit_price', 'charges', 'gross_pnl', 'net_pnl', 'proof_status']",
+    "action": "Run market-day analyzer paper lifecycle proof."
+  },
+  {
+    "severity": "HIGH",
+    "area": "pipeline",
+    "issue": "Full trading pipeline is not trade ready",
+    "proof": "blockers=['live_market_analyzer_paper_trade_not_proven'] verdict=NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR",
+    "action": "Run fresh training, costed backtest, market paper trade, dashboard proof."
+  },
+  {
+    "severity": "HIGH",
+    "area": "readiness",
+    "issue": "Proof matrix trade_ready is false",
+    "proof": "verdict=ANALYZER_READY_PROOF_INCOMPLETE",
+    "action": "Clear all proof warnings before live readiness."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "cloud_worker",
+    "issue": "Worker runtime logs not proven by API endpoint check",
+    "proof": "render.yaml has worker, but this command cannot read Render service logs",
+    "action": "Capture Render worker logs showing token-daemon/watchdog/scheduler started."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "dashboard",
+    "issue": "API/DB/report reconciliation not proven",
+    "proof": "",
+    "action": "Run dashboard truth reconciliation."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "dashboard",
+    "issue": "Browser visual dashboard proof missing",
+    "proof": "",
+    "action": "Run screenshot/browser proof."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "model",
+    "issue": "Model promotion not allowed",
+    "proof": "",
+    "action": "Do not promote models until policy passes."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "proof_gate",
+    "issue": "analyzer_paper_lifecycle_proof is PASS_WITH_WARNINGS",
+    "proof": "warnings=['full_signal_to_exit_pnl_lifecycle_not_proven', 'lifecycle_proof_broker_not_connected'] blockers=[]",
+    "action": "Resolve or produce proof."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "proof_gate",
+    "issue": "dashboard_truth_proof is PASS_WITH_WARNINGS",
+    "proof": "warnings=['browser_screenshot_truth_not_proven_in_ci'] blockers=[]",
+    "action": "Resolve or produce proof."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "proof_gate",
+    "issue": "fresh_data_automation_proof is PASS_WITH_WARNINGS",
+    "proof": "warnings=['dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped'] blockers=[]",
+    "action": "Resolve or produce proof."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "proof_gate",
+    "issue": "model_training_load_proof is PASS_WITH_WARNINGS",
+    "proof": "warnings=['model_promotion_remains_blocked_without_policy'] blockers=[]",
+    "action": "Resolve or produce proof."
+  },
+  {
+    "severity": "MEDIUM",
+    "area": "proof_gate",
+    "issue": "repo_authority_and_duplicate_control is PASS_WITH_WARNINGS",
+    "proof": "warnings=['duplicate_basename_candidates_need_runtime_classification'] blockers=[]",
+    "action": "Resolve or produce proof."
+  },
+  {
+    "severity": "LOW",
+    "area": "live_execution",
+    "issue": "Live order wrapper is placeholder \u2014 live trading intentionally blocked",
+    "proof": "core/broker/dhan_live_order_wrapper.py",
+    "action": "SAFETY FEATURE: keeps live trading impossible until explicitly implemented. Do not implement until all proof gates pass."
+  }
+]

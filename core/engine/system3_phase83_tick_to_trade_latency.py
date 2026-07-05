@@ -4,13 +4,14 @@ System3 Phase 83 - Tick-to-Trade Latency Monitor
 Measure total real-time latency from market snapshot time to trade decision timestamp.
 """
 
-import sys
-import pandas as pd
 import json
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 from dateutil import parser as date_parser
 
 # Ensure project root is in path
@@ -23,8 +24,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_JSON = STORAGE_ULTRA / "phase83_tick_to_trade_latency.json"

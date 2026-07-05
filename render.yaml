@@ -1,22 +1,228 @@
 # Render Blueprint for Genesis System3
-# Safe backend-only deployment.
-# Live trading is disabled by default.
-# Render CLI deployment enabled via GitHub Actions.
+# =====================================================================
+# TWO SERVICES:
+#   web    — FastAPI backend (always-on, Starter plan required)
+#   worker — Background daemons: token refresh + watchdog + job scheduler
+#
+# SECRETS: Set all DHAN_* variables in Render dashboard → Environment
+#   (sync: false means they come from the dashboard, not this file)
+#
+# PERSISTENT DISK (optional, V2):
+#   Uncomment the `disk:` block under the worker to persist bhavcopy
+#   cache, logs, and state across deploys. Costs ~$1/GB/month.
+#   Free plan does NOT support persistent disks.
+#
+# SAFETY: LIVE_TRADING_ENABLED is hardcoded 0. Do NOT change until
+#   cloud analyzer/paper proof passes and CI is fully green.
+# =====================================================================
+
+envVarGroups:
+  # Shared credentials — set values ONCE here in Render dashboard
+  # (Environment Groups tab) and both services get them automatically.
+  # This avoids having to set DHAN_* on both web and worker separately.
+  - name: dhan-shared-credentials
+    envVars:
+      - key: DHAN_CLIENT_ID
+        sync: false
+      - key: DHAN_ACCESS_TOKEN
+        sync: false
+      - key: DHAN_PIN
+        sync: false
+      - key: DHAN_TOTP_SECRET
+        sync: false
+      - key: DHAN_APP_ID
+        sync: false
+      - key: DHAN_APP_SECRET
+        sync: false
+      - key: WORKER_PUSH_TOKEN
+        sync: false
 
 services:
+
+  # -------------------------------------------------------------------
+  # Web Service — FastAPI Backend
+  # -------------------------------------------------------------------
   - type: web
     name: genesis-system3-backend
     runtime: docker
-    plan: free
+    plan: starter          # free plan spins down after 15min inactivity
     dockerfilePath: ./dashboard/backend/Dockerfile
     dockerContext: .
-    autoDeploy: false
+    autoDeploy: true
+    healthCheckPath: /api/health
+
     envVars:
+      # --- Deploy identity ---
       - key: SYSTEM3_DEPLOY_TARGET
         value: render
+      - key: RENDER
+        value: "true"
+
+      # --- Safety gates (hardcoded off) ---
       - key: SYSTEM3_MODE
         value: analyzer
       - key: ANALYZE_MODE
         value: "1"
       - key: LIVE_TRADING_ENABLED
         value: "0"
+      - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+
+      # --- Memory stabilization ---
+      - key: DEFER_INSTRUMENT_WARMUP
+        value: "1"
+      - key: CLOUD_PAPER_ENGINE
+        value: "0"
+
+      # --- Memory guard thresholds (512MB Starter) ---
+      - key: MEM_WARN_MB
+        value: "380"
+      - key: MEM_GC_MB
+        value: "420"
+      - key: MEM_LIMIT_MB
+        value: "480"
+
+      # --- Dhan credentials (set in Render dashboard) ---
+      - key: DHAN_CLIENT_ID
+        sync: false
+      - key: DHAN_APP_ID
+        sync: false
+      - key: DHAN_APP_SECRET
+        sync: false
+      - key: DHAN_ACCESS_TOKEN
+        sync: false
+      - key: DHAN_PIN
+        sync: false
+      - key: DHAN_TOTP_SECRET
+        sync: false
+      - key: WORKER_PUSH_TOKEN
+        sync: false
+
+      # --- Worker -> web scheduler-health push auth ---
+      # Set the SAME value on both services in the Render dashboard.
+      # Used to authenticate POST /api/scheduler/health/push so only
+      # the worker can update scheduler status (see app.py + cloud_worker.py).
+      - key: WORKER_PUSH_TOKEN
+        sync: false
+
+  # -------------------------------------------------------------------
+  # Worker Service — Background Daemons
+  # -------------------------------------------------------------------
+  - type: worker
+    name: genesis-system3-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./dashboard/backend/Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/cloud_worker.py
+    autoDeploy: true
+
+    envVars:
+      # --- Deploy identity ---
+      - key: SYSTEM3_DEPLOY_TARGET
+        value: render
+      - key: RENDER
+        value: "true"
+      - key: CLOUD_WORKER
+        value: "true"
+
+      # --- Safety gates (hardcoded off) ---
+      - key: SYSTEM3_MODE
+        value: analyzer
+      - key: ANALYZE_MODE
+        value: "1"
+      - key: LIVE_TRADING_ENABLED
+        value: "0"
+      - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+
+      # --- Dhan credentials (set in Render dashboard) ---
+      - key: DHAN_CLIENT_ID
+        sync: false
+      - key: DHAN_APP_ID
+        sync: false
+      - key: DHAN_APP_SECRET
+        sync: false
+      - key: DHAN_ACCESS_TOKEN
+        sync: false
+      - key: DHAN_PIN
+        sync: false
+      - key: DHAN_TOTP_SECRET
+        sync: false
+
+      # --- Web service URL + push auth (Thread 4 in cloud_worker.py) ---
+      - key: WEB_SERVICE_URL
+        value: https://genesis-system3-backend.onrender.com
+      - key: WORKER_PUSH_TOKEN
+        sync: false
+
+      # --- Memory stabilization ---
+      - key: DEFER_INSTRUMENT_WARMUP
+        value: "1"
+      - key: CLOUD_PAPER_ENGINE
+        value: "0"
+
+      # --- Memory guard thresholds (512MB Starter) ---
+      - key: MEM_WARN_MB
+        value: "380"
+      - key: MEM_GC_MB
+        value: "420"
+      - key: MEM_LIMIT_MB
+        value: "480"
+
+    # --- Persistent disk (uncomment when ready — requires paid plan) ---
+    # disk:
+    #   name: genesis-data
+    #   mountPath: /var/data/genesis
+    #   sizeGB: 1
+
+  # -------------------------------------------------------------------
+  # Staging Web Service — NOT PROVISIONED. Uncomment + push to a
+  # `staging` branch to create it (Render creates a new service from a
+  # Blueprint the first time it sees one defined - this is documented
+  # here, not applied, since creating it requires the Render account
+  # owner's action, not something doable from this environment).
+  #
+  # Once it exists, point e2e/Playwright runs at it instead of
+  # production: DASHBOARD_URL=https://genesis-system3-backend-staging.onrender.com/ui
+  # (tests/dashboard_browser_proof.spec.ts and
+  # tools/playwright-setup/verify_all_ui_tabs.spec.ts already read this
+  # from the environment - no code change needed when this exists).
+  # -------------------------------------------------------------------
+  # - type: web
+  #   name: genesis-system3-backend-staging
+  #   runtime: docker
+  #   plan: starter
+  #   branch: staging
+  #   dockerfilePath: ./dashboard/backend/Dockerfile
+  #   dockerContext: .
+  #   autoDeploy: true
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - key: SYSTEM3_DEPLOY_TARGET
+  #       value: render-staging
+  #     - key: RENDER
+  #       value: "true"
+  #     - key: SYSTEM3_MODE
+  #       value: analyzer
+  #     - key: ANALYZE_MODE
+  #       value: "1"
+  #     - key: LIVE_TRADING_ENABLED
+  #       value: "0"
+  #     - key: SYSTEM3_LIVE_TRADING_ALLOWED
+  #       value: "0"
+  #     # Staging should run with synthetic/test credentials, not real
+  #     # Dhan production creds - set separately in Render's dashboard
+  #     # for this service once created.
+  #     - key: DHAN_CLIENT_ID
+  #       sync: false
+  #     - key: DHAN_APP_ID
+  #       sync: false
+  #     - key: DHAN_APP_SECRET
+  #       sync: false
+  #     - key: DHAN_ACCESS_TOKEN
+  #       sync: false
+  #     - key: DHAN_PIN
+  #       sync: false
+  #     - key: DHAN_TOTP_SECRET
+  #       sync: false

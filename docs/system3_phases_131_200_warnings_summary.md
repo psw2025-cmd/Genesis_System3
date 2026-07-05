@@ -23,19 +23,19 @@
 
 **Root Cause**:
 - Import error: Phase 132 tries to import `Broker` class
-- Actual class name is `AngelOneBroker` (not `Broker`)
+- Actual class name is `DhanBroker` (not `Broker`)
 - ImportError triggers WARN status
 - This is acceptable for DRY-RUN mode
 
 **Actual Message**:
 ```
-"AngelOne broker module not found (may be optional)"
+"Dhan broker module not found (may be optional)"
 ```
 
 **Technical Detail**:
-- Module exists: `core/brokers/angel_one/broker.py` ✅
-- Class name: `AngelOneBroker` ✅
-- Import statement: `from core.brokers.angel_one.broker import Broker` ❌ (should be `AngelOneBroker`)
+- Module exists: `core/brokers/dhan/broker.py` ✅
+- Class name: `DhanBroker` ✅
+- Import statement: `from core.brokers.dhan.broker import Broker` ❌ (should be `DhanBroker`)
 
 **Impact**:
 - ✅ **No impact on DRY-RUN operations**
@@ -79,7 +79,7 @@
 ### Technical Reason
 
 1. **Broker Module Location**:
-   - Phase 132 tries to import: `core.brokers.angel_one.broker`
+   - Phase 132 tries to import: `core.brokers.dhan.broker`
    - This module may not exist or may be in a different location
    - ImportError triggers WARN status
 
@@ -108,7 +108,7 @@
 ### ⚠️ Future Considerations
 
 - **Live Trading**: Will need broker connectivity
-- **API Configuration**: Will need AngelOne credentials
+- **API Configuration**: Will need Dhan credentials
 - **Network Access**: Will need broker endpoint access
 
 ---
@@ -118,12 +118,12 @@
 ### Step 1: Locate/Install Broker Module
 
 Check if broker module exists:
-- `core/brokers/angel_one/broker.py`
+- `core/brokers/dhan/broker.py`
 - Or alternative location in codebase
 
 ### Step 2: Configure Broker API
 
-- Set up AngelOne API credentials
+- Set up Dhan API credentials
 - Store in secure config files
 - Test connectivity
 

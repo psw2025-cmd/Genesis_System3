@@ -5,8 +5,8 @@ Side-by-side comparison of Baseline vs Ultra models, and manual promotion only.
 Respects safety switches - no auto-promotion.
 
 Inputs:
-- Baseline models: core/models/angel_one/
-- Ultra models: core/models/angel_one_ultra/
+- Baseline models: core/models/dhan/
+- Ultra models: core/models/dhan_ultra/
 - Reports and metadata
 
 Outputs:
@@ -16,18 +16,19 @@ Outputs:
 Menu Option: 83
 """
 
-import pandas as pd
-import numpy as np
-import joblib
 import json
 import shutil
-from pathlib import Path
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
-ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
+ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 CONFIG_DIR = PROJECT_ROOT / "core" / "config"
 

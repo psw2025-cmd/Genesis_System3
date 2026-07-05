@@ -4,15 +4,17 @@
 Quick inspector that writes `SYSTEM3_QUICK_INSPECTION_REPORT.md` in project root.
 Safe, read-only.
 """
-from pathlib import Path
+import csv
+import json
+import sys
 from datetime import datetime
-import sys, csv, json
+from pathlib import Path
 
 KEY_FILES = {
     "heartbeat_json": "storage/meta/system3_daily_heartbeat.json",
-    "signals_curated_csv": "storage/live/angel_index_ai_signals_curated.csv",
-    "signals_forward_csv": "storage/live/angel_index_ai_signals_with_forward.csv",
-    "pnl_log_csv": "storage/live/angel_index_ai_pnl_log.csv",
+    "signals_curated_csv": "storage/live/dhan_index_ai_signals_curated.csv",
+    "signals_forward_csv": "storage/live/dhan_index_ai_signals_with_forward.csv",
+    "pnl_log_csv": "storage/live/dhan_index_ai_pnl_log.csv",
     "autopilot_log_dir": "logs",
 }
 

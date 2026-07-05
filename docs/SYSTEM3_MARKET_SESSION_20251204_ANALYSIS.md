@@ -33,7 +33,7 @@
 - ⏭️ **SKIPPED**: 21 phases
 
 **Key Pre-Market Activities**:
-- Phase 205: Broker connectivity test ✅ (SmartAPI login successful)
+- Phase 205: Broker connectivity test ✅ (DhanHQ login successful)
 - Phase 221: Forward returns calculation ✅
 - Phase 222: Signal edge estimation ✅
 - Phase 223: Threshold optimizer ✅ (worked in pre-market)
@@ -139,7 +139,7 @@
 **Possible Causes**:
 1. Process crashed (no exception logged)
 2. System hang/freeze
-3. Network issue (SmartAPI connection lost)
+3. Network issue (DhanHQ connection lost)
 4. Memory/resource exhaustion
 5. Python interpreter crash
 

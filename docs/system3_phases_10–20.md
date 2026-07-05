@@ -19,7 +19,7 @@ Profile: `ULTRA_DEV` (baseline fully protected)
 **New directories (must exist, create if missing)**
 
 - Models (shadow):  
-  `core/models/angel_one_ultra/`
+  `core/models/dhan_ultra/`
 - Ultra data (shadow learning):  
   `storage/ultra/`
 - Ultra learning / research:  
@@ -33,7 +33,7 @@ Profile: `ULTRA_DEV` (baseline fully protected)
 
 1. Ensure these directories exist (create if needed, do not delete/modify old ones):
 
-   - `core/models/angel_one_ultra/`
+   - `core/models/dhan_ultra/`
    - `storage/ultra/`
    - `storage/learning_ultra/`
    - `storage/reports_ultra/`
@@ -42,7 +42,7 @@ Profile: `ULTRA_DEV` (baseline fully protected)
 
 **Validation**
 
-- `dir core\models\angel_one_ultra`
+- `dir core\models\dhan_ultra`
 - `dir storage\ultra`
 - `dir storage\learning_ultra`
 - `dir storage\reports_ultra`
@@ -104,19 +104,19 @@ Add/extend existing profile selector so that:
 
 BASELINE uses:
 
-models: core/models/angel_one/
+models: core/models/dhan/
 
 configs: existing ones
 
 ULTRA_DEV uses:
 
-models: core/models/angel_one_ultra/
+models: core/models/dhan_ultra/
 
 ultra data dirs: storage/ultra/, storage/learning_ultra/, storage/reports_ultra/
 
 File to extend (if already present)
 
-core/engine/angel_model_selector.py
+core/engine/dhan_model_selector.py
 or
 
 If not present, create it with:
@@ -129,7 +129,7 @@ get_storage_dirs(profile: str) -> dict
 
 Cursor Agent – Task 0.3
 
-Ensure angel_model_selector.py supports:
+Ensure dhan_model_selector.py supports:
 
 Profiles: "BASELINE", "ULTRA_DEV".
 
@@ -168,7 +168,7 @@ Validation
 
 Run:
 
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 
 
 Expected:
@@ -176,8 +176,8 @@ Expected:
 Shows something like:
 
 ACTIVE_PROFILE: BASELINE
-BASELINE model dir: core/models/angel_one
-ULTRA_DEV model dir: core/models/angel_one_ultra
+BASELINE model dir: core/models/dhan
+ULTRA_DEV model dir: core/models/dhan_ultra
 
 Phase 10 – Shadow Real-Data Engine V1
 
@@ -191,19 +191,19 @@ core/engine/ultra_shadow_data_engine.py
 
 From baseline (already present):
 
-Signals: storage/live/angel_index_ai_signals.csv
+Signals: storage/live/dhan_index_ai_signals.csv
 
-Trade plans: storage/live/angel_index_ai_trades_plan.csv
+Trade plans: storage/live/dhan_index_ai_trades_plan.csv
 
-PnL log: storage/live/angel_index_ai_pnl_log.csv
+PnL log: storage/live/dhan_index_ai_pnl_log.csv
 
-Real master dataset (if exists): storage/learning/angel_index_real_master_dataset.parquet (optional)
+Real master dataset (if exists): storage/learning/dhan_index_real_master_dataset.parquet (optional)
 
 10.2. Outputs (Ultra Shadow)
 
 Shadow master dataset:
-storage/learning_ultra/angel_ultra_shadow_master.parquet
-storage/learning_ultra/angel_ultra_shadow_master.csv
+storage/learning_ultra/dhan_ultra_shadow_master.parquet
+storage/learning_ultra/dhan_ultra_shadow_master.csv
 
 Content:
 
@@ -306,13 +306,13 @@ Loaded signals: 930
 Loaded trade plans: 3
 Loaded PnL log: 3
 Final shadow rows: 3
-[SAVE] shadow master CSV: storage/learning_ultra/angel_ultra_shadow_master.csv
-[SAVE] shadow master PARQUET: storage/learning_ultra/angel_ultra_shadow_master.parquet
+[SAVE] shadow master CSV: storage/learning_ultra/dhan_ultra_shadow_master.csv
+[SAVE] shadow master PARQUET: storage/learning_ultra/dhan_ultra_shadow_master.parquet
 
 
 Files:
 
-dir storage\learning_ultra\angel_ultra_shadow_master.*
+dir storage\learning_ultra\dhan_ultra_shadow_master.*
 
 Phase 11 – Ultra Feature Expander (50 → ~100 Features)
 
@@ -326,17 +326,17 @@ core/engine/ultra_feature_engineering.py
 
 Synthetic + real/blended training (baseline version):
 
-storage/training/angel_index_options_training.csv (synthetic)
+storage/training/dhan_index_options_training.csv (synthetic)
 
-storage/learning_ultra/angel_ultra_shadow_master.parquet (Phase 10)
+storage/learning_ultra/dhan_ultra_shadow_master.parquet (Phase 10)
 
 11.2. Outputs
 
 Ultra training dataset with extended features:
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
-storage/training/angel_ultra_training.csv
+storage/training/dhan_ultra_training.csv
 
 11.3. Features (Examples)
 
@@ -412,12 +412,12 @@ Combined ultra rows: 3003
 Base features: 25
 Ultra extra features: 60
 Total features: 85
-[SAVE] Ultra training: storage/training/angel_ultra_training.parquet
+[SAVE] Ultra training: storage/training/dhan_ultra_training.parquet
 
 
 File check:
 
-dir storage\training\angel_ultra_training.*
+dir storage\training\dhan_ultra_training.*
 
 Phase 12 – Shadow Model Trainer V3 (Ultra Models)
 
@@ -431,13 +431,13 @@ core/engine/ultra_train_models.py
 
 Ultra training dataset:
 
-storage/training/angel_ultra_training.parquet
+storage/training/dhan_ultra_training.parquet
 
 12.2. Outputs
 
 Ultra models (RF/XGB/Ensemble could be used, but separate):
 
-Directory: core/models/angel_one_ultra/
+Directory: core/models/dhan_ultra/
 
 Files per underlying, e.g.:
 
@@ -467,7 +467,7 @@ Train at least one strong model (RandomForest / XGBoost).
 
 Log accuracy, precision/recall/f1.
 
-Save models + meta into core/models/angel_one_ultra/.
+Save models + meta into core/models/dhan_ultra/.
 
 main() that prints a summary like baseline training.
 
@@ -495,7 +495,7 @@ BANKNIFTY: ...
 
 File check:
 
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 
 Phase 13 – Hyperparameter Space Explorer
 
@@ -507,7 +507,7 @@ core/engine/ultra_hparam_explorer.py
 
 13.1. Functionality
 
-Uses storage/training/angel_ultra_training.parquet.
+Uses storage/training/dhan_ultra_training.parquet.
 
 For each underlying:
 
@@ -558,7 +558,7 @@ core/engine/ultra_regime_classifier.py
 
 Regime labels added to ultra training data (not overwriting original):
 
-storage/training/angel_ultra_training_with_regime.parquet
+storage/training/dhan_ultra_training_with_regime.parquet
 
 Regime distribution report:
 
@@ -609,9 +609,9 @@ core/engine/ultra_multi_consensus.py
 
 15.1. Inputs
 
-Baseline models in core/models/angel_one/.
+Baseline models in core/models/dhan/.
 
-Ultra models in core/models/angel_one_ultra/.
+Ultra models in core/models/dhan_ultra/.
 
 Sample signals or shadow dataset snapshots.
 
@@ -690,7 +690,7 @@ Write results with columns:
 
 underlying, conf_thresh, score_thresh, trades, win_rate, avg_pnl, sharpe_like, comment.
 
-Do not change angel_trade_config.py or thresholds file.
+Do not change dhan_trade_config.py or thresholds file.
 
 16.5. Validation
 
@@ -725,7 +725,7 @@ Print table with side-by-side predictions (shadow only).
 
 Save results to:
 
-storage/ultra/angel_ultra_live_shadow_signals.csv
+storage/ultra/dhan_ultra_live_shadow_signals.csv
 
 17.2. Menu Entry
 
@@ -778,11 +778,11 @@ Ultra models.
 
 Simulated trade plans (shadow only):
 
-storage/ultra/angel_ultra_trade_plan_sim.csv
+storage/ultra/dhan_ultra_trade_plan_sim.csv
 
 PnL log:
 
-storage/ultra/angel_ultra_pnl_sim.csv
+storage/ultra/dhan_ultra_pnl_sim.csv
 
 Summary report:
 
@@ -827,7 +827,7 @@ core/engine/ultra_pnl_analyzer.py
 
 19.1. Inputs
 
-storage/ultra/angel_ultra_pnl_sim.csv
+storage/ultra/dhan_ultra_pnl_sim.csv
 
 19.2. Outputs
 
@@ -928,7 +928,7 @@ Check safety file: if AUTO_PROMOTE_MODELS is false:
 
 still OK to manually promote, but log it clearly.
 
-Copy core/models/angel_one_ultra/NIFTY_ultra_model.pkl → core/models/angel_one/NIFTY_model.pkl (or whichever baseline name is used).
+Copy core/models/dhan_ultra/NIFTY_ultra_model.pkl → core/models/dhan/NIFTY_model.pkl (or whichever baseline name is used).
 
 Create log entry in e.g. storage/reports_ultra/ultra_promotion_log.txt.
 
@@ -957,7 +957,7 @@ When all phases are implemented, ideal verification outputs:
 
 Directory structure
 
-core/models/angel_one_ultra contains Ultra models.
+core/models/dhan_ultra contains Ultra models.
 
 storage/ultra, storage/learning_ultra, storage/reports_ultra populated with shadow data, sim and analysis.
 

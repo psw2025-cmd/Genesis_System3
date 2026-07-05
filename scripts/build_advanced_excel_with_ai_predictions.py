@@ -3,26 +3,27 @@ Build Advanced Excel with AI Predictions - 1 Lakh Method
 Extensive multi-AI approach with full predictions, accuracy, and live data
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from datetime import datetime
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional
+
+import numpy as np
 import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.chart import LineChart, BarChart, ScatterChart, Reference
+import pandas as pd
+from openpyxl.chart import BarChart, LineChart, Reference, ScatterChart
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.ml.ensemble_predictor import EnsemblePredictor
 from src.analytics.performance_metrics import PerformanceMetrics
-from src.selector.top_symbol_selector import TopSymbolSelector
+from src.ml.ensemble_predictor import EnsemblePredictor
 from src.selector.strategy_engine import StrategyEngine
+from src.selector.top_symbol_selector import TopSymbolSelector
 from src.trading.advanced_position_sizing import AdvancedPositionSizing
 from src.trading.dynamic_risk_management import DynamicRiskManager
 

@@ -3,11 +3,12 @@ Verify that the system is using streaming data, not static data
 Tests that data changes between cycles
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
 import json
+import sys
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -1,6 +1,6 @@
 # Option Chain Implementation - Recommendations & Suggestions
 
-**Based on**: Complete analysis of Angel Broker API integration, TOTP implementation, and option chain data validation
+**Based on**: Complete analysis of Dhan Broker API integration, TOTP implementation, and option chain data validation
 
 **Date**: 2025-12-05
 
@@ -39,10 +39,10 @@
    logger.info(f"Quote response: {quote_data is not None}")
    ```
 
-2. **Check SmartAPI method availability**
+2. **Check DhanHQ method availability**
    ```python
    # Test what methods are actually available
-   broker = AngelOneBroker(allow_data_only=True)
+   broker = DhanBroker(allow_data_only=True)
    methods = [m for m in dir(broker.smart) if 'quote' in m.lower() or 'market' in m.lower()]
    print("Available quote methods:", methods)
    ```
@@ -123,8 +123,8 @@
        # Use calculated values
    ```
 
-4. **Check SmartAPI documentation**
-   - Review: https://smartapi.angelbroking.com/docs
+4. **Check DhanHQ documentation**
+   - Review: https://dhanhq.angelbroking.com/docs
    - Search for "Greek" or "Greeks" endpoints
    - Check if it's a premium feature requiring subscription
 
@@ -647,12 +647,12 @@ def smart_fetch(underlying, strategy="ATM"):
 ```python
 # Test broker initialization
 def test_broker_init():
-    broker = AngelOneBroker(allow_data_only=True)
+    broker = DhanBroker(allow_data_only=True)
     assert broker.smart is not None
 
 # Test quote fetching
 def test_get_quote():
-    broker = AngelOneBroker(allow_data_only=True)
+    broker = DhanBroker(allow_data_only=True)
     quote = broker.get_quote("NFO", "NIFTY24FEB2625000CE", "64829")
     assert quote is not None
 
@@ -690,7 +690,7 @@ def test_validation():
 ### 1. API Documentation
 
 **Suggestions**:
-- Document all SmartAPI methods used
+- Document all DhanHQ methods used
 - Document response structures
 - Document error codes and handling
 - Create API method reference guide
@@ -828,7 +828,7 @@ def test_validation():
 
 ### Risk Mitigation
 
-- **API Changes**: Monitor SmartAPI updates, have fallback plans
+- **API Changes**: Monitor DhanHQ updates, have fallback plans
 - **Rate Limiting**: Implement rate limiting to avoid bans
 - **Data Quality**: Always validate before using in trading logic
 - **Failures**: Have manual override and cached data options

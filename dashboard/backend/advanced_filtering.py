@@ -2,8 +2,8 @@
 Advanced Filtering & Search System
 """
 
-from typing import Dict, List, Optional, Any, Callable
 from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 
 class AdvancedFiltering:

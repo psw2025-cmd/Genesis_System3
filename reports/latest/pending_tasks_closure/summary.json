@@ -1,0 +1,97 @@
+{
+  "generated_utc": "2026-06-23T21:27:36.325797Z",
+  "automated_tasks": [
+    {
+      "name": "gate_orchestrator",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "{\n  \"blocker_count\": 0,\n  \"fail_count\": 0,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-06-23T21:25:14.873510+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 8,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"ANALYZER_READY_PROOF_INCOMPLETE\",\n  \"warning_count\": 6\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "dashboard_audit",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\dashboard_full_audit\\summary.md\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "broker_validation",
+      "passed": true,
+      "exit_code": 1,
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\broker_trader_validation\\summary.md\n",
+      "stderr_tail": "",
+      "note": "cloud_truth_ok"
+    },
+    {
+      "name": "human_approval",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\human_approval_gate\\summary.md\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "audit_reports",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    {
+      "name": "multi_agent",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\production_grade_readiness\\summary.md\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "unit_tests",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": ".........                                                                [100%]\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "truth_bridge",
+      "passed": true,
+      "exit_code": 0,
+      "stdout_tail": "ckend.onrender.com/api/qc\n[INFO] Fetching chain_NIFTY -> https://genesis-system3-backend.onrender.com/api/chain/NIFTY\n[INFO] Fetching chain_BANKNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/BANKNIFTY\n[INFO] Fetching chain_FINNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/FINNIFTY\n[INFO] Fetching chain_MIDCPNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/MIDCPNIFTY\n[DONE] Reports generated without Python:\n  C:\\System3\\Genesis_System3\\reports\\latest\\system3_truth_bridge\\summary.md\n  C:\\System3\\Genesis_System3\\reports\\latest\\production_viability_bridge\\summary.md\n\nOptional upload:\n  git add reports/latest/system3_truth_bridge reports/latest/production_viability_bridge\n  git commit -m 'proof: update PowerShell truth bridge reports'\n  git push\n",
+      "stderr_tail": ""
+    }
+  ],
+  "automated_passed": 8,
+  "automated_total": 8,
+  "cloud_endpoints": {
+    "/api/state": {
+      "ok": true
+    },
+    "/api/broker/truth": {
+      "ok": true
+    },
+    "/api/broker/holdings": {
+      "ok": true
+    },
+    "/api/broker/funds": {
+      "ok": true
+    },
+    "/api/portfolio/unified": {
+      "ok": true
+    },
+    "/api/trader/requirements": {
+      "ok": true
+    }
+  },
+  "cloud_all_ok": true,
+  "market_session_pending": [
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+    "ACCUMULATE_5_DAYS_SPEARMAN_RHO_GTE_0_70",
+    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "WEBSOCKET_TICK_HEALTH_IMPLEMENTATION"
+  ],
+  "permanent_safety_gates": [
+    "LIVE_TRADING_DISABLED_BY_DESIGN"
+  ],
+  "all_automatable_work_complete": true,
+  "real_money_ready": false,
+  "verdict": "AUTOMATED_COMPLETE_MARKET_SESSION_PENDING"
+}

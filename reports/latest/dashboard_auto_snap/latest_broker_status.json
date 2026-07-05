@@ -1,0 +1,18 @@
+{
+  "broker": "dhan",
+  "mode": "ANALYZER",
+  "connected": true,
+  "live_trading_enabled": false,
+  "order_placement_allowed": false,
+  "credentials_present": true,
+  "client_id_present": true,
+  "access_token_present": true,
+  "latency_ms": 261,
+  "error": null,
+  "auto_refresh": {
+    "attempted": false,
+    "success": false
+  },
+  "sdk_available": true,
+  "env_source": "core.utils.env_loader"
+}

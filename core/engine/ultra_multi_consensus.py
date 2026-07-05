@@ -5,8 +5,8 @@ Combines predictions from multiple Ultra models & baseline model for analysis.
 Shadow mode only - no trade plans generated.
 
 Inputs:
-- Baseline models: core/models/angel_one/
-- Ultra models: core/models/angel_one_ultra/
+- Baseline models: core/models/dhan/
+- Ultra models: core/models/dhan_ultra/
 - Sample signals or shadow dataset snapshots
 
 Outputs:
@@ -15,21 +15,22 @@ Outputs:
 Menu Option: 78
 """
 
-import pandas as pd
-import numpy as np
-import joblib
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import joblib
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
-ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
+ULTRA_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra"
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 
-SHADOW_PARQUET = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.parquet"
-SHADOW_CSV = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+SHADOW_PARQUET = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.parquet"
+SHADOW_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 CONSENSUS_CSV = REPORTS_ULTRA_DIR / "ultra_consensus_sample.csv"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)

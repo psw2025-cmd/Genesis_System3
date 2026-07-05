@@ -5,11 +5,11 @@ Use Phase 76 self-critique to propose concrete corrections (not apply them autom
 to thresholds and rules.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

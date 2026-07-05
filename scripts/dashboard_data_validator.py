@@ -1,18 +1,19 @@
 """
 Dashboard Data Validator - Production Grade
-Compares dashboard data with live internet sources (NSE, BSE, Angel One)
+Compares dashboard data with live internet sources (NSE, BSE, Dhan)
 Validates all data points and identifies discrepancies
 """
 
-import requests
 import json
 import time
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
 import pytz
-from dataclasses import dataclass, asdict
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"
@@ -84,31 +85,14 @@ class DashboardDataValidator:
         }
 
     def fetch_nse_option_chain(self, symbol: str) -> Optional[Dict]:
-        """Fetch option chain from NSE"""
+        """Fetch option chain from NSE (v3 API via hardened session)."""
         try:
-            # NSE uses different symbol format
-            nse_symbols = {
-                "NIFTY": "NIFTY",
-                "BANKNIFTY": "BANKNIFTY",
-                "FINNIFTY": "FINNIFTY",
-                "MIDCPNIFTY": "MIDCPNIFTY",
-                "SENSEX": "SENSEX",  # BSE
-            }
+            from core.data.nse_session import NSEFetchError, fetch_option_chain_json
 
-            nse_symbol = nse_symbols.get(symbol.upper())
-            if not nse_symbol:
-                return None
-
-            # Try NSE API
-            url = f"{NSE_OPTION_CHAIN}?symbol={nse_symbol}"
-            headers = self.get_nse_headers()
-
-            response = self.session.get(url, headers=headers, timeout=10)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                # Try alternative method
-                return self.fetch_nse_alternative(symbol)
+            return fetch_option_chain_json(symbol)
+        except NSEFetchError as e:
+            print(f"NSE option chain unavailable for {symbol}: {e}")
+            return self.fetch_nse_alternative(symbol)
         except Exception as e:
             print(f"Error fetching NSE data for {symbol}: {e}")
             return None

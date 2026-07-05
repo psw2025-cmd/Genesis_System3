@@ -1,7 +1,8 @@
 """Quick verification of enhanced Excel file"""
 
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 excel_path = Path("outputs/OptionChain_Master_v3_AI_FINAL.xlsx")
 

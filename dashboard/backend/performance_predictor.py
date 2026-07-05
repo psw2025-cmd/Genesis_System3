@@ -6,8 +6,9 @@ Multi-validation for live trading conditions
 import json
 import math
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")

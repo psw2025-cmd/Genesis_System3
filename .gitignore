@@ -14,6 +14,13 @@ venv/
 !.env.example
 config/.env
 config/.env.*
+
+# Local secret store (never commit real credentials)
+.secrets/
+.secrets/render_api_key
+
+# Claude Code settings (may contain session tokens or allowlisted commands with tokens)
+.claude/settings.local.json
 *.pem
 *.key
 *.p8
@@ -36,7 +43,45 @@ logs/
 
 # Local audit artifacts
 audit_artifacts/
+ai_scan.txt
+repomix-output.xml
+FETCH_HEAD
 
 # Desktop app build output (large binaries; exceed GitHub limits)
 desktop_app/dist/
 google-cloud-sdk/
+
+# Windows launch scripts (never needed on Linux/cloud)
+*.bat
+!tools/*.bat
+*.bat.bak*
+*.ps1
+*.cmd
+*.bak
+
+# Root-level JS/TS scratch files and stale data dumps
+# (leading slash anchors to repo root only - without it, *.tsx matches
+# at every directory depth and silently blocks any new file under
+# dashboard/frontend/src/components/ from ever being git-added)
+/*.tsx
+COMPLETE_DIAGNOSTIC_SCRIPT.js
+ONE_LINE_TESTS.js
+QUICK_FIX_CONSOLE.js
+verify_dashboard_fix.js
+*.xlsx
+OptionChain_Master_v3_AI_FINAL.csv
+
+# Auto-generated test suites (regenerate from source if needed)
+tests/auto/
+
+# Legacy archive and agent run logs
+archive/
+AI_AGENT_RUNS/
+
+# Phase reports: allow reports/latest/ (live proof artifacts), block everything else
+reports/*
+!reports/latest
+reports/latest/manual_*
+
+# Runtime state files
+state/

@@ -4,12 +4,13 @@ System3 Phase 302 - Regime-Aware Performance Profiler
 Combines volatility regime info with Phase 301 metrics to see where the system performs best.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

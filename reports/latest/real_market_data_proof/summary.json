@@ -1,0 +1,14 @@
+{
+  "generated_utc": "2026-06-23T21:26:52.504262Z",
+  "status": "PASS_WITH_WARNINGS",
+  "dashboard_data_source": "BROKER_CONNECTED_MARKET_CLOSED",
+  "broker_connected": true,
+  "dhan_live_proof_available": true,
+  "nse_comparison_proof_exists": false,
+  "broker_proof_blocked_by_secrets": false,
+  "synthetic_labelled": false,
+  "remaining_blockers": [
+    "real_market_analyzer_paper_lifecycle_not_proven",
+    "nse_comparison_proof_missing"
+  ]
+}

@@ -2,11 +2,12 @@
 Simple Micro-Level Monitor - Direct output, no subprocess complications
 """
 
+import json
 import sys
 import time
-import json
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

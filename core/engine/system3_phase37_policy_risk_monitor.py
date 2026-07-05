@@ -14,11 +14,12 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 100
 """
 
-import pandas as pd
 import json
-from pathlib import Path
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -53,7 +54,7 @@ def _load_audit_results() -> Optional[pd.DataFrame]:
 
 def _load_shadow_trades() -> Optional[pd.DataFrame]:
     """Load shadow Ultra trades."""
-    shadow_csv = LIVE_DIR / "angel_index_ai_ultra_trades_shadow.csv"
+    shadow_csv = LIVE_DIR / "dhan_index_ai_ultra_trades_shadow.csv"
     if not shadow_csv.exists():
         return None
     try:

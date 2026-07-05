@@ -34,15 +34,16 @@ Date: 2025-12-08 (Upgraded: 2026-02-22)
 Phase: 392/400
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Any, Tuple, List
-from pathlib import Path
-from datetime import datetime, timedelta
-from collections import deque
-import logging
-import joblib
 import json
+import logging
+from collections import deque
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import joblib
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +131,7 @@ _weight_tracker = DynamicWeightTracker()
 def load_ultra_model(underlying: str) -> Optional[Any]:
     """Load Ultra Model for given underlying."""
     try:
-        model_path = Path(f"core/models/angel_one_ultra/{underlying}_ultra_model.pkl")
+        model_path = Path(f"core/models/dhan_ultra/{underlying}_ultra_model.pkl")
         if model_path.exists():
             model = joblib.load(model_path)
             logger.debug(f"Loaded Ultra model: {underlying}")

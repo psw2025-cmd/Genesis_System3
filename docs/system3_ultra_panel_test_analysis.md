@@ -41,7 +41,7 @@ A comprehensive test run was executed on the System3 Ultra Control Panel, testin
 | 1 | ✅ PASS | Core boot executed |
 | 2 | ✅ PASS | Health check completed |
 | 3 | ✅ PASS | Data pipeline test completed |
-| 4 | ✅ PASS | Angel One API test - Login successful |
+| 4 | ✅ PASS | Dhan API test - Login successful |
 | 5 | ✅ PASS | Instruments test completed |
 | 6 | ✅ PASS | Index options watch completed |
 | 7 | ⏭️ SKIPPED | LIVE loop (intentionally skipped) |

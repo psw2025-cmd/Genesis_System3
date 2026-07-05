@@ -1,0 +1,94 @@
+{
+  "chain_banknifty": {
+    "bytes": 199,
+    "content_type": "application/json",
+    "data": {
+      "contracts": [],
+      "data_source": "closed",
+      "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+      "pcr": 1.0,
+      "spot": 0,
+      "status": "MARKET_CLOSED",
+      "total_contracts": 0,
+      "underlying": "BANKNIFTY"
+    },
+    "elapsed_s": 0.403,
+    "endpoint": "/api/chain/BANKNIFTY",
+    "error": null,
+    "name": "chain_banknifty",
+    "ok": true,
+    "sha256": "<redacted>",
+    "status": 200,
+    "text_preview": null,
+    "url": "https://genesis-system3-backend.onrender.com/api/chain/BANKNIFTY"
+  },
+  "chain_finnifty": {
+    "bytes": 198,
+    "content_type": "application/json",
+    "data": {
+      "contracts": [],
+      "data_source": "closed",
+      "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+      "pcr": 1.0,
+      "spot": 0,
+      "status": "MARKET_CLOSED",
+      "total_contracts": 0,
+      "underlying": "FINNIFTY"
+    },
+    "elapsed_s": 0.428,
+    "endpoint": "/api/chain/FINNIFTY",
+    "error": null,
+    "name": "chain_finnifty",
+    "ok": true,
+    "sha256": "<redacted>",
+    "status": 200,
+    "text_preview": null,
+    "url": "https://genesis-system3-backend.onrender.com/api/chain/FINNIFTY"
+  },
+  "chain_midcpnifty": {
+    "bytes": 200,
+    "content_type": "application/json",
+    "data": {
+      "contracts": [],
+      "data_source": "closed",
+      "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+      "pcr": 1.0,
+      "spot": 0,
+      "status": "MARKET_CLOSED",
+      "total_contracts": 0,
+      "underlying": "MIDCPNIFTY"
+    },
+    "elapsed_s": 0.895,
+    "endpoint": "/api/chain/MIDCPNIFTY",
+    "error": null,
+    "name": "chain_midcpnifty",
+    "ok": true,
+    "sha256": "<redacted>",
+    "status": 200,
+    "text_preview": null,
+    "url": "https://genesis-system3-backend.onrender.com/api/chain/MIDCPNIFTY"
+  },
+  "chain_nifty": {
+    "bytes": 195,
+    "content_type": "application/json",
+    "data": {
+      "contracts": [],
+      "data_source": "closed",
+      "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+      "pcr": 1.0,
+      "spot": 0,
+      "status": "MARKET_CLOSED",
+      "total_contracts": 0,
+      "underlying": "NIFTY"
+    },
+    "elapsed_s": 0.383,
+    "endpoint": "/api/chain/NIFTY",
+    "error": null,
+    "name": "chain_nifty",
+    "ok": true,
+    "sha256": "<redacted>",
+    "status": 200,
+    "text_preview": null,
+    "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY"
+  }
+}

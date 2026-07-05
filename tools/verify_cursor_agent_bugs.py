@@ -6,8 +6,8 @@ Verify known code-quality issues are fixed.
 - Logger present where required (e.g. performance attribution)
 Run from repo root: python tools/verify_cursor_agent_bugs.py
 """
-import sys
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

@@ -40,7 +40,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const isConnectingRef = useRef(false)
   const marketCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  
+  const reconnectAttemptsRef = useRef(0)
+
   // Store callbacks in refs to prevent unnecessary reconnections
   const callbacksRef = useRef({ onMessage, onError, onConnect, onDisconnect })
   
@@ -78,6 +79,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       ws.onopen = () => {
         isConnectingRef.current = false
+        reconnectAttemptsRef.current = 0
         setIsConnected(true)
         setUsePolling(false)
         callbacksRef.current.onConnect?.()
@@ -118,11 +120,20 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current)
           }
+          // Exponential backoff with jitter, capped at 30s. Previously a
+          // fixed 3s retry with no cap - a backend outage meant every
+          // connected tab hammered the server with a reconnect attempt
+          // every 3 seconds indefinitely.
+          const attempt = reconnectAttemptsRef.current
+          reconnectAttemptsRef.current = attempt + 1
+          const baseDelay = Math.min(3000 * 2 ** attempt, 30000)
+          const jitter = baseDelay * 0.2 * Math.random()
+          const delay = baseDelay + jitter
           reconnectTimeoutRef.current = setTimeout(() => {
             if (enabled && !isConnectingRef.current && isMarketOpen()) {
               connect()
             }
-          }, 3000) // Increased delay to 3 seconds
+          }, delay)
         }
       }
 
@@ -152,6 +163,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       pollIntervalRef.current = null
     }
     isConnectingRef.current = false
+    reconnectAttemptsRef.current = 0
     setIsConnected(false)
   }, [])
 

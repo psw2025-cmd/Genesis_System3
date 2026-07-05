@@ -2,11 +2,12 @@
 Production System Test - End-to-end validation
 """
 
+import json
 import sys
 import time
-import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -164,7 +165,11 @@ def test_monitor_components():
 
     try:
         # Test profit monitor functions
-        from scripts.profit_focused_monitor import get_pnl_summary, get_open_positions, get_system_status
+        from scripts.profit_focused_monitor import (
+            get_open_positions,
+            get_pnl_summary,
+            get_system_status,
+        )
 
         # Test PnL summary
         pnl = get_pnl_summary()

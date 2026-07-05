@@ -14,7 +14,7 @@
 2. **Additive Only**: New modules only, no overwrites
 3. **No Auto-Execution**: All execution must be manual/read-only
 4. **No Silent Config Changes**: All config changes must be explicit and logged
-5. **No Model Overwrites**: Models saved to `core/models/angel_one_ultra/` only
+5. **No Model Overwrites**: Models saved to `core/models/dhan_ultra/` only
 6. **Output Location**: All outputs to `storage/ultra/ph46_ph55/`
 7. **Documentation**: All docs under `docs/system3_phases_46_55_*`
 

@@ -59,7 +59,7 @@ system3_ultra_daily_full.bat
 
 **Step 3**: Check Shadow Trades
 ```cmd
-type storage\live\angel_index_ai_ultra_trades_shadow.csv
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 **Step 4**: Run Daily All-In-One (Optional)
@@ -172,7 +172,7 @@ python -m core.engine.system3_phase41_promotion_executor
 
 **Output**: `storage/ultra/phase41_promotion_staging_report.md`
 
-**Staging Location**: `core/models/angel_one_ultra_staging/`
+**Staging Location**: `core/models/dhan_ultra_staging/`
 
 ---
 
@@ -202,7 +202,7 @@ If you decide to promote staged models to baseline:
 3. **Manual copy** from staging to baseline:
    ```cmd
    # Example (DO NOT RUN WITHOUT REVIEW):
-   # copy core\models\angel_one_ultra_staging\FINNIFTY_model.pkl core\models\angel_one\FINNIFTY_model.pkl
+   # copy core\models\dhan_ultra_staging\FINNIFTY_model.pkl core\models\dhan\FINNIFTY_model.pkl
    ```
 4. **Document the promotion** (manual note)
 

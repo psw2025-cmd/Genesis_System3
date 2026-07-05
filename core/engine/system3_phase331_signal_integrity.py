@@ -5,14 +5,15 @@ Detects structural issues in live signal CSVs before they are used by trade plan
 Checks: missing columns, NaNs in key fields, zero rows, mixed dtypes.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -22,16 +23,16 @@ logger = logging.getLogger(__name__)
 
 # Signal CSV files to check
 SIGNAL_FILES = [
-    "storage/live/angel_index_ai_signals.csv",
-    "storage/live/angel_index_ai_signals_curated.csv",
-    "storage/live/angel_index_ai_signals_with_forward.csv",
+    "storage/live/dhan_index_ai_signals.csv",
+    "storage/live/dhan_index_ai_signals_curated.csv",
+    "storage/live/dhan_index_ai_signals_with_forward.csv",
 ]
 
 # Required columns for each file
 REQUIRED_COLUMNS = {
-    "angel_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
-    "angel_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts", "pred_label"],
-    "angel_index_ai_signals_with_forward.csv": [
+    "dhan_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+    "dhan_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts", "pred_label"],
+    "dhan_index_ai_signals_with_forward.csv": [
         "underlying",
         "symbol",
         "signal",

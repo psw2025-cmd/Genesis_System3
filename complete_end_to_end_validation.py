@@ -3,15 +3,16 @@
 Complete End-to-End Validation
 Tests all features, tabs, multi-user scenarios, market hours, paper trading, learning
 """
-import sys
-import requests
-import json
-import time
-import subprocess
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Any
 import concurrent.futures
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import requests
 
 ROOT_DIR = Path(__file__).parent
 sys.path.insert(0, str(ROOT_DIR))
@@ -59,7 +60,7 @@ class CompleteEndToEndValidator:
         print_header("MARKET HOURS & DATA SWITCHING")
         
         try:
-            from src.utils.market_hours import is_market_open, get_market_status
+            from src.utils.market_hours import get_market_status, is_market_open
             
             is_open, reason = is_market_open()
             status = get_market_status()

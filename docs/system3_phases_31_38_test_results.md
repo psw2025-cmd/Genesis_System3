@@ -143,7 +143,7 @@ After retesting, verify:
 - [x] Phase 32: `phase32_ultra_vs_baseline_summary.md` exists
 - [ ] Phase 33: `phase33_promotion_plan.json` exists (no JSON error)
 - [ ] Phase 33: `phase33_promotion_plan.md` exists
-- [x] Phase 34: `angel_index_ai_ultra_trades_shadow.csv` exists (empty is OK)
+- [x] Phase 34: `dhan_index_ai_ultra_trades_shadow.csv` exists (empty is OK)
 - [x] Phase 35: `phase35_decision_audit_report.md` exists
 - [ ] Phase 36: `phase36_cull_execution_log.md` exists
 - [x] Phase 37: `phase37_policy_risk_dashboard.md` exists

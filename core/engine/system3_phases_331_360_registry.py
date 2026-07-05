@@ -5,8 +5,8 @@ Registers all new phases for the autorun master.
 Provides callable functions and phase metadata.
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent

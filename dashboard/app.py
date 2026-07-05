@@ -3,8 +3,8 @@ System3 Ultra Streamlit Dashboard
 Connects to backend API (port 8000) for real-time monitoring.
 """
 
-import streamlit as st
 import requests
+import streamlit as st
 
 API_BASE = "http://127.0.0.1:8000"
 

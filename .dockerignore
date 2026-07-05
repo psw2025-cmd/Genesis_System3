@@ -16,5 +16,4 @@ agent_memory
 .env
 .env.*
 !.env.example
-dashboard/frontend/dist
 dashboard/backend/logs

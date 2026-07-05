@@ -5,8 +5,8 @@
 - **File**: `system3_prep_for_new_day.py`
 - **Purpose**:
   - Archives the current live signals CSV:
-    - From `storage/live/angel_index_ai_signals.csv`
-    - To `storage/live/archive/angel_index_ai_signals_YYYYMMDD_HHMMSS_before_new_day.csv`
+    - From `storage/live/dhan_index_ai_signals.csv`
+    - To `storage/live/archive/dhan_index_ai_signals_YYYYMMDD_HHMMSS_before_new_day.csv`
   - Prepares the system for a fresh DRY-RUN day without mixing old scores.
 
 **Example usage**:
@@ -49,7 +49,7 @@ If not enough data is available or the CSV cannot be read, it falls back to defa
 
 - **File**: `system3_signal_test_mode.py`
 - **Purpose**:
-  - Offline DRY-RUN analysis of recent signals from `storage/live/angel_index_ai_signals.csv`.
+  - Offline DRY-RUN analysis of recent signals from `storage/live/dhan_index_ai_signals.csv`.
   - Optional auto-thresholds based on historical `final_score`.
 
 **Key CLI options**:
@@ -61,11 +61,11 @@ If not enough data is available or the CSV cannot be read, it falls back to defa
 
 **Flow when `--auto-thresholds` is used**:
 
-1. Loads and filters recent rows from `storage/live/angel_index_ai_signals.csv`.
+1. Loads and filters recent rows from `storage/live/dhan_index_ai_signals.csv`.
 2. Calls `suggest_thresholds_from_history` with:
 
    ```python
-   csv_path = ROOT_DIR / "storage" / "live" / "angel_index_ai_signals.csv"
+   csv_path = ROOT_DIR / "storage" / "live" / "dhan_index_ai_signals.csv"
    calib = suggest_thresholds_from_history(csv_path, lookback_rows=lookback_snapshots)
    ```
 
@@ -96,7 +96,7 @@ python system3_prep_for_new_day.py
 system3_live_day_autopilot.bat
 ```
 
-Let this run long enough to collect new live signals in `storage/live/angel_index_ai_signals.csv`.
+Let this run long enough to collect new live signals in `storage/live/dhan_index_ai_signals.csv`.
 
 #### 3) After some data is collected, run test mode with auto-thresholds
 

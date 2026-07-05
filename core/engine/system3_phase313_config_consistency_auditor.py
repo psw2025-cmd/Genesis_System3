@@ -4,8 +4,8 @@ System3 Phase 313 - Config Consistency Auditor
 Audits all critical configuration files for syntax, consistency, and conflicts.
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
 
 try:
@@ -14,9 +14,9 @@ try:
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
-from datetime import datetime
-from typing import Dict, Any, List
 import logging
+from datetime import datetime
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

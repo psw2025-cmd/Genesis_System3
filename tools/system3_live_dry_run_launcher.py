@@ -24,13 +24,13 @@ Usage:
 Then follow the interactive menu prompts.
 """
 
-import sys
-import os
 import json
 import logging
-from pathlib import Path
+import os
+import sys
 from datetime import datetime
-from typing import Optional, Dict, Any
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -159,10 +159,10 @@ class LiveDryRunLauncher:
         # Check key CSV files
         logger.info("\n2️⃣  Checking live CSV files...")
         csv_files = [
-            "storage/live/angel_index_ai_signals.csv",
-            "storage/live/angel_virtual_orders.csv",
-            "storage/live/angel_index_ai_pnl_log.csv",
-            "storage/live/angel_index_ai_trades_plan.csv",
+            "storage/live/dhan_index_ai_signals.csv",
+            "storage/live/dhan_virtual_orders.csv",
+            "storage/live/dhan_index_ai_pnl_log.csv",
+            "storage/live/dhan_index_ai_trades_plan.csv",
         ]
 
         for csv_path in csv_files:
@@ -190,35 +190,35 @@ class LiveDryRunLauncher:
             logger.warning(f"   ⚠️  models/ directory not found")
             results["models"] = "MISSING"
 
-        # Check AngelOne configuration
-        logger.info("\n4️⃣  Checking AngelOne configuration...")
-        angel_config = PROJECT_ROOT / "config" / "angel_auth_config.json"
-        if angel_config.exists():
+        # Check Dhan configuration
+        logger.info("\n4️⃣  Checking Dhan configuration...")
+        dhan_config = PROJECT_ROOT / "config" / "dhan_auth_config.json"
+        if dhan_config.exists():
             try:
-                with open(angel_config, "r") as f:
+                with open(dhan_config, "r") as f:
                     config = json.load(f)
                 if "client_code" in config and "password" in config:
-                    logger.info(f"   ✅ AngelOne credentials configured")
-                    results["angel_auth"] = "OK"
+                    logger.info(f"   ✅ Dhan credentials configured")
+                    results["dhan_auth"] = "OK"
                 else:
-                    logger.warning(f"   ⚠️  AngelOne credentials incomplete")
-                    results["angel_auth"] = "INCOMPLETE"
+                    logger.warning(f"   ⚠️  Dhan credentials incomplete")
+                    results["dhan_auth"] = "INCOMPLETE"
             except Exception as e:
-                logger.warning(f"   ⚠️  Error reading AngelOne config: {e}")
-                results["angel_auth"] = "ERROR"
+                logger.warning(f"   ⚠️  Error reading Dhan config: {e}")
+                results["dhan_auth"] = "ERROR"
         else:
-            logger.warning(f"   ⚠️  angel_auth_config.json not found")
-            results["angel_auth"] = "MISSING"
+            logger.warning(f"   ⚠️  dhan_auth_config.json not found")
+            results["dhan_auth"] = "MISSING"
 
         # Check instruments file
         logger.info("\n5️⃣  Checking instruments file...")
-        instruments_file = PROJECT_ROOT / "config" / "angel_instruments.csv"
+        instruments_file = PROJECT_ROOT / "config" / "dhan_instruments.csv"
         if instruments_file.exists():
             row_count = sum(1 for line in open(instruments_file)) - 1
-            logger.info(f"   ✅ angel_instruments.csv ({row_count} instruments)")
+            logger.info(f"   ✅ dhan_instruments.csv ({row_count} instruments)")
             results["instruments"] = "OK"
         else:
-            logger.warning(f"   ⚠️  angel_instruments.csv not found")
+            logger.warning(f"   ⚠️  dhan_instruments.csv not found")
             results["instruments"] = "MISSING"
 
         logger.info("")
@@ -240,7 +240,7 @@ in the following order:
      Duration: ~2 min
 
   2. Run: Option 3 (Test data pipeline)
-     Purpose: Verify AngelOne API connection
+     Purpose: Verify Dhan API connection
      Duration: ~3 min
 
   3. Run: Option 109 > enter "331-380"
@@ -275,7 +275,7 @@ in the following order:
   ⏰ 3:20 PM – 3:40 PM — GENERATE REPORTS
   ────────────────────────────────────────
   9. Run: Option 36 (Daily learning report)
-     Output: logs/angel_daily_learning_YYYY-MM-DD.md
+     Output: logs/dhan_daily_learning_YYYY-MM-DD.md
      Duration: ~2 min
 
   10. Run: Option 37 (Rolling 7-day dashboard)
@@ -432,7 +432,7 @@ Status: ✓ PASS
 Problem: "Signals not being generated"
 Solution:
   1. Check internet connection
-  2. Verify AngelOne login: Option 4 (Test Angel One API)
+  2. Verify Dhan login: Option 4 (Test Dhan API)
   3. Check if models exist: Option 10 (Train models)
   4. Restart Option 11
 
@@ -446,7 +446,7 @@ Solution:
 Problem: "Backtest crashes"
 Solution:
   1. Try Option 13 (DEV backtest) instead (more lenient)
-  2. Check storage/live/angel_index_ai_trades_plan.csv exists
+  2. Check storage/live/dhan_index_ai_trades_plan.csv exists
   3. Wait 30+ minutes for data to accumulate
   4. Check logs/ for specific error
 

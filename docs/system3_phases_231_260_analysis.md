@@ -9,7 +9,7 @@
 
 **Total Phases**: 30 (231-260)  
 **Primary Goal**: Implement virtual execution pipeline with threshold integration  
-**Safety**: 100% DRY-RUN safe, AngelOne-only
+**Safety**: 100% DRY-RUN safe, Dhan-only
 
 ---
 
@@ -86,7 +86,7 @@ config/
 └── live_trade_config.json  # NEW
 
 storage/live/
-└── angel_virtual_orders.csv  # NEW (created at runtime)
+└── dhan_virtual_orders.csv  # NEW (created at runtime)
 
 logs/
 ├── risk/
@@ -145,7 +145,7 @@ storage/meta/
 ### **6. Virtual Execution Engine (Phase 236)**
 - Convert signals to planned orders
 - Run risk checks
-- Log to `angel_virtual_orders.csv`
+- Log to `dhan_virtual_orders.csv`
 - **NO** broker API calls, **NO** network calls
 
 ### **7. Live Loop Integration (Phase 237)**

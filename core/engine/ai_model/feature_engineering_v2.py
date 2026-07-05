@@ -22,13 +22,14 @@ Date: 2025-12-08
 Phase: 389/400
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Any
-from pathlib import Path
+import json
 import logging
 from datetime import datetime
-import json
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -419,7 +420,7 @@ def run_phase_389() -> Dict[str, Any]:
         logger.info("Phase 389: Feature Engineering Upgrade - Starting")
 
         # Load curated dataset
-        curated_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+        curated_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
         if not curated_path.exists():
             logger.warning(f"Curated dataset not found: {curated_path}")
             # Use sample data for testing

@@ -235,12 +235,12 @@
 All WARN phases are correctly detecting missing data files and returning appropriate status:
 
 #### **Category 1: Need Virtual Orders (10 phases)**
-- ✅ Correctly detecting missing `angel_virtual_orders.csv`
+- ✅ Correctly detecting missing `dhan_virtual_orders.csv`
 - ✅ Returning WARN with clear message
 - ✅ Will become OK once autopilot generates orders
 
 #### **Category 2: Need Signals Data (8 phases)**
-- ✅ Correctly detecting missing `angel_index_ai_signals.csv`
+- ✅ Correctly detecting missing `dhan_index_ai_signals.csv`
 - ✅ Returning WARN with clear message
 - ✅ Will become OK once signal engine generates signals
 

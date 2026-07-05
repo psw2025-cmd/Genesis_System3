@@ -3,12 +3,13 @@ Multi-User Dashboard Verification Script
 Simulates multiple traders/users testing the dashboard
 """
 
-import requests
 import json
 import sys
 import time
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 

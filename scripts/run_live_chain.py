@@ -1,41 +1,49 @@
 """
-Live Option Chain Runner - Main entry point
+Live Option Chain Runner - DISABLED (Dhan / DhanHQ path).
+
+System3 is Dhan-only. This script depends on Dhan broker and DhanHQ
+WebSocket which are disabled. Running this script will raise RuntimeError
+when attempting to connect to Dhan.
 """
 
+import argparse
+import json
 import sys
 import time
-import argparse
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict
-import pytz
+from pathlib import Path
+from typing import Dict, Optional
+
 import pandas as pd
-import json
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from core.brokers.angel_one.broker import AngelOneBroker
-from src.angel.expiry_selector import get_expiry_for_all_indices
-from src.angel.live_chain_ws import LiveChainWebSocket
+try:
+    import pytz
+
+    _PYTZ_AVAILABLE = True
+except ImportError:
+    pytz = None
+    _PYTZ_AVAILABLE = False
+
+from core.utils.logger import logger
+from core.utils.option_chain_calculations import add_calculated_columns
 from src.angel.live_chain_rest import LiveChainREST
-from src.metrics.iv_solver import solve_implied_volatility
 from src.metrics.greeks import calculate_greeks_from_market_price
+from src.metrics.iv_solver import solve_implied_volatility
 from src.metrics.oi_buildup import compute_deltas
-from src.selector.top_symbol_selector import TopSymbolSelector
-from src.selector.strategy_engine import StrategyEngine
-from src.storage.sqlite_store import OptionChainStore
 from src.output.export_csv import CSVExporter
-from src.validation.qc_validator import QCValidator
-from src.utils.market_hours import is_market_open, get_market_status
 from src.output.metrics_logger import log_cycle_metrics
+from src.selector.strategy_engine import StrategyEngine
+from src.selector.top_symbol_selector import TopSymbolSelector
+from src.storage.sqlite_store import OptionChainStore
+from src.storage.trade_history import TradeHistoryStore
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
-from src.storage.trade_history import TradeHistoryStore
-from core.utils.option_chain_calculations import add_calculated_columns
-from core.utils.logger import logger
-
+from src.utils.market_hours import get_market_status, is_market_open
+from src.validation.qc_validator import QCValidator
 
 # Available indices
 AVAILABLE_INDICES = [
@@ -81,11 +89,11 @@ class LiveChainRunner:
 
         # Initialize components
         if not sim_mode:
-            logger.info("Initializing broker...")
-            self.broker = AngelOneBroker(allow_data_only=True)
-            logger.info("Initializing components...")
-            self.ws_manager = LiveChainWebSocket(self.broker) if use_websocket else None
-            self.rest_fallback = LiveChainREST(self.broker)
+            raise RuntimeError(
+                "LiveChainRunner: Dhan broker path is disabled. "
+                "System3 is Dhan-only. Pass sim_mode=True for simulation, "
+                "or use the Dhan data feed instead."
+            )
         else:
             logger.info("SIMULATION MODE: Skipping broker initialization")
             self.broker = None

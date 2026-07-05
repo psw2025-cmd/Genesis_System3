@@ -165,7 +165,7 @@ def check_heartbeat_staleness() -> Tuple[bool, Optional[float]]:
 
 **Evidence from Today**:
 - No network errors logged
-- All broker calls successful (AngelOne login successful multiple times)
+- All broker calls successful (Dhan login successful multiple times)
 
 **Code Reference**:
 ```264:284:system3_autorun_master.py
@@ -320,7 +320,7 @@ def enforce_safety_checks() -> bool:
     
     # Check 2: Automation config
     try:
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         if AUTOMATION_CONFIG.auto_execute_trades:
             errors.append("AUTOMATION_CONFIG.auto_execute_trades is True (must be False)")
         logger.info(f"auto_execute_trades: {AUTOMATION_CONFIG.auto_execute_trades}")

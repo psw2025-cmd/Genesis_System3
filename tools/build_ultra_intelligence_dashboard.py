@@ -1,7 +1,7 @@
-from pathlib import Path
-from datetime import datetime, timezone
-import json
 import html
+import json
+from datetime import datetime, timezone
+from pathlib import Path
 
 ROOT = Path.cwd()
 OUT = ROOT / "reports" / "model_benchmark_dashboard"
@@ -30,15 +30,17 @@ for a in artifacts:
     test = a.get("test_samples")
     feats = a.get("features_count")
     ok = a.get("artifact_pair_ok")
-    model_rows.append({
-        "underlying": u,
-        "accuracy": acc if isinstance(acc, (int, float)) else None,
-        "train": train,
-        "test": test,
-        "features": feats,
-        "artifact_ok": bool(ok),
-        "risk": "HIGH" if training_profile.get("rows_scanned", 0) == 0 else "MEDIUM",
-    })
+    model_rows.append(
+        {
+            "underlying": u,
+            "accuracy": acc if isinstance(acc, (int, float)) else None,
+            "train": train,
+            "test": test,
+            "features": feats,
+            "artifact_ok": bool(ok),
+            "risk": "HIGH" if training_profile.get("rows_scanned", 0) == 0 else "MEDIUM",
+        }
+    )
 
 payload = {
     "generated_at": generated_at,
@@ -57,7 +59,7 @@ payload = {
         {"name": "Cost/slippage P&L", "status": False},
         {"name": "Live option-chain tracking", "status": False},
         {"name": "Promotion gate", "status": False},
-    ]
+    ],
 }
 
 json_blob = json.dumps(payload, indent=2)
@@ -390,7 +392,8 @@ fillGates();
 (OUT / "ultra.html").write_text(html_doc, encoding="utf-8")
 
 doc = ROOT / "docs" / "model_benchmark" / "ULTRA_INTELLIGENCE_DASHBOARD.md"
-doc.write_text(f"""# System3 Ultra Intelligence Dashboard
+doc.write_text(
+    f"""# System3 Ultra Intelligence Dashboard
 
 Generated UTC: {generated_at}
 
@@ -426,12 +429,19 @@ No .env changed.
 No broker config changed.
 No database changed.
 No model artifacts changed.
-""", encoding="utf-8")
+""",
+    encoding="utf-8",
+)
 
-print(json.dumps({
-  "generated_at": generated_at,
-  "ultra_dashboard": "reports/model_benchmark_dashboard/ultra.html",
-  "doc": "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
-  "models": len(model_rows),
-  "readiness_score": score
-}, indent=2))
+print(
+    json.dumps(
+        {
+            "generated_at": generated_at,
+            "ultra_dashboard": "reports/model_benchmark_dashboard/ultra.html",
+            "doc": "docs/model_benchmark/ULTRA_INTELLIGENCE_DASHBOARD.md",
+            "models": len(model_rows),
+            "readiness_score": score,
+        },
+        indent=2,
+    )
+)

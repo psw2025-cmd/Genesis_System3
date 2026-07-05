@@ -36,7 +36,7 @@
 ### **Data Management (238-241)** - ⚠️ **WARN (Expected)**
 | Phase | Component | Status | Reason |
 |-------|-----------|--------|--------|
-| **238** | Schema Guard | ⚠️ WARN | Needs `angel_virtual_orders.csv` |
+| **238** | Schema Guard | ⚠️ WARN | Needs `dhan_virtual_orders.csv` |
 | **239** | PnL Joiner | ⚠️ WARN | Needs virtual orders + forward returns |
 | **240** | PnL Summary | ⚠️ WARN | Needs enriched orders CSV |
 | **241** | Trade Diagnostics | ⚠️ WARN | Needs enriched orders CSV |
@@ -117,7 +117,7 @@
 
 These phases require data files that will be generated when autopilot runs:
 
-1. **Phase 238** (Schema Guard): Needs `storage/live/angel_virtual_orders.csv`
+1. **Phase 238** (Schema Guard): Needs `storage/live/dhan_virtual_orders.csv`
 2. **Phase 239** (PnL Joiner): Needs virtual orders + forward returns
 3. **Phase 240** (PnL Summary): Needs enriched orders CSV
 4. **Phase 241** (Diagnostics): Needs enriched orders CSV

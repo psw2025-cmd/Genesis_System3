@@ -3,13 +3,41 @@ Real-Time Alerts & Notifications System
 """
 
 import json
+import os
 from datetime import datetime
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
+
+# Slack delivery, OFF by default - same opt-in pattern as the API-key auth
+# and kill switch: set SLACK_WEBHOOK_URL to enable. Without it, alerts
+# behave exactly as before (written to alerts.jsonl only, no delivery
+# channel) - this was the original gap (alerts had zero delivery channel,
+# nothing ever paged a human). Only WARNING+ severity is sent to avoid
+# flooding Slack with routine INFO alerts.
+_SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+_SLACK_MIN_SEVERITY_RANK = {"info": 0, "warning": 1, "error": 2, "critical": 3}
+
+
+def _send_slack_alert(alert: Dict[str, Any]) -> None:
+    if not _SLACK_WEBHOOK_URL:
+        return
+    if _SLACK_MIN_SEVERITY_RANK.get(alert.get("severity"), 0) < 1:
+        return
+    try:
+        import requests
+
+        emoji = {"warning": ":warning:", "error": ":x:", "critical": ":rotating_light:"}.get(
+            alert.get("severity"), ":bell:"
+        )
+        text = f"{emoji} *{alert.get('title')}* ({alert.get('type')})\n{alert.get('message')}"
+        requests.post(_SLACK_WEBHOOK_URL, json={"text": text}, timeout=5)
+    except Exception as e:
+        print(f"[alerts] Slack delivery failed (non-fatal): {e}")
 
 
 class AlertType(Enum):
@@ -84,6 +112,7 @@ class AlertsSystem:
 
         # Notify subscribers
         self._notify_subscribers(alert)
+        _send_slack_alert(alert)
 
         return alert
 
@@ -297,9 +326,36 @@ class AlertsSystem:
         return alerts
 
     def mark_alert_read(self, alert_id: str) -> bool:
-        """Mark an alert as read"""
-        # This would require rewriting the file, which is expensive
-        # For now, we'll track read status in memory or a separate file
+        """Mark an alert as read. Was a no-op stub that always returned
+        True regardless of whether alert_id existed - UI 'mark read'
+        actions had zero effect. alerts.jsonl is append-only and small
+        at this scale (not a high-volume event stream), so rewriting it
+        is cheap; atomic write-temp-then-rename avoids corrupting it on
+        a crash mid-write, same pattern as runtime_state_store."""
+        if not self.alerts_file.exists():
+            return False
+        found = False
+        lines_out = []
+        with open(self.alerts_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    alert = json.loads(line)
+                except json.JSONDecodeError:
+                    lines_out.append(line)
+                    continue
+                if alert.get("id") == alert_id:
+                    alert["read"] = True
+                    found = True
+                lines_out.append(json.dumps(alert, default=str))
+        if not found:
+            return False
+        tmp_path = self.alerts_file.with_suffix(self.alerts_file.suffix + f".tmp{os.getpid()}")
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines_out) + "\n")
+        os.replace(tmp_path, self.alerts_file)
         return True
 
     def _notify_subscribers(self, alert: Dict[str, Any]):

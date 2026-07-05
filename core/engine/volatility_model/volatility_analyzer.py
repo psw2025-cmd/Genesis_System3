@@ -2,9 +2,10 @@
 Volatility Analyzer - Compute IV, IVP, IVR, volatility regimes
 """
 
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
 
 
 def compute_iv_percentile(iv_current: float, iv_history: pd.Series) -> float:

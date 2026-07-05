@@ -4,14 +4,15 @@ System3 Phase 87 - Expected Value Calculator
 Compute Expected Value (EV) per signal/trade based on historical performance.
 """
 
-import sys
-import pandas as pd
 import json
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
+import sys
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -23,7 +24,7 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_PARQUET = STORAGE_ULTRA / "phase87_expected_value.parquet"

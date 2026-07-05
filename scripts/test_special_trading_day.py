@@ -7,9 +7,11 @@ ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.utils.market_hours import is_market_open
 from datetime import datetime
+
 import pytz
+
+from src.utils.market_hours import is_market_open
 
 ist = pytz.timezone("Asia/Kolkata")
 now = datetime.now(ist)

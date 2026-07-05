@@ -9,21 +9,21 @@
 
 ### Module Name Mapping
 
-The validation plan references `angel_ultra_*` modules, but implementation uses `ultra_*`. **Functionality is identical**.
+The validation plan references `dhan_ultra_*` modules, but implementation uses `ultra_*`. **Functionality is identical**.
 
 | Plan Reference | Actual Implementation | Compliance |
 |----------------|----------------------|------------|
-| `angel_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Same functionality |
-| `angel_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Same functionality |
-| `angel_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Same functionality |
-| `angel_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Same functionality |
-| `angel_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Same functionality |
-| `angel_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Same functionality |
-| `angel_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Same functionality |
+| `dhan_ultra_shadow_data.py` | `ultra_shadow_data_engine.py` | ✅ Same functionality |
+| `dhan_ultra_feature_expander.py` | `ultra_feature_engineering.py` | ✅ Same functionality |
+| `dhan_ultra_model_trainer.py` | `ultra_train_models.py` | ✅ Same functionality |
+| `dhan_ultra_hparam_explorer.py` | `ultra_hparam_explorer.py` | ✅ Same functionality |
+| `dhan_ultra_regime_classifier.py` | `ultra_regime_classifier.py` | ✅ Same functionality |
+| `dhan_ultra_multi_consensus.py` | `ultra_multi_consensus.py` | ✅ Same functionality |
+| `dhan_ultra_threshold_lab.py` | `ultra_threshold_lab.py` | ✅ Same functionality |
 | `ultra_live_signals_shadow` | `ultra_live_signals_shadow.py` | ✅ Same functionality |
-| `angel_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Same functionality |
-| `angel_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Same functionality |
-| `angel_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Same functionality |
+| `dhan_ultra_trade_simulator` | `ultra_trade_simulator.py` | ✅ Same functionality |
+| `dhan_ultra_pnl_analyzer` | `ultra_pnl_analyzer.py` | ✅ Same functionality |
+| `dhan_ultra_promotion_manager` | `ultra_promotion_manager.py` | ✅ Same functionality |
 
 **Conclusion**: All modules implemented with correct functionality. Naming convention differs but does not affect functionality.
 
@@ -36,7 +36,7 @@ The validation plan references `angel_ultra_*` modules, but implementation uses 
 **10.1 Files & Modules**: ✅
 - Module created: `ultra_shadow_data_engine.py`
 - Inputs: Reads from baseline (READ ONLY)
-- Outputs: `storage/learning_ultra/angel_ultra_shadow_master.*`
+- Outputs: `storage/learning_ultra/dhan_ultra_shadow_master.*`
 
 **10.2 Expected Behavior**: ✅
 - Joins signals, trades, PnL into master dataset
@@ -62,7 +62,7 @@ The validation plan references `angel_ultra_*` modules, but implementation uses 
 **11.1 Files & Modules**: ✅
 - Module created: `ultra_feature_engineering.py`
 - Input: Shadow master parquet
-- Output: `storage/training/angel_ultra_training.*`
+- Output: `storage/training/dhan_ultra_training.*`
 
 **11.2 Features**: ✅
 - Expanded moneyness & distance ✅
@@ -92,7 +92,7 @@ The validation plan references `angel_ultra_*` modules, but implementation uses 
 **12.1 Files & Modules**: ✅
 - Module created: `ultra_train_models.py`
 - Input: Ultra training parquet
-- Output: `core/models/angel_one_ultra/*_ultra_model.*`
+- Output: `core/models/dhan_ultra/*_ultra_model.*`
 
 **12.2 Behavior**: ✅
 - Trains for all 5 underlyings ✅
@@ -139,7 +139,7 @@ The validation plan references `angel_ultra_*` modules, but implementation uses 
 
 **13.4 Confirmation**: ✅
 - Reports created in `storage/reports_ultra/` ✅
-- No new files in `core/models/angel_one_ultra/` ✅
+- No new files in `core/models/dhan_ultra/` ✅
 
 **Result**: ✅ **VALIDATED**
 
@@ -332,9 +332,9 @@ The validation plan references `angel_ultra_*` modules, but implementation uses 
 
 ### Baseline Protection ✅
 
-- [x] `core/models/angel_one/*.pkl` - **UNCHANGED**
-- [x] `core/models/angel_one/*_meta.json` - **UNCHANGED**
-- [x] `storage/training/angel_index_options_training*` - **UNCHANGED**
+- [x] `core/models/dhan/*.pkl` - **UNCHANGED**
+- [x] `core/models/dhan/*_meta.json` - **UNCHANGED**
+- [x] `storage/training/dhan_index_options_training*` - **UNCHANGED**
 - [x] `storage/config/*` - **READ ONLY**
 
 ### Ultra Isolation ✅

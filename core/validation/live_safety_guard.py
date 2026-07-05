@@ -6,10 +6,10 @@ Tracks signal rates, position limits, and logs safety trips.
 """
 
 import sys
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
-from datetime import datetime, date
 from collections import defaultdict, deque
+from datetime import date, datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

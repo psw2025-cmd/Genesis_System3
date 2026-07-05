@@ -18,14 +18,15 @@ Date: 2025-12-08
 Phase: 391/400
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Any, Tuple
-from pathlib import Path
+import json
 import logging
 from datetime import datetime
-import json
+from pathlib import Path
+from typing import Any, Dict, Optional, Tuple
+
 import joblib
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,8 @@ except ImportError:
 
 # Check if sklearn is available
 try:
+    from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
     from sklearn.model_selection import train_test_split
-    from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 
     SKLEARN_AVAILABLE = True
 except ImportError:
@@ -87,7 +88,7 @@ def load_training_data() -> pd.DataFrame:
         return pd.read_csv(feature_eng_path)
 
     # Fallback to curated dataset
-    curated_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+    curated_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
     if curated_path.exists():
         logger.info(f"Loading curated data: {curated_path}")
         return pd.read_csv(curated_path)

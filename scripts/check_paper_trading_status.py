@@ -1,11 +1,12 @@
 """Quick status check for paper trading"""
 
-import sys
 import json
 import os
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

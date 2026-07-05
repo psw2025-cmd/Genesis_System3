@@ -378,7 +378,7 @@ broker_status: DRY_RUN_FILLED
 
 ### Future Enhancements
 1. ⏳ **PENDING**: Wire phases into `system3_ultra.py` menu
-2. ⏳ **PENDING**: Implement real SmartAPI in wrapper (when ready)
+2. ⏳ **PENDING**: Implement real DhanHQ in wrapper (when ready)
 3. ⏳ **PENDING**: Test with actual trades (when `LIVE_TRADING_ENABLED=True`)
 
 ---

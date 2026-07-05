@@ -3,13 +3,14 @@ End-to-End Verification - Complete System Check
 Verifies entire pipeline from start to end
 """
 
-import sys
-from pathlib import Path
 import json
-import pandas as pd
-from datetime import datetime
-import pytz
+import sys
 import time
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -40,9 +41,9 @@ def verify_pre_trading():
 
     # Check components
     try:
+        from src.sim.replay_engine import ReplayEngine
         from src.trading.paper_executor import PaperExecutor
         from src.trading.pnl_tracker import PnLTracker
-        from src.sim.replay_engine import ReplayEngine
 
         print(f"  [OK] All components importable")
     except Exception as e:

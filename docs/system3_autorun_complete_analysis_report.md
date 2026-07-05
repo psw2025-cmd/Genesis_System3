@@ -197,9 +197,9 @@ All files created successfully:
 #### Storage/Live (18 files) ✅
 
 All files created successfully:
-- `angel_index_ai_signals_curated.csv` ✅
-- `angel_index_ai_signals_with_forward.csv` ✅
-- `angel_index_ai_signals_reconciled.csv` ✅
+- `dhan_index_ai_signals_curated.csv` ✅
+- `dhan_index_ai_signals_with_forward.csv` ✅
+- `dhan_index_ai_signals_reconciled.csv` ✅
 - Archive: 4 archived signal files ✅
 
 #### Log Files ✅

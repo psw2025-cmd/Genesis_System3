@@ -10,10 +10,11 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 91
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -134,7 +135,7 @@ def analyze_misfires(df: pd.DataFrame, n: int = 300) -> Dict[str, Any]:
 def load_recent_outcomes(n: int = 300) -> Optional[pd.DataFrame]:
     """Load last N outcomes from available sources."""
     # Try PnL simulation
-    pnl_csv = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
+    pnl_csv = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
     if pnl_csv.exists():
         try:
             df = pd.read_csv(pnl_csv)
@@ -143,7 +144,7 @@ def load_recent_outcomes(n: int = 300) -> Optional[pd.DataFrame]:
             pass
 
     # Try shadow master
-    shadow_csv = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+    shadow_csv = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
     if shadow_csv.exists():
         try:
             df = pd.read_csv(shadow_csv)

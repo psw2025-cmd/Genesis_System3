@@ -1,5 +1,5 @@
 """
-System3 Live Trading Configuration (Mode 1 - Angel One Only)
+System3 Live Trading Configuration (Mode 1 - Dhan Only)
 
 This is the CENTRAL configuration file for all live trading operations.
 All phases 101-130 MUST check these flags before any real trading operations.
@@ -45,16 +45,32 @@ LIVE_ALLOWED_UNDERLYINGS = [
 ]
 
 # ============================================================================
-# ANGEL ONE SPECIFIC SETTINGS
+# DHAN ORDER SETTINGS
 # ============================================================================
-ANGEL_PRODUCT_TYPE = "INTRADAY"  # or as per current SmartAPI usage
-ANGEL_ORDER_VARIETY = "NORMAL"
-ANGEL_ALLOWED_ORDER_TYPES = ["MARKET"]  # For phase 1 live trading
+DHAN_PRODUCT_TYPE = "INTRADAY"
+DHAN_ORDER_VARIETY = "NORMAL"
+DHAN_ALLOWED_ORDER_TYPES = ["MARKET"]
+
+# Backward-compat aliases (phases 101/107 still use old names — updated below)
+ANGEL_PRODUCT_TYPE = DHAN_PRODUCT_TYPE
+ANGEL_ORDER_VARIETY = DHAN_ORDER_VARIETY
+ANGEL_ALLOWED_ORDER_TYPES = DHAN_ALLOWED_ORDER_TYPES
 
 # ============================================================================
-# ADDITIONAL RISK CONTROLS
+# ADDITIONAL RISK CONTROLS — SINGLE SOURCE OF TRUTH (units explicit)
 # ============================================================================
-MAX_DAILY_DRAWDOWN_RUPEES = 5000  # Maximum daily drawdown limit
+# C3 FIX: all risk ceilings centralized here with EXPLICIT units to avoid the
+# prior ambiguity (optimizer's max_daily_loss=10.0 is a PERCENT suggestion,
+# NOT an absolute rupee cap — they are different things and must not be confused).
+MAX_DAILY_DRAWDOWN_RUPEES = 5000      # HARD STOP: absolute ₹ daily loss → halt trading
+MAX_RISK_PER_TRADE_RUPEES = 2000      # HARD CAP: absolute ₹ risk per single trade
+MAX_DAILY_LOSS_PCT = 10.0             # SOFT: % of capital/day (optimizer suggestion only)
+MAX_PORTFOLIO_HEAT_PCT = 6.0          # SOFT: max % of capital deployed at once
+
+# Enforcement note: the HARD ₹ caps (DRAWDOWN_RUPEES, RISK_PER_TRADE_RUPEES) are
+# the authoritative live-trading guards. The _PCT values are advisory only and
+# come from the risk optimizer's Kelly analysis — never used as live stop logic.
+
 USE_LIVE_EXECUTION_ENGINE = False  # Use Phase 107 (LIVE) vs Phase 106 (DRY_RUN)
 
 # ============================================================================

@@ -4,10 +4,11 @@ Desktop App Monitor - Continuous tracking of app behavior
 
 import sys
 import time
-import requests
-import psutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import psutil
+import requests
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")

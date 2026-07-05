@@ -3,10 +3,11 @@ Comprehensive Test Suite - All Features
 Tests all implemented features
 """
 
-import requests
 import json
 import sys
 from datetime import datetime
+
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 

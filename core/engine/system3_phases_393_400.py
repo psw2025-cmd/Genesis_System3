@@ -1,11 +1,12 @@
 """System3 Phase Files for 393-400 - Simplified Implementations"""
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import logging
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ def run_phase_394():
         logger.info("Phase 394: PnL Outcome Learning - Starting")
 
         # Check for PnL log
-        pnl_log_path = Path("storage/live/angel_index_ai_pnl_log.csv")
+        pnl_log_path = Path("storage/live/dhan_index_ai_pnl_log.csv")
         real_trades = 0
 
         if pnl_log_path.exists():

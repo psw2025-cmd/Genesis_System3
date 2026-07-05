@@ -2,10 +2,10 @@
 Run Complete Verification - Multiple Test Runs
 """
 
-import sys
-import subprocess
-from pathlib import Path
 import json
+import subprocess
+import sys
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

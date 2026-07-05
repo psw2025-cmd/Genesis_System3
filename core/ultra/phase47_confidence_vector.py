@@ -10,12 +10,13 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 109
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -28,8 +29,8 @@ def load_confidence_history(days: int = 7) -> Optional[pd.DataFrame]:
     """Load confidence history for last N days."""
     # Try multiple sources
     sources = [
-        ULTRA_DIR / "angel_ultra_live_shadow_signals.csv",
-        LIVE_DIR / "angel_index_ai_signals.csv",
+        ULTRA_DIR / "dhan_ultra_live_shadow_signals.csv",
+        LIVE_DIR / "dhan_index_ai_signals.csv",
     ]
 
     for source in sources:

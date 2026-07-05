@@ -5,7 +5,7 @@ Experiments thresholds on shadow PnL without changing real configs.
 Grid search analysis only.
 
 Inputs:
-- storage/learning_ultra/angel_ultra_shadow_master.parquet
+- storage/learning_ultra/dhan_ultra_shadow_master.parquet
 
 Outputs:
 - storage/reports_ultra/ultra_threshold_grid_search.csv
@@ -13,18 +13,19 @@ Outputs:
 Menu Option: 79
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, List
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_ULTRA_DIR = PROJECT_ROOT / "storage" / "learning_ultra"
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 
-SHADOW_PARQUET = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.parquet"
-SHADOW_CSV = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+SHADOW_PARQUET = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.parquet"
+SHADOW_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 GRID_SEARCH_CSV = REPORTS_ULTRA_DIR / "ultra_threshold_grid_search.csv"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)

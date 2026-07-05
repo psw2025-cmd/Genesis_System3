@@ -9,18 +9,18 @@ References:
 - Phase 249: LSTM predictor (model structure)
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Directories
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
 # Validation thresholds

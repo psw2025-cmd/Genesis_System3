@@ -3,22 +3,23 @@ Show Full Orchestra - Complete System Demonstration
 Displays all components working together in real-time
 """
 
-import sys
-from pathlib import Path
 import json
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.selector.strategy_engine import StrategyEngine
+from src.storage.trade_history import TradeHistoryStore
 from src.trading.advanced_position_sizing import AdvancedPositionSizing
 from src.trading.dynamic_risk_management import DynamicRiskManager
-from src.selector.strategy_engine import StrategyEngine
 from src.trading.paper_executor import PaperExecutor
 from src.trading.pnl_tracker import PnLTracker
-from src.storage.trade_history import TradeHistoryStore
 
 
 def show_full_orchestra():

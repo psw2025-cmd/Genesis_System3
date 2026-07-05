@@ -4,11 +4,11 @@ System3 Phase 230 - AI Fallback Behavior Auditor
 Reviews logs to count delta-based ai_score fallback usage.
 """
 
-import sys
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

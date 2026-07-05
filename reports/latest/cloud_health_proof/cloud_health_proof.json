@@ -1,0 +1,35 @@
+{
+  "generated_utc": "2026-06-14T14:02:00Z",
+  "commit": "2465e35f",
+  "cloud_platform": "Render",
+  "backend_service": "genesis-system3-backend",
+  "worker_service": "genesis-system3-worker",
+  "live_trading_enabled": false,
+  "system3_live_trading_allowed": false,
+  "mode": "PAPER/ANALYZER",
+  "endpoint_probes": [
+    {"url": "https://genesis-system3-backend.onrender.com/", "http": 200, "status": "running"},
+    {"url": "https://genesis-system3-backend.onrender.com/health", "http": 200, "live_allowed": false, "mode": "PAPER"},
+    {"url": "https://genesis-system3-backend.onrender.com/api/health", "http": 200, "live_allowed": false},
+    {"url": "https://genesis-system3-backend.onrender.com/api/state", "http": 200, "mode": "PAPER", "data_source": "SYNTHETIC"},
+    {"url": "https://genesis-system3-backend.onrender.com/api/broker/status", "http": 200, "connected": false, "live_trading_enabled": false, "credentials_present": true, "error": "TOKEN_EXPIRED_OR_INVALID"},
+    {"url": "https://genesis-system3-backend.onrender.com/docs", "http": 200}
+  ],
+  "worker_config_proof": {
+    "render_yaml_worker_service": true,
+    "worker_entrypoint": "scripts/cloud_worker.py",
+    "cloud_worker_py_exists": true,
+    "cloud_worker_compiles": true,
+    "token_manager_cloud_fallback": true,
+    "live_trading_guard_in_worker": true,
+    "threads_started": ["token-daemon", "watchdog", "job-scheduler"]
+  },
+  "safety_confirmation": {
+    "LIVE_TRADING_ENABLED": "0",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+    "mode_on_health_endpoint": "PAPER",
+    "live_allowed_on_health_endpoint": false,
+    "order_placement_allowed": false
+  },
+  "note": "Worker service credentials_present=true confirms DHAN_* env vars are read from os.environ (cloud mode). Token error is expected — Dhan secrets not yet set in Render dashboard. Set DHAN_CLIENT_ID, DHAN_APP_ID, DHAN_APP_SECRET, DHAN_PIN, DHAN_TOTP_SECRET, DHAN_ACCESS_TOKEN in Render dashboard to activate token refresh."
+}

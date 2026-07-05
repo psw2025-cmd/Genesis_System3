@@ -4,13 +4,14 @@ System3 Phase 315 - Transactional Write Guard
 Protects critical files from partial or corrupted writes by enforcing transactional writes.
 """
 
-import sys
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional
 import logging
 import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -24,18 +25,18 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Protected files
 PROTECTED_FILES = [
-    "storage/live/angel_index_ai_signals.csv",
-    "storage/live/angel_index_ai_signals_curated.csv",
-    "storage/live/angel_index_ai_signals_with_forward.csv",
-    "storage/live/angel_index_ai_pnl_log.csv",
+    "storage/live/dhan_index_ai_signals.csv",
+    "storage/live/dhan_index_ai_signals_curated.csv",
+    "storage/live/dhan_index_ai_signals_with_forward.csv",
+    "storage/live/dhan_index_ai_pnl_log.csv",
 ]
 
 # Expected columns (minimal requirements)
 EXPECTED_COLUMNS = {
-    "angel_index_ai_signals.csv": ["ts", "underlying", "pred_label"],
-    "angel_index_ai_signals_curated.csv": ["ts", "underlying", "pred_label"],
-    "angel_index_ai_signals_with_forward.csv": ["ts", "underlying", "pred_label"],
-    "angel_index_ai_pnl_log.csv": ["ts", "symbol"],
+    "dhan_index_ai_signals.csv": ["ts", "underlying", "pred_label"],
+    "dhan_index_ai_signals_curated.csv": ["ts", "underlying", "pred_label"],
+    "dhan_index_ai_signals_with_forward.csv": ["ts", "underlying", "pred_label"],
+    "dhan_index_ai_pnl_log.csv": ["ts", "symbol"],
 }
 
 

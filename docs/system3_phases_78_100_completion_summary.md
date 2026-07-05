@@ -11,10 +11,10 @@
 
 **Created Missing Configuration Files**:
 
-1. **`config/angel_automation_config.json`** ✅
+1. **`config/dhan_automation_config.json`** ✅
    - Created with default automation settings
    - Matches Python module defaults
-   - Location: `C:\Genesis_System3\config\angel_automation_config.json`
+   - Location: `C:\Genesis_System3\config\dhan_automation_config.json`
 
 2. **`config/system3_job_scheduler.json`** ✅
    - Created with default job scheduler config
@@ -64,7 +64,7 @@ python -m core.engine.system3_phase100_final_certification
 
 ## Files Created
 
-1. ✅ `config/angel_automation_config.json`
+1. ✅ `config/dhan_automation_config.json`
 2. ✅ `config/system3_job_scheduler.json`
 3. ✅ `docs/system3_phases_78_100_next_steps_completed.md`
 4. ✅ `docs/system3_phases_78_100_completion_summary.md` (this file)

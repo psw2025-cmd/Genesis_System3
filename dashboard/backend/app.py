@@ -3,22 +3,79 @@ System3 Ultra Dashboard Backend
 FastAPI service for real-time system monitoring and control
 """
 
-import os
-import sys
-import json
 import asyncio
 import hashlib
+import json
+import os
 import re
+import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
 
+# Timeouts for sync broker/scanner work — must not block the asyncio event loop.
+_BROKER_IO_TIMEOUT_S = 8.0
+_SCANNER_IO_TIMEOUT_S = 120.0
+_SCANNER_EOD_TIMEOUT_S = 180.0
+_TRUTH_IO_TIMEOUT_S = 45.0
+_EOD_SCANNER_CACHE: tuple[float, Dict[str, Any]] = (0.0, {})
+_EOD_SCANNER_TTL_S = 1800.0
+
+# Dedicated small executor for the spot-price background refresh, isolated
+# from the shared default asyncio.to_thread() executor. asyncio.wait_for()
+# timing out does NOT cancel the underlying OS thread — it just stops
+# waiting on it. If the Yahoo Finance calls inside hang (rate-limited cloud
+# IPs, slow socket), previously that orphaned thread piled up in the SAME
+# shared executor pool every other blocking call in this app depends on
+# (_run_blocking for broker/chain/scanner work), starving all of them and
+# growing memory unbounded until OOM. A small dedicated pool caps how many
+# stuck Yahoo-fetch threads can accumulate and stops them from starving
+# unrelated request handling.
+_SPOT_REFRESH_EXECUTOR = None  # Yahoo Finance disabled — ThreadPoolExecutor no longer needed
+
+
+def _market_open_from_state() -> bool:
+    """Use real market-hours truth first; SSOT can be stale after a wedged loop."""
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            open_now, _reason = is_market_open()
+            return bool(open_now)
+        except Exception:
+            pass
+    if SSOT_AVAILABLE and state_store is not None:
+        try:
+            return bool((state_store.get_state().get("market") or {}).get("is_open"))
+        except Exception:
+            pass
+    return False
+
+
+async def _run_blocking(fn, *args, timeout: float = 15.0, **kwargs):
+    """Run sync I/O in a worker thread with a hard timeout."""
+    return await asyncio.wait_for(asyncio.to_thread(fn, *args, **kwargs), timeout=timeout)
+
+
+def _scanner_market_closed_response() -> Dict[str, Any]:
+    return {
+        "status": "market_closed",
+        "market_open": False,
+        "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+        "segments_implemented": 0,
+        "segments_total": 4,
+        "by_segment": {},
+        "market_wide": {"top_ce": None, "top_pe": None},
+        "note": "Live scanner skipped while market is closed",
+    }
+
+
 # CRITICAL: Add project root to Python path FIRST, before any core module imports
-# This allows the backend to import core.brokers.angel_one.broker and other core modules
+# This allows the backend to import core.brokers.dhan.dhan_readonly and other core modules
 ROOT_DIR = Path(__file__).parent.parent.parent.resolve()  # Use resolve() to get absolute path
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -26,38 +83,52 @@ if str(ROOT_DIR) not in sys.path:
 if str(ROOT_DIR / "src") not in sys.path:
     sys.path.insert(0, str(ROOT_DIR / "src"))
 
-# Try to import broker module at module level (with error handling)
-# This ensures the import path is correct and module is available
-BROKER_AVAILABLE = False
-AngelOneBroker = None
+# Broker: Dhan (read-only, analyzer mode)
+DHAN_AVAILABLE = False
 try:
-    from core.brokers.angel_one.broker import AngelOneBroker
+    from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status_probe
 
-    BROKER_AVAILABLE = True
-    print(f"[Backend] Broker module imported successfully from {ROOT_DIR}")
+    DHAN_AVAILABLE = True
+    print(f"[Backend] Dhan broker module imported successfully from {ROOT_DIR}")
 except ImportError as e:
-    print(f"[Backend] Warning: Could not import broker module: {e}")
-    print(f"[Backend] ROOT_DIR: {ROOT_DIR}")
-    print(f"[Backend] sys.path[0:3]: {sys.path[0:3]}")
+    print(f"[Backend] Warning: Could not import Dhan broker module: {e}")
 except Exception as e:
-    print(f"[Backend] Warning: Error importing broker module: {e}")
+    print(f"[Backend] Warning: Error importing Dhan broker module: {e}")
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import (
+    BackgroundTasks,
+    FastAPI,
+    HTTPException,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
-    print("Warning: pandas not available")
+# pandas lazy-loaded — only import when actually needed
+# Saves ~45MB at startup
+pd = None  # Will be imported lazily when needed
+
+def _get_pd():
+    """Lazy pandas import — call this instead of using pd directly."""
+    global pd
+    if pd is None:
+        try:
+            import pandas as _pd
+            pd = _pd
+        except ImportError:
+            pass
+    return pd
 import sqlite3
-import numpy as np
+
+# numpy removed — was only used for synthetic data (np.random.normal)
+# Use random.gauss() instead — saves ~25MB
 
 # Import market detection and synthetic data generator
 try:
-    from utils.market_hours import is_market_open, get_market_status
+    from utils.market_hours import get_market_status, is_market_open
 
     MARKET_DETECTION_AVAILABLE = True
 except ImportError as e:
@@ -71,9 +142,9 @@ try:
     from dashboard.backend.synthetic_data_generator import (
         generate_synthetic_chain_data,
         generate_synthetic_health_data,
+        generate_synthetic_perf_data,
         generate_synthetic_qc_data,
         generate_synthetic_signal_data,
-        generate_synthetic_perf_data,
     )
 
     SYNTHETIC_DATA_AVAILABLE = True
@@ -83,9 +154,9 @@ except ImportError:
         from synthetic_data_generator import (
             generate_synthetic_chain_data,
             generate_synthetic_health_data,
+            generate_synthetic_perf_data,
             generate_synthetic_qc_data,
             generate_synthetic_signal_data,
-            generate_synthetic_perf_data,
         )
 
         SYNTHETIC_DATA_AVAILABLE = True
@@ -95,14 +166,14 @@ except ImportError:
 
 # Import performance predictor and live validator
 try:
-    from dashboard.backend.performance_predictor import get_performance_predictor
     from dashboard.backend.live_profit_validator import get_live_validator
+    from dashboard.backend.performance_predictor import get_performance_predictor
 
     PERFORMANCE_PREDICTOR_AVAILABLE = True
 except ImportError:
     try:
-        from performance_predictor import get_performance_predictor
         from live_profit_validator import get_live_validator
+        from performance_predictor import get_performance_predictor
 
         PERFORMANCE_PREDICTOR_AVAILABLE = True
     except ImportError:
@@ -146,24 +217,24 @@ except ImportError:
 try:
     from dashboard.backend.advanced_charting import get_advanced_charting
     from dashboard.backend.advanced_filtering import get_advanced_filtering
-    from dashboard.backend.risk_management import get_risk_management
     from dashboard.backend.backtesting import get_backtesting_engine
-    from dashboard.backend.ml_performance_tracking import get_ml_tracker
-    from dashboard.backend.trade_journal import get_trade_journal
     from dashboard.backend.export_reporting import get_export_reporting
+    from dashboard.backend.ml_performance_tracking import get_ml_tracker
     from dashboard.backend.order_management import get_order_management
+    from dashboard.backend.risk_management import get_risk_management
+    from dashboard.backend.trade_journal import get_trade_journal
 
     ADVANCED_FEATURES_AVAILABLE = True
 except ImportError:
     try:
         from advanced_charting import get_advanced_charting
         from advanced_filtering import get_advanced_filtering
-        from risk_management import get_risk_management
         from backtesting import get_backtesting_engine
-        from ml_performance_tracking import get_ml_tracker
-        from trade_journal import get_trade_journal
         from export_reporting import get_export_reporting
+        from ml_performance_tracking import get_ml_tracker
         from order_management import get_order_management
+        from risk_management import get_risk_management
+        from trade_journal import get_trade_journal
 
         ADVANCED_FEATURES_AVAILABLE = True
     except ImportError:
@@ -172,8 +243,8 @@ except ImportError:
 
 # Try to import watchdog (optional)
 try:
-    from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler
+    from watchdog.observers import Observer
 
     WATCHDOG_AVAILABLE = True
 except ImportError:
@@ -183,7 +254,15 @@ except ImportError:
     print("Warning: watchdog not available - file watching disabled")
 
 ROOT_DIR = Path(__file__).parent.parent.parent
-OUTPUTS_DIR = ROOT_DIR / "outputs"
+# OUTPUTS_DIR: check src/outputs first (actual data location), fallback to outputs/
+_src_outputs = ROOT_DIR / "src" / "outputs"
+_root_outputs = ROOT_DIR / "outputs"
+if _src_outputs.exists():
+    OUTPUTS_DIR = _src_outputs
+else:
+    OUTPUTS_DIR = _root_outputs
+    OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+print(f"[Backend] OUTPUTS_DIR resolved to: {OUTPUTS_DIR}")
 LOGS_DIR = ROOT_DIR / "logs"
 AUDIT_DIR = OUTPUTS_DIR / "audit"
 DB_DIR = OUTPUTS_DIR / "db"
@@ -198,7 +277,34 @@ if not REAL_ONLY:
 AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 DB_DIR.mkdir(parents=True, exist_ok=True)
 
+
+# ── Modular routers (memory-efficient, lazy imports) ─────────────────────
+import sys as _sys
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in _sys.path:
+    _sys.path.insert(0, _backend_dir)
+
+from routers import broker as broker_router
+from routers import chain as chain_router
+from routers import ml as ml_router
+
+# ── Memory guard middleware ────────────────────────────────────────────────
+from middleware.memory_guard import memory_guard_middleware, get_memory_stats
+from starlette.middleware.base import BaseHTTPMiddleware
+
 app = FastAPI(title="System3 Ultra Dashboard API")
+
+# ── Modular routers DISABLED — they duplicated 19 existing routes and
+# overrode the rich endpoint versions the frontend depends on, breaking
+# all dashboard tabs. Proper modularization requires MOVING code out of
+# app.py (delete old versions), not adding parallel simplified copies.
+# app.include_router(broker_router.router)   # disabled — duplicate routes
+# app.include_router(chain_router.router)    # disabled — duplicate routes
+# app.include_router(ml_router.router)       # disabled — duplicate routes
+
+# ── MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) ─────────────
+from starlette.middleware.base import BaseHTTPMiddleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=memory_guard_middleware)
 
 
 # Rate limiting middleware to prevent excessive API calls
@@ -207,9 +313,11 @@ async def rate_limit_middleware(request, call_next):
     """Add small delay to throttle external API calls and prevent rate limiting"""
     import time
 
-    # Small delay to prevent rapid-fire requests (especially during startup)
-    # This helps avoid Angel One rate limits
-    time.sleep(0.1)
+    # Rate limiting: only apply to external API calls, not all requests
+    # time.sleep(0.1) on ALL requests was causing request queue buildup = memory spike
+    _ext_paths = {"/api/broker", "/api/chain"}
+    if any(request.url.path.startswith(p) for p in _ext_paths):
+        await asyncio.sleep(0.05)  # Async sleep - doesn't block event loop
     response = await call_next(request)
     return response
 
@@ -222,21 +330,132 @@ if SSOT_AVAILABLE:
 else:
     state_store = None
 
-# CORS - allow localhost and local network IPs
-# For development: allow all origins (change to specific list in production)
+# Warm instruments master — sync from Dhan CDN if stale, then load cache.
+# Set DEFER_INSTRUMENT_WARMUP=1 on Render to skip eager load at startup and
+# save ~150-200 MB peak RAM (instruments still lazy-load via /api/instruments/health).
+if os.environ.get("DEFER_INSTRUMENT_WARMUP", "0").strip().lower() not in ("1", "true", "yes", "on"):
+    try:
+        from scripts.sync_dhan_instruments_master import META_JSON
+        from scripts.sync_dhan_instruments_master import sync as sync_instruments_master
+
+        _need_sync = True
+        if META_JSON.exists():
+            import json as _json
+            from datetime import datetime, timezone
+
+            meta = _json.loads(META_JSON.read_text(encoding="utf-8"))
+            synced = meta.get("synced_utc")
+            if synced:
+                age_h = (
+                    datetime.now(timezone.utc) - datetime.fromisoformat(synced.replace("Z", "+00:00"))
+                ).total_seconds() / 3600
+                _need_sync = age_h > 24
+        if _need_sync and not (ROOT_DIR / "storage" / "instruments" / "api-scrip-master-detailed.csv").exists():
+            try:
+                sync_instruments_master(force=True)
+            except Exception as _sync_exc:
+                print(f"[startup] instrument sync deferred: {_sync_exc}")
+        from core.data.instruments_cache import ensure_instruments_loaded
+
+        _inst_metrics = ensure_instruments_loaded()
+        if _inst_metrics.get("rows", 0) > 0:
+            print(f"[startup] instruments: {_inst_metrics['rows']} rows source={_inst_metrics.get('source')}")
+    except Exception as _inst_exc:
+        print(f"[startup] instruments warm-up skipped: {_inst_exc}")
+else:
+    print("[startup] instruments warm-up deferred via DEFER_INSTRUMENT_WARMUP=1")
+
+# CORS - explicit allow-list only. Wildcard origins + credentials is an open
+# CORS misconfiguration (any site can read authenticated responses).
+# Override/extend via ALLOWED_ORIGINS env var (comma-separated).
+_default_allowed_origins = [
+    "https://genesis-system3-backend.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "null",  # Electron file:// pages send Origin: null
+]
+_env_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "")
+_allowed_origins = [o.strip() for o in _env_allowed_origins.split(",") if o.strip()] or _default_allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# API-key auth, OFF by default. Every route is currently reachable by
+# anyone who finds this URL - that's a real gap - but flipping this on
+# unconditionally would lock out the live frontend the instant it
+# deploys, since the frontend has no way to send a key until it is
+# rebuilt with a matching VITE_API_KEY baked in. Enable deliberately:
+#   1. Set API_KEY=<random-secret> and REQUIRE_API_KEY=true on the
+#      backend (Render dashboard env vars).
+#   2. Set the same value as VITE_API_KEY in the frontend's build env
+#      and rebuild/redeploy the frontend.
+#   3. Only then does this actually enforce - until both sides are
+#      updated, requests proceed exactly as before (fail open, with a
+#      one-time startup warning so the gap is visible in logs).
+_REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
+_API_KEY = os.environ.get("API_KEY", "").strip()
+_API_KEY_EXEMPT_PREFIXES = ("/ui", "/docs", "/openapi.json", "/redoc", "/ws")
+_API_KEY_EXEMPT_EXACT = ("/", "/api/health", "/favicon.ico", "/metrics")
+
+if _REQUIRE_API_KEY and not _API_KEY:
+    print("[security] REQUIRE_API_KEY=true but API_KEY is unset - auth will reject all requests")
+elif not _REQUIRE_API_KEY:
+    print("[security] API key auth is DISABLED (set REQUIRE_API_KEY=true and API_KEY to enable)")
+
+
+@app.middleware("http")
+async def _enforce_api_key(request: Request, call_next):
+    if not _REQUIRE_API_KEY:
+        return await call_next(request)
+    path = request.url.path
+    if path in _API_KEY_EXEMPT_EXACT or path.startswith(_API_KEY_EXEMPT_PREFIXES):
+        return await call_next(request)
+    if request.headers.get("X-API-Key", "") != _API_KEY:
+        return JSONResponse(status_code=401, content={"detail": "Missing or invalid X-API-Key header"})
+    return await call_next(request)
+
+
+# Outermost middleware (added last = runs first/wraps everything else, per
+# Starlette's add_middleware ordering) so every request - including ones
+# the API-key check rejects - gets a request_id available to logging and
+# echoed back in the response for client-side correlation.
+try:
+    from dashboard.backend.structured_logging import RequestIDMiddleware
+except ImportError:
+    from structured_logging import RequestIDMiddleware
+
+app.add_middleware(RequestIDMiddleware)
+
 
 _DASHBOARD_DIR = ROOT_DIR / "dashboard"
+_REACT_DIST_DIR = ROOT_DIR / "dashboard" / "frontend" / "dist"
+
+# Mount React frontend static assets (JS/CSS bundles)
+try:
+    from fastapi.staticfiles import StaticFiles as _StaticFiles
+
+    if _REACT_DIST_DIR.exists() and (_REACT_DIST_DIR / "assets").exists():
+        app.mount(
+            "/ui/assets",
+            _StaticFiles(directory=str(_REACT_DIST_DIR / "assets")),
+            name="ui-assets",
+        )
+        print(f"[frontend] React dist mounted from {_REACT_DIST_DIR}")
+    else:
+        print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} — serving legacy Vue")
+except Exception as _e:
+    print(f"[frontend] StaticFiles mount failed: {_e} — serving legacy Vue")
+
 
 # Root route - helpful message
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     base_url = os.environ.get("PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
     dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")
@@ -260,18 +479,36 @@ async def root():
 
 @app.get("/ui", include_in_schema=False)
 @app.get("/ui/", include_in_schema=False)
-async def serve_dashboard_index():
-    f = _DASHBOARD_DIR / "index.html"
-    if f.exists():
-        return FileResponse(str(f), media_type="text/html")
+@app.get("/ui/{path:path}", include_in_schema=False)
+async def serve_dashboard_index(path: str = ""):
+    """Serve React SPA — React dist takes priority over legacy Vue."""
+    # Try React dist first
+    react_index = _REACT_DIST_DIR / "index.html"
+    if react_index.exists():
+        return FileResponse(
+            str(react_index), media_type="text/html", headers={**_NO_CACHE_HEADERS, "X-Frontend": "react"}
+        )
+    # Fallback to legacy Vue
+    vue_index = _DASHBOARD_DIR / "index.html"
+    if vue_index.exists():
+        return FileResponse(
+            str(vue_index), media_type="text/html", headers={**_NO_CACHE_HEADERS, "X-Frontend": "vue-legacy"}
+        )
     raise HTTPException(status_code=404, detail="Dashboard not found")
+
+
+_NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
 
 
 @app.get("/ui/app.js", include_in_schema=False)
 async def serve_dashboard_js():
     f = _DASHBOARD_DIR / "app.js"
     if f.exists():
-        return FileResponse(str(f), media_type="application/javascript")
+        return FileResponse(str(f), media_type="application/javascript", headers=_NO_CACHE_HEADERS)
     raise HTTPException(status_code=404, detail="app.js not found")
 
 
@@ -279,7 +516,7 @@ async def serve_dashboard_js():
 async def serve_dashboard_css():
     f = _DASHBOARD_DIR / "style.css"
     if f.exists():
-        return FileResponse(str(f), media_type="text/css")
+        return FileResponse(str(f), media_type="text/css", headers=_NO_CACHE_HEADERS)
     raise HTTPException(status_code=404, detail="style.css not found")
 
 
@@ -299,7 +536,7 @@ async def get_state():
     if not SSOT_AVAILABLE or state_store is None:
         raise HTTPException(status_code=503, detail="State store not available")
 
-    state = state_store.get_state()
+    state = await asyncio.to_thread(state_store.get_state)
     # Gate: if broker not connected or data not real, force mode to PAPER for UI consistency
     broker_connected = state.get("broker", {}).get("connected", False)
     ds = (state.get("data_source") or "").upper()
@@ -343,93 +580,21 @@ async def get_state_history(limit: int = 100):
 
 @app.get("/api/broker/status")
 async def get_broker_status():
-    """Get broker connection status. Uses Dhan if configured, falls back to AngelOne."""
-    # If Dhan credentials are present, use Dhan (read-only, analyzer mode)
-    dhan_client_id = os.getenv("DHAN_CLIENT_ID", "").strip()
-    dhan_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
-    if dhan_client_id and dhan_token:
-        try:
-            from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
-            return _dhan_status()
-        except Exception as _e:
-            pass  # fall through to AngelOne
-
-    # Try AngelOne
-    broker_class = AngelOneBroker if BROKER_AVAILABLE and AngelOneBroker is not None else None
-    if broker_class is None:
-        try:
-            from core.brokers.angel_one.broker import AngelOneBroker as BrokerClass
-
-            broker_class = BrokerClass
-        except ImportError as e:
-            return {
-                "connected": False,
-                "name": "AngelOne",
-                "status": "not_available",
-                "error": f"Broker module import failed: {str(e)[:200]}",
-                "error_type": "MODULE_NOT_AVAILABLE",
-                "latency_ms": None,
-                "last_ok": None,
-            }
-
+    """Get broker connection status. Uses Dhan broker (read-only, analyzer mode)."""
     try:
-        import time
+        from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
 
-        start_time = time.time()
-        broker = broker_class(allow_data_only=True)
-
-        # Test with profile fetch to ensure connection is real
-        profile = broker.get_profile()
-        latency_ms = int((time.time() - start_time) * 1000)
-
-        if profile and profile.get("status"):
-            return {
-                "connected": True,
-                "name": "AngelOne",
-                "status": "connected",
-                "latency_ms": latency_ms,
-                "last_ok": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
-                "client_code": profile.get("data", {}).get("clientcode", "N/A"),
-                "profile_status": profile.get("status"),
-            }
-        else:
-            return {
-                "connected": False,
-                "name": "AngelOne",
-                "status": "disconnected",
-                "error": "Profile fetch failed",
-                "error_type": "PROFILE_FETCH_FAILED",
-                "latency_ms": latency_ms,
-                "last_ok": None,
-            }
-    except ImportError:
+        status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=5)
+        if SSOT_AVAILABLE and state_store is not None:
+            state_store.update_state({"broker": status})
+        return status
+    except Exception as _e:
         return {
             "connected": False,
-            "name": "AngelOne",
-            "status": "not_available",
-            "error": "SmartApi not installed",
-            "error_type": "MODULE_NOT_FOUND",
-            "latency_ms": None,
-            "last_ok": None,
-        }
-    except Exception as e:
-        error_msg = str(e)
-        # Extract specific error details
-        if "Missing" in error_msg or "credentials" in error_msg.lower():
-            error_type = "NO_CREDENTIALS"
-        elif "TOTP" in error_msg or "totp" in error_msg.lower():
-            error_type = "TOTP_ERROR"
-        elif "login" in error_msg.lower() or "session" in error_msg.lower():
-            error_type = "LOGIN_FAILED"
-        else:
-            error_type = "CONNECTION_ERROR"
-
-        return {
-            "connected": False,
-            "name": "AngelOne",
-            "status": "disconnected",
-            "error": error_msg[:200],
-            "error_type": error_type,
+            "name": "dhan",
+            "status": "error",
+            "error": str(_e)[:200],
+            "error_type": "DHAN_STATUS_ERROR",
             "latency_ms": None,
             "last_ok": None,
         }
@@ -440,7 +605,11 @@ async def get_dhan_broker_status():
     """Dhan read-only broker status. Never returns access token. No live trading."""
     try:
         from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
-        return dhan_get_status()
+
+        status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=5)
+        if SSOT_AVAILABLE and state_store is not None:
+            state_store.update_state({"broker": status})
+        return status
     except ImportError as exc:
         return {
             "broker": "dhan",
@@ -463,45 +632,309 @@ async def get_dhan_broker_status():
         }
 
 
+@app.get("/api/broker/truth")
+async def get_broker_truth():
+    """Multi-validated broker trader truth — holdings, positions, funds."""
+    _hit = _cache_get("broker_truth", _TTL_BROKER_TRUTH)
+    if _hit is not None:
+        return _hit
+
+    try:
+        from dashboard.backend.broker_truth_validator import build_broker_truth_report
+    except ImportError:
+        from broker_truth_validator import build_broker_truth_report
+    try:
+        return await _run_blocking(build_broker_truth_report, timeout=_TRUTH_IO_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        return {"success": False, "error": "broker_truth_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
+
+
+@app.get("/api/broker/holdings")
+async def get_broker_holdings():
+    """Dhan equity holdings — read-only. No orders."""
+    _hit = _cache_get("broker_holdings", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
+
+    try:
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_holding_row,
+            normalize_holdings_payload,
+        )
+        from core.brokers.dhan.dhan_readonly import get_holdings
+
+        result = await _run_blocking(get_holdings, timeout=_BROKER_IO_TIMEOUT_S)
+        raw_rows = normalize_holdings_payload(result.get("data"))
+        normalized = [normalize_holding_row(r) for r in raw_rows]
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "count": len(normalized),
+            "rows": normalized,
+            **result,
+            "data": raw_rows,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/broker/funds")
+async def get_broker_funds():
+    """Dhan fund limits / available balance — read-only. No orders."""
+    _hit = _cache_get("broker_funds", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
+
+    try:
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_funds_payload,
+            normalize_funds_row,
+        )
+        from core.brokers.dhan.dhan_readonly import get_funds
+
+        result = await _run_blocking(get_funds, timeout=_BROKER_IO_TIMEOUT_S)
+        raw = normalize_funds_payload(result.get("data"))
+        normalized = normalize_funds_row(raw)
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "normalized": normalized,
+            **result,
+            "data": raw,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/broker/diagnose")
+async def get_broker_diagnose():
+    """Diagnose exactly WHY broker is disconnected. Key for Render setup."""
+    import os as _os
+
+    issues = []
+    hints = []
+    env_checks = {
+        "DHAN_CLIENT_ID": _os.environ.get("DHAN_CLIENT_ID", "").strip(),
+        "DHAN_ACCESS_TOKEN": _os.environ.get("DHAN_ACCESS_TOKEN", "").strip(),
+        "DHAN_PIN": _os.environ.get("DHAN_PIN", "").strip(),
+        "DHAN_TOTP_SECRET": _os.environ.get("DHAN_TOTP_SECRET", "").strip(),
+    }
+    for key, val in env_checks.items():
+        if not val:
+            issues.append(f"MISSING: {key} env var not set in Render")
+            hints.append(f"Set {key} in Render → Environment → Add Env Var")
+
+    # Check token validity
+    token = env_checks["DHAN_ACCESS_TOKEN"]
+    token_status = "not_set"
+    if token:
+        if len(token) < 20:
+            issues.append("DHAN_ACCESS_TOKEN too short — likely invalid")
+            token_status = "too_short"
+        elif token.startswith("Bearer "):
+            issues.append("DHAN_ACCESS_TOKEN has 'Bearer ' prefix — remove it")
+            token_status = "has_bearer_prefix"
+        else:
+            token_status = "present"
+
+    client_id = env_checks["DHAN_CLIENT_ID"]
+
+    # Try a real Dhan API call if credentials present
+    api_test = None
+    if token and client_id:
+        try:
+            from core.brokers.dhan.dhan_readonly import get_funds
+
+            result = get_funds()
+            api_test = {"success": result.get("success"), "data": result.get("data")}
+            if result.get("success"):
+                issues.clear()
+                hints = ["Token valid and working!"]
+        except Exception as e:
+            api_test = {"success": False, "error": str(e)[:100]}
+            issues.append(f"Dhan API call failed: {str(e)[:80]}")
+
+    return {
+        "env_vars": {
+            "DHAN_CLIENT_ID_present": bool(client_id),
+            "DHAN_CLIENT_ID_preview": client_id[-4:] if client_id else "NOT_SET",
+            "DHAN_ACCESS_TOKEN_present": bool(token),
+            "DHAN_ACCESS_TOKEN_status": token_status,
+            "DHAN_ACCESS_TOKEN_length": len(token) if token else 0,
+            "DHAN_PIN_present": bool(env_checks["DHAN_PIN"]),
+            "DHAN_TOTP_present": bool(env_checks["DHAN_TOTP_SECRET"]),
+        },
+        "issues": issues,
+        "hints": hints,
+        "api_probe": api_test,
+        "fix_action": (
+            "Update DHAN_ACCESS_TOKEN in Render Environment Variables. "
+            "Get fresh token from https://login.dhan.co → Profile → API. "
+            "Token expires daily — use DHAN_PIN + DHAN_TOTP_SECRET for auto-refresh."
+            if issues
+            else "No issues found"
+        ),
+    }
+
+
+@app.get("/api/broker/positions/live")
+async def get_broker_positions_live():
+    _hit = _cache_get("broker_positions", _TTL_BROKER)
+    if _hit is not None:
+        return _hit
+    """Dhan open positions — read-only. No orders."""
+    try:
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_position_row,
+            normalize_positions_payload,
+        )
+        from core.brokers.dhan.dhan_readonly import get_positions
+
+        result = await _run_blocking(get_positions, timeout=_BROKER_IO_TIMEOUT_S)
+        raw_rows = normalize_positions_payload(result.get("data"))
+        normalized = [normalize_position_row(r) for r in raw_rows]
+        return {
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "source": "dhan_readonly",
+            "validated": result.get("success", False),
+            "count": len(normalized),
+            "rows": normalized,
+            **result,
+            "data": raw_rows,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "data": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/portfolio/unified")
+async def get_unified_portfolio():
+    """Paper + broker read-only portfolio truth. Never enables live trading."""
+    _hit = _cache_get("portfolio", _TTL_PORTFOLIO)
+    if _hit is not None:
+        return _hit
+
+    try:
+        from dashboard.backend.portfolio_truth_service import build_unified_portfolio
+    except ImportError:
+        from portfolio_truth_service import build_unified_portfolio
+    try:
+        return await _run_blocking(build_unified_portfolio, OUTPUTS_DIR, timeout=_TRUTH_IO_TIMEOUT_S)
+    except asyncio.TimeoutError:
+        return {"error": "portfolio_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
+
+
+@app.get("/api/trader/requirements")
+async def get_trader_requirements():
+    """Full trader field audit mapped to available API data."""
+    try:
+        from dashboard.backend.trader_requirements_service import (
+            build_trader_requirements_report,
+        )
+    except ImportError:
+        from trader_requirements_service import build_trader_requirements_report
+    return build_trader_requirements_report(OUTPUTS_DIR)
+
+
+@app.get("/api/approval/status")
+async def get_approval_status():
+    """Human approval gate — owner sign-off status (does not enable live trading)."""
+    try:
+        from dashboard.backend.human_approval_service import build_approval_status
+    except ImportError:
+        from human_approval_service import build_approval_status
+    return build_approval_status()
+
+
+@app.get("/metrics", include_in_schema=False)
+async def get_metrics():
+    """Prometheus text-exposition metrics - request counts/latency
+    histogram recorded by RequestIDMiddleware on every request. Exempt
+    from API-key auth (standard practice - scrapers shouldn't need the
+    dashboard's app key) but not from anything else."""
+    try:
+        from dashboard.backend.metrics import render_prometheus_text
+    except ImportError:
+        from metrics import render_prometheus_text
+    return Response(content=render_prometheus_text(), media_type="text/plain; version=0.0.4")
+
+
+@app.get("/api/kill-switch/status")
+async def get_kill_switch_status():
+    """Kill switch status — the same storage/live/kill_switch.json the batch
+    session loop checks every cycle, and that order_management.create_order
+    now also checks before creating any (currently paper-only) order."""
+    try:
+        from core.engine.system3_phase113_kill_switch_monitor import run_phase113
+    except ImportError as e:
+        return {"status": "ERROR", "kill_active": None, "error": f"monitor unavailable: {e}"}
+    result = run_phase113()
+    return {
+        "status": result.get("status"),
+        "kill_active": result.get("outputs", {}).get("kill_active"),
+        "details": result.get("details"),
+        "kill_switch_path": result.get("outputs", {}).get("kill_switch_path"),
+    }
+
+
 @app.get("/api/broker/deps")
 async def get_broker_deps():
-    """Get broker dependency installation status"""
+    """Get broker dependency installation status (Dhan)"""
     try:
-        import sys
         import subprocess
 
-        # Check if SmartAPI is installed
-        smartapi_installed = False
+        dhanhq_installed = False
+        dhanhq_version = None
         try:
-            import smartapi
+            import dhanhq
 
-            smartapi_installed = True
-            smartapi_version = getattr(smartapi, "__version__", "unknown")
+            dhanhq_installed = True
+            dhanhq_version = getattr(dhanhq, "__version__", "unknown")
         except ImportError:
-            smartapi_version = None
+            pass
 
-        # Get Python path
         python_path = sys.executable
 
-        # Check pip freeze for smartapi
         pip_freeze_hit = False
         try:
             result = subprocess.run([python_path, "-m", "pip", "freeze"], capture_output=True, text=True, timeout=5)
-            if "smartapi" in result.stdout.lower():
+            if "dhanhq" in result.stdout.lower():
                 pip_freeze_hit = True
         except:
             pass
 
         return {
-            "smartapi_installed": smartapi_installed,
-            "smartapi_version": smartapi_version,
+            "dhanhq_installed": dhanhq_installed,
+            "dhanhq_version": dhanhq_version,
             "python_path": python_path,
             "pip_freeze_hit": pip_freeze_hit,
-            "broker_module_available": BROKER_AVAILABLE,
+            "broker_module_available": DHAN_AVAILABLE,
         }
     except Exception as e:
         return {
-            "smartapi_installed": False,
+            "dhanhq_installed": False,
             "error": str(e)[:200],
             "python_path": sys.executable if "sys" in locals() else "unknown",
         }
@@ -598,8 +1031,810 @@ async def get_status():
         }
 
 
+# ─── System3 Analytics Endpoints ─────────────────────────────────────────────
+
+GAIN_RANK_FILE = ROOT_DIR / "state" / "gain_rank_history.json"
+VALIDATION_DIR = ROOT_DIR / "state" / "market_validations"
+DS_HEALTH_FILE = ROOT_DIR / "state" / "datasource_health.json"
+RETRAIN_FLAG = ROOT_DIR / "state" / "retrain_signal.json"
+WATCHDOG_LOG = ROOT_DIR / "logs" / "dhan_watchdog.log"
+JOB_SCHED_CFG = ROOT_DIR / "config" / "system3_job_scheduler.json"
+
+
+@app.get("/api/instruments/health")
+async def get_instruments_health():
+    """Instrument master freshness — Dhan CDN sync status."""
+    try:
+        from core.data.instruments_cache import ensure_instruments_loaded
+        from core.data.instruments_master import META_JSON
+
+        metrics = ensure_instruments_loaded()
+        meta = {}
+        if META_JSON.exists():
+            meta = json.loads(META_JSON.read_text(encoding="utf-8"))
+        stale = True
+        if meta.get("synced_utc"):
+            from datetime import datetime, timezone
+
+            synced = datetime.fromisoformat(meta["synced_utc"].replace("Z", "+00:00"))
+            age_h = (datetime.now(timezone.utc) - synced).total_seconds() / 3600
+            stale = age_h > 24
+        return {
+            "status": "ok" if metrics.get("rows", 0) > 0 else "missing",
+            "rows": metrics.get("rows", 0),
+            "source": metrics.get("source"),
+            "stale": stale,
+            "meta": meta,
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
+@app.get("/api/gain_rank")
+async def get_gain_rank(refresh: bool = False):
+    """Latest gain rank predictions and 14-day history from gain_rank_history.json."""
+    try:
+        if not GAIN_RANK_FILE.exists():
+            return {"status": "no_data", "latest": None, "history": [], "is_today": False, "stale": True}
+        history = json.loads(GAIN_RANK_FILE.read_text())
+        if not isinstance(history, list):
+            history = []
+        today = datetime.now(IST).strftime("%Y-%m-%d")
+        today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
+        latest = today_entry or (history[-1] if history else None)
+        stale = latest is None or latest.get("date") != today
+        market_open = False
+        if SSOT_AVAILABLE and state_store is not None:
+            market_open = bool((state_store.get_state().get("market") or {}).get("is_open"))
+        if (refresh or stale) and market_open:
+            # NOTE: run_ranking imports pandas/numpy/ML models which
+            # causes OOM on 512MB Render Starter instances when run in
+            # the web process. The scheduler (worker service) runs
+            # daily_gain_rank_and_validate.py at 09:15 IST instead.
+            # This web endpoint is read-only — never trigger inline.
+            pass
+        if False and market_open:  # disabled — kept for syntax compatibility
+            try:
+                pass
+            except Exception as rank_err:
+                return {
+                    "status": "ok",
+                    "latest": latest,
+                    "history": history[-14:],
+                    "total_days": len(history),
+                    "is_today": not stale,
+                    "stale": stale,
+                    "rank_refresh_error": str(rank_err)[:200],
+                }
+        return {
+            "status": "ok",
+            "latest": latest,
+            "history": history[-14:],
+            "total_days": len(history),
+            "is_today": not stale,
+            "stale": stale,
+            "latest_date": (latest or {}).get("date"),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e), "latest": None, "history": [], "is_today": False, "stale": True}
+
+
+@app.get("/api/scanner/top_contract_gainers")
+async def get_top_contract_gainers(top_n: int = 5):
+    """
+    Live market scanner: highest % gain CE and PE per index segment.
+    TTL cached 60s to prevent 126s recompute on every dashboard poll.
+    """
+    _hit = _cache_get("scanner_gainers", _TTL_SCANNER)
+    if _hit is not None:
+        return _hit
+    global _EOD_SCANNER_CACHE
+    if not _market_open_from_state():
+        cached_at, cached = _EOD_SCANNER_CACHE
+        if cached and (time.time() - cached_at) < _EOD_SCANNER_TTL_S:
+            return cached
+        try:
+
+            def _eod_scanner():
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+                from dashboard.backend.contract_gain_scanner import (
+                    INDEX_SEGMENTS,
+                    scan_all_segments_from_chains,
+                )
+
+                dsm = DataSourceManager()
+                chains: Dict[str, Any] = {}
+
+                def _fetch_one(underlying: str):
+                    ch = fetch_chain_for_api(dsm, underlying)
+                    return underlying, ch or {"contracts": [], "underlying": underlying}
+
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    futs = [pool.submit(_fetch_one, u) for u in INDEX_SEGMENTS]
+                    for fut in as_completed(futs):
+                        underlying, ch = fut.result()
+                        chains[underlying] = ch
+                report = scan_all_segments_from_chains(chains, top_n=min(max(top_n, 1), 20))
+                report["status"] = "eod_snapshot"
+                report["market_open"] = False
+                report["note"] = "After-hours scanner from NSE EOD chain"
+                return report
+
+            result = await _run_blocking(_eod_scanner, timeout=_SCANNER_EOD_TIMEOUT_S)
+            if int(result.get("segments_implemented") or 0) > 0:
+                _EOD_SCANNER_CACHE = (time.time(), result)
+            return result
+        except asyncio.TimeoutError:
+            return {**_scanner_market_closed_response(), "status": "timeout"}
+        except Exception as exc:
+            return {**_scanner_market_closed_response(), "error": str(exc)[:200]}
+    try:
+        from dashboard.backend.contract_gain_scanner import (
+            build_top_contract_gainers_report,
+        )
+
+        report = await _run_blocking(
+            build_top_contract_gainers_report,
+            min(max(top_n, 1), 20),
+            timeout=_SCANNER_IO_TIMEOUT_S,
+        )
+        report["status"] = "ok" if report.get("segments_implemented", 0) > 0 else "no_data"
+        return report
+    except asyncio.TimeoutError:
+        return {
+            "status": "timeout",
+            "error": f"scanner exceeded {_SCANNER_IO_TIMEOUT_S}s",
+            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "segments_implemented": 0,
+            "by_segment": {},
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)[:300],
+            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "segments_implemented": 0,
+            "by_segment": {},
+        }
+
+
+@app.get("/api/scanner/equity_options")
+async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = False):
+    """Equity (stock) F&O universe + OPTSTK top CE/PE from bhavcopy."""
+    if not _market_open_from_state():
+        return {
+            "status": "market_closed",
+            "market_open": False,
+            "scanner": {"data_available": False, "market_top_ce": None, "market_top_pe": None},
+            "segments": {"equity_options": {"implemented": True, "live_chain_per_stock": False}},
+            "implementation_gaps": ["MARKET_CLOSED", "LIVE_PER_STOCK_DHAN_CHAIN"],
+            "note": "Equity option scanner skipped while market is closed",
+        }
+    try:
+        from dashboard.backend.equity_option_scanner import build_equity_options_report
+
+        return await _run_blocking(
+            build_equity_options_report,
+            min(max(top_n, 1), 50),
+            priority_only,
+            timeout=_SCANNER_IO_TIMEOUT_S,
+        )
+    except asyncio.TimeoutError:
+        return {"status": "timeout", "error": f"equity_scanner exceeded {_SCANNER_IO_TIMEOUT_S}s"}
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:300]}
+
+
+@app.get("/api/scanner/segments")
+async def get_scanner_segments():
+    """Implementation matrix: index OPTIDX vs equity OPTSTK vs cash equity."""
+    try:
+        from dashboard.backend.equity_option_scanner import build_equity_options_report
+
+        report = build_equity_options_report(top_n=5)
+        return {
+            "status": "ok",
+            "segments": report.get("segments", {}),
+            "implementation_gaps": report.get("implementation_gaps", []),
+            "generated_utc": report.get("generated_utc"),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
+@app.get("/api/accuracy_trend")
+async def get_accuracy_trend():
+    _hit = _cache_get("accuracy_trend", _TTL_ACCURACY)
+    if _hit is not None:
+        return _hit
+    """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
+    try:
+        if not VALIDATION_DIR.exists():
+            return {"status": "no_data", "trend": [], "retrain_needed": RETRAIN_FLAG.exists()}
+        files = sorted(VALIDATION_DIR.glob("market_validation_*.json"))[-14:]
+        trend = []
+        for f in files:
+            try:
+                d = json.loads(f.read_text())
+                rho = d.get("rank_correlation_spearman") or d.get("spearman_correlation")
+                trend.append(
+                    {
+                        "date": d.get("date", f.stem.replace("market_validation_", "")),
+                        "rho": round(rho, 4) if rho is not None else None,
+                        "hit_rate": d.get("hit_rate"),
+                        "status": d.get("status", "UNKNOWN"),
+                        "predicted": d.get("predicted_ranking", []),
+                        "actual": d.get("actual_ranking", []),
+                    }
+                )
+            except Exception:
+                continue
+        avg_rho = None
+        rhos = [e["rho"] for e in trend if e["rho"] is not None]
+        if rhos:
+            avg_rho = round(sum(rhos) / len(rhos), 4)
+        return {
+            "status": "ok",
+            "trend": trend,
+            "avg_rho": avg_rho,
+            "retrain_needed": RETRAIN_FLAG.exists(),
+            "days_available": len(trend),
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e), "trend": [], "retrain_needed": False}
+
+
+@app.get("/api/auto_gates")
+async def get_auto_gates(refresh: bool = False):
+    """Runtime-driven production/prediction/profit blocker gates (replaces static dashboard proof matrix)."""
+    _hit = _cache_get("auto_gates", _TTL_AUTO_GATES)
+    if _hit is not None:
+        return _hit
+
+    try:
+        try:
+            from dashboard.backend.auto_gates_service import build_auto_gates_report
+        except ImportError:
+            from auto_gates_service import build_auto_gates_report
+        live_state = None
+        if SSOT_AVAILABLE and state_store is not None:
+            live_state = state_store.get_state()
+        return build_auto_gates_report(refresh=refresh, live_state=live_state)
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)[:200],
+            "runtime_driven": False,
+            "proof_gates": [],
+            "live_trading_enabled": False,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Worker -> Web scheduler-health bridge
+# ---------------------------------------------------------------------------
+# CRITICAL ARCHITECTURE NOTE: Render's `web` and `worker` services
+# (render.yaml) run as two SEPARATE containers with separate ephemeral
+# filesystems — no shared disk is configured. The job scheduler daemon
+# (core/engine/system3_phase82_job_scheduler.py) runs inside the WORKER
+# service via scripts/cloud_worker.py. A web-service endpoint that reads
+# local files for scheduler state will ALWAYS see nothing, because those
+# files only ever exist on the worker container.
+#
+# Fix: the worker actively PUSHES its heartbeat/job-status to the web
+# service over HTTP every scheduler tick (~60s, see job scheduler daemon
+# loop), authenticated with a shared secret (WORKER_PUSH_TOKEN env var,
+# set identically on both Render services). The web service holds the
+# latest pushed snapshot in memory and serves it back from GET. If the
+# worker never pushes (e.g. not deployed, crashed, or token mismatch),
+# GET correctly reports unhealthy/stale instead of silently looking like
+# an idle-but-fine scheduler.
+_scheduler_health_state: Dict[str, Any] = {
+    "received": False,
+    "last_push_at": None,
+    "daemon_heartbeat": None,
+    "daemon_pid": None,
+    "jobs": {},
+    "config_alert": None,
+    "config_jobs_total": None,
+    "config_jobs_enabled": None,
+    "jobs_status_today": {},
+    "fired_keys_today": [],
+}
+_WORKER_PUSH_TOKEN = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+
+
+@app.post("/api/scheduler/health/push")
+async def push_scheduler_health(payload: Dict[str, Any], request: Request):
+    """
+    Called by the WORKER service (scripts/cloud_worker.py Thread 4) on
+    every scheduler tick to push its real state to the web service,
+    since the two run on separate Render containers with no shared
+    filesystem. Requires X-Worker-Token header matching WORKER_PUSH_TOKEN
+    env var (set identically on both services in the Render dashboard)
+    when that env var is configured; if it is not set on this (web)
+    side, push is accepted unauthenticated (local/dev convenience).
+    """
+    global _scheduler_health_state
+    if _WORKER_PUSH_TOKEN:
+        sent_token = request.headers.get("X-Worker-Token", "")
+        if sent_token != _WORKER_PUSH_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing X-Worker-Token")
+    _scheduler_health_state = {
+        "received": True,
+        "last_push_at": datetime.now(timezone.utc).isoformat(),
+        "daemon_heartbeat": payload.get("daemon_heartbeat"),
+        "daemon_pid": payload.get("daemon_pid"),
+        "jobs": payload.get("jobs", {}),
+        "config_alert": payload.get("config_alert"),
+        "config_jobs_total": payload.get("config_jobs_total"),
+        "config_jobs_enabled": payload.get("config_jobs_enabled"),
+        "jobs_status_today": payload.get("jobs_status_today", {}),
+        "fired_keys_today": payload.get("fired_keys_today", []),
+    }
+    return {"accepted": True}
+
+
+# ---------------------------------------------------------------------------
+# Chain push — worker precomputes the small set of default-underlying option
+# chains and pushes them here, same pattern as scheduler health push above.
+# GET /api/chain/{underlying} (see _get_chain_uncached) serves straight from
+# this in-memory snapshot for anything fresh enough, instead of doing the
+# expensive DataSourceManager() + live Dhan fetch inline on the web dyno —
+# that inline path is what was crash-looping the 512MB web container during
+# market hours (2026-07-02 forensic investigation, see CHANGE_LOG.md).
+# Falls back to the old inline fetch only for underlyings the worker doesn't
+# push, or if the push has gone stale (worker down/redeploying).
+#
+# The worker pushes off-hours too, at a much slower cadence, since the
+# EOD/bhavcopy snapshot it fetches then barely changes between ticks (see
+# cloud_worker.py's Thread 5 docstring — this used to be market-hours-only,
+# which meant every after-hours page view fell back to the slow inline fetch
+# below and frequently surfaced as a permanent "Market Closed" screen with no
+# data at all, even though EOD data was available). Each push carries a
+# `market_open` flag so we know which freshness window applies.
+# ---------------------------------------------------------------------------
+_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = (
+    {}
+)  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
+_PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s during market hours; treat
+# anything older than this as stale and fall back to the inline live fetch.
+_PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker pushes every ~300s off-hours (cloud_worker.py
+# _CHAIN_PUSH_CLOSED_INTERVAL_S) — give it 2x that before treating it as stale.
+
+
+@app.post("/api/chain/push")
+async def push_chain_snapshots(payload: Dict[str, Any], request: Request):
+    """Called by scripts/cloud_worker.py's chain-push thread. Same auth as
+    /api/scheduler/health/push. Body: {"chains": {"NIFTY": {...}, ...}, "market_open": bool}."""
+    if _WORKER_PUSH_TOKEN:
+        sent_token = request.headers.get("X-Worker-Token", "")
+        if sent_token != _WORKER_PUSH_TOKEN:
+            raise HTTPException(status_code=401, detail="Invalid or missing X-Worker-Token")
+    chains = payload.get("chains", {})
+    if not isinstance(chains, dict):
+        raise HTTPException(status_code=400, detail="'chains' must be an object")
+    market_open = bool(payload.get("market_open", True))
+    now = _time_module.time()
+    for symbol, data in chains.items():
+        if isinstance(data, dict):
+            _PUSHED_CHAIN_CACHE[symbol.upper()] = {"data": data, "received_at": now, "market_open": market_open}
+    return {"accepted": True, "symbols": list(chains.keys())}
+
+
+@app.get("/api/deploy/info")
+async def get_deploy_info():
+    """
+    Exposes the deployed commit SHA so external proof scripts (e.g.
+    scripts/paper_day_proof_pack.py) can verify Render is actually
+    running the expected commit, without needing a Render API key.
+    Render auto-injects RENDER_GIT_COMMIT on every deploy — this just
+    surfaces it. No secrets involved.
+    """
+    return {
+        "git_sha": os.environ.get("RENDER_GIT_COMMIT", ""),
+        "git_branch": os.environ.get("RENDER_GIT_BRANCH", ""),
+        "service_name": os.environ.get("RENDER_SERVICE_NAME", ""),
+        "deployed_at_known": bool(os.environ.get("RENDER_GIT_COMMIT")),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Live Trading Gate — evaluates ALL conditions before allowing live mode
+# ---------------------------------------------------------------------------
+
+_LIVE_APPROVAL_FILE = ROOT_DIR / "config" / "kill_switch.json"
+_RISK_CONFIG_FILE = ROOT_DIR / "config" / "system3_risk_config.yml"
+_GAIN_RANK_HISTORY = ROOT_DIR / "state" / "gain_rank_history.json"
+_VAL_DIR = ROOT_DIR / "state" / "market_validations"
+
+
+@app.get("/api/live-trading/gate")
+async def get_live_trading_gate():
+    """
+    Evaluates every condition required before live trading is allowed.
+    Returns gate_open=true ONLY when ALL pass.
+    This is what the dashboard "Go Live" button checks first.
+    Live trading remains OFF until human gives explicit approval phrase.
+    """
+    gates = []
+    gate_open = True
+
+    def gate(name: str, passed: bool, detail: str):
+        nonlocal gate_open
+        if not passed:
+            gate_open = False
+        gates.append({"gate": name, "passed": passed, "detail": detail})
+
+    # Gate 1: Safety env vars
+    live_env = os.environ.get("LIVE_TRADING_ENABLED", "0")
+    gate("env_live_disabled", live_env == "0", f"LIVE_TRADING_ENABLED={live_env} (must be 0 for paper, 1 for live)")
+
+    # Gate 2: Kill switch
+    try:
+        ks = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        gate(
+            "kill_switch_off",
+            not ks.get("kill_switch_activated", False),
+            "Kill switch not activated" if not ks.get("kill_switch_activated") else "KILL SWITCH ACTIVE",
+        )
+        gate(
+            "human_approved",
+            ks.get("live_trading_approved", False),
+            (
+                "Human approval given"
+                if ks.get("live_trading_approved")
+                else "NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json"
+            ),
+        )
+    except Exception as e:
+        gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
+
+    # Gate 3: ML accuracy — Spearman rho >= 0.70 over 10+ days
+    try:
+        history = (
+            json.loads((_VAL_DIR.parent / "gain_rank_history.json").read_text())
+            if (_VAL_DIR.parent / "gain_rank_history.json").exists()
+            else []
+        )
+        val_files = list(_VAL_DIR.glob("market_validation_*.json")) if _VAL_DIR.exists() else []
+        rhos = []
+        for vf in val_files:
+            v = json.loads(vf.read_text())
+            rho = v.get("spearman_correlation")
+            if rho is not None:
+                rhos.append(rho)
+        avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
+        gate("validation_days", len(val_files) >= 10, f"{len(val_files)} validation days (need ≥10)")
+        gate("ml_accuracy_rho", avg_rho >= 0.70, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
+    except Exception as e:
+        gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
+
+    # Gate 4: Max daily loss set
+    try:
+        # Use kill_switch.json for max_loss (avoid yaml dependency)
+        # Risk config also in kill_switch since both updated together
+        ks_data = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        max_loss = ks_data.get("max_daily_loss_inr", 0)
+        gate(
+            "max_loss_configured",
+            max_loss > 0 and max_loss <= 10000,
+            f"Max daily loss = ₹{max_loss} hardcoded in kill_switch.json",
+        )
+    except Exception as e:
+        gate("max_loss_configured", False, f"Could not read max loss config: {e}")
+
+    return {
+        "gate_open": gate_open,
+        "gates": gates,
+        "summary": f"{sum(1 for g in gates if g['passed'])}/{len(gates)} gates passed",
+        "verdict": "LIVE_TRADING_ALLOWED" if gate_open else "LIVE_TRADING_BLOCKED",
+        "message": (
+            "All gates pass — ready for live trading after human approval"
+            if gate_open
+            else "Live trading blocked — see failed gates above"
+        ),
+        "live_trading_status": "OFF — remains off until all gates pass",
+    }
+
+
+@app.post("/api/live-trading/approve")
+async def approve_live_trading(payload: Dict[str, Any]):
+    """
+    Human approval endpoint. Requires exact phrase to prevent accidental activation.
+    Even after approval, LIVE_TRADING_ENABLED env var must be manually set to 1
+    on Render dashboard — this cannot be done via API.
+    """
+    REQUIRED_PHRASE = "I APPROVE LIVE TRADING WITH MAX LOSS RS 5000"
+    phrase = payload.get("approval_phrase", "").strip().upper()
+
+    if phrase != REQUIRED_PHRASE:
+        return {
+            "approved": False,
+            "message": f"Wrong phrase. Required: '{REQUIRED_PHRASE}'",
+            "note": "Exact phrase required to prevent accidental activation",
+        }
+
+    try:
+        ks_path = ROOT_DIR / "config" / "kill_switch.json"
+        ks = json.loads(ks_path.read_text()) if ks_path.exists() else {}
+        ks["live_trading_approved"] = True
+        ks["live_trading_approval_phrase"] = phrase
+        ks["approval_timestamp"] = datetime.now(timezone.utc).isoformat()
+        ks["approver_note"] = "Human approval given via dashboard"
+        ks_path.write_text(json.dumps(ks, indent=2))
+        return {
+            "approved": True,
+            "message": "Approval recorded. IMPORTANT: You must STILL manually set "
+            "LIVE_TRADING_ENABLED=1 on Render dashboard to actually enable live trading. "
+            "This approval alone does NOT enable live trading.",
+            "next_step": "Render dashboard → genesis-system3-backend → Environment → "
+            "LIVE_TRADING_ENABLED → change to 1 → Save",
+        }
+    except Exception as e:
+        return {"approved": False, "message": f"Failed to save approval: {e}"}
+
+
+@app.get("/api/scheduler/health")
+async def get_scheduler_health():
+    """
+    Job scheduler health, as last pushed by the worker service (see
+    /api/scheduler/health/push above). NOT a local-file read — the
+    scheduler daemon runs on a different Render container than this web
+    service, so local files here would always be empty.
+
+    `healthy=False` covers three real failure modes:
+      1. Worker has never pushed at all (never deployed / crashed at boot)
+      2. Worker's own config_alert is set (broken scheduler config)
+      3. Last push is older than STALE_THRESHOLD_S (worker thread died
+         but the worker process itself is still up, so Render wouldn't
+         restart it — this is exactly the silent-failure shape that
+         caused the original bug)
+    """
+    STALE_THRESHOLD_S = 180  # daemon ticks every ~60s; 3 missed ticks = stale
+
+    state = _scheduler_health_state
+    healthy = True
+    reasons = []
+
+    if not state["received"]:
+        healthy = False
+        reasons.append(
+            "worker has never pushed scheduler health — check worker service is deployed and running cloud_worker.py"
+        )
+    else:
+        try:
+            last_push = datetime.fromisoformat(state["last_push_at"])
+            age_s = (datetime.now(timezone.utc) - last_push).total_seconds()
+            if age_s > STALE_THRESHOLD_S:
+                healthy = False
+                reasons.append(f"last worker push was {age_s:.0f}s ago (stale, expected <{STALE_THRESHOLD_S}s)")
+        except Exception:
+            pass
+
+    if state.get("config_alert"):
+        healthy = False
+        reasons.append(f"worker reports config alert: {state['config_alert'].get('message', state['config_alert'])}")
+
+    # NOTE: state["jobs"] is execution HISTORY — it only gains an entry for
+    # a job_id once that job fires for the first time since daemon start.
+    # A freshly (re)started worker legitimately has jobs={} for hours
+    # (e.g. restarted at 01:00 IST, next job doesn't fire until pre-market)
+    # even though its config has 23 enabled jobs. Checking config_jobs_enabled
+    # (pushed separately, reflects config load result each tick) instead of
+    # the fired-history dict avoids false "zero jobs loaded" alarms on every
+    # worker restart outside market hours. config_jobs_enabled is None only
+    # when talking to an older worker build that predates this field.
+    if state["received"] and state.get("config_jobs_enabled") == 0:
+        healthy = False
+        reasons.append("worker's job scheduler config has zero enabled jobs")
+
+    # Richer breakdown on top of the checks above: classifies every enabled
+    # job into fired/pending/missed/catchup_eligible/skipped for today,
+    # re-evaluating live against the current moment for jobs not yet fired
+    # (see core/engine/system3_scheduler_catchup.py). jobs={} alone is never
+    # treated as fatal here if nothing was due yet — only a genuine
+    # missed_jobs_today entry (past its catch-up window, never fired) marks
+    # unhealthy.
+    try:
+        from core.engine.system3_phase82_job_scheduler import (
+            load_config as _load_scheduler_config,
+        )
+        from core.engine.system3_scheduler_catchup import (
+            load_policy as _load_catchup_policy,
+        )
+        from core.engine.system3_scheduler_catchup import summarize_scheduler_status
+
+        now_ist = datetime.now(IST)
+        is_weekend = now_ist.weekday() >= 5
+        is_holiday = False
+        try:
+            from core.utils.nse_holidays import is_trading_holiday
+
+            is_holiday, _ = is_trading_holiday(now_ist.date())
+        except Exception:
+            pass
+
+        config = _load_scheduler_config()
+        policy = _load_catchup_policy()
+        summary = summarize_scheduler_status(
+            config,
+            state,
+            now=now_ist,
+            policy=policy,
+            is_holiday=is_holiday,
+            is_weekend=is_weekend,
+            api_health_ok=True,  # this endpoint answering IS proof the API is running
+        )
+        if state["received"] and summary.get("missed_jobs_today"):
+            healthy = False
+            reasons.append(f"jobs missed today (past catch-up window, never fired): {summary['missed_jobs_today']}")
+    except Exception as e:
+        summary = {
+            "configured_jobs_count": None,
+            "enabled_jobs_count": None,
+            "fired_jobs_today": [],
+            "pending_jobs_today": [],
+            "missed_jobs_today": [],
+            "catchup_eligible_jobs": [],
+            "skipped_jobs_today": [],
+        }
+        reasons.append(f"could not compute job status summary: {e}")
+
+    return {
+        **state,
+        **summary,
+        "healthy": healthy,
+        "unhealthy_reasons": reasons,
+    }
+
+
+@app.get("/api/system_health")
+async def get_system_health():
+    """Datasource health, token status, retrain flag, and scheduler job status."""
+    try:
+        # Token status from watchdog log last line
+        token_status = {"status": "unknown", "log_line": "log not found"}
+        try:
+            if WATCHDOG_LOG.exists():
+                lines = WATCHDOG_LOG.read_text().strip().splitlines()
+                last_line = lines[-1] if lines else ""
+                token_status = {"status": "ok" if "Token OK" in last_line else "warning", "log_line": last_line}
+        except Exception:
+            pass
+
+        # Datasource health
+        ds_health = None
+        ds_resilience = "UNKNOWN"
+        try:
+            if DS_HEALTH_FILE.exists():
+                ds_health = json.loads(DS_HEALTH_FILE.read_text())
+                ds_resilience = ds_health.get("resilience", "UNKNOWN")
+        except Exception:
+            pass
+
+        # Scheduler jobs
+        jobs_summary = []
+        scheduler_daemon = {"started_at": None, "heartbeat": None, "pid": None, "active": False}
+        try:
+            cfg = json.loads(JOB_SCHED_CFG.read_text())
+            scheduler_state = {}
+            scheduler_state_file = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
+            if scheduler_state_file.exists():
+                try:
+                    scheduler_state = json.loads(scheduler_state_file.read_text())
+                    scheduler_daemon["started_at"] = scheduler_state.get("daemon_started_at")
+                    scheduler_daemon["heartbeat"] = scheduler_state.get("daemon_heartbeat")
+                    scheduler_daemon["pid"] = scheduler_state.get("daemon_pid")
+
+                    if scheduler_daemon["heartbeat"]:
+                        try:
+                            hb_time = datetime.fromisoformat(scheduler_daemon["heartbeat"])
+                            if hb_time.tzinfo is None:
+                                hb_time = IST.localize(hb_time)
+                            now_ist = datetime.now(IST)
+                            age_seconds = (now_ist - hb_time).total_seconds()
+                            scheduler_daemon["active"] = 0 <= age_seconds < 180
+                        except Exception as hb_exc:
+                            print(f"Error parsing heartbeat: {hb_exc}")
+                except Exception:
+                    pass
+            for j in cfg.get("jobs", []):
+                job_id = j.get("id")
+                job_state = scheduler_state.get("jobs", {}).get(job_id, {})
+                jobs_summary.append(
+                    {
+                        "id": job_id,
+                        "name": j.get("name"),
+                        "schedule_time": j.get("schedule_time", "daily"),
+                        "enabled": j.get("enabled", False),
+                        "last_run_time": job_state.get("last_run_time"),
+                        "last_status": job_state.get("last_status"),
+                        "last_error": job_state.get("last_error"),
+                    }
+                )
+        except Exception:
+            pass
+
+        return {
+            "status": "ok",
+            "timestamp": datetime.now(IST).isoformat(),
+            "token": token_status,
+            "datasource_health": ds_health,
+            "datasource_resilience": ds_resilience,
+            "retrain_needed": RETRAIN_FLAG.exists(),
+            "scheduler_daemon": scheduler_daemon,
+            "jobs": jobs_summary,
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
+@app.api_route("/api/scheduler/run/{job_id}", methods=["GET", "POST"])
+async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, secret: Optional[str] = None):
+    """
+    Trigger a specific scheduler job in the background.
+    Supports GET and POST to allow simple integration with external web-cron services (e.g. cron-job.org).
+    """
+    expected_secret = os.environ.get("SCHEDULER_SECRET")
+    if not expected_secret:
+        # Fail closed: an unset secret must never mean "no auth required".
+        raise HTTPException(status_code=503, detail="SCHEDULER_SECRET not configured on server")
+    if secret != expected_secret:
+        raise HTTPException(status_code=403, detail="Invalid scheduler secret")
+
+    # Load scheduler config to verify job ID
+    try:
+        cfg = json.loads(JOB_SCHED_CFG.read_text())
+        job = next((j for j in cfg.get("jobs", []) if j.get("id") == job_id), None)
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found in scheduler config")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read scheduler config: {str(e)}")
+
+    # Run the job inside BackgroundTasks to return immediate response and avoid timeouts
+    def _run_job_bg():
+        try:
+            import importlib.util as _ilu
+            import pathlib as _pl
+
+            _spec = _ilu.spec_from_file_location(
+                "job_scheduler_bg",
+                _pl.Path(__file__).resolve().parent.parent.parent
+                / "core"
+                / "engine"
+                / "system3_phase82_job_scheduler.py",
+            )
+            if _spec and _spec.loader:
+                _js = _ilu.module_from_spec(_spec)
+                _spec.loader.exec_module(_js)  # type: ignore[union-attr]
+                _js.run_single_job(job_id)
+                print(f"[API-Scheduler] Background execution of job '{job_id}' completed.")
+        except Exception as exc:
+            print(f"[API-Scheduler] Background execution of job '{job_id}' failed: {exc}")
+
+    background_tasks.add_task(_run_job_bg)
+    return {
+        "status": "triggered",
+        "job_id": job_id,
+        "name": job.get("name"),
+        "message": f"Job '{job_id}' has been scheduled for background execution.",
+    }
+
+
 # WebSocket connections
 active_connections: List[WebSocket] = []
+_MAX_WS_CONNECTIONS = 20  # hard cap — this is a small-team dashboard, not a
+# consumer product. Each open connection runs its own dedicated per-second
+# loop on the single Render worker process (--workers 1, 512MB Starter box);
+# an unbounded number of stale/reconnecting tabs is an unbounded amount of
+# background work with no ceiling. Rejecting past this cap is a cheap safety
+# net against that becoming an OOM source (2026-07-02 forensic investigation).
 
 # File watcher for real-time updates
 # Store the event loop for use in file watcher thread
@@ -893,7 +2128,69 @@ class HealthResponse(BaseModel):
     performance_sla: Dict[str, Any]
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# TTL CACHE — Prevents Render 503 cascade on cold-start and poll overload
+# Heavy APIs cache their results. Cache is in-process dict (no Redis needed).
+# TTLs chosen for trading: broker data 30s, scanner 60s, accuracy 120s.
+# ═══════════════════════════════════════════════════════════════════════════
+import time as _time_module
+
+_API_CACHE: dict = {}  # {key: (timestamp, data)}
+
+
+def _cache_get(key: str, ttl_s: float):
+    """Return cached value if fresh, else None."""
+    entry = _API_CACHE.get(key)
+    if entry and (_time_module.time() - entry[0]) < ttl_s:
+        return entry[1]
+    return None
+
+
+def _cache_set(key: str, value):
+    """Store value with current timestamp."""
+    _API_CACHE[key] = (_time_module.time(), value)
+    return value
+
+
+# TTL constants (seconds)
+_TTL_BROKER = 30  # holdings, positions, funds — Dhan API calls
+_TTL_PAPER = 15  # paper positions/pnl — changes each tick
+_TTL_SCANNER = 60  # contract gainers, equity_options — heavy compute
+_TTL_ACCURACY = 120  # accuracy trend — file read, slow
+_TTL_PERF = 120  # performance data
+_TTL_PORTFOLIO = 30  # portfolio/unified
+_TTL_AUTO_GATES = 60  # auto gates — reads several files
+_TTL_BROKER_TRUTH = 30  # broker truth validator
+
+
 # API Endpoints
+@app.get("/api/memory")
+async def get_memory():
+    """Real-time memory usage — RSS vs Starter limit (512MB)."""
+    try:
+        import resource, gc
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        limit_mb = int(os.environ.get("MEM_LIMIT_MB", "480"))
+        pct = rss_mb / limit_mb * 100
+        status = "OK" if pct < 75 else "WARN" if pct < 85 else "HIGH"
+        if status == "HIGH":
+            before = rss_mb
+            gc.collect()
+            rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            freed = before - rss_mb
+            print(f"[/api/memory] GC triggered: freed {freed:.0f}MB")
+        return {
+            "rss_mb": round(rss_mb, 1),
+            "limit_mb": limit_mb,
+            "pct_used": round(pct, 1),
+            "headroom_mb": round(limit_mb - rss_mb, 1),
+            "status": status,
+            "gc_triggered": status == "HIGH",
+        }
+    except Exception as e:
+        return {"error": str(e), "status": "UNKNOWN"}
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -954,36 +2251,30 @@ async def get_health():
             mode = "PAPER"
             broker_name = "unknown"
 
-            # Check Dhan first — takes priority when DHAN credentials are present
-            _dhan_cid = os.getenv("DHAN_CLIENT_ID", "").strip()
-            _dhan_tok = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
-            if _dhan_cid and _dhan_tok:
-                try:
-                    from core.brokers.dhan.dhan_readonly import get_status as _dhan_get_status
-                    _dhan_result = _dhan_get_status()
-                    if _dhan_result.get("connected"):
-                        broker_connected = True
-                        broker_status_str = "connected"
-                        broker_name = "dhan"
-                        mode = "PAPER"
-                except Exception:
-                    pass
-
-            # Fallback: Try SSOT state (AngelOne) if Dhan not connected
-            if not broker_connected:
-                if SSOT_AVAILABLE and state_store:
-                    ssot_state = state_store.get_state()
-                    broker_connected = ssot_state.get("broker", {}).get("connected", False)
-                    broker_status_str = "connected" if broker_connected else "disconnected"
-                    mode = ssot_state.get("mode", "PAPER")
-                    broker_name = ssot_state.get("broker", {}).get("name", "unknown")
+            # Health is polled frequently by dashboard/verifiers; use cached SSOT truth.
+            # Live Dhan probing belongs to /api/broker/status so a slow broker call cannot
+            # block /api/health and cascade into /api/state timeouts.
+            try:
+                if SSOT_AVAILABLE and state_store is not None:
+                    cached_broker = state_store.get_state().get("broker") or {}
+                    broker_connected = bool(cached_broker.get("connected"))
+                    broker_status_str = cached_broker.get("status") or (
+                        "connected" if broker_connected else "disconnected"
+                    )
+                    broker_name = cached_broker.get("name") or "dhan"
                 else:
                     health_file = OUTPUTS_DIR / "health.json"
                     if health_file.exists():
-                        health = json.loads(health_file.read_text())
-                        broker_connected = health.get("is_connected", False)
+                        health_cached = json.loads(health_file.read_text())
+                        broker_connected = bool(
+                            health_cached.get("is_connected") or health_cached.get("broker_status") == "connected"
+                        )
                         broker_status_str = "connected" if broker_connected else "disconnected"
-                        mode = health.get("mode", "PAPER")
+                        broker_name = "dhan"
+            except Exception:
+                pass
+
+            # Dhan is the only broker — no AngelOne fallback
 
             # If broker not ready, return explicit NOT_READY state
             if not broker_connected:
@@ -1018,7 +2309,7 @@ async def get_health():
                     "message": "BROKER_NOT_READY - Real data unavailable",
                 }
 
-            # Broker IS connected (Dhan or AngelOne) — return PAPER/ANALYZER ready state
+            # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
             # live_allowed=False always: LIVE trading is permanently disabled
             return {
                 "status": "ok",
@@ -1138,21 +2429,19 @@ async def get_health():
 
         # PRODUCTION GATE: live_allowed only when broker connected + real data + market open
         ds = (data_source if SSOT_AVAILABLE and state_store else "real").lower()
-        live_allowed = broker_connected and ds in ("real", "live") and market_status_str == "open"
-        live_blockers = []
-        if not broker_connected:
-            live_blockers.append("broker not connected")
-        if ds not in ("real", "live"):
-            live_blockers.append(f"data_source is {data_source}")
-        if market_status_str != "open":
-            live_blockers.append("market is closed")
+        # PERMANENT SAFETY: live_allowed is ALWAYS False in analyzer mode
+        # Even if broker+market are ready, live trading requires ENV change + human approval
+        live_allowed = False
+        live_blockers = ["Live trading permanently disabled — analyzer/paper mode only"]
+        # live_blockers already set above (permanent)
         mode_raw = mode if SSOT_AVAILABLE and state_store else health.get("mode", "UNKNOWN")
         mode_effective = mode_raw or "PAPER"
         if (mode_effective or "").upper() == "LIVE" and not live_allowed:
             mode_effective = "PAPER"
             print(f"[MODE_GATE] requested=LIVE allowed=false reason={live_blockers}")
-        elif (mode_effective or "").upper() == "LIVE" and live_allowed:
-            print(f"[MODE_GATE] requested=LIVE allowed=true")
+        elif (mode_effective or "").upper() == "LIVE":
+            mode_effective = "PAPER"  # Override: LIVE never allowed
+            print(f"[MODE_GATE] requested=LIVE forced=PAPER reason=permanent_analyzer_mode")
 
         return {
             "status": "ok",
@@ -1208,7 +2497,23 @@ async def get_qc():
             # Return JSONResponse to ensure proper serialization
             return JSONResponse(content=qc_data)
 
-        # REAL_ONLY MODE: If broker not ready, return NOT_READY
+        # Market closed — do not surface stale FAIL from last session (before broker gate)
+        if not market_is_open:
+            return JSONResponse(
+                content={
+                    "status": "MARKET_CLOSED",
+                    "skipped": True,
+                    "overall_passed": None,
+                    "qc_passed": None,
+                    "message": "QC skipped — market closed (stale spread checks not applied)",
+                    "data_source": "skipped",
+                    "total_contracts": 0,
+                    "underlying_count": 0,
+                    "underlying_results": {},
+                }
+            )
+
+        # REAL_ONLY MODE: If broker not ready, return NOT_READY (market open only)
         if REAL_ONLY:
             broker_connected = False
             if SSOT_AVAILABLE and state_store:
@@ -1224,6 +2529,7 @@ async def get_qc():
                 return {
                     "status": "NOT_READY",
                     "qc_passed": False,
+                    "overall_passed": False,
                     "message": "BROKER_NOT_READY - Real QC data unavailable",
                     "data_source": "live",
                     "total_contracts": 0,
@@ -1258,7 +2564,223 @@ async def get_qc():
 
 
 # Default underlyings for discovery (validator and UI)
-DEFAULT_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY"]
+DEFAULT_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+
+
+def _runtime_qc_chain_to_df(chain: Dict[str, Any]):
+    if pd is None:
+        return None
+    contracts = chain.get("contracts") or []
+    if not contracts:
+        return pd.DataFrame()
+    return pd.DataFrame(contracts)
+
+
+def _runtime_qc_source_is_synthetic(source: Any) -> bool:
+    return "synthetic" in str(source or "").lower() or "fake" in str(source or "").lower()
+
+
+def _runtime_qc_trade_ready(chain: Dict[str, Any]) -> bool:
+    if bool(chain.get("trade_ready") or chain.get("tradeable") or chain.get("ready_for_trade")):
+        return True
+    status = str(chain.get("status") or "").upper()
+    return status in {"MARKET_OPEN", "LIVE", "TRADE_READY"}
+
+
+def _runtime_qc_market_closed_zero_ok(result: Dict[str, Any]) -> bool:
+    status = str(result.get("status") or "").upper()
+    return bool(
+        result.get("market_open") is False
+        and int(result.get("total_contracts") or 0) == 0
+        and (result.get("skipped") is True or status in {"MARKET_CLOSED", "MARKET_CLOSED_EXPECTED"})
+    )
+
+
+def _runtime_qc_anomalies(df, market_open: bool) -> Tuple[List[str], List[str]]:
+    critical: List[str] = []
+    warnings: List[str] = []
+    if df is None or df.empty:
+        return critical, warnings
+
+    def _series(name: str):
+        return pd.to_numeric(df[name], errors="coerce") if name in df.columns else None
+
+    bid_col = ask_col = None
+    try:
+        from src.validation.qc_validator import QCValidator
+
+        bid_col, ask_col = QCValidator._bid_ask_columns(df)
+    except Exception:
+        pass
+    if bid_col and ask_col:
+        bid = pd.to_numeric(df[bid_col], errors="coerce")
+        ask = pd.to_numeric(df[ask_col], errors="coerce")
+        bad = ((bid.notna()) & (ask.notna()) & (ask < bid)).sum()
+        if bad:
+            critical.append(f"{int(bad)} contracts have ask < bid")
+
+    ltp = _series("ltp")
+    if ltp is not None:
+        negative_ltp = ((ltp.notna()) & (ltp < 0)).sum()
+        if negative_ltp:
+            critical.append(f"{int(negative_ltp)} contracts have negative LTP")
+        zero_ltp = ((ltp.notna()) & (ltp == 0)).sum()
+        if len(df) and zero_ltp > len(df) * 0.2:
+            warnings.append(f"{int(zero_ltp)} contracts have zero LTP")
+
+    iv = _series("iv")
+    if iv is not None:
+        invalid_iv = ((iv.notna()) & ((iv < 0) | (iv > 3))).sum()
+        if invalid_iv:
+            warnings.append(f"{int(invalid_iv)} contracts have IV outside 0-3 range")
+
+    for col in ("strike", "option_type"):
+        if col not in df.columns:
+            warnings.append(f"missing {col}")
+        else:
+            missing = df[col].isna().sum()
+            if len(df) and missing > len(df) * 0.1:
+                warnings.append(f"{int(missing)} contracts missing {col}")
+
+    if market_open and "fetch_timestamp" in df.columns:
+        try:
+            now = datetime.now(IST)
+            ts = pd.to_datetime(
+                df["fetch_timestamp"].astype(str).str.replace(" IST", "", regex=False),
+                errors="coerce",
+            )
+            if getattr(ts.dt, "tz", None) is None:
+                ts = ts.dt.tz_localize(IST, nonexistent="NaT", ambiguous="NaT")
+            age = (now - ts).dt.total_seconds()
+            stale = ((age.notna()) & (age > 60)).sum()
+            if stale > len(df) * 0.1:
+                warnings.append(f"{int(stale)} contracts have stale timestamps >60s")
+        except Exception:
+            pass
+    return critical, warnings
+
+
+@app.get("/api/qc/runtime")
+async def get_qc_runtime():
+    """Read-only runtime QC over the same chain adapter used by /api/chain."""
+    market_is_open = False
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            market_is_open, _reason = is_market_open()
+        except Exception:
+            market_is_open = False
+
+    critical_failures: List[str] = []
+    warnings: List[str] = []
+    underlying_results: Dict[str, Any] = {}
+    total_contracts = 0
+    data_sources: List[str] = []
+
+    try:
+        from core.data.datasource_manager import DataSourceManager
+        from dashboard.backend.chain_adapter import fetch_chain_for_api
+        from src.validation.qc_validator import QCValidator
+    except Exception as exc:
+        return {
+            "status": "ERROR",
+            "overall_passed": False,
+            "market_open": market_is_open,
+            "skipped": False,
+            "data_source": "import_error",
+            "total_contracts": 0,
+            "underlying_count": 0,
+            "underlying_results": {},
+            "critical_failures": [f"runtime QC import failed: {exc}"],
+            "warnings": [],
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+
+    validator = QCValidator(paper_sanity_mode=True)
+
+    for underlying in DEFAULT_UNDERLYINGS:
+        chain: Dict[str, Any] = {
+            "underlying": underlying,
+            "contracts": [],
+            "total_contracts": 0,
+            "status": "MARKET_CLOSED" if not market_is_open else "NO_DATA",
+            "data_source": "closed" if not market_is_open else "live",
+        }
+        fetch_error = None
+        try:
+
+            def _fetch_chain():
+                return fetch_chain_for_api(DataSourceManager(), underlying)
+
+            fetched = await _run_blocking(_fetch_chain, timeout=45.0)
+            if fetched:
+                chain.update(fetched)
+                if not market_is_open and not chain.get("status"):
+                    chain["status"] = "MARKET_CLOSED"
+        except asyncio.TimeoutError:
+            fetch_error = "timeout"
+        except Exception as exc:
+            fetch_error = str(exc)
+
+        contracts_count = int(chain.get("total_contracts") or len(chain.get("contracts") or []))
+        source = chain.get("data_source") or chain.get("source") or "unknown"
+        data_sources.append(str(source))
+        total_contracts += contracts_count
+        df = _runtime_qc_chain_to_df(chain)
+        skipped = bool(not market_is_open and contracts_count == 0)
+        result_status = "MARKET_CLOSED_EXPECTED" if skipped else str(chain.get("status") or "OK")
+
+        if _runtime_qc_source_is_synthetic(source) and _runtime_qc_trade_ready(chain):
+            critical_failures.append(f"{underlying}: synthetic/fake data marked trade-ready")
+
+        qc_passed = None
+        qc_reasons: List[str] = []
+        underlying_critical: List[str] = []
+        underlying_warnings: List[str] = []
+        if skipped:
+            qc_passed = None
+        elif df is not None:
+            qc_passed, qc_reasons = validator.validate_snapshot(df, underlying)
+            underlying_critical, underlying_warnings = _runtime_qc_anomalies(df, market_is_open)
+            critical_failures.extend([f"{underlying}: {item}" for item in underlying_critical])
+            warnings.extend([f"{underlying}: {item}" for item in underlying_warnings])
+            if not qc_passed:
+                warnings.extend([f"{underlying}: {item}" for item in qc_reasons])
+
+        if fetch_error and market_is_open:
+            critical_failures.append(f"{underlying}: chain fetch failed: {fetch_error}")
+        elif fetch_error:
+            warnings.append(f"{underlying}: after-hours chain fetch skipped/failed: {fetch_error}")
+
+        underlying_results[underlying] = {
+            "status": result_status,
+            "passed": qc_passed,
+            "skipped": skipped,
+            "market_open": market_is_open,
+            "total_contracts": contracts_count,
+            "data_source": source,
+            "qc_reasons": qc_reasons,
+            "critical_failures": underlying_critical,
+            "warnings": underlying_warnings,
+            "fetch_error": fetch_error,
+        }
+
+    skipped_all = bool(not market_is_open and total_contracts == 0)
+    status = "MARKET_CLOSED_EXPECTED" if skipped_all else ("FAIL" if critical_failures else "PASS")
+    return {
+        "status": status,
+        "overall_passed": False if critical_failures else (None if skipped_all else True),
+        "market_open": market_is_open,
+        "skipped": skipped_all,
+        "data_source": ",".join(sorted(set(data_sources))) if data_sources else "unknown",
+        "total_contracts": total_contracts,
+        "underlying_count": len(DEFAULT_UNDERLYINGS),
+        "underlying_results": underlying_results,
+        "critical_failures": critical_failures,
+        "warnings": warnings,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
 
 
 @app.get("/api/underlyings")
@@ -1267,8 +2789,39 @@ async def get_underlyings():
     return {"underlyings": DEFAULT_UNDERLYINGS}
 
 
+_TTL_CHAIN = 8  # option chain — frontend polls every 5s per client; DataSourceManager()
+# construction + live Dhan fetch inside is expensive (instrument master lookup +
+# network call). Without this cache, every open browser tab re-triggers that full
+# cost every 5s, which was a leading suspect for OOM-driven 502 crash loops on the
+# 512MB Render Starter box during market hours (2026-07-02 forensic investigation).
+
+
 @app.get("/api/chain/{underlying}")
 async def get_chain(underlying: str):
+    """Get option chain for specific underlying.
+
+    Preference order: (1) fresh worker-pushed snapshot — precomputed off-dyno,
+    zero cost to this process, see push_chain_snapshots above; (2) short local
+    TTL cache (_TTL_CHAIN) of a prior inline fetch on THIS dyno; (3) inline
+    live fetch (_get_chain_uncached) as the last resort, for underlyings the
+    worker doesn't push or when the worker itself is down/stale.
+    """
+    sym = underlying.upper()
+    pushed = _PUSHED_CHAIN_CACHE.get(sym)
+    if pushed:
+        fresh_window = _PUSHED_CHAIN_FRESH_S if pushed.get("market_open", True) else _PUSHED_CHAIN_FRESH_S_CLOSED
+        if (_time_module.time() - pushed["received_at"]) < fresh_window:
+            return pushed["data"]
+
+    cache_key = f"chain_{sym}"
+    _hit = _cache_get(cache_key, _TTL_CHAIN)
+    if _hit is not None:
+        return _hit
+    result = await _get_chain_uncached(underlying)
+    return _cache_set(cache_key, result)
+
+
+async def _get_chain_uncached(underlying: str):
     """Get option chain for specific underlying"""
     try:
         # Check market status first
@@ -1284,22 +2837,33 @@ async def get_chain(underlying: str):
             try:
                 # Import BASE_SPOT_PRICES (try both import paths)
                 try:
-                    from dashboard.backend.synthetic_data_generator import BASE_SPOT_PRICES
+                    from dashboard.backend.synthetic_data_generator import (
+                        BASE_SPOT_PRICES,
+                    )
                 except ImportError:
                     from synthetic_data_generator import BASE_SPOT_PRICES
 
                 # Try to get last known spot price from real data if available
                 spot_price = None
                 chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                if chain_file.exists() and pd is not None:
+                if chain_file.exists():
                     try:
-                        df = pd.read_csv(chain_file)
-                        if "underlying" in df.columns and "spot_price" in df.columns:
-                            filtered = df[df["underlying"].astype(str).str.upper() == underlying.upper()]
-                            if not filtered.empty:
-                                spot_vals = pd.to_numeric(filtered["spot_price"], errors="coerce").dropna()
-                                if not spot_vals.empty:
-                                    spot_price = float(spot_vals.iloc[0])
+                        import csv as _csv
+                        filtered_rows = []
+                        with open(chain_file, newline="") as _f:
+                            reader = _csv.DictReader(_f)
+                            for row in reader:
+                                if row.get("underlying","").upper() == underlying.upper():
+                                    filtered_rows.append(row)
+                        if filtered_rows and "spot_price" in filtered_rows[0]:
+                            for _r in filtered_rows:
+                                try:
+                                    _sv = float(_r.get("spot_price") or 0)
+                                    if _sv > 0:
+                                        spot_price = _sv
+                                        break
+                                except (ValueError, TypeError):
+                                    continue
                     except:
                         pass
 
@@ -1332,7 +2896,9 @@ async def get_chain(underlying: str):
                 # Import BASE_SPOT_PRICES (try both import paths)
                 try:
                     try:
-                        from dashboard.backend.synthetic_data_generator import BASE_SPOT_PRICES
+                        from dashboard.backend.synthetic_data_generator import (
+                            BASE_SPOT_PRICES,
+                        )
                     except ImportError:
                         from synthetic_data_generator import BASE_SPOT_PRICES
                 except ImportError:
@@ -1350,6 +2916,49 @@ async def get_chain(underlying: str):
                     "message": f"Using synthetic data (market closed) - Error: {str(e)}",
                 }
 
+        if not market_is_open:
+            # LAST-SESSION SNAPSHOT: persisted during live hours (see snapshot write)
+            try:
+                _snap_file = ROOT_DIR / "state" / "chain_cache" / f"{underlying.upper()}.json"
+                if _snap_file.exists():
+                    _snap = json.loads(_snap_file.read_text())
+                    if _snap.get("contracts"):
+                        _snap["status"] = "MARKET_CLOSED"
+                        _snap["stale"] = True
+                        _snap["message"] = (
+                            f"Last session snapshot ({_snap.get('snapshot_time', 'unknown')})"
+                        )
+                        return _snap
+            except Exception as _se:
+                print(f"[chain] snapshot read failed: {_se}")
+            try:
+
+                def _eod_chain_fetch():
+                    from core.data.datasource_manager import DataSourceManager
+                    from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                    return fetch_chain_for_api(DataSourceManager(), underlying.upper())
+
+                eod = await _run_blocking(_eod_chain_fetch, timeout=45.0)
+                if eod and int(eod.get("total_contracts") or 0) > 0:
+                    eod["status"] = "EOD_SNAPSHOT"
+                    eod["message"] = "After-hours chain from EOD archive (bhavcopy/NSE)"
+                    return eod
+            except asyncio.TimeoutError:
+                pass
+            except Exception as exc:
+                print(f"EOD chain fallback failed: {exc}")
+            return {
+                "underlying": underlying.upper(),
+                "contracts": [],
+                "spot": 0,
+                "pcr": 1.0,
+                "total_contracts": 0,
+                "data_source": "closed",
+                "status": "MARKET_CLOSED",
+                "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
+            }
+
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
             broker_connected = False
@@ -1363,6 +2972,33 @@ async def get_chain(underlying: str):
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
+                # FALLBACK: state_store may not have broker truth on fresh deploy
+                # Try direct Dhan API check before returning NOT_READY
+                try:
+                    from core.brokers.dhan.dhan_readonly import (
+                        get_status as _direct_dhan,
+                    )
+
+                    _dstatus = _direct_dhan()
+                    if _dstatus.get("connected"):
+                        broker_connected = True
+                        # Update state_store with real truth
+                        if SSOT_AVAILABLE and state_store:
+                            state_store.update_state(
+                                {
+                                    "broker": {
+                                        "connected": True,
+                                        "name": "dhan",
+                                        "status": "connected",
+                                        "error": None,
+                                        "latency_ms": _dstatus.get("latency_ms"),
+                                    }
+                                }
+                            )
+                except Exception:
+                    pass
+
+            if not broker_connected:
                 return {
                     "underlying": underlying.upper(),
                     "contracts": [],
@@ -1374,18 +3010,77 @@ async def get_chain(underlying: str):
                     "message": "BROKER_NOT_READY - Real chain data unavailable",
                 }
 
-        # Market is open - use real data
+        # Market closed — prefer Dhan snapshot, never label MARKET_OPEN
+        if not market_is_open:
+            try:
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                _dsm = DataSourceManager()
+                _closed = fetch_chain_for_api(_dsm, underlying.upper())
+                if _closed and _closed.get("contracts"):
+                    _closed["status"] = "MARKET_CLOSED"
+                    _closed["message"] = "Market closed — last available chain snapshot"
+                    return _closed
+            except Exception:
+                pass
+
+        # ALWAYS try Dhan P0 first when market is open (or as fallback)
+        # chain_raw_live.csv on Render is from repo clone — may be months old
+        # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
+        try:
+            from core.data.datasource_manager import DataSourceManager
+            from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+            _dsm = DataSourceManager()
+            _live = fetch_chain_for_api(_dsm, underlying.upper())
+            if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
+                _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
+                _live["source_priority"] = "dhan_p0_live"
+                # PERSIST last-session snapshot for after-hours display
+                try:
+                    _snap_dir = ROOT_DIR / "state" / "chain_cache"
+                    _snap_dir.mkdir(parents=True, exist_ok=True)
+                    _snap_out = dict(_live)
+                    _snap_out["snapshot_time"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M IST")
+                    (_snap_dir / f"{underlying.upper()}.json").write_text(
+                        json.dumps(_snap_out, default=str)
+                    )
+                except Exception as _we:
+                    print(f"[chain] snapshot write failed: {_we}")
+                return _live
+            else:
+                print(
+                    f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback"
+                )
+        except Exception as _dsm_err:
+            print(f"[chain/{underlying}] DSM failed: {_dsm_err} — using CSV fallback")
+
+        # CSV fallback (only reached if Dhan P0 fails)
         chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
         if not chain_file.exists():
+            # Try Dhan Data API directly
+            try:
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                _dsm = DataSourceManager()
+                _chain_result = fetch_chain_for_api(_dsm, underlying.upper())
+                if _chain_result and _chain_result.get("contracts"):
+                    return _chain_result
+            except Exception:
+                pass
             return {
                 "underlying": underlying,
                 "contracts": [],
-                "message": "Chain data not found",
+                "message": "Chain data not found — Dhan fetch also failed",
                 "spot": 0,
                 "pcr": 1.0,
                 "total_contracts": 0,
                 "data_source": "real",
             }
+
+        # DSM already tried above — directly read CSV as last resort
 
         # Try pandas first, fallback to csv module
         df = None
@@ -1591,25 +3286,40 @@ async def get_chain(underlying: str):
             df["liquidity_score"] = 0
 
         # Convert to dict, handling NaN values
+        # Also map CSV column names to standard dashboard field names
+        _col_map = {
+            "dOI": "oi_change",  # OI change from CSV
+            "dVolume": "vol_change",  # Volume change
+            "spot_price": "spot_price",
+        }
         contracts = []
         for _, row in df.iterrows():
             contract = {}
             for col in df.columns:
                 val = row[col]
+                target_col = _col_map.get(col, col)
                 if pd.isna(val):
-                    contract[col] = None
+                    contract[target_col] = None
                 else:
-                    contract[col] = val
+                    try:
+                        contract[target_col] = float(val) if isinstance(val, (int, float)) else val
+                    except (TypeError, ValueError):
+                        contract[target_col] = val
+            # Ensure oi_change exists even if dOI missing
+            if "oi_change" not in contract:
+                contract["oi_change"] = 0
             contracts.append(contract)
 
+        chain_status = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
         return {
             "underlying": underlying,
             "spot": float(spot),
             "pcr": float(pcr),
-            "contracts": contracts[:1000],  # Limit to 1000 contracts
+            "contracts": contracts[:1000],
             "total_contracts": len(contracts),
             "data_source": "real",
-            "status": "MARKET_OPEN",
+            "status": chain_status,
+            "message": "Cached chain CSV" if not market_is_open else "Live chain data",
         }
     except Exception as e:
         # Return empty data instead of 500 error
@@ -1641,6 +3351,15 @@ async def get_top_signal():
             signal = generate_synthetic_signal_data()
             signal["data_source"] = "synthetic"
             return signal
+
+        if not market_is_open:
+            return {
+                "action": "NO_TRADE",
+                "status": "MARKET_CLOSED",
+                "reason": "Market closed - live signal unavailable",
+                "data_source": "closed",
+                "confidence": 0,
+            }
 
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
@@ -1730,6 +3449,8 @@ async def get_pnl():
     try:
         pnl_csv = OUTPUTS_DIR / "paper_pnl.csv"
         pnl_summary = OUTPUTS_DIR / "paper_pnl_summary.json"
+        if not pnl_summary.exists():
+            pnl_summary = ROOT_DIR / "paper_pnl_summary.json"
 
         csv_data = []
         if pnl_csv.exists():
@@ -1765,6 +3486,15 @@ async def get_pnl():
                 summary = json.loads(pnl_summary.read_text())
             except:
                 summary = {}
+        # Also try pnl_live.json as authoritative source
+        pnl_live = OUTPUTS_DIR / "pnl_live.json"
+        if pnl_live.exists() and not summary.get("total_trades"):
+            try:
+                live = json.loads(pnl_live.read_text())
+                if live.get("total_trades", 0) > 0:
+                    summary = live
+            except:
+                pass
 
         # Ensure history has proper ISO timestamps
         processed_history = []
@@ -1791,6 +3521,16 @@ async def get_pnl():
                 # No timestamp - add current one
                 processed_item["timestamp"] = datetime.now(IST).isoformat()
             processed_history.append(processed_item)
+
+        # ── REMOVED Feb-2026 fixture fallback ──────────────────────────────────
+        # Previously: loaded paper_closed_trades_feb2026.json when no real trades.
+        # This caused FAKE Feb-1 data to appear in the Paper tab as if real trades.
+        # Fix: honest empty state — no trades until cloud paper engine generates them.
+        if not processed_history:
+            pass  # Honest: no historical trades yet — engine will populate during market hours
+
+        # Keep /api/pnl fast for dashboard health checks. Symbol enrichment loads the
+        # instrument master and can exceed the verifier timeout when no live PnL file exists.
 
         return {
             "history": processed_history,
@@ -1843,6 +3583,15 @@ async def get_performance():
         if not market_is_open and not REAL_ONLY and SYNTHETIC_DATA_AVAILABLE:
             synthetic_perf = generate_synthetic_perf_data()
             return {"status": "OK", "current": synthetic_perf, "history": [], "data_source": "synthetic"}
+
+        if not market_is_open:
+            return {
+                "status": "MARKET_CLOSED",
+                "current": {},
+                "history": [],
+                "data_source": "closed",
+                "message": "Market closed - live performance data unavailable",
+            }
 
         # REAL_ONLY MODE: If broker not ready, return NOT_READY
         if REAL_ONLY:
@@ -2008,6 +3757,10 @@ async def get_enhanced_signals(limit: int = 10):
 @app.get("/api/paper")
 async def get_paper():
     """Get paper trading data (combines positions and PnL)"""
+    _hit = _cache_get("paper", _TTL_PAPER)
+    if _hit is not None:
+        return _hit
+
     try:
         positions_data = await get_positions()
         pnl_data = await get_pnl()
@@ -2125,8 +3878,27 @@ async def get_logs_tail(lines: int = 200):
             all_lines = f.readlines()
             tail_lines = all_lines[-lines:]
 
-        # Redact secrets
-        redacted = [redact_secrets(line) for line in tail_lines]
+        # Redact secrets and collapse consecutive duplicate lines (UI log spam)
+        redacted_raw = [redact_secrets(line) for line in tail_lines]
+        redacted: list[str] = []
+        prev = None
+        dup_count = 0
+        for line in redacted_raw:
+            stripped = line.rstrip("\n")
+            if stripped == prev:
+                dup_count += 1
+                continue
+            if dup_count > 0 and prev is not None:
+                redacted.append(f"{prev}  (repeated {dup_count + 1}x)\n")
+                dup_count = 0
+            elif prev is not None:
+                redacted.append(prev + "\n")
+            prev = stripped
+        if prev is not None:
+            if dup_count > 0:
+                redacted.append(f"{prev}  (repeated {dup_count + 1}x)\n")
+            else:
+                redacted.append(prev + "\n")
 
         return {"logs": redacted, "file": latest_log.name, "total_lines": len(all_lines)}
     except Exception as e:
@@ -2158,15 +3930,32 @@ async def audit_secrets():
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket for real-time updates - Only active during market hours (Mon-Fri, 9:15 AM - 3:30 PM IST)"""
-    # Check if market is open before accepting connection
-    if MARKET_DETECTION_AVAILABLE:
-        is_open, reason = is_market_open()
-        if not is_open:
-            # Reject connection outside market hours
-            await websocket.close(code=1008, reason=f"Market closed: {reason}")
-            return
-
+    # Accept WS connection always — market status sent in first message
+    # (Previously rejected outside hours with 1008 — this broke testing and
+    # prevented the dashboard from showing WS as connected during dev)
     await websocket.accept()
+    if len(active_connections) >= _MAX_WS_CONNECTIONS:
+        await websocket.close(code=1013, reason="Too many live connections — try again shortly")
+        return
+    market_open_now = False
+    market_close_reason = "unknown"
+    if MARKET_DETECTION_AVAILABLE:
+        try:
+            market_open_now, market_close_reason = is_market_open()
+        except Exception:
+            pass
+    # Send market status immediately on connect
+    try:
+        await websocket.send_json(
+            {
+                "type": "market_status",
+                "market_open": market_open_now,
+                "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
+                "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+            }
+        )
+    except Exception:
+        pass
     active_connections.append(websocket)
 
     try:
@@ -2199,6 +3988,23 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(1)  # Check every second
 
             now = datetime.now(pytz.timezone("Asia/Kolkata")).timestamp()
+
+            # Send state+signal update every 5 seconds (market only)
+            if market_open_now and now - last_health_send >= 5:
+                try:
+                    state_store_data = state_store.get_state() if SSOT_AVAILABLE and state_store else {}
+                    if state_store_data:
+                        await websocket.send_json(
+                            {
+                                "type": "state_update",
+                                "data": state_store_data,
+                                "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
+                            }
+                        )
+                except (WebSocketDisconnect, ConnectionError):
+                    raise
+                except Exception:
+                    pass
 
             # Send health update every 3 seconds
             if now - last_health_send >= 3:
@@ -2291,64 +4097,149 @@ async def websocket_endpoint(websocket: WebSocket):
             active_connections.remove(websocket)
 
 
-async def background_data_refresh():
-    """Background task to refresh spot prices every 30 seconds"""
-    import time
+async def cloud_paper_trading_loop():
+    """Background task: generate paper trades from live chain during market hours.
+    PAPER ONLY — never places real orders. Phantom-guarded, single-lot."""
+    import asyncio as _asyncio
+
+    # Allow disabling via env (default ON)
+    if os.environ.get("CLOUD_PAPER_ENGINE", "1") in ("0", "false", "False"):
+        print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0")
+        return
 
     while True:
         try:
-            # Refresh spot prices from live sources
-            symbols = {
-                "NIFTY": "^NSEI",
-                "BANKNIFTY": "^NSEBANK",
-                "FINNIFTY": "^NSEFINNIFTY",
-                "MIDCPNIFTY": "^NSEMIDCP",
-                "SENSEX": "^BSESN",
-            }
-
-            import requests
-
-            session = requests.Session()
-            session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
-
-            for underlying, yahoo_symbol in symbols.items():
+            # Only run during market hours
+            mkt_open = False
+            if MARKET_DETECTION_AVAILABLE:
                 try:
-                    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}"
-                    response = session.get(url, timeout=5)
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "chart" in data and "result" in data["chart"]:
-                            result = data["chart"]["result"][0]
-                            meta = result.get("meta", {})
-                            ltp = meta.get("regularMarketPrice")
-                            if ltp and pd is not None:
-                                # Update chain CSV
-                                chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
-                                if chain_file.exists():
-                                    try:
-                                        df = pd.read_csv(chain_file)
-                                        if "underlying" in df.columns and "spot_price" in df.columns:
-                                            mask = df["underlying"].astype(str).str.upper() == underlying.upper()
-                                            if mask.any():
-                                                df.loc[mask, "spot_price"] = ltp
-                                                df.to_csv(chain_file, index=False)
-                                    except:
-                                        pass
-                except:
-                    pass
+                    mkt_open, _ = is_market_open()
+                except Exception:
+                    mkt_open = False
 
-            await asyncio.sleep(30)  # Refresh every 30 seconds
+            if mkt_open:
+                try:
+                    from dashboard.backend.cloud_paper_engine import get_paper_engine
+                except ImportError:
+                    from cloud_paper_engine import get_paper_engine
+
+                engine = get_paper_engine(OUTPUTS_DIR)
+
+                # Fetch live chains for all index symbols
+                chains = []
+                for sym in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]:
+                    try:
+                        ch = await get_chain(sym)
+                        if ch and ch.get("contracts"):
+                            chains.append(ch)
+                    except Exception:
+                        continue
+
+                if chains:
+                    engine.step(chains, max_open=3)
+                    print(
+                        f"[paper-loop] tick: {len(engine.open_positions)} open, {len(engine.closed_positions)} closed"
+                    )
+
+            await _asyncio.sleep(60)  # tick every 60s
         except Exception as e:
-            # Log error but continue
-            await asyncio.sleep(30)
+            print(f"[paper-loop] error (continuing): {e}")
+            await _asyncio.sleep(60)
+
+
+def _refresh_spot_prices_blocking() -> None:
+    """
+    Spot price refresh — DISABLED in web process.
+
+    Yahoo Finance via requests library was using ~150MB RAM
+    (requests.Session + urllib3 connection pool stays alive).
+
+    Spot prices now come from:
+    1. /api/chain/{sym} — NSE direct, polled every 5s by frontend useData
+    2. gain_rank_history.json — written by worker scheduler at 09:15 IST
+
+    This function is kept as a no-op so the executor call in
+    background_data_refresh() doesn't crash. The background task
+    itself now sleeps for 5 minutes between no-op calls to save CPU.
+    """
+    pass  # Yahoo Finance disabled — NSE data used instead
+
+def _run_startup_token_refresh_blocking() -> None:
+    """Synchronous Dhan token refresh — only ever called via asyncio.to_thread
+    from _startup_token_refresh_task, never awaited directly in the startup
+    event handler. A hang here must never block the server from accepting
+    requests (this previously ran inline in startup(), which could freeze
+    the whole single-process event loop — and the entire app — if Dhan's
+    auth endpoint was slow or unresponsive).
+    """
+    import importlib.util as _ilu
+    import pathlib as _pl
+
+    _spec = _ilu.spec_from_file_location(
+        "token_manager_startup",
+        _pl.Path(__file__).resolve().parent.parent.parent / "core" / "brokers" / "dhan" / "token_manager.py",
+    )
+    if _spec and _spec.loader:
+        _tm = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_tm)  # type: ignore[union-attr]
+        _result = _tm.refresh_token()
+        if _result.get("success"):
+            print(f"[startup] Dhan token refreshed via {_result.get('strategy')}")
+        else:
+            print(f"[startup] Dhan token refresh skipped/failed: {_result.get('message', _result)}")
+
+
+async def _startup_token_refresh_task() -> None:
+    """Background task: refresh the Dhan token without ever blocking server
+    readiness. Bounded by an overall timeout so a hung HTTP call inside the
+    SDK can't hang this task forever either.
+    """
+    try:
+        await asyncio.wait_for(asyncio.to_thread(_run_startup_token_refresh_blocking), timeout=45)
+    except asyncio.TimeoutError:
+        print("[startup] Token refresh timed out after 45s (non-fatal) — continuing with existing token")
+    except Exception as _e:
+        print(f"[startup] Token refresh error (non-fatal): {_e}")
 
 
 @app.on_event("startup")
 async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
+
+    # Log startup memory so we know baseline RSS
+    try:
+        import resource, gc
+        gc.collect()  # Clean up before measuring
+        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+        print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
+        if rss_mb > 350:
+            print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
+        else:
+            print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
+    except Exception as e:
+        print(f"[startup] Memory check skipped: {e}")
+
+    # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
+    # Fired as a background task (never awaited here) so a slow/hung Dhan
+    # auth call cannot delay or block the server from accepting requests.
+    _pin = os.environ.get("DHAN_PIN", "").strip()
+    _totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
+    if _pin and _totp:
+        asyncio.create_task(_startup_token_refresh_task())
+    else:
+        if not os.environ.get("DHAN_ACCESS_TOKEN"):
+            print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set — token refresh skipped")
+
     # Start background data refresh
     asyncio.create_task(background_data_refresh())
+
+    # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
+    # cloud_paper_trading_loop: only start if CLOUD_PAPER_ENGINE=1
+    if os.environ.get("CLOUD_PAPER_ENGINE", "0") not in ("0", "false", "False"):
+        asyncio.create_task(cloud_paper_trading_loop())
+    else:
+        print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0 (not started)")
 
     # Start state sync service if SSOT is available
     if SSOT_AVAILABLE and state_store is not None:
@@ -2916,116 +4807,6 @@ async def check_risk_limits(risk_limits: Dict[str, float]):
         return {"status": "ERROR", "message": str(e)}
 
 
-@app.get("/api/charting/heatmap/{underlying}")
-async def get_heatmap(underlying: str, metric: str = "oi"):
-    """Get option chain heatmap data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        heatmap = charting.generate_option_chain_heatmap(chain_data, metric)
-
-        return {"status": "ok", "heatmap": heatmap}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/iv-surface/{underlying}")
-async def get_iv_surface(underlying: str):
-    """Get IV surface data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        surface = charting.generate_iv_surface(chain_data)
-
-        return {"status": "ok", "surface": surface}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/greeks/{underlying}")
-async def get_greeks_chart(underlying: str, greek: str = "delta"):
-    """Get Greeks chart data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        greeks_data = charting.generate_greeks_chart(chain_data, greek)
-
-        return {"status": "ok", "greeks": greeks_data}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.get("/api/charting/pcr/{underlying}")
-async def get_pcr_chart(underlying: str):
-    """Get Put-Call Ratio chart data"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced charting not available"}
-
-        chain_data = await get_chain(underlying)
-        charting = get_advanced_charting()
-        pcr_data = charting.generate_pcr_chart(chain_data)
-
-        return {"status": "ok", "pcr": pcr_data}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.post("/api/filter/chain/{underlying}")
-async def filter_option_chain_endpoint(underlying: str, filters: Dict[str, Any]):
-    """Filter option chain"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced filtering not available"}
-
-        chain_data = await get_chain(underlying)
-        contracts = chain_data.get("contracts", [])
-
-        filtering = get_advanced_filtering()
-        filtered = filtering.filter_option_chain(contracts, filters)
-
-        return {
-            "status": "ok",
-            "original_count": len(contracts),
-            "filtered_count": len(filtered),
-            "contracts": filtered,
-        }
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
-@app.post("/api/filter/positions")
-async def filter_positions_endpoint(filters: Dict[str, Any]):
-    """Filter positions"""
-    try:
-        if not ADVANCED_FEATURES_AVAILABLE:
-            return {"status": "ERROR", "message": "Advanced filtering not available"}
-
-        positions_data = await get_positions()
-        positions = positions_data.get("positions", [])
-
-        filtering = get_advanced_filtering()
-        filtered = filtering.filter_positions(positions, filters)
-
-        return {
-            "status": "ok",
-            "original_count": len(positions),
-            "filtered_count": len(filtered),
-            "positions": filtered,
-        }
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
-
-
 @app.post("/api/backtest/run")
 async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data: List[Dict[str, Any]] = None):
     """Run backtest"""
@@ -3044,8 +4825,8 @@ async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data
                         "timestamp": (
                             datetime.now(pytz.timezone("Asia/Kolkata")) - timedelta(days=100 - i)
                         ).isoformat(),
-                        "price": base_price + np.random.normal(0, 100),
-                        "ltp": base_price + np.random.normal(0, 100),
+                        "price": base_price + __import__("random").gauss(0, 100),
+                        "ltp": base_price + __import__("random").gauss(0, 100),
                     }
                 )
 
@@ -3207,6 +4988,15 @@ async def export_positions(format: str = "csv"):
         positions_data = await get_positions()
         positions = positions_data.get("positions", [])
 
+        if not positions:
+            return {
+                "status": "ok",
+                "file": None,
+                "format": format,
+                "count": 0,
+                "message": "No open positions to export",
+            }
+
         export_system = get_export_reporting()
         timestamp = datetime.now(IST).strftime("%Y%m%d_%H%M%S")
 
@@ -3280,10 +5070,41 @@ async def generate_report():
 
 @app.post("/api/orders/create")
 async def create_order(order_data: Dict[str, Any]):
-    """Create a new order"""
+    """Create a new order. Gated on: kill switch (inside
+    OrderManagement.create_order itself), human approval, and portfolio
+    risk limits - previously all three existed but only the dashboard's
+    read-only status endpoints ever consulted them; nothing in the
+    order-creation path did."""
     try:
         if not ADVANCED_FEATURES_AVAILABLE:
             return {"status": "ERROR", "message": "Order management not available"}
+
+        try:
+            from dashboard.backend.human_approval_service import build_approval_status
+        except ImportError:
+            from human_approval_service import build_approval_status
+        approval = build_approval_status()
+        if not approval.get("human_approval"):
+            return {
+                "status": "ERROR",
+                "message": "Order rejected: human approval gate not signed off",
+                "approval": approval,
+            }
+
+        try:
+            live_cfg = json.loads((ROOT_DIR / "config" / "live_trade_config.json").read_text())
+        except Exception:
+            live_cfg = {}
+        risk_limits = {
+            "max_positions": live_cfg.get("MAX_OPEN_POSITIONS", 5),
+            "max_exposure": live_cfg.get("MAX_EXPOSURE", 100000),
+            "max_loss": -abs(live_cfg.get("MAX_DAILY_LOSS", 5000)),
+            "max_concentration_pct": live_cfg.get("MAX_CONCENTRATION_PCT", 50),
+        }
+        positions_data = await get_positions()
+        risk_check = get_risk_management().check_risk_limits(positions_data.get("positions", []), risk_limits)
+        if risk_check.get("status") == "FAIL":
+            return {"status": "ERROR", "message": "Order rejected: risk limits breached", "risk_check": risk_check}
 
         order_mgmt = get_order_management()
         order = order_mgmt.create_order(
@@ -3360,10 +5181,13 @@ async def get_trade_history(
     """
     try:
         try:
-            from dashboard.backend.trade_logger import get_trades_by_date, get_all_trades
+            from dashboard.backend.trade_logger import (
+                get_all_trades,
+                get_trades_by_date,
+            )
         except ImportError:
             # Fallback to relative import
-            from trade_logger import get_trades_by_date, get_all_trades
+            from trade_logger import get_all_trades, get_trades_by_date
 
         if date:
             trades = get_trades_by_date(date, start_time, end_time)
@@ -3386,11 +5210,83 @@ async def get_today_trades():
             # Fallback to relative import
             from trade_logger import get_trades_by_date
         from datetime import datetime
+
         import pytz
 
         IST = pytz.timezone("Asia/Kolkata")
         today = datetime.now(IST).strftime("%Y-%m-%d")
         trades = get_trades_by_date(today, start_time="09:15", end_time="15:30")
+
+        def _today_match(ts: str) -> bool:
+            return today in (ts or "")
+
+        # SSOT open positions opened today (paper analyzer cycle)
+        if SSOT_AVAILABLE and state_store is not None:
+            for p in state_store.get_state().get("positions") or []:
+                if not isinstance(p, dict):
+                    continue
+                ts = p.get("time_ist") or p.get("timestamp") or ""
+                if not _today_match(ts):
+                    continue
+                pid = p.get("position_id")
+                if pid and any(t.get("position_id") == pid for t in trades):
+                    continue
+                trades.append(
+                    {
+                        "timestamp": p.get("timestamp"),
+                        "time_ist": p.get("time_ist"),
+                        "event_type": "POSITION_OPENED",
+                        "position_id": pid,
+                        "underlying": p.get("underlying"),
+                        "symbol": p.get("underlying"),
+                        "strike": p.get("strike"),
+                        "option_type": p.get("option_type"),
+                        "action": "OPEN",
+                        "entry_price": p.get("entry_price"),
+                        "qty": p.get("qty"),
+                        "strategy": p.get("strategy"),
+                        "source": "state_store",
+                    }
+                )
+
+        # Lifecycle proof closed trades from today's artifact
+        lifecycle_summary = ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
+        if lifecycle_summary.exists():
+            try:
+                proof = json.loads(lifecycle_summary.read_text(encoding="utf-8"))
+                started = (proof.get("evidence") or {}).get("proof_id") or ""
+                if proof.get("pass") and _today_match(started):
+                    proof_file = sorted(
+                        (ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof").glob("LIFECYCLE_*.json")
+                    )
+                    if proof_file:
+                        detail = json.loads(proof_file[-1].read_text(encoding="utf-8"))
+                        oid = (detail.get("entry_order") or {}).get("order_id")
+                        if oid and not any(t.get("position_id") == oid for t in trades):
+                            sig = detail.get("signal") or {}
+                            ent = detail.get("entry_order") or {}
+                            ext = detail.get("exit_record") or {}
+                            trades.append(
+                                {
+                                    "time_ist": datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST"),
+                                    "event_type": "POSITION_CLOSED",
+                                    "position_id": oid,
+                                    "underlying": sig.get("symbol"),
+                                    "symbol": sig.get("symbol"),
+                                    "strike": sig.get("strike"),
+                                    "option_type": sig.get("option_type"),
+                                    "action": "CLOSE",
+                                    "entry_price": ent.get("fill_price"),
+                                    "exit_price": ext.get("exit_price"),
+                                    "qty": ent.get("quantity") or 1,
+                                    "pnl": ext.get("pnl_total"),
+                                    "strategy": "PAPER_LIFECYCLE_PROOF",
+                                    "exit_reason": ext.get("exit_reason"),
+                                    "source": "lifecycle_proof",
+                                }
+                            )
+            except Exception:
+                pass
 
         # Separate by action
         entries = [t for t in trades if t.get("action") == "OPEN"]
@@ -3403,6 +5299,7 @@ async def get_today_trades():
             "entries": entries,
             "exits": exits,
             "count": len(trades),
+            "sources": sorted({t.get("source", "trade_logger") for t in trades}),
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -3663,6 +5560,9 @@ async def get_learning_insights():
 
 @app.get("/api/learning/status")
 async def get_learning_status():
+    _hit = _cache_get("learning_status", 60.0)
+    if _hit is not None:
+        return _hit
     """Get learning system status - Always returns HTTP 200"""
     try:
         learning_log = ROOT_DIR / "storage" / "learning" / "continuous_learning_log.json"
@@ -3778,9 +5678,9 @@ async def get_validation_status():
 async def run_validation():
     """Run validation systems"""
     try:
+        import re
         import subprocess
         import sys
-        import re
 
         result = subprocess.run(
             [sys.executable, str(ROOT_DIR / "complete_end_to_end_validation.py")],
@@ -3843,10 +5743,10 @@ async def run_validation():
 async def run_learning_cycle():
     """Run one learning cycle"""
     try:
-        import subprocess
-        import sys
         import json
         import re
+        import subprocess
+        import sys
 
         result = subprocess.run(
             [sys.executable, str(ROOT_DIR / "continuous_learning_system.py")],
@@ -4033,39 +5933,11 @@ async def runner_stop():
 @app.get("/api/runner/status")
 async def runner_status():
     """Get runner status via runner.py CLI"""
+    import time
+
     try:
-        import subprocess
-        import time
-
-        runner_script = ROOT_DIR / "runner.py"
-        if not runner_script.exists():
-            return {"runner": "ERROR", "error": "runner.py not found"}
-
-        result = subprocess.run(
-            [sys.executable, str(runner_script), "status"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            cwd=str(ROOT_DIR),
-        )
-
-        # Parse JSON output from runner.py
-        try:
-            output_lines = result.stdout.split("\n")
-            json_start = None
-            for i, line in enumerate(output_lines):
-                if line.strip().startswith("{"):
-                    json_start = i
-                    break
-            if json_start is not None:
-                json_output = "\n".join(output_lines[json_start:])
-                status_data = json.loads(json_output)
-                return status_data
-        except Exception as parse_err:
-            # If parsing fails, try heartbeat fallback
-            pass
-
-        # Fallback: try to read heartbeat directly
+        # Read heartbeat file directly — spawning runner.py as subprocess is
+        # unsafe on 512Mi Render (imports all modules, spikes RAM to OOM).
         heartbeat_file = ROOT_DIR / "system3_daily_heartbeat.json"
         if heartbeat_file.exists():
             try:
@@ -4080,9 +5952,14 @@ async def runner_status():
                     "uptime_seconds": hb.get("system_info", {}).get("uptime_seconds"),
                 }
             except Exception as hb_err:
-                pass
+                return {"runner": "ERROR", "error": f"heartbeat parse error: {hb_err}"}
 
-        return {"runner": "STOPPED", "error": "Could not parse status"}
+        runner_script = ROOT_DIR / "runner.py"
+        return {
+            "runner": "NOT_STARTED",
+            "runner_script_exists": runner_script.exists(),
+            "message": "No heartbeat file found — runner has not run yet",
+        }
     except Exception as e:
         return {"runner": "ERROR", "error": str(e)}
 

@@ -4,12 +4,13 @@ System3 Phase 307 - Live vs Backtest Consistency Checker
 Ensures that live DRY-RUN behavior matches what backtest/test-mode would do under the same thresholds.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +20,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-LIVE_SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
+LIVE_SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
 TEST_MODE_MD = PROJECT_ROOT / "logs" / "signals" / "system3_signal_test_mode_last_run.md"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "validation"

@@ -20,7 +20,7 @@
 
 ### Documentation
 - ✅ Analysis complete: `docs/SYSTEM3_SELL_ANOMALIES_ANALYSIS.md`
-- ✅ Anomalies saved: `storage/clean/angel_index_ai_signals_sell_anomalies.csv`
+- ✅ Anomalies saved: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`
 
 **Verdict**: ✅ **Handled Correctly** - No action required for EV analysis
 
@@ -41,7 +41,7 @@
 - **Moneyness**: ✅ Fixed (0 zero values)
 
 ### File Location
-- `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv`
+- `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv`
 
 **Verdict**: ✅ **Ready for Use** - All quality checks passed
 
@@ -119,9 +119,9 @@
 ### Files Generated
 
 **Clean CSV Files**:
-- ✅ `storage/clean/angel_index_ai_signals_with_forward_clean.csv` (596 rows)
-- ✅ `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
-- ✅ `storage/clean/angel_index_ai_signals_sell_anomalies.csv` (2 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_with_forward_clean.csv` (596 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` (232 rows)
+- ✅ `storage/clean/dhan_index_ai_signals_sell_anomalies.csv` (2 rows)
 
 **Documentation**:
 - ✅ `docs/SYSTEM3_CSV_SCHEMA_AUTOMATED.md`

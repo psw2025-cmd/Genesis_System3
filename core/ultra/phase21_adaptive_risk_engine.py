@@ -14,12 +14,13 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 84
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, List, Optional
-from datetime import datetime
 import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -46,8 +47,8 @@ class AdaptiveRiskEngine:
         win_rates = {}
 
         # Try to load from PnL logs or shadow master
-        pnl_csv = ULTRA_DIR / "angel_ultra_pnl_sim.csv"
-        shadow_csv = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+        pnl_csv = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"
+        shadow_csv = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 
         for csv_path in [pnl_csv, shadow_csv]:
             if csv_path.exists():

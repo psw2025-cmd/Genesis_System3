@@ -13,17 +13,18 @@ UPGRADED FEATURES:
 Mode: Post-market, optionally daily pre-market refresh.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Tuple, Optional
 import logging
+import sys
+from collections import deque
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 from scipy.spatial import distance
 from scipy.stats import ks_2samp
-from collections import deque
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -328,7 +329,7 @@ def run_phase_341_model_drift_detector_v2(root_path: str = None, logger_obj=None
 
     try:
         # Paths
-        signals_with_forward = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+        signals_with_forward = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
         diag_dir = root / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 

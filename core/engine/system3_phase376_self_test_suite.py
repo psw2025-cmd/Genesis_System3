@@ -14,14 +14,14 @@ Phase 376 validates:
 - Performance is within acceptable bounds
 """
 
-import sys
 import json
-import time
 import logging
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
-from datetime import datetime
+import sys
+import time
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -116,10 +116,10 @@ def test_csv_files() -> Dict[str, Any]:
     results = {"passed": 0, "failed": 0, "files": {}}
 
     csv_files = [
-        "angel_index_ai_signals.csv",
-        "angel_index_ai_signals_curated.csv",
-        "angel_index_ai_signals_with_forward.csv",
-        "angel_virtual_orders.csv",
+        "dhan_index_ai_signals.csv",
+        "dhan_index_ai_signals_curated.csv",
+        "dhan_index_ai_signals_with_forward.csv",
+        "dhan_virtual_orders.csv",
     ]
 
     for filename in csv_files:
@@ -152,7 +152,7 @@ def test_safety_flags() -> Dict[str, Any]:
 
     safety_checks = [
         ("config/live_trade_config.json", "LIVE_TRADING_ENABLED", False),
-        ("config/angel_automation_config.json", "auto_execute_trades", False),
+        ("config/dhan_automation_config.json", "auto_execute_trades", False),
         ("core/config/system3_ultra_safety.json", "AUTO_EXECUTE_TRADES", False),
     ]
 
@@ -191,7 +191,7 @@ def test_no_live_trading() -> Dict[str, Any]:
         "execute_live_trade",
         "place_live_order",
         "live_execution",
-        "angel_broker.place_order",
+        "dhan_broker.place_order",
         "LIVE_TRADING_ENABLED = True",
         "USE_ANGELONE_LIVE_EXECUTION = True",
     ]

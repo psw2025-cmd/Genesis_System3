@@ -26,10 +26,10 @@
 
 **Validation Results**:
 - ✅ **Input Sources**: Reads from baseline (READ ONLY)
-  - `storage/live/angel_index_ai_signals.csv` (930 rows)
-  - `storage/live/angel_index_ai_trades_plan.csv` (3 rows)
-  - `storage/live/angel_index_ai_pnl_log.csv` (3 rows)
-- ✅ **Output**: `storage/learning_ultra/angel_ultra_shadow_master.*`
+  - `storage/live/dhan_index_ai_signals.csv` (930 rows)
+  - `storage/live/dhan_index_ai_trades_plan.csv` (3 rows)
+  - `storage/live/dhan_index_ai_pnl_log.csv` (3 rows)
+- ✅ **Output**: `storage/learning_ultra/dhan_ultra_shadow_master.*`
   - CSV: 512 bytes (3 rows)
   - Parquet: 10,170 bytes (3 rows)
 - ✅ **Columns**: All required columns present
@@ -57,7 +57,7 @@ FINNIFTY,27850.0,CE,2025-11-28T23:44:02,505.0,,HOLD,BUY_CE,-0.354,0.646,...
 
 **Validation Results**:
 - ✅ **Input**: Shadow master (3 rows) + Synthetic training (3000 rows)
-- ✅ **Output**: `storage/training/angel_ultra_training.*`
+- ✅ **Output**: `storage/training/dhan_ultra_training.*`
   - Total rows: 3003
   - Total features: 52 (within expected 40-52 range)
 - ✅ **Feature Breakdown**:
@@ -87,7 +87,7 @@ FINNIFTY,27850.0,CE,2025-11-28T23:44:02,505.0,,HOLD,BUY_CE,-0.354,0.646,...
 - ✅ **Models Trained**: All 5 underlyings
 - ✅ **Accuracy**: 99.17% - 100% (target: 99-100%) ✅
 - ✅ **Features Used**: 40 per model
-- ✅ **Output Location**: `core/models/angel_one_ultra/`
+- ✅ **Output Location**: `core/models/dhan_ultra/`
 - ✅ **Metadata Includes**:
   - `underlying`, `accuracy`, `feature_count`
   - `train_rows`, `test_rows`, `features` (list)
@@ -105,8 +105,8 @@ FINNIFTY,27850.0,CE,2025-11-28T23:44:02,505.0,,HOLD,BUY_CE,-0.354,0.646,...
 **Average Accuracy**: 99.34% ✅
 
 **Files Created**:
-- ✅ `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- ✅ `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- ✅ `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 **Result**: ✅ **VALIDATED**
 
@@ -140,7 +140,7 @@ FINNIFTY,27850.0,CE,2025-11-28T23:44:02,505.0,,HOLD,BUY_CE,-0.354,0.646,...
   - LOW_VOL_RANGE: 7-9%
   - Trend regimes: <5% each
 - ✅ **Files Created**:
-  - `storage/training/angel_ultra_training_with_regime.parquet`
+  - `storage/training/dhan_ultra_training_with_regime.parquet`
   - `storage/reports_ultra/ultra_regime_summary.csv`
 
 **Sample Regime Summary**:
@@ -270,16 +270,16 @@ SENSEX       0.0000     0.9917     +0.9917
 ### Baseline Protection ✅
 
 **Files Checked**:
-- ✅ `core/models/angel_one/*.pkl` - **UNCHANGED**
-- ✅ `core/models/angel_one/*_meta.json` - **UNCHANGED**
-- ✅ `storage/training/angel_index_options_training.*` - **UNCHANGED**
+- ✅ `core/models/dhan/*.pkl` - **UNCHANGED**
+- ✅ `core/models/dhan/*_meta.json` - **UNCHANGED**
+- ✅ `storage/training/dhan_index_options_training.*` - **UNCHANGED**
 - ✅ `storage/config/*` - **READ ONLY**
 
 **Ultra Isolation**:
-- ✅ `core/models/angel_one_ultra/` - **SEPARATE** (5 models)
+- ✅ `core/models/dhan_ultra/` - **SEPARATE** (5 models)
 - ✅ `storage/learning_ultra/` - **SEPARATE**
 - ✅ `storage/reports_ultra/` - **SEPARATE**
-- ✅ `storage/training/angel_ultra_*` - **SEPARATE**
+- ✅ `storage/training/dhan_ultra_*` - **SEPARATE**
 
 **Safety Switches**:
 - ✅ `AUTO_EXECUTE_TRADES`: False
@@ -295,15 +295,15 @@ SENSEX       0.0000     0.9917     +0.9917
 ## 📁 Files Created Summary
 
 ### Models (10 files)
-- `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 ### Data (4 files)
-- `storage/learning_ultra/angel_ultra_shadow_master.csv`
-- `storage/learning_ultra/angel_ultra_shadow_master.parquet`
-- `storage/training/angel_ultra_training.csv`
-- `storage/training/angel_ultra_training.parquet`
-- `storage/training/angel_ultra_training_with_regime.parquet`
+- `storage/learning_ultra/dhan_ultra_shadow_master.csv`
+- `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
+- `storage/training/dhan_ultra_training.csv`
+- `storage/training/dhan_ultra_training.parquet`
+- `storage/training/dhan_ultra_training_with_regime.parquet`
 
 ### Reports (8+ files)
 - `storage/reports_ultra/ultra_hparam_results_*.csv` (5 files)
@@ -364,7 +364,7 @@ SENSEX       0.0000     0.9917     +0.9917
 
 ## 📝 Notes
 
-1. **Module Names**: Validation plan uses `angel_ultra_*` but implementation uses `ultra_*`. Functionality is identical.
+1. **Module Names**: Validation plan uses `dhan_ultra_*` but implementation uses `ultra_*`. Functionality is identical.
 2. **Small Dataset**: Phases 18-19 show expected behavior with 3-row dataset. Will work correctly with larger datasets.
 3. **Baseline Metadata**: Baseline models might not have accuracy in metadata, but Ultra models do. Promotion system works correctly.
 4. **Phase 17**: Can be tested when broker is available, or skipped for now.

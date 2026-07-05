@@ -3,11 +3,12 @@ Comprehensive Feature Test Suite
 Tests all implemented features with online and offline validation
 """
 
-import requests
 import json
 import sys
 from datetime import datetime
 from pathlib import Path
+
+import requests
 
 # Fix Unicode encoding
 sys.stdout.reconfigure(encoding="utf-8")

@@ -9,10 +9,12 @@ ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from scripts.run_live_chain import LiveChainRunner
-from core.utils.logger import logger
 from datetime import datetime
+
 import pytz
+
+from core.utils.logger import logger
+from scripts.run_live_chain import LiveChainRunner
 
 
 def main():

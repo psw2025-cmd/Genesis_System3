@@ -2,7 +2,7 @@
 
 ## Problem Identified
 
-The `AngelOneBroker` class had a `_env_live_guard()` that was blocking **ALL** broker initialization, including data fetching operations like:
+The `DhanBroker` class had a `_env_live_guard()` that was blocking **ALL** broker initialization, including data fetching operations like:
 - Option chain fetching
 - LTP (Last Traded Price) retrieval
 - Profile fetching
@@ -12,21 +12,21 @@ This guard was meant to prevent live trading, but it was too restrictive and blo
 
 ## Root Cause
 
-The `_env_live_guard()` function was called in `AngelOneBroker.__init__()`, which meant:
-- **Any** use of `AngelOneBroker()` required `SYSTEM3_LIVE_TRADING_ALLOWED=1`
+The `_env_live_guard()` function was called in `DhanBroker.__init__()`, which meant:
+- **Any** use of `DhanBroker()` required `SYSTEM3_LIVE_TRADING_ALLOWED=1`
 - This blocked legitimate data fetching operations
-- Existing code like `angel_options_watch.py` would fail if the guard was enforced
+- Existing code like `dhan_options_watch.py` would fail if the guard was enforced
 
 ## Solution Implemented
 
 ### 1. Modified Broker Initialization
 
-Added an `allow_data_only` parameter to `AngelOneBroker.__init__()`:
+Added an `allow_data_only` parameter to `DhanBroker.__init__()`:
 
 ```python
 def __init__(self, allow_data_only: bool = False):
     """
-    Initialize Angel One broker connection.
+    Initialize Dhan broker connection.
     
     Args:
         allow_data_only: If True, allows data fetching without live trading guard.
@@ -40,17 +40,17 @@ def __init__(self, allow_data_only: bool = False):
 
 ### 2. Updated All Data-Fetching Code
 
-Updated all existing files that use `AngelOneBroker()` for data fetching:
+Updated all existing files that use `DhanBroker()` for data fetching:
 
 - ✅ `core/engine/test_angelone_option_chain.py` - Option chain test script
 - ✅ `core/engine/test_angelone_api.py` - API test script
-- ✅ `core/engine/angel_options_watch.py` - Options watch
-- ✅ `core/engine/angel_options_watch_loop.py` - Options watch loop
-- ✅ `core/engine/angel_monday_diagnostic.py` - Diagnostic script
+- ✅ `core/engine/dhan_options_watch.py` - Options watch
+- ✅ `core/engine/dhan_options_watch_loop.py` - Options watch loop
+- ✅ `core/engine/dhan_monday_diagnostic.py` - Diagnostic script
 - ✅ `core/engine/system3_phase205_broker_selftest.py` - Broker self-test
 - ✅ `core/engine/ultra_live_signals_shadow.py` - Ultra shadow signals
 
-All now use: `AngelOneBroker(allow_data_only=True)`
+All now use: `DhanBroker(allow_data_only=True)`
 
 ### 3. Added Guard for Order Placement
 
@@ -75,7 +75,7 @@ This will be used by order placement methods (when implemented) to ensure live t
 ### Data Fetching (No Guard Required)
 ```python
 # These work without SYSTEM3_LIVE_TRADING_ALLOWED
-broker = AngelOneBroker(allow_data_only=True)
+broker = DhanBroker(allow_data_only=True)
 option_chain = broker.get_option_chain_by_underlying("NIFTY", "NFO")
 ltp = broker.get_ltp("NSE", "SBIN-EQ", "3045")
 profile = broker.get_profile()
@@ -85,7 +85,7 @@ profile = broker.get_profile()
 ```python
 # These will require SYSTEM3_LIVE_TRADING_ALLOWED=1
 # (When order placement methods are implemented)
-broker = AngelOneBroker()  # or allow_data_only=False
+broker = DhanBroker()  # or allow_data_only=False
 broker.place_order(...)  # Will call _check_live_trading_allowed()
 ```
 

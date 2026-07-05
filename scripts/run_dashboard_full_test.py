@@ -47,7 +47,7 @@ def import_verify_module():
 
 def run_playwright_step() -> Dict[str, Any]:
     """Run Playwright dashboard verification as a single step."""
-    from subprocess import run, CalledProcessError
+    from subprocess import CalledProcessError, run
 
     script = ROOT / "tools" / "playwright_dashboard_verification.py"
     if not script.exists():

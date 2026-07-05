@@ -5,16 +5,17 @@ Tests for race conditions, data consistency, and performance
 """
 
 import asyncio
-import aiohttp
+import json
+import random
 import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
-import json
+from typing import Any, Dict, List
+
+import aiohttp
 import pytz
-from dataclasses import dataclass, asdict
-from concurrent.futures import ThreadPoolExecutor
-import random
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

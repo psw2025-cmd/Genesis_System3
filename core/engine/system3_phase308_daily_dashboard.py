@@ -4,12 +4,13 @@ System3 Phase 308 - Daily PnL & Accuracy Dashboard Generator (Research View)
 Produces a single daily dashboard summarizing PnL-like metrics, accuracy, and confidence tiers.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,8 +20,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_WITH_FORWARD_CSV = STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv"
-CONFIDENCE_TAGGED_CSV = STORAGE_LIVE / "angel_index_ai_signals_confidence_tagged_305.csv"
+SIGNALS_WITH_FORWARD_CSV = STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv"
+CONFIDENCE_TAGGED_CSV = STORAGE_LIVE / "dhan_index_ai_signals_confidence_tagged_305.csv"
 PERFORMANCE_301_JSON = STORAGE_META / "system3_daily_performance_301.json"
 REGIME_302_JSON = STORAGE_META / "system3_regime_performance_302.json"
 CONSISTENCY_307_JSON = STORAGE_META / "system3_live_vs_test_consistency_307.json"

@@ -4,12 +4,12 @@ System3 Phase 98 - Rollback Mechanism
 Read backup manifest and print rollback plan (dry-run only).
 """
 
-import sys
 import argparse
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

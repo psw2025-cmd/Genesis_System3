@@ -119,7 +119,7 @@
       "exists": true,
       "has_safety_checks": true,
       "has_encoding_fix": true,
-      "has_smartapi_fix": true,
+      "has_dhanhq_fix": true,
       "all_valid": true
     }
   },
@@ -171,7 +171,7 @@
     "venv/Scripts/python.exe": {
       "exists": true
     },
-    "storage/live/angel_index_ai_signals.csv": {
+    "storage/live/dhan_index_ai_signals.csv": {
       "exists": true
     },
     "system3_daily_heartbeat.json": {

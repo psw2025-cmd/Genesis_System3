@@ -5,9 +5,9 @@ Runs all phases 231-260 in test mode and prints summary.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -48,9 +48,11 @@ for phase_num, (module_path, func_name) in PHASE_IMPORTS.items():
 def check_phase232() -> Dict[str, Any]:
     """Check Phase 232: Signal engine integration."""
     try:
-        from core.engine.system3_signal_engine import run_signal_engine
         # Check if threshold loading is integrated
         import inspect
+
+        from core.engine.system3_signal_engine import run_signal_engine
+
         source = inspect.getsource(run_signal_engine)
         if "threshold_loader" in source or "load_thresholds" in source:
             return {
@@ -58,7 +60,7 @@ def check_phase232() -> Dict[str, Any]:
                 "status": "OK",
                 "details": "Threshold loading integrated in signal engine",
                 "outputs": {},
-                "errors": []
+                "errors": [],
             }
         else:
             return {
@@ -66,43 +68,27 @@ def check_phase232() -> Dict[str, Any]:
                 "status": "WARN",
                 "details": "Threshold loading not found in signal engine",
                 "outputs": {},
-                "errors": []
+                "errors": [],
             }
     except Exception as e:
-        return {
-            "phase": 232,
-            "status": "ERROR",
-            "details": f"Error checking: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 232, "status": "ERROR", "details": f"Error checking: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase233() -> Dict[str, Any]:
     """Check Phase 233: Order models."""
     try:
         from core.execution.order_models import PlannedOrder, RiskDecision
-        return {
-            "phase": 233,
-            "status": "OK",
-            "details": "Order models available",
-            "outputs": {},
-            "errors": []
-        }
+
+        return {"phase": 233, "status": "OK", "details": "Order models available", "outputs": {}, "errors": []}
     except Exception as e:
-        return {
-            "phase": 233,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 233, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase234() -> Dict[str, Any]:
     """Check Phase 234: Config loader."""
     try:
         from core.config.live_trade_config_loader import load_live_trade_config
+
         config = load_live_trade_config()
         if not config.get("LIVE_TRADING_ENABLED", True):
             return {
@@ -110,7 +96,7 @@ def check_phase234() -> Dict[str, Any]:
                 "status": "OK",
                 "details": "Config loader available, LIVE_TRADING_ENABLED=False (safe)",
                 "outputs": {},
-                "errors": []
+                "errors": [],
             }
         else:
             return {
@@ -118,65 +104,48 @@ def check_phase234() -> Dict[str, Any]:
                 "status": "ERROR",
                 "details": "LIVE_TRADING_ENABLED is True (UNSAFE!)",
                 "outputs": {},
-                "errors": ["LIVE_TRADING_ENABLED should be False"]
+                "errors": ["LIVE_TRADING_ENABLED should be False"],
             }
     except Exception as e:
-        return {
-            "phase": 234,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 234, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase235() -> Dict[str, Any]:
     """Check Phase 235: Risk guard."""
     try:
-        from core.execution.risk_guard import check_per_trade_limits, check_daily_limits
-        return {
-            "phase": 235,
-            "status": "OK",
-            "details": "Risk guard available",
-            "outputs": {},
-            "errors": []
-        }
+        from core.execution.risk_guard import check_daily_limits, check_per_trade_limits
+
+        return {"phase": 235, "status": "OK", "details": "Risk guard available", "outputs": {}, "errors": []}
     except Exception as e:
-        return {
-            "phase": 235,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 235, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase236() -> Dict[str, Any]:
     """Check Phase 236: Virtual execution engine."""
     try:
-        from core.execution.live_execution_engine import plan_orders_from_signals, log_virtual_orders
+        from core.execution.live_execution_engine import (
+            log_virtual_orders,
+            plan_orders_from_signals,
+        )
+
         return {
             "phase": 236,
             "status": "OK",
             "details": "Virtual execution engine available",
             "outputs": {},
-            "errors": []
+            "errors": [],
         }
     except Exception as e:
-        return {
-            "phase": 236,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 236, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase237() -> Dict[str, Any]:
     """Check Phase 237: Live loop integration."""
     try:
-        from core.engine.system3_signal_engine import run_signal_engine
         import inspect
+
+        from core.engine.system3_signal_engine import run_signal_engine
+
         source = inspect.getsource(run_signal_engine)
         if "plan_orders_from_signals" in source or "log_virtual_orders" in source:
             return {
@@ -184,7 +153,7 @@ def check_phase237() -> Dict[str, Any]:
                 "status": "OK",
                 "details": "Virtual execution integrated in signal engine",
                 "outputs": {},
-                "errors": []
+                "errors": [],
             }
         else:
             return {
@@ -192,37 +161,20 @@ def check_phase237() -> Dict[str, Any]:
                 "status": "WARN",
                 "details": "Virtual execution not found in signal engine",
                 "outputs": {},
-                "errors": []
+                "errors": [],
             }
     except Exception as e:
-        return {
-            "phase": 237,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 237, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase242() -> Dict[str, Any]:
     """Check Phase 242: Alert hooks."""
     try:
         from core.monitoring.alert_hooks import log_virtual_trade_alert
-        return {
-            "phase": 242,
-            "status": "OK",
-            "details": "Alert hooks available",
-            "outputs": {},
-            "errors": []
-        }
+
+        return {"phase": 242, "status": "OK", "details": "Alert hooks available", "outputs": {}, "errors": []}
     except Exception as e:
-        return {
-            "phase": 242,
-            "status": "ERROR",
-            "details": f"Error: {e}",
-            "outputs": {},
-            "errors": [str(e)]
-        }
+        return {"phase": 242, "status": "ERROR", "details": f"Error: {e}", "outputs": {}, "errors": [str(e)]}
 
 
 def check_phase248() -> Dict[str, Any]:
@@ -233,7 +185,7 @@ def check_phase248() -> Dict[str, Any]:
         "status": "OK",
         "details": "Error handling implemented in phases 237+",
         "outputs": {},
-        "errors": []
+        "errors": [],
     }
 
 
@@ -255,6 +207,7 @@ def check_phase231():
     """Check Phase 231: Threshold Loader."""
     try:
         from core.engine.threshold_loader import run_phase231
+
         result = run_phase231()
         # run_phase231() already returns a proper PhaseResult dict
         return result
@@ -266,7 +219,7 @@ def check_phase231():
             "details": f"Import error: {e}",
             "outputs": {},
             "errors": [],
-            "warnings": [f"ImportError: {e}"]
+            "warnings": [f"ImportError: {e}"],
         }
     except Exception as e:
         # Fallback if any other error occurs
@@ -276,7 +229,7 @@ def check_phase231():
             "details": f"Error running Phase 231: {e}",
             "outputs": {},
             "errors": [],
-            "warnings": [str(e)]
+            "warnings": [str(e)],
         }
 
 
@@ -286,9 +239,9 @@ def main():
     print("SYSTEM3 PHASES 231-260 DIAGNOSTICS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-    
+
     results = []
-    
+
     for phase_num in range(231, 261):
         print(f"Phase {phase_num:3d}... ", end="", flush=True)
         try:
@@ -300,43 +253,43 @@ def main():
                     "status": "NOT_IMPLEMENTED",
                     "details": "Phase not found",
                     "outputs": {},
-                    "errors": []
+                    "errors": [],
                 }
-            
+
             results.append((phase_num, result))
             status_icon = "✅" if result["status"] == "OK" else "⚠️" if result["status"] == "WARN" else "❌"
             print(f"{status_icon} {result['status']}")
-            
+
         except Exception as e:
             import traceback
+
             error_msg = str(e)
             print(f"❌ ERROR: {error_msg}")
             # Only print full traceback for Phase 231 to debug
             if phase_num == 231:
                 traceback.print_exc()
-            results.append((phase_num, {
-                "phase": phase_num,
-                "status": "ERROR",
-                "details": error_msg,
-                "outputs": {},
-                "errors": [error_msg]
-            }))
-    
+            results.append(
+                (
+                    phase_num,
+                    {"phase": phase_num, "status": "ERROR", "details": error_msg, "outputs": {}, "errors": [error_msg]},
+                )
+            )
+
     # Summary
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    
+
     ok_count = sum(1 for _, r in results if r.get("status") == "OK")
     warn_count = sum(1 for _, r in results if r.get("status") == "WARN")
     error_count = sum(1 for _, r in results if r.get("status") == "ERROR")
     not_impl_count = sum(1 for _, r in results if r.get("status") == "NOT_IMPLEMENTED")
-    
+
     print(f"OK: {ok_count}")
     print(f"WARN: {warn_count}")
     print(f"ERROR: {error_count}")
     print(f"NOT IMPLEMENTED: {not_impl_count}")
-    
+
     # Print Phase 231 threshold summary if available
     phase231_result = next((r for _, r in results if r.get("phase") == 231), None)
     if phase231_result and "outputs" in phase231_result:
@@ -359,12 +312,12 @@ def main():
                 for warn in phase231_result["warnings"]:
                     print(f"  ⚠️ {warn}")
             print("=" * 70)
-    
+
     # Generate status document
     DOCS_DIR = PROJECT_ROOT / "docs"
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     STATUS_PATH = DOCS_DIR / "system3_phases_231_260_implementation_status.md"
-    
+
     with STATUS_PATH.open("w", encoding="utf-8") as f:
         f.write("# System3 Phases 231-260 Implementation Status\n\n")
         f.write(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
@@ -376,17 +329,16 @@ def main():
         f.write("## Phase Details\n\n")
         f.write("| Phase | Component / Script | Status | Notes |\n")
         f.write("|-------|-------------------|--------|-------|\n")
-        
+
         for phase_num, result in results:
             component = result.get("details", "")
             status = result.get("status", "UNKNOWN")
             notes = "; ".join(result.get("errors", [])) if result.get("errors") else "-"
             f.write(f"| {phase_num} | {component[:50]} | {status} | {notes} |\n")
-    
+
     print(f"\nStatus document: {STATUS_PATH}")
     print("\n" + "=" * 70)
 
 
 if __name__ == "__main__":
     main()
-

@@ -14,10 +14,10 @@ Usage:
   python tools/system3_watchdog_status_reporter.py [--output WATCHDOG_RUNTIME_STATUS.md]
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 ROOT_DIR = Path(__file__).parent.parent.absolute()

@@ -5,10 +5,11 @@ Estimates spread and liquidity from existing snapshot data.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -20,7 +21,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
 OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase141_spread_liquidity_metrics.csv"
 
 

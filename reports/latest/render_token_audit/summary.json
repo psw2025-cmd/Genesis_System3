@@ -1,0 +1,29 @@
+{
+  "generated_utc": "2026-06-25T00:00:00+00:00",
+  "status": "PASS_WITH_WARNINGS",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "live_trading_enabled": false,
+  "secrets_touched": false,
+  "issue_from_render_logs": {
+    "generate_token_rate_limit": "Token can be generated once every 2 minutes.",
+    "renew_token_error": "DH-906 Invalid Token",
+    "manual_oauth_fallback_printed": true
+  },
+  "fix_applied": {
+    "file": "scripts/dhan_token_auto_refresh.py",
+    "commit": "3c9f344452ea6a6c2126535f79fc1c8d88cb0cd3",
+    "changes": [
+      "Added Render/cloud detection",
+      "Added 130 second refresh cooldown",
+      "Added cooldown marker under reports/latest/render_token_audit/last_refresh_attempt.txt",
+      "Wrapped daemon startup and scheduled refresh calls through guarded _safe_refresh",
+      "Kept manual OAuth available only through explicit --oauth command"
+    ]
+  },
+  "remaining_risk": [
+    "Backend startup may still call token_manager.refresh_token directly outside the daemon path",
+    "token_manager.py still needs a cloud-mode no-auto-OAuth guard if backend startup continues printing consent URL",
+    "Need post-deploy Render logs to verify duplicate token attempts stopped"
+  ],
+  "next_action": "Deploy latest repo to Render and check logs for absence of repeated generate_token within 2 minutes and no automatic OAuth manual fallback during normal startup."
+}

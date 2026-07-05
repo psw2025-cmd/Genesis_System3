@@ -5,14 +5,15 @@ Tracks the quality of forward return data being captured in live signals.
 Monitors: data freshness, completeness, anomalies.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, Any
 import logging
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -39,7 +40,7 @@ def run_phase337_forward_return_quality_tracker(root_path: str = None, **kwargs)
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load forward signals
-    forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+    forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
     if not forward_file.exists():
         logger.warning(f"Forward signals file not found: {forward_file}")

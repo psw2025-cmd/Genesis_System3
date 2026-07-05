@@ -5,10 +5,11 @@ Creates expiry calendar mapping for supported underlyings.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -19,7 +20,7 @@ if str(PROJECT_ROOT) not in sys.path:
 STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
-UNIVERSE_CSV_PATH = STORAGE_ULTRA / "phase136_angel_symbol_universe.csv"
+UNIVERSE_CSV_PATH = STORAGE_ULTRA / "phase136_dhan_symbol_universe.csv"
 OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase137_expiry_calendar_map.csv"
 
 

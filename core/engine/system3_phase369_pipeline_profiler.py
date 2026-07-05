@@ -9,14 +9,14 @@ Run lightweight (no heavy external libraries).
 Avoid blocking execution of main workflow.
 """
 
-import sys
 import json
 import logging
-import time
 import os
-from pathlib import Path
+import sys
+import time
 from datetime import datetime
-from typing import Dict, Any, List, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -70,10 +70,10 @@ class PipelineProfiler:
         """Profile all critical signal files."""
 
         files_to_profile = [
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
-            STORAGE_LIVE / "clean" / "angel_index_ai_signals_deduped.csv",
-            STORAGE_LIVE / "clean" / "angel_index_ai_signals_with_forward_deduped.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "clean" / "dhan_index_ai_signals_deduped.csv",
+            STORAGE_LIVE / "clean" / "dhan_index_ai_signals_with_forward_deduped.csv",
         ]
 
         profile_results = {}

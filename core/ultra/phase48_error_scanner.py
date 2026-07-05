@@ -10,12 +10,13 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 110
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional, List
 import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -30,8 +31,8 @@ def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
     # Try to load from various sources
     sources = [
         (ULTRA_DIR / "phase31_ultra_fused_decisions.csv", "final_action"),
-        (LIVE_DIR / "angel_index_ai_signals.csv", "pred_label"),
-        (LIVE_DIR / "angel_index_ai_trades_plan.csv", "action"),
+        (LIVE_DIR / "dhan_index_ai_signals.csv", "pred_label"),
+        (LIVE_DIR / "dhan_index_ai_trades_plan.csv", "action"),
     ]
 
     predictions = []

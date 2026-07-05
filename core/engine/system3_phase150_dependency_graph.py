@@ -4,11 +4,11 @@ System3 Phase 150 - Phase Dependency Graph (Static)
 Maps each phase to its inputs/outputs (static mapping).
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -66,20 +66,20 @@ DEPENDENCY_GRAPH = {
     "136": {
         "inputs": [],
         "outputs": [
-            "storage/ultra/phase136_angel_symbol_universe.csv",
-            "storage/ultra/phase136_angel_symbol_universe.json",
+            "storage/ultra/phase136_dhan_symbol_universe.csv",
+            "storage/ultra/phase136_dhan_symbol_universe.json",
         ],
     },
     "137": {
-        "inputs": ["storage/ultra/phase136_angel_symbol_universe.csv"],
+        "inputs": ["storage/ultra/phase136_dhan_symbol_universe.csv"],
         "outputs": ["storage/ultra/phase137_expiry_calendar_map.csv"],
     },
     "138": {
-        "inputs": ["storage/ultra/phase136_angel_symbol_universe.csv"],
+        "inputs": ["storage/ultra/phase136_dhan_symbol_universe.csv"],
         "outputs": ["storage/ultra/phase138_risk_tiers.csv"],
     },
     "139": {
-        "inputs": ["storage/ultra/phase136_angel_symbol_universe.csv"],
+        "inputs": ["storage/ultra/phase136_dhan_symbol_universe.csv"],
         "outputs": ["storage/ultra/phase139_lot_margin.csv"],
     },
     "140": {
@@ -87,7 +87,7 @@ DEPENDENCY_GRAPH = {
         "outputs": ["storage/ultra/phase140_capital_guardrail.csv", "storage/ultra/phase140_capital_guardrail.md"],
     },
     "141": {
-        "inputs": ["storage/live/angel_index_ai_signals.csv"],
+        "inputs": ["storage/live/dhan_index_ai_signals.csv"],
         "outputs": ["storage/ultra/phase141_spread_liquidity_metrics.csv"],
     },
     "142": {

@@ -66,7 +66,7 @@
 - Snapshot from Phase 42
 
 **Output**: 
-- Staged models: `core/models/angel_one_ultra_staging/`
+- Staged models: `core/models/dhan_ultra_staging/`
 - Report: `storage/ultra/phase41_promotion_staging_report.md`
 
 **Menu**: Option 104
@@ -175,7 +175,7 @@
 1. `storage/snapshots/` (for Phase 42)
 2. `storage/logs_ultra/` (for logging)
 3. `storage/ultra/weekly_packs/` (for Phase 40)
-4. `core/models/angel_one_ultra_staging/` (for Phase 41)
+4. `core/models/dhan_ultra_staging/` (for Phase 41)
 
 ---
 
@@ -248,7 +248,7 @@ python -m core.engine.system3_phase42_snapshot_manager list
 python -m core.engine.system3_phase41_promotion_executor
 ```
 
-**Expected**: Models staged to `core/models/angel_one_ultra_staging/` (if prerequisites met)
+**Expected**: Models staged to `core/models/dhan_ultra_staging/` (if prerequisites met)
 
 ---
 

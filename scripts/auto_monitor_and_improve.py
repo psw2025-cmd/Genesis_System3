@@ -4,14 +4,15 @@ Continuously monitors, corrects, and optimizes the trading system
 Goal: Maximum profit through automated improvements
 """
 
-import sys
-import time
 import json
 import subprocess
-import requests
-from pathlib import Path
+import sys
+import time
 from datetime import datetime
+from pathlib import Path
+
 import pytz
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

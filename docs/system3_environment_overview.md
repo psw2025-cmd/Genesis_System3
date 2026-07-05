@@ -1,7 +1,7 @@
 # System3 Environment Overview
 
 **Date**: 2025-11-30  
-**Project**: System3 Ultra - Angel One Index Options Trading System
+**Project**: System3 Ultra - Dhan Index Options Trading System
 
 ---
 
@@ -91,7 +91,7 @@ C:\Genesis_System3\core\ultra\
 
 ### Trade Configuration
 
-**`core\engine\angel_trade_config.py`**
+**`core\engine\dhan_trade_config.py`**
 - Trade thresholds (min_confidence, min_abs_score)
 - Position sizing parameters
 - Target/stop-loss percentages
@@ -99,7 +99,7 @@ C:\Genesis_System3\core\ultra\
 
 ### Automation Configuration
 
-**`core\engine\angel_automation_config.py`**
+**`core\engine\dhan_automation_config.py`**
 - Auto-execute trades (default: False)
 - Auto-simulate PnL (default: False)
 - Auto-update thresholds (default: False)
@@ -122,7 +122,7 @@ C:\Genesis_System3\core\ultra\
 ### Storage Config Files
 
 **`storage\config\`** directory contains:
-- `angel_blended_training_v3_config.json` - Blended training config
+- `dhan_blended_training_v3_config.json` - Blended training config
 - `risk_profile_suggestions.json` - Risk profile suggestions
 - `strategy_optimization.json` - Strategy optimization settings
 - `system3_env_config.json` - Environment configuration
@@ -139,7 +139,7 @@ C:\Genesis_System3\core\ultra\
 ### Baseline Models
 
 ```
-C:\Genesis_System3\core\models\angel_one\
+C:\Genesis_System3\core\models\dhan\
 ```
 - Contains: 10 files (5 .pkl models + 5 .json metadata)
 - Underlyings: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX
@@ -147,7 +147,7 @@ C:\Genesis_System3\core\models\angel_one\
 ### Blended Models
 
 ```
-C:\Genesis_System3\core\models\angel_one_real_blended\
+C:\Genesis_System3\core\models\dhan_real_blended\
 ```
 - Contains: 10 files (5 .pkl models + 5 .json metadata)
 - Real + synthetic blended models
@@ -155,7 +155,7 @@ C:\Genesis_System3\core\models\angel_one_real_blended\
 ### Ultra Models
 
 ```
-C:\Genesis_System3\core\models\angel_one_ultra\
+C:\Genesis_System3\core\models\dhan_ultra\
 ```
 - Contains: 10 files (5 .pkl models + 5 .json metadata)
 - Ultra-mode models
@@ -176,19 +176,19 @@ C:\Genesis_System3\storage\training\
 ```
 C:\Genesis_System3\storage\live\
 ```
-- Live signals: `angel_index_ai_signals.csv`
-- Trade plans: `angel_index_ai_trades_plan.csv`
-- PnL logs: `angel_index_ai_pnl_log.csv`
-- Execution logs: `angel_index_ai_trades_exec_log.csv`
+- Live signals: `dhan_index_ai_signals.csv`
+- Trade plans: `dhan_index_ai_trades_plan.csv`
+- PnL logs: `dhan_index_ai_pnl_log.csv`
+- Execution logs: `dhan_index_ai_trades_exec_log.csv`
 
 ### Learning Data
 
 ```
 C:\Genesis_System3\storage\learning\
 ```
-- Real outcomes: `angel_real_outcomes.csv`
+- Real outcomes: `dhan_real_outcomes.csv`
 - Real signals: `real_signals_raw.csv`
-- Master dataset: `angel_index_real_master_dataset.csv`
+- Master dataset: `dhan_index_real_master_dataset.csv`
 
 ### Ultra Data
 

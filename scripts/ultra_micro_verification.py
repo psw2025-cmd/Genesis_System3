@@ -3,13 +3,14 @@ Ultra-Micro Level System Verification
 Tests every component, compares with best practices, and provides proof
 """
 
-import sys
 import json
+import sys
 import time
 import traceback
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
+
 import pandas as pd
 import pytz
 
@@ -86,7 +87,7 @@ class UltraMicroVerifier:
     def test_imports(self) -> Dict:
         """Test all critical imports."""
         imports_to_test = [
-            ("core.brokers.angel_one.broker", "AngelOneBroker"),
+            ("core.brokers.dhan.broker", "DhanBroker"),
             ("src.trading.paper_executor", "PaperExecutor"),
             ("src.trading.pnl_tracker", "PnLTracker"),
             ("src.storage.trade_history", "TradeHistoryStore"),

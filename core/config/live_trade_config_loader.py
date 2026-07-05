@@ -4,10 +4,10 @@ System3 Phase 234 - Live Trading Config Loader
 Load and validate live trading configuration.
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:

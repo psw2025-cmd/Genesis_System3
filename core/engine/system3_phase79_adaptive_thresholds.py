@@ -5,14 +5,15 @@ Use volatility/regime features to generate adaptive thresholds per regime
 instead of single fixed values.
 """
 
-import sys
-import pandas as pd
 import json
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
 from itertools import product
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -24,8 +25,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 # Output files
 OUTPUT_JSON = STORAGE_ULTRA / "phase79_adaptive_thresholds.json"

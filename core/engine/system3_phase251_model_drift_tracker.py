@@ -15,12 +15,12 @@ Status: FULLY FUNCTIONAL (wired to Phase 250 JSON evaluation output)
 Date: 2025-12-06
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -28,9 +28,9 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import LSTM utilities for reading Phase 250 output
 from core.engine.system3_lstm_utils import (
-    read_latest_evaluation_metrics,
-    extract_model_metrics,
     compare_to_baseline,
+    extract_model_metrics,
+    read_latest_evaluation_metrics,
     write_promotion_decision,
 )
 
@@ -39,7 +39,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 # Directories
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 STORAGE_DIR = PROJECT_ROOT / "storage" / "live"
 

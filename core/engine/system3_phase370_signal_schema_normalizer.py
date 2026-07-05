@@ -5,15 +5,16 @@ Non-destructively repairs signal CSV files with schema mismatches.
 Archives originals with timestamps before any modifications.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-import shutil
-from typing import Dict, Any, List, Tuple
 import logging
+import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -223,9 +224,9 @@ def run_phase370(context: Dict[str, Any] = None) -> Dict[str, Any]:
     try:
         # Target signal files
         signal_files = [
-            STORAGE_LIVE / "angel_index_ai_signals.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
         ]
 
         # Process each file

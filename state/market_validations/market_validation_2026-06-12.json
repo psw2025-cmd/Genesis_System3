@@ -1,0 +1,49 @@
+{
+  "date": "2026-06-12",
+  "timestamp": "2026-06-12T18:11:26.141151",
+  "predicted_ranking": [
+    "NIFTY",
+    "MIDCPNIFTY",
+    "FINNIFTY",
+    "BANKNIFTY"
+  ],
+  "actual_ranking": [
+    "NIFTY",
+    "BANKNIFTY",
+    "FINNIFTY",
+    "MIDCPNIFTY"
+  ],
+  "common_symbols": [
+    "NIFTY",
+    "MIDCPNIFTY",
+    "FINNIFTY",
+    "BANKNIFTY"
+  ],
+  "spearman_correlation": 0.2,
+  "hit_rate": 0.6667,
+  "top_n_evaluated": 3,
+  "retrain_signal": true,
+  "status": "RETRAIN_NEEDED",
+  "actual_details": [
+    {
+      "underlying": "NIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 1
+    },
+    {
+      "underlying": "BANKNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 2
+    },
+    {
+      "underlying": "FINNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 3
+    },
+    {
+      "underlying": "MIDCPNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 4
+    }
+  ]
+}

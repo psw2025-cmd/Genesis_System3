@@ -1,19 +1,19 @@
 {
-  "angel_index_ai_signals.csv": [
+  "dhan_index_ai_signals.csv": [
     "underlying",
     "symbol",
     "signal",
     "final_score",
     "ts"
   ],
-  "angel_index_ai_signals_curated.csv": [
+  "dhan_index_ai_signals_curated.csv": [
     "underlying",
     "symbol",
     "signal",
     "final_score",
     "ts"
   ],
-  "angel_virtual_orders.csv": [
+  "dhan_virtual_orders.csv": [
     "ts",
     "underlying",
     "strike",
@@ -30,7 +30,7 @@
     "risk_flags_json",
     "snapshot_id"
   ],
-  "angel_index_ai_pnl_log.csv": [
+  "dhan_index_ai_pnl_log.csv": [
     "ts",
     "underlying",
     "strike",

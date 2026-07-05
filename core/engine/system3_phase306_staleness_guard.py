@@ -6,10 +6,11 @@ AUTO-HEAL INTEGRATED: Automatically triggers recovery actions.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +20,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_META = PROJECT_ROOT / "storage" / "meta"
 STORAGE_META.mkdir(parents=True, exist_ok=True)
 
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
 STALENESS_CSV = STORAGE_META / "system3_staleness_flags_306.csv"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "performance"

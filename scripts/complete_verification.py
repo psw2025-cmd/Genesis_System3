@@ -3,9 +3,10 @@ Complete System Verification - Final Check
 """
 
 import sys
-import requests
 import time
 from pathlib import Path
+
+import requests
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")

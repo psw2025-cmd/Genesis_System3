@@ -5,13 +5,13 @@ Measure per-step latency inside live loops: data fetch, feature build,
 model inference, trade logic, logging.
 """
 
+import json
+import statistics
 import sys
 import time
-import json
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List
-import statistics
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

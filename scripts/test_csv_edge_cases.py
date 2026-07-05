@@ -3,12 +3,13 @@ Test CSV Files - Edge Cases and Error Conditions
 Tests how CSV files handle various edge cases and error conditions
 """
 
-import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-import tempfile
 import shutil
+import sys
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

@@ -13,7 +13,7 @@
    ```
 
 2. Ensure required input files exist:
-   - `storage/live/angel_index_ai_signals.csv` (for Phase 31)
+   - `storage/live/dhan_index_ai_signals.csv` (for Phase 31)
    - `storage/reports_ultra/phase21_risk_evaluations.csv` (optional, for Phase 31)
    - `storage/reports_ultra/phase30_calibration_results.csv` (optional, for Phase 31)
 
@@ -87,11 +87,11 @@ This will:
 ### Phase 34: Ultra Live Shadow Comparison
 ```powershell
 (venv) PS C:\Genesis_System3> python -m core.engine.system3_phase34_ultra_shadow_exec
-(venv) PS C:\Genesis_System3> type storage\live\angel_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
+(venv) PS C:\Genesis_System3> type storage\live\dhan_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
 ```
 
 **Expected Outputs**:
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 
 **Verification**:
 - Check that CSV exists (may be empty if no BUY actions with SAFE risk)
@@ -198,7 +198,7 @@ After running all phases, verify:
 - [ ] Phase 31: `phase31_ultra_fused_decisions.csv` exists with expected columns
 - [ ] Phase 32: `phase32_ultra_vs_baseline_summary.md` contains comparison tables
 - [ ] Phase 33: `phase33_promotion_plan.md` shows eligibility per underlying
-- [ ] Phase 34: `angel_index_ai_ultra_trades_shadow.csv` exists (may be empty)
+- [ ] Phase 34: `dhan_index_ai_ultra_trades_shadow.csv` exists (may be empty)
 - [ ] Phase 35: `phase35_decision_audit_report.md` shows OK/WARN/BLOCK counts
 - [ ] Phase 36: `phase36_cull_execution_log.md` shows all steps executed
 - [ ] Phase 37: `phase37_policy_risk_dashboard.md` shows safety settings
@@ -209,7 +209,7 @@ After running all phases, verify:
 ## Troubleshooting
 
 ### Phase 31 fails: "No live signals found"
-- **Solution**: Ensure `storage/live/angel_index_ai_signals.csv` exists
+- **Solution**: Ensure `storage/live/dhan_index_ai_signals.csv` exists
 - **Workaround**: Run menu option 11 to generate signals first
 
 ### Phase 32 fails: "No Ultra decisions found"
@@ -233,7 +233,7 @@ After running all phases, verify:
 
 When all phases pass:
 - All output files created in `storage/ultra/`
-- Shadow trades logged to `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- Shadow trades logged to `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 - No baseline files modified
 - No configs changed
 - All safety guarantees maintained

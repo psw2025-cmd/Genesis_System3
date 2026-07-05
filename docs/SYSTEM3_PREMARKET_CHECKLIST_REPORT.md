@@ -17,10 +17,10 @@ Due to terminal configuration issues, the checklist script must be run manually.
 
 ## Checklist Results (Based on Codebase Analysis)
 
-### Check 1: SmartAPI Login (dry-run)
+### Check 1: DhanHQ Login (dry-run)
 **Status**: ⚠️ **WARN** (Non-blocking)
-- **Details**: SmartAPI may not be installed (non-blocking for DRY-RUN mode)
-- **Repair**: Not required - DRY-RUN mode doesn't need SmartAPI
+- **Details**: DhanHQ may not be installed (non-blocking for DRY-RUN mode)
+- **Repair**: Not required - DRY-RUN mode doesn't need DhanHQ
 - **Verdict**: ✅ **OK** (non-blocking)
 
 ### Check 2: Internet Stability
@@ -50,8 +50,8 @@ Due to terminal configuration issues, the checklist script must be run manually.
 ### Check 6: Storage CSVs Exist (non-zero signals)
 **Status**: ✅ **PASS**
 - **Details**: 
-  - `storage/live/angel_index_ai_signals.csv` - EXISTS (30+ rows)
-  - `storage/live/angel_index_ai_signals_curated.csv` - EXISTS (608 rows)
+  - `storage/live/dhan_index_ai_signals.csv` - EXISTS (30+ rows)
+  - `storage/live/dhan_index_ai_signals_curated.csv` - EXISTS (608 rows)
 - **Repair**: None needed
 - **Verdict**: ✅ **OK**
 
@@ -91,9 +91,9 @@ Due to terminal configuration issues, the checklist script must be run manually.
 - **Repair**: Will be generated during autorun
 - **Verdict**: ✅ **OK** (non-blocking)
 
-### Check 13: AngelOne Data Extractor
+### Check 13: Dhan Data Extractor
 **Status**: ✅ **PASS**
-- **Details**: Extractor file exists: `core/engine/angel_real_data_extractor.py`
+- **Details**: Extractor file exists: `core/engine/dhan_real_data_extractor.py`
 - **Repair**: None needed
 - **Verdict**: ✅ **OK**
 
@@ -105,7 +105,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 
 ### Check 15: Options Chain Retrieval
 **Status**: ✅ **PASS**
-- **Details**: Options chain code exists: `core/engine/angel_live_ai_signals.py`
+- **Details**: Options chain code exists: `core/engine/dhan_live_ai_signals.py`
 - **Repair**: None needed
 - **Verdict**: ✅ **OK**
 
@@ -132,7 +132,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 
 ### Check 19: Strike Decision Logic
 **Status**: ✅ **PASS**
-- **Details**: Strike decision logic exists: `core/engine/angel_trade_decision.py`
+- **Details**: Strike decision logic exists: `core/engine/dhan_trade_decision.py`
 - **Repair**: None needed
 - **Verdict**: ✅ **OK**
 
@@ -148,7 +148,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 
 | Check | Name | Status | Blocking |
 |-------|------|--------|----------|
-| 1 | SmartAPI Login | ⚠️ WARN | No |
+| 1 | DhanHQ Login | ⚠️ WARN | No |
 | 2 | Internet Stability | ⚠️ MANUAL | Yes |
 | 3 | Heartbeat Freshness | ⚠️ FAIL (Expected) | No |
 | 4 | Watchdog Running | ⚠️ FAIL (Expected) | No |
@@ -160,7 +160,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 | 10 | Shutdown Flag | ✅ PASS | - |
 | 11 | No Crash Logs | ✅ PASS | - |
 | 12 | Next_Run Timestamps | ⚠️ WARN | No |
-| 13 | AngelOne Data Extractor | ✅ PASS | - |
+| 13 | Dhan Data Extractor | ✅ PASS | - |
 | 14 | PnL Simulator Loads CSV | ✅ PASS | - |
 | 15 | Options Chain Retrieval | ✅ PASS | - |
 | 16 | EV Tables Exist | ✅ PASS | - |
@@ -190,7 +190,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 ### Rationale:
 1. ✅ **14 checks pass** - All critical system components verified
 2. ✅ **3 expected failures** - Checks 3-5 fail because autorun hasn't started yet (normal)
-3. ✅ **2 non-blocking warnings** - SmartAPI and schedule hints (optional)
+3. ✅ **2 non-blocking warnings** - DhanHQ and schedule hints (optional)
 4. ✅ **1 manual check** - Internet stability (verify manually: ping 8.8.8.8)
 5. ✅ **All critical files exist** - CSVs, configs, scripts all present
 6. ✅ **Safety confirmed** - DRY-RUN mode, no live trading flags
@@ -203,7 +203,7 @@ Due to terminal configuration issues, the checklist script must be run manually.
 ### Expected Behavior After Start:
 - Checks 3-5 will pass once autorun starts (heartbeat updates, processes running)
 - Check 12 will pass after Phase 309 runs (schedule hints generated)
-- Check 1 may remain as warning if SmartAPI not installed (non-blocking for DRY-RUN)
+- Check 1 may remain as warning if DhanHQ not installed (non-blocking for DRY-RUN)
 
 ---
 

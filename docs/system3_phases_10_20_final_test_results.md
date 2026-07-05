@@ -47,7 +47,7 @@
 - All 5 Ultra models trained successfully
 - Accuracy: 99.17% - 100% (avg: 99.74%)
 - 40 features per model
-- Models saved to `core/models/angel_one_ultra/`
+- Models saved to `core/models/dhan_ultra/`
 
 ### Phase 13: Hyperparameter Explorer ✅
 **Results**:
@@ -121,15 +121,15 @@
 ## 📁 Files Created
 
 ### Models
-- `core/models/angel_one_ultra/*_ultra_model.pkl` (5 files)
-- `core/models/angel_one_ultra/*_ultra_model_meta.json` (5 files)
+- `core/models/dhan_ultra/*_ultra_model.pkl` (5 files)
+- `core/models/dhan_ultra/*_ultra_model_meta.json` (5 files)
 
 ### Data
-- `storage/learning_ultra/angel_ultra_shadow_master.csv`
-- `storage/learning_ultra/angel_ultra_shadow_master.parquet`
-- `storage/training/angel_ultra_training.csv`
-- `storage/training/angel_ultra_training.parquet`
-- `storage/training/angel_ultra_training_with_regime.parquet`
+- `storage/learning_ultra/dhan_ultra_shadow_master.csv`
+- `storage/learning_ultra/dhan_ultra_shadow_master.parquet`
+- `storage/training/dhan_ultra_training.csv`
+- `storage/training/dhan_ultra_training.parquet`
+- `storage/training/dhan_ultra_training_with_regime.parquet`
 
 ### Reports
 - `storage/reports_ultra/ultra_hparam_results_*.csv` (5 files)

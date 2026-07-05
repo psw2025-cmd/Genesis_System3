@@ -14,6 +14,24 @@ extend-exclude = '''
 )
 '''
 
+[tool.mypy]
+# Legacy codebase, never previously type-checked. Ignore missing
+# third-party stubs (fastapi/pydantic/numpy/pandas/etc.) rather than
+# installing every dependency into mypy's isolated pre-commit env -
+# that surfaces import-resolution noise, not real type errors. Real
+# type errors are still reported.
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = "."
+exclude = '''(?x)(
+    ^venv/
+    | ^\.venv/
+    | ^node_modules/
+    | ^tests/auto/system3_generated_tests/
+    | ^dashboard/frontend/
+    | ^desktop_app/
+)'''
+
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "*_test.py"]
 testpaths = ["core", "tools", "phases", "dashboard", "tests"]

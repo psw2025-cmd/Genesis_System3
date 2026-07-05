@@ -4,11 +4,11 @@ System3 Phase 200 - MASTER STATUS SNAPSHOT (Angel DRY-RUN)
 Consolidates final view and serves as truth source for session start.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -81,7 +81,7 @@ def run_phase200_master_status_snapshot() -> Dict[str, Any]:
         master_snapshot = {
             "timestamp": datetime.now().isoformat(),
             "dry_run": True,
-            "broker": "ANGEL_ONE",
+            "broker": "DHAN",
             "one_lot_test": "ACTIVE",
             "last_known_status": overall_status,
             "config": {

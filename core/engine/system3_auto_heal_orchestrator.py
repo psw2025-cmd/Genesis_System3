@@ -13,15 +13,15 @@ SAFETY: All operations are read-only or safe-write to meta/logs directories.
 NO trading operations or baseline overwrite.
 """
 
-import sys
-import os
 import json
-import shutil
 import logging
+import os
+import shutil
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -119,7 +119,7 @@ class AutoHealOrchestrator:
                 logger.warning(f"Could not re-run phase 306: {e}")
 
             # Option 2: Check if signals CSV itself is stale and needs refresh
-            signals_csv = STORAGE_LIVE / "angel_index_ai_signals.csv"
+            signals_csv = STORAGE_LIVE / "dhan_index_ai_signals.csv"
             if signals_csv.exists():
                 import pandas as pd
 

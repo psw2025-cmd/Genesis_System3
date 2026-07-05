@@ -1,0 +1,56 @@
+{
+  "generated_utc": "2026-06-25T00:00:00+00:00",
+  "source": "user_pasted_render_log_excerpt",
+  "status": "PASS_WITH_WARNINGS",
+  "live_trading_enabled": false,
+  "secrets_touched": false,
+  "oom_proven_in_excerpt": false,
+  "dashboard_raw_template_reported": true,
+  "findings": [
+    {
+      "priority": "P0",
+      "area": "dashboard_ui",
+      "finding": "User pasted rendered page text containing raw Vue {{ ... }} template expressions.",
+      "meaning": "Vue app did not mount, app.js failed, Vue CDN failed, or user copied raw HTML/source instead of rendered browser view.",
+      "action_taken": "Dashboard browser proof now fails if raw Vue template tokens are visible. Commit 5bbf0151a4cb4c70fb95d2a925e79c3e4472c663."
+    },
+    {
+      "priority": "P0",
+      "area": "dhan_token_refresh",
+      "finding": "At 06:58 generate_token returned Dhan rate-limit message: Token can be generated once every 2 minutes. renew_token then failed with DH-906 Invalid Token and OAuth manual fallback was printed.",
+      "meaning": "Likely overlapping startup/redeploy token refresh or an invalid old DHAN_ACCESS_TOKEN. Not an OOM by itself.",
+      "required_action": "Suppress automatic manual OAuth fallback in Render cloud mode and throttle duplicate token refresh attempts."
+    },
+    {
+      "priority": "P1",
+      "area": "startup_recovery",
+      "finding": "At 06:59 generate_token succeeded and DHAN_ACCESS_TOKEN was set in os.environ cloud mode.",
+      "meaning": "Broker token auto-refresh can work, but startup overlap/rate-limit handling needs hardening."
+    },
+    {
+      "priority": "P1",
+      "area": "performance",
+      "finding": "Several API calls completed but took 3-5 seconds: /api/state, /api/paper, /api/broker/status, /api/trades/today.",
+      "meaning": "Dashboard polling can create load spikes on Render starter. Need request coalescing/cache TTL for heavy endpoints."
+    },
+    {
+      "priority": "P1",
+      "area": "memory",
+      "finding": "Instruments loaded from runtime JSON: 143079 rows.",
+      "meaning": "Large instrument load is a startup memory pressure point. Not proven as leak from the excerpt."
+    },
+    {
+      "priority": "P2",
+      "area": "market_data",
+      "finding": "NSE live data fetched for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY. ML signal CSV not found; ml_confidence_score is 0 and weight redistributed.",
+      "meaning": "Market data fallback is active; prediction model factor is incomplete for current session."
+    }
+  ],
+  "next_required_fixes": [
+    "Patch Dhan token manager to avoid manual OAuth printing in Render cloud auto-start path.",
+    "Add token refresh cooldown/lock to prevent generate_token calls within 2 minutes.",
+    "Run dashboard browser proof after deploy; it must fail if raw {{ ... }} is visible.",
+    "Add TTL/cache/coalescing for heavy dashboard endpoints to reduce 3-5s repeated API load.",
+    "Collect actual OOM restart log lines if memory issue continues."
+  ]
+}

@@ -5,9 +5,9 @@ Comprehensive safety check: LIVE_TRADING_ENABLED, risk guard, kill switch, trade
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -16,10 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import config
 try:
-    from config.live_trade_config import (
-        LIVE_TRADING_ENABLED,
-        MAX_LIVE_TRADES_PER_DAY,
-    )
+    from config.live_trade_config import LIVE_TRADING_ENABLED, MAX_LIVE_TRADES_PER_DAY
 except ImportError as e:
     print(f"[PH119] ERROR: Failed to import live_trade_config: {e}")
     sys.exit(1)

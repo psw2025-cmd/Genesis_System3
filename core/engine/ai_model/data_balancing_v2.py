@@ -13,10 +13,11 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import pandas as pd
-import numpy as np
-from typing import Tuple, Dict, Any
 import logging
+from typing import Any, Dict, Tuple
+
+import numpy as np
+import pandas as pd
 
 # Configure logging
 logger = logging.getLogger(__name__)

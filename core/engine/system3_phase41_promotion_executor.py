@@ -12,15 +12,15 @@ Menu Option: 104
 
 import json
 import shutil
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
-STAGING_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra_staging"
-BLENDED_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_real_blended"
+STAGING_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra_staging"
+BLENDED_MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_real_blended"
 LOGS_ULTRA_DIR = PROJECT_ROOT / "storage" / "logs_ultra"
 
 STAGING_MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -48,7 +48,9 @@ def _log(message: str) -> None:
 
 def find_latest_snapshot_dir() -> Optional[Path]:
     """Find the latest snapshot directory."""
-    from core.engine.system3_phase42_snapshot_manager import find_latest_snapshot_dir as find_snap
+    from core.engine.system3_phase42_snapshot_manager import (
+        find_latest_snapshot_dir as find_snap,
+    )
 
     return find_snap()
 

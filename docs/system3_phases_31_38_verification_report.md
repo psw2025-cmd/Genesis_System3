@@ -95,7 +95,7 @@ All 8 phases (31-38) of the Ultra Integration layer have been:
 - Created empty shadow trades file
 
 **Outputs Verified**:
-- ✅ `storage/live/angel_index_ai_ultra_trades_shadow.csv` (empty, but file exists)
+- ✅ `storage/live/dhan_index_ai_ultra_trades_shadow.csv` (empty, but file exists)
 
 **Logic Review**:
 - Correctly filters for BUY actions with SAFE risk flag
@@ -241,7 +241,7 @@ All phases maintain strict safety:
 - `storage/ultra/phase33_promotion_plan.md` (ready for retest)
 
 ### Phase 34
-- `storage/live/angel_index_ai_ultra_trades_shadow.csv` ✅
+- `storage/live/dhan_index_ai_ultra_trades_shadow.csv` ✅
 
 ### Phase 35
 - `storage/ultra/phase35_decision_audit.csv` ✅

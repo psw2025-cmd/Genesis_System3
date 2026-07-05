@@ -5,7 +5,7 @@ Define structured Python models for planned orders and risk decisions.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 @dataclass

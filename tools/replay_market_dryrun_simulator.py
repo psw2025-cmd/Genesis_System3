@@ -5,11 +5,11 @@ Simulates 6 hours of Option 11 (Live AI Signals) behavior using existing signal 
 NO real API calls. READ-ONLY simulation.
 """
 
-import os
-import sys
 import csv
 import json
+import os
 import random
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -33,9 +33,9 @@ REPLAY_SUMMARY_FILE = WORK_DIR / "REPLAY_DRY_RUN_SUMMARY.md"
 
 class ReplaySimulator:
     def __init__(self):
-        self.signals_file = LIVE_DIR / "angel_index_ai_signals.csv"
-        self.orders_file = LIVE_DIR / "angel_virtual_orders.csv"
-        self.pnl_file = DATA_DIR / "angel_index_ai_pnl_log.csv"
+        self.signals_file = LIVE_DIR / "dhan_index_ai_signals.csv"
+        self.orders_file = LIVE_DIR / "dhan_virtual_orders.csv"
+        self.pnl_file = DATA_DIR / "dhan_index_ai_pnl_log.csv"
 
         # Metrics
         self.initial_signals_count = 0

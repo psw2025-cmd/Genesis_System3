@@ -3,12 +3,12 @@ Complete System Validator - Identifies ALL Issues
 Comprehensive validation of entire system
 """
 
+import ast
+import importlib.util
+import json
 import sys
 from pathlib import Path
-import importlib.util
-import ast
-import json
-from typing import List, Dict
+from typing import Dict, List
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -29,7 +29,7 @@ class CompleteSystemValidator:
         print("-" * 80)
 
         critical_modules = [
-            "core.brokers.angel_one.broker",
+            "core.brokers.dhan.broker",
             "src.trading.paper_executor",
             "src.trading.pnl_tracker",
             "src.trading.advanced_position_sizing",
@@ -65,7 +65,7 @@ class CompleteSystemValidator:
         print("-" * 80)
 
         critical_files = [
-            "core/brokers/angel_one/broker.py",
+            "core/brokers/dhan/broker.py",
             "src/trading/paper_executor.py",
             "src/trading/pnl_tracker.py",
             "src/trading/advanced_position_sizing.py",
@@ -99,9 +99,9 @@ class CompleteSystemValidator:
         print("-" * 80)
 
         try:
+            from src.selector.strategy_engine import StrategyEngine
             from src.trading.advanced_position_sizing import AdvancedPositionSizing
             from src.trading.dynamic_risk_management import DynamicRiskManager
-            from src.selector.strategy_engine import StrategyEngine
 
             ps = AdvancedPositionSizing()
             rm = DynamicRiskManager()

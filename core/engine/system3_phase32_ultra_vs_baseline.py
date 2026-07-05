@@ -9,11 +9,12 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 95
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LIVE_DIR = PROJECT_ROOT / "storage" / "live"
@@ -26,7 +27,7 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 def _load_baseline_trades() -> Optional[pd.DataFrame]:
     """Load baseline trade plans."""
-    trades_csv = LIVE_DIR / "angel_index_ai_trades_plan.csv"
+    trades_csv = LIVE_DIR / "dhan_index_ai_trades_plan.csv"
     if not trades_csv.exists():
         return None
     try:
@@ -37,7 +38,7 @@ def _load_baseline_trades() -> Optional[pd.DataFrame]:
 
 def _load_baseline_pnl() -> Optional[pd.DataFrame]:
     """Load baseline PnL log."""
-    pnl_csv = LIVE_DIR / "angel_index_ai_pnl_log.csv"
+    pnl_csv = LIVE_DIR / "dhan_index_ai_pnl_log.csv"
     if not pnl_csv.exists():
         return None
     try:

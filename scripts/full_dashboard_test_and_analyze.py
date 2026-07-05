@@ -3,14 +3,15 @@ Full Dashboard Test and Analysis
 Starts services if needed, then performs comprehensive testing and content analysis
 """
 
-import sys
-import os
 import json
-import time
-import requests
+import os
 import subprocess
+import sys
+import time
 from datetime import datetime
+
 import pytz
+import requests
 
 # Fix Unicode encoding for Windows
 if sys.platform == "win32":

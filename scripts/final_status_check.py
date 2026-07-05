@@ -1,7 +1,8 @@
 """Final Status Check"""
 
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 csv_path = Path("outputs/chain_raw_live.csv")
 if csv_path.exists():

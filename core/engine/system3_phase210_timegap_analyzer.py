@@ -5,10 +5,11 @@ Detects gaps in historical data timestamps.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -22,7 +23,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "history"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_timegap_analyzer_report.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 GAP_THRESHOLD_MINUTES = 2
 
 

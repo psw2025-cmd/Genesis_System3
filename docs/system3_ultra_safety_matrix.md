@@ -19,9 +19,9 @@ This document provides a comprehensive safety matrix for all System3 Ultra Contr
 | **BASELINE CORE** | | | | | |
 | `main_launcher` | LOW | Read-Only | No baseline write | Startup confirmation | `system3_ultra_*.log` |
 | `health_check` | LOW | Read-Only | No baseline write | Health report | `system3_ultra_*.log` |
-| `train_angel_models` | MEDIUM | Read-Write | Baseline model backup | Model files | `system3_ultra_*.log` |
-| `angel_live_ai_signals` | LOW | Shadow-Only | Auto-execute disabled | Signal CSV | `system3_ultra_*.log` |
-| `angel_trade_executor` | HIGH | DRY-RUN-Only | No real orders | Execution log | `system3_ultra_*.log` |
+| `train_dhan_models` | MEDIUM | Read-Write | Baseline model backup | Model files | `system3_ultra_*.log` |
+| `dhan_live_ai_signals` | LOW | Shadow-Only | Auto-execute disabled | Signal CSV | `system3_ultra_*.log` |
+| `dhan_trade_executor` | HIGH | DRY-RUN-Only | No real orders | Execution log | `system3_ultra_*.log` |
 | **ULTRA SHADOW** | | | | | |
 | `ultra_shadow_data_engine` | LOW | Shadow-Only | Ultra directory only | Shadow dataset | `system3_ultra_*.log` |
 | `ultra_feature_engineering` | LOW | Shadow-Only | Ultra directory only | Feature CSV | `system3_ultra_*.log` |

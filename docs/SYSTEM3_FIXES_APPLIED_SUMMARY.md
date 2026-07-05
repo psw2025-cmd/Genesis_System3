@@ -9,7 +9,7 @@
 ## ✅ FIXES APPLIED
 
 ### Fix 1: Unicode Encoding Error (CRITICAL)
-**File**: `core/engine/angel_monday_diagnostic.py`  
+**File**: `core/engine/dhan_monday_diagnostic.py`  
 **Status**: ✅ **FIXED**
 
 **Changes**:
@@ -115,7 +115,7 @@
    - Verify signals CSV is populated
 
 4. **Verify Signals**:
-   - Check `storage/live/angel_index_ai_signals.csv` for new signals
+   - Check `storage/live/dhan_index_ai_signals.csv` for new signals
    - Verify phases 221-223 no longer warn (signals available)
 
 ---

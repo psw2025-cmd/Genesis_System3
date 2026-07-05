@@ -1,0 +1,12 @@
+system3_surface,proof_source,ok,status,source_url_or_file,notes
+/api/health,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/health,safe GET proof
+/api/state,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/state,safe GET proof
+/api/broker/dhan/status,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/broker/dhan/status,safe GET proof
+/api/broker/holdings,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/broker/holdings,safe GET proof
+/api/broker/funds,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/broker/funds,safe GET proof
+/api/broker/positions/live,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/broker/positions/live,safe GET proof
+/api/instruments/health,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/instruments/health,safe GET proof
+/api/underlyings,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/underlyings,safe GET proof
+/api/chain/NIFTY,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/chain/NIFTY,safe GET proof
+/api/auto_gates,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/auto_gates,safe GET proof
+/api/paper,live_safe_get,yes,200,https://genesis-system3-backend.onrender.com/api/paper,safe GET proof

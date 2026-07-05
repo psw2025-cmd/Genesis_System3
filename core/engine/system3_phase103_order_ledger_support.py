@@ -6,10 +6,11 @@ Bridges Phase 102 (schema definition) and Phase 104 (order construction).
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Tuple, List
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

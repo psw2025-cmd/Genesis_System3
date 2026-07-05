@@ -4,12 +4,13 @@ System3 Phase 287 - Resource Usage Monitor
 Monitors system resource usage: CPU, memory, disk, file sizes.
 """
 
-import sys
 import os
-import psutil
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import psutil
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

@@ -4,11 +4,12 @@ Validates data against multiple online and offline sources
 """
 
 import json
-import requests
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
 import pytz
+import requests
 
 IST = pytz.timezone("Asia/Kolkata")
 

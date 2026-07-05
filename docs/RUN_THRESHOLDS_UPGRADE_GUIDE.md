@@ -22,7 +22,7 @@ The batch file runs all steps in sequence:
 
 After running, check these files:
 
-- `storage/live/angel_index_ai_signals_with_forward.csv` - Enriched signals
+- `storage/live/dhan_index_ai_signals_with_forward.csv` - Enriched signals
 - `logs/research/system3_signal_edge_report.md` - EV tables
 - `storage/meta/system3_live_thresholds.json` - Live thresholds
 - `docs/system3_thresholds_comparison.md` - Threshold comparison

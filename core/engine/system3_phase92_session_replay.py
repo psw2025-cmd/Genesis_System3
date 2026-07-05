@@ -4,12 +4,13 @@ System3 Phase 92 - Session Replay Player
 Reconstruct a day's events as a chronological replay log.
 """
 
-import sys
 import argparse
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import List, Dict, Any
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -22,9 +23,9 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 SESSION_REPLAY_DIR = STORAGE_ULTRA / "session_replay"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 
 SESSION_REPLAY_DIR.mkdir(parents=True, exist_ok=True)
 

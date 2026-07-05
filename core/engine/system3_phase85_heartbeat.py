@@ -4,12 +4,12 @@ System3 Phase 85 - Heartbeat Engine
 Maintain a heartbeat log: System3 alive + status, for monitoring.
 """
 
-import sys
 import argparse
+import sys
 import time
-from pathlib import Path
 from datetime import datetime
-from typing import Optional, Dict
+from pathlib import Path
+from typing import Dict, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -32,8 +32,8 @@ DEFAULT_INTERVAL = 5
 def get_system_status() -> Dict[str, str]:
     """Get current system status."""
     try:
+        from core.engine.dhan_automation_config import AUTOMATION_CONFIG
         from core.engine.ultra_safety import load_ultra_safety
-        from core.engine.angel_automation_config import AUTOMATION_CONFIG
 
         safety = load_ultra_safety()
         auto_exec = safety.get("AUTO_EXECUTE_TRADES", False) or AUTOMATION_CONFIG.auto_execute_trades

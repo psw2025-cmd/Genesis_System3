@@ -9,9 +9,10 @@ Provides a self-test endpoint for the signal engine that validates:
 
 import sys
 from pathlib import Path
-from typing import Dict, Any
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]

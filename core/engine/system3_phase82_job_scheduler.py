@@ -5,18 +5,38 @@ Provide a job scheduler abstraction to run tasks (fetch, train, eval, reports)
 in a controlled way.
 """
 
-import sys
-import json
 import argparse
+import json
+import os
+import signal
 import subprocess
+import sys
+import threading
+import time
+from datetime import date as _date_cls
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+
+def _is_today_market_holiday(d) -> tuple:
+    """Wraps core.utils.nse_holidays.is_trading_holiday; fails open
+    (treats as non-holiday) with a printed warning if the module or
+    that year's data is unavailable, so a missing/broken calendar
+    cannot silently block ALL market-dependent jobs forever."""
+    try:
+        from core.utils.nse_holidays import is_trading_holiday
+
+        return is_trading_holiday(d)
+    except Exception as exc:
+        print(f"[PH82] WARNING: nse_holidays check failed ({exc}) — " f"treating {d} as non-holiday (fail-open)")
+        return False, None
+
 
 # Paths
 CONFIG_DIR = PROJECT_ROOT / "config"
@@ -56,15 +76,61 @@ def create_default_config() -> None:
 
 
 def load_config() -> Dict[str, Any]:
-    """Load job scheduler config."""
+    """
+    Load job scheduler config.
+
+    SAFETY: a JSON parse failure here used to be silently swallowed,
+    returning {"jobs": []} — which meant the daemon kept running and
+    logging heartbeats normally while firing ZERO scheduled jobs. That
+    exact failure mode went undetected for weeks (see CHANGE_LOG entry
+    on the 2026-06-30 config repair). Now any parse failure is loud:
+    written to CHANGE_LOG.md and to a dedicated alert file the
+    dashboard/health endpoint can surface, instead of disappearing into
+    stdout that nobody was tailing.
+    """
     create_default_config()
 
     try:
         with CONFIG_JSON.open("r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            jobs = data.get("jobs", [])
+            if not jobs:
+                _alert_scheduler_config_issue("Config loaded but contains zero jobs — scheduler will do nothing.")
+            return data
     except Exception as e:
-        print(f"[PH82] Error loading config: {e}")
+        msg = f"Job scheduler config is invalid JSON — ALL jobs are dead: {e}"
+        print(f"[PH82] {msg}")
+        _alert_scheduler_config_issue(msg)
         return {"jobs": []}
+
+
+def _alert_scheduler_config_issue(message: str) -> None:
+    """Write a loud, visible alert when the scheduler config is broken
+    or empty, so this can never again fail silently for weeks."""
+    try:
+        alert_path = PROJECT_ROOT / "state" / "scheduler_config_alert.json"
+        alert_path.parent.mkdir(parents=True, exist_ok=True)
+        alert_path.write_text(
+            json.dumps(
+                {
+                    "alert": True,
+                    "message": message,
+                    "detected_at": datetime.now().isoformat(),
+                    "config_path": str(CONFIG_JSON),
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+    try:
+        log_path = PROJECT_ROOT / "CHANGE_LOG.md"
+        if log_path.exists():
+            with log_path.open("a", encoding="utf-8") as f:
+                f.write(f"\n- [SCHEDULER ALERT] {datetime.now().isoformat()} — {message}\n")
+    except Exception:
+        pass
 
 
 def load_state() -> Dict[str, Any]:
@@ -86,19 +152,30 @@ def save_state(state: Dict[str, Any]) -> None:
 
 
 def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
-    """Run a single job."""
+    """Run a single job.
+    Supports two formats:
+      module-based: {"module": "core.engine.foo"}  → python -m core.engine.foo
+      script-based: {"script": "scripts/foo.py", "args": ["--mode", "rank"]}
+    Optional: {"timeout_minutes": 10} overrides default 5-minute timeout.
+    """
     job_id = job["id"]
-    module_name = job["module"]
+    print(f"[PH82] Running job: {job.get('name', job_id)} ({job_id})...")
 
-    print(f"[PH82] Running job: {job['name']} ({job_id})...")
+    if "script" in job:
+        cmd = [sys.executable, str(PROJECT_ROOT / job["script"])] + job.get("args", [])
+    else:
+        module_name = job["module"]
+        cmd = [sys.executable, "-m", module_name]
+
+    timeout_secs = int(job.get("timeout_minutes", 5)) * 60
 
     try:
         result = subprocess.run(
-            [sys.executable, "-m", module_name],
+            cmd,
             cwd=PROJECT_ROOT,
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=timeout_secs,
         )
 
         return {
@@ -110,7 +187,7 @@ def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "last_run_time": datetime.now().isoformat(),
             "last_status": "TIMEOUT",
-            "last_error": "Job timed out after 5 minutes",
+            "last_error": f"Job timed out after {timeout_secs // 60} minutes",
         }
     except Exception as e:
         return {
@@ -211,12 +288,248 @@ def generate_log_md(state: Dict[str, Any], config: Dict[str, Any]) -> None:
             )
 
 
+_IST = timezone(timedelta(hours=5, minutes=30))
+
+
+def _now_ist() -> datetime:
+    return datetime.now(_IST)
+
+
+def _check_web_service_health(timeout_s: float = 5.0) -> bool:
+    """Best-effort check that the web service is reachable, used only to
+    gate the post_market_api_running catch-up condition. Fails closed
+    (returns False) on any error — a catch-up job that needs the API
+    running must never fire just because we couldn't tell."""
+    web_url = os.environ.get("WEB_SERVICE_URL", "").strip().rstrip("/")
+    if not web_url.lower().startswith(("http://", "https://")):
+        # Reject file:// and any other scheme outright — this must only
+        # ever reach the configured web service over HTTP(S).
+        return False
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(f"{web_url}/api/health", method="GET")
+        with urllib.request.urlopen(req, timeout=timeout_s) as resp:  # nosec B310 - scheme validated above
+            return resp.status == 200
+    except Exception:
+        return False
+
+
+def _append_daemon_log(message: str) -> None:
+    log_path = PROJECT_ROOT / "CHANGE_LOG.md"
+    if not log_path.exists():
+        return
+    try:
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(f"\n- {message}\n")
+    except Exception as e:
+        print(f"[Daemon] CHANGE_LOG write failed: {e}")
+
+
+def run_daemon() -> None:
+    """
+    Daemon loop: fires enabled jobs at their schedule_time (IST) once per day.
+    Weekdays only (skip Saturday/Sunday). Checks every 60 seconds.
+    Start: python core/engine/system3_phase82_job_scheduler.py --daemon
+    Stop:  kill $(cat state/scheduler_daemon.pid)
+    """
+    pid_file = PROJECT_ROOT / "state" / "scheduler_daemon.pid"
+    pid_file.parent.mkdir(parents=True, exist_ok=True)
+    pid_file.write_text(str(os.getpid()))
+    print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
+
+    _stop = {"flag": False}
+
+    def _handle(signum, frame):
+        print(f"[PH82-Daemon] Signal {signum} — shutting down...")
+        _stop["flag"] = True
+
+    # signal.signal() only works when called from the main thread of the main
+    # interpreter. cloud_worker.py runs this daemon inside a background
+    # threading.Thread, so registering handlers there raises ValueError before
+    # the loop ever ticks once — silently swallowed by the caller's bare
+    # except Exception, killing the scheduler thread forever with no visible
+    # crash. This was the actual root cause of the 11-day dead job loop.
+    if threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGTERM, _handle)
+        signal.signal(signal.SIGINT, _handle)
+    else:
+        print(
+            "[PH82-Daemon] Running in non-main thread — skipping OS signal "
+            "handlers (daemon=True thread exits with the process)."
+        )
+
+    from core.engine.system3_scheduler_catchup import (
+        FireStatus,
+        evaluate_job_fire,
+        load_policy,
+    )
+
+    catchup_policy = load_policy()
+
+    state = load_state()
+    if "jobs" not in state:
+        state["jobs"] = {}
+
+    # Save startup metadata
+    now_ist_str = _now_ist().isoformat()
+    state["daemon_started_at"] = now_ist_str
+    state["daemon_heartbeat"] = now_ist_str
+    state["daemon_pid"] = os.getpid()
+    save_state(state)
+
+    while not _stop["flag"]:
+        now = _now_ist()
+
+        # Periodic heartbeat update
+        state = load_state()
+        state["daemon_heartbeat"] = now.isoformat()
+        state["daemon_pid"] = os.getpid()
+
+        today_str = now.strftime("%Y-%m-%d")
+        is_weekday = now.weekday() < 5  # 0=Mon … 4=Fri
+        is_weekend = not is_weekday
+
+        config = load_config()  # hot-reload each tick
+
+        # Distinct from state["jobs"] (execution history, keyed by job_id,
+        # only populated once a job actually FIRES for the first time).
+        # A freshly (re)started daemon legitimately has state["jobs"] == {}
+        # for hours until the next scheduled job time — that is NOT the
+        # same as "config has zero jobs configured". Pushed separately so
+        # the web dashboard's health check can tell the two apart instead
+        # of raising a false "zero jobs loaded" alarm on every restart.
+        state["config_jobs_total"] = len(config.get("jobs", []))
+        state["config_jobs_enabled"] = sum(1 for j in config.get("jobs", []) if j.get("enabled", False))
+
+        # fired_keys_today is the SOLE source of truth for "already fired" —
+        # persisted in state, reloaded fresh every tick, reset on date
+        # rollover. Replaces the old in-memory last_fired/last_fired_date
+        # dicts, which reset to empty on every restart: a restart landing
+        # after a job's exact window meant it stayed missed for the rest of
+        # the day (no catch-up) AND, separately, a restart on the SAME day
+        # for a "daily" job could refire it a second time since the
+        # in-memory dedup was gone. Persisting fixes both failure modes.
+        if state.get("fired_keys_date") != today_str:
+            state["fired_keys_date"] = today_str
+            state["fired_keys_today"] = []
+        fired_keys_today = set(state.get("fired_keys_today", []))
+
+        if state.get("jobs_status_date") != today_str:
+            state["jobs_status_date"] = today_str
+            state["jobs_status_today"] = {}
+        state["jobs_status_today"] = state.get("jobs_status_today", {})
+
+        save_state(state)
+
+        for job in config.get("jobs", []):
+            if not job.get("enabled", False):
+                continue
+            job_id = job["id"]
+            sched = job.get("schedule_time", "daily")
+
+            # Day-of-week filtering: weekdays_only OR explicit days list
+            if job.get("weekdays_only", False) and not is_weekday:
+                continue
+            named_days = job.get("days")
+            if named_days and isinstance(named_days, list):
+                day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                if day_names[now.weekday()] not in named_days:
+                    continue
+
+            is_holiday, holiday_name = (False, None)
+            if job.get("market_dependent", False):
+                is_holiday, holiday_name = _is_today_market_holiday(now.date())
+
+            # NSE/BSE holiday filtering: jobs flagged market_dependent must
+            # also be skipped (and explicitly logged, not silently) on
+            # exchange holidays — weekdays_only alone fires on Diwali,
+            # Republic Day, etc, which produces misleading "validated"
+            # output for a day with no real market data.
+            if job.get("market_dependent", False) and is_holiday:
+                holiday_key = f"{today_str}|holiday|{job_id}"
+                if holiday_key not in fired_keys_today:
+                    print(
+                        f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — SKIPPING "
+                        f"{job.get('name', job_id)}: NSE/BSE holiday ({holiday_name})"
+                    )
+                    state["jobs"][job_id] = {
+                        "last_run_time": now.isoformat(),
+                        "last_status": "MARKET_CLOSED_OR_HOLIDAY",
+                        "last_error": None,
+                        "holiday_name": holiday_name,
+                    }
+                    state["jobs_status_today"][job_id] = FireStatus.SKIPPED_MARKET_CLOSED
+                    fired_keys_today.add(holiday_key)
+                    state["fired_keys_today"] = sorted(fired_keys_today)
+                    save_state(state)
+                continue
+
+            if sched.lower() == "daily":
+                daily_key = f"{today_str}|daily|{job_id}"
+                if daily_key in fired_keys_today:
+                    continue
+                should_fire, fire_status, fire_key = True, FireStatus.ON_TIME, daily_key
+            else:
+                decision = evaluate_job_fire(
+                    job=job,
+                    now=now,
+                    policy=catchup_policy,
+                    state={"fired_keys_today": list(fired_keys_today)},
+                    is_holiday=is_holiday,
+                    is_weekend=is_weekend,
+                    api_health_ok=_check_web_service_health(),
+                )
+                should_fire = decision["should_fire"]
+                fire_status = decision["status"]
+                fire_key = decision["fire_key"]
+                if fire_status not in (FireStatus.PENDING, FireStatus.SKIPPED_ALREADY_FIRED):
+                    state["jobs_status_today"][job_id] = fire_status
+                    if fire_status not in (FireStatus.ON_TIME, FireStatus.CATCH_UP):
+                        print(
+                            f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — {fire_status}: "
+                            f"{job.get('name', job_id)} — {decision['reason']}"
+                        )
+
+            if should_fire:
+                print(
+                    f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — FIRING ({fire_status}): "
+                    f"{job.get('name', job_id)}"
+                )
+                result = run_job(job)
+                result["fire_status"] = fire_status
+                state["jobs"][job_id] = result
+                state["jobs_status_today"][job_id] = (
+                    FireStatus.FAILED if result.get("last_status") in ("FAILED", "ERROR", "TIMEOUT") else fire_status
+                )
+                fired_keys_today.add(fire_key)
+                state["fired_keys_today"] = sorted(fired_keys_today)
+                save_state(state)
+                _append_daemon_log(
+                    f"[{now.strftime('%Y-%m-%d %H:%M')} IST] [Scheduler-Daemon] "
+                    f"JOB FIRED ({fire_status}): {job_id} — status={result.get('last_status', 'UNKNOWN')}"
+                )
+                print(f"[PH82-Daemon] {job_id} done — {result.get('last_status')}")
+
+        if _stop["flag"]:
+            break
+        time.sleep(60)
+
+    print(f"[PH82-Daemon] Stopped at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
+    try:
+        pid_file.unlink(missing_ok=True)
+    except Exception:
+        pass
+    save_state(state)
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="System3 Phase 82 - Job Scheduler")
     parser.add_argument("--list", action="store_true", help="List all jobs")
     parser.add_argument("--run-once", action="store_true", help="Run all enabled jobs")
     parser.add_argument("--job-id", type=str, help="Run a single job by ID")
+    parser.add_argument("--daemon", action="store_true", help="Run daemon: fire jobs at scheduled IST times")
 
     args = parser.parse_args()
 
@@ -227,6 +540,8 @@ def main():
             run_all_jobs()
         elif args.job_id:
             run_single_job(args.job_id)
+        elif args.daemon:
+            run_daemon()
         else:
             parser.print_help()
 

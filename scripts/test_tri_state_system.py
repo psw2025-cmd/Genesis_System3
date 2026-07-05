@@ -4,16 +4,17 @@ Test Tri-State System - 5 minute simulation test
 
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from scripts.smart_live_chain_runner import SmartLiveChainRunner
 from core.utils.logger import logger
+from scripts.smart_live_chain_runner import SmartLiveChainRunner
 
 IST = pytz.timezone("Asia/Kolkata")
 

@@ -63,14 +63,14 @@ The automated test run successfully executed all phases 118-142 (phases 76-100) 
 **Output**:
 ```
 [PH100] Some checks failed. SYSTEM3_CERTIFIED = FALSE
-[PH100] Missing configs: ['config/angel_automation_config.json', 'config/system3_job_scheduler.json']
+[PH100] Missing configs: ['config/dhan_automation_config.json', 'config/system3_job_scheduler.json']
 ```
 
 **Analysis**:
 - Phase 100 executed successfully
 - Certification check failed due to missing configuration files
 - Missing files:
-  - `config/angel_automation_config.json` (should exist - core config)
+  - `config/dhan_automation_config.json` (should exist - core config)
   - `config/system3_job_scheduler.json` (created on first run of Phase 82)
 
 ---
@@ -145,7 +145,7 @@ The automated test run successfully executed all phases 118-142 (phases 76-100) 
 **Phase 100 (Final Certification)**:
 - ⚠️ Some checks failed: SYSTEM3_CERTIFIED = FALSE
 - **Missing Configs**:
-  - `config/angel_automation_config.json`
+  - `config/dhan_automation_config.json`
   - `config/system3_job_scheduler.json`
 - **Analysis**: These are expected to exist but weren't found
 - **Fix**: Ensure config files exist (Phase 82 creates job_scheduler.json on first run)
@@ -160,7 +160,7 @@ The automated test run successfully executed all phases 118-142 (phases 76-100) 
 1. **Fix Missing Config Files**:
    ```bash
    # Ensure these configs exist
-   config/angel_automation_config.json
+   config/dhan_automation_config.json
    config/system3_job_scheduler.json
    ```
 

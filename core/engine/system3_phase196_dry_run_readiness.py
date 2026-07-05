@@ -4,11 +4,11 @@ System3 Phase 196 - DRY-RUN Readiness Checklist
 Verifies DRY-RUN readiness and provides explicit YES/NO.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -50,7 +50,7 @@ def run_phase196_dry_run_readiness() -> Dict[str, Any]:
         checks["dry_run_only"] = master_config.get("dry_run", True) is True
 
         # Check 2: ANGEL_ONLY
-        checks["angel_only"] = master_config.get("broker", "") == "ANGEL_ONE"
+        checks["dhan_only"] = master_config.get("broker", "") == "DHAN"
 
         # Check 3: Capital & lot-size rules
         capital_guardrail_path = STORAGE_ULTRA / "phase140_capital_guardrail.csv"
@@ -83,7 +83,7 @@ def run_phase196_dry_run_readiness() -> Dict[str, Any]:
             f.write("| Check | Status |\n")
             f.write("|-------|--------|\n")
             f.write(f"| DRY_RUN only | {'✅ PASS' if checks['dry_run_only'] else '❌ FAIL'} |\n")
-            f.write(f"| ANGEL_ONLY | {'✅ PASS' if checks['angel_only'] else '❌ FAIL'} |\n")
+            f.write(f"| ANGEL_ONLY | {'✅ PASS' if checks['dhan_only'] else '❌ FAIL'} |\n")
             f.write(
                 f"| Capital & lot-size rules obeyed | {'✅ PASS' if checks['capital_rules_obeyed'] else '❌ FAIL'} |\n"
             )

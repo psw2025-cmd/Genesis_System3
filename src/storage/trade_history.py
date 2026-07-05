@@ -1,12 +1,14 @@
 """
 Trade History Storage - Stores all paper trades
 """
-import sys
-from pathlib import Path
-from datetime import datetime
-from typing import List, Dict
-import pandas as pd
+
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
+
+import pandas as pd
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -20,47 +22,52 @@ class TradeHistoryStore:
     """
     Stores trade history to CSV and JSON.
     """
-    
+
     def __init__(self):
         """Initialize trade history store."""
         self.output_dir = ROOT_DIR / "outputs"
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.trades_csv = self.output_dir / "paper_trades_live.csv"
         self.positions_json = self.output_dir / "positions_live.json"
         self.pnl_json = self.output_dir / "pnl_live.json"
-        
+
     def save_trade(self, trade: Dict):
         """
         Save a single trade to CSV with consistent column structure.
-        
+
         Args:
             trade: Trade dict from PaperExecutor
         """
         # Define standard columns (always present)
         standard_columns = [
-            'position_id', 'action', 'timestamp', 'time_ist', 'underlying', 
-            'strike', 'option_type', 'price', 'qty', 'strategy'
+            "position_id",
+            "action",
+            "timestamp",
+            "time_ist",
+            "underlying",
+            "strike",
+            "option_type",
+            "price",
+            "qty",
+            "strategy",
         ]
-        
+
         # Optional columns for CLOSE actions
-        optional_columns = [
-            'exit_reason', 'realized_pnl', 'realized_pnl_pct', 
-            'entry_price', 'exit_price'
-        ]
-        
+        optional_columns = ["exit_reason", "realized_pnl", "realized_pnl_pct", "entry_price", "exit_price"]
+
         # Build trade data with standard columns first
         trade_data = {}
         for col in standard_columns:
             trade_data[col] = trade.get(col, None)
-        
+
         # Add optional columns if present in trade dict
         for col in optional_columns:
             if col in trade:
                 trade_data[col] = trade.get(col, None)
-        
+
         df = pd.DataFrame([trade_data])
-        
+
         # Read existing file to get all columns (for consistency)
         if self.trades_csv.exists():
             try:
@@ -99,40 +106,40 @@ class TradeHistoryStore:
                 if col not in df.columns:
                     df[col] = None
             df = df[all_columns]
-        
+
         # Append to CSV
         if self.trades_csv.exists():
-            df.to_csv(self.trades_csv, mode='a', header=False, index=False)
+            df.to_csv(self.trades_csv, mode="a", header=False, index=False)
         else:
-            df.to_csv(self.trades_csv, mode='w', header=True, index=False)
-    
+            df.to_csv(self.trades_csv, mode="w", header=True, index=False)
+
     def save_positions(self, positions: List[Dict], summary: Dict):
         """
         Save current positions to JSON.
-        
+
         Args:
             positions: List of open positions
             summary: Positions summary
         """
         data = {
-            'timestamp_ist': datetime.now(pytz.timezone('Asia/Kolkata')).strftime('%Y-%m-%d %H:%M:%S IST'),
-            'open_positions': positions,
-            'summary': summary
+            "timestamp_ist": datetime.now(pytz.timezone("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S IST"),
+            "open_positions": positions,
+            "summary": summary,
         }
-        
-        with open(self.positions_json, 'w', encoding='utf-8') as f:
+
+        with open(self.positions_json, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, default=str)
-    
+
     def save_pnl(self, pnl_summary: Dict):
         """
         Save PnL summary to JSON.
-        
+
         Args:
             pnl_summary: PnL summary from PnLTracker
         """
-        with open(self.pnl_json, 'w', encoding='utf-8') as f:
+        with open(self.pnl_json, "w", encoding="utf-8") as f:
             json.dump(pnl_summary, f, indent=2, default=str)
-    
+
     def get_trade_history_df(self) -> pd.DataFrame:
         """Get trade history as DataFrame."""
         if self.trades_csv.exists():

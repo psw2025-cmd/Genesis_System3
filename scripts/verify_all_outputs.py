@@ -2,11 +2,12 @@
 Verify All Outputs - Simple checker without encoding issues
 """
 
-import sys
 import json
 import os
-import pandas as pd
+import sys
 from pathlib import Path
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 

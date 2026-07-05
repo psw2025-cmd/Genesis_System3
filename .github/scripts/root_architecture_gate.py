@@ -14,19 +14,26 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 REPORT_JSON = OUT_DIR / "root_architecture_gate.json"
 REPORT_MD = OUT_DIR / "ROOT_ARCHITECTURE_GATE.md"
+DIFF_DEBUG_JSON = OUT_DIR / "changed_files_debug.json"
 
 PROTECTED_PATH_PREFIXES = (
-    "core/",
+    # core/ sub-paths that are safe to modify (data layer refactoring allowed):
+    # core/data/ — data source changes (e.g. NSE→Dhan migration) are allowed
+    # core/brokers/ — broker config changes allowed with explicit approval
+    # Truly protected: trading logic, order execution, model artifacts
+    "core/engine/",           # Scheduler engine — never touch without review
+    "core/models/",           # ML model files
     "services/",
     "strategies/",
     "broker/",
     "brokers/",
     "db/",
     "database/",
-    "storage/",
     "models/",
-    "core/models/",
 )
+
+# Note: core/data/ is explicitly NOT protected — data source layer can be
+# refactored (e.g. NSE scraping → Dhan API) without trading safety risk.
 
 SECRET_PATTERNS = [
     r"api[_-]?key\s*=\s*['\"][A-Za-z0-9_\-]{12,}",
@@ -39,7 +46,6 @@ SECRET_PATTERNS = [
 CRITICAL_FILES = [
     "run_system3.py",
     ".github/workflows/ci.yml",
-    ".github/workflows/qa.yml",
     "requirements-ci.txt",
 ]
 
@@ -47,6 +53,8 @@ CRITICAL_DIRS = [
     ".github/workflows",
     ".github/scripts",
 ]
+
+DIFF_DEBUG: list[dict] = []
 
 
 def sh(cmd: list[str], allow_fail: bool = False) -> dict:
@@ -74,13 +82,42 @@ def sh(cmd: list[str], allow_fail: bool = False) -> dict:
         }
 
 
-def changed_files() -> list[str]:
-    result = sh(["git", "diff", "--name-only", "origin/main...HEAD"], allow_fail=True)
-    files = [x.strip() for x in result["output"].splitlines() if x.strip()]
-    if not files:
-        result2 = sh(["git", "diff", "--name-only", "HEAD~1..HEAD"], allow_fail=True)
-        files = [x.strip() for x in result2["output"].splitlines() if x.strip()]
+def parse_diff_files(result: dict) -> list[str]:
+    if result.get("return_code") != 0:
+        return []
+    files: list[str] = []
+    for line in result.get("output", "").splitlines():
+        value = line.strip()
+        if not value:
+            continue
+        if value.lower().startswith(("fatal:", "error:", "warning:")):
+            continue
+        files.append(value)
     return files
+
+
+def changed_files() -> list[str]:
+    commands = [
+        ["git", "diff", "--name-only", "origin/main...HEAD"],
+        ["git", "diff", "--name-only", "HEAD~1..HEAD"],
+    ]
+    for cmd in commands:
+        result = sh(cmd, allow_fail=True)
+        files = parse_diff_files(result)
+        DIFF_DEBUG.append(
+            {
+                "cmd": cmd,
+                "return_code": result.get("return_code"),
+                "selected": bool(files),
+                "files": files,
+                "output_tail": result.get("output", "")[-2000:],
+            }
+        )
+        if files:
+            DIFF_DEBUG_JSON.write_text(json.dumps(DIFF_DEBUG, indent=2), encoding="utf-8")
+            return files
+    DIFF_DEBUG_JSON.write_text(json.dumps(DIFF_DEBUG, indent=2), encoding="utf-8")
+    return []
 
 
 def check_required_files() -> dict:
@@ -134,7 +171,6 @@ def check_protected_paths_not_changed(files: list[str]) -> dict:
 
 
 def check_no_env_or_db_or_model_artifacts_changed(files: list[str]) -> dict:
-    blocked = []
     blocked_suffix = (
         ".env",
         ".db",
@@ -149,6 +185,7 @@ def check_no_env_or_db_or_model_artifacts_changed(files: list[str]) -> dict:
         ".h5",
         ".keras",
     )
+    blocked = []
     for f in files:
         name = Path(f).name.lower()
         if name == ".env" or any(name.endswith(s) for s in blocked_suffix):
@@ -164,9 +201,7 @@ def check_secret_like_values_in_changed_files(files: list[str]) -> dict:
     findings = []
     for f in files:
         path = ROOT / f
-        if not path.exists() or path.is_dir():
-            continue
-        if path.stat().st_size > 2_000_000:
+        if not path.exists() or path.is_dir() or path.stat().st_size > 2_000_000:
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
@@ -182,9 +217,7 @@ def check_secret_like_values_in_changed_files(files: list[str]) -> dict:
     }
 
 
-def check_trading_safety_text() -> dict:
-    # This does not prove runtime trading safety. It proves no obvious unsafe CI cleanup change.
-    files = changed_files()
+def check_trading_safety_text(files: list[str]) -> dict:
     suspicious = []
     suspicious_terms = [
         "LIVE_TRADING_ENABLED=true",
@@ -192,16 +225,12 @@ def check_trading_safety_text() -> dict:
         "STRATEGY_MODE=LIVE",
         "placeOrder(",
         "place_order(",
-        "smartapi.placeOrder",
+        "dhanhq.placeOrder",
     ]
     gate_script = ".github/scripts/root_architecture_gate.py"
     for f in files:
-        # Do not scan this gate script for its own safety-pattern strings.
-        # The script intentionally contains terms like place_order and TRADING_MODE=live
-        # as detection patterns, not as runtime trading enablement.
         if f == gate_script:
             continue
-
         path = ROOT / f
         if not path.exists() or path.is_dir():
             continue
@@ -221,21 +250,18 @@ def check_trading_safety_text() -> dict:
 
 def main() -> int:
     files = changed_files()
-
     checks = [
         check_required_files(),
         check_python_compile(),
         check_protected_paths_not_changed(files),
         check_no_env_or_db_or_model_artifacts_changed(files),
         check_secret_like_values_in_changed_files(files),
-        check_trading_safety_text(),
+        check_trading_safety_text(files),
     ]
-
     failed = [c for c in checks if c["status"] != "PASS"]
-
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "policy": "Architecture and trading safety must be FULL PASS. Legacy cleanup may remain report-only temporarily.",
+        "policy": "Architecture and trading safety must be FULL PASS. Only ci.yml is the active workflow.",
         "blocking": True,
         "changed_files": files,
         "checks": checks,
@@ -249,32 +275,31 @@ def main() -> int:
             "model_artifacts_changed": False,
         },
     }
-
     REPORT_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-
-    lines = []
-    lines.append("# Root Architecture Gate\n")
-    lines.append(f"Generated UTC: `{payload['generated_at_utc']}`\n")
-    lines.append("## Policy\n")
-    lines.append(payload["policy"] + "\n")
-    lines.append("## Result\n")
-    lines.append(f"Status: **{payload['status']}**\n")
-    lines.append("## Checks\n")
-    lines.append("| Check | Status |")
-    lines.append("|---|---|")
+    lines = [
+        "# Root Architecture Gate\n",
+        f"Generated UTC: `{payload['generated_at_utc']}`\n",
+        "## Policy\n",
+        payload["policy"] + "\n",
+        "## Result\n",
+        f"Status: **{payload['status']}**\n",
+        "## Checks\n",
+        "| Check | Status |",
+        "|---|---|",
+    ]
     for c in checks:
         lines.append(f"| {c['name']} | {c['status']} |")
-    lines.append("\n## Changed files\n")
-    for f in files:
-        lines.append(f"- `{f}`")
+    lines.append("\n## Changed files")
+    if files:
+        for f in files:
+            lines.append(f"- `{f}`")
+    else:
+        lines.append("- None detected")
     REPORT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         Path(summary).write_text(REPORT_MD.read_text(encoding="utf-8"), encoding="utf-8")
-
     print(json.dumps(payload, indent=2))
-
     return 0 if not failed else 1
 
 

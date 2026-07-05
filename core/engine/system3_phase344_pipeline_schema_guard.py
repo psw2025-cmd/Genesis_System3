@@ -7,12 +7,13 @@ Detects column mismatches, type issues, and missing required fields.
 Mode: Pre-market and before OP cycle.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -39,10 +40,10 @@ def run_phase_344_pipeline_schema_guard(root_path: str = None, logger_obj=None) 
     try:
         # Define expected schema per CSV (aligned with actual writer implementations)
         expected_schema = {
-            "angel_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
-            "angel_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+            "dhan_index_ai_signals.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
+            "dhan_index_ai_signals_curated.csv": ["underlying", "symbol", "signal", "final_score", "ts"],
             # Matches live_execution_engine.py::log_virtual_orders() - 15 columns
-            "angel_virtual_orders.csv": [
+            "dhan_virtual_orders.csv": [
                 "ts",
                 "underlying",
                 "strike",
@@ -59,8 +60,8 @@ def run_phase_344_pipeline_schema_guard(root_path: str = None, logger_obj=None) 
                 "risk_flags_json",
                 "snapshot_id",
             ],
-            # Matches angel_pnl_simulator.py::run_pnl_simulation() - 15 columns
-            "angel_index_ai_pnl_log.csv": [
+            # Matches dhan_pnl_simulator.py::run_pnl_simulation() - 15 columns
+            "dhan_index_ai_pnl_log.csv": [
                 "ts",
                 "underlying",
                 "strike",

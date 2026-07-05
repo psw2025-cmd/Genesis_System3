@@ -8,22 +8,22 @@ Quick reference for checking Phase 7-9 results.
 
 ### Check if CSV file exists:
 ```bash
-dir storage\learning\angel_index_real_master_dataset.csv
+dir storage\learning\dhan_index_real_master_dataset.csv
 ```
 
 ### View first 10 rows of master dataset:
 ```bash
-python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}'); print(f'\nColumns: {list(df.columns)}')"
+python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(df.head(10).to_string()); print(f'\nTotal rows: {len(df)}'); print(f'\nColumns: {list(df.columns)}')"
 ```
 
 ### Check file size and row count:
 ```bash
-python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(f'Total Rows: {len(df)}'); print(f'Total Columns: {len(df.columns)}'); print(f'\nColumn Names:\n{list(df.columns)}'); print(f'\nData Types:\n{df.dtypes}')"
+python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(f'Total Rows: {len(df)}'); print(f'Total Columns: {len(df.columns)}'); print(f'\nColumn Names:\n{list(df.columns)}'); print(f'\nData Types:\n{df.dtypes}')"
 ```
 
 ### View summary statistics:
 ```bash
-python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_real_master_dataset.csv'); print(df.describe())"
+python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\dhan_index_real_master_dataset.csv'); print(df.describe())"
 ```
 
 ---
@@ -32,33 +32,33 @@ python -c "import pandas as pd; df=pd.read_csv(r'storage\learning\angel_index_re
 
 ### Check if blended models directory exists:
 ```bash
-dir core\models\angel_one_real_blended
+dir core\models\dhan_real_blended
 ```
 
 ### List all blended model files:
 ```bash
-dir core\models\angel_one_real_blended\*.pkl
-dir core\models\angel_one_real_blended\*.json
+dir core\models\dhan_real_blended\*.pkl
+dir core\models\dhan_real_blended\*.json
 ```
 
 ### View NIFTY model metadata:
 ```bash
-type core\models\angel_one_real_blended\NIFTY_model_blended_v3_meta.json
+type core\models\dhan_real_blended\NIFTY_model_blended_v3_meta.json
 ```
 
 ### View all model metadata files:
 ```bash
-type core\models\angel_one_real_blended\*_meta.json
+type core\models\dhan_real_blended\*_meta.json
 ```
 
 ### Verify baseline models are untouched:
 ```bash
-dir core\models\angel_one\*.pkl
+dir core\models\dhan\*.pkl
 ```
 
 ### Count total files in blended directory:
 ```bash
-python -c "from pathlib import Path; p = Path('core/models/angel_one_real_blended'); files = list(p.glob('*')); print(f'Total files: {len(files)}'); [print(f.name) for f in files]"
+python -c "from pathlib import Path; p = Path('core/models/dhan_real_blended'); files = list(p.glob('*')); print(f'Total files: {len(files)}'); [print(f.name) for f in files]"
 ```
 
 ---
@@ -73,7 +73,7 @@ python run_system3.py
 
 ### Or run directly:
 ```bash
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 ### Check current profile config:
@@ -83,7 +83,7 @@ type storage\config\system3_live_beta_profile.json
 
 ### Verify model selector can load models:
 ```bash
-python -c "from core.engine.angel_model_selector import get_active_profile, load_models_for_profile; profile = get_active_profile(); print(f'Active Profile: {profile}'); models = load_models_for_profile(profile); print(f'Models loaded: {len(models[\"models\"])}'); [print(f'{u}: {p}') for u, p in models['model_paths'].items()]"
+python -c "from core.engine.dhan_model_selector import get_active_profile, load_models_for_profile; profile = get_active_profile(); print(f'Active Profile: {profile}'); models = load_models_for_profile(profile); print(f'Models loaded: {len(models[\"models\"])}'); [print(f'{u}: {p}') for u, p in models['model_paths'].items()]"
 ```
 
 ---
@@ -97,7 +97,7 @@ import pandas as pd
 from pathlib import Path
 
 print('=== PHASE 7 VERIFICATION ===')
-csv_path = Path('storage/learning/angel_index_real_master_dataset.csv')
+csv_path = Path('storage/learning/dhan_index_real_master_dataset.csv')
 if csv_path.exists():
     df = pd.read_csv(csv_path)
     print(f'✅ Master Dataset CSV: {len(df)} rows, {len(df.columns)} columns')
@@ -106,7 +106,7 @@ else:
     print('❌ Master Dataset CSV: NOT FOUND')
 
 print('\n=== PHASE 8 VERIFICATION ===')
-blended_dir = Path('core/models/angel_one_real_blended')
+blended_dir = Path('core/models/dhan_real_blended')
 if blended_dir.exists():
     pkl_files = list(blended_dir.glob('*.pkl'))
     json_files = list(blended_dir.glob('*.json'))
@@ -119,7 +119,7 @@ else:
     print('❌ Blended Models Directory: NOT FOUND')
 
 print('\n=== PHASE 9 VERIFICATION ===')
-from core.engine.angel_model_selector import get_active_profile, load_models_for_profile
+from core.engine.dhan_model_selector import get_active_profile, load_models_for_profile
 profile = get_active_profile()
 models = load_models_for_profile(profile)
 print(f'✅ Active Profile: {profile}')
@@ -136,7 +136,7 @@ for u, p in models['model_paths'].items():
 ### Phase 7 Expected Output:
 ```
 ✅ Master Dataset CSV: <N> rows, <M> columns
-   File: storage/learning/angel_index_real_master_dataset.csv
+   File: storage/learning/dhan_index_real_master_dataset.csv
 ```
 
 ### Phase 8 Expected Output:
@@ -186,7 +186,7 @@ python run_system3.py
 type storage\config\system3_live_beta_profile.json
 
 # Run directly
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 ---

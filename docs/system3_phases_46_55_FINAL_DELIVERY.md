@@ -74,7 +74,7 @@ All 10 phases (46-55) of the Final Evolution Pack have been successfully impleme
 
 1. **No Baseline Modifications**: ✅
    - All modules in `core/ultra/`
-   - No changes to `core/models/angel_one/`
+   - No changes to `core/models/dhan/`
    - No changes to baseline configs
 
 2. **Additive Only**: ✅
@@ -166,7 +166,7 @@ python system3_ultra.py
 ### Step 5: Verify No Baseline Changes
 
 **Check these directories**:
-- `core/models/angel_one/` - Should have no new files from phases 46-55
+- `core/models/dhan/` - Should have no new files from phases 46-55
 - `storage/config/` - Baseline configs unchanged
 - `core/engine/` - No overwritten files (only new `system3_phase*` files if any)
 

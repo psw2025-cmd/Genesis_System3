@@ -8,7 +8,7 @@
 ## Executive Summary
 
 ### Purpose
-This plan defines **30 new phases (101-130)** that add **Angel One LIVE trading automation** to System3, specifically for **Mode 1 (Indian Market Only)**. The implementation is designed to be:
+This plan defines **30 new phases (101-130)** that add **Dhan LIVE trading automation** to System3, specifically for **Mode 1 (Indian Market Only)**. The implementation is designed to be:
 
 - ✅ **Safe & Layered**: Multiple safety checks and guards
 - ✅ **Fully Configurable**: All real trading controlled by config flags
@@ -32,7 +32,7 @@ This plan defines **30 new phases (101-130)** that add **Angel One LIVE trading 
 |-------|------|---------|-------------|
 | **101** | Live Trading Config + Sanity Check | Central config layer + pre-market check script | `config/live_trade_config.py`, `storage/live/phase101_live_trade_config_snapshot.json` |
 | **102** | Local Order Ledger Schema | Define canonical CSV ledger for all live trades | `storage/live/live_orders_ledger.csv` (with header) |
-| **103** | AngelOne Low-Level Order Wrapper | Abstract AngelOne SmartAPI order placement (skeleton) | `core/broker/angel_live_order_wrapper.py` (class skeleton) |
+| **103** | Dhan Low-Level Order Wrapper | Abstract Dhan DhanHQ order placement (skeleton) | `core/broker/dhan_live_order_wrapper.py` (class skeleton) |
 | **104** | Trade Plan → Local Order Construction | Convert trade plan CSV rows to ledger orders | Appended rows to `live_orders_ledger.csv` |
 | **105** | Ledger Integrity Checker | Validate ledger sanity before execution | Validation dict, `logs/phase105_ledger_integrity_issues.log` |
 
@@ -40,13 +40,13 @@ This plan defines **30 new phases (101-130)** that add **Angel One LIVE trading 
 
 ---
 
-### Group 2: AngelOne Execution Wrapper & Dry-Run Mirroring (106-110)
+### Group 2: Dhan Execution Wrapper & Dry-Run Mirroring (106-110)
 **Purpose**: Execution layer with dry-run capability
 
 | Phase | Name | Purpose | Key Outputs |
 |-------|------|---------|-------------|
 | **106** | Live Execution DRY-RUN Bridge | Wire ledger to existing DRY RUN executor | Updated ledger (DRY_RUN_FILLED), `logs/phase106_dryrun_execution.log` |
-| **107** | AngelOne LIVE Execution | Actual real-order placement (guarded, OFF by default) | Updated ledger (SENT/FILLED), `logs/phase107_live_execution_engine.log` |
+| **107** | Dhan LIVE Execution | Actual real-order placement (guarded, OFF by default) | Updated ledger (SENT/FILLED), `logs/phase107_live_execution_engine.log` |
 | **108** | Order Status Refresher | Pull order statuses from Angel and update ledger | Updated ledger statuses |
 | **109** | Intraday Risk Guard | Enforce capital and drawdown limits | Risk check dict (OK/BLOCK) |
 | **110** | Stop-Loss & Exit Rule Builder | Build conservative SL/TP rules per trade | `storage/live/phase110_exit_rules_pending.json` |
@@ -172,11 +172,11 @@ broker_status, last_update_ts, pnl_absolute, pnl_percent, exit_price, exit_reaso
 
 ---
 
-## AngelOne Order Wrapper
+## Dhan Order Wrapper
 
-### `core/broker/angel_live_order_wrapper.py`
+### `core/broker/dhan_live_order_wrapper.py`
 
-**Purpose**: Abstract AngelOne SmartAPI order placement
+**Purpose**: Abstract Dhan DhanHQ order placement
 
 **Class Structure**:
 ```python
@@ -190,7 +190,7 @@ class AngelLiveOrderWrapper:
 **Current Implementation**: 
 - **Skeleton only** - No real API calls
 - Returns `"status": "ERROR", "error": "NOT_IMPLEMENTED"` or `"DRY_RUN"`
-- Real SmartAPI integration to be added later by Pritam
+- Real DhanHQ integration to be added later by Pritam
 
 **Safety**: This is the **ONLY** place where real broker API calls will be made. All other phases use this wrapper.
 
@@ -371,7 +371,7 @@ if kill_switch_path.exists():
    - Action: Cursor agent must inspect existing code and reuse
 
 2. **Trade Plan CSV**
-   - Location: `storage/live/angel_index_ai_trades_plan.csv`
+   - Location: `storage/live/dhan_index_ai_trades_plan.csv`
    - Used by: Phase 104
    - Format: Existing System3 trade planning output
 
@@ -381,14 +381,14 @@ if kill_switch_path.exists():
    - Action: Connect ledger to existing Real Outcome files
 
 4. **SmartConnect Session**
-   - Location: Existing Angel One integration
+   - Location: Existing Dhan integration
    - Used by: Phase 103 (AngelLiveOrderWrapper)
    - Action: Pass existing SmartConnect session to wrapper
 
 ### New Components to Create
 
 1. **Config File**: `config/live_trade_config.py`
-2. **Broker Wrapper**: `core/broker/angel_live_order_wrapper.py`
+2. **Broker Wrapper**: `core/broker/dhan_live_order_wrapper.py`
 3. **Order Ledger**: `storage/live/live_orders_ledger.csv`
 4. **Phase Modules**: `core/engine/system3_phaseNNN_*.py` (101-120)
 5. **Stub Modules**: `core/engine/system3_phaseNNN_*.py` (121-130)
@@ -406,7 +406,7 @@ if kill_switch_path.exists():
 - `config/live_trade_config.py`
 
 **Broker**:
-- `core/broker/angel_live_order_wrapper.py`
+- `core/broker/dhan_live_order_wrapper.py`
 
 **Phase Modules (101-120)**:
 - `core/engine/system3_phase101_live_trade_config_check.py`
@@ -539,7 +539,7 @@ python -m core.engine.system3_phase114_live_session_health
 
 ## Critical Implementation Notes
 
-1. **Phase 103 (Wrapper)**: Must remain DRY_RUN/STUB until Pritam explicitly enables real SmartAPI integration
+1. **Phase 103 (Wrapper)**: Must remain DRY_RUN/STUB until Pritam explicitly enables real DhanHQ integration
 2. **Phase 107 (Live Execution)**: Must check `LIVE_TRADING_ENABLED` and abort if False
 3. **Phase 106 (Dry-Run)**: Must reuse existing DRY RUN executor from System3
 4. **Phase 104 (Trade Plan)**: Must check for duplicates before appending to ledger
@@ -557,7 +557,7 @@ python -m core.engine.system3_phase114_live_session_health
 1. **DRY RUN Executor**: Need to locate existing DRY RUN executor module name/path
 2. **SmartConnect Session**: Need to understand how existing SmartConnect session is managed
 3. **Lot Size**: Need to determine lot size calculation (assume 1 for now, log warning)
-4. **Trade Plan CSV Format**: Need to verify exact column names in `angel_index_ai_trades_plan.csv`
+4. **Trade Plan CSV Format**: Need to verify exact column names in `dhan_index_ai_trades_plan.csv`
 5. **Real Outcome Files**: Need to verify format of existing Real Outcome files for Phase 117
 
 ---

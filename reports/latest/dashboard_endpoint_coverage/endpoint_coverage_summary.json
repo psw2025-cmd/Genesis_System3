@@ -1,444 +1,1005 @@
 {
+  "generated_utc": "2026-06-14T16:23:21.552528+00:00",
   "base_url": "https://genesis-system3-backend.onrender.com",
-  "by_category": {
-    "agent": {
-      "failed": [],
-      "ok": 4,
-      "total": 4
-    },
-    "broker": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    },
-    "core": {
-      "failed": [],
-      "ok": 6,
-      "total": 6
-    },
-    "data": {
-      "failed": [],
-      "ok": 1,
-      "total": 1
-    },
-    "forensic": {
-      "failed": [],
-      "ok": 1,
-      "total": 1
-    },
-    "learning": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    },
-    "logs": {
-      "failed": [],
-      "ok": 1,
-      "total": 1
-    },
-    "ml": {
-      "failed": [],
-      "ok": 3,
-      "total": 3
-    },
-    "paper": {
-      "failed": [],
-      "ok": 6,
-      "total": 6
-    },
-    "prediction": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    },
-    "proof": {
-      "failed": [],
-      "ok": 1,
-      "total": 1
-    },
-    "risk": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    },
-    "runner": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    },
-    "security": {
-      "failed": [],
-      "ok": 1,
-      "total": 1
-    },
-    "signals": {
-      "failed": [],
-      "ok": 3,
-      "total": 3
-    },
-    "validation": {
-      "failed": [],
-      "ok": 2,
-      "total": 2
-    }
-  },
-  "core_ok": true,
-  "fail_count": 0,
-  "generated_utc": "2026-06-11T04:58:52.813729+00:00",
-  "note": "This workflow probes GET/read-only endpoints only. POST endpoints that can mutate state are not executed.",
-  "ok_count": 39,
-  "results": [
+  "gate": "dashboard_endpoint_coverage",
+  "pass": true,
+  "status": "PASS",
+  "required_endpoints_total": 5,
+  "required_endpoints_ok": 5,
+  "required_endpoints_failed": 0,
+  "optional_endpoints_total": 6,
+  "optional_endpoints_ok": 6,
+  "safety_checks_passed": [
+    "/api/health: live_allowed_must_be_false OK",
+    "/api/broker/status: no_live_order_placement OK",
+    "/api/state: mode_not_live OK"
+  ],
+  "safety_violations": [],
+  "all_required_endpoints_pass": true,
+  "no_safety_violations": true,
+  "browser_visual_truth_proven": false,
+  "api_db_report_reconciliation_proven": false,
+  "endpoint_coverage_complete": true,
+  "broker_connected": true,
+  "broker_error": null,
+  "health_status": "ok",
+  "live_allowed": false,
+  "state_mode": "PAPER",
+  "live_trading_enabled": false,
+  "system3_live_trading_allowed": false,
+  "endpoints": [
     {
-      "body_preview": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"https://genesis-system3-backend.onrender.com\",\"dashboard_url\":\"https://genesis-system3-backend.onrender.com\",\"api_docs\":\"https://genesis-system3-backend.onrender.com/docs\",\"health\":\"https://genesis-system3-backend.onrender.com/api/health\",\"state\":\"https://genesis-system3-backend.onrender.com/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\"}}",
-      "category": "core",
-      "elapsed_ms": 21310,
+      "url": "https://genesis-system3-backend.onrender.com/health",
       "ok": true,
-      "path": "/",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/"
+      "http": 200,
+      "latency_ms": 910,
+      "json": {
+        "status": "ok",
+        "mode": "PAPER",
+        "broker_status": "connected",
+        "market_status": "closed",
+        "data_source": "live",
+        "live_allowed": false,
+        "live_blockers": [
+          "Live trading permanently disabled in analyzer mode"
+        ],
+        "broker": {
+          "connected": true,
+          "name": "dhan",
+          "status": "connected",
+          "error": null
+        },
+        "market": {
+          "is_open": false,
+          "reason": "closed"
+        },
+        "cycle_count": 0,
+        "refresh_interval": 5,
+        "last_fetch": "2026-06-14T21:53:22.155025+05:30",
+        "qc_status": "PASS",
+        "qc_failures": [],
+        "trades_executed": 0,
+        "open_positions": 0,
+        "total_pnl": 0.0,
+        "daily_pnl": 0.0,
+        "performance_sla": {
+          "cycle_duration_sec": 0,
+          "fetch_duration_sec": 0,
+          "strategy_duration_sec": 0,
+          "sla_pass": true
+        },
+        "message": "ANALYZER_READY - Broker connected, paper mode active"
+      },
+      "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-14T21:53:22.155025+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_",
+      "endpoint": "/health",
+      "required": true
     },
     {
-      "body_preview": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Ultra Dashboard API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\noauth2RedirectUrl: window.location.origin + '/docs/oauth2-redirect',\n    presets: [\n        SwaggerUIBundle.presets.apis,\n        SwaggerUIBundle.SwaggerUIStandalonePreset\n        ],\n    })\n    </script>\n    </body>\n    </html>\n    ",
-      "category": "core",
-      "elapsed_ms": 217,
+      "url": "https://genesis-system3-backend.onrender.com/api/health",
       "ok": true,
-      "path": "/docs",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/docs"
+      "http": 200,
+      "latency_ms": 635,
+      "json": {
+        "status": "ok",
+        "mode": "PAPER",
+        "broker_status": "connected",
+        "market_status": "closed",
+        "data_source": "live",
+        "live_allowed": false,
+        "live_blockers": [
+          "Live trading permanently disabled in analyzer mode"
+        ],
+        "broker": {
+          "connected": true,
+          "name": "dhan",
+          "status": "connected",
+          "error": null
+        },
+        "market": {
+          "is_open": false,
+          "reason": "closed"
+        },
+        "cycle_count": 0,
+        "refresh_interval": 5,
+        "last_fetch": "2026-06-14T21:53:23.027208+05:30",
+        "qc_status": "PASS",
+        "qc_failures": [],
+        "trades_executed": 0,
+        "open_positions": 0,
+        "total_pnl": 0.0,
+        "daily_pnl": 0.0,
+        "performance_sla": {
+          "cycle_duration_sec": 0,
+          "fetch_duration_sec": 0,
+          "strategy_duration_sec": 0,
+          "sla_pass": true
+        },
+        "message": "ANALYZER_READY - Broker connected, paper mode active"
+      },
+      "snippet": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-06-14T21:53:23.027208+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_",
+      "endpoint": "/api/health",
+      "required": true
     },
     {
-      "body_preview": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"System3 Ultra Dashboard API\",\"version\":\"0.1.0\"},\"paths\":{\"/\":{\"get\":{\"summary\":\"Root\",\"operationId\":\"root__get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}}}}},\"/api/state\":{\"get\":{\"summary\":\"Get State\",\"description\":\"Get unified runtime state (SSOT).\\nAll pages should read from this endpoint for consistency.\\nPRODUCTION: Never expose mode=LIVE when broker disconnected or data synthetic.\",\"operationId\":\"get_state_api_state_get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}}}}},\"/api/state/history\":{\"get\":{\"summary\":\"Get State History\",\"description\":\"Get SSOT state history (time series).\\nUseful for tracking state changes over time.\",\"operationId\":\"get_state_history_api_state_history_get\",\"parameters\":[{\"name\":\"limit\",\"in\":\"query\",\"required\":false,\"schema\":{\"type\":\"integer\",\"default\":100,\"title\":\"Limit\"}}],\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{}}}},\"422\":{\"description\":\"Validation Error\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/HTTPValidationError\"}}}",
-      "category": "core",
-      "elapsed_ms": 278,
+      "url": "https://genesis-system3-backend.onrender.com/api/state",
       "ok": true,
-      "path": "/openapi.json",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/openapi.json"
+      "http": 200,
+      "latency_ms": 344,
+      "json": {
+        "state_version": 30,
+        "timestamp_utc": "2026-06-14T16:23:22.157083Z",
+        "timestamp_ist": "2026-06-14T21:53:22.157084+05:30",
+        "mode": "PAPER",
+        "data_source": "SYNTHETIC",
+        "market": {
+          "is_open": false,
+          "reason": "Market closed: Weekend (Sunday)",
+          "next_open": "2026-06-15 09:15:00 IST",
+          "current_time_ist": "2026-06-14T21:53:22.155641+05:30"
+        },
+        "broker": {
+          "broker": "dhan",
+          "mode": "ANALYZER",
+          "connected": true,
+          "live_trading_enabled": false,
+          "order_placement_allowed": false,
+          "credentials_present": true,
+          "latency_ms": 252,
+          "error": null,
+          "sdk_available": true,
+          "env_source": "core.utils.env_loader"
+        },
+        "qc": {
+          "status": "PASS",
+          "reasons": [],
+          "contracts_total": 0,
+          "underlyings": 0,
+          "failures": []
+        },
+        "signals": {
+          "status": "NO_TRADE",
+          "underlying": null,
+          "confidence": 0,
+          "reason": "No signal generated",
+          "last_signal": null
+        },
+        "positions": [],
+        "pnl": {
+          "unrealized": 0.0,
+          "realized": 0.0,
+          "total": 0.0,
+          "day_total": 0.0
+        },
+        "risk": {
+          "var95": 0.0,
+          "es95": 0.0,
+          "exposure": 0.0,
+          "concentration": 0.0,
+          "greeks": {
+            "delta": 0.0,
+            "gamma": 0.0,
+            "theta": 0.0,
+            "vega": 0.0
+          },
+          "limits": {
+            "status": "PASS",
+            "breaches": []
+          }
+        },
+        "model": {
+          "active": null,
+          "type": null,
+          "fallback_used": false,
+          "metrics": {}
+        },
+        "alerts": [
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:53:22.155715+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:53:16.965242+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:53:11.961579+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:53:05.818136+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:53:00.814199+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:55.531404+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:50.527748+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:45.525312+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:40.522096+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:35.518960+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:30.229155+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:25.225857+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:20.222795+05:30",
+            "read": false
+          },
+          {
+            "level": "WARN",
+            "code": "BROKER_DISCONNECTED",
+            "message": "Broker connection lost",
+            "ts": "2026-06-14T21:52:15.220385+05:30",
+            "read": false
+          }
+        ],
+        "cycle_count": 30,
+        "last_cycle_ts_iso": "2026-06-14T21:53:22.157084+05:30",
+        "last_fetch_ts_iso": "2026-06-14T21:53:22.157084+05:30",
+        "positions_source": "INTERNAL_UNVERIFIED",
+        "reconciliation": {
+          "status": "OK",
+          "mismatches": [],
+          "timestamp": "2026-06-14T21:52:13.627946+05:30"
+        }
+      },
+      "snippet": "{\"state_version\":30,\"timestamp_utc\":\"2026-06-14T16:23:22.157083Z\",\"timestamp_ist\":\"2026-06-14T21:53:22.157084+05:30\",\"mode\":\"PAPER\",\"data_source\":\"SYNTHETIC\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: Weekend (Sunday)\",\"next_open\":\"2026-06-15 09:15:00 IST\",\"current_time_ist\":\"2026-06-14T21:53:22.155641+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":252,\"error\":null,\"",
+      "endpoint": "/api/state",
+      "required": true
     },
     {
-      "body_preview": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
-      "category": "core",
-      "elapsed_ms": 226,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
       "ok": true,
-      "path": "/api/health",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/health"
+      "http": 200,
+      "latency_ms": 637,
+      "json": {
+        "broker": "dhan",
+        "mode": "ANALYZER",
+        "connected": true,
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "credentials_present": true,
+        "latency_ms": 260,
+        "error": null,
+        "sdk_available": true,
+        "env_source": "core.utils.env_loader"
+      },
+      "snippet": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"latency_ms\":260,\"error\":null,\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+      "endpoint": "/api/broker/status",
+      "required": true
     },
     {
-      "body_preview": "{\"state_version\":2,\"timestamp_utc\":\"2026-06-11T04:58:31.669925Z\",\"timestamp_ist\":\"2026-06-11T10:28:31.669925+05:30\",\"mode\":\"PAPER\",\"data_source\":\"not_ready\",\"market\":{\"is_open\":false,\"reason\":\"Market closed\",\"next_open\":null,\"current_time_ist\":\"2026-06-11T10:28:31.583986+05:30\"},\"broker\":{\"connected\":false,\"name\":\"AngelOne\",\"status\":\"disconnected\",\"error\":null,\"latency_ms\":null,\"last_ok\":null},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,\"es95\":0.0,\"exposure\":0.0,\"concentration\":0.0,\"greeks\":{\"delta\":0.0,\"gamma\":0.0,\"theta\":0.0,\"vega\":0.0},\"limits\":{\"status\":\"PASS\",\"breaches\":[]}},\"model\":{\"active\":null,\"type\":null,\"fallback_used\":false,\"metrics\":{}},\"alerts\":[{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-11T10:28:37.752042+05:30\",\"read\":false},{\"level\":\"WARN\",\"code\":\"BROKER_DISCONNECTED\",\"message\":\"Broker connection lost\",\"ts\":\"2026-06-11T10:28:32.749790+05:30\",\"read\":false}],\"cy",
-      "category": "core",
-      "elapsed_ms": 203,
+      "url": "https://genesis-system3-backend.onrender.com/docs",
       "ok": true,
-      "path": "/api/state",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/state"
+      "http": 200,
+      "latency_ms": 372,
+      "json": null,
+      "snippet": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Ultra Dashboard API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/sw",
+      "endpoint": "/docs",
+      "required": true
     },
     {
-      "body_preview": "{\"status\":\"ok\",\"timestamp\":\"2026-06-11T10:28:39.690436+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"unknown\",\"market_status\":\"unknown\",\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
-      "category": "core",
-      "elapsed_ms": 378,
+      "url": "https://genesis-system3-backend.onrender.com/",
       "ok": true,
-      "path": "/api/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/status"
+      "http": 200,
+      "latency_ms": 355,
+      "json": {
+        "message": "System3 Ultra Dashboard API",
+        "status": "running",
+        "backend_url": "https://genesis-system3-backend.onrender.com",
+        "dashboard_url": "https://genesis-system3-backend.onrender.com",
+        "api_docs": "https://genesis-system3-backend.onrender.com/docs",
+        "health": "https://genesis-system3-backend.onrender.com/api/health",
+        "state": "https://genesis-system3-backend.onrender.com/api/state",
+        "relative_paths": {
+          "api_docs": "/docs",
+          "health": "/api/health",
+          "state": "/api/state",
+          "broker_status": "/api/broker/status",
+          "dashboard": "/ui"
+        }
+      },
+      "snippet": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"https://genesis-system3-backend.onrender.com\",\"dashboard_url\":\"https://genesis-system3-backend.onrender.com\",\"api_docs\":\"https://genesis-system3-backend.onrender.com/docs\",\"health\":\"https://genesis-system3-backend.onrender.com/api/health\",\"state\":\"https://genesis-system3-backend.onrender.com/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\",\"da",
+      "endpoint": "/",
+      "required": false
     },
     {
-      "body_preview": "{\"connected\":false,\"name\":\"AngelOne\",\"status\":\"not_available\",\"error\":\"Broker module import failed: No module named 'websocket'\",\"error_type\":\"MODULE_NOT_AVAILABLE\",\"latency_ms\":null,\"last_ok\":null}",
-      "category": "broker",
-      "elapsed_ms": 262,
+      "url": "https://genesis-system3-backend.onrender.com/api/gain_rank",
       "ok": true,
-      "path": "/api/broker/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/status"
+      "http": 200,
+      "latency_ms": 362,
+      "json": {
+        "status": "ok",
+        "latest": {
+          "date": "2026-06-13",
+          "time": "19:07:05",
+          "predictions": [
+            {
+              "rank": 1,
+              "underlying": "NIFTY",
+              "gain_score": 76.93,
+              "expected_move_pct": 0.032,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 2,
+              "underlying": "BANKNIFTY",
+              "gain_score": 66.04,
+              "expected_move_pct": 0.099,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 3,
+              "underlying": "MIDCPNIFTY",
+              "gain_score": 61.7,
+              "expected_move_pct": 0.147,
+              "recommendation": "TRADE"
+            },
+            {
+              "rank": 4,
+              "underlying": "FINNIFTY",
+              "gain_score": 34.58,
+              "expected_move_pct": 0.031,
+              "recommendation": "SKIP"
+            }
+          ]
+        },
+        "history": [
+          {
+            "date": "2026-06-12",
+            "time": "14:00:00",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "BANKNIFTY",
+                "gain_score": 72,
+                "expected_move_pct": 0.018,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "NIFTY",
+                "gain_score": 65,
+                "expected_move_pct": 0.012,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "FINNIFTY",
+                "gain_score": 58,
+                "expected_move_pct": 0.009,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 41,
+                "expected_move_pct": 0.007,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-12",
+            "time": "18:08:31",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "FINNIFTY",
+                "gain_score": 50.16,
+                "expected_move_pct": 0.021,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "BANKNIFTY",
+                "gain_score": 46.79,
+                "expected_move_pct": 0.009,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "NIFTY",
+                "gain_score": 46.69,
+                "expected_move_pct": 0.017,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 46.48,
+                "expected_move_pct": 0.012,
+                "recommendation": "TRADE"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-12",
+            "time": "18:09:14",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "FINNIFTY",
+                "gain_score": 53.15,
+                "expected_move_pct": 0.01,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "NIFTY",
+                "gain_score": 47.87,
+                "expected_move_pct": 0.023,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "BANKNIFTY",
+                "gain_score": 45.14,
+                "expected_move_pct": 0.001,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 44.42,
+                "expected_move_pct": 0.011,
+                "recommendation": "TRADE"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-12",
+            "time": "18:09:14",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "FINNIFTY",
+                "gain_score": 53.15,
+                "expected_move_pct": 0.01,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "NIFTY",
+                "gain_score": 47.87,
+                "expected_move_pct": 0.023,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "BANKNIFTY",
+                "gain_score": 45.14,
+                "expected_move_pct": 0.001,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 44.42,
+                "expected_move_pct": 0.011,
+                "recommendation": "TRADE"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-12",
+            "time": "18:11:23",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "NIFTY",
+                "gain_score": 47.83,
+                "expected_move_pct": 0.011,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 45.9,
+                "expected_move_pct": 0.033,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "FINNIFTY",
+                "gain_score": 45.12,
+                "expected_move_pct": 0.021,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "BANKNIFTY",
+                "gain_score": 41.17,
+                "expected_move_pct": 0.007,
+                "recommendation": "TRADE"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-12",
+            "time": "18:11:23",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "NIFTY",
+                "gain_score": 47.83,
+                "expected_move_pct": 0.011,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 45.9,
+                "expected_move_pct": 0.033,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "FINNIFTY",
+                "gain_score": 45.12,
+                "expected_move_pct": 0.021,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "BANKNIFTY",
+                "gain_score": 41.17,
+                "expected_move_pct": 0.007,
+                "recommendation": "TRADE"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "05:56:15",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 30.31,
+                "expected_move_pct": 0.027,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 2,
+                "underlying": "FINNIFTY",
+                "gain_score": 29.96,
+                "expected_move_pct": 0.023,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 3,
+                "underlying": "BANKNIFTY",
+                "gain_score": 28.42,
+                "expected_move_pct": 0.008,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 4,
+                "underlying": "NIFTY",
+                "gain_score": 28.24,
+                "expected_move_pct": 0.006,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "05:56:15",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 30.31,
+                "expected_move_pct": 0.027,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 2,
+                "underlying": "FINNIFTY",
+                "gain_score": 29.96,
+                "expected_move_pct": 0.023,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 3,
+                "underlying": "BANKNIFTY",
+                "gain_score": 28.42,
+                "expected_move_pct": 0.008,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 4,
+                "underlying": "NIFTY",
+                "gain_score": 28.24,
+                "expected_move_pct": 0.006,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "06:56:01",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 32.3,
+                "expected_move_pct": 0.046,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 2,
+                "underlying": "FINNIFTY",
+                "gain_score": 29.78,
+                "expected_move_pct": 0.02,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 3,
+                "underlying": "NIFTY",
+                "gain_score": 28.93,
+                "expected_move_pct": 0.012,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 4,
+                "underlying": "BANKNIFTY",
+                "gain_score": 28.66,
+                "expected_move_pct": 0.009,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "06:56:01",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 32.3,
+                "expected_move_pct": 0.046,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 2,
+                "underlying": "FINNIFTY",
+                "gain_score": 29.78,
+                "expected_move_pct": 0.02,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 3,
+                "underlying": "NIFTY",
+                "gain_score": 28.93,
+                "expected_move_pct": 0.012,
+                "recommendation": "SKIP"
+              },
+              {
+                "rank": 4,
+                "underlying": "BANKNIFTY",
+                "gain_score": 28.66,
+                "expected_move_pct": 0.009,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "19:05:15",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "NIFTY",
+                "gain_score": 74.11,
+                "expected_move_pct": 0.032,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "BANKNIFTY",
+                "gain_score": 62.61,
+                "expected_move_pct": 0.099,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 56.74,
+                "expected_move_pct": 0.147,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "FINNIFTY",
+                "gain_score": 34.61,
+                "expected_move_pct": 0.031,
+                "recommendation": "SKIP"
+              }
+            ]
+          },
+          {
+            "date": "2026-06-13",
+            "time": "19:07:05",
+            "predictions": [
+              {
+                "rank": 1,
+                "underlying": "NIFTY",
+                "gain_score": 76.93,
+                "expected_move_pct": 0.032,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 2,
+                "underlying": "BANKNIFTY",
+                "gain_score": 66.04,
+                "expected_move_pct": 0.099,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 3,
+                "underlying": "MIDCPNIFTY",
+                "gain_score": 61.7,
+                "expected_move_pct": 0.147,
+                "recommendation": "TRADE"
+              },
+              {
+                "rank": 4,
+                "underlying": "FINNIFTY",
+                "gain_score": 34.58,
+                "expected_move_pct": 0.031,
+                "recommendation": "SKIP"
+              }
+            ]
+          }
+        ],
+        "total_days": 12
+      },
+      "snippet": "{\"status\":\"ok\",\"latest\":{\"date\":\"2026-06-13\",\"time\":\"19:07:05\",\"predictions\":[{\"rank\":1,\"underlying\":\"NIFTY\",\"gain_score\":76.93,\"expected_move_pct\":0.032,\"recommendation\":\"TRADE\"},{\"rank\":2,\"underlying\":\"BANKNIFTY\",\"gain_score\":66.04,\"expected_move_pct\":0.099,\"recommendation\":\"TRADE\"},{\"rank\":3,\"underlying\":\"MIDCPNIFTY\",\"gain_score\":61.7,\"expected_move_pct\":0.147,\"recommendation\":\"TRADE\"},{\"rank\":4,\"underlying\":\"FINNIFTY\",\"gain_score\":34.58,\"expected_move_pct\":0.031,\"recommendation\":\"SKIP\"}]},\"h",
+      "endpoint": "/api/gain_rank",
+      "required": false
     },
     {
-      "body_preview": "{\"smartapi_installed\":false,\"smartapi_version\":null,\"python_path\":\"/usr/local/bin/python\",\"pip_freeze_hit\":true,\"broker_module_available\":false}",
-      "category": "broker",
-      "elapsed_ms": 4619,
+      "url": "https://genesis-system3-backend.onrender.com/api/accuracy_trend",
       "ok": true,
-      "path": "/api/broker/deps",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/deps"
+      "http": 200,
+      "latency_ms": 356,
+      "json": {
+        "status": "ok",
+        "trend": [
+          {
+            "date": "2026-06-12",
+            "rho": 0.2,
+            "hit_rate": 0.6667,
+            "status": "RETRAIN_NEEDED",
+            "predicted": [
+              "NIFTY",
+              "MIDCPNIFTY",
+              "FINNIFTY",
+              "BANKNIFTY"
+            ],
+            "actual": [
+              "NIFTY",
+              "BANKNIFTY",
+              "FINNIFTY",
+              "MIDCPNIFTY"
+            ]
+          }
+        ],
+        "avg_rho": 0.2,
+        "retrain_needed": false,
+        "days_available": 1
+      },
+      "snippet": "{\"status\":\"ok\",\"trend\":[{\"date\":\"2026-06-12\",\"rho\":0.2,\"hit_rate\":0.6667,\"status\":\"RETRAIN_NEEDED\",\"predicted\":[\"NIFTY\",\"MIDCPNIFTY\",\"FINNIFTY\",\"BANKNIFTY\"],\"actual\":[\"NIFTY\",\"BANKNIFTY\",\"FINNIFTY\",\"MIDCPNIFTY\"]}],\"avg_rho\":0.2,\"retrain_needed\":false,\"days_available\":1}",
+      "endpoint": "/api/accuracy_trend",
+      "required": false
     },
     {
-      "body_preview": "{\"underlyings\":[\"NIFTY\",\"BANKNIFTY\",\"FINNIFTY\"]}",
-      "category": "data",
-      "elapsed_ms": 212,
+      "url": "https://genesis-system3-backend.onrender.com/api/system_health",
       "ok": true,
-      "path": "/api/underlyings",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/underlyings"
+      "http": 200,
+      "latency_ms": 358,
+      "json": {
+        "status": "ok",
+        "timestamp": "2026-06-14T21:53:25.832883+05:30",
+        "token": {
+          "status": "unknown",
+          "log_line": "log not found"
+        },
+        "datasource_health": null,
+        "datasource_resilience": "UNKNOWN",
+        "retrain_needed": false,
+        "jobs": [
+          {
+            "id": "daily_status",
+            "name": "Daily Status Check",
+            "schedule_time": "daily",
+            "enabled": false
+          },
+          {
+            "id": "daily_gain_rank",
+            "name": "Daily Gain Rank (Pre-Market)",
+            "schedule_time": "09:15",
+            "enabled": true
+          },
+          {
+            "id": "daily_gain_validate",
+            "name": "Daily Gain Validate (Post-Market)",
+            "schedule_time": "15:35",
+            "enabled": true
+          },
+          {
+            "id": "daily_gain_trend",
+            "name": "Daily Accuracy Trend (Post-Market)",
+            "schedule_time": "15:40",
+            "enabled": true
+          },
+          {
+            "id": "auto_retrain",
+            "name": "Auto Model Retrain (Post-Market)",
+            "schedule_time": "16:00",
+            "enabled": true
+          },
+          {
+            "id": "bhavcopy_download",
+            "name": "NSE FO Bhavcopy Download (Post-Market)",
+            "schedule_time": "18:30",
+            "enabled": true
+          },
+          {
+            "id": "datasource_health_check",
+            "name": "Data Source Health Check (Pre-Market)",
+            "schedule_time": "08:00",
+            "enabled": true
+          },
+          {
+            "id": "signal_engine_bhavcopy",
+            "name": "Signal Engine \u2014 Bhavcopy Runner (Post-Market)",
+            "schedule_time": "18:45",
+            "enabled": true
+          },
+          {
+            "id": "paper_lifecycle_proof",
+            "name": "Analyzer/Paper Lifecycle Proof",
+            "schedule_time": "09:30",
+            "enabled": true
+          },
+          {
+            "id": "dashboard_endpoint_coverage",
+            "name": "Dashboard Endpoint Coverage Proof",
+            "schedule_time": "08:05",
+            "enabled": true
+          }
+        ]
+      },
+      "snippet": "{\"status\":\"ok\",\"timestamp\":\"2026-06-14T21:53:25.832883+05:30\",\"token\":{\"status\":\"unknown\",\"log_line\":\"log not found\"},\"datasource_health\":null,\"datasource_resilience\":\"UNKNOWN\",\"retrain_needed\":false,\"jobs\":[{\"id\":\"daily_status\",\"name\":\"Daily Status Check\",\"schedule_time\":\"daily\",\"enabled\":false},{\"id\":\"daily_gain_rank\",\"name\":\"Daily Gain Rank (Pre-Market)\",\"schedule_time\":\"09:15\",\"enabled\":true},{\"id\":\"daily_gain_validate\",\"name\":\"Daily Gain Validate (Post-Market)\",\"schedule_time\":\"15:35\",\"enab",
+      "endpoint": "/api/system_health",
+      "required": false
     },
     {
-      "body_preview": "{\"action\":\"NO_TRADE\",\"reason\":\"BROKER_NOT_READY - Real signal data unavailable\",\"data_source\":\"live\",\"confidence\":0}",
-      "category": "signals",
-      "elapsed_ms": 193,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/deps",
       "ok": true,
-      "path": "/api/signal/top",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/signal/top"
+      "http": 200,
+      "latency_ms": 4518,
+      "json": {
+        "dhanhq_installed": true,
+        "dhanhq_version": "unknown",
+        "python_path": "/usr/local/bin/python",
+        "pip_freeze_hit": true,
+        "broker_module_available": true
+      },
+      "snippet": "{\"dhanhq_installed\":true,\"dhanhq_version\":\"unknown\",\"python_path\":\"/usr/local/bin/python\",\"pip_freeze_hit\":true,\"broker_module_available\":true}",
+      "endpoint": "/api/broker/deps",
+      "required": false
     },
     {
-      "body_preview": "{\"action\":\"NO_TRADE\",\"reason\":\"BROKER_NOT_READY - Real signal data unavailable\",\"data_source\":\"live\",\"confidence\":0}",
-      "category": "signals",
-      "elapsed_ms": 385,
+      "url": "https://genesis-system3-backend.onrender.com/api/status",
       "ok": true,
-      "path": "/api/signals",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/signals"
-    },
-    {
-      "body_preview": "{\"signals\":[],\"count\":0,\"message\":\"Signal CSV not found\",\"data_source\":\"real\"}",
-      "category": "signals",
-      "elapsed_ms": 216,
-      "ok": true,
-      "path": "/api/signals/enhanced",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/signals/enhanced"
-    },
-    {
-      "body_preview": "{\"positions\":[],\"open_count\":0,\"message\":\"Positions file not found\"}",
-      "category": "paper",
-      "elapsed_ms": 360,
-      "ok": true,
-      "path": "/api/positions",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/positions"
-    },
-    {
-      "body_preview": "{\"history\":[],\"summary\":{\"total_trades\":0,\"winning_trades\":0,\"losing_trades\":0,\"win_rate\":0.0,\"total_realized_pnl\":0.0,\"total_unrealized_pnl\":0.0,\"total_pnl\":0.0,\"open_positions\":0}}",
-      "category": "paper",
-      "elapsed_ms": 217,
-      "ok": true,
-      "path": "/api/pnl",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/pnl"
-    },
-    {
-      "body_preview": "{\"positions\":{\"positions\":[],\"open_count\":0,\"message\":\"Positions file not found\"},\"pnl\":{\"history\":[],\"summary\":{\"total_trades\":0,\"winning_trades\":0,\"losing_trades\":0,\"win_rate\":0.0,\"total_realized_pnl\":0.0,\"total_unrealized_pnl\":0.0,\"total_pnl\":0.0,\"open_positions\":0}}}",
-      "category": "paper",
-      "elapsed_ms": 192,
-      "ok": true,
-      "path": "/api/paper",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/paper"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"orders\":[],\"count\":0}",
-      "category": "paper",
-      "elapsed_ms": 204,
-      "ok": true,
-      "path": "/api/orders",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/orders"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"history\":[],\"count\":0}",
-      "category": "paper",
-      "elapsed_ms": 219,
-      "ok": true,
-      "path": "/api/orders/history",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/orders/history"
-    },
-    {
-      "body_preview": "{\"date\":\"2026-06-11\",\"market_hours\":\"09:15 - 15:30 IST\",\"total_trades\":0,\"entries\":[],\"exits\":[],\"count\":0}",
-      "category": "paper",
-      "elapsed_ms": 215,
-      "ok": true,
-      "path": "/api/trades/today",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/trades/today"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"risk_metrics\":{\"total_exposure\":0.0,\"total_pnl\":0.0,\"var\":0.0,\"expected_shortfall\":0.0,\"max_drawdown\":0.0,\"concentration_risk\":0.0}}",
-      "category": "risk",
-      "elapsed_ms": 354,
-      "ok": true,
-      "path": "/api/risk",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/risk"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"risk_metrics\":{\"total_exposure\":0.0,\"total_pnl\":0.0,\"var\":0.0,\"expected_shortfall\":0.0,\"max_drawdown\":0.0,\"concentration_risk\":0.0}}",
-      "category": "risk",
-      "elapsed_ms": 195,
-      "ok": true,
-      "path": "/api/risk/portfolio",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/risk/portfolio"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"performance\":{\"status\":\"ok\",\"models\":{}}}",
-      "category": "ml",
-      "elapsed_ms": 205,
-      "ok": true,
-      "path": "/api/ml/performance",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/ml/performance"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"comparison\":{\"status\":\"ERROR\",\"message\":\"No models found\"}}",
-      "category": "ml",
-      "elapsed_ms": 193,
-      "ok": true,
-      "path": "/api/ml/compare",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/ml/compare"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"data\":{\"active_models\":{},\"fallback_used\":false,\"metrics\":{},\"timestamp\":\"2026-06-11T10:28:48.152984+05:30\"}}",
-      "category": "ml",
-      "elapsed_ms": 212,
-      "ok": true,
-      "path": "/api/model/behavior",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/model/behavior"
-    },
-    {
-      "body_preview": "{\"status\":\"NO_DATA\",\"message\":\"No open positions\"}",
-      "category": "prediction",
-      "elapsed_ms": 199,
-      "ok": true,
-      "path": "/api/predict/portfolio",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/predict/portfolio"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"current_performance\":{\"total_pnl\":0.0,\"total_trades\":0,\"win_rate\":0.0,\"open_positions\":0},\"predicted_performance\":{\"projected_pnl\":0.0,\"projected_win_rate\":0.0,\"confidence\":0.5},\"portfolio_prediction\":{\"portfolio_prediction\":{\"total_exposure\":0,\"predicted_pnl\":0.0,\"pnl_percentage\":0,\"average_confidence\":0.0,\"position_count\":0},\"position_predictions\":[],\"timestamp\":\"2026-06-11T10:28:48.555728+05:30\"},\"timestamp\":\"2026-06-11T10:28:48.555763+05:30\"}",
-      "category": "prediction",
-      "elapsed_ms": 202,
-      "ok": true,
-      "path": "/api/predict/performance",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/predict/performance"
-    },
-    {
-      "body_preview": "{\"status\":\"NO_DATA\",\"message\":\"No validation reports found\"}",
-      "category": "validation",
-      "elapsed_ms": 198,
-      "ok": true,
-      "path": "/api/validate/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/validate/status"
-    },
-    {
-      "body_preview": "{\"status\":\"not_run\",\"message\":\"Run production_grade_validation.py to generate report\",\"results\":{\"tests_passed\":0,\"total_tests\":0,\"success_rate\":0.0},\"updated_at\":\"2026-06-11T10:28:48.960206+05:30\"}",
-      "category": "validation",
-      "elapsed_ms": 207,
-      "ok": true,
-      "path": "/api/validation/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/validation/status"
-    },
-    {
-      "body_preview": "{\"status\":\"inactive\",\"message\":\"Learning system not started yet\",\"last_update\":null,\"total_cycles\":0,\"latest_insights\":{},\"updated_at\":\"2026-06-11T10:28:49.170143+05:30\"}",
-      "category": "learning",
-      "elapsed_ms": 209,
-      "ok": true,
-      "path": "/api/learning/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/learning/status"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"message\":\"Learning insights not available yet\",\"win_rate\":0.0,\"total_trades\":0,\"profitable_trades\":0,\"best_strategy\":null,\"best_underlying\":null,\"updated_at\":\"2026-06-11T10:28:49.372129+05:30\"}",
-      "category": "learning",
-      "elapsed_ms": 200,
-      "ok": true,
-      "path": "/api/learning/insights",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/learning/insights"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"available\":true,\"paused\":false,\"has_memory\":false,\"has_plan\":false,\"timestamp\":\"2026-06-11T10:28:49.567438+05:30\"}",
-      "category": "agent",
-      "elapsed_ms": 196,
-      "ok": true,
-      "path": "/api/agent/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/agent/status"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"tasks\":[],\"run_id\":\"NONE\"}",
-      "category": "agent",
-      "elapsed_ms": 344,
-      "ok": true,
-      "path": "/api/agent/memory",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/agent/memory"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"issues\":[]}",
-      "category": "agent",
-      "elapsed_ms": 206,
-      "ok": true,
-      "path": "/api/agent/issues",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/agent/issues"
-    },
-    {
-      "body_preview": "{\"status\":\"none\",\"message\":\"No pending upgrade plan\"}",
-      "category": "agent",
-      "elapsed_ms": 190,
-      "ok": true,
-      "path": "/api/agent/upgrade-plan",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/agent/upgrade-plan"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"message\":\"Runner endpoints are working\"}",
-      "category": "runner",
-      "elapsed_ms": 197,
-      "ok": true,
-      "path": "/api/runner/test",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/runner/test"
-    },
-    {
-      "body_preview": "{\"runner\":\"STOPPED\",\"pid\":null,\"mode\":\"FULLY_AUTONOMOUS\",\"uptime_seconds\":28155,\"heartbeat_age_seconds\":315482,\"autopilot_running\":false,\"market_status\":\"POST_MARKET\",\"cycle_count\":394,\"health_score\":87.5}",
-      "category": "runner",
-      "elapsed_ms": 1463,
-      "ok": true,
-      "path": "/api/runner/status",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/runner/status"
-    },
-    {
-      "body_preview": "{\"status\":\"ok\",\"message\":\"Forensic report not available yet\",\"timestamp\":\"2026-06-11T10:28:52.169199+05:30\",\"signal_accuracy\":{\"accuracy\":0.0,\"total_trades\":0},\"data_integrity\":{\"issues\":[]},\"performance_metrics\":{\"total_trades\":0,\"win_rate\":0.0,\"total_pnl\":0.0},\"updated_at\":\"2026-06-11T10:28:52.169227+05:30\"}",
-      "category": "forensic",
-      "elapsed_ms": 197,
-      "ok": true,
-      "path": "/api/forensic/report",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/forensic/report"
-    },
-    {
-      "body_preview": "PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000X'\ufffd\\C\ufffd\ufffd\u000e\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u0012\u0000\u0000\u0000ssot_snapshot.json\ufffdVMo\ufffd0\f\ufffd\ufffdW\u0018\ufffd\ufffd\r\u001c\ufffd\ufffdpnY\ufffd\u0001A7\ufffdH\ufffd\rX1\u0018\ufffd\u0338Bd)\ufffd\ufffdY\ufffd\ufffd>\ufffdS\ufffd\ufffdu\ufffd\ufffd\u0012\ufffd\ufffd\ufffd\ufffdH\ufffdOy\ufffdp\u001cW*\ufffd >\ufffd\ufffd\ufffd3w\ufffd\ufffd\ufffd\u0005\ufffdH\u0006\u0692\ufffd\ufffd\\a\ufffd\ufffd\ufffd\u73ee\ufffd\ufffdU\ufffd\ufffd\ufffd\ufffdp2\u001d\ufffd{\ufffdQ\u0018\ufffd\ufffd\u001fn'\ufffdH\u0549\ufffd{S\u07ca\ufffd\ufffd\r\ufffd\u0003\ufffd\n\ufffdx\u0002\ufffd\ufffd\ufffd\ufffdn\ufffd\ufffd\ufffd\u0004)\u0014K\ufffd\u000b\\Z\u0018W\ufffd\u0000\ufffd\u001c\ufffd\u0000$vP$x\ufffd_\ufffd\ufffd\u0218\ufffd`\ufffdET\ufffde\ufffd\ufffd\u0000Y\ufffd\ufffd~)\ufffd\u001dL\ufffd\ufffd\u012d\ufffd\f\ufffdT\u0013\ufffdrJk\u0018\ufffdB\u0000SqQ\ufffd[e\f'\ufffdp2\ufffd\ufffd\u0421/%\ufffd\u0007\ufffdw \f3\ufffd\u0019\u0003\ufffdt\ufffdSn\feea3\ufffd\u0002]2hH\u0015\ufffd\ufffdeaI\ufffd4\ufffd\ufffd\u0015\ufffd\ufffd\ufffd.\u0553c\ufffd\u0018g\ufffd\ufffdK]\u076e\u0006[~\ufffd\ufffd\ufffdfr\ufffd\ufffd\ufffdk\ufffd\ufffdk\u0005|\ufffd\ufffd-B\t\ufffd\ufffd\ufffd\u0015W\ufffdj\ufffdW[r\ufffd\ufffd\ufffdG\ufffdRi\ufffd[Dh.\ufffd:\ufffdM-I\ufffdt\u0007^\ufffd\u001f-\ufffd\ufffdjv3w\u03ce\ufffd\u0306\ufffd-It\ufffd`e3c\ufffd\ufffdS%qR` \ufffd\u0579\ufffd\u001d\ufffd\ufffd\u06d2=\ufffdD\u0011\ufffddw\u03e8\ufffd\ufffd3\ufffd\ufffd\ufffd\ufffd\ufffd\f\ufffd\ufffd\ufffd\ufffd\u001cl\ufffd\ufffd\"\t:\ufffd\u0016\ufffdf\u0015D\ufffdL\ufffd\u0003\u0012\ufffd\ufffd$\u000ed\u0017x\ufffdDuWO@\ufffd\u0010\f\ufffdpT\ufffd\ufffd\u0192\n\ufffd\ufffdiv\ufffd\u0004\ufffdB\ufffdO\u1172\ufffd\ufffd\ufffdG8\ufffd;@\ufffd\ufffd\u0002\ufffd\u0012\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd$\ufffd\u07a9r/\u0000\ufffdGs%\ufffd\u0019m+\ufffd\ufffd\ufffd\ufffd\ufffd/\u001a9\ufffd\ufffd\ufffd\ufffdq\ufffdA\ufffd2\ufffd\u0007\ufffdwq.\u03d6+\u0003%\b.y\ufffd,\ufffd\ufffd(\ufffd\u0797N-c\n\ufffd2\ufffd\ufffd}\ufffd\ufffd\fa\\k\ufffd\ufffd\ufffd\ufffdv\ufffd\ufffdo\u0016\ufffd\ufffde\u0014\u036f7\ufffd\u001b\ufffd\ufffdN\ufffd\ufffd\ufffd+\u0017\u07e9WVO\ufffd\ufffdb\ufffd\ufffdk\ufffd\ufffd\\H\ufffd\ufffd7\u001c\u0007ZI,=l\ufffdW[\ufffd\ufffd\ufffd\ufffd\ufffdw\ufffdy\u000f\ufffd0xg\ufffd\u0007\ufffd\ufffdx\ufffd{\ufffd\ufffd\ufffdx\ufffd\ufffdq\u0010\ufffdC\ufffd\u07fc\ufffdo\ufffdb\ufffd\ufffd)\u0118\ufffdL5rY\ufffd`e\ufffdrN$\ufffd\ufffd\ufffd2nA\ufffdGc\ufffd\ufffd\u0013\ufffd\ufffd\u0013\u078a\ufffd\ufffdh/\ufffd\ufffd|\u0015\ufffd>\ufffd_\ufffdo\ufffd\ufffd\ufffd\u04e2n\ufffd\ufffd\\\ufffd\u0016\ufffd\ufffd\ufffd\ufffd\ufffd\u0007ay\ufffd\bwFd\ufffdT+\u001d\ufffd\u001e4\u007f4\ufffd`8\u0019L\ufffd\ufffd\ufffd\ufffd\ufffd\u000fPK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000X'\ufffd\\C\ufffd\ufffd\u000e\ufffd\u0002\u0000\u0000\ufffd\b\u0000\u0000\u001a\u0000\u0000\u0000state_history/state_6.json\ufffdVMo\ufffd0\f\ufffd\ufffdW\u0018\ufffd\ufffd\r\u001c\ufffd\ufffdpnY\ufffd\u0001A7\ufffdH\ufffd\rX1\u0018\ufffd\u0338Bd)\ufffd\ufffdY\ufffd\ufffd>\ufffdS\ufffd\ufffdu\ufffd\ufffd\u0012\ufffd\ufffd\ufffd\ufffdH\ufffdOy\ufffdp\u001cW*\ufffd >\ufffd\ufffd\ufffd3w\ufffd\ufffd\ufffd\u0005\ufffdH\u0006\u0692\ufffd\ufffd\\a\ufffd\ufffd\ufffd\u73ee\ufffd\ufffdU\ufffd\ufffd\ufffd\ufffdp2\u001d\ufffd{\ufffdQ\u0018\ufffd\ufffd\u001fn'\ufffdH\u0549\ufffd{S\u07ca\ufffd\ufffd\r\ufffd\u0003\ufffd\n\ufffdx\u0002\ufffd\ufffd\ufffd\ufffdn\ufffd\ufffd\ufffd\u0004)\u0014K\ufffd\u000b\\Z\u0018W\ufffd\u0000\ufffd\u001c\ufffd\u0000$vP$x\ufffd_\ufffd\ufffd\u0218\ufffd`\ufffdET\ufffde\ufffd\ufffd\u0000Y\ufffd\ufffd~)\ufffd\u001dL\ufffd\ufffd\u012d\ufffd\f\ufffdT\u0013\ufffdrJk\u0018\ufffdB\u0000SqQ\ufffd[e\f'\ufffdp2\ufffd\ufffd\u0421/%\ufffd\u0007\ufffdw \f3\ufffd\u0019\u0003\ufffdt\ufffdSn\feea3\ufffd\u0002]2hH\u0015\ufffd\ufffdeaI\ufffd4\ufffd\ufffd\u0015\ufffd\ufffd\ufffd.\u0553c\ufffd\u0018g\ufffd\ufffdK]\u076e\u0006[~\ufffd\ufffd\ufffdfr\ufffd\ufffd\ufffdk\ufffd\ufffdk\u0005|\ufffd\ufffd-B\t\ufffd\ufffd\ufffd\u0015W\ufffdj\ufffdW[r\ufffd\ufffd\ufffdG\ufffdRi\ufffd[Dh.\ufffd:\ufffdM-I\ufffdt\u0007^\ufffd\u001f-\ufffd\ufffdjv3w\u03ce\ufffd\u0306\ufffd-It\ufffd`e3c\ufffd\ufffdS%qR` \ufffd\u0579\ufffd\u001d\ufffd\ufffd\u06d2=\ufffdD\u0011\ufffddw\u03e8\ufffd\ufffd3\ufffd\ufffd\ufffd\ufffd\ufffd\f\ufffd\ufffd\ufffd\ufffd\u001cl\ufffd\ufffd\"\t:\ufffd\u0016\ufffdf\u0015D\ufffdL\ufffd\u0003\u0012\ufffd\ufffd$\u000ed\u0017x\ufffdDuWO@\ufffd\u0010\f\ufffdpT\ufffd\ufffd\u0192",
-      "category": "proof",
-      "elapsed_ms": 197,
-      "ok": true,
-      "path": "/api/proof-pack",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/proof-pack"
-    },
-    {
-      "body_preview": "{\"logs\":[],\"message\":\"No log files found\"}",
-      "category": "logs",
-      "elapsed_ms": 199,
-      "ok": true,
-      "path": "/api/logs/tail?lines=40",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/logs/tail?lines=40"
-    },
-    {
-      "body_preview": "{\"secrets_found\":0,\"scanned_files\":[],\"status\":\"PASS\"}",
-      "category": "security",
-      "elapsed_ms": 209,
-      "ok": true,
-      "path": "/api/audit/secrets",
-      "status_code": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/audit/secrets"
+      "http": 200,
+      "latency_ms": 363,
+      "json": {
+        "status": "ok",
+        "timestamp": "2026-06-14T21:53:30.711084+05:30",
+        "backend": {
+          "running": true,
+          "port": 8000,
+          "uptime_estimate": "running"
+        },
+        "frontend": {
+          "expected_url": "http://localhost:3000",
+          "status": "should_be_running"
+        },
+        "data": {
+          "source": "real",
+          "market_status": {
+            "is_open": false,
+            "reason": "Market closed: Weekend (Sunday)",
+            "current_time_ist": null,
+            "next_open": "2026-06-15 09:15:00 IST",
+            "seconds_until_open": null
+          },
+          "fresh": false,
+          "last_update": null
+        },
+        "health": false,
+        "endpoints": {
+          "health": "/api/health",
+          "chain": "/api/chain/{underlying}",
+          "signals": "/api/signal/top",
+          "positions": "/api/positions",
+          "pnl": "/api/pnl",
+          "perf": "/api/perf"
+        }
+      },
+      "snippet": "{\"status\":\"ok\",\"timestamp\":\"2026-06-14T21:53:30.711084+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Market closed: Weekend (Sunday)\",\"current_time_ist\":null,\"next_open\":\"2026-06-15 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/ch",
+      "endpoint": "/api/status",
+      "required": false
     }
   ],
-  "total_endpoints_tested": 39
+  "blockers": [],
+  "warnings": [
+    "browser_visual_truth_not_proven",
+    "api_db_reconciliation_not_automated"
+  ],
+  "next_action": "All required endpoints pass and no safety violations. Accumulate live proof."
 }

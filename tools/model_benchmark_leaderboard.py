@@ -1,19 +1,20 @@
-from pathlib import Path
-from datetime import datetime, timezone
-import json
 import csv
 import html
+import json
 import os
+from datetime import datetime, timezone
+from pathlib import Path
 
 ROOT = Path.cwd()
 OUT_DIR = ROOT / "reports" / "model_benchmark_dashboard"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-TRAINING_CSV = ROOT / "storage" / "training" / "angel_index_options_training.csv"
-MODELS_DIR = ROOT / "core" / "models" / "angel_one"
+TRAINING_CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"
+MODELS_DIR = ROOT / "core" / "models" / "dhan"
 AUTHORITY_MAP = ROOT / "reports" / "authority_map" / "system3_authority_runtime_map.json"
 
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
+
 
 def file_status(path: Path):
     return {
@@ -22,6 +23,7 @@ def file_status(path: Path):
         "size_bytes": path.stat().st_size if path.exists() else 0,
         "mtime_utc": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat() if path.exists() else None,
     }
+
 
 def csv_profile(path: Path, max_rows_scan=200000):
     result = {
@@ -60,6 +62,7 @@ def csv_profile(path: Path, max_rows_scan=200000):
         result["status"] = f"error: {e}"
     return result
 
+
 def model_artifacts_profile():
     rows = []
     for u in UNDERLYINGS:
@@ -71,18 +74,25 @@ def model_artifacts_profile():
                 meta_json = json.loads(meta.read_text(encoding="utf-8", errors="ignore"))
             except Exception as e:
                 meta_json = {"read_error": str(e)}
-        rows.append({
-            "underlying": u,
-            "model": file_status(model),
-            "meta": file_status(meta),
-            "meta_json": meta_json,
-            "artifact_pair_ok": model.exists() and meta.exists(),
-            "test_accuracy": meta_json.get("test_accuracy") if isinstance(meta_json, dict) else None,
-            "train_samples": meta_json.get("train_samples") if isinstance(meta_json, dict) else None,
-            "test_samples": meta_json.get("test_samples") if isinstance(meta_json, dict) else None,
-            "features_count": len(meta_json.get("features", [])) if isinstance(meta_json, dict) and isinstance(meta_json.get("features"), list) else None,
-        })
+        rows.append(
+            {
+                "underlying": u,
+                "model": file_status(model),
+                "meta": file_status(meta),
+                "meta_json": meta_json,
+                "artifact_pair_ok": model.exists() and meta.exists(),
+                "test_accuracy": meta_json.get("test_accuracy") if isinstance(meta_json, dict) else None,
+                "train_samples": meta_json.get("train_samples") if isinstance(meta_json, dict) else None,
+                "test_samples": meta_json.get("test_samples") if isinstance(meta_json, dict) else None,
+                "features_count": (
+                    len(meta_json.get("features", []))
+                    if isinstance(meta_json, dict) and isinstance(meta_json.get("features"), list)
+                    else None
+                ),
+            }
+        )
     return rows
+
 
 def readiness_score(training, artifacts):
     score = 0
@@ -127,10 +137,12 @@ def readiness_score(training, artifacts):
         "reasons": reasons,
     }
 
+
 def status_badge(ok, label_true="PASS", label_false="NOT PROVEN"):
     if ok:
         return f'<span class="badge pass">{label_true}</span>'
     return f'<span class="badge fail">{label_false}</span>'
+
 
 training = csv_profile(TRAINING_CSV)
 artifacts = model_artifacts_profile()
@@ -152,7 +164,7 @@ data = {
         "Implement model comparison: baseline, gradient boosting, ensemble-ready slots",
         "Implement cost/slippage/spread-aware P&L benchmark",
         "Expose model version + benchmark score in dashboard backend",
-        "Block promotion if benchmark proof missing"
+        "Block promotion if benchmark proof missing",
     ],
 }
 
@@ -161,7 +173,8 @@ json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 artifact_rows = []
 for a in artifacts:
-    artifact_rows.append(f"""
+    artifact_rows.append(
+        f"""
 <tr>
   <td>{html.escape(a['underlying'])}</td>
   <td>{status_badge(a['model']['exists'], 'FOUND', 'MISSING')}</td>
@@ -171,7 +184,8 @@ for a in artifacts:
   <td>{html.escape(str(a.get('test_samples')))}</td>
   <td>{html.escape(str(a.get('features_count')))}</td>
 </tr>
-""")
+"""
+    )
 
 training_underlying_rows = []
 for k, v in sorted(training.get("underlyings", {}).items(), key=lambda x: (-x[1], x[0])):
@@ -299,7 +313,8 @@ html_path = OUT_DIR / "index.html"
 html_path.write_text(html_doc, encoding="utf-8")
 
 md_path = ROOT / "docs" / "model_benchmark" / "MODEL_BENCHMARK_LEADERBOARD.md"
-md_path.write_text(f"""# Model Benchmark Leaderboard Framework
+md_path.write_text(
+    f"""# Model Benchmark Leaderboard Framework
 
 Generated UTC: {data['generated_at_utc']}
 
@@ -345,14 +360,21 @@ No .env changed.
 No broker config changed.
 No database changed.
 No model artifacts changed.
-""", encoding="utf-8")
+""",
+    encoding="utf-8",
+)
 
-print(json.dumps({
-    "generated_at_utc": data["generated_at_utc"],
-    "dashboard": str(html_path),
-    "json": str(json_path),
-    "docs": str(md_path),
-    "readiness_percent": score,
-    "training_rows_scanned": training.get("rows_scanned", 0),
-    "artifact_pairs": sum(1 for a in artifacts if a["artifact_pair_ok"]),
-}, indent=2))
+print(
+    json.dumps(
+        {
+            "generated_at_utc": data["generated_at_utc"],
+            "dashboard": str(html_path),
+            "json": str(json_path),
+            "docs": str(md_path),
+            "readiness_percent": score,
+            "training_rows_scanned": training.get("rows_scanned", 0),
+            "artifact_pairs": sum(1 for a in artifacts if a["artifact_pair_ok"]),
+        },
+        indent=2,
+    )
+)

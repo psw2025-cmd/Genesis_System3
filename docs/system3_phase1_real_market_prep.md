@@ -7,7 +7,7 @@
 ## Modules Implemented
 
 ### 1. Market Warmup Scanner
-- **File**: `core/engine/angel_market_warmup_scanner.py`
+- **File**: `core/engine/dhan_market_warmup_scanner.py`
 - **Menu**: Option 48
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Read-only validation
@@ -25,7 +25,7 @@
 ---
 
 ### 2. Signal Record Buffer
-- **File**: `core/engine/angel_signal_record_buffer.py`
+- **File**: `core/engine/dhan_signal_record_buffer.py`
 - **Menu**: Option 49
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Does NOT touch existing signals file
@@ -33,7 +33,7 @@
 **Functionality**:
 - Temporary buffer for storing Monday signals
 - Writes ONLY to `learning/real_signals_raw.csv`
-- Does NOT modify existing `live/angel_index_ai_signals.csv`
+- Does NOT modify existing `live/dhan_index_ai_signals.csv`
 - Provides buffer statistics
 
 **Safety**: Completely separate from existing signals file
@@ -41,7 +41,7 @@
 ---
 
 ### 3. Environment Consistency Checker
-- **File**: `core/engine/angel_env_consistency_checker.py`
+- **File**: `core/engine/dhan_env_consistency_checker.py`
 - **Menu**: Option 50
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Reporting only, no auto-fix
@@ -55,7 +55,7 @@
 ---
 
 ### 4. Real Data Capture Starter
-- **File**: `core/engine/angel_real_data_capture_starter.py`
+- **File**: `core/engine/dhan_real_data_capture_starter.py`
 - **Menu**: Option 51
 - **Status**: ✅ Complete
 - **Mode**: SAFE MODE - Logging only, no execution
@@ -96,10 +96,10 @@
 ## Files Created
 
 ### Engine Modules
-1. `core/engine/angel_market_warmup_scanner.py`
-2. `core/engine/angel_signal_record_buffer.py`
-3. `core/engine/angel_env_consistency_checker.py`
-4. `core/engine/angel_real_data_capture_starter.py`
+1. `core/engine/dhan_market_warmup_scanner.py`
+2. `core/engine/dhan_signal_record_buffer.py`
+3. `core/engine/dhan_env_consistency_checker.py`
+4. `core/engine/dhan_real_data_capture_starter.py`
 
 ### Documentation
 1. `docs/system3_phase1_real_market_prep.md` (this file)
@@ -135,16 +135,16 @@
 
 ```bash
 # Test warmup scanner
-python -m core.engine.angel_market_warmup_scanner
+python -m core.engine.dhan_market_warmup_scanner
 
 # Test signal buffer
-python -m core.engine.angel_signal_record_buffer
+python -m core.engine.dhan_signal_record_buffer
 
 # Test consistency checker
-python -m core.engine.angel_env_consistency_checker
+python -m core.engine.dhan_env_consistency_checker
 
 # Test capture starter
-python -m core.engine.angel_real_data_capture_starter
+python -m core.engine.dhan_real_data_capture_starter
 ```
 
 ---

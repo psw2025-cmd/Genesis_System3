@@ -13,13 +13,13 @@ Phase 378 identifies:
 - Optimization opportunities with estimated impact
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -43,9 +43,9 @@ def analyze_file_io_performance() -> Dict[str, Any]:
 
         # Check signal files
         signal_files = [
-            STORAGE_LIVE / "angel_index_ai_signals.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
         ]
 
         for filepath in signal_files:
@@ -87,9 +87,9 @@ def analyze_memory_usage() -> Dict[str, Any]:
         import pandas as pd
 
         signal_files = {
-            "main_signals": STORAGE_LIVE / "angel_index_ai_signals.csv",
-            "curated_signals": STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            "forward_signals": STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+            "main_signals": STORAGE_LIVE / "dhan_index_ai_signals.csv",
+            "curated_signals": STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            "forward_signals": STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
         }
 
         total_memory_mb = 0

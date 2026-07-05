@@ -7,18 +7,18 @@
 ## 1. Batch 3 Finalization
 
 ### ✅ Improved Stability
-- **Trade lifecycle logger** (`angel_trade_lifecycle_logger.py`)
+- **Trade lifecycle logger** (`dhan_trade_lifecycle_logger.py`)
   - Tracks complete trade lifecycle: SIGNAL → PLAN → EXECUTE → EXIT → PnL
   - Provides audit trail for monitoring and debugging
-  - Logs to `storage/live/angel_trade_lifecycle_log.csv`
+  - Logs to `storage/live/dhan_trade_lifecycle_log.csv`
 
-- **Safety validator** (`angel_safety_checks.py`)
+- **Safety validator** (`dhan_safety_checks.py`)
   - Validates all trade plans before execution
   - Checks confidence, score, entry price
   - Enforces daily trade limits
   - Integrated into trade decision layer
 
-- **Enhanced trade decision** (`angel_trade_decision.py`)
+- **Enhanced trade decision** (`dhan_trade_decision.py`)
   - Safety validation on every trade plan
   - Warnings for low confidence or unusual prices
   - Rejects invalid trades automatically
@@ -39,20 +39,20 @@
 ## 2. Post-Monday Upgrade Pack
 
 ### ✅ Enhanced Threshold Tuner
-- **Real PnL data support** (`angel_threshold_tuner.py`)
+- **Real PnL data support** (`dhan_threshold_tuner.py`)
   - Uses actual PnL data when available (post-Monday)
   - Falls back to synthetic evaluation if no PnL data
   - Optimizes thresholds based on real outcomes
 
 ### ✅ LIVE Mode Preparation
-- **Executor LIVE prep** (`angel_executor_live_prep.py`)
+- **Executor LIVE prep** (`dhan_executor_live_prep.py`)
   - Infrastructure ready for LIVE orders
   - Currently DISABLED for safety
   - Validates readiness before enabling
   - Requires explicit enablement in config
 
 ### ✅ PnL Validation
-- **Intraday PnL monitor** (`angel_intraday_pnl_monitor.py`)
+- **Intraday PnL monitor** (`dhan_intraday_pnl_monitor.py`)
   - Monitors active trades in real-time
   - Computes current PnL based on latest signals
   - Provides alerts and updates
@@ -63,7 +63,7 @@
 ## 3. New Automation Modules
 
 ### ✅ Daily Auto-Report Generator
-- **File**: `angel_daily_report_generator.py`
+- **File**: `dhan_daily_report_generator.py`
 - **Features**:
   - Signal statistics
   - Trade execution summary
@@ -74,16 +74,16 @@
 - **Menu option**: 17
 
 ### ✅ Trade Lifecycle Logger
-- **File**: `angel_trade_lifecycle_logger.py`
+- **File**: `dhan_trade_lifecycle_logger.py`
 - **Features**:
   - Tracks all lifecycle events
   - Generates unique trade IDs
   - Provides audit trail
   - Query active trades
-- **Output**: `storage/live/angel_trade_lifecycle_log.csv`
+- **Output**: `storage/live/dhan_trade_lifecycle_log.csv`
 
 ### ✅ Intraday PnL Monitor
-- **File**: `angel_intraday_pnl_monitor.py`
+- **File**: `dhan_intraday_pnl_monitor.py`
 - **Features**:
   - Real-time PnL for active trades
   - Per-trade and summary views
@@ -91,7 +91,7 @@
 - **Menu option**: 16
 
 ### ✅ Recovery/Watchdog Process
-- **File**: `angel_watchdog_recovery.py`
+- **File**: `dhan_watchdog_recovery.py`
 - **Features**:
   - Monitors signals pipeline health
   - Checks disk space
@@ -120,7 +120,7 @@
 
 ### Current Settings
 ```python
-# angel_automation_config.py
+# dhan_automation_config.py
 auto_execute_trades = False  # ✅ DISABLED
 auto_simulate_pnl = False    # ✅ DISABLED
 max_trades_per_day = 20      # ✅ Safety limit
@@ -129,7 +129,7 @@ max_trades_per_underlying_per_day = 5  # ✅ Safety limit
 
 ### Trade Thresholds
 ```python
-# angel_trade_config.py
+# dhan_trade_config.py
 min_confidence = 0.80  # ✅ Very conservative
 min_abs_score = 0.30   # ✅ Very conservative
 target_pct = 10.0      # ✅ 10% target
@@ -205,21 +205,21 @@ Daily Summary (menu 15)
 ## 8. Files Created/Modified
 
 ### New Files
-1. `core/engine/angel_trade_lifecycle_logger.py`
-2. `core/engine/angel_intraday_pnl_monitor.py`
-3. `core/engine/angel_daily_report_generator.py`
-4. `core/engine/angel_watchdog_recovery.py`
-5. `core/engine/angel_safety_checks.py`
-6. `core/engine/angel_executor_live_prep.py`
-7. `core/engine/angel_automation_config.py`
+1. `core/engine/dhan_trade_lifecycle_logger.py`
+2. `core/engine/dhan_intraday_pnl_monitor.py`
+3. `core/engine/dhan_daily_report_generator.py`
+4. `core/engine/dhan_watchdog_recovery.py`
+5. `core/engine/dhan_safety_checks.py`
+6. `core/engine/dhan_executor_live_prep.py`
+7. `core/engine/dhan_automation_config.py`
 8. `docs/system3_monday_readiness.md`
 9. `docs/system3_batch3_completion.md`
 
 ### Modified Files
-1. `core/engine/angel_trade_decision.py` - Added safety validation
-2. `core/engine/angel_threshold_tuner.py` - Enhanced for real PnL data
-3. `core/engine/angel_trade_executor.py` - Improved duplicate prevention
-4. `core/engine/angel_live_ai_signals.py` - Integrated auto-execution hook
+1. `core/engine/dhan_trade_decision.py` - Added safety validation
+2. `core/engine/dhan_threshold_tuner.py` - Enhanced for real PnL data
+3. `core/engine/dhan_trade_executor.py` - Improved duplicate prevention
+4. `core/engine/dhan_live_ai_signals.py` - Integrated auto-execution hook
 5. `run_system3.py` - Added menu options 16, 17, 18
 
 ---

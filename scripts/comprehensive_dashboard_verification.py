@@ -3,13 +3,14 @@ Comprehensive Dashboard Verification - End-to-End Testing
 Tests all tabs, data synchronization, and backend-frontend integration
 """
 
-import sys
 import json
-import requests
-from pathlib import Path
+import sys
 from datetime import datetime
-import pytz
+from pathlib import Path
 from typing import Dict, List, Optional
+
+import pytz
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 

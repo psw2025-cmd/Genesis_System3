@@ -3,13 +3,14 @@
 Automated Electron Visual Verification
 Uses Playwright to verify UI elements are visible in Electron app
 """
+import json
+import subprocess
 import sys
 import time
-import subprocess
-import requests
-import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 LOGS_DIR = ROOT_DIR / "logs"

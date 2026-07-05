@@ -90,7 +90,7 @@ summary_by_underlying = {}  # Initialize to avoid reference error
 - **DRY_RUN Mode**: ✅ ACTIVE
 - **Live Trading**: ✅ DISABLED
 - **Kill Switch**: ✅ INACTIVE
-- **Broker Config**: ✅ ANGEL_ONE
+- **Broker Config**: ✅ DHAN
 - **Capital Guardrails**: ✅ ACTIVE (1-lot-only)
 - **Master Session**: ✅ READY
 - **DRY-RUN Readiness**: ✅ YES

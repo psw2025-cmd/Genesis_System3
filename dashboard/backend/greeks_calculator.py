@@ -4,8 +4,9 @@ Calculates option Greeks using Black-Scholes model
 """
 
 import math
-from typing import Dict, Optional
 from datetime import datetime
+from typing import Dict, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")

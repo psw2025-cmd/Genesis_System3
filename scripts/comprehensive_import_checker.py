@@ -3,11 +3,11 @@ Comprehensive Import Checker - Identifies ALL Import Issues
 Checks every Python file for import errors
 """
 
-import sys
 import ast
 import importlib.util
+import sys
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 ROOT_DIR = Path(__file__).parent.parent
 if str(ROOT_DIR) not in sys.path:

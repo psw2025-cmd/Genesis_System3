@@ -1,2 +1,0 @@
-comprehensive_app_verification_and_fix.py:463: SyntaxWarning: invalid escape sequence '\['
-  pattern = 'self._state\["broker"\]\["connected"\]'

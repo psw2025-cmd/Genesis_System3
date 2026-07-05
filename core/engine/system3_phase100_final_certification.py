@@ -5,11 +5,11 @@ Run a final checklist and produce a certification file:
 SYSTEM3_CERTIFIED = TRUE (if all checks pass).
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -37,7 +37,7 @@ REQUIRED_FOLDERS = [
 
 # Key configs
 KEY_CONFIGS = [
-    "config/angel_automation_config.json",
+    "config/dhan_automation_config.json",
     "config/system3_job_scheduler.json",
 ]
 

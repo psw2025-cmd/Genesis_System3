@@ -11,11 +11,10 @@ from __future__ import annotations
 import csv
 import glob
 import os
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple, Dict, Any
-
+from typing import Any, Dict, List, Tuple
 
 LOGS_DIR = Path("logs")
 
@@ -190,7 +189,7 @@ def clean_all_history_files() -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
 
     # Main live file
-    live_path = os.path.join("storage", "live", "angel_index_ai_signals.csv")
+    live_path = os.path.join("storage", "live", "dhan_index_ai_signals.csv")
     results.append(clean_csv_file(live_path, backup=True))
 
     # Archived CSVs

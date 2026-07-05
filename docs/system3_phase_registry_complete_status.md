@@ -163,7 +163,7 @@
 - ✅ **All phases**: DRY-RUN safe
 
 ### Broker Safety
-- ✅ **AngelOne**: Read-only API calls only
+- ✅ **Dhan**: Read-only API calls only
 - ✅ **No live orders**: All execution is virtual
 - ✅ **Kill switch**: Monitoring active
 
@@ -219,8 +219,8 @@
 
 ### Expected WARN Statuses
 **Phases 231-260** (8 phases):
-- Require `angel_virtual_orders.csv` (created by Phase 237)
-- Require `angel_virtual_orders_with_pnl.csv` (created by Phase 239)
+- Require `dhan_virtual_orders.csv` (created by Phase 237)
+- Require `dhan_virtual_orders_with_pnl.csv` (created by Phase 239)
 - Will automatically resolve when autopilot generates signals
 
 **Phases 261-300** (27 phases):

@@ -1,14 +1,14 @@
 """
 System3 Phase 131 - Master Session Config
 
-Builds master session configuration for AngelOne-only DRY-RUN mode.
+Builds master session configuration for Dhan-only DRY-RUN mode.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,7 +28,7 @@ OUTPUT_MD_PATH = STORAGE_ULTRA / "phase131_master_session_config_report.md"
 
 # Safe defaults
 SAFE_DEFAULTS = {
-    "broker": "ANGEL_ONE",
+    "broker": "DHAN",
     "live_trading_enabled": False,
     "max_daily_trades": 10,
     "max_trades_per_underlying": 3,
@@ -128,7 +128,7 @@ def run_phase131_master_session_config(mode: str = "ANGEL_ONLY") -> Dict[str, An
             f.write("\n## Summary\n\n")
             f.write("✅ **DRY_RUN_ONLY**: YES\n")
             f.write("✅ **LIVE_TRADING_ENABLED**: FALSE\n")
-            f.write("✅ **BROKER**: ANGEL_ONE\n")
+            f.write("✅ **BROKER**: DHAN\n")
 
         status = "OK" if not errors else "ERROR"
         details = "Master session config created with safe defaults"

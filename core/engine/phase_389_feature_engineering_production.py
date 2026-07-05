@@ -24,13 +24,14 @@ Python: 3.10.11 (venv)
 Mode: DRY-RUN ONLY
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Any, List, Tuple
-from pathlib import Path
-import logging
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -611,7 +612,7 @@ def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
         # Step 1: Load input data
         logger.info("\n[Step 1] Loading input data...")
         if input_csv_path is None:
-            input_csv_path = Path("storage/live/angel_index_ai_signals_curated.csv")
+            input_csv_path = Path("storage/live/dhan_index_ai_signals_curated.csv")
         else:
             input_csv_path = Path(input_csv_path)
 

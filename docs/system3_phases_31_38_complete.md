@@ -10,7 +10,7 @@
 All 8 phases (31-38) of the Ultra Integration layer have been successfully implemented according to the corrected blueprint. All modules are:
 
 - ✅ **Ultra-Isolated**: No baseline files modified
-- ✅ **Baseline-Protected**: All writes go to `storage/ultra/` or `core/models/angel_one_ultra/`
+- ✅ **Baseline-Protected**: All writes go to `storage/ultra/` or `core/models/dhan_ultra/`
 - ✅ **Read-Only**: No automatic config changes or promotions
 - ✅ **Menu-Integrated**: All phases accessible via menu options 94-101
 
@@ -76,7 +76,7 @@ All 8 phases (31-38) of the Ultra Integration layer have been successfully imple
 **Functionality**:
 - Runs Ultra decisions in shadow mode alongside baseline
 - Logs shadow trades but never executes
-- Outputs: `storage/live/angel_index_ai_ultra_trades_shadow.csv`
+- Outputs: `storage/live/dhan_index_ai_ultra_trades_shadow.csv`
 
 **Key Features**:
 - Only creates shadow trades for BUY actions with SAFE risk flag
@@ -184,7 +184,7 @@ All phases are integrated into `run_system3.py`:
 
 All phases maintain strict safety guarantees:
 
-1. **No Baseline Overwrites**: All writes go to `storage/ultra/` or `core/models/angel_one_ultra/`
+1. **No Baseline Overwrites**: All writes go to `storage/ultra/` or `core/models/dhan_ultra/`
 2. **No Auto-Execution**: Shadow trades are logged but never executed
 3. **No Auto-Promotion**: Promotion planner only suggests, never applies
 4. **No Config Changes**: All config reads are read-only
@@ -219,7 +219,7 @@ storage/ultra/
 └── phase38_governance_summary.md
 
 storage/live/
-└── angel_index_ai_ultra_trades_shadow.csv
+└── dhan_index_ai_ultra_trades_shadow.csv
 ```
 
 ---
@@ -253,7 +253,7 @@ type storage\ultra\phase33_promotion_plan.md
 
 # Phase 34
 python -m core.engine.system3_phase34_ultra_shadow_exec
-type storage\live\angel_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
+type storage\live\dhan_index_ai_ultra_trades_shadow.csv | Select-Object -First 10
 
 # Phase 35
 python -m core.engine.system3_phase35_ultra_auditor

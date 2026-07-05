@@ -4,13 +4,13 @@ System3 Phase 97 - Backup & Recovery Engine
 Create snapshots of key state files for backup.
 """
 
-import sys
 import argparse
 import json
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -30,7 +30,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 # Essential files to backup
 ESSENTIAL_FILES = [
-    "config/angel_automation_config.json",
+    "config/dhan_automation_config.json",
     "config/system3_job_scheduler.json",
     "config/system3_operator_override.json",
     "storage/ultra/ph76_ph100/phase79_adaptive_thresholds.json",

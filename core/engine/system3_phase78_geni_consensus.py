@@ -5,12 +5,13 @@ Combine Baseline model, Ultra model, and any heuristic signals into a single
 consensus signal per option leg.
 """
 
-import sys
-import pandas as pd
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -22,8 +23,8 @@ STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra" / "ph76_ph100"
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 
 # Input files (baseline predictions = live signals, ultra = same or separate)
-BASELINE_SIGNALS = STORAGE_LIVE / "angel_index_ai_signals.csv"
-ULTRA_SIGNALS = STORAGE_LIVE / "angel_index_ai_signals.csv"  # Can be same or separate
+BASELINE_SIGNALS = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+ULTRA_SIGNALS = STORAGE_LIVE / "dhan_index_ai_signals.csv"  # Can be same or separate
 
 # Output files
 OUTPUT_PARQUET = STORAGE_ULTRA / "phase78_geni_consensus.parquet"

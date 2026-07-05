@@ -2,11 +2,12 @@
 Verify All 3 Steps: Frontend, Dashboard Access, Desktop Build
 """
 
-import sys
-import requests
-import time
 import os
+import sys
+import time
 from pathlib import Path
+
+import requests
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")

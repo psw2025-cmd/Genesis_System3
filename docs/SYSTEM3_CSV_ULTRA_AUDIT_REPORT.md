@@ -1,5 +1,5 @@
 # System3 CSV Ultra Audit Report - Comprehensive Quality Control
-**File Analyzed**: `storage/live/angel_index_ai_signals_with_forward.csv`  
+**File Analyzed**: `storage/live/dhan_index_ai_signals_with_forward.csv`  
 **Analysis Date**: December 4, 2025, 7:30 PM IST  
 **Status**: ⚠️ **CRITICAL ISSUES FOUND**
 

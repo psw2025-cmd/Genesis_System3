@@ -3,9 +3,10 @@ Advanced Order Management System
 """
 
 import json
-from typing import Dict, List, Optional, Any
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -50,7 +51,19 @@ class OrderManagement:
         target: Optional[float] = None,
         trailing_stop_pct: Optional[float] = None,
     ) -> Dict[str, Any]:
-        """Create a new order"""
+        """Create a new order. Paper-only today, but gated on the same
+        kill switch (storage/live/kill_switch.json) the batch session loop
+        checks, so a single switch governs every order-creation path -
+        including this one, if a live path is ever added on top of it."""
+        try:
+            from core.engine.system3_phase113_kill_switch_monitor import run_phase113
+        except ImportError:
+            run_phase113 = None
+        if run_phase113 is not None:
+            kill_result = run_phase113()
+            if kill_result.get("status") == "KILL":
+                raise RuntimeError(f"Order rejected: kill switch active ({kill_result.get('details')})")
+
         order = {
             "order_id": f"ORD_{datetime.now(IST).strftime('%Y%m%d%H%M%S%f')}",
             "symbol": symbol,

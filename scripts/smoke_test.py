@@ -3,12 +3,13 @@
 Smoke Tests for Genesis System3
 Quick validation that core components work
 """
-import sys
 import os
 import subprocess
-import requests
+import sys
 import time
 from pathlib import Path
+
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -17,9 +18,9 @@ def test_imports():
     """Test critical imports"""
     print("[TEST] Critical imports...")
     try:
-        import pandas as pd
-        import numpy as np
         import fastapi
+        import numpy as np
+        import pandas as pd
         import uvicorn
 
         print("  [PASS] All imports successful")

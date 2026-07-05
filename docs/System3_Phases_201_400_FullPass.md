@@ -27,7 +27,7 @@ All phases are fully rewritten (not placeholders) and designed to integrate clea
 - Auto-generate install_requirements.bat.
 
 ## PHASE 205 – BROKER CREDENTIAL SELF-TESTER
-- Validate AngelOne keys.
+- Validate Dhan keys.
 - Validate Binance public API connectivity.
 - Mask sensitive fields before logging.
 

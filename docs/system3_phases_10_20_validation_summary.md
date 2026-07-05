@@ -34,10 +34,10 @@
 - ✅ All Ultra work in separate directories
 
 ### Ultra Isolation ✅
-- ✅ Models: `core/models/angel_one_ultra/`
+- ✅ Models: `core/models/dhan_ultra/`
 - ✅ Data: `storage/learning_ultra/`
 - ✅ Reports: `storage/reports_ultra/`
-- ✅ Training: `storage/training/angel_ultra_*`
+- ✅ Training: `storage/training/dhan_ultra_*`
 
 ### Safety Switches ✅
 - ✅ All auto-features disabled (False)

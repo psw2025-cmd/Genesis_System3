@@ -1,8 +1,8 @@
 # deployment_and_endpoint_proof
 
-Generated UTC: 2026-06-11T17:10:55.738411+00:00
+Generated UTC: 2026-06-23T21:26:07.462583+00:00
 
-- Status: `PASS_WITH_WARNINGS`
+- Status: `PASS`
 - Pass: `True`
 - Auto repair allowed: `True`
 
@@ -12,7 +12,7 @@ Generated UTC: 2026-06-11T17:10:55.738411+00:00
 
 ## Warnings
 
-- `public_backend_url_not_configured_endpoint_live_probe_skipped`
+- None
 
 ## Next action
 

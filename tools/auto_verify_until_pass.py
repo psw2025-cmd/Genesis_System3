@@ -7,12 +7,12 @@ Usage:
   .\venv\Scripts\python.exe tools\auto_verify_until_pass.py --attempts 3
 """
 
+import argparse
 import subprocess
 import sys
-from pathlib import Path
-from datetime import datetime
 import time
-import argparse
+from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INSPECTOR = ROOT / "logs" / "inspector"

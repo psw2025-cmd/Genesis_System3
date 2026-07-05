@@ -4,12 +4,12 @@ System3 Phase 96 - Chaos Test Engine
 Simulate failures to ensure System3 fails safe (no trades, no corruption).
 """
 
-import sys
 import json
 import subprocess
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -36,12 +36,12 @@ CHAOS_SCENARIOS = [
     {
         "name": "corrupted_csv_header",
         "description": "Corrupted CSV header",
-        "module": "core.engine.angel_live_ai_signals",
+        "module": "core.engine.dhan_live_ai_signals",
     },
     {
         "name": "empty_signals",
         "description": "Empty signals file",
-        "module": "core.engine.angel_trade_decision",
+        "module": "core.engine.dhan_trade_decision",
     },
 ]
 

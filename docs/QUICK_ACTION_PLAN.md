@@ -35,7 +35,7 @@
 **Investigation Needed**:
 ```python
 # Test this manually:
-broker = AngelOneBroker(allow_data_only=True)
+broker = DhanBroker(allow_data_only=True)
 
 # Check what methods exist
 print([m for m in dir(broker.smart) if 'quote' in m.lower() or 'market' in m.lower()])
@@ -65,7 +65,7 @@ print("marketData response:", test2)
 has_greeks = any('greek' in m.lower() for m in dir(broker.smart))
 print("Greeks method available:", has_greeks)
 
-# Check SmartAPI documentation
+# Check DhanHQ documentation
 # May need to use different endpoint or calculate manually
 ```
 
@@ -76,7 +76,7 @@ print("Greeks method available:", has_greeks)
 ### Action 1: Verify Quote API (30 minutes)
 
 **Steps**:
-1. Create test script to check SmartAPI methods
+1. Create test script to check DhanHQ methods
 2. Test `getQuote()` with known working option
 3. Check response structure
 4. Update `get_quote()` implementation if needed
@@ -344,7 +344,7 @@ opt_data["data_age_seconds"] = 0  # Fresh data
 ### Immediate (Today)
 - [ ] Test `getQuote()` method manually
 - [ ] Add detailed logging to quote/Greeks methods
-- [ ] Check SmartAPI documentation for correct method names
+- [ ] Check DhanHQ documentation for correct method names
 - [ ] Run validator on current CSV
 
 ### This Week

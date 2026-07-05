@@ -4,12 +4,13 @@ System3 Phase 93 - Operator Override Engine
 Allow operator to define override rules and log what they would block.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,8 +26,8 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 CONFIG_JSON = CONFIG_DIR / "system3_operator_override.json"
 
 # Input files
-SIGNALS_CSV = STORAGE_LIVE / "angel_index_ai_signals.csv"
-TRADES_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
+SIGNALS_CSV = STORAGE_LIVE / "dhan_index_ai_signals.csv"
+TRADES_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
 
 # Output files
 STATE_JSON = STORAGE_ULTRA / "phase93_override_state.json"

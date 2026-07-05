@@ -78,7 +78,7 @@
 
 ## Files Generated
 
-1. ✅ `storage/live/angel_index_ai_signals_with_forward.csv` - Enriched signals
+1. ✅ `storage/live/dhan_index_ai_signals_with_forward.csv` - Enriched signals
 2. ✅ `logs/research/system3_signal_edge_report.md` - EV tables
 3. ✅ `storage/meta/system3_live_thresholds.json` - Live thresholds
 4. ✅ `docs/system3_thresholds_comparison.md` - Comparison report

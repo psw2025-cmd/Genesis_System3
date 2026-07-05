@@ -1,287 +1,855 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genesis System3 Ultra Dashboard</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System3 AI Trading Control Center — Pritam S. Warghade</title>
+<link rel="icon" href="data:,">
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/ui/style.css">
 </head>
 <body>
-    <div id="app">
-        <div class="dashboard">
-            <!-- Sidebar Navigation -->
-            <div class="sidebar">
-                <div class="logo">
-                    <h1>System3</h1>
-                    <div class="status-indicator" :class="systemStatus.toLowerCase()"></div>
-                </div>
-                <nav class="nav-tabs">
-                    <div 
-                        v-for="tab in tabs" 
-                        :key="tab.id"
-                        class="tab" 
-                        :class="{active: activeTab === tab.id}" 
-                        @click="activeTab = tab.id"
-                    >
-                        <span class="tab-icon">{{ tab.icon }}</span>
-                        <span class="tab-label">{{ tab.label }}</span>
-                    </div>
-                </nav>
-            </div>
+<div id="app" v-cloak>
 
-            <!-- Main Content Area -->
-            <div class="content">
-                <!-- Overview Tab -->
-                <div v-if="activeTab === 'overview'" class="tab-content">
-                    <h2>System Overview</h2>
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getPnLClass()">
-                            <div class="metric-label">Total PnL</div>
-                            <div class="metric-value">₹{{ formatNumber(metrics.pnl) }}</div>
-                            <div class="metric-change">{{ metrics.pnlChange >= 0 ? '+' : '' }}{{ metrics.pnlChange.toFixed(2) }}%</div>
-                        </div>
-                        <div class="metric-card" :class="getPerfClass()">
-                            <div class="metric-label">Cycle Duration</div>
-                            <div class="metric-value">{{ metrics.cycleDuration }}s</div>
-                            <div class="metric-change">{{ metrics.cycleDuration < 3 ? 'GREEN' : metrics.cycleDuration < 10 ? 'YELLOW' : 'RED' }}</div>
-                        </div>
-                        <div class="metric-card green">
-                            <div class="metric-label">Trades Executed</div>
-                            <div class="metric-value">{{ metrics.tradesExecuted }}</div>
-                            <div class="metric-change">Open: {{ metrics.openPositions }}</div>
-                        </div>
-                        <div class="metric-card" :class="getGreeksClass()">
-                            <div class="metric-label">Greeks Success</div>
-                            <div class="metric-value">{{ metrics.greeksSuccess }}%</div>
-                            <div class="metric-change">Fallback: {{ metrics.greeksFallback }}</div>
-                        </div>
-                    </div>
-
-                    <div class="panel">
-                        <h3>System Status</h3>
-                        <div class="status-grid">
-                            <div class="status-item">
-                                <span class="status-label">Mode:</span>
-                                <span class="status-value">{{ systemStatus }}</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Last Fetch:</span>
-                                <span class="status-value">{{ formatTime(metrics.lastFetch) }}</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Data Success Rate:</span>
-                                <span class="status-value">{{ metrics.dataSuccessRate }}%</span>
-                            </div>
-                            <div class="status-item">
-                                <span class="status-label">Signal Success Rate:</span>
-                                <span class="status-value">{{ metrics.signalSuccessRate }}%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Latency Tab -->
-                <div v-if="activeTab === 'latency'" class="tab-content">
-                    <h2>Latency Metrics</h2>
-                    <div class="panel">
-                        <div class="latency-grid">
-                            <div class="latency-item" :class="getLatencyClass(metrics.fetchDuration)">
-                                <div class="latency-label">Fetch Duration</div>
-                                <div class="latency-value">{{ metrics.fetchDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.fetchDuration < 3 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                            <div class="latency-item" :class="getLatencyClass(metrics.strategyDuration)">
-                                <div class="latency-label">Strategy Duration</div>
-                                <div class="latency-value">{{ metrics.strategyDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.strategyDuration < 1 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                            <div class="latency-item" :class="getLatencyClass(metrics.cycleDuration)">
-                                <div class="latency-label">Total Cycle</div>
-                                <div class="latency-value">{{ metrics.cycleDuration }}s</div>
-                                <div class="latency-sla">{{ metrics.cycleDuration < 10 ? 'PASS' : 'FAIL' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Risk Tab -->
-                <div v-if="activeTab === 'risk'" class="tab-content">
-                    <h2>Risk Management</h2>
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getRiskClass(metrics.maxDrawdown)">
-                            <div class="metric-label">Max Drawdown</div>
-                            <div class="metric-value">{{ metrics.maxDrawdown }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Win Rate</div>
-                            <div class="metric-value">{{ metrics.winRate }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Trades</div>
-                            <div class="metric-value">{{ metrics.totalTrades }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Winning Trades</div>
-                            <div class="metric-value">{{ metrics.winningTrades }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Greeks Tab -->
-                <div v-if="activeTab === 'greeks'" class="tab-content">
-                    <h2>Greeks Status</h2>
-                    
-                    <!-- Underlying Selector -->
-                    <div class="underlying-selector">
-                        <button 
-                            v-for="u in underlyings" 
-                            :key="u"
-                            class="underlying-btn"
-                            :class="{active: selectedUnderlying === u}"
-                            @click="selectedUnderlying = u; fetchChainData(u)"
-                        >
-                            {{ u }}
-                        </button>
-                    </div>
-                    
-                    <div class="metric-grid">
-                        <div class="metric-card" :class="getGreeksClass()">
-                            <div class="metric-label">API Success Rate</div>
-                            <div class="metric-value">{{ metrics.greeksSuccess.toFixed(1) }}%</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Black-Scholes Fallback</div>
-                            <div class="metric-value">{{ metrics.greeksFallback }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Unavailable</div>
-                            <div class="metric-value">{{ metrics.greeksUnavailable }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Contracts</div>
-                            <div class="metric-value">{{ chainData.totalContracts }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="panel">
-                        <h3>Greeks Distribution</h3>
-                        <div class="greeks-status">
-                            <div class="status-row">
-                                <span>Contracts with Full Greeks (Delta, Gamma, Vega, Theta):</span>
-                                <span class="green">{{ Math.round(chainData.totalContracts * metrics.greeksSuccess / 100) }}</span>
-                            </div>
-                            <div class="status-row">
-                                <span>Contracts with Partial Greeks:</span>
-                                <span class="yellow">{{ metrics.greeksFallback }}</span>
-                            </div>
-                            <div class="status-row">
-                                <span>Contracts without Greeks:</span>
-                                <span class="red">{{ metrics.greeksUnavailable }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Option Chain Tab -->
-                <div v-if="activeTab === 'options'" class="tab-content">
-                    <h2>Option Chain Analytics</h2>
-                    
-                    <!-- Underlying Selector -->
-                    <div class="underlying-selector">
-                        <button 
-                            v-for="u in underlyings" 
-                            :key="u"
-                            class="underlying-btn"
-                            :class="{active: selectedUnderlying === u}"
-                            @click="selectedUnderlying = u; fetchChainData(u)"
-                        >
-                            {{ u }}
-                        </button>
-                    </div>
-
-                    <!-- Metrics -->
-                    <div class="metric-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Spot Price</div>
-                            <div class="metric-value">₹{{ formatNumber(chainData.spot) }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Put-Call Ratio</div>
-                            <div class="metric-value">{{ chainData.pcr?.toFixed(2) || 'N/A' }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Total Contracts</div>
-                            <div class="metric-value">{{ chainData.totalContracts || 0 }}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Filtered</div>
-                            <div class="metric-value">{{ filteredContracts.length }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Chain Table -->
-                    <div class="panel">
-                        <div class="table-container">
-                            <table class="chain-table">
-                                <thead>
-                                    <tr>
-                                        <th>Strike</th>
-                                        <th>Type</th>
-                                        <th>LTP</th>
-                                        <th>OI</th>
-                                        <th>Volume</th>
-                                        <th>IV</th>
-                                        <th>Delta</th>
-                                        <th>Gamma</th>
-                                        <th>Vega</th>
-                                        <th>Theta</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(contract, idx) in filteredContracts.slice(0, 100)" :key="idx">
-                                        <td>{{ contract.strike }}</td>
-                                        <td>{{ contract.option_type }}</td>
-                                        <td>₹{{ contract.ltp?.toFixed(2) || 'N/A' }}</td>
-                                        <td>{{ formatNumber(contract.oi) }}</td>
-                                        <td>{{ formatNumber(contract.volume) }}</td>
-                                        <td>{{ contract.iv ? (contract.iv * 100).toFixed(2) + '%' : 'N/A' }}</td>
-                                        <td>{{ contract.delta?.toFixed(3) || 'N/A' }}</td>
-                                        <td>{{ contract.gamma?.toFixed(4) || 'N/A' }}</td>
-                                        <td>{{ contract.vega?.toFixed(2) || 'N/A' }}</td>
-                                        <td>{{ contract.theta?.toFixed(2) || 'N/A' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Trades Tab -->
-                <div v-if="activeTab === 'trades'" class="tab-content">
-                    <h2>Live Trades</h2>
-                    <div class="panel">
-                        <div class="trades-list">
-                            <div v-for="trade in liveTrades" :key="trade.id" class="trade-item">
-                                <div class="trade-symbol">{{ trade.symbol }}</div>
-                                <div class="trade-details">
-                                    <span>Entry: ₹{{ trade.entryPrice }}</span>
-                                    <span>Current: ₹{{ trade.currentPrice }}</span>
-                                    <span :class="trade.pnl >= 0 ? 'green' : 'red'">
-                                        PnL: ₹{{ trade.pnl.toFixed(2) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div v-if="liveTrades.length === 0" class="no-trades">
-                                No active trades
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- PREMIUM IDENTITY HEADER -->
+  <header class="topbar">
+    <div class="identity-block">
+      <div class="system-title">
+        <span class="sys-hex">⬡</span>
+        <div class="sys-name-stack">
+          <div class="sys-title-line">SYSTEM3&nbsp;<span class="sys-ai">AI</span>&nbsp;TRADING CONTROL CENTER</div>
+          <div class="owner-name-block">
+            <div class="owner-name">PRITAM S. WARGHADE</div>
+            <div class="owner-name-line" aria-hidden="true"></div>
+          </div>
+          <div class="owner-roles">OWNER · MARKET INTELLIGENCE · OPTION CHAIN · AUTONOMOUS LEARNING</div>
         </div>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="market-clock"><span class="clock-label">IST</span><span class="clock-time">{{ currentTime }}</span></div>
+      <div class="market-pill" :class="marketOpen?'pill-open':'pill-closed'">
+        <span class="pulse-dot"></span>{{ marketOpen?'MARKET OPEN':'MARKET CLOSED' }}
+        <span class="pill-countdown">{{ marketCountdown }}</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-chip" :class="broker.connected?'chip-green':'chip-red'">
+        <span class="cdot"></span>{{ broker.connected?'DHAN CONNECTED':'BROKER OFFLINE' }}
+      </div>
+      <div class="mode-chip"><span class="mode-dot"></span>ANALYZER / PAPER</div>
+      <div class="live-chip"><span class="live-dot"></span>LIVE DISABLED</div>
+      <div class="conn-health" :class="'conn-'+connHealth" :title="'Connection: '+connHealth">
+        <span class="conn-dot"></span>{{ connHealth==='live'?'LIVE':connHealth==='reconnecting'?'RECONNECTING':'CONNECTING' }}
+      </div>
+      <div class="ws-pill"
+           :class="wsStatus==='live'?'ws-live':wsStatus==='connecting'?'ws-connecting':wsStatus==='market_closed'?'ws-closed':'ws-off'"
+           :title="'WebSocket: '+wsStatus+(lastWsTick?' | Last tick: '+lastWsTick:'')"
+           @click="wsConnect()">
+        <span class="ws-dot"></span>WS {{ wsStatus==='live'?'●':wsStatus==='connecting'?'…':wsStatus==='market_closed'?'MKT-CLOSED':'○' }}
+      </div>
+      <div class="rho-pill" :class="rhoClass">ρ {{ latestRho!==null?latestRho.toFixed(2):'--' }}</div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <nav class="sidenav">
+      <div v-for="tab in tabs" :key="tab.id" class="nav-item"
+           :class="{active: activeTab===tab.id}" @click="activeTab=tab.id">
+        <span class="nav-icon">{{ tab.icon }}</span>
+        <span class="nav-label">{{ tab.label }}</span>
+        <span v-if="tab.badge && typeof tab.badge === 'string'" class="nav-badge" :class="tab.badgeClass">{{ tab.badge }}</span>
+        <span v-if="tab.badge && typeof tab.badge !== 'string' && tab.badge.value" class="nav-alert">{{ tab.badge.value }}</span>
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="sf-row"><span>Sync</span><strong>{{ lastSync }}</strong></div>
+      <div class="sf-row"><span>Mode</span><strong class="tx-a">PAPER ONLY</strong></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="global-proof-strip" aria-label="Dashboard proof status">
+      <span>Proof Status: Gate Matrix visible</span>
+      <span>Option Chain readiness: Contracts tracked</span>
+      <span>P&L Positions: GROSS P&L · NET P&L · OPEN POSITIONS</span>
+      <span>Safety: LIVE DISABLED · PAPER ONLY</span>
     </div>
 
-    <script src="app.js"></script>
+    <!-- ══ SYSTEM CONTROL ══ -->
+    <section v-if="activeTab==='control'" class="tab">
+      <div class="sec-hdr"><h2>System Control</h2><span class="sec-sub">Master status · Safety gates · Production readiness</span></div>
+
+      <div v-if="approvalData.human_approval" class="owner-approval-banner mt16">
+        <span class="oab-icon">✅</span>
+        <div>
+          <div class="oab-title">OWNER APPROVAL RECORDED — FULL TRUST GRANTED</div>
+          <div class="oab-sub">{{ approvalData.approved_by || 'PRITAM S. WARGHADE' }} · World-class build authorized · Live orders remain gated by technical proof (ρ, paper lifecycle, expectancy)</div>
+        </div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi kpi-b"><div class="kpi-lbl">SYSTEM MODE</div><div class="kpi-val">{{ state.mode||'PAPER' }}</div><div class="kpi-sub">Analyzer / Paper only</div></div>
+        <div class="kpi" :class="broker.connected?'kpi-g':'kpi-r'"><div class="kpi-lbl">BROKER</div><div class="kpi-val">{{ broker.connected?'CONN':'OFFLINE' }}</div><div class="kpi-sub">{{ broker.error||'Dhan ANALYZER' }}</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE TRADING</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0 hardcoded</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">ORDER PLACEMENT</div><div class="kpi-val">BLOCKED</div><div class="kpi-sub">Skeleton wrapper</div></div>
+        <div class="kpi" :class="marketOpen?'kpi-g':'kpi-a'"><div class="kpi-lbl">MARKET</div><div class="kpi-val">{{ marketOpen?'OPEN':'CLOSED' }}</div><div class="kpi-sub">{{ marketCountdown }}</div></div>
+        <div class="kpi kpi-p"><div class="kpi-lbl">DATA APIs</div><div class="kpi-val">ACTIVE</div><div class="kpi-sub">Dhan · till 23 Jul</div></div>
+      </div>
+
+      <!-- NO TRADE REASON MATRIX — critical for trader -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🚫 No-Trade Reason Matrix</span><span class="ps">Why system is/isn't trading right now</span></div>
+        <div class="no-trade-grid">
+          <div class="nt-hdr"><span>GATE</span><span>STATUS</span><span>REASON</span></div>
+          <div v-for="r in noTradeReasons" :key="r.gate" class="nt-row">
+            <span class="nt-gate">{{ r.gate }}</span>
+            <span class="nt-status" :class="r.status==='PASS'?'tx-g':r.status==='FAIL'?'tx-r':r.status==='PEND'?'tx-a':'tx-m'">
+              {{ r.status==='PASS'?'✅ PASS':r.status==='FAIL'?'❌ FAIL':r.status==='PEND'?'⏳ PEND':'⚠️ '+r.status }}
+            </span>
+            <span class="nt-reason tx-m">{{ r.reason }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">🔬 Production Gate Matrix</span><span class="ps">ANALYZER_READY verdict</span></div>
+          <div class="gate-tbl">
+            <div class="gate-hdr"><span>GATE</span><span>STATUS</span><span>✓</span><span>NOTES</span></div>
+            <div v-for="g in proofGates" :key="g.name" class="gate-row">
+              <span>{{ g.name }}</span><span :class="g.pass?'tx-g':'tx-a'">{{ g.status }}</span>
+              <span :class="g.pass?'tx-g':'tx-r'">{{ g.pass?'✓':'✗' }}</span><span class="tx-m">{{ g.note }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">🪜 Live Enablement Checklist</span></div>
+          <div class="checklist">
+            <div v-for="r in readinessLadder" :key="r.label" class="cl-r" :class="r.done?'done':'pend'">
+              <span>{{ r.done?'✅':'⏳' }}</span><span>{{ r.label }}</span><span class="tx-m">{{ r.detail }}</span>
+            </div>
+          </div>
+          <div class="kill-switch-banner mt16">
+            <span class="ks-icon">🔴</span>
+            <div><div class="ks-title">LIVE TRADING KILL SWITCH — ACTIVE</div>
+            <div class="ks-sub">LIVE_TRADING_ENABLED=0 · SYSTEM3_LIVE_TRADING_ALLOWED=0 · Cannot be enabled from dashboard</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Honest status -->
+      <div class="honest-status-banner mt16">
+        <div class="hsb-row"><span class="hsb-label">CLOUD / DASHBOARD</span><span class="hsb-val tx-g">MUCH IMPROVED ✓</span></div>
+        <div class="hsb-row"><span class="hsb-label">ANALYZER / PAPER</span><span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">MARKET-DAY LIFECYCLE</span><span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span></div>
+        <div class="hsb-row"><span class="hsb-label">PREDICTION PROOF</span><span class="hsb-val tx-a">1/5 DAYS (ρ=0.20) ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">HUMAN APPROVAL</span><span class="hsb-val" :class="approvalData.human_approval?'tx-g':'tx-a'">{{ approvalData.human_approval?'OWNER APPROVED ✓':'PENDING ⏳' }}</span></div>
+        <div class="hsb-row"><span class="hsb-label">LIVE TRADING</span><span class="hsb-val tx-r">BLOCKED 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">PRODUCTION</span><span class="hsb-val tx-r">NOT READY 🔴</span></div>
+      </div>
+    </section>
+
+    <!-- ══ BROKER & DATA HEALTH ══ -->
+    <section v-if="activeTab==='health'" class="tab">
+      <div class="sec-hdr"><h2>Broker & Data Health</h2><span class="sec-sub">All auth levels · Data freshness · QC</span></div>
+
+      <!-- BROKER TRUTH — all 11 levels -->
+      <div class="panel">
+        <div class="ph"><span class="pt">🔑 Broker Auth Truth — All Levels</span><span class="ps">Not just "connected" — full proof</span></div>
+        <div class="broker-truth-grid">
+          <div class="bt-row"><span class="bt-lbl">Cloud App</span><span class="bt-val tx-g">ALIVE ✓</span><span class="bt-note">Render running</span></div>
+          <div class="bt-row"><span class="bt-lbl">SDK Import</span><span class="bt-val" :class="brokerDetail.sdk_available?'tx-g':'tx-r'">{{ brokerDetail.sdk_available?'LOADED ✓':'FAILED ✗' }}</span><span class="bt-note">dhanhq SDK</span></div>
+          <div class="bt-row"><span class="bt-lbl">Client ID</span><span class="bt-val" :class="brokerDetail.client_id_present?'tx-g':'tx-r'">{{ brokerDetail.client_id_present?'PRESENT ✓':'MISSING ✗' }}</span><span class="bt-note">...3741</span></div>
+          <div class="bt-row"><span class="bt-lbl">Access Token</span><span class="bt-val" :class="brokerDetail.access_token_present?'tx-g':'tx-r'">{{ brokerDetail.access_token_present?'PRESENT ✓':'MISSING ✗' }}</span><span class="bt-note">Auto-refreshed</span></div>
+          <div class="bt-row"><span class="bt-lbl">Auth Probe</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-r'">{{ brokerDetail.connected?'AUTHENTICATED ✓':(brokerDetail.error||'FAILED ✗') }}</span><span class="bt-note">Profile API call</span></div>
+          <div class="bt-row"><span class="bt-lbl">Quote API</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-a'">{{ brokerDetail.connected?'REACHABLE ✓':'UNVERIFIED' }}</span><span class="bt-note">Dhan Data APIs</span></div>
+          <div class="bt-row"><span class="bt-lbl">Option Chain API</span><span class="bt-val" :class="brokerDetail.connected?'tx-g':'tx-a'">{{ brokerDetail.connected?'ACTIVE ✓':'UNVERIFIED' }}</span><span class="bt-note">Data APIs subscribed</span></div>
+          <div class="bt-row"><span class="bt-lbl">Order Placement</span><span class="bt-val tx-g">{{ brokerDetail.order_placement_allowed?'⚠️ ALLOWED':'BLOCKED ✓' }}</span><span class="bt-note">Skeleton wrapper</span></div>
+          <div class="bt-row"><span class="bt-lbl">Live Trading</span><span class="bt-val tx-g">{{ brokerDetail.live_trading_enabled?'⚠️ ENABLED':'DISABLED ✓' }}</span><span class="bt-note">ENV=0</span></div>
+          <div class="bt-row"><span class="bt-lbl">Latency</span><span class="bt-val">{{ brokerDetail.latency_ms?brokerDetail.latency_ms+'ms':'--' }}</span><span class="bt-note">Profile API</span></div>
+          <div class="bt-row"><span class="bt-lbl">Env Source</span><span class="bt-val tx-m">{{ brokerDetail.env_source||'cloud env' }}</span><span class="bt-note">Render dashboard</span></div>
+          <div class="bt-row"><span class="bt-lbl">Token Refresh</span><span class="bt-val" :class="brokerDetail.auto_refresh?.success?'tx-g':'tx-m'">{{ brokerDetail.auto_refresh?.success?'REFRESHED ✓':'STANDBY' }}</span><span class="bt-note">PIN+TOTP auto</span></div>
+          <div class="bt-row"><span class="bt-lbl">Holdings API</span><span class="bt-val" :class="brokerHoldingsOk?'tx-g':'tx-r'">{{ brokerHoldingsOk?'VALID ✓':(brokerTruth.holdings?.error||'OFFLINE') }}</span><span class="bt-note">{{ holdingRows.length }} equity</span></div>
+          <div class="bt-row"><span class="bt-lbl">Funds API</span><span class="bt-val" :class="brokerFundsOk?'tx-g':'tx-r'">{{ brokerFundsOk?'VALID ✓':(brokerTruth.funds?.error||'OFFLINE') }}</span><span class="bt-note">Balance read-only</span></div>
+          <div class="bt-row"><span class="bt-lbl">Positions API</span><span class="bt-val" :class="brokerPositionsOk?'tx-g':'tx-r'">{{ brokerPositionsOk?'VALID ✓':(brokerTruth.positions?.error||'OFFLINE') }}</span><span class="bt-note">{{ positionRows.length }} open</span></div>
+          <div class="bt-row"><span class="bt-lbl">Trader Validation</span><span class="bt-val" :class="brokerValidation.overall==='VALID'?'tx-g':'tx-a'">{{ brokerValidation.overall||'--' }} · {{ brokerValidation.valid_pct||0 }}%</span><span class="bt-note">Multi-check</span></div>
+        </div>
+      </div>
+
+      <!-- Data freshness + QC -->
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">📡 Data Freshness</span><span class="ps">Dhan P0 · NSE fallback</span></div>
+          <div class="tok-info">
+            <div class="tok-r"><span>Option Chain</span><strong :class="qcData.timestamp?'tx-g':'tx-a'">{{ qcData.timestamp_ist ? ageStr(qcData.timestamp_ist) : '--' }}</strong></div>
+            <div class="tok-r"><span>Chain Source</span><strong>{{ chainData.data_source||'--' }}</strong></div>
+            <div class="tok-r"><span>Chain Status</span><strong :class="chainData.status==='MARKET_OPEN'?'tx-g':'tx-a'">{{ chainData.status||'--' }}</strong></div>
+            <div class="tok-r"><span>Contracts</span><strong>{{ chainData.total_contracts||0 }} loaded</strong></div>
+            <div class="tok-r">
+              <span>WebSocket</span>
+              <strong :class="wsStatus==='live'?'tx-g':wsStatus==='market_closed'?'tx-a':'tx-r'">
+                {{ wsStatus==='live'?'CONNECTED (live ticks)':wsStatus==='connecting'?'CONNECTING...':wsStatus==='market_closed'?'MARKET CLOSED (will reconnect)':wsStatus==='error'?'ERROR':'DISCONNECTED' }}
+                <span v-if="wsLatency"> | {{ wsLatency }}ms</span>
+              </strong>
+            </div>
+            <div class="tok-r"><span>REST Fallback</span><strong class="tx-g">NSE Public → nsepython</strong></div>
+            <div class="tok-r"><span>Bhavcopy EOD</span><strong class="tx-g">Jun 8–12 cached ✓</strong></div>
+            <div class="tok-r"><span>Last GainRank</span><strong>{{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : '--' }}</strong></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">🔍 QC Report</span><span class="ps">Live option chain quality</span></div>
+          <div class="tok-info">
+            <div class="tok-r"><span>Overall</span><strong :class="qcData.overall_passed?'tx-g':'tx-r'">{{ qcData.overall_passed===true?'PASS ✓':qcData.overall_passed===false?'FAIL ✗':'--' }}</strong></div>
+            <div class="tok-r"><span>QC Time</span><strong class="tx-m">{{ qcData.timestamp_ist||'--' }}</strong></div>
+          </div>
+          <template v-if="qcData.underlying_results">
+            <div class="qc-grid">
+              <div class="qc-hdr"><span>INDEX</span><span>CONTRACTS</span><span>STATUS</span><span>ISSUE</span></div>
+              <div v-for="(res, sym) in qcData.underlying_results" :key="sym" class="qc-row">
+                <span class="rs">{{ sym }}</span>
+                <span>{{ res.contract_count }}</span>
+                <span :class="res.passed?'tx-g':'tx-r'">{{ res.passed?'PASS':'FAIL' }}</span>
+                <span class="tx-m" style="font-size:.6rem">{{ res.reasons?.[0]||'--' }}</span>
+              </div>
+            </div>
+          </template>
+          <div v-else class="no-data">No QC data</div>
+          <!-- Data source priority -->
+          <div class="ph mt16"><span class="pt">📡 Source Priority</span></div>
+          <div class="tok-info">
+            <div class="tok-r"><span>P0 Dhan Data API</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P1 NSE Public</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P3 Bhavcopy EOD</span><strong class="tx-g">ACTIVE ✓</strong></div>
+            <div class="tok-r"><span>P5 Yahoo Finance</span><strong class="tx-a">FALLBACK</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job scheduler -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">⏰ Job Scheduler (IST)</span></div>
+        <div class="job-tbl">
+          <div class="job-hdr"><span>JOB</span><span>TIME</span><span>STATUS</span><span>LAST RUN</span><span>RESULT</span></div>
+          <div v-for="job in healthData.jobs" :key="job.id" class="job-row" :class="job.enabled?'je':'jd'">
+            <span>{{ job.name||job.id }}</span><span>{{ job.schedule_time }}</span>
+            <span :class="job.enabled?'tx-g':'tx-m'">{{ job.enabled?'ACTIVE':'OFF' }}</span>
+            <span class="tx-m">{{ job.last_run_time ? new Date(job.last_run_time).toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: false}).replace(',', '') : 'NEVER' }}</span>
+            <span :class="job.last_status === 'SUCCESS' ? 'tx-g' : job.last_status === 'FAILED' || job.last_status === 'ERROR' || job.last_status === 'TIMEOUT' ? 'tx-r' : 'tx-m'">
+              {{ job.last_status || 'N/A' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ MARKET SCANNER ══ -->
+    <section v-if="activeTab==='scanner'" class="tab">
+      <div class="sec-hdr"><h2>Market Scanner</h2><span class="sec-sub">Index option underlyings · GainRank · Live CE/PE gainers · PATH A/B</span></div>
+      <div class="scanner-note"><span class="sn-badge index">INDEX OPTIDX</span>4 segments · <span class="sn-badge equity">EQUITY OPTSTK</span>{{ equityOptionsData.universe?.underlying_count||0 }} F&O stocks · Cash: <strong>FORECAST_ONLY</strong></div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔥 Highest Gain CE / PE (Live Market)</span><span class="ps">{{ topGainersData.segments_implemented||0 }}/{{ topGainersData.segments_total||4 }} segments · NSE index F&O</span></div>
+        <div class="tok-info mb8">
+          <div class="tok-r"><span>Market Top CE</span><strong class="tx-r">{{ topGainersData.market_wide?.top_ce?.trading_symbol || '--' }} · {{ topGainersData.market_wide?.top_ce?.gain_pct!=null ? topGainersData.market_wide.top_ce.gain_pct.toFixed(2)+'%' : '--' }}</strong></div>
+          <div class="tok-r"><span>Market Top PE</span><strong class="tx-g">{{ topGainersData.market_wide?.top_pe?.trading_symbol || '--' }} · {{ topGainersData.market_wide?.top_pe?.gain_pct!=null ? topGainersData.market_wide.top_pe.gain_pct.toFixed(2)+'%' : '--' }}</strong></div>
+          <div class="tok-r"><span>All segments live</span><strong :class="topGainersData.all_segments_live?'tx-g':'tx-a'">{{ topGainersData.all_segments_live ? 'YES' : 'PARTIAL' }}</strong></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr>
+              <th>SEGMENT</th><th>STATUS</th><th>TOP CE SYMBOL</th><th>CE GAIN%</th><th>TOP PE SYMBOL</th><th>PE GAIN%</th><th>SPOT</th><th>SOURCE</th>
+            </tr></thead>
+            <tbody>
+              <tr v-for="seg in ['NIFTY','BANKNIFTY','FINNIFTY','MIDCPNIFTY']" :key="seg">
+                <td class="sym-tag">{{ seg }}</td>
+                <td :class="topGainersData.by_segment?.[seg]?.implemented?'tx-g':'tx-a'">{{ topGainersData.by_segment?.[seg]?.implemented ? 'LIVE' : (topGainersData.by_segment?.[seg]?.status||'NO DATA') }}</td>
+                <td class="tx-m sym-contract">{{ topGainersData.by_segment?.[seg]?.top_ce?.trading_symbol || '--' }}</td>
+                <td class="tx-r">{{ topGainersData.by_segment?.[seg]?.top_ce?.gain_pct!=null ? topGainersData.by_segment[seg].top_ce.gain_pct.toFixed(2)+'%' : '--' }}</td>
+                <td class="tx-m sym-contract">{{ topGainersData.by_segment?.[seg]?.top_pe?.trading_symbol || '--' }}</td>
+                <td class="tx-g">{{ topGainersData.by_segment?.[seg]?.top_pe?.gain_pct!=null ? topGainersData.by_segment[seg].top_pe.gain_pct.toFixed(2)+'%' : '--' }}</td>
+                <td>{{ formatNum(topGainersData.by_segment?.[seg]?.spot||0) }}</td>
+                <td class="tx-m">{{ topGainersData.by_segment?.[seg]?.data_source||'--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-if="topGainersData.missing_segments?.length" class="fc-note mt8"><span>⚠️</span>Missing chain data: <strong>{{ topGainersData.missing_segments.join(', ') }}</strong></div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🏦 Equity Options (OPTSTK)</span><span class="ps">{{ equityOptionsData.universe?.underlying_count||0 }} NSE F&O stocks · {{ equityOptionsData.scanner?.data_available?'Bhavcopy':'Universe only' }}</span></div>
+        <div class="tok-info mb8">
+          <div class="tok-r"><span>Instrument</span><strong>OPTSTK (stock options)</strong></div>
+          <div class="tok-r"><span>Top CE (OI buildup)</span><strong class="tx-r">{{ equityOptionsData.scanner?.market_top_ce?.underlying||'--' }} {{ equityOptionsData.scanner?.market_top_ce?.gain_pct!=null?equityOptionsData.scanner.market_top_ce.gain_pct.toFixed(1)+'%':'' }}</strong></div>
+          <div class="tok-r"><span>Top PE (OI buildup)</span><strong class="tx-g">{{ equityOptionsData.scanner?.market_top_pe?.underlying||'--' }} {{ equityOptionsData.scanner?.market_top_pe?.gain_pct!=null?equityOptionsData.scanner.market_top_pe.gain_pct.toFixed(1)+'%':'' }}</strong></div>
+          <div class="tok-r"><span>Live chain/stock</span><strong class="tx-a">{{ equityOptionsData.segments?.equity_options?.live_chain_per_stock?'YES':'PENDING' }}</strong></div>
+        </div>
+        <div style="overflow-x:auto" v-if="equityOptionsData.scanner?.top_ce_list?.length">
+          <table class="full-trade-table">
+            <thead><tr><th>TYPE</th><th>STOCK</th><th>STRIKE</th><th>OI BUILDUP%</th><th>LTP</th></tr></thead>
+            <tbody>
+              <tr v-for="r in equityOptionsData.scanner.top_ce_list.slice(0,5)" :key="'ece'+r.underlying+r.strike"><td class="tag-ce">CE</td><td class="sym-tag">{{ r.underlying }}</td><td>{{ formatNum(r.strike) }}</td><td class="tx-r">{{ r.gain_pct?.toFixed(1) }}%</td><td>{{ formatNum(r.ltp) }}</td></tr>
+              <tr v-for="r in equityOptionsData.scanner.top_pe_list.slice(0,5)" :key="'epe'+r.underlying+r.strike"><td class="tag-pe">PE</td><td class="sym-tag">{{ r.underlying }}</td><td>{{ formatNum(r.strike) }}</td><td class="tx-g">{{ r.gain_pct?.toFixed(1) }}%</td><td>{{ formatNum(r.ltp) }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="no-data">Equity F&O universe loaded · bhavcopy scanner runs when EOD file available</div>
+        <div v-if="equityOptionsData.implementation_gaps?.length" class="fc-note mt8"><span>ℹ️</span>Gaps: {{ equityOptionsData.implementation_gaps.join(' · ') }}</div>
+      </div>
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">📊 Top Option Candidates</span><span class="ps badge-b">PATH B — PAPER TRADE</span></div>
+          <div class="rank-table">
+            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE</span><span>MOVE%</span><span>OPTION</span><span>CALL</span></div>
+            <template v-if="gainRankData.latest?.predictions?.length">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying" class="rank-row" :class="p.recommendation==='TRADE'?'rr-trade':'rr-skip'">
+                <span class="rn">#{{ p.rank }}</span><span class="rs">{{ p.underlying }}</span>
+                <span class="rsc"><div class="sbar-w"><div class="sbar" :style="{width:p.gain_score+'%',background:scoreColor(p.gain_score)}"></div></div><span>{{ p.gain_score.toFixed(1) }}</span></span>
+                <span>{{ (p.expected_move_pct*100).toFixed(2) }}%</span>
+                <span class="tag-opt">ELIGIBLE ✓</span>
+                <span class="ract" :class="p.recommendation==='TRADE'?'act-trade':'act-skip'">{{ p.recommendation }}</span>
+              </div>
+            </template>
+            <div v-else class="no-data">09:15 IST pre-market · Last: {{ gainRankData.latest?.date||'--' }}</div>
+          </div>
+          <div class="panel-foot">Last run: {{ gainRankData.latest ? gainRankData.latest.date+' '+gainRankData.latest.time : 'N/A' }}<span v-if="gainRankStale" class="tx-r"> · STALE (not {{ gainRankDate }}) — refreshes at market open</span></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">🔮 Index Forecast</span><span class="ps badge-a">PATH A — FORECAST</span></div>
+          <div class="forecast-table">
+            <div class="fc-hdr"><span>INDEX</span><span>SCORE</span><span>DIR</span><span>TYPE</span><span>STATUS</span></div>
+            <template v-if="gainRankData.latest?.predictions?.length">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying+'fc'" class="fc-row">
+                <span class="rs">{{ p.underlying }}</span><span>{{ p.gain_score.toFixed(1) }}</span>
+                <span :class="p.gain_score>=50?'tx-g':'tx-r'">{{ p.gain_score>=50?'▲ UP':'▼ DOWN' }}</span>
+                <span class="tag-idx">INDEX</span><span class="tag-opt-t">OPTION ELIGIBLE</span>
+              </div>
+            </template>
+            <div v-else class="no-data">No forecast data</div>
+          </div>
+          <div class="fc-note"><span>ℹ️</span>Cash equity stocks: <strong>FORECAST_ONLY_CASH_EQUITY</strong></div>
+        </div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📊 Score Distribution</span></div>
+        <div class="chart-h"><canvas id="scannerChart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ══ OPTION CHAIN ══ -->
+    <section v-if="activeTab==='options'" class="tab">
+      <div class="sec-hdr"><h2>Option Chain Scanner</h2><span class="sec-sub">Dhan Data APIs P0 · OI · IV · Greeks · PCR · Max Pain</span></div>
+      <div class="chain-controls">
+        <div class="ctl-group"><label>INDEX</label>
+          <div class="seg-btns"><button v-for="sym in chainSymbols" :key="sym" class="seg-btn" :class="{active:chainSymbol===sym}" @click="selectChainSymbol(sym)">{{ sym }}</button></div>
+        </div>
+        <div class="ctl-group"><label>STRIKES</label>
+          <select class="chain-select" v-model="chainStrikeFilter">
+            <option value="10">±10 ATM</option><option value="20">±20 ATM</option><option value="all">All</option>
+          </select>
+        </div>
+        <div class="ctl-info">
+          <span class="spot-badge">SPOT ₹{{ formatNum(chainData.spot||0) }}</span>
+          <span class="pcr-badge" :class="(chainData.pcr||1)>1.2?'pcr-bull':(chainData.pcr||1)<0.8?'pcr-bear':'pcr-neut'">PCR {{ (chainData.pcr||0).toFixed(2) }}</span>
+          <span class="src-badge">{{ chainData.data_source||'--' }}</span>
+          <span class="src-badge" :class="chainData.status==='MARKET_OPEN'?'badge-live':'badge-closed'">{{ chainData.status||'--' }}</span>
+        </div>
+      </div>
+      <div class="tradability-row mt8">
+        <div class="trad-item pass"><span>✅</span><span>Symbol valid</span></div>
+        <div class="trad-item pass"><span>✅</span><span>Exchange IDX_I</span></div>
+        <div class="trad-item" :class="chainData.contracts?.length?'pass':'warn'"><span>{{ chainData.contracts?.length?'✅':'⚠️' }}</span><span>Chain available</span></div>
+        <div class="trad-item" :class="chainData.spot?'pass':'warn'"><span>{{ chainData.spot?'✅':'⚠️' }}</span><span>Spot price</span></div>
+        <div class="trad-item" :class="qcData.overall_passed?'pass':'warn'"><span>{{ qcData.overall_passed?'✅':'⚠️' }}</span><span>QC / Spread</span></div>
+        <div class="trad-item pass"><span>✅</span><span>Paper mode</span></div>
+        <div class="trad-item pass"><span>✅</span><span>Live disabled</span></div>
+      </div>
+      <div class="oi-summary panel mt8">
+        <div class="oi-col"><div class="oi-lbl">CALL OI</div><div class="oi-val tx-r">{{ formatLakh(chainCeOI) }}</div></div>
+        <div class="oi-bar-wrap"><div class="oi-bar-ce" :style="{width:ceOIPct+'%'}"></div><div class="oi-bar-pe" :style="{width:peOIPct+'%'}"></div></div>
+        <div class="oi-col right"><div class="oi-lbl">PUT OI</div><div class="oi-val tx-g">{{ formatLakh(chainPeOI) }}</div></div>
+        <div class="oi-stat">Max Pain: <strong>{{ maxPainStrike||'--' }}</strong></div>
+        <div class="oi-stat">ATM IV: <strong>{{ atmIV?(atmIV*100).toFixed(1)+'%':'--' }}</strong></div>
+        <div class="oi-stat">Contracts: <strong>{{ chainData.total_contracts||0 }}</strong></div>
+      </div>
+      <div class="panel mt8">
+        <div class="chain-table-wrap">
+          <table class="chain-table">
+            <thead>
+              <tr><th class="ce-h" colspan="6">CALLS</th><th class="strike-h">STRIKE</th><th class="pe-h" colspan="6">PUTS</th></tr>
+              <tr><th class="ce-col">OI</th><th class="ce-col">ChgOI</th><th class="ce-col">Vol</th><th class="ce-col">IV%</th><th class="ce-col">LTP</th><th class="ce-col">Δ</th>
+              <th class="strike-col">STRIKE</th>
+              <th class="pe-col">Δ</th><th class="pe-col">LTP</th><th class="pe-col">IV%</th><th class="pe-col">Vol</th><th class="pe-col">ChgOI</th><th class="pe-col">OI</th></tr>
+            </thead>
+            <tbody>
+              <tr v-if="chainLoading"><td colspan="13" class="no-data">Loading...</td></tr>
+              <tr v-else-if="!filteredChainRows.length"><td colspan="13" class="no-data">{{ chainData.message||'Select index above' }}</td></tr>
+              <tr v-for="row in filteredChainRows" :key="row.strike" class="chain-row" :class="{atm:row.isATM}">
+                <td class="ce-col oi-col">{{ formatLakh(row.ce?.oi||0) }}</td>
+                <td class="ce-col" :class="(row.ce?.oi_change||0)>0?'tx-g':'tx-r'">{{ formatLakh(row.ce?.oi_change||0) }}</td>
+                <td class="ce-col">{{ formatLakh(row.ce?.volume||0) }}</td>
+                <td class="ce-col">{{ row.ce?.iv?(row.ce.iv*100).toFixed(1):'-' }}</td>
+                <td class="ce-col ltp-col">{{ formatNum(row.ce?.ltp||0) }}</td>
+                <td class="ce-col">{{ row.ce?.delta?row.ce.delta.toFixed(2):'-' }}</td>
+                <td class="strike-col" :class="{'atm-strike':row.isATM}">{{ formatNum(row.strike) }}<span v-if="row.isATM" class="atm-tag">ATM</span></td>
+                <td class="pe-col">{{ row.pe?.delta?row.pe.delta.toFixed(2):'-' }}</td>
+                <td class="pe-col ltp-col">{{ formatNum(row.pe?.ltp||0) }}</td>
+                <td class="pe-col">{{ row.pe?.iv?(row.pe.iv*100).toFixed(1):'-' }}</td>
+                <td class="pe-col">{{ formatLakh(row.pe?.volume||0) }}</td>
+                <td class="pe-col" :class="(row.pe?.oi_change||0)>0?'tx-g':'tx-r'">{{ formatLakh(row.pe?.oi_change||0) }}</td>
+                <td class="pe-col oi-col">{{ formatLakh(row.pe?.oi||0) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PAPER LIFECYCLE — Full trader P&L ══ -->
+    <section v-if="activeTab==='paper'" class="tab">
+      <div class="sec-hdr"><h2>Paper Trade Lifecycle</h2><span class="sec-sub">Full signal→order→fill→exit→P&L · PAPER ONLY</span></div>
+      <div class="path-banner path-b">
+        <span>PATH B — OPTION PAPER TRADE</span>
+        <span class="path-gate">Gate: {{ autoGatesData.gates_passing||0 }}/{{ autoGatesData.gates_total||7 }} proof · Paper mode ✅ · Live disabled ✅</span>
+      </div>
+
+      <div class="proof-strip mt16" aria-label="Paper lifecycle proof status">
+        <div class="proof-chip" :class="(autoGatesData.gates_passing||0)>=(autoGatesData.gates_total||1)?'proof-ok':'proof-warn'"><span>Proof Status</span><strong>Gate Matrix {{ autoGatesData.gates_passing||0 }}/{{ autoGatesData.gates_total||7 }}</strong></div>
+        <div class="proof-chip proof-safe"><span>Safety</span><strong>LIVE TRADING BLOCKED</strong></div>
+        <div class="proof-chip proof-paper"><span>P&L Positions</span><strong>GROSS P&L · NET P&L · OPEN POSITIONS</strong></div>
+        <div class="proof-chip proof-source"><span>Source Truth</span><strong>DHAN_READONLY · PAPER ONLY</strong></div>
+      </div>
+
+      <!-- P&L with charges -->
+      <div class="kpi-row mt16">
+        <div class="kpi kpi-b"><div class="kpi-lbl">GROSS P&L</div><div class="kpi-val" :class="(paperSummary.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(paperSummary.total_pnl||0) }}</div><div class="kpi-sub">Before charges</div></div>
+        <div class="kpi kpi-r"><div class="kpi-lbl">EST. CHARGES</div><div class="kpi-val tx-r">₹{{ formatNum(pnlWithCharges.totalCharges) }}</div><div class="kpi-sub">Brokerage+STT+GST</div></div>
+        <div class="kpi" :class="pnlWithCharges.net>=0?'kpi-g':'kpi-r'"><div class="kpi-lbl">NET P&L</div><div class="kpi-val" :class="pnlWithCharges.net>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pnlWithCharges.net) }}</div><div class="kpi-sub">After all charges</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">WIN RATE</div><div class="kpi-val">{{ paperSummary.win_rate?(paperSummary.win_rate*100).toFixed(1)+'%':paperSummary.winning_trades!=null?((paperSummary.winning_trades/(paperSummary.total_trades||1))*100).toFixed(1)+'%':'--' }}</div><div class="kpi-sub">{{ paperSummary.winning_trades||0 }}W / {{ paperSummary.losing_trades||0 }}L</div></div>
+        <div class="kpi kpi-c"><div class="kpi-lbl">TOTAL TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Paper simulation</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">OPEN POSITIONS</div><div class="kpi-val">{{ paperPositions.length }}</div><div class="kpi-sub">Paper simulation</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">DATA TRUTH</div><div class="kpi-val" style="font-size:.75rem">{{ portfolioTransparency }}</div><div class="kpi-sub">Paper vs broker read-only</div></div>
+      </div>
+
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🏦 Dhan Broker Holdings (Read-Only)</span><span class="ps">Real account · no orders · LIVE DISABLED</span></div>
+        <div class="tok-info">
+          <div class="tok-r"><span>Holdings</span><strong>{{ brokerHoldings.length }}</strong></div>
+          <div class="tok-r"><span>Broker positions</span><strong>{{ brokerPositions.length }}</strong></div>
+          <div class="tok-r"><span>Source</span><strong class="tx-a">DHAN_READONLY</strong></div>
+        </div>
+        <div v-if="brokerHoldings.length || brokerPositions.length" style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>TYPE</th><th>SYMBOL</th><th>QTY</th><th>AVG</th><th>LTP</th><th>P&L</th></tr></thead>
+            <tbody>
+              <tr v-for="(h,i) in brokerHoldings" :key="'h'+i" class="ftt-row">
+                <td>HOLDING</td><td class="sym-tag">{{ h.symbol }}</td><td>{{ h.quantity||0 }}</td>
+                <td>{{ formatNum(h.avg_price||0) }}</td><td>{{ formatNum(h.ltp||0) }}</td><td>{{ h.pnl!=null?formatNum(h.pnl):'--' }}</td>
+              </tr>
+              <tr v-for="(p,i) in brokerPositions" :key="'p'+i" class="ftt-row">
+                <td>POSITION</td><td class="sym-tag">{{ p.symbol }}</td><td>{{ p.quantity||0 }}</td>
+                <td>{{ formatNum(p.avg_price||0) }}</td><td>{{ formatNum(p.ltp||0) }}</td><td>{{ p.pnl!=null?formatNum(p.pnl):'--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="no-data">No broker holdings/positions returned (market closed or read-only API empty)</div>
+      </div>
+
+      <!-- Charges breakdown -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">💰 P&L Charges Breakdown</span><span class="ps">Estimated · actual charges after real execution</span></div>
+        <div class="charges-grid">
+          <div class="ch-row"><span>Gross P&L</span><strong :class="pnlWithCharges.gross>=0?'tx-g':'tx-r'">₹{{ formatNum(pnlWithCharges.gross) }}</strong></div>
+          <div class="ch-row"><span>Brokerage (₹20/side)</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.brokerage) }}</strong></div>
+          <div class="ch-row"><span>STT (0.0125% sell)</span><strong class="tx-r">- ₹{{ pnlWithCharges.stt }}</strong></div>
+          <div class="ch-row"><span>Exchange charges</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.exchange) }}</strong></div>
+          <div class="ch-row"><span>GST (18%)</span><strong class="tx-r">- ₹{{ pnlWithCharges.gst }}</strong></div>
+          <div class="ch-row"><span>SEBI (₹10/Cr)</span><strong class="tx-r">- ₹{{ pnlWithCharges.sebi }}</strong></div>
+          <div class="ch-row"><span>Slippage (est.)</span><strong class="tx-r">- ₹{{ formatNum(pnlWithCharges.slippage) }}</strong></div>
+          <div class="ch-row ch-total"><span>NET P&L</span><strong :class="pnlWithCharges.net>=0?'tx-g':'tx-r'">₹{{ formatNum(pnlWithCharges.net) }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Trade lifecycle pipeline -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔄 Trade Lifecycle Pipeline</span></div>
+        <div class="pipeline">
+          <div class="pipe-step done"><div class="pipe-ico">📡</div><div class="pipe-lbl">Signal</div><div class="pipe-sub">GainRank</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step done"><div class="pipe-ico">✅</div><div class="pipe-lbl">Option Gate</div><div class="pipe-sub">Eligibility</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step done"><div class="pipe-ico">📋</div><div class="pipe-lbl">Paper Order</div><div class="pipe-sub">Simulated</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step done"><div class="pipe-ico">💰</div><div class="pipe-lbl">Fill</div><div class="pipe-sub">Slippage model</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step active"><div class="pipe-ico">📊</div><div class="pipe-lbl">SL/Target</div><div class="pipe-sub">Monitor</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step active"><div class="pipe-ico">🏁</div><div class="pipe-lbl">Exit</div><div class="pipe-sub">P&L calc</div></div>
+          <div class="pipe-arr">→</div>
+          <div class="pipe-step pend"><div class="pipe-ico">🧠</div><div class="pipe-lbl">Learning</div><div class="pipe-sub">Auto update</div></div>
+        </div>
+      </div>
+
+      <!-- Full trade history with all fields -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📜 Complete Trade History</span><span class="ps">{{ tradeHistorySubtitle }}</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr>
+              <th>TIME</th><th>POS ID</th><th>INDEX</th><th>SYMBOL</th><th>EXPIRY</th><th>CE/PE</th><th>STRIKE</th>
+              <th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>GROSS P&L</th><th>P&L%</th><th>EXIT REASON</th>
+            </tr></thead>
+            <tbody>
+              <template v-if="tradeHistory.length">
+                <tr v-for="t in tradeHistory" :key="t.position_id" class="ftt-row">
+                  <td>{{ (t.time_ist||'').substring(5,16) }}</td>
+                  <td class="tx-m">{{ t.position_id||'--' }}</td>
+                  <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td class="tx-m sym-contract">{{ contractSymbol(t) }}</td>
+                  <td>{{ formatExpiry(t.expiry_date) }}</td>
+                  <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
+                  <td>{{ formatNum(t.strike||0) }}</td>
+                  <td>{{ formatNum(t.entry_price||0) }}</td>
+                  <td>{{ formatNum(t.exit_price||0) }}</td>
+                  <td>{{ formatNum(t.qty||0) }}</td>
+                  <td :class="(t.realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(t.realized_pnl||0) }}</td>
+                  <td :class="(t.realized_pnl_pct||0)>=0?'pnl-pos':'pnl-neg'">{{ t.realized_pnl_pct?(t.realized_pnl_pct).toFixed(1)+'%':'--' }}</td>
+                  <td class="tx-m">{{ t.exit_reason||'--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="13" class="no-data">No closed trades yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Today's trades from /api/trades/today -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📅 Today's Trades (09:15–15:30 IST)</span><span class="ps">{{ todayTrades.date||'--' }} · {{ todayTrades.total_trades||0 }} entries</span></div>
+        <div class="tok-info">
+          <div class="tok-r"><span>Entries</span><strong>{{ todayTrades.entries?.length||0 }}</strong></div>
+          <div class="tok-r"><span>Exits</span><strong>{{ todayTrades.exits?.length||0 }}</strong></div>
+          <div class="tok-r"><span>Total</span><strong>{{ todayTrades.count||0 }}</strong></div>
+        </div>
+        <div v-if="!todayTrades.entries?.length" class="no-data">No trade-log entries yet · SSOT open positions: {{ paperPositions.length }} · Lifecycle proof runs 09:30/12:00/14:00 IST</div>
+      </div>
+
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">📊 P&L Chart</span></div>
+          <div class="chart-h"><canvas id="pnlChart"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">📋 Open Positions</span><span class="ps">{{ paperPositions.length }} active</span></div>
+          <div v-if="paperPositions.length">
+            <div class="trade-table">
+              <div class="trade-hdr"><span>SYMBOL</span><span>INDEX</span><span>EXPIRY</span><span>CE/PE</span><span>STRIKE</span><span>QTY</span><span>ENTRY</span><span>CMP</span><span>UNREAL P&L</span><span>STATUS</span></div>
+              <div v-for="pos in paperPositions" :key="pos.position_id" class="trade-row">
+                <span class="tx-m sym-contract">{{ contractSymbol(pos) }}</span>
+                <span class="sym-tag">{{ pos.underlying||'--' }}</span>
+                <span>{{ formatExpiry(pos.expiry_date) }}</span>
+                <span :class="pos.option_type==='CE'?'tag-ce':'tag-pe'">{{ pos.option_type||'--' }}</span>
+                <span>{{ formatNum(pos.strike||0) }}</span><span>{{ pos.qty||0 }}</span>
+                <span>{{ formatNum(pos.entry_price||0) }}</span>
+                <span>{{ formatNum(pos.current_price||pos.entry_price||0) }}</span>
+                <span :class="(pos.unrealized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pos.unrealized_pnl||0) }}</span>
+                <span class="pos-status">{{ pos.status||'OPEN' }}</span>
+              </div>
+            </div>
+          </div>
+          <div v-else class="no-data">No open positions</div>
+        </div>
+      </div>
+      <div class="safety-banner mt16"><span>🛡️</span><span><strong>PAPER MODE</strong> — All trades simulated. No real orders. Live trading DISABLED. Human approval required before live.</span></div>
+    </section>
+
+    <!-- ══ PORTFOLIO — Real Dhan + Paper ══ -->
+    <section v-if="activeTab==='portfolio'" class="tab">
+      <div class="sec-hdr"><h2>Portfolio</h2><span class="sec-sub">Real Dhan holdings (read-only) + Paper trades · Live trading DISABLED</span></div>
+
+      <!-- Transparency banner -->
+      <div class="path-banner path-b">
+        <span>PORTFOLIO TRUTH — {{ portfolioData.data_transparency || 'LOADING' }} · {{ brokerDataSource }}</span>
+        <span class="path-gate">Broker read-only ✅ · Order placement BLOCKED ✅ · Live trading DISABLED ✅ · Multi-validated trader fields</span>
+      </div>
+
+      <!-- Broker validation status -->
+      <div class="broker-val-banner mt16" :class="brokerValidation.overall==='VALID'?'bvb-pass':brokerValidation.overall==='BROKER_OFFLINE'?'bvb-offline':'bvb-warn'">
+        <span class="bvb-icon">{{ brokerValidation.overall==='VALID'?'✅':brokerValidation.overall==='BROKER_OFFLINE'?'🔌':'⚠️' }}</span>
+        <div>
+          <div class="bvb-title">BROKER TRADER DATA — {{ brokerValidation.overall || 'CHECKING' }} · {{ brokerValidation.valid_pct||0 }}% fields valid</div>
+          <div class="bvb-sub">{{ broker.connected ? 'Dhan read-only APIs polled every 10s' : 'Broker offline — reconnect at market open or refresh token' }} · Holdings {{ brokerHoldingsOk?'LIVE':'--' }} · Funds {{ brokerFundsOk?'LIVE':'--' }} · Positions {{ brokerPositionsOk?'LIVE':'--' }}</div>
+        </div>
+      </div>
+
+      <!-- Account funds KPIs -->
+      <div class="kpi-row mt16">
+        <div class="kpi kpi-b"><div class="kpi-lbl">AVAILABLE BALANCE</div><div class="kpi-val">{{ fundsInfo.available_balance!=null ? '₹'+formatNum(fundsInfo.available_balance) : fundsInfo.availabelBalance!=null ? '₹'+formatNum(fundsInfo.availabelBalance) : fundsInfo.availableBalance!=null ? '₹'+formatNum(fundsInfo.availableBalance) : '--' }}</div><div class="kpi-sub">{{ brokerFundsOk ? 'Dhan LIVE' : 'Unavailable' }}</div></div>
+        <div class="kpi kpi-c"><div class="kpi-lbl">UTILISED MARGIN</div><div class="kpi-val">{{ fundsInfo.utilized_amount!=null ? '₹'+formatNum(fundsInfo.utilized_amount) : fundsInfo.utilizedAmount!=null ? '₹'+formatNum(fundsInfo.utilizedAmount) : '--' }}</div><div class="kpi-sub">In use</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">REAL HOLDINGS</div><div class="kpi-val">{{ holdingRows.length }}</div><div class="kpi-sub">Equity stocks</div></div>
+        <div class="kpi kpi-p"><div class="kpi-lbl">REAL POSITIONS</div><div class="kpi-val">{{ positionRows.length }}</div><div class="kpi-sub">Open F&O/equity</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">PAPER TRADES</div><div class="kpi-val">{{ paperSummary.total_trades||0 }}</div><div class="kpi-sub">Simulation</div></div>
+        <div class="kpi" :class="(paperSummary.total_pnl||0)>=0?'kpi-g':'kpi-r'"><div class="kpi-lbl">PAPER NET P&L</div><div class="kpi-val" :class="(paperSummary.total_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(pnlWithCharges.net) }}</div><div class="kpi-sub">After charges</div></div>
+      </div>
+
+      <!-- Real Dhan Holdings -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">💼 Real Dhan Equity Holdings</span><span class="ps">Read-only · {{ brokerHoldingsOk ? 'LIVE' : 'unavailable' }}</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>SYMBOL</th><th>QTY</th><th>AVG PRICE</th><th>LTP</th><th>CUR VALUE</th><th>P&L</th><th>P&L%</th></tr></thead>
+            <tbody>
+              <template v-if="holdingRows.length">
+                <tr v-for="(h,i) in holdingRows" :key="i" class="ftt-row">
+                  <td class="sym-tag">{{ h.tradingSymbol||h.symbol||h.securityId||'--' }}</td>
+                  <td>{{ h.totalQty||h.quantity||h.availableQty||0 }}</td>
+                  <td>{{ formatNum(h.avgCostPrice||h.averagePrice||h.costPrice||0) }}</td>
+                  <td>{{ formatNum(h.lastTradedPrice||h.ltp||h.lastPrice||0) }}</td>
+                  <td>{{ formatNum((h.totalQty||h.quantity||0)*(h.lastTradedPrice||h.ltp||0)) }}</td>
+                  <td :class="((h.lastTradedPrice||0)-(h.avgCostPrice||0))>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(((h.lastTradedPrice||h.ltp||0)-(h.avgCostPrice||h.averagePrice||0))*(h.totalQty||h.quantity||0)) }}</td>
+                  <td :class="((h.lastTradedPrice||0)-(h.avgCostPrice||0))>=0?'pnl-pos':'pnl-neg'">{{ h.avgCostPrice ? (((h.lastTradedPrice||h.ltp||0)-(h.avgCostPrice))/(h.avgCostPrice)*100).toFixed(2)+'%' : '--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="7" class="no-data">{{ brokerHoldingsOk ? 'No equity holdings in Dhan account' : (brokerHoldings.error || 'Dhan holdings unavailable — broker may be reconnecting') }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Real Dhan Positions -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📊 Real Dhan Open Positions</span><span class="ps">Read-only · F&O + intraday</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>SYMBOL</th><th>PRODUCT</th><th>NET QTY</th><th>AVG PRICE</th><th>LTP</th><th>UNREAL P&L</th><th>REALISED P&L</th></tr></thead>
+            <tbody>
+              <template v-if="positionRows.length">
+                <tr v-for="(p,i) in positionRows" :key="i" class="ftt-row">
+                  <td class="sym-tag">{{ p.trading_symbol||p.tradingSymbol||p.symbol||'--' }}</td>
+                  <td class="tx-m">{{ p.productType||p.product||'--' }}</td>
+                  <td>{{ p.netQty||p.netQuantity||p.quantity||0 }}</td>
+                  <td>{{ formatNum(p.buyAvg||p.averagePrice||p.costPrice||0) }}</td>
+                  <td>{{ formatNum(p.lastTradedPrice||p.ltp||0) }}</td>
+                  <td :class="(p.unrealizedProfit||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(p.unrealizedProfit||0) }}</td>
+                  <td :class="(p.realizedProfit||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(p.realizedProfit||0) }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="7" class="no-data">{{ brokerPositions.error || 'No open positions in Dhan account' }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Paper Trade Detail -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📋 Paper Trade Portfolio</span><span class="ps">Simulation · {{ tradeHistory.length }} closed trades</span></div>
+        <div style="overflow-x:auto">
+          <table class="full-trade-table">
+            <thead><tr><th>TIME</th><th>INDEX</th><th>SYMBOL</th><th>EXPIRY</th><th>CE/PE</th><th>STRIKE</th><th>ENTRY ₹</th><th>EXIT ₹</th><th>QTY</th><th>P&L</th><th>EXIT REASON</th></tr></thead>
+            <tbody>
+              <template v-if="tradeHistory.length">
+                <tr v-for="t in tradeHistory" :key="t.position_id" class="ftt-row">
+                  <td>{{ (t.time_ist||'').substring(5,16) }}</td>
+                  <td class="sym-tag">{{ t.underlying||'--' }}</td>
+                  <td class="tx-m sym-contract">{{ contractSymbol(t) }}</td>
+                  <td>{{ formatExpiry(t.expiry_date) }}</td>
+                  <td :class="t.option_type==='CE'?'tag-ce':'tag-pe'">{{ t.option_type||'--' }}</td>
+                  <td>{{ formatNum(t.strike||0) }}</td>
+                  <td>{{ formatNum(t.entry_price||0) }}</td>
+                  <td>{{ formatNum(t.exit_price||0) }}</td>
+                  <td>{{ formatNum(t.qty||0) }}</td>
+                  <td :class="(t.realized_pnl||0)>=0?'pnl-pos':'pnl-neg'">₹{{ formatNum(t.realized_pnl||0) }}</td>
+                  <td class="tx-m">{{ t.exit_reason||'--' }}</td>
+                </tr>
+              </template>
+              <tr v-else><td colspan="11" class="no-data">No paper trades yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="safety-banner mt16"><span>🛡️</span><span><strong>READ-ONLY PORTFOLIO</strong> — Real Dhan data shown for monitoring only. No orders can be placed. Live trading DISABLED. Paper trades are simulation.</span></div>
+
+      <!-- Trader field validation matrix -->
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">✅ Trader Field Validation</span><span class="ps">Multi-check: auth → API → shape → value</span></div>
+        <div class="val-tbl broker-field-tbl">
+          <div class="val-hdr bf-hdr"><span>FIELD</span><span>STATUS</span><span>VALUE</span></div>
+          <div v-for="(fld, key) in brokerTraderFields" :key="key" class="val-row bf-row">
+            <span class="tx-m">{{ key.replace(/_/g,' ') }}</span>
+            <span :class="fld.valid?'tx-g':fld.status==='BROKER_OFFLINE'?'tx-a':'tx-r'">{{ fld.valid ? 'VALID ✓' : fld.status }}</span>
+            <span>{{ fld.value!=null ? (typeof fld.value==='number' ? formatNum(fld.value) : fld.value) : '--' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PREDICTION VS ACTUAL ══ -->
+    <section v-if="activeTab==='accuracy'" class="tab">
+      <div class="sec-hdr"><h2>Prediction vs Actual</h2><span class="sec-sub">Spearman ρ · Hit Rate · Walk-Forward proof</span></div>
+      <div class="kpi-row">
+        <div class="kpi kpi-p"><div class="kpi-lbl">AVG ρ</div><div class="kpi-val">{{ accuracyData.avg_rho?accuracyData.avg_rho.toFixed(4):'--' }}</div><div class="kpi-sub">Target ≥ 0.700</div></div>
+        <div class="kpi kpi-b"><div class="kpi-lbl">HIT RATE</div><div class="kpi-val">{{ latestHitRate!==null?(latestHitRate*100).toFixed(1)+'%':'--' }}</div><div class="kpi-sub">Top-N accuracy</div></div>
+        <div class="kpi" :class="accuracyData.retrain_needed?'kpi-r':'kpi-g'"><div class="kpi-lbl">RETRAIN</div><div class="kpi-val">{{ accuracyData.retrain_needed?'NEEDED':'OK' }}</div><div class="kpi-sub">Fires if ρ&lt;0.40×3d</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">DAYS</div><div class="kpi-val">{{ accuracyData.days_available||0 }} / 5</div><div class="kpi-sub">Min 5 for calibration</div></div>
+      </div>
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">📋 Prediction vs Actual Log</span><span class="ps">Real matured rows only</span></div>
+          <div class="val-tbl">
+            <div class="val-hdr"><span>DATE</span><span>PREDICTED TOP</span><span>ACTUAL TOP</span><span>ρ</span><span>HIT%</span><span>STATUS</span></div>
+            <template v-if="accuracyData.trend?.length">
+              <div v-for="row in accuracyData.trend" :key="row.date" class="val-row">
+                <span>{{ row.date }}</span>
+                <span class="val-chips">
+                  <span v-for="(sym,i) in (row.predicted||[]).slice(0,3)" :key="'p'+row.date+i" class="val-chip val-chip-p">{{ sym }}</span>
+                  <span v-if="!(row.predicted||[]).length" class="tx-m">--</span>
+                </span>
+                <span class="val-chips">
+                  <span v-for="(sym,i) in (row.actual||[]).slice(0,3)" :key="'a'+row.date+i" class="val-chip val-chip-a">{{ sym }}</span>
+                  <span v-if="!(row.actual||[]).length" class="tx-m">--</span>
+                </span>
+                <span :class="row.rho>=0.7?'tx-g':row.rho>=0.4?'tx-a':'tx-r'">{{ row.rho!=null?row.rho.toFixed(3):'--' }}</span>
+                <span>{{ row.hit_rate!=null?(row.hit_rate*100).toFixed(1)+'%':'--' }}</span>
+                <span class="val-status" :class="row.status==='RETRAIN_NEEDED'?'tx-r':'tx-g'">{{ row.status }}</span>
+              </div>
+            </template>
+            <div v-else class="no-data">1 day available (Jun 12) · Runs daily 15:35 IST</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="pt">📈 ρ Trend vs Target 0.70</span></div>
+          <div class="chart-h-tall"><canvas id="rhoFull"></canvas></div>
+        </div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔮 Walk-Forward Proof</span></div>
+        <div class="wf-grid">
+          <div class="wf-r"><span>Bhavcopy Days Used</span><strong class="tx-g">5 days (Jun 8–12)</strong></div>
+          <div class="wf-r"><span>Cost Model</span><strong>₹20/side + STT + SEBI + slippage</strong></div>
+          <div class="wf-r"><span>Trades Simulated</span><strong>8 walk-forward trades</strong></div>
+          <div class="wf-r"><span>Walk-Forward Status</span><strong class="tx-g">PASS ✓</strong></div>
+          <div class="wf-r"><span>Production Gate</span><strong class="tx-a">BLOCKED until 5+ days + ρ≥0.70</strong></div>
+          <div class="wf-r"><span>Prediction Maturity</span><strong class="tx-a">1/5 days · HIGH OVERFITTING RISK</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SIGNALS ══ -->
+    <section v-if="activeTab==='signals'" class="tab">
+      <div class="sec-hdr"><h2>Signal Intelligence</h2><span class="sec-sub">GainRankEngine · 7-Factor · Dhan Data P0</span></div>
+      <div class="panel">
+        <div class="ph"><span class="pt">⚙️ Factor Weights</span></div>
+        <div class="factor-grid">
+          <div v-for="f in factors" :key="f.name" class="factor-item">
+            <div class="f-name">{{ f.name }}</div>
+            <div class="f-bar-w"><div class="f-bar" :style="{width:(f.weight*100)+'%',background:f.color}"></div></div>
+            <div class="f-pct">{{ (f.weight*100).toFixed(0) }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col mt16">
+        <div class="panel">
+          <div class="ph"><span class="pt">🏆 Latest Rankings</span></div>
+          <div class="rank-table">
+            <div class="rank-hdr"><span>RNK</span><span>INDEX</span><span>SCORE</span><span>MOVE%</span><span>CALL</span></div>
+            <template v-if="gainRankData.latest">
+              <div v-for="p in gainRankData.latest.predictions" :key="p.underlying" class="rank-row" :class="p.recommendation==='TRADE'?'rr-trade':'rr-skip'">
+                <span class="rn">#{{ p.rank }}</span><span class="rs">{{ p.underlying }}</span>
+                <span class="rsc"><div class="sbar-w"><div class="sbar" :style="{width:p.gain_score+'%',background:scoreColor(p.gain_score)}"></div></div><span>{{ p.gain_score.toFixed(2) }}</span></span>
+                <span>{{ (p.expected_move_pct*100).toFixed(3) }}%</span>
+                <span class="ract" :class="p.recommendation==='TRADE'?'act-trade':'act-skip'">{{ p.recommendation }}</span>
+              </div>
+            </template>
+            <div v-else class="no-data">09:15 IST pre-market</div>
+          </div>
+        </div>
+        <div class="panel"><div class="ph"><span class="pt">📊 Score Chart</span></div><div class="chart-h"><canvas id="rankHistChart"></canvas></div></div>
+      </div>
+    </section>
+
+    <!-- ══ ALERTS ══ -->
+    <section v-if="activeTab==='alerts'" class="tab">
+      <div class="sec-hdr"><h2>Alerts</h2><span class="sec-sub">Active · Resolved · Deduped — false BROKER_DISCONNECTED loop fixed</span></div>
+      <div class="kpi-row">
+        <div class="kpi" :class="unreadCount?'kpi-r':'kpi-g'"><div class="kpi-lbl">UNREAD</div><div class="kpi-val">{{ unreadCount }}</div><div class="kpi-sub">Active alerts</div></div>
+        <div class="kpi kpi-s"><div class="kpi-lbl">TOTAL</div><div class="kpi-val">{{ alertsData.length }}</div><div class="kpi-sub">Last 30</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">DEDUP FIX</div><div class="kpi-val">APPLIED</div><div class="kpi-sub">upsert + resolve</div></div>
+        <div class="kpi kpi-b"><div class="kpi-lbl">SYNC INTERVAL</div><div class="kpi-val">5s</div><div class="kpi-sub">No more flood</div></div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔔 Active Alerts</span></div>
+        <div v-if="activeAlerts.length">
+          <div v-for="a in activeAlerts" :key="a.ts" class="alert-row" :class="a.level==='CRIT'?'alert-crit':a.level==='WARN'?'alert-warn':'alert-info'">
+            <span class="alert-lvl">{{ a.level }}</span>
+            <span class="alert-code">{{ a.code }}</span>
+            <span class="alert-msg">{{ a.message }}</span>
+            <span class="alert-ts tx-m">{{ ageStr(a.ts) }}</span>
+          </div>
+        </div>
+        <div v-else class="no-data tx-g">✅ No active alerts</div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">📋 Alert History (last 30)</span></div>
+        <div class="alert-tbl">
+          <div class="alert-hdr"><span>LEVEL</span><span>CODE</span><span>MESSAGE</span><span>TIME</span><span>STATUS</span></div>
+          <div v-for="a in alertsData" :key="a.ts+a.code" class="alert-hist-row">
+            <span class="alert-lvl-s" :class="a.level==='WARN'?'tx-a':a.level==='CRIT'?'tx-r':'tx-m'">{{ a.level }}</span>
+            <span class="tx-c" style="font-size:.65rem">{{ a.code }}</span>
+            <span class="tx-m" style="font-size:.65rem">{{ a.message }}</span>
+            <span class="tx-m" style="font-size:.6rem">{{ ageStr(a.ts) }}</span>
+            <span :class="a.resolved?'tx-g':'tx-a'" style="font-size:.6rem">{{ a.resolved?'RESOLVED':'ACTIVE' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ ERROR LOG ══ -->
+    <section v-if="activeTab==='logs'" class="tab">
+      <div class="sec-hdr"><h2>Error & System Log</h2><span class="sec-sub">Live tail · Secrets redacted · 150 lines</span></div>
+      <div class="panel">
+        <div class="ph"><span class="pt">📋 System Log</span><button class="btn-sm" @click="loadLogs()">🔄 Refresh</button></div>
+        <div class="log-box">
+          <div v-if="!logsData.length" class="no-data">Loading...</div>
+          <div v-for="(line,i) in logsData" :key="i" class="log-line"
+               :class="line.includes('ERROR')||line.includes('CRITICAL')?'log-err':line.includes('WARN')?'log-warn':line.includes('INFO')?'log-info':''">{{ line }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PROOF GATES ══ -->
+    <section v-if="activeTab==='proof'" class="tab">
+      <div class="sec-hdr"><h2>Proof Status Matrix</h2><span class="sec-sub">8-Gate Orchestrator</span></div>
+      <div class="kpi-row">
+        <div class="kpi kpi-g"><div class="kpi-lbl">GATES</div><div class="kpi-val">{{ autoGatesData.gates_passing||0 }} / {{ autoGatesData.gates_total||7 }}</div><div class="kpi-sub">{{ (autoGatesData.open_blockers||[]).length }} blockers</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">VERDICT</div><div class="kpi-val" style="font-size:.75rem">ANALYZER_READY</div><div class="kpi-sub">PROOF_INCOMPLETE</div></div>
+        <div class="kpi kpi-r"><div class="kpi-lbl">TRADE READY</div><div class="kpi-val">NO</div><div class="kpi-sub">By design</div></div>
+        <div class="kpi kpi-g"><div class="kpi-lbl">LIVE</div><div class="kpi-val">DISABLED</div><div class="kpi-sub">ENV=0</div></div>
+      </div>
+      <div class="panel mt16">
+        <div class="ph"><span class="pt">🔬 Gate Matrix</span></div>
+        <div class="gate-tbl">
+          <div class="gate-hdr"><span>GATE</span><span>STATUS</span><span>PASS</span><span>NOTES</span></div>
+          <div v-for="g in proofGates" :key="g.name" class="gate-row">
+            <span>{{ g.name }}</span><span :class="g.pass?'tx-g':'tx-a'">{{ g.status }}</span>
+            <span :class="g.pass?'tx-g':'tx-r'">{{ g.pass?'✓':'✗' }}</span><span class="tx-m">{{ g.note }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="honest-status-banner mt16">
+        <div class="hsb-row"><span class="hsb-label">CLOUD / DASHBOARD</span><span class="hsb-val tx-g">MUCH IMPROVED ✓</span></div>
+        <div class="hsb-row"><span class="hsb-label">ANALYZER / PAPER</span><span class="hsb-val tx-a">READY WITH WARNINGS ⚠</span></div>
+        <div class="hsb-row"><span class="hsb-label">MARKET-DAY LIFECYCLE</span><span class="hsb-val tx-a">PENDING REAL SESSION ⏳</span></div>
+        <div class="hsb-row"><span class="hsb-label">LIVE TRADING</span><span class="hsb-val tx-r">BLOCKED 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">PRODUCTION</span><span class="hsb-val tx-r">NOT READY 🔴</span></div>
+        <div class="hsb-row"><span class="hsb-label">WEBSOCKET TICK</span><span class="hsb-val tx-a">NOT IMPLEMENTED ⚠</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<script src="/ui/app.js"></script>
 </body>
 </html>

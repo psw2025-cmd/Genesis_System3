@@ -4,8 +4,9 @@ Investigate PnL Discrepancy - Why API shows different PnL than files
 
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 sys.stdout.reconfigure(encoding="utf-8")

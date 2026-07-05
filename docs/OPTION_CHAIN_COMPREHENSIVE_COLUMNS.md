@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Complete
 
-The option chain fetching has been enhanced to fetch **ALL possible columns** from Angel One SmartAPI.
+The option chain fetching has been enhanced to fetch **ALL possible columns** from Dhan DhanHQ.
 
 ---
 
@@ -156,7 +156,7 @@ The option chain fetching has been enhanced to fetch **ALL possible columns** fr
 - Some fields may be `None` if:
   - Market is closed
   - Option has no trading activity
-  - API method not available in your SmartAPI version
+  - API method not available in your DhanHQ version
   - Rate limiting (too many requests)
 
 ### Fallback Behavior
@@ -180,9 +180,9 @@ NIFTY,NFO,NIFTY25DEC2423000CE,NIFTY25DEC2423000CE,NIFTY,12345,30DEC2024,2024-12-
 ## 🚀 Usage
 
 ```python
-from core.brokers.angel_one.broker import AngelOneBroker
+from core.brokers.dhan.broker import DhanBroker
 
-broker = AngelOneBroker(allow_data_only=True)
+broker = DhanBroker(allow_data_only=True)
 
 # Fetch comprehensive option chain
 option_chain = broker.get_option_chain_by_underlying(
@@ -224,9 +224,9 @@ The output will show:
 
 ## 📊 Column Mapping Reference
 
-### Angel One API Response → Our Column Names
+### Dhan API Response → Our Column Names
 
-| Angel One Field | Our Column | Notes |
+| Dhan Field | Our Column | Notes |
 |----------------|------------|-------|
 | `ltp` | `ltp` | Last traded price |
 | `open` | `open` | Open price |

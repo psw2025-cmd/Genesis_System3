@@ -31,7 +31,7 @@
 ### Signal engine (`system3_signal_engine.py`)
 
 - **Short-history loader**:
-  - `load_recent_signal_history(SIGNALS_CSV, max_rows=5000)` reads the last up to 5000 rows from `storage/live/angel_index_ai_signals.csv`, parses timestamps if present, and returns a DataFrame or `None`.
+  - `load_recent_signal_history(SIGNALS_CSV, max_rows=5000)` reads the last up to 5000 rows from `storage/live/dhan_index_ai_signals.csv`, parses timestamps if present, and returns a DataFrame or `None`.
 - **Short-history feature computation**:
   - `compute_short_history_features(history_df, snapshot_df, min_history_points=5)`:
     - Groups `history_df` by `(underlying, strike, side)`.
@@ -77,7 +77,7 @@
 ### Test mode (`system3_signal_test_mode.py`)
 
 - **Purpose**:
-  - DRY-RUN analysis of recent signals from `storage/live/angel_index_ai_signals.csv` with no trading or broker interaction.
+  - DRY-RUN analysis of recent signals from `storage/live/dhan_index_ai_signals.csv` with no trading or broker interaction.
 - **CLI options**:
   - `--lookback-snapshots` (int, default 20): approximate number of recent snapshots to examine.
   - `--underlyings` (string, default `NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY,SENSEX`): comma-separated list.
@@ -98,7 +98,7 @@
 
 - **Live DRY-RUN session (existing)**:
   - `system3_live_day_autopilot.bat`
-  - This runs pre-market checks, live AngelOne DRY-RUN loop, intraday monitors, and EOD wrap-up.
+  - This runs pre-market checks, live Dhan DRY-RUN loop, intraday monitors, and EOD wrap-up.
 - **Signal test mode (new)**:
   - `system3_signal_test_mode.bat`
     - Activates `venv` and runs `python system3_signal_test_mode.py --lookback-snapshots 30`.

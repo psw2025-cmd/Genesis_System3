@@ -1,5 +1,13 @@
 {
-  "total_trades": 0,
-  "winning_trades": 0,
-  "net_pnl": 0.0
+  "total_trades": 9,
+  "winning_trades": 3,
+  "losing_trades": 6,
+  "win_rate": 0.3333,
+  "total_realized_pnl": -1806.07,
+  "total_unrealized_pnl": 0.0,
+  "total_pnl": -1806.07,
+  "avg_pnl_per_trade": -200.67,
+  "open_positions": 0,
+  "note": "Feb 1 2026 paper session \u2014 9 synthetic trades, 3W/6L",
+  "data_source": "paper_simulation"
 }

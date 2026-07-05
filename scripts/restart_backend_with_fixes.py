@@ -3,10 +3,10 @@ Restart Backend with All Fixes Applied
 Kills existing backend and restarts with new code
 """
 
-import sys
-import subprocess
-import time
 import os
+import subprocess
+import sys
+import time
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent

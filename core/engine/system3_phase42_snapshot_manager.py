@@ -10,15 +10,15 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Options: 105 (Create), 106 (List)
 """
 
-import shutil
-from pathlib import Path
-from datetime import datetime
-from typing import List, Optional, Dict, Any
 import json
+import shutil
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SNAPSHOTS_DIR = PROJECT_ROOT / "storage" / "snapshots"
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
 LOGS_ULTRA_DIR = PROJECT_ROOT / "storage" / "logs_ultra"
 
@@ -82,13 +82,13 @@ def create_snapshot() -> Path:
         files_copied.append(f"configs/thresholds_auto.json")
         _log(f"Copied: thresholds_auto.json")
 
-    # angel_trade_config.py (as .txt)
-    trade_config_file = PROJECT_ROOT / "core" / "engine" / "angel_trade_config.py"
+    # dhan_trade_config.py (as .txt)
+    trade_config_file = PROJECT_ROOT / "core" / "engine" / "dhan_trade_config.py"
     if trade_config_file.exists():
-        dest = config_dest / "angel_trade_config.txt"
+        dest = config_dest / "dhan_trade_config.txt"
         shutil.copy2(trade_config_file, dest)
-        files_copied.append(f"configs/angel_trade_config.txt")
-        _log(f"Copied: angel_trade_config.py (as .txt)")
+        files_copied.append(f"configs/dhan_trade_config.txt")
+        _log(f"Copied: dhan_trade_config.py (as .txt)")
 
     # Create snapshot metadata
     metadata = {

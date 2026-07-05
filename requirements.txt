@@ -1,11 +1,35 @@
 # pandas: dataframe, CSV, backtest, and analysis support
-pandas==2.2.3
+# pinned to >=2.2 to keep API compatible; pip picks wheel for current Python
+pandas>=2.2.3
 
 # numpy: numerical arrays and vectorized calculations for indicators/backtests
-numpy==1.26.4
+numpy>=1.26.4
 
 # python-dotenv: local .env loading while keeping GitHub Actions secrets separate
 python-dotenv==1.0.1
 
-# requests: HTTP API calls for OpenAlgo / broker gateway integrations
+# requests: HTTP API calls for NSE fallback, broker integrations
 requests==2.32.3
+
+# dhanhq: DhanHQ broker SDK — REQUIRED for all broker operations
+dhanhq==2.2.0
+
+# pyotp: TOTP generation for automated Dhan token refresh (PIN+TOTP strategy)
+pyotp==2.9.0
+
+# scipy: Spearman rank correlation for prediction accuracy validation
+scipy>=1.12.0
+
+# ---- Data Source Fallback Libraries (multi-source resilience) ----
+
+# nsepython: NSE India public API wrapper — server edition works in cloud (proxy rotation)
+# P2 fallback after NSE live API fails. pip install nsepython (local) or nsepythonserver (cloud)
+nsepython>=2.97
+
+# yfinance: Yahoo Finance — spot price fallback only (^NSEI, ^NSEBANK)
+# P5 fallback: provides real spot price when all chain sources fail
+yfinance>=0.2.38
+
+# jugaad-data: NSE historical F&O bhavcopy downloader (alternative to direct CDN fetch)
+# P4 fallback. Note: UDiFF format (post-Jul 2024) support is limited — prefer direct bhavcopy
+jugaad-data>=0.31.1

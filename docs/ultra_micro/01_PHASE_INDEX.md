@@ -193,9 +193,9 @@ Live Signal Engine (Uses thresholds)
 
 ### Data Flow Between Phases
 
-1. **Phase 221** reads: `angel_index_ai_signals_curated.csv`
-2. **Phase 221** writes: `angel_index_ai_signals_with_forward.csv`
-3. **Phase 222** reads: `angel_index_ai_signals_with_forward.csv`
+1. **Phase 221** reads: `dhan_index_ai_signals_curated.csv`
+2. **Phase 221** writes: `dhan_index_ai_signals_with_forward.csv`
+3. **Phase 222** reads: `dhan_index_ai_signals_with_forward.csv`
 4. **Phase 222** writes: `logs/research/system3_signal_edge_report.md`
 5. **Phase 304** reads: `system3_signal_edge_report.md`
 6. **Phase 304** writes: `storage/meta/system3_live_thresholds.json`

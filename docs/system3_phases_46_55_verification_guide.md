@@ -109,7 +109,7 @@ python system3_ultra.py
 ### Step 5: Verify No Baseline Changes
 
 Check that no baseline files were modified:
-- [ ] `core/models/angel_one/` - No new files
+- [ ] `core/models/dhan/` - No new files
 - [ ] `core/engine/` - No overwritten files (only new `system3_phase*` files)
 - [ ] Baseline configs unchanged
 

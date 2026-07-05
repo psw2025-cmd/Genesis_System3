@@ -5,14 +5,15 @@ Monitors correlation between signal scores and actual forward returns.
 Helps identify if scoring model is still predictive.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -38,7 +39,7 @@ def run_phase338_signal_outcome_correlation(root_path: str = None, **kwargs) -> 
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load forward signals
-    forward_file = root / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+    forward_file = root / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
     if not forward_file.exists():
         logger.warning(f"Forward signals file not found: {forward_file}")

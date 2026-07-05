@@ -13,13 +13,13 @@ Phase 379 detects:
 - Signal conflicts and contradictions
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -47,7 +47,7 @@ def detect_unusual_signal_patterns() -> Dict[str, Any]:
     try:
         import pandas as pd
 
-        signals_file = STORAGE_LIVE / "angel_index_ai_signals.csv"
+        signals_file = STORAGE_LIVE / "dhan_index_ai_signals.csv"
         if signals_file.exists():
             df = pd.read_csv(signals_file, on_bad_lines="skip", low_memory=False)
 
@@ -110,13 +110,13 @@ def detect_data_anomalies() -> Dict[str, Any]:
     }
 
     try:
-        import pandas as pd
         import numpy as np
+        import pandas as pd
 
         signal_files = [
-            STORAGE_LIVE / "angel_index_ai_signals.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-            STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+            STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
         ]
 
         for filepath in signal_files:

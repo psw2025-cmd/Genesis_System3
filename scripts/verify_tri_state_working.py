@@ -3,11 +3,12 @@ Verify Tri-State System is Working
 Shows proof that files are updating in all modes
 """
 
+import json
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
-import json
+from pathlib import Path
+
 import pandas as pd
 import pytz
 

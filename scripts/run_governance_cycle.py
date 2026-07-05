@@ -9,8 +9,8 @@ import argparse
 import json
 import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PROOF_DIR = ROOT / "proof"

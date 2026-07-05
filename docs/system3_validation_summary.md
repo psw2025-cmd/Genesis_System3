@@ -51,7 +51,7 @@ system3_full_validation.bat
 python -m core.engine.system3_status_check
 
 # Models
-python -m core.engine.train_angel_models
+python -m core.engine.train_dhan_models
 
 # Ultra phases 39-45
 python verify_phases_39_45.py

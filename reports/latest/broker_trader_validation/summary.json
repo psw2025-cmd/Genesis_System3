@@ -1,0 +1,101 @@
+{
+  "generated_utc": "2026-06-23T21:26:45.211310Z",
+  "live_trading_enabled": false,
+  "order_placement_allowed": false,
+  "broker": {
+    "broker": "dhan",
+    "mode": "ANALYZER",
+    "connected": false,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "credentials_present": false,
+    "client_id_present": false,
+    "access_token_present": false,
+    "error": "CONFIG_MISSING",
+    "auto_refresh": {
+      "attempted": false,
+      "success": false
+    },
+    "sdk_available": false,
+    "env_source": "core.utils.env_loader"
+  },
+  "broker_connected": false,
+  "validation": {
+    "overall": "BROKER_OFFLINE",
+    "valid_pct": 0,
+    "valid_count": 0,
+    "total_fields": 8,
+    "all_apis_success": false
+  },
+  "trader_fields": {
+    "cash_available": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "utilized_margin": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "total_limit": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "holdings_count": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "positions_count": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "holdings_total_value": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "positions_unrealized_pnl": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    },
+    "positions_realized_pnl": {
+      "status": "BROKER_OFFLINE",
+      "valid": false,
+      "value": null
+    }
+  },
+  "funds": {
+    "success": false,
+    "source": null,
+    "error": "CONFIG_MISSING",
+    "normalized": {
+      "available_balance": null,
+      "utilized_amount": null,
+      "total_limit": null,
+      "raw": {}
+    },
+    "raw_count": 0
+  },
+  "holdings": {
+    "success": false,
+    "source": null,
+    "error": "CONFIG_MISSING",
+    "count": 0,
+    "rows": [],
+    "raw_rows": []
+  },
+  "positions": {
+    "success": false,
+    "source": null,
+    "error": "CONFIG_MISSING",
+    "count": 0,
+    "rows": [],
+    "raw_rows": []
+  },
+  "data_source": "BROKER_OFFLINE"
+}

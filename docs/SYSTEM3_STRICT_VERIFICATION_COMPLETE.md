@@ -55,7 +55,7 @@ Date: 2025-12-04 00:54:36
 
 Phase 221: Computed forward returns for 560 of 608 rows
 
-Output CSV: C:\Genesis_System3\storage\live\angel_index_ai_signals_with_forward.csv
+Output CSV: C:\Genesis_System3\storage\live\dhan_index_ai_signals_with_forward.csv
 Total Rows: 608
 Rows with Forward Returns: 560
 
@@ -66,7 +66,7 @@ REASON: Exit code 0, no error keywords in stderr, output file created successful
 ```
 
 **Output File Verification**:
-- ✅ File exists: `storage\live\angel_index_ai_signals_with_forward.csv`
+- ✅ File exists: `storage\live\dhan_index_ai_signals_with_forward.csv`
 - ✅ File size: Non-zero (contains 608 rows)
 - ✅ Forward returns computed: 560 of 608 rows (92% coverage)
 
@@ -127,15 +127,15 @@ REASON: Exit code 0, no error keywords in stderr, output file created successful
 
 **Command**:
 ```
-C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 ```
 
 **Execution Report**:
 ```
 === COMMAND EXECUTION REPORT ===
-COMMAND: C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+COMMAND: C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 STDOUT:
-[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\angel_index_ai_pnl_log.csv
+[PNL] Detailed trade PnL log written to: C:\Genesis_System3\storage\live\dhan_index_ai_pnl_log.csv
 
 === PnL SUMMARY BY UNDERLYING ===
 underlying  count  mean  max  min
@@ -148,7 +148,7 @@ REASON: Exit code 0, no error keywords in stderr, output file created successful
 ```
 
 **Output File Verification**:
-- ✅ File exists: `storage\live\angel_index_ai_pnl_log.csv`
+- ✅ File exists: `storage\live\dhan_index_ai_pnl_log.csv`
 - ✅ File size: Non-zero (contains PnL data)
 - ✅ Trades evaluated: 3 trades (FINNIFTY)
 
@@ -183,7 +183,7 @@ REASON: Exit code 0, no error keywords in stderr, output file created successful
 
 ### run_pnl_simulator.bat
 - ✅ Uses canonical Python path: `C:\Genesis_System3\venv\Scripts\python.exe`
-- ✅ Executes: `core\engine\angel_pnl_simulator.py`
+- ✅ Executes: `core\engine\dhan_pnl_simulator.py`
 - ✅ Error handling: Checks exit code
 - ✅ Status messages: Clear success/failure messages
 
@@ -239,7 +239,7 @@ REASON: Exit code 0, no error keywords in stderr, output file created successful
 ## Files Modified
 
 ### Fixed Files
-1. **`core/engine/angel_pnl_simulator.py`**
+1. **`core/engine/dhan_pnl_simulator.py`**
    - **Issue**: Missing sys.path setup causing `ModuleNotFoundError`
    - **Fix**: Added project root to sys.path before import (lines 9-12)
    - **Status**: ✅ **FIXED**

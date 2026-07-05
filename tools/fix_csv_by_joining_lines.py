@@ -3,11 +3,11 @@
 This is a heuristic: it assumes rows were broken into multiple lines but fields do not contain unescaped newlines.
 """
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CSV = ROOT / "storage" / "training" / "angel_index_options_training.csv"
+CSV = ROOT / "storage" / "training" / "dhan_index_options_training.csv"
 if not CSV.exists():
     print("CSV missing", CSV)
     raise SystemExit(1)

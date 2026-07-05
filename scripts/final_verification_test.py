@@ -2,13 +2,14 @@
 Final verification test - Run system and verify all components work correctly.
 """
 
+import json
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
-import pytz
-import json
+from pathlib import Path
+
 import pandas as pd
+import pytz
 
 # Fix Unicode encoding for Windows console
 if sys.platform == "win32":

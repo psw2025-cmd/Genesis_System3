@@ -19,12 +19,12 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import os
-import sys
 import json
+import os
 import pickle
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # CRITICAL: Change to project root FIRST, before any imports
 project_root = Path(__file__).resolve().parents[2]
@@ -34,20 +34,20 @@ os.chdir(str(project_root))
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
+import numpy as np
+import pandas as pd
+
 from core.engine.system3_phase392_ensemble_integration import (
-    run_phase_392,
+    SUPPORTED_UNDERLYINGS,
     EnsembleConfig,
-    load_ultra_models,
-    load_xgboost_models,
     delta_fallback_score,
     ensemble_predict,
-    SUPPORTED_UNDERLYINGS,
+    load_ultra_models,
+    load_xgboost_models,
+    run_phase_392,
 )
 from core.engine.ultra_models_loader import load_ultra_model
 from model_training_v2 import load_balanced_dataset
-
-import numpy as np
-import pandas as pd
 
 
 def test_check_1_xgboost_models():

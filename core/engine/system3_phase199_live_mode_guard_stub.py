@@ -5,9 +5,9 @@ Formal guard/memo module stating DRY-RUN mode only.
 """
 
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -45,7 +45,7 @@ def run_phase199_live_mode_guard_stub() -> Dict[str, Any]:
             f.write("### Key Points:\n\n")
             f.write("1. **DRY-RUN ONLY**: All phases 131-200 operate in DRY-RUN mode.\n")
             f.write("2. **NO LIVE TRADING**: No code path in phases 131-200 enables live trading.\n")
-            f.write("3. **ANGEL_ONE ONLY**: System is configured for AngelOne broker only.\n")
+            f.write("3. **DHAN ONLY**: System is configured for Dhan broker only.\n")
             f.write("4. **ONE-LOT TEST MODE**: System is configured for 1-lot-only testing.\n")
             f.write("5. **SAFETY FIRST**: All safety mechanisms must be verified before any future live mode.\n\n")
 

@@ -4,11 +4,11 @@ System3 Phase 304 - Dynamic Threshold Tuner (Safe Mode)
 Proposes updated BUY/SELL thresholds using Phase 222 + Phases 301-303, but DO NOT change live thresholds automatically.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

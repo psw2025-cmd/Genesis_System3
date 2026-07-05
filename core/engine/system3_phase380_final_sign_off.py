@@ -13,13 +13,13 @@ Phase 380 verifies:
 - Issues resolved or documented
 """
 
-import sys
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, List
-from datetime import datetime
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -181,7 +181,7 @@ def verify_safety_compliance() -> Dict[str, Any]:
 
         # Check 2: No live trading code
         live_trading_code_found = False
-        dangerous_patterns = ["execute_live_trade", "place_live_order", "live_execution", "angel_broker.place_order"]
+        dangerous_patterns = ["execute_live_trade", "place_live_order", "live_execution", "dhan_broker.place_order"]
 
         phase_files = list((PROJECT_ROOT / "core" / "engine").glob("system3_phase37*.py"))
         for phase_file in phase_files:

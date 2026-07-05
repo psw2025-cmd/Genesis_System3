@@ -4,13 +4,13 @@ System3 Phase 95 - Operator Activity Log
 Track operator actions in a structured log.
 """
 
-import sys
 import argparse
 import json
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
+import sys
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

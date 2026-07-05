@@ -12,9 +12,10 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 89
 """
 
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import numpy as np
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"

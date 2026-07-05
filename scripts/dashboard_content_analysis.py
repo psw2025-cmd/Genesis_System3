@@ -3,14 +3,15 @@ Dashboard Content Analysis - Full Testing and Analysis
 Accesses dashboard, tests all tabs, and analyzes all content
 """
 
-import sys
-import os
 import json
+import os
+import sys
 import time
-import requests
 from datetime import datetime
-from bs4 import BeautifulSoup
+
 import pytz
+import requests
+from bs4 import BeautifulSoup
 
 # Fix Unicode encoding for Windows
 if sys.platform == "win32":

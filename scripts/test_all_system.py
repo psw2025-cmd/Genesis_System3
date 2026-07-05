@@ -2,12 +2,13 @@
 Comprehensive System Test - Tests all components
 """
 
-import sys
 import json
-import requests
 import subprocess
+import sys
 import time
 from pathlib import Path
+
+import requests
 
 # Fix encoding
 if sys.platform == "win32":

@@ -3,10 +3,11 @@ Synthetic Data Generator for Dashboard
 Generates realistic option chain data when market is closed
 """
 
-import random
 import math
+import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 import pytz
 
 IST = pytz.timezone("Asia/Kolkata")
@@ -264,7 +265,12 @@ def generate_synthetic_chain_data(underlying: str, spot_price: Optional[float] =
                 }
             )
 
-    return contracts
+    try:
+        from core.brokers.dhan.nse_option_symbol import enrich_option_rows
+
+        return enrich_option_rows(contracts)
+    except Exception:
+        return contracts
 
 
 def generate_synthetic_health_data() -> Dict[str, Any]:

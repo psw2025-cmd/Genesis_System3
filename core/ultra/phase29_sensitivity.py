@@ -10,15 +10,16 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 92
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Dict, Any, List, Optional
 import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one_ultra"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan_ultra"
 
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive automated cleaning and validation pipeline has been implemented for `angel_index_ai_signals_with_forward.csv`. The pipeline produces clean, validated CSV files ready for EV analysis, threshold optimization, and model training.
+A comprehensive automated cleaning and validation pipeline has been implemented for `dhan_index_ai_signals_with_forward.csv`. The pipeline produces clean, validated CSV files ready for EV analysis, threshold optimization, and model training.
 
 ## Files Created
 
@@ -14,7 +14,7 @@ A comprehensive automated cleaning and validation pipeline has been implemented 
    - Categorizes columns into logical groups
    - Generates `docs/SYSTEM3_CSV_SCHEMA_AUTOMATED.md`
 
-2. **`core/tools/clean_angel_signals_csv.py`**
+2. **`core/tools/clean_dhan_signals_csv.py`**
    - Main cleaning pipeline
    - Removes bad rows (duplicate headers, invalid rows)
    - Converts numeric columns
@@ -40,16 +40,16 @@ A comprehensive automated cleaning and validation pipeline has been implemented 
 
 ### Clean CSV Files
 
-- **`storage/clean/angel_index_ai_signals_with_forward_clean.csv`**
+- **`storage/clean/dhan_index_ai_signals_with_forward_clean.csv`**
   - Fully cleaned version of the original CSV
   - Bad rows removed, types converted, moneyness fixed, outliers removed
 
-- **`storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv`**
+- **`storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv`**
   - Subset ready for EV analysis and training
   - All forward returns present, valid signals, no outliers
   - Typically 200-400 rows
 
-- **`storage/clean/angel_index_ai_signals_sell_anomalies.csv`**
+- **`storage/clean/dhan_index_ai_signals_sell_anomalies.csv`**
   - SELL signals with extreme positive forward returns
   - Requires manual review
   - May be empty if no anomalies detected
@@ -112,7 +112,7 @@ run_clean_signals_and_validate.bat
 python -m core.tools.schema_audit
 
 # Cleaning pipeline
-python -m core.tools.clean_angel_signals_csv
+python -m core.tools.clean_dhan_signals_csv
 
 # Validation
 python -m core.tools.validate_clean_csv
@@ -142,7 +142,7 @@ python -m core.tools.validate_clean_csv
 
 ## Constants and Configuration
 
-All constants are defined at the top of `clean_angel_signals_csv.py`:
+All constants are defined at the top of `clean_dhan_signals_csv.py`:
 
 - `OUTLIER_THRESHOLD = 1.0` - Threshold for extreme forward returns
 - `NUMERIC_COLUMNS` - List of columns to convert to numeric

@@ -7,10 +7,10 @@
 ## Phase 1: LOG + ANALYZE ONLY ✅
 
 ### 1. Real Outcome Logger
-- **File**: `core/engine/angel_real_outcome_logger.py`
+- **File**: `core/engine/dhan_real_outcome_logger.py`
 - **Menu**: Option 28
 - **Function**: Logs every trade (even DRY RUN) to learning table
-- **Output**: `storage/learning/angel_real_outcomes.csv`
+- **Output**: `storage/learning/dhan_real_outcomes.csv`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED
 
@@ -20,7 +20,7 @@
 - signal_confidence, score, thresholds_used, regime, model_version, snapshot_index
 
 ### 2. Signal vs Outcome Analyzer
-- **File**: `core/engine/angel_signal_outcome_analyzer.py`
+- **File**: `core/engine/dhan_signal_outcome_analyzer.py`
 - **Menu**: Option 29
 - **Function**: Analyzes signal quality vs actual outcomes
 - **Output**: `storage/reports/real_learning_summary_YYYYMMDD.csv`
@@ -34,10 +34,10 @@
 - Confusion table: signal vs actual direction
 
 ### 3. Misfire Detector
-- **File**: `core/engine/angel_misfire_detector.py`
+- **File**: `core/engine/dhan_misfire_detector.py`
 - **Menu**: Option 30
 - **Function**: Identifies false positives and false negatives
-- **Output**: `storage/learning/angel_misfires.csv`
+- **Output**: `storage/learning/dhan_misfires.csv`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED
 
@@ -51,7 +51,7 @@
 ## Phase 2: SUGGEST ONLY ✅
 
 ### 4. Real Threshold Recommender
-- **File**: `core/engine/angel_real_threshold_recommender.py`
+- **File**: `core/engine/dhan_real_threshold_recommender.py`
 - **Menu**: Option 31
 - **Function**: Recommends thresholds based on real PnL
 - **Output**: `storage/config/thresholds_real_suggestions.json`
@@ -65,7 +65,7 @@
 - Per-underlying recommendations
 
 ### 5. Position Sizing & Risk Optimizer
-- **File**: `core/engine/angel_risk_profile_optimizer.py`
+- **File**: `core/engine/dhan_risk_profile_optimizer.py`
 - **Menu**: Option 32
 - **Function**: Suggests risk profile based on real PnL distribution
 - **Output**: `storage/config/risk_profile_suggestions.json`
@@ -83,10 +83,10 @@
 ## Phase 3: READY, BUT MANUAL ✅
 
 ### 6. Real Data Extractor for Training
-- **File**: `core/engine/angel_real_data_extractor.py`
+- **File**: `core/engine/dhan_real_data_extractor.py`
 - **Menu**: Option 33
 - **Function**: Converts real outcomes into training rows
-- **Output**: `storage/training/angel_real_training_candidates.csv`
+- **Output**: `storage/training/dhan_real_training_candidates.csv`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED
 
@@ -97,10 +97,10 @@
 - Adds PnL buckets (HIGH_WIN/WIN/FLAT/LOSS/HIGH_LOSS)
 
 ### 7. Blended Dataset Builder
-- **File**: `core/engine/angel_blended_dataset_builder.py`
+- **File**: `core/engine/dhan_blended_dataset_builder.py`
 - **Menu**: Option 34
 - **Function**: Combines synthetic + real training data
-- **Output**: `storage/training/angel_blended_training_preview.csv`
+- **Output**: `storage/training/dhan_blended_training_preview.csv`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED (Preview only)
 
@@ -110,10 +110,10 @@
 - Column alignment and feature preservation
 
 ### 8. Blended Model Trainer (MANUAL TRIGGER ONLY)
-- **File**: `core/engine/angel_blended_model_trainer_v2.py`
+- **File**: `core/engine/dhan_blended_model_trainer_v2.py`
 - **Menu**: Option 35
 - **Function**: Trains models on blended dataset
-- **Output**: Updated models in `core/models/angel_one/`
+- **Output**: Updated models in `core/models/dhan/`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED (Requires explicit confirmation)
 
@@ -129,10 +129,10 @@
 ## Daily Monitoring & Reporting ✅
 
 ### 9. End-of-Day Learning Report
-- **File**: `core/engine/angel_daily_learning_report.py`
+- **File**: `core/engine/dhan_daily_learning_report.py`
 - **Menu**: Option 36
 - **Function**: Generates comprehensive daily learning report
-- **Output**: `storage/reports/angel_daily_learning_report_YYYYMMDD.txt`
+- **Output**: `storage/reports/dhan_daily_learning_report_YYYYMMDD.txt`
 - **Status**: ✅ Complete
 - **Auto-Update**: ❌ DISABLED (Report only)
 
@@ -145,7 +145,7 @@
 - Per-underlying performance
 
 ### 10. Rolling 7-Day Learning Dashboard
-- **File**: `core/engine/angel_rolling_learning_dashboard.py`
+- **File**: `core/engine/dhan_rolling_learning_dashboard.py`
 - **Menu**: Option 37
 - **Function**: Aggregates last 7 trading days
 - **Output**: Console + `storage/reports/rolling_learning_dashboard_YYYYMMDD.csv`
@@ -195,17 +195,17 @@
 ```
 storage/
 ├── learning/
-│   ├── angel_real_outcomes.csv          # All trade outcomes
-│   └── angel_misfires.csv              # Tagged misfires
+│   ├── dhan_real_outcomes.csv          # All trade outcomes
+│   └── dhan_misfires.csv              # Tagged misfires
 ├── config/
 │   ├── thresholds_real_suggestions.json # Threshold recommendations
 │   └── risk_profile_suggestions.json    # Risk profile suggestions
 ├── training/
-│   ├── angel_real_training_candidates.csv    # Real training data
-│   └── angel_blended_training_preview.csv    # Blended preview
+│   ├── dhan_real_training_candidates.csv    # Real training data
+│   └── dhan_blended_training_preview.csv    # Blended preview
 └── reports/
     ├── real_learning_summary_YYYYMMDD.csv    # Signal analysis
-    ├── angel_daily_learning_report_YYYYMMDD.txt  # Daily report
+    ├── dhan_daily_learning_report_YYYYMMDD.txt  # Daily report
     └── rolling_learning_dashboard_YYYYMMDD.csv   # 7-day dashboard
 ```
 
@@ -235,31 +235,31 @@ storage/
 
 ```bash
 # Test outcome logger
-python -m core.engine.angel_real_outcome_logger
+python -m core.engine.dhan_real_outcome_logger
 
 # Analyze signals vs outcomes
-python -m core.engine.angel_signal_outcome_analyzer
+python -m core.engine.dhan_signal_outcome_analyzer
 
 # Detect misfires
-python -m core.engine.angel_misfire_detector
+python -m core.engine.dhan_misfire_detector
 
 # Get threshold recommendations
-python -m core.engine.angel_real_threshold_recommender
+python -m core.engine.dhan_real_threshold_recommender
 
 # Get risk profile suggestions
-python -m core.engine.angel_risk_profile_optimizer
+python -m core.engine.dhan_risk_profile_optimizer
 
 # Extract real training data
-python -m core.engine.angel_real_data_extractor
+python -m core.engine.dhan_real_data_extractor
 
 # Build blended dataset
-python -m core.engine.angel_blended_dataset_builder
+python -m core.engine.dhan_blended_dataset_builder
 
 # Generate daily report
-python -m core.engine.angel_daily_learning_report
+python -m core.engine.dhan_daily_learning_report
 
 # View rolling dashboard
-python -m core.engine.angel_rolling_learning_dashboard
+python -m core.engine.dhan_rolling_learning_dashboard
 ```
 
 ---

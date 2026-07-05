@@ -3,12 +3,13 @@ Comprehensive Validation and Test - All Fixes
 Tests PnL calculation, trade logging, API endpoints, and system integrity
 """
 
-import sys
 import json
-import requests
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
+import requests
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -237,7 +238,11 @@ def test_trade_visibility():
     # Check if trade logger functions exist
     try:
         sys.path.insert(0, str(ROOT_DIR))
-        from dashboard.backend.trade_logger import get_trades_by_date, get_all_trades, log_trade_event
+        from dashboard.backend.trade_logger import (
+            get_all_trades,
+            get_trades_by_date,
+            log_trade_event,
+        )
 
         print(f"{Colors.GREEN}✅ Trade logger functions available{Colors.RESET}")
 

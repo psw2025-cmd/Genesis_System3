@@ -4,28 +4,32 @@ System3 Phase 221 - Forward Return Calculator
 Computes forward returns for historical signals.
 """
 
-import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import json
+import sys
 import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from core.utils.timestamp_parser import normalize_timestamp_column_strict, write_iso_timestamps
+from core.utils.timestamp_parser import (
+    normalize_timestamp_column_strict,
+    write_iso_timestamps,
+)
 
-OUTPUT_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+OUTPUT_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 METRICS_DIR = PROJECT_ROOT / "storage" / "metrics"
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 # Use aggregated full dataset (from Phase 220) if available, else fall back to current curated
-CURATED_FULL_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated_full.csv"
-CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+CURATED_FULL_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated_full.csv"
+CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 

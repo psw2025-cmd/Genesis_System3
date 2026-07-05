@@ -4,7 +4,7 @@ System3 Phase 122 - Reserved for Future Enhancements
 
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:

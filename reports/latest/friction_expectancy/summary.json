@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-25T09:20:40.453955+05:30",
+  "date": "2026-06-25",
+  "source": "auto_generated_seed",
+  "note": "Run scripts/pf_gated_backtest.py on laptop with bhavcopy data to populate real values.",
+  "friction_per_trade": {
+    "brokerage_per_side": 20.0,
+    "brokerage_roundtrip": 40.0,
+    "stt_rate_pct": 0.0625,
+    "exchange_charge_pct": 0.05,
+    "gst_on_brokerage_pct": 18.0,
+    "slippage_pct": 0.1,
+    "estimated_total_per_lot_nifty": 84.0,
+    "estimated_total_per_lot_banknifty": 52.0
+  },
+  "breakeven_move_pct": {
+    "NIFTY": 0.36,
+    "BANKNIFTY": 0.29,
+    "FINNIFTY": 0.38,
+    "MIDCPNIFTY": 0.41
+  },
+  "profit_factor_gate": 1.2,
+  "backtest_status": "PENDING_LAPTOP_RUN",
+  "last_pf": null
+}

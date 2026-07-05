@@ -1,0 +1,28 @@
+﻿{
+    "generated_utc":  "2026-06-23T21:27:27.3732048Z",
+    "summary":  {
+                    "generated_utc":  "2026-06-23T21:27:27.3732048Z",
+                    "runner":  "PowerShell-NoPython",
+                    "production_live_ready":  false,
+                    "paper_analyzer_allowed":  true,
+                    "strategy_quarantined_for_live":  true,
+                    "reason":  "Production/live readiness remains blocked until real market paper lifecycle, broker freshness, tick health, execution quality and positive net expectancy are proven."
+                },
+    "blockers":  [
+                     {
+                         "severity":  "HIGH",
+                         "code":  "LIVE_DISABLED_UNTIL_PROVEN",
+                         "message":  "Live trading remains disabled until all production gates pass."
+                     },
+                     {
+                         "severity":  "HIGH",
+                         "code":  "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
+                         "message":  "WebSocket tick health proof is not available from PowerShell bridge."
+                     },
+                     {
+                         "severity":  "HIGH",
+                         "code":  "FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE",
+                         "message":  "Positive expectancy after all costs is not proven."
+                     }
+                 ]
+}

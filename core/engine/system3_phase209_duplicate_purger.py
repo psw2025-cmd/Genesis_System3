@@ -5,10 +5,11 @@ Removes duplicate rows from curated training data.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -18,7 +19,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "data_cleaning"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_duplicate_purger.log"
 
-CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
 
 def run_phase209(**kwargs) -> Dict[str, Any]:

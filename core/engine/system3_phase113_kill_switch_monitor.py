@@ -4,11 +4,11 @@ System3 Phase 113 - Kill Switch Monitor
 Monitor kill switch file and return status.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

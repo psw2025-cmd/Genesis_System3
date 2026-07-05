@@ -1,6 +1,6 @@
 # fresh_data_automation_proof
 
-Generated UTC: 2026-06-11T17:10:55.738692+00:00
+Generated UTC: 2026-06-23T21:26:07.465580+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -12,8 +12,7 @@ Generated UTC: 2026-06-11T17:10:55.738692+00:00
 
 ## Warnings
 
-- `binance_crypto_data_candidates_not_proven`
-- `angel_broker_secrets_not_available_to_ci_data_live_probe_skipped`
+- `dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped`
 
 ## Next action
 

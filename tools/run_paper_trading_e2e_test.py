@@ -5,12 +5,12 @@ Run with the repository venv Python, e.g.:
   .\venv\Scripts\python.exe tools\run_paper_trading_e2e_test.py
 """
 
-import subprocess
-import sys
 import csv
 import json
-from pathlib import Path
+import subprocess
+import sys
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LOGS_DIR = ROOT / "logs"

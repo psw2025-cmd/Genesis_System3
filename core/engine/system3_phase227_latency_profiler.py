@@ -5,11 +5,12 @@ Measures delay between market timestamps and processing times.
 """
 
 import sys
-import pandas as pd
-import numpy as np
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +20,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "performance"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_latency_profile.md"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
 def run_phase227(**kwargs) -> Dict[str, Any]:

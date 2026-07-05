@@ -4,12 +4,13 @@ System3 Phase 272 - Feature Selection Optimizer
 Identifies optimal feature subsets for ML models.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,7 +31,7 @@ def run_phase272(**kwargs) -> Dict[str, Any]:
 
     try:
         # Load curated training data to analyze features
-        CURATED_PATH = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+        CURATED_PATH = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
         if not CURATED_PATH.exists():
             return {

@@ -9,11 +9,11 @@ References:
 - Phase 249: LSTM predictor (prediction source)
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -67,7 +67,7 @@ def run_phase255(**kwargs) -> Dict[str, Any]:
 
     try:
         # Check if shadow predictions CSV exists
-        shadow_csv = STORAGE_DIR / "angel_index_ai_signals_with_forward_lstm.csv"
+        shadow_csv = STORAGE_DIR / "dhan_index_ai_signals_with_forward_lstm.csv"
 
         if not shadow_csv.exists():
             return {

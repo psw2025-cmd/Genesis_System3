@@ -7,14 +7,15 @@ System3 AI upgrade - training data pipeline hardening:
 - Diagnostics for data loading
 """
 
+import logging
+from collections import Counter
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+import joblib
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, Optional
-from pathlib import Path
-import joblib
-from datetime import datetime, timedelta
-from collections import Counter
-import logging
 
 from core.utils.logger import logger
 
@@ -36,8 +37,8 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # System3 training data configuration
 # ---------------------------------------------------------------------------
-CURATED_TRAINING_PATH = Path("storage") / "live" / "angel_index_ai_signals_curated.csv"
-LIVE_TRAINING_PATH = Path("storage") / "live" / "angel_index_ai_signals.csv"
+CURATED_TRAINING_PATH = Path("storage") / "live" / "dhan_index_ai_signals_curated.csv"
+LIVE_TRAINING_PATH = Path("storage") / "live" / "dhan_index_ai_signals.csv"
 
 # Minimum number of rows required for a dataset to be considered usable
 MIN_TRAINING_SAMPLES = 200
@@ -421,6 +422,16 @@ def predict_direction(model: Any, df: pd.DataFrame) -> pd.DataFrame:
             df = df.copy()
             df["ml_prediction"] = 0.0
             df["ml_probability"] = 0.5
+            df["ai_score"] = 0.0
+            # C1 FIX: mark every row as NON-MODEL so downstream gates can block trades
+            df["prediction_source"] = "NO_MODEL_FALLBACK"
+            df["model_healthy"] = False
+            _loud = _get_loader_logger()
+            _loud.error(
+                "[ml_predictor] CRITICAL: model is None — predictions are 0.5 NOISE, "
+                "NOT real ML output. Downstream MUST NOT trade on these. "
+                "Check model loading (this was the original Genesis silent-failure bug)."
+            )
         return df
 
     df = df.copy()
@@ -467,7 +478,9 @@ def predict_direction(model: Any, df: pd.DataFrame) -> pd.DataFrame:
 
         # Convert to score (-1 to +1)
         if len(df) > 1 and df["ml_probability"].nunique() == 1:
-            # Model is predicting same for all - use feature-based score instead
+            # Model is predicting same for all - DEGRADED (use feature proxy, flag it)
+            df["prediction_source"] = "DELTA_PROXY_DEGRADED"
+            df["model_healthy"] = False
             # Use delta and Greeks as proxy for direction
             if "delta" in df.columns:
                 delta_proxy = df["delta"].copy()
@@ -480,10 +493,21 @@ def predict_direction(model: Any, df: pd.DataFrame) -> pd.DataFrame:
             df["ai_score"] = (df["ml_probability"] - 0.5) * 1.5  # Slightly softer range
             df["ai_score"] = df["ai_score"].clip(-1.0, 1.0)
 
+        # C1 FIX: mark as healthy real-model prediction
+        df["prediction_source"] = "ML_MODEL"
+        df["model_healthy"] = True
+
     except Exception as e:
-        print(f"[WARN] ML prediction failed: {e}")
+        # C1 FIX: prediction failure is LOUD and flagged, not silently swallowed
+        _loud = _get_loader_logger()
+        _loud.error(
+            f"[ml_predictor] CRITICAL: model.predict() FAILED: {e} — "
+            f"falling back to 0.5 NOISE. Downstream MUST NOT trade on these rows."
+        )
         df["ml_prediction"] = 0
         df["ml_probability"] = 0.5
         df["ai_score"] = 0.0
+        df["prediction_source"] = "PREDICT_FAILED_FALLBACK"
+        df["model_healthy"] = False
 
     return df

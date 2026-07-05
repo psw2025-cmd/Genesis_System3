@@ -1,6 +1,8 @@
 {
-  "action": "NO TRADE",
-  "reason": "QC failed",
-  "timestamp_ist": "2026-02-01 18:30:52 IST",
-  "timestamp_epoch": 1769950852.901745
+  "action": "AWAITING_MARKET_SIGNAL",
+  "reason": "Cloud paper engine active \u2014 signals generated during market hours from live chain",
+  "timestamp_ist": "2026-06-25 09:22:47 IST",
+  "mode": "PAPER_CLOUD_SIM",
+  "live_trading_enabled": false,
+  "gate_status": "ANALYZER_READY_PROOF_INCOMPLETE"
 }

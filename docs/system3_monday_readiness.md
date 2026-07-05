@@ -121,7 +121,7 @@
 1. Check system health (menu 18)
 2. Review logs in `logs/` directory
 3. Restart menu option 11 if needed
-4. Check Angel One API connection
+4. Check Dhan API connection
 
 ### If Unexpected Trades Appear
 1. Review trade plan CSV
@@ -140,19 +140,19 @@
 ## 7. Key Files & Locations
 
 ### Configuration
-- `core/engine/angel_trade_config.py` - Trade thresholds
-- `core/engine/angel_automation_config.py` - Automation settings
+- `core/engine/dhan_trade_config.py` - Trade thresholds
+- `core/engine/dhan_automation_config.py` - Automation settings
 - `storage/config/thresholds_auto.json` - Auto-tuned thresholds
 
 ### Data Files
-- `storage/live/angel_index_ai_signals.csv` - Live signals
-- `storage/live/angel_index_ai_trades_plan.csv` - Trade plans
-- `storage/live/angel_index_ai_trades_exec_log.csv` - Execution log
-- `storage/live/angel_index_ai_pnl_log.csv` - PnL log
+- `storage/live/dhan_index_ai_signals.csv` - Live signals
+- `storage/live/dhan_index_ai_trades_plan.csv` - Trade plans
+- `storage/live/dhan_index_ai_trades_exec_log.csv` - Execution log
+- `storage/live/dhan_index_ai_pnl_log.csv` - PnL log
 
 ### Models
-- `core/models/angel_one/*_model.pkl` - Trained models
-- `core/models/angel_one/*_model_meta.json` - Model metadata
+- `core/models/dhan/*_model.pkl` - Trained models
+- `core/models/dhan/*_model_meta.json` - Model metadata
 
 ### Reports
 - `storage/reports/daily_report_YYYY-MM-DD.txt` - Daily reports
@@ -185,7 +185,7 @@
 
 ### Logs Location
 - Application logs: `logs/`
-- Trade lifecycle: `storage/live/angel_trade_lifecycle_log.csv`
+- Trade lifecycle: `storage/live/dhan_trade_lifecycle_log.csv`
 
 ### Debugging
 - Run system health check (menu 18)

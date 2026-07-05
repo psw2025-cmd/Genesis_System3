@@ -4,13 +4,13 @@ System3 Phase 314 - Data Lineage Tracker
 Tracks origin and lineage of key live and training data files.
 """
 
-import sys
-import json
 import hashlib
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
+import json
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -26,10 +26,10 @@ LINEAGE_LOG = HEALTH_DIR / "data_lineage_log.jsonl"
 
 # Key files to track
 KEY_FILES = [
-    "storage/live/angel_index_ai_signals.csv",
-    "storage/live/angel_index_ai_signals_curated.csv",
-    "storage/live/angel_index_ai_signals_with_forward.csv",
-    "storage/live/angel_index_ai_pnl_log.csv",
+    "storage/live/dhan_index_ai_signals.csv",
+    "storage/live/dhan_index_ai_signals_curated.csv",
+    "storage/live/dhan_index_ai_signals_with_forward.csv",
+    "storage/live/dhan_index_ai_pnl_log.csv",
 ]
 
 

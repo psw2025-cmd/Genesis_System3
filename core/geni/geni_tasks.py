@@ -6,15 +6,15 @@ Tasks reference existing scripts and validators.
 """
 
 from dataclasses import dataclass
-from typing import Optional, List
 from pathlib import Path
+from typing import List, Optional
 
 from .geni_config import (
+    FULL_VERIFICATION,
     PROJECT_ROOT,
+    SYSTEM3_ULTRA_ENTRY,
     ULTRA_DAILY_RUNNER,
     ULTRA_VALIDATION,
-    FULL_VERIFICATION,
-    SYSTEM3_ULTRA_ENTRY,
 )
 
 

@@ -5,10 +5,11 @@ Analyzes capital curve and drawdown from DRY-RUN PnL data.
 """
 
 import sys
-import pandas as pd
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -20,7 +21,7 @@ STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_ULTRA = PROJECT_ROOT / "storage" / "ultra"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
-PNL_LOG_CSV = STORAGE_LIVE / "angel_index_ai_pnl_log.csv"
+PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase156_capital_curve.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase156_capital_curve_report.md"
 

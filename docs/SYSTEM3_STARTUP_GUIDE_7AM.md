@@ -153,8 +153,8 @@
 
 ### Option 3: Check Signal Files
 **Location**: `storage/live/`
-- `angel_index_ai_signals.csv` - Should have new rows after 9:15 AM
-- `angel_index_ai_signals_curated.csv` - Should update periodically
+- `dhan_index_ai_signals.csv` - Should have new rows after 9:15 AM
+- `dhan_index_ai_signals_curated.csv` - Should update periodically
 
 ---
 
@@ -195,7 +195,7 @@
 
 **Possible Causes**:
 - All signals are HOLD (expected with conservative thresholds)
-- SmartAPI connection issue
+- DhanHQ connection issue
 - Data source unavailable
 
 **Solution**: Check autopilot logs for specific errors

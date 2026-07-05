@@ -4,13 +4,14 @@ System3 Phase 104 - Trade Plan → Local Order Construction
 Take rows from existing trade plan CSV and construct local ledger orders.
 """
 
-import sys
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any
 import random
 import string
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -21,7 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 STORAGE_LIVE = PROJECT_ROOT / "storage" / "live"
 STORAGE_LIVE.mkdir(parents=True, exist_ok=True)
 
-TRADE_PLAN_CSV = STORAGE_LIVE / "angel_index_ai_trades_plan.csv"
+TRADE_PLAN_CSV = STORAGE_LIVE / "dhan_index_ai_trades_plan.csv"
 LEDGER_CSV = STORAGE_LIVE / "live_orders_ledger.csv"
 
 

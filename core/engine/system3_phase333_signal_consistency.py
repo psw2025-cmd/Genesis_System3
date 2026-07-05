@@ -4,13 +4,14 @@ System3 Phase 333 - Signal Consistency & Duplicate Detector
 Detects suspicious duplicates or inconsistent entries in the curated signal file.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List
 import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -33,7 +34,7 @@ def run_phase333_signal_consistency(root_path: str = None, **kwargs) -> Dict[str
     root = Path(root_path) if root_path else PROJECT_ROOT
 
     # Load curated signals
-    signals_file = root / "storage" / "live" / "angel_index_ai_signals_curated.csv"
+    signals_file = root / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
     if not signals_file.exists():
         logger.error(f"Signal file not found: {signals_file}")

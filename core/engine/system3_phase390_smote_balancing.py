@@ -11,21 +11,24 @@ Author: System3 AI Team
 Date: 2025-12-08
 """
 
-import os
-import sys
 import json
 import logging
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from core.engine.ai_model.data_balancing_v2 import load_engineered_features, balance_multiclass_signals
+from core.engine.ai_model.data_balancing_v2 import (
+    balance_multiclass_signals,
+    load_engineered_features,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -47,7 +50,7 @@ def verify_safety_flags() -> bool:
     logger.info("\n[SAFETY CHECK]")
 
     # Check for common safety flag files
-    safety_files = ["live_trade_config.py", "angel_automation_config.json", "system3_ultra_safety.json"]
+    safety_files = ["live_trade_config.py", "dhan_automation_config.json", "system3_ultra_safety.json"]
 
     for fname in safety_files:
         fpath = Path("core") / "config" / fname

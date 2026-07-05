@@ -138,7 +138,7 @@ Indices to fetch: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX
 Include all strikes: False
 Output file: storage/live/option_chain_ALL_INDICES.csv
 
-Initializing AngelOne broker...
+Initializing Dhan broker...
 [OK] Broker initialized
 
 ================================================================================

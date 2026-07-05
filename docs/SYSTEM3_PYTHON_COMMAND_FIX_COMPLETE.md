@@ -112,7 +112,7 @@ C:\Genesis_System3\venv\Scripts\python.exe core\engine\system3_phase222_signal_e
 
 #### PnL Simulator
 ```batch
-C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py
+C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py
 ```
 
 ### Option 3: Use Batch Files
@@ -172,7 +172,7 @@ The `validate_core_commands.py` script implements strict error detection:
 
 ### Phase 221 (Forward Returns)
 - **Expected**: Computes forward returns for historical signals
-- **Output**: `storage/live/angel_index_ai_signals_with_forward.csv`
+- **Output**: `storage/live/dhan_index_ai_signals_with_forward.csv`
 - **Success Criteria**: No errors, CSV file updated
 
 ### Phase 222 (Signal Edge)

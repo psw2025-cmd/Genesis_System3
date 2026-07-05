@@ -4,15 +4,16 @@ Checks, fixes, verifies against online, and optimizes
 Goal: Maximum Profit
 """
 
+import json
+import os
+import subprocess
 import sys
 import time
-import json
-import subprocess
-import requests
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 import pytz
-import os
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

@@ -2,10 +2,11 @@
 Quick System Status Check - Shows what's actually happening
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
 import pytz
 
 ROOT_DIR = Path(__file__).parent.parent

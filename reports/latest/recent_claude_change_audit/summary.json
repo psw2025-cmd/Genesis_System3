@@ -1,0 +1,42 @@
+{
+  "generated_utc": "2026-06-23T08:00:00Z",
+  "auditor": "Claude (independent verification)",
+  "scope": "Cloud dashboard + broker auth + data truth + safety",
+  "verdict": "ANALYZER_READY_WITH_WARNINGS",
+  "cloud_dashboard": "MUCH_IMPROVED",
+  "analyzer_paper_mode": "READY_WITH_WARNINGS",
+  "live_trading": "BLOCKED",
+  "production": "NOT_READY",
+  "checks": {
+    "deploy_path_single": true,
+    "deployed_file": "dashboard/backend/app.py (157KB) via uvicorn",
+    "duplicate_deploy_risk": false,
+    "live_trading_env_locked": true,
+    "order_placement_blocked_in_code": true,
+    "broker_status_checks_profile_api": true,
+    "broker_status_not_just_ping": true,
+    "prediction_vs_actual_real_row": true,
+    "prediction_days": 1,
+    "prediction_days_needed": 5,
+    "market_day_lifecycle_proven": false,
+    "paper_lifecycle_dry_run_only": true,
+    "all_tabs_wired_to_real_apis": true,
+    "proof_tab_static_by_design": true,
+    "broker_all_levels_now_shown": true,
+    "honest_status_banner_added": true,
+    "path_a_b_separated": true,
+    "cash_equity_blocked_from_paper_trade": true
+  },
+  "remaining_blockers": [
+    "Market-day lifecycle proof: needs real NSE session (09:30 IST weekday)",
+    "Prediction proof: 1 day only (\u03c1=0.20) \u2014 need 5+ days with \u03c1\u22650.70",
+    "Broker quote API working: confirmed at auth level, option chain API needs live session test",
+    "Multi-day cloud stability: 2 days recorded (Jun 12-13) \u2014 not enough for production claim"
+  ],
+  "what_was_fixed_today": [
+    "Broker status now shows all 11 auth levels (not just CONN)",
+    "Honest proof status banner added to Proof tab",
+    "CSS updated for new components"
+  ],
+  "recommended_next": "Run during today's market session (09:15-15:30 IST) to collect validation day 2 and paper lifecycle real proof"
+}

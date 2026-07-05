@@ -1,0 +1,204 @@
+import { useStore } from '../store'
+import { fmt, fmtCr, signClass, cn } from '../lib/utils'
+import { PriceCell } from './ui/PriceCell'
+
+function Row({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'var(--border)' }}>
+      <span style={{ color: 'var(--text-mut)', fontSize: '.75rem' }}>{label}</span>
+      <span className={cn('num', color)} style={{ fontSize: '.8rem', fontWeight: 600 }}>{value}</span>
+    </div>
+  )
+}
+
+// Holdings/positions can arrive at any of these keys depending on backend
+// version: 'rows' (current normalizer output), 'holdings'/'positions' (legacy
+// alias), or 'data' (raw passthrough). Check all, in priority order.
+function pickArray(obj: any, ...keys: string[]): any[] {
+  if (!obj) return []
+  for (const k of keys) {
+    const v = obj[k]
+    if (Array.isArray(v)) return v
+  }
+  return []
+}
+
+export function BrokerPanel() {
+  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected } = useStore()
+
+  // Funds: backend wraps the clean values under `normalized`. Older shapes
+  // (or partial failures) may put them directly on the root or under `funds`.
+  const funds =
+    brokerFunds?.normalized ??
+    brokerFunds?.funds ??
+    brokerFunds ??
+    null
+
+  const fundsError = brokerFunds && brokerFunds.success === false
+  const fundsLoading = brokerFunds == null
+
+  const holdings  = pickArray(brokerHoldings, 'rows', 'holdings', 'data')
+  const positions = pickArray(brokerPositions, 'rows', 'positions', 'data')
+
+  const holdingsError  = brokerHoldings  && brokerHoldings.success === false
+  const positionsError = brokerPositions && brokerPositions.success === false
+
+  const availBal   = funds?.available_balance ?? funds?.availableBalance ?? null
+  const usedMargin = funds?.utilized_amount   ?? funds?.utilizedAmount   ?? null
+  const totalBal   = funds?.total_limit       ?? funds?.total_balance   ?? funds?.totalBalance ?? null
+
+  // Holding avg price can be avg_price (current normalizer) or average_price (legacy)
+  const getAvg = (h: any) => h.avg_price ?? h.average_price ?? 0
+  const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.entry_price ?? 0
+
+  return (
+    <div className="p-6 space-y-6 overflow-y-auto h-full">
+
+      {/* Connection Status */}
+      <div className="card p-4">
+        <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          🔗 Broker Connection — Dhan
+        </h3>
+        <Row label="Status"       value={brokerConnected ? 'CONNECTED' : 'OFFLINE'}
+             color={brokerConnected ? 'tx-up' : 'tx-down'} />
+        <Row label="Mode"         value="READ-ONLY (Analyzer)" />
+        <Row label="Client ID"    value={brokerStatus?.client_id ?? '...3741'} />
+        <Row label="Token Status" value={brokerStatus?.token_status ?? (brokerConnected ? 'VALID' : 'UNKNOWN')}
+             color={brokerConnected ? 'tx-up' : 'tx-down'} />
+        <Row label="Holdings API" value={holdingsError ? 'ERROR' : holdings.length >= 0 && brokerHoldings ? 'VALID ✓' : 'CHECKING...'}
+             color={holdingsError ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
+        <Row label="Funds API"    value={fundsError ? 'ERROR' : funds ? 'VALID ✓' : 'CHECKING...'}
+             color={fundsError ? 'tx-down' : funds ? 'tx-up' : undefined} />
+        <Row label="Live Trading" value="DISABLED (hardcoded 0)" color="tx-down" />
+      </div>
+
+      {/* Funds */}
+      <div className="card p-4">
+        <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          💰 Account Funds
+        </h3>
+        {fundsError ? (
+          <p style={{ color: 'var(--down)', fontSize: '.8rem' }}>
+            Failed to load funds: {brokerFunds?.error ?? 'unknown error'}
+          </p>
+        ) : fundsLoading ? (
+          <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading funds data…</p>
+        ) : availBal == null ? (
+          <p style={{ color: 'var(--amber)', fontSize: '.8rem' }}>
+            Funds API responded but no balance field found in response
+          </p>
+        ) : (
+          <>
+            <Row label="Available Balance" value={fmtCr(availBal)}  color="tx-up" />
+            <Row label="Used Margin"       value={fmtCr(usedMargin)} color={(usedMargin ?? 0) > 0 ? 'tx-down' : undefined} />
+            <Row label="Total Balance"     value={fmtCr(totalBal)} />
+          </>
+        )}
+      </div>
+
+      {/* Holdings */}
+      <div className="card" style={{ overflow: 'hidden' }}>
+        <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
+          <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+            📊 Equity Holdings ({holdings.length})
+          </h3>
+        </div>
+        {holdingsError ? (
+          <p style={{ padding: '20px', color: 'var(--down)', fontSize: '.8rem' }}>
+            Failed to load holdings: {brokerHoldings?.error ?? 'unknown error'}
+          </p>
+        ) : !brokerHoldings ? (
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading holdings…</p>
+        ) : holdings.length === 0 ? (
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
+            No equity holdings found
+          </p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Symbol', 'Qty', 'Avg Cost', 'LTP', 'P&L', 'P&L%'].map(h => (
+                  <th key={h} className="thead" style={{ textAlign: h === 'Symbol' ? 'left' : 'right' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {holdings.slice(0, 15).map((h: any, i: number) => {
+                const avg = getAvg(h)
+                const ltp = h.ltp ?? 0
+                const qty = h.quantity ?? 0
+                const pnl = h.pnl ?? ((ltp - avg) * qty)
+                const pnlPct = h.pnl_pct ?? (avg > 0 ? ((ltp - avg) / avg) * 100 : 0)
+                return (
+                  <tr key={i} className="trow">
+                    <td className="tcell" style={{ fontWeight: 600 }}>{h.trading_symbol ?? h.symbol ?? '--'}</td>
+                    <td className="tcell" style={{ textAlign: 'right' }}>{qty || '--'}</td>
+                    <td className="tcell" style={{ textAlign: 'right' }}>{fmt(avg)}</td>
+                    <td className="tcell" style={{ textAlign: 'right' }}>
+                      <PriceCell value={ltp} />
+                    </td>
+                    <td className={cn('tcell', signClass(pnl))} style={{ textAlign: 'right', fontWeight: 600 }}>
+                      {fmtCr(pnl)}
+                    </td>
+                    <td className={cn('tcell', signClass(pnlPct))} style={{ textAlign: 'right' }}>
+                      {pnlPct >= 0 ? '+' : ''}{(pnlPct ?? 0).toFixed(2)}%
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Live Positions */}
+      <div className="card" style={{ overflow: 'hidden' }}>
+        <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
+          <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+            📋 Dhan Live Positions ({positions.length})
+          </h3>
+        </div>
+        {positionsError ? (
+          <p style={{ padding: '20px', color: 'var(--down)', fontSize: '.8rem' }}>
+            Failed to load positions: {brokerPositions?.error ?? 'unknown error'}
+          </p>
+        ) : !brokerPositions ? (
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading positions…</p>
+        ) : positions.length === 0 ? (
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
+            No open positions in Dhan account (read-only view)
+          </p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Symbol', 'Side', 'Qty', 'Entry', 'LTP', 'P&L'].map(h => (
+                  <th key={h} className="thead">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {positions.map((p: any, i: number) => (
+                <tr key={i} className="trow">
+                  <td className="tcell" style={{ fontWeight: 600 }}>{p.trading_symbol ?? p.symbol ?? '--'}</td>
+                  <td className="tcell">
+                    <span className={cn('pill text-xs', p.position_type === 'LONG' ? 'tx-up' : 'tx-down')}
+                          style={{ fontSize: '.6rem' }}>
+                      {p.position_type ?? p.side ?? '--'}
+                    </span>
+                  </td>
+                  <td className="tcell">{p.net_qty ?? p.quantity ?? '--'}</td>
+                  <td className="tcell">{fmt(getEntry(p))}</td>
+                  <td className="tcell"><PriceCell value={p.ltp ?? 0} /></td>
+                  <td className={cn('tcell', signClass(p.unrealized_pnl ?? p.pnl ?? 0))} style={{ fontWeight: 600 }}>
+                    {fmtCr(p.unrealized_pnl ?? p.pnl ?? 0)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}

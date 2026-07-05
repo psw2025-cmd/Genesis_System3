@@ -10,7 +10,7 @@
 ### Task 0.1: Ultra Directories ✅
 
 **Directories Created**:
-- ✅ `core/models/angel_one_ultra/` - Ultra models storage
+- ✅ `core/models/dhan_ultra/` - Ultra models storage
 - ✅ `storage/ultra/` - Ultra live data
 - ✅ `storage/learning_ultra/` - Ultra learning data
 - ✅ `storage/reports_ultra/` - Ultra reports
@@ -18,7 +18,7 @@
 
 **Verification**:
 ```bash
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 dir storage\ultra
 dir storage\learning_ultra
 dir storage\reports_ultra
@@ -63,7 +63,7 @@ Current Safety Settings:
 
 **Files Created/Updated**:
 - ✅ `core/config/system3_active_profile.json` - Active profile config
-- ✅ `core/engine/angel_model_selector.py` - Extended for ULTRA_DEV
+- ✅ `core/engine/dhan_model_selector.py` - Extended for ULTRA_DEV
 
 **New Functions Added**:
 - `get_model_dir(profile)` - Returns model directory for profile
@@ -72,9 +72,9 @@ Current Safety Settings:
 - Extended `load_models_for_profile()` - Now supports ULTRA_DEV
 
 **Profile Support**:
-- ✅ **BASELINE**: Uses `core/models/angel_one/`
-- ✅ **LIVE_BETA**: Uses `core/models/angel_one_real_blended/`
-- ✅ **ULTRA_DEV**: Uses `core/models/angel_one_ultra/`
+- ✅ **BASELINE**: Uses `core/models/dhan/`
+- ✅ **LIVE_BETA**: Uses `core/models/dhan_real_blended/`
+- ✅ **ULTRA_DEV**: Uses `core/models/dhan_ultra/`
 
 **Storage Directories by Profile**:
 
@@ -94,7 +94,7 @@ Current Safety Settings:
 
 **Verification**:
 ```bash
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 **Expected Output (BASELINE)**:
@@ -107,13 +107,13 @@ Use Blended Models: True
 Execution Mode: DRY_RUN_ONLY
 
 === PROFILE PATHS ===
-Model Directory: core/models/angel_one
+Model Directory: core/models/dhan
 Signals Directory: storage/live
 Learning Directory: storage/learning
 Reports Directory: storage/reports
 
 === MODEL SOURCES ===
-NIFTY: core/models/angel_one/NIFTY_model.pkl (BASELINE)
+NIFTY: core/models/dhan/NIFTY_model.pkl (BASELINE)
 ...
 ```
 
@@ -170,7 +170,7 @@ Edit `core/config/system3_active_profile.json`:
 1. `core/config/system3_ultra_safety.json`
 2. `core/engine/ultra_safety.py`
 3. `core/config/system3_active_profile.json`
-4. Updated: `core/engine/angel_model_selector.py`
+4. Updated: `core/engine/dhan_model_selector.py`
 5. Created: 5 directories (empty, ready for use)
 
 ---
@@ -184,12 +184,12 @@ python -m core.engine.ultra_safety
 
 **Test Profile Selector**:
 ```bash
-python -m core.engine.angel_model_selector
+python -m core.engine.dhan_model_selector
 ```
 
 **Check Directories**:
 ```bash
-dir core\models\angel_one_ultra
+dir core\models\dhan_ultra
 dir storage\ultra
 dir storage\learning_ultra
 dir storage\reports_ultra

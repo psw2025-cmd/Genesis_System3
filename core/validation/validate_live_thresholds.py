@@ -5,12 +5,13 @@ Validates live thresholds JSON structure and verifies signal counts match expect
 This is a pre-market check to ensure thresholds are safe before market opens.
 """
 
-import sys
 import json
-import pandas as pd
-from pathlib import Path
-from typing import Dict, Any, List, Tuple
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import pandas as pd
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -21,7 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 META_DIR = PROJECT_ROOT / "storage" / "meta"
 CLEAN_DIR = PROJECT_ROOT / "storage" / "clean"
 THRESHOLDS_JSON = META_DIR / "system3_live_thresholds.json"
-EV_READY_CSV = CLEAN_DIR / "angel_index_ai_signals_with_forward_ev_ready.csv"
+EV_READY_CSV = CLEAN_DIR / "dhan_index_ai_signals_with_forward_ev_ready.csv"
 
 # Expected signal counts (from distribution analysis)
 EXPECTED_BUY_SIGNALS = 40

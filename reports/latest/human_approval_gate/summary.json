@@ -1,0 +1,20 @@
+{
+  "generated_utc": "2026-06-23T21:26:52.899315Z",
+  "human_approval": true,
+  "approved_by": "PRITAM S. WARGHADE",
+  "approved_utc": "2026-06-24T02:30:00+05:30",
+  "scope": "Full owner trust for world-class development, automation, and performance optimization.",
+  "live_trading_enabled": false,
+  "live_trading_env_flip_authorized": false,
+  "dashboard_status": "PASS",
+  "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
+  "technical_gates_still_required": [
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+    "POSITIVE_NET_EXPECTANCY_AFTER_ALL_COSTS",
+    "WEBSOCKET_TICK_HEALTH_PROVEN"
+  ],
+  "technical_gates_pending_count": 4,
+  "production_ready_for_real_money": false,
+  "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders."
+}

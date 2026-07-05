@@ -1,9 +1,0 @@
-commit a0ebb3635fb1d21bd5210a9871fe7e27309eb2ac
-Author: psw2025-cmd <176781239+psw2025-cmd@users.noreply.github.com>
-Date:   Thu Jun 11 19:55:04 2026 +0000
-
-    fix: Dhan broker in health/MODE_GATE, broker/status; reduce polling to 5s with overlap guard
-
- dashboard/app.js         | 15 +++++----
- dashboard/backend/app.py | 84 +++++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 77 insertions(+), 22 deletions(-)

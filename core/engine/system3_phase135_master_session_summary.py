@@ -4,11 +4,11 @@ System3 Phase 135 - Master Session Human Summary MD
 Generates human-readable summary of master session setup.
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -149,7 +149,7 @@ def run_phase135_master_session_summary() -> Dict[str, Any]:
             f.write("## Final Summary\n\n")
             f.write(f"- **MASTER_SESSION_READY**: {master_session_ready}\n")
             f.write(f"- **DRY_RUN_ONLY**: YES ✅\n")
-            f.write(f"- **BROKER**: ANGEL_ONE ✅\n")
+            f.write(f"- **BROKER**: DHAN ✅\n")
 
         status = "OK" if not errors else "ERROR"
         details = f"Master session summary generated: READY={master_session_ready}"

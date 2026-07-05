@@ -9,7 +9,7 @@
 Before running `START_AUTORUN_AND_WATCHDOG.bat`, verify:
 
 - [ ] `storage/meta/system3_live_thresholds.json` exists
-- [ ] `storage/clean/angel_index_ai_signals_with_forward_ev_ready.csv` exists
+- [ ] `storage/clean/dhan_index_ai_signals_with_forward_ev_ready.csv` exists
 - [ ] `core/validation/validate_live_thresholds.py` exists
 - [ ] `core/validation/pre_market_signal_dryrun.py` exists
 - [ ] `core/engine/system3_signal_engine_self_test.py` exists

@@ -10,10 +10,11 @@ Status: OPERATIONAL
 Date: 2025-12-06
 """
 
+from pathlib import Path
+from typing import Any, Tuple
+
 import torch
 import torch.nn as nn
-from pathlib import Path
-from typing import Tuple, Any
 
 
 class SimpleLSTM(nn.Module):
@@ -71,7 +72,7 @@ def load_model_from_state_dict(model_path: Path, input_size: int = 10) -> Tuple[
 
 def main():
     """Test model loading."""
-    model_path = Path("c:/Genesis_System3/core/models/angel_one/NIFTY_lstm_model.pth")
+    model_path = Path("c:/Genesis_System3/core/models/dhan/NIFTY_lstm_model.pth")
     model, success = load_model_from_state_dict(model_path)
 
     if success:

@@ -4,16 +4,17 @@ Tracks dashboard data and verifies against online sources
 Runs every 2 minutes to ensure data accuracy
 """
 
-import sys
-import time
 import json
-import subprocess
-import requests
-from pathlib import Path
-from datetime import datetime
-import pytz
 import os
 import re
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+import pytz
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

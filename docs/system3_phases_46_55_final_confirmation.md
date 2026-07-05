@@ -125,7 +125,7 @@ python system3_ultra.py
 
 ### 5. Verify No Baseline Changes
 
-- Check `core/models/angel_one/` - should have no new files from phases 46-55
+- Check `core/models/dhan/` - should have no new files from phases 46-55
 - Check baseline configs - should be unchanged
 - Check `core/engine/` - should have no overwritten files
 

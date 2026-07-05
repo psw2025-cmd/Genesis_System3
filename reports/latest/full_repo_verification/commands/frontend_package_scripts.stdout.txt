@@ -1,7 +1,0 @@
-Scripts available in system3-ultra-dashboard@1.0.0 via `npm run`:
-  dev
-    vite
-  build
-    vite build
-  preview
-    vite preview

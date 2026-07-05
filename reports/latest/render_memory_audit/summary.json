@@ -1,0 +1,65 @@
+{
+  "generated_utc": "2026-06-25T00:00:00+00:00",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "status": "PASS_WITH_WARNINGS",
+  "live_trading_enabled": false,
+  "secrets_touched": false,
+  "runtime_patch_applied": false,
+  "scope": [
+    "render.yaml",
+    "scripts/cloud_worker.py",
+    "while True loop search results",
+    "Render web and worker service configuration"
+  ],
+  "confirmed_facts": {
+    "render_web_service": "genesis-system3-backend",
+    "render_worker_service": "genesis-system3-worker",
+    "web_runtime": "docker",
+    "worker_runtime": "docker",
+    "web_plan": "starter",
+    "worker_plan": "starter",
+    "worker_command": "python scripts/cloud_worker.py",
+    "live_trading_hard_disabled_in_render_yaml": true,
+    "worker_has_main_keepalive_loop": true,
+    "worker_runs_three_daemon_threads": true
+  },
+  "high_probability_memory_risks": [
+    {
+      "area": "cloud_worker",
+      "risk": "single worker process runs token daemon, watchdog, and job scheduler as long-running threads",
+      "impact": "if any daemon leaks memory, Render worker process can restart",
+      "action": "add safe memory snapshot logging and isolate heavy jobs if memory climbs"
+    },
+    {
+      "area": "while_true_loops",
+      "risk": "repo contains multiple long-running loops that need bounded memory review",
+      "impact": "unbounded caches/lists/dataframes may accumulate over time",
+      "action": "audit each active runtime loop and add cleanup/TTL/bounds"
+    },
+    {
+      "area": "option_chain_and_dataframes",
+      "risk": "option-chain and market-data processing can create large objects",
+      "impact": "sudden memory spikes during fetch/parse/model jobs",
+      "action": "free large temporary objects after each batch and avoid retaining full chain history in RAM"
+    },
+    {
+      "area": "render_logs_missing",
+      "risk": "Render service logs and memory graphs are not available from GitHub repo alone",
+      "impact": "exact OOM root cause is not fully proven yet",
+      "action": "collect last 3-5 minutes of Render logs before restart"
+    }
+  ],
+  "files_added": [
+    "docs/render/RENDER_MEMORY_OOM_RUNBOOK.md",
+    "reports/latest/render_memory_audit/summary.json",
+    "reports/latest/render_memory_audit/summary.md"
+  ],
+  "required_next_actions": [
+    "Collect Render logs immediately before the OOM restart",
+    "Patch cloud_worker.py with safe RSS memory snapshot logs",
+    "Run static loop/cache audit for active runtime files",
+    "Move heavy dashboard/browser proof outside Render web runtime",
+    "Upgrade Render plan only after memory growth pattern is known"
+  ],
+  "final_recommendation": "Do not upgrade RAM first. First add memory logs, collect Render logs, and identify whether memory climbs steadily or spikes during scheduled jobs."
+}

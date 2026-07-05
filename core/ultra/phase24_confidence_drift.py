@@ -10,10 +10,11 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 87
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -127,7 +128,7 @@ def load_recent_signals(n: int = 200) -> Optional[pd.DataFrame]:
         DataFrame with confidence column, or None
     """
     # Try shadow signals first
-    shadow_csv = ULTRA_DIR / "angel_ultra_live_shadow_signals.csv"
+    shadow_csv = ULTRA_DIR / "dhan_ultra_live_shadow_signals.csv"
     if shadow_csv.exists():
         try:
             df = pd.read_csv(shadow_csv)
@@ -141,7 +142,7 @@ def load_recent_signals(n: int = 200) -> Optional[pd.DataFrame]:
             pass
 
     # Try baseline signals
-    signals_csv = LIVE_DIR / "angel_index_ai_signals.csv"
+    signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
     if signals_csv.exists():
         try:
             df = pd.read_csv(signals_csv)
@@ -155,7 +156,7 @@ def load_recent_signals(n: int = 200) -> Optional[pd.DataFrame]:
             pass
 
     # Try shadow master
-    shadow_master = LEARNING_ULTRA_DIR / "angel_ultra_shadow_master.csv"
+    shadow_master = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
     if shadow_master.exists():
         try:
             df = pd.read_csv(shadow_master)

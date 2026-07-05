@@ -58,7 +58,7 @@ All 10 phases (301-310) executed without errors. Some phases returned WARN statu
 
 ### Phase 305 - Confidence Tier ✅
 - ✅ `logs/ml/system3_confidence_tiering_305.md` - **CREATED**
-- ✅ `storage/live/angel_index_ai_signals_confidence_tagged_305.csv` - **CREATED**
+- ✅ `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv` - **CREATED**
 - **Content**: 30 signals tagged (all LOW confidence, 0 HIGH, 0 MEDIUM)
 
 ### Phase 306 - Staleness Guard ✅
@@ -187,7 +187,7 @@ All phases executed successfully. WARN statuses are expected and non-blocking:
 - **Phase 302**: ❌ Not created (depends on Phase 301)
 - **Phase 303**: ❌ Not created (no signals)
 - **Phase 304**: ✅ **CREATED** - `storage/meta/system3_threshold_proposals_304.json`
-- **Phase 305**: ✅ **CREATED** - `storage/live/angel_index_ai_signals_confidence_tagged_305.csv`
+- **Phase 305**: ✅ **CREATED** - `storage/live/dhan_index_ai_signals_confidence_tagged_305.csv`
 
 ### Threshold/Configuration Proposals (Phases 306-310)
 - **Phase 304**: ✅ **CREATED** - `storage/meta/system3_threshold_proposals_304.json` (3 proposals)

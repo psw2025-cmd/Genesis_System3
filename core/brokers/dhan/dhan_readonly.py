@@ -8,10 +8,10 @@ SAFETY CONTRACT:
 - Profile endpoint used for connectivity check.
 """
 
+import logging
 import os
 import sys
 import time
-import logging
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 if ROOT_DIR not in sys.path:
@@ -67,6 +67,12 @@ _DHAN_POSITIONS_URL = "https://api.dhan.co/v2/positions"
 _DHAN_HOLDINGS_URL = "https://api.dhan.co/v2/holdings"
 _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 
+# Broker status endpoint is polled every 10s by the dashboard.  Auto-refresh
+# must therefore be rate-limited so an expired/missing token does not trigger
+# repeated login attempts or TOTP churn on every UI poll.
+_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "300") or "300")
+_LAST_STATUS_REFRESH_ATTEMPT_AT = 0.0
+
 logger = logging.getLogger("dhan_readonly")
 
 
@@ -75,6 +81,80 @@ def _mask(value: str, keep: int = 4) -> str:
     if not value:
         return "<empty>"
     return f"{'*' * max(0, len(value) - keep)}{value[-keep:]}"
+
+
+def _env_truthy(name: str, default: str = "0") -> bool:
+    return os.getenv(name, default).strip().lower() in ("1", "true", "yes", "on")
+
+
+def _env_falsey(name: str, default: str = "0") -> bool:
+    return os.getenv(name, default).strip().lower() in ("0", "false", "no", "off", "")
+
+
+def _status_auto_refresh_enabled() -> bool:
+    """
+    Safe default: enabled only for read-only broker status checks.
+    Disable with DHAN_STATUS_AUTO_REFRESH=0 if needed.
+    """
+    if not _env_truthy("DHAN_STATUS_AUTO_REFRESH", "1"):
+        return False
+
+    # Never allow this read-only adapter to be used as a live-trading bypass.
+    # The refresh is only for profile/fund/position reads in ANALYZER/PAPER mode.
+    if not _env_falsey("LIVE_TRADING_ENABLED", "0"):
+        return False
+    if not _env_falsey("SYSTEM3_LIVE_TRADING_ALLOWED", "0"):
+        return False
+
+    return True
+
+
+def _safe_refresh_token_for_status(reason: str) -> dict:
+    """
+    Refresh Dhan token from the web backend process when dashboard broker status
+    detects an expired/missing token.  Returns only safe metadata; never returns
+    or logs the raw access token.
+    """
+    global _LAST_STATUS_REFRESH_ATTEMPT_AT
+
+    meta = {
+        "attempted": False,
+        "success": False,
+        "reason": reason,
+        "cooldown_s": _STATUS_REFRESH_COOLDOWN_S,
+    }
+
+    if not _status_auto_refresh_enabled():
+        meta["skipped"] = "AUTO_REFRESH_DISABLED_OR_LIVE_GATE"
+        return meta
+
+    now = time.time()
+    elapsed = now - _LAST_STATUS_REFRESH_ATTEMPT_AT
+    if _LAST_STATUS_REFRESH_ATTEMPT_AT and elapsed < _STATUS_REFRESH_COOLDOWN_S:
+        meta["skipped"] = "COOLDOWN"
+        meta["cooldown_remaining_s"] = int(_STATUS_REFRESH_COOLDOWN_S - elapsed)
+        return meta
+
+    _LAST_STATUS_REFRESH_ATTEMPT_AT = now
+    meta["attempted"] = True
+
+    try:
+        from core.brokers.dhan.token_manager import refresh_token
+
+        # Expired/missing dashboard token needs a fresh generate attempt first.
+        # renew_token can fail once the token is already fully expired.
+        force_generate = reason in ("CONFIG_MISSING", "TOKEN_EXPIRED_OR_INVALID")
+        result = refresh_token(force_generate=force_generate)
+        meta["success"] = bool(result.get("success"))
+        meta["strategy"] = result.get("strategy")
+        meta["message"] = str(result.get("message", ""))[:160]
+        meta["token_value_printed"] = False
+        return meta
+    except Exception as exc:
+        meta["error_type"] = type(exc).__name__
+        meta["message"] = str(exc)[:160]
+        meta["token_value_printed"] = False
+        return meta
 
 
 def get_dhan_credentials_masked() -> dict:
@@ -273,8 +353,10 @@ def get_status() -> dict:
     Full broker status check. Safe for API responses.
     Never includes raw access token.
     """
+    refresh_meta = {"attempted": False, "success": False}
     masked = get_dhan_credentials_masked()
-    if not masked["access_token_present"] or not masked["client_id_present"]:
+
+    if not masked["client_id_present"]:
         return {
             "broker": "dhan",
             "mode": "ANALYZER",
@@ -282,8 +364,32 @@ def get_status() -> dict:
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "credentials_present": False,
+            "client_id_present": False,
+            "access_token_present": masked["access_token_present"],
             "error": "CONFIG_MISSING",
+            "auto_refresh": refresh_meta,
+            "sdk_available": _DHAN_SDK_OK,
+            "env_source": _ENV_LOADED_VIA,
         }
+
+    if not masked["access_token_present"]:
+        refresh_meta = _safe_refresh_token_for_status("CONFIG_MISSING")
+        masked = get_dhan_credentials_masked()
+        if not masked["access_token_present"]:
+            return {
+                "broker": "dhan",
+                "mode": "ANALYZER",
+                "connected": False,
+                "live_trading_enabled": False,
+                "order_placement_allowed": False,
+                "credentials_present": False,
+                "client_id_present": True,
+                "access_token_present": False,
+                "error": "CONFIG_MISSING",
+                "auto_refresh": refresh_meta,
+                "sdk_available": _DHAN_SDK_OK,
+                "env_source": _ENV_LOADED_VIA,
+            }
 
     t0 = time.time()
     profile_result = get_profile()
@@ -292,15 +398,27 @@ def get_status() -> dict:
     connected = profile_result.get("success", False)
     error = None if connected else profile_result.get("error", "UNKNOWN")
 
+    if not connected and error == "TOKEN_EXPIRED_OR_INVALID":
+        refresh_meta = _safe_refresh_token_for_status(error)
+        if refresh_meta.get("success"):
+            t0 = time.time()
+            profile_result = get_profile()
+            latency_ms = int((time.time() - t0) * 1000)
+            connected = profile_result.get("success", False)
+            error = None if connected else profile_result.get("error", "UNKNOWN")
+
     return {
         "broker": "dhan",
         "mode": "ANALYZER",
         "connected": connected,
         "live_trading_enabled": False,
         "order_placement_allowed": False,
-        "credentials_present": True,
+        "credentials_present": bool(masked["client_id_present"] and masked["access_token_present"]),
+        "client_id_present": masked["client_id_present"],
+        "access_token_present": masked["access_token_present"],
         "latency_ms": latency_ms,
         "error": error,
+        "auto_refresh": refresh_meta,
         "sdk_available": _DHAN_SDK_OK,
         "env_source": _ENV_LOADED_VIA,
     }

@@ -2,9 +2,10 @@
 Check output files and display summary.
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
+
 import pandas as pd
 
 # Fix Unicode encoding for Windows console

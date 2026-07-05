@@ -1,0 +1,50 @@
+[
+  {
+    "file": "scripts/cloud_worker.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "core/brokers/dhan/token_manager.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "core/brokers/dhan/dhan_readonly.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "core/engine/system3_phase82_job_scheduler.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "dashboard/backend/app.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "config/live_trade_config.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "core/broker/dhan_live_order_wrapper.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  },
+  {
+    "file": "scripts/system3_master_proof_orchestrator.py",
+    "exists": true,
+    "compile_pass": true,
+    "error": ""
+  }
+]

@@ -5,13 +5,14 @@ Creates a consolidated snapshot of the current signal pipeline state
 and writes human-readable report and machine-readable JSON.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -26,10 +27,10 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Signal files to analyze
 SIGNAL_FILES = {
-    "signals": STORAGE_LIVE / "angel_index_ai_signals.csv",
-    "curated": STORAGE_LIVE / "angel_index_ai_signals_curated.csv",
-    "with_forward": STORAGE_LIVE / "angel_index_ai_signals_with_forward.csv",
-    "virtual_orders": STORAGE_LIVE / "angel_virtual_orders.csv",
+    "signals": STORAGE_LIVE / "dhan_index_ai_signals.csv",
+    "curated": STORAGE_LIVE / "dhan_index_ai_signals_curated.csv",
+    "with_forward": STORAGE_LIVE / "dhan_index_ai_signals_with_forward.csv",
+    "virtual_orders": STORAGE_LIVE / "dhan_virtual_orders.csv",
 }
 
 

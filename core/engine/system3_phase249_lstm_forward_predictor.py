@@ -9,28 +9,29 @@ References:
 - Phase 221: system3_phase221_forward_returns.py (data source)
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Directories
-MODELS_DIR = PROJECT_ROOT / "core" / "models" / "angel_one"
+MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 LOGS_DIR = PROJECT_ROOT / "logs"
 STORAGE_DIR = PROJECT_ROOT / "storage" / "live"
 
 # Input: Phase 221 output (forward returns calculated)
-INPUT_CSV = STORAGE_DIR / "angel_index_ai_signals_with_forward.csv"
+INPUT_CSV = STORAGE_DIR / "dhan_index_ai_signals_with_forward.csv"
 
 # Output: Shadow predictions (does NOT overwrite Phase 221 output)
-OUTPUT_CSV = STORAGE_DIR / "angel_index_ai_signals_with_forward_lstm.csv"
+OUTPUT_CSV = STORAGE_DIR / "dhan_index_ai_signals_with_forward_lstm.csv"
 
 # LSTM configuration
 SEQUENCE_LENGTH = 20  # Last 20 timestamps (~30 minutes of data)

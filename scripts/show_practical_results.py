@@ -2,12 +2,13 @@
 Show Practical Results - Complete System Output
 """
 
-import sys
 import json
-import pandas as pd
 import os
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 ROOT_DIR = Path(__file__).parent.parent
 

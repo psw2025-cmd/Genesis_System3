@@ -88,7 +88,7 @@
 **Previous Run Results** (from validation):
 - ✅ Exit code: 0
 - ✅ No errors in stderr
-- ✅ Output file created: `storage\live\angel_index_ai_signals_with_forward.csv`
+- ✅ Output file created: `storage\live\dhan_index_ai_signals_with_forward.csv`
 - ✅ File is non-empty (608 rows, 560 with forward returns)
 
 **Expected**: Should pass if run manually
@@ -106,13 +106,13 @@
 **Expected**: Should pass if run manually
 
 ### PnL Simulator
-**Command**: `C:\Genesis_System3\venv\Scripts\python.exe core\engine\angel_pnl_simulator.py`
+**Command**: `C:\Genesis_System3\venv\Scripts\python.exe core\engine\dhan_pnl_simulator.py`
 
 **Status**: ⚠️ **CANNOT EXECUTE** (terminal issue)
 **Previous Run Results** (from validation):
 - ✅ Exit code: 0
 - ✅ No errors in stderr
-- ✅ Output file created: `storage\live\angel_index_ai_pnl_log.csv`
+- ✅ Output file created: `storage\live\dhan_index_ai_pnl_log.csv`
 - ✅ PnL log written (3 trades evaluated for FINNIFTY)
 
 **Expected**: Should pass if run manually

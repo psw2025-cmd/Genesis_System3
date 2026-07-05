@@ -4,12 +4,12 @@ System3 Phase 84 - Resource Optimizer
 Analyze CPU/memory usage logs (if available) and suggest performance optimizations.
 """
 
-import sys
 import json
 import os
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Optional import for psutil (for actual resource monitoring)
 try:
@@ -78,7 +78,7 @@ def analyze_resource_usage() -> Dict[str, Any]:
     # Sample modules to measure
     sample_modules = [
         "core.engine.check_system3_status",
-        "core.engine.angel_live_ai_signals",
+        "core.engine.dhan_live_ai_signals",
         "core.engine.system3_phase31_ultra_fusion",
     ]
 

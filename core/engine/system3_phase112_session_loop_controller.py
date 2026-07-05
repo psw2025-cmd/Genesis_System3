@@ -6,9 +6,9 @@ One-shot loop controller that orchestrates the full execution flow.
 
 import sys
 import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -17,12 +17,12 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import phase functions
 try:
-    from core.engine.system3_phase111_live_session_brain import run_phase111
     from core.engine.system3_phase104_tradeplan_to_orders import run_phase104
     from core.engine.system3_phase105_ledger_integrity_check import run_phase105
-    from core.engine.system3_phase109_intraday_risk_guard import run_phase109
     from core.engine.system3_phase106_dryrun_execution_bridge import run_phase106
     from core.engine.system3_phase107_live_execution_engine import run_phase107
+    from core.engine.system3_phase109_intraday_risk_guard import run_phase109
+    from core.engine.system3_phase111_live_session_brain import run_phase111
     from core.engine.system3_phase113_kill_switch_monitor import run_phase113
 except ImportError as e:
     print(f"[PH112] ERROR: Failed to import phase modules: {e}")

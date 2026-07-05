@@ -4,11 +4,12 @@ Fixes spot price discrepancies and ensures real-time data accuracy
 """
 
 import json
-import requests
-from pathlib import Path
-from datetime import datetime
-import pytz
 import sys
+from datetime import datetime
+from pathlib import Path
+
+import pytz
+import requests
 
 ROOT_DIR = Path(__file__).parent.parent
 OUTPUTS_DIR = ROOT_DIR / "outputs"

@@ -4,13 +4,14 @@ System3 Phase 223 - Threshold Optimizer
 Optimizes BUY/SELL thresholds based on historical data.
 """
 
-import sys
 import json
-import pandas as pd
-import numpy as np
-from pathlib import Path
+import sys
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -24,7 +25,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_threshold_optimizer.log"
 
-SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals_with_forward.csv"
+SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
 def run_phase223(**kwargs) -> Dict[str, Any]:
@@ -53,9 +54,7 @@ def run_phase223(**kwargs) -> Dict[str, Any]:
         try:
             # Try with forward returns first
             signals_file = (
-                SIGNALS_CSV
-                if SIGNALS_CSV.exists()
-                else PROJECT_ROOT / "storage" / "live" / "angel_index_ai_signals.csv"
+                SIGNALS_CSV if SIGNALS_CSV.exists() else PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
             )
 
             if not signals_file.exists():

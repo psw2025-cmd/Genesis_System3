@@ -1,0 +1,155 @@
+{
+  "url_tested": "http://127.0.0.1:8000/ui",
+  "viewports_tested": [
+    "1920x1080",
+    "768x1024",
+    "375x667"
+  ],
+  "screenshots_created": [
+    "desktop_1920x1080.png",
+    "mobile_375x667.png",
+    "tablet_768x1024.png"
+  ],
+  "fields_found": [
+    {
+      "field": "analyzer_paper_mode_desktop",
+      "status": "PASS",
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_desktop",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
+    },
+    {
+      "field": "broker_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /BROKER OFFLINE/i"
+    },
+    {
+      "field": "data_source_desktop",
+      "status": "PASS",
+      "detail": "Matched /Dhan/i"
+    },
+    {
+      "field": "market_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /MARKET CLOSED/i"
+    },
+    {
+      "field": "option_chain_readiness_desktop",
+      "status": "PASS",
+      "detail": "Matched /Option Chain/i"
+    },
+    {
+      "field": "proof_audit_status_desktop",
+      "status": "PASS",
+      "detail": "Matched /Proof Status/i"
+    },
+    {
+      "field": "pnl_positions_desktop",
+      "status": "PASS",
+      "detail": "Matched /GROSS P&L/i"
+    },
+    {
+      "field": "no_false_live_ready_desktop",
+      "status": "PASS",
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
+    },
+    {
+      "field": "analyzer_paper_mode_tablet",
+      "status": "PASS",
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_tablet",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
+    },
+    {
+      "field": "broker_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /BROKER OFFLINE/i"
+    },
+    {
+      "field": "data_source_tablet",
+      "status": "PASS",
+      "detail": "Matched /DATA APIs/i"
+    },
+    {
+      "field": "market_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /MARKET CLOSED/i"
+    },
+    {
+      "field": "option_chain_readiness_tablet",
+      "status": "PASS",
+      "detail": "Matched /Option Chain/i"
+    },
+    {
+      "field": "proof_audit_status_tablet",
+      "status": "PASS",
+      "detail": "Matched /Proof Status/i"
+    },
+    {
+      "field": "pnl_positions_tablet",
+      "status": "PASS",
+      "detail": "Matched /GROSS P&L/i"
+    },
+    {
+      "field": "no_false_live_ready_tablet",
+      "status": "PASS",
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
+    },
+    {
+      "field": "analyzer_paper_mode_mobile",
+      "status": "PASS",
+      "detail": "Matched /ANALYZER\\s*\\/\\s*PAPER/i"
+    },
+    {
+      "field": "live_trading_disabled_mobile",
+      "status": "PASS",
+      "detail": "Matched /LIVE DISABLED/i"
+    },
+    {
+      "field": "broker_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /BROKER OFFLINE/i"
+    },
+    {
+      "field": "data_source_mobile",
+      "status": "PASS",
+      "detail": "Matched /DATA APIs/i"
+    },
+    {
+      "field": "market_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /MARKET CLOSED/i"
+    },
+    {
+      "field": "option_chain_readiness_mobile",
+      "status": "PASS",
+      "detail": "Matched /Option Chain/i"
+    },
+    {
+      "field": "proof_audit_status_mobile",
+      "status": "PASS",
+      "detail": "Matched /Proof Status/i"
+    },
+    {
+      "field": "pnl_positions_mobile",
+      "status": "PASS",
+      "detail": "Matched /GROSS P&L/i"
+    },
+    {
+      "field": "no_false_live_ready_mobile",
+      "status": "PASS",
+      "detail": "Shows PRODUCTION NOT READY / LIVE BLOCKED"
+    }
+  ],
+  "fields_missing": [],
+  "load_result": "PASS",
+  "console_errors": [],
+  "final_verdict": "PASS",
+  "generated_utc": "2026-06-23T21:06:29.587Z"
+}

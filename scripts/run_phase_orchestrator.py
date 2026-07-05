@@ -36,7 +36,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-
 ROOT = Path(__file__).resolve().parent.parent
 PROOF_DIR = ROOT / "proof" / "archive"
 PROOF_DIR.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,32 @@
+{
+  "branch": {
+    "cmd": "git branch --show-current",
+    "rc": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "head": {
+    "cmd": "git rev-parse HEAD",
+    "rc": 0,
+    "stdout": "7d23907f1b38e669a84dac16905839e433102084\n",
+    "stderr": ""
+  },
+  "origin_head": {
+    "cmd": "git rev-parse origin/main",
+    "rc": 0,
+    "stdout": "7d23907f1b38e669a84dac16905839e433102084\n",
+    "stderr": ""
+  },
+  "status": {
+    "cmd": "git status --short --untracked-files=all",
+    "rc": 0,
+    "stdout": " M dashboard/backend/app.py\n",
+    "stderr": ""
+  },
+  "recent": {
+    "cmd": "git log --oneline -8",
+    "rc": 0,
+    "stdout": "7d23907f fix(dashboard): broker KPI shows CONN not LIVE to avoid confusion with live trading\n2c2d61b3 feat(dashboard): complete institutional-grade UI rebuild \u2014 Bloomberg dark theme\ne0a9775d fix(proof): clear all 8 orchestrator gate blockers \u2014 ANALYZER_READY achieved\n7678433d chore(docs): update CHANGE_LOG + SYSTEM_STATE for session 8\n3fd12846 feat(proof): paper lifecycle proof + cloud fixes + issue scan\ndac219c6 feat(proof): cloud health proof \u2014 8/8 gates PASS, 0 blockers\n2465e35f chore(cleanup): remove 2157 files of repo clutter + update .gitignore\n12a510ab feat(cloud): add Render worker service + cloud-safe token manager\n",
+    "stderr": ""
+  }
+}

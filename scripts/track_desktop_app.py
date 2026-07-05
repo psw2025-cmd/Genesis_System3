@@ -2,12 +2,13 @@
 Track Desktop App - Monitor installation and startup
 """
 
+import subprocess
 import sys
 import time
-import requests
-import subprocess
-import psutil
 from pathlib import Path
+
+import psutil
+import requests
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")

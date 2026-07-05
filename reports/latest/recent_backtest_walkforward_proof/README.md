@@ -1,8 +1,8 @@
 # recent_backtest_walkforward_proof
 
-Generated UTC: 2026-06-11T17:10:55.739290+00:00
+Generated UTC: 2026-06-23T21:26:07.483925+00:00
 
-- Status: `PASS_WITH_WARNINGS`
+- Status: `PASS`
 - Pass: `True`
 - Auto repair allowed: `False`
 
@@ -12,8 +12,8 @@ Generated UTC: 2026-06-11T17:10:55.739290+00:00
 
 ## Warnings
 
-- `recent_costed_walkforward_result_not_proven`
+- None
 
 ## Next action
 
-Run recent walk-forward validation using fresh data with brokerage, charges, slippage, spread and option liquidity assumptions.
+Run scripts/costed_walkforward_proof.py to prove bhavcopy walk-forward with full cost model.
