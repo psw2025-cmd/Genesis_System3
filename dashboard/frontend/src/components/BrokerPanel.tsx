@@ -1,4 +1,4 @@
-import { useStore } from '../store'
+﻿import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 import { PriceCell } from './ui/PriceCell'
 import { AuthUnlock } from './AuthUnlock'
@@ -12,9 +12,6 @@ function Row({ label, value, color }: { label: string; value: string; color?: st
   )
 }
 
-// Holdings/positions can arrive at any of these keys depending on backend
-// version: 'rows' (current normalizer output), 'holdings'/'positions' (legacy
-// alias), or 'data' (raw passthrough). Check all, in priority order.
 function pickArray(obj: any, ...keys: string[]): any[] {
   if (!obj) return []
   for (const k of keys) {
@@ -24,11 +21,22 @@ function pickArray(obj: any, ...keys: string[]): any[] {
   return []
 }
 
+function brokerFailure(obj: any): { bad: boolean; message: string } {
+  if (!obj) return { bad: false, message: '' }
+  const raw = obj.raw ?? obj.data ?? obj.normalized?.raw ?? obj.funds?.raw ?? obj
+  const remarks = raw?.remarks ?? obj?.remarks ?? {}
+  const msg = remarks?.error_message ?? raw?.error_message ?? raw?.message ?? obj?.error ?? obj?.message ?? ''
+  const code = remarks?.error_code ?? raw?.error_code ?? obj?.error_code ?? ''
+  const typ = remarks?.error_type ?? raw?.error_type ?? obj?.error_type ?? ''
+  const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
+  const detail = JSON.stringify([msg, code, typ]).toLowerCase()
+  const bad = obj?.success === false || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized')
+  return { bad, message: [code, typ, msg].filter(Boolean).join(' - ') }
+}
+
 export function BrokerPanel() {
   const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen } = useStore()
 
-  // Funds: backend wraps the clean values under `normalized`. Older shapes
-  // (or partial failures) may put them directly on the root or under `funds`.
   const funds =
     brokerFunds?.normalized ??
     brokerFunds?.funds ??
@@ -37,21 +45,25 @@ export function BrokerPanel() {
 
   const authBlocked = apiStatus?.status === 'API_AUTH_REQUIRED'
   const brokerBlocked = authBlocked || apiStatus?.status === 'API_ERROR'
-  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerConnected ? 'LIVE READ-ONLY' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
-  const fundsError = brokerFunds && brokerFunds.success === false
+  const fundsFailure = brokerFailure(brokerFunds)
+  const statusFailure = brokerFailure(brokerStatus)
+  const holdingsFailure = brokerFailure(brokerHoldings)
+  const positionsFailure = brokerFailure(brokerPositions)
+  const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
+  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerConnected ? 'LIVE READ-ONLY' : fundsFailure.bad || statusFailure.bad ? 'API/TOKEN ERROR' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
+  const fundsError = Boolean(brokerFunds && (brokerFunds.success === false || fundsFailure.bad))
   const fundsLoading = brokerFunds == null
 
   const holdings  = pickArray(brokerHoldings, 'rows', 'holdings', 'data')
   const positions = pickArray(brokerPositions, 'rows', 'positions', 'data')
 
-  const holdingsError  = brokerHoldings  && brokerHoldings.success === false
-  const positionsError = brokerPositions && brokerPositions.success === false
+  const holdingsError  = Boolean(brokerHoldings  && (brokerHoldings.success === false || holdingsFailure.bad))
+  const positionsError = Boolean(brokerPositions && (brokerPositions.success === false || positionsFailure.bad))
 
   const availBal   = funds?.available_balance ?? funds?.availableBalance ?? null
   const usedMargin = funds?.utilized_amount   ?? funds?.utilizedAmount   ?? null
   const totalBal   = funds?.total_limit       ?? funds?.total_balance   ?? funds?.totalBalance ?? null
 
-  // Holding avg price can be avg_price (current normalizer) or average_price (legacy)
   const getAvg = (h: any) => h.avg_price ?? h.average_price ?? 0
   const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.entry_price ?? 0
 
@@ -59,41 +71,41 @@ export function BrokerPanel() {
     <div className="p-6 space-y-6 overflow-y-auto h-full">
       {authBlocked && <AuthUnlock />}
 
-      {/* Connection Status */}
       <div className="card p-4">
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-          🔗 Broker Connection — Dhan
+          Broker Connection - Dhan
         </h3>
         <Row label="Status"       value={brokerConnected ? 'CONNECTED' : dataState}
-             color={brokerConnected ? 'tx-up' : 'tx-down'} />
+             color={brokerConnected ? 'tx-up' : brokerApiResponded && !fundsFailure.bad && !statusFailure.bad ? 'tx-amber' : 'tx-down'} />
         <Row label="Mode"         value="READ-ONLY (Analyzer)" />
         <Row label="Client ID"    value={brokerStatus?.client_id ?? '...3741'} />
-        <Row label="Token Status" value={brokerStatus?.token_status ?? (brokerConnected ? 'VALID' : 'UNKNOWN')}
-             color={brokerConnected ? 'tx-up' : 'tx-down'} />
-        <Row label="Holdings API" value={holdingsError ? 'ERROR' : holdings.length >= 0 && brokerHoldings ? 'VALID ✓' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
+        <Row label="Token Status" value={statusFailure.bad || fundsFailure.bad ? 'ERROR' : brokerStatus?.token_status ?? (brokerConnected ? 'VALID' : 'UNKNOWN')}
+             color={statusFailure.bad || fundsFailure.bad ? 'tx-down' : brokerConnected ? 'tx-up' : 'tx-down'} />
+        <Row label="Holdings API" value={holdingsError ? 'ERROR' : holdings.length >= 0 && brokerHoldings ? 'VALID' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
              color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
-        <Row label="Funds API"    value={fundsError ? 'ERROR' : funds ? 'VALID ✓' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
+        <Row label="Funds API"    value={fundsError ? 'ERROR' : funds ? 'VALID' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
              color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
-        <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / OFFLINE OK'} />
+        <Row label="Broker Blocker" value={fundsFailure.bad || statusFailure.bad ? (fundsFailure.message || statusFailure.message || 'BROKER API ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={fundsFailure.bad || statusFailure.bad ? 'tx-down' : 'tx-up'} />
+        <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
         <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : 'VISIBLE WHEN READ-ONLY API RESPONDS'} color={authBlocked ? 'tx-down' : undefined} />
         <Row label="Live Trading" value="DISABLED (hardcoded 0)" color="tx-down" />
       </div>
 
-      {/* Funds */}
       <div className="card p-4">
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-          💰 Account Funds
+          Account Funds
         </h3>
         {fundsError ? (
-          <p style={{ color: 'var(--down)', fontSize: '.8rem' }}>
-            Failed to load funds: {brokerFunds?.error ?? 'unknown error'}
-          </p>
+          <div style={{ color: 'var(--down)', fontSize: '.8rem', lineHeight: 1.6 }}>
+            <div>Failed to load funds: {fundsFailure.message || brokerFunds?.error || 'unknown error'}</div>
+            <div>Market close is not the blocker. Check Dhan token/API response.</div>
+          </div>
         ) : fundsLoading ? (
           <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading funds data...</p>
         ) : availBal == null ? (
           <div style={{ color: 'var(--text-mut)', fontSize: '.8rem', lineHeight: 1.6 }}>
             <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds unavailable: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
-            <div>Read-only funds should remain visible when authenticated, including market closed/offline sessions.</div>
+            <div>Read-only funds should remain visible when authenticated, including market closed/offline sessions. If data is missing here, the blocker is API/token/data-shape, not market close.</div>
           </div>
         ) : (
           <>
@@ -104,22 +116,21 @@ export function BrokerPanel() {
         )}
       </div>
 
-      {/* Holdings */}
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
           <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-            📊 Equity Holdings ({holdings.length})
+            Equity Holdings ({holdings.length})
           </h3>
         </div>
         {holdingsError ? (
           <p style={{ padding: '20px', color: 'var(--down)', fontSize: '.8rem' }}>
-            Failed to load holdings: {brokerHoldings?.error ?? 'unknown error'}
+            Failed to load holdings: {holdingsFailure.message || brokerHoldings?.error || 'unknown error'}
           </p>
         ) : !brokerHoldings ? (
-          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading holdings…</p>
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading holdings...</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-{authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerConnected ? 'No equity holdings found' : 'Waiting for broker connection or cached read-only data...'}
+            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerConnected ? 'No equity holdings found' : 'Waiting for broker connection or cached read-only data...'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -159,19 +170,18 @@ export function BrokerPanel() {
         )}
       </div>
 
-      {/* Live Positions */}
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>
           <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-            📋 Dhan Live Positions ({positions.length})
+            Dhan Live Positions ({positions.length})
           </h3>
         </div>
         {positionsError ? (
           <p style={{ padding: '20px', color: 'var(--down)', fontSize: '.8rem' }}>
-            Failed to load positions: {brokerPositions?.error ?? 'unknown error'}
+            Failed to load positions: {positionsFailure.message || brokerPositions?.error || 'unknown error'}
           </p>
         ) : !brokerPositions ? (
-          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading positions…</p>
+          <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading positions...</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
             {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : 'No open positions in Dhan account (read-only view)'}
@@ -210,3 +220,4 @@ export function BrokerPanel() {
     </div>
   )
 }
+
