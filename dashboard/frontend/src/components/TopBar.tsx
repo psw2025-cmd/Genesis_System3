@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
 
@@ -25,28 +25,39 @@ function IndexChip({ symbol, spot, chg }: { symbol:string; spot?:number; chg?:nu
       </span>
       {chg != null && spot && (
         <span className="num" style={{ fontSize:'.55rem', color: isUp ? 'var(--up)' : 'var(--down)' }}>
-          {isUp ? '▲' : '▼'}{Math.abs(chg).toFixed(1)}%
+          {isUp ? 'â–²' : 'â–¼'}{Math.abs(chg).toFixed(1)}%
         </span>
       )}
     </div>
   )
 }
 
+function hasBrokerApiError(obj: any): boolean {
+  if (!obj) return false
+  const raw = obj.raw ?? obj.data ?? obj.normalized?.raw ?? obj.funds?.raw ?? obj
+  const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
+  const details = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
+  return status === 'failure' || details.includes('invalid') || details.includes('token') || details.includes('unauthorized')
+}
+
 export function TopBar() {
-  const { wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain } = useStore()
+  const {
+    wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus,
+  } = useStore()
   const rho = state?.signals?.spearman_rho ?? null
 
-  // Spot prices come from gain_rank.latest.rankings — this is the ONLY endpoint
-  // that returns actual spot_price per underlying. /api/underlyings only returns
-  // a bare name list (["NIFTY","BANKNIFTY",...]) with no price data — never use it
-  // for spot prices. gain_rank is file-based and persists across market hours,
-  // so this also satisfies "show last known data when market is closed".
+  const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
+  const brokerHasError = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || hasBrokerApiError(brokerStatus)
+    || hasBrokerApiError(brokerFunds)
+    || hasBrokerApiError(brokerHoldings)
+    || hasBrokerApiError(brokerPositions)
+  const brokerLabel = brokerConnected ? 'CONNECTED' : brokerHasError ? 'API ERR' : brokerApiResponded ? 'API OK' : 'OFFLINE'
+  const brokerGood = brokerConnected || (brokerApiResponded && !brokerHasError)
+  const marketLabel = marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / DATA POLLING'
+
   const getSpot = (sym: string) => {
-    // Handle multiple data shapes from gain_rank API:
-    // Shape 1: {latest: {rankings: [{underlying, spot_price, change_pct}]}}
-    // Shape 2: {rankings: [{underlying, spot_price}]}
-    // Shape 3 (actual): [{date, predictions: [{underlying, gain_score}]}]
-    // Also try chain data for live spot when market open
     const chainData = chain[sym]
     if (chainData?.spot && chainData.spot > 0) {
       return { spot: chainData.spot, chg: null }
@@ -85,26 +96,26 @@ export function TopBar() {
         <span style={{
           display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
           borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)',
-          background: marketOpen ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)',
-          color: marketOpen ? 'var(--up)' : 'var(--down)',
-          border:`1px solid ${marketOpen ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'}`,
+          background: marketOpen ? 'rgba(0,232,122,.1)' : 'rgba(245,158,11,.08)',
+          color: marketOpen ? 'var(--up)' : 'var(--amber)',
+          border:`1px solid ${marketOpen ? 'rgba(0,232,122,.25)' : 'rgba(245,158,11,.2)'}`,
         }}>
           <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: marketOpen ? 'var(--up)' : 'var(--down)',
+                         background: marketOpen ? 'var(--up)' : 'var(--amber)',
                          animation: marketOpen ? 'pulseDot 1.5s infinite' : 'none' }} />
-          {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
+          {marketLabel}
         </span>
 
         <span onClick={() => setActiveTab('broker')} style={{
           display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
           borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)', cursor:'pointer',
-          background: brokerConnected ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)',
-          color: brokerConnected ? 'var(--up)' : 'var(--down)',
-          border:`1px solid ${brokerConnected ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'}`,
-        }} title="Click → Broker Data">
+          background: brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)',
+          color: brokerGood ? 'var(--up)' : 'var(--down)',
+          border:`1px solid ${brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'}`,
+        }} title="Click â†’ Broker Data">
           <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: brokerConnected ? 'var(--up)' : 'var(--down)' }} />
-          DHAN {brokerConnected ? '✓' : '✗'}
+                         background: brokerGood ? 'var(--up)' : 'var(--down)' }} />
+          DHAN {brokerLabel}
         </span>
 
         <span style={{ padding:'3px 8px', borderRadius:'6px', fontSize:'.62rem', fontWeight:700,
@@ -133,7 +144,7 @@ export function TopBar() {
         {rho != null && (
           <div style={{ padding:'3px 7px', background:'var(--surface-2)',
                         borderRadius:'5px', border:'1px solid var(--border)' }}>
-            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>ρ </span>
+            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>Ï </span>
             <span className="num" style={{ fontSize:'.75rem', fontWeight:700,
                                            color: rho>=0.7 ? 'var(--up)' : rho>=0.4 ? 'var(--amber)' : 'var(--down)' }}>
               {rho.toFixed(2)}
@@ -144,3 +155,4 @@ export function TopBar() {
     </header>
   )
 }
+
