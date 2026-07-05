@@ -1,6 +1,7 @@
 import { useStore } from '../store'
 import { fmtCr, signClass } from '../lib/utils'
 import { cn } from '../lib/utils'
+import { AuthUnlock } from './AuthUnlock'
 
 function KPI({ label, value, sub, color }: {
   label: string; value: string | number; sub?: string; color?: string
@@ -38,7 +39,7 @@ function GateRow({ label, status, note }: { label: string; status: string; note?
 }
 
 export function Overview() {
-  const { health, paper, autoGates, brokerStatus, brokerFunds } = useStore()
+  const { health, paper, autoGates, apiStatus } = useStore()
 
   const brokerConn  = health?.broker?.connected
   const totalPnl    = paper?.pnl?.summary?.total_pnl ?? 0
@@ -79,6 +80,24 @@ export function Overview() {
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
+      <div className="card p-4 border border-down/30 bg-down/5">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <div className="text-xs text-text-muted uppercase tracking-wider">Analyzer / Paper Command Center</div>
+            <div className="text-sm text-text-primary font-semibold">PAPER MODE ACTIVE - LIVE TRADING DISABLED</div>
+          </div>
+          <span className="pill text-[10px] bg-down/10 text-down border border-down/20">LIVE OFF</span>
+        </div>
+        <div className="mt-3 text-xs text-text-muted">
+          Option Chain: available in the Trade tab with market-closed/cache/no-data states.
+        </div>
+        {apiStatus && (
+          <div className="mt-2 text-xs text-text-muted">
+            API status: <span className="font-mono text-amber">{apiStatus.status}</span> - {apiStatus.message}
+          </div>
+        )}
+      </div>
+      {apiStatus?.status === 'API_AUTH_REQUIRED' && <AuthUnlock />}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI label="Broker"         value={brokerConn ? 'CONNECTED' : 'OFFLINE'}
              color={brokerConn ? 'text-up' : 'text-down'} sub="Dhan read-only" />

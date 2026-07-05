@@ -23,7 +23,9 @@ console.log('API_BASE configured as:', API_BASE || '(relative origin)')
 // import the default `axios` export, none create a local instance). No-op
 // until the backend has REQUIRE_API_KEY=true and a matching API_KEY set -
 // see the comment in dashboard/backend/app.py next to _enforce_api_key.
-const apiKey = import.meta.env.VITE_API_KEY
-if (apiKey && apiKey.trim()) {
-  axios.defaults.headers.common['X-API-Key'] = apiKey.trim()
+export const API_KEY = (import.meta.env.VITE_API_KEY || '').trim()
+export const API_HEADERS: Record<string, string> = API_KEY ? { 'X-API-Key': API_KEY } : {}
+
+if (API_KEY) {
+  axios.defaults.headers.common['X-API-Key'] = API_KEY
 }

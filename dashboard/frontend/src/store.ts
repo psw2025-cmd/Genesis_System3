@@ -15,6 +15,7 @@ interface DashboardState {
   gainRank: any
   alerts: any[]
   autoGates: any
+  apiStatus: any
 
   // Performance data — works after market too
   pnl: any
@@ -39,6 +40,7 @@ interface DashboardState {
   setAlerts: (d: any[]) => void
   setAutoGates: (d: any) => void
   setPnl: (d: any) => void
+  setApiStatus: (d: any) => void
   setBrokerStatus: (d: any) => void
   setBrokerHoldings: (d: any) => void
   setBrokerFunds: (d: any) => void
@@ -59,12 +61,13 @@ export const useStore = create<DashboardState>((set) => ({
   gainRank: null,
   alerts: [],
   autoGates: null,
+  apiStatus: null,
   pnl: null,
   brokerStatus: null,
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
-  activeTab: 'trade',
+  activeTab: 'overview',
   chainSymbol: 'NIFTY',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
@@ -80,6 +83,7 @@ export const useStore = create<DashboardState>((set) => ({
   setAlerts: (alerts) => set({ alerts }),
   setAutoGates: (autoGates) => set({ autoGates }),
   setPnl: (pnl) => set({ pnl }),
+  setApiStatus: (apiStatus) => set({ apiStatus }),
   setBrokerStatus: (brokerStatus) => set({ brokerStatus, brokerConnected: brokerStatus?.connected ?? false }),
   setBrokerHoldings: (brokerHoldings) => set({ brokerHoldings }),
   setBrokerFunds: (brokerFunds) => set({ brokerFunds }),

@@ -1,6 +1,7 @@
 import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 import { PriceCell } from './ui/PriceCell'
+import { AuthUnlock } from './AuthUnlock'
 
 function Row({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
@@ -24,7 +25,7 @@ function pickArray(obj: any, ...keys: string[]): any[] {
 }
 
 export function BrokerPanel() {
-  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected } = useStore()
+  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen } = useStore()
 
   // Funds: backend wraps the clean values under `normalized`. Older shapes
   // (or partial failures) may put them directly on the root or under `funds`.
@@ -34,6 +35,9 @@ export function BrokerPanel() {
     brokerFunds ??
     null
 
+  const authBlocked = apiStatus?.status === 'API_AUTH_REQUIRED'
+  const brokerBlocked = authBlocked || apiStatus?.status === 'API_ERROR'
+  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerConnected ? 'LIVE READ-ONLY' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
   const fundsError = brokerFunds && brokerFunds.success === false
   const fundsLoading = brokerFunds == null
 
@@ -53,22 +57,25 @@ export function BrokerPanel() {
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
+      {authBlocked && <AuthUnlock />}
 
       {/* Connection Status */}
       <div className="card p-4">
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
           🔗 Broker Connection — Dhan
         </h3>
-        <Row label="Status"       value={brokerConnected ? 'CONNECTED' : 'OFFLINE'}
+        <Row label="Status"       value={brokerConnected ? 'CONNECTED' : dataState}
              color={brokerConnected ? 'tx-up' : 'tx-down'} />
         <Row label="Mode"         value="READ-ONLY (Analyzer)" />
         <Row label="Client ID"    value={brokerStatus?.client_id ?? '...3741'} />
         <Row label="Token Status" value={brokerStatus?.token_status ?? (brokerConnected ? 'VALID' : 'UNKNOWN')}
              color={brokerConnected ? 'tx-up' : 'tx-down'} />
-        <Row label="Holdings API" value={holdingsError ? 'ERROR' : holdings.length >= 0 && brokerHoldings ? 'VALID ✓' : 'CHECKING...'}
-             color={holdingsError ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
-        <Row label="Funds API"    value={fundsError ? 'ERROR' : funds ? 'VALID ✓' : 'CHECKING...'}
-             color={fundsError ? 'tx-down' : funds ? 'tx-up' : undefined} />
+        <Row label="Holdings API" value={holdingsError ? 'ERROR' : holdings.length >= 0 && brokerHoldings ? 'VALID ✓' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
+             color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
+        <Row label="Funds API"    value={fundsError ? 'ERROR' : funds ? 'VALID ✓' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING...'}
+             color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
+        <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / OFFLINE OK'} />
+        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : 'VISIBLE WHEN READ-ONLY API RESPONDS'} color={authBlocked ? 'tx-down' : undefined} />
         <Row label="Live Trading" value="DISABLED (hardcoded 0)" color="tx-down" />
       </div>
 
@@ -82,11 +89,12 @@ export function BrokerPanel() {
             Failed to load funds: {brokerFunds?.error ?? 'unknown error'}
           </p>
         ) : fundsLoading ? (
-          <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading funds data…</p>
+          <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading funds data...</p>
         ) : availBal == null ? (
-          <p style={{ color: 'var(--amber)', fontSize: '.8rem' }}>
-            Funds API responded but no balance field found in response
-          </p>
+          <div style={{ color: 'var(--text-mut)', fontSize: '.8rem', lineHeight: 1.6 }}>
+            <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds unavailable: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
+            <div>Read-only funds should remain visible when authenticated, including market closed/offline sessions.</div>
+          </div>
         ) : (
           <>
             <Row label="Available Balance" value={fmtCr(availBal)}  color="tx-up" />
@@ -111,7 +119,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading holdings…</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            No equity holdings found
+{authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerConnected ? 'No equity holdings found' : 'Waiting for broker connection or cached read-only data...'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -166,7 +174,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Loading positions…</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            No open positions in Dhan account (read-only view)
+            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : 'No open positions in Dhan account (read-only view)'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

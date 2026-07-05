@@ -19,13 +19,14 @@ const ICONS: Record<string, any> = {
 }
 
 export function AlertsTab() {
-  const { alerts } = useStore()
+  const { alerts, apiStatus } = useStore()
 
   if (alerts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 text-text-muted">
         <Bell size={40} className="opacity-30" />
-        <p className="text-sm">No alerts</p>
+        <p className="text-sm">{apiStatus ? `Alerts unavailable: ${apiStatus.status}` : 'No alerts'}</p>
+        {apiStatus && <p className="text-xs max-w-md text-center">{apiStatus.message}</p>}
       </div>
     )
   }

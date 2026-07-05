@@ -5,6 +5,7 @@ FastAPI service for real-time system monitoring and control
 
 import asyncio
 import hashlib
+import hmac
 import json
 import os
 import re
@@ -401,13 +402,84 @@ app.add_middleware(
 #      one-time startup warning so the gap is visible in logs).
 _REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
 _API_KEY = os.environ.get("API_KEY", "").strip()
+_DASHBOARD_SESSION_COOKIE = "system3_dashboard_session"
+_DASHBOARD_SESSION_MAX_AGE = int(os.environ.get("DASHBOARD_SESSION_MAX_AGE", "43200"))
 _API_KEY_EXEMPT_PREFIXES = ("/ui", "/docs", "/openapi.json", "/redoc", "/ws")
-_API_KEY_EXEMPT_EXACT = ("/", "/api/health", "/favicon.ico", "/metrics")
+_API_KEY_EXEMPT_EXACT = (
+    "/",
+    "/api/health",
+    "/api/auth/session",
+    "/api/auth/status",
+    "/api/auth/logout",
+    "/favicon.ico",
+    "/metrics",
+)
 
 if _REQUIRE_API_KEY and not _API_KEY:
     print("[security] REQUIRE_API_KEY=true but API_KEY is unset - auth will reject all requests")
 elif not _REQUIRE_API_KEY:
     print("[security] API key auth is DISABLED (set REQUIRE_API_KEY=true and API_KEY to enable)")
+
+
+def _dashboard_session_token() -> str:
+    if not _API_KEY:
+        return ""
+    return hashlib.sha256(f"system3-dashboard-session-v1:{_API_KEY}".encode("utf-8")).hexdigest()
+
+
+def _has_dashboard_api_access(request: Request) -> bool:
+    if not _REQUIRE_API_KEY:
+        return True
+    if not _API_KEY:
+        return False
+    header_key = request.headers.get("X-API-Key", "")
+    if header_key and hmac.compare_digest(header_key, _API_KEY):
+        return True
+    cookie_token = request.cookies.get(_DASHBOARD_SESSION_COOKIE, "")
+    expected = _dashboard_session_token()
+    return bool(cookie_token and expected and hmac.compare_digest(cookie_token, expected))
+
+
+class DashboardAuthRequest(BaseModel):
+    api_key: str
+
+
+@app.post("/api/auth/session")
+async def create_dashboard_session(payload: DashboardAuthRequest, request: Request):
+    if not _REQUIRE_API_KEY:
+        return {"ok": True, "authenticated": True, "mode": "auth_disabled"}
+    if not _API_KEY:
+        raise HTTPException(status_code=503, detail="Dashboard API auth is required but API_KEY is not configured")
+    if not hmac.compare_digest((payload.api_key or "").strip(), _API_KEY):
+        raise HTTPException(status_code=401, detail="Invalid dashboard API key")
+    response = JSONResponse({"ok": True, "authenticated": True, "mode": "session_cookie"})
+    response.set_cookie(
+        _DASHBOARD_SESSION_COOKIE,
+        _dashboard_session_token(),
+        max_age=_DASHBOARD_SESSION_MAX_AGE,
+        httponly=True,
+        secure=request.url.scheme == "https",
+        samesite="lax",
+        path="/",
+    )
+    return response
+
+
+@app.get("/api/auth/status")
+async def dashboard_auth_status(request: Request):
+    return {
+        "required": _REQUIRE_API_KEY,
+        "configured": bool(_API_KEY),
+        "authenticated": _has_dashboard_api_access(request),
+        "mode": "session_cookie_or_header" if _REQUIRE_API_KEY else "auth_disabled",
+    }
+
+
+@app.post("/api/auth/logout")
+async def dashboard_auth_logout(request: Request):
+    response = JSONResponse({"ok": True, "authenticated": False})
+    response.delete_cookie(_DASHBOARD_SESSION_COOKIE, path="/")
+    return response
 
 
 @app.middleware("http")
@@ -417,8 +489,8 @@ async def _enforce_api_key(request: Request, call_next):
     path = request.url.path
     if path in _API_KEY_EXEMPT_EXACT or path.startswith(_API_KEY_EXEMPT_PREFIXES):
         return await call_next(request)
-    if request.headers.get("X-API-Key", "") != _API_KEY:
-        return JSONResponse(status_code=401, content={"detail": "Missing or invalid X-API-Key header"})
+    if not _has_dashboard_api_access(request):
+        return JSONResponse(status_code=401, content={"detail": "Missing or invalid dashboard API session"})
     return await call_next(request)
 
 
@@ -1847,7 +1919,7 @@ def set_event_loop(loop):
     _main_loop = loop
 
 
-class OutputFileHandler(FileSystemEventHandler):
+class OutputFileHandler(FileSystemEventHandler if FileSystemEventHandler is not None else object):
     def on_modified(self, event):
         """Handle file modification events"""
         if not event.is_directory and event.src_path.endswith((".json", ".csv", ".jsonl")):

@@ -1,5 +1,6 @@
 import { useStore } from '../store'
 import { cn } from '../lib/utils'
+import { AuthUnlock } from './AuthUnlock'
 
 function Row({ label, value, ok }: { label: string; value: string; ok?: boolean }) {
   return (
@@ -13,7 +14,7 @@ function Row({ label, value, ok }: { label: string; value: string; ok?: boolean 
 }
 
 export function SystemTab() {
-  const { health, wsStatus, brokerConnected } = useStore()
+  const { health, wsStatus, brokerConnected, apiStatus, marketOpen } = useStore()
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
@@ -24,6 +25,8 @@ export function SystemTab() {
         <Row label="Live Trading" value="DISABLED (hardcoded)"  ok={false} />
         <Row label="Mode"         value={health?.mode ?? '--'} />
         <Row label="Data Source"  value={health?.data_source ?? '--'} />
+        <Row label="Market State" value={marketOpen ? 'OPEN' : 'CLOSED / OFFLINE'} />
+        <Row label="API Status" value={apiStatus?.status ?? 'OK / WAITING'} ok={!apiStatus} />
       </div>
 
       <div className="card p-5">
@@ -36,11 +39,14 @@ export function SystemTab() {
           ok={health?.qc_status === 'OK' || health?.qc_status === 'PASS'} />
       </div>
 
+      {apiStatus?.status === 'API_AUTH_REQUIRED' && <AuthUnlock />}
+
       <div className="card p-5">
         <h3 className="text-sm font-semibold text-text-primary mb-3">Safety</h3>
         <Row label="LIVE_TRADING_ENABLED" value="0 (hardcoded)" ok={false} />
         <Row label="Paper Mode"           value="ACTIVE" ok={true} />
         <Row label="Live Allowed"         value={String(health?.live_allowed ?? false)} ok={false} />
+        <Row label="Broker Data Visibility" value={apiStatus?.status === 'API_AUTH_REQUIRED' ? 'AUTH REQUIRED' : 'READ-ONLY WHEN API RESPONDS'} ok={apiStatus ? false : undefined} />
         {(health?.live_blockers ?? []).map((b: string, i: number) => (
           <Row key={i} label={`Blocker ${i+1}`} value={b} ok={false} />
         ))}

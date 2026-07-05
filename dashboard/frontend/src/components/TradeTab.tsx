@@ -33,7 +33,7 @@ function ScannerRow({ row }: { row: any }) {
 }
 
 export function TradeTab() {
-  const { gainRank } = useStore()
+  const { gainRank, apiStatus } = useStore()
   const rankings: any[] = gainRank?.rankings ?? []
 
   return (
@@ -53,8 +53,9 @@ export function TradeTab() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {rankings.length === 0 ? (
-            <div className="p-6 text-center text-text-muted text-sm">
-              Loading rankings…
+            <div className="p-6 text-center text-text-muted text-sm space-y-2">
+              <div className="font-semibold text-text-primary">{apiStatus?.status === 'API_AUTH_REQUIRED' ? 'API authentication required' : 'No rankings available'}</div>
+              <div>{apiStatus?.message || gainRank?.message || 'Scanner has no current ranking rows.'}</div>
             </div>
           ) : (
             rankings.map((row, i) => <ScannerRow key={i} row={row} />)
