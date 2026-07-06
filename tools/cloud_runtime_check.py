@@ -51,6 +51,8 @@ ENDPOINTS: List[Tuple[str, str]] = [
     ("state", "/api/state"),
 ]
 
+AUTH_INFER_MIN_ENDPOINTS = 2
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -166,6 +168,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
     auth_required = bool(isinstance(auth_status, dict) and auth_status.get("required") is True)
     auth_authenticated = bool(isinstance(auth_status, dict) and auth_status.get("authenticated") is True)
     auth_limited = auth_required and not auth_authenticated
+    # Endpoints behind dashboard API auth when REQUIRE_API_KEY=true.
     protected_endpoints = {
         "deploy_info",
         "memory_before",
@@ -180,6 +183,11 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
         "underlyings",
         "state",
     }
+
+    def _is_auth_protected_401(endpoint_name: str) -> bool:
+        item = results.get(endpoint_name) or {}
+        return bool(auth_limited and endpoint_name in protected_endpoints and item.get("status_code") == 401)
+
     if not auth_limited:
         inferred_auth_401s = 0
         for endpoint_name in protected_endpoints:
@@ -187,7 +195,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
             preview = str(item.get("text_preview") or "").lower()
             if item.get("status_code") == 401 and "dashboard api session" in preview:
                 inferred_auth_401s += 1
-        if inferred_auth_401s >= 2:
+        if inferred_auth_401s >= AUTH_INFER_MIN_ENDPOINTS:
             auth_limited = True
             auth_required = True
     auth_limited_count = 0
@@ -195,7 +203,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
     for name, item in results.items():
         if not item.get("ok"):
             status_code = item.get("status_code")
-            if auth_limited and name in protected_endpoints and status_code == 401:
+            if _is_auth_protected_401(name):
                 passed.append(f"endpoint_{name}_auth_protected")
                 auth_limited_count += 1
             else:
@@ -220,13 +228,13 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
     broker = get_json(results, "broker_status") or {}
     if isinstance(broker, dict) and broker.get("connected") is True:
         passed.append("broker_connected")
-    elif auth_limited and (results.get("broker_status") or {}).get("status_code") == 401:
+    elif _is_auth_protected_401("broker_status"):
         passed.append("broker_status_auth_protected")
     else:
         alert("WARNING", "broker_not_connected", f"broker status not connected: {broker.get('error') if isinstance(broker, dict) else broker}")
 
     scheduler = get_json(results, "scheduler_health") or {}
-    if auth_limited and (results.get("scheduler_health") or {}).get("status_code") == 401:
+    if _is_auth_protected_401("scheduler_health"):
         passed.append("scheduler_status_auth_protected")
     elif isinstance(scheduler, dict):
         if scheduler.get("healthy") is True:
@@ -237,7 +245,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
             alert("WARNING", "scheduler_no_worker_push", "worker scheduler health has not been received")
 
     chain = get_json(results, "chain_nifty") or {}
-    if auth_limited and (results.get("chain_nifty") or {}).get("status_code") == 401:
+    if _is_auth_protected_401("chain_nifty"):
         passed.append("chain_nifty_auth_protected")
     elif isinstance(chain, dict):
         contracts = int(chain.get("total_contracts") or len(chain.get("contracts") or []))
