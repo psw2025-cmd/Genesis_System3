@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
 const normalizeApiBase = (value: string): string => value.replace(/\/+$/, '')
 
@@ -19,13 +19,13 @@ const getApiBase = (): string => {
 export const API_BASE = getApiBase()
 console.log('API_BASE configured as:', API_BASE || '(relative origin)')
 
-// Sent on every request via axios's shared global instance (all components
-// import the default `axios` export, none create a local instance). No-op
-// until the backend has REQUIRE_API_KEY=true and a matching API_KEY set -
-// see the comment in dashboard/backend/app.py next to _enforce_api_key.
 export const API_KEY = (import.meta.env.VITE_API_KEY || '').trim()
 export const API_HEADERS: Record<string, string> = API_KEY ? { 'X-API-Key': API_KEY } : {}
+
+axios.defaults.withCredentials = true
+axios.defaults.headers.common.Accept = 'application/json'
 
 if (API_KEY) {
   axios.defaults.headers.common['X-API-Key'] = API_KEY
 }
+
