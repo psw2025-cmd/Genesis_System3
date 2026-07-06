@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 # READ-ONLY: no workflow may write back to the repo.
-# Any contents:write here fails the workflow-policy-guard below.
+# Any contents write permission here fails the workflow-policy-guard below.
 permissions:
   contents: read
   actions: read
@@ -42,7 +42,7 @@ jobs:
   # -----------------------------------------------------------------------
   # GATE 1 — Workflow policy + trading safety guard (BLOCKING)
   # Must be first. All other jobs depend on this passing.
-  # Verifies: approved workflow files only, no contents:write, no auto-fix,
+  # Verifies: approved workflow files only, no repo write permission, no auto-fix,
   #           LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0
   #           hardcoded in this file.
   # -----------------------------------------------------------------------
@@ -65,29 +65,30 @@ jobs:
           mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
           printf 'Workflow files found:\n'
           printf '  %s\n' "${workflows[@]}"
-          declare -A allowed_set=(
-            [".github/workflows/ci.yml"]=1
-            [".github/workflows/cloud-runtime-check.yml"]=1
-            [".github/workflows/render-env-audit.yml"]=1
-          )
+
           for wf in "${workflows[@]}"; do
-            [[ -n "${allowed_set[$wf]+x}" ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
-          done
-          for a in "${!allowed_set[@]}"; do
-            found=0
-            for wf in "${workflows[@]}"; do [[ "$wf" == "$a" ]] && found=1 && break; done
-            [[ $found -eq 1 ]] || { echo "FAIL: required workflow file missing: $a"; exit 1; }
+            case "$wf" in
+              .github/workflows/ci.yml|.github/workflows/cloud-runtime-check.yml|.github/workflows/render-env-audit.yml)
+                ;;
+              *)
+                echo "FAIL: unexpected workflow file: $wf"
+                exit 1
+                ;;
+            esac
           done
 
-          # --- 2. No contents:write (would allow repo mutations from CI) ---
-          if grep -RIn "contents[:][ ]write" .github/workflows; then
-            echo "FAIL: contents:write found in workflows — CI must be read-only"
+          for required in .github/workflows/ci.yml .github/workflows/cloud-runtime-check.yml .github/workflows/render-env-audit.yml; do
+            test -f "$required" || { echo "FAIL: required workflow file missing: $required"; exit 1; }
+          done
+
+          # --- 2. No contents write permission (would allow repo mutations from CI) ---
+          if grep -RIn "contents:[[:space:]]*write" .github/workflows; then
+            echo "FAIL: contents write permission found in workflows — CI must be read-only"
             exit 1
           fi
 
           # --- 3. No auto-fix bots or cloud deploy ---
-          # Character-class patterns prevent the grep command from matching itself.
-          if grep -RIn "[-][-]auto[-]fix" .github/workflows; then
+          if grep -RIn -- "--auto-fix" .github/workflows; then
             echo "FAIL: auto-fix bots are forbidden in CI workflows"
             exit 1
           fi
