@@ -1,0 +1,194 @@
+name: Render Env Audit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render-env-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+    steps:
+      - name: Audit Render env without printing secrets
+        shell: python
+        run: |
+          import os, json, hashlib, urllib.request, urllib.error, datetime
+          from pathlib import Path
+
+          out_dir = Path('reports/latest/render_env_audit')
+          out_dir.mkdir(parents=True, exist_ok=True)
+
+          api_key = (os.environ.get('RENDER_API_KEY') or '').strip()
+          result = {
+              'generated_at_utc': datetime.datetime.utcnow().isoformat() + 'Z',
+              'api_key_present': bool(api_key),
+              'services': [],
+              'errors': [],
+          }
+
+          def write_artifacts():
+              (out_dir / 'render_env_audit.json').write_text(json.dumps(result, indent=2, sort_keys=True), encoding='utf-8')
+              lines = ['# Render Env Audit', '', f"Generated: {result['generated_at_utc']}", '', f"RENDER_API_KEY present: {result['api_key_present']}", '']
+              if result['errors']:
+                  lines.append('## Errors')
+                  for e in result['errors']:
+                      lines.append(f"- {e}")
+                  lines.append('')
+              lines.append('## Services')
+              for svc in result['services']:
+                  lines.append(f"### {svc.get('name')} ({svc.get('type')})")
+                  lines.append(f"- id: `{svc.get('id')}`")
+                  lines.append(f"- env endpoint status: `{svc.get('env_status')}`")
+                  lines.append('')
+                  lines.append('| key | present | len | trim_ok | sha12 |')
+                  lines.append('|---|---:|---:|---:|---|')
+                  for key, fp in svc.get('env_fingerprints', {}).items():
+                      lines.append(f"| `{key}` | {fp.get('present')} | {fp.get('len','')} | {fp.get('trim_ok','')} | `{fp.get('sha12','')}` |")
+                  lines.append('')
+              (out_dir / 'render_env_audit.md').write_text('\n'.join(lines), encoding='utf-8')
+
+          def request_json(url):
+              req = urllib.request.Request(url, headers={
+                  'Authorization': f'Bearer {api_key}',
+                  'Accept': 'application/json',
+              })
+              with urllib.request.urlopen(req, timeout=45) as resp:
+                  body = resp.read().decode('utf-8', errors='replace')
+                  return resp.status, json.loads(body) if body else None
+
+          def sha12(value):
+              return hashlib.sha256(value.encode('utf-8')).hexdigest()[:12]
+
+          def env_fp(value):
+              if value is None:
+                  return {'present': False}
+              raw = str(value)
+              trimmed = raw.strip()
+              return {
+                  'present': True,
+                  'len': len(trimmed),
+                  'trim_ok': raw == trimmed,
+                  'sha12': sha12(trimmed),
+              }
+
+          watch_keys = [
+              'API_KEY',
+              'REQUIRE_API_KEY',
+              'DHAN_CLIENT_ID',
+              'DHAN_ACCESS_TOKEN',
+              'DHAN_PIN',
+              'DHAN_TOTP_SECRET',
+              'DHAN_APP_ID',
+              'DHAN_APP_SECRET',
+              'WORKER_PUSH_TOKEN',
+              'DHAN_OPTION_CHAIN_EXPIRY',
+              'DHAN_OPTION_CHAIN_EXPIRY_NIFTY',
+              'DHAN_OPTION_CHAIN_EXPIRY_BANKNIFTY',
+              'DHAN_OPTION_CHAIN_EXPIRY_FINNIFTY',
+              'DHAN_OPTION_CHAIN_EXPIRY_MIDCPNIFTY',
+              'DHAN_OPTION_CHAIN_EXPIRY_SENSEX',
+              'DHAN_OPTION_CHAIN_SEGMENT_SENSEX',
+              'CLOUD_WORKER',
+              'WEB_SERVICE_URL',
+              'SYSTEM3_MODE',
+              'ANALYZE_MODE',
+              'LIVE_TRADING_ENABLED',
+              'SYSTEM3_LIVE_TRADING_ALLOWED',
+          ]
+
+          if not api_key:
+              result['errors'].append('GitHub secret RENDER_API_KEY is missing or empty.')
+              write_artifacts()
+              raise SystemExit(1)
+
+          try:
+              status, services_payload = request_json('https://api.render.com/v1/services?limit=100')
+          except urllib.error.HTTPError as e:
+              detail = e.read().decode('utf-8', errors='replace')[:500]
+              result['errors'].append(f'List services failed HTTP {e.code}: {detail}')
+              write_artifacts()
+              raise
+          except Exception as e:
+              result['errors'].append(f'List services failed: {e!r}')
+              write_artifacts()
+              raise
+
+          services_raw = services_payload if isinstance(services_payload, list) else services_payload.get('services', []) if isinstance(services_payload, dict) else []
+          candidates = []
+          for item in services_raw:
+              svc = item.get('service', item) if isinstance(item, dict) else {}
+              name = svc.get('name') or svc.get('serviceName') or ''
+              sid = svc.get('id') or svc.get('serviceId')
+              typ = svc.get('type') or svc.get('serviceType') or svc.get('runtime') or ''
+              if sid and name in ('genesis-system3-backend', 'genesis-system3-worker'):
+                  candidates.append({'id': sid, 'name': name, 'type': typ})
+
+          if not candidates:
+              result['errors'].append('Could not find services named genesis-system3-backend and genesis-system3-worker from Render API.')
+              # include non-secret names for diagnosis
+              result['seen_service_names'] = [
+                  (item.get('service', item).get('name') if isinstance(item, dict) else None)
+                  for item in services_raw[:50]
+              ]
+
+          for svc in candidates:
+              sid = svc['id']
+              svc_result = dict(svc)
+              svc_result['env_fingerprints'] = {}
+              try:
+                  env_status, env_payload = request_json(f'https://api.render.com/v1/services/{sid}/env-vars')
+                  svc_result['env_status'] = env_status
+                  env_raw = env_payload if isinstance(env_payload, list) else env_payload.get('envVars', []) if isinstance(env_payload, dict) else []
+                  env_map = {}
+                  for item in env_raw:
+                      ev = item.get('envVar', item) if isinstance(item, dict) else {}
+                      key = ev.get('key') or ev.get('name')
+                      val = ev.get('value')
+                      if key:
+                          env_map[key] = val
+                  for key in watch_keys:
+                      svc_result['env_fingerprints'][key] = env_fp(env_map.get(key))
+              except urllib.error.HTTPError as e:
+                  detail = e.read().decode('utf-8', errors='replace')[:500]
+                  svc_result['env_status'] = f'HTTP {e.code}'
+                  svc_result['env_error'] = detail
+              except Exception as e:
+                  svc_result['env_status'] = 'ERROR'
+                  svc_result['env_error'] = repr(e)
+              result['services'].append(svc_result)
+
+          # Compare backend vs worker fingerprints for critical shared keys.
+          by_name = {s['name']: s for s in result['services']}
+          shared_keys = ['API_KEY', 'DHAN_CLIENT_ID', 'DHAN_ACCESS_TOKEN', 'DHAN_APP_ID', 'DHAN_APP_SECRET', 'DHAN_TOTP_SECRET', 'WORKER_PUSH_TOKEN']
+          comparison = []
+          if 'genesis-system3-backend' in by_name and 'genesis-system3-worker' in by_name:
+              b = by_name['genesis-system3-backend'].get('env_fingerprints', {})
+              w = by_name['genesis-system3-worker'].get('env_fingerprints', {})
+              for key in shared_keys:
+                  bf = b.get(key, {})
+                  wf = w.get(key, {})
+                  comparison.append({
+                      'key': key,
+                      'backend_present': bf.get('present'),
+                      'worker_present': wf.get('present'),
+                      'same_sha12': bf.get('sha12') == wf.get('sha12') if bf.get('sha12') and wf.get('sha12') else False,
+                      'backend_sha12': bf.get('sha12'),
+                      'worker_sha12': wf.get('sha12'),
+                  })
+          result['shared_key_comparison'] = comparison
+
+          write_artifacts()
+          print(json.dumps({
+              'services_found': [s['name'] for s in result['services']],
+              'errors': result['errors'],
+              'shared_key_comparison': comparison,
+              'artifact_dir': str(out_dir),
+          }, indent=2))
+
+      - name: Upload Render env audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-env-audit
+          path: reports/latest/render_env_audit/
+          retention-days: 14
