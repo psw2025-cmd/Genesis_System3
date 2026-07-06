@@ -245,10 +245,10 @@ export function useData() {
   }, [poll, pollBroker, pollSecondary, wsConnect])
 
   useEffect(() => {
-    const TOP_BAR_SYMS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY']
+    const TOP_BAR_SYMS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
 
     pollChain(chainSymbol)
-    const fastTimer = setInterval(() => pollChain(chainSymbol), 5000)
+    const fastTimer = setInterval(() => pollChain(chainSymbol), 15000)
 
     TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
     const topBarTimer = setInterval(() => {

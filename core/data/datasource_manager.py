@@ -31,6 +31,17 @@ class DataSourceManager:
         "SENSEX": "51",
     }
 
+    # Dhan option-chain segment is not identical for every index.
+    # Keep env override so Render can correct a broker-side segment without code deploy:
+    #   DHAN_OPTION_CHAIN_SEGMENT_SENSEX=<broker accepted value>
+    _DHAN_SEGMENTS = {
+        "NIFTY": "IDX_I",
+        "BANKNIFTY": "IDX_I",
+        "FINNIFTY": "IDX_I",
+        "MIDCPNIFTY": "IDX_I",
+        "SENSEX": "IDX_B",
+    }
+
     def __init__(self):
         self._client = None
 
@@ -99,9 +110,13 @@ class DataSourceManager:
                         logger.info(
                             f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} expiry={resolved_expiry}"
                         )
+                        segment = os.environ.get(
+                            f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
+                            self._DHAN_SEGMENTS.get(sym, "IDX_I"),
+                        ).strip() or "IDX_I"
                         resp = dhan.option_chain(
                             under_security_id=sec_id,
-                            under_exchange_segment="IDX_I",
+                            under_exchange_segment=segment,
                             expiry=resolved_expiry,
                         )
                         parser_name = "parse_dhan_option_chain_payload"
