@@ -2,7 +2,7 @@
 Genesis System3 — Cloud Worker
 ================================
 Single-process entrypoint for Render worker service.
-Runs five background daemons as threads:
+Runs six background daemons as threads:
 
   Thread 1 — Token daemon       : refreshes DHAN_ACCESS_TOKEN daily at 08:30 IST
   Thread 2 — Token watchdog     : checks token validity every CHECK_INTERVAL_S
@@ -319,6 +319,35 @@ def _run_chain_push():
         time.sleep(_CHAIN_PUSH_INTERVAL_S)
 
 
+
+
+# ---------------------------------------------------------------------------
+# Thread 6: Core Pipeline V8 paper/analyzer ledger
+# ---------------------------------------------------------------------------
+_PAPER_PIPELINE_V8_INTERVAL_S = int(os.environ.get("SYSTEM3_PAPER_PIPELINE_V8_INTERVAL_S", "120"))
+
+
+def _run_paper_pipeline_v8():
+    log.info("[paper-pipeline-v8] starting")
+    if os.environ.get("SYSTEM3_PAPER_PIPELINE_V8_ENABLED", "1") in ("0", "false", "False"):
+        log.info("[paper-pipeline-v8] disabled via SYSTEM3_PAPER_PIPELINE_V8_ENABLED=0")
+        return
+    while True:
+        try:
+            from dashboard.backend.paper_pipeline_v8 import run_pipeline_once
+            result = run_pipeline_once(ROOT, create_paper_orders=True, source="cloud_worker")
+            log.info(
+                "[paper-pipeline-v8] status=%s forecasts=%s paper_orders=%s blocked=%s",
+                result.get("status"),
+                result.get("forecasts_seen"),
+                result.get("paper_orders_written"),
+                result.get("blocked_written"),
+            )
+        except Exception as exc:
+            log.warning(f"[paper-pipeline-v8] tick failed: {exc}")
+        time.sleep(_PAPER_PIPELINE_V8_INTERVAL_S)
+
+
 # ---------------------------------------------------------------------------
 # Startup: bootstrap token from PIN+TOTP before threads start
 # ---------------------------------------------------------------------------
@@ -361,6 +390,7 @@ def main():
         threading.Thread(target=_run_job_scheduler, name="job-scheduler", daemon=True),
         threading.Thread(target=_run_health_push, name="health-push", daemon=True),
         threading.Thread(target=_run_chain_push, name="chain-push", daemon=True),
+        threading.Thread(target=_run_paper_pipeline_v8, name="paper-pipeline-v8", daemon=True),
     ]
 
     for t in threads:
