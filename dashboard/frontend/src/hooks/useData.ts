@@ -3,6 +3,8 @@ import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
 
 const BASE = API_BASE || window.location.origin
+const TRANSIENT_STATUS = new Set([0, 502, 503, 504, 520, 521, 522, 523, 524])
+const isTransient = (status?: number) => TRANSIENT_STATUS.has(Number(status ?? -1))
 
 class ApiRequestError extends Error {
   status: number
@@ -17,16 +19,26 @@ class ApiRequestError extends Error {
 }
 
 async function fetchJSON(path: string) {
-  const r = await fetch(BASE + path, { credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS } })
-  if (!r.ok) throw new ApiRequestError(path, r.status)
-  return r.json()
+  try {
+    const r = await fetch(BASE + path, { credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS } })
+    if (!r.ok) throw new ApiRequestError(path, r.status)
+    return r.json()
+  } catch (err: any) {
+    if (err instanceof ApiRequestError) throw err
+    throw new ApiRequestError(path, 0)
+  }
 }
 
 const authStatus = (path: string, status: number) => ({
-  status: status === 401 ? 'API_AUTH_REQUIRED' : 'API_ERROR',
+  status: status === 401 ? 'API_AUTH_REQUIRED' : isTransient(status) ? (status === 0 ? 'NETWORK_ERROR' : 'RENDER_UNAVAILABLE') : 'API_ERROR',
   code: status,
   path,
-  message: status === 401 ? 'Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.' : `Backend API returned ${status}`,
+  severity: status === 401 ? 'locked' : isTransient(status) ? 'transient' : 'error',
+  message: status === 401
+    ? 'Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.'
+    : isTransient(status)
+      ? (status === 0 ? `Network/DNS could not reach Render for ${path}. Keeping last-good data where available.` : `Render/backend temporarily returned ${status} for ${path}. Keeping last-good data where available.`)
+      : `Backend API returned ${status}`,
 })
 
 const fallbackHealth = (apiStatus: any) => ({
@@ -110,6 +122,28 @@ const fallbackChain = (sym: string, apiStatus: any) => ({
   message: apiStatus?.message || 'Option chain unavailable',
 })
 
+
+function keepLastGood(previous: any, apiStatus: any, label: string) {
+  if (!previous) return null
+  return {
+    ...previous,
+    stale: true,
+    transient_error: true,
+    degraded_at: new Date().toISOString(),
+    last_warning: `${label}: ${apiStatus?.message || 'temporary API failure'}`,
+    status: previous.status || 'STALE_LAST_GOOD',
+  }
+}
+
+function withFailureCount(apiStatus: any, group: string, count: number) {
+  return {
+    ...apiStatus,
+    group,
+    consecutive_failures: count,
+    message: count < 3 ? `${apiStatus.message} Retrying; last-good UI data is retained.` : apiStatus.message,
+  }
+}
+
 function apiError(result: PromiseSettledResult<any>, path: string) {
   if (result.status === 'rejected' && result.reason instanceof ApiRequestError) return authStatus(path, result.reason.status)
   if (result.status === 'rejected') return { status: 'API_ERROR', code: 0, path, message: String(result.reason?.message || result.reason) }
@@ -125,6 +159,21 @@ export function useData() {
   } = useStore()
 
   const wsRef = useRef<WebSocket | null>(null)
+  const wsReconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const wsReconnectAttemptsRef = useRef(0)
+  const unmountedRef = useRef(false)
+  const failureCountRef = useRef<Record<string, number>>({})
+
+  const markFailure = useCallback((group: string, apiStatus: any) => {
+    const count = (failureCountRef.current[group] || 0) + 1
+    failureCountRef.current[group] = count
+    setApiStatus(withFailureCount(apiStatus, group, count))
+    return count
+  }, [setApiStatus])
+
+  const markSuccess = useCallback((group: string) => {
+    failureCountRef.current[group] = 0
+  }, [])
 
   const pollBroker = useCallback(async () => {
     const [status, holdings, funds, positions] = await Promise.allSettled([
@@ -140,13 +189,16 @@ export function useData() {
     const positionsErr = apiError(positions, '/api/broker/positions/live')
     const err = statusErr || holdingsErr || fundsErr || positionsErr
 
-    if (err) setApiStatus(err)
+    const prev = useStore.getState()
+    const retainTransient = err && isTransient(err.code)
+    if (err) markFailure('broker', err)
+    else markSuccess('broker')
 
-    setBrokerStatus(status.status === 'fulfilled' ? status.value : fallbackBrokerStatus(statusErr || err))
-    setBrokerHoldings(holdings.status === 'fulfilled' ? holdings.value : fallbackRows(holdingsErr || err, 'Holdings'))
-    setBrokerFunds(funds.status === 'fulfilled' ? funds.value : fallbackFunds(fundsErr || err))
-    setBrokerPositions(positions.status === 'fulfilled' ? positions.value : fallbackRows(positionsErr || err, 'Positions'))
-  }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, setApiStatus])
+    setBrokerStatus(status.status === 'fulfilled' ? status.value : retainTransient ? (keepLastGood(prev.brokerStatus, err, 'Broker status') || fallbackBrokerStatus(statusErr || err)) : fallbackBrokerStatus(statusErr || err))
+    setBrokerHoldings(holdings.status === 'fulfilled' ? holdings.value : retainTransient ? (keepLastGood(prev.brokerHoldings, err, 'Holdings') || fallbackRows(holdingsErr || err, 'Holdings')) : fallbackRows(holdingsErr || err, 'Holdings'))
+    setBrokerFunds(funds.status === 'fulfilled' ? funds.value : retainTransient ? (keepLastGood(prev.brokerFunds, err, 'Funds') || fallbackFunds(fundsErr || err)) : fallbackFunds(fundsErr || err))
+    setBrokerPositions(positions.status === 'fulfilled' ? positions.value : retainTransient ? (keepLastGood(prev.brokerPositions, err, 'Positions') || fallbackRows(positionsErr || err, 'Positions')) : fallbackRows(positionsErr || err, 'Positions'))
+  }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, markFailure, markSuccess])
 
   const poll = useCallback(async () => {
     const [health, state, paper, gainRank, pnl] = await Promise.allSettled([
@@ -159,31 +211,38 @@ export function useData() {
 
     const err = apiError(health, '/api/health') || apiError(state, '/api/state') || apiError(paper, '/api/paper') || apiError(gainRank, '/api/gain_rank') || apiError(pnl, '/api/pnl')
 
-    if (err) {
-      setApiStatus(err)
-      if (health.status !== 'fulfilled') setHealth(fallbackHealth(err))
-      if (paper.status !== 'fulfilled') setPaper(fallbackPaper)
-      if (gainRank.status !== 'fulfilled') setGainRank(fallbackGainRank(err))
-      if (pnl.status !== 'fulfilled') setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: err.status, message: err.message })
-    }
+    const prev = useStore.getState()
+    const retainTransient = err && isTransient(err.code)
+    if (err) markFailure('core', err)
+    else markSuccess('core')
 
     if (health.status === 'fulfilled') setHealth(health.value)
+    else if (!retainTransient || !prev.health) setHealth(fallbackHealth(err))
+
     if (state.status === 'fulfilled') setState(state.value)
     if (paper.status === 'fulfilled') setPaper(paper.value)
+    else if (!retainTransient || !prev.paper) setPaper(fallbackPaper)
+
     if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
+    else if (!retainTransient || !prev.gainRank) setGainRank(fallbackGainRank(err))
+
     if (pnl.status === 'fulfilled') setPnl(pnl.value)
-  }, [setHealth, setState, setPaper, setGainRank, setPnl, setApiStatus])
+    else if (!retainTransient || !prev.pnl) setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: err?.status, message: err?.message })
+  }, [setHealth, setState, setPaper, setGainRank, setPnl, markFailure, markSuccess])
 
   const pollChain = useCallback(async (sym: string) => {
     try {
       const data = await fetchJSON(`/api/chain/${sym}`)
+      markSuccess(`chain_${sym}`)
       setChain(sym, data)
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
-      setApiStatus(apiStatus)
-      setChain(sym, fallbackChain(sym, apiStatus))
+      markFailure(`chain_${sym}`, apiStatus)
+      const prev = useStore.getState().chain?.[sym]
+      if (isTransient(apiStatus.code) && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} option chain`))
+      else setChain(sym, fallbackChain(sym, apiStatus))
     }
-  }, [setChain, setApiStatus])
+  }, [setChain, markFailure])
 
   const pollSecondary = useCallback(async () => {
     const [alerts, gates] = await Promise.allSettled([
@@ -192,15 +251,17 @@ export function useData() {
     ])
 
     const err = apiError(alerts, '/api/alerts/recent') || apiError(gates, '/api/auto_gates')
-    if (err) {
-      setApiStatus(err)
-      if (alerts.status !== 'fulfilled') setAlerts([])
-      if (gates.status !== 'fulfilled') setAutoGates(fallbackGates(err))
-    }
+    const prev = useStore.getState()
+    const retainTransient = err && isTransient(err.code)
+    if (err) markFailure('secondary', err)
+    else markSuccess('secondary')
 
     if (alerts.status === 'fulfilled') setAlerts(Array.isArray(alerts.value?.alerts) ? alerts.value.alerts : [])
+    else if (!retainTransient || !prev.alerts?.length) setAlerts([])
+
     if (gates.status === 'fulfilled') setAutoGates(gates.value)
-  }, [setAlerts, setAutoGates, setApiStatus])
+    else if (!retainTransient || !prev.autoGates) setAutoGates(fallbackGates(err))
+  }, [setAlerts, setAutoGates, markFailure, markSuccess])
 
   const wsConnect = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState <= 1) return
@@ -210,11 +271,20 @@ export function useData() {
     wsRef.current = ws
     setWsStatus('connecting')
 
-    ws.onopen = () => setWsStatus('live')
+    ws.onopen = () => {
+      wsReconnectAttemptsRef.current = 0
+      setWsStatus('live')
+    }
     ws.onerror = () => setWsStatus('error')
     ws.onclose = () => {
       setWsStatus('off')
-      setTimeout(wsConnect, 5000)
+      if (unmountedRef.current) return
+      const attempt = wsReconnectAttemptsRef.current
+      wsReconnectAttemptsRef.current = attempt + 1
+      const baseDelay = Math.min(5000 * 2 ** attempt, 60000)
+      const jitter = Math.round(baseDelay * 0.25 * Math.random())
+      if (wsReconnectTimerRef.current) clearTimeout(wsReconnectTimerRef.current)
+      wsReconnectTimerRef.current = setTimeout(wsConnect, baseDelay + jitter)
     }
     ws.onmessage = (ev) => {
       try {
@@ -227,19 +297,22 @@ export function useData() {
   }, [setHealth, setWsStatus])
 
   useEffect(() => {
+    unmountedRef.current = false
     poll()
     pollBroker()
     pollSecondary()
     wsConnect()
 
-    const coreTimer = setInterval(poll, 20000)
-    const brokerTimer = setInterval(pollBroker, 30000)
-    const secTimer = setInterval(pollSecondary, 60000)
+    const coreTimer = setInterval(poll, 45000)
+    const brokerTimer = setInterval(pollBroker, 60000)
+    const secTimer = setInterval(pollSecondary, 120000)
 
     return () => {
+      unmountedRef.current = true
       clearInterval(coreTimer)
       clearInterval(brokerTimer)
       clearInterval(secTimer)
+      if (wsReconnectTimerRef.current) clearTimeout(wsReconnectTimerRef.current)
       wsRef.current?.close()
     }
   }, [poll, pollBroker, pollSecondary, wsConnect])
@@ -248,12 +321,12 @@ export function useData() {
     const TOP_BAR_SYMS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
 
     pollChain(chainSymbol)
-    const fastTimer = setInterval(() => pollChain(chainSymbol), 15000)
+    const fastTimer = setInterval(() => pollChain(chainSymbol), 30000)
 
     TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
     const topBarTimer = setInterval(() => {
       TOP_BAR_SYMS.forEach(sym => { if (sym !== chainSymbol) pollChain(sym) })
-    }, 30000)
+    }, 90000)
 
     return () => {
       clearInterval(fastTimer)

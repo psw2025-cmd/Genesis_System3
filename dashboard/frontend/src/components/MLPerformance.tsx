@@ -37,7 +37,7 @@ export default function MLPerformance() {
 
     fetchData()
     // Optimized polling: 10000ms (10 seconds) - ML metrics don't need frequent updates
-    const interval = setInterval(fetchData, 10000)
+    const interval = setInterval(fetchData, 60000)
     return () => clearInterval(interval)
   }, [])
 
@@ -54,7 +54,7 @@ export default function MLPerformance() {
       }
     }
     fetchState()
-    const interval = setInterval(fetchState, 10000)
+    const interval = setInterval(fetchState, 60000)
     return () => clearInterval(interval)
   }, [])
 
@@ -162,8 +162,16 @@ export default function MLPerformance() {
       )}
 
       {!performance && !comparison && (
-        <div className="text-gray-400 text-center py-12">
-          No ML performance data available
+        <div className="bg-yellow-900/10 border border-yellow-700/50 p-6 rounded-lg">
+          <h3 className="text-xl font-bold mb-2 text-yellow-300">ML Performance NOT_READY</h3>
+          <p className="text-sm text-gray-300">
+            No matured ML performance artifact is available yet. This is not a UI crash.
+          </p>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div><div className="text-gray-400">Required source</div><div className="font-mono">/api/ml/performance</div></div>
+            <div><div className="text-gray-400">Comparison source</div><div className="font-mono">/api/ml/compare</div></div>
+            <div><div className="text-gray-400">Next action</div><div>Run/verify training and matured prediction proof job.</div></div>
+          </div>
         </div>
       )}
     </div>
