@@ -1,4 +1,4 @@
-﻿import { useStore } from '../store'
+import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 import { PriceCell } from './ui/PriceCell'
 import { AuthUnlock } from './AuthUnlock'

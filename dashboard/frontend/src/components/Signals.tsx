@@ -3,86 +3,101 @@ import axios from 'axios'
 import { API_BASE } from '../config'
 import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
+import { AuthUnlock } from './AuthUnlock'
 
 export default function Signals() {
   const [signal, setSignal] = useState<any>(null)
   const [qc, setQc] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<{endpoint: string, status?: number, message: string} | null>(null)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Use SSOT for consistency
-        const stateRes = await axios.get(`${API_BASE}/api/state`)
-        const state = stateRes.data
-        
-        // Convert SSOT signals to signal format
-        const signals = state.signals || {}
-        const signalData = {
-          action: signals.status === 'BUY' || signals.status === 'SELL' ? 'TRADE' : 'NO_TRADE',
-          underlying: signals.underlying || 'N/A',
-          strategy: signals.reason || 'NONE',
-          confidence: (signals.confidence || 0) / 100, // Convert from 0-100 to 0-1
-          direction: signals.status === 'BUY' ? 'LONG' : signals.status === 'SELL' ? 'SHORT' : 'NONE',
-          reason: signals.reason || 'No signal generated'
-        }
-        
-        // Convert SSOT QC to QC format
-        const qcData = {
-          status: state.qc?.status || 'PASS',
-          total_contracts: state.qc?.contracts_total || 0,
-          underlyings: state.qc?.underlyings || 0,
-          failures: state.qc?.failures || []
-        }
-        
-        setSignal(signalData)
-        setQc(qcData)
+  const fetchData = async () => {
+    setIsLoading(true)
+    try {
+      const stateRes = await axios.get(`${API_BASE}/api/state`)
+      const state = stateRes.data
+
+      const signals = state.signals || {}
+      const signalData = {
+        action: signals.status === 'BUY' || signals.status === 'SELL' ? 'TRADE' : 'NO_TRADE',
+        underlying: signals.underlying || 'N/A',
+        strategy: signals.reason || 'NONE',
+        confidence: (signals.confidence || 0) / 100,
+        direction: signals.status === 'BUY' ? 'LONG' : signals.status === 'SELL' ? 'SHORT' : 'NONE',
+        reason: signals.reason || state.market?.reason || 'No signal generated',
+      }
+
+      const qcData = {
+        status: state.qc?.status || 'PASS',
+        total_contracts: state.qc?.contracts_total || 0,
+        underlyings: state.qc?.underlyings || 0,
+        failures: state.qc?.failures || [],
+        no_trade_reasons: state.qc?.no_trade_reasons || {},
+        qc_failures: state.qc?.qc_failures || state.qc?.failures || [],
+      }
+
+      setSignal(signalData)
+      setQc(qcData)
+      setAuthRequired(false)
+      setError(null)
+    } catch (error: any) {
+      const status = error.response?.status || null
+      if (status === 401) {
+        setAuthRequired(true)
         setError(null)
-      } catch (error: any) {
-        console.error('Error fetching signals:', error)
-        const errorMsg = error.message || 'Unknown error'
-        const status = error.response?.status || null
+        setSignal(null)
+        setQc({
+          status: 'LOCKED',
+          total_contracts: 0,
+          underlyings: 0,
+          failures: ['Dashboard API auth required'],
+        })
+      } else {
+        setAuthRequired(false)
         setError({
           endpoint: `${API_BASE}/api/state`,
           status: status || undefined,
-          message: errorMsg
+          message: error.message || 'Failed to fetch signal data',
         })
-        // Fallback to old endpoints
-        try {
-          const [signalRes, qcRes] = await Promise.all([
-            axios.get(`${API_BASE}/api/signal/top`),
-            axios.get(`${API_BASE}/api/qc`)
-          ])
-          setSignal(signalRes.data)
-          setQc(qcRes.data)
-          setError(null)
-        } catch (fallbackError: any) {
-          console.error('Fallback also failed:', fallbackError)
-          const fallbackStatus = fallbackError.response?.status || null
-          setError({
-            endpoint: `${API_BASE}/api/signal/top`,
-            status: fallbackStatus || undefined,
-            message: fallbackError.message || 'Failed to fetch signal data'
-          })
-        }
-      } finally {
-        setIsLoading(false)
       }
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchData()
-    // Optimized polling: 3000ms (3 seconds) instead of 2000ms
-    const interval = setInterval(fetchData, 3000)
+    const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [])
 
-  if (isLoading && !signal) {
+  if (isLoading && !signal && !authRequired) {
     return (
       <div className="p-6">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <div className="text-xl font-bold">Loading signals...</div>
         </div>
+      </div>
+    )
+  }
+
+  if (authRequired) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold">Signals & Recommendations</h2>
+        <div className="card p-4 border border-amber/30 bg-amber/5">
+          <div className="text-xs text-text-muted uppercase tracking-wider">Signal Data Locked</div>
+          <div className="text-sm text-text-primary font-semibold">Dashboard API auth is required before signals can be read.</div>
+          <div className="mt-2 text-xs text-text-muted">This is a read-only lock. Live trading remains disabled.</div>
+        </div>
+        <AuthUnlock />
+        <EmptyState
+          title="Signals locked"
+          reason="Enter the Dashboard API key to unlock read-only signal, broker, paper, scanner and gate data."
+          icon="LOCK"
+        />
       </div>
     )
   }
@@ -95,17 +110,12 @@ export default function Signals() {
           endpoint={error.endpoint}
           status={error.status}
           message={error.message}
-          onRetry={() => {
-            setIsLoading(true)
-            setError(null)
-            // Trigger re-fetch
-            window.location.reload()
-          }}
+          onRetry={fetchData}
         />
         <EmptyState
           title="Signal data unavailable"
-          reason="Unable to load trading signals. Please check backend connection."
-          icon="📡"
+          reason="Backend did not return signal/state data. Check API health and deployment."
+          icon="INFO"
         />
       </div>
     )
@@ -118,7 +128,7 @@ export default function Signals() {
         <EmptyState
           title="No signals available"
           reason="No trading signals generated yet. Signals will appear when market conditions are met."
-          icon="📊"
+          icon="INFO"
         />
       </div>
     )
@@ -126,19 +136,17 @@ export default function Signals() {
 
   const isTrade = signal.action === 'TRADE'
   const isManaging = signal.action === 'MANAGING_POSITION' || signal.reason?.includes('Managing')
-  
-  // Get blocking reasons from SSOT (if available)
+
   const blockingReasons: string[] = []
   if (qc?.status === 'FAIL') blockingReasons.push('QC Fail')
   if (!signal.underlying || signal.underlying === 'N/A') blockingReasons.push('No Underlying')
   if ((signal.confidence || 0) < 0.5) blockingReasons.push('Low Confidence')
-  if (signal.reason?.includes('market closed')) blockingReasons.push('Market Closed')
+  if (signal.reason?.toLowerCase?.().includes('market closed')) blockingReasons.push('Market Closed')
 
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold">Signals & Recommendations</h2>
 
-      {/* Top Signal Card */}
       <div className={`p-6 rounded-lg ${isTrade ? 'bg-green-900' : isManaging ? 'bg-blue-900' : 'bg-gray-800'}`}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-2xl font-bold">
@@ -148,13 +156,13 @@ export default function Signals() {
             {signal.action}
           </div>
         </div>
-        
+
         {isManaging && (
           <div className="mb-4 p-3 bg-blue-800 rounded">
             <div className="text-sm">Currently managing open positions. No new trades until positions are closed.</div>
           </div>
         )}
-        
+
         {blockingReasons.length > 0 && !isTrade && !isManaging && (
           <div className="mb-4 p-3 bg-yellow-900 rounded">
             <div className="text-sm font-bold mb-2">What Blocked Trading?</div>
@@ -165,7 +173,7 @@ export default function Signals() {
             </ul>
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <div className="text-sm text-gray-400">Underlying</div>
@@ -187,21 +195,20 @@ export default function Signals() {
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <div className="text-sm text-gray-400">Entry Mid</div>
-              <div className="text-lg">₹{signal.entry_mid?.toFixed(2) || 'N/A'}</div>
+              <div className="text-lg">Rs {signal.entry_mid?.toFixed(2) || 'N/A'}</div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Stop Loss</div>
-              <div className="text-lg">₹{signal.stop_loss?.toFixed(2) || 'N/A'}</div>
+              <div className="text-lg">Rs {signal.stop_loss?.toFixed(2) || 'N/A'}</div>
             </div>
             <div>
               <div className="text-sm text-gray-400">Target</div>
-              <div className="text-lg">₹{signal.target?.toFixed(2) || 'N/A'}</div>
+              <div className="text-lg">Rs {signal.target?.toFixed(2) || 'N/A'}</div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Explainability Panel */}
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">Explainability</h3>
         <div className="space-y-2">
@@ -222,7 +229,6 @@ export default function Signals() {
         </div>
       </div>
 
-      {/* What Blocked Trading */}
       {!isTrade && qc && (
         <div className="bg-red-900 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">What Blocked Trading?</h3>
@@ -251,7 +257,6 @@ export default function Signals() {
         </div>
       )}
 
-      {/* Export */}
       <div className="bg-gray-800 p-4 rounded-lg">
         <button
           onClick={() => {
@@ -270,3 +275,4 @@ export default function Signals() {
     </div>
   )
 }
+

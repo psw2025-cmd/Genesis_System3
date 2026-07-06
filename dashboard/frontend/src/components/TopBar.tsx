@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
 
@@ -25,7 +25,7 @@ function IndexChip({ symbol, spot, chg }: { symbol:string; spot?:number; chg?:nu
       </span>
       {chg != null && spot && (
         <span className="num" style={{ fontSize:'.55rem', color: isUp ? 'var(--up)' : 'var(--down)' }}>
-          {isUp ? 'â–²' : 'â–¼'}{Math.abs(chg).toFixed(1)}%
+          {isUp ? 'UP' : 'DOWN'}{Math.abs(chg).toFixed(1)}%
         </span>
       )}
     </div>
@@ -112,7 +112,7 @@ export function TopBar() {
           background: brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)',
           color: brokerGood ? 'var(--up)' : 'var(--down)',
           border:`1px solid ${brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'}`,
-        }} title="Click â†’ Broker Data">
+        }} title="Click -> Broker Data">
           <span style={{ width:'6px', height:'6px', borderRadius:'50%',
                          background: brokerGood ? 'var(--up)' : 'var(--down)' }} />
           DHAN {brokerLabel}
@@ -144,7 +144,7 @@ export function TopBar() {
         {rho != null && (
           <div style={{ padding:'3px 7px', background:'var(--surface-2)',
                         borderRadius:'5px', border:'1px solid var(--border)' }}>
-            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>Ï </span>
+            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>rho </span>
             <span className="num" style={{ fontSize:'.75rem', fontWeight:700,
                                            color: rho>=0.7 ? 'var(--up)' : rho>=0.4 ? 'var(--amber)' : 'var(--down)' }}>
               {rho.toFixed(2)}
