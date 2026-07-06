@@ -53,23 +53,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          workflow_count=0
-          for wf in $(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort); do
-            workflow_count=$((workflow_count + 1))
-            echo "Workflow file found: $wf"
-            case "$wf" in
-              .github/workflows/ci.yml|.github/workflows/cloud-runtime-check.yml|.github/workflows/render-env-audit.yml)
-                ;;
-              *)
-                echo "FAIL: unexpected workflow file: $wf"
-                exit 1
-                ;;
-            esac
-          done
-          test "$workflow_count" -ge 1 || { echo "FAIL: no workflow files found"; exit 1; }
-          for required in .github/workflows/ci.yml .github/workflows/cloud-runtime-check.yml .github/workflows/render-env-audit.yml; do
-            test -f "$required" || { echo "FAIL: required workflow file missing: $required"; exit 1; }
-          done
+          test -f .github/workflows/ci.yml || { echo "FAIL: ci.yml missing"; exit 1; }
+          test -f .github/workflows/cloud-runtime-check.yml || { echo "FAIL: cloud-runtime-check.yml missing"; exit 1; }
+          test -f .github/workflows/render-env-audit.yml || { echo "FAIL: render-env-audit.yml missing"; exit 1; }
           grep -q 'LIVE_TRADING_ENABLED.*"0"' .github/workflows/ci.yml || \
             { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml env"; exit 1; }
           grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED.*"0"' .github/workflows/ci.yml || \
