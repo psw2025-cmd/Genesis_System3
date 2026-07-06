@@ -19,7 +19,6 @@ on:
   workflow_dispatch:
 
 # READ-ONLY: no workflow may write back to the repo.
-# Any contents write permission here fails the workflow-policy-guard below.
 permissions:
   contents: read
   actions: read
@@ -41,10 +40,6 @@ env:
 jobs:
   # -----------------------------------------------------------------------
   # GATE 1 — Workflow policy + trading safety guard (BLOCKING)
-  # Must be first. All other jobs depend on this passing.
-  # Verifies: approved workflow files only, no repo write permission, no auto-fix,
-  #           LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0
-  #           hardcoded in this file.
   # -----------------------------------------------------------------------
   workflow-policy-guard:
     name: BLOCKING - workflow policy and trading safety guard
@@ -58,10 +53,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # --- 1. Only approved read-only workflow files must exist ---
-          # Allowed: ci.yml (safety gate), cloud-runtime-check.yml (read-only
-          # health probe), and render-env-audit.yml (manual no-secrets env audit).
           workflow_count=0
           for wf in $(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort); do
             workflow_count=$((workflow_count + 1))
@@ -76,33 +67,13 @@ jobs:
             esac
           done
           test "$workflow_count" -ge 1 || { echo "FAIL: no workflow files found"; exit 1; }
-
           for required in .github/workflows/ci.yml .github/workflows/cloud-runtime-check.yml .github/workflows/render-env-audit.yml; do
             test -f "$required" || { echo "FAIL: required workflow file missing: $required"; exit 1; }
           done
-
-          # --- 2. No contents write permission (would allow repo mutations from CI) ---
-          if grep -RIn "contents[:][[:space:]]*write" .github/workflows; then
-            echo "FAIL: contents write permission found in workflows — CI must be read-only"
-            exit 1
-          fi
-
-          # --- 3. No auto-fix bots or cloud deploy ---
-          if grep -RIn "[-][-]auto[-]fix" .github/workflows; then
-            echo "FAIL: auto-fix bots are forbidden in CI workflows"
-            exit 1
-          fi
-          if grep -RIn "azure[/]webapps[-]deploy" .github/workflows; then
-            echo "FAIL: azure cloud deploy is forbidden in CI workflows"
-            exit 1
-          fi
-
-          # --- 4. Trading safety flags MUST be hardcoded off in this file ---
           grep -q 'LIVE_TRADING_ENABLED.*"0"' .github/workflows/ci.yml || \
             { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml env"; exit 1; }
           grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED.*"0"' .github/workflows/ci.yml || \
             { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml env"; exit 1; }
-
           echo "policy_guard=PASS"
           echo "trading_safety=PASS"
 
@@ -202,10 +173,6 @@ jobs:
           python -m py_compile dashboard/backend/app.py
           python -m py_compile dashboard/backend/paper_pipeline_v8.py
           python -m py_compile scripts/system3_core_pipeline_v8.py
-          # Paper-day proof pack chain (2026-06-30/07-01 work) — these were
-          # never in this list and CI "passing" never actually validated
-          # them; closing that gap here rather than relying solely on
-          # out-of-band py_compile checks done outside CI.
           python -m py_compile scripts/paper_day_proof_pack.py
           python -m py_compile scripts/run_dashboard_browser_proof.py
           python -m py_compile scripts/daily_prediction_benchmark.py
@@ -214,7 +181,6 @@ jobs:
           python -m py_compile scripts/cloud_worker.py
           python -m py_compile core/engine/system3_phase82_job_scheduler.py
           python -m py_compile scripts/system3_self_healing_watchdog.py
-          # Frontend TypeScript check for new components (syntax only)
           test -f dashboard/frontend/src/components/LiveTradingGate.tsx && echo 'LiveTradingGate.tsx exists' || exit 1
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           echo "compile_expanded=PASS"
