@@ -709,6 +709,10 @@ async def get_broker_truth():
     """Multi-validated broker trader truth — holdings, positions, funds."""
     _hit = _cache_get("broker_truth", _TTL_BROKER_TRUTH)
     if _hit is not None:
+        if isinstance(_hit, dict):
+            hit = dict(_hit)
+            hit.setdefault("source_priority", "web_ttl_cache")
+            return hit
         return _hit
 
     try:
@@ -2882,8 +2886,15 @@ async def get_chain(underlying: str):
     pushed = _PUSHED_CHAIN_CACHE.get(sym)
     if pushed:
         fresh_window = _PUSHED_CHAIN_FRESH_S if pushed.get("market_open", True) else _PUSHED_CHAIN_FRESH_S_CLOSED
-        if (_time_module.time() - pushed["received_at"]) < fresh_window:
-            return pushed["data"]
+        age_s = _time_module.time() - pushed["received_at"]
+        if age_s < fresh_window:
+            data = dict(pushed["data"] or {})
+            data.setdefault("status", "MARKET_OPEN" if pushed.get("market_open", True) else "MARKET_CLOSED")
+            data.setdefault("data_source", "worker_push")
+            data["source_priority"] = "worker_push"
+            data["snapshot_age_seconds"] = round(age_s, 1)
+            data["stale"] = False
+            return data
 
     cache_key = f"chain_{sym}"
     _hit = _cache_get(cache_key, _TTL_CHAIN)
@@ -3272,11 +3283,16 @@ async def _get_chain_uncached(underlying: str):
                 contracts.append(contract)
 
             return {
-                "underlying": underlying,
+                "underlying": underlying.upper(),
                 "spot": float(spot),
                 "pcr": float(pcr),
                 "contracts": contracts[:1000],
                 "total_contracts": len(contracts),
+                "data_source": "csv_fallback",
+                "source_priority": "csv_fallback_after_live_fetch_failed",
+                "status": "STALE_CSV_FALLBACK" if market_is_open else "MARKET_CLOSED_CSV_SNAPSHOT",
+                "stale": True,
+                "message": "Dhan live option-chain fetch failed; showing local CSV fallback, which may be stale. Do not treat as live price.",
             }
 
         # Continue with pandas path
@@ -3382,16 +3398,18 @@ async def _get_chain_uncached(underlying: str):
                 contract["oi_change"] = 0
             contracts.append(contract)
 
-        chain_status = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
+        chain_status = "STALE_CSV_FALLBACK" if market_is_open else "MARKET_CLOSED_CSV_SNAPSHOT"
         return {
-            "underlying": underlying,
+            "underlying": underlying.upper(),
             "spot": float(spot),
             "pcr": float(pcr),
             "contracts": contracts[:1000],
             "total_contracts": len(contracts),
-            "data_source": "real",
+            "data_source": "csv_fallback",
+            "source_priority": "csv_fallback_after_live_fetch_failed",
             "status": chain_status,
-            "message": "Cached chain CSV" if not market_is_open else "Live chain data",
+            "stale": True,
+            "message": "Dhan live option-chain fetch failed; showing local CSV fallback, which may be stale. Do not treat as live price." if market_is_open else "Market closed - local CSV snapshot.",
         }
     except Exception as e:
         # Return empty data instead of 500 error

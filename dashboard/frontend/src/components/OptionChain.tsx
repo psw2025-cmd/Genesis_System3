@@ -15,6 +15,21 @@ interface Contract {
   iv: number
   delta: number
   theta: number
+  top_bid_price?: number
+  top_ask_price?: number
+  bid?: number
+  ask?: number
+  bid_price?: number
+  ask_price?: number
+}
+
+function quotePrice(c: Contract | undefined, side: 'bid' | 'ask') {
+  if (!c) return null
+  const anyC = c as any
+  const v = side === 'bid'
+    ? (anyC.top_bid_price ?? anyC.bid ?? anyC.bid_price)
+    : (anyC.top_ask_price ?? anyC.ask ?? anyC.ask_price)
+  return v == null || Number(v) <= 0 ? null : Number(v)
 }
 
 function oiBar(val: number, max: number, type: 'CE' | 'PE') {
@@ -56,11 +71,16 @@ export function OptionChain() {
     }
   }, [data?.spot, chainSymbol])
 
-  const contracts: Contract[] = data?.contracts ?? []
-  const spot = data?.spot ?? 0
-  const pcr  = data?.pcr ?? '--'
-  const status = data?.status ?? 'LOADING'
+  const chainMismatch = Boolean(data?.underlying && String(data.underlying).toUpperCase() !== chainSymbol)
+  const contracts: Contract[] = chainMismatch ? [] : (data?.contracts ?? [])
+  const spot = chainMismatch ? 0 : (data?.spot ?? 0)
+  const pcr  = chainMismatch ? '--' : (data?.pcr ?? '--')
+  const status = chainMismatch ? 'CHAIN_SYMBOL_MISMATCH' : (data?.status ?? 'LOADING')
   const dataSource = data?.data_source ?? state?.data_source ?? '--'
+  const sourcePriority = data?.source_priority ?? '--'
+  const stale = Boolean(data?.stale) || String(status).toUpperCase().includes('STALE') || String(sourcePriority).toLowerCase().includes('csv')
+  const snapshotAge = data?.snapshot_age_seconds
+  const fetchedAt = data?.fetched_at_utc ?? data?.snapshot_time ?? data?.generated_at ?? '--'
   const marketReason = String(state?.market?.reason ?? data?.message ?? (marketOpen ? 'Market open' : 'Market closed'))
   const nextOpen = String(state?.market?.next_open ?? '--')
   const latestSignals = gainRank?.latest?.predictions ?? gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
@@ -149,12 +169,36 @@ export function OptionChain() {
     )
   }
 
-  if (status === 'NOT_READY' || (contracts.length === 0 && marketOpen)) {
+  if (status === 'NOT_READY' || chainMismatch || (contracts.length === 0 && marketOpen)) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <div className="w-12 h-12 rounded-full bg-amber/10 border border-amber/30 flex items-center justify-center text-2xl">!</div>
-        <p className="text-amber font-semibold">Broker Not Ready</p>
-        <p className="text-text-muted text-sm">{data?.message || 'Waiting for Dhan connection...'}</p>
+      <div className="p-6 space-y-4 overflow-y-auto h-full">
+        <div className="flex items-center gap-2 flex-wrap">
+          {SYMBOLS.map(sym => (
+            <button key={sym}
+              onClick={() => setChainSymbol(sym)}
+              className={cn(
+                'px-3 py-1 rounded text-xs font-mono font-semibold transition-colors',
+                chainSymbol === sym
+                  ? 'bg-accent text-white'
+                  : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
+              )}
+            >{sym}</button>
+          ))}
+        </div>
+        <div className="card p-4 border border-amber/30 bg-amber/5">
+          <div className="text-xs text-text-muted uppercase tracking-wider">Option Chain - {chainSymbol}</div>
+          <div className="text-sm text-amber font-semibold mt-1">Live option-chain rows are not available for this selected symbol.</div>
+          <div className="text-xs text-text-muted mt-3 leading-5">
+            Status: <span className="font-mono">{String(status)}</span><br />
+            Source: <span className="font-mono">{String(dataSource)} / {String(sourcePriority)}</span><br />
+            Backend: <span className="font-mono">{data?.message || 'No contracts returned by backend.'}</span>
+          </div>
+          {chainMismatch && (
+            <div className="text-xs text-down mt-3 font-mono">
+              Backend returned {String(data?.underlying)} while UI selected {chainSymbol}. Table hidden to avoid showing wrong-symbol data.
+            </div>
+          )}
+        </div>
       </div>
     )
   }
@@ -202,6 +246,16 @@ export function OptionChain() {
         </div>
       </div>
 
+      {(stale || data?.message || sourcePriority !== '--') && (
+        <div className={cn('px-4 py-2 border-b border-border text-xs font-mono', stale ? 'text-amber bg-amber/5' : 'text-text-muted')}>
+          {stale ? 'STALE / FALLBACK DATA - ' : ''}
+          {chainSymbol} source={String(dataSource)} priority={String(sourcePriority)}
+          {snapshotAge != null ? ` age=${snapshotAge}s` : ''}
+          {fetchedAt !== '--' ? ` fetched=${String(fetchedAt)}` : ''}
+          {data?.message ? ` - ${String(data.message)}` : ''}
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto">
         <table className="w-full border-collapse text-xs">
           <thead className="sticky top-0 z-10 bg-surface-1">
@@ -244,7 +298,7 @@ export function OptionChain() {
                   <td className="tcell text-right">
                     {ce ? <PriceCell value={ce.ltp} /> : '--'}
                   </td>
-                  <td className="tcell text-right text-text-muted">{ce?.ltp != null ? fmt(ce.ltp * 0.998, 1) : '--'}</td>
+                  <td className="tcell text-right text-text-muted">{quotePrice(ce, 'bid') != null ? fmt(quotePrice(ce, 'bid')!, 1) : '--'}</td>
 
                   <td className={cn(
                     'tcell text-center font-bold text-sm px-4',
@@ -254,7 +308,7 @@ export function OptionChain() {
                     {isATM && <span className="ml-1 text-[9px] text-accent font-mono">ATM</span>}
                   </td>
 
-                  <td className="tcell text-left text-text-muted">{pe?.ltp != null ? fmt(pe.ltp * 1.002, 1) : '--'}</td>
+                  <td className="tcell text-left text-text-muted">{quotePrice(pe, 'ask') != null ? fmt(quotePrice(pe, 'ask')!, 1) : '--'}</td>
                   <td className="tcell text-left">
                     {pe ? <PriceCell value={pe.ltp} /> : '--'}
                   </td>

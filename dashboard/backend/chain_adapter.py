@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -104,8 +105,11 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         "pcr": pcr,
         "contracts": contracts,
         "total_contracts": len(contracts),
-        "data_source": source,
+        "data_source": source or "dhan",
+        "source_priority": "dhan_option_chain_live" if (source or "").lower() in ("dhan", "datasource_manager") else source,
         "status": "OK",
+        "stale": False,
+        "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
         "expiry_date": chain_expiry,
         "limited_for_web": True,
         "max_contracts": _int_env("CHAIN_MAX_CONTRACTS", 160),

@@ -1,0 +1,35 @@
+name: Dashboard Live UI Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 3-10 * * 1-5"
+
+jobs:
+  dashboard-live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium
+
+      - name: Capture live dashboard proof
+        run: node tools/dashboard_live_ui_proof.mjs
+
+      - name: Upload dashboard proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-live-ui-proof
+          path: reports/latest/dashboard_live_ui_proof/
+          retention-days: 14
