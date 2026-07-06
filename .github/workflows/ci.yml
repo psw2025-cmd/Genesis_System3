@@ -42,7 +42,7 @@ jobs:
   # -----------------------------------------------------------------------
   # GATE 1 — Workflow policy + trading safety guard (BLOCKING)
   # Must be first. All other jobs depend on this passing.
-  # Verifies: exactly 2 workflow files (ci.yml + cloud-runtime-check.yml), no contents:write, no auto-fix,
+  # Verifies: approved workflow files only, no contents:write, no auto-fix,
   #           LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0
   #           hardcoded in this file.
   # -----------------------------------------------------------------------
@@ -59,15 +59,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          # --- 1. Only the two approved workflow files must exist ---
-          # Allowed: ci.yml (safety gate) and cloud-runtime-check.yml (read-only
-          # health probe; stores reports as artifacts, never pushes to the repo).
+          # --- 1. Only approved read-only workflow files must exist ---
+          # Allowed: ci.yml (safety gate), cloud-runtime-check.yml (read-only
+          # health probe), and render-env-audit.yml (manual no-secrets env audit).
           mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
           printf 'Workflow files found:\n'
           printf '  %s\n' "${workflows[@]}"
           declare -A allowed_set=(
             [".github/workflows/ci.yml"]=1
             [".github/workflows/cloud-runtime-check.yml"]=1
+            [".github/workflows/render-env-audit.yml"]=1
           )
           for wf in "${workflows[@]}"; do
             [[ -n "${allowed_set[$wf]+x}" ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
@@ -147,6 +148,8 @@ jobs:
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
+          python -m py_compile dashboard/backend/paper_pipeline_v8.py
+          python -m py_compile scripts/system3_core_pipeline_v8.py
           echo "compile_proof=PASS"
 
   # -----------------------------------------------------------------------
@@ -196,6 +199,8 @@ jobs:
           python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile dashboard/backend/app.py
+          python -m py_compile dashboard/backend/paper_pipeline_v8.py
+          python -m py_compile scripts/system3_core_pipeline_v8.py
           # Paper-day proof pack chain (2026-06-30/07-01 work) — these were
           # never in this list and CI "passing" never actually validated
           # them; closing that gap here rather than relying solely on
@@ -242,6 +247,7 @@ jobs:
             tests/test_qc_validator_dhan_aliases.py \
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
+            tests/test_core_pipeline_v8.py \
             -v --tb=short
 
       - name: Run proof batch
