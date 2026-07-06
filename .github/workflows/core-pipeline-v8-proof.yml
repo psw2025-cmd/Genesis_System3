@@ -1,0 +1,35 @@
+name: Core Pipeline V8 Proof
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'dashboard/backend/paper_pipeline_v8.py'
+      - 'scripts/system3_core_pipeline_v8.py'
+      - 'scripts/cloud_worker.py'
+      - '.github/workflows/core-pipeline-v8-proof.yml'
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    env:
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+      SYSTEM3_MODE: analyzer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Syntax checks
+        run: |
+          python -m py_compile dashboard/backend/paper_pipeline_v8.py scripts/system3_core_pipeline_v8.py scripts/cloud_worker.py dashboard/backend/app.py
+      - name: Run Core Pipeline V8 self-test
+        run: |
+          python scripts/system3_core_pipeline_v8.py --self-test --proof-dir reports/latest/core_pipeline_v8_selftest
+      - name: Upload proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-pipeline-v8-proof
+          path: reports/latest/core_pipeline_v8_selftest/

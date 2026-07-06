@@ -6089,3 +6089,27 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
+# CORE_PIPELINE_V8_ENDPOINT_START
+@app.get("/api/paper/pipeline/status")
+async def get_core_pipeline_v8_status():
+    """Read-only analyzer/paper pipeline status: forecasts, trade gates, paper orders, blockers."""
+    try:
+        try:
+            from dashboard.backend.paper_pipeline_v8 import build_pipeline_status
+        except ImportError:
+            from paper_pipeline_v8 import build_pipeline_status
+        return build_pipeline_status(ROOT_DIR, OUTPUTS_DIR)
+    except Exception as e:
+        return {
+            "status": "error",
+            "pipeline": "core_pipeline_v8",
+            "error": str(e)[:300],
+            "safety": {
+                "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+                "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+                "broker_real_order_path": "not_used_by_core_pipeline_v8",
+            },
+        }
+# CORE_PIPELINE_V8_ENDPOINT_END
+
