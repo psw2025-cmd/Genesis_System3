@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { PriceCell } from './ui/PriceCell'
 import { fmt, cn } from '../lib/utils'
