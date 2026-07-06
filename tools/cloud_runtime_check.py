@@ -37,6 +37,7 @@ SECRET_VALUE_RE = re.compile(r"([A-Za-z0-9_\-]{16,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-
 ENDPOINTS: List[Tuple[str, str]] = [
     ("deploy_info", "/api/deploy/info"),
     ("health", "/api/health"),
+    ("auth_status", "/api/auth/status"),
     ("memory_before", "/api/memory"),
     ("broker_status", "/api/broker/status"),
     ("broker_dhan_status", "/api/broker/dhan/status"),
@@ -81,7 +82,7 @@ def redact(obj: Any) -> Any:
     return obj
 
 
-def fetch_json(base_url: str, path: str, timeout_s: float) -> Dict[str, Any]:
+def fetch_json(base_url: str, path: str, timeout_s: float, api_key: str = "") -> Dict[str, Any]:
     url = base_url.rstrip("/") + path
     started = time.perf_counter()
     result: Dict[str, Any] = {
@@ -95,7 +96,10 @@ def fetch_json(base_url: str, path: str, timeout_s: float) -> Dict[str, Any]:
         "error": None,
     }
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.0"})
+        headers = {"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.0"}
+        if api_key:
+            headers["X-API-Key"] = api_key
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=timeout_s) as resp:
             raw = resp.read(1_000_000)
             latency_ms = round((time.perf_counter() - started) * 1000, 1)
@@ -158,11 +162,53 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
         target = alerts if level == "CRITICAL" else warnings
         target.append({"level": level, "key": key, "message": message})
 
+    auth_status = get_json(results, "auth_status") or {}
+    auth_required = bool(isinstance(auth_status, dict) and auth_status.get("required") is True)
+    auth_authenticated = bool(isinstance(auth_status, dict) and auth_status.get("authenticated") is True)
+    auth_limited = auth_required and not auth_authenticated
+    protected_endpoints = {
+        "deploy_info",
+        "memory_before",
+        "broker_status",
+        "broker_dhan_status",
+        "broker_deps",
+        "scheduler_health",
+        "portfolio_unified",
+        "memory_after_portfolio",
+        "chain_nifty",
+        "memory_after_chain",
+        "underlyings",
+        "state",
+    }
+    if not auth_limited:
+        inferred_auth_401s = 0
+        for endpoint_name in protected_endpoints:
+            item = results.get(endpoint_name) or {}
+            preview = str(item.get("text_preview") or "").lower()
+            if item.get("status_code") == 401 and "dashboard api session" in preview:
+                inferred_auth_401s += 1
+        if inferred_auth_401s >= 2:
+            auth_limited = True
+            auth_required = True
+    auth_limited_count = 0
+
     for name, item in results.items():
         if not item.get("ok"):
-            alert("WARNING", f"endpoint_{name}", f"{name} failed: {item.get('status_code')} {item.get('error')}")
+            status_code = item.get("status_code")
+            if auth_limited and name in protected_endpoints and status_code == 401:
+                passed.append(f"endpoint_{name}_auth_protected")
+                auth_limited_count += 1
+            else:
+                alert("WARNING", f"endpoint_{name}", f"{name} failed: {status_code} {item.get('error')}")
         else:
             passed.append(f"endpoint_{name}")
+
+    if auth_limited and auth_limited_count:
+        alert(
+            "WARNING",
+            "auth_required_limited_visibility",
+            f"Dashboard API auth is required; {auth_limited_count} protected endpoints returned 401 without session/header auth.",
+        )
 
     deploy = get_json(results, "deploy_info") or {}
     deployed_sha = str(deploy.get("git_sha") or "")
@@ -174,11 +220,15 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
     broker = get_json(results, "broker_status") or {}
     if isinstance(broker, dict) and broker.get("connected") is True:
         passed.append("broker_connected")
+    elif auth_limited and (results.get("broker_status") or {}).get("status_code") == 401:
+        passed.append("broker_status_auth_protected")
     else:
         alert("WARNING", "broker_not_connected", f"broker status not connected: {broker.get('error') if isinstance(broker, dict) else broker}")
 
     scheduler = get_json(results, "scheduler_health") or {}
-    if isinstance(scheduler, dict):
+    if auth_limited and (results.get("scheduler_health") or {}).get("status_code") == 401:
+        passed.append("scheduler_status_auth_protected")
+    elif isinstance(scheduler, dict):
         if scheduler.get("healthy") is True:
             passed.append("scheduler_healthy")
         elif scheduler.get("received") is True:
@@ -187,7 +237,9 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
             alert("WARNING", "scheduler_no_worker_push", "worker scheduler health has not been received")
 
     chain = get_json(results, "chain_nifty") or {}
-    if isinstance(chain, dict):
+    if auth_limited and (results.get("chain_nifty") or {}).get("status_code") == 401:
+        passed.append("chain_nifty_auth_protected")
+    elif isinstance(chain, dict):
         contracts = int(chain.get("total_contracts") or len(chain.get("contracts") or []))
         source = chain.get("data_source") or chain.get("source")
         if contracts > 0:
@@ -257,6 +309,8 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
         },
         "key_facts": {
             "broker_connected": bool(isinstance(broker, dict) and broker.get("connected") is True),
+            "api_auth_required": auth_required,
+            "api_auth_authenticated": auth_authenticated,
             "scheduler_received": bool(isinstance(scheduler, dict) and scheduler.get("received") is True),
             "scheduler_healthy": bool(isinstance(scheduler, dict) and scheduler.get("healthy") is True),
             "chain_nifty_contracts": int(chain.get("total_contracts") or len(chain.get("contracts") or [])) if isinstance(chain, dict) else 0,
@@ -315,6 +369,7 @@ def main() -> int:
     parser.add_argument("--base-url", default=os.environ.get("CLOUD_RUNTIME_BASE_URL", DEFAULT_BASE_URL))
     parser.add_argument("--timeout", type=float, default=float(os.environ.get("CLOUD_RUNTIME_TIMEOUT_S", "20")))
     parser.add_argument("--expected-commit", default=os.environ.get("GITHUB_SHA", ""))
+    parser.add_argument("--api-key", default=os.environ.get("CLOUD_RUNTIME_API_KEY", ""))
     args = parser.parse_args()
 
     base_url = args.base_url.rstrip("/")
@@ -323,7 +378,7 @@ def main() -> int:
 
     # Execute in sequence so memory_before/after checkpoints have meaning.
     for name, path in ENDPOINTS:
-        results[name] = fetch_json(base_url, path, timeout_s=args.timeout)
+        results[name] = fetch_json(base_url, path, timeout_s=args.timeout, api_key=args.api_key)
         # small pause avoids hammering free/starter dyno during checks
         time.sleep(0.25)
 
