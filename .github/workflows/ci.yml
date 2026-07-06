@@ -82,13 +82,13 @@ jobs:
           done
 
           # --- 2. No contents write permission (would allow repo mutations from CI) ---
-          if grep -RIn "contents:[[:space:]]*write" .github/workflows; then
+          if grep -RIn "contents[:][[:space:]]*write" .github/workflows; then
             echo "FAIL: contents write permission found in workflows — CI must be read-only"
             exit 1
           fi
 
           # --- 3. No auto-fix bots or cloud deploy ---
-          if grep -RIn -- "--auto-fix" .github/workflows; then
+          if grep -RIn "[-][-]auto[-]fix" .github/workflows; then
             echo "FAIL: auto-fix bots are forbidden in CI workflows"
             exit 1
           fi
