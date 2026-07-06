@@ -25,14 +25,14 @@ export default function PaperTrading() {
       } catch (error: any) {
         console.error('Error fetching trading data:', error)
         setError(error.message || 'Failed to fetch trading data')
-        setState(null)
-        setPnl(null)
+        // Keep last-good data visible during transient Render/API failures.
+        // Do not blank the full page on one failed poll.
       }
     }
     // Fetch immediately on mount
     fetchData()
-    // Optimized polling: 3000ms (3 seconds) - ensures data is always fresh
-    const interval = setInterval(fetchData, 3000)
+    // Render-safe polling: 30000ms. Dashboard is read-only/PAPER; avoid hammering backend.
+    const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [])
   
@@ -255,7 +255,7 @@ export default function PaperTrading() {
             </table>
           </div>
         ) : (
-          <div className="text-gray-400">No open positions</div>
+          <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No open paper positions</div><div className="text-sm text-gray-400 mt-2">Reason: paper engine has no open simulated position, market is closed, or broker/live data is not ready. This is not an error and no real order is placed.</div></div>
         )}
       </div>
 
@@ -285,7 +285,7 @@ export default function PaperTrading() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="text-gray-400">No PnL data available</div>
+            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No PnL curve yet</div><div className="text-sm text-gray-400 mt-2">Reason: no completed paper trade/PnL history rows are available. The chart will appear after paper engine records history.</div></div>
           )}
         </div>
 
@@ -352,7 +352,7 @@ export default function PaperTrading() {
               </div>
             </div>
           ) : (
-            <div className="text-gray-400">No trades completed yet</div>
+            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No completed paper trades yet</div><div className="text-sm text-gray-400 mt-2">Win rate needs closed paper trades. Live trading remains OFF.</div></div>
           )}
       </div>
 

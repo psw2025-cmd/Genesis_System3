@@ -48,13 +48,19 @@ export function TopBar() {
   const rho = state?.signals?.spearman_rho ?? null
 
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const brokerHasError = apiStatus?.status === 'API_AUTH_REQUIRED'
+  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'RENDER_UNAVAILABLE'
+  const authLocked = apiStatus?.status === 'API_AUTH_REQUIRED'
+  const brokerHasError = authLocked
     || hasBrokerApiError(brokerStatus)
     || hasBrokerApiError(brokerFunds)
     || hasBrokerApiError(brokerHoldings)
     || hasBrokerApiError(brokerPositions)
-  const brokerLabel = brokerConnected ? 'CONNECTED' : brokerHasError ? 'API ERR' : brokerApiResponded ? 'API OK' : 'OFFLINE'
+  const brokerDegraded = Boolean(transientApi && (brokerConnected || brokerApiResponded))
+  const brokerLabel = brokerDegraded ? 'DEGRADED' : brokerConnected ? 'CONNECTED' : brokerHasError ? 'API ERR' : brokerApiResponded ? 'API OK' : 'OFFLINE'
   const brokerGood = brokerConnected || (brokerApiResponded && !brokerHasError)
+  const brokerColor = brokerDegraded ? 'var(--amber)' : brokerGood ? 'var(--up)' : 'var(--down)'
+  const brokerBg = brokerDegraded ? 'rgba(245,158,11,.1)' : brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)'
+  const brokerBorder = brokerDegraded ? 'rgba(245,158,11,.25)' : brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'
   const marketLabel = marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / DATA POLLING'
 
   const getSpot = (sym: string) => {
@@ -109,12 +115,12 @@ export function TopBar() {
         <span onClick={() => setActiveTab('broker')} style={{
           display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
           borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)', cursor:'pointer',
-          background: brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)',
-          color: brokerGood ? 'var(--up)' : 'var(--down)',
-          border:`1px solid ${brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'}`,
-        }} title="Click -> Broker Data">
+          background: brokerBg,
+          color: brokerColor,
+          border:`1px solid ${brokerBorder}`,
+        }} title={apiStatus?.message || "Click -> Broker Data"}>
           <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: brokerGood ? 'var(--up)' : 'var(--down)' }} />
+                         background: brokerColor }} />
           DHAN {brokerLabel}
         </span>
 
