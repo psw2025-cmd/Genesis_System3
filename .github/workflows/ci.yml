@@ -62,11 +62,10 @@ jobs:
           # --- 1. Only approved read-only workflow files must exist ---
           # Allowed: ci.yml (safety gate), cloud-runtime-check.yml (read-only
           # health probe), and render-env-audit.yml (manual no-secrets env audit).
-          mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
-          printf 'Workflow files found:\n'
-          printf '  %s\n' "${workflows[@]}"
-
-          for wf in "${workflows[@]}"; do
+          workflow_count=0
+          for wf in $(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort); do
+            workflow_count=$((workflow_count + 1))
+            echo "Workflow file found: $wf"
             case "$wf" in
               .github/workflows/ci.yml|.github/workflows/cloud-runtime-check.yml|.github/workflows/render-env-audit.yml)
                 ;;
@@ -76,6 +75,7 @@ jobs:
                 ;;
             esac
           done
+          test "$workflow_count" -ge 1 || { echo "FAIL: no workflow files found"; exit 1; }
 
           for required in .github/workflows/ci.yml .github/workflows/cloud-runtime-check.yml .github/workflows/render-env-audit.yml; do
             test -f "$required" || { echo "FAIL: required workflow file missing: $required"; exit 1; }
