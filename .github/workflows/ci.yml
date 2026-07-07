@@ -62,12 +62,12 @@ jobs:
           fi
 
           echo "Checking forbidden auto-write/deploy commands..."
-          if grep -RInE "git[[:space:]]+push|gh[[:space:]]+pr[[:space:]]+merge|gh[[:space:]]+release|create-pull-request|peter-evans/create-pull-request|--auto-fix|auto_fix|autofix" .github/workflows; then
+          if grep -RInE "git[[:space:]]+p[u]sh|gh[[:space:]]+pr[[:space:]]+m[e]rge|gh[[:space:]]+r[e]lease|create-pull-r[e]quest|peter-evans/create-pull-r[e]quest|--auto-f[i]x|auto_f[i]x|autof[i]x" .github/workflows; then
             echo "FAIL: auto-fix/write-back behavior found in workflow."
             exit 1
           fi
 
-          if grep -RInE "azure/webapps-deploy|aws-actions|google-github-actions/deploy|render deploy|flyctl deploy|railway up|vercel --prod|netlify deploy" .github/workflows; then
+          if grep -RInE "azure/webapps-d[e]ploy|aws-a[c]tions|google-github-actions/d[e]ploy|render d[e]ploy|flyctl d[e]ploy|railway [u]p|vercel --p[r]od|netlify d[e]ploy" .github/workflows; then
             echo "FAIL: cloud deploy command/action found in workflow."
             exit 1
           fi
