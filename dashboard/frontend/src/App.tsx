@@ -20,6 +20,7 @@ import { PerformanceTab }  from './components/PerformanceTab'
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
+import { GenesisTab } from './components/GenesisTab'
 
 function Content() {
   const { activeTab } = useStore()
@@ -32,6 +33,7 @@ function Content() {
     case 'paper':        return <PaperTrading />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
+    case 'genesis':      return <GenesisTab />
     case 'broker':       return <BrokerPanel />
     case 'alerts':       return <AlertsTab />
     case 'system':       return <SystemTab />
@@ -55,3 +57,4 @@ export default function App() {
     </div>
   )
 }
+

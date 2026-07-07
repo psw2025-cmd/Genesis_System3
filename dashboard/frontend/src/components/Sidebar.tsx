@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   LineChart, FileText, BarChart3, Brain,
-  Bell, Activity, Shield, Layers
+  Bell, Activity, Shield, Layers, Sparkles
 } from 'lucide-react'
 import { useStore } from '../store'
 import { cn } from '../lib/utils'
@@ -15,6 +15,7 @@ const TABS = [
   { id: 'positions',   label: 'Positions',     Icon: Database,         group: 'trading' },
   { id: 'performance', label: 'Performance',   Icon: BarChart3,        group: 'analysis' },
   { id: 'ml',          label: 'ML Model',      Icon: Brain,            group: 'analysis' },
+  { id: 'genesis',     label: 'Genesis',       Icon: Sparkles,         group: 'analysis' },
   { id: 'broker',      label: 'Broker',        Icon: Database,         group: 'system' },
   { id: 'alerts',      label: 'Alerts',        Icon: Bell,             group: 'system' },
   { id: 'system',      label: 'System',        Icon: Activity,         group: 'system' },
@@ -101,3 +102,4 @@ export function Sidebar() {
     </nav>
   )
 }
+

@@ -1108,3 +1108,32 @@ Fix:
 Verification:
 - `python -m py_compile dashboard/app.py` PASS.
 - Existing running Streamlit server will hot-reload after user clicks `Rerun` or refreshes the browser.
+
+### [2026-07-07] [Codex] REACT UI: Genesis autonomous dashboard moved into production `/ui`
+
+User asked to make Render `/ui` the single official dashboard instead of having a separate local Streamlit UI.
+
+Changes:
+- Added `dashboard/frontend/src/components/GenesisTab.tsx`.
+- Wired `Genesis` into React `Sidebar.tsx` under Analysis group.
+- Wired `GenesisTab` into `App.tsx` content routing.
+- Rebuilt `dashboard/frontend/dist` so `/ui` serves the new tab.
+
+Genesis React tab includes:
+- Autonomous Brain summary
+- Hidden Secrets Lab
+- Never Die Monitor
+- Hunger Meter
+- Truth & Control
+- Voice alert button
+- Full-control request button that remains safety-gated
+
+Verification:
+- `npm run build` PASS.
+- Local backend `/ui` returned 200.
+- Built JS asset under `/ui/assets/index-CcmQ9Si7.js` returned 200 and contains Genesis tab code.
+- `/final-message` returned 200.
+
+Safety:
+- No live trading enabled.
+- Full control remains a request only; backend returns `live_trading_enabled=false`.
