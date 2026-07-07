@@ -217,6 +217,7 @@
         "dashboard/frontend/src/main.tsx"
       ],
       "model_modules": [
+        "advanced_prediction_enhancer.py",
         "core/engine/ai_model/__init__.py",
         "core/engine/ai_model/data_balancing_v2.py",
         "core/engine/ai_model/feature_engineering_v2.py",
@@ -338,6 +339,8 @@
         "models/xgboost_v1/NIFTY_xgb_model.pkl",
         "models/xgboost_v1/SENSEX_xgb_meta.json",
         "models/xgboost_v1/SENSEX_xgb_model.pkl",
+        "reports/latest/model_accuracy_report.json",
+        "reports/latest/model_accuracy_report.md",
         "reports/latest/model_training_load_proof/README.md",
         "reports/latest/model_training_load_proof/dryrun_proof.json",
         "reports/latest/model_training_load_proof/summary.json",

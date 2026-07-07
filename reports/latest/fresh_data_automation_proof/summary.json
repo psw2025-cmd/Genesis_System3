@@ -4,7 +4,7 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 182,
+    "data_candidate_count": 184,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       "core/brokers/dhan/nse_option_symbol.py",
@@ -124,10 +124,10 @@
       "reports/latest/external_data_yahoo/yahoo_data_summary.json",
       "reports/latest/fresh_data_automation_proof/README.md",
       "reports/latest/fresh_data_automation_proof/summary.json",
-      "reports/latest/qc_forensic_anomaly_audit/anomaly_matrix.csv",
-      "reports/latest/qc_forensic_anomaly_audit/chain_matrix.json"
+      "reports/latest/option_strike_visibility.json",
+      "reports/latest/option_strike_visibility.md"
     ],
-    "dhan_india_candidate_count": 67,
+    "dhan_india_candidate_count": 69,
     "dhan_india_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       "core/brokers/dhan/nse_option_symbol.py",
@@ -179,6 +179,8 @@
       "reports/latest/dashboard_auto_snap/latest_ui_response.json",
       "reports/latest/dhan_option_chain_schema_audit/summary.json",
       "reports/latest/dhan_option_chain_schema_audit/summary.md",
+      "reports/latest/option_strike_visibility.json",
+      "reports/latest/option_strike_visibility.md",
       "scripts/analyze_optionchain_master.py",
       "scripts/build_production_optionchain_master.py",
       "scripts/enhance_optionchain_with_predictions.py",
