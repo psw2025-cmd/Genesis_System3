@@ -1,15 +1,7 @@
 name: Genesis System3 Global Safety CI
 
-# Runs on the self-hosted Windows runner registered on this repo.
-# Zero GitHub-hosted minutes consumed — required while billing is restricted.
-#
-# Self-hosted runner setup (one-time, run as Administrator on this machine):
-#   1. gh api repos/psw2025-cmd/Genesis_System3/actions/runners/registration-token -X POST -q '.token'
-#   2. Download: https://github.com/actions/runner/releases/latest  (windows-x64)
-#   3. Extract to C:\actions-runner\
-#   4. cd C:\actions-runner
-#   5. .\config.cmd --url https://github.com/psw2025-cmd/Genesis_System3 --token <TOKEN> --name windows-self-hosted --labels self-hosted,windows --runasservice
-#   6. .\run.cmd   (or install as service: .\svc.cmd install && .\svc.cmd start)
+# Self-hosted Windows runner CI.
+# Analyzer/Paper only. No live trading. No repo write-back from CI.
 
 on:
   push:
@@ -18,8 +10,6 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
-# READ-ONLY: no workflow may write back to the repo.
-# Any contents:write here fails the workflow-policy-guard below.
 permissions:
   contents: read
   actions: read
@@ -39,13 +29,6 @@ env:
   PYTHONUNBUFFERED: "1"
 
 jobs:
-  # -----------------------------------------------------------------------
-  # GATE 1 — Workflow policy + trading safety guard (BLOCKING)
-  # Must be first. All other jobs depend on this passing.
-  # Verifies: exactly 2 workflow files (ci.yml + cloud-runtime-check.yml), no contents:write, no auto-fix,
-  #           LIVE_TRADING_ENABLED=0 and SYSTEM3_LIVE_TRADING_ALLOWED=0
-  #           hardcoded in this file.
-  # -----------------------------------------------------------------------
   workflow-policy-guard:
     name: BLOCKING - workflow policy and trading safety guard
     runs-on: self-hosted
@@ -59,54 +42,48 @@ jobs:
         run: |
           set -euo pipefail
 
-          # --- 1. Only the two approved workflow files must exist ---
-          # Allowed: ci.yml (safety gate) and cloud-runtime-check.yml (read-only
-          # health probe; stores reports as artifacts, never pushes to the repo).
+          echo "Scanning workflow files..."
           mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
+
+          if [[ ${#workflows[@]} -eq 0 ]]; then
+            echo "FAIL: no workflow files found"
+            exit 1
+          fi
+
           printf 'Workflow files found:\n'
           printf '  %s\n' "${workflows[@]}"
-          declare -A allowed_set=(
-            [".github/workflows/ci.yml"]=1
-            [".github/workflows/cloud-runtime-check.yml"]=1
-          )
-          for wf in "${workflows[@]}"; do
-            [[ -n "${allowed_set[$wf]+x}" ]] || { echo "FAIL: unexpected workflow file: $wf"; exit 1; }
-          done
-          for a in "${!allowed_set[@]}"; do
-            found=0
-            for wf in "${workflows[@]}"; do [[ "$wf" == "$a" ]] && found=1 && break; done
-            [[ $found -eq 1 ]] || { echo "FAIL: required workflow file missing: $a"; exit 1; }
-          done
 
-          # --- 2. No contents:write (would allow repo mutations from CI) ---
-          if grep -RIn "contents[:][ ]write" .github/workflows; then
-            echo "FAIL: contents:write found in workflows — CI must be read-only"
+          test -f .github/workflows/ci.yml || { echo "FAIL: ci.yml missing"; exit 1; }
+
+          echo "Checking CI permissions are read-only..."
+          if grep -RInE "contents:[[:space:]]*write|actions:[[:space:]]*write|packages:[[:space:]]*write|pull-requests:[[:space:]]*write|issues:[[:space:]]*write" .github/workflows; then
+            echo "FAIL: write permission found in workflow. CI must remain read-only."
             exit 1
           fi
 
-          # --- 3. No auto-fix bots or cloud deploy ---
-          # Character-class patterns prevent the grep command from matching itself.
-          if grep -RIn "[-][-]auto[-]fix" .github/workflows; then
-            echo "FAIL: auto-fix bots are forbidden in CI workflows"
-            exit 1
-          fi
-          if grep -RIn "azure[/]webapps[-]deploy" .github/workflows; then
-            echo "FAIL: azure cloud deploy is forbidden in CI workflows"
+          echo "Checking forbidden auto-write/deploy commands..."
+          if grep -RInE "git[[:space:]]+push|gh[[:space:]]+pr[[:space:]]+merge|gh[[:space:]]+release|create-pull-request|peter-evans/create-pull-request|--auto-fix|auto_fix|autofix" .github/workflows; then
+            echo "FAIL: auto-fix/write-back behavior found in workflow."
             exit 1
           fi
 
-          # --- 4. Trading safety flags MUST be hardcoded off in this file ---
-          grep -q 'LIVE_TRADING_ENABLED.*"0"' .github/workflows/ci.yml || \
-            { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml env"; exit 1; }
-          grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED.*"0"' .github/workflows/ci.yml || \
-            { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml env"; exit 1; }
+          if grep -RInE "azure/webapps-deploy|aws-actions|google-github-actions/deploy|render deploy|flyctl deploy|railway up|vercel --prod|netlify deploy" .github/workflows; then
+            echo "FAIL: cloud deploy command/action found in workflow."
+            exit 1
+          fi
+
+          echo "Checking live trading is hard-disabled..."
+          if grep -RInE "LIVE_TRADING_ENABLED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?|SYSTEM3_LIVE_TRADING_ALLOWED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?" .github/workflows; then
+            echo "FAIL: live trading enabled inside workflow."
+            exit 1
+          fi
+
+          grep -q 'LIVE_TRADING_ENABLED: "0"' .github/workflows/ci.yml || { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml"; exit 1; }
+          grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED: "0"' .github/workflows/ci.yml || { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml"; exit 1; }
 
           echo "policy_guard=PASS"
           echo "trading_safety=PASS"
 
-  # -----------------------------------------------------------------------
-  # GATE 2 — Architecture and trading safety gate (BLOCKING)
-  # -----------------------------------------------------------------------
   architecture-trading-safety:
     name: BLOCKING - architecture and trading safety gate
     runs-on: self-hosted
@@ -127,9 +104,6 @@ jobs:
           python .github/scripts/root_architecture_gate.py
           echo "architecture_gate=PASS"
 
-  # -----------------------------------------------------------------------
-  # GATE 3 — Python compile proof (BLOCKING, fast)
-  # -----------------------------------------------------------------------
   python-compile-proof:
     name: BLOCKING - Python compile proof
     runs-on: self-hosted
@@ -149,10 +123,6 @@ jobs:
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           echo "compile_proof=PASS"
 
-  # -----------------------------------------------------------------------
-  # GATE 4 — Full proof pack: install, compile, import smoke, pytest, proof
-  # (BLOCKING)
-  # -----------------------------------------------------------------------
   full-proof-pack-validation:
     name: BLOCKING - full proof pack validation
     runs-on: self-hosted
@@ -196,10 +166,6 @@ jobs:
           python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile dashboard/backend/app.py
-          # Paper-day proof pack chain (2026-06-30/07-01 work) — these were
-          # never in this list and CI "passing" never actually validated
-          # them; closing that gap here rather than relying solely on
-          # out-of-band py_compile checks done outside CI.
           python -m py_compile scripts/paper_day_proof_pack.py
           python -m py_compile scripts/run_dashboard_browser_proof.py
           python -m py_compile scripts/daily_prediction_benchmark.py
@@ -208,8 +174,7 @@ jobs:
           python -m py_compile scripts/cloud_worker.py
           python -m py_compile core/engine/system3_phase82_job_scheduler.py
           python -m py_compile scripts/system3_self_healing_watchdog.py
-          # Frontend TypeScript check for new components (syntax only)
-          test -f dashboard/frontend/src/components/LiveTradingGate.tsx && echo 'LiveTradingGate.tsx exists' || exit 1
+          test -f dashboard/frontend/src/components/LiveTradingGate.tsx
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           echo "compile_expanded=PASS"
 
@@ -273,9 +238,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-  # -----------------------------------------------------------------------
-  # GATE 5 — Frontend production build (BLOCKING)
-  # -----------------------------------------------------------------------
   frontend-build:
     name: BLOCKING - frontend production build
     runs-on: self-hosted
@@ -295,5 +257,3 @@ jobs:
       - name: Build (vite build)
         shell: bash
         run: npm run build
-        # Note: TypeScript strict errors are pre-existing and tracked separately.
-        # The vite build succeeding is the deployability gate.
