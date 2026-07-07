@@ -1137,3 +1137,20 @@ Verification:
 Safety:
 - No live trading enabled.
 - Full control remains a request only; backend returns `live_trading_enabled=false`.
+
+### [2026-07-07] [Codex] UI FIX: Make Genesis visible by default in production React dashboard
+
+User screenshot showed production `/ui` still looked like the old icon-only dashboard and user could not see Genesis clearly.
+
+Fix:
+- `Sidebar.tsx`: expanded sidebar from icon-only to visible labels.
+- Moved `Genesis Brain` to the top Command group.
+- Highlighted Genesis Brain item so it cannot be missed.
+- `store.ts`: default active tab changed from `overview` to `genesis`, so `/ui` opens directly on Genesis after refresh.
+- Rebuilt React `dist` bundle.
+
+Verification:
+- `npm run build` PASS.
+- Local `/ui` returned 200.
+- Local `/ui` HTML references new bundle `index-DSLCpJxU.js`.
+- Local JS asset returned 200 and contains `Genesis Brain` + `Genesis Command Intelligence`.

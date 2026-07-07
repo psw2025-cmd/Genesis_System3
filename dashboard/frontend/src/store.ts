@@ -67,7 +67,7 @@ export const useStore = create<DashboardState>((set) => ({
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
-  activeTab: 'overview',
+  activeTab: 'genesis',
   chainSymbol: 'NIFTY',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
@@ -91,3 +91,4 @@ export const useStore = create<DashboardState>((set) => ({
   setActiveTab: (activeTab) => set({ activeTab }),
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
 }))
+
