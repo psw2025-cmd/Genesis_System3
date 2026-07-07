@@ -2,71 +2,82 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
 
-type ApiState = {
+type GenesisState = {
+  brief?: any
   brain?: any
   lab?: any
   monitor?: any
   hunger?: any
   truth?: any
-  compliance?: any
-  cost?: any
+  health?: any
+  system?: any
   final?: any
   control?: any
-  error?: string
   loading: boolean
+  error?: string
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="card p-5 space-y-3">
-      <h3 className="text-sm font-semibold text-text-primary tracking-wide">{title}</h3>
-      {children}
-    </section>
-  )
+const card: React.CSSProperties = {
+  background: 'var(--surface-2)',
+  border: '1px solid var(--border)',
+  borderRadius: 8,
+  padding: 16,
 }
 
-function Metric({ label, value, tone }: { label: string; value: any; tone?: 'up' | 'down' | 'warn' }) {
-  const color = tone === 'up' ? 'text-up' : tone === 'down' ? 'text-down' : tone === 'warn' ? 'text-warn' : 'text-text-primary'
-  return (
-    <div className="rounded border border-border bg-surface-2 p-4 min-h-[88px]">
-      <div className="text-xs uppercase text-text-muted mb-2">{label}</div>
-      <div className={`num text-xl font-semibold ${color}`}>{String(value ?? '--')}</div>
-    </div>
-  )
-}
-
-function JsonBlock({ data }: { data: any }) {
-  return (
-    <pre className="text-xs text-text-muted bg-surface-2 border border-border rounded p-3 overflow-auto max-h-72">
-      {JSON.stringify(data ?? {}, null, 2)}
-    </pre>
-  )
-}
+const small: React.CSSProperties = { color: 'var(--text-mut)', fontSize: 12, lineHeight: 1.5 }
+const title: React.CSSProperties = { color: 'var(--text-primary)', fontSize: 13, fontWeight: 800, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }
 
 async function getData(path: string) {
   const res = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS })
   return res.data?.data ?? res.data
 }
 
+function Metric({ label, value, tone }: { label: string; value: any; tone?: 'up' | 'down' | 'warn' | 'accent' }) {
+  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : tone === 'warn' ? 'var(--warn)' : tone === 'accent' ? 'var(--accent)' : 'var(--text-primary)'
+  return (
+    <div style={card}>
+      <div style={{ ...small, textTransform: 'uppercase', fontWeight: 700 }}>{label}</div>
+      <div className="num" style={{ color, fontSize: 24, fontWeight: 900, marginTop: 6 }}>{String(value ?? '--')}</div>
+    </div>
+  )
+}
+
+function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
+  return <section style={card}><div style={title}>{heading}</div>{children}</section>
+}
+
+function Checklist({ items }: { items: string[] }) {
+  return <div style={{ display: 'grid', gap: 8 }}>{(items || []).map((x, i) => (
+    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', color: 'var(--text-primary)', fontSize: 13 }}>
+      <span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{x}</span>
+    </div>
+  ))}</div>
+}
+
+function JsonBlock({ data }: { data: any }) {
+  return <pre style={{ ...small, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: 12, overflow: 'auto', maxHeight: 240 }}>{JSON.stringify(data ?? {}, null, 2)}</pre>
+}
+
 export function GenesisTab() {
-  const [state, setState] = useState<ApiState>({ loading: true })
+  const [state, setState] = useState<GenesisState>({ loading: true })
 
   const load = async () => {
     setState(s => ({ ...s, loading: true, error: undefined }))
     try {
-      const [brain, lab, monitor, hunger, truth, compliance, cost, final] = await Promise.all([
+      const [brief, brain, lab, monitor, hunger, truth, health, system, final] = await Promise.all([
+        getData('/genesis-production-brief'),
         getData('/autonomous-brain'),
         getData('/hidden-secrets-lab'),
         getData('/never-die-monitor'),
         getData('/hunger-meter'),
         getData('/data-truth-score'),
-        getData('/compliance-check'),
-        getData('/cost-roi'),
+        getData('/health'),
+        getData('/api/system_health'),
         getData('/final-message'),
       ])
-      setState({ brain, lab, monitor, hunger, truth, compliance, cost, final, loading: false })
+      setState({ brief, brain, lab, monitor, hunger, truth, health, system, final, loading: false })
     } catch (e: any) {
-      setState({ loading: false, error: e?.response?.data?.detail || e?.message || 'Genesis API failed' })
+      setState({ loading: false, error: e?.response?.data?.detail || e?.message || 'Genesis APIs failed' })
     }
   }
 
@@ -82,89 +93,103 @@ export function GenesisTab() {
   }
 
   const speak = () => {
-    try {
-      const text = 'Alert: New opportunity found. Genesis analyzer is active.'
-      window.speechSynthesis?.speak(new SpeechSynthesisUtterance(text))
-    } catch {}
+    try { window.speechSynthesis?.speak(new SpeechSynthesisUtterance('Alert: Genesis opportunity monitor is active.')) } catch {}
   }
 
-  if (state.loading) {
-    return <div className="p-6 text-text-muted">Genesis is thinking...</div>
-  }
+  if (state.loading) return <div style={{ padding: 24, color: 'var(--text-mut)' }}>Genesis is loading production command intelligence...</div>
+  if (state.error) return <div style={{ padding: 24 }}><div style={{ ...card, borderColor: 'var(--down)', color: 'var(--down)' }}>{state.error}</div></div>
 
-  if (state.error) {
-    return (
-      <div className="p-6">
-        <div className="card p-5 border-down text-down">{state.error}</div>
-      </div>
-    )
-  }
-
-  const secrets = Array.isArray(state.lab?.items) ? state.lab.items : []
+  const marketOpen = state.health?.market_status === 'open' || state.health?.market?.is_open
+  const sources = state.brief?.sources || []
+  const secrets = state.lab?.items || []
 
   return (
-    <div className="p-6 space-y-6 overflow-y-auto h-full">
-      <div className="card p-5 flex items-center justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase text-text-muted">Autonomous Brain</div>
-          <h2 className="text-xl font-bold text-text-primary">Genesis Command Intelligence</h2>
-          <p className="text-sm text-text-muted mt-1">Analyzer/paper intelligence is active. Real-money execution remains blocked until proof gates pass.</p>
+    <div style={{ height: '100%', overflowY: 'auto', padding: 24, display: 'grid', gap: 18 }}>
+      <div style={{ ...card, borderColor: 'var(--accent)', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), var(--surface-2))' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 900, letterSpacing: '0.08em' }}>GENESIS PRODUCTION COMMAND CENTER</div>
+            <h1 style={{ color: 'var(--text-primary)', margin: '6px 0 4px', fontSize: 28 }}>AI Options Automation Dashboard</h1>
+            <div style={small}>One official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.</div>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={load} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 800 }}>Refresh</button>
+            <button onClick={speak} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--accent)', background: 'transparent', color: 'var(--accent)', fontWeight: 800 }}>Voice Alert</button>
+          </div>
         </div>
-        <button className="px-4 py-2 rounded bg-accent text-black font-semibold" onClick={load}>Refresh</button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+        <Metric label="Operating Mode" value={state.brief?.mode || (marketOpen ? 'MARKET OPEN' : 'OFF MARKET')} tone="accent" />
+        <Metric label="Broker" value={state.health?.broker_status || '--'} tone={state.health?.broker_status === 'connected' ? 'up' : 'warn'} />
         <Metric label="Truth Score" value={`${state.truth?.truth_score ?? 0}%`} tone="warn" />
         <Metric label="Memory Events" value={state.brain?.memory_events ?? 0} tone="up" />
-        <Metric label="Profit Goal" value="₹10L/month" />
-        <Metric label="Live Trading" value={state.compliance?.live_trading_enabled === '1' ? 'ON' : 'OFF'} tone="down" />
+        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'BLOCKED'} tone="down" />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <Card title="What I Learned Today">
-          <JsonBlock data={state.brain?.what_i_learned_today} />
-          <div className="text-sm text-text-muted">Rule changed: {state.brain?.rule_i_changed ?? '--'}</div>
-          <div className="text-sm text-warn">Profit claim: {state.brain?.profit_i_made_without_human ?? '--'}</div>
-        </Card>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 18 }}>
+        <Section heading={marketOpen ? 'Market Open: Trader Must See' : 'Off-Market: Trader Must See'}>
+          <Checklist items={marketOpen ? state.brief?.market_open_must_show : state.brief?.off_market_must_show} />
+        </Section>
 
-        <Card title="Hidden Secrets Lab">
-          <div className="space-y-2">
+        <Section heading="Prediction Accuracy & Gain Rank Requirements">
+          <div style={{ display: 'grid', gap: 10 }}>
+            <Metric label="Accuracy Goal" value={`${state.hunger?.accuracy_goal_pct ?? 90}%`} tone="accent" />
+            <div style={small}>Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.</div>
+            <div style={{ color: 'var(--warn)', fontSize: 13, fontWeight: 700 }}>Current blocker: {state.hunger?.need_to_fix || 'Need multi-day proof rows.'}</div>
+          </div>
+        </Section>
+
+        <Section heading="Global Research Sources Integrated">
+          <div style={{ display: 'grid', gap: 10 }}>
+            {sources.map((s: any, i: number) => (
+              <a key={i} href={s.url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
+                <div style={{ fontWeight: 800 }}>{s.name}</div>
+                <div style={small}>{s.use}</div>
+              </a>
+            ))}
+          </div>
+        </Section>
+
+        <Section heading="Hidden Secrets Lab">
+          <div style={{ display: 'grid', gap: 10 }}>
             {secrets.map((item: any, idx: number) => (
-              <div key={idx} className="border border-border rounded p-3 bg-surface-2">
-                <div className="text-sm text-text-primary font-semibold">{item.secret}</div>
-                <div className="text-xs text-text-muted mt-1">Verified: {String(item.verified)} | Impact: {item.profit_impact}</div>
+              <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
+                <div style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: 13 }}>{item.secret}</div>
+                <div style={small}>Verified: {String(item.verified)} | Impact: {item.profit_impact}</div>
               </div>
             ))}
           </div>
-        </Card>
+        </Section>
 
-        <Card title="Never Die Monitor">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Section heading="Integration Map">
+          <div style={{ display: 'grid', gap: 10 }}>
+            {(state.brief?.integration_map || []).map((x: any, i: number) => (
+              <div key={i} style={{ borderLeft: '3px solid var(--accent)', paddingLeft: 10 }}>
+                <div style={{ color: 'var(--text-primary)', fontWeight: 900 }}>{x.layer}</div>
+                <div style={small}>Current: {x.current}</div>
+                <div style={small}>Next: {x.next}</div>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <Section heading="Never Die Monitor">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
             <Metric label="Uptime Seconds" value={state.monitor?.uptime_seconds ?? 0} />
             <Metric label="Last Self-Heal" value={state.monitor?.last_self_heal ?? '--'} tone="up" />
             <Metric label="Issues Fixed" value={state.monitor?.issues_fixed_without_human ?? 0} tone="up" />
           </div>
-          <JsonBlock data={state.monitor} />
-        </Card>
-
-        <Card title="Hunger Meter">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Metric label="Current Observed" value={`₹${state.hunger?.current_profit_observed ?? 0}`} />
-            <Metric label="Accuracy Goal" value={`${state.hunger?.accuracy_goal_pct ?? 90}%`} />
-          </div>
-          <div className="text-sm text-warn">Need to fix: {state.hunger?.need_to_fix ?? '--'}</div>
-          <JsonBlock data={state.cost} />
-        </Card>
+        </Section>
       </div>
 
-      <Card title="Truth & Control">
-        <div className="flex flex-wrap gap-3">
-          <button className="px-4 py-2 rounded border border-border bg-surface-2" onClick={speak}>Voice Alert</button>
-          <button className="px-4 py-2 rounded border border-down text-down bg-surface-2" onClick={requestControl}>Let Agent Take Full Control</button>
+      <Section heading="Truth, Compliance, And Control">
+        <div style={{ display: 'grid', gap: 12 }}>
+          <div style={{ color: 'var(--down)', fontWeight: 900 }}>Kill switch visible: live trading remains disabled until all proof gates pass.</div>
+          <button onClick={requestControl} style={{ width: 260, padding: '12px 14px', borderRadius: 6, border: '1px solid var(--down)', background: 'rgba(255,77,109,0.12)', color: 'var(--down)', fontWeight: 900 }}>Let Agent Take Full Control</button>
+          <JsonBlock data={state.control || state.final} />
         </div>
-        <div className="text-sm text-down">Kill switch visible: live trading remains disabled until proof gates pass.</div>
-        <JsonBlock data={state.control ?? state.final} />
-      </Card>
+      </Section>
     </div>
   )
 }

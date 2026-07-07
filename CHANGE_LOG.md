@@ -1154,3 +1154,39 @@ Verification:
 - Local `/ui` returned 200.
 - Local `/ui` HTML references new bundle `index-DSLCpJxU.js`.
 - Local JS asset returned 200 and contains `Genesis Brain` + `Genesis Command Intelligence`.
+
+### [2026-07-07] [Codex] PRODUCTION UI: Genesis tab upgraded to trader command center
+
+User said production `/ui` still did not look production-grade and asked for online research, global documentation references, and a dashboard showing what a trader needs during market-open/off-market for prediction accuracy and gain ranking.
+
+Research sources integrated into backend brief:
+- Zerodha Varsity Options Theory
+- Zerodha Varsity Option Strategies
+- Cboe Options Institute
+- NSE India Option Chain
+- DhanHQ API v2
+
+Backend:
+- Added `/genesis-production-brief` with market-open checklist, off-market checklist, official source list, integration map, and production verdict.
+
+React UI:
+- Rebuilt `GenesisTab.tsx` as a full production command center:
+  - Operating mode, broker, truth score, memory events, live trading gate
+  - Market-open/off-market trader must-see checklist
+  - Prediction accuracy and gain-rank requirements
+  - Global research source cards with links
+  - Hidden Secrets Lab
+  - Integration map
+  - Never Die Monitor
+  - Truth/compliance/control section
+
+Verification:
+- Backend py_compile PASS.
+- `npm run build` PASS.
+- Local `/ui` returned 200.
+- Local bundle `index-sWIXlwq8.js` returned 200 and contains `GENESIS PRODUCTION COMMAND CENTER` and `Trader Must See`.
+- Local `/genesis-production-brief` returned 200.
+
+Safety:
+- Live trading remains disabled.
+- UI explicitly says real-money execution remains blocked until proof gates pass.

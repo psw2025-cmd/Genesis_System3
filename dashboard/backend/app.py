@@ -6926,3 +6926,39 @@ async def genesis_final_message():
 
 
 
+
+_GENESIS_PRODUCTION_SOURCES = [
+    {"name": "Zerodha Varsity - Options Theory", "url": "https://zerodha.com/varsity/module/option-theory/", "use": "Greeks, volatility, moneyness, pricing education"},
+    {"name": "Zerodha Varsity - Option Strategies", "url": "https://zerodha.com/varsity/module/option-strategies/", "use": "Spreads, straddle, strangle, max pain, PCR, iron condor"},
+    {"name": "Cboe Options Institute", "url": "https://www.cboe.com/optionsinstitute/", "use": "Global options education, risk management, strategy playbooks"},
+    {"name": "NSE India Option Chain", "url": "https://www.nseindia.com/option-chain", "use": "Indian option-chain truth: OI, volume, strike/expiry surface"},
+    {"name": "DhanHQ API v2", "url": "https://dhanhq.co/docs/v2/", "use": "Broker API, option chain, market feed, historical data, orders when gates pass"},
+]
+
+@app.get("/genesis-production-brief")
+async def genesis_production_brief():
+    truth = _genesis_truth_score()
+    mode = "MARKET_OPEN_OPERATOR" if _market_open_from_state() else "OFF_MARKET_RESEARCH_AND_VALIDATION"
+    return _compat_ok({
+        "mode": mode,
+        "sources": _GENESIS_PRODUCTION_SOURCES,
+        "market_open_must_show": [
+            "broker connected/read-only latency", "live option chain contracts by symbol", "PCR, max pain, IV, OI buildup",
+            "top gain-ranked symbols", "prediction BUY/SELL/HOLD confidence", "spread/liquidity risk", "open positions and P&L",
+            "kill switch and daily-loss gate", "data truth score from at least two sources",
+        ],
+        "off_market_must_show": [
+            "last scanner snapshot and staleness", "prediction-vs-actual accuracy trend", "Spearman rho and top-N hit rate",
+            "loss learning notes", "strategy research queue", "backtest/walk-forward status", "broker token health",
+            "next market open checklist", "deployment and self-heal status",
+        ],
+        "integration_map": [
+            {"layer": "Broker", "current": "Dhan read-only + gated order endpoint", "next": "keep real-money disabled until proof gates pass"},
+            {"layer": "Market data", "current": "Dhan/NSE/cache chain endpoints", "next": "add 2-source truth comparison per symbol"},
+            {"layer": "Prediction", "current": "gain rank + signal confidence APIs", "next": "show multi-day rho/top-N trend on Genesis tab"},
+            {"layer": "Risk", "current": "2% trade risk, 5% daily loss policy displayed", "next": "enforce position sizing in paper lifecycle"},
+            {"layer": "Learning", "current": "memory JSONL + research log", "next": "promote only after walk-forward improvement"},
+        ],
+        "truth": truth,
+        "production_verdict": "ANALYZER_PRODUCTION_UI_READY__LIVE_TRADING_STILL_BLOCKED",
+    })
