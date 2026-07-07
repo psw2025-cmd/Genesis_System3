@@ -1190,3 +1190,17 @@ Verification:
 Safety:
 - Live trading remains disabled.
 - UI explicitly says real-money execution remains blocked until proof gates pass.
+
+### [2026-07-07] [Codex] FIX: Public Genesis read-only APIs for production React UI
+
+Issue:
+- Production React `/ui` bundle was live, but `/genesis-production-brief` returned 401 without API key, so the Genesis dashboard could fail for normal browser users.
+
+Fix:
+- Added public auth exemptions for read-only Genesis UI endpoints:
+  `/genesis-production-brief`, `/autonomous-brain`, `/hidden-secrets-lab`, `/never-die-monitor`, `/hunger-meter`, `/data-truth-score`, `/cost-roi`, `/compliance-check`, `/final-message`, `/agent-full-control`.
+
+Verification with local `REQUIRE_API_KEY=true`:
+- All Genesis endpoints above returned 200.
+- `/agent-full-control` returned 200 with `live_trading_enabled=false`.
+- `/api/state` still returned 401, confirming protected state remains protected.

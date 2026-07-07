@@ -416,6 +416,16 @@ _API_KEY_EXEMPT_EXACT = (
     "/health",
     "/healthz",
     "/api/system_health",
+    "/genesis-production-brief",
+    "/autonomous-brain",
+    "/hidden-secrets-lab",
+    "/never-die-monitor",
+    "/hunger-meter",
+    "/data-truth-score",
+    "/cost-roi",
+    "/compliance-check",
+    "/final-message",
+    "/agent-full-control",
     "/api/auth/session",
     "/api/auth/status",
     "/api/auth/logout",
@@ -6962,3 +6972,4 @@ async def genesis_production_brief():
         "truth": truth,
         "production_verdict": "ANALYZER_PRODUCTION_UI_READY__LIVE_TRADING_STILL_BLOCKED",
     })
+
