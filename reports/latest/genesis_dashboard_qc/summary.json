@@ -1,0 +1,111 @@
+{
+  "generated_ist": "2026-07-07T23:30:57+05:30",
+  "verdict": "PASS_WITH_WARNINGS",
+  "production_ui": "https://genesis-system3-backend.onrender.com/ui",
+  "deployed_bundle": "index-sWIXlwq8.js",
+  "compile": {
+    "backend_py_compile": "PASS",
+    "streamlit_py_compile": "PASS",
+    "react_build": "PASS"
+  },
+  "local_route_registration": {
+    "title": "System3 Genesis API",
+    "route_count": 173,
+    "missing_routes": []
+  },
+  "production_endpoints": [
+    {
+      "path": "/ui",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/ui/assets/index-sWIXlwq8.js",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/health",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/api/system_health",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/genesis-production-brief",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/autonomous-brain",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/hidden-secrets-lab",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/never-die-monitor",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/hunger-meter",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/data-truth-score",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/cost-roi",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/compliance-check",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/final-message",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/agent-full-control",
+      "status": 200,
+      "pass": true,
+      "live_trading_enabled": false
+    },
+    {
+      "path": "/api/state without key",
+      "status": 401,
+      "pass": true
+    }
+  ],
+  "safety": {
+    "live_trading_enabled": "0",
+    "system3_live_trading_allowed": "0",
+    "agent_full_control_live_enabled": false,
+    "real_profit_claimed": false
+  },
+  "warnings": [
+    "React bundle larger than 500 KB; consider code splitting later.",
+    "Visual browser screenshot automation not run in this QC pass; HTTP and bundle checks passed.",
+    "Data truth score is 0 on production response because proof rows are not visible to that deployed endpoint path yet.",
+    "Market is closed during QC, so live option-chain row rendering was not verified against market-open broker feed."
+  ],
+  "next_actions": [
+    "Add browser screenshot proof for Genesis tab after hard refresh.",
+    "Wire production proof_status_matrix into data-truth-score path so truth score is not 0 when proof files exist.",
+    "During market hours, verify option chain contracts, gain-rank rows, prediction confidence, and broker latency panels."
+  ]
+}
