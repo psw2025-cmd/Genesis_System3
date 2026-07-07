@@ -1096,3 +1096,15 @@ Verification with local `REQUIRE_API_KEY=true`:
 
 Note:
 - The production Render URL will show this only after this code is committed/pushed and Render redeploys.
+
+### [2026-07-07] [Codex] UI FIX: Streamlit tab overflow replaced with sidebar workflow selector
+
+User screenshot showed the local Streamlit dashboard running at `127.0.0.1:8501`, but the horizontal tab row was overcrowded and the final tabs were cut off.
+
+Fix:
+- `dashboard/app.py`: replaced 15 horizontal `st.tabs()` with a sidebar `Workflow` radio selector.
+- Each workflow now renders one page at a time, improving readability and avoiding truncated tabs on desktop/mobile.
+
+Verification:
+- `python -m py_compile dashboard/app.py` PASS.
+- Existing running Streamlit server will hot-reload after user clicks `Rerun` or refreshes the browser.

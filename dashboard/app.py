@@ -104,12 +104,14 @@ with st.sidebar:
 st.title("System3 Genesis Operator Console")
 st.markdown('<span class="think"></span>Agent is thinking...', unsafe_allow_html=True)
 
-tabs = st.tabs([
+PAGES = [
     "Dashboard", "Live Chart", "Profit Scan", "Option Chain", "Greeks", "AI Prediction", "Auto Trader", "Positions", "Orders", "Backtest",
     "Autonomous Brain", "Hidden Secrets Lab", "Never Die Monitor", "Hunger Meter", "Truth & Control",
-])
+]
+selected_page = st.sidebar.radio("Workflow", PAGES, index=0)
+st.subheader(selected_page)
 
-with tabs[0]:
+if selected_page == "Dashboard":
     pnl = api("/pnl")
     today = pnl.get("today") or pnl.get("summary") or {}
     c1, c2, c3, c4 = st.columns(4)
@@ -128,7 +130,7 @@ with tabs[0]:
     else:
         st.info("No real equity curve data available yet.")
 
-with tabs[1]:
+if selected_page == "Live Chart":
     auto_refresh = st.toggle("Auto refresh", value=False)
     if auto_refresh:
         st.cache_data.clear()
@@ -148,7 +150,7 @@ with tabs[1]:
     else:
         st.warning(chart.get("source", "No real candle data returned."))
 
-with tabs[2]:
+if selected_page == "Profit Scan":
     scan = api("/profit-scan?sort=score", timeout=35)
     rows = scan.get("items") or []
     df = pd.DataFrame(rows)
@@ -168,7 +170,7 @@ with tabs[2]:
     else:
         st.info(scan.get("reason") or "No real scanner rows available.")
 
-with tabs[3]:
+if selected_page == "Option Chain":
     chain = api(f"/chain/{symbol}?expiry={expiry}", timeout=25)
     contracts = pd.DataFrame(chain.get("contracts") or chain.get("rows") or chain.get("chain") or [])
     intel = api(f"/option-intelligence/{symbol}", timeout=25)
@@ -185,7 +187,7 @@ with tabs[3]:
     else:
         st.warning(chain.get("message") or "No real option chain contracts returned.")
 
-with tabs[4]:
+if selected_page == "Greeks":
     with st.form("greeks_form"):
         spot = st.number_input("Spot", min_value=0.0, value=25000.0)
         strike = st.number_input("Strike", min_value=0.0, value=25000.0)
@@ -199,7 +201,7 @@ with tabs[4]:
             col.metric(name.upper(), f"{float(greeks.get(name, 0) or 0):.4f}")
         st.metric("IV", pct((greeks.get("iv") or 0) * 100))
 
-with tabs[5]:
+if selected_page == "AI Prediction":
     pred_symbol = st.selectbox("Prediction symbol", SYMBOLS, key="pred_symbol")
     pred = api(f"/prediction/{pred_symbol}")
     signal = str(pred.get("signal", "HOLD")).upper()
@@ -211,14 +213,14 @@ with tabs[5]:
     if signal in {"BUY", "SELL"} and conf > 50:
         st.toast(f"Signal: {signal} {pred_symbol} confidence {pct(conf)}")
 
-with tabs[6]:
+if selected_page == "Auto Trader":
     enabled = st.toggle("Auto Trader", value=False)
     risk = st.slider("Risk per trade", min_value=1, max_value=5, value=2, format="%d%%")
     max_trades = st.number_input("Max trades per day", min_value=1, max_value=20, value=3)
     st.info("Live order execution remains gated by backend safety flags.")
     st.json({"auto_trader_ui": enabled, "risk_pct": risk, "max_trades_per_day": max_trades, "hard_max_risk_pct": 2})
 
-with tabs[7]:
+if selected_page == "Positions":
     pos = api("/positions?status=OPEN")
     positions = pd.DataFrame(pos.get("positions") or [])
     if not positions.empty:
@@ -231,7 +233,7 @@ with tabs[7]:
     else:
         st.info("No open positions returned by Dhan/read-only state.")
 
-with tabs[8]:
+if selected_page == "Orders":
     orders = api("/order-history")
     history = pd.DataFrame(orders.get("history") or orders.get("orders") or [])
     if not history.empty:
@@ -242,7 +244,7 @@ with tabs[8]:
     else:
         st.info("No order history available.")
 
-with tabs[9]:
+if selected_page == "Backtest":
     start = st.date_input("Start", value=date.today() - timedelta(days=30))
     end = st.date_input("End", value=date.today())
     strategy = st.selectbox("Strategy", ["iron_condor", "long_straddle", "long_strangle", "butterfly", "calendar"])
@@ -255,7 +257,7 @@ with tabs[9]:
         else:
             st.info("No real backtest curve returned.")
 
-with tabs[10]:
+if selected_page == "Autonomous Brain":
     brain = api("/autonomous-brain")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Memory Events", brain.get("memory_events", 0))
@@ -271,7 +273,7 @@ with tabs[10]:
     if st.button("Adapt market now"):
         st.json(api(f"/adapt-market?symbol={symbol}"))
 
-with tabs[11]:
+if selected_page == "Hidden Secrets Lab":
     lab = api("/hidden-secrets-lab")
     items = pd.DataFrame(lab.get("items") or [])
     st.subheader("Verified Secrets Lab")
@@ -281,7 +283,7 @@ with tabs[11]:
         st.info("No verified secrets available.")
     st.json(api(f"/world-comparison?symbol={symbol}"))
 
-with tabs[12]:
+if selected_page == "Never Die Monitor":
     monitor = api("/never-die-monitor")
     c1, c2, c3 = st.columns(3)
     c1.metric("Uptime Seconds", monitor.get("uptime_seconds") or 0)
@@ -290,7 +292,7 @@ with tabs[12]:
     st.markdown('<span class="oktick">✓ Self-heal status file written.</span>', unsafe_allow_html=True)
     st.json(monitor)
 
-with tabs[13]:
+if selected_page == "Hunger Meter":
     hunger = api("/hunger-meter")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Profit Goal", money(hunger.get("profit_goal_monthly", 1000000)))
@@ -300,7 +302,7 @@ with tabs[13]:
     st.warning(hunger.get("need_to_fix", "No action computed."))
     st.json(api("/roadmap"))
 
-with tabs[14]:
+if selected_page == "Truth & Control":
     truth = api("/data-truth-score")
     compliance = api("/compliance-check")
     cost = api("/cost-roi")
@@ -321,3 +323,4 @@ with tabs[14]:
 st.divider()
 st.caption(f"{VERSION} | Backend: {BACKEND_URL} | Analyzer/Paper first | Currency: INR | Percent format: 2 decimals")
 print("DEPLOY READY: git push && render deploy")
+
