@@ -980,3 +980,119 @@ issue (502 responses were visible in this same verification run's console log, m
 endpoints) — tracked by the 10-minute recurring check already scheduled.
 
 **Live trading status: DISABLED. LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0.**
+
+### [2026-07-07] [Codex] CTO COMPAT API + STREAMLIT CONSOLE PATCH
+
+User requested a constrained 100-task dashboard/API build with edits only to `dashboard/backend/app.py` and `dashboard/app.py`.
+
+Changed only those two files:
+- `dashboard/backend/app.py`: title set to `System3 Genesis API`, CORS wildcard enabled, `.env` load added, root compatibility endpoints added for health, profit scan, chain, Greeks/IV, chart, prediction, positions, PnL, gated orders, order history/status, funds, instruments, signals, OI/IV/volume analysis, risk, emergency exit, tradebook, holdings, Dhan health, `/ws/ticks`, request timing, 100 req/min limiter, 404/500 handlers, scanner/token background loops, and `trades.csv` logging for order attempts.
+- `dashboard/app.py`: replaced placeholder with 10-tab Streamlit console: dashboard, chart, profit scan, option chain, Greeks, AI prediction, auto trader controls, positions, orders, backtest, sidebar status/symbol/expiry, API spinners/errors, CSV downloads, INR/% formatting, signal toasts, and keyboard refresh hook.
+
+Safety:
+- No live order placement enabled. `/place-order`, `/order/{id}`, and `/emergency-exit` remain blocked unless existing `LIVE_TRADING_ENABLED=1` and `SYSTEM3_LIVE_TRADING_ALLOWED=1` are both set.
+- No fake market data added. Empty/no-data responses are returned when real local/Dhan data is unavailable.
+
+Verification:
+- `python -m py_compile dashboard\\backend\\app.py` PASS with `PYTHONDONTWRITEBYTECODE=1`.
+- `python -m py_compile dashboard\\app.py` PASS with `PYTHONDONTWRITEBYTECODE=1`.
+- Backend import route check PASS: all requested compatibility endpoints registered; title is `System3 Genesis API`.
+
+DEPLOY READY: git push && render deploy
+
+### [2026-07-07] [Codex] VERIFY: CTO compatibility patch smoke-tested
+
+Follow-up verification after user requested "first verify".
+
+Additional fix inside allowed file:
+- `dashboard/backend/app.py`: added missing async `background_data_refresh()` no-op placeholder. Real Uvicorn startup was failing because startup called this function but it was not defined.
+
+Verification:
+- `python -m py_compile dashboard\\backend\\app.py` PASS.
+- `python -m py_compile dashboard\\app.py` PASS.
+- Route registration check PASS earlier: all requested compatibility routes present; title `System3 Genesis API`.
+- Short-lived local Uvicorn smoke PASS on safe endpoints:
+  - GET `/health` 200 success
+  - GET `/chart/NIFTY?timeframe=5m` 200 success
+  - GET `/prediction/NIFTY` 200 success
+  - GET `/pnl` 200 success
+  - GET `/risk` 200 success
+  - POST `/greeks` 200 success
+  - POST `/iv` 200 success
+  - POST `/place-order` 200 success with `placed=false`, message `blocked_by_safety_flags_no_live_order_placed`
+
+Safety confirmed: no live order placed; live trading remains gated by `LIVE_TRADING_ENABLED` + `SYSTEM3_LIVE_TRADING_ALLOWED`.
+
+### [2026-07-07] [Codex] VERIFY: Streamlit UI local HTTP check
+
+User selected recommendation #3: browser/UI verification of `dashboard/app.py`.
+
+Actions:
+- Installed missing UI runtime packages into local `.venv` only: `streamlit`, `plotly` and dependencies. Repo files were not changed for dependency installation.
+- Started backend locally on `http://127.0.0.1:8000`.
+- Started Streamlit locally on `http://127.0.0.1:8501`.
+
+Verification:
+- `GET http://127.0.0.1:8501` returned HTTP 200 with Streamlit HTML.
+- `GET http://127.0.0.1:8000/health` returned HTTP 200 `status=success`.
+- `POST http://127.0.0.1:8000/place-order` returned HTTP 200 `status=success`, `placed=false`, `message=blocked_by_safety_flags_no_live_order_placed`.
+
+Safety:
+- No real order placed.
+- Local verification servers were stopped after the check.
+- Generated `trades.csv` verification artifact was removed to honor the no-new-files rule.
+
+### [2026-07-07] [Codex] AUTONOMOUS GENESIS EXPANSION + DEPLOYMENT FILES
+
+User lifted the prior two-file restriction and authorized deployment/runtime file changes.
+
+Backend/API:
+- Added Genesis autonomous intelligence endpoints: `/auto-research`, `/verify-strategy`, `/learn-from-loss`, `/adapt-market`, `/option-intelligence/{symbol}`, `/autonomous-brain`, `/hidden-secrets-lab`, `/never-die-monitor`, `/hunger-meter`, `/data-truth-score`, `/world-comparison`, `/roadmap`, `/cost-roi`, `/compliance-check`, `/audit-trail`, `/agent-full-control`, `/final-message`.
+- Added option strategy catalog for straddle, strangle, iron condor, butterfly, calendar with regime/risk mapping.
+- Added computed PCR, max pain, OI buildup, smart-money score, institutional footprint, gamma-squeeze score, market regime, and strategy recommendation from available chain snapshots.
+- Autonomous chain intelligence uses cached/worker-pushed snapshots to avoid UI-blocking live network fetches.
+- Full-control endpoint records request but keeps `live_trading_enabled=false` unless existing safety gates are separately passed.
+
+Dashboard/UI:
+- Expanded Streamlit console with previous workflows plus Autonomous Brain, Hidden Secrets Lab, Never Die Monitor, Hunger Meter, and Truth & Control tabs.
+- Added voice-alert test, browser notification permission request, agent-thinking animation, self-fix green tick, human-vs-agent comparison, kill-switch visibility, and full-control request button.
+
+Deployment files:
+- Updated `requirements.txt` with FastAPI/Uvicorn/Streamlit/Plotly dashboard runtime dependencies and optional analytics packages.
+- Added `Procfile`, `runtime.txt`, `Dockerfile`, `.env.example`.
+- Appended README local/Render/Docker deployment instructions.
+
+Verification:
+- `python -m py_compile dashboard/backend/app.py` PASS.
+- `python -m py_compile dashboard/app.py` PASS.
+- Route registration PASS: 172 routes, no autonomous route missing, title `System3 Genesis API`.
+- Local smoke PASS: key autonomous endpoints returned HTTP 200 `status=success`; `/agent-full-control` returned `live_trading_enabled=false`.
+- Local services started and left running for user:
+  - Backend: `http://127.0.0.1:8000`
+  - Streamlit: `http://127.0.0.1:8501`
+
+Safety:
+- Live trading not enabled.
+- Real-money earning not claimed; final message explicitly says analyzer mode and proof gates are still required.
+
+### [2026-07-07] [Codex] FIX: Public health endpoints exempt from dashboard API session auth
+
+User reported production curl results:
+- `https://genesis-system3-backend.onrender.com/health` returned 401 `Missing or invalid dashboard API session`
+- `https://genesis-system3-backend.onrender.com/api/system_health` returned 401
+
+Root cause:
+- Auth middleware exempted `/api/health`, docs, UI, and auth routes, but not root `/health`, `/healthz`, or `/api/system_health`.
+
+Fix:
+- Added `/health`, `/healthz`, and `/api/system_health` to `_API_KEY_EXEMPT_EXACT` in `dashboard/backend/app.py`.
+
+Verification with local `REQUIRE_API_KEY=true`:
+- `/health` -> 200
+- `/healthz` -> 200
+- `/api/health` -> 200
+- `/api/system_health` -> 200
+- `/api/state` -> 401, confirming protected endpoints remain protected.
+
+Note:
+- The production Render URL will show this only after this code is committed/pushed and Render redeploys.

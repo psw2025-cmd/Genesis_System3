@@ -33,3 +33,16 @@ yfinance>=0.2.38
 # jugaad-data: NSE historical F&O bhavcopy downloader (alternative to direct CDN fetch)
 # P4 fallback. Note: UDiFF format (post-Jul 2024) support is limited — prefer direct bhavcopy
 jugaad-data>=0.31.1
+
+# ---- Dashboard/API runtime ----
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+streamlit>=1.38.0
+plotly>=5.24.0
+pydantic>=2.7.0
+python-multipart>=0.0.10
+watchdog>=4.0.0
+# ---- Optional analytics / resilience ----
+statsmodels>=0.14.2
+scikit-learn>=1.5.0
+joblib>=1.4.2
