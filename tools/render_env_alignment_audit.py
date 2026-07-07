@@ -7,13 +7,12 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "render_env_alignment"
 ENV_FILES = {
-    "backend": Path(r"C:\System3\genesis-system3-backend.env"),
-    "worker": Path(r"C:\System3\genesis-system3-worker.env"),
-    "shared": Path(r"C:\System3\dhan-shared-credentials.env"),
+    "backend": Path(r"C:\System3\Genesis_System3\tests\RENDER ENV\genesis-system3-backend (2).env"),
+    "worker": Path(r"C:\System3\Genesis_System3\tests\RENDER ENV\genesis-system3-worker (1).env"),
+    "shared": Path(r"C:\System3\Genesis_System3\tests\RENDER ENV\dhan-shared-credentials (1).env"),
 }
 
 SECRET_KEY_MARKERS = ("TOKEN", "SECRET", "PIN", "KEY", "CLIENT_ID", "APP_ID")
@@ -164,9 +163,7 @@ def main() -> int:
         "|---|---:|---|---|",
     ]
     for name, result in results.items():
-        lines.append(
-            f"| {name} | {result['keyCount']} | {result['requiredPresent']} | {result['requiredNonEmpty']} |"
-        )
+        lines.append(f"| {name} | {result['keyCount']} | {result['requiredPresent']} | {result['requiredNonEmpty']} |")
     lines.extend(["", "## Blockers", *(f"- {b}" for b in all_blockers or ["None"])])
     lines.extend(["", "## Warnings", *(f"- {w}" for w in all_warnings or ["None"])])
     lines.extend(["", "## Required Next Step"])

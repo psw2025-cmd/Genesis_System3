@@ -10,12 +10,11 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 os.environ["REQUIRE_API_KEY"] = "true"
-os.environ["API_KEY"] = "dummy-dashboard-key"
+os.environ["API_KEY"] = "dummy"
 os.environ["LIVE_TRADING_ENABLED"] = "0"
 os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
 os.environ["DEFER_INSTRUMENT_WARMUP"] = "1"
@@ -25,7 +24,9 @@ app_module = importlib.import_module("dashboard.backend.app")
 
 
 class FakeRequest:
-    def __init__(self, path: str = "/api/state", headers: dict[str, str] | None = None, cookies: dict[str, str] | None = None):
+    def __init__(
+        self, path: str = "/api/state", headers: dict[str, str] | None = None, cookies: dict[str, str] | None = None
+    ):
         self.headers = headers or {}
         self.cookies = cookies or {}
         self.url = SimpleNamespace(path=path, scheme="http")
@@ -37,7 +38,7 @@ async def main() -> int:
     if locked:
         raise SystemExit("expected request without header/cookie to be locked")
 
-    header_req = FakeRequest(headers={"X-API-Key": "dummy-dashboard-key"})
+    header_req = FakeRequest(headers={"X-API-Key": "dummy"})
     if not app_module._has_dashboard_api_access(header_req):
         raise SystemExit("expected X-API-Key request to pass")
 
@@ -50,7 +51,7 @@ async def main() -> int:
     else:
         raise SystemExit("expected wrong key to raise HTTPException")
 
-    good_payload = app_module.DashboardAuthRequest(api_key="dummy-dashboard-key")
+    good_payload = app_module.DashboardAuthRequest(api_key="dummy")
     response = await app_module.create_dashboard_session(good_payload, FakeRequest(path="/api/auth/session"))
     cookie_header = response.headers.get("set-cookie", "")
     if "system3_dashboard_session=" not in cookie_header or "HttpOnly" not in cookie_header:

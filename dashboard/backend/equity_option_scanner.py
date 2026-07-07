@@ -13,10 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from core.brokers.dhan.equity_fo_universe import (
-    PRIORITY_EQUITY_FO,
-    load_equity_fo_universe,
-)
+from core.brokers.dhan.equity_fo_universe import PRIORITY_EQUITY_FO, load_equity_fo_universe
 
 ROOT = Path(__file__).resolve().parents[2]
 BHAVCOPY_DIR = ROOT / "storage" / "bhavcopy"
@@ -69,38 +66,42 @@ def _parse_equity_option_rows(df: pd.DataFrame) -> List[Dict[str, Any]]:
     # Exclude index underlyings
     sub = sub[~sub[sym_col].astype(str).str.upper().isin(INDEX_SEGMENTS)]
 
-    rows: List[Dict[str, Any]] = []
-    for _, r in sub.iterrows():
-        underlying = str(r[sym_col]).strip().upper()
-        opt = str(r[opt_col]).strip().upper()
-        try:
-            oi = float(r.get(oi_col) or 0)
-            oi_chg = float(r.get(oi_chg_col) or 0)
-            ltp = float(r.get(ltp_col) or 0)
-            vol = float(r.get(vol_col) or 0)
-            strike = float(r.get(strike_col) or 0)
-        except (TypeError, ValueError):
-            continue
-        if ltp <= 0 or strike <= 0:
-            continue
-        prev_oi = max(oi - oi_chg, 1)
-        oi_buildup_pct = (oi_chg / prev_oi) * 100.0
-        rows.append(
-            {
-                "underlying": underlying,
-                "option_type": opt,
-                "strike": strike,
-                "ltp": ltp,
-                "oi": int(oi),
-                "oi_change": int(oi_chg),
-                "volume": int(vol),
-                "gain_pct": round(oi_buildup_pct, 4),
-                "gain_metric": "oi_buildup_pct",
-                "expiry_date": str(r.get(exp_col) or "")[:10],
-                "instrument_type": "OPTSTK",
-            }
-        )
-    return rows
+    if sub.empty:
+        return []
+
+    # Vectorized numeric conversions
+    sub[strike_col] = pd.to_numeric(sub[strike_col], errors="coerce").fillna(0.0)
+    sub[ltp_col] = pd.to_numeric(sub[ltp_col], errors="coerce").fillna(0.0)
+    sub[oi_col] = pd.to_numeric(sub[oi_col], errors="coerce").fillna(0.0)
+    sub[oi_chg_col] = pd.to_numeric(sub[oi_chg_col], errors="coerce").fillna(0.0)
+    sub[vol_col] = pd.to_numeric(sub[vol_col], errors="coerce").fillna(0.0)
+
+    # Filter invalid prices/strikes
+    sub = sub[(sub[ltp_col] > 0) & (sub[strike_col] > 0)]
+    if sub.empty:
+        return []
+
+    prev_oi = (sub[oi_col] - sub[oi_chg_col]).clip(lower=1.0)
+    sub["gain_pct"] = (sub[oi_chg_col] / prev_oi * 100.0).round(4)
+
+    # Create final structured DataFrame
+    res_df = pd.DataFrame(
+        {
+            "underlying": sub[sym_col].astype(str).str.strip().str.upper(),
+            "option_type": sub[opt_col].astype(str).str.strip().str.upper(),
+            "strike": sub[strike_col],
+            "ltp": sub[ltp_col],
+            "oi": sub[oi_col].astype(int),
+            "oi_change": sub[oi_chg_col].astype(int),
+            "volume": sub[vol_col].astype(int),
+            "gain_pct": sub["gain_pct"],
+            "gain_metric": "oi_buildup_pct",
+            "expiry_date": sub[exp_col].astype(str).str.slice(0, 10) if exp_col in sub.columns else "",
+            "instrument_type": "OPTSTK",
+        }
+    )
+
+    return res_df.to_dict("records")
 
 
 def _enrich_trading_symbol(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -132,7 +133,16 @@ def scan_equity_top_gainers(
         slot = "top_ce" if r["option_type"] == "CE" else "top_pe"
         cur = by_stock[u][slot]
         if cur is None or r["gain_pct"] > cur["gain_pct"]:
-            by_stock[u][slot] = _enrich_trading_symbol(r)
+            by_stock[u][slot] = r
+
+    by_stock_sample = []
+    for stock_info in list(by_stock.values())[:top_n]:
+        sample = {
+            "underlying": stock_info["underlying"],
+            "top_ce": _enrich_trading_symbol(stock_info["top_ce"]) if stock_info["top_ce"] else None,
+            "top_pe": _enrich_trading_symbol(stock_info["top_pe"]) if stock_info["top_pe"] else None,
+        }
+        by_stock_sample.append(sample)
 
     return {
         "market_top_ce": _enrich_trading_symbol(ce[0]) if ce else None,
@@ -140,7 +150,7 @@ def scan_equity_top_gainers(
         "top_ce_list": [_enrich_trading_symbol(r) for r in ce[:top_n]],
         "top_pe_list": [_enrich_trading_symbol(r) for r in pe[:top_n]],
         "stocks_scanned": len(by_stock),
-        "by_stock_sample": list(by_stock.values())[:top_n],
+        "by_stock_sample": by_stock_sample,
     }
 
 

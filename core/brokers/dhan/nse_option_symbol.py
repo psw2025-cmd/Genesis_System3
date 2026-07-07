@@ -39,6 +39,7 @@ _TRADING_SYMBOL_RE = re.compile(
     re.IGNORECASE,
 )
 
+
 def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
     """Parse stock OPTSTK symbol — supports YYMMM and DDMMMYY (OpenAlgo/NSE)."""
     m = re.match(
@@ -85,6 +86,7 @@ def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
         "instrument_type": "OPTSTK",
     }
 
+
 _WEEKLY_SYMBOL_RE = re.compile(
     rf"^(?P<underlying>{_UNDERLYINGS})"
     rf"(?P<yy>\d{{2}})(?P<m>\d)(?P<dd>\d{{2}})"
@@ -94,8 +96,18 @@ _WEEKLY_SYMBOL_RE = re.compile(
 )
 
 _MONTH_MAP = {
-    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
-    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+    "JAN": 1,
+    "FEB": 2,
+    "MAR": 3,
+    "APR": 4,
+    "MAY": 5,
+    "JUN": 6,
+    "JUL": 7,
+    "AUG": 8,
+    "SEP": 9,
+    "OCT": 10,
+    "NOV": 11,
+    "DEC": 12,
 }
 
 
@@ -194,6 +206,11 @@ def parse_trading_symbol(trading_symbol: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+_INSTRUMENTS_BY_SYMBOL = None
+_INSTRUMENTS_BY_KEY = None
+_LAST_DF_ID = None
+
+
 def _lookup_instrument_master(
     underlying: str,
     strike: float,
@@ -201,6 +218,7 @@ def _lookup_instrument_master(
     expiry_date: Optional[date] = None,
     trading_symbol: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
+    global _INSTRUMENTS_BY_SYMBOL, _INSTRUMENTS_BY_KEY, _LAST_DF_ID
     try:
         from core.data.instruments_cache import get_instruments_df
     except ImportError:
@@ -210,45 +228,70 @@ def _lookup_instrument_master(
     if df is None or df.empty:
         return None
 
+    if _LAST_DF_ID != id(df) or _INSTRUMENTS_BY_SYMBOL is None:
+        cols = {c.lower(): c for c in df.columns}
+        ex_col = cols.get("exch_seg")
+        name_col = cols.get("name")
+        sym_col = cols.get("symbol")
+        strike_col = cols.get("strike")
+        expiry_col = cols.get("expiry")
+        token_col = cols.get("token")
+        lot_col = cols.get("lotsize") or cols.get("lot_size")
+        inst_col = cols.get("instrumenttype")
+
+        sub = df.copy()
+        if ex_col:
+            sub = sub[sub[ex_col].astype(str).str.upper().isin(["NFO", "BFO"])]
+        if inst_col:
+            sub = sub[sub[inst_col].astype(str).str.contains("OPT", na=False)]
+
+        by_sym = {}
+        by_key = {}
+        if not sub.empty:
+            records = sub.to_dict("records")
+            for r in records:
+                sym_val = str(r.get(sym_col) or "").strip().upper()
+                if sym_val:
+                    by_sym[sym_val] = r
+                underlying_val = str(r.get(name_col) or "").strip().upper()
+                try:
+                    strike_val = float(r.get(strike_col) or 0.0)
+                except (ValueError, TypeError):
+                    strike_val = 0.0
+                opt_val = "CE" if sym_val.endswith("CE") else ("PE" if sym_val.endswith("PE") else "")
+                expiry_val = str(r.get(expiry_col) or "")[:10]
+                if underlying_val and strike_val > 0 and opt_val and expiry_val:
+                    key = (underlying_val, strike_val, opt_val, expiry_val)
+                    by_key[key] = r
+
+        _INSTRUMENTS_BY_SYMBOL = by_sym
+        _INSTRUMENTS_BY_KEY = by_key
+        _LAST_DF_ID = id(df)
+
     cols = {c.lower(): c for c in df.columns}
-    ex_col = cols.get("exch_seg")
     name_col = cols.get("name")
     sym_col = cols.get("symbol")
     strike_col = cols.get("strike")
     expiry_col = cols.get("expiry")
     token_col = cols.get("token")
     lot_col = cols.get("lotsize") or cols.get("lot_size")
-    inst_col = cols.get("instrumenttype")
 
-    sub = df.copy()
-    if ex_col:
-        sub = sub[sub[ex_col].astype(str).str.upper().isin(["NFO", "BFO"])]
-    if inst_col:
-        sub = sub[sub[inst_col].astype(str).str.contains("OPT", na=False)]
-
-    if trading_symbol and sym_col:
-        hit = sub[sub[sym_col].astype(str).str.upper() == trading_symbol.upper()]
-        if not hit.empty:
-            sub = hit
+    row = None
+    if trading_symbol:
+        row = _INSTRUMENTS_BY_SYMBOL.get(trading_symbol.upper())
     else:
-        if name_col:
-            sub = sub[sub[name_col].astype(str).str.upper() == underlying.upper()]
-        if strike_col and not sub.empty:
-            sub = sub[sub[strike_col].astype(float) == float(strike)]
-        if sym_col and not sub.empty and option_type:
-            opt = option_type.upper()
-            sub = sub[sub[sym_col].astype(str).str.upper().str.endswith(opt)]
-        if expiry_col and expiry_date is not None and not sub.empty:
-            exp_str = expiry_date.strftime("%Y-%m-%d")
-            sub = sub[sub[expiry_col].astype(str).str[:10] == exp_str]
+        exp_str = expiry_date.strftime("%Y-%m-%d") if expiry_date else ""
+        if exp_str:
+            row = _INSTRUMENTS_BY_KEY.get((underlying.upper(), float(strike), option_type.upper(), exp_str))
 
-    if sub.empty:
+    if row is None:
         return None
 
-    row = sub.iloc[0]
-    sym_val = str(row[sym_col]) if sym_col else trading_symbol
-    exp_val = str(row[expiry_col])[:10] if expiry_col and row.get(expiry_col) is not None else (
-        expiry_date.isoformat() if expiry_date else None
+    sym_val = str(row[sym_col]) if sym_col and row.get(sym_col) is not None else None
+    exp_val = (
+        str(row[expiry_col])[:10]
+        if expiry_col and row.get(expiry_col) is not None
+        else (expiry_date.isoformat() if expiry_date else None)
     )
     return {
         "trading_symbol": sym_val,
@@ -327,11 +370,7 @@ def enrich_option_row(row: Dict[str, Any], default_expiry: Union[str, date, None
         return row
     out = dict(row)
 
-    trading_symbol = (
-        out.get("trading_symbol")
-        or out.get("tradingSymbol")
-        or out.get("symbol")
-    )
+    trading_symbol = out.get("trading_symbol") or out.get("tradingSymbol") or out.get("symbol")
     # If symbol is only underlying (NIFTY), do not treat as trading symbol
     if trading_symbol and str(trading_symbol).upper() in INDEX_FO_DEFAULTS:
         trading_symbol = None

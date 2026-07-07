@@ -5,7 +5,9 @@ __pycache__
 .pytest_cache
 .mypy_cache
 node_modules
-reports
+# Allow reports/latest for truth score, ignore other reports
+reports/*
+!reports/latest
 runtime_reports
 agent_memory
 *.log

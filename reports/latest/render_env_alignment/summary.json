@@ -1,0 +1,170 @@
+{
+  "generatedUtc": "2026-07-07T19:59:05.583233Z",
+  "status": "PASS",
+  "files": {
+    "backend": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\genesis-system3-backend (2).env",
+    "worker": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\genesis-system3-worker (1).env",
+    "shared": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\dhan-shared-credentials (1).env"
+  },
+  "results": {
+    "backend": {
+      "file": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\genesis-system3-backend (2).env",
+      "exists": true,
+      "keyCount": 20,
+      "requiredPresent": true,
+      "requiredNonEmpty": true,
+      "missing": [],
+      "empty": [],
+      "safeFlags": {
+        "LIVE_TRADING_ENABLED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_LIVE_TRADING_ALLOWED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_MODE": {
+          "ok": true,
+          "value": "analyzer"
+        },
+        "ANALYZE_MODE": {
+          "ok": true,
+          "value": "1"
+        },
+        "REQUIRE_API_KEY": {
+          "ok": true,
+          "value": "<redacted>"
+        }
+      },
+      "keysRedacted": {
+        "ANALYZE_MODE": "1",
+        "API_KEY": "<redacted>",
+        "CLOUD_PAPER_ENGINE": "1",
+        "DEFER_INSTRUMENT_WARMUP": "1",
+        "DHAN_ACCESS_TOKEN": "<redacted>",
+        "DHAN_APP_ID": "<redacted>",
+        "DHAN_APP_SECRET": "<redacted>",
+        "DHAN_CLIENT_ID": "<redacted>",
+        "DHAN_PIN": "<redacted>",
+        "DHAN_TOTP_SECRET": "<redacted>",
+        "LIVE_TRADING_ENABLED": "0",
+        "MEM_GC_MB": "<set>",
+        "MEM_LIMIT_MB": "<set>",
+        "MEM_WARN_MB": "<set>",
+        "RENDER": "true",
+        "REQUIRE_API_KEY": "<redacted>",
+        "SYSTEM3_DEPLOY_TARGET": "<set>",
+        "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+        "SYSTEM3_MODE": "analyzer",
+        "WORKER_PUSH_TOKEN": "<redacted>"
+      },
+      "blockers": [],
+      "warnings": []
+    },
+    "worker": {
+      "file": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\genesis-system3-worker (1).env",
+      "exists": true,
+      "keyCount": 20,
+      "requiredPresent": true,
+      "requiredNonEmpty": true,
+      "missing": [],
+      "empty": [],
+      "safeFlags": {
+        "LIVE_TRADING_ENABLED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_LIVE_TRADING_ALLOWED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_MODE": {
+          "ok": true,
+          "value": "analyzer"
+        },
+        "ANALYZE_MODE": {
+          "ok": true,
+          "value": "1"
+        }
+      },
+      "keysRedacted": {
+        "ANALYZE_MODE": "1",
+        "CLOUD_PAPER_ENGINE": "1",
+        "CLOUD_WORKER": "true",
+        "DEFER_INSTRUMENT_WARMUP": "1",
+        "DHAN_ACCESS_TOKEN": "<redacted>",
+        "DHAN_APP_ID": "<redacted>",
+        "DHAN_APP_SECRET": "<redacted>",
+        "DHAN_CLIENT_ID": "<redacted>",
+        "DHAN_PIN": "<redacted>",
+        "DHAN_TOTP_SECRET": "<redacted>",
+        "LIVE_TRADING_ENABLED": "0",
+        "MEM_GC_MB": "<set>",
+        "MEM_LIMIT_MB": "<set>",
+        "MEM_WARN_MB": "<set>",
+        "RENDER": "true",
+        "SYSTEM3_DEPLOY_TARGET": "<set>",
+        "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+        "SYSTEM3_MODE": "analyzer",
+        "WEB_SERVICE_URL": "<set>",
+        "WORKER_PUSH_TOKEN": "<redacted>"
+      },
+      "blockers": [],
+      "warnings": []
+    },
+    "shared": {
+      "file": "C:\\System3\\Genesis_System3\\tests\\RENDER ENV\\dhan-shared-credentials (1).env",
+      "exists": true,
+      "keyCount": 15,
+      "requiredPresent": true,
+      "requiredNonEmpty": true,
+      "missing": [],
+      "empty": [],
+      "safeFlags": {
+        "LIVE_TRADING_ENABLED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_LIVE_TRADING_ALLOWED": {
+          "ok": true,
+          "value": "0"
+        },
+        "SYSTEM3_MODE": {
+          "ok": true,
+          "value": "analyzer"
+        },
+        "ANALYZE_MODE": {
+          "ok": true,
+          "value": "1"
+        }
+      },
+      "keysRedacted": {
+        "ANALYZE_MODE": "1",
+        "CLOUD_PAPER_ENGINE": "1",
+        "DEFER_INSTRUMENT_WARMUP": "1",
+        "DHAN_ACCESS_TOKEN": "<redacted>",
+        "DHAN_APP_ID": "<redacted>",
+        "DHAN_APP_SECRET": "<redacted>",
+        "DHAN_CLIENT_ID": "<redacted>",
+        "DHAN_PIN": "<redacted>",
+        "DHAN_TOTP_SECRET": "<redacted>",
+        "LIVE_TRADING_ENABLED": "0",
+        "RENDER": "true",
+        "SYSTEM3_DEPLOY_TARGET": "<set>",
+        "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+        "SYSTEM3_MODE": "analyzer",
+        "WORKER_PUSH_TOKEN": "<redacted>"
+      },
+      "blockers": [],
+      "warnings": []
+    }
+  },
+  "blockers": [],
+  "warnings": [],
+  "notes": [
+    "Secret values are not printed; only presence and selected safe flag values are shown.",
+    "Broker funds/holdings/positions should remain protected behind dashboard auth.",
+    "LIVE_TRADING_ENABLED and SYSTEM3_LIVE_TRADING_ALLOWED must remain false/0."
+  ]
+}

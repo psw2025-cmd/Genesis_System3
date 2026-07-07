@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-23T21:26:07.501886+00:00",
+  "generated_utc": "2026-07-07T19:46:19.684207+00:00",
   "mode": "Analyzer/Paper only; live trading disabled",
   "optional_missing_count": 0,
   "pending_count": 0,
@@ -42,9 +42,7 @@
       "path": "reports/latest/fresh_data_automation_proof/summary.json",
       "required": true,
       "status": "PASS_WITH_WARNINGS",
-      "warnings": [
-        "dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
-      ]
+      "warnings": []
     },
     {
       "blockers": [],
