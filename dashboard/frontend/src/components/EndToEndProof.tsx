@@ -19,6 +19,7 @@ const CORE_ENDPOINTS = [
   '/api/broker/positions/live',
   '/api/gain_rank',
   '/api/pnl',
+  '/api/trades/today',
   '/api/auto_gates',
 ]
 
@@ -43,7 +44,7 @@ function isDhanChain(json: any) {
   const combined = `${source} ${priority} ${status}`
   if (json.stale === true) return false
   if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(combined)) return false
-  const contracts = Array.isArray(json.contracts) ? json.contracts.length : 0
+  const contracts = Array.isArray(json.contracts) ? json.contracts.length : Number(json.total_contracts || 0)
   const spot = Number(json.spot || 0)
   return source === 'dhan' && contracts > 0 && spot > 0
 }
@@ -51,6 +52,30 @@ function isDhanChain(json: any) {
 function blockedReason(json: any) {
   if (!json || typeof json !== 'object') return 'NO_RESPONSE'
   return json.blocked_reason || json.message || json.status || json.error || 'UNKNOWN'
+}
+
+function endpoint(probes: Probe[], name: string) {
+  return probes.find(p => p.endpoint === name)
+}
+
+function hasRows(json: any, ...keys: string[]) {
+  if (!json || typeof json !== 'object') return false
+  for (const k of keys) {
+    if (Array.isArray(json[k])) return true
+    if (Array.isArray(json?.data?.[k])) return true
+    if (Array.isArray(json?.normalized?.[k])) return true
+  }
+  return false
+}
+
+function isBrokerConnected(json: any) {
+  if (!json || typeof json !== 'object') return false
+  return json.connected === true || json.success === true || String(json.status || '').toLowerCase().includes('connected')
+}
+
+function isLiveTradingBlocked(stateJson: any, brokerJson: any) {
+  const raw = stateJson?.live_trading_enabled ?? stateJson?.liveTradingEnabled ?? stateJson?.live_allowed ?? brokerJson?.live_trading_enabled ?? brokerJson?.liveTradingEnabled ?? brokerJson?.live_allowed ?? '0'
+  return !(raw === true || String(raw) === '1')
 }
 
 export function EndToEndProof() {
@@ -84,8 +109,31 @@ export function EndToEndProof() {
   const core = useMemo(() => probes.filter(p => !p.endpoint.startsWith('/api/chain/')), [probes])
   const chainPass = chains.length === CHAIN_SYMBOLS.length && chains.every(p => p.ok && isDhanChain(p.json))
   const corePass = core.length > 0 && core.every(p => p.ok)
-  const fakeBlocked = chains.every(p => !String(p.json?.data_source || '').includes('csv_fallback'))
-  const overall = corePass && chainPass && fakeBlocked
+  const noBadSource = chains.every(p => !/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(JSON.stringify(p.json || {})))
+  const broker = endpoint(probes, '/api/broker/dhan/status')
+  const funds = endpoint(probes, '/api/broker/funds')
+  const holdings = endpoint(probes, '/api/broker/holdings')
+  const positions = endpoint(probes, '/api/broker/positions/live')
+  const state = endpoint(probes, '/api/state')
+  const pnl = endpoint(probes, '/api/pnl')
+  const trades = endpoint(probes, '/api/trades/today')
+  const gates = endpoint(probes, '/api/auto_gates')
+
+  const readiness = [
+    { item: 'Dhan broker connection', ok: Boolean(broker?.ok && isBrokerConnected(broker.json)), evidence: broker?.json?.status || broker?.json?.token_status || broker?.status || '-' },
+    { item: 'Dhan access token/session', ok: Boolean(broker?.ok && !/invalid|expired|unauthorized|token error/i.test(JSON.stringify(broker.json || {}))), evidence: broker?.json?.token_status || broker?.json?.status || '-' },
+    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.blocked && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || '-' },
+    { item: 'Real broker holdings response', ok: Boolean(holdings?.ok && holdings.json && holdings.json.success !== false), evidence: hasRows(holdings?.json, 'rows', 'holdings', 'data') ? 'rows visible or empty broker response' : (holdings?.json?.message || holdings?.status || '-') },
+    { item: 'Real broker positions response', ok: Boolean(positions?.ok && positions.json && positions.json.success !== false), evidence: hasRows(positions?.json, 'rows', 'positions', 'data') ? 'rows visible or empty broker response' : (positions?.json?.message || positions?.status || '-') },
+    { item: 'Real Dhan option chain for all watched symbols', ok: chainPass, evidence: `${chains.filter(p => p.ok && isDhanChain(p.json)).length}/${CHAIN_SYMBOLS.length}` },
+    { item: 'No non-Dhan/stale/fallback markers in chain', ok: noBadSource, evidence: noBadSource ? 'clean' : 'blocked marker found' },
+    { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || '-' },
+    { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || '-') },
+    { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || '-' },
+    { item: 'Live-money switch blocked until separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
+  ]
+  const readinessPass = readiness.every(r => r.ok)
+  const overall = corePass && chainPass && noBadSource && readinessPass
 
   return (
     <div style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
@@ -93,7 +141,7 @@ export function EndToEndProof() {
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>End-to-End Visual Truth Proof</h2>
           <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>
-            Dhan-only data truth, paper/analyzer proof, no CSV/stale/synthetic display as live.
+            Real broker/data truth only. Live money remains blocked until every row below passes.
           </div>
         </div>
         <button onClick={runProof} disabled={loading} style={{
@@ -102,16 +150,29 @@ export function EndToEndProof() {
         }}>{loading ? 'Checking...' : 'Recheck Now'}</button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
         <div className="card">{badge(overall, 'FULL E2E')}<div style={{ marginTop: 8, fontSize: 12 }}>Overall visual proof</div></div>
         <div className="card">{badge(corePass, 'API')}<div style={{ marginTop: 8, fontSize: 12 }}>Core endpoints</div></div>
         <div className="card">{badge(chainPass, 'DHAN CHAIN')}<div style={{ marginTop: 8, fontSize: 12 }}>Real Dhan option chain</div></div>
-        <div className="card">{badge(fakeBlocked, 'NO FAKE')}<div style={{ marginTop: 8, fontSize: 12 }}>No csv/stale/synthetic as live</div></div>
+        <div className="card">{badge(noBadSource, 'NO BAD SOURCE')}<div style={{ marginTop: 8, fontSize: 12 }}>No non-Dhan/stale/fallback</div></div>
+        <div className="card">{badge(readinessPass, 'TRADER READY')}<div style={{ marginTop: 8, fontSize: 12 }}>Human readiness checklist</div></div>
       </div>
 
       <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-        Last run: {lastRun || 'not yet'} · Live trading remains outside this visual proof.
+        Last run: {lastRun || 'not yet'} · This panel is proof-only; it does not enable live orders.
       </div>
+
+      <h3 style={{ fontSize: 16 }}>Trader Readiness Truth Checklist</h3>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 18 }}>
+        <thead><tr><th className="thead">Required for real-money trading</th><th className="thead">Status</th><th className="thead">Evidence visible to user</th></tr></thead>
+        <tbody>
+          {readiness.map(row => <tr key={row.item}>
+            <td className="tcell"><b>{row.item}</b></td>
+            <td className="tcell">{badge(row.ok)}</td>
+            <td className="tcell">{String(row.evidence)}</td>
+          </tr>)}
+        </tbody>
+      </table>
 
       <h3 style={{ fontSize: 16 }}>Dhan Option Chain Proof</h3>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 18 }}>
