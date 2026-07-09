@@ -31,23 +31,21 @@ except ImportError:
         return 0.0
 
 
-# Configuration
-MEM_WARN_MB = int(os.environ.get("MEM_WARN_MB", "380"))  # warn at 380MB
-MEM_GC_MB = int(os.environ.get("MEM_GC_MB", "420"))  # force GC at 420MB
-MEM_LIMIT_MB = int(os.environ.get("MEM_LIMIT_MB", "480"))  # 512MB Starter limit
+MEM_WARN_MB = int(os.environ.get("MEM_WARN_MB", "380"))
+MEM_GC_MB = int(os.environ.get("MEM_GC_MB", "420"))
+MEM_LIMIT_MB = int(os.environ.get("MEM_LIMIT_MB", "480"))
 
-# Expensive endpoints — skip GC overhead tracking for fast paths
 _FAST_PATHS = {"/", "/api/health", "/api/state", "/static"}
 
 _last_gc_time = 0.0
-GC_COOLDOWN_S = 30.0  # Don't GC more than once per 30s
+GC_COOLDOWN_S = 30.0
 
 _CHAIN_ALLOWED_DATA_SOURCES = {"dhan", "dhan_option_chain_live"}
 _CHAIN_ALLOWED_SOURCE_PREFIXES = ("dhan", "worker_push")
 
 
 def _chain_response_is_dhan_only(payload: dict) -> bool:
-    """True only when the response contains real Dhan-derived option-chain rows."""
+    """True only when the response contains current Dhan-derived option-chain rows."""
     contracts = payload.get("contracts") or []
     if not isinstance(contracts, list) or not contracts:
         return False
@@ -71,7 +69,6 @@ def _chain_response_is_dhan_only(payload: dict) -> bool:
     if source_priority and source_priority != "--" and not source_priority.startswith(_CHAIN_ALLOWED_SOURCE_PREFIXES):
         return False
 
-    # Spot and contract count must be real positive values from Dhan.
     try:
         if float(payload.get("spot") or 0) <= 0:
             return False
@@ -87,7 +84,7 @@ def _chain_response_is_dhan_only(payload: dict) -> bool:
 
 
 def _blocked_chain_payload(original: dict) -> dict:
-    """Return explicit blocked state instead of stale/fallback market data."""
+    """Return explicit blocked state instead of unusable market data."""
     return {
         "underlying": str(original.get("underlying") or "").upper(),
         "contracts": [],
@@ -95,15 +92,15 @@ def _blocked_chain_payload(original: dict) -> dict:
         "pcr": 0,
         "total_contracts": 0,
         "data_source": "dhan",
-        "source_priority": "dhan_only_no_fallback",
+        "source_priority": "dhan_only_no_rows",
         "status": "NO_DHAN_DATA",
         "stale": False,
         "blocked": True,
-        "blocked_reason": "NON_DHAN_OR_STALE_CHAIN_SUPPRESSED",
+        "blocked_reason": "NO_CURRENT_DHAN_OPTION_CHAIN_ROWS",
         "suppressed_source": original.get("data_source"),
         "suppressed_source_priority": original.get("source_priority"),
         "suppressed_status": original.get("status"),
-        "message": "No valid Dhan option-chain rows are available. CSV/fallback/stale/synthetic data is suppressed by Dhan-only truth guard.",
+        "message": "No current Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
     }
 
 
@@ -157,7 +154,7 @@ async def memory_guard_middleware(request, call_next: Callable):
     1. Tracks RSS before/after each request
     2. Forces GC if memory exceeds threshold
     3. Logs warnings when memory is high
-    4. Enforces Dhan-only chain truth so stale fallbacks cannot be shown as live
+    4. Enforces Dhan-only chain truth so old local rows cannot be shown as live
     """
     global _last_gc_time
 
@@ -175,7 +172,6 @@ async def memory_guard_middleware(request, call_next: Callable):
     elapsed_ms = (time.monotonic() - t0) * 1000
     delta_mb = rss_after - rss_before
 
-    # Force GC if memory is high and cooldown has passed
     if rss_after > MEM_GC_MB and (time.monotonic() - _last_gc_time) > GC_COOLDOWN_S:
         gc.collect()
         _last_gc_time = time.monotonic()
