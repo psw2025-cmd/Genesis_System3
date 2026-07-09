@@ -16,6 +16,7 @@ Runs six background daemons as threads:
                                    (EOD/bhavcopy snapshot barely changes
                                    between pushes off-hours — see ARCHITECTURE
                                    note)
+  Thread 6 — Core Pipeline V8   : analyzer/paper ledger from real-data forecasts
 
 ARCHITECTURE NOTE: Render's `web` and `worker` services run as separate
 containers with separate ephemeral filesystems — no shared disk. The
@@ -228,11 +229,10 @@ def _run_health_push():
 # ---------------------------------------------------------------------------
 # Thread 5: Chain push (worker -> web, see ARCHITECTURE note above)
 # ---------------------------------------------------------------------------
-# Must match dashboard/backend/app.py's DEFAULT_UNDERLYINGS. GET
-# /api/chain/{underlying} on the web service only serves from this push for
-# exactly these symbols; anything else still falls back to an inline fetch
-# on the web dyno (rare — the dashboard's default watchlist is these four).
-_CHAIN_PUSH_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+# Must match dashboard/backend/frontend watched underlyings and E2E proof:
+# NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX. Anything omitted here can
+# fall back to inline web fetch and break the end-to-end truth proof.
+_CHAIN_PUSH_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 _CHAIN_PUSH_INTERVAL_S = 20
 # EOD/bhavcopy data doesn't change between market close and the next
 # pre-market session, so off-hours pushes happen far less often than the
@@ -319,8 +319,6 @@ def _run_chain_push():
         time.sleep(_CHAIN_PUSH_INTERVAL_S)
 
 
-
-
 # ---------------------------------------------------------------------------
 # Thread 6: Core Pipeline V8 paper/analyzer ledger
 # ---------------------------------------------------------------------------
@@ -335,6 +333,7 @@ def _run_paper_pipeline_v8():
     while True:
         try:
             from dashboard.backend.paper_pipeline_v8 import run_pipeline_once
+
             result = run_pipeline_once(ROOT, create_paper_orders=True, source="cloud_worker")
             log.info(
                 "[paper-pipeline-v8] status=%s forecasts=%s paper_orders=%s blocked=%s",
@@ -376,40 +375,27 @@ def _bootstrap_token():
 # Main
 # ---------------------------------------------------------------------------
 def main():
-    log.info("=" * 60)
-    log.info("Genesis System3 Cloud Worker starting")
-    log.info(f"LIVE_TRADING_ENABLED={os.environ.get('LIVE_TRADING_ENABLED', '0')}")
-    log.info(f"SYSTEM3_MODE={os.environ.get('SYSTEM3_MODE', 'analyzer')}")
-    log.info("=" * 60)
-
+    log.info("=== Genesis System3 Cloud Worker starting ===")
+    log.info(f"ROOT={ROOT}")
     _bootstrap_token()
 
     threads = [
-        threading.Thread(target=_run_token_daemon, name="token-daemon", daemon=True),
-        threading.Thread(target=_run_watchdog, name="watchdog", daemon=True),
-        threading.Thread(target=_run_job_scheduler, name="job-scheduler", daemon=True),
-        threading.Thread(target=_run_health_push, name="health-push", daemon=True),
-        threading.Thread(target=_run_chain_push, name="chain-push", daemon=True),
-        threading.Thread(target=_run_paper_pipeline_v8, name="paper-pipeline-v8", daemon=True),
+        ("token-daemon", _run_token_daemon),
+        ("watchdog", _run_watchdog),
+        ("job-scheduler", _run_job_scheduler),
+        ("health-push", _run_health_push),
+        ("chain-push", _run_chain_push),
+        ("paper-pipeline-v8", _run_paper_pipeline_v8),
     ]
 
-    for t in threads:
+    for name, target in threads:
+        t = threading.Thread(target=target, name=name, daemon=True)
         t.start()
-        log.info(f"[main] started thread: {t.name}")
+        log.info(f"[{name}] thread launched")
 
-    # Keep main thread alive; restart any dead thread every 60s
+    # Keep process alive; if a daemon thread crashes, it logs the exception.
     while True:
         time.sleep(60)
-        for t in threads:
-            if not t.is_alive():
-                log.warning(f"[main] thread '{t.name}' died — restarting")
-                new_t = threading.Thread(
-                    target=t._target,  # type: ignore[attr-defined]
-                    name=t.name,
-                    daemon=True,
-                )
-                new_t.start()
-                threads[threads.index(t)] = new_t
 
 
 if __name__ == "__main__":
