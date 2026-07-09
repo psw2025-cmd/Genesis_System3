@@ -43,6 +43,20 @@ def _limit_chain_df(df: pd.DataFrame, spot: Any) -> pd.DataFrame:
         return df.head(max_contracts)
 
 
+def _normalize_chain_source(source: Any) -> str:
+    """Return externally visible source truth.
+
+    DataSourceManager is only an internal adapter name. If a chain row arrived
+    through DataSourceManager, the upstream source is Dhan because the manager is
+    Dhan-only. Exposing `datasource_manager` confuses dashboard proof and can
+    block a real Dhan payload as non-Dhan.
+    """
+    src = str(source or "").strip().lower()
+    if src in ("", "datasource_manager", "real", "dhan_option_chain_live"):
+        return "dhan"
+    return src
+
+
 def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
     """Fetch option chain via DataSourceManager and normalize for /api/chain."""
     if not hasattr(dsm, "fetch_option_chain"):
@@ -67,6 +81,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         prev_oi = int(row.get("previous_oi", row.get("prev_oi", 0)) or 0)
         if chain_expiry is None:
             chain_expiry = row.get("expiry") or row.get("expiry_date")
+        row_source = _normalize_chain_source(row.get("source", "dhan"))
         base = {
             "underlying": underlying.upper(),
             "strike": strike,
@@ -87,7 +102,8 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
             "security_id": row.get("security_id") or row.get("token"),
             "trading_symbol": row.get("trading_symbol") or row.get("tradingSymbol") or row.get("symbol"),
             "expiry_date": row.get("expiry") or row.get("expiry_date"),
-            "source": str(row.get("source", "datasource_manager")),
+            "source": row_source,
+            "data_source": row_source,
         }
         contracts.append(enrich_option_row(base, default_expiry=chain_expiry))
 
@@ -97,7 +113,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
     pe_oi = sum(c["oi"] for c in contracts if c["option_type"] == "PE")
     ce_oi = sum(c["oi"] for c in contracts if c["option_type"] == "CE")
     pcr = float(pe_oi / ce_oi) if ce_oi > 0 else 1.0
-    source = contracts[0].get("source", "real")
+    source = _normalize_chain_source(contracts[0].get("source", "dhan"))
 
     return {
         "underlying": underlying.upper(),
@@ -105,8 +121,8 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         "pcr": pcr,
         "contracts": contracts,
         "total_contracts": len(contracts),
-        "data_source": source or "dhan",
-        "source_priority": "dhan_option_chain_live" if (source or "").lower() in ("dhan", "datasource_manager") else source,
+        "data_source": source,
+        "source_priority": "dhan_option_chain_live" if source == "dhan" else source,
         "status": "OK",
         "stale": False,
         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
