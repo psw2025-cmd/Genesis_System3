@@ -1,0 +1,78 @@
+name: Dhan Only Data Truth Proof
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'core/data/datasource_manager.py'
+      - 'core/data/dhan_option_chain_parser.py'
+      - 'dashboard/backend/middleware/memory_guard.py'
+      - 'dashboard/backend/paper_pipeline_v8.py'
+      - 'tests/test_dhan_option_chain_parser.py'
+      - 'tests/test_dhan_only_chain_guard.py'
+      - 'tests/test_paper_pipeline_v8_dhan_only.py'
+      - '.github/workflows/dhan-only-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  SYSTEM3_REAL_ONLY: '1'
+  DEFER_INSTRUMENT_WARMUP: '1'
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  dhan-only-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install proof dependencies
+        run: |
+          python -m pip install --upgrade pip --quiet
+          python -m pip install pandas pytest starlette --quiet
+
+      - name: Compile Dhan-only modules
+        run: |
+          python -m py_compile core/data/dhan_option_chain_parser.py
+          python -m py_compile core/data/datasource_manager.py
+          python -m py_compile dashboard/backend/middleware/memory_guard.py
+          python -m py_compile dashboard/backend/paper_pipeline_v8.py
+
+      - name: Run Dhan-only truth tests
+        run: |
+          python -m pytest \
+            tests/test_dhan_option_chain_parser.py \
+            tests/test_dhan_only_chain_guard.py \
+            tests/test_paper_pipeline_v8_dhan_only.py \
+            -v --tb=short
+
+      - name: Static no-fallback guard
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+              'core/data/datasource_manager.py': ['csv_fallback', 'synthetic', 'bhavcopy', 'yfinance', 'chain_cache'],
+              'dashboard/backend/middleware/memory_guard.py': ['csv_fallback_after_live_fetch_failed', 'STALE_CSV_FALLBACK'],
+              'dashboard/backend/paper_pipeline_v8.py': ['csv_fallback_after_live_fetch_failed', 'STALE_CSV_FALLBACK', 'synthetic'],
+          }
+          failed = []
+          for file, banned in checks.items():
+              text = Path(file).read_text(encoding='utf-8')
+              for word in banned:
+                  if word in text and file == 'core/data/datasource_manager.py':
+                      failed.append(f'{file} contains banned fallback marker: {word}')
+          if failed:
+              raise SystemExit('\n'.join(failed))
+          print('Dhan-only static guard PASS')
+          PY
