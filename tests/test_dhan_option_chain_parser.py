@@ -19,6 +19,73 @@ def sample_payload():
         return json.load(f)
 
 
+def test_official_dhan_v2_oc_payload_parsed():
+    payload = {
+        "status": "success",
+        "data": {
+            "last_price": 25642.8,
+            "oc": {
+                "25650.000000": {
+                    "ce": {
+                        "average_price": 146.99,
+                        "greeks": {"delta": 0.53871, "theta": -15.1539, "gamma": 0.00132, "vega": 12.18593},
+                        "implied_volatility": 9.789193798280868,
+                        "last_price": 134,
+                        "oi": 3786445,
+                        "previous_close_price": 244.85,
+                        "previous_oi": 402220,
+                        "previous_volume": 31931705,
+                        "security_id": 42528,
+                        "top_ask_price": 134,
+                        "top_ask_quantity": 1365,
+                        "top_bid_price": 133.55,
+                        "top_bid_quantity": 1625,
+                        "volume": 117567970,
+                    },
+                    "pe": {
+                        "average_price": 134.62,
+                        "greeks": {"delta": -0.46732, "theta": -10.61131, "gamma": 0.00109, "vega": 12.2025},
+                        "implied_volatility": 11.939337251280934,
+                        "last_price": 132.8,
+                        "oi": 3096145,
+                        "previous_close_price": 101.45,
+                        "previous_oi": 2327260,
+                        "previous_volume": 81224780,
+                        "security_id": 42529,
+                        "top_ask_price": 132.75,
+                        "top_ask_quantity": 390,
+                        "top_bid_price": 132.45,
+                        "top_bid_quantity": 65,
+                        "volume": 157009970,
+                    },
+                }
+            },
+        },
+    }
+
+    df, spot = parse_dhan_option_chain_payload(payload)
+
+    assert spot == pytest.approx(25642.8)
+    assert len(df) == 2
+    assert set(df["option_type"]) == {"CE", "PE"}
+    assert set(df["source"]) == {"dhan"}
+    ce = df[df["option_type"] == "CE"].iloc[0]
+    assert ce["strike"] == pytest.approx(25650.0)
+    assert ce["ltp"] == pytest.approx(134)
+    assert ce["oi"] == 3786445
+    assert ce["previous_oi"] == 402220
+    assert ce["change_in_oi"] == 3384225
+    assert ce["top_bid_price"] == pytest.approx(133.55)
+    assert ce["top_ask_price"] == pytest.approx(134)
+
+
+def test_unknown_payload_returns_empty_df_without_fallback_rows():
+    df, spot = parse_dhan_option_chain_payload({"status": "success", "data": {"last_price": 1, "oc": {}}})
+
+    assert spot == 0.0
+    assert df.empty
+
+
 def test_ce_and_pe_parsed(sample_payload):
     df, spot = parse_dhan_option_chain_payload(sample_payload)
     assert spot == pytest.approx(24500.5)
