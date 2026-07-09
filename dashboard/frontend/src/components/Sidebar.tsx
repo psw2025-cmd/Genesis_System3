@@ -1,12 +1,13 @@
 import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
-  Bell, Activity, Shield, Layers, Sparkles
+  Bell, Activity, Shield, Layers, Sparkles, CheckCircle
 } from 'lucide-react'
 import { useStore } from '../store'
 
 const TABS = [
   { id: 'genesis',     label: 'Genesis Brain', Icon: Sparkles,         group: 'main' },
+  { id: 'e2e-proof',   label: 'E2E Proof',     Icon: CheckCircle,      group: 'main' },
   { id: 'overview',    label: 'Overview',      Icon: LayoutDashboard,  group: 'main' },
   { id: 'chain',       label: 'Option Chain',  Icon: Layers,           group: 'market' },
   { id: 'signals',     label: 'Signals',       Icon: TrendingUp,       group: 'market' },
@@ -65,6 +66,7 @@ export function Sidebar() {
               const active = activeTab === id
               const marketDim = ['chain', 'signals', 'trade'].includes(id) && !marketOpen
               const isGenesis = id === 'genesis'
+              const isProof = id === 'e2e-proof'
               return (
                 <button
                   key={id}
@@ -79,7 +81,7 @@ export function Sidebar() {
                     border: active ? '1px solid var(--accent)' : '1px solid transparent',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: active ? 'var(--surface-3)' : isGenesis ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+                    background: active ? 'var(--surface-3)' : isGenesis || isProof ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
                     opacity: marketDim ? 0.45 : 1,
                     transition: 'all 0.12s',
                     position: 'relative',
@@ -90,12 +92,12 @@ export function Sidebar() {
                 >
                   <Icon
                     size={16}
-                    color={active || isGenesis ? 'var(--accent)' : 'var(--text-mut)'}
+                    color={active || isGenesis || isProof ? 'var(--accent)' : 'var(--text-mut)'}
                     style={{ flexShrink: 0 }}
                   />
                   <span style={{
                     fontSize: '12px',
-                    fontWeight: active || isGenesis ? 700 : 600,
+                    fontWeight: active || isGenesis || isProof ? 700 : 600,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -109,6 +111,7 @@ export function Sidebar() {
                       background: brokerConnected ? 'var(--up)' : 'var(--down)',
                     }} />
                   )}
+                  {id === 'e2e-proof' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>PROOF</span>}
                   {id === 'gates' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>LOCK</span>}
                 </button>
               )
