@@ -11,6 +11,7 @@ on:
       - 'dashboard/backend/**'
       - 'core/data/**'
       - 'tools/dashboard_live_ui_proof.mjs'
+      - 'tools/permanent_live_log_watch.mjs'
       - '.github/workflows/dashboard-live-proof.yml'
   schedule:
     - cron: "*/30 3-10 * * 1-5"
@@ -28,7 +29,7 @@ env:
 jobs:
   dashboard-live-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
@@ -47,10 +48,16 @@ jobs:
       - name: Capture live dashboard proof
         run: node tools/dashboard_live_ui_proof.mjs
 
+      - name: Permanent live log watch
+        if: always()
+        run: node tools/permanent_live_log_watch.mjs
+
       - name: Upload dashboard proof artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: dashboard-live-ui-proof
-          path: reports/latest/dashboard_live_ui_proof/
+          path: |
+            reports/latest/dashboard_live_ui_proof/
+            reports/latest/permanent_live_log_watch/
           retention-days: 14
