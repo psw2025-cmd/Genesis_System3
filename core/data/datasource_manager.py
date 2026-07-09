@@ -5,14 +5,21 @@ NSE scraping, Yahoo Finance, bhavcopy removed to save RAM.
 fetch_option_chain() preserved for chain_adapter.py compatibility.
 """
 from __future__ import annotations
+
 import json
 import logging
 import os
+import time
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[2]
+
+# --- GLOBAL STATE FOR CACHE & THROTTLING ---
+_LAST_CHAIN_FETCH = 0.0
+_EXPIRY_CACHE: Dict[int, Dict[str, Any]] = {}
 
 
 class DataSourceManager:
@@ -40,22 +47,80 @@ class DataSourceManager:
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client
 
+    def _throttle(self):
+        """Ensures a strict 3.2-second gap between heavy Dhan API calls."""
+        global _LAST_CHAIN_FETCH
+        elapsed = time.time() - _LAST_CHAIN_FETCH
+        if elapsed < 3.2:
+            time.sleep(3.2 - elapsed)
+        _LAST_CHAIN_FETCH = time.time()
+
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         """
         Fetch option chain — backward-compatible return: (DataFrame, spot_price).
         Uses Dhan API. Falls back to cached JSON file written by worker.
+
+        For indices, Dhan requires numeric UnderlyingScrip (security_id).
         """
         import pandas as pd
+        global _EXPIRY_CACHE
+
         sym = symbol.upper()
+
+        # Security ID map for index option chains
+        index_security_map = {
+            "NIFTY": 13,
+            "BANKNIFTY": 25,
+            "FINNIFTY": 27,
+            "MIDCPNIFTY": 442,
+            "SENSEX": 51,
+        }
 
         try:
             dhan = self._get_client()
             if dhan is not None:
+                security_id = index_security_map.get(sym)
+                if security_id is None:
+                    logger.warning(f"[DSM] No security_id mapping for {sym}; falling back to cached chain")
+                    raise ValueError(f"Unknown underlying for option_chain: {sym}")
+
+                # 1. Resolve Expiry (Fetch if blank, use 1-hour cache)
+                target_expiry = expiry
+                if not target_expiry:
+                    now = datetime.now()
+                    cache_entry = _EXPIRY_CACHE.get(security_id)
+
+                    if cache_entry and cache_entry["expires_at"] > now and cache_entry["expiries"]:
+                        target_expiry = cache_entry["expiries"][0]
+                    else:
+                        self._throttle()
+                        try:
+                            # Fetch new expiry list from Dhan
+                            exp_resp = dhan.get_expiry_list(UnderlyingScrip=str(security_id), UnderlyingSeg="IDX_I")
+                            if exp_resp and isinstance(exp_resp, dict) and exp_resp.get("status") == "success":
+                                data = exp_resp.get("data", [])
+                                if data and isinstance(data, list):
+                                    target_expiry = data[0]
+                                    _EXPIRY_CACHE[security_id] = {
+                                        "expiries": data,
+                                        "expires_at": now + timedelta(hours=1)
+                                    }
+                        except AttributeError:
+                            logger.warning(f"[DSM] get_expiry_list not available on this dhanhq version.")
+                        except Exception as e:
+                            logger.warning(f"[DSM] Expiry fetch error for {sym}: {e}")
+
+                    if not target_expiry:
+                        raise ValueError(f"No valid expiry resolved for {sym}. Cannot fetch chain.")
+
+                # 2. Throttle and Fetch Chain
+                self._throttle()
                 resp = dhan.get_option_chain(
-                    UnderlyingScrip=sym,
+                    UnderlyingScrip=str(security_id),
                     UnderlyingSeg="IDX_I",
-                    Expiry=expiry,
+                    Expiry=target_expiry,
                 )
+                
                 if resp and isinstance(resp, dict) and resp.get("status") == "success":
                     from core.data.dhan_option_chain_parser import parse_option_chain_to_df
                     df, spot = parse_option_chain_to_df(resp, sym)
@@ -68,6 +133,8 @@ class DataSourceManager:
         cache = ROOT / "state" / "chain_cache" / f"{sym}.json"
         if cache.exists():
             try:
+                import pandas as pd
+
                 data = json.loads(cache.read_text())
                 spot = float(data.get("spot", 0))
                 strikes = data.get("strikes", [])
@@ -84,8 +151,11 @@ class DataSourceManager:
         result = self.fetch_option_chain(symbol, expiry)
         if result is None or result[0] is None:
             return {
-                "underlying": symbol, "spot": 0, "pcr": 0,
-                "strikes": [], "error": "No data available",
+                "underlying": symbol,
+                "spot": 0,
+                "pcr": 0,
+                "strikes": [],
+                "error": "No data available",
             }
         df, spot = result
         return {
