@@ -2939,7 +2939,7 @@ async def _get_chain_uncached(underlying: str):
 
                     return fetch_chain_for_api(DataSourceManager(), underlying.upper())
 
-                eod = await _run_blocking(_eod_chain_fetch, timeout=45.0)
+                eod = await _run_blocking(_eod_chain_fetch, timeout=5.0)
                 if eod and int(eod.get("total_contracts") or 0) > 0:
                     eod["status"] = "EOD_SNAPSHOT"
                     eod["message"] = "After-hours chain from EOD archive (bhavcopy/NSE)"
@@ -4782,12 +4782,38 @@ async def get_portfolio_risk():
         positions = positions_data.get("positions", [])
 
         risk_mgmt = get_risk_management()
-        risk_metrics = risk_mgmt.calculate_portfolio_risk(positions)
+        
+        def _calc_risk():
+            return risk_mgmt.calculate_portfolio_risk(positions)
+            
+        try:
+            # Run the blocking calculation in a background thread with a 5-second timeout
+            risk_metrics = await _run_blocking(_calc_risk, timeout=5.0)
+        except Exception as timeout_err:
+            print(f"Risk calculation timed out: {timeout_err}")
+            risk_metrics = {"status": "MARKET_CLOSED", "message": "Risk calculation timed out (market likely closed)"}
 
         return {"status": "ok", "risk_metrics": risk_metrics}
     except Exception as e:
         return {"status": "ERROR", "message": str(e)}
 
+
+@app.post("/api/risk/check-limits")
+async def check_risk_limits(risk_limits: Dict[str, float]):
+    """Check risk limits"""
+    try:
+        if not ADVANCED_FEATURES_AVAILABLE:
+            return {"status": "ERROR", "message": "Risk management not available"}
+
+        positions_data = await get_positions()
+        positions = positions_data.get("positions", [])
+
+        risk_mgmt = get_risk_management()
+        limit_check = risk_mgmt.check_risk_limits(positions, risk_limits)
+
+        return {"status": "ok", "limit_check": limit_check}
+    except Exception as e:
+        return {"status": "ERROR", "message": str(e)}
 
 @app.post("/api/risk/check-limits")
 async def check_risk_limits(risk_limits: Dict[str, float]):
