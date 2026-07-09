@@ -8,7 +8,7 @@ oi_change, flat greeks on leg).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 
@@ -69,63 +69,93 @@ def parse_dhan_leg(leg: Dict[str, Any], strike: float, option_type: str) -> Dict
     }
 
 
-def parse_dhan_option_chain_payload(
-    payload: Any,
-) -> Tuple[pd.DataFrame, float]:
-    """
-    Parse Dhan option_chain API response.
-
-    Accepts full response dict or bare list of strike rows.
-    Returns (DataFrame, spot_price).
-    """
+def _iter_official_oc_rows(data: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float]:
+    """Parse official Dhan v2 response shape: data.oc.{strike}.{ce|pe}."""
     rows: List[Dict[str, Any]] = []
-    spot = 0.0
+    spot = _safe_float(data.get("last_price"))
+    oc = data.get("oc") or {}
+    if not isinstance(oc, dict):
+        return rows, spot
 
-    if isinstance(payload, dict):
-        data = payload.get("data", payload)
-        if isinstance(data, dict):
-            items = data.get("data", [])
-            spot = _safe_float(data.get("last_price", spot))
-        else:
-            items = data if isinstance(data, list) else []
-    elif isinstance(payload, list):
-        items = payload
-    else:
-        items = []
+    for strike_key, strike_payload in oc.items():
+        if not isinstance(strike_payload, dict):
+            continue
+        strike = _safe_float(strike_key, _safe_float(strike_payload.get("strike_price")))
+        for opt_type, key in (("CE", "ce"), ("PE", "pe")):
+            leg = strike_payload.get(key)
+            if isinstance(leg, dict) and leg:
+                rows.append(parse_dhan_leg(leg, strike, opt_type))
+    return rows, spot
 
+
+def _iter_list_rows(items: Any, initial_spot: float = 0.0) -> Tuple[List[Dict[str, Any]], float]:
+    """Parse SDK/list style rows that contain strike_price and ce/pe objects."""
+    rows: List[Dict[str, Any]] = []
+    spot = initial_spot
+    if not isinstance(items, list):
+        return rows, spot
     for item in items:
         if not isinstance(item, dict):
             continue
-        spot = _safe_float(item.get("last_price", spot))
-        strike = _safe_float(item.get("strike_price", 0))
-        for opt_type, key in [("CE", "ce"), ("PE", "pe")]:
+        spot = _safe_float(item.get("last_price", spot), spot)
+        strike = _safe_float(item.get("strike_price", item.get("strike", 0)))
+        for opt_type, key in (("CE", "ce"), ("PE", "pe")):
             leg = item.get(key)
             if isinstance(leg, dict) and leg:
                 rows.append(parse_dhan_leg(leg, strike, opt_type))
+    return rows, spot
 
-    return (pd.DataFrame(rows), spot) if rows else (pd.DataFrame(), spot)
+
+def parse_dhan_option_chain_payload(payload: Any) -> Tuple[pd.DataFrame, float]:
+    """
+    Parse Dhan option_chain API response.
+
+    Official Dhan v2 shape is:
+      {"status":"success", "data":{"last_price": ..., "oc": {"strike": {"ce":..., "pe":...}}}}
+
+    Some SDK versions may return a list-like wrapper. Both shapes are accepted.
+    Returns (DataFrame, spot_price). Empty result means no official Dhan chain rows
+    were present; callers must not silently substitute CSV/synthetic data as live.
+    """
+    if isinstance(payload, dict):
+        data = payload.get("data", payload)
+        if isinstance(data, dict):
+            official_rows, spot = _iter_official_oc_rows(data)
+            if official_rows:
+                return pd.DataFrame(official_rows), spot
+            list_rows, spot = _iter_list_rows(data.get("data", []), spot)
+            if list_rows:
+                return pd.DataFrame(list_rows), spot
+        elif isinstance(data, list):
+            list_rows, spot = _iter_list_rows(data)
+            if list_rows:
+                return pd.DataFrame(list_rows), spot
+    elif isinstance(payload, list):
+        list_rows, spot = _iter_list_rows(payload)
+        if list_rows:
+            return pd.DataFrame(list_rows), spot
+
+    return pd.DataFrame(), 0.0
+
 
 def parse_option_chain_to_df(resp: Dict[str, Any], symbol: str) -> tuple:
     """
-    Parse Dhan option chain response into (DataFrame, spot_price) tuple.
-    Backward-compatible with chain_adapter.py which expects this format.
+    Parse option-chain response into (DataFrame, spot_price) tuple.
+
+    First tries the official Dhan v2 parser. The legacy flat-list parser remains
+    only for old internal wrappers; it does not invent data.
     """
     try:
-        import pandas as pd
-        data = resp.get("data", {})
-        spot = float(data.get("last_price", 0) or data.get("spot_price", 0) or 0)
-        options = data.get("oc", data.get("options_chain", []))
-        
-        if not options and isinstance(data, dict):
-            # Try to find option data in nested structure
-            for key in data:
-                if isinstance(data[key], list) and len(data[key]) > 0:
-                    options = data[key]
-                    break
-        
-        if not options:
+        df, spot = parse_dhan_option_chain_payload(resp)
+        if df is not None and not df.empty:
+            return df, spot
+
+        data = resp.get("data", {}) if isinstance(resp, dict) else {}
+        spot = float(data.get("last_price", 0) or data.get("spot_price", 0) or 0) if isinstance(data, dict) else 0.0
+        options = data.get("options_chain", []) if isinstance(data, dict) else []
+        if not isinstance(options, list):
             return pd.DataFrame(), spot
-        
+
         rows = []
         for opt in options:
             if isinstance(opt, dict):
@@ -133,17 +163,19 @@ def parse_option_chain_to_df(resp: Dict[str, Any], symbol: str) -> tuple:
                     "strike": opt.get("strike_price", opt.get("SP", 0)),
                     "option_type": opt.get("option_type", opt.get("OT", "")),
                     "oi": opt.get("oi", opt.get("OI", 0)),
+                    "previous_oi": opt.get("previous_oi", opt.get("prev_oi", 0)),
+                    "change_in_oi": opt.get("change_in_oi", opt.get("COI", 0)),
                     "volume": opt.get("volume", opt.get("VOL", 0)),
                     "ltp": opt.get("last_price", opt.get("LTP", 0)),
-                    "bid": opt.get("bid_price", opt.get("BP", 0)),
-                    "ask": opt.get("ask_price", opt.get("AP", 0)),
-                    "iv": opt.get("implied_volatility", opt.get("IV", 0)),
-                    "change_in_oi": opt.get("change_in_oi", opt.get("COI", 0)),
+                    "top_bid_price": opt.get("top_bid_price", opt.get("bid_price", opt.get("BP", 0))),
+                    "top_ask_price": opt.get("top_ask_price", opt.get("ask_price", opt.get("AP", 0))),
+                    "iv": _safe_float(opt.get("implied_volatility", opt.get("IV", 0))) / 100.0,
+                    "implied_volatility": opt.get("implied_volatility", opt.get("IV", 0)),
                     "underlying": symbol,
+                    "source": "dhan",
                 })
-        
+
         df = pd.DataFrame(rows) if rows else pd.DataFrame()
         return df, spot
-    except Exception as e:
-        import pandas as pd
+    except Exception:
         return pd.DataFrame(), 0.0
