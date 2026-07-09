@@ -11,6 +11,7 @@ on:
       - 'dashboard/frontend/src/config.ts'
       - 'dashboard/frontend/src/components/Sidebar.tsx'
       - 'dashboard/frontend/src/components/EndToEndProof.tsx'
+      - 'dashboard/frontend/src/components/SystemTruthControl.tsx'
       - 'dashboard/frontend/src/components/PaperTrading.tsx'
       - 'dashboard/frontend/src/components/BrokerPanel.tsx'
       - 'dashboard/backend/**'
