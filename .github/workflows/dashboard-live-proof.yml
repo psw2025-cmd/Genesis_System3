@@ -2,8 +2,28 @@ name: Dashboard Live UI Proof
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'dashboard/frontend/src/App.tsx'
+      - 'dashboard/frontend/src/components/Sidebar.tsx'
+      - 'dashboard/frontend/src/components/EndToEndProof.tsx'
+      - 'dashboard/backend/**'
+      - 'core/data/**'
+      - 'tools/dashboard_live_ui_proof.mjs'
+      - '.github/workflows/dashboard-live-proof.yml'
   schedule:
     - cron: "*/30 3-10 * * 1-5"
+
+permissions:
+  contents: read
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  SYSTEM3_REAL_ONLY: '1'
 
 jobs:
   dashboard-live-proof:
@@ -29,6 +49,7 @@ jobs:
 
       - name: Upload dashboard proof artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: dashboard-live-ui-proof
           path: reports/latest/dashboard_live_ui_proof/
