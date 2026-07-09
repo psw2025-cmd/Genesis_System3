@@ -1,11 +1,13 @@
 """
 DataSourceManager — Dhan Only (backward-compatible API).
 All market data from DhanHQ API.
-NSE scraping, Yahoo Finance, bhavcopy removed to save RAM.
-fetch_option_chain() preserved for chain_adapter.py compatibility.
+
+No CSV/cache/synthetic fallback is allowed in this layer. If Dhan does not return
+valid option-chain rows, callers receive NO_DHAN_DATA and must display a blocked
+state instead of stale prices.
 """
 from __future__ import annotations
-import json
+
 import logging
 import os
 from datetime import date, timedelta
@@ -19,7 +21,6 @@ ROOT = Path(__file__).resolve().parents[2]
 class DataSourceManager:
     """
     Dhan-only data manager.
-    Saves ~200MB vs multi-source version (no requests.Session pools).
     Backward-compatible: fetch_option_chain() returns (DataFrame, spot_price).
     """
 
@@ -31,9 +32,7 @@ class DataSourceManager:
         "SENSEX": "51",
     }
 
-    # Dhan option-chain segment is not identical for every index.
-    # Keep env override so Render can correct a broker-side segment without code deploy:
-    #   DHAN_OPTION_CHAIN_SEGMENT_SENSEX=<broker accepted value>
+    # Official Dhan option-chain request uses UnderlyingScrip, UnderlyingSeg, Expiry.
     _DHAN_SEGMENTS = {
         "NIFTY": "IDX_I",
         "BANKNIFTY": "IDX_I",
@@ -44,6 +43,11 @@ class DataSourceManager:
 
     def __init__(self):
         self._client = None
+        self._last_error: Optional[str] = None
+
+    @property
+    def last_error(self) -> Optional[str]:
+        return self._last_error
 
     def _get_client(self):
         if self._client is None:
@@ -56,13 +60,16 @@ class DataSourceManager:
                 if client_id and token:
                     ctx = DhanContext(client_id, token)
                     self._client = dhanhq(ctx)
+                else:
+                    self._last_error = "DHAN_CREDENTIALS_MISSING"
             except Exception as e:
+                self._last_error = f"DHAN_CLIENT_INIT_FAILED: {e}"
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client
 
     @staticmethod
     def _nearest_expiry() -> str:
-        """Return nearest Thursday as YYYY-MM-DD for Dhan option_chain fallback."""
+        """Return nearest Thursday as YYYY-MM-DD for Dhan option_chain."""
         override = os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
         if override:
             return override
@@ -83,102 +90,128 @@ class DataSourceManager:
 
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         """
-        Fetch option chain — backward-compatible return: (DataFrame, spot_price).
-        Uses Dhan API. Falls back to cached JSON file written by worker.
+        Fetch option chain from Dhan only.
+
+        Return:
+          (DataFrame, spot_price) when official Dhan chain rows are available.
+          (None, 0.0) when Dhan is unavailable/empty/error.
+
+        This function intentionally does not read state/chain_cache or CSV files.
         """
-        import pandas as pd
         sym = symbol.upper()
+        self._last_error = None
 
         try:
             dhan = self._get_client()
-            if dhan is not None:
-                resp = None
-                parser_name = "parse_option_chain_to_df"
+            if dhan is None:
+                self._last_error = self._last_error or "DHAN_CLIENT_UNAVAILABLE"
+                return None, 0.0
 
-                if hasattr(dhan, "get_option_chain"):
-                    # Older/internal wrappers exposed get_option_chain(...).
+            resp = None
+            parser_name = "parse_option_chain_to_df"
+
+            if hasattr(dhan, "get_option_chain"):
+                sec_id = self._DHAN_SECURITY_IDS.get(sym)
+                segment = os.environ.get(
+                    f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
+                    self._DHAN_SEGMENTS.get(sym, "IDX_I"),
+                ).strip() or "IDX_I"
+                resolved_expiry = self._option_chain_expiry(sym, expiry)
+                if sec_id:
                     resp = dhan.get_option_chain(
-                        UnderlyingScrip=sym,
-                        UnderlyingSeg="IDX_I",
-                        Expiry=expiry,
+                        UnderlyingScrip=int(sec_id),
+                        UnderlyingSeg=segment,
+                        Expiry=resolved_expiry,
                     )
-                elif hasattr(dhan, "option_chain"):
-                    # DhanHQ SDK 2.2 exposes option_chain(...), not get_option_chain(...).
-                    sec_id = self._DHAN_SECURITY_IDS.get(sym)
-                    if sec_id:
-                        resolved_expiry = self._option_chain_expiry(sym, expiry)
-                        logger.info(
-                            f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} expiry={resolved_expiry}"
-                        )
-                        segment = os.environ.get(
-                            f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
-                            self._DHAN_SEGMENTS.get(sym, "IDX_I"),
-                        ).strip() or "IDX_I"
-                        resp = dhan.option_chain(
-                            under_security_id=sec_id,
-                            under_exchange_segment=segment,
-                            expiry=resolved_expiry,
-                        )
-                        parser_name = "parse_dhan_option_chain_payload"
-                    else:
-                        logger.warning(f"[DSM] No Dhan security id configured for {sym}")
                 else:
-                    logger.warning("[DSM] Dhan client has no option-chain method")
+                    self._last_error = f"DHAN_SECURITY_ID_MISSING:{sym}"
+                    logger.warning(f"[DSM] No Dhan security id configured for {sym}")
+            elif hasattr(dhan, "option_chain"):
+                sec_id = self._DHAN_SECURITY_IDS.get(sym)
+                if sec_id:
+                    resolved_expiry = self._option_chain_expiry(sym, expiry)
+                    segment = os.environ.get(
+                        f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
+                        self._DHAN_SEGMENTS.get(sym, "IDX_I"),
+                    ).strip() or "IDX_I"
+                    logger.info(
+                        f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} segment={segment} expiry={resolved_expiry}"
+                    )
+                    resp = dhan.option_chain(
+                        under_security_id=sec_id,
+                        under_exchange_segment=segment,
+                        expiry=resolved_expiry,
+                    )
+                    parser_name = "parse_dhan_option_chain_payload"
+                else:
+                    self._last_error = f"DHAN_SECURITY_ID_MISSING:{sym}"
+                    logger.warning(f"[DSM] No Dhan security id configured for {sym}")
+            else:
+                self._last_error = "DHAN_OPTION_CHAIN_METHOD_MISSING"
+                logger.warning("[DSM] Dhan client has no option-chain method")
 
-                if resp and isinstance(resp, dict) and resp.get("status") == "success":
-                    from core.data import dhan_option_chain_parser as parser
+            if not (resp and isinstance(resp, dict)):
+                self._last_error = self._last_error or "DHAN_EMPTY_RESPONSE"
+                return None, 0.0
+            if resp.get("status") != "success":
+                self._last_error = f"DHAN_STATUS_{resp.get('status') or 'UNKNOWN'}"
+                return None, 0.0
 
-                    if parser_name == "parse_dhan_option_chain_payload":
-                        df, spot = parser.parse_dhan_option_chain_payload(resp)
-                    else:
-                        df, spot = parser.parse_option_chain_to_df(resp, sym)
-                    if df is not None and not df.empty:
-                        return df, spot
+            from core.data import dhan_option_chain_parser as parser
+
+            if parser_name == "parse_dhan_option_chain_payload":
+                df, spot = parser.parse_dhan_option_chain_payload(resp)
+            else:
+                df, spot = parser.parse_option_chain_to_df(resp, sym)
+            if df is not None and not df.empty:
+                return df, spot
+            self._last_error = "DHAN_EMPTY_OPTION_CHAIN_ROWS"
+            return None, 0.0
         except Exception as e:
+            self._last_error = f"DHAN_FETCH_ERROR: {e}"
             logger.warning(f"[DSM] Dhan fetch_option_chain failed for {sym}: {e}")
-
-        # Fallback: cached file from worker scheduler
-        cache = ROOT / "state" / "chain_cache" / f"{sym}.json"
-        if cache.exists():
-            try:
-                data = json.loads(cache.read_text())
-                spot = float(data.get("spot", 0))
-                strikes = data.get("strikes", [])
-                if strikes:
-                    df = pd.DataFrame(strikes)
-                    return df, spot
-            except Exception as e:
-                logger.warning(f"[DSM] Cache read failed for {sym}: {e}")
-
-        return None, 0.0
+            return None, 0.0
 
     def get_option_chain(self, symbol: str, expiry: str = "") -> Dict[str, Any]:
-        """New-style API — returns dict directly."""
+        """New-style API — returns dict directly. Dhan-only; no fallback."""
         result = self.fetch_option_chain(symbol, expiry)
         if result is None or result[0] is None:
             return {
-                "underlying": symbol, "spot": 0, "pcr": 0,
-                "strikes": [], "error": "No data available",
+                "underlying": symbol.upper(),
+                "spot": 0,
+                "pcr": 0,
+                "strikes": [],
+                "status": "NO_DHAN_DATA",
+                "source": "dhan",
+                "error": self.last_error or "No Dhan option-chain data available",
             }
         df, spot = result
         return {
-            "underlying": symbol,
+            "underlying": symbol.upper(),
             "spot": spot,
             "strikes": df.to_dict("records") if hasattr(df, "to_dict") else [],
             "source": "dhan",
+            "status": "OK",
         }
 
     def get_spot_price(self, symbol: str) -> float:
-        """Get spot price from Dhan LTP API."""
+        """Get spot price from Dhan LTP API where available."""
         try:
             dhan = self._get_client()
             if dhan is None:
                 return 0.0
-            resp = dhan.get_ltp_data(securities={"IDX_I": [symbol]})
+            sec_id = self._DHAN_SECURITY_IDS.get(symbol.upper(), symbol)
+            segment = os.environ.get(
+                f"DHAN_OPTION_CHAIN_SEGMENT_{symbol.upper()}",
+                self._DHAN_SEGMENTS.get(symbol.upper(), "IDX_I"),
+            ).strip() or "IDX_I"
+            resp = dhan.get_ltp_data(securities={segment: [int(sec_id) if str(sec_id).isdigit() else sec_id]})
             if resp and isinstance(resp, dict):
                 data = resp.get("data", {})
                 if data:
-                    return float(list(data.values())[0].get("last_price", 0))
+                    first = list(data.values())[0]
+                    if isinstance(first, dict):
+                        return float(first.get("last_price", 0) or 0)
         except Exception as e:
             logger.warning(f"[DSM] LTP failed for {symbol}: {e}")
         return 0.0
@@ -188,7 +221,7 @@ class DataSourceManager:
         try:
             dhan = self._get_client()
             if dhan is None:
-                return {"status": "NO_CREDENTIALS", "source": "dhan"}
+                return {"status": "NO_CREDENTIALS", "source": "dhan", "error": self.last_error}
             resp = dhan.get_holdings()
             ok = isinstance(resp, dict) and "data" in resp
             return {"status": "OK" if ok else "ERROR", "source": "dhan"}
