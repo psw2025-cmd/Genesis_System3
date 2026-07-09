@@ -30,28 +30,56 @@ function badge(status: Status) {
   )
 }
 
+function looksLikeCandidate(x: any): boolean {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return false
+  const hasName = Boolean(x.underlying || x.symbol || x.ticker || x.name || x.trading_symbol)
+  const hasScore = x.score !== undefined || x.display_score !== undefined || x.confidence !== undefined || x.gain_pct !== undefined || x.change_percent !== undefined
+  const hasOption = x.option_side !== undefined || x.option_type !== undefined || x.signal_type !== undefined || x.side !== undefined || x.direction !== undefined
+  return hasName && (hasScore || hasOption)
+}
+
+function collectCandidateRows(x: any, depth = 0): any[] {
+  if (depth > 8 || x == null) return []
+  if (Array.isArray(x)) {
+    if (x.some(looksLikeCandidate)) return x.filter(looksLikeCandidate)
+    return x.flatMap(v => collectCandidateRows(v, depth + 1))
+  }
+  if (typeof x !== 'object') return []
+
+  const rows: any[] = []
+  for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'top5', 'top', 'entries']) {
+    if (Array.isArray(x[key])) rows.push(...collectCandidateRows(x[key], depth + 1))
+  }
+  for (const key of ['top_ce', 'top_pe', 'market_top_ce', 'market_top_pe', 'best_ce', 'best_pe']) {
+    if (looksLikeCandidate(x[key])) rows.push(x[key])
+  }
+  for (const key of ['latest', 'data', 'scanner', 'market_wide', 'by_segment', 'segments', 'payload', 'result']) {
+    if (x[key]) rows.push(...collectCandidateRows(x[key], depth + 1))
+  }
+  return rows
+}
+
 function countList(x: any): number {
   if (Array.isArray(x)) return x.length
   if (!x || typeof x !== 'object') return 0
-  for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'entries', 'exits', 'positions', 'holdings']) {
+  for (const key of ['positions', 'holdings', 'rows', 'data']) {
     if (Array.isArray(x[key])) return x[key].length
-    if (Array.isArray(x?.data?.[key])) return x.data[key].length
   }
-  return 0
+  return collectCandidateRows(x).length
 }
 
 function hasCePe(x: any): boolean {
   const stack: any[] = [x]
   let seen = 0
-  while (stack.length && seen < 1000) {
+  while (stack.length && seen < 1500) {
     seen += 1
     const item = stack.pop()
     if (Array.isArray(item)) {
       for (const child of item.slice(0, 100)) stack.push(child)
     } else if (item && typeof item === 'object') {
-      const side = String(item.option_side || item.option_type || item.signal_type || item.side || item.direction || item.action || '').toUpperCase()
+      const side = String(item.option_side || item.option_type || item.signal_type || item.side || item.direction || item.action || item.instrument_type || '').toUpperCase()
       if (side.includes('CE') || side.includes('PE') || side.includes('CALL') || side.includes('PUT')) return true
-      for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'latest', 'data']) {
+      for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'latest', 'data', 'scanner', 'market_wide', 'by_segment', 'segments', 'top_ce', 'top_pe']) {
         if (item[key]) stack.push(item[key])
       }
     }
@@ -91,6 +119,7 @@ export function SystemTruthControl() {
         ['holdings', axios.get(`${API_BASE}/api/broker/holdings`)],
         ['positions', axios.get(`${API_BASE}/api/broker/positions/live`)],
         ['gain', axios.get(`${API_BASE}/api/gain_rank`)],
+        ['scanner', axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5`)],
         ['pnl', axios.get(`${API_BASE}/api/pnl`)],
         ['trades', axios.get(`${API_BASE}/api/trades/today`)],
         ['gates', axios.get(`${API_BASE}/api/auto_gates`)],
@@ -119,6 +148,7 @@ export function SystemTruthControl() {
     const funds = data.funds?.data || {}
     const state = data.state?.data || {}
     const gain = data.gain?.data || {}
+    const scanner = data.scanner?.data || {}
     const trades = data.trades?.data || {}
     const gates = data.gates?.data || {}
     const chains = CHAIN_SYMBOLS.map(sym => ({ sym, payload: data[`chain_${sym}`]?.data, ok: data[`chain_${sym}`]?.ok }))
@@ -126,9 +156,12 @@ export function SystemTruthControl() {
     const chainSafeBlocks = chains.filter(x => x.ok && safeNoTradeChain(x.payload)).length
     const liveFlag = state.live_trading_enabled ?? state.liveTradingEnabled ?? broker.live_trading_enabled ?? false
     const orderAllowed = state.order_placement_allowed ?? broker.order_placement_allowed ?? false
-    const gainCount = countList(gain)
+    const gainRows = collectCandidateRows(gain)
+    const scannerRows = collectCandidateRows(scanner)
+    const gainCount = gainRows.length + scannerRows.length
     const tradeCount = countList(trades)
     const gateOk = Boolean(data.gates?.ok)
+    const cePeOk = hasCePe(gain) || hasCePe(scanner)
 
     return [
       {
@@ -146,7 +179,7 @@ export function SystemTruthControl() {
       {
         layer: 'Funds / margin truth',
         status: data.funds?.ok && !funds.error ? 'PASS' : 'BLOCKED',
-        evidence: `available=${funds.available_balance ?? '-'}, used=${funds.used_margin ?? '-'}, source=${funds.source || '-'}`,
+        evidence: `available=${funds.available_balance ?? funds.normalized?.available_balance ?? '-'}, used=${funds.used_margin ?? funds.normalized?.used_margin ?? '-'}, source=${funds.source || '-'}`,
         requiredForMoney: true,
       },
       {
@@ -164,13 +197,13 @@ export function SystemTruthControl() {
       {
         layer: 'Universe / ranking candidates',
         status: gainCount > 0 ? 'PASS' : 'BLOCKED',
-        evidence: `candidate_rows=${gainCount}`,
+        evidence: `candidate_rows=${gainCount}, gain=${gainRows.length}, scanner=${scannerRows.length}`,
         requiredForMoney: true,
       },
       {
         layer: 'CE / PE decision evidence',
-        status: hasCePe(gain) ? 'PASS' : 'BLOCKED',
-        evidence: hasCePe(gain) ? 'CE/PE field found in model/ranker payload' : 'No CE/PE side found in model/ranker payload',
+        status: cePeOk ? 'PASS' : 'BLOCKED',
+        evidence: cePeOk ? 'CE/PE field found in ranker/scanner payload' : 'No CE/PE side found in model/ranker/scanner payload',
         requiredForMoney: true,
       },
       {
