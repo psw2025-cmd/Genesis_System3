@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -71,13 +71,14 @@ class DataSourceManager:
         return self._client
 
     @staticmethod
-    def _nearest_expiry() -> str:
-        """Last-resort fallback only; official expiry-list is preferred."""
-        today = date.today()
-        days_ahead = (3 - today.weekday()) % 7
-        if days_ahead == 0:
-            days_ahead = 7
-        return (today + timedelta(days=days_ahead)).strftime("%Y-%m-%d")
+    def _market_closed_now() -> bool:
+        try:
+            from utils.market_hours import is_market_open
+
+            open_now, _reason = is_market_open()
+            return not bool(open_now)
+        except Exception:
+            return False
 
     def _load_expiry_cache(self) -> Dict[str, Any]:
         try:
@@ -96,15 +97,22 @@ class DataSourceManager:
         except Exception as exc:
             logger.warning(f"[DSM] Could not save Dhan expiry cache: {exc}")
 
-    def _fetch_dhan_expiry_list_raw(self, sec_id: str, segment: str) -> List[str]:
-        """Fetch official Dhan expiry list for an underlying.
-
-        This uses the documented REST endpoint directly instead of relying on a
-        particular SDK method name. It avoids the old nearest-Thursday guess.
-        """
+    def _dhan_headers(self) -> Optional[Dict[str, str]]:
         client_id = os.environ.get("DHAN_CLIENT_ID", "").strip()
         token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip()
         if not client_id or not token:
+            self._last_error = "DHAN_CREDENTIALS_MISSING"
+            return None
+        return {
+            "Content-Type": "application/json",
+            "access-token": token,
+            "client-id": client_id,
+        }
+
+    def _fetch_dhan_expiry_list_raw(self, sec_id: str, segment: str) -> List[str]:
+        """Fetch official Dhan expiry list for an underlying."""
+        headers = self._dhan_headers()
+        if not headers:
             self._last_error = "DHAN_CREDENTIALS_MISSING_FOR_EXPIRY_LIST"
             return []
         try:
@@ -112,11 +120,7 @@ class DataSourceManager:
 
             resp = requests.post(
                 "https://api.dhan.co/v2/optionchain/expirylist",
-                headers={
-                    "Content-Type": "application/json",
-                    "access-token": token,
-                    "client-id": client_id,
-                },
+                headers=headers,
                 json={"UnderlyingScrip": int(sec_id), "UnderlyingSeg": segment},
                 timeout=10,
             )
@@ -133,12 +137,45 @@ class DataSourceManager:
                 return []
             dates = payload.get("data") or []
             if not isinstance(dates, list):
+                self._last_error = "DHAN_EXPIRY_LIST_BAD_DATA_SHAPE"
                 return []
-            return [str(x) for x in dates if str(x).strip()]
+            return [str(x)[:10] for x in dates if str(x).strip()]
         except Exception as exc:
             self._last_error = f"DHAN_EXPIRY_LIST_ERROR: {exc}"
             logger.warning(f"[DSM] Dhan expiry-list fetch failed: {exc}")
             return []
+
+    def _fetch_dhan_option_chain_raw(self, sec_id: str, segment: str, expiry: str) -> Optional[Dict[str, Any]]:
+        """Fetch official Dhan v2 option-chain payload. No non-Dhan fallback."""
+        headers = self._dhan_headers()
+        if not headers:
+            self._last_error = "DHAN_CREDENTIALS_MISSING_FOR_OPTION_CHAIN"
+            return None
+        try:
+            import requests
+
+            resp = requests.post(
+                "https://api.dhan.co/v2/optionchain",
+                headers=headers,
+                json={"UnderlyingScrip": int(sec_id), "UnderlyingSeg": segment, "Expiry": expiry},
+                timeout=15,
+            )
+            try:
+                payload = resp.json()
+            except Exception:
+                payload = {"raw": resp.text[:500]}
+            if resp.status_code >= 400:
+                self._last_error = f"DHAN_OPTION_CHAIN_HTTP_{resp.status_code}:{expiry}"
+                logger.warning(f"[DSM] Dhan option-chain HTTP {resp.status_code}: {payload}")
+                return None
+            if not isinstance(payload, dict) or payload.get("status") != "success":
+                self._last_error = f"DHAN_OPTION_CHAIN_STATUS_{payload.get('status') if isinstance(payload, dict) else 'BAD_PAYLOAD'}:{expiry}"
+                return None
+            return payload
+        except Exception as exc:
+            self._last_error = f"DHAN_OPTION_CHAIN_ERROR: {exc}"
+            logger.warning(f"[DSM] Dhan option-chain fetch failed: {exc}")
+            return None
 
     def _official_expiry_list(self, sym: str, sec_id: str, segment: str) -> List[str]:
         key = f"{sym}:{sec_id}:{segment}"
@@ -149,7 +186,7 @@ class DataSourceManager:
             age = now_ts - float(item.get("fetched_ts", 0) or 0)
             dates = item.get("dates") or []
             if age <= _EXPIRY_CACHE_TTL_S and isinstance(dates, list) and dates:
-                return [str(x) for x in dates]
+                return [str(x)[:10] for x in dates]
 
         dates = self._fetch_dhan_expiry_list_raw(sec_id, segment)
         if dates:
@@ -157,9 +194,9 @@ class DataSourceManager:
             self._save_expiry_cache(cache)
         return dates
 
-    @staticmethod
-    def _pick_active_expiry(dates: List[str]) -> str:
+    def _pick_active_expiry(self, dates: List[str]) -> str:
         today = date.today()
+        skip_today = self._market_closed_now()
         parsed: List[Tuple[date, str]] = []
         for raw in dates:
             try:
@@ -167,37 +204,35 @@ class DataSourceManager:
                 parsed.append((d, str(raw)[:10]))
             except Exception:
                 continue
-        future = sorted((d, s) for d, s in parsed if d >= today)
+        if skip_today:
+            future = sorted((d, s) for d, s in parsed if d > today)
+        else:
+            future = sorted((d, s) for d, s in parsed if d >= today)
         if future:
             return future[0][1]
-        if parsed:
+        if parsed and not skip_today:
             return sorted(parsed)[-1][1]
         return ""
 
     def _option_chain_expiry(self, sym: str, sec_id: str, segment: str, expiry: str = "") -> str:
-        """Resolve option-chain expiry using Dhan's official expiry list.
-
-        Explicit env/request override is still honored for emergency operator
-        control, but automatic operation uses /optionchain/expirylist.
-        """
+        """Resolve option-chain expiry using Dhan's official expiry list only."""
         manual = (
             (expiry or "").strip()
             or os.environ.get(f"DHAN_OPTION_CHAIN_EXPIRY_{sym.upper()}", "").strip()
             or os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
         )
         if manual:
-            return manual
+            return manual[:10]
         dates = self._official_expiry_list(sym.upper(), sec_id, segment)
         picked = self._pick_active_expiry(dates)
         if picked:
             return picked
-        fallback = self._nearest_expiry()
-        self._last_error = self._last_error or "DHAN_EXPIRY_LIST_EMPTY_USING_LAST_RESORT_DATE_GUESS"
-        return fallback
+        self._last_error = self._last_error or "DHAN_EXPIRY_LIST_EMPTY_NO_OFFICIAL_EXPIRY"
+        return ""
 
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         """
-        Fetch option chain from Dhan only.
+        Fetch option chain from official Dhan REST only.
 
         Return:
           (DataFrame, spot_price) when official Dhan chain rows are available.
@@ -207,13 +242,6 @@ class DataSourceManager:
         self._last_error = None
 
         try:
-            dhan = self._get_client()
-            if dhan is None:
-                self._last_error = self._last_error or "DHAN_CLIENT_UNAVAILABLE"
-                return None, 0.0
-
-            resp = None
-            parser_name = "parse_option_chain_to_df"
             sec_id = self._DHAN_SECURITY_IDS.get(sym)
             segment = os.environ.get(
                 f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
@@ -226,40 +254,27 @@ class DataSourceManager:
                 return None, 0.0
 
             resolved_expiry = self._option_chain_expiry(sym, sec_id, segment, expiry)
+            if not resolved_expiry:
+                self._last_error = self._last_error or f"DHAN_NO_OFFICIAL_EXPIRY:{sym}"
+                return None, 0.0
 
-            if hasattr(dhan, "get_option_chain"):
-                logger.info(f"[DSM] Dhan get_option_chain fetch: {sym} sec_id={sec_id} segment={segment} expiry={resolved_expiry}")
-                resp = dhan.get_option_chain(
-                    UnderlyingScrip=int(sec_id),
-                    UnderlyingSeg=segment,
-                    Expiry=resolved_expiry,
-                )
-            elif hasattr(dhan, "option_chain"):
-                logger.info(f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} segment={segment} expiry={resolved_expiry}")
-                resp = dhan.option_chain(
-                    under_security_id=sec_id,
-                    under_exchange_segment=segment,
-                    expiry=resolved_expiry,
-                )
-                parser_name = "parse_dhan_option_chain_payload"
-            else:
-                self._last_error = "DHAN_OPTION_CHAIN_METHOD_MISSING"
-                logger.warning("[DSM] Dhan client has no option-chain method")
-
+            logger.info(f"[DSM] Dhan REST option-chain fetch: {sym} sec_id={sec_id} segment={segment} expiry={resolved_expiry}")
+            resp = self._fetch_dhan_option_chain_raw(sec_id, segment, resolved_expiry)
             if not (resp and isinstance(resp, dict)):
                 self._last_error = self._last_error or "DHAN_EMPTY_RESPONSE"
-                return None, 0.0
-            if resp.get("status") != "success":
-                self._last_error = f"DHAN_STATUS_{resp.get('status') or 'UNKNOWN'}"
                 return None, 0.0
 
             from core.data import dhan_option_chain_parser as parser
 
-            if parser_name == "parse_dhan_option_chain_payload":
-                df, spot = parser.parse_dhan_option_chain_payload(resp)
-            else:
-                df, spot = parser.parse_option_chain_to_df(resp, sym)
+            df, spot = parser.parse_dhan_option_chain_payload(resp)
             if df is not None and not df.empty:
+                try:
+                    if "expiry" not in df.columns:
+                        df["expiry"] = resolved_expiry
+                    if "underlying" not in df.columns:
+                        df["underlying"] = sym
+                except Exception:
+                    pass
                 return df, spot
             self._last_error = f"DHAN_EMPTY_OPTION_CHAIN_ROWS:{sym}:{resolved_expiry}"
             return None, 0.0
