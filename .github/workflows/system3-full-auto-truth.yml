@@ -1,0 +1,112 @@
+name: System3 Full Auto Truth
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_first:
+        description: "Trigger Render deploy hook before proof"
+        required: false
+        default: "false"
+  schedule:
+    - cron: "*/30 3-10 * * 1-5"
+
+permissions:
+  contents: read
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  SYSTEM3_REAL_ONLY: '1'
+  DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+  DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+  RENDER_BACKEND_DEPLOY_HOOK_URL: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}
+
+jobs:
+  full-auto-truth:
+    name: Deploy optional + verify complete truth chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install proof tooling
+        run: |
+          npm --prefix tools install --no-save --no-package-lock playwright
+          npm --prefix tools exec playwright install chromium
+
+      - name: Optional Render deploy
+        if: ${{ github.event.inputs.deploy_first == 'true' }}
+        run: |
+          if [ -z "$RENDER_BACKEND_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_BACKEND_DEPLOY_HOOK_URL secret not configured; skipping deploy hook"
+            exit 0
+          fi
+          curl -fsS -X POST "$RENDER_BACKEND_DEPLOY_HOOK_URL" >/tmp/render_deploy_response.txt || {
+            echo "Render deploy hook call failed"
+            cat /tmp/render_deploy_response.txt || true
+            exit 1
+          }
+          echo "Render deploy hook accepted"
+
+      - name: Wait for backend health
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request
+          base = os.environ.get('DASHBOARD_BASE_URL','').rstrip('/')
+          deadline = time.time() + 900
+          last = None
+          while time.time() < deadline:
+            try:
+              with urllib.request.urlopen(base + '/api/health', timeout=20) as r:
+                body = r.read(200000).decode('utf-8', 'replace')
+                last = body
+                if 200 <= r.status < 400:
+                  print('backend health ok')
+                  raise SystemExit(0)
+            except Exception as exc:
+              last = str(exc)
+            print('waiting backend health:', str(last)[:200])
+            time.sleep(20)
+          print('backend health did not become ok')
+          print(last)
+          raise SystemExit(1)
+          PY
+
+      - name: Repo no-fake frontend guard
+        run: node tools/frontend_no_fake_guard.mjs
+
+      - name: Cloud runtime check
+        if: always()
+        run: |
+          python tools/cloud_runtime_check.py \
+            --base-url "$DASHBOARD_BASE_URL" \
+            --expected-commit "$(git rev-parse HEAD)"
+
+      - name: Dashboard visual truth proof
+        if: always()
+        run: node tools/dashboard_live_ui_proof.mjs
+
+      - name: Permanent browser/network log watch
+        if: always()
+        run: node tools/permanent_live_log_watch.mjs
+
+      - name: Upload full auto truth artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: system3-full-auto-truth
+          path: |
+            reports/latest/cloud_runtime_check/
+            reports/latest/dashboard_live_ui_proof/
+            reports/latest/permanent_live_log_watch/
+          retention-days: 14
