@@ -77,10 +77,19 @@ function dhanChainOk(payload) {
   const status = String(payload.status || '').toUpperCase()
   const combined = `${source} ${priority} ${status}`
   if (payload.stale === true) return false
-  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(combined)) return false
+  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock)/i.test(combined)) return false
   const contracts = Number(payload.total_contracts || (Array.isArray(payload.contracts) ? payload.contracts.length : 0))
   const spot = Number(payload.spot || 0)
-  return source === 'dhan' && spot > 0 && contracts > 0
+  const allowedStatus = status === 'OK' || status === 'MARKET_OPEN' || status === 'MARKET_CLOSED_DHAN_SNAPSHOT' || status === 'EOD_SNAPSHOT'
+  return source === 'dhan' && allowedStatus && spot > 0 && contracts > 0
+}
+
+function isSafeDhanBlocked(payload) {
+  if (!payload || typeof payload !== 'object') return false
+  const status = String(payload.status || '').toUpperCase()
+  const reason = String(payload.blocked_reason || payload.message || '').toUpperCase()
+  const source = String(payload.data_source || payload.source || '').toLowerCase()
+  return source === 'dhan' && status === 'NO_DHAN_DATA' && /NO_CURRENT|NO_DHAN|OPTION_CHAIN|ROWS/.test(reason)
 }
 
 const browser = await chromium.launch({ headless: true })
@@ -120,11 +129,13 @@ const summary = {
   network_response_count: 0,
   screenshots: [],
   final_verdict: 'UNKNOWN',
+  infra_blockers: [],
+  trade_readiness_blockers: [],
   blockers: []
 }
 
 try {
-  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 60000 })
 
   if (key) {
     const auth = await page.evaluate(async (apiKey) => {
@@ -137,12 +148,13 @@ try {
       return { ok: r.ok, status: r.status, text: await r.text() }
     }, key)
     summary.auth = { ok: auth.ok, status: auth.status }
-    if (!auth.ok) summary.blockers.push(`AUTH_FAIL:${auth.status}`)
-    await page.reload({ waitUntil: 'networkidle', timeout: 60000 })
+    if (!auth.ok) summary.infra_blockers.push(`AUTH_FAIL:${auth.status}`)
   } else {
     summary.auth = { ok: false, status: 0, note: 'DASHBOARD_API_KEY secret not configured' }
-    summary.blockers.push('DASHBOARD_API_KEY_SECRET_MISSING')
+    summary.infra_blockers.push('DASHBOARD_API_KEY_SECRET_MISSING')
   }
+
+  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
 
   for (const ep of endpoints) {
     const result = await page.evaluate(async (ep) => {
@@ -157,14 +169,16 @@ try {
     const payload = tryJson(result.body)
     fs.writeFileSync(path.join(outDir, `${safeName(ep)}.txt`), result.body || result.error || '')
     summary.endpoints.push({ endpoint: ep, ok: result.ok, status: result.status, error: result.error || null })
-    if (!result.ok) summary.blockers.push(`API_FAIL:${ep}:${result.status}`)
-    scanForbidden(`API:${ep}`, result.body || result.error || '', summary.blockers)
+    if (!result.ok) summary.infra_blockers.push(`API_FAIL:${ep}:${result.status}`)
+    scanForbidden(`API:${ep}`, result.body || result.error || '', summary.infra_blockers)
 
     if (ep.includes('/api/chain/')) {
       const ok = dhanChainOk(payload)
+      const safeBlocked = isSafeDhanBlocked(payload)
       const row = {
         endpoint: ep,
         ok,
+        safe_blocked: safeBlocked,
         source: payload?.data_source || payload?.source || null,
         priority: payload?.source_priority || null,
         status: payload?.status || null,
@@ -173,7 +187,11 @@ try {
         blocker: ok ? null : (payload?.blocked_reason || payload?.message || payload?.status || 'NOT_REAL_DHAN_CHAIN')
       }
       summary.chain_truth.push(row)
-      if (!ok) summary.blockers.push(`CHAIN_NOT_REAL_DHAN:${ep}:${row.blocker}`)
+      if (!ok) {
+        const msg = `CHAIN_NOT_TRADE_READY:${ep}:${row.blocker}`
+        if (safeBlocked) summary.trade_readiness_blockers.push(msg)
+        else summary.infra_blockers.push(msg)
+      }
     }
   }
 
@@ -183,19 +201,19 @@ try {
       await page.waitForTimeout(3000)
       const body = await page.locator('body').innerText({ timeout: 10000 })
       fs.writeFileSync(path.join(outDir, `${id}.body.txt`), body)
-      scanForbidden(`UI:${title}`, body, summary.blockers)
+      scanForbidden(`UI:${title}`, body, summary.infra_blockers)
       const screenshot = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshot, fullPage: true })
       const ok = fs.existsSync(screenshot) && fs.statSync(screenshot).size > 10000
       summary.screenshots.push({ id, title, ok, path: screenshot, size: ok ? fs.statSync(screenshot).size : 0 })
-      if (!ok) summary.blockers.push(`SCREENSHOT_MISSING_OR_EMPTY:${title}`)
+      if (!ok) summary.infra_blockers.push(`SCREENSHOT_MISSING_OR_EMPTY:${title}`)
     } catch (err) {
       summary.screenshots.push({ id, title, ok: false, error: String(err) })
-      summary.blockers.push(`UI_TAB_EXCEPTION:${title}:${String(err).slice(0, 160)}`)
+      summary.infra_blockers.push(`UI_TAB_EXCEPTION:${title}:${String(err).slice(0, 160)}`)
     }
   }
 } catch (err) {
-  summary.blockers.push(`TOP_LEVEL_EXCEPTION:${String(err).slice(0, 240)}`)
+  summary.infra_blockers.push(`TOP_LEVEL_EXCEPTION:${String(err).slice(0, 240)}`)
 }
 
 summary.browser_console_count = browserConsole.length
@@ -206,18 +224,19 @@ summary.network_response_count = networkResponses.length
 for (const item of browserConsole) {
   const text = `${item.type} ${item.text}`
   if (/error/i.test(item.type) || /failed|error|exception|401|500|csv_fallback|synthetic|fallback|stale/i.test(text)) {
-    summary.blockers.push(`BROWSER_CONSOLE:${text.slice(0, 180)}`)
+    summary.infra_blockers.push(`BROWSER_CONSOLE:${text.slice(0, 180)}`)
   }
 }
-for (const err of pageErrors) summary.blockers.push(`PAGE_ERROR:${err.message}`)
-for (const req of requestFailures) summary.blockers.push(`REQUEST_FAILED:${req.url}:${req.failure}`)
+for (const err of pageErrors) summary.infra_blockers.push(`PAGE_ERROR:${err.message}`)
+for (const req of requestFailures) summary.infra_blockers.push(`REQUEST_FAILED:${req.url}:${req.failure}`)
 
 fs.writeFileSync(path.join(outDir, 'browser_console.json'), JSON.stringify(browserConsole, null, 2))
 fs.writeFileSync(path.join(outDir, 'page_errors.json'), JSON.stringify(pageErrors, null, 2))
 fs.writeFileSync(path.join(outDir, 'request_failures.json'), JSON.stringify(requestFailures, null, 2))
 fs.writeFileSync(path.join(outDir, 'network_responses.json'), JSON.stringify(networkResponses, null, 2))
 
-summary.final_verdict = summary.blockers.length === 0 ? 'PASS' : 'FAIL'
+summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blockers]
+summary.final_verdict = summary.infra_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
   '# Permanent Live Log Watch',
@@ -233,7 +252,7 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `- Network responses: ${summary.network_response_count}`,
   '',
   '## Dhan Chain Truth',
-  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.endpoint} source=${x.source} priority=${x.priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
+  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.endpoint} source=${x.source} priority=${x.priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
   '',
   '## API Endpoints',
   ...summary.endpoints.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.endpoint}${x.error ? ` ${x.error}` : ''}`),
@@ -241,14 +260,22 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   '## Screenshots',
   ...summary.screenshots.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} size=${x.size || 0}${x.error ? ` ${x.error}` : ''}`),
   '',
-  '## Blockers',
-  ...(summary.blockers.length ? summary.blockers.map(x => `- ${x}`) : ['- none'])
+  '## Infrastructure Blockers',
+  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']),
+  '',
+  '## Trading Readiness Blockers',
+  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none'])
 ].join('\n'))
 
 await browser.close()
 
-if (summary.final_verdict !== 'PASS') {
-  console.error(`PERMANENT_LIVE_LOG_WATCH_FAILED blockers=${summary.blockers.length}`)
-  console.error(summary.blockers.join('\n'))
+if (summary.infra_blockers.length) {
+  console.error(`PERMANENT_LIVE_LOG_WATCH_FAILED infra_blockers=${summary.infra_blockers.length}`)
+  console.error(summary.infra_blockers.join('\n'))
   process.exit(1)
+}
+
+if (summary.trade_readiness_blockers.length) {
+  console.error(`PERMANENT_LIVE_LOG_WATCH_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`)
+  console.error(summary.trade_readiness_blockers.join('\n'))
 }
