@@ -9,13 +9,10 @@ Runs six background daemons as threads:
   Thread 3 — Job scheduler      : fires the scheduled weekday analysis jobs
   Thread 4 — Health push        : pushes scheduler heartbeat/job-status to the
                                    web service every ~30s (see ARCHITECTURE note)
-  Thread 5 — Chain push         : precomputes option chains for the default
-                                   underlyings and pushes them to the web
-                                   service every ~20s during market hours,
-                                   and every ~5min while the market is closed
-                                   (EOD/bhavcopy snapshot barely changes
-                                   between pushes off-hours — see ARCHITECTURE
-                                   note)
+  Thread 5 — Chain push         : precomputes official Dhan option chains for
+                                   the default underlyings, persists them for
+                                   the paper/analyzer pipeline, and pushes them
+                                   to the web service.
   Thread 6 — Core Pipeline V8   : analyzer/paper ledger from real-data forecasts
 
 ARCHITECTURE NOTE: Render's `web` and `worker` services run as separate
@@ -27,25 +24,10 @@ state over HTTP to the web service's /api/scheduler/health/push
 endpoint instead. If WEB_SERVICE_URL is not set, Thread 4 logs a
 warning once and stays idle (does not crash the worker).
 
-Thread 5 exists because GET /api/chain/{underlying} on the web service used
-to do its DataSourceManager() + live Dhan fetch INLINE on the request path —
-polled every 5s by every open browser tab, on the same single-worker
-(--workers 1) 512MB web container that also has to stay responsive for
-Render's own health checks. That was a leading suspect for the web dyno's
-502 crash-loop during market hours (2026-07-02 forensic investigation, see
-CHANGE_LOG.md). Thread 5 moves that cost here instead: this worker container
-is not request-serving, so a slow/heavy tick here never produces a 502 for a
-real user, and if this thread's own memory use becomes a problem it can be
-tuned/throttled independently of the user-facing web dyno.
-
-Thread 5 originally only ran `if mkt_open`, which meant the pushed snapshot
-went stale the instant the market closed and every after-hours page view fell
-back to the same expensive inline DataSourceManager() fetch on the web dyno
-that this thread exists to avoid — reproduced live on 2026-07-02: /api/chain
-returned an empty MARKET_CLOSED stub and the dashboard showed a permanent
-"Market Closed" lock screen even though bhavcopy/EOD data was available. It
-now also pushes off-hours, just far less often (`_CHAIN_PUSH_CLOSED_INTERVAL_S`)
-since EOD data doesn't change between pushes.
+Thread 5 moves Dhan option-chain work off the request-serving web dyno.
+It also writes the exact Dhan chain payload to local worker files consumed by
+Core Pipeline V8, so the paper/analyzer path uses the same official Dhan chain
+truth that the dashboard sees. There is no CSV/Yahoo/synthetic substitute here.
 
 Requires these env vars (set in Render dashboard → Environment):
   DHAN_CLIENT_ID, DHAN_APP_ID, DHAN_APP_SECRET
@@ -55,19 +37,19 @@ Requires these env vars (set in Render dashboard → Environment):
   WEB_SERVICE_URL        e.g. https://genesis-system3-backend.onrender.com
                           (defaults to the production URL if unset)
   WORKER_PUSH_TOKEN      shared secret; must match the web service's
-                          WORKER_PUSH_TOKEN env var exactly. If unset on
-                          either side, push proceeds unauthenticated
-                          (logged once, for local/dev use only).
+                          WORKER_PUSH_TOKEN env var exactly.
 
 Safety gate: LIVE_TRADING_ENABLED must be 0 (default). Do NOT change until
 paper/analyzer proof passes and CI is fully green.
 """
 
+import json
 import logging
 import os
 import sys
 import threading
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -76,9 +58,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))  # needed for `from utils.market_hours import ...`
-# (dashboard/backend/app.py adds this same path for the same reason — see its
-# sys.path.insert(0, str(ROOT_DIR / "src")) — this worker needs it too for
-# Thread 5's is_market_open() check below.)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -165,13 +144,11 @@ def _run_health_push():
 
     if not push_token:
         log.warning(
-            "[health-push] WORKER_PUSH_TOKEN not set — pushes will be "
-            "unauthenticated. Set this env var identically on both the "
-            "web and worker Render services for production."
+            "[health-push] WORKER_PUSH_TOKEN not set — pushes will be rejected when the web service requires it. "
+            "Set the same value on both Render services."
         )
 
     try:
-        import json as _json
         import urllib.error as _urlerr
         import urllib.request as _urlreq
     except Exception as exc:
@@ -192,7 +169,7 @@ def _run_health_push():
             }
 
             if _SCHEDULER_STATE_FILE.exists():
-                state = _json.loads(_SCHEDULER_STATE_FILE.read_text(encoding="utf-8"))
+                state = json.loads(_SCHEDULER_STATE_FILE.read_text(encoding="utf-8"))
                 payload["daemon_heartbeat"] = state.get("daemon_heartbeat")
                 payload["daemon_pid"] = state.get("daemon_pid")
                 payload["jobs"] = state.get("jobs", {})
@@ -202,9 +179,9 @@ def _run_health_push():
                 payload["fired_keys_today"] = state.get("fired_keys_today", [])
 
             if _SCHEDULER_ALERT_FILE.exists():
-                payload["config_alert"] = _json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))
+                payload["config_alert"] = json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))
 
-            body = _json.dumps(payload).encode("utf-8")
+            body = json.dumps(payload).encode("utf-8")
             headers = {"Content-Type": "application/json"}
             if push_token:
                 headers["X-Worker-Token"] = push_token
@@ -218,6 +195,11 @@ def _run_health_push():
             with _urlreq.urlopen(req, timeout=10) as resp:  # nosec B310 - scheme validated at thread start
                 if resp.status != 200:
                     log.warning(f"[health-push] non-200 response: {resp.status}")
+        except _urlerr.HTTPError as exc:
+            if exc.code == 401:
+                log.warning("[health-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker")
+            else:
+                log.warning(f"[health-push] HTTP error from web service ({web_url}): {exc}")
         except _urlerr.URLError as exc:
             log.warning(f"[health-push] could not reach web service ({web_url}): {exc}")
         except Exception as exc:
@@ -227,21 +209,40 @@ def _run_health_push():
 
 
 # ---------------------------------------------------------------------------
-# Thread 5: Chain push (worker -> web, see ARCHITECTURE note above)
+# Thread 5: Chain push (worker -> web + worker-local paper/analyzer file proof)
 # ---------------------------------------------------------------------------
-# Must match dashboard/backend/frontend watched underlyings and E2E proof:
-# NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX. Anything omitted here can
-# fall back to inline web fetch and break the end-to-end truth proof.
 _CHAIN_PUSH_SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 _CHAIN_PUSH_INTERVAL_S = 20
-# EOD/bhavcopy data doesn't change between market close and the next
-# pre-market session, so off-hours pushes happen far less often than the
-# 20s live cadence — this is a throttle on the *fetch+push*, the outer loop
-# still ticks every _CHAIN_PUSH_INTERVAL_S so it reacts quickly once the
-# market reopens. Must stay well under _PUSHED_CHAIN_FRESH_S_CLOSED in
-# dashboard/backend/app.py or the web dyno will treat pushes as stale between
-# ticks and fall back to the (slow) inline fetch anyway.
 _CHAIN_PUSH_CLOSED_INTERVAL_S = 300
+# Dhan option-chain endpoint is rate-limited. Keep a gap between each unique
+# underlying request so one loop does not self-throttle all 5 symbols.
+_CHAIN_FETCH_SPACING_S = float(os.environ.get("DHAN_OPTION_CHAIN_FETCH_SPACING_S", "3.25"))
+
+
+def _persist_chain_for_paper_pipeline(symbol: str, data: dict) -> None:
+    """Persist official Dhan chain JSON locally for Core Pipeline V8.
+
+    The web service receives in-memory pushes, but the worker paper/analyzer
+    thread reads local files. Without this write, Truth Control can show Dhan
+    chain in the UI while paper/analyzer still sees NO_LIVE_OPTION_QUOTE.
+    """
+    payload = dict(data)
+    payload.setdefault("data_source", "dhan")
+    payload.setdefault("source", "dhan")
+    payload.setdefault("stale", False)
+    payload["persisted_at_utc"] = datetime.now(timezone.utc).isoformat()
+    payload["paper_pipeline_visible"] = True
+    for path in (
+        ROOT / "state" / f"chain_{symbol.upper()}.json",
+        ROOT / "src" / "outputs" / f"chain_{symbol.upper()}.json",
+    ):
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+            os.replace(tmp, path)
+        except Exception as exc:
+            log.warning(f"[chain-push] could not persist {symbol} chain to {path}: {exc}")
 
 
 def _run_chain_push():
@@ -253,11 +254,10 @@ def _run_chain_push():
     push_token = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
 
     try:
-        import json as _json
         import urllib.error as _urlerr
         import urllib.request as _urlreq
     except Exception as exc:
-        log.exception(f"[chain-push] import failed, thread exiting: {exc}")
+        log.exception(f"[chain-push] import failed: {exc}")
         return
 
     last_closed_push = 0.0
@@ -281,23 +281,33 @@ def _run_chain_push():
                     time.sleep(_CHAIN_PUSH_INTERVAL_S)
                     continue
 
-                # One DataSourceManager for the whole tick — avoid reconstructing
-                # it (instrument master lookup etc.) per symbol.
                 dsm = DataSourceManager()
                 chains = {}
-                for sym in _CHAIN_PUSH_SYMBOLS:
+                for idx, sym in enumerate(_CHAIN_PUSH_SYMBOLS):
                     try:
                         data = fetch_chain_for_api(dsm, sym)
                         if data and data.get("contracts"):
                             chains[sym] = data
+                            _persist_chain_for_paper_pipeline(sym, data)
+                            log.info(
+                                "[chain-push] official Dhan chain ready: %s contracts=%s spot=%s expiry=%s",
+                                sym,
+                                data.get("total_contracts"),
+                                data.get("spot"),
+                                data.get("expiry_date"),
+                            )
+                        else:
+                            log.warning("[chain-push] no Dhan chain for %s: %s", sym, getattr(dsm, "last_error", None))
                     except Exception as exc:
                         log.warning(f"[chain-push] fetch failed for {sym}: {exc}")
+                    if idx < len(_CHAIN_PUSH_SYMBOLS) - 1:
+                        time.sleep(_CHAIN_FETCH_SPACING_S)
 
                 if not mkt_open:
                     last_closed_push = time.time()
 
                 if chains:
-                    body = _json.dumps({"chains": chains, "market_open": mkt_open}).encode("utf-8")
+                    body = json.dumps({"chains": chains, "market_open": mkt_open}).encode("utf-8")
                     headers = {"Content-Type": "application/json"}
                     if push_token:
                         headers["X-Worker-Token"] = push_token
@@ -311,6 +321,11 @@ def _run_chain_push():
                         with _urlreq.urlopen(req, timeout=15) as resp:  # nosec B310 - scheme validated at thread start
                             if resp.status != 200:
                                 log.warning(f"[chain-push] non-200 response: {resp.status}")
+                    except _urlerr.HTTPError as exc:
+                        if exc.code == 401:
+                            log.warning("[chain-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker")
+                        else:
+                            log.warning(f"[chain-push] HTTP error from web service ({web_url}): {exc}")
                     except _urlerr.URLError as exc:
                         log.warning(f"[chain-push] could not reach web service ({web_url}): {exc}")
         except Exception as exc:
@@ -393,7 +408,6 @@ def main():
         t.start()
         log.info(f"[{name}] thread launched")
 
-    # Keep process alive; if a daemon thread crashes, it logs the exception.
     while True:
         time.sleep(60)
 
