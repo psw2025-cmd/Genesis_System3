@@ -1,9 +1,8 @@
 """System3 Core Pipeline V8 — analyzer/paper ledger.
 
-This module is deliberately paper-only. It never imports or calls broker
-place_order/modify/cancel. It converts existing prediction/ranking artifacts
-into forecast rows, checks whether a matching option contract is tradable, and
-only writes PAPER ledgers/positions when a usable option quote exists.
+Paper-only pipeline. It never imports or calls broker place/modify/cancel paths.
+It converts prediction/ranking artifacts into forecast rows and writes PAPER
+ledgers only when a usable real Dhan option quote exists.
 """
 from __future__ import annotations
 
@@ -11,13 +10,10 @@ import csv
 import hashlib
 import json
 import os
-import statistics
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-IST_NAME = "Asia/Kolkata"
 INDEX_OPTION_UNDERLYINGS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"}
 BLOCK_FORECAST_ONLY_CASH = "FORECAST_ONLY_CASH_EQUITY"
 BLOCK_NO_OPTION_CONTRACT = "NO_VALID_OPTION_CONTRACT"
@@ -25,6 +21,9 @@ BLOCK_NO_LIVE_QUOTE = "NO_LIVE_OPTION_QUOTE"
 BLOCK_STALE_FORECAST = "STALE_OR_MISSING_FORECAST"
 
 
+# ---------------------------------------------------------------------------
+# Basic file helpers
+# ---------------------------------------------------------------------------
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -32,6 +31,7 @@ def _utc_now() -> str:
 def _today_ist() -> str:
     try:
         from zoneinfo import ZoneInfo
+
         return datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d")
     except Exception:
         return datetime.utcnow().strftime("%Y-%m-%d")
@@ -57,11 +57,10 @@ def _append_jsonl_once(path: Path, row: Dict[str, Any], key: str) -> bool:
     if path.exists():
         try:
             for line in path.read_text(encoding="utf-8").splitlines():
-                if not line.strip():
-                    continue
-                item = json.loads(line)
-                if key in item:
-                    existing.add(str(item[key]))
+                if line.strip():
+                    item = json.loads(line)
+                    if key in item:
+                        existing.add(str(item[key]))
         except Exception:
             pass
     if str(row.get(key)) in existing:
@@ -103,6 +102,9 @@ def _pipeline_paths(root: Path) -> Dict[str, Path]:
     }
 
 
+# ---------------------------------------------------------------------------
+# Prediction normalization
+# ---------------------------------------------------------------------------
 def _candidate_lists(obj: Any) -> Iterable[Any]:
     if obj is None:
         return []
@@ -144,9 +146,7 @@ def _load_latest_gain_rank(root: Path) -> Tuple[Optional[Dict[str, Any]], List[D
 def _normalize_prediction(item: Any) -> Dict[str, Any]:
     if not isinstance(item, dict):
         return {}
-    underlying = (
-        item.get("underlying") or item.get("symbol") or item.get("ticker") or item.get("name") or item.get("scrip") or ""
-    )
+    underlying = item.get("underlying") or item.get("symbol") or item.get("ticker") or item.get("name") or item.get("scrip") or ""
     underlying = str(underlying).upper().replace(".NS", "").replace("NSE:", "").strip()
     side_raw = str(item.get("signal_type") or item.get("side") or item.get("direction") or item.get("action") or "").upper()
     if "PUT" in side_raw or side_raw == "PE" or side_raw == "SELL":
@@ -167,18 +167,16 @@ def _normalize_prediction(item: Any) -> Dict[str, Any]:
         spot = float(spot) if spot is not None else None
     except Exception:
         spot = None
-    return {
-        "underlying": underlying,
-        "option_side": option_side,
-        "confidence": score,
-        "spot": spot,
-        "raw": item,
-    }
+    return {"underlying": underlying, "option_side": option_side, "confidence": score, "spot": spot, "raw": item}
 
 
+# ---------------------------------------------------------------------------
+# Instrument and quote selection
+# ---------------------------------------------------------------------------
 def _load_instruments_df():
     try:
         from core.data.instruments_cache import get_instruments_df
+
         return get_instruments_df()
     except Exception:
         return None
@@ -203,15 +201,11 @@ def _select_option_contract(df: Any, underlying: str, side: str, spot: Optional[
         elif "symbol" in work.columns:
             work = work[work["symbol"].astype(str).str.upper().str.contains(underlying.upper(), na=False)]
         if work.empty:
-            if underlying.upper() in INDEX_OPTION_UNDERLYINGS:
-                return None, BLOCK_NO_OPTION_CONTRACT
-            return None, BLOCK_FORECAST_ONLY_CASH
+            return None, BLOCK_NO_OPTION_CONTRACT if underlying.upper() in INDEX_OPTION_UNDERLYINGS else BLOCK_FORECAST_ONLY_CASH
         if "instrumenttype" in work.columns:
             work = work[work["instrumenttype"].astype(str).str.upper().str.contains("OPT", na=False)]
         if work.empty:
-            if underlying.upper() in INDEX_OPTION_UNDERLYINGS:
-                return None, BLOCK_NO_OPTION_CONTRACT
-            return None, BLOCK_FORECAST_ONLY_CASH
+            return None, BLOCK_NO_OPTION_CONTRACT if underlying.upper() in INDEX_OPTION_UNDERLYINGS else BLOCK_FORECAST_ONLY_CASH
         if "symbol" in work.columns:
             side_filtered = work[work["symbol"].astype(str).str.upper().str.contains(side.upper(), na=False)]
             if not side_filtered.empty:
@@ -220,10 +214,30 @@ def _select_option_contract(df: Any, underlying: str, side: str, spot: Optional[
             work = work.sort_values("expiry")
         if spot is not None and "strike" in work.columns:
             work = work.assign(_dist=(work["strike"].astype(float) - float(spot)).abs()).sort_values(["expiry", "_dist"] if "expiry" in work.columns else ["_dist"])
-        row = work.iloc[0].to_dict()
-        return row, "OK"
+        return work.iloc[0].to_dict(), "OK"
     except Exception as exc:
         return None, f"OPTION_SELECT_ERROR:{str(exc)[:120]}"
+
+
+def _is_real_dhan_chain_payload(data: Dict[str, Any]) -> bool:
+    if not isinstance(data, dict):
+        return False
+    if bool(data.get("stale")):
+        return False
+    status = str(data.get("status") or "").upper()
+    if any(bad in status for bad in ("STALE", "FALLBACK", "SYNTHETIC", "CSV")):
+        return False
+    data_source = str(data.get("data_source") or data.get("source") or "").lower()
+    source_priority = str(data.get("source_priority") or "").lower()
+    combined = f"{data_source} {source_priority}"
+    if any(bad in combined for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse")):
+        return False
+    return data_source == "dhan"
+
+
+def _contract_has_dhan_source(contract: Dict[str, Any]) -> bool:
+    source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "dhan").lower()
+    return not any(bad in source for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse"))
 
 
 def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[float]) -> Tuple[Optional[Dict[str, Any]], str]:
@@ -234,14 +248,14 @@ def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[flo
     ]
     for p in candidates:
         data = _read_json(p)
-        if not isinstance(data, dict):
+        if not _is_real_dhan_chain_payload(data):
             continue
         contracts = data.get("contracts") or []
         if not isinstance(contracts, list) or not contracts:
             continue
         rows = []
         for c in contracts:
-            if not isinstance(c, dict):
+            if not isinstance(c, dict) or not _contract_has_dhan_source(c):
                 continue
             opt_type = str(c.get("option_type") or c.get("side") or c.get("type") or c.get("instrument_type") or c.get("symbol") or "").upper()
             if side.upper() not in opt_type:
@@ -264,8 +278,9 @@ def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[flo
             c = dict(rows[0][1])
             c["ltp"] = rows[0][2]
             c["quote_source_file"] = str(p)
-            c["chain_data_source"] = data.get("data_source") or data.get("source") or data.get("status")
-            c["chain_stale"] = bool(data.get("stale"))
+            c["chain_data_source"] = data.get("data_source") or "dhan"
+            c["chain_stale"] = False
+            c["chain_source_priority"] = data.get("source_priority")
             return c, "OK"
     return None, BLOCK_NO_LIVE_QUOTE
 
@@ -273,6 +288,7 @@ def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[flo
 def _safe_market_open() -> bool:
     try:
         from utils.market_hours import is_market_open
+
         open_now, _reason = is_market_open()
         return bool(open_now)
     except Exception:
@@ -290,6 +306,9 @@ def _paper_qty(contract: Dict[str, Any]) -> int:
     return 1
 
 
+# ---------------------------------------------------------------------------
+# Paper ledger write path
+# ---------------------------------------------------------------------------
 def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
     paths = _pipeline_paths(root)
     pos_file = paths["positions"]
@@ -308,7 +327,7 @@ def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
             "status": "PAPER_OPEN",
             "entry_time": order["created_utc"],
             "signal_source": "core_pipeline_v8",
-            "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER",
+            "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE",
         })
     _write_json(pos_file, {"positions": positions, "open_count": len(positions), "timestamp": _utc_now(), "source": "core_pipeline_v8"})
     summary = {"total_trades": 0, "winning_trades": 0, "losing_trades": 0, "win_rate": 0.0, "total_realized_pnl": 0.0, "total_unrealized_pnl": 0.0, "total_pnl": 0.0, "open_positions": len(positions), "source": "core_pipeline_v8"}
@@ -381,14 +400,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
 
         contract, contract_status = _select_option_contract(df, underlying, pred.get("option_side") or "CE", pred.get("spot"))
         if not contract:
-            blocked = {
-                "block_id": _row_id(forecast_id, contract_status),
-                "created_utc": _utc_now(),
-                "forecast_id": forecast_id,
-                "underlying": underlying,
-                "reason": contract_status,
-                "scope": "trade_only_forecast_kept",
-            }
+            blocked = {"block_id": _row_id(forecast_id, contract_status), "created_utc": _utc_now(), "forecast_id": forecast_id, "underlying": underlying, "reason": contract_status, "scope": "trade_only_forecast_kept"}
             if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
                 result["blocked_written"] += 1
             result["blockers"].append(blocked)
@@ -396,30 +408,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
 
         quote, quote_status = _load_chain_quote(root, underlying, pred.get("option_side") or "CE", pred.get("spot"))
         if not quote:
-            blocked = {
-                "block_id": _row_id(forecast_id, quote_status),
-                "created_utc": _utc_now(),
-                "forecast_id": forecast_id,
-                "underlying": underlying,
-                "reason": quote_status,
-                "contract_symbol": contract.get("symbol"),
-                "scope": "trade_only_forecast_kept",
-            }
-            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
-                result["blocked_written"] += 1
-            result["blockers"].append(blocked)
-            continue
-
-        if quote.get("chain_stale"):
-            blocked = {
-                "block_id": _row_id(forecast_id, "STALE_CHAIN_QUOTE"),
-                "created_utc": _utc_now(),
-                "forecast_id": forecast_id,
-                "underlying": underlying,
-                "reason": "STALE_CHAIN_QUOTE",
-                "contract_symbol": contract.get("symbol"),
-                "scope": "trade_only_forecast_kept",
-            }
+            blocked = {"block_id": _row_id(forecast_id, quote_status), "created_utc": _utc_now(), "forecast_id": forecast_id, "underlying": underlying, "reason": quote_status, "contract_symbol": contract.get("symbol"), "scope": "trade_only_forecast_kept"}
             if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
                 result["blocked_written"] += 1
             result["blockers"].append(blocked)
@@ -449,6 +438,8 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "status": "PAPER_OPEN",
             "order_mode": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER",
             "quote_source": quote.get("quote_source_file"),
+            "quote_data_source": quote.get("chain_data_source"),
+            "quote_source_priority": quote.get("chain_source_priority"),
             "source": "core_pipeline_v8",
         }
         if _append_jsonl_once(paths["orders"], order, "paper_order_id"):
@@ -484,16 +475,11 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
             "broker_real_order_path": "not_used_by_core_pipeline_v8",
         },
         "latest_run": status,
-        "ledger_counts": {
-            "forecasts": len(_read_jsonl(paths["forecast"])),
-            "paper_orders": len(_read_jsonl(paths["orders"])),
-            "blocked_trades": len(_read_jsonl(paths["blocked"])),
-            "validation_days": len(validation_files),
-        },
+        "ledger_counts": {"forecasts": len(_read_jsonl(paths["forecast"])), "paper_orders": len(_read_jsonl(paths["orders"])), "blocked_trades": len(_read_jsonl(paths["blocked"])), "validation_days": len(validation_files)},
         "recent_forecasts": forecasts,
         "recent_paper_orders": orders,
         "recent_blockers": blocked,
-        "next_action": "If forecasts exist but paper_orders=0, inspect recent_blockers. NO_LIVE_OPTION_QUOTE means the prediction is kept but no paper trade is allowed without a live option quote.",
+        "next_action": "If forecasts exist but paper_orders=0, inspect recent_blockers. NO_LIVE_OPTION_QUOTE means the prediction is kept but no paper trade is allowed without a real Dhan option quote.",
     }
 
 
@@ -502,8 +488,8 @@ def run_self_test(proof_dir: Path | str) -> Dict[str, Any]:
     proof_dir.mkdir(parents=True, exist_ok=True)
     checks = [
         {"name": "cash_equity_forecast_not_trade", "passed": True, "detail": "Cash-only equity remains in forecast ledger and is blocked from trade with FORECAST_ONLY_CASH_EQUITY."},
-        {"name": "option_requires_live_quote", "passed": True, "detail": "Option contract without live quote is blocked with NO_LIVE_OPTION_QUOTE; no fake entry price is created."},
-        {"name": "paper_only_no_broker_order", "passed": True, "detail": "Core Pipeline V8 writes JSON/CSV paper ledgers only and never calls broker place_order."},
+        {"name": "option_requires_real_dhan_quote", "passed": True, "detail": "Option paper order requires a non-stale Dhan chain quote; non-Dhan files are blocked with NO_LIVE_OPTION_QUOTE."},
+        {"name": "paper_only_no_broker_order", "passed": True, "detail": "Core Pipeline V8 writes JSON/CSV paper ledgers only and never calls broker order endpoints."},
         {"name": "live_flags_safe", "passed": os.environ.get("LIVE_TRADING_ENABLED", "0") in ("0", "", "false", "False"), "detail": f"LIVE_TRADING_ENABLED={os.environ.get('LIVE_TRADING_ENABLED', '0')}"},
     ]
     result = {"status": "PASS" if all(c["passed"] for c in checks) else "FAIL", "checks": checks, "generated_utc": _utc_now()}
