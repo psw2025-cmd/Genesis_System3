@@ -1,0 +1,13 @@
+{
+  "min_train_rows": 30,
+  "min_test_rows": 10,
+  "min_walk_forward_windows": 3,
+  "min_hit_rate": 0.55,
+  "min_profit_factor": 1.15,
+  "min_expectancy": 0.01,
+  "max_drawdown_pct": 0.2,
+  "min_avg_trade_return": 0.002,
+  "paper_only": true,
+  "live_trading_enabled_required_value": "0",
+  "promotion_rule": "A strategy/symbol/side can become paper champion only after walk-forward out-of-sample gates pass. Live trading remains blocked until separate human approval and live-risk gates pass."
+}
