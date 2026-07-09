@@ -37,7 +37,7 @@ const authStatus = (path: string, status: number) => ({
   message: status === 401
     ? 'Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.'
     : isTransient(status)
-      ? (status === 0 ? `Network/DNS could not reach Render for ${path}. Keeping last-good data where available.` : `Render/backend temporarily returned ${status} for ${path}. Keeping last-good data where available.`)
+      ? (status === 0 ? `Network/DNS could not reach Render for ${path}. Real data is blocked until live API returns.` : `Render/backend returned ${status} for ${path}. Real data is blocked until live API returns.`)
       : `Backend API returned ${status}`,
 })
 
@@ -51,20 +51,24 @@ const fallbackHealth = (apiStatus: any) => ({
   live_blockers: [apiStatus?.message || 'Backend API unavailable'],
 })
 
-const fallbackPaper = {
+const blockedPaper = (apiStatus: any) => ({
   positions: { open_count: 0, open_positions: [] },
   pnl: { summary: { total_pnl: 0, win_rate: 0, total_trades: 0, closed_positions: [] } },
-}
+  status: apiStatus?.status || 'NO_REAL_PAPER_DATA',
+  blocked: true,
+  blocked_reason: apiStatus?.message || 'Paper data unavailable from live backend',
+})
 
-const fallbackGainRank = (apiStatus: any) => ({
+const blockedGainRank = (apiStatus: any) => ({
   rankings: [],
   latest: { predictions: [] },
-  status: apiStatus?.status || 'API_LOCKED',
-  stale: true,
+  status: apiStatus?.status || 'NO_REAL_RANK_DATA',
+  blocked: true,
+  stale: false,
   message: apiStatus?.message || 'Backend API unavailable',
 })
 
-const fallbackGates = (apiStatus: any) => ({
+const blockedGates = (apiStatus: any) => ({
   proof_gates: [
     {
       gate_id: 'api_access',
@@ -75,7 +79,7 @@ const fallbackGates = (apiStatus: any) => ({
   ],
 })
 
-const fallbackBrokerStatus = (apiStatus: any) => ({
+const blockedBrokerStatus = (apiStatus: any) => ({
   success: false,
   connected: false,
   status: apiStatus?.status || 'API_LOCKED',
@@ -84,16 +88,17 @@ const fallbackBrokerStatus = (apiStatus: any) => ({
   error: apiStatus?.message || 'Broker API unavailable',
 })
 
-const fallbackRows = (apiStatus: any, label: string) => ({
+const blockedRows = (apiStatus: any, label: string) => ({
   success: false,
   rows: [],
   count: 0,
   status: apiStatus?.status || 'API_LOCKED',
+  blocked: true,
   message: `${label}: ${apiStatus?.message || 'API unavailable'}`,
   error: apiStatus?.message || 'API unavailable',
 })
 
-const fallbackFunds = (apiStatus: any) => ({
+const blockedFunds = (apiStatus: any) => ({
   success: false,
   normalized: {
     available_balance: null,
@@ -112,16 +117,32 @@ const fallbackFunds = (apiStatus: any) => ({
   error: apiStatus?.message || 'Funds API unavailable',
 })
 
-const fallbackChain = (sym: string, apiStatus: any) => ({
+const blockedChain = (sym: string, apiStatus: any) => ({
   underlying: sym,
   contracts: [],
   spot: 0,
   pcr: '--',
-  status: apiStatus?.status || 'API_LOCKED',
-  data_source: apiStatus?.status || 'API_LOCKED',
-  message: apiStatus?.message || 'Option chain unavailable',
+  status: 'NO_DHAN_DATA',
+  blocked: true,
+  blocked_reason: apiStatus?.message || 'Dhan live option chain unavailable',
+  data_source: 'dhan',
+  source_priority: 'blocked_until_real_dhan_stream',
+  stale: false,
+  message: apiStatus?.message || 'Dhan live option chain unavailable',
 })
 
+function isRealDhanChainPayload(data: any) {
+  if (!data || typeof data !== 'object') return false
+  const source = String(data.data_source || data.source || '').toLowerCase()
+  const priority = String(data.source_priority || '').toLowerCase()
+  const status = String(data.status || '').toUpperCase()
+  const combined = `${source} ${priority} ${status}`
+  if (data.stale === true) return false
+  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(combined)) return false
+  const contracts = Number(data.total_contracts || (Array.isArray(data.contracts) ? data.contracts.length : 0))
+  const spot = Number(data.spot || 0)
+  return source === 'dhan' && spot > 0 && contracts > 0
+}
 
 function keepLastGood(previous: any, apiStatus: any, label: string) {
   if (!previous) return null
@@ -140,7 +161,7 @@ function withFailureCount(apiStatus: any, group: string, count: number) {
     ...apiStatus,
     group,
     consecutive_failures: count,
-    message: count < 3 ? `${apiStatus.message} Retrying; last-good UI data is retained.` : apiStatus.message,
+    message: count < 3 ? `${apiStatus.message} Retrying; live data remains blocked where truth cannot be proven.` : apiStatus.message,
   }
 }
 
@@ -194,10 +215,10 @@ export function useData() {
     if (err) markFailure('broker', err)
     else markSuccess('broker')
 
-    setBrokerStatus(status.status === 'fulfilled' ? status.value : retainTransient ? (keepLastGood(prev.brokerStatus, err, 'Broker status') || fallbackBrokerStatus(statusErr || err)) : fallbackBrokerStatus(statusErr || err))
-    setBrokerHoldings(holdings.status === 'fulfilled' ? holdings.value : retainTransient ? (keepLastGood(prev.brokerHoldings, err, 'Holdings') || fallbackRows(holdingsErr || err, 'Holdings')) : fallbackRows(holdingsErr || err, 'Holdings'))
-    setBrokerFunds(funds.status === 'fulfilled' ? funds.value : retainTransient ? (keepLastGood(prev.brokerFunds, err, 'Funds') || fallbackFunds(fundsErr || err)) : fallbackFunds(fundsErr || err))
-    setBrokerPositions(positions.status === 'fulfilled' ? positions.value : retainTransient ? (keepLastGood(prev.brokerPositions, err, 'Positions') || fallbackRows(positionsErr || err, 'Positions')) : fallbackRows(positionsErr || err, 'Positions'))
+    setBrokerStatus(status.status === 'fulfilled' ? status.value : retainTransient ? (keepLastGood(prev.brokerStatus, err, 'Broker status') || blockedBrokerStatus(statusErr || err)) : blockedBrokerStatus(statusErr || err))
+    setBrokerHoldings(holdings.status === 'fulfilled' ? holdings.value : retainTransient ? (keepLastGood(prev.brokerHoldings, err, 'Holdings') || blockedRows(holdingsErr || err, 'Holdings')) : blockedRows(holdingsErr || err, 'Holdings'))
+    setBrokerFunds(funds.status === 'fulfilled' ? funds.value : retainTransient ? (keepLastGood(prev.brokerFunds, err, 'Funds') || blockedFunds(fundsErr || err)) : blockedFunds(fundsErr || err))
+    setBrokerPositions(positions.status === 'fulfilled' ? positions.value : retainTransient ? (keepLastGood(prev.brokerPositions, err, 'Positions') || blockedRows(positionsErr || err, 'Positions')) : blockedRows(positionsErr || err, 'Positions'))
   }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, markFailure, markSuccess])
 
   const poll = useCallback(async () => {
@@ -221,28 +242,32 @@ export function useData() {
 
     if (state.status === 'fulfilled') setState(state.value)
     if (paper.status === 'fulfilled') setPaper(paper.value)
-    else if (!retainTransient || !prev.paper) setPaper(fallbackPaper)
+    else if (!retainTransient || !prev.paper) setPaper(blockedPaper(err))
 
     if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
-    else if (!retainTransient || !prev.gainRank) setGainRank(fallbackGainRank(err))
+    else if (!retainTransient || !prev.gainRank) setGainRank(blockedGainRank(err))
 
     if (pnl.status === 'fulfilled') setPnl(pnl.value)
-    else if (!retainTransient || !prev.pnl) setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: err?.status, message: err?.message })
+    else if (!retainTransient || !prev.pnl) setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: err?.status, message: err?.message, blocked: true })
   }, [setHealth, setState, setPaper, setGainRank, setPnl, markFailure, markSuccess])
 
   const pollChain = useCallback(async (sym: string) => {
     try {
       const data = await fetchJSON(`/api/chain/${sym}`)
+      if (!isRealDhanChainPayload(data)) {
+        const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven live Dhan data' })
+        markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/chain/${sym}`, message: blocked.blocked_reason })
+        setChain(sym, blocked)
+        return
+      }
       markSuccess(`chain_${sym}`)
-      setChain(sym, data)
+      setChain(sym, { ...data, stale: false, blocked: false, verified_live_dhan: true })
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       markFailure(`chain_${sym}`, apiStatus)
-      const prev = useStore.getState().chain?.[sym]
-      if (isTransient(apiStatus.code) && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} option chain`))
-      else setChain(sym, fallbackChain(sym, apiStatus))
+      setChain(sym, blockedChain(sym, apiStatus))
     }
-  }, [setChain, markFailure])
+  }, [setChain, markFailure, markSuccess])
 
   const pollSecondary = useCallback(async () => {
     const [alerts, gates] = await Promise.allSettled([
@@ -260,7 +285,7 @@ export function useData() {
     else if (!retainTransient || !prev.alerts?.length) setAlerts([])
 
     if (gates.status === 'fulfilled') setAutoGates(gates.value)
-    else if (!retainTransient || !prev.autoGates) setAutoGates(fallbackGates(err))
+    else if (!retainTransient || !prev.autoGates) setAutoGates(blockedGates(err))
   }, [setAlerts, setAutoGates, markFailure, markSuccess])
 
   const wsConnect = useCallback(() => {
@@ -334,4 +359,3 @@ export function useData() {
     }
   }, [chainSymbol, pollChain])
 }
-
