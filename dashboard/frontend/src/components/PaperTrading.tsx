@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import axios from 'axios'
 import { API_BASE } from '../config'
 import DataSourceWarning from './DataSourceWarning'
@@ -41,6 +40,7 @@ export default function PaperTrading() {
       setError(null)
     } catch (err: any) {
       console.error('Error fetching paper trading data:', err)
+      setBundle(null)
       setError(err.message || 'Failed to fetch paper trading data')
     }
   }
@@ -73,31 +73,22 @@ export default function PaperTrading() {
   const pnl = bundle.pnl || {}
   const tradesToday = bundle.tradesToday || {}
   const positions = Array.isArray(state.positions) ? state.positions : []
-  const positionsSource = state.positions_source || 'INTERNAL_UNVERIFIED'
+  const positionsSource = state.positions_source || 'NO_POSITIONS'
   const dataSource = state.data_source || 'not_ready'
   const brokerConnected = Boolean(state?.broker?.connected)
   const mode = state.mode || 'PAPER'
   const stateVersion = state.state_version || 0
   const liveTradingAllowed = String(state.live_trading_enabled || state.liveTradingEnabled || '0') === '1'
   const analyzerSafe = String(mode).toUpperCase().includes('PAPER') || String(mode).toUpperCase().includes('ANALYZER') || !liveTradingAllowed
-
-  const pnlHistory = (pnl?.history || []).map((item: any) => {
-    let timestamp = item.timestamp || item.date || item.time || new Date().toISOString()
-    const parsed = new Date(timestamp)
-    timestamp = isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString()
-    return { ...item, timestamp, total_pnl: Number(item.total_pnl || item.total_unrealized_pnl || 0) }
-  }).filter((item: any) => !isNaN(new Date(item.timestamp).getTime()))
-
-  const summary = pnl?.summary || {}
-  const totalUnrealized = positions.reduce((sum: number, p: any) => sum + Number(p.unrealized_pnl || 0), 0)
-  const totalRealized = Number(summary?.total_realized_pnl || 0)
-  const totalPnL = totalUnrealized + totalRealized
+  const paperTruthOk = analyzerSafe && !liveTradingAllowed
   const todayEntries = Array.isArray(tradesToday.entries) ? tradesToday.entries : []
   const todayExits = Array.isArray(tradesToday.exits) ? tradesToday.exits : []
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
-  const isRealData = dataSource === 'REAL' || dataSource === 'real' || dataSource === 'dhan'
-  const paperTruthOk = analyzerSafe && !liveTradingAllowed
+  const summary = pnl?.summary || {}
+  const totalRealized = Number(summary?.total_realized_pnl || 0)
+  const totalUnrealized = positions.reduce((sum: number, p: any) => sum + Number(p.unrealized_pnl || 0), 0)
+  const totalPnL = totalRealized + totalUnrealized
+  const maxPositions = state?.risk?.limits?.max_positions ?? state?.risk?.limits?.maxPositions ?? '-'
+  const observeOnly = positionsSource === 'PAPER_LEDGER_NOT_BROKER_VERIFIED'
 
   return (
     <div className="space-y-6">
@@ -112,12 +103,6 @@ export default function PaperTrading() {
           Recheck Paper Proof
         </button>
       </div>
-
-      {error && (
-        <div className="bg-yellow-900/20 border border-yellow-700 p-3 rounded-lg text-yellow-300 text-sm">
-          Last poll failed but last-good data is still visible: {error}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gray-800 p-4 rounded-lg">
@@ -144,10 +129,10 @@ export default function PaperTrading() {
 
       <DataSourceWarning dataSource={dataSource} brokerConnected={brokerConnected} mode={mode} />
 
-      {positionsSource === 'INTERNAL_UNVERIFIED' && positions.length > 0 && (
+      {observeOnly && positions.length > 0 && (
         <div className="bg-orange-900/20 border border-orange-700 p-3 rounded-lg">
           <div className="text-sm text-orange-300">
-            ⚠️ Positions shown are INTERNAL_UNVERIFIED. Treat as paper/analyzer evidence only, not broker reality.
+            ⚠️ Positions shown are paper-ledger observe-only rows. Treat as analyzer evidence only, not broker reality.
           </div>
         </div>
       )}
@@ -194,7 +179,7 @@ export default function PaperTrading() {
         ) : (
           <div className="bg-gray-900/50 border border-gray-700 p-6 rounded">
             <div className="font-bold text-gray-200">No open paper positions</div>
-            <div className="text-sm text-gray-400 mt-2">Reason: paper engine has no open simulated position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.</div>
+            <div className="text-sm text-gray-400 mt-2">Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.</div>
           </div>
         )}
       </div>
@@ -213,60 +198,22 @@ export default function PaperTrading() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">Equity Curve</h3>
-          {pnlHistory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={pnlHistory}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="timestamp" tickFormatter={(v) => new Date(v).toLocaleTimeString()} />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="total_pnl" stroke="#8884d8" name="Total PnL" />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No PnL curve yet</div><div className="text-sm text-gray-400 mt-2">Chart appears after paper engine records history.</div></div>
-          )}
-        </div>
-
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">PnL Summary</h3>
-          <div className="space-y-2">
-            <div className="flex justify-between"><span>Total PnL:</span><span className={`font-bold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalPnL)}</span></div>
-            <div className="flex justify-between"><span>Unrealized:</span><span className={`${totalUnrealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalUnrealized)}</span></div>
-            <div className="flex justify-between"><span>Realized:</span><span className={`${totalRealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalRealized)}</span></div>
-            <div className="flex justify-between"><span>Open Positions:</span><span>{positions.length}</span></div>
-            <div className="flex justify-between"><span>Today Entries:</span><span>{todayEntries.length}</span></div>
-            <div className="flex justify-between"><span>Today Exits:</span><span>{todayExits.length}</span></div>
-          </div>
-        </div>
-      </div>
-
       <div className="bg-gray-800 p-6 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">Win Rate</h3>
-        {summary.total_trades > 0 ? (
-          <div className="space-y-4">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={[{ name: 'Winning', value: summary.winning_trades || 0 }, { name: 'Losing', value: summary.losing_trades || 0 }]} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
-                  {[0, 1].map((_entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="text-center"><div className="text-3xl font-bold">{summary.win_rate?.toFixed(1) || 0}%</div><div className="text-sm text-gray-400">Win Rate</div></div>
-          </div>
-        ) : (
-          <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No completed paper trades yet</div><div className="text-sm text-gray-400 mt-2">Win rate needs closed paper trades. Live trading remains OFF.</div></div>
-        )}
+        <h3 className="text-xl font-bold mb-4">PnL Summary</h3>
+        <div className="space-y-2">
+          <div className="flex justify-between"><span>Total PnL:</span><span className={`font-bold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalPnL)}</span></div>
+          <div className="flex justify-between"><span>Unrealized:</span><span className={`${totalUnrealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalUnrealized)}</span></div>
+          <div className="flex justify-between"><span>Realized:</span><span className={`${totalRealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalRealized)}</span></div>
+          <div className="flex justify-between"><span>Open Positions:</span><span>{positions.length}</span></div>
+          <div className="flex justify-between"><span>Today Entries:</span><span>{todayEntries.length}</span></div>
+          <div className="flex justify-between"><span>Today Exits:</span><span>{todayExits.length}</span></div>
+        </div>
       </div>
 
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">Risk Panel</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div><div className="text-sm text-gray-400">Max Positions</div><div className="text-2xl font-bold">5</div><div className="text-xs text-gray-500">Current: {positions.length}</div></div>
+          <div><div className="text-sm text-gray-400">Max Positions</div><div className="text-2xl font-bold">{String(maxPositions)}</div><div className="text-xs text-gray-500">Current: {positions.length}</div></div>
           <div><div className="text-sm text-gray-400">Total Paper Exposure</div><div className="text-2xl font-bold">{money(positions.reduce((sum: number, p: any) => sum + (Number(p.entry_price || 0) * Number(p.qty || 0)), 0))}</div></div>
           <div><div className="text-sm text-gray-400">Live Order Safety</div><div className="text-2xl font-bold text-green-400">BLOCKED</div><div className="text-xs text-gray-500">Paper UI does not call broker/order close endpoints.</div></div>
         </div>
