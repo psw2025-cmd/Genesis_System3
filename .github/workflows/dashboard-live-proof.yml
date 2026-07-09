@@ -15,6 +15,7 @@ on:
       - 'dashboard/frontend/src/components/BrokerPanel.tsx'
       - 'dashboard/backend/**'
       - 'core/data/**'
+      - 'tools/package.json'
       - 'tools/frontend_no_fake_guard.mjs'
       - 'tools/dashboard_live_ui_proof.mjs'
       - 'tools/permanent_live_log_watch.mjs'
@@ -48,8 +49,8 @@ jobs:
 
       - name: Install Playwright
         run: |
-          npm install --no-save playwright
-          npx playwright install chromium
+          npm --prefix tools install --no-save --no-package-lock playwright
+          npm --prefix tools exec playwright install chromium
 
       - name: Frontend no fake hardcoded guard
         run: node tools/frontend_no_fake_guard.mjs
