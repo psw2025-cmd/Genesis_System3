@@ -42,33 +42,13 @@ GC_COOLDOWN_S = 30.0
 
 _CHAIN_ALLOWED_DATA_SOURCES = {"dhan", "dhan_option_chain_live"}
 _CHAIN_ALLOWED_SOURCE_PREFIXES = ("dhan", "worker_push")
+_BAD_CHAIN_MARKERS = ("csv", "fallback", "synthetic", "bhavcopy", "nse", "yahoo", "fake", "mock")
 
 
-def _chain_response_is_dhan_only(payload: dict) -> bool:
-    """True only when the response contains current Dhan-derived option-chain rows."""
+def _chain_has_contracts_and_spot(payload: dict) -> bool:
     contracts = payload.get("contracts") or []
     if not isinstance(contracts, list) or not contracts:
         return False
-
-    if bool(payload.get("stale")):
-        return False
-
-    status = str(payload.get("status") or "").upper()
-    if "STALE" in status or "FALLBACK" in status or "SYNTHETIC" in status or "CSV" in status:
-        return False
-
-    data_source = str(payload.get("data_source") or "").lower()
-    source_priority = str(payload.get("source_priority") or "").lower()
-    source_text = f"{data_source} {source_priority}"
-    if any(bad in source_text for bad in ("csv", "fallback", "synthetic", "bhavcopy", "nse", "yahoo")):
-        return False
-
-    if data_source not in _CHAIN_ALLOWED_DATA_SOURCES:
-        return False
-
-    if source_priority and source_priority != "--" and not source_priority.startswith(_CHAIN_ALLOWED_SOURCE_PREFIXES):
-        return False
-
     try:
         if float(payload.get("spot") or 0) <= 0:
             return False
@@ -79,8 +59,60 @@ def _chain_response_is_dhan_only(payload: dict) -> bool:
             return False
     except Exception:
         return False
+    return True
+
+
+def _chain_source_is_dhan(payload: dict) -> bool:
+    data_source = str(payload.get("data_source") or payload.get("source") or "").lower()
+    source_priority = str(payload.get("source_priority") or "").lower()
+    source_text = f"{data_source} {source_priority}"
+    if any(bad in source_text for bad in _BAD_CHAIN_MARKERS):
+        return False
+    if data_source not in _CHAIN_ALLOWED_DATA_SOURCES:
+        return False
+    if source_priority and source_priority != "--" and not source_priority.startswith(_CHAIN_ALLOWED_SOURCE_PREFIXES):
+        return False
+    return True
+
+
+def _chain_response_is_dhan_only(payload: dict) -> bool:
+    """True only when the response contains Dhan-derived option-chain rows.
+
+    During market hours, rows must be current and not stale. When the market is
+    closed, a verified Dhan last-session snapshot is allowed only when clearly
+    labelled as a snapshot and not as live.
+    """
+    if not _chain_has_contracts_and_spot(payload):
+        return False
+    if not _chain_source_is_dhan(payload):
+        return False
+
+    status = str(payload.get("status") or "").upper()
+    if "FALLBACK" in status or "SYNTHETIC" in status or "CSV" in status:
+        return False
+
+    market_closed_snapshot = status in {"MARKET_CLOSED", "EOD_SNAPSHOT", "VERIFIED_DHAN_SNAPSHOT", "MARKET_CLOSED_DHAN_SNAPSHOT"}
+    if bool(payload.get("stale")) and not market_closed_snapshot:
+        return False
+    if "STALE" in status and not market_closed_snapshot:
+        return False
 
     return True
+
+
+def _normalize_verified_chain_payload(payload: dict) -> dict:
+    data = dict(payload)
+    status = str(data.get("status") or "").upper()
+    market_closed_snapshot = status in {"MARKET_CLOSED", "EOD_SNAPSHOT", "VERIFIED_DHAN_SNAPSHOT", "MARKET_CLOSED_DHAN_SNAPSHOT"}
+    if market_closed_snapshot:
+        data["data_source"] = "dhan"
+        data["source_priority"] = "dhan_last_verified_snapshot"
+        data["status"] = "MARKET_CLOSED_DHAN_SNAPSHOT"
+        data["stale"] = False
+        data["live"] = False
+        data["snapshot"] = True
+        data["message"] = "Market closed — showing last verified Dhan option-chain snapshot, not live ticks."
+    return data
 
 
 def _blocked_chain_payload(original: dict) -> dict:
@@ -96,11 +128,11 @@ def _blocked_chain_payload(original: dict) -> dict:
         "status": "NO_DHAN_DATA",
         "stale": False,
         "blocked": True,
-        "blocked_reason": "NO_CURRENT_DHAN_OPTION_CHAIN_ROWS",
+        "blocked_reason": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
         "suppressed_source": original.get("data_source"),
         "suppressed_source_priority": original.get("source_priority"),
         "suppressed_status": original.get("status"),
-        "message": "No current Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
+        "message": "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
     }
 
 
@@ -136,7 +168,9 @@ async def _enforce_dhan_only_chain_response(request, response):
             background=response.background,
         )
 
-    if isinstance(payload, dict) and not _chain_response_is_dhan_only(payload):
+    if isinstance(payload, dict) and _chain_response_is_dhan_only(payload):
+        return JSONResponse(_normalize_verified_chain_payload(payload), status_code=200)
+    if isinstance(payload, dict):
         return JSONResponse(_blocked_chain_payload(payload), status_code=200)
 
     return Response(
