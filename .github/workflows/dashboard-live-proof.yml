@@ -12,8 +12,10 @@ on:
       - 'dashboard/frontend/src/components/Sidebar.tsx'
       - 'dashboard/frontend/src/components/EndToEndProof.tsx'
       - 'dashboard/frontend/src/components/PaperTrading.tsx'
+      - 'dashboard/frontend/src/components/BrokerPanel.tsx'
       - 'dashboard/backend/**'
       - 'core/data/**'
+      - 'tools/frontend_no_fake_guard.mjs'
       - 'tools/dashboard_live_ui_proof.mjs'
       - 'tools/permanent_live_log_watch.mjs'
       - '.github/workflows/dashboard-live-proof.yml'
@@ -48,6 +50,9 @@ jobs:
         run: |
           npm install --no-save playwright
           npx playwright install chromium
+
+      - name: Frontend no fake hardcoded guard
+        run: node tools/frontend_no_fake_guard.mjs
 
       - name: Capture live dashboard proof
         run: node tools/dashboard_live_ui_proof.mjs
