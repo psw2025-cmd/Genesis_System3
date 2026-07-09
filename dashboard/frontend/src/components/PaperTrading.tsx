@@ -3,186 +3,157 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import axios from 'axios'
 import { API_BASE } from '../config'
 import DataSourceWarning from './DataSourceWarning'
-import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
 
+type ApiBundle = {
+  state: any
+  pnl: any
+  tradesToday: any
+}
+
+function money(v: any) {
+  const n = Number(v || 0)
+  return `₹${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`
+}
+
+function statusBadge(ok: boolean, text: string) {
+  return (
+    <span className={`inline-flex px-2 py-1 rounded text-xs font-bold ${ok ? 'bg-green-900/30 text-green-300 border border-green-700' : 'bg-red-900/30 text-red-300 border border-red-700'}`}>
+      {text}
+    </span>
+  )
+}
+
 export default function PaperTrading() {
-  const [state, setState] = useState<any>(null)
-  const [pnl, setPnl] = useState<any>(null)
+  const [bundle, setBundle] = useState<ApiBundle | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [lastRefresh, setLastRefresh] = useState<string>('')
+
+  const fetchData = async () => {
+    try {
+      const [stateRes, pnlRes, tradesRes] = await Promise.all([
+        axios.get(`${API_BASE}/api/state`),
+        axios.get(`${API_BASE}/api/pnl`),
+        axios.get(`${API_BASE}/api/trades/today`).catch((err) => ({ data: { status: 'ERROR', error: err.message, entries: [], exits: [], count: 0 } })),
+      ])
+      setBundle({ state: stateRes.data, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null })
+      setLastRefresh(new Date().toLocaleString())
+      setError(null)
+    } catch (err: any) {
+      console.error('Error fetching paper trading data:', err)
+      setError(err.message || 'Failed to fetch paper trading data')
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Use SSOT endpoint for consistency
-        const [stateRes, pnlRes] = await Promise.all([
-          axios.get(`${API_BASE}/api/state`),
-          axios.get(`${API_BASE}/api/pnl`)
-        ])
-        setState(stateRes.data)
-        setPnl(pnlRes.data || null)
-        setError(null)
-      } catch (error: any) {
-        console.error('Error fetching trading data:', error)
-        setError(error.message || 'Failed to fetch trading data')
-        // Keep last-good data visible during transient Render/API failures.
-        // Do not blank the full page on one failed poll.
-      }
-    }
-    // Fetch immediately on mount
     fetchData()
-    // Render-safe polling: 30000ms. Dashboard is read-only/PAPER; avoid hammering backend.
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [])
-  
-  // Extract positions from state (SSOT)
-  const positions = state?.positions || []
-  const positionsSource = state?.positions_source || 'INTERNAL_UNVERIFIED'
-  const dataSource = state?.data_source || 'not_ready'
-  const brokerConnected = state?.broker?.connected || false
-  const mode = state?.mode || 'PAPER'
-  const stateVersion = state?.state_version || 0
 
-  // Show error if present
-  if (error) {
+  if (error && !bundle) {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">Paper Trading Console</h2>
-        <ErrorBanner
-          endpoint={`${API_BASE}/api/state`}
-          message={error}
-          onRetry={() => window.location.reload()}
-        />
-      </div>
-    )
-  }
-  
-  // Add loading state check
-  if (!state) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Paper Trading Console</h2>
-        <div className="p-6 text-center text-gray-400">Loading trading data...</div>
+        <ErrorBanner endpoint={`${API_BASE}/api/state`} message={error} onRetry={fetchData} />
       </div>
     )
   }
 
-  // Process PnL history with proper timestamp handling
+  if (!bundle) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+        <div className="p-6 text-center text-gray-400">Loading paper/analyzer proof...</div>
+      </div>
+    )
+  }
+
+  const state = bundle.state || {}
+  const pnl = bundle.pnl || {}
+  const tradesToday = bundle.tradesToday || {}
+  const positions = Array.isArray(state.positions) ? state.positions : []
+  const positionsSource = state.positions_source || 'INTERNAL_UNVERIFIED'
+  const dataSource = state.data_source || 'not_ready'
+  const brokerConnected = Boolean(state?.broker?.connected)
+  const mode = state.mode || 'PAPER'
+  const stateVersion = state.state_version || 0
+  const liveTradingAllowed = String(state.live_trading_enabled || state.liveTradingEnabled || '0') === '1'
+  const analyzerSafe = String(mode).toUpperCase().includes('PAPER') || String(mode).toUpperCase().includes('ANALYZER') || !liveTradingAllowed
+
   const pnlHistory = (pnl?.history || []).map((item: any) => {
-    // Ensure timestamp is in ISO format
     let timestamp = item.timestamp || item.date || item.time || new Date().toISOString()
-    
-    // If timestamp is not a valid ISO string, try to parse it
-    if (typeof timestamp === 'string') {
-      // Try parsing various formats
-      const parsed = new Date(timestamp)
-      if (isNaN(parsed.getTime())) {
-        // Invalid date - use current time
-        timestamp = new Date().toISOString()
-      } else {
-        // Valid date - ensure ISO format
-        timestamp = parsed.toISOString()
-      }
-    } else if (timestamp instanceof Date) {
-      timestamp = timestamp.toISOString()
-    } else {
-      // Fallback to current time
-      timestamp = new Date().toISOString()
-    }
-    
-    return {
-      ...item,
-      timestamp: timestamp,
-      total_pnl: item.total_pnl || item.total_unrealized_pnl || 0
-    }
-  }).filter((item: any) => {
-    // Filter out items with invalid timestamps
-    const date = new Date(item.timestamp)
-    return !isNaN(date.getTime())
-  })
-  
+    const parsed = new Date(timestamp)
+    timestamp = isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString()
+    return { ...item, timestamp, total_pnl: Number(item.total_pnl || item.total_unrealized_pnl || 0) }
+  }).filter((item: any) => !isNaN(new Date(item.timestamp).getTime()))
+
   const summary = pnl?.summary || {}
-  
-  // Calculate total unrealized PnL from positions if summary doesn't have it
-  const totalUnrealized = positions.reduce((sum, p) => sum + (p.unrealized_pnl || 0), 0)
-  const totalRealized = summary?.total_realized_pnl || 0
+  const totalUnrealized = positions.reduce((sum: number, p: any) => sum + Number(p.unrealized_pnl || 0), 0)
+  const totalRealized = Number(summary?.total_realized_pnl || 0)
   const totalPnL = totalUnrealized + totalRealized
+  const todayEntries = Array.isArray(tradesToday.entries) ? tradesToday.entries : []
+  const todayExits = Array.isArray(tradesToday.exits) ? tradesToday.exits : []
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+  const isRealData = dataSource === 'REAL' || dataSource === 'real' || dataSource === 'dhan'
+  const paperTruthOk = analyzerSafe && !liveTradingAllowed
 
-  const isRealData = dataSource === 'REAL' || dataSource === 'real'
-  const canTrade = isRealData && brokerConnected
-  
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start gap-4">
         <div>
           <h2 className="text-3xl font-bold">Paper Trading Console</h2>
           <div className="text-sm text-gray-400 mt-1">
-            State Version: {stateVersion} | Positions Source: {positionsSource}
+            State Version: {stateVersion} | Positions Source: {positionsSource} | Last Refresh: {lastRefresh || '-'}
           </div>
         </div>
-        {positions.length > 0 && (
-          <button
-            disabled={!canTrade}
-            onClick={async () => {
-              if (!canTrade) {
-                alert('Trading is disabled. Real data and broker connection required.')
-                return
-              }
-              if (confirm(`Close ALL ${positions.length} positions? This action cannot be undone.`)) {
-                try {
-                  // Close all positions
-                  const closePromises = positions.map((pos: any) => 
-                    axios.post(`${API_BASE}/api/positions/${pos.position_id}/close`).catch(err => {
-                      console.error(`Error closing position ${pos.position_id}:`, err)
-                      return null
-                    })
-                  )
-                  await Promise.all(closePromises)
-                  
-                  // Refresh data
-                  const [posRes, pnlRes] = await Promise.all([
-                    axios.get(`${API_BASE}/api/positions`),
-                    axios.get(`${API_BASE}/api/pnl`)
-                  ])
-                  setPositions(posRes.data.positions || [])
-                  setPnl(pnlRes.data)
-                  alert('All positions closed successfully')
-                } catch (error) {
-                  console.error('Error closing all positions:', error)
-                  alert('Failed to close some positions. Check console for details.')
-                }
-              }
-            }}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-bold"
-          >
-            Close All (Emergency)
-          </button>
-        )}
+        <button onClick={fetchData} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold">
+          Recheck Paper Proof
+        </button>
       </div>
-      
-      {/* Data Source Warning */}
-      <DataSourceWarning 
-        dataSource={dataSource}
-        brokerConnected={brokerConnected}
-        mode={mode}
-      />
-      
-      {/* Position Source Warning */}
+
+      {error && (
+        <div className="bg-yellow-900/20 border border-yellow-700 p-3 rounded-lg text-yellow-300 text-sm">
+          Last poll failed but last-good data is still visible: {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="text-sm text-gray-400">Mode Safety</div>
+          <div className="mt-2">{statusBadge(paperTruthOk, paperTruthOk ? 'PAPER / ANALYZER SAFE' : 'BLOCKED')}</div>
+          <div className="text-xs text-gray-500 mt-2">Live trading flag: {liveTradingAllowed ? 'ON' : 'OFF'}</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="text-sm text-gray-400">Broker Data</div>
+          <div className="mt-2">{statusBadge(Boolean(brokerConnected), brokerConnected ? 'CONNECTED' : 'NOT CONNECTED')}</div>
+          <div className="text-xs text-gray-500 mt-2">Source: {String(dataSource)}</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="text-sm text-gray-400">Today Paper Entries</div>
+          <div className="text-2xl font-bold mt-1">{todayEntries.length}</div>
+          <div className="text-xs text-gray-500 mt-2">From /api/trades/today</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg">
+          <div className="text-sm text-gray-400">Today Paper Exits</div>
+          <div className="text-2xl font-bold mt-1">{todayExits.length}</div>
+          <div className="text-xs text-gray-500 mt-2">Closed paper/analyzer records</div>
+        </div>
+      </div>
+
+      <DataSourceWarning dataSource={dataSource} brokerConnected={brokerConnected} mode={mode} />
+
       {positionsSource === 'INTERNAL_UNVERIFIED' && positions.length > 0 && (
         <div className="bg-orange-900/20 border border-orange-700 p-3 rounded-lg">
           <div className="text-sm text-orange-300">
-            ⚠️ Positions shown are <strong>INTERNAL (UNVERIFIED)</strong>. Broker is disconnected. 
-            These positions may not match broker reality.
+            ⚠️ Positions shown are INTERNAL_UNVERIFIED. Treat as paper/analyzer evidence only, not broker reality.
           </div>
         </div>
       )}
 
-      {/* Open Positions */}
       <div className="bg-gray-800 p-6 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">Open Positions ({positions.length})</h3>
+        <h3 className="text-xl font-bold mb-4">Open Paper Positions ({positions.length})</h3>
         {positions.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -196,7 +167,7 @@ export default function PaperTrading() {
                   <th className="text-right p-2">Unrealized PnL</th>
                   <th className="text-right p-2">SL/Target</th>
                   <th className="text-left p-2">Provenance</th>
-                  <th className="text-right p-2">Actions</th>
+                  <th className="text-left p-2">Action Safety</th>
                 </tr>
               </thead>
               <tbody>
@@ -205,177 +176,99 @@ export default function PaperTrading() {
                     <td className="p-2">{pos.position_id || 'N/A'}</td>
                     <td className="p-2">{pos.symbol || pos.underlying || 'N/A'}</td>
                     <td className="text-right p-2">{pos.qty || pos.quantity || 0}</td>
-                    <td className="text-right p-2">₹{pos.entry_price?.toFixed(2) || 'N/A'}</td>
-                    <td className="text-right p-2">₹{pos.current_price?.toFixed(2) || pos.entry_price?.toFixed(2) || 'N/A'}</td>
-                    <td className={`text-right p-2 ${(pos.unrealized_pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      ₹{pos.unrealized_pnl?.toFixed(2) || '0.00'}
-                    </td>
-                    <td className="text-right p-2 text-xs">
-                      SL: ₹{pos.stop_loss?.toFixed(2) || 'N/A'}<br/>
-                      TG: ₹{pos.target?.toFixed(2) || 'N/A'}
-                    </td>
+                    <td className="text-right p-2">{money(pos.entry_price)}</td>
+                    <td className="text-right p-2">{money(pos.current_price ?? pos.entry_price)}</td>
+                    <td className={`text-right p-2 ${Number(pos.unrealized_pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(pos.unrealized_pnl)}</td>
+                    <td className="text-right p-2 text-xs">SL: {money(pos.stop_loss)}<br/>TG: {money(pos.target)}</td>
                     <td className="text-left p-2 text-xs text-gray-400">
-                      {pos.signal_source ? (
-                        <>
-                          Signal: {pos.signal_source}<br/>
-                          {pos.entry_time && `Entry: ${new Date(pos.entry_time).toLocaleString()}`}
-                          {pos.confidence && ` | Conf: ${(pos.confidence * 100).toFixed(0)}%`}
-                        </>
-                      ) : (
-                        'N/A'
-                      )}
+                      Signal: {pos.signal_source || pos.strategy || 'N/A'}<br/>
+                      {pos.entry_time ? `Entry: ${new Date(pos.entry_time).toLocaleString()}` : ''}
+                      {pos.confidence ? ` | Conf: ${(Number(pos.confidence) * 100).toFixed(0)}%` : ''}
                     </td>
-                    <td className="text-right p-2">
-                      <button
-                        onClick={async () => {
-                          if (confirm(`Close position ${pos.position_id}?`)) {
-                            try {
-                              await axios.post(`${API_BASE}/api/positions/${pos.position_id}/close`)
-                              // Refresh data
-                              const [posRes, pnlRes] = await Promise.all([
-                                axios.get(`${API_BASE}/api/positions`),
-                                axios.get(`${API_BASE}/api/pnl`)
-                              ])
-                              setPositions(posRes.data.positions || [])
-                              setPnl(pnlRes.data)
-                            } catch (error) {
-                              console.error('Error closing position:', error)
-                              alert('Failed to close position')
-                            }
-                          }
-                        }}
-                        className="px-2 py-1 bg-red-600 rounded hover:bg-red-700 text-xs"
-                      >
-                        Close
-                      </button>
-                    </td>
+                    <td className="text-left p-2 text-xs text-yellow-300">Read-only proof. No broker/position close route called from paper UI.</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No open paper positions</div><div className="text-sm text-gray-400 mt-2">Reason: paper engine has no open simulated position, market is closed, or broker/live data is not ready. This is not an error and no real order is placed.</div></div>
+          <div className="bg-gray-900/50 border border-gray-700 p-6 rounded">
+            <div className="font-bold text-gray-200">No open paper positions</div>
+            <div className="text-sm text-gray-400 mt-2">Reason: paper engine has no open simulated position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.</div>
+          </div>
         )}
       </div>
 
-      {/* PnL Charts */}
+      <div className="bg-gray-800 p-6 rounded-lg">
+        <h3 className="text-xl font-bold mb-4">Today Paper Trade Proof</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <div className="font-bold mb-2">Entries ({todayEntries.length})</div>
+            <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-64">{JSON.stringify(todayEntries.slice(0, 20), null, 2)}</pre>
+          </div>
+          <div>
+            <div className="font-bold mb-2">Exits ({todayExits.length})</div>
+            <pre className="bg-gray-900 p-3 rounded text-xs overflow-auto max-h-64">{JSON.stringify(todayExits.slice(0, 20), null, 2)}</pre>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Equity Curve */}
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">Equity Curve</h3>
           {pnlHistory.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={pnlHistory}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="timestamp" 
-                  tickFormatter={(v) => {
-                    try {
-                      const date = new Date(v)
-                      return isNaN(date.getTime()) ? 'Invalid' : date.toLocaleTimeString()
-                    } catch {
-                      return 'Invalid'
-                    }
-                  }} 
-                />
+                <XAxis dataKey="timestamp" tickFormatter={(v) => new Date(v).toLocaleTimeString()} />
                 <YAxis />
                 <Tooltip />
                 <Line type="monotone" dataKey="total_pnl" stroke="#8884d8" name="Total PnL" />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No PnL curve yet</div><div className="text-sm text-gray-400 mt-2">Reason: no completed paper trade/PnL history rows are available. The chart will appear after paper engine records history.</div></div>
+            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No PnL curve yet</div><div className="text-sm text-gray-400 mt-2">Chart appears after paper engine records history.</div></div>
           )}
         </div>
 
-        {/* PnL Summary */}
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">PnL Summary</h3>
           <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Total PnL:</span>
-              <span className={`font-bold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ₹{totalPnL.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Unrealized:</span>
-              <span className={`${totalUnrealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ₹{totalUnrealized.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Realized:</span>
-              <span className={`${totalRealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ₹{totalRealized.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Open Positions:</span>
-              <span>{positions.length}</span>
-            </div>
+            <div className="flex justify-between"><span>Total PnL:</span><span className={`font-bold ${totalPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalPnL)}</span></div>
+            <div className="flex justify-between"><span>Unrealized:</span><span className={`${totalUnrealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalUnrealized)}</span></div>
+            <div className="flex justify-between"><span>Realized:</span><span className={`${totalRealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalRealized)}</span></div>
+            <div className="flex justify-between"><span>Open Positions:</span><span>{positions.length}</span></div>
+            <div className="flex justify-between"><span>Today Entries:</span><span>{todayEntries.length}</span></div>
+            <div className="flex justify-between"><span>Today Exits:</span><span>{todayExits.length}</span></div>
           </div>
         </div>
       </div>
 
-      {/* Win Rate */}
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">Win Rate</h3>
         {summary.total_trades > 0 ? (
-            <div className="space-y-4">
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'Winning', value: summary.winning_trades || 0 },
-                      { name: 'Losing', value: summary.losing_trades || 0 }
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {[0, 1].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="text-center">
-                <div className="text-3xl font-bold">{summary.win_rate?.toFixed(1) || 0}%</div>
-                <div className="text-sm text-gray-400">Win Rate</div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No completed paper trades yet</div><div className="text-sm text-gray-400 mt-2">Win rate needs closed paper trades. Live trading remains OFF.</div></div>
-          )}
+          <div className="space-y-4">
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={[{ name: 'Winning', value: summary.winning_trades || 0 }, { name: 'Losing', value: summary.losing_trades || 0 }]} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
+                  {[0, 1].map((_entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="text-center"><div className="text-3xl font-bold">{summary.win_rate?.toFixed(1) || 0}%</div><div className="text-sm text-gray-400">Win Rate</div></div>
+          </div>
+        ) : (
+          <div className="bg-gray-900/50 border border-gray-700 p-6 rounded"><div className="font-bold text-gray-200">No completed paper trades yet</div><div className="text-sm text-gray-400 mt-2">Win rate needs closed paper trades. Live trading remains OFF.</div></div>
+        )}
       </div>
 
-      {/* Risk Panel */}
       <div className="bg-gray-800 p-6 rounded-lg">
         <h3 className="text-xl font-bold mb-4">Risk Panel</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <div className="text-sm text-gray-400">Max Positions</div>
-            <div className="text-2xl font-bold">5</div>
-            <div className="text-xs text-gray-500">Current: {positions.length}</div>
-          </div>
-          <div>
-            <div className="text-sm text-gray-400">Total Exposure</div>
-            <div className="text-2xl font-bold">
-              ₹{positions.reduce((sum, p) => sum + ((p.entry_price || 0) * (p.qty || 0)), 0).toFixed(2)}
-            </div>
-          </div>
-          <div>
-            <div className="text-sm text-gray-400">Kill Switch</div>
-            <div className="text-2xl font-bold text-green-400">ACTIVE</div>
-            <div className="text-xs text-gray-500">Trades disabled by default</div>
-          </div>
+          <div><div className="text-sm text-gray-400">Max Positions</div><div className="text-2xl font-bold">5</div><div className="text-xs text-gray-500">Current: {positions.length}</div></div>
+          <div><div className="text-sm text-gray-400">Total Paper Exposure</div><div className="text-2xl font-bold">{money(positions.reduce((sum: number, p: any) => sum + (Number(p.entry_price || 0) * Number(p.qty || 0)), 0))}</div></div>
+          <div><div className="text-sm text-gray-400">Live Order Safety</div><div className="text-2xl font-bold text-green-400">BLOCKED</div><div className="text-xs text-gray-500">Paper UI does not call broker/order close endpoints.</div></div>
         </div>
       </div>
     </div>
