@@ -73,6 +73,7 @@ const summary = {
   ui: [],
   chain_truth: [],
   trader_readiness_panel_visible: false,
+  truth_control_visible: false,
   final_verdict: 'UNKNOWN',
   infra_blockers: [],
   trade_readiness_blockers: [],
@@ -144,6 +145,7 @@ for (const ep of apiEndpoints) {
 }
 
 const tabs = [
+  ['truth', 'Truth Control'],
   ['genesis', 'Genesis Brain'],
   ['e2e_proof', 'E2E Proof'],
   ['overview', 'Overview'],
@@ -168,9 +170,11 @@ for (const [id, title] of tabs) {
     await page.screenshot({ path: screenshotPath, fullPage: true })
     const screenshotOk = fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 10000
     const e2eHasProofWords = id !== 'e2e_proof' || /Trader Readiness Truth Checklist|Required for real-money trading|Live-money switch blocked/i.test(text)
+    const truthHasProofWords = id !== 'truth' || /System Truth Control|Money readiness|Live broker order execution must remain disabled/i.test(text)
     if (id === 'e2e_proof' && e2eHasProofWords) summary.trader_readiness_panel_visible = true
-    const ok = !bad && screenshotOk && e2eHasProofWords
-    summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, e2e_has_trader_readiness: e2eHasProofWords })
+    if (id === 'truth' && truthHasProofWords) summary.truth_control_visible = true
+    const ok = !bad && screenshotOk && e2eHasProofWords && truthHasProofWords
+    summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, e2e_has_trader_readiness: e2eHasProofWords, truth_control_visible: truthHasProofWords })
     if (!ok) summary.infra_blockers.push(`UI_FAIL:${title}`)
   } catch (err) {
     summary.ui.push({ id, title, ok: false, error: String(err) })
@@ -179,6 +183,7 @@ for (const [id, title] of tabs) {
 }
 
 if (!summary.trader_readiness_panel_visible) summary.infra_blockers.push('TRADER_READINESS_PANEL_NOT_VISIBLE')
+if (!summary.truth_control_visible) summary.infra_blockers.push('TRUTH_CONTROL_NOT_VISIBLE')
 
 await page.setViewportSize({ width: 390, height: 844 })
 await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
@@ -197,6 +202,7 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Base: ${base}`,
   `Final verdict: **${summary.final_verdict}**`,
   `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`,
+  `Truth control visible: **${summary.truth_control_visible}**`,
   '',
   '## Chain Truth',
   ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
