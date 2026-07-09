@@ -1,0 +1,56 @@
+name: Permanent Repo Render Safety
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: "*/30 3-10 * * 1-5"
+
+permissions:
+  contents: read
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  SYSTEM3_REAL_ONLY: '1'
+  DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+  DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+
+jobs:
+  repo-render-safety:
+    name: Repo and Render config guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Permanent repo and render safety audit
+        run: python tools/permanent_repo_render_safety.py
+
+      - name: Cloud runtime check proof
+        if: always()
+        run: |
+          python tools/cloud_runtime_check.py \
+            --base-url "$DASHBOARD_BASE_URL" \
+            --expected-commit "$(git rev-parse HEAD)"
+
+      - name: Upload permanent safety artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: permanent-repo-render-safety
+          path: |
+            reports/latest/permanent_repo_render_safety/
+            reports/latest/cloud_runtime_check/
+          retention-days: 14
