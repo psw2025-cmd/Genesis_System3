@@ -16,6 +16,7 @@ import { SystemTab }     from './components/SystemTab'
 import { LiveTradingGate } from './components/LiveTradingGate'
 import { PerformanceTab }  from './components/PerformanceTab'
 import { EndToEndProof }   from './components/EndToEndProof'
+import { SystemTruthControl } from './components/SystemTruthControl'
 
 // ── Tier B: Axios-based tabs (need axios dep, call backend directly) ───
 import Signals       from './components/Signals'
@@ -26,6 +27,7 @@ import { GenesisTab } from './components/GenesisTab'
 function Content() {
   const { activeTab } = useStore()
   switch (activeTab) {
+    case 'truth':        return <SystemTruthControl />
     case 'overview':     return <Overview />
     case 'trade':        return <TradeTab />
     case 'positions':    return <Positions />
@@ -40,7 +42,7 @@ function Content() {
     case 'alerts':       return <AlertsTab />
     case 'system':       return <SystemTab />
     case 'gates':        return <LiveTradingGate />
-    default:             return <Overview />
+    default:             return <SystemTruthControl />
   }
 }
 
