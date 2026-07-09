@@ -9,10 +9,14 @@ on:
       - 'dashboard/backend/middleware/memory_guard.py'
       - 'dashboard/backend/paper_pipeline_v8.py'
       - 'dashboard/backend/profit_governor.py'
+      - 'dashboard/backend/lifetime_research_engine.py'
+      - 'config/lifetime_research_policy.json'
+      - 'scripts/system3_lifetime_research_runner.py'
       - 'tests/test_dhan_option_chain_parser.py'
       - 'tests/test_dhan_only_chain_guard.py'
       - 'tests/test_paper_pipeline_v8_dhan_only.py'
       - 'tests/test_profit_governor.py'
+      - 'tests/test_lifetime_research_engine.py'
       - '.github/workflows/dhan-only-proof.yml'
   workflow_dispatch:
 
@@ -51,6 +55,8 @@ jobs:
           python -m py_compile dashboard/backend/middleware/memory_guard.py
           python -m py_compile dashboard/backend/paper_pipeline_v8.py
           python -m py_compile dashboard/backend/profit_governor.py
+          python -m py_compile dashboard/backend/lifetime_research_engine.py
+          python -m py_compile scripts/system3_lifetime_research_runner.py
 
       - name: Run Dhan-only truth tests
         run: |
@@ -59,7 +65,27 @@ jobs:
             tests/test_dhan_only_chain_guard.py \
             tests/test_paper_pipeline_v8_dhan_only.py \
             tests/test_profit_governor.py \
+            tests/test_lifetime_research_engine.py \
             -v --tb=short
+
+      - name: Generate visible research proof report
+        run: |
+          python scripts/system3_lifetime_research_runner.py || true
+          test -f reports/latest/lifetime_research_engine/summary.json
+          test -f reports/latest/lifetime_research_engine/summary.md
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('reports/latest/lifetime_research_engine/summary.json')
+          data = json.loads(p.read_text())
+          print(json.dumps({
+            'status': data.get('status'),
+            'outcome_rows_loaded': data.get('outcome_rows_loaded'),
+            'champion': data.get('champion'),
+            'blockers': data.get('blockers'),
+            'safety': data.get('safety'),
+          }, indent=2))
+          PY
 
       - name: Static no-fallback guard
         run: |
@@ -80,3 +106,12 @@ jobs:
               raise SystemExit('\n'.join(failed))
           print('Dhan-only static guard PASS')
           PY
+
+      - name: Upload visible proof artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dhan-only-lifetime-research-proof
+          path: |
+            reports/latest/lifetime_research_engine/summary.json
+            reports/latest/lifetime_research_engine/summary.md
