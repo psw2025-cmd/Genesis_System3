@@ -27,6 +27,7 @@ const endpoints = [
 ]
 
 const tabs = [
+  ['truth', 'Truth Control'],
   ['genesis', 'Genesis Brain'],
   ['e2e_proof', 'E2E Proof'],
   ['overview', 'Overview'],
@@ -128,6 +129,7 @@ const summary = {
   request_failure_count: 0,
   network_response_count: 0,
   screenshots: [],
+  truth_control_visible: false,
   final_verdict: 'UNKNOWN',
   infra_blockers: [],
   trade_readiness_blockers: [],
@@ -202,6 +204,9 @@ try {
       const body = await page.locator('body').innerText({ timeout: 10000 })
       fs.writeFileSync(path.join(outDir, `${id}.body.txt`), body)
       scanForbidden(`UI:${title}`, body, summary.infra_blockers)
+      if (id === 'truth' && /System Truth Control|Money readiness|Live broker order execution must remain disabled/i.test(body)) {
+        summary.truth_control_visible = true
+      }
       const screenshot = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshot, fullPage: true })
       const ok = fs.existsSync(screenshot) && fs.statSync(screenshot).size > 10000
@@ -212,6 +217,8 @@ try {
       summary.infra_blockers.push(`UI_TAB_EXCEPTION:${title}:${String(err).slice(0, 160)}`)
     }
   }
+
+  if (!summary.truth_control_visible) summary.infra_blockers.push('TRUTH_CONTROL_NOT_VISIBLE')
 } catch (err) {
   summary.infra_blockers.push(`TOP_LEVEL_EXCEPTION:${String(err).slice(0, 240)}`)
 }
@@ -244,6 +251,7 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Generated: ${summary.generated_at}`,
   `Base: ${summary.base}`,
   `Final verdict: **${summary.final_verdict}**`,
+  `Truth control visible: **${summary.truth_control_visible}**`,
   '',
   '## Runtime Log Sources Captured',
   `- Browser console entries: ${summary.browser_console_count}`,
