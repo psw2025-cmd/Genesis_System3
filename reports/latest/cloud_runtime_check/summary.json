@@ -1,777 +1,242 @@
 {
   "alerts": [],
   "base_url": "https://genesis-system3-backend.onrender.com",
-  "deployed_commit": "[REDACTED]",
+  "deployed_commit": "",
   "endpoints": {
     "broker_deps": {
-      "error": "HTTPError: 503",
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
       "json": null,
-      "latency_ms": 561.7,
+      "latency_ms": 1.2,
       "ok": false,
-      "status_code": 503,
-      "text_preview": "Service Unavailable",
+      "status_code": null,
+      "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/broker/deps",
       "url_path": "/api/broker/deps"
     },
     "broker_dhan_status": {
-      "error": "HTTPError: 503",
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
       "json": null,
-      "latency_ms": 391.5,
+      "latency_ms": 1.1,
       "ok": false,
-      "status_code": 503,
-      "text_preview": "Service Unavailable",
+      "status_code": null,
+      "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
       "url_path": "/api/broker/dhan/status"
     },
     "broker_status": {
-      "error": null,
-      "json": {
-        "broker": "dhan",
-        "connected": true,
-        "error": null,
-        "latency_ms": 288,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "source": "dhan_readonly",
-        "status": "connected"
-      },
-      "latency_ms": 479.9,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.1,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
       "url_path": "/api/broker/status"
     },
     "chain_nifty": {
-      "error": null,
-      "json": {
-        "contracts": [],
-        "data_source": "closed",
-        "message": "Market closed - live chain fetch skipped in REAL_ONLY mode",
-        "pcr": 1.0,
-        "spot": 0,
-        "status": "MARKET_CLOSED",
-        "total_contracts": 0,
-        "underlying": "NIFTY"
-      },
-      "latency_ms": 189.9,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY",
       "url_path": "/api/chain/NIFTY"
     },
     "deploy_info": {
-      "error": null,
-      "json": {
-        "deployed_at_known": true,
-        "git_branch": "main",
-        "git_sha": "[REDACTED]",
-        "service_name": "genesis-system3-backend"
-      },
-      "latency_ms": 353.1,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 22.4,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/deploy/info",
       "url_path": "/api/deploy/info"
     },
     "health": {
-      "error": null,
-      "json": {
-        "broker": {
-          "connected": true,
-          "error": null,
-          "name": "dhan",
-          "status": "connected"
-        },
-        "broker_status": "connected",
-        "cycle_count": 0,
-        "daily_pnl": 0.0,
-        "data_source": "live",
-        "last_fetch": "2026-07-03T23:16:54.364234+05:30",
-        "live_allowed": false,
-        "live_blockers": [
-          "Live trading permanently disabled in analyzer mode"
-        ],
-        "market": {
-          "is_open": false,
-          "reason": "closed"
-        },
-        "market_status": "closed",
-        "message": "ANALYZER_READY - Broker connected, paper mode active",
-        "mode": "PAPER",
-        "open_positions": 0,
-        "performance_sla": {
-          "cycle_duration_sec": 0,
-          "fetch_duration_sec": 0,
-          "sla_pass": true,
-          "strategy_duration_sec": 0
-        },
-        "qc_failures": [],
-        "qc_status": "PASS",
-        "refresh_interval": 5,
-        "status": "ok",
-        "total_pnl": 0.0,
-        "trades_executed": 0
-      },
-      "latency_ms": 147.2,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/health",
       "url_path": "/api/health"
     },
     "memory_after_chain": {
-      "error": null,
-      "json": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "latency_ms": 138.7,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/memory",
       "url_path": "/api/memory"
     },
     "memory_after_portfolio": {
-      "error": null,
-      "json": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "latency_ms": 127.8,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.1,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/memory",
       "url_path": "/api/memory"
     },
     "memory_before": {
-      "error": null,
-      "json": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "latency_ms": 130.6,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/memory",
       "url_path": "/api/memory"
     },
     "portfolio_unified": {
-      "error": null,
-      "json": {
-        "auto_gates_report": "reports/latest/system3_auto_gates/summary.json",
-        "blockers": [
-          "PROFIT_BLOCKER",
-          "SYS3-BLK-003",
-          "SYS3-BLK-005",
-          "SYS3-BLK-008",
-          "[REDACTED]",
-          "[REDACTED]",
-          "[REDACTED]",
-          "LIVE_TRADING_DISABLED_BY_DESIGN"
-        ],
-        "broker": {
-          "connected": true,
-          "details_loaded": false,
-          "details_mode": "skipped_for_render_memory",
-          "error": null,
-          "holdings_count": 0,
-          "positions_count": 0,
-          "source": "dhan_readonly"
-        },
-        "broker_holdings": [],
-        "broker_positions": [],
-        "data_transparency": "PAPER_INTERNAL",
-        "generated_utc": "2026-07-03T17:47:02.024831Z",
-        "human_approval": true,
-        "human_approval_by": "PRITAM S. WARGHADE",
-        "live_trading_enabled": false,
-        "next_actions": [
-          "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
-          "Run scripts/[REDACTED].py after paper trades accumulate",
-          "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
-          "Run scripts/system3_option_visibility_audit.py"
-        ],
-        "order_placement_allowed": false,
-        "paper": {
-          "data_source": "paper_cloud_sim",
-          "open_count": 0,
-          "open_positions": [],
-          "summary": {
-            "closed_count": 0,
-            "closed_positions": [],
-            "data_source": "paper_cloud_sim",
-            "losing_trades": 0,
-            "note": "Cloud paper engine populates during market hours (09:15-15:30 IST).",
-            "open_count": 0,
-            "open_positions": [],
-            "timestamp_ist": "2026-06-25 09:22:47 IST",
-            "total_pnl": 0.0,
-            "total_realized_pnl": 0.0,
-            "total_trades": 0,
-            "total_unrealized_pnl": 0.0,
-            "win_rate": 0.0,
-            "winning_trades": 0
-          },
-          "trade_history_count": 9
-        },
-        "production_ready_for_real_money": false,
-        "trade_history": [
-          {
-            "entry_price": 142.5,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 128.0,
-            "exit_reason": "STOP_LOSS",
-            "expiry_date": "2026-09-24",
-            "lot_size": 50,
-            "option_type": "CE",
-            "position_id": "POS_0001",
-            "qty": 50,
-            "realized_pnl": -725.0,
-            "realized_pnl_pct": -10.2,
-            "security_id": "1100470",
-            "strike": 23500,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 10:15:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "NIFTY"
-          },
-          {
-            "entry_price": 210.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 245.0,
-            "exit_reason": "TARGET",
-            "expiry_date": "2026-09-24",
-            "lot_size": 15,
-            "option_type": "PE",
-            "position_id": "POS_0002",
-            "qty": 30,
-            "realized_pnl": 1050.0,
-            "realized_pnl_pct": 16.7,
-            "security_id": "1100470",
-            "strike": 48500,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 10:42:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "BANKNIFTY"
-          },
-          {
-            "entry_price": 95.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 88.0,
-            "exit_reason": "STOP_LOSS",
-            "expiry_date": "2026-09-24",
-            "lot_size": 50,
-            "option_type": "PE",
-            "position_id": "POS_0003",
-            "qty": 50,
-            "realized_pnl": -350.0,
-            "realized_pnl_pct": -7.4,
-            "security_id": "1100470",
-            "strike": 23400,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 11:05:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "NIFTY"
-          },
-          {
-            "entry_price": 78.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 62.0,
-            "exit_reason": "STOP_LOSS",
-            "expiry_date": "2026-09-24",
-            "lot_size": 40,
-            "option_type": "CE",
-            "position_id": "POS_0004",
-            "qty": 40,
-            "realized_pnl": -640.0,
-            "realized_pnl_pct": -20.5,
-            "security_id": "1100470",
-            "strike": 22800,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 11:30:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "FINNIFTY"
-          },
-          {
-            "entry_price": 185.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 220.0,
-            "exit_reason": "TARGET",
-            "expiry_date": "2026-09-24",
-            "lot_size": 15,
-            "option_type": "CE",
-            "position_id": "POS_0005",
-            "qty": 25,
-            "realized_pnl": 875.0,
-            "realized_pnl_pct": 18.9,
-            "security_id": "1100470",
-            "strike": 49000,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 12:10:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "BANKNIFTY"
-          },
-          {
-            "entry_price": 118.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 102.0,
-            "exit_reason": "TIME_EXIT",
-            "expiry_date": "2026-09-24",
-            "lot_size": 50,
-            "option_type": "CE",
-            "position_id": "POS_0006",
-            "qty": 50,
-            "realized_pnl": -800.0,
-            "realized_pnl_pct": -13.6,
-            "security_id": "1100470",
-            "strike": 23600,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 13:00:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "NIFTY"
-          },
-          {
-            "entry_price": 65.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 58.0,
-            "exit_reason": "STOP_LOSS",
-            "expiry_date": "2026-09-24",
-            "lot_size": 75,
-            "option_type": "PE",
-            "position_id": "POS_0007",
-            "qty": 60,
-            "realized_pnl": -420.0,
-            "realized_pnl_pct": -10.8,
-            "security_id": "1100470",
-            "strike": 11200,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 13:45:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "MIDCPNIFTY"
-          },
-          {
-            "entry_price": 88.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 96.0,
-            "exit_reason": "TARGET",
-            "expiry_date": "2026-09-24",
-            "lot_size": 50,
-            "option_type": "PE",
-            "position_id": "POS_0008",
-            "qty": 50,
-            "realized_pnl": 400.0,
-            "realized_pnl_pct": 9.1,
-            "security_id": "1100470",
-            "strike": 23550,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 14:20:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "NIFTY"
-          },
-          {
-            "entry_price": 195.0,
-            "exchange_segment": "NSE_FNO",
-            "exit_price": 178.0,
-            "exit_reason": "TIME_EXIT",
-            "expiry_date": "2026-09-24",
-            "lot_size": 15,
-            "option_type": "PE",
-            "position_id": "POS_0009",
-            "qty": 30,
-            "realized_pnl": -510.0,
-            "realized_pnl_pct": -8.7,
-            "security_id": "1100470",
-            "strike": 48800,
-            "symbol": "BSXOPT",
-            "symbol_resolved_from": "instrument_master",
-            "time_ist": "2026-02-01 14:55:00 IST",
-            "trading_symbol": "BSXOPT",
-            "underlying": "BANKNIFTY"
-          }
-        ],
-        "trade_history_meta": {
-          "data_source": "paper_simulation",
-          "is_fixture": true,
-          "note": "Synthetic paper trades \u2014 trading_symbol per NSE/Dhan DDMMMYY format (weekly expiry Thu 05-Feb-2026)",
-          "session": "Feb 1 2026 paper session",
-          "session_expiry": "2026-02-05"
-        }
-      },
-      "latency_ms": 4412.5,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/portfolio/unified",
       "url_path": "/api/portfolio/unified"
     },
     "scheduler_health": {
-      "error": null,
-      "json": {
-        "catchup_eligible_jobs": [],
-        "config_alert": null,
-        "config_jobs_enabled": 23,
-        "config_jobs_total": 23,
-        "configured_jobs_count": 23,
-        "daemon_heartbeat": "2026-07-03T23:16:52.518133+05:30",
-        "daemon_pid": 1,
-        "enabled_jobs_count": 23,
-        "fired_jobs_today": [
-          "bhavcopy_download",
-          "signal_engine_bhavcopy",
-          "weekly_repo_authority_audit"
-        ],
-        "fired_keys_today": [
-          "2026-07-03|15:35|daily_gain_validate",
-          "2026-07-03|16:05|dashboard_browser_proof",
-          "2026-07-03|18:30|bhavcopy_download",
-          "2026-07-03|18:45|signal_engine_bhavcopy",
-          "2026-07-03|19:00|weekly_repo_authority_audit"
-        ],
-        "healthy": false,
-        "jobs": {
-          "bhavcopy_download": {
-            "fire_status": "ON_TIME",
-            "last_error": null,
-            "last_run_time": "2026-07-03T12:59:58.260046",
-            "last_status": "SUCCESS"
-          },
-          "daily_gain_validate": {
-            "fire_status": "CATCH_UP",
-            "last_error": "Traceback (most recent call last):\n  File \"/app/scripts/daily_gain_rank_and_validate.py\", line 30, in <module>\n    from core.data.nse_provider import (\nImportError: cannot import name 'is_expiry_day' from 'core.data.nse_provider' (/app/core/data/nse_provider.py)\n",
-            "last_run_time": "2026-07-03T11:47:28.749423",
-            "last_status": "FAILED"
-          },
-          "dashboard_browser_proof": {
-            "fire_status": "CATCH_UP",
-            "last_error": "",
-            "last_run_time": "2026-07-03T11:47:29.928866",
-            "last_status": "FAILED"
-          },
-          "signal_engine_bhavcopy": {
-            "fire_status": "ON_TIME",
-            "last_error": null,
-            "last_run_time": "2026-07-03T13:14:18.145042",
-            "last_status": "SUCCESS"
-          },
-          "weekly_repo_authority_audit": {
-            "fire_status": "ON_TIME",
-            "last_error": null,
-            "last_run_time": "2026-07-03T13:29:36.923487",
-            "last_status": "SUCCESS"
-          }
-        },
-        "jobs_status_today": {
-          "auto_coordinator_post_market": "SKIPPED_TOO_LATE",
-          "auto_coordinator_premarket": "SKIPPED_TOO_LATE",
-          "auto_retrain": "SKIPPED_UPSTREAM_MISSING",
-          "bhavcopy_download": "ON_TIME",
-          "daily_gain_rank": "SKIPPED_TOO_LATE",
-          "daily_gain_trend": "SKIPPED_TOO_LATE",
-          "daily_gain_validate": "FAILED",
-          "daily_prediction_benchmark": "SKIPPED_TOO_LATE",
-          "dashboard_browser_proof": "FAILED",
-          "dashboard_endpoint_coverage": "SKIPPED_TOO_LATE",
-          "datasource_health_check": "SKIPPED_TOO_LATE",
-          "dhan_instruments_sync": "SKIPPED_TOO_LATE",
-          "paper_day_proof_pack": "SKIPPED_TOO_LATE",
-          "paper_lifecycle_proof": "SKIPPED_TOO_LATE",
-          "paper_lifecycle_proof_afternoon": "SKIPPED_TOO_LATE",
-          "paper_lifecycle_proof_midday": "SKIPPED_TOO_LATE",
-          "self_healing_watchdog": "SKIPPED_TOO_LATE",
-          "signal_engine_bhavcopy": "ON_TIME",
-          "system3_post_market_pipeline": "SKIPPED_TOO_LATE",
-          "ui_market_cross_verify": "SKIPPED_TOO_LATE",
-          "ui_market_cross_verify_afternoon": "SKIPPED_TOO_LATE",
-          "ui_market_cross_verify_midday": "SKIPPED_TOO_LATE",
-          "weekly_repo_authority_audit": "ON_TIME"
-        },
-        "last_push_at": "2026-07-03T17:46:53.583031+00:00",
-        "missed_jobs_today": [
-          "self_healing_watchdog",
-          "datasource_health_check",
-          "dashboard_endpoint_coverage",
-          "auto_coordinator_premarket",
-          "dhan_instruments_sync",
-          "daily_gain_rank",
-          "paper_lifecycle_proof",
-          "ui_market_cross_verify",
-          "paper_lifecycle_proof_midday",
-          "ui_market_cross_verify_midday",
-          "paper_lifecycle_proof_afternoon",
-          "[REDACTED]",
-          "daily_gain_validate",
-          "daily_gain_trend",
-          "daily_prediction_benchmark",
-          "dashboard_browser_proof",
-          "system3_post_market_pipeline",
-          "paper_day_proof_pack",
-          "auto_retrain",
-          "auto_coordinator_post_market"
-        ],
-        "pending_jobs_today": [],
-        "received": true,
-        "skipped_jobs_today": [],
-        "unhealthy_reasons": [
-          "jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'daily_gain_trend', 'daily_prediction_benchmark', 'dashboard_browser_proof', 'system3_post_market_pipeline', 'paper_day_proof_pack', 'auto_retrain', 'auto_coordinator_post_market']"
-        ]
-      },
-      "latency_ms": 180.8,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/scheduler/health",
       "url_path": "/api/scheduler/health"
     },
     "state": {
-      "error": null,
-      "json": {
-        "alerts": [],
-        "broker": {
-          "access_token_present": true,
-          "auto_refresh": {
-            "attempted": false,
-            "success": false
-          },
-          "broker": "dhan",
-          "client_id_present": true,
-          "connected": true,
-          "credentials_present": true,
-          "env_source": "core.utils.env_loader",
-          "error": null,
-          "latency_ms": 273,
-          "live_trading_enabled": false,
-          "mode": "ANALYZER",
-          "order_placement_allowed": false,
-          "sdk_available": true
-        },
-        "cycle_count": 144,
-        "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
-        "last_cycle_ts_iso": "2026-07-03T23:17:00.848650+05:30",
-        "last_fetch_ts_iso": "2026-07-03T23:17:00.848650+05:30",
-        "last_tick_age_sec": 5.04,
-        "market": {
-          "current_time_ist": "2026-07-03T23:17:00.817224+05:30",
-          "is_open": false,
-          "next_open": "2026-07-06 09:15:00 IST",
-          "reason": "Market closed: After hours (closed at 15:30)"
-        },
-        "mode": "PAPER",
-        "model": {
-          "active": null,
-          "fallback_used": false,
-          "metrics": {},
-          "type": null
-        },
-        "pnl": {
-          "day_total": 0.0,
-          "realized": 0.0,
-          "total": 0.0,
-          "unrealized": 0.0
-        },
-        "positions": [],
-        "positions_source": "INTERNAL_UNVERIFIED",
-        "qc": {
-          "contracts_total": 0,
-          "failures": [],
-          "reasons": [],
-          "status": "PASS",
-          "underlyings": 0
-        },
-        "reconciliation": {
-          "mismatches": [],
-          "status": "OK",
-          "timestamp": "2026-07-03T23:05:06.846329+05:30"
-        },
-        "refresh_interval": 5,
-        "risk": {
-          "concentration": 0.0,
-          "es95": 0.0,
-          "exposure": 0.0,
-          "greeks": {
-            "delta": 0.0,
-            "gamma": 0.0,
-            "theta": 0.0,
-            "vega": 0.0
-          },
-          "limits": {
-            "breaches": [],
-            "status": "PASS"
-          },
-          "var95": 0.0
-        },
-        "signals": {
-          "confidence": 0,
-          "last_signal": null,
-          "reason": "No signal generated",
-          "status": "NO_TRADE",
-          "underlying": null
-        },
-        "state_version": 144,
-        "tick_health": {
-          "last_tick_age_sec": 5.04,
-          "market_open": false,
-          "refresh_interval_sec": 5,
-          "source": "rest_poll_ssot",
-          "websocket_endpoint": "/ws/stream"
-        },
-        "timestamp_ist": "2026-07-03T23:17:00.848650+05:30",
-        "timestamp_utc": "2026-07-03T17:47:00.848649Z"
-      },
-      "latency_ms": 118.7,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/state",
       "url_path": "/api/state"
     },
     "underlyings": {
-      "error": null,
-      "json": {
-        "chain_endpoint": "/api/chain/{underlying}",
-        "chain_source": "app_worker_pushed_cache",
-        "default": "NIFTY",
-        "underlyings": [
-          "NIFTY",
-          "BANKNIFTY",
-          "FINNIFTY",
-          "MIDCPNIFTY",
-          "SENSEX"
-        ]
-      },
-      "latency_ms": 118.1,
-      "ok": true,
-      "status_code": 200,
+      "error": "URLError: <urlopen error [Errno -5] No address associated with hostname>",
+      "json": null,
+      "latency_ms": 1.2,
+      "ok": false,
+      "status_code": null,
       "text_preview": null,
       "url": "https://genesis-system3-backend.onrender.com/api/underlyings",
       "url_path": "/api/underlyings"
     }
   },
-  "expected_commit": "4f44d1945f676813beb098ae4282983f861a33a5",
-  "generated_utc": "2026-07-03T17:46:53.654103Z",
+  "expected_commit": "0148588fa2db552c2236f99c2959cf44b54432c1",
+  "generated_utc": "2026-07-06T10:29:04.817766Z",
   "key_facts": {
-    "broker_connected": true,
+    "broker_connected": false,
     "chain_nifty_contracts": 0,
-    "portfolio_details_mode": "skipped_for_render_memory",
+    "portfolio_details_mode": null,
     "scheduler_healthy": false,
-    "scheduler_received": true
+    "scheduler_received": false
   },
   "memory": {
     "after_chain": {
-      "available": true,
-      "pct_used": 83.0,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "rss_mb": 398.5,
-      "status": "WARN"
+      "available": false
     },
     "after_portfolio": {
-      "available": true,
-      "pct_used": 83.0,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "rss_mb": 398.5,
-      "status": "WARN"
+      "available": false
     },
     "before": {
-      "available": true,
-      "pct_used": 83.0,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 81.5,
-        "limit_mb": 480,
-        "pct_used": 83.0,
-        "rss_mb": 398.5,
-        "status": "WARN"
-      },
-      "rss_mb": 398.5,
-      "status": "WARN"
+      "available": false
     }
   },
-  "passed": [
-    "broker_connected",
-    "endpoint_broker_status",
-    "endpoint_chain_nifty",
-    "endpoint_deploy_info",
-    "endpoint_health",
-    "endpoint_memory_after_chain",
-    "endpoint_memory_after_portfolio",
-    "endpoint_memory_before",
-    "endpoint_portfolio_unified",
-    "endpoint_scheduler_health",
-    "endpoint_state",
-    "endpoint_underlyings",
-    "memory_after_chain_below_420mb",
-    "memory_after_portfolio_below_420mb",
-    "memory_before_below_420mb",
-    "portfolio_broker_details_skipped_for_memory",
-    "portfolio_live_disabled"
-  ],
+  "passed": [],
   "script": "tools/cloud_runtime_check.py",
   "verdict": "WARN",
   "warnings": [
     {
+      "key": "endpoint_deploy_info",
+      "level": "WARNING",
+      "message": "deploy_info failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_health",
+      "level": "WARNING",
+      "message": "health failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_memory_before",
+      "level": "WARNING",
+      "message": "memory_before failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_broker_status",
+      "level": "WARNING",
+      "message": "broker_status failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
       "key": "endpoint_broker_dhan_status",
       "level": "WARNING",
-      "message": "broker_dhan_status failed: 503 HTTPError: 503"
+      "message": "broker_dhan_status failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
     },
     {
       "key": "endpoint_broker_deps",
       "level": "WARNING",
-      "message": "broker_deps failed: 503 HTTPError: 503"
+      "message": "broker_deps failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
     },
     {
-      "key": "deploy_commit_mismatch",
+      "key": "endpoint_scheduler_health",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=4f44d1945f67"
+      "message": "scheduler_health failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
     },
     {
-      "key": "scheduler_not_healthy",
+      "key": "endpoint_portfolio_unified",
       "level": "WARNING",
-      "message": "worker push received but unhealthy: [\"jobs missed today (past catch-up window, never fired): ['self_healing_watchdog', 'datasource_health_check', 'dashboard_endpoint_coverage', 'auto_coordinator_premarket', 'dhan_instruments_sync', 'daily_gain_rank', 'paper_lifecycle_proof', 'ui_market_cross_verify', 'paper_lifecycle_proof_midday', 'ui_market_cross_verify_midday', 'paper_lifecycle_proof_afternoon', '[REDACTED]', 'daily_gain_validate', 'daily_gain_trend', 'daily_prediction_benchmark', 'dashboard_browser_proof', 'system3_post_market_pipeline', 'paper_day_proof_pack', 'auto_retrain', 'auto_coordinator_post_market']\"]"
+      "message": "portfolio_unified failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_memory_after_portfolio",
+      "level": "WARNING",
+      "message": "memory_after_portfolio failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_chain_nifty",
+      "level": "WARNING",
+      "message": "chain_nifty failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_memory_after_chain",
+      "level": "WARNING",
+      "message": "memory_after_chain failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_underlyings",
+      "level": "WARNING",
+      "message": "underlyings failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "endpoint_state",
+      "level": "WARNING",
+      "message": "state failed: None URLError: <urlopen error [Errno -5] No address associated with hostname>"
+    },
+    {
+      "key": "broker_not_connected",
+      "level": "WARNING",
+      "message": "broker status not connected: None"
+    },
+    {
+      "key": "scheduler_no_worker_push",
+      "level": "WARNING",
+      "message": "worker scheduler health has not been received"
     },
     {
       "key": "chain_nifty_empty",
       "level": "WARNING",
-      "message": "NIFTY chain empty/status=MARKET_CLOSED source=closed"
+      "message": "NIFTY chain empty/status=None source=None"
     }
   ]
 }
