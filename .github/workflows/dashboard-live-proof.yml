@@ -6,8 +6,12 @@ on:
     branches: [ main ]
     paths:
       - 'dashboard/frontend/src/App.tsx'
+      - 'dashboard/frontend/src/hooks/useData.ts'
+      - 'dashboard/frontend/src/store.ts'
+      - 'dashboard/frontend/src/config.ts'
       - 'dashboard/frontend/src/components/Sidebar.tsx'
       - 'dashboard/frontend/src/components/EndToEndProof.tsx'
+      - 'dashboard/frontend/src/components/PaperTrading.tsx'
       - 'dashboard/backend/**'
       - 'core/data/**'
       - 'tools/dashboard_live_ui_proof.mjs'
