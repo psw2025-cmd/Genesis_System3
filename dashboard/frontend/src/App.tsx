@@ -15,6 +15,7 @@ import { AlertsTab }     from './components/AlertsTab'
 import { SystemTab }     from './components/SystemTab'
 import { LiveTradingGate } from './components/LiveTradingGate'
 import { PerformanceTab }  from './components/PerformanceTab'
+import { EndToEndProof }   from './components/EndToEndProof'
 
 // ── Tier B: Axios-based tabs (need axios dep, call backend directly) ───
 import Signals       from './components/Signals'
@@ -34,6 +35,7 @@ function Content() {
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
     case 'genesis':      return <GenesisTab />
+    case 'e2e-proof':    return <EndToEndProof />
     case 'broker':       return <BrokerPanel />
     case 'alerts':       return <AlertsTab />
     case 'system':       return <SystemTab />
@@ -57,4 +59,3 @@ export default function App() {
     </div>
   )
 }
-
