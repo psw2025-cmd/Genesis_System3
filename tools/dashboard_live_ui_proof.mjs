@@ -27,6 +27,7 @@ const apiEndpoints = [
   ...chainEndpoints,
   '/api/gain_rank',
   '/api/pnl',
+  '/api/trades/today',
   '/api/auto_gates'
 ]
 
@@ -62,6 +63,7 @@ const summary = {
   api: [],
   ui: [],
   chain_truth: [],
+  trader_readiness_panel_visible: false,
   final_verdict: 'UNKNOWN',
   blockers: [],
 }
@@ -141,19 +143,22 @@ for (const [id, title] of tabs) {
     await btn.click({ timeout: 10000 })
     await page.waitForTimeout(3000)
     const text = await page.locator('body').innerText({ timeout: 10000 })
-    const bad = /Endpoint:\s*\/api\/|Request failed with status code 401|Loading funds|Loading holdings|Loading positions/.test(text)
+    const bad = /Endpoint:\s*\/api\/|Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text)
     const screenshotPath = path.join(outDir, `${id}.png`)
     await page.screenshot({ path: screenshotPath, fullPage: true })
     const screenshotOk = fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 10000
-    const e2eHasProofWords = id !== 'e2e_proof' || /End-to-End Visual Truth Proof|Dhan Option Chain Proof|Core API/.test(text)
+    const e2eHasProofWords = id !== 'e2e_proof' || /Trader Readiness Truth Checklist|Required for real-money trading|Live-money switch blocked/i.test(text)
+    if (id === 'e2e_proof' && e2eHasProofWords) summary.trader_readiness_panel_visible = true
     const ok = !bad && screenshotOk && e2eHasProofWords
-    summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, e2e_has_proof_words: e2eHasProofWords })
+    summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, e2e_has_trader_readiness: e2eHasProofWords })
     if (!ok) summary.blockers.push(`UI_FAIL:${title}`)
   } catch (err) {
     summary.ui.push({ id, title, ok: false, error: String(err) })
     summary.blockers.push(`UI_EXCEPTION:${title}:${String(err).slice(0, 160)}`)
   }
 }
+
+if (!summary.trader_readiness_panel_visible) summary.blockers.push('TRADER_READINESS_PANEL_NOT_VISIBLE')
 
 await page.setViewportSize({ width: 390, height: 844 })
 await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
@@ -170,6 +175,7 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Generated: ${summary.generated_at}`,
   `Base: ${base}`,
   `Final verdict: **${summary.final_verdict}**`,
+  `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`,
   '',
   '## Chain Truth',
   ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
