@@ -2,9 +2,8 @@
 DataSourceManager — Dhan Only (backward-compatible API).
 All market data from DhanHQ API.
 
-No CSV/cache/synthetic fallback is allowed in this layer. If Dhan does not return
-valid option-chain rows, callers receive NO_DHAN_DATA and must display a blocked
-state instead of stale prices.
+If Dhan does not return valid option-chain rows, callers receive NO_DHAN_DATA
+and must display a blocked state instead of stale prices.
 """
 from __future__ import annotations
 
@@ -95,8 +94,6 @@ class DataSourceManager:
         Return:
           (DataFrame, spot_price) when official Dhan chain rows are available.
           (None, 0.0) when Dhan is unavailable/empty/error.
-
-        This function intentionally does not read state/chain_cache or CSV files.
         """
         sym = symbol.upper()
         self._last_error = None
@@ -173,7 +170,7 @@ class DataSourceManager:
             return None, 0.0
 
     def get_option_chain(self, symbol: str, expiry: str = "") -> Dict[str, Any]:
-        """New-style API — returns dict directly. Dhan-only; no fallback."""
+        """New-style API — returns dict directly. Dhan-only."""
         result = self.fetch_option_chain(symbol, expiry)
         if result is None or result[0] is None:
             return {
