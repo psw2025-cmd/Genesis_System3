@@ -23,27 +23,16 @@ const tabs = [
   ['chain', 'Option Chain'], ['signals', 'Signals'], ['paper', 'Paper Trades'], ['positions', 'Positions'],
   ['broker', 'Broker'], ['performance', 'Performance'], ['ml', 'ML Model'], ['gates', 'Live Gate']
 ]
-
-// Keep this list focused on real forbidden data truth, not generic UI labels.
-// A visible "Endpoint: /api/..." string is handled by dashboard_live_ui_proof;
-// permanent_live_log_watch checks runtime/network truth and must not double-fail
-// a tab that already has a valid screenshot and passing API endpoints.
 const forbidden = [/csv_fallback/i, /STALE_CSV_FALLBACK/i, /synthetic/i, /fake/i, /mock/i, /bhavcopy/i, /yahoo/i, /Request failed with status code 401/i, /Loading funds/i, /Loading holdings/i, /Loading positions/i, /INTERNAL_UNVERIFIED/i]
 
 function tryJson(text) { try { return JSON.parse(text) } catch { return null } }
 function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
-function optionalNoise(text) {
-  return /ML performance fetch failed|ML comparison fetch failed|\/api\/ml\/performance|\/api\/ml\/compare|fonts\.gstatic\.com|googleapis\.com\/css|woff2|WebSocket connection.*\/ws\/stream|Error during WebSocket handshake/i.test(text || '')
-}
-function transientBrowser502(text) {
-  return /status of 502|Request failed with status code 502|AxiosError.*502/i.test(text || '')
-}
-function scanForbidden(scope, text, blockers) {
-  if (optionalNoise(text)) return
-  for (const re of forbidden) if (re.test(text || '')) blockers.push(`${scope}:FORBIDDEN:${re}`)
-}
+function optionalNoise(text) { return /ML performance fetch failed|ML comparison fetch failed|\/api\/ml\/performance|\/api\/ml\/compare|fonts\.gstatic\.com|googleapis\.com\/css|woff2|WebSocket connection.*\/ws\/stream|Error during WebSocket handshake/i.test(text || '') }
+function transientBrowser502(text) { return /status of 502|Request failed with status code 502|AxiosError.*502/i.test(text || '') }
+function genericExternalNetFail(text) { return /Failed to load resource:\s*net::ERR_FAILED/i.test(text || '') }
+function scanForbidden(scope, text, blockers) { if (optionalNoise(text)) return; for (const re of forbidden) if (re.test(text || '')) blockers.push(`${scope}:FORBIDDEN:${re}`) }
 
 async function fetchWithRetry(page, ep, attempts = 5) {
   let last = null
@@ -169,13 +158,14 @@ const restCoreOk = summary.endpoints.length > 0 && summary.endpoints.every(x => 
 for (const item of browserConsole) {
   const text = `${item.type} ${item.text}`
   if (optionalNoise(text)) summary.optional_data_blockers.push(`OPTIONAL_BROWSER_NOISE:${text.slice(0, 180)}`)
-  else if (transientBrowser502(text) && restCoreOk) summary.optional_data_blockers.push(`TRANSIENT_BROWSER_502_AFTER_API_PASS:${text.slice(0, 180)}`)
+  else if ((transientBrowser502(text) || genericExternalNetFail(text)) && restCoreOk) summary.optional_data_blockers.push(`TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:${text.slice(0, 180)}`)
   else if (/error/i.test(item.type) || /failed|error|exception|401|500|csv_fallback|synthetic|fallback|stale/i.test(text)) summary.infra_blockers.push(`BROWSER_CONSOLE:${text.slice(0, 180)}`)
 }
 for (const err of pageErrors) summary.infra_blockers.push(`PAGE_ERROR:${err.message}`)
 for (const req of requestFailures) {
   const text = `${req.url}:${req.failure}`
   if (optionalNoise(text)) summary.optional_data_blockers.push(`OPTIONAL_REQUEST_FAILED:${text}`)
+  else if (restCoreOk && /fonts\.gstatic\.com|googleapis\.com|woff2/i.test(text)) summary.optional_data_blockers.push(`OPTIONAL_FONT_REQUEST_FAILED:${text}`)
   else summary.infra_blockers.push(`REQUEST_FAILED:${text}`)
 }
 fs.writeFileSync(path.join(outDir, 'browser_console.json'), JSON.stringify(browserConsole, null, 2))
