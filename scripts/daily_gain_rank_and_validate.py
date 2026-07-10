@@ -1,283 +1,219 @@
 """
 Daily Gain Rank + Market Validation Runner
 ==========================================
-Runs every trading day (can be scheduled via cron or system3 orchestrator).
 
-Schedule:
-  09:15 — Pre-market: rank all symbols, save predictions
-  15:35 — Post-market: validate predictions vs actual NSE results
-  15:40 — Print accuracy trend, fire retrain signal if needed
-
-Usage:
-  python scripts/daily_gain_rank_and_validate.py --mode rank
-  python scripts/daily_gain_rank_and_validate.py --mode validate
-  python scripts/daily_gain_rank_and_validate.py --mode trend
-  python scripts/daily_gain_rank_and_validate.py --mode full
+Dhan-only analyzer job. It must never scrape NSE, read CSV fallback as live,
+or create synthetic market rows. If verified Dhan rows are unavailable, it writes
+an explicit BLOCKED proof instead of crashing or pretending the model is trained.
 """
+from __future__ import annotations
 
 import argparse
 import json
 import os
 import sys
-from datetime import datetime
+import time
+from datetime import date, datetime
+from pathlib import Path
+from typing import Dict, Tuple
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT_DIR)
-
-import numpy as np
 import pandas as pd
 
-from core.data.nse_provider import (
-    fetch_option_chain,
-    is_expiry_day,
-    load_oi_cache,
-    save_oi_cache,
-    spot_price_from_chain,
-)
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from core.data.datasource_manager import get_datasource_manager
 from src.ranking.gain_rank_engine import GainRankEngine
 from src.ranking.ml_signal_aggregator import load_ml_confidence
 from src.validation.market_result_validator import MarketResultValidator
 
-
-def _nse_chain_to_df(chain_json: dict) -> pd.DataFrame:
-    """Convert raw NSE option chain JSON to a flat DataFrame."""
-    rows = []
-    for entry in chain_json.get("records", {}).get("data", []):
-        strike = entry.get("strikePrice", 0)
-        for opt_type, key in [("CE", "CE"), ("PE", "PE")]:
-            leg = entry.get(key, {})
-            if not leg:
-                continue
-            rows.append(
-                {
-                    "strike": strike,
-                    "option_type": opt_type,
-                    "oi": leg.get("openInterest", 0),
-                    "volume": leg.get("totalTradedVolume", 0),
-                    "ltp": leg.get("lastPrice", 0.0),
-                    "iv": leg.get("impliedVolatility", 0.0) / 100.0,
-                }
-            )
-    return pd.DataFrame(rows) if rows else pd.DataFrame()
+ENABLED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+STATE_DIR = Path(ROOT_DIR) / "state"
+REPORT_DIR = Path(ROOT_DIR) / "reports" / "latest" / "daily_gain_rank_and_validate"
+OI_CACHE_FILE = STATE_DIR / "dhan_oi_cache.json"
 
 
-def load_live_chain_data():
-    """
-    Load live options chain data.
-    Priority: (1) NSE public API  (2) local CSV storage  (3) synthetic fallback.
-    Returns (all_chain_data, spots).
-    """
-    underlyings = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
-    all_data, spots = {}, {}
+def _now() -> str:
+    return datetime.now().isoformat()
 
-    for sym in underlyings:
-        # --- Priority 1: NSE public API ---
-        chain_json = fetch_option_chain(sym)
-        if chain_json:
-            df = _nse_chain_to_df(chain_json)
-            if not df.empty:
-                spot = spot_price_from_chain(chain_json)
-                all_data[sym] = df
-                spots[sym] = spot
-                print(f"  {sym}: NSE live data ({len(df)} rows, spot={spot:.0f})")
-                continue
-            print(f"  {sym}: NSE returned empty chain — trying CSV")
 
-        # --- Priority 2: local CSV ---
-        storage_dir = os.path.join(ROOT_DIR, "storage")
-        candidates = []
-        if os.path.isdir(storage_dir):
-            candidates = sorted(
-                [f for f in os.listdir(storage_dir) if sym.lower() in f.lower() and f.endswith(".csv")],
-                reverse=True,
-            )
-        if candidates:
-            path = os.path.join(storage_dir, candidates[0])
-            try:
-                df = pd.read_csv(path)
-                all_data[sym] = df
-                spot_col = next((c for c in df.columns if "spot" in c.lower()), None)
-                spots[sym] = float(df[spot_col].iloc[0]) if spot_col else 0.0
-                print(f"  {sym}: loaded from CSV {candidates[0]} ({len(df)} rows)")
-                continue
-            except Exception as e:
-                print(f"  {sym}: CSV load failed — {e}")
+def _write_status(status: str, reason: str, extra: dict | None = None) -> None:
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "generated_at": _now(),
+        "status": status,
+        "reason": reason,
+        "source": "dhan_only_no_fallback",
+        "enabled_underlyings": ENABLED_UNDERLYINGS,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    if extra:
+        payload.update(extra)
+    (REPORT_DIR / "summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    (REPORT_DIR / "summary.md").write_text(
+        "\n".join([
+            "# Daily Gain Rank + Validation",
+            "",
+            f"- Generated: `{payload['generated_at']}`",
+            f"- Status: **{payload['status']}**",
+            f"- Source: `{payload['source']}`",
+            f"- Reason: {payload['reason']}",
+            "- Live trading: `OFF`",
+            "- Orders called: `false`",
+        ]) + "\n",
+        encoding="utf-8",
+    )
 
-        # --- Priority 3: synthetic fallback (LAST RESORT — no real OI) ---
-        spot = {"NIFTY": 23000, "BANKNIFTY": 52000, "FINNIFTY": 23500, "MIDCPNIFTY": 12000}[sym]
-        strikes = [spot - 500 + i * 50 for i in range(20)]
-        all_data[sym] = pd.DataFrame(
-            {
-                "strike": strikes,
-                "option_type": ["CE"] * 10 + ["PE"] * 10,
-                "oi": [100000] * 20,  # flat OI — zero change signal, not random noise
-                "volume": [10000] * 20,
-                "ltp": np.random.uniform(10, 300, 20),
-                "iv": [0.18] * 20,
-            }
-        )
+
+def is_expiry_day(today: date | None = None) -> bool:
+    """Conservative weekly-expiry guard for Indian index options."""
+    d = today or date.today()
+    return d.weekday() == 3
+
+
+def load_oi_cache() -> Dict[str, int]:
+    try:
+        if OI_CACHE_FILE.exists():
+            data = json.loads(OI_CACHE_FILE.read_text(encoding="utf-8"))
+            return {str(k): int(v) for k, v in data.items() if int(v) > 0}
+    except Exception:
+        pass
+    return {}
+
+
+def save_oi_cache(snapshot: Dict[str, int]) -> None:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    tmp = OI_CACHE_FILE.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(snapshot, indent=2, sort_keys=True), encoding="utf-8")
+    os.replace(tmp, OI_CACHE_FILE)
+
+
+def _oi_total(df: pd.DataFrame) -> int:
+    col = next((c for c in df.columns if c.lower() == "oi" or ("oi" in c.lower() and "change" not in c.lower() and "prev" not in c.lower())), None)
+    if not col:
+        return 0
+    try:
+        return int(float(df[col].sum()))
+    except Exception:
+        return 0
+
+
+def load_live_chain_data() -> Tuple[Dict[str, pd.DataFrame], Dict[str, float]]:
+    """Load official Dhan option-chain rows only."""
+    dsm = get_datasource_manager()
+    all_data: Dict[str, pd.DataFrame] = {}
+    spots: Dict[str, float] = {}
+    blocked: Dict[str, str] = {}
+    for idx, sym in enumerate(ENABLED_UNDERLYINGS):
+        if idx:
+            time.sleep(float(os.environ.get("DHAN_OPTION_CHAIN_SPACING_S", "3.25")))
+        df, spot = dsm.fetch_option_chain(sym)
+        if df is None or df.empty or float(spot or 0) <= 0:
+            reason = dsm.last_error or "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+            blocked[sym] = reason
+            print(f"  {sym}: BLOCKED — {reason}")
+            continue
+        all_data[sym] = df
         spots[sym] = float(spot)
-        print(f"  {sym}: SYNTHETIC fallback — OI change factor will be 0 (no real data)")
-
+        print(f"  {sym}: Dhan official chain rows={len(df)} spot={float(spot):.2f}")
+    if blocked:
+        _write_status("PARTIAL" if all_data else "BLOCKED", "Some enabled Dhan chains unavailable", {"blocked_underlyings": blocked, "loaded_underlyings": sorted(all_data)})
     return all_data, spots
 
 
 def run_ranking(top_n: int = 5) -> None:
-    """Pre-market: rank all symbols, save predictions to gain_rank_history.json."""
-    print(f"\n{'='*60}")
-    print(f"  GAIN RANK ENGINE — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'='*60}")
-
+    print(f"\n{'='*60}\n  DHAN-ONLY GAIN RANK — {_now()}\n{'='*60}")
     all_data, spots = load_live_chain_data()
+    if not all_data:
+        _write_status("BLOCKED", "No verified Dhan option-chain rows; ranking not generated")
+        print("  BLOCKED: no verified Dhan rows")
+        return
 
-    # Expiry day guard: OI rollover distorts change% on weekly expiry (Thursdays)
     if is_expiry_day():
         oi_history = {}
-        print("  EXPIRY DAY (Thursday): OI change factor DISABLED to prevent rollover distortion")
+        print("  EXPIRY DAY: OI change disabled")
     else:
-        # Build oi_history from persistent cache (real prev session OI vs current)
-        prev_oi_cache = load_oi_cache()
+        prev = load_oi_cache()
         oi_history = {}
-        curr_oi_snapshot = {}
         for sym, df in all_data.items():
-            oi_col = next(
-                (
-                    c
-                    for c in df.columns
-                    if c.lower() == "oi"
-                    or ("oi" in c.lower() and "change" not in c.lower() and "prev" not in c.lower())
-                ),
-                None,
-            )
-            curr_oi = float(df[oi_col].sum()) if oi_col is not None else 0.0
-            curr_oi_snapshot[sym] = int(curr_oi)
-            if sym in prev_oi_cache and prev_oi_cache[sym] > 0:
-                oi_history[sym] = {"prev_oi": prev_oi_cache[sym], "curr_oi": curr_oi}
-        if oi_history:
-            print(f"  Real OI change available for: {list(oi_history.keys())}")
-        else:
-            print("  OI cache empty — first run, OI change factor will use intra-chain fallback")
+            curr = _oi_total(df)
+            if prev.get(sym, 0) > 0 and curr > 0:
+                oi_history[sym] = {"prev_oi": prev[sym], "curr_oi": curr}
 
-    # Load ML signal confidence from system3_signal_engine output (7th factor)
     ml_confidence = load_ml_confidence()
-    if ml_confidence:
-        print(f"  ML signal confidence loaded for: {list(ml_confidence.keys())}")
-    else:
-        print("  ML signal CSV not found — 7th factor (ml_confidence) will be 0, weight redistributed")
+    if not ml_confidence:
+        print("  ML confidence missing: ranker runs with ML weight redistributed; model not proven trained")
 
     engine = GainRankEngine(top_n=top_n)
     ranked_df = engine.rank_all(all_data, spots, oi_history, ml_confidence=ml_confidence)
+    if ranked_df.empty:
+        _write_status("BLOCKED", "Rank engine produced no rows from verified Dhan chains")
+        print("  BLOCKED: no ranked rows")
+        return
 
-    print(f"\n  Ranked {len(ranked_df)} underlyings by predicted gain potential:\n")
-    display_cols = [
-        "rank",
-        "underlying",
-        "gain_score",
-        "ml_confidence_score",
-        "oi_change_score",
-        "expected_move_pct",
-        "recommendation",
-    ]
-    avail_cols = [c for c in display_cols if c in ranked_df.columns]
-    print(ranked_df[avail_cols].to_string(index=False))
-
-    top = engine.get_top_n(all_data, spots, oi_history, ml_confidence=ml_confidence)
-    if top:
-        print(f"\n  TOP {len(top)} SYMBOLS FOR TODAY:")
-        for t in top:
-            print(
-                f"    #{t['rank']}  {t['underlying']:12s}  score={t['gain_score']:.1f}"
-                f"  ml_conf={t.get('ml_confidence_score', 0):.1f}"
-                f"  oi={t.get('oi_change_score', 0):.1f}"
-                f"  move={t['expected_move_pct']*100:.2f}%"
-            )
-    else:
-        print("\n  WARNING: No symbols met minimum gain score threshold.")
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    ranked_df.to_json(REPORT_DIR / "ranked.json", orient="records", indent=2)
+    cols = [c for c in ["rank", "underlying", "gain_score", "ml_confidence_score", "oi_change_score", "expected_move_pct", "recommendation"] if c in ranked_df.columns]
+    print(ranked_df[cols].to_string(index=False))
+    _write_status("PASS", "Dhan-only ranking generated", {"ranked_rows": int(len(ranked_df)), "ranked_underlyings": ranked_df.get("underlying", pd.Series(dtype=str)).astype(str).tolist(), "ml_confidence_loaded": bool(ml_confidence)})
 
 
 def run_validation() -> None:
-    """Post-market: compare predictions vs actual NSE results."""
-    print(f"\n{'='*60}")
-    print(f"  MARKET RESULT VALIDATION — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"{'='*60}")
-
-    validator = MarketResultValidator()
-    report = validator.run_daily_validation()
-
-    if report.get("status") == "SKIPPED":
-        print(f"\n  Validation skipped: {report.get('reason')}")
+    print(f"\n{'='*60}\n  MARKET RESULT VALIDATION — {_now()}\n{'='*60}")
+    try:
+        validator = MarketResultValidator()
+        report = validator.run_daily_validation()
+    except Exception as exc:
+        _write_status("BLOCKED", f"Validation crashed: {type(exc).__name__}: {str(exc)[:200]}")
+        print(f"  BLOCKED: validation crashed: {exc}")
         return
-
-    rho = report.get("rank_correlation_spearman", report.get("spearman_correlation", "N/A"))
-    print(f"\n  Date            : {report['date']}")
-    print(f"  Predicted order : {report.get('predicted_ranking', [])}")
-    print(f"  Actual order    : {report.get('actual_ranking', [])}")
-    print(f"  Spearman ρ      : {rho}")
-    print(f"  Hit rate (top-3): {report.get('hit_rate', 0):.0%}")
-    print(f"  Status          : {report.get('status')}")
-
-    if report.get("retrain_signal"):
-        print("\n  *** RETRAIN SIGNAL FIRED — accuracy below threshold ***")
-        print("  Action: trigger model retraining pipeline")
-
-    # Save OI snapshot after post-market validation so tomorrow's rank has real prev_oi.
-    # Only persist if we got real data (OI > 0 means NSE delivered actual values).
-    print("\n  Saving OI snapshot for tomorrow's ranking...")
-    all_data, _ = load_live_chain_data()
-    oi_snapshot = {}
-    for sym, df in all_data.items():
-        oi_col = next((c for c in df.columns if "oi" in c.lower() and "change" not in c.lower()), None)
-        total = int(df[oi_col].sum()) if oi_col is not None else 0
-        if total > 0:
-            oi_snapshot[sym] = total
-    if oi_snapshot:
-        save_oi_cache(oi_snapshot)
-        print(f"  OI snapshot saved (real NSE data): {oi_snapshot}")
-    else:
-        print("  OI snapshot NOT saved — all data was synthetic (zero OI), skipping to avoid contamination")
+    if report.get("status") == "SKIPPED":
+        _write_status("SKIPPED", str(report.get("reason") or "validation skipped"), {"validation": report})
+        print(f"  Validation skipped: {report.get('reason')}")
+        return
+    _write_status("PASS", "Validation completed", {"validation": report})
+    print(json.dumps(report, indent=2, default=str))
 
 
 def run_trend() -> None:
-    """Print rolling accuracy trend."""
-    print(f"\n{'='*60}")
-    print(f"  ACCURACY TREND (last 14 days)")
-    print(f"{'='*60}")
+    print(f"\n{'='*60}\n  ACCURACY TREND — {_now()}\n{'='*60}")
+    try:
+        validator = MarketResultValidator()
+        trend = validator.get_accuracy_trend(last_n_days=14)
+    except Exception as exc:
+        _write_status("BLOCKED", f"Trend crashed: {type(exc).__name__}: {str(exc)[:200]}")
+        print(f"  BLOCKED: trend crashed: {exc}")
+        return
+    _write_status("PASS" if trend else "SKIPPED", "Trend checked", {"trend": trend})
+    print(json.dumps(trend, indent=2, default=str))
 
-    validator = MarketResultValidator()
-    trend = validator.get_accuracy_trend(last_n_days=14)
-    print(json.dumps(trend, indent=2))
 
-    if trend.get("retrain_signal"):
-        print("\n  *** MODEL DRIFT DETECTED — retraining recommended ***")
+def run_post_market_pipeline() -> None:
+    pipeline = os.path.join(ROOT_DIR, "scripts", "system3_post_market_auto_pipeline.py")
+    if not os.path.isfile(pipeline):
+        return
+    try:
+        import subprocess
+        subprocess.run([sys.executable, pipeline], cwd=ROOT_DIR, timeout=900, check=False)
+    except Exception as exc:
+        print(f"  Post-market pipeline warning: {exc}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Daily gain rank + market validation runner")
-    parser.add_argument(
-        "--mode", choices=["rank", "validate", "trend", "full"], default="full", help="Which step to run"
-    )
-    parser.add_argument("--top-n", type=int, default=5, help="Number of top symbols to rank (default: 5)")
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Dhan-only daily gain rank + validation")
+    parser.add_argument("--mode", choices=["rank", "validate", "trend", "full"], default="full")
+    parser.add_argument("--top-n", type=int, default=5)
     args = parser.parse_args()
-
     if args.mode in ("rank", "full"):
         run_ranking(top_n=args.top_n)
-
     if args.mode in ("validate", "full"):
         run_validation()
-
     if args.mode in ("trend", "full"):
         run_trend()
-
     if args.mode in ("validate", "trend", "full"):
-        print("\n  Running post-market auto pipeline (proofs + gate sync)...")
-        try:
-            import subprocess
-
-            pipeline = os.path.join(ROOT_DIR, "scripts", "system3_post_market_auto_pipeline.py")
-            if os.path.isfile(pipeline):
-                subprocess.run([sys.executable, pipeline], cwd=ROOT_DIR, timeout=900)
-        except Exception as exc:
-            print(f"  Post-market pipeline warning: {exc}")
+        run_post_market_pipeline()
 
 
 if __name__ == "__main__":
