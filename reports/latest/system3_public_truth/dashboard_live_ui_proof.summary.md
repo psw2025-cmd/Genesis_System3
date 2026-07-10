@@ -1,10 +1,10 @@
 # Dashboard Live UI Proof
 
-Generated: 2026-07-10T16:47:00.219Z
+Generated: 2026-07-10T18:17:06.311Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
-Final verdict: **PASS**
+Final verdict: **FAIL**
 Trader readiness panel visible: **true**
 Truth control visible: **true**
 
@@ -42,7 +42,7 @@ Truth control visible: **true**
 - PASS Overview
 - PASS Option Chain
 - PASS Signals
-- PASS Paper Trades
+- FAIL Paper Trades
 - PASS Positions
 - PASS Broker
 - PASS Performance
@@ -50,7 +50,7 @@ Truth control visible: **true**
 - PASS Live Gate
 
 ## Infrastructure Blockers
-- none
+- UI_FAIL:Paper Trades
 
 ## Trading Readiness Blockers
 - none
