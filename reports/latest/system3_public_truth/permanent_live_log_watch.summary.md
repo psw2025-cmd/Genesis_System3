@@ -1,6 +1,6 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-10T15:56:43.770Z
+Generated: 2026-07-10T16:35:12.695Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
@@ -11,7 +11,7 @@ Truth control visible: **true**
 - Browser console entries: 11
 - Page errors: 0
 - Request failures: 5
-- Network responses: 103
+- Network responses: 110
 
 ## Dhan Chain Truth
 - PASS (required) /api/chain/NIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=24212.8 contracts=160 blocker=-
@@ -40,23 +40,23 @@ Truth control visible: **true**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- PASS Truth Control size=171392
-- PASS Genesis Brain size=242731
-- PASS E2E Proof size=152279
-- PASS Overview size=118366
-- PASS Option Chain size=191917
-- PASS Signals size=80742
-- PASS Paper Trades size=120572
-- PASS Positions size=61555
-- PASS Broker size=108373
-- PASS Performance size=61900
-- PASS ML Model size=72136
-- PASS Live Gate size=102352
+- PASS Truth Control size=171355
+- PASS Genesis Brain size=242931
+- PASS E2E Proof size=144479
+- PASS Overview size=118670
+- PASS Option Chain size=192153
+- PASS Signals size=80934
+- PASS Paper Trades size=120792
+- PASS Positions size=61745
+- PASS Broker size=108630
+- PASS Performance size=61769
+- PASS ML Model size=72486
+- PASS Live Gate size=102311
 
 ## Infrastructure Blockers
-- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
 - BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been block
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
 - BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
 - BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2' from origin 'https://genesis-syst
 - BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
@@ -64,8 +64,8 @@ Truth control visible: **true**
 - BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
 - BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
 - BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
-- REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
 - REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2:net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
 - REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2:net::ERR_FAILED
 - REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2:net::ERR_FAILED
 - REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2:net::ERR_FAILED
