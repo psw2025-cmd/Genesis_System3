@@ -23,6 +23,9 @@ function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/
 function tryJson(text) { try { return JSON.parse(text) } catch { return { raw: String(text || '').slice(0, 2000) } } }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
+function hasUiFailureText(text) {
+  return /Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text || '')
+}
 
 async function pageFetchJson(page, ep, attempts = 5) {
   let last = null
@@ -66,29 +69,10 @@ function isSafeDhanBlocked(payload) {
 }
 
 const browser = await chromium.launch({ headless: true })
-const context = await browser.newContext({
-  viewport: { width: 1366, height: 768 },
-  extraHTTPHeaders: headers(key),
-})
+const context = await browser.newContext({ viewport: { width: 1366, height: 768 }, extraHTTPHeaders: headers(key) })
 const page = await context.newPage()
 
-const summary = {
-  base,
-  generated_at: new Date().toISOString(),
-  required_symbols: requiredSymbols,
-  optional_symbols: optionalSymbols,
-  auth: { ok: false, status: 0 },
-  api: [],
-  ui: [],
-  chain_truth: [],
-  trader_readiness_panel_visible: false,
-  truth_control_visible: false,
-  final_verdict: 'UNKNOWN',
-  infra_blockers: [],
-  trade_readiness_blockers: [],
-  optional_data_blockers: [],
-  blockers: [],
-}
+const summary = { base, generated_at: new Date().toISOString(), required_symbols: requiredSymbols, optional_symbols: optionalSymbols, auth: { ok: false, status: 0 }, api: [], ui: [], chain_truth: [], trader_readiness_panel_visible: false, truth_control_visible: false, final_verdict: 'UNKNOWN', infra_blockers: [], trade_readiness_blockers: [], optional_data_blockers: [], blockers: [] }
 
 try {
   await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 90000 })
@@ -97,12 +81,7 @@ try {
     let auth = null
     for (let i = 0; i < 5; i++) {
       auth = await page.evaluate(async (apiKey) => {
-        const r = await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-          credentials: 'include',
-          body: JSON.stringify({ api_key: apiKey })
-        })
+        const r = await fetch('/api/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey }, credentials: 'include', body: JSON.stringify({ api_key: apiKey }) })
         return { ok: r.ok, status: r.status, text: await r.text() }
       }, key)
       if (auth.ok || ![429, 502, 503, 504].includes(Number(auth.status))) break
@@ -116,32 +95,18 @@ try {
   }
   fs.writeFileSync(path.join(outDir, 'auth_session.json'), JSON.stringify(summary.auth, null, 2))
 
-  // Sequential proof calls are deliberately slow. Render/Dashboard API can rate-limit bursts.
   for (const ep of apiEndpoints) {
     await wait(2500)
     const result = await pageFetchJson(page, ep, 5)
     const payload = tryJson(result.body || '')
     const optional = optionalChainEndpoints.includes(ep)
-    const apiRow = { endpoint: ep, ok: result.ok, status: result.status, optional }
-    summary.api.push(apiRow)
+    summary.api.push({ endpoint: ep, ok: result.ok, status: result.status, optional })
     fs.writeFileSync(path.join(outDir, `${safeName(ep)}.json`), JSON.stringify(payload, null, 2))
 
     if (chainEndpoints.includes(ep)) {
       const ok = result.ok && dhanChainOk(payload)
       const safeBlocked = result.ok && isSafeDhanBlocked(payload)
-      const chainRow = {
-        endpoint: ep,
-        ok,
-        optional,
-        safe_blocked: safeBlocked,
-        source: payload?.data_source || payload?.source || null,
-        source_priority: payload?.source_priority || null,
-        status: payload?.status || null,
-        stale: payload?.stale === true,
-        spot: payload?.spot || 0,
-        total_contracts: payload?.total_contracts || (Array.isArray(payload?.contracts) ? payload.contracts.length : 0),
-        blocker: ok ? null : (payload?.blocked_reason || payload?.message || payload?.status || 'NOT_REAL_DHAN_CHAIN')
-      }
+      const chainRow = { endpoint: ep, ok, optional, safe_blocked: safeBlocked, source: payload?.data_source || payload?.source || null, source_priority: payload?.source_priority || null, status: payload?.status || null, stale: payload?.stale === true, spot: payload?.spot || 0, total_contracts: payload?.total_contracts || (Array.isArray(payload?.contracts) ? payload.contracts.length : 0), blocker: ok ? null : (payload?.blocked_reason || payload?.message || payload?.status || 'NOT_REAL_DHAN_CHAIN') }
       summary.chain_truth.push(chainRow)
       if (!ok) {
         const msg = `CHAIN_NOT_TRADE_READY:${ep}:${chainRow.blocker}`
@@ -170,7 +135,7 @@ try {
       await btn.click({ timeout: 25000 })
       await page.waitForTimeout(4000)
       const text = await page.locator('body').innerText({ timeout: 15000 })
-      const bad = /Endpoint:\s*\/api\/|Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text)
+      const bad = hasUiFailureText(text)
       const screenshotPath = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: true })
       const screenshotOk = fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 10000
@@ -204,34 +169,14 @@ summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blocke
 summary.final_verdict = summary.infra_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Dashboard Live UI Proof', '',
-  `Generated: ${summary.generated_at}`,
-  `Base: ${base}`,
-  `Required symbols: ${summary.required_symbols.join(', ')}`,
-  `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`,
-  `Final verdict: **${summary.final_verdict}**`,
-  `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`,
-  `Truth control visible: **${summary.truth_control_visible}**`, '',
-  '## Chain Truth',
-  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
-  '## API',
-  ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`), '',
-  '## UI Screenshots',
-  ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title}${x.error ? ` - ${x.error}` : ''}`), '',
-  '## Infrastructure Blockers',
-  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
-  '## Trading Readiness Blockers',
-  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
-  '## Optional Data Blockers',
-  ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none'])
+  '# Dashboard Live UI Proof', '', `Generated: ${summary.generated_at}`, `Base: ${summary.base}`, `Required symbols: ${summary.required_symbols.join(', ')}`, `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`, `Final verdict: **${summary.final_verdict}**`, `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`, `Truth control visible: **${summary.truth_control_visible}**`, '',
+  '## Chain Truth', ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
+  '## API', ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`), '',
+  '## UI Screenshots', ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title}${x.error ? ` - ${x.error}` : ''}`), '',
+  '## Infrastructure Blockers', ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
+  '## Trading Readiness Blockers', ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
+  '## Optional Data Blockers', ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none'])
 ].join('\n'))
 
-if (summary.infra_blockers.length) {
-  console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length}`)
-  console.error(summary.infra_blockers.join('\n'))
-  process.exit(1)
-}
-if (summary.trade_readiness_blockers.length) {
-  console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`)
-  console.error(summary.trade_readiness_blockers.join('\n'))
-}
+if (summary.infra_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length}`); console.error(summary.infra_blockers.join('\n')); process.exit(1) }
+if (summary.trade_readiness_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`); console.error(summary.trade_readiness_blockers.join('\n')) }
