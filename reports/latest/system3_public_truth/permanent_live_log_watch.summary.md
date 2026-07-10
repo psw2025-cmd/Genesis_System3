@@ -1,6 +1,6 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-10T12:51:14.131Z
+Generated: 2026-07-10T15:56:43.770Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
@@ -8,10 +8,10 @@ Final verdict: **FAIL**
 Truth control visible: **true**
 
 ## Runtime Log Sources Captured
-- Browser console entries: 3
+- Browser console entries: 11
 - Page errors: 0
-- Request failures: 2
-- Network responses: 114
+- Request failures: 5
+- Network responses: 103
 
 ## Dhan Chain Truth
 - PASS (required) /api/chain/NIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=24212.8 contracts=160 blocker=-
@@ -40,24 +40,35 @@ Truth control visible: **true**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- PASS Truth Control size=135395
-- PASS Genesis Brain size=46893
-- PASS E2E Proof size=118359
-- PASS Overview size=96589
-- PASS Option Chain size=151387
-- PASS Signals size=45940
-- PASS Paper Trades size=50649
-- PASS Positions size=55516
-- PASS Broker size=82934
-- PASS Performance size=55196
-- PASS ML Model size=75005
-- PASS Live Gate size=58708
+- PASS Truth Control size=171392
+- PASS Genesis Brain size=242731
+- PASS E2E Proof size=152279
+- PASS Overview size=118366
+- PASS Option Chain size=191917
+- PASS Signals size=80742
+- PASS Paper Trades size=120572
+- PASS Positions size=61555
+- PASS Broker size=108373
+- PASS Performance size=61900
+- PASS ML Model size=72136
+- PASS Live Gate size=102352
 
 ## Infrastructure Blockers
-- BROWSER_CONSOLE:warning ML performance fetch failed: timeout of 5000ms exceeded
-- BROWSER_CONSOLE:warning ML comparison fetch failed: timeout of 5000ms exceeded
-- REQUEST_FAILED:https://genesis-system3-backend.onrender.com/api/ml/performance:net::ERR_ABORTED
-- REQUEST_FAILED:https://genesis-system3-backend.onrender.com/api/ml/compare:net::ERR_ABORTED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been block
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2' from origin 'https://genesis-syst
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- BROWSER_CONSOLE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2:net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2:net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2:net::ERR_FAILED
+- REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2:net::ERR_FAILED
 
 ## Trading Readiness Blockers
 - none
