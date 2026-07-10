@@ -7,8 +7,6 @@ Purpose:
 - Save latest proof to reports/latest/cloud_runtime_check/.
 - Analyzer/paper safety only. This script never sends broker secrets and never
   calls order-placement endpoints.
-
-Stdlib-only so it can run in GitHub Actions without extra dependencies.
 """
 from __future__ import annotations
 
@@ -81,7 +79,17 @@ def redact(obj: Any) -> Any:
     return obj
 
 
-def fetch_json(base_url: str, path: str, timeout_s: float) -> Dict[str, Any]:
+def _headers(api_key: str) -> Dict[str, str]:
+    headers = {"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.1"}
+    # Render backend requires X-API-Key when REQUIRE_API_KEY=true. The value is
+    # supplied by GitHub Actions secret DASHBOARD_API_KEY and is never written
+    # to the report; endpoint responses are still redacted before saving.
+    if api_key:
+        headers["X-API-Key"] = api_key
+    return headers
+
+
+def fetch_json(base_url: str, path: str, timeout_s: float, api_key: str) -> Dict[str, Any]:
     url = base_url.rstrip("/") + path
     started = time.perf_counter()
     result: Dict[str, Any] = {
@@ -95,7 +103,7 @@ def fetch_json(base_url: str, path: str, timeout_s: float) -> Dict[str, Any]:
         "error": None,
     }
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.0"})
+        req = urllib.request.Request(url, headers=_headers(api_key))
         with urllib.request.urlopen(req, timeout=timeout_s) as resp:
             raw = resp.read(1_000_000)
             latency_ms = round((time.perf_counter() - started) * 1000, 1)
@@ -207,7 +215,6 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
         if portfolio.get("order_placement_allowed") is False and portfolio.get("live_trading_enabled") is False:
             passed.append("portfolio_live_disabled")
 
-    # Safety scan across all endpoint responses.
     for endpoint_name, item in results.items():
         payload = item.get("json")
         for p, v in walk_values(payload):
@@ -222,11 +229,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
     mem_before = memory_status(get_json(results, "memory_before"))
     mem_after_portfolio = memory_status(get_json(results, "memory_after_portfolio"))
     mem_after_chain = memory_status(get_json(results, "memory_after_chain"))
-    for key, mem in [
-        ("memory_before", mem_before),
-        ("memory_after_portfolio", mem_after_portfolio),
-        ("memory_after_chain", mem_after_chain),
-    ]:
+    for key, mem in [("memory_before", mem_before), ("memory_after_portfolio", mem_after_portfolio), ("memory_after_chain", mem_after_chain)]:
         rss = mem.get("rss_mb")
         try:
             if rss is not None and float(rss) >= 420:
@@ -250,11 +253,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
         "passed": sorted(set(passed)),
         "warnings": warnings,
         "alerts": alerts,
-        "memory": {
-            "before": mem_before,
-            "after_portfolio": mem_after_portfolio,
-            "after_chain": mem_after_chain,
-        },
+        "memory": {"before": mem_before, "after_portfolio": mem_after_portfolio, "after_chain": mem_after_chain},
         "key_facts": {
             "broker_connected": bool(isinstance(broker, dict) and broker.get("connected") is True),
             "scheduler_received": bool(isinstance(scheduler, dict) and scheduler.get("received") is True),
@@ -319,26 +318,20 @@ def main() -> int:
 
     base_url = args.base_url.rstrip("/")
     generated_utc = utc_now()
+    api_key = os.environ.get("DASHBOARD_API_KEY", "").strip() or os.environ.get("API_KEY", "").strip()
     results: Dict[str, Any] = {}
 
-    # Execute in sequence so memory_before/after checkpoints have meaning.
     for name, path in ENDPOINTS:
-        results[name] = fetch_json(base_url, path, timeout_s=args.timeout)
-        # small pause avoids hammering free/starter dyno during checks
-        time.sleep(0.25)
+        results[name] = fetch_json(base_url, path, timeout_s=args.timeout, api_key=api_key)
+        time.sleep(0.35)
 
     report = analyze(base_url, results, args.expected_commit)
     report["generated_utc"] = generated_utc
     report["script"] = "tools/cloud_runtime_check.py"
+    report["auth_header_used"] = bool(api_key)
     write_reports(report, results)
 
-    print(json.dumps({
-        "generated_utc": generated_utc,
-        "verdict": report["verdict"],
-        "alerts": report["alerts"],
-        "warnings": report["warnings"],
-        "report_dir": str(REPORT_DIR),
-    }, indent=2))
+    print(json.dumps({"generated_utc": generated_utc, "verdict": report["verdict"], "alerts": report["alerts"], "warnings": report["warnings"], "report_dir": str(REPORT_DIR), "auth_header_used": bool(api_key)}, indent=2))
     return 0
 
 
@@ -348,8 +341,5 @@ if __name__ == "__main__":
     except Exception:
         traceback.print_exc()
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
-        (REPORT_DIR / "summary.json").write_text(
-            json.dumps({"generated_utc": utc_now(), "verdict": "ERROR", "traceback": traceback.format_exc()}, indent=2),
-            encoding="utf-8",
-        )
+        (REPORT_DIR / "summary.json").write_text(json.dumps({"generated_utc": utc_now(), "verdict": "ERROR", "traceback": traceback.format_exc()}, indent=2), encoding="utf-8")
         raise
