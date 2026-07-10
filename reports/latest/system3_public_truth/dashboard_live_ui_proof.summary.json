@@ -153,7 +153,7 @@
     }
   ],
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
-  "generated_at": "2026-07-10T10:32:23.950Z",
+  "generated_at": "2026-07-10T11:48:24.820Z",
   "infra_blockers": [],
   "trade_readiness_blockers": [
     "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"

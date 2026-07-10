@@ -1,6 +1,6 @@
 # Dashboard Live UI Proof
 
-Generated: 2026-07-10T10:32:23.950Z
+Generated: 2026-07-10T11:48:24.820Z
 Base: https://genesis-system3-backend.onrender.com
 Final verdict: **BLOCKED_NOT_TRADE_READY**
 Trader readiness panel visible: **true**
