@@ -1,0 +1,87 @@
+name: Dashboard Visual Production Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/dashboard-visual-production-proof.yml'
+      - 'tools/dashboard_live_ui_proof.mjs'
+      - 'dashboard/frontend/**'
+      - 'dashboard/backend/**'
+
+permissions:
+  contents: write
+
+env:
+  DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+  DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright
+        run: |
+          npm --prefix tools install --no-save --no-package-lock playwright
+          npm --prefix tools exec playwright install chromium
+      - name: Run dashboard screenshot proof
+        continue-on-error: true
+        run: node tools/dashboard_live_ui_proof.mjs
+      - name: Build visual report
+        if: always()
+        run: |
+          set -e
+          OUT=reports/latest/dashboard_visual_production_proof
+          SRC=reports/latest/dashboard_live_ui_proof
+          rm -rf "$OUT"
+          mkdir -p "$OUT/screenshots"
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          out=Path('reports/latest/dashboard_visual_production_proof')
+          src=Path('reports/latest/dashboard_live_ui_proof')
+          names=['truth.png','signals.png','paper.png','broker.png','ml.png','gates.png','overview.png','mobile_390x844.png']
+          rows=[]
+          for n in names:
+            p=src/n
+            ok=p.exists() and p.stat().st_size>10000
+            if ok:
+              shutil.copy2(p,out/'screenshots'/n)
+            rows.append({'file':n,'ok':ok,'size_bytes':p.stat().st_size if p.exists() else 0})
+          summary={'visual_gate_pass':all(r['ok'] for r in rows),'screenshots':rows}
+          (out/'summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          md=['# Dashboard Visual Production Proof','',f"Visual gate pass: **{summary['visual_gate_pass']}**",'']
+          for r in rows:
+            md.append(f"- {'PASS' if r['ok'] else 'MISSING'} `{r['file']}` size=`{r['size_bytes']}`")
+          md.append('')
+          for r in rows:
+            if r['ok']:
+              md += [f"## {r['file']}",'',f"![{r['file']}](screenshots/{r['file']})",'']
+          (out/'visual_proof.md').write_text('\n'.join(md),encoding='utf-8')
+          PY
+      - name: Commit visual proof
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_visual_production_proof/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): publish dashboard visual production proof [skip ci]"
+          git push
+      - name: Enforce visual gate
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,sys
+          data=json.load(open('reports/latest/dashboard_visual_production_proof/summary.json',encoding='utf-8'))
+          sys.exit(0 if data.get('visual_gate_pass') else 1)
+          PY
