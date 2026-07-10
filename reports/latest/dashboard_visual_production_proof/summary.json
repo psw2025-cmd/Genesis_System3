@@ -1,0 +1,45 @@
+{
+  "visual_gate_pass": true,
+  "screenshots": [
+    {
+      "file": "truth.png",
+      "ok": true,
+      "size_bytes": 171190
+    },
+    {
+      "file": "signals.png",
+      "ok": true,
+      "size_bytes": 80568
+    },
+    {
+      "file": "paper.png",
+      "ok": true,
+      "size_bytes": 120496
+    },
+    {
+      "file": "broker.png",
+      "ok": true,
+      "size_bytes": 108252
+    },
+    {
+      "file": "ml.png",
+      "ok": true,
+      "size_bytes": 90110
+    },
+    {
+      "file": "gates.png",
+      "ok": true,
+      "size_bytes": 102023
+    },
+    {
+      "file": "overview.png",
+      "ok": true,
+      "size_bytes": 110678
+    },
+    {
+      "file": "mobile_390x844.png",
+      "ok": true,
+      "size_bytes": 84924
+    }
+  ]
+}
