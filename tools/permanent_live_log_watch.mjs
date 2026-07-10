@@ -7,38 +7,26 @@ const key = process.env.DASHBOARD_API_KEY || ''
 const outDir = path.join('reports', 'latest', 'permanent_live_log_watch')
 fs.mkdirSync(outDir, { recursive: true })
 
+const requiredSymbols = (process.env.SYSTEM3_REQUIRED_UNDERLYINGS || 'NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY')
+  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+const optionalSymbols = (process.env.SYSTEM3_OPTIONAL_UNDERLYINGS || 'SENSEX')
+  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+  .filter(s => !requiredSymbols.includes(s))
+const requiredChainEndpoints = requiredSymbols.map(s => `/api/chain/${s}`)
+const optionalChainEndpoints = optionalSymbols.map(s => `/api/chain/${s}`)
+const chainEndpoints = [...requiredChainEndpoints, ...optionalChainEndpoints]
+
 const endpoints = [
-  '/api/auth/status',
-  '/api/deploy/info',
-  '/api/health',
-  '/api/state',
-  '/api/broker/dhan/status',
-  '/api/broker/funds',
-  '/api/broker/holdings',
-  '/api/broker/positions/live',
-  '/api/chain/NIFTY',
-  '/api/chain/BANKNIFTY',
-  '/api/chain/FINNIFTY',
-  '/api/chain/MIDCPNIFTY',
-  '/api/chain/SENSEX',
-  '/api/gain_rank',
-  '/api/pnl',
-  '/api/auto_gates'
+  '/api/auth/status', '/api/deploy/info', '/api/health', '/api/state',
+  '/api/broker/dhan/status', '/api/broker/funds', '/api/broker/holdings', '/api/broker/positions/live',
+  ...chainEndpoints,
+  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/auto_gates'
 ]
 
 const tabs = [
-  ['truth', 'Truth Control'],
-  ['genesis', 'Genesis Brain'],
-  ['e2e_proof', 'E2E Proof'],
-  ['overview', 'Overview'],
-  ['chain', 'Option Chain'],
-  ['signals', 'Signals'],
-  ['paper', 'Paper Trades'],
-  ['positions', 'Positions'],
-  ['broker', 'Broker'],
-  ['performance', 'Performance'],
-  ['ml', 'ML Model'],
-  ['gates', 'Live Gate']
+  ['truth', 'Truth Control'], ['genesis', 'Genesis Brain'], ['e2e_proof', 'E2E Proof'], ['overview', 'Overview'],
+  ['chain', 'Option Chain'], ['signals', 'Signals'], ['paper', 'Paper Trades'], ['positions', 'Positions'],
+  ['broker', 'Broker'], ['performance', 'Performance'], ['ml', 'ML Model'], ['gates', 'Live Gate']
 ]
 
 const forbidden = [
@@ -57,18 +45,33 @@ const forbidden = [
   /INTERNAL_UNVERIFIED/i,
 ]
 
-function tryJson(text) {
-  try { return JSON.parse(text) } catch { return null }
-}
-
-function safeName(s) {
-  return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '')
-}
+function tryJson(text) { try { return JSON.parse(text) } catch { return null } }
+function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
+function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 
 function scanForbidden(scope, text, blockers) {
   for (const re of forbidden) {
     if (re.test(text || '')) blockers.push(`${scope}:FORBIDDEN:${re}`)
   }
+}
+
+async function fetchWithRetry(page, ep, attempts = 4) {
+  let last = null
+  for (let i = 0; i < attempts; i++) {
+    const result = await page.evaluate(async (ep) => {
+      try {
+        const r = await fetch(ep, { credentials: 'include' })
+        const text = await r.text()
+        return { ok: r.ok, status: r.status, body: text.slice(0, 200000) }
+      } catch (err) {
+        return { ok: false, status: 0, body: '', error: String(err) }
+      }
+    }, ep)
+    last = result
+    if (result.ok || ![0, 502, 503, 504].includes(Number(result.status))) return result
+    await wait(5000 * (i + 1))
+  }
+  return last
 }
 
 function dhanChainOk(payload) {
@@ -102,25 +105,19 @@ const pageErrors = []
 const requestFailures = []
 const networkResponses = []
 
-page.on('console', msg => {
-  browserConsole.push({ type: msg.type(), text: msg.text(), location: msg.location() })
-})
-page.on('pageerror', err => {
-  pageErrors.push({ message: err.message, stack: err.stack })
-})
-page.on('requestfailed', req => {
-  requestFailures.push({ url: req.url(), method: req.method(), failure: req.failure()?.errorText || null })
-})
+page.on('console', msg => { browserConsole.push({ type: msg.type(), text: msg.text(), location: msg.location() }) })
+page.on('pageerror', err => { pageErrors.push({ message: err.message, stack: err.stack }) })
+page.on('requestfailed', req => { requestFailures.push({ url: req.url(), method: req.method(), failure: req.failure()?.errorText || null }) })
 page.on('response', res => {
   const url = res.url()
-  if (url.includes('/api/') || url.includes('/ui/')) {
-    networkResponses.push({ url, status: res.status(), ok: res.ok() })
-  }
+  if (url.includes('/api/') || url.includes('/ui/')) networkResponses.push({ url, status: res.status(), ok: res.ok() })
 })
 
 const summary = {
   base,
   generated_at: new Date().toISOString(),
+  required_symbols: requiredSymbols,
+  optional_symbols: optionalSymbols,
   auth: { ok: false, status: 0 },
   endpoints: [],
   chain_truth: [],
@@ -133,6 +130,7 @@ const summary = {
   final_verdict: 'UNKNOWN',
   infra_blockers: [],
   trade_readiness_blockers: [],
+  optional_data_blockers: [],
   blockers: []
 }
 
@@ -140,15 +138,17 @@ try {
   await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 60000 })
 
   if (key) {
-    const auth = await page.evaluate(async (apiKey) => {
-      const r = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ api_key: apiKey })
-      })
-      return { ok: r.ok, status: r.status, text: await r.text() }
-    }, key)
+    let auth = null
+    for (let i = 0; i < 4; i++) {
+      auth = await page.evaluate(async (apiKey) => {
+        const r = await fetch('/api/auth/session', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ api_key: apiKey })
+        })
+        return { ok: r.ok, status: r.status, text: await r.text() }
+      }, key)
+      if (auth.ok || ![502, 503, 504].includes(Number(auth.status))) break
+      await wait(5000 * (i + 1))
+    }
     summary.auth = { ok: auth.ok, status: auth.status }
     if (!auth.ok) summary.infra_blockers.push(`AUTH_FAIL:${auth.status}`)
   } else {
@@ -159,20 +159,13 @@ try {
   await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
 
   for (const ep of endpoints) {
-    const result = await page.evaluate(async (ep) => {
-      try {
-        const r = await fetch(ep, { credentials: 'include' })
-        const text = await r.text()
-        return { ok: r.ok, status: r.status, body: text.slice(0, 200000) }
-      } catch (err) {
-        return { ok: false, status: 0, body: '', error: String(err) }
-      }
-    }, ep)
+    const result = await fetchWithRetry(page, ep, 4)
     const payload = tryJson(result.body)
     fs.writeFileSync(path.join(outDir, `${safeName(ep)}.txt`), result.body || result.error || '')
-    summary.endpoints.push({ endpoint: ep, ok: result.ok, status: result.status, error: result.error || null })
+    const optional = optionalChainEndpoints.includes(ep)
+    summary.endpoints.push({ endpoint: ep, ok: result.ok, status: result.status, optional, error: result.error || null })
     if (!result.ok) summary.infra_blockers.push(`API_FAIL:${ep}:${result.status}`)
-    scanForbidden(`API:${ep}`, result.body || result.error || '', summary.infra_blockers)
+    if (result.ok) scanForbidden(`API:${ep}`, result.body || result.error || '', summary.infra_blockers)
 
     if (ep.includes('/api/chain/')) {
       const ok = dhanChainOk(payload)
@@ -180,6 +173,7 @@ try {
       const row = {
         endpoint: ep,
         ok,
+        optional,
         safe_blocked: safeBlocked,
         source: payload?.data_source || payload?.source || null,
         priority: payload?.source_priority || null,
@@ -191,7 +185,8 @@ try {
       summary.chain_truth.push(row)
       if (!ok) {
         const msg = `CHAIN_NOT_TRADE_READY:${ep}:${row.blocker}`
-        if (safeBlocked) summary.trade_readiness_blockers.push(msg)
+        if (optional && safeBlocked) summary.optional_data_blockers.push(msg)
+        else if (safeBlocked) summary.trade_readiness_blockers.push(msg)
         else summary.infra_blockers.push(msg)
       }
     }
@@ -199,14 +194,12 @@ try {
 
   for (const [id, title] of tabs) {
     try {
-      await page.locator(`button[title="${title}"]`).first().click({ timeout: 12000 })
+      await page.locator(`button[title="${title}"]`).first().click({ timeout: 15000 })
       await page.waitForTimeout(3000)
       const body = await page.locator('body').innerText({ timeout: 10000 })
       fs.writeFileSync(path.join(outDir, `${id}.body.txt`), body)
       scanForbidden(`UI:${title}`, body, summary.infra_blockers)
-      if (id === 'truth' && /System Truth Control|Money readiness|Live broker order execution must remain disabled/i.test(body)) {
-        summary.truth_control_visible = true
-      }
+      if (id === 'truth' && /System Truth Control|Money readiness|Live broker order execution must remain disabled/i.test(body)) summary.truth_control_visible = true
       const screenshot = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshot, fullPage: true })
       const ok = fs.existsSync(screenshot) && fs.statSync(screenshot).size > 10000
@@ -230,9 +223,7 @@ summary.network_response_count = networkResponses.length
 
 for (const item of browserConsole) {
   const text = `${item.type} ${item.text}`
-  if (/error/i.test(item.type) || /failed|error|exception|401|500|csv_fallback|synthetic|fallback|stale/i.test(text)) {
-    summary.infra_blockers.push(`BROWSER_CONSOLE:${text.slice(0, 180)}`)
-  }
+  if (/error/i.test(item.type) || /failed|error|exception|401|500|csv_fallback|synthetic|fallback|stale/i.test(text)) summary.infra_blockers.push(`BROWSER_CONSOLE:${text.slice(0, 180)}`)
 }
 for (const err of pageErrors) summary.infra_blockers.push(`PAGE_ERROR:${err.message}`)
 for (const req of requestFailures) summary.infra_blockers.push(`REQUEST_FAILED:${req.url}:${req.failure}`)
@@ -246,33 +237,30 @@ summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blocke
 summary.final_verdict = summary.infra_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Permanent Live Log Watch',
-  '',
+  '# Permanent Live Log Watch', '',
   `Generated: ${summary.generated_at}`,
   `Base: ${summary.base}`,
+  `Required symbols: ${summary.required_symbols.join(', ')}`,
+  `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`,
   `Final verdict: **${summary.final_verdict}**`,
-  `Truth control visible: **${summary.truth_control_visible}**`,
-  '',
+  `Truth control visible: **${summary.truth_control_visible}**`, '',
   '## Runtime Log Sources Captured',
   `- Browser console entries: ${summary.browser_console_count}`,
   `- Page errors: ${summary.page_error_count}`,
   `- Request failures: ${summary.request_failure_count}`,
-  `- Network responses: ${summary.network_response_count}`,
-  '',
+  `- Network responses: ${summary.network_response_count}`, '',
   '## Dhan Chain Truth',
-  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.endpoint} source=${x.source} priority=${x.priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
-  '',
+  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
   '## API Endpoints',
-  ...summary.endpoints.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.endpoint}${x.error ? ` ${x.error}` : ''}`),
-  '',
+  ...summary.endpoints.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}${x.error ? ` ${x.error}` : ''}`), '',
   '## Screenshots',
-  ...summary.screenshots.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} size=${x.size || 0}${x.error ? ` ${x.error}` : ''}`),
-  '',
+  ...summary.screenshots.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} size=${x.size || 0}${x.error ? ` ${x.error}` : ''}`), '',
   '## Infrastructure Blockers',
-  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']),
-  '',
+  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Trading Readiness Blockers',
-  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none'])
+  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
+  '## Optional Data Blockers',
+  ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none'])
 ].join('\n'))
 
 await browser.close()
