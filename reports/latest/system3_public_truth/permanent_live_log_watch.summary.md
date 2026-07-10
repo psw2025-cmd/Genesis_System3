@@ -1,17 +1,17 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-10T18:19:56.364Z
+Generated: 2026-07-10T19:39:43.415Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
-Final verdict: **FAIL**
+Final verdict: **PASS**
 Truth control visible: **true**
 
 ## Runtime Log Sources Captured
-- Browser console entries: 15
+- Browser console entries: 11
 - Page errors: 0
 - Request failures: 5
-- Network responses: 106
+- Network responses: 110
 
 ## Dhan Chain Truth
 - PASS (required) /api/chain/NIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=24212.8 contracts=160 blocker=-
@@ -40,42 +40,39 @@ Truth control visible: **true**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- PASS Truth Control size=171106
+- PASS Truth Control size=170823
 - PASS Genesis Brain size=242799
-- PASS E2E Proof size=144442
-- PASS Overview size=118653
-- PASS Option Chain size=191738
-- PASS Signals size=80629
-- PASS Paper Trades size=120457
-- PASS Positions size=61853
-- PASS Broker size=108561
-- PASS Performance size=61711
-- PASS ML Model size=72257
-- PASS Live Gate size=102252
+- PASS E2E Proof size=144025
+- PASS Overview size=117310
+- PASS Option Chain size=191780
+- PASS Signals size=80227
+- PASS Paper Trades size=119772
+- PASS Positions size=61476
+- PASS Broker size=108233
+- PASS Performance size=61060
+- PASS ML Model size=72015
+- PASS Live Gate size=101898
 
 ## Infrastructure Blockers
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
-- BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED
+- none
 
 ## Trading Readiness Blockers
 - none
 
 ## Optional Data Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- TRANSIENT_BROWSER_502_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_502_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_502_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_502_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been block
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
-- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2' from origin 'https://genesis-syst
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2:net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
-- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2:net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2:net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2:net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2:net::ERR_FAILED

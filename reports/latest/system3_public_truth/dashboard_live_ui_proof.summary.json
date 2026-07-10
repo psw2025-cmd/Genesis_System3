@@ -110,9 +110,7 @@
     }
   ],
   "base": "https://genesis-system3-backend.onrender.com",
-  "blockers": [
-    "UI_FAIL:Paper Trades"
-  ],
+  "blockers": [],
   "chain_truth": [
     {
       "blocker": null,
@@ -180,11 +178,9 @@
       "total_contracts": 0
     }
   ],
-  "final_verdict": "FAIL",
-  "generated_at": "2026-07-10T18:17:06.311Z",
-  "infra_blockers": [
-    "UI_FAIL:Paper Trades"
-  ],
+  "final_verdict": "PASS",
+  "generated_at": "2026-07-10T19:37:04.751Z",
+  "infra_blockers": [],
   "trade_readiness_blockers": [],
   "ui": [
     {
@@ -242,10 +238,10 @@
       "truth_control_visible": true
     },
     {
-      "bad_raw_error_or_loading": true,
+      "bad_raw_error_or_loading": false,
       "e2e_has_trader_readiness": true,
       "id": "paper",
-      "ok": false,
+      "ok": true,
       "screenshot_ok": true,
       "title": "Paper Trades",
       "truth_control_visible": true

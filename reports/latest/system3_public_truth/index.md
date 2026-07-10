@@ -1,8 +1,8 @@
 # System3 Public Truth
 
-- Generated UTC: `2026-07-10T18:22:51.977703Z`
-- Commit: `3d64cbe318a485920b1704f5fad728e8aeccbe20`
-- Final verdict: **FAIL**
+- Generated UTC: `2026-07-10T19:41:46.040177Z`
+- Commit: `c4cff44517b5975b32d8bb239cfd03353ae24608`
+- Final verdict: **UNKNOWN**
 
 ## Safety
 - LIVE_TRADING_ENABLED: `0`
@@ -13,8 +13,8 @@
 
 ## Source summaries
 - `cloud_runtime_check` present=`True` verdict=`WARN`
-- `dashboard_live_ui_proof` present=`True` verdict=`FAIL`
-- `permanent_live_log_watch` present=`True` verdict=`FAIL`
+- `dashboard_live_ui_proof` present=`True` verdict=`PASS`
+- `permanent_live_log_watch` present=`True` verdict=`PASS`
 
 ## Read path
 - Fetch `reports/latest/system3_public_truth/index.json` for machine-readable status.
