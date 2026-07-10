@@ -7,52 +7,38 @@ const key = process.env.DASHBOARD_API_KEY || ''
 const outDir = path.join('reports', 'latest', 'dashboard_live_ui_proof')
 fs.mkdirSync(outDir, { recursive: true })
 
-const requiredSymbols = (process.env.SYSTEM3_REQUIRED_UNDERLYINGS || 'NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY')
-  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
-const optionalSymbols = (process.env.SYSTEM3_OPTIONAL_UNDERLYINGS || 'SENSEX')
-  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
-  .filter(s => !requiredSymbols.includes(s))
-
+const requiredSymbols = (process.env.SYSTEM3_REQUIRED_UNDERLYINGS || 'NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY').split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+const optionalSymbols = (process.env.SYSTEM3_OPTIONAL_UNDERLYINGS || 'SENSEX').split(',').map(s => s.trim().toUpperCase()).filter(Boolean).filter(s => !requiredSymbols.includes(s))
 const requiredChainEndpoints = requiredSymbols.map(s => `/api/chain/${s}`)
 const optionalChainEndpoints = optionalSymbols.map(s => `/api/chain/${s}`)
 const chainEndpoints = [...requiredChainEndpoints, ...optionalChainEndpoints]
-
 const apiEndpoints = [
-  '/api/auth/status',
-  '/api/deploy/info',
-  '/api/health',
-  '/api/state',
-  '/api/broker/dhan/status',
-  '/api/broker/funds',
-  '/api/broker/holdings',
-  '/api/broker/positions/live',
+  '/api/auth/status', '/api/deploy/info', '/api/health', '/api/state',
+  '/api/broker/dhan/status', '/api/broker/funds', '/api/broker/holdings', '/api/broker/positions/live',
   ...chainEndpoints,
-  '/api/gain_rank',
-  '/api/scanner/top_contract_gainers?top_n=5',
-  '/api/pnl',
-  '/api/trades/today',
-  '/api/auto_gates'
+  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/trades/today', '/api/auto_gates'
 ]
 
 function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
 function tryJson(text) { try { return JSON.parse(text) } catch { return { raw: String(text || '').slice(0, 2000) } } }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
+function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
 
-async function pageFetchJson(page, ep, attempts = 3) {
+async function pageFetchJson(page, ep, attempts = 5) {
   let last = null
   for (let i = 0; i < attempts; i++) {
-    const result = await page.evaluate(async (ep) => {
+    const result = await page.evaluate(async ({ ep, apiKey }) => {
       try {
-        const r = await fetch(ep, { credentials: 'include' })
+        const r = await fetch(ep, { credentials: 'include', headers: apiKey ? { 'X-API-Key': apiKey } : {} })
         const text = await r.text()
         return { endpoint: ep, ok: r.ok, status: r.status, body: text.slice(0, 200000) }
       } catch (err) {
         return { endpoint: ep, ok: false, status: 0, error: String(err), body: '' }
       }
-    }, ep)
+    }, { ep, apiKey: key })
     last = result
-    if (result.ok || ![0, 502, 503, 504].includes(Number(result.status))) return result
-    await wait(5000 * (i + 1))
+    if (result.ok || ![0, 429, 502, 503, 504].includes(Number(result.status))) return result
+    await wait([8000, 16000, 30000, 45000, 60000][i] || 60000)
   }
   return last
 }
@@ -80,7 +66,10 @@ function isSafeDhanBlocked(payload) {
 }
 
 const browser = await chromium.launch({ headless: true })
-const context = await browser.newContext({ viewport: { width: 1366, height: 768 } })
+const context = await browser.newContext({
+  viewport: { width: 1366, height: 768 },
+  extraHTTPHeaders: headers(key),
+})
 const page = await context.newPage()
 
 const summary = {
@@ -102,45 +91,44 @@ const summary = {
 }
 
 try {
-  await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 60000 })
+  await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 90000 })
 
   if (key) {
     let auth = null
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       auth = await page.evaluate(async (apiKey) => {
         const r = await fetch('/api/auth/session', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
           credentials: 'include',
           body: JSON.stringify({ api_key: apiKey })
         })
         return { ok: r.ok, status: r.status, text: await r.text() }
       }, key)
-      if (auth.ok || ![502, 503, 504].includes(Number(auth.status))) break
-      await wait(5000 * (i + 1))
+      if (auth.ok || ![429, 502, 503, 504].includes(Number(auth.status))) break
+      await wait([8000, 16000, 30000, 45000, 60000][i] || 60000)
     }
     summary.auth = { ok: auth.ok, status: auth.status }
     if (!auth.ok) summary.infra_blockers.push(`AUTH_FAIL:${auth.status}`)
-    fs.writeFileSync(path.join(outDir, 'auth_session.json'), JSON.stringify(summary.auth, null, 2))
   } else {
     summary.auth = { ok: false, status: 0, note: 'DASHBOARD_API_KEY secret not configured' }
     summary.infra_blockers.push('DASHBOARD_API_KEY_SECRET_MISSING')
-    fs.writeFileSync(path.join(outDir, 'auth_session.json'), JSON.stringify(summary.auth, null, 2))
   }
+  fs.writeFileSync(path.join(outDir, 'auth_session.json'), JSON.stringify(summary.auth, null, 2))
 
-  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
-
+  // Sequential proof calls are deliberately slow. Render/Dashboard API can rate-limit bursts.
   for (const ep of apiEndpoints) {
-    const result = await pageFetchJson(page, ep, 3)
+    await wait(2500)
+    const result = await pageFetchJson(page, ep, 5)
     const payload = tryJson(result.body || '')
-    const apiRow = { endpoint: ep, ok: result.ok, status: result.status, optional: optionalChainEndpoints.includes(ep) }
+    const optional = optionalChainEndpoints.includes(ep)
+    const apiRow = { endpoint: ep, ok: result.ok, status: result.status, optional }
     summary.api.push(apiRow)
     fs.writeFileSync(path.join(outDir, `${safeName(ep)}.json`), JSON.stringify(payload, null, 2))
 
     if (chainEndpoints.includes(ep)) {
       const ok = result.ok && dhanChainOk(payload)
       const safeBlocked = result.ok && isSafeDhanBlocked(payload)
-      const optional = optionalChainEndpoints.includes(ep)
       const chainRow = {
         endpoint: ep,
         ok,
@@ -163,12 +151,11 @@ try {
       }
     }
 
-    if (!result.ok) {
-      const msg = `API_FAIL:${ep}:${result.status}`
-      if (optionalChainEndpoints.includes(ep) && [200, 404].includes(Number(result.status))) summary.optional_data_blockers.push(msg)
-      else summary.infra_blockers.push(msg)
-    }
+    if (!result.ok) summary.infra_blockers.push(`API_FAIL:${ep}:${result.status}`)
   }
+
+  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 })
+  await wait(5000)
 
   const tabs = [
     ['truth', 'Truth Control'], ['genesis', 'Genesis Brain'], ['e2e_proof', 'E2E Proof'], ['overview', 'Overview'],
@@ -178,10 +165,11 @@ try {
 
   for (const [id, title] of tabs) {
     try {
+      await wait(1500)
       const btn = page.locator(`button[title="${title}"]`).first()
-      await btn.click({ timeout: 15000 })
-      await page.waitForTimeout(3000)
-      const text = await page.locator('body').innerText({ timeout: 10000 })
+      await btn.click({ timeout: 25000 })
+      await page.waitForTimeout(4000)
+      const text = await page.locator('body').innerText({ timeout: 15000 })
       const bad = /Endpoint:\s*\/api\/|Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text)
       const screenshotPath = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: true })
@@ -203,8 +191,8 @@ try {
   if (!summary.truth_control_visible) summary.infra_blockers.push('TRUTH_CONTROL_NOT_VISIBLE')
 
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 60000 })
-  await page.waitForTimeout(3000)
+  await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 })
+  await page.waitForTimeout(5000)
   const mobilePath = path.join(outDir, 'mobile_390x844.png')
   await page.screenshot({ path: mobilePath, fullPage: true })
   if (!fs.existsSync(mobilePath) || fs.statSync(mobilePath).size <= 10000) summary.infra_blockers.push('MOBILE_SCREENSHOT_MISSING_OR_EMPTY')
@@ -216,31 +204,24 @@ summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blocke
 summary.final_verdict = summary.infra_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Dashboard Live UI Proof',
-  '',
+  '# Dashboard Live UI Proof', '',
   `Generated: ${summary.generated_at}`,
   `Base: ${base}`,
   `Required symbols: ${summary.required_symbols.join(', ')}`,
   `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`,
   `Final verdict: **${summary.final_verdict}**`,
   `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`,
-  `Truth control visible: **${summary.truth_control_visible}**`,
-  '',
+  `Truth control visible: **${summary.truth_control_visible}**`, '',
   '## Chain Truth',
-  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`),
-  '',
+  ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
   '## API',
-  ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`),
-  '',
+  ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`), '',
   '## UI Screenshots',
-  ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title}${x.error ? ` - ${x.error}` : ''}`),
-  '',
+  ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title}${x.error ? ` - ${x.error}` : ''}`), '',
   '## Infrastructure Blockers',
-  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']),
-  '',
+  ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Trading Readiness Blockers',
-  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']),
-  '',
+  ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Optional Data Blockers',
   ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none'])
 ].join('\n'))
@@ -250,7 +231,6 @@ if (summary.infra_blockers.length) {
   console.error(summary.infra_blockers.join('\n'))
   process.exit(1)
 }
-
 if (summary.trade_readiness_blockers.length) {
   console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`)
   console.error(summary.trade_readiness_blockers.join('\n'))
