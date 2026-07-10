@@ -1,0 +1,194 @@
+name: System3 Latest Truth Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/triggers/system3_truth_trigger.txt'
+      - '.github/workflows/system3-latest-truth-publish.yml'
+      - 'tools/cloud_runtime_check.py'
+      - 'tools/dashboard_live_ui_proof.mjs'
+      - 'tools/permanent_live_log_watch.mjs'
+      - 'tools/frontend_no_fake_guard.mjs'
+      - 'dashboard/frontend/src/components/SystemTruthControl.tsx'
+      - 'dashboard/backend/**'
+      - 'core/data/**'
+      - 'scripts/cloud_worker.py'
+  schedule:
+    - cron: "*/30 3-10 * * 1-5"
+
+permissions:
+  contents: write
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  SYSTEM3_REAL_ONLY: '1'
+  DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+  DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+
+jobs:
+  latest-truth-publish:
+    name: Run proof and commit compact latest truth
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install proof tooling
+        run: |
+          npm --prefix tools install --no-save --no-package-lock playwright
+          npm --prefix tools exec playwright install chromium
+
+      - name: Frontend no fake hardcoded guard
+        id: frontend_guard
+        continue-on-error: true
+        run: node tools/frontend_no_fake_guard.mjs
+
+      - name: Cloud runtime check
+        id: cloud_runtime
+        continue-on-error: true
+        run: |
+          python tools/cloud_runtime_check.py \
+            --base-url "$DASHBOARD_BASE_URL" \
+            --expected-commit "$(git rev-parse HEAD)"
+
+      - name: Dashboard visual truth proof
+        id: dashboard_proof
+        continue-on-error: true
+        run: node tools/dashboard_live_ui_proof.mjs
+
+      - name: Permanent browser/network log watch
+        id: live_log_watch
+        continue-on-error: true
+        run: node tools/permanent_live_log_watch.mjs
+
+      - name: Build compact latest truth folder
+        if: always()
+        run: |
+          set -e
+          OUT="reports/latest/system3_public_truth"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
+          python - <<'PY'
+          import json, os, shutil
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          out = Path('reports/latest/system3_public_truth')
+          out.mkdir(parents=True, exist_ok=True)
+          sources = {
+            'cloud_runtime_check': Path('reports/latest/cloud_runtime_check'),
+            'dashboard_live_ui_proof': Path('reports/latest/dashboard_live_ui_proof'),
+            'permanent_live_log_watch': Path('reports/latest/permanent_live_log_watch'),
+          }
+          summaries = {}
+          final = 'UNKNOWN'
+          infra_fail = False
+          trade_blocked = False
+          for name, folder in sources.items():
+            item = {'present': folder.exists(), 'summary_json': None, 'summary_md': None, 'verdict': 'MISSING'}
+            sj = folder / 'summary.json'
+            sm = folder / 'summary.md'
+            if sj.exists():
+              try:
+                data = json.loads(sj.read_text(encoding='utf-8', errors='replace'))
+                # keep compact only; strip giant lists if ever present
+                compact = {}
+                for k in ['final_verdict','verdict','status','blockers','infra_blockers','trade_readiness_blockers','chain_truth','api','ui','generated_at','generated_utc','base','deployed_git_sha','expected_commit','commit_match']:
+                  if k in data:
+                    compact[k] = data[k]
+                item['summary_json'] = compact
+                item['verdict'] = str(compact.get('final_verdict') or compact.get('verdict') or compact.get('status') or 'UNKNOWN')
+                (out / f'{name}.summary.json').write_text(json.dumps(compact, indent=2, sort_keys=True), encoding='utf-8')
+              except Exception as exc:
+                item['summary_json'] = {'error': str(exc)}
+            if sm.exists():
+              text = sm.read_text(encoding='utf-8', errors='replace')[:20000]
+              item['summary_md'] = f'{name}.summary.md'
+              (out / f'{name}.summary.md').write_text(text, encoding='utf-8')
+            v = item['verdict'].upper()
+            if v == 'FAIL':
+              infra_fail = True
+            if 'BLOCKED' in v or 'NOT_TRADE_READY' in v:
+              trade_blocked = True
+            summaries[name] = item
+          if infra_fail:
+            final = 'FAIL'
+          elif trade_blocked:
+            final = 'BLOCKED_NOT_TRADE_READY'
+          elif all(v['verdict'].upper() in ('PASS','OK') for v in summaries.values() if v['present']):
+            final = 'PASS'
+          index = {
+            'generated_utc': datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+            'workflow': 'System3 Latest Truth Publish',
+            'commit': os.environ.get('GITHUB_SHA',''),
+            'final_verdict': final,
+            'safety': {
+              'live_trading_enabled': os.environ.get('LIVE_TRADING_ENABLED','0'),
+              'system3_live_trading_allowed': os.environ.get('SYSTEM3_LIVE_TRADING_ALLOWED','0'),
+              'analyze_mode': os.environ.get('ANALYZE_MODE','1'),
+              'broker_order_endpoints_called': False,
+              'secrets_written': False,
+            },
+            'summaries': summaries,
+            'how_to_trigger': 'Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.',
+            'how_to_read': 'Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.',
+          }
+          (out / 'index.json').write_text(json.dumps(index, indent=2, sort_keys=True), encoding='utf-8')
+          md = [
+            '# System3 Public Truth',
+            '',
+            f"- Generated UTC: `{index['generated_utc']}`",
+            f"- Commit: `{index['commit']}`",
+            f"- Final verdict: **{final}**",
+            '',
+            '## Safety',
+            f"- LIVE_TRADING_ENABLED: `{index['safety']['live_trading_enabled']}`",
+            f"- SYSTEM3_LIVE_TRADING_ALLOWED: `{index['safety']['system3_live_trading_allowed']}`",
+            f"- ANALYZE_MODE: `{index['safety']['analyze_mode']}`",
+            '- Broker order endpoints called: `false`',
+            '- Secrets written: `false`',
+            '',
+            '## Source summaries',
+          ]
+          for name, item in summaries.items():
+            md.append(f"- `{name}` present=`{item['present']}` verdict=`{item['verdict']}`")
+          md.extend(['', '## Read path', '- Fetch `reports/latest/system3_public_truth/index.json` for machine-readable status.', '- Fetch `reports/latest/system3_public_truth/index.md` for human status.'])
+          (out / 'index.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
+          PY
+          find "$OUT" -maxdepth 1 -type f -print | sort
+
+      - name: Commit latest compact truth to repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/system3_public_truth/
+          if git diff --cached --quiet; then
+            echo "No public truth changes to commit"
+            exit 0
+          fi
+          git commit -m "ci(proof): publish latest system3 truth [skip ci]"
+          git push
+
+      - name: Upload latest truth artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: system3-public-truth
+          path: reports/latest/system3_public_truth/
+          retention-days: 14
