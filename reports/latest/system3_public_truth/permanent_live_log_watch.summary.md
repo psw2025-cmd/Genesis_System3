@@ -1,187 +1,66 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-10T11:49:13.019Z
+Generated: 2026-07-10T12:51:14.131Z
 Base: https://genesis-system3-backend.onrender.com
+Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
+Optional symbols: SENSEX
 Final verdict: **FAIL**
-Truth control visible: **false**
+Truth control visible: **true**
 
 ## Runtime Log Sources Captured
-- Browser console entries: 18
+- Browser console entries: 3
 - Page errors: 0
-- Request failures: 0
-- Network responses: 19
+- Request failures: 2
+- Network responses: 114
 
 ## Dhan Chain Truth
-- FAIL /api/chain/NIFTY source=null priority=null status=null spot=0 contracts=0 blocker=NOT_REAL_DHAN_CHAIN
-- FAIL /api/chain/BANKNIFTY source=null priority=null status=null spot=0 contracts=0 blocker=NOT_REAL_DHAN_CHAIN
-- FAIL /api/chain/FINNIFTY source=null priority=null status=null spot=0 contracts=0 blocker=NOT_REAL_DHAN_CHAIN
-- FAIL /api/chain/MIDCPNIFTY source=null priority=null status=null spot=0 contracts=0 blocker=NOT_REAL_DHAN_CHAIN
-- FAIL /api/chain/SENSEX source=null priority=null status=null spot=0 contracts=0 blocker=NOT_REAL_DHAN_CHAIN
+- PASS (required) /api/chain/NIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=24212.8 contracts=160 blocker=-
+- PASS (required) /api/chain/BANKNIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=58082.7 contracts=160 blocker=-
+- PASS (required) /api/chain/FINNIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=26824.1 contracts=160 blocker=-
+- PASS (required) /api/chain/MIDCPNIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=14796 contracts=160 blocker=-
+- BLOCKED (optional) /api/chain/SENSEX source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 
 ## API Endpoints
-- FAIL 502 /api/auth/status
-- FAIL 502 /api/deploy/info
-- FAIL 502 /api/health
-- FAIL 401 /api/state
-- FAIL 502 /api/broker/dhan/status
-- FAIL 502 /api/broker/funds
-- FAIL 502 /api/broker/holdings
-- FAIL 401 /api/broker/positions/live
-- FAIL 401 /api/chain/NIFTY
-- FAIL 401 /api/chain/BANKNIFTY
-- FAIL 401 /api/chain/FINNIFTY
-- FAIL 401 /api/chain/MIDCPNIFTY
-- FAIL 401 /api/chain/SENSEX
-- FAIL 401 /api/gain_rank
-- FAIL 401 /api/pnl
-- FAIL 401 /api/auto_gates
+- PASS 200  /api/auth/status
+- PASS 200  /api/deploy/info
+- PASS 200  /api/health
+- PASS 200  /api/state
+- PASS 200  /api/broker/dhan/status
+- PASS 200  /api/broker/funds
+- PASS 200  /api/broker/holdings
+- PASS 200  /api/broker/positions/live
+- PASS 200  /api/chain/NIFTY
+- PASS 200  /api/chain/BANKNIFTY
+- PASS 200  /api/chain/FINNIFTY
+- PASS 200  /api/chain/MIDCPNIFTY
+- PASS 200 (optional) /api/chain/SENSEX
+- PASS 200  /api/gain_rank
+- PASS 200  /api/scanner/top_contract_gainers?top_n=5
+- PASS 200  /api/pnl
+- PASS 200  /api/auto_gates
 
 ## Screenshots
-- FAIL Truth Control size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Truth Control"]').first()
-
-- FAIL Genesis Brain size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Genesis Brain"]').first()
-
-- FAIL E2E Proof size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="E2E Proof"]').first()
-
-- FAIL Overview size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Overview"]').first()
-
-- FAIL Option Chain size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Option Chain"]').first()
-
-- FAIL Signals size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Signals"]').first()
-
-- FAIL Paper Trades size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Paper Trades"]').first()
-
-- FAIL Positions size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Positions"]').first()
-
-- FAIL Broker size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Broker"]').first()
-
-- FAIL Performance size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Performance"]').first()
-
-- FAIL ML Model size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="ML Model"]').first()
-
-- FAIL Live Gate size=0 TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Live Gate"]').first()
-
+- PASS Truth Control size=135395
+- PASS Genesis Brain size=46893
+- PASS E2E Proof size=118359
+- PASS Overview size=96589
+- PASS Option Chain size=151387
+- PASS Signals size=45940
+- PASS Paper Trades size=50649
+- PASS Positions size=55516
+- PASS Broker size=82934
+- PASS Performance size=55196
+- PASS ML Model size=75005
+- PASS Live Gate size=58708
 
 ## Infrastructure Blockers
-- AUTH_FAIL:502
-- API_FAIL:/api/auth/status:502
-- API:/api/auth/status:FORBIDDEN:/mock/i
-- API_FAIL:/api/deploy/info:502
-- API:/api/deploy/info:FORBIDDEN:/mock/i
-- API_FAIL:/api/health:502
-- API:/api/health:FORBIDDEN:/mock/i
-- API_FAIL:/api/state:401
-- API_FAIL:/api/broker/dhan/status:502
-- API:/api/broker/dhan/status:FORBIDDEN:/mock/i
-- API_FAIL:/api/broker/funds:502
-- API:/api/broker/funds:FORBIDDEN:/mock/i
-- API_FAIL:/api/broker/holdings:502
-- API:/api/broker/holdings:FORBIDDEN:/mock/i
-- API_FAIL:/api/broker/positions/live:401
-- API_FAIL:/api/chain/NIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/BANKNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/FINNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/MIDCPNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/SENSEX:401
-- CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/gain_rank:401
-- API_FAIL:/api/pnl:401
-- API_FAIL:/api/auto_gates:401
-- UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Truth Control"]').first()
-
-- UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Genesis Brain"]').first()
-
-- UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="E2E Proof"]').first()
-
-- UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Overview"]').first()
-
-- UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Option Chain"]').first()
-
-- UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Signals"]').first()
-
-- UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Paper Trades"]').first()
-
-- UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Positions"]').first()
-
-- UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Broker"]').first()
-
-- UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Performance"]').first()
-
-- UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="ML Model"]').first()
-
-- UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 12000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Live Gate"]').first()
-
-- TRUTH_CONTROL_NOT_VISIBLE
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 502 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
-- BROWSER_CONSOLE:error Failed to load resource: the server responded with a status of 401 ()
+- BROWSER_CONSOLE:warning ML performance fetch failed: timeout of 5000ms exceeded
+- BROWSER_CONSOLE:warning ML comparison fetch failed: timeout of 5000ms exceeded
+- REQUEST_FAILED:https://genesis-system3-backend.onrender.com/api/ml/performance:net::ERR_ABORTED
+- REQUEST_FAILED:https://genesis-system3-backend.onrender.com/api/ml/compare:net::ERR_ABORTED
 
 ## Trading Readiness Blockers
 - none
+
+## Optional Data Blockers
+- CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
