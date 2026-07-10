@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -32,16 +33,26 @@ class DataSourceManager:
         "BANKNIFTY": "25",
         "FINNIFTY": "27",
         "MIDCPNIFTY": "442",
+        # SENSEX is a BSE index. Keep the security id configurable because
+        # Dhan instrument master can change. Current default follows the
+        # existing repo mapping; the segment fix below is the important part.
         "SENSEX": "51",
     }
 
     # Official Dhan option-chain request uses UnderlyingScrip, UnderlyingSeg, Expiry.
+    # Dhan annexure exposes BSE_FNO, not IDX_B. Using IDX_B produced no rows for SENSEX.
     _DHAN_SEGMENTS = {
         "NIFTY": "IDX_I",
         "BANKNIFTY": "IDX_I",
         "FINNIFTY": "IDX_I",
         "MIDCPNIFTY": "IDX_I",
-        "SENSEX": "IDX_B",
+        "SENSEX": "BSE_FNO",
+    }
+
+    # Fallback segments are attempted only when the primary segment returns no
+    # official expiry/chain rows. No non-Dhan fallback is ever used.
+    _DHAN_SEGMENT_FALLBACKS = {
+        "SENSEX": ["IDX_I"],
     }
 
     def __init__(self):
@@ -129,11 +140,11 @@ class DataSourceManager:
             except Exception:
                 payload = {"raw": resp.text[:500]}
             if resp.status_code >= 400:
-                self._last_error = f"DHAN_EXPIRY_LIST_HTTP_{resp.status_code}"
+                self._last_error = f"DHAN_EXPIRY_LIST_HTTP_{resp.status_code}:{sec_id}:{segment}"
                 logger.warning(f"[DSM] Dhan expiry-list HTTP {resp.status_code}: {payload}")
                 return []
             if not isinstance(payload, dict) or payload.get("status") != "success":
-                self._last_error = f"DHAN_EXPIRY_LIST_STATUS_{payload.get('status') if isinstance(payload, dict) else 'BAD_PAYLOAD'}"
+                self._last_error = f"DHAN_EXPIRY_LIST_STATUS_{payload.get('status') if isinstance(payload, dict) else 'BAD_PAYLOAD'}:{sec_id}:{segment}"
                 return []
             dates = payload.get("data") or []
             if not isinstance(dates, list):
@@ -165,11 +176,11 @@ class DataSourceManager:
             except Exception:
                 payload = {"raw": resp.text[:500]}
             if resp.status_code >= 400:
-                self._last_error = f"DHAN_OPTION_CHAIN_HTTP_{resp.status_code}:{expiry}"
+                self._last_error = f"DHAN_OPTION_CHAIN_HTTP_{resp.status_code}:{sec_id}:{segment}:{expiry}"
                 logger.warning(f"[DSM] Dhan option-chain HTTP {resp.status_code}: {payload}")
                 return None
             if not isinstance(payload, dict) or payload.get("status") != "success":
-                self._last_error = f"DHAN_OPTION_CHAIN_STATUS_{payload.get('status') if isinstance(payload, dict) else 'BAD_PAYLOAD'}:{expiry}"
+                self._last_error = f"DHAN_OPTION_CHAIN_STATUS_{payload.get('status') if isinstance(payload, dict) else 'BAD_PAYLOAD'}:{sec_id}:{segment}:{expiry}"
                 return None
             return payload
         except Exception as exc:
@@ -230,6 +241,18 @@ class DataSourceManager:
         self._last_error = self._last_error or "DHAN_EXPIRY_LIST_EMPTY_NO_OFFICIAL_EXPIRY"
         return ""
 
+    def _candidate_underlying_pairs(self, sym: str, sec_id: str, segment: str) -> List[Tuple[str, str]]:
+        pairs: List[Tuple[str, str]] = []
+        def add(a: str, b: str) -> None:
+            if a and b and (a, b) not in pairs:
+                pairs.append((a, b))
+        add(sec_id, segment)
+        env_extra = os.environ.get(f"DHAN_OPTION_CHAIN_SEGMENT_FALLBACKS_{sym}", "").strip()
+        extra_segments = [x.strip() for x in env_extra.split(",") if x.strip()] if env_extra else self._DHAN_SEGMENT_FALLBACKS.get(sym, [])
+        for seg in extra_segments:
+            add(sec_id, seg)
+        return pairs
+
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         """
         Fetch option chain from official Dhan REST only.
@@ -242,7 +265,7 @@ class DataSourceManager:
         self._last_error = None
 
         try:
-            sec_id = self._DHAN_SECURITY_IDS.get(sym)
+            sec_id = os.environ.get(f"DHAN_OPTION_CHAIN_SECURITY_ID_{sym}", "").strip() or self._DHAN_SECURITY_IDS.get(sym)
             segment = os.environ.get(
                 f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
                 self._DHAN_SEGMENTS.get(sym, "IDX_I"),
@@ -253,30 +276,43 @@ class DataSourceManager:
                 logger.warning(f"[DSM] No Dhan security id configured for {sym}")
                 return None, 0.0
 
-            resolved_expiry = self._option_chain_expiry(sym, sec_id, segment, expiry)
-            if not resolved_expiry:
-                self._last_error = self._last_error or f"DHAN_NO_OFFICIAL_EXPIRY:{sym}"
-                return None, 0.0
+            attempts = []
+            pairs = self._candidate_underlying_pairs(sym, str(sec_id), segment)
+            for idx, (candidate_sec_id, candidate_segment) in enumerate(pairs):
+                if idx > 0:
+                    time.sleep(float(os.environ.get("DHAN_OPTION_CHAIN_FALLBACK_SPACING_S", "3.25")))
+                resolved_expiry = self._option_chain_expiry(sym, candidate_sec_id, candidate_segment, expiry)
+                if not resolved_expiry:
+                    attempts.append(f"{candidate_sec_id}:{candidate_segment}:NO_OFFICIAL_EXPIRY:{self.last_error}")
+                    continue
 
-            logger.info(f"[DSM] Dhan REST option-chain fetch: {sym} sec_id={sec_id} segment={segment} expiry={resolved_expiry}")
-            resp = self._fetch_dhan_option_chain_raw(sec_id, segment, resolved_expiry)
-            if not (resp and isinstance(resp, dict)):
-                self._last_error = self._last_error or "DHAN_EMPTY_RESPONSE"
-                return None, 0.0
+                logger.info(
+                    f"[DSM] Dhan REST option-chain fetch: {sym} sec_id={candidate_sec_id} segment={candidate_segment} expiry={resolved_expiry}"
+                )
+                resp = self._fetch_dhan_option_chain_raw(candidate_sec_id, candidate_segment, resolved_expiry)
+                if not (resp and isinstance(resp, dict)):
+                    attempts.append(f"{candidate_sec_id}:{candidate_segment}:{resolved_expiry}:{self.last_error or 'DHAN_EMPTY_RESPONSE'}")
+                    continue
 
-            from core.data import dhan_option_chain_parser as parser
+                from core.data import dhan_option_chain_parser as parser
 
-            df, spot = parser.parse_dhan_option_chain_payload(resp)
-            if df is not None and not df.empty:
-                try:
-                    if "expiry" not in df.columns:
-                        df["expiry"] = resolved_expiry
-                    if "underlying" not in df.columns:
-                        df["underlying"] = sym
-                except Exception:
-                    pass
-                return df, spot
-            self._last_error = f"DHAN_EMPTY_OPTION_CHAIN_ROWS:{sym}:{resolved_expiry}"
+                df, spot = parser.parse_dhan_option_chain_payload(resp)
+                if df is not None and not df.empty:
+                    try:
+                        if "expiry" not in df.columns:
+                            df["expiry"] = resolved_expiry
+                        if "underlying" not in df.columns:
+                            df["underlying"] = sym
+                        if "dhan_underlying_segment" not in df.columns:
+                            df["dhan_underlying_segment"] = candidate_segment
+                        if "dhan_underlying_security_id" not in df.columns:
+                            df["dhan_underlying_security_id"] = candidate_sec_id
+                    except Exception:
+                        pass
+                    return df, spot
+                attempts.append(f"{candidate_sec_id}:{candidate_segment}:{resolved_expiry}:EMPTY_ROWS")
+
+            self._last_error = f"DHAN_EMPTY_OPTION_CHAIN_ROWS:{sym}:attempts={'|'.join(attempts[-4:])}"
             return None, 0.0
         except Exception as e:
             self._last_error = f"DHAN_FETCH_ERROR: {e}"
@@ -311,7 +347,7 @@ class DataSourceManager:
             dhan = self._get_client()
             if dhan is None:
                 return 0.0
-            sec_id = self._DHAN_SECURITY_IDS.get(symbol.upper(), symbol)
+            sec_id = os.environ.get(f"DHAN_OPTION_CHAIN_SECURITY_ID_{symbol.upper()}", "").strip() or self._DHAN_SECURITY_IDS.get(symbol.upper(), symbol)
             segment = os.environ.get(
                 f"DHAN_OPTION_CHAIN_SEGMENT_{symbol.upper()}",
                 self._DHAN_SEGMENTS.get(symbol.upper(), "IDX_I"),
