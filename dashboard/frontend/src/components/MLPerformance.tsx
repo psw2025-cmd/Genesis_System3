@@ -64,7 +64,7 @@ export default function MLPerformance() {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>ML Model Truth</h2>
-          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>This tab is proof-only. It does not train inline and does not fake metrics.</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>This tab is proof-only. It does not train inline and does not invent metrics.</div>
         </div>
         <span style={{
           padding: '5px 10px', borderRadius: 999, fontSize: 11, fontWeight: 900,
