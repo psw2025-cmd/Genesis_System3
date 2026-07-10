@@ -85,14 +85,16 @@ jobs:
           set -e
           OUT="reports/latest/system3_public_truth"
           rm -rf "$OUT"
-          mkdir -p "$OUT"
+          mkdir -p "$OUT/screenshots"
           python - <<'PY'
-          import json, os
+          import json, os, shutil
           from datetime import datetime, timezone
           from pathlib import Path
 
           out = Path('reports/latest/system3_public_truth')
+          shots_out = out / 'screenshots'
           out.mkdir(parents=True, exist_ok=True)
+          shots_out.mkdir(parents=True, exist_ok=True)
           sources = {
             'cloud_runtime_check': Path('reports/latest/cloud_runtime_check'),
             'dashboard_live_ui_proof': Path('reports/latest/dashboard_live_ui_proof'),
@@ -136,6 +138,18 @@ jobs:
               warning_found = True
             summaries[name] = item
 
+          screenshot_src = Path('reports/latest/dashboard_live_ui_proof')
+          screenshot_names = ['truth.png','signals.png','paper.png','broker.png','ml.png','gates.png','overview.png','mobile_390x844.png']
+          visual = []
+          for name in screenshot_names:
+            src = screenshot_src / name
+            if src.exists() and src.stat().st_size > 10000:
+              dst = shots_out / name
+              shutil.copy2(src, dst)
+              visual.append({'file': f'screenshots/{name}', 'size_bytes': dst.stat().st_size, 'ok': True})
+            else:
+              visual.append({'file': f'screenshots/{name}', 'size_bytes': 0, 'ok': False})
+
           if infra_fail:
             final = 'FAIL'
           elif trade_blocked:
@@ -161,6 +175,7 @@ jobs:
               'broker_order_endpoints_called': False,
               'secrets_written': False,
             },
+            'visual_screenshots': visual,
             'summaries': summaries,
             'how_to_trigger': 'Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.',
             'how_to_read': 'Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.',
@@ -177,14 +192,29 @@ jobs:
             f"- ANALYZE_MODE: `{index['safety']['analyze_mode']}`",
             '- Broker order endpoints called: `false`',
             '- Secrets written: `false`', '',
-            '## Source summaries',
+            '## Visual screenshots',
           ]
+          for shot in visual:
+            mark = 'PASS' if shot['ok'] else 'MISSING'
+            md.append(f"- {mark} [{shot['file']}]({shot['file']}) size=`{shot['size_bytes']}`")
+          md.extend(['', '## Source summaries'])
           for name, item in summaries.items():
             md.append(f"- `{name}` present=`{item['present']}` verdict=`{item['verdict']}`")
           md.extend(['', '## Read path', '- Fetch `reports/latest/system3_public_truth/index.json` for machine-readable status.', '- Fetch `reports/latest/system3_public_truth/index.md` for human status.'])
           (out / 'index.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
+
+          visual_md = ['# Dashboard Visual Proof', '']
+          for shot in visual:
+            visual_md.append(f"## {shot['file']}")
+            visual_md.append('')
+            if shot['ok']:
+              visual_md.append(f"![{shot['file']}]({shot['file']})")
+            else:
+              visual_md.append('MISSING')
+            visual_md.append('')
+          (out / 'visual_proof.md').write_text('\n'.join(visual_md), encoding='utf-8')
           PY
-          find "$OUT" -maxdepth 1 -type f -print | sort
+          find "$OUT" -maxdepth 2 -type f -print | sort
 
       - name: Commit latest compact truth to repo
         if: always()
