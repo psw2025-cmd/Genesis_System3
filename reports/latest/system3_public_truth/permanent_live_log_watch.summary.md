@@ -1,17 +1,17 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-10T19:39:43.415Z
+Generated: 2026-07-10T20:14:53.515Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
-Final verdict: **PASS**
+Final verdict: **FAIL**
 Truth control visible: **true**
 
 ## Runtime Log Sources Captured
 - Browser console entries: 11
 - Page errors: 0
 - Request failures: 5
-- Network responses: 110
+- Network responses: 81
 
 ## Dhan Chain Truth
 - PASS (required) /api/chain/NIFTY source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT spot=24212.8 contracts=160 blocker=-
@@ -40,21 +40,21 @@ Truth control visible: **true**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- PASS Truth Control size=170823
-- PASS Genesis Brain size=242799
-- PASS E2E Proof size=144025
-- PASS Overview size=117310
-- PASS Option Chain size=191780
-- PASS Signals size=80227
-- PASS Paper Trades size=119772
-- PASS Positions size=61476
-- PASS Broker size=108233
-- PASS Performance size=61060
-- PASS ML Model size=72015
-- PASS Live Gate size=101898
+- PASS Truth Control size=166545
+- PASS Genesis Brain size=242760
+- PASS E2E Proof size=144321
+- PASS Overview size=110938
+- PASS Option Chain size=191785
+- PASS Signals size=80656
+- PASS Paper Trades size=120185
+- PASS Positions size=61578
+- PASS Broker size=108625
+- PASS Performance size=61823
+- PASS ML Model size=90020
+- PASS Live Gate size=102376
 
 ## Infrastructure Blockers
-- none
+- UI:ML Model:FORBIDDEN:/fake/i
 
 ## Trading Readiness Blockers
 - none

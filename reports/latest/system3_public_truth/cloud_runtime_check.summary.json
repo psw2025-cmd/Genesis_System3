@@ -1,5 +1,75 @@
 {
-  "expected_commit": "c4cff44517b5975b32d8bb239cfd03353ae24608",
-  "generated_utc": "2026-07-10T19:36:49.899126Z",
-  "verdict": "WARN"
+  "alerts": [],
+  "deployed_commit": "[REDACTED]",
+  "expected_commit": "8c78eb92b882c32e896ff2dec295cba73715755c",
+  "generated_utc": "2026-07-10T20:10:33.205997Z",
+  "key_facts": {
+    "broker_connected": false,
+    "chain_nifty_contracts": 160,
+    "portfolio_details_mode": "skipped_for_render_memory",
+    "scheduler_healthy": false,
+    "scheduler_received": false
+  },
+  "memory": {
+    "after_chain": {
+      "available": true,
+      "pct_used": 23.1,
+      "raw": {
+        "gc_triggered": false,
+        "headroom_mb": 1384.0,
+        "limit_mb": 1800,
+        "pct_used": 23.1,
+        "rss_mb": 416.0,
+        "status": "OK"
+      },
+      "rss_mb": 416.0,
+      "status": "OK"
+    },
+    "after_portfolio": {
+      "available": true,
+      "pct_used": 23.1,
+      "raw": {
+        "gc_triggered": false,
+        "headroom_mb": 1384.0,
+        "limit_mb": 1800,
+        "pct_used": 23.1,
+        "rss_mb": 416.0,
+        "status": "OK"
+      },
+      "rss_mb": 416.0,
+      "status": "OK"
+    },
+    "before": {
+      "available": true,
+      "pct_used": 20.6,
+      "raw": {
+        "gc_triggered": false,
+        "headroom_mb": 1429.7,
+        "limit_mb": 1800,
+        "pct_used": 20.6,
+        "rss_mb": 370.3,
+        "status": "OK"
+      },
+      "rss_mb": 370.3,
+      "status": "OK"
+    }
+  },
+  "verdict": "WARN",
+  "warnings": [
+    {
+      "key": "deploy_commit_mismatch",
+      "level": "WARNING",
+      "message": "Render git_sha=[REDACTED] expected=8c78eb92b882"
+    },
+    {
+      "key": "broker_not_connected",
+      "level": "WARNING",
+      "message": "broker status not connected: TOKEN_EXPIRED_OR_INVALID"
+    },
+    {
+      "key": "scheduler_no_worker_push",
+      "level": "WARNING",
+      "message": "worker scheduler health has not been received"
+    }
+  ]
 }
