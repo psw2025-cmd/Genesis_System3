@@ -130,7 +130,7 @@
     }
   ],
   "final_verdict": "FAIL",
-  "generated_at": "2026-07-10T09:10:31.823Z",
+  "generated_at": "2026-07-10T10:33:50.385Z",
   "infra_blockers": [
     "AUTH_FAIL:502",
     "API_FAIL:/api/auth/status:502",

@@ -1,7 +1,7 @@
 # System3 Public Truth
 
-- Generated UTC: `2026-07-10T09:13:00.355736Z`
-- Commit: `793d83f594411b5f70ef55197b3896c2e7642a8a`
+- Generated UTC: `2026-07-10T10:36:19.632466Z`
+- Commit: `f1cff2c82b87c52f726cf849f0964c890af5fba2`
 - Final verdict: **FAIL**
 
 ## Safety
@@ -13,7 +13,7 @@
 
 ## Source summaries
 - `cloud_runtime_check` present=`True` verdict=`WARN`
-- `dashboard_live_ui_proof` present=`True` verdict=`FAIL`
+- `dashboard_live_ui_proof` present=`True` verdict=`BLOCKED_NOT_TRADE_READY`
 - `permanent_live_log_watch` present=`True` verdict=`FAIL`
 
 ## Read path

@@ -2,306 +2,270 @@
   "api": [
     {
       "endpoint": "/api/auth/status",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/deploy/info",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/health",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/state",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/broker/funds",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/broker/holdings",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/broker/positions/live",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/chain/NIFTY",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/chain/BANKNIFTY",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/chain/FINNIFTY",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/chain/MIDCPNIFTY",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/chain/SENSEX",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/gain_rank",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/pnl",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/trades/today",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     },
     {
       "endpoint": "/api/auto_gates",
-      "ok": false,
-      "status": 502
+      "ok": true,
+      "status": 200
     }
   ],
   "base": "https://genesis-system3-backend.onrender.com",
   "blockers": [
-    "AUTH_FAIL:502",
-    "API_FAIL:/api/auth/status:502",
-    "API_FAIL:/api/deploy/info:502",
-    "API_FAIL:/api/health:502",
-    "API_FAIL:/api/state:502",
-    "API_FAIL:/api/broker/dhan/status:502",
-    "API_FAIL:/api/broker/funds:502",
-    "API_FAIL:/api/broker/holdings:502",
-    "API_FAIL:/api/broker/positions/live:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/NIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/BANKNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/FINNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/MIDCPNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/SENSEX:502",
-    "API_FAIL:/api/gain_rank:502",
-    "API_FAIL:/api/pnl:502",
-    "API_FAIL:/api/trades/today:502",
-    "API_FAIL:/api/auto_gates:502",
-    "UI_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
-    "UI_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
-    "UI_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
-    "UI_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
-    "UI_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
-    "UI_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
-    "UI_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
-    "UI_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
-    "UI_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
-    "UI_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
-    "UI_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
-    "UI_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
-    "TRADER_READINESS_PANEL_NOT_VISIBLE",
-    "TRUTH_CONTROL_NOT_VISIBLE"
+    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
   ],
   "chain_truth": [
     {
-      "blocker": "NOT_REAL_DHAN_CHAIN",
+      "blocker": null,
       "endpoint": "/api/chain/NIFTY",
-      "ok": false,
+      "ok": true,
       "safe_blocked": false,
-      "source": null,
-      "source_priority": null,
-      "spot": 0,
+      "source": "dhan",
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 24212.8,
       "stale": false,
-      "status": null,
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NOT_REAL_DHAN_CHAIN",
+      "blocker": null,
       "endpoint": "/api/chain/BANKNIFTY",
-      "ok": false,
+      "ok": true,
       "safe_blocked": false,
-      "source": null,
-      "source_priority": null,
-      "spot": 0,
+      "source": "dhan",
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 58082.7,
       "stale": false,
-      "status": null,
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NOT_REAL_DHAN_CHAIN",
+      "blocker": null,
       "endpoint": "/api/chain/FINNIFTY",
-      "ok": false,
+      "ok": true,
       "safe_blocked": false,
-      "source": null,
-      "source_priority": null,
-      "spot": 0,
+      "source": "dhan",
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 26824.1,
       "stale": false,
-      "status": null,
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NOT_REAL_DHAN_CHAIN",
+      "blocker": null,
       "endpoint": "/api/chain/MIDCPNIFTY",
-      "ok": false,
+      "ok": true,
       "safe_blocked": false,
-      "source": null,
-      "source_priority": null,
-      "spot": 0,
+      "source": "dhan",
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 14796,
       "stale": false,
-      "status": null,
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NOT_REAL_DHAN_CHAIN",
+      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
       "endpoint": "/api/chain/SENSEX",
       "ok": false,
-      "safe_blocked": false,
-      "source": null,
-      "source_priority": null,
+      "safe_blocked": true,
+      "source": "dhan",
+      "source_priority": "dhan_only_no_rows",
       "spot": 0,
       "stale": false,
-      "status": null,
+      "status": "NO_DHAN_DATA",
       "total_contracts": 0
     }
   ],
-  "final_verdict": "FAIL",
-  "generated_at": "2026-07-10T09:08:22.380Z",
-  "infra_blockers": [
-    "AUTH_FAIL:502",
-    "API_FAIL:/api/auth/status:502",
-    "API_FAIL:/api/deploy/info:502",
-    "API_FAIL:/api/health:502",
-    "API_FAIL:/api/state:502",
-    "API_FAIL:/api/broker/dhan/status:502",
-    "API_FAIL:/api/broker/funds:502",
-    "API_FAIL:/api/broker/holdings:502",
-    "API_FAIL:/api/broker/positions/live:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/NIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/BANKNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/FINNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/MIDCPNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/SENSEX:502",
-    "API_FAIL:/api/gain_rank:502",
-    "API_FAIL:/api/pnl:502",
-    "API_FAIL:/api/trades/today:502",
-    "API_FAIL:/api/auto_gates:502",
-    "UI_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
-    "UI_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
-    "UI_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
-    "UI_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
-    "UI_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
-    "UI_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
-    "UI_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
-    "UI_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
-    "UI_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
-    "UI_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
-    "UI_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
-    "UI_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
-    "TRADER_READINESS_PANEL_NOT_VISIBLE",
-    "TRUTH_CONTROL_NOT_VISIBLE"
+  "final_verdict": "BLOCKED_NOT_TRADE_READY",
+  "generated_at": "2026-07-10T10:32:23.950Z",
+  "infra_blockers": [],
+  "trade_readiness_blockers": [
+    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
   ],
-  "trade_readiness_blockers": [],
   "ui": [
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "truth",
-      "ok": false,
-      "title": "Truth Control"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Truth Control",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "genesis",
-      "ok": false,
-      "title": "Genesis Brain"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Genesis Brain",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "e2e_proof",
-      "ok": false,
-      "title": "E2E Proof"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "E2E Proof",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "overview",
-      "ok": false,
-      "title": "Overview"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Overview",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "chain",
-      "ok": false,
-      "title": "Option Chain"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Option Chain",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "signals",
-      "ok": false,
-      "title": "Signals"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Signals",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "paper",
-      "ok": false,
-      "title": "Paper Trades"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Paper Trades",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "positions",
-      "ok": false,
-      "title": "Positions"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Positions",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "broker",
-      "ok": false,
-      "title": "Broker"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Broker",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "performance",
-      "ok": false,
-      "title": "Performance"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Performance",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "ml",
-      "ok": false,
-      "title": "ML Model"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "ML Model",
+      "truth_control_visible": true
     },
     {
-      "error": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
+      "bad_raw_error_or_loading": false,
+      "e2e_has_trader_readiness": true,
       "id": "gates",
-      "ok": false,
-      "title": "Live Gate"
+      "ok": true,
+      "screenshot_ok": true,
+      "title": "Live Gate",
+      "truth_control_visible": true
     }
   ]
 }
