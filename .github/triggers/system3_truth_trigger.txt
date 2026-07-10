@@ -1,0 +1,8 @@
+System3 truth trigger file.
+
+Purpose:
+- Updating this file is a safe repo-only way to trigger the latest truth publishing workflow.
+- It must never contain secrets.
+- It must never change live trading flags.
+
+Initial trigger: 2026-07-10T08:50:00Z
