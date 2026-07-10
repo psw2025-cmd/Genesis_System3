@@ -7,6 +7,8 @@ Purpose:
 - Save latest proof to reports/latest/cloud_runtime_check/.
 - Analyzer/paper safety only. This script never sends broker secrets and never
   calls order-placement endpoints.
+
+Stdlib-only so it can run in GitHub Actions without extra dependencies.
 """
 from __future__ import annotations
 
@@ -14,7 +16,6 @@ import argparse
 import json
 import os
 import re
-import sys
 import time
 import traceback
 import urllib.error
@@ -54,7 +55,6 @@ def utc_now() -> str:
 
 
 def redact(obj: Any) -> Any:
-    """Recursively redact likely secrets from keys/values."""
     if isinstance(obj, dict):
         out: Dict[str, Any] = {}
         for key, value in obj.items():
@@ -80,19 +80,14 @@ def redact(obj: Any) -> Any:
 
 
 def _headers(api_key: str) -> Dict[str, str]:
-    headers = {"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.1"}
-    # Render backend requires X-API-Key when REQUIRE_API_KEY=true. The value is
-    # supplied by GitHub Actions secret DASHBOARD_API_KEY and is never written
-    # to the report; endpoint responses are still redacted before saving.
+    headers = {"User-Agent": "Genesis-System3-Cloud-Runtime-Check/1.2"}
     if api_key:
         headers["X-API-Key"] = api_key
     return headers
 
 
-def fetch_json(base_url: str, path: str, timeout_s: float, api_key: str) -> Dict[str, Any]:
-    url = base_url.rstrip("/") + path
-    started = time.perf_counter()
-    result: Dict[str, Any] = {
+def _new_result(url: str, path: str) -> Dict[str, Any]:
+    return {
         "url_path": path,
         "url": url,
         "ok": False,
@@ -101,32 +96,54 @@ def fetch_json(base_url: str, path: str, timeout_s: float, api_key: str) -> Dict
         "json": None,
         "text_preview": None,
         "error": None,
+        "attempts": 0,
     }
-    try:
-        req = urllib.request.Request(url, headers=_headers(api_key))
-        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-            raw = resp.read(1_000_000)
-            latency_ms = round((time.perf_counter() - started) * 1000, 1)
-            text = raw.decode("utf-8", errors="replace")
-            result["status_code"] = getattr(resp, "status", None)
-            result["latency_ms"] = latency_ms
-            result["ok"] = 200 <= int(result["status_code"] or 0) < 400
-            try:
-                result["json"] = redact(json.loads(text))
-            except Exception:
-                result["text_preview"] = redact(text[:1000])
-    except urllib.error.HTTPError as exc:
-        result["status_code"] = exc.code
-        result["latency_ms"] = round((time.perf_counter() - started) * 1000, 1)
+
+
+def fetch_json(base_url: str, path: str, timeout_s: float, api_key: str) -> Dict[str, Any]:
+    url = base_url.rstrip("/") + path
+    result = _new_result(url, path)
+    retry_statuses = {0, 429, 502, 503, 504}
+    backoffs = [0.0, 5.0, 12.0, 25.0]
+    last_started = time.perf_counter()
+    for attempt, sleep_s in enumerate(backoffs, start=1):
+        if sleep_s:
+            time.sleep(sleep_s)
+        last_started = time.perf_counter()
+        result["attempts"] = attempt
         try:
-            text = exc.read(4000).decode("utf-8", errors="replace")
-        except Exception:
-            text = ""
-        result["text_preview"] = redact(text[:1000])
-        result["error"] = f"HTTPError: {exc.code}"
-    except Exception as exc:
-        result["latency_ms"] = round((time.perf_counter() - started) * 1000, 1)
-        result["error"] = f"{type(exc).__name__}: {str(exc)[:300]}"
+            req = urllib.request.Request(url, headers=_headers(api_key))
+            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+                raw = resp.read(1_000_000)
+                text = raw.decode("utf-8", errors="replace")
+                result["status_code"] = getattr(resp, "status", None)
+                result["latency_ms"] = round((time.perf_counter() - last_started) * 1000, 1)
+                result["ok"] = 200 <= int(result["status_code"] or 0) < 400
+                result["error"] = None
+                try:
+                    result["json"] = redact(json.loads(text))
+                    result["text_preview"] = None
+                except Exception:
+                    result["json"] = None
+                    result["text_preview"] = redact(text[:1000])
+                return result
+        except urllib.error.HTTPError as exc:
+            result["status_code"] = exc.code
+            result["latency_ms"] = round((time.perf_counter() - last_started) * 1000, 1)
+            try:
+                text = exc.read(4000).decode("utf-8", errors="replace")
+            except Exception:
+                text = ""
+            result["text_preview"] = redact(text[:1000])
+            result["error"] = f"HTTPError: {exc.code}"
+            if exc.code not in retry_statuses or attempt == len(backoffs):
+                return result
+        except Exception as exc:
+            result["status_code"] = 0
+            result["latency_ms"] = round((time.perf_counter() - last_started) * 1000, 1)
+            result["error"] = f"{type(exc).__name__}: {str(exc)[:300]}"
+            if attempt == len(backoffs):
+                return result
     return result
 
 
@@ -168,7 +185,7 @@ def analyze(base_url: str, results: Dict[str, Any], expected_commit: str) -> Dic
 
     for name, item in results.items():
         if not item.get("ok"):
-            alert("WARNING", f"endpoint_{name}", f"{name} failed: {item.get('status_code')} {item.get('error')}")
+            alert("WARNING", f"endpoint_{name}", f"{name} failed: {item.get('status_code')} {item.get('error')} attempts={item.get('attempts')}")
         else:
             passed.append(f"endpoint_{name}")
 
@@ -301,7 +318,7 @@ def write_reports(report: Dict[str, Any], results: Dict[str, Any]) -> None:
     lines.append("")
     lines.append("## Endpoint status")
     for name, item in results.items():
-        lines.append(f"- `{name}` `{item.get('url_path')}`: ok=`{item.get('ok')}`, status=`{item.get('status_code')}`, latency_ms=`{item.get('latency_ms')}`")
+        lines.append(f"- `{name}` `{item.get('url_path')}`: ok=`{item.get('ok')}`, status=`{item.get('status_code')}`, latency_ms=`{item.get('latency_ms')}`, attempts=`{item.get('attempts')}`")
     lines.append("")
     lines.append("## Safety")
     lines.append("- This check does not call order placement, modification, cancellation, or live-trading enablement endpoints.")
@@ -328,10 +345,9 @@ def main() -> int:
     report = analyze(base_url, results, args.expected_commit)
     report["generated_utc"] = generated_utc
     report["script"] = "tools/cloud_runtime_check.py"
-    report["auth_header_used"] = bool(api_key)
     write_reports(report, results)
 
-    print(json.dumps({"generated_utc": generated_utc, "verdict": report["verdict"], "alerts": report["alerts"], "warnings": report["warnings"], "report_dir": str(REPORT_DIR), "auth_header_used": bool(api_key)}, indent=2))
+    print(json.dumps({"generated_utc": generated_utc, "verdict": report["verdict"], "alerts": report["alerts"], "warnings": report["warnings"], "report_dir": str(REPORT_DIR)}, indent=2))
     return 0
 
 
