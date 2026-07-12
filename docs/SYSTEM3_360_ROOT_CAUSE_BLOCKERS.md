@@ -8,7 +8,7 @@ Generated purpose: stop symptom-level fixes and track the real end-to-end blocke
 
 Status: **NOT PRODUCTION GRADE**
 
-Reason: UI visibility is improving, but real trading chain is still blocked at broker auth, option-chain universe, scanner/ranker, paper lifecycle, ML/training proof, Render/fresh visual proof, and final truth aggregation.
+Reason: UI visibility is improving, but real trading chain is still blocked at broker auth, option-chain universe, scanner/ranker, paper lifecycle, ML/training proof, Render/fresh visual proof, GitHub/Render failure tracking, and final truth aggregation.
 
 ## Permanent operating authority and safety boundary
 
@@ -37,10 +37,11 @@ If automated dashboard UI proof is missing, stale, red, blocked, pending, or con
 7. No live trading remains correct; this is a safety pass, not a money-readiness pass.
 8. Dependency/install health and credential presence must be audited automatically; manual chat claims do not count.
 9. Any claim without automated live dashboard UI proof is invalid and must be reverted to PENDING/BLOCKED.
+10. GitHub workflow failures and Render public endpoint failures must be tracked together in one TODO and resolved from proof, not from chat memory.
 
 ## Pending blocker count
 
-Total pending blockers: **21**
+Total pending blockers: **22**
 
 | ID | Blocker | Owner | Required fix | Proof required |
 |---|---|---|---|---|
@@ -65,6 +66,7 @@ Total pending blockers: **21**
 | B19 | Dependency/install health not continuously proven | Workflow | Run secure install audit for Python/Node/project dependency readiness | install audit report PASS/BLOCKED with exact failing package/command |
 | B20 | Credential presence/format not continuously proven | Workflow/Render | Check required credential presence via secure workflow env only; never print values | credential audit report with redacted presence/format status |
 | B21 | Claim made without automated dashboard visual proof | Assistant/Workflow | Revert claim to PENDING/BLOCKED and require visual issue tracker + dashboard proof board PASS | dashboard_visible_issue_tracker and autopilot proof board PASS after latest commit |
+| B22 | GitHub workflow and Render failure tracker not proven PASS | Workflow/Render | Track GitHub failed runs and Render endpoint failures together every 30 minutes | `docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md` and `reports/latest/github_render_failure_tracker/summary.json` PASS |
 
 ## User-side fixes required
 
@@ -84,6 +86,7 @@ Total pending blockers: **21**
 6. Track visible dashboard red/error/pending issues automatically until zero.
 7. Track dependency/install and credential readiness automatically.
 8. Block any DONE/resolved claim unless live dashboard UI proof is current and PASS.
+9. Track GitHub workflow failures and Render endpoint failures in one persistent TODO.
 
 ## Render/workflow fixes required
 
@@ -94,6 +97,7 @@ Total pending blockers: **21**
 5. Verify final public truth regenerated after latest commit.
 6. Verify required secrets are present through secure workflow env checks only.
 7. Verify automated dashboard UI visual proof after latest commit.
+8. Verify GitHub + Render failure tracker PASS.
 
 ## Required final proof before any resolved claim
 
@@ -107,7 +111,8 @@ Total pending blockers: **21**
 8. Dashboard visual proof with owner + proof bar.
 9. Visible UI issue tracker PASS.
 10. Autopilot proof board PASS.
-11. Integration report proof.
-12. Workflow failure tracker proof.
-13. Dependency/install + credential audit proof.
-14. Final public truth proof.
+11. GitHub + Render failure tracker PASS.
+12. Integration report proof.
+13. Workflow failure tracker proof.
+14. Dependency/install + credential audit proof.
+15. Final public truth proof.
