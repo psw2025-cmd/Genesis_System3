@@ -54,7 +54,9 @@ export function BrokerPanel() {
   const holdingsFailure = brokerFailure(brokerHoldings)
   const positionsFailure = brokerFailure(brokerPositions)
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerConnected ? 'LIVE READ-ONLY' : fundsFailure.bad || statusFailure.bad ? 'API/TOKEN ERROR' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
+  const brokerTokenBad = fundsFailure.bad || statusFailure.bad
+  const brokerTruthConnected = Boolean(brokerConnected && !brokerTokenBad && !authBlocked)
+  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'BLOCKED / TOKEN ERROR' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
   const fundsError = Boolean(brokerFunds && (brokerFunds.success === false || brokerFunds.blocked === true || fundsFailure.bad))
   const fundsLoading = brokerFunds == null
 
@@ -79,15 +81,16 @@ export function BrokerPanel() {
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
           Broker Connection - Dhan
         </h3>
-        <Row label="Status" value={brokerConnected ? 'CONNECTED' : dataState} color={brokerConnected ? 'tx-up' : brokerApiResponded && !fundsFailure.bad && !statusFailure.bad ? 'tx-amber' : 'tx-down'} />
+        <Row label="Status" value={brokerTruthConnected ? 'CONNECTED' : dataState} color={brokerTruthConnected ? 'tx-up' : brokerApiResponded && !brokerTokenBad ? 'tx-amber' : 'tx-down'} />
+        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH BLOCKED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
         <Row label="Mode" value="READ-ONLY BROKER PROOF" />
         <Row label="Client ID" value={brokerClientId(brokerStatus)} color={brokerClientId(brokerStatus).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
-        <Row label="Token Status" value={statusFailure.bad || fundsFailure.bad ? 'ERROR' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerConnected ? 'VALID' : 'UNKNOWN')} color={statusFailure.bad || fundsFailure.bad ? 'tx-down' : brokerConnected ? 'tx-up' : 'tx-down'} />
+        <Row label="Token Status" value={brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
         <Row label="Holdings API" value={holdingsError ? 'ERROR/BLOCKED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
         <Row label="Funds API" value={fundsError ? 'ERROR/BLOCKED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
-        <Row label="Broker Blocker" value={fundsFailure.bad || statusFailure.bad ? (fundsFailure.message || statusFailure.message || 'BROKER API ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={fundsFailure.bad || statusFailure.bad ? 'tx-down' : 'tx-up'} />
+        <Row label="Broker Blocker" value={brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={brokerTokenBad ? 'tx-down' : 'tx-up'} />
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
-        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked ? 'tx-down' : undefined} />
+        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
       </div>
 
@@ -128,7 +131,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker holdings API...</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerConnected ? 'No equity holdings found in Dhan broker response' : 'No live broker holdings response available.'}
+            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -170,7 +173,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker positions API...</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : 'No open positions in Dhan account read-only response'}
+            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
