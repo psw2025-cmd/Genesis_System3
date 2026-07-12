@@ -55,7 +55,7 @@ jobs:
         id: install
         continue-on-error: true
         run: |
-          rm -rf .proof-node
+          rm -rf .proof-node node_modules
           mkdir .proof-node
           cd .proof-node
           npm init -y >/dev/null 2>&1
@@ -63,13 +63,15 @@ jobs:
           npx playwright install chromium --with-deps
           cd ..
           test -d .proof-node/node_modules/playwright
+          # Static ESM imports do not reliably honor NODE_PATH. Expose only the
+          # isolated proof dependencies at the repository root for this job.
+          ln -s .proof-node/node_modules node_modules
+          node --input-type=module -e "import('playwright').then(m => { if (!m.chromium) process.exit(1) })"
 
       - name: Scan live dashboard visible issues
         id: scan
         if: steps.install.outcome == 'success'
         continue-on-error: true
-        env:
-          NODE_PATH: ${{ github.workspace }}/.proof-node/node_modules
         run: node tools/dashboard_visible_issue_tracker.mjs
 
       - name: Always create machine-readable blocked evidence
