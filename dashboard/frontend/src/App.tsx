@@ -17,6 +17,7 @@ import { LiveTradingGate } from './components/LiveTradingGate'
 import { PerformanceTab }  from './components/PerformanceTab'
 import { EndToEndProof }   from './components/EndToEndProof'
 import { SystemTruthControl } from './components/SystemTruthControl'
+import { LiveSimulation } from './components/LiveSimulation'
 
 // ── Tier B: Axios-based tabs (need axios dep, call backend directly) ───
 import Signals       from './components/Signals'
@@ -112,6 +113,7 @@ function Content() {
     case 'alerts':       return <AlertsTab />
     case 'system':       return <SystemTab />
     case 'gates':        return <LiveTradingGate />
+    case 'sim-live':     return <LiveSimulation />
     default:             return <SystemTruthControl />
   }
 }
