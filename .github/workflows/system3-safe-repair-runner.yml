@@ -1,0 +1,83 @@
+name: System3 Safe Repair Runner
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/system3-safe-repair-runner.yml'
+      - 'tools/system3_safe_repair_runner.py'
+      - 'tools/system3_auto_coordinator.py'
+      - 'tools/system3_autopilot_proof_board.py'
+      - 'tools/system3_github_render_failure_tracker.py'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'scripts/system3_gate_evaluator.py'
+      - 'dashboard/backend/**'
+      - 'dashboard/frontend/**'
+      - 'docs/**'
+  workflow_run:
+    workflows:
+      - System3 GitHub Render Failure Tracker
+      - Dashboard Visible Issue Tracker
+      - System3 Autopilot Proof Board
+      - System3 Render 100 Agent Swarm
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  safe-repair-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SYSTEM3_API_BASE: https://genesis-system3-backend.onrender.com
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install proof dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install fastapi pydantic requests pytz pytest
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@1.49.1
+          npx playwright install chromium --with-deps
+      - name: Run safe repair runner
+        run: python tools/system3_safe_repair_runner.py || true
+      - name: Refresh visible dashboard proof
+        run: node tools/dashboard_visible_issue_tracker.mjs || true
+      - name: Refresh autopilot board
+        run: python tools/system3_autopilot_proof_board.py || true
+      - name: Commit safe repair proof
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/safe_repair_runner/ reports/latest/system3_auto_gates/ reports/latest/system3_auto_coordinator/ reports/latest/github_render_failure_tracker/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/autopilot_proof_board/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md config/human_approval_gate.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(safety): update safe repair runner proof [skip ci]"
+          git push
+      - name: Enforce safe repair proof
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/safe_repair_runner/summary.json'
+          data=json.load(open(p, encoding='utf-8'))
+          print(json.dumps(data, indent=2)[:9000])
+          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          PY
