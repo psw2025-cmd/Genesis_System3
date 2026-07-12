@@ -1,0 +1,135 @@
+name: System3 Market Session Proof Runner
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub cron is UTC. These map to IST market/post-market windows.
+    # 09:20 IST market start proof
+    - cron: '50 3 * * 1-5'
+    # 09:45 IST lifecycle proof
+    - cron: '15 4 * * 1-5'
+    # 12:30 IST mid-session tick/chain proof
+    - cron: '0 7 * * 1-5'
+    # 15:35 IST post-market ML validation / expectancy proof
+    - cron: '5 10 * * 1-5'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  market-session-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      SYSTEM3_API_BASE: https://genesis-system3-backend.onrender.com
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install proof dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install fastapi pydantic requests pytz pytest
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@1.49.1
+          npx playwright install chromium --with-deps
+      - name: Market proof start marker
+        run: |
+          mkdir -p reports/latest/market_session_proof_runner
+          python - <<'PY'
+          import datetime, json
+          payload={
+            'generated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'purpose': 'market_session_red_gate_resolution',
+            'live_trading_enabled': False,
+            'order_routes_called': False,
+            'targets': ['ML validation days','tick health','paper lifecycle','option strike visibility','profit expectancy','dashboard visual proof']
+          }
+          open('reports/latest/market_session_proof_runner/start.json','w',encoding='utf-8').write(json.dumps(payload,indent=2))
+          print(json.dumps(payload,indent=2))
+          PY
+      - name: Run gate evaluator before repair
+        run: python scripts/system3_gate_evaluator.py --sync-gates || true
+      - name: Run market/session proof coordinator
+        run: python tools/system3_auto_coordinator.py --full --api-base "$SYSTEM3_API_BASE" || true
+      - name: Run explicit gate proof scripts
+        run: |
+          python scripts/system3_model_accuracy_tracker.py --api-base "$SYSTEM3_API_BASE" || true
+          python scripts/system3_option_visibility_audit.py --api-base "$SYSTEM3_API_BASE" || true
+          python scripts/system3_friction_expectancy_proof.py || true
+          python scripts/websocket_tick_health_proof.py || true
+          python scripts/paper_lifecycle_proof.py || true
+          python scripts/system3_gate_evaluator.py --sync-gates || true
+      - name: Run backend/render/visual proof refresh
+        run: |
+          python tools/system3_github_render_failure_tracker.py || true
+          node tools/dashboard_visible_issue_tracker.mjs || true
+          python tools/system3_autopilot_proof_board.py || true
+          python tools/system3_safe_repair_runner.py || true
+      - name: Build market proof summary
+        run: |
+          python - <<'PY'
+          import json, pathlib, datetime
+          root=pathlib.Path('.')
+          out=root/'reports/latest/market_session_proof_runner'
+          out.mkdir(parents=True,exist_ok=True)
+          def r(p):
+            p=root/p
+            if not p.exists(): return {}
+            try: return json.loads(p.read_text(encoding='utf-8'))
+            except Exception as e: return {'error':str(e)}
+          gates=r('reports/latest/system3_auto_gates/summary.json')
+          visible=r('reports/latest/dashboard_visible_issue_tracker/summary.json')
+          board=r('reports/latest/autopilot_proof_board/summary.json')
+          safe=r('reports/latest/safe_repair_runner/summary.json')
+          payload={
+            'generated_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'status': 'PASS' if gates.get('trade_ready') is True and visible.get('status')=='PASS' and board.get('status')=='PASS' else 'BLOCKED',
+            'live_trading_enabled': False,
+            'order_routes_called': False,
+            'secrets_printed': False,
+            'gates_passing': gates.get('gates_passing'),
+            'gates_total': gates.get('gates_total'),
+            'trade_ready': gates.get('trade_ready'),
+            'analyzer_ready': gates.get('analyzer_ready'),
+            'open_blockers': gates.get('open_blockers'),
+            'technical_gates_still_required': gates.get('technical_gates_still_required'),
+            'visible_ui_status': visible.get('status'),
+            'visible_issue_count': visible.get('visible_issue_count'),
+            'autopilot_status': board.get('status'),
+            'safe_repair_status': safe.get('status'),
+          }
+          (out/'summary.json').write_text(json.dumps(payload,indent=2,sort_keys=True),encoding='utf-8')
+          lines=['# System3 Market Session Proof Runner','',f"Generated UTC: `{payload['generated_utc']}`",f"Status: **{payload['status']}**",'', '## Safety','', '- live_trading_enabled: `false`','- order_routes_called: `false`','- secrets_printed: `false`','', '## Gate state','',f"- Gates: `{payload['gates_passing']}/{payload['gates_total']}`",f"- Trade ready: `{payload['trade_ready']}`",f"- Analyzer ready: `{payload['analyzer_ready']}`",f"- Open blockers: `{payload['open_blockers']}`",f"- Technical gates still required: `{payload['technical_gates_still_required']}`",'', '## Visual proof state','',f"- Visible UI status: `{payload['visible_ui_status']}`",f"- Visible issue count: `{payload['visible_issue_count']}`",f"- Autopilot status: `{payload['autopilot_status']}`",f"- Safe repair status: `{payload['safe_repair_status']}`"]
+          (out/'summary.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          print(json.dumps(payload,indent=2))
+          PY
+      - name: Commit market-session proof reports
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/market_session_proof_runner/ reports/latest/system3_auto_gates/ reports/latest/system3_auto_coordinator/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/autopilot_proof_board/ reports/latest/safe_repair_runner/ reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md config/human_approval_gate.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): update market-session gate proof [skip ci]"
+          git push
+      - name: Enforce market-session proof
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/market_session_proof_runner/summary.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps(data, indent=2)[:9000])
+          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          PY
