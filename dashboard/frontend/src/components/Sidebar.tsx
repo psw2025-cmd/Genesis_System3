@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
-  Bell, Activity, Shield, Layers, Sparkles, CheckCircle
+  Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical
 } from 'lucide-react'
 import { useStore } from '../store'
 
@@ -10,6 +10,7 @@ const TABS = [
   { id: 'genesis',     label: 'Genesis Brain', Icon: Sparkles,         group: 'main' },
   { id: 'e2e-proof',   label: 'E2E Proof',     Icon: CheckCircle,      group: 'main' },
   { id: 'overview',    label: 'Overview',      Icon: LayoutDashboard,  group: 'main' },
+  { id: 'sim-live',    label: 'Sim Live',      Icon: FlaskConical,     group: 'main' },
   { id: 'chain',       label: 'Option Chain',  Icon: Layers,           group: 'market' },
   { id: 'signals',     label: 'Signals',       Icon: TrendingUp,       group: 'market' },
   { id: 'trade',       label: 'Trade',         Icon: FileText,         group: 'trading' },
@@ -69,6 +70,7 @@ export function Sidebar() {
               const isGenesis = id === 'genesis'
               const isProof = id === 'e2e-proof'
               const isTruth = id === 'truth'
+              const isSim = id === 'sim-live'
               return (
                 <button
                   key={id}
@@ -83,7 +85,7 @@ export function Sidebar() {
                     border: active ? '1px solid var(--accent)' : '1px solid transparent',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: active ? 'var(--surface-3)' : isGenesis || isProof || isTruth ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+                    background: active ? 'var(--surface-3)' : isGenesis || isProof || isTruth || isSim ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
                     opacity: marketDim ? 0.45 : 1,
                     transition: 'all 0.12s',
                     position: 'relative',
@@ -94,12 +96,12 @@ export function Sidebar() {
                 >
                   <Icon
                     size={16}
-                    color={active || isGenesis || isProof || isTruth ? 'var(--accent)' : 'var(--text-mut)'}
+                    color={active || isGenesis || isProof || isTruth || isSim ? 'var(--accent)' : 'var(--text-mut)'}
                     style={{ flexShrink: 0 }}
                   />
                   <span style={{
                     fontSize: '12px',
-                    fontWeight: active || isGenesis || isProof || isTruth ? 700 : 600,
+                    fontWeight: active || isGenesis || isProof || isTruth || isSim ? 700 : 600,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -115,6 +117,7 @@ export function Sidebar() {
                   )}
                   {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>TRUTH</span>}
                   {id === 'e2e-proof' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>PROOF</span>}
+                  {id === 'sim-live' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>SIM</span>}
                   {id === 'gates' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>LOCK</span>}
                 </button>
               )
