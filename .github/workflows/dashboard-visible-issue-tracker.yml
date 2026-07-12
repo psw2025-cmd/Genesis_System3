@@ -1,0 +1,64 @@
+name: Dashboard Visible Issue Tracker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/dashboard-visible-issue-tracker.yml'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'dashboard/frontend/**'
+      - 'dashboard/backend/**'
+      - 'reports/latest/**'
+  workflow_run:
+    workflows:
+      - Dashboard Visual Production Proof
+      - System3 Public Truth Publish
+      - System3 Parallel Root-Cause Audit
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  visible-issue-tracker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.name != 'Dashboard Visible Issue Tracker'
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@1.49.1
+          npx playwright install chromium --with-deps
+      - name: Scan live dashboard visible issues
+        run: node tools/dashboard_visible_issue_tracker.mjs
+      - name: Commit visible issue report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_visible_issue_tracker/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): publish dashboard visible issue tracker [skip ci]"
+          git push
+      - name: Enforce no visible UI blockers
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps(data, indent=2)[:6000])
+          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          PY
