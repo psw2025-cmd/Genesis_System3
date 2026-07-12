@@ -6,9 +6,18 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/dashboard-visual-production-proof.yml'
+      - '.github/workflows/system3-latest-truth-publish.yml'
+      - '.github/workflows/options-ml-training-proof.yml'
       - 'tools/dashboard_live_ui_proof.mjs'
+      - 'tools/permanent_live_log_watch.mjs'
+      - 'tools/cloud_runtime_check.py'
       - 'dashboard/frontend/**'
       - 'dashboard/backend/**'
+      - 'core/data/**'
+      - 'core/brokers/**'
+      - 'scripts/**'
+      - 'config/**'
+      - 'docs/SYSTEM3_PRODUCTION_GRADE_1000_POINT_QC_TODO.md'
 
 permissions:
   contents: write
