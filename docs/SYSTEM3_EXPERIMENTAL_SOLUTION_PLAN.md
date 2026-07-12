@@ -1,9 +1,9 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-12T12:19:49.854373+00:00`
+Generated UTC: `2026-07-12T12:20:34.124623+00:00`
 Status: **BLOCKED**
-Issues: `218`
-Fix lanes: `11`
+Issues: `242`
+Fix lanes: `12`
 
 ## Rule
 
@@ -24,7 +24,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### WORKFLOW_CI — 45 issues
+### WORKFLOW_CI — 74 issues
 
 Recommended fixes:
 - Read workflow_failure_tracker TODO.
@@ -46,7 +46,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 29188296601 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Experimental Solution Planner' run 29192320637 conclusion=failure commit=5602298850ab1e8ee04ddb650648a56f5cf3778e
 
 ### UI_RED_VISUAL — 43 issues
 
@@ -72,7 +72,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.
 
-### RENDER_DEPLOY — 34 issues
+### RENDER_DEPLOY — 30 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -271,7 +271,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### ML_TRAINING — 17 issues
+### ML_TRAINING — 11 issues
 
 Recommended fixes:
 - Build real CE/PE dataset proof.
@@ -290,10 +290,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188296364 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188285638 conclusion=failure commit=2b94621fdf90608a12d4a92248da53365c600f17
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187705858 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187345533 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e
 
 ### UNKNOWN — 8 issues
 
@@ -355,6 +351,20 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_077:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
+
+### INSTALL_CREDENTIAL — 5 issues
+
+Recommended fixes:
+- Fix dependency/import/compile errors from secure audit.
+- Verify credentials via redacted secure env checks only.
+- Never print or commit credential values.
+
+Top issues:
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29192202456 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29192129828 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29192123667 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29192122572 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29192087903 conclusion=failure commit=9576dc05321b1caedf53bb400b0b1ed102531b03
 
 ### SCANNER_SIGNAL — 2 issues
 
