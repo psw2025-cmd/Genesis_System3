@@ -16,15 +16,29 @@ const apiEndpoints = [
   '/api/auth/status', '/api/deploy/info', '/api/health', '/api/state',
   '/api/broker/dhan/status', '/api/broker/funds', '/api/broker/holdings', '/api/broker/positions/live',
   ...chainEndpoints,
-  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/trades/today', '/api/auto_gates'
+  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/trades/today', '/api/auto_gates', '/api/ml/performance', '/api/ml/compare', '/api/paper'
 ]
 
 function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
 function tryJson(text) { try { return JSON.parse(text) } catch { return { raw: String(text || '').slice(0, 2000) } } }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
 function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
-function hasUiFailureText(text) {
-  return /Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text || '')
+function hasUiFailureText(text) { return /Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text || '') }
+function hasOwner(text) { return /PRITAM\s+S\.?\s+WARGHADE/i.test(text || '') && /OWNER/i.test(text || '') }
+function hasSafetyText(text) { return /LIVE\s+OFF/i.test(text || '') && /PAPER/i.test(text || '') }
+function hasMlProofText(text) { return /ML Model Truth/i.test(text || '') && /Training status/i.test(text || '') && /Proof records/i.test(text || '') && /(MODEL_NOT_PROVEN|MODEL_PROOF_READY|PROVEN|BLOCKED)/i.test(text || '') }
+function hasPaperTruthText(text) { return /Paper Truth Provenance/i.test(text || '') && /Fake\/fixture rejected/i.test(text || '') && /Order endpoints/i.test(text || '') && /(NOT CALLED|BLOCKED)/i.test(text || '') }
+function solutionFor(blocker) {
+  const b = String(blocker || '')
+  if (b.includes('OWNER_BADGE_NOT_VISIBLE')) return 'Ensure TopBar renders OWNER / PRITAM S. WARGHADE in desktop and mobile screenshots, then rerun visual proof.'
+  if (b.includes('SAFETY_LABELS_NOT_VISIBLE')) return 'Ensure TopBar shows PAPER and LIVE OFF in every screenshot.'
+  if (b.includes('ML_PROOF_TEXT_NOT_VISIBLE')) return 'Ensure ML tab displays Proof records, Training status, model score/accuracy/AUC or a clear BLOCKED reason from /api/ml/performance.'
+  if (b.includes('PAPER_TRUTH_NOT_VISIBLE')) return 'Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.'
+  if (b.includes('SCREENSHOT_MISSING_OR_EMPTY')) return 'Fix Playwright screenshot capture, route load, or tab selector; screenshot file must exist and be >10KB.'
+  if (b.includes('API_FAIL')) return 'Fix API endpoint/auth/rate-limit/deploy issue before claiming dashboard visual proof.'
+  if (b.includes('CHAIN_NOT_TRADE_READY')) return 'Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.'
+  if (b.includes('UI_FAIL') || b.includes('UI_EXCEPTION')) return 'Fix UI route, tab rendering, loading state, or browser exception; rerun visual proof.'
+  return 'Investigate exact blocker, patch source, redeploy, and regenerate dashboard visual proof before claiming resolved.'
 }
 
 async function pageFetchJson(page, ep, attempts = 5) {
@@ -72,7 +86,12 @@ const browser = await chromium.launch({ headless: true })
 const context = await browser.newContext({ viewport: { width: 1366, height: 768 }, extraHTTPHeaders: headers(key) })
 const page = await context.newPage()
 
-const summary = { base, generated_at: new Date().toISOString(), required_symbols: requiredSymbols, optional_symbols: optionalSymbols, auth: { ok: false, status: 0 }, api: [], ui: [], chain_truth: [], trader_readiness_panel_visible: false, truth_control_visible: false, final_verdict: 'UNKNOWN', infra_blockers: [], trade_readiness_blockers: [], optional_data_blockers: [], blockers: [] }
+const summary = { base, generated_at: new Date().toISOString(), required_symbols: requiredSymbols, optional_symbols: optionalSymbols, auth: { ok: false, status: 0 }, api: [], ui: [], visual_requirements: [], chain_truth: [], trader_readiness_panel_visible: false, truth_control_visible: false, owner_badge_visible: false, safety_labels_visible: false, ml_proof_visible: false, paper_truth_visible: false, final_verdict: 'UNKNOWN', infra_blockers: [], trade_readiness_blockers: [], visual_blockers: [], optional_data_blockers: [], blockers: [], solutions: [] }
+
+function addVisualReq(id, ok, blocker, details = {}) {
+  summary.visual_requirements.push({ id, ok, blocker: ok ? null : blocker, ...details })
+  if (!ok) summary.visual_blockers.push(blocker)
+}
 
 try {
   await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 90000 })
@@ -133,7 +152,7 @@ try {
       await wait(1500)
       const btn = page.locator(`button[title="${title}"]`).first()
       await btn.click({ timeout: 25000 })
-      await page.waitForTimeout(4000)
+      await page.waitForTimeout(4500)
       const text = await page.locator('body').innerText({ timeout: 15000 })
       const bad = hasUiFailureText(text)
       const screenshotPath = path.join(outDir, `${id}.png`)
@@ -141,10 +160,23 @@ try {
       const screenshotOk = fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 10000
       const e2eHasProofWords = id !== 'e2e_proof' || /Trader Readiness Truth Checklist|Required for real-money trading|Live-money switch blocked/i.test(text)
       const truthHasProofWords = id !== 'truth' || /System Truth Control|Money readiness|Live broker order execution must remain disabled/i.test(text)
+      const ownerVisible = hasOwner(text)
+      const safetyVisible = hasSafetyText(text)
+      const mlVisible = id !== 'ml' || hasMlProofText(text)
+      const paperVisible = id !== 'paper' || hasPaperTruthText(text)
+      if (ownerVisible) summary.owner_badge_visible = true
+      if (safetyVisible) summary.safety_labels_visible = true
+      if (id === 'ml' && mlVisible) summary.ml_proof_visible = true
+      if (id === 'paper' && paperVisible) summary.paper_truth_visible = true
       if (id === 'e2e_proof' && e2eHasProofWords) summary.trader_readiness_panel_visible = true
       if (id === 'truth' && truthHasProofWords) summary.truth_control_visible = true
-      const ok = !bad && screenshotOk && e2eHasProofWords && truthHasProofWords
-      summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, e2e_has_trader_readiness: e2eHasProofWords, truth_control_visible: truthHasProofWords })
+      const ok = !bad && screenshotOk && e2eHasProofWords && truthHasProofWords && ownerVisible && safetyVisible && mlVisible && paperVisible
+      summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, owner_visible: ownerVisible, safety_labels_visible: safetyVisible, ml_proof_visible: mlVisible, paper_truth_visible: paperVisible, e2e_has_trader_readiness: e2eHasProofWords, truth_control_visible: truthHasProofWords })
+      if (!screenshotOk) summary.visual_blockers.push(`SCREENSHOT_MISSING_OR_EMPTY:${title}`)
+      if (!ownerVisible) summary.visual_blockers.push(`OWNER_BADGE_NOT_VISIBLE:${title}`)
+      if (!safetyVisible) summary.visual_blockers.push(`SAFETY_LABELS_NOT_VISIBLE:${title}`)
+      if (!mlVisible) summary.visual_blockers.push(`ML_PROOF_TEXT_NOT_VISIBLE:${title}`)
+      if (!paperVisible) summary.visual_blockers.push(`PAPER_TRUTH_NOT_VISIBLE:${title}`)
       if (!ok) summary.infra_blockers.push(`UI_FAIL:${title}`)
     } catch (err) {
       summary.ui.push({ id, title, ok: false, error: String(err) })
@@ -154,29 +186,44 @@ try {
 
   if (!summary.trader_readiness_panel_visible) summary.infra_blockers.push('TRADER_READINESS_PANEL_NOT_VISIBLE')
   if (!summary.truth_control_visible) summary.infra_blockers.push('TRUTH_CONTROL_NOT_VISIBLE')
+  addVisualReq('OWNER_BADGE_VISIBLE', summary.owner_badge_visible, 'OWNER_BADGE_NOT_VISIBLE:GLOBAL')
+  addVisualReq('SAFETY_LABELS_VISIBLE', summary.safety_labels_visible, 'SAFETY_LABELS_NOT_VISIBLE:GLOBAL')
+  addVisualReq('ML_PROOF_VISIBLE', summary.ml_proof_visible, 'ML_PROOF_TEXT_NOT_VISIBLE:GLOBAL')
+  addVisualReq('PAPER_TRUTH_VISIBLE', summary.paper_truth_visible, 'PAPER_TRUTH_NOT_VISIBLE:GLOBAL')
 
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 })
   await page.waitForTimeout(5000)
+  const mobileText = await page.locator('body').innerText({ timeout: 15000 }).catch(() => '')
   const mobilePath = path.join(outDir, 'mobile_390x844.png')
   await page.screenshot({ path: mobilePath, fullPage: true })
-  if (!fs.existsSync(mobilePath) || fs.statSync(mobilePath).size <= 10000) summary.infra_blockers.push('MOBILE_SCREENSHOT_MISSING_OR_EMPTY')
+  const mobileOk = fs.existsSync(mobilePath) && fs.statSync(mobilePath).size > 10000
+  if (!mobileOk) summary.visual_blockers.push('SCREENSHOT_MISSING_OR_EMPTY:MOBILE_390x844')
+  addVisualReq('MOBILE_SCREENSHOT_PRESENT', mobileOk, 'SCREENSHOT_MISSING_OR_EMPTY:MOBILE_390x844')
+  addVisualReq('MOBILE_OWNER_OR_RESPONSIVE_UI', hasOwner(mobileText) || /SYSTEM3|AI OPTIONS CONTROL/i.test(mobileText), 'OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI')
 } finally {
   await browser.close()
 }
 
-summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blockers]
-summary.final_verdict = summary.infra_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
+summary.visual_blockers = Array.from(new Set(summary.visual_blockers))
+summary.infra_blockers = Array.from(new Set(summary.infra_blockers))
+summary.trade_readiness_blockers = Array.from(new Set(summary.trade_readiness_blockers))
+summary.blockers = [...summary.infra_blockers, ...summary.trade_readiness_blockers, ...summary.visual_blockers]
+summary.solutions = summary.blockers.map(b => ({ blocker: b, solution: solutionFor(b) }))
+summary.final_verdict = summary.infra_blockers.length || summary.visual_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Dashboard Live UI Proof', '', `Generated: ${summary.generated_at}`, `Base: ${summary.base}`, `Required symbols: ${summary.required_symbols.join(', ')}`, `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`, `Final verdict: **${summary.final_verdict}**`, `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`, `Truth control visible: **${summary.truth_control_visible}**`, '',
+  '# Dashboard Live UI Proof', '', `Generated: ${summary.generated_at}`, `Base: ${summary.base}`, `Required symbols: ${summary.required_symbols.join(', ')}`, `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`, `Final verdict: **${summary.final_verdict}**`, `Owner badge visible: **${summary.owner_badge_visible}**`, `Safety labels visible: **${summary.safety_labels_visible}**`, `ML proof visible: **${summary.ml_proof_visible}**`, `Paper truth visible: **${summary.paper_truth_visible}**`, `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`, `Truth control visible: **${summary.truth_control_visible}**`, '',
+  '## Visual Requirements', ...summary.visual_requirements.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.id}${x.blocker ? ` blocker=${x.blocker}` : ''}`), '',
   '## Chain Truth', ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
   '## API', ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`), '',
-  '## UI Screenshots', ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title}${x.error ? ` - ${x.error}` : ''}`), '',
+  '## UI Screenshots', ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} owner=${x.owner_visible} safety=${x.safety_labels_visible} ml=${x.ml_proof_visible} paper=${x.paper_truth_visible}${x.error ? ` - ${x.error}` : ''}`), '',
   '## Infrastructure Blockers', ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
+  '## Visual Blockers', ...(summary.visual_blockers.length ? summary.visual_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Trading Readiness Blockers', ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
-  '## Optional Data Blockers', ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none'])
+  '## Optional Data Blockers', ...(summary.optional_data_blockers.length ? summary.optional_data_blockers.map(x => `- ${x}`) : ['- none']), '',
+  '## Required Solutions', ...(summary.solutions.length ? summary.solutions.map(x => `- ${x.blocker}: ${x.solution}`) : ['- none'])
 ].join('\n'))
 
-if (summary.infra_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length}`); console.error(summary.infra_blockers.join('\n')); process.exit(1) }
+if (summary.infra_blockers.length || summary.visual_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length} visual_blockers=${summary.visual_blockers.length}`); console.error([...summary.infra_blockers, ...summary.visual_blockers].join('\n')); process.exit(1) }
 if (summary.trade_readiness_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`); console.error(summary.trade_readiness_blockers.join('\n')) }
