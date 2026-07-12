@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-12T12:04:52.209688+00:00",
-  "issue_count": 74,
-  "lane_count": 10,
+  "generated_utc": "2026-07-12T12:08:01.457799+00:00",
+  "issue_count": 218,
+  "lane_count": 11,
   "lanes": [
     {
-      "issue_count": 34,
+      "issue_count": 45,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -13,7 +13,62 @@
       ],
       "top_issues": [
         {
-          "issue": "missing_report:reports/latest/render_100_agent_swarm/summary.json",
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_011:workflow_failures: Workflow failures present: failed_count=22",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_031:workflow_failures: Workflow failures present: failed_count=22",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_051:workflow_failures: Workflow failures present: failed_count=22",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_071:workflow_failures: Workflow failures present: failed_count=22",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_091:workflow_failures: Workflow failures present: failed_count=22",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
@@ -81,66 +136,11 @@
           "issue": "{\"branch\": \"main\", \"commit\": \"325d0b6568aeb4a465cc982265955eb976d915e0\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:56:16Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188296364\", \"run_id\": 29188296364, \"updated_at\": \"2026-07-12T09:56:16Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285899\", \"run_id\": 29188285899, \"updated_at\": \"2026-07-12T09:56:32Z\", \"workflow\": \"Cloud Runtime Check\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285896\", \"run_id\": 29188285896, \"updated_at\": \"2026-07-12T09:57:51Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285890\", \"run_id\": 29188285890, \"updated_at\": \"2026-07-12T09:56:27Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285638\", \"run_id\": 29188285638, \"updated_at\": \"2026-07-12T09:55:51Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:48Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706180\", \"run_id\": 29187706180, \"updated_at\": \"2026-07-12T09:37:06Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:48Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706168\", \"run_id\": 29187706168, \"updated_at\": \"2026-07-12T09:49:41Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:47Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187705858\", \"run_id\": 29187705858, \"updated_at\": \"2026-07-12T09:34:47Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345805\", \"run_id\": 29187345805, \"updated_at\": \"2026-07-12T09:22:25Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:21:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345770\", \"run_id\": 29187345770, \"updated_at\": \"2026-07-12T09:34:49Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:50Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345533\", \"run_id\": 29187345533, \"updated_at\": \"2026-07-12T09:21:50Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"bfb108b2cbe59a5a73dfdefbecf5326e226afe1f\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:34Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187338101\", \"run_id\": 29187338101, \"updated_at\": \"2026-07-12T09:22:11Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 12,
+      "issue_count": 43,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -149,69 +149,134 @@
       ],
       "top_issues": [
         {
-          "issue": "Required secret missing from workflow env: DASHBOARD_API_KEY",
+          "issue": "agent_003:frontend_ui_load: UI route failed to load.",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Required secret missing from workflow env: DHAN_CLIENT_ID",
+          "issue": "agent_011:workflow_failures: Workflow failure tracker status=BLOCKED",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
+          "issue": "agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Add/verify required secret in secure store: DASHBOARD_API_KEY",
+          "issue": "agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Add/verify required secret in secure store: DHAN_CLIENT_ID",
+          "issue": "agent_015:install_dependencies: Install/credential audit blocked: 3 blockers",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
+          "issue": "agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "status=BLOCKED",
+          "issue": "agent_023:frontend_ui_load: UI route failed to load.",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Need fresh screenshot after latest commits; older screenshots do not prove current UI.",
+          "issue": "agent_031:workflow_failures: Workflow failure tracker status=BLOCKED",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "status=BLOCKED",
+          "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix workflow 'Dashboard Live UI Proof' run 29187099924 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+          "issue": "agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "status=BLOCKED",
+          "issue": "agent_035:install_dependencies: Install/credential audit blocked: 3 blockers",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "status=BLOCKED",
+          "issue": "agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
           "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/todo_status_update/summary.json"
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_043:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_051:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_055:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_063:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_071:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_073:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_075:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_079:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_083:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     },
     {
-      "issue_count": 11,
+      "issue_count": 34,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -219,6 +284,121 @@
         "Run live dashboard screenshot proof after deploy."
       ],
       "top_issues": [
+        {
+          "issue": "agent_001:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_001:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_002:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_010:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_022:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_030:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /api/health: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_042:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_050:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_062:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_070:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_082:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/deploy/info: status=502",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_090:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
         {
           "issue": "Public truth final verdict is FAIL.",
           "lane": "RENDER_DEPLOY",
@@ -228,56 +408,263 @@
           "issue": "Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        },
-        {
-          "issue": "Final public truth is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        },
-        {
-          "issue": "Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29188296590 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29188285896 conclusion=failure commit=2b94621fdf90608a12d4a92248da53365c600f17",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187706180 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187345805 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187338101 conclusion=failure commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187277521 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 8,
+      "issue_count": 29,
+      "lane": "BROKER_DHAN",
+      "recommended_fixes": [
+        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
+        "Treat token/auth/funds failure as connected=false.",
+        "Do not enable live orders."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker endpoint server error: /api/broker/diagnose",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 21,
+      "lane": "OPTION_CHAIN",
+      "recommended_fixes": [
+        "Prove Dhan chain rows for enabled universe.",
+        "Show strike/expiry/CE/PE visibility in dashboard.",
+        "Block scanner until chain rows are real."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_006:option_chain: Option-chain proof blocked for NIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_006:option_chain: Option-chain proof blocked for BANKNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_006:option_chain: Option-chain proof blocked for FINNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_006:option_chain: Option-chain proof blocked for MIDCPNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_026:option_chain: Option-chain proof blocked for NIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_026:option_chain: Option-chain proof blocked for BANKNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_026:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_026:option_chain: Option-chain proof blocked for MIDCPNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_046:option_chain: Option-chain proof blocked for NIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_046:option_chain: Option-chain proof blocked for BANKNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_046:option_chain: Option-chain proof blocked for FINNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_046:option_chain: Option-chain proof blocked for MIDCPNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_066:option_chain: Option-chain proof blocked for NIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_066:option_chain: Option-chain proof blocked for BANKNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_066:option_chain: Option-chain proof blocked for MIDCPNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_086:option_chain: Option-chain proof blocked for NIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_086:option_chain: Option-chain proof blocked for BANKNIFTY: status=502 sample=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  fon",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_086:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_086:option_chain: Option-chain proof blocked for MIDCPNIFTY: status=401 sample={\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 17,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -285,6 +672,51 @@
         "Dashboard must show score and blocked reason if unavailable."
       ],
       "top_issues": [
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_049:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
         {
           "issue": "Options ML training summary is missing/not published.",
           "lane": "ML_TRAINING",
@@ -328,12 +760,42 @@
       ]
     },
     {
-      "issue_count": 2,
+      "issue_count": 8,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
       ],
       "top_issues": [
+        {
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
         {
           "issue": "blocker_count=3",
           "lane": "UNKNOWN",
@@ -347,7 +809,7 @@
       ]
     },
     {
-      "issue_count": 2,
+      "issue_count": 7,
       "lane": "ROUTE_CODE",
       "recommended_fixes": [
         "Patch active dashboard/backend/app.py route if routers are disabled.",
@@ -355,6 +817,31 @@
         "Add tests/proofs for active route behavior."
       ],
       "top_issues": [
+        {
+          "issue": "agent_018:route_conflicts: Modular broker router disabled; patches in router may not affect active app route.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_038:route_conflicts: Modular broker router disabled; patches in router may not affect active app route.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_058:route_conflicts: Modular broker router disabled; patches in router may not affect active app route.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_078:route_conflicts: Modular broker router disabled; patches in router may not affect active app route.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_098:route_conflicts: Modular broker router disabled; patches in router may not affect active app route.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
         {
           "issue": "Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.",
           "lane": "ROUTE_CODE",
@@ -368,60 +855,7 @@
       ]
     },
     {
-      "issue_count": 2,
-      "lane": "BROKER_DHAN",
-      "recommended_fixes": [
-        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
-        "Treat token/auth/funds failure as connected=false.",
-        "Do not enable live orders."
-      ],
-      "top_issues": [
-        {
-          "issue": "Actual Dhan auth cannot be proven by static repo; needs Render API probe and user refreshed token if invalid.",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        },
-        {
-          "issue": "Option-chain/scanner cannot pass until Dhan auth and live/closed-market Dhan chain rows are proven.",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 1,
-      "lane": "FAKE_STALE_DATA",
-      "recommended_fixes": [
-        "Remove fake/mock/synthetic/Yahoo/bhavcopy from displayed live truth path.",
-        "Allow only explicit blocked status when real data missing.",
-        "Add proof that no fake rows are used in paper/signals/ML dashboard."
-      ],
-      "top_issues": [
-        {
-          "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
-          "lane": "FAKE_STALE_DATA",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 1,
-      "lane": "OPTION_CHAIN",
-      "recommended_fixes": [
-        "Prove Dhan chain rows for enabled universe.",
-        "Show strike/expiry/CE/PE visibility in dashboard.",
-        "Block scanner until chain rows are real."
-      ],
-      "top_issues": [
-        {
-          "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 1,
+      "issue_count": 6,
       "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
         "Require paper entry, exit, PnL, source/provenance.",
@@ -430,9 +864,96 @@
       ],
       "top_issues": [
         {
+          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
           "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
           "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 6,
+      "lane": "FAKE_STALE_DATA",
+      "recommended_fixes": [
+        "Remove fake/mock/synthetic/Yahoo/bhavcopy from displayed live truth path.",
+        "Allow only explicit blocked status when real data missing.",
+        "Add proof that no fake rows are used in paper/signals/ML dashboard."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_017:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', ",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_037:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', ",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_057:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', ",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_077:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', ",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', ",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 2,
+      "lane": "SCANNER_SIGNAL",
+      "recommended_fixes": [
+        "Verify top_contract_gainers returns real rows.",
+        "Require CE/PE side, strike, expiry, score, reason.",
+        "If market closed, report exact blocked reason, not fake signal."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     }
@@ -444,7 +965,7 @@
     "reports/latest/autopilot_proof_board/summary.json": "MISSING",
     "reports/latest/dashboard_visible_issue_tracker/summary.json": "MISSING",
     "reports/latest/parallel_root_cause_audit/summary.json": "BLOCKED",
-    "reports/latest/render_100_agent_swarm/summary.json": "MISSING",
+    "reports/latest/render_100_agent_swarm/summary.json": "BLOCKED",
     "reports/latest/secure_install_credential_audit/summary.json": "BLOCKED",
     "reports/latest/system3_public_truth/index.json": "FAIL",
     "reports/latest/todo_status_update/summary.json": "BLOCKED",
