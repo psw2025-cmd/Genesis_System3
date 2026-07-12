@@ -1,0 +1,33 @@
+{
+  "agent_id": "009",
+  "evidence": {
+    "/api/ml/performance": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    },
+    "/api/ml/status": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    }
+  },
+  "findings": [
+    "agent_id=009",
+    "focus=ml_training",
+    "pass=1"
+  ],
+  "focus": "ml_training",
+  "generated_utc": "2026-07-12T12:06:07.717969+00:00",
+  "issue_count": 2,
+  "issues": [
+    "ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+    "ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 1,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

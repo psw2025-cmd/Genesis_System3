@@ -1,0 +1,24 @@
+{
+  "agent_id": "030",
+  "evidence": {
+    "exists": true,
+    "sample": "# System3 Public Truth\n\n- Generated UTC: `2026-07-10T20:16:53.486255Z`\n- Commit: `8c78eb92b882c32e896ff2dec295cba73715755c`\n- Final verdict: **FAIL**\n\n## Safety\n- LIVE_TRADING_ENABLED: `0`\n- SYSTEM3_LIVE_TRADING_ALLOWED: `0`\n- ANALYZE_MODE: `1`\n- Broker order endpoints called: `false`\n- Secrets written: `false`\n\n## Visual screenshots\n- PASS [screenshots/truth.png](screenshots/truth.png) size=`166664`\n- PASS [screenshots/signals.png](screenshots/signals.png) size=`80569`\n- PASS [screenshots/paper.png](screenshots/paper.png) size=`120298`\n- PASS [screenshots/broker.png](screenshots/broker.png) size=`108414`\n- PASS [screenshots/ml.png](screenshots/ml.png) size=`89738`\n- PASS [screenshots/gates.png](screenshots/gates.png) size=`102222`\n- PASS [screenshots/overview.png](screenshots/overview.png) size=`110584`\n- PASS [screenshots/mobile_390x844.png](screenshots/mobile_390x844.png) size=`84822`\n\n## Source summaries\n- `cloud_runtime_check` present=`True` verdict=`WARN`\n- `dashboard_live_ui_pro"
+  },
+  "findings": [
+    "agent_id=030",
+    "focus=public_truth",
+    "pass=2"
+  ],
+  "focus": "public_truth",
+  "generated_utc": "2026-07-12T12:06:30.260830+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Public truth final verdict is FAIL."
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

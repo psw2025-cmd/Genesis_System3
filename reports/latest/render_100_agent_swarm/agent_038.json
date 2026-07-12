@@ -1,0 +1,24 @@
+{
+  "agent_id": "038",
+  "evidence": {
+    "duplicate_routes": [],
+    "router_disabled": true
+  },
+  "findings": [
+    "agent_id=038",
+    "focus=route_conflicts",
+    "pass=2"
+  ],
+  "focus": "route_conflicts",
+  "generated_utc": "2026-07-12T12:06:19.596103+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Modular broker router disabled; patches in router may not affect active app route."
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

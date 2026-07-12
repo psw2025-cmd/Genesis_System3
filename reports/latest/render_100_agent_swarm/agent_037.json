@@ -1,0 +1,64 @@
+{
+  "agent_id": "037",
+  "evidence": {
+    "hits": [
+      {
+        "file": "dashboard/backend/app.py",
+        "word": "synthetic"
+      },
+      {
+        "file": "dashboard/backend/app.py",
+        "word": "fake"
+      },
+      {
+        "file": "dashboard/backend/app.py",
+        "word": "fixture"
+      },
+      {
+        "file": "dashboard/backend/app.py",
+        "word": "yahoo"
+      },
+      {
+        "file": "dashboard/backend/app.py",
+        "word": "bhavcopy"
+      },
+      {
+        "file": "dashboard/frontend/src/components/PaperTrading.tsx",
+        "word": "synthetic"
+      },
+      {
+        "file": "dashboard/frontend/src/components/PaperTrading.tsx",
+        "word": "fake"
+      },
+      {
+        "file": "dashboard/frontend/src/components/PaperTrading.tsx",
+        "word": "fixture"
+      },
+      {
+        "file": "dashboard/frontend/src/components/PaperTrading.tsx",
+        "word": "mock"
+      },
+      {
+        "file": "docs/SYSTEM3_360_ROOT_CAUSE_BLOCKERS.md",
+        "word": "fake"
+      }
+    ]
+  },
+  "findings": [
+    "agent_id=037",
+    "focus=stale_fake_synthetic",
+    "pass=2"
+  ],
+  "focus": "stale_fake_synthetic",
+  "generated_utc": "2026-07-12T12:06:06.301342+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'fake'}, {'file': 'dashb"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

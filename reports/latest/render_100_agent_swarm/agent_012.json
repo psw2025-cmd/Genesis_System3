@@ -1,0 +1,23 @@
+{
+  "agent_id": "012",
+  "evidence": {
+    "visible_ui_issues": {}
+  },
+  "findings": [
+    "agent_id=012",
+    "focus=visible_ui_issues",
+    "pass=1"
+  ],
+  "focus": "visible_ui_issues",
+  "generated_utc": "2026-07-12T12:05:52.590239+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Dashboard visible issue tracker summary missing."
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 1,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

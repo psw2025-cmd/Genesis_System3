@@ -1,0 +1,21 @@
+{
+  "agent_id": "100",
+  "evidence": {
+    "has_mobile_390x844": true
+  },
+  "findings": [
+    "agent_id=100",
+    "focus=mobile_responsive",
+    "pass=5"
+  ],
+  "focus": "mobile_responsive",
+  "generated_utc": "2026-07-12T12:07:01.558277+00:00",
+  "issue_count": 0,
+  "issues": [],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 5,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "PASS"
+}

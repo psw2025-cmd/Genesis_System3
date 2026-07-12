@@ -1,0 +1,24 @@
+{
+  "agent_id": "096",
+  "evidence": {
+    "live_flags": {
+      "env_allowed": "0",
+      "env_live": "0"
+    }
+  },
+  "findings": [
+    "agent_id=096",
+    "focus=security_live_off",
+    "pass=5"
+  ],
+  "focus": "security_live_off",
+  "generated_utc": "2026-07-12T12:06:46.361946+00:00",
+  "issue_count": 0,
+  "issues": [],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 5,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "PASS"
+}

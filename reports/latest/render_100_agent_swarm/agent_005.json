@@ -1,0 +1,45 @@
+{
+  "agent_id": "005",
+  "evidence": {
+    "/api/broker/diagnose": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    },
+    "/api/broker/funds": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    },
+    "/api/broker/holdings": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    },
+    "/api/broker/positions/live": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    }
+  },
+  "findings": [
+    "agent_id=005",
+    "focus=broker_truth",
+    "pass=1"
+  ],
+  "focus": "broker_truth",
+  "generated_utc": "2026-07-12T12:06:22.753341+00:00",
+  "issue_count": 4,
+  "issues": [
+    "Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+    "Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+    "Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+    "Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 1,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

@@ -1,0 +1,172 @@
+{
+  "agent_id": "035",
+  "evidence": {
+    "secure_install_credential_audit": {
+      "blocker_count": 3,
+      "blockers": [
+        "Required secret missing from workflow env: DASHBOARD_API_KEY",
+        "Required secret missing from workflow env: DHAN_CLIENT_ID",
+        "Required secret missing from workflow env: DHAN_ACCESS_TOKEN"
+      ],
+      "checks": {
+        "node_path": "/opt/hostedtoolcache/node/20.20.2/x64/bin/node",
+        "npm_path": "/opt/hostedtoolcache/node/20.20.2/x64/bin/npm",
+        "package_json_exists": true,
+        "python_path": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "requirements_txt_exists": true
+      },
+      "findings": [
+        "Python executable found.",
+        "Node executable found."
+      ],
+      "generated_utc": "2026-07-12T11:57:36.789269+00:00",
+      "live_order_routes_called": false,
+      "live_safety_flags": {
+        "ANALYZE_MODE": "1",
+        "LIVE_TRADING_ENABLED": "0",
+        "SYSTEM3_LIVE_TRADING_ALLOWED": "0"
+      },
+      "optional_secrets_redacted": [
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "DHAN_PIN",
+          "present": false
+        },
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "DHAN_TOTP_SECRET",
+          "present": false
+        },
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "WORKER_PUSH_TOKEN",
+          "present": false
+        }
+      ],
+      "production_grade_claim_allowed": false,
+      "python_compile_results": [
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -m py_compile tools/system3_parallel_root_cause_audit.py",
+          "file": "tools/system3_parallel_root_cause_audit.py",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -m py_compile tools/system3_workflow_failure_tracker.py",
+          "file": "tools/system3_workflow_failure_tracker.py",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -m py_compile tools/system3_todo_status_updater.py",
+          "file": "tools/system3_todo_status_updater.py",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -m py_compile tools/system3_secure_install_credential_audit.py",
+          "file": "tools/system3_secure_install_credential_audit.py",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": ""
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -m py_compile dashboard/backend/app.py",
+          "file": "dashboard/backend/app.py",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": ""
+        }
+      ],
+      "python_import_results": [
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -c import fastapi; print('fastapi:OK')",
+          "module": "fastapi",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": "fastapi:OK\n"
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -c import pydantic; print('pydantic:OK')",
+          "module": "pydantic",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": "pydantic:OK\n"
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -c import requests; print('requests:OK')",
+          "module": "requests",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": "requests:OK\n"
+        },
+        {
+          "cmd": "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python -c import pytz; print('pytz:OK')",
+          "module": "pytz",
+          "ok": true,
+          "returncode": 0,
+          "stderr_tail": "",
+          "stdout_tail": "pytz:OK\n"
+        }
+      ],
+      "required_secrets_redacted": [
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "DASHBOARD_API_KEY",
+          "present": false
+        },
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "DHAN_CLIENT_ID",
+          "present": false
+        },
+        {
+          "format_warnings": [],
+          "length": 0,
+          "name": "DHAN_ACCESS_TOKEN",
+          "present": false
+        }
+      ],
+      "secrets_printed": false,
+      "status": "BLOCKED",
+      "todo": [
+        "Add/verify required secret in secure store: DASHBOARD_API_KEY",
+        "Add/verify required secret in secure store: DHAN_CLIENT_ID",
+        "Add/verify required secret in secure store: DHAN_ACCESS_TOKEN"
+      ]
+    }
+  },
+  "findings": [
+    "agent_id=035",
+    "focus=install_dependencies",
+    "pass=2"
+  ],
+  "focus": "install_dependencies",
+  "generated_utc": "2026-07-12T12:05:40.455936+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Install/credential audit blocked: 3 blockers"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

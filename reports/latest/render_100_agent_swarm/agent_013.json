@@ -1,0 +1,60 @@
+{
+  "agent_id": "013",
+  "evidence": {
+    "todo_status": {
+      "counts": {
+        "BLOCKED": 1,
+        "DONE": 0,
+        "PARTIAL": 0,
+        "PENDING": 0
+      },
+      "generated_utc": "2026-07-12T11:56:59.850143+00:00",
+      "proof_state": {
+        "contracts_pass": false,
+        "has_360_matrix": true,
+        "has_contract_builder": true,
+        "has_options_pipeline": true,
+        "has_parallel_tool": true,
+        "has_parallel_workflow": true,
+        "has_tracker_tool": true,
+        "has_visual_rules": true,
+        "has_workflow_tracker": true,
+        "live_ui_pass": false,
+        "ml_blocked": false,
+        "ml_pass": false,
+        "ml_visible": false,
+        "owner_visible": true,
+        "paper_visible": false,
+        "parallel_blocked": true,
+        "parallel_blocker_count": 14,
+        "proof_bar_visible": false,
+        "public_fail": true,
+        "public_pass": false,
+        "screenshots_ok": true,
+        "visual_pass": true,
+        "workflow_blocked": true
+      },
+      "reason": "TODO file not found or empty: /home/runner/work/Genesis_System3/Genesis_System3/System3_Production_Grade_1000_Point_QC_TODO.md",
+      "status": "BLOCKED",
+      "todo_path": "/home/runner/work/Genesis_System3/Genesis_System3/System3_Production_Grade_1000_Point_QC_TODO.md",
+      "total": 0
+    }
+  },
+  "findings": [
+    "agent_id=013",
+    "focus=todo_status",
+    "pass=1"
+  ],
+  "focus": "todo_status",
+  "generated_utc": "2026-07-12T12:05:48.461135+00:00",
+  "issue_count": 1,
+  "issues": [
+    "TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 1,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

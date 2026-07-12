@@ -1,0 +1,26 @@
+{
+  "agent_id": "059",
+  "evidence": {
+    "missing": [
+      "reports/latest/autopilot_proof_board/summary.json",
+      "reports/latest/dashboard_visible_issue_tracker/summary.json"
+    ]
+  },
+  "findings": [
+    "agent_id=059",
+    "focus=proof_files",
+    "pass=3"
+  ],
+  "focus": "proof_files",
+  "generated_utc": "2026-07-12T12:05:49.958778+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 3,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

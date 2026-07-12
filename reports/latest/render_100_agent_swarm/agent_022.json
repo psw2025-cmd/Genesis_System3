@@ -1,0 +1,29 @@
+{
+  "agent_id": "022",
+  "evidence": {
+    "/api/deploy/info": {
+      "error": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "latency_ms": 14767,
+      "ok": false,
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/deploy/info"
+    }
+  },
+  "findings": [
+    "agent_id=022",
+    "focus=deploy_freshness",
+    "pass=2"
+  ],
+  "focus": "deploy_freshness",
+  "generated_utc": "2026-07-12T12:05:55.157992+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Deploy info endpoint missing/failing; cannot prove Render deployed latest commit."
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

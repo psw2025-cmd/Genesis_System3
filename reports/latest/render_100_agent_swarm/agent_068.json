@@ -1,0 +1,27 @@
+{
+  "agent_id": "068",
+  "evidence": {
+    "/api/paper": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    }
+  },
+  "findings": [
+    "agent_id=068",
+    "focus=paper_lifecycle",
+    "pass=4"
+  ],
+  "focus": "paper_lifecycle",
+  "generated_utc": "2026-07-12T12:07:15.227715+00:00",
+  "issue_count": 1,
+  "issues": [
+    "Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}"
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 4,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}

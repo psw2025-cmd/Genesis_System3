@@ -1,0 +1,30 @@
+{
+  "agent_id": "027",
+  "evidence": {
+    "/api/scanner/top_contract_gainers": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    },
+    "/api/state": {
+      "ok": false,
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401
+    }
+  },
+  "findings": [
+    "agent_id=027",
+    "focus=scanner_signals",
+    "pass=2"
+  ],
+  "focus": "scanner_signals",
+  "generated_utc": "2026-07-12T12:06:27.592849+00:00",
+  "issue_count": 0,
+  "issues": [],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 2,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "PASS"
+}

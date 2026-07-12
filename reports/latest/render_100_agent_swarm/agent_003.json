@@ -1,0 +1,28 @@
+{
+  "agent_id": "003",
+  "evidence": {
+    "ui": {
+      "latency_ms": 35134,
+      "ok": false,
+      "sample": "",
+      "status_code": 0
+    }
+  },
+  "findings": [
+    "agent_id=003",
+    "focus=frontend_ui_load",
+    "pass=1"
+  ],
+  "focus": "frontend_ui_load",
+  "generated_utc": "2026-07-12T12:06:53.394005+00:00",
+  "issue_count": 1,
+  "issues": [
+    "UI route failed to load."
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "pass": 1,
+  "production_grade_claim_allowed": false,
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}
