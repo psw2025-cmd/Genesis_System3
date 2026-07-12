@@ -31,6 +31,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       fail-fast: false
+      max-parallel: 100
       matrix:
         agent_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -58,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: render-swarm-agent-${{ matrix.agent_id }}
-          path: reports/latest/render_100_agent_swarm/agent_${{ format('{0:000}', matrix.agent_id) }}.*
+          path: reports/latest/render_100_agent_swarm/agent_*.*
           if-no-files-found: warn
           retention-days: 14
 
@@ -79,7 +80,7 @@ jobs:
       - name: Merge swarm reports
         run: |
           mkdir -p reports/latest/render_100_agent_swarm
-          find artifacts -type f -name 'agent_*.json' -o -name 'agent_*.md' | while read f; do cp "$f" reports/latest/render_100_agent_swarm/; done
+          find artifacts -type f \( -name 'agent_*.json' -o -name 'agent_*.md' \) | while read f; do cp "$f" reports/latest/render_100_agent_swarm/; done
           python tools/system3_render_100_agent_swarm.py --aggregate || true
       - name: Commit swarm reports
         run: |
