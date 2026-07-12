@@ -1,0 +1,231 @@
+{
+  "failed_count": 20,
+  "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "325d0b6568aeb4a465cc982265955eb976d915e0",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:56:16Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188296364",
+      "run_id": 29188296364,
+      "updated_at": "2026-07-12T09:56:16Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "2b94621fdf90608a12d4a92248da53365c600f17",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:55:51Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285638",
+      "run_id": 29188285638,
+      "updated_at": "2026-07-12T09:55:51Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:34:48Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706180",
+      "run_id": 29187706180,
+      "updated_at": "2026-07-12T09:37:06Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:34:48Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706168",
+      "run_id": 29187706168,
+      "updated_at": "2026-07-12T09:49:41Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:34:47Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187705858",
+      "run_id": 29187705858,
+      "updated_at": "2026-07-12T09:34:47Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:21:51Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345805",
+      "run_id": 29187345805,
+      "updated_at": "2026-07-12T09:22:25Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-12T09:21:51Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345770",
+      "run_id": 29187345770,
+      "updated_at": "2026-07-12T09:34:49Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:21:50Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345533",
+      "run_id": 29187345533,
+      "updated_at": "2026-07-12T09:21:50Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:21:34Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187338101",
+      "run_id": 29187338101,
+      "updated_at": "2026-07-12T09:22:11Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-12T09:21:34Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187338089",
+      "run_id": 29187338089,
+      "updated_at": "2026-07-12T09:21:52Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:21:33Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187337809",
+      "run_id": 29187337809,
+      "updated_at": "2026-07-12T09:21:33Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "3e29bdf057391ea319019622c5dbb08c2c2a1671",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-12T09:19:19Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187277532",
+      "run_id": 29187277532,
+      "updated_at": "2026-07-12T09:21:35Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "3e29bdf057391ea319019622c5dbb08c2c2a1671",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:19:19Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187277521",
+      "run_id": 29187277521,
+      "updated_at": "2026-07-12T09:19:53Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "3e29bdf057391ea319019622c5dbb08c2c2a1671",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:19:19Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187277310",
+      "run_id": 29187277310,
+      "updated_at": "2026-07-12T09:19:19Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "5991b1d981b1112a29af436fa677540053159f9d",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-12T09:12:47Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099940",
+      "run_id": 29187099940,
+      "updated_at": "2026-07-12T09:19:21Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "5991b1d981b1112a29af436fa677540053159f9d",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:12:47Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099924",
+      "run_id": 29187099924,
+      "updated_at": "2026-07-12T09:17:07Z",
+      "workflow": "Dashboard Live UI Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "5991b1d981b1112a29af436fa677540053159f9d",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:12:47Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099915",
+      "run_id": 29187099915,
+      "updated_at": "2026-07-12T09:15:26Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "5991b1d981b1112a29af436fa677540053159f9d",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:12:46Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099498",
+      "run_id": 29187099498,
+      "updated_at": "2026-07-12T09:12:46Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "0026994e1673195619213310c400c77231d59f88",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-12T09:00:58Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29186770121",
+      "run_id": 29186770121,
+      "updated_at": "2026-07-12T09:12:49Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "0026994e1673195619213310c400c77231d59f88",
+      "conclusion": "failure",
+      "created_at": "2026-07-12T09:00:58Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29186770113",
+      "run_id": 29186770113,
+      "updated_at": "2026-07-12T09:01:28Z",
+      "workflow": "Permanent Repo Render Safety"
+    }
+  ],
+  "generated_utc": "2026-07-12T09:56:24.465236+00:00",
+  "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
+  "repository": "psw2025-cmd/Genesis_System3",
+  "status": "BLOCKED",
+  "todo": [
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188296364 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188285638 conclusion=failure commit=2b94621fdf90608a12d4a92248da53365c600f17",
+    "Fix workflow 'Permanent Repo Render Safety' run 29187706180 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29187706168 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187705858 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+    "Fix workflow 'Permanent Repo Render Safety' run 29187345805 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29187345770 conclusion=cancelled commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187345533 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+    "Fix workflow 'Permanent Repo Render Safety' run 29187338101 conclusion=failure commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29187338089 conclusion=cancelled commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187337809 conclusion=failure commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29187277532 conclusion=cancelled commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+    "Fix workflow 'Permanent Repo Render Safety' run 29187277521 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187277310 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29187099940 conclusion=cancelled commit=5991b1d981b1112a29af436fa677540053159f9d",
+    "Fix workflow 'Dashboard Live UI Proof' run 29187099924 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+    "Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187099498 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 29186770121 conclusion=cancelled commit=0026994e1673195619213310c400c77231d59f88",
+    "Fix workflow 'Permanent Repo Render Safety' run 29186770113 conclusion=failure commit=0026994e1673195619213310c400c77231d59f88"
+  ]
+}
