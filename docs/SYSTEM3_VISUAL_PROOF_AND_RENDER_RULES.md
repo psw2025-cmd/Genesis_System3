@@ -6,6 +6,24 @@ Owner/operator: **PRITAM S. WARGHADE**
 
 No feature, fix, model, paper-trade path, broker path, data path, or dashboard change may be called resolved unless fresh dashboard visual proof exists after that change.
 
+## Assistant-owned UI verification rule
+
+The user is not responsible for sending phone screenshots to prove dashboard status.
+
+Before any status, resolved, fixed, production-grade, money-ready, broker-ready, model-ready, or visual-ready claim, the operator/assistant must check the generated dashboard UI proof artifacts directly:
+
+```text
+reports/latest/dashboard_visual_production_proof/summary.json
+reports/latest/dashboard_visual_production_proof/visual_proof.md
+reports/latest/dashboard_live_ui_proof/summary.json
+reports/latest/system3_public_truth/index.md
+reports/latest/parallel_root_cause_audit/summary.json
+```
+
+Phone screenshots from the user are only extra evidence. They are not the primary proof source.
+
+If the generated UI proof is missing, stale, failed, or from an old commit, status must remain **PENDING/BLOCKED**.
+
 ## Always-required verification for every step
 
 Every step/change must include all three proof classes before any resolved claim:
@@ -122,6 +140,7 @@ Render issues must never be ignored or treated as cosmetic. These are production
 6. Render verification must be checked for every step.
 7. Integration verification must be checked for every step.
 8. Final public truth cannot pass if visual proof is missing, stale, or incomplete.
+9. User phone screenshots are not required for proof; generated dashboard proof must be checked first.
 
 ## Live trading safety
 
