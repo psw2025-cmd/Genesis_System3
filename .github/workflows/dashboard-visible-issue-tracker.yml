@@ -17,8 +17,7 @@ on:
       - System3 Public Truth Publish
       - System3 Parallel Root-Cause Audit
       - System3 Autopilot Proof Board
-    types:
-      - completed
+    types: [completed]
 
 permissions:
   contents: write
@@ -41,23 +40,38 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
+
       - name: Verify analyzer-only safety flags
         run: |
           test "$ANALYZE_MODE" = "1"
           test "$LIVE_TRADING_ENABLED" = "0"
           test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
-      - name: Install locked dashboard proof dependencies
+
+      - name: Install isolated dashboard proof dependencies
+        id: install
+        continue-on-error: true
         run: |
-          npm ci --ignore-scripts
+          rm -rf .proof-node
+          mkdir .proof-node
+          cd .proof-node
+          npm init -y >/dev/null 2>&1
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false playwright@1.52.0
           npx playwright install chromium --with-deps
+          cd ..
+          test -d .proof-node/node_modules/playwright
+
       - name: Scan live dashboard visible issues
         id: scan
+        if: steps.install.outcome == 'success'
         continue-on-error: true
+        env:
+          NODE_PATH: ${{ github.workspace }}/.proof-node/node_modules
         run: node tools/dashboard_visible_issue_tracker.mjs
+
       - name: Always create machine-readable blocked evidence
         if: always()
         shell: bash
@@ -66,16 +80,18 @@ jobs:
           if test -s reports/latest/dashboard_visible_issue_tracker/summary.json && test -s reports/latest/dashboard_visible_issue_tracker/summary.md; then
             exit 0
           fi
-          python - <<'PY'
+          INSTALL_OUTCOME='${{ steps.install.outcome }}' SCAN_OUTCOME='${{ steps.scan.outcome }}' python - <<'PY'
           import json, os
           from datetime import datetime, timezone
 
           out='reports/latest/dashboard_visible_issue_tracker'
           os.makedirs(out, exist_ok=True)
-          scan_outcome='${{ steps.scan.outcome }}'
+          install_outcome=os.environ.get('INSTALL_OUTCOME','unknown')
+          scan_outcome=os.environ.get('SCAN_OUTCOME','unknown')
           reason=(
               'visual tracker did not produce its required report; '
-              f'scan_step_outcome={scan_outcome}. Inspect dependency install, browser launch, Render reachability, and authentication.'
+              f'install_step_outcome={install_outcome}; scan_step_outcome={scan_outcome}. '
+              'Inspect isolated Playwright installation, browser launch, Render reachability, and authentication.'
           )
           data={
               'generated_at': datetime.now(timezone.utc).isoformat(),
@@ -108,6 +124,7 @@ jobs:
               f.write('## Exact blocker\n\n')
               f.write(f'- {reason}\n')
           PY
+
       - name: Validate and sanitize report before publication
         if: always()
         env:
@@ -123,49 +140,34 @@ jobs:
           missing=[k for k in required if k not in d]
           if missing:
               raise SystemExit(f'missing report keys: {missing}')
-
-          expected = d.get('status') == 'PASS'
+          expected=d.get('status') == 'PASS'
           if d.get('production_grade_claim_allowed') != expected:
               raise SystemExit('production_grade_claim_allowed must be true only when status is PASS')
-
-          # Authentication proof must contain status only. Never publish response bodies,
-          # cookies, session material, API keys, authorization headers, or token fields.
-          auth=d.get('auth')
-          if not isinstance(auth, dict):
-              auth={'ok': False, 'status': 0, 'note': 'authentication result missing or malformed'}
-          safe_auth={
-              'ok': bool(auth.get('ok')),
-              'status': int(auth.get('status') or 0),
-          }
+          auth=d.get('auth') if isinstance(d.get('auth'),dict) else {}
+          safe_auth={'ok': bool(auth.get('ok')), 'status': int(auth.get('status') or 0)}
           if auth.get('note'):
               safe_auth['note']=str(auth.get('note'))[:300]
           d['auth']=safe_auth
-
-          forbidden_names={'api_key','apikey','authorization','cookie','cookies','password','secret','session','token','access_token','refresh_token','text','body','response_body'}
-          def find_forbidden(value, path='root'):
+          forbidden={'api_key','apikey','authorization','cookie','cookies','password','secret','session','token','access_token','refresh_token','text','body','response_body'}
+          def scan(v,path='root'):
               hits=[]
-              if isinstance(value, dict):
-                  for k,v in value.items():
+              if isinstance(v,dict):
+                  for k,x in v.items():
                       key=str(k).lower()
-                      if key in forbidden_names or any(part in key for part in ('password','secret','token','cookie','authorization','api_key')):
+                      if key in forbidden or any(s in key for s in ('password','secret','token','cookie','authorization','api_key')):
                           hits.append(f'{path}.{k}')
-                      hits.extend(find_forbidden(v, f'{path}.{k}'))
-              elif isinstance(value, list):
-                  for i,v in enumerate(value):
-                      hits.extend(find_forbidden(v, f'{path}[{i}]'))
+                      hits.extend(scan(x,f'{path}.{k}'))
+              elif isinstance(v,list):
+                  for i,x in enumerate(v): hits.extend(scan(x,f'{path}[{i}]'))
               return hits
-
-          hits=find_forbidden(d)
+          hits=scan(d)
           if hits:
               raise SystemExit(f'proof report contains forbidden sensitive fields: {hits[:20]}')
-
-          serialized=json.dumps(d, sort_keys=True)
+          serialized=json.dumps(d,sort_keys=True)
           key=os.environ.get('PROOF_API_KEY','')
           if key and key in serialized:
               raise SystemExit('proof report contains the dashboard API key value')
-
-          with open(p,'w',encoding='utf-8') as f:
-              json.dump(d,f,indent=2)
+          with open(p,'w',encoding='utf-8') as f: json.dump(d,f,indent=2)
           print(json.dumps({
               'status': d.get('status'),
               'visible_issue_count': d.get('visible_issue_count'),
@@ -173,8 +175,9 @@ jobs:
               'ui_exception_count': d.get('ui_exception_count'),
               'auth_ok': bool(d.get('auth',{}).get('ok')),
               'production_grade_claim_allowed': d.get('production_grade_claim_allowed'),
-          }, indent=2))
+          },indent=2))
           PY
+
       - name: Commit visible issue report with conflict retry
         if: always()
         run: |
@@ -186,20 +189,20 @@ jobs:
           if git push; then exit 0; fi
           git pull --rebase origin main
           git push
+
       - name: Enforce no visible UI blockers
         run: |
           python - <<'PY'
           import json
           p='reports/latest/dashboard_visible_issue_tracker/summary.json'
-          data=json.load(open(p,encoding='utf-8'))
-          safe={
-              'status': data.get('status'),
-              'visible_issue_count': data.get('visible_issue_count'),
-              'screenshot_missing_count': data.get('screenshot_missing_count'),
-              'ui_exception_count': data.get('ui_exception_count'),
-              'auth_ok': bool(data.get('auth',{}).get('ok')),
-              'production_grade_claim_allowed': data.get('production_grade_claim_allowed'),
-          }
-          print(json.dumps(safe, indent=2))
-          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          d=json.load(open(p,encoding='utf-8'))
+          print(json.dumps({
+              'status': d.get('status'),
+              'visible_issue_count': d.get('visible_issue_count'),
+              'screenshot_missing_count': d.get('screenshot_missing_count'),
+              'ui_exception_count': d.get('ui_exception_count'),
+              'auth_ok': bool(d.get('auth',{}).get('ok')),
+              'production_grade_claim_allowed': d.get('production_grade_claim_allowed'),
+          },indent=2))
+          raise SystemExit(0 if d.get('status') == 'PASS' else 1)
           PY
