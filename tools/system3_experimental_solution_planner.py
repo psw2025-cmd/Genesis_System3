@@ -20,6 +20,7 @@ DOC = ROOT / "docs" / "SYSTEM3_EXPERIMENTAL_SOLUTION_PLAN.md"
 
 REPORTS = [
     "reports/latest/render_100_agent_swarm/summary.json",
+    "reports/latest/github_render_failure_tracker/summary.json",
     "reports/latest/autopilot_proof_board/summary.json",
     "reports/latest/dashboard_visible_issue_tracker/summary.json",
     "reports/latest/secure_install_credential_audit/summary.json",
@@ -30,6 +31,7 @@ REPORTS = [
 ]
 
 LANE_RULES = [
+    ("GITHUB_RENDER_FAILURE", ["github", "workflow", "render endpoint", "run=", "failed workflows", "render_failures", "github_failed"]),
     ("RENDER_DEPLOY", ["render", "deploy", "stale", "frontend bundle", "public truth"]),
     ("UI_RED_VISUAL", ["visible", "ui", "red", "blocked", "pending", "screenshot"]),
     ("BROKER_DHAN", ["broker", "dhan", "token", "auth", "fund", "holding", "client"]),
@@ -37,13 +39,19 @@ LANE_RULES = [
     ("SCANNER_SIGNAL", ["scanner", "signal", "ce/pe", "candidate", "no trade"]),
     ("PAPER_LIFECYCLE", ["paper", "lifecycle", "entry", "exit", "pnl", "provenance"]),
     ("ML_TRAINING", ["ml", "model", "training", "accuracy", "auc", "spearman", "expectancy"]),
-    ("WORKFLOW_CI", ["workflow", "github", "ci", "action", "failed", "timed_out", "cancelled"]),
+    ("WORKFLOW_CI", ["ci", "action", "failed", "timed_out", "cancelled"]),
     ("INSTALL_CREDENTIAL", ["install", "dependency", "credential", "secret", "env"]),
     ("ROUTE_CODE", ["route", "router", "app.py", "duplicate", "inactive"]),
     ("FAKE_STALE_DATA", ["fake", "mock", "fixture", "synthetic", "yahoo", "bhavcopy"]),
 ]
 
 LANE_FIXES = {
+    "GITHUB_RENDER_FAILURE": [
+        "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
+        "Fix failed GitHub workflows from latest run/job evidence.",
+        "Fix failing Render endpoints or deploy freshness issues.",
+        "Keep item open until a later GitHub + Render failure tracker run is PASS.",
+    ],
     "RENDER_DEPLOY": [
         "Verify /api/deploy/info exposes latest commit.",
         "Force Render redeploy if commit mismatch or missing.",
@@ -115,7 +123,7 @@ def load_json(path: str) -> Dict[str, Any]:
 def extract_issues(data: Any) -> List[str]:
     out: List[str] = []
     if isinstance(data, dict):
-        for key in ["blockers", "todo", "issues", "visible_issues", "failed_runs"]:
+        for key in ["blockers", "todo", "issues", "visible_issues", "failed_runs", "failed_workflows", "render_failures"]:
             val = data.get(key)
             if isinstance(val, list):
                 for x in val[:500]:
