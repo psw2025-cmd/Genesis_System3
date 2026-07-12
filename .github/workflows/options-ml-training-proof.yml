@@ -1,0 +1,68 @@
+name: CE PE Options ML Training Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Data source: dhan or csv
+        required: true
+        default: dhan
+      lookback_days:
+        description: Lookback days for Dhan download
+        required: true
+        default: '45'
+  schedule:
+    - cron: '30 11 * * 1-5'
+
+permissions:
+  contents: write
+
+env:
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
+  DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+
+jobs:
+  options-ml-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ML dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn joblib
+      - name: Run CE/PE history + training pipeline
+        continue-on-error: true
+        run: |
+          SRC="${{ github.event.inputs.source || 'dhan' }}"
+          DAYS="${{ github.event.inputs.lookback_days || '45' }}"
+          python scripts/options_ce_pe_history_pipeline.py --mode full --source "$SRC" --lookback-days "$DAYS"
+      - name: Commit CE/PE ML proof summary
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/options_ml_training/ state/models/options_ce_pe_model.joblib 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(ml): publish CE PE options training proof [skip ci]"
+          git push
+      - name: Upload CE/PE ML artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: options-ce-pe-ml-proof
+          path: |
+            reports/latest/options_ml_training/
+            state/options_history/dataset/ce_pe_dataset.csv
+            state/models/options_ce_pe_model.joblib
+          retention-days: 14
+      - name: Enforce proof exists
+        if: always()
+        run: |
+          test -f reports/latest/options_ml_training/summary.json
