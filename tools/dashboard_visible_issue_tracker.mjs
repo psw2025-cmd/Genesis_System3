@@ -36,14 +36,19 @@ function uniq(items) {
 }
 
 function isAllowedSafetyLine(text) {
-  const t = String(text || '').toUpperCase()
-  return (
-    t.includes('LIVE') && (t.includes('OFF') || t.includes('BLOCKED') || t.includes('DISABLED'))
-  ) || (
-    t.includes('LIVE TRADING') && t.includes('BLOCKED BY BACKEND FLAG')
-  ) || (
-    t.includes('ORDER') && t.includes('NOT CALLED')
+  const t = String(text || '').toUpperCase().replace(/\s+/g, ' ').trim()
+  const liveTradingSafety = t.includes('LIVE TRADING') && (
+    t.includes('OFF') ||
+    t.includes('DISABLED') ||
+    t.includes('BLOCKED BY BACKEND FLAG') ||
+    t.includes('NOT ALLOWED')
   )
+  const orderSafety = t.includes('ORDER') && (
+    t.includes('NOT CALLED') ||
+    t.includes('PLACEMENT DISABLED') ||
+    t.includes('EXECUTION DISABLED')
+  )
+  return liveTradingSafety || orderSafety
 }
 
 function classifyLine(line) {
