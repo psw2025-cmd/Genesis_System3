@@ -1,25 +1,34 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-type SimRow = {
-  id: string
-  time: string
+type BackendPosition = {
+  position_id: string
   symbol: string
   side: 'CE' | 'PE'
   strike: number
   expiry: string
-  entry: number
+  entry_price: number
   ltp: number
   qty: number
   pnl: number
   status: 'OPEN' | 'CLOSED'
-  reason: string
+  source: string
 }
 
-const baseRows: SimRow[] = [
-  { id: 'SIM-001', time: '09:20:05', symbol: 'NIFTY', side: 'CE', strike: 24550, expiry: 'SIM-WEEKLY', entry: 112.4, ltp: 118.2, qty: 75, pnl: 435, status: 'OPEN', reason: 'virtual momentum + tick heartbeat' },
-  { id: 'SIM-002', time: '09:22:18', symbol: 'BANKNIFTY', side: 'PE', strike: 52300, expiry: 'SIM-WEEKLY', entry: 184.5, ltp: 176.8, qty: 30, pnl: 231, status: 'OPEN', reason: 'virtual reversal + spread ok' },
-  { id: 'SIM-003', time: '09:29:41', symbol: 'FINNIFTY', side: 'CE', strike: 23600, expiry: 'SIM-WEEKLY', entry: 62.2, ltp: 66.1, qty: 65, pnl: 253.5, status: 'CLOSED', reason: 'virtual target hit' },
-]
+type BackendSimState = {
+  status: string
+  mode: string
+  scenario: string
+  generated_utc: string
+  broker?: { connected?: boolean; status?: string; heartbeat_age_sec?: number; source?: string }
+  market?: { is_open?: boolean; state?: string; source?: string }
+  risk?: { live_trading_enabled?: boolean; order_placement_allowed?: boolean; real_broker_routes_called?: boolean }
+  option_chain?: Array<Record<string, any>>
+  signals?: Array<Record<string, any>>
+  positions?: BackendPosition[]
+  paper?: { total_pnl?: number; currency?: string; source?: string }
+  gates?: Record<string, boolean>
+  safety_banner?: string
+}
 
 function cardStyle(border = 'rgba(148,163,184,.18)') {
   return {
@@ -45,53 +54,73 @@ function Pill({ label, ok = true }: { label: string; ok?: boolean }) {
   )
 }
 
+async function fetchSimulation(scenario: string): Promise<BackendSimState> {
+  const res = await fetch(`/api/simulation/live/state?scenario=${encodeURIComponent(scenario)}`, { credentials: 'include' })
+  if (!res.ok) throw new Error(`backend simulation API failed: ${res.status}`)
+  return res.json()
+}
+
 export function LiveSimulation() {
   const [running, setRunning] = useState(true)
   const [scenario, setScenario] = useState<'trend' | 'range' | 'volatile'>('trend')
-  const [step, setStep] = useState(7)
+  const [tick, setTick] = useState(0)
+  const [data, setData] = useState<BackendSimState | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const rows = useMemo(() => {
-    const factor = scenario === 'trend' ? 1.0 : scenario === 'range' ? 0.52 : 1.74
-    return baseRows.map((r, i) => {
-      const delta = running ? (step + i * 2) * factor * (r.side === 'CE' ? 0.32 : -0.28) : 0
-      const ltp = Number((r.ltp + delta).toFixed(2))
-      const pnl = Number(((ltp - r.entry) * r.qty * (r.side === 'PE' ? -1 : 1)).toFixed(2))
-      return { ...r, ltp, pnl }
-    })
-  }, [running, scenario, step])
+  useEffect(() => {
+    let stop = false
+    async function load() {
+      try {
+        const payload = await fetchSimulation(scenario)
+        if (!stop) {
+          setData(payload)
+          setError(null)
+        }
+      } catch (err: any) {
+        if (!stop) setError(err?.message || String(err))
+      }
+    }
+    load()
+    if (!running) return () => { stop = true }
+    const id = window.setInterval(() => {
+      setTick(v => v + 1)
+      load()
+    }, 2500)
+    return () => { stop = true; window.clearInterval(id) }
+  }, [running, scenario])
 
-  const totalPnl = rows.reduce((a, r) => a + r.pnl, 0)
-  const gateItems = [
-    'virtual broker heartbeat',
-    'virtual tick stream',
-    'virtual option chain',
-    'virtual CE/PE signal',
-    'virtual paper order path',
-    'virtual risk guard',
-    'virtual dashboard refresh',
-  ]
+  const rows = data?.positions || []
+  const totalPnl = Number(data?.paper?.total_pnl || rows.reduce((a, r) => a + Number(r.pnl || 0), 0))
+  const gateItems = useMemo(() => Object.entries(data?.gates || {}).filter(([k]) => k !== 'real_live_gate_credit'), [data])
 
   return (
     <section style={{ height: '100%', overflow: 'auto', padding: '18px 18px 110px' }} data-testid="live-simulation-tab">
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '14px', alignItems: 'flex-start', marginBottom: '14px' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 950 }}>Virtual Live Trading Simulation</h1>
-          <p style={{ margin: '6px 0 0', color: 'var(--text-mut)', maxWidth: '880px', lineHeight: 1.45 }}>
-            This tab simulates live market conditions for dashboard testing only. It does not call broker order APIs,
-            does not change real gates, does not enable live trading, and must be removed or disabled before real execution approval.
+          <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 950 }}>Backend Virtual Live Trading Simulation</h1>
+          <p style={{ margin: '6px 0 0', color: 'var(--text-mut)', maxWidth: '920px', lineHeight: 1.45 }}>
+            This tab consumes backend API route <b>/api/simulation/live/state</b> like a live feed. It is simulation only:
+            no broker order APIs, no real live gate credit, no live trading enablement.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Pill label="BACKEND FEED" />
           <Pill label="SIMULATION ONLY" />
           <Pill label="NO REAL ORDERS" />
           <Pill label="LIVE OFF" />
         </div>
       </div>
 
+      {error && (
+        <div style={{ ...cardStyle('rgba(239,68,68,.35)'), marginBottom: '14px', color: 'var(--down)', fontWeight: 900 }}>
+          Backend simulation API not available yet: {error}. After Render deploy, this should come from /api/simulation/live/state.
+        </div>
+      )}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px', marginBottom: '14px' }}>
         <div style={cardStyle('rgba(0,232,122,.28)')}>
-          <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>VIRTUAL MODE</div>
-          <div style={{ fontSize: '22px', fontWeight: 950, color: 'var(--up)' }}>{running ? 'RUNNING' : 'PAUSED'}</div>
+          <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>BACKEND SIM MODE</div>
+          <div style={{ fontSize: '22px', fontWeight: 950, color: 'var(--up)' }}>{running ? 'STREAMING' : 'PAUSED'}</div>
         </div>
         <div style={cardStyle('rgba(59,130,246,.28)')}>
           <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>VIRTUAL P&L</div>
@@ -102,18 +131,18 @@ export function LiveSimulation() {
           <div style={{ fontSize: '22px', fontWeight: 950, color: 'var(--amber)' }}>OFF / LOCKED</div>
         </div>
         <div style={cardStyle('rgba(148,163,184,.25)')}>
-          <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>SCENARIO</div>
-          <div style={{ fontSize: '22px', fontWeight: 950, textTransform: 'uppercase' }}>{scenario}</div>
+          <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>SOURCE</div>
+          <div style={{ fontSize: '18px', fontWeight: 950 }}>{data?.status || 'WAITING'}</div>
         </div>
       </div>
 
       <div style={{ ...cardStyle(), marginBottom: '14px' }}>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           <button onClick={() => setRunning(v => !v)} style={{ padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 900, cursor: 'pointer' }}>
-            {running ? 'Pause virtual stream' : 'Start virtual stream'}
+            {running ? 'Pause backend stream' : 'Start backend stream'}
           </button>
-          <button onClick={() => setStep(v => v + 1)} style={{ padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 900, cursor: 'pointer' }}>
-            Advance virtual tick
+          <button onClick={() => setTick(v => v + 1)} style={{ padding: '9px 12px', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 900, cursor: 'pointer' }}>
+            Refresh backend tick #{tick}
           </button>
           {(['trend', 'range', 'volatile'] as const).map(s => (
             <button key={s} onClick={() => setScenario(s)} style={{ padding: '9px 12px', borderRadius: '10px', border: scenario === s ? '1px solid var(--accent)' : '1px solid var(--border)', background: scenario === s ? 'rgba(0,232,122,.10)' : 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 900, cursor: 'pointer', textTransform: 'uppercase' }}>
@@ -125,21 +154,21 @@ export function LiveSimulation() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 1.2fr) minmax(280px, .8fr)', gap: '14px' }}>
         <div style={cardStyle()}>
-          <h2 style={{ marginTop: 0 }}>Virtual paper order tape</h2>
+          <h2 style={{ marginTop: 0 }}>Backend virtual paper order tape</h2>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
               <thead>
                 <tr style={{ color: 'var(--text-mut)', textAlign: 'left' }}>
-                  <th style={{ padding: '8px' }}>ID</th><th>Time</th><th>Symbol</th><th>Side</th><th>Strike</th><th>LTP</th><th>P&L</th><th>Status</th><th>Reason</th>
+                  <th style={{ padding: '8px' }}>ID</th><th>Symbol</th><th>Side</th><th>Strike</th><th>Expiry</th><th>LTP</th><th>P&L</th><th>Status</th><th>Source</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map(r => (
-                  <tr key={r.id} style={{ borderTop: '1px solid var(--border)' }}>
-                    <td style={{ padding: '8px', fontFamily: 'var(--font-mono)' }}>{r.id}</td>
-                    <td>{r.time}</td><td>{r.symbol}</td><td>{r.side}</td><td>{r.strike}</td><td>{r.ltp}</td>
-                    <td style={{ color: r.pnl >= 0 ? 'var(--up)' : 'var(--down)', fontWeight: 900 }}>₹{r.pnl.toFixed(2)}</td>
-                    <td>{r.status}</td><td style={{ color: 'var(--text-mut)' }}>{r.reason}</td>
+                  <tr key={r.position_id} style={{ borderTop: '1px solid var(--border)' }}>
+                    <td style={{ padding: '8px', fontFamily: 'var(--font-mono)' }}>{r.position_id}</td>
+                    <td>{r.symbol}</td><td>{r.side}</td><td>{r.strike}</td><td>{r.expiry}</td><td>{r.ltp}</td>
+                    <td style={{ color: Number(r.pnl) >= 0 ? 'var(--up)' : 'var(--down)', fontWeight: 900 }}>₹{Number(r.pnl).toFixed(2)}</td>
+                    <td>{r.status}</td><td style={{ color: 'var(--text-mut)' }}>{r.source}</td>
                   </tr>
                 ))}
               </tbody>
@@ -148,17 +177,17 @@ export function LiveSimulation() {
         </div>
 
         <div style={cardStyle()}>
-          <h2 style={{ marginTop: 0 }}>Virtual live checklist</h2>
+          <h2 style={{ marginTop: 0 }}>Backend virtual checklist</h2>
           <div style={{ display: 'grid', gap: '8px' }}>
-            {gateItems.map(item => (
+            {gateItems.map(([item, ok]) => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0,232,122,.20)', borderRadius: '10px', padding: '9px 10px', background: 'rgba(0,232,122,.06)' }}>
-                <span style={{ fontWeight: 800 }}>{item}</span>
-                <span style={{ color: 'var(--up)', fontWeight: 950 }}>✓ SIM OK</span>
+                <span style={{ fontWeight: 800 }}>{item.replaceAll('_', ' ')}</span>
+                <span style={{ color: ok ? 'var(--up)' : 'var(--amber)', fontWeight: 950 }}>{ok ? '✓ SIM OK' : 'SIM ONLY'}</span>
               </div>
             ))}
           </div>
           <div style={{ marginTop: '12px', padding: '10px', borderRadius: '10px', background: 'rgba(245,158,11,.10)', border: '1px solid rgba(245,158,11,.35)', color: 'var(--amber)', fontWeight: 850 }}>
-            Real Live Gate remains separate. Simulation green checks must never be counted as real production readiness.
+            {data?.safety_banner || 'Simulation green checks must never be counted as real production readiness.'}
           </div>
         </div>
       </div>
