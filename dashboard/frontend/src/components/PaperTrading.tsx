@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { API_BASE } from '../config'
+import { API_BASE, API_HEADERS } from '../config'
 import DataSourceWarning from './DataSourceWarning'
 import ErrorBanner from './ErrorBanner'
 
 type ApiBundle = {
   state: any
+  paper: any
   pnl: any
   tradesToday: any
 }
@@ -30,12 +31,13 @@ export default function PaperTrading() {
 
   const fetchData = async () => {
     try {
-      const [stateRes, pnlRes, tradesRes] = await Promise.all([
-        axios.get(`${API_BASE}/api/state`),
-        axios.get(`${API_BASE}/api/pnl`),
-        axios.get(`${API_BASE}/api/trades/today`).catch((err) => ({ data: { status: 'ERROR', error: err.message, entries: [], exits: [], count: 0 } })),
+      const [stateRes, paperRes, pnlRes, tradesRes] = await Promise.all([
+        axios.get(`${API_BASE}/api/state`, { headers: API_HEADERS }),
+        axios.get(`${API_BASE}/api/paper`, { headers: API_HEADERS }).catch((err) => ({ data: { status: 'ERROR', error: err.message, positions: [], trades: [], paper_truth: { source_file: 'unavailable', fake_fixture_rows_rejected: 0, displayed_rows: 0 } } })),
+        axios.get(`${API_BASE}/api/pnl`, { headers: API_HEADERS }),
+        axios.get(`${API_BASE}/api/trades/today`, { headers: API_HEADERS }).catch((err) => ({ data: { status: 'ERROR', error: err.message, trades: [], entries: [], exits: [], count: 0, paper_truth: { source_file: 'unavailable', fake_fixture_rows_rejected: 0, displayed_rows: 0 } } })),
       ])
-      setBundle({ state: stateRes.data, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null })
+      setBundle({ state: stateRes.data, paper: paperRes.data || null, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null })
       setLastRefresh(new Date().toLocaleString())
       setError(null)
     } catch (err: any) {
@@ -70,21 +72,25 @@ export default function PaperTrading() {
   }
 
   const state = bundle.state || {}
+  const paper = bundle.paper || {}
   const pnl = bundle.pnl || {}
   const tradesToday = bundle.tradesToday || {}
-  const positions = Array.isArray(state.positions) ? state.positions : []
-  const positionsSource = state.positions_source || 'NO_POSITIONS'
+  const positions = Array.isArray(paper.positions) ? paper.positions : Array.isArray(state.positions) ? state.positions : []
+  const positionsSource = state.positions_source || paper?.paper_truth?.source_file || 'NO_POSITIONS'
   const dataSource = state.data_source || 'not_ready'
   const brokerConnected = Boolean(state?.broker?.connected)
-  const mode = state.mode || 'PAPER'
+  const mode = state.mode || paper.mode || 'PAPER'
   const stateVersion = state.state_version || 0
   const liveTradingAllowed = String(state.live_trading_enabled || state.liveTradingEnabled || '0') === '1'
   const analyzerSafe = String(mode).toUpperCase().includes('PAPER') || String(mode).toUpperCase().includes('ANALYZER') || !liveTradingAllowed
-  const paperTruthOk = analyzerSafe && !liveTradingAllowed
-  const todayEntries = Array.isArray(tradesToday.entries) ? tradesToday.entries : []
+  const paperTruth = paper?.paper_truth || tradesToday?.paper_truth || pnl?.paper_truth || {}
+  const rejectedRows = Number(paperTruth.fake_fixture_rows_rejected || 0)
+  const paperTruthOk = analyzerSafe && !liveTradingAllowed && paperTruth.broker_order_endpoints_called !== true
+  const tradesList = Array.isArray(tradesToday.trades) ? tradesToday.trades : []
+  const todayEntries = Array.isArray(tradesToday.entries) ? tradesToday.entries : tradesList
   const todayExits = Array.isArray(tradesToday.exits) ? tradesToday.exits : []
   const summary = pnl?.summary || {}
-  const totalRealized = Number(summary?.total_realized_pnl || 0)
+  const totalRealized = Number(summary?.total_realized_pnl ?? summary?.realized_pnl ?? 0)
   const totalUnrealized = positions.reduce((sum: number, p: any) => sum + Number(p.unrealized_pnl || 0), 0)
   const totalPnL = totalRealized + totalUnrealized
   const maxPositions = state?.risk?.limits?.max_positions ?? state?.risk?.limits?.maxPositions ?? '-'
@@ -127,6 +133,17 @@ export default function PaperTrading() {
         </div>
       </div>
 
+      <div className="bg-gray-800 p-5 rounded-lg border border-blue-800/60">
+        <h3 className="text-lg font-bold mb-3">Paper Truth Provenance</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+          <div><div className="text-gray-400">Source file</div><div className="font-mono text-xs break-all">{String(paperTruth.source_file || 'NO_PAPER_SOURCE')}</div></div>
+          <div><div className="text-gray-400">Displayed rows</div><div className="text-2xl font-bold">{Number(paperTruth.displayed_rows || todayEntries.length || 0)}</div></div>
+          <div><div className="text-gray-400">Fake/fixture rejected</div><div className={rejectedRows > 0 ? 'text-2xl font-bold text-yellow-300' : 'text-2xl font-bold text-green-300'}>{rejectedRows}</div></div>
+          <div><div className="text-gray-400">Order endpoints</div><div className="text-2xl font-bold text-green-400">{paperTruth.broker_order_endpoints_called ? 'CALLED/BLOCK' : 'NOT CALLED'}</div></div>
+        </div>
+        <div className="text-xs text-gray-400 mt-3">Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.</div>
+      </div>
+
       <DataSourceWarning dataSource={dataSource} brokerConnected={brokerConnected} mode={mode} />
 
       {observeOnly && positions.length > 0 && (
@@ -167,6 +184,7 @@ export default function PaperTrading() {
                     <td className="text-right p-2 text-xs">SL: {money(pos.stop_loss)}<br/>TG: {money(pos.target)}</td>
                     <td className="text-left p-2 text-xs text-gray-400">
                       Signal: {pos.signal_source || pos.strategy || 'N/A'}<br/>
+                      Source: {pos.market_data_source || pos.quote_source || pos.data_source || 'paper_truth_checked'}<br/>
                       {pos.entry_time ? `Entry: ${new Date(pos.entry_time).toLocaleString()}` : ''}
                       {pos.confidence ? ` | Conf: ${(Number(pos.confidence) * 100).toFixed(0)}%` : ''}
                     </td>
