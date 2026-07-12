@@ -80,17 +80,27 @@ export function TopBar() {
 
   return (
     <header style={{
-      height:'52px', background:'var(--surface-1)', borderBottom:'1px solid var(--border)',
+      height:'56px', background:'var(--surface-1)', borderBottom:'1px solid var(--border)',
       display:'flex', alignItems:'center', padding:'0 12px', gap:'10px',
       flexShrink:0, zIndex:50, overflow:'hidden'
     }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'6px', flexShrink:0 }}>
-        <span style={{ color:'var(--accent)', fontWeight:800, fontSize:'.8rem', letterSpacing:'.1em' }}>SYSTEM3</span>
-        <span style={{ color:'var(--text-mut)', fontSize:'.6rem' }}>PSW</span>
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', flexShrink:0 }}>
+        <div style={{ display:'flex', flexDirection:'column', lineHeight:1 }}>
+          <span style={{ color:'var(--accent)', fontWeight:900, fontSize:'.82rem', letterSpacing:'.14em' }}>SYSTEM3</span>
+          <span style={{ color:'var(--text-mut)', fontSize:'.52rem', letterSpacing:'.16em', fontFamily:'var(--font-mono)' }}>AI OPTIONS CONTROL</span>
+        </div>
+        <div style={{
+          display:'flex', flexDirection:'column', justifyContent:'center', padding:'4px 10px', borderRadius:'10px',
+          background:'linear-gradient(135deg, rgba(59,130,246,.16), rgba(0,232,122,.10))',
+          border:'1px solid rgba(59,130,246,.35)', boxShadow:'0 0 18px rgba(59,130,246,.10)'
+        }} title="System owner / operator identity for visual proof">
+          <span style={{ fontSize:'.5rem', color:'var(--text-mut)', letterSpacing:'.18em', fontFamily:'var(--font-mono)' }}>OWNER</span>
+          <span style={{ fontSize:'.7rem', color:'var(--text-pri)', fontWeight:900, letterSpacing:'.08em' }}>PRITAM S. WARGHADE</span>
+        </div>
       </div>
-      <div style={{ width:'1px', height:'28px', background:'var(--border)' }} />
+      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
       <Clock />
-      <div style={{ width:'1px', height:'28px', background:'var(--border)' }} />
+      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
 
       <div style={{ display:'flex', gap:'6px', flex:1, overflow:'hidden' }}>
         <IndexChip symbol="NIFTY"    spot={nifty?.spot}    chg={nifty?.chg ?? undefined} />
@@ -161,4 +171,3 @@ export function TopBar() {
     </header>
   )
 }
-
