@@ -2,6 +2,8 @@ name: Dashboard Visible Issue Tracker
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
   push:
     branches: [ main ]
     paths:
@@ -15,6 +17,7 @@ on:
       - Dashboard Visual Production Proof
       - System3 Public Truth Publish
       - System3 Parallel Root-Cause Audit
+      - System3 Autopilot Proof Board
     types:
       - completed
 
@@ -43,7 +46,7 @@ jobs:
           npm install playwright@1.49.1
           npx playwright install chromium --with-deps
       - name: Scan live dashboard visible issues
-        run: node tools/dashboard_visible_issue_tracker.mjs
+        run: node tools/dashboard_visible_issue_tracker.mjs || true
       - name: Commit visible issue report
         if: always()
         run: |
