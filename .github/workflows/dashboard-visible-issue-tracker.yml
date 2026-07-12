@@ -45,6 +45,11 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
       - name: Install locked dashboard proof dependencies
         run: |
           npm ci --ignore-scripts
@@ -53,6 +58,56 @@ jobs:
         id: scan
         continue-on-error: true
         run: node tools/dashboard_visible_issue_tracker.mjs
+      - name: Always create machine-readable blocked evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p reports/latest/dashboard_visible_issue_tracker
+          if test -s reports/latest/dashboard_visible_issue_tracker/summary.json && test -s reports/latest/dashboard_visible_issue_tracker/summary.md; then
+            exit 0
+          fi
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+
+          out='reports/latest/dashboard_visible_issue_tracker'
+          os.makedirs(out, exist_ok=True)
+          scan_outcome='${{ steps.scan.outcome }}'
+          reason=(
+              'visual tracker did not produce its required report; '
+              f'scan_step_outcome={scan_outcome}. Inspect dependency install, browser launch, Render reachability, and authentication.'
+          )
+          data={
+              'generated_at': datetime.now(timezone.utc).isoformat(),
+              'base': os.environ.get('DASHBOARD_BASE_URL',''),
+              'status': 'BLOCKED',
+              'auth': {'ok': False, 'note': 'not proven because tracker report was not produced'},
+              'tabs': [],
+              'visible_issue_count': 0,
+              'info_line_count': 0,
+              'screenshot_missing_count': 13,
+              'ui_exception_count': 1,
+              'global_exception': reason,
+              'visible_issues': [],
+              'info_lines': [],
+              'todo': [reason],
+              'production_grade_claim_allowed': False,
+              'analyzer_safety': {
+                  'analyze_mode': os.environ.get('ANALYZE_MODE') == '1',
+                  'live_trading_enabled': False,
+                  'system3_live_trading_allowed': False,
+              },
+          }
+          with open(f'{out}/summary.json','w',encoding='utf-8') as f:
+              json.dump(data,f,indent=2)
+          with open(f'{out}/summary.md','w',encoding='utf-8') as f:
+              f.write('# Dashboard Visible Issue Tracker\n\n')
+              f.write(f"Generated: {data['generated_at']}\n\n")
+              f.write('Status: **BLOCKED**\n\n')
+              f.write('Production-grade claim allowed: `false`\n\n')
+              f.write('## Exact blocker\n\n')
+              f.write(f'- {reason}\n')
+          PY
       - name: Validate report was always produced
         if: always()
         run: |
@@ -78,7 +133,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/dashboard_visible_issue_tracker/
+          git add -f reports/latest/dashboard_visible_issue_tracker/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): publish dashboard visible issue tracker [skip ci]"
           if git push; then exit 0; fi
