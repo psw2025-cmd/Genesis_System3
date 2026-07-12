@@ -1,0 +1,67 @@
+name: System3 GitHub Render Failure Tracker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/system3-github-render-failure-tracker.yml'
+      - 'tools/system3_github_render_failure_tracker.py'
+      - 'dashboard/backend/**'
+      - 'dashboard/frontend/**'
+      - 'tools/**'
+      - 'docs/**'
+  workflow_run:
+    workflows:
+      - Dashboard Visible Issue Tracker
+      - System3 Autopilot Proof Board
+      - System3 Render 100 Agent Swarm
+      - System3 Experimental Solution Planner
+      - System3 Secure Install Credential Audit
+      - System3 1000 Point TODO Status Updater
+      - System3 Parallel Root-Cause Audit
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  github-render-failure-tracker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.name != 'System3 GitHub Render Failure Tracker'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Track GitHub workflow and Render failures
+        run: python tools/system3_github_render_failure_tracker.py || true
+      - name: Commit GitHub Render failure TODO
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): update github render failure todo [skip ci]"
+          git push
+      - name: Enforce no GitHub Render failures
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/github_render_failure_tracker/summary.json'
+          data=json.load(open(p, encoding='utf-8'))
+          print(json.dumps(data, indent=2)[:10000])
+          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          PY
