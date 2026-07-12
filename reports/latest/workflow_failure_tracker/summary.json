@@ -232,7 +232,7 @@
       "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-07-12T10:34:15.714602+00:00",
+  "generated_utc": "2026-07-12T11:25:42.806351+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
