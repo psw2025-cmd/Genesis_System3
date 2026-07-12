@@ -1,5 +1,5 @@
 {
-  "failed_count": 23,
+  "failed_count": 22,
   "failed_runs": [
     {
       "branch": "main",
@@ -220,19 +220,9 @@
       "run_id": 29187099915,
       "updated_at": "2026-07-12T09:15:26Z",
       "workflow": "Permanent Repo Render Safety"
-    },
-    {
-      "branch": "main",
-      "commit": "5991b1d981b1112a29af436fa677540053159f9d",
-      "conclusion": "failure",
-      "created_at": "2026-07-12T09:12:46Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099498",
-      "run_id": 29187099498,
-      "updated_at": "2026-07-12T09:12:46Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-07-12T11:25:42.806351+00:00",
+  "generated_utc": "2026-07-12T11:49:37.318916+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
@@ -258,7 +248,6 @@
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187277310 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
     "Fix workflow 'Genesis System3 Global Safety CI' run 29187099940 conclusion=cancelled commit=5991b1d981b1112a29af436fa677540053159f9d",
     "Fix workflow 'Dashboard Live UI Proof' run 29187099924 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
-    "Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187099498 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d"
+    "Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d"
   ]
 }

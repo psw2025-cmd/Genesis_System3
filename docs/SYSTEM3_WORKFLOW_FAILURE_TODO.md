@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-07-12T11:25:42.806351+00:00`
+Generated UTC: `2026-07-12T11:49:37.318916+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `23`
+Failed workflow count: `22`
 
 ## Rule
 
@@ -34,7 +34,6 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Genesis System3 Global Safety CI' run 29187099940 conclusion=cancelled commit=5991b1d981b1112a29af436fa677540053159f9d
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 29187099924 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d
 - [ ] Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187099498 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d
 
 ## Failed run details
 
@@ -62,4 +61,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Genesis System3 Global Safety CI | 29187099940 | cancelled | `5991b1d981b1` | 2026-07-12T09:19:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099940 |
 | Dashboard Live UI Proof | 29187099924 | failure | `5991b1d981b1` | 2026-07-12T09:17:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099924 |
 | Permanent Repo Render Safety | 29187099915 | failure | `5991b1d981b1` | 2026-07-12T09:15:26Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099915 |
-| .github/workflows/options-ml-training-proof.yml | 29187099498 | failure | `5991b1d981b1` | 2026-07-12T09:12:46Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187099498 |
