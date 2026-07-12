@@ -51,6 +51,11 @@ jobs:
           test "$LIVE_TRADING_ENABLED" = "0"
           test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
 
+      - name: Remove previously committed visual proof
+        run: |
+          rm -rf reports/latest/dashboard_visible_issue_tracker
+          mkdir -p reports/latest/dashboard_visible_issue_tracker
+
       - name: Install isolated dashboard proof dependencies
         id: install
         continue-on-error: true
