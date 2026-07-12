@@ -1,0 +1,21 @@
+{
+  "blocker_count": 2,
+  "blockers": [
+    "Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.",
+    "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth."
+  ],
+  "description": "Active backend route truth and duplicate/inactive-router risk",
+  "findings": [
+    "Active broker funds route is implemented in app.py.",
+    "Active broker live positions route is implemented in app.py."
+  ],
+  "generated_utc": "2026-07-12T09:21:58.329278+00:00",
+  "live_trading_enabled": false,
+  "production_grade_claim_allowed": false,
+  "required_fixes": [
+    "Move critical fixed logic into active dashboard/backend/app.py routes or safely complete router migration without duplicate routes.",
+    "Add proof that synthetic generator is never used for live scanner/chain/model/paper truth."
+  ],
+  "status": "BLOCKED",
+  "track": "backend_routes"
+}

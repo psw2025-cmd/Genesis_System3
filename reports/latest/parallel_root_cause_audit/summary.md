@@ -1,0 +1,21 @@
+# System3 Parallel Root-Cause Audit Summary
+
+- Status: **BLOCKED**
+- Tracks reported: `8/8`
+- Blockers: `14`
+
+## Blockers
+- Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.
+- Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
+- Public truth final verdict is FAIL.
+- Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.
+- Actual Dhan auth cannot be proven by static repo; needs Render API probe and user refreshed token if invalid.
+- Option-chain/scanner cannot pass until Dhan auth and live/closed-market Dhan chain rows are proven.
+- Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.
+- Trading router may be inactive if app.py duplicate routes are authoritative.
+- Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.
+- Options ML training summary is missing/not published.
+- Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
+- Need fresh screenshot after latest commits; older screenshots do not prove current UI.
+- Final public truth is FAIL.
+- Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.

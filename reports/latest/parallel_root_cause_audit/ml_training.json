@@ -1,0 +1,21 @@
+{
+  "blocker_count": 2,
+  "blockers": [
+    "Options ML training summary is missing/not published.",
+    "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible."
+  ],
+  "description": "CE/PE ML training proof and score visibility",
+  "findings": [
+    "CE/PE historical options training pipeline exists.",
+    "CE/PE contract builder exists."
+  ],
+  "generated_utc": "2026-07-12T09:21:57.440361+00:00",
+  "live_trading_enabled": false,
+  "production_grade_claim_allowed": false,
+  "required_fixes": [
+    "Run options-ml-training-proof workflow with valid Dhan historical data or licensed CSV import.",
+    "ML tab must show score fields from proof JSON, not hardcoded text."
+  ],
+  "status": "BLOCKED",
+  "track": "ml_training"
+}

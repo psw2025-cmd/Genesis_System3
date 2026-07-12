@@ -1,0 +1,21 @@
+{
+  "blocker_count": 2,
+  "blockers": [
+    "Trading router may be inactive if app.py duplicate routes are authoritative.",
+    "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel."
+  ],
+  "description": "Paper trade lifecycle and provenance",
+  "findings": [
+    "Paper UI now has provenance panel.",
+    "Inactive/route trading module contains fake fixture rejection logic."
+  ],
+  "generated_utc": "2026-07-12T09:21:56.591694+00:00",
+  "live_trading_enabled": false,
+  "production_grade_claim_allowed": false,
+  "required_fixes": [
+    "Move paper provenance logic into active app.py route or confirm active endpoint response includes paper_truth.",
+    "Run paper lifecycle proof with actual Dhan-derived candidate after scanner/ranker pass."
+  ],
+  "status": "BLOCKED",
+  "track": "paper_lifecycle"
+}
