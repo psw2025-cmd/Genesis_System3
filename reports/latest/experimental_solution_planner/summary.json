@@ -1,0 +1,455 @@
+{
+  "generated_utc": "2026-07-12T12:03:45.769058+00:00",
+  "issue_count": 74,
+  "lane_count": 10,
+  "lanes": [
+    {
+      "issue_count": 34,
+      "lane": "WORKFLOW_CI",
+      "recommended_fixes": [
+        "Read workflow_failure_tracker TODO.",
+        "Fix failing workflow logs one by one.",
+        "Keep failed workflows in TODO until later successful run proves fixed."
+      ],
+      "top_issues": [
+        {
+          "issue": "missing_report:reports/latest/render_100_agent_swarm/summary.json",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "missing_report:reports/latest/autopilot_proof_board/summary.json",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29188296601 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Cloud Runtime Check' run 29188285899 conclusion=cancelled commit=2b94621fdf90608a12d4a92248da53365c600f17",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29188285890 conclusion=cancelled commit=2b94621fdf90608a12d4a92248da53365c600f17",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29187706168 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29187345770 conclusion=cancelled commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29187338089 conclusion=cancelled commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29187277532 conclusion=cancelled commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29187099940 conclusion=cancelled commit=5991b1d981b1112a29af436fa677540053159f9d",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"325d0b6568aeb4a465cc982265955eb976d915e0\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:56:17Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188296601\", \"run_id\": 29188296601, \"updated_at\": \"2026-07-12T09:56:56Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"325d0b6568aeb4a465cc982265955eb976d915e0\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:56:16Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188296590\", \"run_id\": 29188296590, \"updated_at\": \"2026-07-12T09:56:49Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"325d0b6568aeb4a465cc982265955eb976d915e0\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:56:16Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188296364\", \"run_id\": 29188296364, \"updated_at\": \"2026-07-12T09:56:16Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285899\", \"run_id\": 29188285899, \"updated_at\": \"2026-07-12T09:56:32Z\", \"workflow\": \"Cloud Runtime Check\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285896\", \"run_id\": 29188285896, \"updated_at\": \"2026-07-12T09:57:51Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285890\", \"run_id\": 29188285890, \"updated_at\": \"2026-07-12T09:56:27Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"2b94621fdf90608a12d4a92248da53365c600f17\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:55:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29188285638\", \"run_id\": 29188285638, \"updated_at\": \"2026-07-12T09:55:51Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:48Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706180\", \"run_id\": 29187706180, \"updated_at\": \"2026-07-12T09:37:06Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:48Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187706168\", \"run_id\": 29187706168, \"updated_at\": \"2026-07-12T09:49:41Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:34:47Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187705858\", \"run_id\": 29187705858, \"updated_at\": \"2026-07-12T09:34:47Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345805\", \"run_id\": 29187345805, \"updated_at\": \"2026-07-12T09:22:25Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-12T09:21:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345770\", \"run_id\": 29187345770, \"updated_at\": \"2026-07-12T09:34:49Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"dcc19a7f2572e7a15523516f4ba8fb77b9d9914e\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:50Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187345533\", \"run_id\": 29187345533, \"updated_at\": \"2026-07-12T09:21:50Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"bfb108b2cbe59a5a73dfdefbecf5326e226afe1f\", \"conclusion\": \"failure\", \"created_at\": \"2026-07-12T09:21:34Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29187338101\", \"run_id\": 29187338101, \"updated_at\": \"2026-07-12T09:22:11Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 12,
+      "lane": "UI_RED_VISUAL",
+      "recommended_fixes": [
+        "Use dashboard_visible_issue_tracker output as source of truth.",
+        "Fix root cause for each visible red/blocked/pending line; do not hide text.",
+        "Re-run tracker until visible_issue_count=0."
+      ],
+      "top_issues": [
+        {
+          "issue": "Required secret missing from workflow env: DASHBOARD_API_KEY",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Required secret missing from workflow env: DHAN_CLIENT_ID",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Add/verify required secret in secure store: DASHBOARD_API_KEY",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Add/verify required secret in secure store: DHAN_CLIENT_ID",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "Need fresh screenshot after latest commits; older screenshots do not prove current UI.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Dashboard Live UI Proof' run 29187099924 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "status=BLOCKED",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/todo_status_update/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 11,
+      "lane": "RENDER_DEPLOY",
+      "recommended_fixes": [
+        "Verify /api/deploy/info exposes latest commit.",
+        "Force Render redeploy if commit mismatch or missing.",
+        "Run live dashboard screenshot proof after deploy."
+      ],
+      "top_issues": [
+        {
+          "issue": "Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Final public truth is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29188296590 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29188285896 conclusion=failure commit=2b94621fdf90608a12d4a92248da53365c600f17",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187706180 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187345805 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187338101 conclusion=failure commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187277521 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'Permanent Repo Render Safety' run 29187099915 conclusion=failure commit=5991b1d981b1112a29af436fa677540053159f9d",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 8,
+      "lane": "ML_TRAINING",
+      "recommended_fixes": [
+        "Build real CE/PE dataset proof.",
+        "Train/test split and accuracy/AUC/Spearman proof.",
+        "Dashboard must show score and blocked reason if unavailable."
+      ],
+      "top_issues": [
+        {
+          "issue": "Options ML training summary is missing/not published.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188296364 conclusion=failure commit=325d0b6568aeb4a465cc982265955eb976d915e0",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29188285638 conclusion=failure commit=2b94621fdf90608a12d4a92248da53365c600f17",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187705858 conclusion=failure commit=4baec3db8f17c88b9652d53c87b2cb6d8ecb34f9",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187345533 conclusion=failure commit=dcc19a7f2572e7a15523516f4ba8fb77b9d9914e",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187337809 conclusion=failure commit=bfb108b2cbe59a5a73dfdefbecf5326e226afe1f",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 29187277310 conclusion=failure commit=3e29bdf057391ea319019622c5dbb08c2c2a1671",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 2,
+      "lane": "UNKNOWN",
+      "recommended_fixes": [
+        "Inspect source report, classify manually, add rule to planner."
+      ],
+      "top_issues": [
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "blocker_count=14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 2,
+      "lane": "ROUTE_CODE",
+      "recommended_fixes": [
+        "Patch active dashboard/backend/app.py route if routers are disabled.",
+        "Remove duplicate route ambiguity or prove active endpoint response.",
+        "Add tests/proofs for active route behavior."
+      ],
+      "top_issues": [
+        {
+          "issue": "Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Trading router may be inactive if app.py duplicate routes are authoritative.",
+          "lane": "ROUTE_CODE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 2,
+      "lane": "BROKER_DHAN",
+      "recommended_fixes": [
+        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
+        "Treat token/auth/funds failure as connected=false.",
+        "Do not enable live orders."
+      ],
+      "top_issues": [
+        {
+          "issue": "Actual Dhan auth cannot be proven by static repo; needs Render API probe and user refreshed token if invalid.",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Option-chain/scanner cannot pass until Dhan auth and live/closed-market Dhan chain rows are proven.",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 1,
+      "lane": "FAKE_STALE_DATA",
+      "recommended_fixes": [
+        "Remove fake/mock/synthetic/Yahoo/bhavcopy from displayed live truth path.",
+        "Allow only explicit blocked status when real data missing.",
+        "Add proof that no fake rows are used in paper/signals/ML dashboard."
+      ],
+      "top_issues": [
+        {
+          "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
+          "lane": "FAKE_STALE_DATA",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 1,
+      "lane": "OPTION_CHAIN",
+      "recommended_fixes": [
+        "Prove Dhan chain rows for enabled universe.",
+        "Show strike/expiry/CE/PE visibility in dashboard.",
+        "Block scanner until chain rows are real."
+      ],
+      "top_issues": [
+        {
+          "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 1,
+      "lane": "PAPER_LIFECYCLE",
+      "recommended_fixes": [
+        "Require paper entry, exit, PnL, source/provenance.",
+        "Reject fake/fixture/mock rows.",
+        "Show order endpoints not called."
+      ],
+      "top_issues": [
+        {
+          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    }
+  ],
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "production_grade_claim_allowed": false,
+  "report_status": {
+    "reports/latest/autopilot_proof_board/summary.json": "MISSING",
+    "reports/latest/dashboard_visible_issue_tracker/summary.json": "MISSING",
+    "reports/latest/parallel_root_cause_audit/summary.json": "BLOCKED",
+    "reports/latest/render_100_agent_swarm/summary.json": "MISSING",
+    "reports/latest/secure_install_credential_audit/summary.json": "BLOCKED",
+    "reports/latest/system3_public_truth/index.json": "FAIL",
+    "reports/latest/todo_status_update/summary.json": "BLOCKED",
+    "reports/latest/workflow_failure_tracker/summary.json": "BLOCKED"
+  },
+  "secrets_printed": false,
+  "status": "BLOCKED"
+}
