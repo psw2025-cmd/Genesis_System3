@@ -4,6 +4,7 @@
   "status": "BLOCKED",
   "auth": {
     "ok": false,
+    "status": 0,
     "note": "not proven because tracker report was not produced"
   },
   "tabs": [],
