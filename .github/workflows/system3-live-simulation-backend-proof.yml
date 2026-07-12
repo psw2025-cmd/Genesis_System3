@@ -2,6 +2,8 @@ name: System3 Backend Live Simulation Proof
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
   push:
     branches: [ main ]
     paths:
@@ -15,21 +17,38 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: system3-backend-live-simulation-proof
+  cancel-in-progress: false
+
 jobs:
   backend-live-simulation-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Inject simulation routes into active app
         run: python scripts/inject_live_simulation_routes.py
+
+      - name: Verify active route registration is present
+        run: |
+          grep -q 'SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES' dashboard/backend/app.py
+          grep -q '/api/simulation/live/state' dashboard/backend/app.py
+          python -m py_compile dashboard/backend/live_simulation_service.py scripts/inject_live_simulation_routes.py
+
       - name: Prove simulation service payload
         run: |
           mkdir -p reports/latest/backend_live_simulation
@@ -41,6 +60,7 @@ jobs:
           assert payload['status']=='SIMULATION_ONLY'
           assert payload['risk']['live_trading_enabled'] is False
           assert payload['risk']['order_placement_allowed'] is False
+          assert payload['risk']['real_broker_routes_called'] is False
           assert payload['gates']['real_live_gate_credit'] is False
           assert len(payload['option_chain']) >= 4
           assert len(payload['signals']) >= 4
@@ -49,6 +69,7 @@ jobs:
             'status':'PASS',
             'source':'backend_live_simulation_service',
             'api_routes':['/api/simulation/live/state','/api/simulation/live/chain','/api/simulation/live/signals','/api/simulation/live/paper'],
+            'active_app_route_injected': True,
             'simulation_only': True,
             'live_trading_enabled': False,
             'order_placement_allowed': False,
@@ -58,14 +79,29 @@ jobs:
             'signal_rows': len(payload['signals']),
             'position_rows': len(payload['positions']),
           }, indent=2), encoding='utf-8')
-          out.joinpath('summary.md').write_text('# Backend Live Simulation Proof\n\nStatus: **PASS**\n\n- Source: backend service\n- API routes: `/api/simulation/live/*`\n- Simulation only: `true`\n- Live trading enabled: `false`\n- Order placement allowed: `false`\n- Real broker routes called: `false`\n- Real live gate credit: `false`\n', encoding='utf-8')
-          print(json.dumps(payload, indent=2)[:5000])
+          out.joinpath('summary.md').write_text('# Backend Live Simulation Proof\n\nStatus: **PASS**\n\n- Active app route injected: `true`\n- Source: backend service\n- API routes: `/api/simulation/live/*`\n- Simulation only: `true`\n- Live trading enabled: `false`\n- Order placement allowed: `false`\n- Real broker routes called: `false`\n- Real live gate credit: `false`\n', encoding='utf-8')
           PY
-      - name: Commit injected app and proof
+
+      - name: Frontend compile proof
+        working-directory: dashboard/frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit injected app and proof safely
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add dashboard/backend/app.py reports/latest/backend_live_simulation/
-          if git diff --cached --quiet; then exit 0; fi
+          if git diff --cached --quiet; then
+            echo "No injection/proof changes required"
+            exit 0
+          fi
           git commit -m "ci(sim): inject backend live simulation routes [skip ci]"
-          git push
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push attempt ${attempt} failed; rebasing onto latest main"
+            git pull --rebase origin main
+          done
+          echo "Unable to publish injected route after three attempts"
+          exit 1
