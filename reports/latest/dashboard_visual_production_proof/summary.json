@@ -4,42 +4,42 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 166815
+      "size_bytes": 166568
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 80680
+      "size_bytes": 78526
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 120272
+      "size_bytes": 63390
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 108372
+      "size_bytes": 108336
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 90021
+      "size_bytes": 90165
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 102212
+      "size_bytes": 102031
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 110941
+      "size_bytes": 110529
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 84894
+      "size_bytes": 85147
     }
   ]
 }
