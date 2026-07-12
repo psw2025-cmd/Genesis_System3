@@ -24,46 +24,72 @@ import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
-function OwnerVisualBadge() {
+function ProductionProofBar() {
+  const proofItems = [
+    ['OWNER', 'PRITAM S. WARGHADE', true],
+    ['LIVE', 'OFF', true],
+    ['MODE', 'PAPER ONLY', true],
+    ['DATA', 'DHAN ONLY REQUIRED', true],
+    ['ML SCORE', 'TRAINING PROOF REQUIRED', false],
+    ['PAPER', 'PROVENANCE REQUIRED', false],
+    ['RENDER', 'VISUAL PROOF REQUIRED', false],
+  ] as const
+
   return (
     <div
-      data-testid="owner-visual-badge"
-      aria-label="System owner Pritam S. Warghade"
+      data-testid="production-proof-bar"
+      aria-label="Production proof bar for Pritam S. Warghade"
       style={{
         position: 'fixed',
+        left: '12px',
         right: '12px',
         bottom: '12px',
         zIndex: 9999,
         pointerEvents: 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '2px',
-        padding: '8px 12px',
-        borderRadius: '14px',
-        background: 'linear-gradient(135deg, rgba(2,6,23,.92), rgba(15,23,42,.86))',
-        border: '1px solid rgba(0,232,122,.45)',
-        boxShadow: '0 0 26px rgba(0,232,122,.22), inset 0 0 18px rgba(59,130,246,.10)',
-        backdropFilter: 'blur(8px)',
-        maxWidth: 'calc(100vw - 24px)',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(128px, 1fr))',
+        gap: '6px',
+        padding: '8px',
+        borderRadius: '16px',
+        background: 'linear-gradient(135deg, rgba(2,6,23,.94), rgba(15,23,42,.88))',
+        border: '1px solid rgba(59,130,246,.40)',
+        boxShadow: '0 0 28px rgba(59,130,246,.20), inset 0 0 18px rgba(0,232,122,.08)',
+        backdropFilter: 'blur(10px)',
       }}
-      title="OWNER / PRITAM S. WARGHADE — required dashboard visual proof"
+      title="Production-grade proof bar — any unproven gate stays BLOCKED / REQUIRED"
     >
-      <span style={{
-        color: 'var(--text-mut)',
-        fontSize: '.52rem',
-        lineHeight: 1,
-        fontFamily: 'var(--font-mono)',
-        letterSpacing: '.22em',
-        fontWeight: 800,
-      }}>OWNER / OPERATOR</span>
-      <span style={{
-        color: 'var(--accent)',
-        fontSize: '.78rem',
-        lineHeight: 1.1,
-        fontWeight: 950,
-        letterSpacing: '.10em',
-        whiteSpace: 'nowrap',
-      }}>PRITAM S. WARGHADE</span>
+      {proofItems.map(([label, value, safe]) => (
+        <div key={label} style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2px',
+          minWidth: 0,
+          padding: '6px 8px',
+          borderRadius: '10px',
+          background: safe ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.10)',
+          border: safe ? '1px solid rgba(0,232,122,.26)' : '1px solid rgba(245,158,11,.30)',
+        }}>
+          <span style={{
+            color: 'var(--text-mut)',
+            fontSize: '.48rem',
+            lineHeight: 1,
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '.18em',
+            fontWeight: 900,
+            whiteSpace: 'nowrap',
+          }}>{label}</span>
+          <span style={{
+            color: safe ? 'var(--accent)' : 'var(--amber)',
+            fontSize: '.62rem',
+            lineHeight: 1.1,
+            fontWeight: 950,
+            letterSpacing: '.06em',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>{value}</span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -96,8 +122,8 @@ export default function App() {
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
                   background: 'var(--surface)', overflow: 'hidden' }}>
       <TopBar />
-      <OwnerVisualBadge />
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <ProductionProofBar />
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: '76px' }}>
         <Sidebar />
         <main style={{ flex: 1, overflow: 'hidden' }}>
           <Content />
