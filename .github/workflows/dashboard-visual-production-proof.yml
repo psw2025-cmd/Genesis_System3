@@ -2,6 +2,8 @@ name: Dashboard Visual Production Proof
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '15 * * * *'
   push:
     branches: [ main ]
     paths:
@@ -22,6 +24,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: dashboard-visual-production-proof
+  cancel-in-progress: false
+
 env:
   DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
   DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
@@ -32,65 +38,161 @@ env:
 jobs:
   visual-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install Playwright
+          cache: npm
+      - name: Install locked dashboard proof dependencies
         run: |
-          npm --prefix tools install --no-save --no-package-lock playwright
-          npm --prefix tools exec playwright install chromium
+          npm ci --ignore-scripts
+          npx playwright install chromium --with-deps
+      - name: Assert analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
       - name: Run dashboard screenshot proof
+        id: live_proof
         continue-on-error: true
         run: node tools/dashboard_live_ui_proof.mjs
-      - name: Build visual report
+      - name: Build visual report from live proof truth
         if: always()
         run: |
           set -e
-          OUT=reports/latest/dashboard_visual_production_proof
-          SRC=reports/latest/dashboard_live_ui_proof
-          rm -rf "$OUT"
-          mkdir -p "$OUT/screenshots"
           python - <<'PY'
           import json, shutil
           from pathlib import Path
-          out=Path('reports/latest/dashboard_visual_production_proof')
-          src=Path('reports/latest/dashboard_live_ui_proof')
-          names=['truth.png','signals.png','paper.png','broker.png','ml.png','gates.png','overview.png','mobile_390x844.png']
-          rows=[]
-          for n in names:
-            p=src/n
-            ok=p.exists() and p.stat().st_size>10000
-            if ok:
-              shutil.copy2(p,out/'screenshots'/n)
-            rows.append({'file':n,'ok':ok,'size_bytes':p.stat().st_size if p.exists() else 0})
-          summary={'visual_gate_pass':all(r['ok'] for r in rows),'screenshots':rows}
-          (out/'summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
-          md=['# Dashboard Visual Production Proof','',f"Visual gate pass: **{summary['visual_gate_pass']}**",'']
-          for r in rows:
-            md.append(f"- {'PASS' if r['ok'] else 'MISSING'} `{r['file']}` size=`{r['size_bytes']}`")
+
+          out = Path('reports/latest/dashboard_visual_production_proof')
+          src = Path('reports/latest/dashboard_live_ui_proof')
+          shutil.rmtree(out, ignore_errors=True)
+          (out / 'screenshots').mkdir(parents=True, exist_ok=True)
+
+          names = [
+              'truth.png', 'genesis.png', 'e2e_proof.png', 'overview.png',
+              'chain.png', 'signals.png', 'paper.png', 'positions.png',
+              'broker.png', 'performance.png', 'ml.png', 'gates.png',
+              'mobile_390x844.png',
+          ]
+          rows = []
+          for name in names:
+              p = src / name
+              ok = p.exists() and p.stat().st_size > 10000
+              if ok:
+                  shutil.copy2(p, out / 'screenshots' / name)
+              rows.append({'file': name, 'ok': ok, 'size_bytes': p.stat().st_size if p.exists() else 0})
+
+          source_summary_path = src / 'summary.json'
+          source = {}
+          source_error = None
+          try:
+              source = json.loads(source_summary_path.read_text(encoding='utf-8'))
+          except Exception as exc:
+              source_error = f'{type(exc).__name__}: {exc}'
+
+          screenshot_gate = all(row['ok'] for row in rows)
+          auth_ok = bool(source.get('auth', {}).get('ok'))
+          source_verdict = source.get('final_verdict', 'MISSING')
+          infra_blockers = list(source.get('infra_blockers') or [])
+          visual_blockers = list(source.get('visual_blockers') or [])
+          trade_readiness_blockers = list(source.get('trade_readiness_blockers') or [])
+
+          visual_gate_pass = (
+              source_error is None
+              and screenshot_gate
+              and auth_ok
+              and source_verdict == 'PASS'
+              and not infra_blockers
+              and not visual_blockers
+              and not trade_readiness_blockers
+          )
+
+          summary = {
+              'generated_at': source.get('generated_at'),
+              'base': source.get('base'),
+              'visual_gate_pass': visual_gate_pass,
+              'production_grade_claim_allowed': visual_gate_pass,
+              'source_summary_ok': source_error is None,
+              'source_summary_error': source_error,
+              'source_final_verdict': source_verdict,
+              'auth_ok': auth_ok,
+              'screenshot_gate_pass': screenshot_gate,
+              'infra_blockers': infra_blockers,
+              'visual_blockers': visual_blockers,
+              'trade_readiness_blockers': trade_readiness_blockers,
+              'screenshots': rows,
+              'safety': {
+                  'analyze_mode': True,
+                  'live_trading_enabled': False,
+                  'system3_live_trading_allowed': False,
+              },
+          }
+          (out / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
+
+          md = [
+              '# Dashboard Visual Production Proof', '',
+              f"Generated: {summary['generated_at']}",
+              f"Base: {summary['base']}",
+              f"Visual gate pass: **{summary['visual_gate_pass']}**",
+              f"Production-grade claim allowed: **{summary['production_grade_claim_allowed']}**",
+              f"Source verdict: **{summary['source_final_verdict']}**",
+              f"Auth OK: **{summary['auth_ok']}**",
+              f"Screenshot gate: **{summary['screenshot_gate_pass']}**", '',
+              '## Blockers',
+          ]
+          blockers = infra_blockers + visual_blockers + trade_readiness_blockers
+          md.extend([f'- {item}' for item in blockers] if blockers else ['- none'])
+          md += ['', '## Screenshots']
+          for row in rows:
+              md.append(f"- {'PASS' if row['ok'] else 'MISSING'} `{row['file']}` size=`{row['size_bytes']}`")
           md.append('')
-          for r in rows:
-            if r['ok']:
-              md += [f"## {r['file']}",'',f"![{r['file']}](screenshots/{r['file']})",'']
-          (out/'visual_proof.md').write_text('\n'.join(md),encoding='utf-8')
+          for row in rows:
+              if row['ok']:
+                  md += [f"## {row['file']}", '', f"![{row['file']}](screenshots/{row['file']})", '']
+          (out / 'visual_proof.md').write_text('\n'.join(md), encoding='utf-8')
           PY
-      - name: Commit visual proof
+      - name: Validate analyzer-safe report contract
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          p = 'reports/latest/dashboard_visual_production_proof/summary.json'
+          d = json.load(open(p, encoding='utf-8'))
+          assert d['safety']['analyze_mode'] is True
+          assert d['safety']['live_trading_enabled'] is False
+          assert d['safety']['system3_live_trading_allowed'] is False
+          assert d['production_grade_claim_allowed'] == d['visual_gate_pass']
+          print(json.dumps({
+              'visual_gate_pass': d['visual_gate_pass'],
+              'source_final_verdict': d['source_final_verdict'],
+              'auth_ok': d['auth_ok'],
+              'screenshot_gate_pass': d['screenshot_gate_pass'],
+              'infra_blockers': len(d['infra_blockers']),
+              'visual_blockers': len(d['visual_blockers']),
+              'trade_readiness_blockers': len(d['trade_readiness_blockers']),
+          }, indent=2))
+          PY
+      - name: Commit visual proof with conflict retry
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/dashboard_visual_production_proof/
+          git add -f reports/latest/dashboard_visual_production_proof/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): publish dashboard visual production proof [skip ci]"
+          if git push; then exit 0; fi
+          git pull --rebase origin main
           git push
-      - name: Enforce visual gate
+      - name: Enforce current live visual gate
         if: always()
         run: |
           python - <<'PY'
-          import json,sys
-          data=json.load(open('reports/latest/dashboard_visual_production_proof/summary.json',encoding='utf-8'))
-          sys.exit(0 if data.get('visual_gate_pass') else 1)
+          import json, sys
+          data = json.load(open('reports/latest/dashboard_visual_production_proof/summary.json', encoding='utf-8'))
+          sys.exit(0 if data.get('visual_gate_pass') is True else 1)
           PY
