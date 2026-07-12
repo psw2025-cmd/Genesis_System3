@@ -6,7 +6,9 @@ on:
     workflows:
       - System3 Parallel Root-Cause Audit
       - System3 Workflow Failure Tracker
+      - System3 GitHub Render Failure Tracker
       - Dashboard Visual Production Proof
+      - System3 Dashboard Visible Issue Tracker
       - System3 Public Truth Publish
       - Options CE PE ML Training Proof
     types:
@@ -17,10 +19,20 @@ on:
       - '.github/workflows/system3-todo-status-updater.yml'
       - 'tools/system3_todo_status_updater.py'
       - 'docs/SYSTEM3_PRODUCTION_GRADE_1000_POINT_QC_TODO.md'
+      - 'System3_Production_Grade_1000_Point_QC_TODO.md'
       - 'reports/latest/**'
 
 permissions:
   contents: write
+
+concurrency:
+  group: system3-1000-point-todo-status
+  cancel-in-progress: true
+
+env:
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
 
 jobs:
   update-todo-status:
@@ -29,16 +41,100 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.name != 'System3 1000 Point TODO Status Updater'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Verify analyzer-only safety flags
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Normalize current proof paths for TODO updater
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          root = Path('reports/latest')
+
+          # The updater historically reads dashboard_visual_production_proof.
+          # Use the newer visible tracker only as a fail-closed compatibility
+          # source when the historical report is absent.
+          visual_target = root / 'dashboard_visual_production_proof' / 'summary.json'
+          visible_source = root / 'dashboard_visible_issue_tracker' / 'summary.json'
+          if not visual_target.exists() and visible_source.exists():
+              src = json.loads(visible_source.read_text(encoding='utf-8'))
+              status = str(src.get('status') or '').upper()
+              auth = src.get('auth') if isinstance(src.get('auth'), dict) else {}
+              screenshots = src.get('screenshots') if isinstance(src.get('screenshots'), list) else []
+              safe = {
+                  'final_verdict': 'PASS' if status == 'PASS' and src.get('production_grade_claim_allowed') is True else 'BLOCKED',
+                  'visual_gate_pass': bool(status == 'PASS' and src.get('production_grade_claim_allowed') is True),
+                  'screenshots': [
+                      {'ok': bool(x.get('ok'))}
+                      for x in screenshots
+                      if isinstance(x, dict)
+                  ],
+                  'auth_ok': bool(auth.get('ok') is True),
+                  'source': 'dashboard_visible_issue_tracker',
+              }
+              visual_target.parent.mkdir(parents=True, exist_ok=True)
+              visual_target.write_text(json.dumps(safe, indent=2, sort_keys=True), encoding='utf-8')
+
+          # Prefer the current GitHub/Render tracker when the older workflow
+          # failure report is absent. Copy only non-sensitive status counters.
+          failure_target = root / 'workflow_failure_tracker' / 'summary.json'
+          render_source = root / 'github_render_failure_tracker' / 'summary.json'
+          if not failure_target.exists() and render_source.exists():
+              src = json.loads(render_source.read_text(encoding='utf-8'))
+              safe = {
+                  'status': str(src.get('status') or 'BLOCKED').upper(),
+                  'failed_count': int(src.get('failed_count') or src.get('workflow_failed_count') or 0),
+                  'source': 'github_render_failure_tracker',
+              }
+              failure_target.parent.mkdir(parents=True, exist_ok=True)
+              failure_target.write_text(json.dumps(safe, indent=2, sort_keys=True), encoding='utf-8')
+
       - name: Convert 1000 point TODO into proof status
         run: python tools/system3_todo_status_updater.py
-      - name: Commit TODO status report
+
+      - name: Validate fail-closed report
+        shell: python
         run: |
+          import json
+          from pathlib import Path
+
+          report = Path('reports/latest/todo_status_update/summary.json')
+          if not report.exists():
+              raise SystemExit('TODO status summary was not generated')
+          data = json.loads(report.read_text(encoding='utf-8'))
+          status = str(data.get('status') or '').upper()
+          if status not in {'DONE', 'BLOCKED'}:
+              raise SystemExit(f'Unexpected TODO status: {status!r}')
+          allowed = data.get('production_grade_claim_allowed') is True
+          if status != 'DONE' and allowed:
+              raise SystemExit('Blocked TODO report cannot allow a production-grade claim')
+          print(f"todo_status={status}")
+          print(f"todo_total={int(data.get('total') or 0)}")
+          print(f"production_grade_claim_allowed={allowed}")
+
+      - name: Commit TODO status report
+        shell: bash
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/todo_status_update/
+          git add -f reports/latest/todo_status_update/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(todo): update 1000 point proof status [skip ci]"
-          git push
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            git pull --rebase origin main
+          done
+          exit 1
