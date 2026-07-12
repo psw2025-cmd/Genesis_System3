@@ -1,0 +1,141 @@
+{
+  "failed_workflows": [
+    {
+      "branch": "main",
+      "commit": "cdc00d894f008fd0653e242798dbc4ff713f159f",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720288",
+      "run_id": 29192720288,
+      "updated_at": "2026-07-12T12:30:29Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "cdc00d894f008fd0653e242798dbc4ff713f159f",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720073",
+      "run_id": 29192720073,
+      "updated_at": "2026-07-12T12:29:56Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "4986f22102b5adeca5fdad827f612eb596133ddd",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708869",
+      "run_id": 29192708869,
+      "updated_at": "2026-07-12T12:37:01Z",
+      "workflow": "System3 GitHub Render Failure Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "4986f22102b5adeca5fdad827f612eb596133ddd",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708858",
+      "run_id": 29192708858,
+      "updated_at": "2026-07-12T12:37:12Z",
+      "workflow": "System3 Secure Install Credential Audit"
+    },
+    {
+      "branch": "main",
+      "commit": "4986f22102b5adeca5fdad827f612eb596133ddd",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708838",
+      "run_id": 29192708838,
+      "updated_at": "2026-07-12T12:37:02Z",
+      "workflow": "System3 Experimental Solution Planner"
+    }
+  ],
+  "generated_utc": "2026-07-12T12:37:56.630197Z",
+  "github_failed_count": 5,
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "production_grade_claim_allowed": false,
+  "render_base": "https://genesis-system3-backend.onrender.com",
+  "render_failed_count": 9,
+  "render_failures": [
+    {
+      "endpoint": "/api/state",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/state"
+    },
+    {
+      "endpoint": "/api/deploy/info",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/deploy/info"
+    },
+    {
+      "endpoint": "/api/broker/diagnose",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/diagnose"
+    },
+    {
+      "endpoint": "/api/broker/funds",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/funds"
+    },
+    {
+      "endpoint": "/api/broker/holdings",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings"
+    },
+    {
+      "endpoint": "/api/broker/positions/live",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/broker/positions/live"
+    },
+    {
+      "endpoint": "/api/scanner/top_contract_gainers",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/scanner/top_contract_gainers"
+    },
+    {
+      "endpoint": "/api/paper",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/paper"
+    },
+    {
+      "endpoint": "/api/ml/performance",
+      "reason": "HTTP status 401",
+      "sample": "{\"detail\":\"Missing or invalid dashboard API session\"}",
+      "status_code": 401,
+      "url": "https://genesis-system3-backend.onrender.com/api/ml/performance"
+    }
+  ],
+  "repository": "psw2025-cmd/Genesis_System3",
+  "secrets_printed": false,
+  "status": "BLOCKED",
+  "todo": [
+    "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29192720288 conclusion=failure commit=cdc00d894f00",
+    "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29192720073 conclusion=failure commit=cdc00d894f00",
+    "Fix GitHub workflow 'System3 GitHub Render Failure Tracker' run=29192708869 conclusion=failure commit=4986f22102b5",
+    "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29192708858 conclusion=failure commit=4986f22102b5",
+    "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29192708838 conclusion=failure commit=4986f22102b5",
+    "Fix Render endpoint /api/state: HTTP status 401 status=401",
+    "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
+    "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
+    "Fix Render endpoint /api/broker/funds: HTTP status 401 status=401",
+    "Fix Render endpoint /api/broker/holdings: HTTP status 401 status=401",
+    "Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401",
+    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401",
+    "Fix Render endpoint /api/paper: HTTP status 401 status=401",
+    "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401"
+  ],
+  "todo_count": 14
+}
