@@ -11,7 +11,6 @@ on:
       - 'tools/dashboard_visible_issue_tracker.mjs'
       - 'dashboard/frontend/**'
       - 'dashboard/backend/**'
-      - 'reports/latest/**'
   workflow_run:
     workflows:
       - Dashboard Visual Production Proof
@@ -24,11 +23,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: dashboard-visible-issue-tracker
+  cancel-in-progress: false
+
 jobs:
   visible-issue-tracker:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.name != 'Dashboard Visible Issue Tracker'
+    timeout-minutes: 25
     env:
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
@@ -37,17 +39,37 @@ jobs:
       ANALYZE_MODE: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install Playwright
+          cache: npm
+      - name: Install Playwright without modifying repository manifests
         run: |
-          npm init -y >/dev/null 2>&1 || true
-          npm install playwright@1.49.1
+          npm install --no-save --no-package-lock playwright@1.49.1
           npx playwright install chromium --with-deps
       - name: Scan live dashboard visible issues
-        run: node tools/dashboard_visible_issue_tracker.mjs || true
-      - name: Commit visible issue report
+        id: scan
+        continue-on-error: true
+        run: node tools/dashboard_visible_issue_tracker.mjs
+      - name: Validate report was always produced
+        if: always()
+        run: |
+          test -s reports/latest/dashboard_visible_issue_tracker/summary.json
+          test -s reports/latest/dashboard_visible_issue_tracker/summary.md
+          python - <<'PY'
+          import json
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p, encoding='utf-8'))
+          required=['generated_at','status','visible_issue_count','production_grade_claim_allowed']
+          missing=[k for k in required if k not in d]
+          if missing:
+              raise SystemExit(f'missing report keys: {missing}')
+          assert d['production_grade_claim_allowed'] is False
+          print(json.dumps({k:d.get(k) for k in required}, indent=2))
+          PY
+      - name: Commit visible issue report with conflict retry
         if: always()
         run: |
           git config user.name "github-actions[bot]"
@@ -55,6 +77,8 @@ jobs:
           git add reports/latest/dashboard_visible_issue_tracker/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): publish dashboard visible issue tracker [skip ci]"
+          if git push; then exit 0; fi
+          git pull --rebase origin main
           git push
       - name: Enforce no visible UI blockers
         run: |
