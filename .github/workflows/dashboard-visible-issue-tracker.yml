@@ -66,7 +66,11 @@ jobs:
           missing=[k for k in required if k not in d]
           if missing:
               raise SystemExit(f'missing report keys: {missing}')
-          assert d['production_grade_claim_allowed'] is False
+          expected = d.get('status') == 'PASS'
+          if d.get('production_grade_claim_allowed') is not expected:
+              raise SystemExit(
+                  'production_grade_claim_allowed must be true only when status is PASS'
+              )
           print(json.dumps({k:d.get(k) for k in required}, indent=2))
           PY
       - name: Commit visible issue report with conflict retry
