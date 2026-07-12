@@ -12,6 +12,7 @@ const tabs = [
   ['genesis', 'Genesis Brain'],
   ['e2e_proof', 'E2E Proof'],
   ['overview', 'Overview'],
+  ['sim_live', 'Sim Live'],
   ['chain', 'Option Chain'],
   ['signals', 'Signals'],
   ['paper', 'Paper Trades'],
@@ -209,6 +210,7 @@ summary.todo = uniq(summary.todo).slice(0, 500)
 summary.visible_issue_count = summary.visible_issues.length
 summary.info_line_count = summary.info_lines.length
 summary.status = summary.visible_issue_count || summary.screenshot_missing_count || summary.ui_exception_count || summary.global_exception || !summary.auth?.ok ? 'BLOCKED' : 'PASS'
+summary.production_grade_claim_allowed = summary.status === 'PASS'
 
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 
@@ -223,6 +225,7 @@ const md = [
   `Screenshot missing count: \`${summary.screenshot_missing_count}\``,
   `UI exception count: \`${summary.ui_exception_count}\``,
   `Auth OK: \`${Boolean(summary.auth?.ok)}\``,
+  `Production-grade claim allowed: \`${summary.production_grade_claim_allowed}\``,
   summary.global_exception ? `Global exception: \`${summary.global_exception}\`` : '',
   '',
   '## Rule',
