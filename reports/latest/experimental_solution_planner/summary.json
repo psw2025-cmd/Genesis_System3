@@ -1,146 +1,147 @@
 {
-  "generated_utc": "2026-07-12T12:23:49.108936+00:00",
-  "issue_count": 242,
-  "lane_count": 12,
+  "generated_utc": "2026-07-12T12:53:48.438982+00:00",
+  "issue_count": 274,
+  "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 74,
-      "lane": "WORKFLOW_CI",
+      "issue_count": 90,
+      "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
-        "Read workflow_failure_tracker TODO.",
-        "Fix failing workflow logs one by one.",
-        "Keep failed workflows in TODO until later successful run proves fixed."
+        "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
+        "Fix failed GitHub workflows from latest run/job evidence.",
+        "Fix failing Render endpoints or deploy freshness issues.",
+        "Keep item open until a later GitHub + Render failure tracker run is PASS."
       ],
       "top_issues": [
         {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
           "issue": "agent_011:workflow_failures: Workflow failures present: failed_count=22",
-          "lane": "WORKFLOW_CI",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
+          "issue": "agent_011:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
           "issue": "agent_031:workflow_failures: Workflow failures present: failed_count=22",
-          "lane": "WORKFLOW_CI",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_031:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
           "issue": "agent_051:workflow_failures: Workflow failures present: failed_count=22",
-          "lane": "WORKFLOW_CI",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
+          "issue": "agent_051:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
           "issue": "agent_071:workflow_failures: Workflow failures present: failed_count=22",
-          "lane": "WORKFLOW_CI",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
+          "issue": "agent_071:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
           "issue": "agent_091:workflow_failures: Workflow failures present: failed_count=22",
-          "lane": "WORKFLOW_CI",
+          "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "missing_report:reports/latest/autopilot_proof_board/summary.json",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
+          "issue": "agent_091:workflow_failures: Workflow failure tracker status=BLOCKED",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29192720288 conclusion=failure commit=cdc00d894f00",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192320637 conclusion=failure commit=5602298850ab1e8ee04ddb650648a56f5cf3778e",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29192720073 conclusion=failure commit=cdc00d894f00",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192320165 conclusion=failure commit=5602298850ab1e8ee04ddb650648a56f5cf3778e",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix GitHub workflow 'System3 GitHub Render Failure Tracker' run=29192708869 conclusion=failure commit=4986f22102b5",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192319529 conclusion=failure commit=5602298850ab1e8ee04ddb650648a56f5cf3778e",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29192708858 conclusion=failure commit=4986f22102b5",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192251718 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29192708838 conclusion=failure commit=4986f22102b5",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192214229 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/state: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192214099 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Experimental Solution Planner' run 29192212224 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Autopilot Proof Board' run 29192208916 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Autopilot Proof Board' run 29192208533 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/paper: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Autopilot Proof Board' run 29192208308 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Autopilot Proof Board' run 29192202499 conclusion=failure commit=4607b4b035155479e5a3e27c48e55c492c99c5d9",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "{\"branch\": \"main\", \"commit\": \"cdc00d894f008fd0653e242798dbc4ff713f159f\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720288\", \"run_id\": 29192720288, \"updated_at\": \"2026-07-12T12:30:29Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"cdc00d894f008fd0653e242798dbc4ff713f159f\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720073\", \"run_id\": 29192720073, \"updated_at\": \"2026-07-12T12:29:56Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"4986f22102b5adeca5fdad827f612eb596133ddd\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708869\", \"run_id\": 29192708869, \"updated_at\": \"2026-07-12T12:37:01Z\", \"workflow\": \"System3 GitHub Render Failure Tracker\"}",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"branch\": \"main\", \"commit\": \"4986f22102b5adeca5fdad827f612eb596133ddd\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708858\", \"run_id\": 29192708858, \"updated_at\": \"2026-07-12T12:37:12Z\", \"workflow\": \"System3 Secure Install Credential Audit\"}",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 43,
+      "issue_count": 38,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -150,11 +151,6 @@
       "top_issues": [
         {
           "issue": "agent_003:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_011:workflow_failures: Workflow failure tracker status=BLOCKED",
           "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
@@ -184,11 +180,6 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_031:workflow_failures: Workflow failure tracker status=BLOCKED",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
           "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
           "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
@@ -210,11 +201,6 @@
         },
         {
           "issue": "agent_043:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_051:workflow_failures: Workflow failure tracker status=BLOCKED",
           "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
@@ -244,11 +230,6 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_071:workflow_failures: Workflow failure tracker status=BLOCKED",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
           "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
           "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
@@ -272,11 +253,31 @@
           "issue": "agent_083:frontend_ui_load: UI route failed to load.",
           "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_092:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_093:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_095:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_099:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     },
     {
-      "issue_count": 30,
+      "issue_count": 36,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -400,19 +401,19 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Public truth final verdict is FAIL.",
+          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
           "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.",
+          "issue": "{\"endpoint\": \"/api/state\", \"reason\": \"HTTP status 401\", \"sample\": \"{\\\"detail\\\":\\\"Missing or invalid dashboard API session\\\"}\", \"status_code\": 401, \"url\": \"https://genesis-system3-backend.onrender.com/api/state\"}",
           "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 29,
+      "issue_count": 33,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -730,7 +731,68 @@
       ]
     },
     {
-      "issue_count": 8,
+      "issue_count": 10,
+      "lane": "WORKFLOW_CI",
+      "recommended_fixes": [
+        "Read workflow_failure_tracker TODO.",
+        "Fix failing workflow logs one by one.",
+        "Keep failed workflows in TODO until later successful run proves fixed."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "missing_report:reports/latest/autopilot_proof_board/summary.json",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "failed_count=34",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 9,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
@@ -765,6 +827,11 @@
           "issue": "issue_count=143",
           "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
           "issue": "blocker_count=3",
@@ -970,6 +1037,7 @@
   "report_status": {
     "reports/latest/autopilot_proof_board/summary.json": "MISSING",
     "reports/latest/dashboard_visible_issue_tracker/summary.json": "MISSING",
+    "reports/latest/github_render_failure_tracker/summary.json": "BLOCKED",
     "reports/latest/parallel_root_cause_audit/summary.json": "BLOCKED",
     "reports/latest/render_100_agent_swarm/summary.json": "BLOCKED",
     "reports/latest/secure_install_credential_audit/summary.json": "BLOCKED",

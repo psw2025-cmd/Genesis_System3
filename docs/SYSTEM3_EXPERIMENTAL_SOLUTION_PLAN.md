@@ -1,9 +1,9 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-12T12:23:49.108936+00:00`
+Generated UTC: `2026-07-12T12:53:48.438982+00:00`
 Status: **BLOCKED**
-Issues: `242`
-Fix lanes: `12`
+Issues: `274`
+Fix lanes: `13`
 
 ## Rule
 
@@ -14,6 +14,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 | Report | Status |
 |---|---|
 | `reports/latest/render_100_agent_swarm/summary.json` | `BLOCKED` |
+| `reports/latest/github_render_failure_tracker/summary.json` | `BLOCKED` |
 | `reports/latest/autopilot_proof_board/summary.json` | `MISSING` |
 | `reports/latest/dashboard_visible_issue_tracker/summary.json` | `MISSING` |
 | `reports/latest/secure_install_credential_audit/summary.json` | `BLOCKED` |
@@ -24,31 +25,32 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### WORKFLOW_CI — 74 issues
+### GITHUB_RENDER_FAILURE — 90 issues
 
 Recommended fixes:
-- Read workflow_failure_tracker TODO.
-- Fix failing workflow logs one by one.
-- Keep failed workflows in TODO until later successful run proves fixed.
+- Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
+- Fix failed GitHub workflows from latest run/job evidence.
+- Fix failing Render endpoints or deploy freshness issues.
+- Keep item open until a later GitHub + Render failure tracker run is PASS.
 
 Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Experimental Solution Planner' run 29192320637 conclusion=failure commit=5602298850ab1e8ee04ddb650648a56f5cf3778e
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29192720288 conclusion=failure commit=cdc00d894f00
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29192720073 conclusion=failure commit=cdc00d894f00
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 GitHub Render Failure Tracker' run=29192708869 conclusion=failure commit=4986f22102b5
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29192708858 conclusion=failure commit=4986f22102b5
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29192708838 conclusion=failure commit=4986f22102b5
 
-### UI_RED_VISUAL — 43 issues
+### UI_RED_VISUAL — 38 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -57,22 +59,22 @@ Recommended fixes:
 
 Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_003:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_015:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_023:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_035:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_043:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### RENDER_DEPLOY — 30 issues
+### RENDER_DEPLOY — 36 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -151,7 +153,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### BROKER_DHAN — 29 issues
+### BROKER_DHAN — 33 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -291,7 +293,26 @@ Top issues:
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
 
-### UNKNOWN — 8 issues
+### WORKFLOW_CI — 10 issues
+
+Recommended fixes:
+- Read workflow_failure_tracker TODO.
+- Fix failing workflow logs one by one.
+- Keep failed workflows in TODO until later successful run proves fixed.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: missing_report:reports/latest/dashboard_visible_issue_tracker/summary.json
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=34
+
+### UNKNOWN — 9 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -303,6 +324,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=14
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
