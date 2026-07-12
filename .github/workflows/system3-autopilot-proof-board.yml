@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/system3-autopilot-proof-board.yml'
       - 'tools/system3_autopilot_proof_board.py'
+      - 'tools/system3_github_render_failure_tracker.py'
       - 'tools/system3_secure_install_credential_audit.py'
       - 'tools/dashboard_visible_issue_tracker.mjs'
       - 'tools/system3_parallel_root_cause_audit.py'
@@ -19,6 +20,7 @@ on:
   workflow_run:
     workflows:
       - Dashboard Visible Issue Tracker
+      - System3 GitHub Render Failure Tracker
       - System3 Secure Install Credential Audit
       - System3 Workflow Failure Tracker
       - System3 1000 Point TODO Status Updater
@@ -57,6 +59,8 @@ jobs:
           npx playwright install chromium --with-deps
       - name: Run backend/frontend install and credential audit
         run: python tools/system3_secure_install_credential_audit.py || true
+      - name: Run GitHub Render failure tracker
+        run: python tools/system3_github_render_failure_tracker.py || true
       - name: Run root-cause audit all tracks
         run: python tools/system3_parallel_root_cause_audit.py --track all || true
       - name: Run live dashboard visible issue tracker
@@ -72,7 +76,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/autopilot_proof_board/ reports/latest/secure_install_credential_audit/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/parallel_root_cause_audit/ reports/latest/workflow_failure_tracker/ reports/latest/todo_status_update/ docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md
+          git add reports/latest/autopilot_proof_board/ reports/latest/github_render_failure_tracker/ reports/latest/secure_install_credential_audit/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/parallel_root_cause_audit/ reports/latest/workflow_failure_tracker/ reports/latest/todo_status_update/ docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): update autopilot proof board [skip ci]"
           git push
