@@ -1,45 +1,86 @@
 {
-  "visual_gate_pass": true,
+  "generated_at": null,
+  "base": null,
+  "visual_gate_pass": false,
+  "production_grade_claim_allowed": false,
+  "source_summary_ok": false,
+  "source_summary_error": "FileNotFoundError: [Errno 2] No such file or directory: 'reports/latest/dashboard_live_ui_proof/summary.json'",
+  "source_final_verdict": "MISSING",
+  "auth_ok": false,
+  "screenshot_gate_pass": false,
+  "infra_blockers": [],
+  "visual_blockers": [],
+  "trade_readiness_blockers": [],
   "screenshots": [
     {
       "file": "truth.png",
-      "ok": true,
-      "size_bytes": 202392
+      "ok": false,
+      "size_bytes": 0
     },
     {
-      "file": "signals.png",
-      "ok": true,
-      "size_bytes": 127375
+      "file": "genesis.png",
+      "ok": false,
+      "size_bytes": 0
     },
     {
-      "file": "paper.png",
-      "ok": true,
-      "size_bytes": 174608
-    },
-    {
-      "file": "broker.png",
-      "ok": true,
-      "size_bytes": 157078
-    },
-    {
-      "file": "ml.png",
-      "ok": true,
-      "size_bytes": 138552
-    },
-    {
-      "file": "gates.png",
-      "ok": true,
-      "size_bytes": 138506
+      "file": "e2e_proof.png",
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "overview.png",
-      "ok": true,
-      "size_bytes": 154347
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "chain.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "signals.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "paper.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "positions.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "broker.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "performance.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "ml.png",
+      "ok": false,
+      "size_bytes": 0
+    },
+    {
+      "file": "gates.png",
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "mobile_390x844.png",
-      "ok": true,
-      "size_bytes": 130751
+      "ok": false,
+      "size_bytes": 0
     }
-  ]
+  ],
+  "safety": {
+    "analyze_mode": true,
+    "live_trading_enabled": false,
+    "system3_live_trading_allowed": false
+  }
 }
