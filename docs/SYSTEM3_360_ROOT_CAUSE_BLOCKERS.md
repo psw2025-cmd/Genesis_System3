@@ -18,6 +18,14 @@ This authority does **not** allow secrets to be pasted, printed, committed, logg
 
 Live trading remains OFF. Analyzer/paper/read-only broker proof is allowed. Live order placement, modification, cancellation, or routing remains blocked unless separately proven safe and explicitly enabled later by the owner.
 
+## Absolute visual-claim rule
+
+No issue, feature, fix, gate, workflow, model, broker state, paper state, scanner state, or production-grade status may be claimed DONE / fixed / resolved / passed unless the live Render dashboard UI is visually checked by automation after the latest relevant commit and shows the required proof text on screen.
+
+Backend/API JSON, file existence, screenshot file size, logs, or chat statements are supporting evidence only. Final claim evidence must include dashboard UI visible proof from automated screenshot/text inspection.
+
+If automated dashboard UI proof is missing, stale, red, blocked, pending, or contradictory, status must remain **PENDING** or **BLOCKED**. Do not use manual user screenshots as the final proof requirement.
+
 ## Critical root findings
 
 1. Some backend router patches may not affect production because modular routers are imported but not included in `dashboard/backend/app.py`; old app-level routes remain active.
@@ -28,10 +36,11 @@ Live trading remains OFF. Analyzer/paper/read-only broker proof is allowed. Live
 6. Final public truth can be stale if workflows do not run after latest patches.
 7. No live trading remains correct; this is a safety pass, not a money-readiness pass.
 8. Dependency/install health and credential presence must be audited automatically; manual chat claims do not count.
+9. Any claim without automated live dashboard UI proof is invalid and must be reverted to PENDING/BLOCKED.
 
 ## Pending blocker count
 
-Total pending blockers: **20**
+Total pending blockers: **21**
 
 | ID | Blocker | Owner | Required fix | Proof required |
 |---|---|---|---|---|
@@ -55,6 +64,7 @@ Total pending blockers: **20**
 | B18 | 360 integration gate missing | Workflow | One workflow must combine Render API, dashboard visual proof, broker truth, chain truth, scanner, paper, ML, and final verdict | Integration report PASS/BLOCKED with exact blocker list |
 | B19 | Dependency/install health not continuously proven | Workflow | Run secure install audit for Python/Node/project dependency readiness | install audit report PASS/BLOCKED with exact failing package/command |
 | B20 | Credential presence/format not continuously proven | Workflow/Render | Check required credential presence via secure workflow env only; never print values | credential audit report with redacted presence/format status |
+| B21 | Claim made without automated dashboard visual proof | Assistant/Workflow | Revert claim to PENDING/BLOCKED and require visual issue tracker + dashboard proof board PASS | dashboard_visible_issue_tracker and autopilot proof board PASS after latest commit |
 
 ## User-side fixes required
 
@@ -73,6 +83,7 @@ Total pending blockers: **20**
 5. Keep live order paths disabled.
 6. Track visible dashboard red/error/pending issues automatically until zero.
 7. Track dependency/install and credential readiness automatically.
+8. Block any DONE/resolved claim unless live dashboard UI proof is current and PASS.
 
 ## Render/workflow fixes required
 
@@ -82,6 +93,7 @@ Total pending blockers: **20**
 4. Verify worker writes latest proof.
 5. Verify final public truth regenerated after latest commit.
 6. Verify required secrets are present through secure workflow env checks only.
+7. Verify automated dashboard UI visual proof after latest commit.
 
 ## Required final proof before any resolved claim
 
@@ -93,8 +105,9 @@ Total pending blockers: **20**
 6. Paper lifecycle proof.
 7. ML training score proof.
 8. Dashboard visual proof with owner + proof bar.
-9. Integration report proof.
-10. Workflow failure tracker proof.
-11. Visible UI issue tracker proof.
-12. Dependency/install + credential audit proof.
-13. Final public truth proof.
+9. Visible UI issue tracker PASS.
+10. Autopilot proof board PASS.
+11. Integration report proof.
+12. Workflow failure tracker proof.
+13. Dependency/install + credential audit proof.
+14. Final public truth proof.
