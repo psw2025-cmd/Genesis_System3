@@ -45,9 +45,9 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-      - name: Install Playwright without modifying repository manifests
+      - name: Install locked dashboard proof dependencies
         run: |
-          npm install --no-save --no-package-lock playwright@1.49.1
+          npm ci --ignore-scripts
           npx playwright install chromium --with-deps
       - name: Scan live dashboard visible issues
         id: scan
@@ -67,7 +67,7 @@ jobs:
           if missing:
               raise SystemExit(f'missing report keys: {missing}')
           expected = d.get('status') == 'PASS'
-          if d.get('production_grade_claim_allowed') is not expected:
+          if d.get('production_grade_claim_allowed') != expected:
               raise SystemExit(
                   'production_grade_claim_allowed must be true only when status is PASS'
               )
