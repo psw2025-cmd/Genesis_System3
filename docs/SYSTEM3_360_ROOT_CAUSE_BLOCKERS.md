@@ -10,6 +10,14 @@ Status: **NOT PRODUCTION GRADE**
 
 Reason: UI visibility is improving, but real trading chain is still blocked at broker auth, option-chain universe, scanner/ranker, paper lifecycle, ML/training proof, Render/fresh visual proof, and final truth aggregation.
 
+## Permanent operating authority and safety boundary
+
+User grants standing authority to execute repo repair, dependency install checks, GitHub Actions proof workflows, Render verification workflows, dashboard visual proof, integration verification, and TODO/status reporting required to resolve System3 blockers.
+
+This authority does **not** allow secrets to be pasted, printed, committed, logged, screenshotted, or stored in chat/repo files. Credentials may only be used through secure secret stores and workflow environment variables. Any missing/invalid credential must be reported as a blocker with redacted proof only.
+
+Live trading remains OFF. Analyzer/paper/read-only broker proof is allowed. Live order placement, modification, cancellation, or routing remains blocked unless separately proven safe and explicitly enabled later by the owner.
+
 ## Critical root findings
 
 1. Some backend router patches may not affect production because modular routers are imported but not included in `dashboard/backend/app.py`; old app-level routes remain active.
@@ -19,10 +27,11 @@ Reason: UI visibility is improving, but real trading chain is still blocked at b
 5. Screenshot file size is not proof. The actual visible text and blocker rows must be checked.
 6. Final public truth can be stale if workflows do not run after latest patches.
 7. No live trading remains correct; this is a safety pass, not a money-readiness pass.
+8. Dependency/install health and credential presence must be audited automatically; manual chat claims do not count.
 
 ## Pending blocker count
 
-Total pending blockers: **18**
+Total pending blockers: **20**
 
 | ID | Blocker | Owner | Required fix | Proof required |
 |---|---|---|---|---|
@@ -44,14 +53,16 @@ Total pending blockers: **18**
 | B16 | Production Proof Bar not yet visually validated | UI/Render | Render latest UI and capture screenshots | Screenshot shows 7 proof gates visible |
 | B17 | Render worker/scheduler proof not complete | Render/Workflow | Worker must write latest proof artifacts reliably | Reports show latest worker/scheduler proof timestamp/status |
 | B18 | 360 integration gate missing | Workflow | One workflow must combine Render API, dashboard visual proof, broker truth, chain truth, scanner, paper, ML, and final verdict | Integration report PASS/BLOCKED with exact blocker list |
+| B19 | Dependency/install health not continuously proven | Workflow | Run secure install audit for Python/Node/project dependency readiness | install audit report PASS/BLOCKED with exact failing package/command |
+| B20 | Credential presence/format not continuously proven | Workflow/Render | Check required credential presence via secure workflow env only; never print values | credential audit report with redacted presence/format status |
 
 ## User-side fixes required
 
-1. Refresh or replace Dhan read-only API token/session through the secure Dhan process.
-2. Verify correct Dhan client ID/account is configured in Render.
+1. Refresh or replace Dhan read-only API token/session through the secure Dhan process when audit says invalid/expired.
+2. Verify correct Dhan client ID/account is configured in Render when audit says missing/mismatch.
 3. Do not paste secrets in chat.
 4. After updating Render environment, redeploy backend and worker.
-5. Send screenshots only after refresh/redeploy, so stale UI is not mistaken for latest code.
+5. Screenshots from user are optional only; automated dashboard visual proof is mandatory.
 
 ## Code-side fixes required
 
@@ -60,6 +71,8 @@ Total pending blockers: **18**
 3. Centralize public truth: latest commit, Render commit, visual proof commit, and dashboard UI must match.
 4. Add one integration proof workflow that checks all required APIs and screenshots.
 5. Keep live order paths disabled.
+6. Track visible dashboard red/error/pending issues automatically until zero.
+7. Track dependency/install and credential readiness automatically.
 
 ## Render/workflow fixes required
 
@@ -67,7 +80,8 @@ Total pending blockers: **18**
 2. Verify frontend bundle refreshed.
 3. Verify backend API refresh after deploy.
 4. Verify worker writes latest proof.
-5. Verify final public truth regenerated after the latest commit.
+5. Verify final public truth regenerated after latest commit.
+6. Verify required secrets are present through secure workflow env checks only.
 
 ## Required final proof before any resolved claim
 
@@ -80,4 +94,7 @@ Total pending blockers: **18**
 7. ML training score proof.
 8. Dashboard visual proof with owner + proof bar.
 9. Integration report proof.
-10. Final public truth proof.
+10. Workflow failure tracker proof.
+11. Visible UI issue tracker proof.
+12. Dependency/install + credential audit proof.
+13. Final public truth proof.
