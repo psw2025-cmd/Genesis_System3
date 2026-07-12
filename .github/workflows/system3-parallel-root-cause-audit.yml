@@ -1,0 +1,87 @@
+name: System3 Parallel Root-Cause Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/system3-parallel-root-cause-audit.yml'
+      - 'tools/system3_parallel_root_cause_audit.py'
+      - 'dashboard/backend/**'
+      - 'dashboard/frontend/**'
+      - 'core/**'
+      - 'scripts/**'
+      - 'docs/SYSTEM3_360_ROOT_CAUSE_BLOCKERS.md'
+      - 'reports/latest/system3_public_truth/**'
+      - 'reports/latest/dashboard_visual_production_proof/**'
+
+permissions:
+  contents: write
+
+jobs:
+  audit-track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        track:
+          - backend_routes
+          - render_truth
+          - broker_auth
+          - chain_scanner
+          - paper_lifecycle
+          - ml_training
+          - visual_proof
+          - final_truth
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run parallel audit track
+        run: python tools/system3_parallel_root_cause_audit.py --track "${{ matrix.track }}"
+      - name: Upload track report
+        uses: actions/upload-artifact@v4
+        with:
+          name: parallel-audit-${{ matrix.track }}
+          path: reports/latest/parallel_root_cause_audit/${{ matrix.track }}.*
+          retention-days: 14
+
+  aggregate:
+    runs-on: ubuntu-latest
+    needs: audit-track
+    if: always()
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download audit artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Merge reports
+        run: |
+          mkdir -p reports/latest/parallel_root_cause_audit
+          find artifacts -type f -name '*.json' -o -name '*.md' | while read f; do cp "$f" reports/latest/parallel_root_cause_audit/; done
+          python tools/system3_parallel_root_cause_audit.py --track aggregate
+      - name: Commit aggregate audit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/parallel_root_cause_audit/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(audit): publish parallel root-cause audit [skip ci]"
+          git push
+      - name: Enforce no production-grade claim
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/parallel_root_cause_audit/summary.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps(data, indent=2))
+          # This workflow is diagnostic. It does not fail on blockers;
+          # it publishes blocker truth for parallel fixing.
+          PY
