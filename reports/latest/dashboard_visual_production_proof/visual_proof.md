@@ -2,14 +2,14 @@
 
 Visual gate pass: **True**
 
-- PASS `truth.png` size=`170589`
-- PASS `signals.png` size=`80517`
-- PASS `paper.png` size=`119979`
-- PASS `broker.png` size=`108432`
-- PASS `ml.png` size=`90066`
-- PASS `gates.png` size=`102326`
-- PASS `overview.png` size=`120219`
-- PASS `mobile_390x844.png` size=`85319`
+- PASS `truth.png` size=`177671`
+- PASS `signals.png` size=`87931`
+- PASS `paper.png` size=`127266`
+- PASS `broker.png` size=`125223`
+- PASS `ml.png` size=`97865`
+- PASS `gates.png` size=`109980`
+- PASS `overview.png` size=`143620`
+- PASS `mobile_390x844.png` size=`90691`
 
 ## truth.png
 
