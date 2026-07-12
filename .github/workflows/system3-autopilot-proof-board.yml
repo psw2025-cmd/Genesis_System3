@@ -1,0 +1,87 @@
+name: System3 Autopilot Proof Board
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/system3-autopilot-proof-board.yml'
+      - 'tools/system3_autopilot_proof_board.py'
+      - 'tools/system3_secure_install_credential_audit.py'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'tools/system3_parallel_root_cause_audit.py'
+      - 'tools/system3_todo_status_updater.py'
+      - 'tools/system3_workflow_failure_tracker.py'
+      - 'dashboard/backend/**'
+      - 'dashboard/frontend/**'
+      - 'docs/**'
+      - 'reports/latest/**'
+  workflow_run:
+    workflows:
+      - Dashboard Visible Issue Tracker
+      - System3 Secure Install Credential Audit
+      - System3 Workflow Failure Tracker
+      - System3 1000 Point TODO Status Updater
+      - System3 Parallel Root-Cause Audit
+    types:
+      - completed
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  autopilot-proof-board:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install fastapi pydantic requests pytz
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@1.49.1
+          npx playwright install chromium --with-deps
+      - name: Run backend/frontend install and credential audit
+        run: python tools/system3_secure_install_credential_audit.py || true
+      - name: Run root-cause audit all tracks
+        run: python tools/system3_parallel_root_cause_audit.py --track all || true
+      - name: Run live dashboard visible issue tracker
+        run: node tools/dashboard_visible_issue_tracker.mjs || true
+      - name: Run workflow failure tracker
+        run: python tools/system3_workflow_failure_tracker.py || true
+      - name: Run 1000 point TODO status updater
+        run: python tools/system3_todo_status_updater.py || true
+      - name: Build autopilot proof board
+        run: python tools/system3_autopilot_proof_board.py || true
+      - name: Commit autopilot proof board and reports
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/autopilot_proof_board/ reports/latest/secure_install_credential_audit/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/parallel_root_cause_audit/ reports/latest/workflow_failure_tracker/ reports/latest/todo_status_update/ docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): update autopilot proof board [skip ci]"
+          git push
+      - name: Enforce autopilot proof board
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/autopilot_proof_board/summary.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps(data, indent=2)[:8000])
+          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          PY
