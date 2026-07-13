@@ -43,6 +43,7 @@ Safety gate: LIVE_TRADING_ENABLED must be 0 (default). Do NOT change until
 paper/analyzer proof passes and CI is fully green.
 """
 
+import hashlib
 import json
 import logging
 import os
@@ -78,6 +79,100 @@ os.environ.setdefault("ANALYZE_MODE", "1")
 if os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", ""):
     log.critical("LIVE_TRADING_ENABLED is set to a truthy value — refusing to start worker.")
     sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Render worker diagnostics — no secrets printed
+# ---------------------------------------------------------------------------
+def _utc() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _secret_meta(name: str) -> dict:
+    raw = os.environ.get(name, "")
+    value = raw.strip()
+    return {
+        "present": bool(value),
+        "length": len(value),
+        "sha256_8": hashlib.sha256(value.encode("utf-8")).hexdigest()[:8] if value else None,
+    }
+
+
+def _runtime_report() -> dict:
+    token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip()
+    pin = os.environ.get("DHAN_PIN", "").strip()
+    totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
+    client = os.environ.get("DHAN_CLIENT_ID", "").strip()
+    push = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+    web_url = os.environ.get("WEB_SERVICE_URL", _DEFAULT_WEB_URL).strip()
+    return {
+        "generated_utc": _utc(),
+        "status": "PASS" if client and (token or (pin and totp)) and push else "BLOCKED",
+        "worker": "scripts/cloud_worker.py",
+        "web_service_url": web_url,
+        "env_presence": {
+            "DHAN_CLIENT_ID": _secret_meta("DHAN_CLIENT_ID"),
+            "DHAN_ACCESS_TOKEN": _secret_meta("DHAN_ACCESS_TOKEN"),
+            "DHAN_PIN": _secret_meta("DHAN_PIN"),
+            "DHAN_TOTP_SECRET": _secret_meta("DHAN_TOTP_SECRET"),
+            "DHAN_APP_ID": _secret_meta("DHAN_APP_ID"),
+            "DHAN_APP_SECRET": _secret_meta("DHAN_APP_SECRET"),
+            "WORKER_PUSH_TOKEN": _secret_meta("WORKER_PUSH_TOKEN"),
+        },
+        "safety": {
+            "LIVE_TRADING_ENABLED": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+            "SYSTEM3_LIVE_TRADING_ALLOWED": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+            "ANALYZE_MODE": os.environ.get("ANALYZE_MODE", "1"),
+            "live_order_routes_called": False,
+        },
+        "blockers": [
+            b
+            for b, active in {
+                "DHAN_CLIENT_ID missing on worker": not bool(client),
+                "DHAN_ACCESS_TOKEN missing and no PIN/TOTP bootstrap available": not bool(token or (pin and totp)),
+                "WORKER_PUSH_TOKEN missing on worker or not shared with web": not bool(push),
+                "WEB_SERVICE_URL invalid": not web_url.lower().startswith(("http://", "https://")),
+            }.items()
+            if active
+        ],
+    }
+
+
+def _write_runtime_report() -> None:
+    payload = _runtime_report()
+    for out in (
+        ROOT / "reports" / "latest" / "render_worker_runtime" / "summary.json",
+        ROOT / "state" / "render_worker_runtime_summary.json",
+    ):
+        try:
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        except Exception as exc:
+            log.warning(f"[preflight] could not write {out}: {exc}")
+    log.info(
+        "[preflight] status=%s dhan_client=%s access_token_len=%s worker_push_token=%s web_url=%s live=%s",
+        payload["status"],
+        payload["env_presence"]["DHAN_CLIENT_ID"]["present"],
+        payload["env_presence"]["DHAN_ACCESS_TOKEN"]["length"],
+        payload["env_presence"]["WORKER_PUSH_TOKEN"]["present"],
+        payload["web_service_url"],
+        payload["safety"]["LIVE_TRADING_ENABLED"],
+    )
+    for blocker in payload.get("blockers", []):
+        log.warning(f"[preflight] BLOCKER: {blocker}")
+
+
+def _dhan_bootstrap_available() -> bool:
+    token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip()
+    client = os.environ.get("DHAN_CLIENT_ID", "").strip()
+    pin = os.environ.get("DHAN_PIN", "").strip()
+    totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
+    return bool(client and (len(token) > 20 or (pin and totp)))
+
+
+def _looks_like_auth_error(value) -> bool:
+    text = str(value or "").lower()
+    return any(s in text for s in ("401", "unauthorized", "authentication failed", "token invalid", "invalid token"))
 
 
 # ---------------------------------------------------------------------------
@@ -132,6 +227,8 @@ _DEFAULT_WEB_URL = "https://genesis-system3-backend.onrender.com"
 _SCHEDULER_STATE_FILE = ROOT / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
 _SCHEDULER_ALERT_FILE = ROOT / "state" / "scheduler_config_alert.json"
 _PUSH_INTERVAL_S = 30
+_PUSH_AUTH_BACKOFF_S = int(os.environ.get("WORKER_PUSH_AUTH_BACKOFF_S", "300"))
+_PUSH_NETWORK_BACKOFF_S = int(os.environ.get("WORKER_PUSH_NETWORK_BACKOFF_S", "90"))
 
 
 def _run_health_push():
@@ -144,8 +241,8 @@ def _run_health_push():
 
     if not push_token:
         log.warning(
-            "[health-push] WORKER_PUSH_TOKEN not set — pushes will be rejected when the web service requires it. "
-            "Set the same value on both Render services."
+            "[health-push] WORKER_PUSH_TOKEN not set — not pushing to web service. "
+            "Set the same value on both Render services and restart worker."
         )
 
     try:
@@ -156,6 +253,9 @@ def _run_health_push():
         return
 
     while True:
+        if not push_token:
+            time.sleep(_PUSH_AUTH_BACKOFF_S)
+            continue
         try:
             payload = {
                 "daemon_heartbeat": None,
@@ -182,9 +282,7 @@ def _run_health_push():
                 payload["config_alert"] = json.loads(_SCHEDULER_ALERT_FILE.read_text(encoding="utf-8"))
 
             body = json.dumps(payload).encode("utf-8")
-            headers = {"Content-Type": "application/json"}
-            if push_token:
-                headers["X-Worker-Token"] = push_token
+            headers = {"Content-Type": "application/json", "X-Worker-Token": push_token}
 
             req = _urlreq.Request(
                 f"{web_url}/api/scheduler/health/push",
@@ -197,11 +295,17 @@ def _run_health_push():
                     log.warning(f"[health-push] non-200 response: {resp.status}")
         except _urlerr.HTTPError as exc:
             if exc.code == 401:
-                log.warning("[health-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker")
-            else:
-                log.warning(f"[health-push] HTTP error from web service ({web_url}): {exc}")
+                log.warning(
+                    "[health-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker; "
+                    f"backing off { _PUSH_AUTH_BACKOFF_S }s"
+                )
+                time.sleep(_PUSH_AUTH_BACKOFF_S)
+                continue
+            log.warning(f"[health-push] HTTP error from web service ({web_url}): {exc}")
         except _urlerr.URLError as exc:
-            log.warning(f"[health-push] could not reach web service ({web_url}): {exc}")
+            log.warning(f"[health-push] could not reach web service ({web_url}): {exc}; backing off {_PUSH_NETWORK_BACKOFF_S}s")
+            time.sleep(_PUSH_NETWORK_BACKOFF_S)
+            continue
         except Exception as exc:
             log.warning(f"[health-push] push failed: {exc}")
 
@@ -217,6 +321,7 @@ _CHAIN_PUSH_CLOSED_INTERVAL_S = 300
 # Dhan option-chain endpoint is rate-limited. Keep a gap between each unique
 # underlying request so one loop does not self-throttle all 5 symbols.
 _CHAIN_FETCH_SPACING_S = float(os.environ.get("DHAN_OPTION_CHAIN_FETCH_SPACING_S", "3.25"))
+_DHAN_AUTH_BACKOFF_S = int(os.environ.get("DHAN_AUTH_BACKOFF_S", "300"))
 
 
 def _persist_chain_for_paper_pipeline(symbol: str, data: dict) -> None:
@@ -252,6 +357,8 @@ def _run_chain_push():
         log.error(f"[chain-push] WEB_SERVICE_URL has an unexpected scheme ({web_url!r}) — thread exiting")
         return
     push_token = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+    if not push_token:
+        log.warning("[chain-push] WORKER_PUSH_TOKEN not set — local chain files can be written, web push will be skipped.")
 
     try:
         import urllib.error as _urlerr
@@ -261,6 +368,7 @@ def _run_chain_push():
         return
 
     last_closed_push = 0.0
+    dhan_auth_backoff_until = 0.0
     while True:
         try:
             mkt_open = False
@@ -273,6 +381,16 @@ def _run_chain_push():
 
             due_for_closed_push = (time.time() - last_closed_push) >= _CHAIN_PUSH_CLOSED_INTERVAL_S
             if mkt_open or due_for_closed_push:
+                if not _dhan_bootstrap_available():
+                    log.warning("[chain-push] Dhan credential preflight blocked chain fetch — set DHAN_CLIENT_ID and DHAN_ACCESS_TOKEN or PIN/TOTP on worker env")
+                    time.sleep(_DHAN_AUTH_BACKOFF_S)
+                    continue
+                if time.time() < dhan_auth_backoff_until:
+                    remaining = int(dhan_auth_backoff_until - time.time())
+                    log.warning(f"[chain-push] Dhan auth backoff active ({remaining}s remaining)")
+                    time.sleep(min(_CHAIN_PUSH_INTERVAL_S, max(1, remaining)))
+                    continue
+
                 try:
                     from core.data.datasource_manager import DataSourceManager
                     from dashboard.backend.chain_adapter import fetch_chain_for_api
@@ -286,6 +404,7 @@ def _run_chain_push():
                 for idx, sym in enumerate(_CHAIN_PUSH_SYMBOLS):
                     try:
                         data = fetch_chain_for_api(dsm, sym)
+                        last_error = getattr(dsm, "last_error", None)
                         if data and data.get("contracts"):
                             chains[sym] = data
                             _persist_chain_for_paper_pipeline(sym, data)
@@ -297,9 +416,20 @@ def _run_chain_push():
                                 data.get("expiry_date"),
                             )
                         else:
-                            log.warning("[chain-push] no Dhan chain for %s: %s", sym, getattr(dsm, "last_error", None))
+                            log.warning("[chain-push] no Dhan chain for %s: %s", sym, last_error)
+                            if _looks_like_auth_error(last_error):
+                                dhan_auth_backoff_until = time.time() + _DHAN_AUTH_BACKOFF_S
+                                _write_runtime_report()
+                                log.warning(
+                                    f"[chain-push] Dhan auth failure detected for {sym}; backing off {_DHAN_AUTH_BACKOFF_S}s. "
+                                    "Restart worker after updating Dhan token/env."
+                                )
+                                break
                     except Exception as exc:
                         log.warning(f"[chain-push] fetch failed for {sym}: {exc}")
+                        if _looks_like_auth_error(exc):
+                            dhan_auth_backoff_until = time.time() + _DHAN_AUTH_BACKOFF_S
+                            break
                     if idx < len(_CHAIN_PUSH_SYMBOLS) - 1:
                         time.sleep(_CHAIN_FETCH_SPACING_S)
 
@@ -307,27 +437,32 @@ def _run_chain_push():
                     last_closed_push = time.time()
 
                 if chains:
-                    body = json.dumps({"chains": chains, "market_open": mkt_open}).encode("utf-8")
-                    headers = {"Content-Type": "application/json"}
-                    if push_token:
-                        headers["X-Worker-Token"] = push_token
-                    req = _urlreq.Request(
-                        f"{web_url}/api/chain/push",
-                        data=body,
-                        headers=headers,
-                        method="POST",
-                    )
-                    try:
-                        with _urlreq.urlopen(req, timeout=15) as resp:  # nosec B310 - scheme validated at thread start
-                            if resp.status != 200:
-                                log.warning(f"[chain-push] non-200 response: {resp.status}")
-                    except _urlerr.HTTPError as exc:
-                        if exc.code == 401:
-                            log.warning("[chain-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker")
-                        else:
-                            log.warning(f"[chain-push] HTTP error from web service ({web_url}): {exc}")
-                    except _urlerr.URLError as exc:
-                        log.warning(f"[chain-push] could not reach web service ({web_url}): {exc}")
+                    if not push_token:
+                        log.warning("[chain-push] chains ready locally but web push skipped because WORKER_PUSH_TOKEN is missing")
+                    else:
+                        body = json.dumps({"chains": chains, "market_open": mkt_open}).encode("utf-8")
+                        headers = {"Content-Type": "application/json", "X-Worker-Token": push_token}
+                        req = _urlreq.Request(
+                            f"{web_url}/api/chain/push",
+                            data=body,
+                            headers=headers,
+                            method="POST",
+                        )
+                        try:
+                            with _urlreq.urlopen(req, timeout=15) as resp:  # nosec B310 - scheme validated at thread start
+                                if resp.status != 200:
+                                    log.warning(f"[chain-push] non-200 response: {resp.status}")
+                        except _urlerr.HTTPError as exc:
+                            if exc.code == 401:
+                                log.warning(
+                                    "[chain-push] 401 from web service — WORKER_PUSH_TOKEN missing or different between Render web and worker; "
+                                    f"backing off {_PUSH_AUTH_BACKOFF_S}s"
+                                )
+                                time.sleep(_PUSH_AUTH_BACKOFF_S)
+                            else:
+                                log.warning(f"[chain-push] HTTP error from web service ({web_url}): {exc}")
+                        except _urlerr.URLError as exc:
+                            log.warning(f"[chain-push] could not reach web service ({web_url}): {exc}")
         except Exception as exc:
             log.warning(f"[chain-push] error (continuing): {exc}")
 
@@ -392,7 +527,9 @@ def _bootstrap_token():
 def main():
     log.info("=== Genesis System3 Cloud Worker starting ===")
     log.info(f"ROOT={ROOT}")
+    _write_runtime_report()
     _bootstrap_token()
+    _write_runtime_report()
 
     threads = [
         ("token-daemon", _run_token_daemon),
