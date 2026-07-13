@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/system3-github-render-failure-tracker.yml'
       - 'tools/system3_github_render_failure_tracker.py'
+      - 'tools/run_authenticated_failure_tracker.py'
       - 'scripts/cloud_worker.py'
       - 'render.yaml'
       - 'docs/SYSTEM3_DHAN_TOKEN_UPDATE_NOTE.md'
@@ -30,6 +31,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
       SYSTEM3_RENDER_TRACKER_EXCLUDE_WORKFLOWS: System3 GitHub Render Failure Tracker
       SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S: '12'
       SYSTEM3_RENDER_TRACKER_GITHUB_TIMEOUT_S: '12'
@@ -77,6 +79,7 @@ jobs:
             'github_repository': os.environ.get('GITHUB_REPOSITORY'),
             'github_token_present': bool(os.environ.get('GITHUB_TOKEN')),
             'dashboard_base_url_present': bool(os.environ.get('DASHBOARD_BASE_URL')),
+            'dashboard_api_key_present': bool(os.environ.get('DASHBOARD_API_KEY')),
             'rate_limit': rate_limit,
             'live_trading_enabled': os.environ.get('LIVE_TRADING_ENABLED'),
             'system3_live_trading_allowed': os.environ.get('SYSTEM3_LIVE_TRADING_ALLOWED'),
@@ -85,10 +88,10 @@ jobs:
           pathlib.Path('reports/latest/github_render_failure_tracker/preflight.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
           print(json.dumps(payload, indent=2))
           PY
-      - name: Track GitHub workflow and Render failures
+      - name: Track GitHub workflow and authenticated Render failures
         id: tracker
         continue-on-error: true
-        run: python tools/system3_github_render_failure_tracker.py
+        run: python tools/run_authenticated_failure_tracker.py
       - name: Ensure tracker summary exists even after crash
         if: always()
         run: |
