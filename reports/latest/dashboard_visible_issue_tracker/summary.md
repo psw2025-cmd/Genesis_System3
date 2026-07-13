@@ -1,11 +1,11 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-13T18:36:03.318Z
+Generated: 2026-07-13T18:41:52.028Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `48`
-Info line count: `94`
+Visible blocker count: `41`
+Info line count: `111`
 Screenshot missing count: `1`
 UI exception count: `1`
 Auth OK: `true`
@@ -44,17 +44,10 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - [ ] Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof	PASS	blocked
 - [ ] Fix visible UI blocker on Overview: STALE
 - [ ] Fix visible UI blocker on Overview: PEND
-- [ ] Fix visible UI blocker on Overview: market-session proof pending
-- [ ] Fix visible UI blocker on Signals: Error Loading Data
-- [ ] Fix visible UI blocker on Signals: Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Signals: Signal data unavailable
-- [ ] Fix visible UI blocker on Signals: ❌ Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry
-- [ ] Fix visible UI blocker on Signals: Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Paper Trades: Error Loading Data
-- [ ] Fix visible UI blocker on Paper Trades: Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Paper Trades: ❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry
-- [ ] Fix visible UI blocker on Paper Trades: Endpoint: /api/state Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Performance: Failed to load performance data: 502
+- [ ] Fix visible UI blocker on Overview: FAIL
+- [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
+- [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
+- [ ] Fix visible UI blocker on Paper Trades: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
@@ -67,14 +60,14 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 | Truth Control | BLOCKED | OK | 12 | 5 | 0 | truth.txt |
 | Genesis Brain | PASS | OK | 0 | 5 | 0 | genesis.txt |
 | E2E Proof | BLOCKED | OK | 17 | 5 | 0 | e2e_proof.txt |
-| Overview | BLOCKED | OK | 3 | 14 | 0 | overview.txt |
+| Overview | BLOCKED | OK | 3 | 15 | 0 | overview.txt |
 | Sim Live | BLOCKED | MISSING | 0 | 0 | 1 | sim_live.txt |
 | Option Chain | PASS | OK | 0 | 6 | 0 | chain.txt |
-| Signals | BLOCKED | OK | 5 | 5 | 0 | signals.txt |
+| Signals | PASS | OK | 0 | 5 | 0 | signals.txt |
 | Trade | PASS | OK | 0 | 6 | 0 | trade.txt |
-| Paper Trades | BLOCKED | OK | 4 | 6 | 0 | paper.txt |
+| Paper Trades | BLOCKED | OK | 3 | 21 | 0 | paper.txt |
 | Positions | PASS | OK | 0 | 7 | 0 | positions.txt |
-| Performance | BLOCKED | OK | 1 | 5 | 0 | performance.txt |
+| Performance | PASS | OK | 0 | 6 | 0 | performance.txt |
 | ML Model | BLOCKED | OK | 3 | 5 | 0 | ml.txt |
 | Broker | BLOCKED | OK | 1 | 7 | 0 | broker.txt |
 | Alerts | PASS | OK | 0 | 5 | 0 | alerts.txt |
@@ -112,17 +105,10 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **E2E Proof**: Live-money switch blocked until separate proof	PASS	blocked
 - **Overview**: STALE
 - **Overview**: PEND
-- **Overview**: market-session proof pending
-- **Signals**: Error Loading Data
-- **Signals**: Error: Request failed with status code 502
-- **Signals**: Signal data unavailable
-- **Signals**: ❌ Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry
-- **Signals**: Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502
-- **Paper Trades**: Error Loading Data
-- **Paper Trades**: Error: Request failed with status code 502
-- **Paper Trades**: ❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry
-- **Paper Trades**: Endpoint: /api/state Error: Request failed with status code 502
-- **Performance**: Failed to load performance data: 502
+- **Overview**: FAIL
+- **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
+- **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
+- **Paper Trades**: BLOCKED
 - **ML Model**: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
@@ -157,8 +143,9 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Overview**: market closed must not hide read-only data
 - **Overview**: Market closed: Before pre-market (opens at 09:15)
 - **Overview**: Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
-- **Overview**: Paper Lifecycle
-- **Overview**: Wire is_tradeable_fo_symbol() in ranking/paper trade path
+- **Overview**: Paper Lifecycle Proof
+- **Overview**: Paper Mode Active
+- **Overview**: CLOUD_PAPER_ENGINE=0, analyzer mode
 - **Option Chain**: MARKET CLOSED / DATA POLLING
 - **Option Chain**: PAPER
 - **Option Chain**: LIVE OFF
@@ -182,6 +169,21 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Paper Trades**: PAPER ONLY
 - **Paper Trades**: Paper Trades
 - **Paper Trades**: Paper Trading Console
+- **Paper Trades**: Recheck Paper Proof
+- **Paper Trades**: PAPER / ANALYZER SAFE
+- **Paper Trades**: Today Paper Entries
+- **Paper Trades**: Today Paper Exits
+- **Paper Trades**: Closed paper/analyzer records
+- **Paper Trades**: Paper Truth Provenance
+- **Paper Trades**: NO_PAPER_SOURCE
+- **Paper Trades**: Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.
+- **Paper Trades**: PAPER TRADING MODE (NO REAL ORDERS)
+- **Paper Trades**: Mode: PAPER | Data Source: NOT_READY | Broker: Connected
+- **Paper Trades**: Open Paper Positions (0)
+- **Paper Trades**: No open paper positions
+- **Paper Trades**: Today Paper Trade Proof
+- **Paper Trades**: Total Paper Exposure
+- **Paper Trades**: Paper UI does not call broker/order close endpoints.
 - **Positions**: MARKET CLOSED / DATA POLLING
 - **Positions**: PAPER
 - **Positions**: LIVE OFF
@@ -194,6 +196,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Performance**: LIVE OFF
 - **Performance**: PAPER ONLY
 - **Performance**: Paper Trades
+- **Performance**: No performance data yet — paper engine has not closed any trades.
 - **ML Model**: MARKET CLOSED / DATA POLLING
 - **ML Model**: PAPER
 - **ML Model**: LIVE OFF
