@@ -64,7 +64,14 @@ jobs:
             Pop-Location
           }
 
-      - name: Install Playwright Chromium
+      - name: Install Node Playwright for dashboard proof
+        shell: pwsh
+        run: |
+          npm install --no-save --package-lock=false playwright@1.52.0
+          npx playwright install chromium
+          node -e "import('playwright').then(p => { if (!p.chromium) process.exit(2); console.log('PLAYWRIGHT_ESM_IMPORT_OK') })"
+
+      - name: Install Python Playwright Chromium
         shell: pwsh
         run: |
           python -m playwright install chromium
