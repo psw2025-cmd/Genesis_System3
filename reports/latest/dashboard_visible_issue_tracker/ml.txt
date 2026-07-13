@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-03:37:33 IST
+04:02:30 IST
 NIFTY
 24,198
 BNFTY
@@ -60,7 +60,7 @@ Required proof: matured prediction history, post-market validation, accuracy/dri
 Active model
 NOT_PROVEN
 Fallback used
-NO
+UNKNOWN
 Proof records
 0
 Training status
