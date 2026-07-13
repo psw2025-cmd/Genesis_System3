@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T23:21:27.885514+00:00`
+Generated UTC: `2026-07-13T23:27:16.340253+00:00`
 Status: **BLOCKED**
-Issues: `405`
+Issues: `404`
 Fix lanes: `13`
 
 ## Rule
@@ -273,28 +273,6 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### UNKNOWN — 16 issues
-
-Recommended fixes:
-- Inspect source report, classify manually, add rule to planner.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=11
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20055ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "ASYNC_CONTENT_NOT_SETTLED after 20047ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=111
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: settle_normalized_tab_count=13
-- `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
-
 ### ML_TRAINING — 15 issues
 
 Recommended fixes:
@@ -318,6 +296,28 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
+
+### UNKNOWN — 15 issues
+
+Recommended fixes:
+- Inspect source report, classify manually, add rule to planner.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=11
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20055ms markers=CHECKING..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "ASYNC_CONTENT_NOT_SETTLED after 20047ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=111
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
+- `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
+- `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
 ### WORKFLOW_CI — 9 issues
 
