@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T23:09:08.066Z",
+  "generated_at": "2026-07-13T23:21:58.410Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -7,8 +7,8 @@
   "order_routes_called": false,
   "secrets_persisted": false,
   "auth": {
-    "ok": true,
-    "status": 200
+    "ok": false,
+    "status": 502
   },
   "ui_response_status": 502,
   "final_url": "https://genesis-system3-backend.onrender.com/ui/",
@@ -47,6 +47,6 @@
     "console.error"
   ],
   "page_error_types": [],
-  "blocker": "UI_HTTP_NOT_OK",
+  "blocker": "DASHBOARD_AUTH_NOT_PROVEN",
   "production_grade_claim_allowed": false
 }
