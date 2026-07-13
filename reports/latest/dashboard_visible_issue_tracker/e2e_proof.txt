@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:33:56 IST
+04:59:11 IST
 NIFTY
 24,198
 BNFTY
@@ -65,14 +65,14 @@ PASS · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 7/13/2026, 11:03:53 PM · This panel is proof-only; it does not enable live orders.
+Last run: 7/13/2026, 11:28:54 PM · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
 Dhan broker connection	BLOCKED	502
 Dhan access token/session	BLOCKED	-
 Real broker funds/margin	BLOCKED	502
 Real broker holdings response	BLOCKED	502
-Real broker positions response	PASS	rows visible or empty broker response
+Real broker positions response	BLOCKED	502
 Real Dhan option chain for all watched symbols	BLOCKED	0/5
 No non-Dhan/stale/fallback markers in chain	PASS	clean
 Paper/analyzer P&L endpoint	BLOCKED	502
@@ -88,12 +88,12 @@ MIDCPNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
 SENSEX	BLOCKED	-	-	502	-	-	UNKNOWN
 Core API / Dashboard Data Proof
 ENDPOINT	HTTP	VISUAL STATUS	IMPORTANT STATUS
-/api/health	200	PASS	ok
-/api/state	200	PASS	PAPER
+/api/health	502	BLOCKED	-
+/api/state	502	BLOCKED	-
 /api/broker/dhan/status	502	BLOCKED	-
 /api/broker/funds	502	BLOCKED	-
 /api/broker/holdings	502	BLOCKED	-
-/api/broker/positions/live	200	PASS	-
+/api/broker/positions/live	502	BLOCKED	-
 /api/gain_rank	502	BLOCKED	-
 /api/pnl	502	BLOCKED	-
 /api/trades/today	502	BLOCKED	-
