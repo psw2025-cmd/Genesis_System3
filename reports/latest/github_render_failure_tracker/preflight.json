@@ -1,0 +1,16 @@
+{
+  "python": "3.11.15",
+  "github_repository": "psw2025-cmd/Genesis_System3",
+  "github_token_present": true,
+  "dashboard_base_url_present": true,
+  "rate_limit": {
+    "available": true,
+    "core_remaining": 4823,
+    "core_limit": 5000,
+    "core_reset": 1783951137,
+    "actions_runner_registration_remaining": 10000
+  },
+  "live_trading_enabled": "0",
+  "system3_live_trading_allowed": "0",
+  "analyze_mode": "1"
+}

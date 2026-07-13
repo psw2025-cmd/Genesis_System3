@@ -1,24 +1,30 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-07-12T12:37:56.630197Z`
+Generated UTC: `2026-07-13T13:16:21.189917Z`
 Status: **BLOCKED**
+Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `https://genesis-system3-backend.onrender.com`
-GitHub failed workflows: `5`
+Excluded workflows: `System3 GitHub Render Failure Tracker`
+GitHub failed workflows: `9`
 Render failed endpoints: `9`
-TODO count: `14`
+TODO count: `18`
 
 ## Rule
 
-Every failed GitHub workflow and Render endpoint failure stays in this TODO until a later run proves PASS. Do not claim resolved from chat, logs, or file existence; dashboard visual proof is still required for final claims.
+Every failed GitHub workflow and Render endpoint failure stays in this TODO until a later run proves PASS. The tracker is report-only and must not create a self-failure storm. Dashboard visual proof is still required for final claims.
 
 ## TODO
 
-- [ ] Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29192720288 conclusion=failure commit=cdc00d894f00
-- [ ] Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29192720073 conclusion=failure commit=cdc00d894f00
-- [ ] Fix GitHub workflow 'System3 GitHub Render Failure Tracker' run=29192708869 conclusion=failure commit=4986f22102b5
-- [ ] Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29192708858 conclusion=failure commit=4986f22102b5
-- [ ] Fix GitHub workflow 'System3 Experimental Solution Planner' run=29192708838 conclusion=failure commit=4986f22102b5
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252920225 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252766022 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252763238 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252761114 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252752825 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252687933 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252684588 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632715 conclusion=cancelled commit=c9c2b8959a46
+- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632028 conclusion=cancelled commit=c9c2b8959a46
 - [ ] Fix Render endpoint /api/state: HTTP status 401 status=401
 - [ ] Fix Render endpoint /api/deploy/info: HTTP status 401 status=401
 - [ ] Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401
@@ -33,22 +39,26 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| Genesis System3 Global Safety CI | 29192720288 | failure | `cdc00d894f00` | 2026-07-12T12:30:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720288 |
-| .github/workflows/options-ml-training-proof.yml | 29192720073 | failure | `cdc00d894f00` | 2026-07-12T12:29:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192720073 |
-| System3 GitHub Render Failure Tracker | 29192708869 | failure | `4986f22102b5` | 2026-07-12T12:37:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708869 |
-| System3 Secure Install Credential Audit | 29192708858 | failure | `4986f22102b5` | 2026-07-12T12:37:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708858 |
-| System3 Experimental Solution Planner | 29192708838 | failure | `4986f22102b5` | 2026-07-12T12:37:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29192708838 |
+| Dashboard Visible Issue Tracker | 29252920225 | cancelled | `c9c2b8959a46` | 2026-07-13T13:15:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252920225 |
+| System3 1000 Point TODO Status Updater | 29252766022 | cancelled | `c9c2b8959a46` | 2026-07-13T13:13:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252766022 |
+| Dashboard Visible Issue Tracker | 29252763238 | cancelled | `c9c2b8959a46` | 2026-07-13T13:13:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252763238 |
+| Dashboard Visible Issue Tracker | 29252761114 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252761114 |
+| Dashboard Visible Issue Tracker | 29252752825 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:00Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252752825 |
+| System3 1000 Point TODO Status Updater | 29252687933 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252687933 |
+| Dashboard Visible Issue Tracker | 29252684588 | cancelled | `c9c2b8959a46` | 2026-07-13T13:10:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252684588 |
+| System3 1000 Point TODO Status Updater | 29252632715 | cancelled | `c9c2b8959a46` | 2026-07-13T13:10:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632715 |
+| System3 1000 Point TODO Status Updater | 29252632028 | cancelled | `c9c2b8959a46` | 2026-07-13T13:09:11Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632028 |
 
 ## Render endpoint failures
 
-| Endpoint | Status | Reason | Sample |
+| Endpoint | Status | Reason | Classification |
 |---|---:|---|---|
-| `/api/state` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/deploy/info` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/broker/diagnose` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/broker/funds` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/broker/holdings` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/broker/positions/live` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/scanner/top_contract_gainers` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/paper` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
-| `/api/ml/performance` | 401 | HTTP status 401 | `{"detail":"Missing or invalid dashboard API session"}` |
+| `/api/state` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/deploy/info` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/broker/diagnose` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/broker/funds` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/broker/holdings` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/broker/positions/live` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/scanner/top_contract_gainers` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/paper` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/api/ml/performance` | 401 | HTTP status 401 | `mentions_auth_error` |
