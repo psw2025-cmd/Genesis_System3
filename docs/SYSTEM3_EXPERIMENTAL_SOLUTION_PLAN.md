@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T23:27:16.340253+00:00`
+Generated UTC: `2026-07-13T23:34:10.121151+00:00`
 Status: **BLOCKED**
-Issues: `404`
+Issues: `389`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### UI_RED_VISUAL — 125 issues
+### UI_RED_VISUAL — 133 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -49,7 +49,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### GITHUB_RENDER_FAILURE — 118 issues
+### GITHUB_RENDER_FAILURE — 96 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -310,16 +310,16 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
 - `reports/latest/github_render_failure_tracker/summary.json`: todo_count=11
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20055ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "ASYNC_CONTENT_NOT_SETTLED after 20047ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20062ms markers=CHECKING..."}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=111
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=110
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=2
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: settle_normalized_tab_count=14
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
-### WORKFLOW_CI — 9 issues
+### WORKFLOW_CI — 10 issues
 
 Recommended fixes:
 - Read workflow_failure_tracker TODO.
@@ -335,7 +335,8 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=45
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "Request failed with status code 502"}
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=33
 
 ### PAPER_LIFECYCLE — 8 issues
 
@@ -398,7 +399,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"}
 
-### INSTALL_CREDENTIAL — 4 issues
+### INSTALL_CREDENTIAL — 2 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -406,8 +407,6 @@ Recommended fixes:
 - Never print or commit credential values.
 
 Top issues:
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29292125357 conclusion=failure commit=bd40edb0b93809895b17b446d2fa4875b4102628
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29291759797 conclusion=failure commit=d8db24f4785d6cdac079a6557c6be61dc518f608
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29291748604 conclusion=failure commit=daf296e9cbb5b80fd4ebfcff57444cd7fb01a303
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29291417520 conclusion=failure commit=158d40d4c273f5d357575321ce577f6096240abd
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293086262 conclusion=failure commit=c4f5d05d68a4c391238e43944a0d71ad50d148d6
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29292788915 conclusion=failure commit=071ddcdbb70c7e202325a38bd621794523e3f8fb
 

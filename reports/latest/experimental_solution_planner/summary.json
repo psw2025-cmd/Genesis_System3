@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-13T23:27:16.340253+00:00",
-  "issue_count": 404,
+  "generated_utc": "2026-07-13T23:34:10.121151+00:00",
+  "issue_count": 389,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 125,
+      "issue_count": 133,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -140,7 +140,7 @@
       ]
     },
     {
-      "issue_count": 118,
+      "issue_count": 96,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -803,12 +803,7 @@
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20055ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20047ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE...\"}",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20062ms markers=CHECKING...\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -823,12 +818,17 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=111",
+          "issue": "info_line_count=110",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "unsettled_tab_count=3",
+          "issue": "unsettled_tab_count=2",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "settle_normalized_tab_count=14",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -845,7 +845,7 @@
       ]
     },
     {
-      "issue_count": 9,
+      "issue_count": 10,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -894,7 +894,12 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "failed_count=45",
+          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"Request failed with status code 502\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "failed_count=33",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1070,7 +1075,7 @@
       ]
     },
     {
-      "issue_count": 4,
+      "issue_count": 2,
       "lane": "INSTALL_CREDENTIAL",
       "recommended_fixes": [
         "Fix dependency/import/compile errors from secure audit.",
@@ -1079,22 +1084,12 @@
       ],
       "top_issues": [
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29292125357 conclusion=failure commit=bd40edb0b93809895b17b446d2fa4875b4102628",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29293086262 conclusion=failure commit=c4f5d05d68a4c391238e43944a0d71ad50d148d6",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29291759797 conclusion=failure commit=d8db24f4785d6cdac079a6557c6be61dc518f608",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29291748604 conclusion=failure commit=daf296e9cbb5b80fd4ebfcff57444cd7fb01a303",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29291417520 conclusion=failure commit=158d40d4c273f5d357575321ce577f6096240abd",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29292788915 conclusion=failure commit=071ddcdbb70c7e202325a38bd621794523e3f8fb",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
