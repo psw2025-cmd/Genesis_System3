@@ -1,0 +1,73 @@
+name: System3 Render Worker Issue Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/cloud_worker.py'
+      - 'render.yaml'
+      - '.github/workflows/system3-render-worker-issue-proof.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  worker-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile worker
+        run: python -m py_compile scripts/cloud_worker.py
+      - name: Verify worker safety patch
+        run: |
+          mkdir -p reports/latest/render_worker_issue_proof
+          python - <<'PY'
+          import json, pathlib, re
+          worker = pathlib.Path('scripts/cloud_worker.py').read_text(encoding='utf-8')
+          render = pathlib.Path('render.yaml').read_text(encoding='utf-8')
+          checks = {
+            'live_trading_forced_off': 'LIVE_TRADING_ENABLED", "0"' in worker and 'SYSTEM3_LIVE_TRADING_ALLOWED", "0"' in worker,
+            'runtime_report_present': 'render_worker_runtime' in worker and '_write_runtime_report()' in worker,
+            'no_secret_printing_meta_only': '_secret_meta' in worker and 'sha256_8' in worker,
+            'worker_push_token_backoff': 'WORKER_PUSH_AUTH_BACKOFF_S' in worker and 'backing off' in worker,
+            'dhan_auth_backoff': 'DHAN_AUTH_BACKOFF_S' in worker and 'Dhan auth failure detected' in worker,
+            'worker_declared_in_render': 'type: worker' in render and 'python scripts/cloud_worker.py' in render,
+            'shared_env_group_declared': 'dhan-shared-credentials' in render and 'WORKER_PUSH_TOKEN' in render,
+          }
+          status = 'PASS' if all(checks.values()) else 'BLOCKED'
+          payload = {
+            'status': status,
+            'checks': checks,
+            'live_trading_enabled': False,
+            'live_order_routes_called': False,
+            'next_required_runtime_steps': [
+              'Restart or redeploy backend after Render pipeline minutes are available',
+              'Restart or redeploy worker after updating Dhan token and WORKER_PUSH_TOKEN',
+              'Confirm worker log preflight status PASS',
+              'Confirm Dhan 401 and worker push 401 are gone',
+            ],
+          }
+          out = pathlib.Path('reports/latest/render_worker_issue_proof')
+          out.joinpath('summary.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
+          out.joinpath('summary.md').write_text('# Render Worker Issue Proof\n\nStatus: **%s**\n\nChecks:\n%s\n\nLive trading remains OFF.\n' % (status, '\n'.join(f'- {k}: {v}' for k,v in checks.items())), encoding='utf-8')
+          if status != 'PASS':
+            raise SystemExit(1)
+          PY
+      - name: Commit proof report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/render_worker_issue_proof/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(worker): publish render worker issue proof [skip ci]"
+          git push
