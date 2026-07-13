@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:22:08 IST
+04:35:38 IST
 NIFTY
 24,198
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN DEGRADED
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -68,7 +68,7 @@ CONTRACTS
 +/-10 ATM
 +/-15 ATM
 +/-20 ATM
-STALE / FALLBACK DATA - NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
+NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
 
 210K
@@ -176,4 +176,4 @@ OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
 129K
 INDEX SCANNER
 No rankings available
-Render/backend returned 502 for /api/paper. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+Scanner has no current ranking rows.
