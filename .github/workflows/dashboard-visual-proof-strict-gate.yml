@@ -1,0 +1,89 @@
+name: Dashboard Visual Proof Strict Gate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15,45 * * * *'
+  workflow_run:
+    workflows:
+      - Dashboard Visible Issue Tracker
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  strict-visual-proof-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      EXPECTED_DASHBOARD_TAB_COUNT: '16'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Enforce current fail-closed visual proof contract
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone, timedelta
+          from pathlib import Path
+
+          path = Path('reports/latest/dashboard_visible_issue_tracker/summary.json')
+          if not path.is_file():
+              raise SystemExit('BLOCKED: dashboard visual proof report is missing')
+
+          data = json.loads(path.read_text(encoding='utf-8'))
+          expected = 16
+          tabs = data.get('tabs') if isinstance(data.get('tabs'), list) else []
+          auth = data.get('auth') if isinstance(data.get('auth'), dict) else {}
+          generated = data.get('generated_at')
+
+          try:
+              stamp = datetime.fromisoformat(str(generated).replace('Z', '+00:00'))
+              if stamp.tzinfo is None:
+                  stamp = stamp.replace(tzinfo=timezone.utc)
+          except Exception as exc:
+              raise SystemExit(f'BLOCKED: invalid generated_at timestamp: {type(exc).__name__}')
+
+          # Scheduled proof must be recent enough to represent the live Render UI.
+          current = datetime.now(timezone.utc)
+          fresh = current - stamp.astimezone(timezone.utc) <= timedelta(hours=2)
+
+          checks = {
+              'status_pass': data.get('status') == 'PASS',
+              'proof_fresh_within_2h': fresh,
+              'auth_ok': auth.get('ok') is True,
+              'expected_tab_count_16': data.get('expected_tab_count') == expected,
+              'scanned_tab_count_16': len(tabs) == expected,
+              'screenshots_complete': data.get('screenshot_missing_count') == 0,
+              'visible_issue_count_zero': data.get('visible_issue_count') == 0,
+              'ui_exception_count_zero': data.get('ui_exception_count') == 0,
+              'global_exception_empty': not data.get('global_exception'),
+              'production_claim_allowed': data.get('production_grade_claim_allowed') is True,
+              'analyze_mode_on': data.get('analyzer_safety', {}).get('analyze_mode') is True,
+              'live_trading_off': data.get('analyzer_safety', {}).get('live_trading_enabled') is False,
+              'system3_live_allowed_off': data.get('analyzer_safety', {}).get('system3_live_trading_allowed') is False,
+          }
+
+          failed = [name for name, ok in checks.items() if not ok]
+          print(json.dumps({
+              'generated_at': generated,
+              'age_minutes': round((current - stamp.astimezone(timezone.utc)).total_seconds() / 60, 1),
+              'status': data.get('status'),
+              'scanned_tab_count': len(tabs),
+              'expected_tab_count': expected,
+              'failed_checks': failed,
+          }, indent=2))
+
+          if failed:
+              raise SystemExit('BLOCKED: strict dashboard visual proof checks failed: ' + ', '.join(failed))
+          PY
