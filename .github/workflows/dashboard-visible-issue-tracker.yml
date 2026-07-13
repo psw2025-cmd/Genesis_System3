@@ -66,6 +66,10 @@ jobs:
           set -euo pipefail
           rm -rf .proof-node node_modules
           mkdir -p .proof-node
+          stage_file=.proof-node/install_failure_stage
+          stage=prepare_manifest
+          printf '%s\n' "$stage" > "$stage_file"
+          trap 'printf "%s\n" "$stage" > "$stage_file"' ERR
           cat > .proof-node/package.json <<'JSON'
           {
             "name": "system3-dashboard-proof-runner",
@@ -90,12 +94,26 @@ jobs:
             done
           }
 
+          stage=npm_install
+          printf '%s\n' "$stage" > "$stage_file"
           retry 3 npm install --prefix .proof-node --ignore-scripts --no-audit --no-fund --package-lock=false
+          stage=chromium_download
+          printf '%s\n' "$stage" > "$stage_file"
           retry 3 .proof-node/node_modules/.bin/playwright install chromium
+          stage=playwright_package_check
+          printf '%s\n' "$stage" > "$stage_file"
           test -d .proof-node/node_modules/playwright
+          stage=browser_path_check
+          printf '%s\n' "$stage" > "$stage_file"
           test -d "$PLAYWRIGHT_BROWSERS_PATH"
+          stage=node_modules_link
+          printf '%s\n' "$stage" > "$stage_file"
           ln -s .proof-node/node_modules node_modules
+          stage=esm_import_check
+          printf '%s\n' "$stage" > "$stage_file"
           node --input-type=module -e "import('playwright').then(m => { if (!m.chromium) process.exit(1) })"
+          printf '%s\n' complete > "$stage_file"
+          trap - ERR
 
       - name: Scan live dashboard visible issues
         id: scan
@@ -116,13 +134,22 @@ jobs:
           from datetime import datetime, timezone
           out='reports/latest/dashboard_visible_issue_tracker'
           expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          allowed_stages={'prepare_manifest','npm_install','chromium_download','playwright_package_check','browser_path_check','node_modules_link','esm_import_check','complete','not_recorded'}
+          stage='not_recorded'
+          stage_path='.proof-node/install_failure_stage'
+          if os.path.exists(stage_path):
+              candidate=open(stage_path,encoding='utf-8').read().strip()
+              if candidate in allowed_stages:
+                  stage=candidate
           reason=(f"visual tracker did not produce its required report; install_step_outcome={os.environ.get('INSTALL_OUTCOME','unknown')}; "
-                  f"scan_step_outcome={os.environ.get('SCAN_OUTCOME','unknown')}. Inspect browser launch, Render reachability, and authentication.")
+                  f"install_failure_stage={stage}; scan_step_outcome={os.environ.get('SCAN_OUTCOME','unknown')}. "
+                  "Inspect the named installation stage, browser launch, Render reachability, and authentication.")
           data={
             'generated_at':datetime.now(timezone.utc).isoformat(), 'base':os.environ.get('DASHBOARD_BASE_URL',''),
             'status':'BLOCKED', 'auth':{'ok':False,'status':0,'note':'not proven because tracker report was not produced'},
             'tabs':[], 'expected_tab_count':expected, 'visible_issue_count':0, 'info_line_count':0,
             'screenshot_missing_count':expected, 'ui_exception_count':1, 'global_exception':reason,
+            'install_failure_stage':stage,
             'visible_issues':[], 'info_lines':[], 'todo':[reason], 'production_grade_claim_allowed':False,
             'analyzer_safety':{'analyze_mode':True,'live_trading_enabled':False,'system3_live_trading_allowed':False}
           }
@@ -145,7 +172,7 @@ jobs:
           auth=d.get('auth') if isinstance(d.get('auth'),dict) else {}
           d['auth']={'ok':bool(auth.get('ok')),'status':int(auth.get('status') or 0),**({'note':str(auth.get('note'))[:300]} if auth.get('note') else {})}
           eligible=d.get('status')=='PASS' and scanned==expected
-          if int(d.get('expected_tab_count') or 0)!=expected or d.get('production_grade_claim_allowed') is not eligible:
+          if int(d.get('expected_tab_count') or 0)!=expected or bool(d.get('production_grade_claim_allowed')) != eligible:
             raise SystemExit('invalid visual proof gate state')
           forbidden=('password','secret','token','cookie','authorization','api_key','response_body')
           def walk(v,path='root'):
@@ -165,6 +192,7 @@ jobs:
           print(json.dumps({'status':d.get('status'),'scanned_tab_count':scanned,'expected_tab_count':expected,
                             'visible_issue_count':d.get('visible_issue_count'),'screenshot_missing_count':d.get('screenshot_missing_count'),
                             'ui_exception_count':d.get('ui_exception_count'),'auth_ok':d['auth']['ok'],
+                            'install_failure_stage':d.get('install_failure_stage'),
                             'production_grade_claim_allowed':d.get('production_grade_claim_allowed')},indent=2))
           PY
 
