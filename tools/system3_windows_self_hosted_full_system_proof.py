@@ -93,7 +93,26 @@ def run_command(cmd: List[str], timeout: int = 240) -> Dict[str, Any]:
     return result
 
 
+def _http_error_category(status: int | None) -> str:
+    if status is None:
+        return "network_error"
+    if status in {401, 403}:
+        return "authentication_or_authorization"
+    if status == 404:
+        return "route_not_found"
+    if status == 408:
+        return "request_timeout"
+    if status == 429:
+        return "rate_limited"
+    if 500 <= status <= 599:
+        return "backend_server_error"
+    if 400 <= status <= 499:
+        return "client_request_error"
+    return "none"
+
+
 def probe(endpoint: str) -> Dict[str, Any]:
+    """Probe one read-only endpoint without persisting its response body."""
     url = f"{BASE_URL}{endpoint}"
     headers = {"User-Agent": "System3-Windows-SelfHosted-Proof/1.0"}
     key = os.environ.get("DASHBOARD_API_KEY", "").strip()
@@ -103,17 +122,47 @@ def probe(endpoint: str) -> Dict[str, Any]:
     started = time.time()
     try:
         with urllib.request.urlopen(req, timeout=20) as resp:  # nosec B310 - configured dashboard URL
-            body = resp.read(2000).decode("utf-8", "replace")
-            return {"endpoint": endpoint, "url": url, "ok": 200 <= resp.status < 300, "status": resp.status, "elapsed_sec": round(time.time() - started, 2), "body_preview": body[:1000]}
+            # Do not read or persist protected response bodies. Status/latency are sufficient proof.
+            return {
+                "endpoint": endpoint,
+                "url": url,
+                "ok": 200 <= resp.status < 300,
+                "status": resp.status,
+                "elapsed_sec": round(time.time() - started, 2),
+                "error_category": _http_error_category(resp.status),
+                "response_body_persisted": False,
+            }
     except urllib.error.HTTPError as exc:
-        preview = ""
-        try:
-            preview = exc.read(1000).decode("utf-8", "replace")
-        except Exception:
-            pass
-        return {"endpoint": endpoint, "url": url, "ok": False, "status": exc.code, "elapsed_sec": round(time.time() - started, 2), "body_preview": preview}
+        return {
+            "endpoint": endpoint,
+            "url": url,
+            "ok": False,
+            "status": exc.code,
+            "elapsed_sec": round(time.time() - started, 2),
+            "error_category": _http_error_category(exc.code),
+            "response_body_persisted": False,
+        }
+    except TimeoutError:
+        return {
+            "endpoint": endpoint,
+            "url": url,
+            "ok": False,
+            "status": None,
+            "elapsed_sec": round(time.time() - started, 2),
+            "error_category": "request_timeout",
+            "response_body_persisted": False,
+        }
     except Exception as exc:
-        return {"endpoint": endpoint, "url": url, "ok": False, "status": None, "elapsed_sec": round(time.time() - started, 2), "error": str(exc)}
+        return {
+            "endpoint": endpoint,
+            "url": url,
+            "ok": False,
+            "status": None,
+            "elapsed_sec": round(time.time() - started, 2),
+            "error_category": "network_error",
+            "error_type": type(exc).__name__,
+            "response_body_persisted": False,
+        }
 
 
 def read_json(path: Path) -> Dict[str, Any]:
@@ -149,7 +198,7 @@ def build_html(payload: Dict[str, Any]) -> str:
     )
     blockers = "".join(f"<li>{b}</li>" for b in payload.get("blockers", [])) or "<li>None</li>"
     endpoints = "\n".join(
-        f"<tr><td>{p['endpoint']}</td><td class={'pass' if p.get('ok') else 'blocked'}>{p.get('status')}</td><td>{p.get('elapsed_sec')}</td><td><pre>{(p.get('error') or p.get('body_preview') or '')[:300]}</pre></td></tr>"
+        f"<tr><td>{p['endpoint']}</td><td class={'pass' if p.get('ok') else 'blocked'}>{p.get('status')}</td><td>{p.get('elapsed_sec')}</td><td>{p.get('error_category', 'none')}</td></tr>"
         for p in payload.get("http_probes", [])
     )
     return f"""<!doctype html>
@@ -167,7 +216,7 @@ td,th{{border:1px solid #334155;padding:9px;text-align:left;vertical-align:top}}
 <b>Live trading enabled:</b> false | <b>Order routes called:</b> false | <b>Analyzer mode:</b> true</div>
 <h2>Status board</h2><table><tr><th>Area</th><th>Status</th><th>Detail</th></tr>{rows}</table>
 <h2>Blockers</h2><div class='card'><ul>{blockers}</ul></div>
-<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Preview</th></tr>{endpoints}</table>
+<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Error category</th></tr>{endpoints}</table>
 </body></html>"""
 
 
@@ -197,9 +246,10 @@ def main() -> int:
 
     for item in probes:
         status = "PASS" if item.get("ok") else "BLOCKED"
-        status_table.append({"name": f"HTTP {item['endpoint']}", "status": status, "detail": str(item.get("status") or item.get("error") or "")})
+        detail = str(item.get("status") or item.get("error_category") or "")
+        status_table.append({"name": f"HTTP {item['endpoint']}", "status": status, "detail": detail})
         if status != "PASS":
-            blockers.append(f"HTTP blocked: {item['endpoint']} — {item.get('status') or item.get('error')}")
+            blockers.append(f"HTTP blocked: {item['endpoint']} — {detail}")
 
     for name, data in reports.items():
         status = report_status(name, data)
@@ -214,6 +264,7 @@ def main() -> int:
         "base_url": BASE_URL,
         "runner": {"platform": platform.platform(), "machine": platform.machine(), "python": sys.version.split()[0]},
         "safety": {"live_trading_enabled": False, "system3_live_trading_allowed": False, "analyze_mode": True, "order_routes_called": False},
+        "response_bodies_persisted": False,
         "commands": commands,
         "http_probes": probes,
         "reports": reports,
@@ -223,10 +274,10 @@ def main() -> int:
 
     (OUT / "summary.json").write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
     md_rows = "\n".join(f"| {r['name']} | {r['status']} | {r.get('detail','')} |" for r in status_table)
-    md = f"# System3 Windows Self-Hosted Full System Proof\n\nGenerated: `{payload['generated_utc']}`\n\nFinal status: **{final}**\n\nSafety: live trading OFF, analyzer mode ON, order routes not called.\n\n## Status board\n\n| Area | Status | Detail |\n|---|---|---|\n{md_rows}\n\n## Blockers\n\n" + "\n".join(f"- {b}" for b in blockers)
+    md = f"# System3 Windows Self-Hosted Full System Proof\n\nGenerated: `{payload['generated_utc']}`\n\nFinal status: **{final}**\n\nSafety: live trading OFF, analyzer mode ON, order routes not called.\n\nResponse bodies persisted: **false**.\n\n## Status board\n\n| Area | Status | Detail |\n|---|---|---|\n{md_rows}\n\n## Blockers\n\n" + "\n".join(f"- {b}" for b in blockers)
     (OUT / "summary.md").write_text(md, encoding="utf-8")
     (OUT / "index.html").write_text(build_html(payload), encoding="utf-8")
-    print(json.dumps({"status": final, "out": str(OUT), "blocker_count": len(blockers)}, indent=2))
+    print(json.dumps({"status": final, "out": str(OUT), "blocker_count": len(blockers), "response_bodies_persisted": False}, indent=2))
     return 0 if final == "PASS" else 2
 
 
