@@ -7,6 +7,10 @@ Purpose:
 - Write persistent MD/JSON TODO so failures are visible next run.
 - Never print or persist secrets, response bodies, cookies, or tokens.
 - Never call live order routes.
+
+Important design rule:
+- This tracker is REPORT-ONLY. It must not fail just because it found blockers;
+  otherwise it creates an infinite self-failure storm.
 """
 from __future__ import annotations
 
@@ -25,6 +29,14 @@ REPO = os.environ.get("GITHUB_REPOSITORY", "psw2025-cmd/Genesis_System3")
 TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""
 BASE = os.environ.get("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
 BAD_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required"}
+SELF_WORKFLOW = "System3 GitHub Render Failure Tracker"
+EXCLUDED_WORKFLOWS = {
+    name.strip()
+    for name in os.environ.get("SYSTEM3_RENDER_TRACKER_EXCLUDE_WORKFLOWS", SELF_WORKFLOW).split(",")
+    if name.strip()
+}
+RENDER_ENDPOINT_TIMEOUT_S = float(os.environ.get("SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S", "12"))
+GITHUB_TIMEOUT_S = float(os.environ.get("SYSTEM3_RENDER_TRACKER_GITHUB_TIMEOUT_S", "12"))
 RENDER_ENDPOINTS = [
     "/",
     "/ui/",
@@ -51,7 +63,7 @@ def get_json(url: str, token: str = "") -> Dict[str, Any]:
         headers["Authorization"] = f"Bearer {token}"
         headers["X-GitHub-Api-Version"] = "2022-11-28"
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urllib.request.urlopen(req, timeout=GITHUB_TIMEOUT_S) as resp:
         return json.loads(resp.read().decode("utf-8", errors="replace"))
 
 
@@ -76,7 +88,7 @@ def http_probe(path: str) -> Dict[str, Any]:
     url = path if path.startswith("http") else BASE + path
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "system3-github-render-failure-tracker"})
-        with urllib.request.urlopen(req, timeout=35) as resp:
+        with urllib.request.urlopen(req, timeout=RENDER_ENDPOINT_TIMEOUT_S) as resp:
             body = resp.read(20000).decode("utf-8", errors="replace")
             return {
                 "url": url,
@@ -112,14 +124,26 @@ def latest_failed_workflows() -> List[Dict[str, Any]]:
     url = f"https://api.github.com/repos/{REPO}/actions/runs?per_page=50"
     try:
         data = get_json(url, TOKEN)
+    except urllib.error.HTTPError as exc:
+        # Keep this non-sensitive and useful for auth/rate-limit triage.
+        reason = f"GitHub API run query failed: HTTP {exc.code}"
+        if exc.code in (401, 403):
+            reason += " (auth/rate-limit/permission candidate)"
+        return [{"workflow": "GITHUB_API", "conclusion": "blocked", "todo": reason}]
     except Exception as exc:
         return [{"workflow": "GITHUB_API", "conclusion": "blocked", "todo": f"GitHub API run query failed: {type(exc).__name__}"}]
+
     failed = []
+    excluded_seen = 0
     for run in data.get("workflow_runs", []):
+        workflow_name = run.get("name") or "UNKNOWN"
+        if workflow_name in EXCLUDED_WORKFLOWS:
+            excluded_seen += 1
+            continue
         if run.get("status") == "completed" and run.get("conclusion") in BAD_CONCLUSIONS:
             failed.append(
                 {
-                    "workflow": run.get("name"),
+                    "workflow": workflow_name,
                     "run_id": run.get("id"),
                     "conclusion": run.get("conclusion"),
                     "commit": run.get("head_sha"),
@@ -128,6 +152,11 @@ def latest_failed_workflows() -> List[Dict[str, Any]]:
                     "html_url": run.get("html_url"),
                 }
             )
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "excluded_workflows.json").write_text(
+        json.dumps({"excluded_workflows": sorted(EXCLUDED_WORKFLOWS), "excluded_seen_in_latest_query": excluded_seen}, indent=2),
+        encoding="utf-8",
+    )
     return failed
 
 
@@ -181,6 +210,7 @@ def main() -> int:
     payload = {
         "generated_utc": utc(),
         "status": "PASS" if not todo else "BLOCKED",
+        "tracker_internal_status": "PASS",
         "repository": REPO,
         "render_base": BASE,
         "github_failed_count": len(failed_runs),
@@ -189,11 +219,15 @@ def main() -> int:
         "failed_workflows": failed_runs,
         "render_failures": render,
         "todo": todo,
+        "excluded_workflows": sorted(EXCLUDED_WORKFLOWS),
+        "render_endpoint_timeout_s": RENDER_ENDPOINT_TIMEOUT_S,
+        "github_timeout_s": GITHUB_TIMEOUT_S,
         "live_trading_enabled": False,
         "order_routes_called": False,
         "secrets_printed": False,
         "response_bodies_persisted": False,
         "production_grade_claim_allowed": False,
+        "report_only_no_self_failure_storm": True,
     }
     (OUT / "summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
 
@@ -202,15 +236,17 @@ def main() -> int:
         "",
         f"Generated UTC: `{payload['generated_utc']}`",
         f"Status: **{payload['status']}**",
+        f"Tracker internal status: **{payload['tracker_internal_status']}**",
         f"Repository: `{payload['repository']}`",
         f"Render base: `{payload['render_base']}`",
+        f"Excluded workflows: `{', '.join(payload['excluded_workflows'])}`",
         f"GitHub failed workflows: `{payload['github_failed_count']}`",
         f"Render failed endpoints: `{payload['render_failed_count']}`",
         f"TODO count: `{payload['todo_count']}`",
         "",
         "## Rule",
         "",
-        "Every failed GitHub workflow and Render endpoint failure stays in this TODO until a later run proves PASS. Do not claim resolved from chat, logs, or file existence; dashboard visual proof is still required for final claims.",
+        "Every failed GitHub workflow and Render endpoint failure stays in this TODO until a later run proves PASS. The tracker is report-only and must not create a self-failure storm. Dashboard visual proof is still required for final claims.",
         "",
         "## TODO",
         "",
@@ -228,7 +264,7 @@ def main() -> int:
                     f"`{str(run.get('commit') or '')[:12]}` | {run.get('updated_at')} | {run.get('html_url')} |"
                 )
     else:
-        lines.append("No failed GitHub workflow runs found in latest query.")
+        lines.append("No failed GitHub workflow runs found in latest query after excluding tracker self-runs.")
     lines += ["", "## Render endpoint failures", ""]
     if render:
         lines += ["| Endpoint | Status | Reason | Classification |", "|---|---:|---|---|"]
@@ -252,18 +288,21 @@ def main() -> int:
             {
                 "generated_utc": payload["generated_utc"],
                 "status": payload["status"],
+                "tracker_internal_status": payload["tracker_internal_status"],
                 "github_failed_count": payload["github_failed_count"],
                 "render_failed_count": payload["render_failed_count"],
                 "todo_count": payload["todo_count"],
+                "excluded_workflows": payload["excluded_workflows"],
                 "live_trading_enabled": payload["live_trading_enabled"],
                 "order_routes_called": payload["order_routes_called"],
                 "response_bodies_persisted": payload["response_bodies_persisted"],
-                "production_grade_claim_allowed": payload["production_grade_claim_allowed"],
+                "report_only_no_self_failure_storm": payload["report_only_no_self_failure_storm"],
             },
             sort_keys=True,
         )
     )
-    return 0 if payload["status"] == "PASS" else 1
+    # Report-only workflow: never fail solely because blockers were detected.
+    return 0
 
 
 if __name__ == "__main__":
