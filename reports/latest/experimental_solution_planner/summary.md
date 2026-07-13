@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T20:28:57.718553+00:00`
+Generated UTC: `2026-07-13T20:34:51.708095+00:00`
 Status: **BLOCKED**
-Issues: `300`
+Issues: `301`
 Fix lanes: `13`
 
 ## Rule
@@ -153,7 +153,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### BROKER_DHAN — 29 issues
+### BROKER_DHAN — 30 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
