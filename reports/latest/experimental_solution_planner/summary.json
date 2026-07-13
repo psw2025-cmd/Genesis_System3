@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-13T17:50:00.020638+00:00",
-  "issue_count": 373,
+  "generated_utc": "2026-07-13T17:55:01.047215+00:00",
+  "issue_count": 379,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 124,
+      "issue_count": 116,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 94,
+      "issue_count": 108,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 34,
+      "issue_count": 35,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 32,
+      "issue_count": 33,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -808,7 +808,7 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=94",
+          "issue": "info_line_count=112",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -874,7 +874,7 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "failed_count=47",
+          "issue": "failed_count=42",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1019,47 +1019,6 @@
       ]
     },
     {
-      "issue_count": 6,
-      "lane": "INSTALL_CREDENTIAL",
-      "recommended_fixes": [
-        "Fix dependency/import/compile errors from secure audit.",
-        "Verify credentials via redacted secure env checks only.",
-        "Never print or commit credential values."
-      ],
-      "top_issues": [
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268923929 conclusion=failure commit=6ef7c98745daabae4da8615977ddd980a4d68c66",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268899902 conclusion=failure commit=ecda575d6912cc450f6b1c553946c9a78685e14e",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268871199 conclusion=failure commit=c50c06af3a9c57372244b4abe8f54b864110a3bc",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268853444 conclusion=failure commit=2cd176a54efc3a81fad1c2de7e6da0c3aa28bb14",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268853033 conclusion=failure commit=2cd176a54efc3a81fad1c2de7e6da0c3aa28bb14",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29268655984 conclusion=failure commit=f0ed5aa63b89c853fab0c6a4c7c2e28330f0a5d7",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
       "issue_count": 4,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
@@ -1087,6 +1046,37 @@
           "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 4,
+      "lane": "INSTALL_CREDENTIAL",
+      "recommended_fixes": [
+        "Fix dependency/import/compile errors from secure audit.",
+        "Verify credentials via redacted secure env checks only.",
+        "Never print or commit credential values."
+      ],
+      "top_issues": [
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29272143206 conclusion=failure commit=a89f7c5c6167bc664866c0109f6fe95c5da3ec30",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29271953549 conclusion=failure commit=4bf20359a610ee1f2afcab24522133f74de109c2",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29271931002 conclusion=failure commit=db4ed8b9097905fb9c1a8b863a1fb99c9d6c5f48",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29271521704 conclusion=failure commit=c044bc3905d64e0dcc36a4aa90a26246a510dbc7",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     }

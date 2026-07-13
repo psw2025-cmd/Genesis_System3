@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T17:50:00.020638+00:00`
+Generated UTC: `2026-07-13T17:55:01.047215+00:00`
 Status: **BLOCKED**
-Issues: `373`
+Issues: `379`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 124 issues
+### GITHUB_RENDER_FAILURE — 116 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29270319349 conclusion=failure commit=5cc5081c8024
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29269822011 conclusion=failure commit=2e9475e9b149
 
-### UI_RED_VISUAL — 94 issues
+### UI_RED_VISUAL — 108 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### BROKER_DHAN — 34 issues
+### BROKER_DHAN — 35 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 32 issues
+### RENDER_DEPLOY — 33 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -311,7 +311,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: todo_count=13
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=94
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=112
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
@@ -331,7 +331,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=47
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=42
 
 ### PAPER_LIFECYCLE — 8 issues
 
@@ -381,21 +381,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 
-### INSTALL_CREDENTIAL — 6 issues
-
-Recommended fixes:
-- Fix dependency/import/compile errors from secure audit.
-- Verify credentials via redacted secure env checks only.
-- Never print or commit credential values.
-
-Top issues:
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268923929 conclusion=failure commit=6ef7c98745daabae4da8615977ddd980a4d68c66
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268899902 conclusion=failure commit=ecda575d6912cc450f6b1c553946c9a78685e14e
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268871199 conclusion=failure commit=c50c06af3a9c57372244b4abe8f54b864110a3bc
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268853444 conclusion=failure commit=2cd176a54efc3a81fad1c2de7e6da0c3aa28bb14
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268853033 conclusion=failure commit=2cd176a54efc3a81fad1c2de7e6da0c3aa28bb14
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29268655984 conclusion=failure commit=f0ed5aa63b89c853fab0c6a4c7c2e28330f0a5d7
-
 ### SCANNER_SIGNAL — 4 issues
 
 Recommended fixes:
@@ -408,4 +393,17 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"}
+
+### INSTALL_CREDENTIAL — 4 issues
+
+Recommended fixes:
+- Fix dependency/import/compile errors from secure audit.
+- Verify credentials via redacted secure env checks only.
+- Never print or commit credential values.
+
+Top issues:
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29272143206 conclusion=failure commit=a89f7c5c6167bc664866c0109f6fe95c5da3ec30
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29271953549 conclusion=failure commit=4bf20359a610ee1f2afcab24522133f74de109c2
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29271931002 conclusion=failure commit=db4ed8b9097905fb9c1a8b863a1fb99c9d6c5f48
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29271521704 conclusion=failure commit=c044bc3905d64e0dcc36a4aa90a26246a510dbc7
 
