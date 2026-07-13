@@ -5,7 +5,7 @@ System3 GitHub + Render Failure Tracker
 Purpose:
 - Track GitHub workflow failures and Render public health/UI failures together.
 - Write persistent MD/JSON TODO so failures are visible next run.
-- Never print secrets.
+- Never print or persist secrets, response bodies, cookies, or tokens.
 - Never call live order routes.
 """
 from __future__ import annotations
@@ -55,6 +55,23 @@ def get_json(url: str, token: str = "") -> Dict[str, Any]:
         return json.loads(resp.read().decode("utf-8", errors="replace"))
 
 
+def classify_body(body: str) -> Dict[str, bool]:
+    """Return safe booleans only; never return or persist response content."""
+    low = body.lower()
+    return {
+        "mentions_commit_or_sha": "commit" in low or "sha" in low,
+        "mentions_auth_error": any(
+            marker in low
+            for marker in (
+                "invalid_authentication",
+                "missing or invalid dashboard api session",
+                "unauthorized",
+            )
+        ),
+        "mentions_server_error": "traceback" in low or "internal server error" in low,
+    }
+
+
 def http_probe(path: str) -> Dict[str, Any]:
     url = path if path.startswith("http") else BASE + path
     try:
@@ -65,13 +82,28 @@ def http_probe(path: str) -> Dict[str, Any]:
                 "url": url,
                 "ok": 200 <= int(resp.status) < 400,
                 "status_code": int(resp.status),
-                "body_sample": body[:2000],
+                "classification": classify_body(body),
             }
     except urllib.error.HTTPError as exc:
         body = exc.read(20000).decode("utf-8", errors="replace") if hasattr(exc, "read") else ""
-        return {"url": url, "ok": False, "status_code": int(exc.code), "body_sample": body[:2000]}
+        return {
+            "url": url,
+            "ok": False,
+            "status_code": int(exc.code),
+            "classification": classify_body(body),
+        }
     except Exception as exc:
-        return {"url": url, "ok": False, "status_code": 0, "error": f"{type(exc).__name__}: {str(exc)[:500]}"}
+        return {
+            "url": url,
+            "ok": False,
+            "status_code": 0,
+            "error_type": type(exc).__name__,
+            "classification": {
+                "mentions_commit_or_sha": False,
+                "mentions_auth_error": False,
+                "mentions_server_error": False,
+            },
+        }
 
 
 def latest_failed_workflows() -> List[Dict[str, Any]]:
@@ -81,7 +113,7 @@ def latest_failed_workflows() -> List[Dict[str, Any]]:
     try:
         data = get_json(url, TOKEN)
     except Exception as exc:
-        return [{"workflow": "GITHUB_API", "conclusion": "blocked", "todo": f"GitHub API run query failed: {type(exc).__name__}: {str(exc)[:300]}"}]
+        return [{"workflow": "GITHUB_API", "conclusion": "blocked", "todo": f"GitHub API run query failed: {type(exc).__name__}"}]
     failed = []
     for run in data.get("workflow_runs", []):
         if run.get("status") == "completed" and run.get("conclusion") in BAD_CONCLUSIONS:
@@ -102,18 +134,28 @@ def latest_failed_workflows() -> List[Dict[str, Any]]:
 def render_failures() -> List[Dict[str, Any]]:
     failures = []
     for ep in RENDER_ENDPOINTS:
-        r = http_probe(ep)
-        sample = str(r.get("body_sample") or r.get("error") or "")
-        low = sample.lower()
+        result = http_probe(ep)
+        classification = result.get("classification") or {}
         reason = None
-        if not r.get("ok"):
-            reason = f"HTTP status {r.get('status_code')}"
-        elif ep == "/api/deploy/info" and "commit" not in low and "sha" not in low:
+        if not result.get("ok"):
+            reason = f"HTTP status {result.get('status_code')}"
+        elif ep == "/api/deploy/info" and not classification.get("mentions_commit_or_sha"):
             reason = "deploy info does not expose commit/sha; stale Render proof risk"
-        elif any(x in low for x in ["traceback", "internal server error", "invalid_authentication", "unauthorized"]):
-            reason = "error/auth text visible in response"
+        elif classification.get("mentions_auth_error"):
+            reason = "authentication error classification detected"
+        elif classification.get("mentions_server_error"):
+            reason = "server error classification detected"
         if reason:
-            failures.append({"endpoint": ep, "url": r.get("url"), "reason": reason, "status_code": r.get("status_code"), "sample": sample[:400]})
+            failures.append(
+                {
+                    "endpoint": ep,
+                    "url": result.get("url"),
+                    "reason": reason,
+                    "status_code": result.get("status_code"),
+                    "error_type": result.get("error_type"),
+                    "classification": classification,
+                }
+            )
     return failures
 
 
@@ -122,13 +164,19 @@ def main() -> int:
     failed_runs = latest_failed_workflows()
     render = render_failures()
     todo = []
-    for r in failed_runs:
-        if r.get("workflow") == "GITHUB_API":
-            todo.append(r.get("todo"))
+    for run in failed_runs:
+        if run.get("workflow") == "GITHUB_API":
+            todo.append(run.get("todo"))
         else:
-            todo.append(f"Fix GitHub workflow '{r.get('workflow')}' run={r.get('run_id')} conclusion={r.get('conclusion')} commit={str(r.get('commit') or '')[:12]}")
-    for r in render:
-        todo.append(f"Fix Render endpoint {r.get('endpoint')}: {r.get('reason')} status={r.get('status_code')}")
+            todo.append(
+                f"Fix GitHub workflow '{run.get('workflow')}' run={run.get('run_id')} "
+                f"conclusion={run.get('conclusion')} commit={str(run.get('commit') or '')[:12]}"
+            )
+    for failure in render:
+        todo.append(
+            f"Fix Render endpoint {failure.get('endpoint')}: "
+            f"{failure.get('reason')} status={failure.get('status_code')}"
+        )
 
     payload = {
         "generated_utc": utc(),
@@ -144,6 +192,7 @@ def main() -> int:
         "live_trading_enabled": False,
         "order_routes_called": False,
         "secrets_printed": False,
+        "response_bodies_persisted": False,
         "production_grade_claim_allowed": False,
     }
     (OUT / "summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
@@ -166,30 +215,54 @@ def main() -> int:
         "## TODO",
         "",
     ]
-    lines += [f"- [ ] {x}" for x in todo] or ["- [x] No GitHub/Render failures detected in this run."]
+    lines += [f"- [ ] {item}" for item in todo] or ["- [x] No GitHub/Render failures detected in this run."]
     lines += ["", "## GitHub workflow failures", ""]
     if failed_runs:
         lines += ["| Workflow | Run | Conclusion | Commit | Updated | Link |", "|---|---:|---|---|---|---|"]
-        for r in failed_runs:
-            if r.get("workflow") == "GITHUB_API":
-                lines.append(f"| GITHUB_API | - | blocked | - | - | {r.get('todo')} |")
+        for run in failed_runs:
+            if run.get("workflow") == "GITHUB_API":
+                lines.append(f"| GITHUB_API | - | blocked | - | - | {run.get('todo')} |")
             else:
-                lines.append(f"| {r.get('workflow')} | {r.get('run_id')} | {r.get('conclusion')} | `{str(r.get('commit') or '')[:12]}` | {r.get('updated_at')} | {r.get('html_url')} |")
+                lines.append(
+                    f"| {run.get('workflow')} | {run.get('run_id')} | {run.get('conclusion')} | "
+                    f"`{str(run.get('commit') or '')[:12]}` | {run.get('updated_at')} | {run.get('html_url')} |"
+                )
     else:
         lines.append("No failed GitHub workflow runs found in latest query.")
     lines += ["", "## Render endpoint failures", ""]
     if render:
-        lines += ["| Endpoint | Status | Reason | Sample |", "|---|---:|---|---|"]
-        for r in render:
-            sample = str(r.get("sample") or "").replace("\n", " ")[:160]
-            lines.append(f"| `{r.get('endpoint')}` | {r.get('status_code')} | {r.get('reason')} | `{sample}` |")
+        lines += ["| Endpoint | Status | Reason | Classification |", "|---|---:|---|---|"]
+        for failure in render:
+            flags = failure.get("classification") or {}
+            active_flags = ", ".join(sorted(name for name, value in flags.items() if value)) or "none"
+            lines.append(
+                f"| `{failure.get('endpoint')}` | {failure.get('status_code')} | "
+                f"{failure.get('reason')} | `{active_flags}` |"
+            )
     else:
         lines.append("No Render endpoint failures found in this run.")
 
-    md = "\n".join(lines) + "\n"
-    (OUT / "summary.md").write_text(md, encoding="utf-8")
-    TODO_MD.write_text(md, encoding="utf-8")
-    print(json.dumps(payload, indent=2)[:12000])
+    markdown = "\n".join(lines) + "\n"
+    (OUT / "summary.md").write_text(markdown, encoding="utf-8")
+    TODO_MD.write_text(markdown, encoding="utf-8")
+
+    # Log only non-sensitive counters and safety flags. Never print the full payload.
+    print(
+        json.dumps(
+            {
+                "generated_utc": payload["generated_utc"],
+                "status": payload["status"],
+                "github_failed_count": payload["github_failed_count"],
+                "render_failed_count": payload["render_failed_count"],
+                "todo_count": payload["todo_count"],
+                "live_trading_enabled": payload["live_trading_enabled"],
+                "order_routes_called": payload["order_routes_called"],
+                "response_bodies_persisted": payload["response_bodies_persisted"],
+                "production_grade_claim_allowed": payload["production_grade_claim_allowed"],
+            },
+            sort_keys=True,
+        )
+    )
     return 0 if payload["status"] == "PASS" else 1
 
 
