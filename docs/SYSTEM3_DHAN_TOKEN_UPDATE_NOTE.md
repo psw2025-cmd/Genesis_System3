@@ -28,6 +28,27 @@ The token update is noted, but it is **not yet proven resolved** until the lates
 - Dashboard Broker tab shows token valid / funds responded / holdings responded.
 - Dashboard visible issue tracker passes after latest deploy.
 
+## Render worker preflight added
+
+A worker-specific preflight is now tracked by:
+
+- `tools/system3_render_worker_preflight.py`
+- `.github/workflows/system3-render-worker-preflight.yml`
+- `reports/latest/render_worker_preflight/summary.json`
+- `reports/latest/render_worker_preflight/summary.md`
+
+This preflight checks only safe metadata:
+
+- backend `/api/health` reachability
+- backend `/api/state` reachability
+- worker push-token rejection symptoms
+- safe secret presence/length checks, without printing values
+- live-trading safety flags
+
+## GitHub failure storm containment
+
+`System3 GitHub Render Failure Tracker` is now report-only. It still writes the GitHub/Render TODO report, but it no longer fails itself just because it found Render or workflow blockers. This prevents one Render/worker issue from creating a continuous GitHub failure loop.
+
 ## Still separate blockers
 
 This token update does not automatically resolve:
