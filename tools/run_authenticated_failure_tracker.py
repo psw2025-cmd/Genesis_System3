@@ -7,6 +7,7 @@ Analyzer-safe proof helper:
 - Never prints or persists the API key, cookies, session data, or response body.
 - Does not call broker order routes.
 - Fails closed: the underlying tracker records authentication failures as blockers.
+- Allows enough time for a sleeping Render service to wake before classifying a timeout.
 """
 from __future__ import annotations
 
@@ -16,6 +17,11 @@ import os
 import runpy
 import urllib.error
 import urllib.request
+
+
+# Render may need longer than the original 12-second probe window after inactivity.
+# Keep this configurable, bounded, and read-only; a real timeout still fails closed.
+os.environ.setdefault("SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S", "30")
 
 
 def install_dashboard_session() -> None:
@@ -45,7 +51,7 @@ def install_dashboard_session() -> None:
         },
     )
     try:
-        with opener.open(request, timeout=12) as response:
+        with opener.open(request, timeout=30) as response:
             # Do not read, print, or persist the response body.
             ok = 200 <= int(response.status) < 300
             os.environ["SYSTEM3_DASHBOARD_SESSION_STATUS"] = (
