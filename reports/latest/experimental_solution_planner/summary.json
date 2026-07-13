@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-13T14:19:17.385417+00:00",
-  "issue_count": 383,
+  "generated_utc": "2026-07-13T14:22:39.269370+00:00",
+  "issue_count": 471,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 120,
+      "issue_count": 195,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,84 +64,84 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256644761 conclusion=cancelled commit=4ee9da31c175",
+          "issue": "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29257619472 conclusion=failure commit=1a47264b2486",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256577231 conclusion=cancelled commit=4ee9da31c175",
+          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257442044 conclusion=cancelled commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256571287 conclusion=cancelled commit=4ee9da31c175",
+          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257438869 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256570513 conclusion=cancelled commit=4ee9da31c175",
+          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257438776 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256563848 conclusion=cancelled commit=4ee9da31c175",
+          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29257435209 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29256551901 conclusion=cancelled commit=a05fd0a413f7",
+          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257435129 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256545865 conclusion=cancelled commit=a05fd0a413f7",
+          "issue": "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29257434935 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256543726 conclusion=cancelled commit=a05fd0a413f7",
+          "issue": "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29257434933 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /ui/: HTTP status 0 status=0",
+          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257434574 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/health: HTTP status 0 status=0",
+          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257430312 conclusion=cancelled commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0",
+          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257429951 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/paper: HTTP status 0 status=0",
+          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257429651 conclusion=failure commit=60f8bfebaacc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4ee9da31c175a593f1a22057f1c34e40bf5ac915\", \"conclusion\": \"cancelled\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256644761\", \"run_id\": 29256644761, \"updated_at\": \"2026-07-13T14:09:30Z\", \"workflow\": \"Dashboard Visible Issue Tracker\"}",
+          "issue": "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29257401443 conclusion=failure commit=3d2cb6103ba7",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4ee9da31c175a593f1a22057f1c34e40bf5ac915\", \"conclusion\": \"cancelled\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256577231\", \"run_id\": 29256577231, \"updated_at\": \"2026-07-13T14:08:04Z\", \"workflow\": \"Dashboard Visible Issue Tracker\"}",
+          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257398022 conclusion=cancelled commit=3d2cb6103ba7",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"4ee9da31c175a593f1a22057f1c34e40bf5ac915\", \"conclusion\": \"cancelled\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256571287\", \"run_id\": 29256571287, \"updated_at\": \"2026-07-13T14:07:07Z\", \"workflow\": \"Dashboard Visible Issue Tracker\"}",
+          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257397864 conclusion=failure commit=3d2cb6103ba7",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 104,
+      "issue_count": 105,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 36,
+      "issue_count": 41,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -401,19 +401,19 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/ui/\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/ui/\"}",
+          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/health\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/api/health\"}",
+          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 35,
+      "issue_count": 41,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -675,7 +675,7 @@
       ]
     },
     {
-      "issue_count": 14,
+      "issue_count": 15,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -730,6 +730,11 @@
         },
         {
           "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -793,7 +798,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=12",
+          "issue": "todo_count=55",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },

@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T14:19:17.385417+00:00`
+Generated UTC: `2026-07-13T14:22:39.269370+00:00`
 Status: **BLOCKED**
-Issues: `383`
+Issues: `471`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 120 issues
+### GITHUB_RENDER_FAILURE — 195 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,13 +44,13 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256644761 conclusion=cancelled commit=4ee9da31c175
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256577231 conclusion=cancelled commit=4ee9da31c175
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256571287 conclusion=cancelled commit=4ee9da31c175
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256570513 conclusion=cancelled commit=4ee9da31c175
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256563848 conclusion=cancelled commit=4ee9da31c175
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29257619472 conclusion=failure commit=1a47264b2486
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257442044 conclusion=cancelled commit=60f8bfebaacc
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257438869 conclusion=failure commit=60f8bfebaacc
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Safe Repair Runner' run=29257438776 conclusion=failure commit=60f8bfebaacc
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29257435209 conclusion=failure commit=60f8bfebaacc
 
-### UI_RED_VISUAL — 104 issues
+### UI_RED_VISUAL — 105 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### RENDER_DEPLOY — 36 issues
+### RENDER_DEPLOY — 41 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -153,7 +153,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### BROKER_DHAN — 35 issues
+### BROKER_DHAN — 41 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### ML_TRAINING — 14 issues
+### ML_TRAINING — 15 issues
 
 Recommended fixes:
 - Build real CE/PE dataset proof.
@@ -291,6 +291,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: Fix visible UI blocker on ML Model: Training proof missing.
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "BLOCKED"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
@@ -308,7 +309,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=12
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=55
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=110
