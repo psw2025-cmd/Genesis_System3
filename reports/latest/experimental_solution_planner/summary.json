@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-13T17:17:09.166721+00:00",
-  "issue_count": 389,
+  "generated_utc": "2026-07-13T17:19:18.559071+00:00",
+  "issue_count": 377,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 109,
+      "issue_count": 99,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 33,
+      "issue_count": 32,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -675,7 +675,7 @@
       ]
     },
     {
-      "issue_count": 15,
+      "issue_count": 14,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -730,11 +730,6 @@
         },
         {
           "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -813,7 +808,7 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=112",
+          "issue": "info_line_count=108",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
