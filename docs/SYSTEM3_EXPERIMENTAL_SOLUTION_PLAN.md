@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T15:18:31.434694+00:00`
+Generated UTC: `2026-07-13T15:25:31.644937+00:00`
 Status: **BLOCKED**
-Issues: `439`
+Issues: `441`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 180 issues
+### GITHUB_RENDER_FAILURE — 182 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Safe Repair Runner' run=29260024782 conclusion=failure commit=0bdcd353c920
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29259601665 conclusion=failure commit=0bdcd353c920
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29259231900 conclusion=failure commit=0bdcd353c920
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29259231747 conclusion=failure commit=0bdcd353c920
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Permanent Repo Render Safety' run=29259231680 conclusion=failure commit=0bdcd353c920
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29262055648 conclusion=failure commit=fd60f35c6241
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Safe Repair Runner' run=29261668284 conclusion=failure commit=70531487870c
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29261665973 conclusion=failure commit=70531487870c
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29261657843 conclusion=failure commit=70531487870c
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29261642786 conclusion=failure commit=0fb18189eb6a
 
 ### UI_RED_VISUAL — 104 issues
 
@@ -308,7 +308,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=45
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=46
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=110
