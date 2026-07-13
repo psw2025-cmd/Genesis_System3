@@ -1,0 +1,84 @@
+{
+  "backend_base": "https://genesis-system3-backend.onrender.com",
+  "blockers": [
+    "backend /api/state not reachable: status=401 error=HTTPError",
+    "DHAN_CLIENT_ID missing in worker env",
+    "DHAN_ACCESS_TOKEN missing/too short in worker env",
+    "WORKER_PUSH_TOKEN missing/too short in worker env",
+    "WORKER_PUSH_TOKEN rejected by backend; token missing or different between web and worker"
+  ],
+  "env_checks": {
+    "DHAN_ACCESS_TOKEN": {
+      "length": 0,
+      "length_ok": false,
+      "name": "DHAN_ACCESS_TOKEN",
+      "present": false
+    },
+    "DHAN_CLIENT_ID": {
+      "length": 0,
+      "length_ok": false,
+      "name": "DHAN_CLIENT_ID",
+      "present": false
+    },
+    "DHAN_PIN": {
+      "length": 0,
+      "length_ok": false,
+      "name": "DHAN_PIN",
+      "present": false
+    },
+    "DHAN_TOTP_SECRET": {
+      "length": 0,
+      "length_ok": false,
+      "name": "DHAN_TOTP_SECRET",
+      "present": false
+    },
+    "SYSTEM3_API_BASE": {
+      "length": 44,
+      "length_ok": true,
+      "name": "SYSTEM3_API_BASE",
+      "present": true
+    },
+    "WEB_SERVICE_URL": {
+      "length": 44,
+      "length_ok": true,
+      "name": "WEB_SERVICE_URL",
+      "present": true
+    },
+    "WORKER_PUSH_TOKEN": {
+      "length": 0,
+      "length_ok": false,
+      "name": "WORKER_PUSH_TOKEN",
+      "present": false
+    }
+  },
+  "generated_utc": "2026-07-13T17:01:44.567102Z",
+  "probes": {
+    "backend_health": {
+      "error_type": null,
+      "ok": true,
+      "status_code": 200
+    },
+    "backend_state": {
+      "error_type": "HTTPError",
+      "ok": false,
+      "status_code": 401
+    },
+    "chain_push_probe": {
+      "error_type": "HTTPError",
+      "ok": false,
+      "status_code": 401
+    },
+    "scheduler_push_probe": {
+      "error_type": "HTTPError",
+      "ok": false,
+      "status_code": 401
+    }
+  },
+  "safety": {
+    "dhan_order_routes_called": false,
+    "live_trading_enabled": false,
+    "order_routes_called": false,
+    "secrets_printed": false
+  },
+  "status": "BLOCKED"
+}
