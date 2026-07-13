@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-23:40:59 IST
+00:07:01 IST
 NIFTY
 24,198
 BNFTY
@@ -75,7 +75,7 @@ Health API
 live
 LOADED
 State API
-Market closed: After hours (closed at 15:30)
+Market closed: Before pre-market (opens at 09:15)
 LOADED
 Broker Status API
 LOADED
@@ -111,7 +111,7 @@ Paper Lifecycle
 market-session proof pending
 PASS
 Tick / Data Freshness
-tick_age=5.0s refresh=5s
+tick_age=7.68s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
