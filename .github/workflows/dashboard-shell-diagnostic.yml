@@ -1,0 +1,91 @@
+name: Dashboard Shell Diagnostic
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Dashboard Visible Issue Tracker"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dashboard-shell-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  diagnose-shell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      DASHBOARD_BASE_URL: "https://genesis-system3-backend.onrender.com"
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {"name":"system3-dashboard-shell-proof","private":true,"version":"1.0.0","dependencies":{"playwright":"1.52.0"}}
+          JSON
+          npm install --prefix .proof-node --no-audit --no-fund
+          .proof-node/node_modules/.bin/playwright install --with-deps chromium
+          ln -sfn "$PWD/.proof-node/node_modules" node_modules
+
+      - name: Run analyzer-safe shell diagnostic
+        run: node tools/dashboard_shell_diagnostic.mjs
+
+      - name: Reject unsafe report fields
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('reports/latest/dashboard_shell_diagnostic/summary.json')
+          text = p.read_text(encoding='utf-8').lower()
+          forbidden = ['api_key"', 'cookie"', 'authorization"', 'token"', 'secret"', 'response_body']
+          hits = [x for x in forbidden if x in text]
+          if hits:
+              raise SystemExit(f'unsafe proof fields detected: {hits}')
+          PY
+
+      - name: Publish current diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_shell_diagnostic/summary.json reports/latest/dashboard_shell_diagnostic/summary.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): publish dashboard shell diagnostic [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
+
+      - name: Enforce fail-closed result
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path('reports/latest/dashboard_shell_diagnostic/summary.json').read_text())
+          assert d['live_trading_enabled'] is False
+          assert d['order_routes_called'] is False
+          assert d['production_grade_claim_allowed'] is False
+          if d['status'] != 'PASS':
+              raise SystemExit(f"dashboard shell blocked: {d['blocker']}")
+          PY
