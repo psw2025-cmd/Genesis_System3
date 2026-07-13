@@ -1,10 +1,10 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-13T17:49:52.960Z
+Generated: 2026-07-13T17:59:30.578Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `43`
+Visible blocker count: `44`
 Info line count: `112`
 Screenshot missing count: `1`
 UI exception count: `1`
@@ -51,6 +51,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - [ ] Fix visible UI blocker on Paper Trades: BLOCKED
+- [ ] Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
 - [ ] Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG
@@ -70,7 +71,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 | Paper Trades | BLOCKED | OK | 3 | 21 | 0 | paper.txt |
 | Positions | PASS | OK | 0 | 7 | 0 | positions.txt |
 | Performance | PASS | OK | 0 | 6 | 0 | performance.txt |
-| ML Model | BLOCKED | OK | 2 | 5 | 0 | ml.txt |
+| ML Model | BLOCKED | OK | 3 | 5 | 0 | ml.txt |
 | Broker | BLOCKED | OK | 1 | 7 | 0 | broker.txt |
 | Alerts | PASS | OK | 0 | 5 | 0 | alerts.txt |
 | System | PASS | OK | 0 | 6 | 0 | system.txt |
@@ -114,6 +115,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - **Paper Trades**: BLOCKED
+- **ML Model**: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
 - **Broker**: BLOCKED BY BACKEND FLAG
