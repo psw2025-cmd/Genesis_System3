@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-21:02:55 IST
+21:06:55 IST
 NIFTY
-24,198
+--
 BNFTY
-58,103
+--
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-LIVE
+OFF
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -53,8 +53,8 @@ System
 Live Gate
 LOCK
 Performance
-last checked 21:02:50 IST
+last checked -- IST
 
 No performance data yet — paper engine has not closed any trades.
 
-API status: /api/pnl responded OK, 0 trades · checked 21:02:50 IST
+API status: /api/pnl loading · checked -- IST
