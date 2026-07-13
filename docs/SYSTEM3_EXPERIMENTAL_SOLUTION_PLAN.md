@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T23:01:35.723956+00:00`
+Generated UTC: `2026-07-13T23:01:49.176463+00:00`
 Status: **BLOCKED**
-Issues: `425`
+Issues: `424`
 Fix lanes: `13`
 
 ## Rule
@@ -297,7 +297,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 
-### UNKNOWN — 16 issues
+### UNKNOWN — 15 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -316,8 +316,8 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=97
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: settle_normalized_tab_count=13
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
+- `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
 ### PAPER_LIFECYCLE — 12 issues
 
