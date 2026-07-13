@@ -8,24 +8,24 @@ td,th{border:1px solid #334155;padding:9px;text-align:left;vertical-align:top} t
 .card{border:1px solid #334155;border-radius:14px;padding:14px;margin:14px 0;background:#111827} pre{white-space:pre-wrap;margin:0;color:#cbd5e1}
 </style></head><body>
 <h1>System3 Windows Self-Hosted Full System Proof</h1>
-<div class='meta'>Generated: 2026-07-13T12:40:46.001147Z | Runner OS: Windows-10-10.0.18362-SP0 | Base URL: https://genesis-system3-backend.onrender.com</div>
+<div class='meta'>Generated: 2026-07-13T13:34:51.024550Z | Runner OS: Windows-10-10.0.18362-SP0 | Base URL: https://genesis-system3-backend.onrender.com</div>
 <div class='card'><b>Final status:</b> <span class='blocked'>BLOCKED</span><br>
 <b>Live trading enabled:</b> false | <b>Order routes called:</b> false | <b>Analyzer mode:</b> true</div>
-<h2>Status board</h2><table><tr><th>Area</th><th>Status</th><th>Detail</th></tr><tr><td>C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates</td><td class='pass'>PASS</td><td>rc=0 elapsed=2.51s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_auto_coordinator.py --full</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=177.56s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_github_render_failure_tracker.py</td><td class='pass'>PASS</td><td>rc=0 elapsed=9.91s</td></tr>
-<tr><td>C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.09s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_autopilot_proof_board.py</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.15s</td></tr>
-<tr><td>HTTP /api/health</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/state</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/status</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/broker/status</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/broker/dhan/status</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/broker/funds</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/broker/holdings</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/broker/positions</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/scanner/top_contract_gainers</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
-<tr><td>HTTP /api/simulation/live/state</td><td class='blocked'>BLOCKED</td><td>502</td></tr>
+<h2>Status board</h2><table><tr><th>Area</th><th>Status</th><th>Detail</th></tr><tr><td>C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates</td><td class='pass'>PASS</td><td>rc=0 elapsed=2.32s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_auto_coordinator.py --full</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=162.09s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_github_render_failure_tracker.py</td><td class='pass'>PASS</td><td>rc=0 elapsed=5.71s</td></tr>
+<tr><td>C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.11s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_autopilot_proof_board.py</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.17s</td></tr>
+<tr><td>HTTP /api/health</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/state</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/status</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/broker/status</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/broker/dhan/status</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/broker/funds</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/broker/holdings</td><td class='pass'>PASS</td><td>200</td></tr>
+<tr><td>HTTP /api/broker/positions</td><td class='blocked'>BLOCKED</td><td>404</td></tr>
+<tr><td>HTTP /api/scanner/top_contract_gainers</td><td class='blocked'>BLOCKED</td><td>The read operation timed out</td></tr>
+<tr><td>HTTP /api/simulation/live/state</td><td class='blocked'>BLOCKED</td><td>404</td></tr>
 <tr><td>Report system3_auto_gates</td><td class='unknown'>UNKNOWN</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\system3_auto_gates\summary.json</td></tr>
 <tr><td>Report github_render_failure_tracker</td><td class='blocked'>BLOCKED</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\github_render_failure_tracker\summary.json</td></tr>
 <tr><td>Report dashboard_visible_issue_tracker</td><td class='blocked'>BLOCKED</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\dashboard_visible_issue_tracker\summary.json</td></tr>
@@ -51,125 +51,15 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from C:\
 }
 
 Node.js v25.2.1
-</li><li>Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1</li><li>HTTP blocked: /api/health — 502</li><li>HTTP blocked: /api/state — 502</li><li>HTTP blocked: /api/status — 502</li><li>HTTP blocked: /api/broker/status — 502</li><li>HTTP blocked: /api/broker/dhan/status — 502</li><li>HTTP blocked: /api/broker/funds — 502</li><li>HTTP blocked: /api/broker/holdings — 502</li><li>HTTP blocked: /api/broker/positions — 502</li><li>HTTP blocked: /api/scanner/top_contract_gainers — 502</li><li>HTTP blocked: /api/simulation/live/state — 502</li><li>Report not PASS: system3_auto_gates — UNKNOWN</li><li>Report not PASS: github_render_failure_tracker — BLOCKED</li><li>Report not PASS: dashboard_visible_issue_tracker — BLOCKED</li><li>Report not PASS: autopilot_proof_board — MISSING</li><li>Report not PASS: safe_repair_runner — MISSING</li><li>Report not PASS: market_session_proof_runner — MISSING</li></ul></div>
-<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Preview</th></tr><tr><td>/api/health</td><td class=blocked>502</td><td>0.33</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/state</td><td class=blocked>502</td><td>0.31</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/status</td><td class=blocked>502</td><td>1.26</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/broker/status</td><td class=blocked>502</td><td>0.29</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/broker/dhan/status</td><td class=blocked>502</td><td>0.29</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/broker/funds</td><td class=blocked>502</td><td>0.3</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/broker/holdings</td><td class=blocked>502</td><td>0.28</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/broker/positions</td><td class=blocked>502</td><td>0.32</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/scanner/top_contract_gainers</td><td class=blocked>502</td><td>0.3</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr>
-<tr><td>/api/simulation/live/state</td><td class=blocked>502</td><td>0.31</td><td><pre><!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>502</title>
-    <style>@font-face {
-  font-family: "Roobert";
-  font-weight: 500;
-  font-style: normal;
-  font-stretch: normal;
-  src: url("data:fo</pre></td></tr></table>
+</li><li>Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1</li><li>HTTP blocked: /api/broker/positions — 404</li><li>HTTP blocked: /api/scanner/top_contract_gainers — The read operation timed out</li><li>HTTP blocked: /api/simulation/live/state — 404</li><li>Report not PASS: system3_auto_gates — UNKNOWN</li><li>Report not PASS: github_render_failure_tracker — BLOCKED</li><li>Report not PASS: dashboard_visible_issue_tracker — BLOCKED</li><li>Report not PASS: autopilot_proof_board — MISSING</li><li>Report not PASS: safe_repair_runner — MISSING</li><li>Report not PASS: market_session_proof_runner — MISSING</li></ul></div>
+<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Preview</th></tr><tr><td>/api/health</td><td class=pass>200</td><td>0.31</td><td><pre>{"status":"ok","mode":"PAPER","broker_status":"connected","market_status":"closed","data_source":"live","live_allowed":false,"live_blockers":["Live trading permanently disabled in analyzer mode"],"broker":{"connected":true,"name":"dhan","status":"connected","error":null},"market":{"is_open":false,"r</pre></td></tr>
+<tr><td>/api/state</td><td class=pass>200</td><td>0.28</td><td><pre>{"state_version":224,"timestamp_utc":"2026-07-13T13:34:22.652673Z","timestamp_ist":"2026-07-13T19:04:22.652673+05:30","mode":"PAPER","data_source":"BROKER_CONNECTED_MARKET_CLOSED","market":{"is_open":false,"reason":"Market closed: After hours (closed at 15:30)","next_open":"2026-07-14 09:15:00 IST",</pre></td></tr>
+<tr><td>/api/status</td><td class=pass>200</td><td>0.33</td><td><pre>{"status":"ok","timestamp":"2026-07-13T19:04:27.027783+05:30","backend":{"running":true,"port":8000,"uptime_estimate":"running"},"frontend":{"expected_url":"http://localhost:3000","status":"should_be_running"},"data":{"source":"real","market_status":{"is_open":false,"reason":"Market closed: After ho</pre></td></tr>
+<tr><td>/api/broker/status</td><td class=pass>200</td><td>0.62</td><td><pre>{"broker":"dhan","mode":"ANALYZER","connected":true,"live_trading_enabled":false,"order_placement_allowed":false,"credentials_present":true,"client_id_present":true,"access_token_present":true,"latency_ms":277,"error":null,"auto_refresh":{"attempted":false,"success":false},"sdk_available":true,"env_</pre></td></tr>
+<tr><td>/api/broker/dhan/status</td><td class=pass>200</td><td>0.61</td><td><pre>{"broker":"dhan","mode":"ANALYZER","connected":true,"live_trading_enabled":false,"order_placement_allowed":false,"credentials_present":true,"client_id_present":true,"access_token_present":true,"latency_ms":274,"error":null,"auto_refresh":{"attempted":false,"success":false},"sdk_available":true,"env_</pre></td></tr>
+<tr><td>/api/broker/funds</td><td class=pass>200</td><td>1.21</td><td><pre>{"live_trading_enabled":false,"order_placement_allowed":false,"source":"sdk","validated":true,"normalized":{"available_balance":1691.56,"utilized_amount":85193.0,"total_limit":0.71,"raw":{"dhanClientId":"1106583741","availabelBalance":1691.56,"sodLimit":0.71,"collateralAmount":0.0,"receiveableAmount</pre></td></tr>
+<tr><td>/api/broker/holdings</td><td class=pass>200</td><td>0.63</td><td><pre>{"live_trading_enabled":false,"order_placement_allowed":false,"source":"sdk","validated":true,"count":11,"rows":[{"symbol":"PARADEEP","quantity":165.0,"avg_price":115.44,"ltp":143.38,"current_value":23657.7,"pnl":4610.099999999999,"pnl_pct":24.2030492030492,"raw":{"exchange":"ALL","tradingSymbol":"P</pre></td></tr>
+<tr><td>/api/broker/positions</td><td class=blocked>404</td><td>0.33</td><td><pre>{"status":"success","data":{"error":"not_found","path":"/api/broker/positions"}}</pre></td></tr>
+<tr><td>/api/scanner/top_contract_gainers</td><td class=blocked>None</td><td>20.04</td><td><pre>The read operation timed out</pre></td></tr>
+<tr><td>/api/simulation/live/state</td><td class=blocked>404</td><td>0.65</td><td><pre>{"status":"success","data":{"error":"not_found","path":"/api/simulation/live/state"}}</pre></td></tr></table>
 </body></html>
