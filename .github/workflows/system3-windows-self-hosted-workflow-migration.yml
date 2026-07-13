@@ -1,0 +1,62 @@
+name: System3 Windows Self-Hosted Workflow Migration
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 3 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-workflows:
+    runs-on: [self-hosted, Windows]
+    timeout-minutes: 20
+    env:
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+      SYSTEM3_APPLY_WORKFLOW_MIGRATION: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Windows self-hosted workflow migrator
+        shell: pwsh
+        run: |
+          python tools/system3_windows_self_hosted_workflow_migrator.py
+      - name: Commit migration and proof reports
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/ reports/latest/windows_self_hosted_workflows/ docs/SYSTEM3_WINDOWS_SELF_HOSTED_WORKFLOW_TODO.md
+          $changes = git diff --cached --name-only
+          if (-not $changes) {
+            Write-Host "No workflow migration changes to commit."
+            exit 0
+          }
+          git commit -m "ci: migrate workflows to Windows self-hosted runner [skip ci]"
+          git push
+      - name: Enforce migration report exists
+        shell: pwsh
+        run: |
+          if (!(Test-Path "reports/latest/windows_self_hosted_workflows/summary.json")) {
+            throw "Missing windows self-hosted workflow migration summary.json"
+          }
+          python - <<'PY'
+          import json
+          p='reports/latest/windows_self_hosted_workflows/summary.json'
+          data=json.load(open(p,encoding='utf-8'))
+          print(json.dumps({
+            'status': data.get('status'),
+            'workflow_count': data.get('workflow_count'),
+            'changed_count': data.get('changed_count'),
+            'manual_review_count': data.get('manual_review_count'),
+            'runner_target': data.get('runner_target'),
+            'safety': data.get('safety'),
+          }, indent=2))
+          if data.get('safety',{}).get('live_trading_enabled') is not False:
+            raise SystemExit('live safety flag invalid')
+          PY
