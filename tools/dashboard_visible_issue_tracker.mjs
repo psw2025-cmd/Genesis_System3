@@ -33,6 +33,14 @@ const blockerWords = [
 ]
 
 const informativeWords = ['NO TRADE', 'NO SIGNAL', 'MARKET CLOSED', 'LIVE OFF', 'PAPER']
+const loadingMarkers = [
+  'CHECKING...',
+  'CHECKING MODEL ARTIFACTS...',
+  'GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE...',
+  'LOADING...',
+]
+const settleTimeoutMs = Math.min(Math.max(Number(process.env.DASHBOARD_TAB_SETTLE_TIMEOUT_MS || 20000), 5000), 60000)
+const settlePollMs = 1000
 
 function uniq(items) {
   return Array.from(new Set(items.filter(Boolean)))
@@ -111,6 +119,37 @@ async function clickDashboardTab(page, title) {
   throw new Error(`Unable to locate/click dashboard tab ${title}; ${attempts.join(' | ')}`)
 }
 
+async function waitForTabToSettle(page) {
+  const startedAt = Date.now()
+  let lastMarkers = []
+  let stableReads = 0
+  let previousText = ''
+
+  while (Date.now() - startedAt < settleTimeoutMs) {
+    const bodyText = await page.locator('body').innerText({ timeout: 5000 }).catch(() => '')
+    const normalized = String(bodyText).toUpperCase().replace(/\s+/g, ' ').trim()
+    lastMarkers = loadingMarkers.filter(marker => normalized.includes(marker))
+
+    if (lastMarkers.length === 0 && normalized && normalized === previousText) {
+      stableReads += 1
+      if (stableReads >= 2) {
+        return { settled: true, elapsed_ms: Date.now() - startedAt, remaining_markers: [] }
+      }
+    } else {
+      stableReads = 0
+    }
+
+    previousText = normalized
+    await page.waitForTimeout(settlePollMs)
+  }
+
+  return {
+    settled: false,
+    elapsed_ms: Date.now() - startedAt,
+    remaining_markers: uniq(lastMarkers),
+  }
+}
+
 async function scanTab(page, id, title) {
   const result = {
     id,
@@ -119,6 +158,9 @@ async function scanTab(page, id, title) {
     screenshot: null,
     screenshot_ok: false,
     navigation_method_index: null,
+    async_content_settled: false,
+    settle_elapsed_ms: 0,
+    settle_remaining_markers: [],
     blocker_lines: [],
     info_lines: [],
     red_elements: [],
@@ -129,7 +171,15 @@ async function scanTab(page, id, title) {
   try {
     const navigation = await clickDashboardTab(page, title)
     result.navigation_method_index = navigation.method_index
-    await page.waitForTimeout(4500)
+    const settle = await waitForTabToSettle(page)
+    result.async_content_settled = settle.settled
+    result.settle_elapsed_ms = settle.elapsed_ms
+    result.settle_remaining_markers = settle.remaining_markers
+    if (!settle.settled) {
+      const markerText = settle.remaining_markers.length ? ` markers=${settle.remaining_markers.join('|')}` : ''
+      result.blocker_lines.push(`ASYNC_CONTENT_NOT_SETTLED after ${settle.elapsed_ms}ms${markerText}`)
+    }
+
     const screenshot = path.join(outDir, `${id}.png`)
     await page.screenshot({ path: screenshot, fullPage: true })
     result.screenshot = screenshot
@@ -174,7 +224,7 @@ async function scanTab(page, id, title) {
 
     result.blocker_lines = uniq(result.blocker_lines).slice(0, 150)
     result.info_lines = uniq(result.info_lines).slice(0, 100)
-    result.ok = result.screenshot_ok && result.blocker_lines.length === 0
+    result.ok = result.screenshot_ok && result.async_content_settled && result.blocker_lines.length === 0
   } catch (err) {
     result.ui_exceptions.push(String(err).slice(0, 500))
   }
@@ -191,6 +241,7 @@ const summary = {
   visible_issue_count: 0,
   info_line_count: 0,
   screenshot_missing_count: 0,
+  unsettled_tab_count: 0,
   ui_exception_count: 0,
   global_exception: null,
   visible_issues: [],
@@ -219,6 +270,7 @@ try {
       const r = await scanTab(page, id, title)
       summary.tabs.push(r)
       if (!r.screenshot_ok) summary.screenshot_missing_count += 1
+      if (!r.async_content_settled) summary.unsettled_tab_count += 1
       summary.ui_exception_count += r.ui_exceptions.length
       for (const line of r.blocker_lines) {
         summary.visible_issues.push({ tab: title, text: line })
@@ -244,7 +296,7 @@ summary.info_lines = summary.info_lines.slice(0, 300)
 summary.todo = uniq(summary.todo).slice(0, 500)
 summary.visible_issue_count = summary.visible_issues.length
 summary.info_line_count = summary.info_lines.length
-summary.status = summary.tabs.length !== tabs.length || summary.visible_issue_count || summary.screenshot_missing_count || summary.ui_exception_count || summary.global_exception || !summary.auth?.ok ? 'BLOCKED' : 'PASS'
+summary.status = summary.tabs.length !== tabs.length || summary.visible_issue_count || summary.screenshot_missing_count || summary.unsettled_tab_count || summary.ui_exception_count || summary.global_exception || !summary.auth?.ok ? 'BLOCKED' : 'PASS'
 summary.production_grade_claim_allowed = summary.status === 'PASS'
 
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
@@ -260,6 +312,7 @@ const md = [
   `Visible blocker count: \`${summary.visible_issue_count}\``,
   `Info line count: \`${summary.info_line_count}\``,
   `Screenshot missing count: \`${summary.screenshot_missing_count}\``,
+  `Unsettled tab count: \`${summary.unsettled_tab_count}\``,
   `UI exception count: \`${summary.ui_exception_count}\``,
   `Auth OK: \`${Boolean(summary.auth?.ok)}\``,
   `Production-grade claim allowed: \`${summary.production_grade_claim_allowed}\``,
@@ -267,7 +320,7 @@ const md = [
   '',
   '## Rule',
   '',
-  'Every live sidebar tab must be scanned. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.',
+  'Every live sidebar tab must be scanned and its asynchronous content must settle before PASS. A timed-out tab is still captured but is recorded as ASYNC_CONTENT_NOT_SETTLED. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.',
   '',
   '## TODO',
   '',
@@ -275,9 +328,9 @@ const md = [
   '',
   '## Tab results',
   '',
-  '| Tab | Status | Screenshot | Blockers | Info | Exceptions | Text file |',
-  '|---|---|---:|---:|---:|---:|---|',
-  ...summary.tabs.map(t => `| ${t.title} | ${t.ok ? 'PASS' : 'BLOCKED'} | ${t.screenshot_ok ? 'OK' : 'MISSING'} | ${t.blocker_lines.length} | ${t.info_lines.length} | ${t.ui_exceptions.length} | ${t.id}.txt |`),
+  '| Tab | Status | Screenshot | Settled | Settle ms | Blockers | Info | Exceptions | Text file |',
+  '|---|---|---:|---:|---:|---:|---:|---:|---|',
+  ...summary.tabs.map(t => `| ${t.title} | ${t.ok ? 'PASS' : 'BLOCKED'} | ${t.screenshot_ok ? 'OK' : 'MISSING'} | ${t.async_content_settled ? 'YES' : 'NO'} | ${t.settle_elapsed_ms} | ${t.blocker_lines.length} | ${t.info_lines.length} | ${t.ui_exceptions.length} | ${t.id}.txt |`),
   '',
   '## Visible blockers',
   '',
@@ -291,6 +344,6 @@ const md = [
 fs.writeFileSync(path.join(outDir, 'summary.md'), md + '\n')
 
 if (summary.status !== 'PASS') {
-  console.error(`DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=${summary.visible_issue_count} screenshots_missing=${summary.screenshot_missing_count} exceptions=${summary.ui_exception_count} auth_ok=${Boolean(summary.auth?.ok)} tabs=${summary.tabs.length}/${tabs.length}`)
+  console.error(`DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=${summary.visible_issue_count} screenshots_missing=${summary.screenshot_missing_count} unsettled_tabs=${summary.unsettled_tab_count} exceptions=${summary.ui_exception_count} auth_ok=${Boolean(summary.auth?.ok)} tabs=${summary.tabs.length}/${tabs.length}`)
   process.exit(1)
 }
