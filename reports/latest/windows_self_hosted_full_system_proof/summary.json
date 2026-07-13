@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-13T13:34:51.024550Z",
+  "generated_utc": "2026-07-13T13:53:55.707469Z",
   "status": "BLOCKED",
   "base_url": "https://genesis-system3-backend.onrender.com",
   "runner": {
@@ -13,6 +13,7 @@
     "analyze_mode": true,
     "order_routes_called": false
   },
+  "response_bodies_persisted": false,
   "commands": [
     {
       "cmd": [
@@ -20,7 +21,7 @@
         "scripts/system3_gate_evaluator.py",
         "--sync-gates"
       ],
-      "started_utc": "2026-07-13T13:31:35.604499Z",
+      "started_utc": "2026-07-13T13:49:13.745593Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "scripts/system3_gate_evaluator.py",
@@ -30,8 +31,8 @@
       "ok": true,
       "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 2.32,
-      "finished_utc": "2026-07-13T13:31:37.923042Z"
+      "elapsed_sec": 3.33,
+      "finished_utc": "2026-07-13T13:49:17.074822Z"
     },
     {
       "cmd": [
@@ -39,42 +40,38 @@
         "tools/system3_auto_coordinator.py",
         "--full"
       ],
-      "started_utc": "2026-07-13T13:31:37.923042Z",
-      "actual_cmd": [
-        "C:\\Python310\\python.exe",
-        "tools/system3_auto_coordinator.py",
-        "--full"
-      ],
-      "returncode": 1,
+      "started_utc": "2026-07-13T13:49:17.075824Z",
       "ok": false,
-      "stdout_tail": "[PASS] markdown_inventory\n[FAIL] control_plane\n[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n",
+      "returncode": null,
+      "error": "timeout after 240s",
+      "stdout_tail": "",
       "stderr_tail": "",
-      "elapsed_sec": 162.09,
-      "finished_utc": "2026-07-13T13:34:20.017961Z"
+      "elapsed_sec": 240.01,
+      "finished_utc": "2026-07-13T13:53:17.081121Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
-      "started_utc": "2026-07-13T13:34:20.017961Z",
+      "started_utc": "2026-07-13T13:53:17.081121Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
       "returncode": 0,
       "ok": true,
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-13T13:34:25.708091Z\", \"github_failed_count\": 9, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 9, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 18, \"tracker_internal_status\": \"PASS\"}\n",
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-13T13:53:25.289145Z\", \"github_failed_count\": 9, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 9, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 18, \"tracker_internal_status\": \"PASS\"}\n",
       "stderr_tail": "",
-      "elapsed_sec": 5.71,
-      "finished_utc": "2026-07-13T13:34:25.729113Z"
+      "elapsed_sec": 8.23,
+      "finished_utc": "2026-07-13T13:53:25.308663Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/dashboard_visible_issue_tracker.mjs"
       ],
-      "started_utc": "2026-07-13T13:34:25.729113Z",
+      "started_utc": "2026-07-13T13:53:25.308663Z",
       "actual_cmd": [
         "node",
         "tools/dashboard_visible_issue_tracker.mjs"
@@ -83,15 +80,15 @@
       "ok": false,
       "stdout_tail": "",
       "stderr_tail": "node:internal/modules/package_json_reader:316\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\tools\\dashboard_visible_issue_tracker.mjs\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:316:9)\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\n    at moduleResolve (node:internal/modules/esm/resolve:858:18)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:712:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:729:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:758:52)\n    at #resolve (node:internal/modules/esm/loader:694:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:614:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33) {\n  code: 'ERR_MODULE_NOT_FOUND'\n}\n\nNode.js v25.2.1\n",
-      "elapsed_sec": 0.11,
-      "finished_utc": "2026-07-13T13:34:25.841112Z"
+      "elapsed_sec": 0.09,
+      "finished_utc": "2026-07-13T13:53:25.400824Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
-      "started_utc": "2026-07-13T13:34:25.841112Z",
+      "started_utc": "2026-07-13T13:53:25.401827Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
@@ -100,8 +97,8 @@
       "ok": false,
       "stdout_tail": "  \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29192129828 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29192123691 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29192123684 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29192123667 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29192122669 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29192122640 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29192122572 conclusion=failure commit=e1bedd7b64f82edfe8eb5c42cf8bbdd8ed126f27\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29192113732 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Render 100 Agent Swarm' run 29192104636 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29192104617 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29192100692 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Render 100 Agent Swarm' run 29192100676 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Workflow Failure Tracker' run 29192100671 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29192100666 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29192099810 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Render 100 Agent Swarm' run 29192099794 conclusion=failure commit=d90e509f4764a25b875152e9dee7447aa3852a92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29192087903 conclusion=failure commit=9576dc05321b1caedf53bb400b0b1ed102531b03\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Parallel Root-Cause Audit' run 29192087897 conclusion=failure commit=9576dc05321b1caedf53bb400b0b1ed102531b03\",\n    \"workflow_failure_tracker: failed_count=34\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=FAIL\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 0.17,
-      "finished_utc": "2026-07-13T13:34:26.012679Z"
+      "elapsed_sec": 0.28,
+      "finished_utc": "2026-07-13T13:53:25.684393Z"
     }
   ],
   "http_probes": [
@@ -110,64 +107,72 @@
       "url": "https://genesis-system3-backend.onrender.com/api/health",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.31,
-      "body_preview": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-07-13T19:04:26.432378+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}"
+      "elapsed_sec": 0.46,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/state",
       "url": "https://genesis-system3-backend.onrender.com/api/state",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.28,
-      "body_preview": "{\"state_version\":224,\"timestamp_utc\":\"2026-07-13T13:34:22.652673Z\",\"timestamp_ist\":\"2026-07-13T19:04:22.652673+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"next_open\":\"2026-07-14 09:15:00 IST\",\"current_time_ist\":\"2026-07-13T19:04:22.650886+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":309,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0"
+      "elapsed_sec": 0.4,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/status",
       "url": "https://genesis-system3-backend.onrender.com/api/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.33,
-      "body_preview": "{\"status\":\"ok\",\"timestamp\":\"2026-07-13T19:04:27.027783+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"current_time_ist\":null,\"next_open\":\"2026-07-14 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":\"2026-07-12T11:57:24\"},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}"
+      "elapsed_sec": 1.25,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/status",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.62,
-      "body_preview": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":277,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}"
+      "elapsed_sec": 1.4,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/dhan/status",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.61,
-      "body_preview": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":274,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}"
+      "elapsed_sec": 1.52,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/funds",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/funds",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 1.21,
-      "body_preview": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"normalized\":{\"available_balance\":1691.56,\"utilized_amount\":85193.0,\"total_limit\":0.71,\"raw\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":1691.56,\"sodLimit\":0.71,\"collateralAmount\":0.0,\"receiveableAmount\":39430.0,\"utilizedAmount\":85193.0,\"blockedPayoutAmount\":0.0,\"withdrawableBalance\":0.0}},\"success\":true,\"data\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":1691.56,\"sodLimit\":0.71,\"collateralAmount\":0.0,\"receiveableAmount\":39430.0,\"utilizedAmount\":85193.0,\"blockedPayoutAmount\":0.0,\"withdrawableBalance\":0.0}}"
+      "elapsed_sec": 1.07,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/holdings",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.63,
-      "body_preview": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":11,\"rows\":[{\"symbol\":\"PARADEEP\",\"quantity\":165.0,\"avg_price\":115.44,\"ltp\":143.38,\"current_value\":23657.7,\"pnl\":4610.099999999999,\"pnl_pct\":24.2030492030492,\"raw\":{\"exchange\":\"ALL\",\"tradingSymbol\":\"PARADEEP\",\"securityId\":\"9741\",\"isin\":\"INE088F01024\",\"totalQty\":165,\"dpQty\":165,\"t1Qty\":0,\"mtf_t1_qty\":0,\"mtf_qty\":0,\"availableQty\":165,\"collateralQty\":0,\"avgCostPrice\":115.44,\"lastTradedPrice\":143.38}},{\"symbol\":\"MRPL\",\"quantity\":164.0,\"avg_price\":188.52232,\"ltp\":164.74,\"current_value\":27017.36,\"pnl\":-3900.30048,\"pnl_pct\":-12.615121647134405,\"raw\":{\"exchange\":\"ALL\",\"tradingSymbol\":\"MRPL\",\"securityId\":\"2283\",\"isin\":\"INE103A01014\",\"totalQty\":164,\"dpQty\":164,\"t1Qty\":0,\"mtf_t1_qty\":0,\"mtf_qty\":0,\"availableQty\":164,\"collateralQty\":0,\"avgCostPrice\":188.52232,\"lastTradedPrice\":164.74}},{\"symbol\":\"SANDUMA\",\"quantity\":230.0,\"avg_price\":202.59615,\"ltp\":203.25,\"current_value\":46747.5,\"pnl\":150.385500000"
+      "elapsed_sec": 2.19,
+      "error_category": "none",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/positions",
       "url": "https://genesis-system3-backend.onrender.com/api/broker/positions",
       "ok": false,
       "status": 404,
-      "elapsed_sec": 0.33,
-      "body_preview": "{\"status\":\"success\",\"data\":{\"error\":\"not_found\",\"path\":\"/api/broker/positions\"}}"
+      "elapsed_sec": 1.38,
+      "error_category": "route_not_found",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/scanner/top_contract_gainers",
@@ -175,20 +180,22 @@
       "ok": false,
       "status": null,
       "elapsed_sec": 20.04,
-      "error": "The read operation timed out"
+      "error_category": "request_timeout",
+      "response_body_persisted": false
     },
     {
       "endpoint": "/api/simulation/live/state",
       "url": "https://genesis-system3-backend.onrender.com/api/simulation/live/state",
       "ok": false,
-      "status": 404,
-      "elapsed_sec": 0.65,
-      "body_preview": "{\"status\":\"success\",\"data\":{\"error\":\"not_found\",\"path\":\"/api/simulation/live/state\"}}"
+      "status": 502,
+      "elapsed_sec": 0.29,
+      "error_category": "backend_server_error",
+      "response_body_persisted": false
     }
   ],
   "reports": {
     "system3_auto_gates": {
-      "generated_utc": "2026-07-13T13:34:19.080893Z",
+      "generated_utc": "2026-07-13T13:53:54.064291Z",
       "gates": {
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
           "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -308,87 +315,87 @@
       "failed_workflows": [
         {
           "branch": "main",
-          "commit": "c7323ac3a26ce4e2f11c85157d5b0942a80cad4a",
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253800771",
-          "run_id": 29253800771,
-          "updated_at": "2026-07-13T13:33:25Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255468809",
+          "run_id": 29255468809,
+          "updated_at": "2026-07-13T13:53:00Z",
+          "workflow": "System3 1000 Point TODO Status Updater"
+        },
+        {
+          "branch": "main",
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255465712",
+          "run_id": 29255465712,
+          "updated_at": "2026-07-13T13:52:55Z",
           "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "c7323ac3a26ce4e2f11c85157d5b0942a80cad4a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253467037",
-          "run_id": 29253467037,
-          "updated_at": "2026-07-13T13:26:21Z",
-          "workflow": "System3 Windows Self-Hosted Full Proof"
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255465169",
+          "run_id": 29255465169,
+          "updated_at": "2026-07-13T13:51:32Z",
+          "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "c7323ac3a26ce4e2f11c85157d5b0942a80cad4a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253466909",
-          "run_id": 29253466909,
-          "updated_at": "2026-07-13T13:30:41Z",
-          "workflow": "Genesis System3 Global Safety CI"
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255437125",
+          "run_id": 29255437125,
+          "updated_at": "2026-07-13T13:51:35Z",
+          "workflow": "System3 1000 Point TODO Status Updater"
         },
         {
           "branch": "main",
-          "commit": "c7323ac3a26ce4e2f11c85157d5b0942a80cad4a",
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255433633",
+          "run_id": 29255433633,
+          "updated_at": "2026-07-13T13:51:32Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255423307",
+          "run_id": 29255423307,
+          "updated_at": "2026-07-13T13:51:04Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "980cc31eaf5d8c228e39670722e2a8eb0740e15f",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253465470",
-          "run_id": 29253465470,
-          "updated_at": "2026-07-13T13:21:34Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255215062",
+          "run_id": 29255215062,
+          "updated_at": "2026-07-13T13:47:54Z",
           "workflow": ".github/workflows/options-ml-training-proof.yml"
         },
         {
           "branch": "main",
-          "commit": "9a165dacbed0b046fd39ab65822512ee5b612472",
+          "commit": "a55d0a050e4efb18888fa1b826f1e0e2be80597f",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253334139",
-          "run_id": 29253334139,
-          "updated_at": "2026-07-13T13:26:53Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255093039",
+          "run_id": 29255093039,
+          "updated_at": "2026-07-13T13:50:56Z",
           "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "9a165dacbed0b046fd39ab65822512ee5b612472",
+          "commit": "a55d0a050e4efb18888fa1b826f1e0e2be80597f",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253137787",
-          "run_id": 29253137787,
-          "updated_at": "2026-07-13T13:26:58Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
-        },
-        {
-          "branch": "main",
-          "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29253054764",
-          "run_id": 29253054764,
-          "updated_at": "2026-07-13T13:19:29Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252924919",
-          "run_id": 29252924919,
-          "updated_at": "2026-07-13T13:16:30Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
-        },
-        {
-          "branch": "main",
-          "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252920225",
-          "run_id": 29252920225,
-          "updated_at": "2026-07-13T13:15:17Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29255012719",
+          "run_id": 29255012719,
+          "updated_at": "2026-07-13T13:46:10Z",
           "workflow": "Dashboard Visible Issue Tracker"
         }
       ],
-      "generated_utc": "2026-07-13T13:34:25.708091Z",
+      "generated_utc": "2026-07-13T13:53:25.289145Z",
       "github_failed_count": 9,
       "github_timeout_s": 12.0,
       "live_trading_enabled": false,
@@ -513,15 +520,15 @@
       "secrets_printed": false,
       "status": "BLOCKED",
       "todo": [
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29253800771 conclusion=cancelled commit=c7323ac3a26c",
-        "Fix GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29253467037 conclusion=failure commit=c7323ac3a26c",
-        "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29253466909 conclusion=failure commit=c7323ac3a26c",
-        "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29253465470 conclusion=failure commit=c7323ac3a26c",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29253334139 conclusion=cancelled commit=9a165dacbed0",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29253137787 conclusion=cancelled commit=9a165dacbed0",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29253054764 conclusion=cancelled commit=c9c2b8959a46",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252924919 conclusion=cancelled commit=c9c2b8959a46",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252920225 conclusion=cancelled commit=c9c2b8959a46",
+        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29255468809 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255465712 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255465169 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29255437125 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255433633 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255423307 conclusion=cancelled commit=980cc31eaf5d",
+        "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29255215062 conclusion=failure commit=980cc31eaf5d",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255093039 conclusion=cancelled commit=a55d0a050e4e",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29255012719 conclusion=cancelled commit=a55d0a050e4e",
         "Fix Render endpoint /api/state: HTTP status 401 status=401",
         "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
         "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
@@ -2200,27 +2207,27 @@
     {
       "name": "C:\\Python310\\python.exe scripts/system3_gate_evaluator.py --sync-gates",
       "status": "PASS",
-      "detail": "rc=0 elapsed=2.32s"
+      "detail": "rc=0 elapsed=3.33s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=162.09s"
+      "detail": "timeout after 240s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_github_render_failure_tracker.py",
       "status": "PASS",
-      "detail": "rc=0 elapsed=5.71s"
+      "detail": "rc=0 elapsed=8.23s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.11s"
+      "detail": "rc=1 elapsed=0.09s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.17s"
+      "detail": "rc=1 elapsed=0.28s"
     },
     {
       "name": "HTTP /api/health",
@@ -2265,12 +2272,12 @@
     {
       "name": "HTTP /api/scanner/top_contract_gainers",
       "status": "BLOCKED",
-      "detail": "The read operation timed out"
+      "detail": "request_timeout"
     },
     {
       "name": "HTTP /api/simulation/live/state",
       "status": "BLOCKED",
-      "detail": "404"
+      "detail": "502"
     },
     {
       "name": "Report system3_auto_gates",
@@ -2304,12 +2311,12 @@
     }
   ],
   "blockers": [
-    "Command blocked: C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full \u2014 1",
+    "Command blocked: C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full \u2014 timeout after 240s",
     "Command blocked: C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs \u2014 node:internal/modules/package_json_reader:316\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\tools\\dashboard_visible_issue_tracker.mjs\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:316:9)\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\n    at moduleResolve (node:internal/modules/esm/resolve:858:18)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:712:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:729:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:758:52)\n    at #resolve (node:internal/modules/esm/loader:694:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:614:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33) {\n  code: 'ERR_MODULE_NOT_FOUND'\n}\n\nNode.js v25.2.1\n",
     "Command blocked: C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py \u2014 1",
     "HTTP blocked: /api/broker/positions \u2014 404",
-    "HTTP blocked: /api/scanner/top_contract_gainers \u2014 The read operation timed out",
-    "HTTP blocked: /api/simulation/live/state \u2014 404",
+    "HTTP blocked: /api/scanner/top_contract_gainers \u2014 request_timeout",
+    "HTTP blocked: /api/simulation/live/state \u2014 502",
     "Report not PASS: system3_auto_gates \u2014 UNKNOWN",
     "Report not PASS: github_render_failure_tracker \u2014 BLOCKED",
     "Report not PASS: dashboard_visible_issue_tracker \u2014 BLOCKED",
