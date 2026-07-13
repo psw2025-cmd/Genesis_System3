@@ -8,7 +8,7 @@ on:
       - System3 Workflow Failure Tracker
       - System3 GitHub Render Failure Tracker
       - Dashboard Visual Production Proof
-      - System3 Dashboard Visible Issue Tracker
+      - Dashboard Visible Issue Tracker
       - System3 Public Truth Publish
       - Options CE PE ML Training Proof
     types:
@@ -59,43 +59,71 @@ jobs:
         shell: python
         run: |
           import json
+          from datetime import datetime, timezone
           from pathlib import Path
 
           root = Path('reports/latest')
 
-          # The updater historically reads dashboard_visual_production_proof.
-          # Use the newer visible tracker only as a fail-closed compatibility
-          # source when the historical report is absent.
+          def read(path):
+              try:
+                  return json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+              except Exception:
+                  return {}
+
+          def stamp(data):
+              raw = data.get('generated_at') or data.get('generated_utc') or data.get('generated_at_utc') or ''
+              try:
+                  return datetime.fromisoformat(str(raw).replace('Z', '+00:00'))
+              except Exception:
+                  return datetime.min.replace(tzinfo=timezone.utc)
+
+          # Always prefer the newer visible tracker when it is at least as current
+          # as the legacy visual report. This prevents a stale legacy PASS/BLOCKED
+          # file from masking a newer fail-closed 16-tab tracker result.
           visual_target = root / 'dashboard_visual_production_proof' / 'summary.json'
           visible_source = root / 'dashboard_visible_issue_tracker' / 'summary.json'
-          if not visual_target.exists() and visible_source.exists():
-              src = json.loads(visible_source.read_text(encoding='utf-8'))
-              status = str(src.get('status') or '').upper()
-              auth = src.get('auth') if isinstance(src.get('auth'), dict) else {}
-              screenshots = src.get('screenshots') if isinstance(src.get('screenshots'), list) else []
+          legacy = read(visual_target)
+          current = read(visible_source)
+          if current and (not legacy or stamp(current) >= stamp(legacy)):
+              status = str(current.get('status') or '').upper()
+              auth = current.get('auth') if isinstance(current.get('auth'), dict) else {}
+              tabs = current.get('tabs') if isinstance(current.get('tabs'), list) else []
+              expected = int(current.get('expected_tab_count') or 16)
+              scanned = len(tabs)
+              eligible = bool(
+                  status == 'PASS'
+                  and current.get('production_grade_claim_allowed') is True
+                  and auth.get('ok') is True
+                  and scanned == expected
+                  and int(current.get('screenshot_missing_count') or 0) == 0
+                  and int(current.get('visible_issue_count') or 0) == 0
+                  and int(current.get('ui_exception_count') or 0) == 0
+                  and not current.get('global_exception')
+              )
               safe = {
-                  'final_verdict': 'PASS' if status == 'PASS' and src.get('production_grade_claim_allowed') is True else 'BLOCKED',
-                  'visual_gate_pass': bool(status == 'PASS' and src.get('production_grade_claim_allowed') is True),
-                  'screenshots': [
-                      {'ok': bool(x.get('ok'))}
-                      for x in screenshots
-                      if isinstance(x, dict)
-                  ],
+                  'generated_at': current.get('generated_at'),
+                  'final_verdict': 'PASS' if eligible else 'BLOCKED',
+                  'visual_gate_pass': eligible,
+                  'screenshots': [{'ok': True} for _ in tabs] if eligible else [],
                   'auth_ok': bool(auth.get('ok') is True),
+                  'expected_tab_count': expected,
+                  'scanned_tab_count': scanned,
                   'source': 'dashboard_visible_issue_tracker',
               }
               visual_target.parent.mkdir(parents=True, exist_ok=True)
               visual_target.write_text(json.dumps(safe, indent=2, sort_keys=True), encoding='utf-8')
 
-          # Prefer the current GitHub/Render tracker when the older workflow
-          # failure report is absent. Copy only non-sensitive status counters.
+          # Prefer the newer GitHub/Render failure tracker over a stale legacy
+          # workflow-failure report. Only safe counters and status are copied.
           failure_target = root / 'workflow_failure_tracker' / 'summary.json'
           render_source = root / 'github_render_failure_tracker' / 'summary.json'
-          if not failure_target.exists() and render_source.exists():
-              src = json.loads(render_source.read_text(encoding='utf-8'))
+          legacy = read(failure_target)
+          current = read(render_source)
+          if current and (not legacy or stamp(current) >= stamp(legacy)):
               safe = {
-                  'status': str(src.get('status') or 'BLOCKED').upper(),
-                  'failed_count': int(src.get('failed_count') or src.get('workflow_failed_count') or 0),
+                  'generated_at': current.get('generated_at') or current.get('generated_utc'),
+                  'status': str(current.get('status') or 'BLOCKED').upper(),
+                  'failed_count': int(current.get('failed_count') or current.get('workflow_failed_count') or 0),
                   'source': 'github_render_failure_tracker',
               }
               failure_target.parent.mkdir(parents=True, exist_ok=True)
