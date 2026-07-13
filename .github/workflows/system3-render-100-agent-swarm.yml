@@ -1,29 +1,25 @@
 name: System3 Render 100 Agent Swarm
 
+# RECOVERY MODE
+# Render is currently the primary blocker, so this expensive 100-job proof swarm
+# must not auto-run on every commit or workflow completion. Use manual dispatch only
+# until backend/worker deployment is stable again.
+
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/system3-render-100-agent-swarm.yml'
-      - 'tools/system3_render_100_agent_swarm.py'
-      - 'dashboard/backend/**'
-      - 'dashboard/frontend/**'
-      - 'tools/**'
-      - 'docs/**'
-      - 'reports/latest/**'
-  workflow_run:
-    workflows:
-      - System3 Autopilot Proof Board
-      - Dashboard Visible Issue Tracker
-      - System3 Secure Install Credential Audit
-      - System3 Parallel Root-Cause Audit
-    types:
-      - completed
+    inputs:
+      agent_count:
+        description: 'Number of agents to run; keep 100 for full proof, lower for quick recovery checks'
+        required: false
+        default: '100'
 
 permissions:
   contents: write
   actions: read
+
+concurrency:
+  group: system3-render-100-agent-swarm
+  cancel-in-progress: true
 
 jobs:
   swarm-agent:
@@ -31,7 +27,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       fail-fast: false
-      max-parallel: 100
+      max-parallel: 10
       matrix:
         agent_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -48,18 +44,36 @@ jobs:
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
+      SYSTEM3_RENDER_SWARM_RECOVERY_MODE: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Skip agents above requested count
+        id: gate
+        run: |
+          COUNT="${{ github.event.inputs.agent_count || '100' }}"
+          AGENT="${{ matrix.agent_id }}"
+          python - <<PY
+          import os
+          count=int(os.environ.get('COUNT','100'))
+          agent=int(os.environ.get('AGENT','1'))
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write(f"run_agent={'true' if agent <= count else 'false'}\n")
+          PY
+        env:
+          COUNT: ${{ github.event.inputs.agent_count || '100' }}
+          AGENT: ${{ matrix.agent_id }}
       - name: Run deterministic audit agent
+        if: steps.gate.outputs.run_agent == 'true'
         run: python tools/system3_render_100_agent_swarm.py --agent-id ${{ matrix.agent_id }} || true
       - name: Upload agent report
+        if: steps.gate.outputs.run_agent == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: render-swarm-agent-${{ matrix.agent_id }}
-          path: reports/latest/render_100_agent_swarm/agent_*.*
+          path: reports/latest/render_100_agent_swarm/agent_*.json
           if-no-files-found: warn
           retention-days: 14
 
@@ -68,6 +82,11 @@ jobs:
     needs: swarm-agent
     if: always()
     timeout-minutes: 10
+    env:
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+      SYSTEM3_RENDER_SWARM_RECOVERY_MODE: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -80,7 +99,7 @@ jobs:
       - name: Merge swarm reports
         run: |
           mkdir -p reports/latest/render_100_agent_swarm
-          find artifacts -type f \( -name 'agent_*.json' -o -name 'agent_*.md' \) | while read f; do cp "$f" reports/latest/render_100_agent_swarm/; done
+          find artifacts -type f -name 'agent_*.json' | while read f; do cp "$f" reports/latest/render_100_agent_swarm/; done
           python tools/system3_render_100_agent_swarm.py --aggregate || true
       - name: Commit swarm reports
         run: |
