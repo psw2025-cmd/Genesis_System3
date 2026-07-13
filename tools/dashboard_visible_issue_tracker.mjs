@@ -15,11 +15,14 @@ const tabs = [
   ['sim_live', 'Sim Live'],
   ['chain', 'Option Chain'],
   ['signals', 'Signals'],
+  ['trade', 'Trade'],
   ['paper', 'Paper Trades'],
   ['positions', 'Positions'],
-  ['broker', 'Broker'],
   ['performance', 'Performance'],
   ['ml', 'ML Model'],
+  ['broker', 'Broker'],
+  ['alerts', 'Alerts'],
+  ['system', 'System'],
   ['gates', 'Live Gate'],
 ]
 
@@ -73,7 +76,7 @@ async function authenticate(page, summary) {
         credentials: 'include',
         body: JSON.stringify({ api_key: apiKey }),
       })
-      return { ok: r.ok, status: r.status, text: await r.text() }
+      return { ok: r.ok, status: r.status }
     }, key)
     if (!auth.ok) summary.todo.push(`Dashboard auth session failed status=${auth.status}`)
     return auth
@@ -158,6 +161,7 @@ const summary = {
   status: 'UNKNOWN',
   auth: null,
   tabs: [],
+  expected_tab_count: tabs.length,
   visible_issue_count: 0,
   info_line_count: 0,
   screenshot_missing_count: 0,
@@ -214,7 +218,7 @@ summary.info_lines = summary.info_lines.slice(0, 300)
 summary.todo = uniq(summary.todo).slice(0, 500)
 summary.visible_issue_count = summary.visible_issues.length
 summary.info_line_count = summary.info_lines.length
-summary.status = summary.visible_issue_count || summary.screenshot_missing_count || summary.ui_exception_count || summary.global_exception || !summary.auth?.ok ? 'BLOCKED' : 'PASS'
+summary.status = summary.tabs.length !== tabs.length || summary.visible_issue_count || summary.screenshot_missing_count || summary.ui_exception_count || summary.global_exception || !summary.auth?.ok ? 'BLOCKED' : 'PASS'
 summary.production_grade_claim_allowed = summary.status === 'PASS'
 
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
@@ -225,6 +229,8 @@ const md = [
   `Generated: ${summary.generated_at}`,
   `Base: ${summary.base}`,
   `Status: **${summary.status}**`,
+  `Expected tab count: \`${summary.expected_tab_count}\``,
+  `Scanned tab count: \`${summary.tabs.length}\``,
   `Visible blocker count: \`${summary.visible_issue_count}\``,
   `Info line count: \`${summary.info_line_count}\``,
   `Screenshot missing count: \`${summary.screenshot_missing_count}\``,
@@ -235,7 +241,7 @@ const md = [
   '',
   '## Rule',
   '',
-  'Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.',
+  'Every live sidebar tab must be scanned. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.',
   '',
   '## TODO',
   '',
@@ -259,6 +265,6 @@ const md = [
 fs.writeFileSync(path.join(outDir, 'summary.md'), md + '\n')
 
 if (summary.status !== 'PASS') {
-  console.error(`DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=${summary.visible_issue_count} screenshots_missing=${summary.screenshot_missing_count} exceptions=${summary.ui_exception_count} auth_ok=${Boolean(summary.auth?.ok)}`)
+  console.error(`DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=${summary.visible_issue_count} screenshots_missing=${summary.screenshot_missing_count} exceptions=${summary.ui_exception_count} auth_ok=${Boolean(summary.auth?.ok)} tabs=${summary.tabs.length}/${tabs.length}`)
   process.exit(1)
 }
