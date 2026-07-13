@@ -36,6 +36,7 @@ const summary = {
   secrets_persisted: false,
   auth: { ok: false, status: 0 },
   ui_response_status: 0,
+  render_ui_available: false,
   final_url: '',
   page_title: '',
   body_text_length: 0,
@@ -72,8 +73,9 @@ try {
 
   const first = await page.goto(`${base}/ui/`, { waitUntil: 'domcontentloaded', timeout: 90000 })
   summary.ui_response_status = first?.status() || 0
+  summary.render_ui_available = summary.ui_response_status >= 200 && summary.ui_response_status < 400
 
-  if (key) {
+  if (key && summary.render_ui_available) {
     summary.auth = await page.evaluate(async apiKey => {
       const response = await fetch('/api/auth/session', {
         method: 'POST',
@@ -87,6 +89,7 @@ try {
 
   const response = await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 }).catch(() => null)
   if (response) summary.ui_response_status = response.status()
+  summary.render_ui_available = summary.ui_response_status >= 200 && summary.ui_response_status < 400
   await page.waitForTimeout(8000)
 
   const shell = await page.evaluate(expected => {
@@ -121,13 +124,15 @@ try {
   summary.safe_visible_controls = shell.controls.map(safeText)
   summary.matched_tabs = shell.matched
   summary.matched_tab_count = shell.matched.length
-  summary.missing_tabs = expectedTabs.filter(title => !shell.matched.includes(title))
-  summary.deployed_asset_drift_detected = summary.missing_tabs.length > 0
+  summary.missing_tabs = summary.render_ui_available
+    ? expectedTabs.filter(title => !shell.matched.includes(title))
+    : []
+  summary.deployed_asset_drift_detected = summary.render_ui_available && summary.missing_tabs.length > 0
   summary.console_error_types = [...new Set(summary.console_error_types)]
   summary.page_error_types = [...new Set(summary.page_error_types)]
 
-  if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
-  else if (summary.ui_response_status < 200 || summary.ui_response_status >= 400) summary.blocker = 'UI_HTTP_NOT_OK'
+  if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE'
+  else if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
   else if (summary.root_child_count === 0 || summary.body_text_length === 0) summary.blocker = 'FRONTEND_ROOT_EMPTY'
   else if (summary.missing_tabs.length) summary.blocker = 'DEPLOYED_FRONTEND_ASSET_DRIFT'
   else if (summary.page_error_types.length || summary.console_error_types.length) summary.blocker = 'FRONTEND_RUNTIME_ERRORS_PRESENT'
@@ -150,12 +155,13 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Generated: ${summary.generated_at}`,
   `Status: **${summary.status}**`,
   `Blocker: **${summary.blocker}**`,
+  `Render UI available: \`${summary.render_ui_available}\``,
   `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
   `UI HTTP: \`${summary.ui_response_status}\``,
   `Root children: \`${summary.root_child_count}\``,
   `Body text length: \`${summary.body_text_length}\``,
   `Matched tabs: \`${summary.matched_tab_count}/${summary.expected_tab_count}\``,
-  `Missing source-defined tabs: \`${summary.missing_tabs.join(', ') || 'none'}\``,
+  `Missing source-defined tabs: \`${summary.missing_tabs.join(', ') || 'not evaluated / none'}\``,
   `Deployed asset drift: \`${summary.deployed_asset_drift_detected}\``,
   `Visible buttons: \`${summary.visible_button_count}\``,
   `Visible links: \`${summary.visible_link_count}\``,
@@ -168,6 +174,7 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
 console.log(JSON.stringify({
   status: summary.status,
   blocker: summary.blocker,
+  render_ui_available: summary.render_ui_available,
   auth_ok: summary.auth.ok,
   ui_http: summary.ui_response_status,
   matched_tabs: `${summary.matched_tab_count}/${summary.expected_tab_count}`,
