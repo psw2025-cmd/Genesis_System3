@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T16:25:15.472258+00:00`
+Generated UTC: `2026-07-13T16:26:17.579070+00:00`
 Status: **BLOCKED**
-Issues: `537`
+Issues: `461`
 Fix lanes: `13`
 
 ## Rule
@@ -24,31 +24,6 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 | `reports/latest/system3_public_truth/index.json` | `FAIL` |
 
 ## Fix lanes
-
-### GITHUB_RENDER_FAILURE — 192 issues
-
-Recommended fixes:
-- Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
-- Fix failed GitHub workflows from latest run/job evidence.
-- Fix failing Render endpoints or deploy freshness issues.
-- Keep item open until a later GitHub + Render failure tracker run is PASS.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Safe Repair Runner' run=29264090719 conclusion=failure commit=d7c98c8953ca
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29263457798 conclusion=failure commit=d7c98c8953ca
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29263132515 conclusion=failure commit=d7c98c8953ca
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29263028987 conclusion=failure commit=3ef736f68fe3
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29263026086 conclusion=failure commit=3ef736f68fe3
 
 ### UI_RED_VISUAL — 158 issues
 
@@ -74,6 +49,31 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
+### GITHUB_RENDER_FAILURE — 113 issues
+
+Recommended fixes:
+- Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
+- Fix failed GitHub workflows from latest run/job evidence.
+- Fix failing Render endpoints or deploy freshness issues.
+- Keep item open until a later GitHub + Render failure tracker run is PASS.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_011:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_031:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_051:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29266275447 conclusion=failure commit=d0ca3e38ae40
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29266219551 conclusion=cancelled commit=0a22fff617dc
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29266291203 conclusion=failure commit=1ae7eea95f39
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29266304287 conclusion=failure commit=68811cacad72
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29266274932 conclusion=failure commit=d0ca3e38ae40
+
 ### BROKER_DHAN — 57 issues
 
 Recommended fixes:
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 36 issues
+### RENDER_DEPLOY — 38 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -309,7 +309,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=50
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=12
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "ERROR"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "FAIL"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
@@ -317,7 +317,7 @@ Top issues:
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
-### WORKFLOW_CI — 10 issues
+### WORKFLOW_CI — 11 issues
 
 Recommended fixes:
 - Read workflow_failure_tracker TODO.
@@ -332,6 +332,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/github_render_failure_tracker/summary.json`: {"branch": "main", "commit": "0a22fff617dcb240d58a8f99392a984b5864b79d", "conclusion": "cancelled", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29266219551", "run_id": 29266219551, "updated_at": "2026-07-13T16:24:51Z", "workflow": "Genesis System3 Global Safety CI"}
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "Request failed with status code 502"}
 - `reports/latest/workflow_failure_tracker/summary.json`: failed_count=44
