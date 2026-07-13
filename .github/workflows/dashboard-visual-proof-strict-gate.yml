@@ -54,12 +54,15 @@ jobs:
           except Exception as exc:
               raise SystemExit(f'BLOCKED: invalid generated_at timestamp: {type(exc).__name__}')
 
-          # Scheduled proof must be recent enough to represent the live Render UI.
+          # Proof must be recent and must not be materially future-dated.
+          # Allow at most five minutes of runner clock skew.
           current = datetime.now(timezone.utc)
-          fresh = current - stamp.astimezone(timezone.utc) <= timedelta(hours=2)
+          age = current - stamp.astimezone(timezone.utc)
+          fresh = timedelta(minutes=-5) <= age <= timedelta(hours=2)
 
           checks = {
               'status_pass': data.get('status') == 'PASS',
+              'proof_timestamp_not_future_dated': age >= timedelta(minutes=-5),
               'proof_fresh_within_2h': fresh,
               'auth_ok': auth.get('ok') is True,
               'expected_tab_count_16': data.get('expected_tab_count') == expected,
@@ -77,7 +80,7 @@ jobs:
           failed = [name for name, ok in checks.items() if not ok]
           print(json.dumps({
               'generated_at': generated,
-              'age_minutes': round((current - stamp.astimezone(timezone.utc)).total_seconds() / 60, 1),
+              'age_minutes': round(age.total_seconds() / 60, 1),
               'status': data.get('status'),
               'scanned_tab_count': len(tabs),
               'expected_tab_count': expected,
