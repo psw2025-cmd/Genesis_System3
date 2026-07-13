@@ -14,6 +14,7 @@ from pathlib import Path
 
 SOURCE = Path("reports/latest/dashboard_visible_issue_tracker/summary.json")
 OUT_DIR = Path("reports/latest/dashboard_visual_loading_postflight")
+EXPECTED_TABS = 16
 
 LOADING_MARKERS = (
     "checking...",
@@ -30,7 +31,9 @@ def main() -> int:
         "status": "BLOCKED",
         "source": str(SOURCE),
         "source_status": None,
+        "expected_tabs": EXPECTED_TABS,
         "tabs_checked": 0,
+        "coverage_complete": False,
         "loading_tabs": [],
         "analyzer_mode": True,
         "live_trading_enabled": False,
@@ -47,6 +50,7 @@ def main() -> int:
             result["source_status"] = source.get("status")
             tabs = source.get("tabs") if isinstance(source.get("tabs"), list) else []
             result["tabs_checked"] = len(tabs)
+            result["coverage_complete"] = len(tabs) == EXPECTED_TABS
 
             for tab in tabs:
                 sample = str(tab.get("body_text_sample") or "").lower()
@@ -60,14 +64,23 @@ def main() -> int:
                         }
                     )
 
-            if not result["loading_tabs"]:
-                result["status"] = "PASS"
-                result["production_grade_claim_allowed"] = bool(
-                    source.get("status") == "PASS"
-                    and source.get("production_grade_claim_allowed") is True
+            source_pass = (
+                source.get("status") == "PASS"
+                and source.get("production_grade_claim_allowed") is True
+            )
+            if not result["coverage_complete"]:
+                result["blocker"] = (
+                    f"dashboard tab coverage incomplete: {len(tabs)}/{EXPECTED_TABS}"
+                )
+            elif result["loading_tabs"]:
+                result["blocker"] = "one or more tabs were captured before async content settled"
+            elif not source_pass:
+                result["blocker"] = (
+                    "source dashboard proof is not PASS or does not allow a production-grade claim"
                 )
             else:
-                result["blocker"] = "one or more tabs were captured before async content settled"
+                result["status"] = "PASS"
+                result["production_grade_claim_allowed"] = True
         except (OSError, ValueError, TypeError) as exc:
             result["blocker"] = f"summary parse failed: {type(exc).__name__}"
 
@@ -78,7 +91,8 @@ def main() -> int:
         "",
         f"Status: **{result['status']}**",
         f"Source status: `{result.get('source_status')}`",
-        f"Tabs checked: `{result['tabs_checked']}`",
+        f"Tabs checked: `{result['tabs_checked']}/{result['expected_tabs']}`",
+        f"Coverage complete: `{str(result['coverage_complete']).lower()}`",
         f"Loading tabs: `{len(result['loading_tabs'])}`",
         "Live trading: `OFF`",
         "Order routes called: `false`",
@@ -98,7 +112,8 @@ def main() -> int:
 
     print(
         "DASHBOARD_LOADING_POSTFLIGHT "
-        f"status={result['status']} tabs={result['tabs_checked']} loading_tabs={len(result['loading_tabs'])} "
+        f"status={result['status']} tabs={result['tabs_checked']}/{result['expected_tabs']} "
+        f"loading_tabs={len(result['loading_tabs'])} "
         "live_trading=OFF order_routes_called=false"
     )
     return 0 if result["status"] == "PASS" else 1
