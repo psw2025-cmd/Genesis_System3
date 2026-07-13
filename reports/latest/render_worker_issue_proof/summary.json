@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-07-13T10:38:44.161639+00:00",
+  "status": "BLOCKED_RUNTIME_PROOF_REQUIRED",
+  "static_source_status": "PASS",
+  "runtime_proof_current": false,
+  "checks": {
+    "live_trading_forced_off": true,
+    "runtime_report_writer_present": true,
+    "no_secret_printing_meta_only": true,
+    "worker_push_token_backoff": true,
+    "dhan_auth_backoff": true,
+    "worker_declared_in_render": true,
+    "shared_env_group_declared": true
+  },
+  "blockers": [
+    "Current deployed Render worker preflight PASS is not proven by this repository-only workflow",
+    "Current Dhan authentication success is not proven",
+    "Current worker-to-backend push authentication success is not proven"
+  ],
+  "live_trading_enabled": false,
+  "system3_live_trading_allowed": false,
+  "analyze_mode": true,
+  "live_order_routes_called": false,
+  "production_grade_claim_allowed": false,
+  "next_required_runtime_steps": [
+    "Redeploy or restart the Render backend and worker when deployment capacity is available",
+    "Confirm the worker preflight report/log is current and status PASS",
+    "Confirm Dhan 401 responses are gone without exposing credentials",
+    "Confirm worker push 401 responses are gone without exposing WORKER_PUSH_TOKEN"
+  ]
+}
