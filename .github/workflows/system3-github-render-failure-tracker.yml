@@ -33,7 +33,10 @@ jobs:
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
       SYSTEM3_RENDER_TRACKER_EXCLUDE_WORKFLOWS: System3 GitHub Render Failure Tracker
-      SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S: '12'
+      # Render free/idle instances can need more than 12 seconds to wake. Keep
+      # this bounded and fail-closed, but avoid classifying normal wake-up as a
+      # backend/scanner failure.
+      SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S: '30'
       SYSTEM3_RENDER_TRACKER_GITHUB_TIMEOUT_S: '12'
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
