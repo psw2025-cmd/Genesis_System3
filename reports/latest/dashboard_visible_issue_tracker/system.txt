@@ -1,0 +1,89 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+02:17:23 IST
+NIFTY
+24,198
+BNFTY
+58,103
+FINNIFTY
+26,827
+MARKET CLOSED / DATA POLLING
+DHAN DEGRADED
+PAPER
+LIVE OFF
+WS
+LIVE
+OWNER
+PRITAM S. WARGHADE
+LIVE
+OFF
+MODE
+PAPER ONLY
+DATA
+DHAN ONLY REQUIRED
+ML SCORE
+TRAINING PROOF REQUIRED
+PAPER
+PROVENANCE REQUIRED
+RENDER
+VISUAL PROOF REQUIRED
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Connection Status
+Broker (Dhan)
+CONNECTED
+WebSocket
+LIVE
+Live Trading
+DISABLED (hardcoded)
+Mode
+PAPER
+Data Source
+live
+Market State
+CLOSED / OFFLINE
+API Status
+RENDER_UNAVAILABLE
+Performance
+Cycle Count
+0
+Cycle Duration
+0.00s
+SLA Pass
+true
+QC Status
+PASS
+Safety
+LIVE_TRADING_ENABLED
+0 (hardcoded)
+Paper Mode
+ACTIVE
+Live Allowed
+false
+Broker Data Visibility
+READ-ONLY WHEN API RESPONDS
+Blocker 1
+Live trading permanently disabled in analyzer mode
