@@ -1,0 +1,37 @@
+name: Dashboard Visual Loading Postflight
+
+on:
+  workflow_run:
+    workflows:
+      - Dashboard Visible Issue Tracker
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ANALYZE_MODE: "1"
+  LIVE_TRADING_ENABLED: "0"
+  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+
+jobs:
+  loading-postflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run fail-closed visual loading audit
+        run: python tools/dashboard_visual_loading_postflight.py
+
+      - name: Upload postflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-visual-loading-postflight
+          path: reports/latest/dashboard_visual_loading_postflight/
+          if-no-files-found: error
+          retention-days: 14
