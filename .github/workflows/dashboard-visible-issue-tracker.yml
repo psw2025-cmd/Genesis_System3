@@ -36,6 +36,7 @@ jobs:
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
+      EXPECTED_DASHBOARD_TAB_COUNT: '16'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,6 +96,7 @@ jobs:
           os.makedirs(out, exist_ok=True)
           install_outcome=os.environ.get('INSTALL_OUTCOME','unknown')
           scan_outcome=os.environ.get('SCAN_OUTCOME','unknown')
+          expected_tabs=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
           reason=(
               'visual tracker did not produce its required report; '
               f'install_step_outcome={install_outcome}; scan_step_outcome={scan_outcome}. '
@@ -106,9 +108,10 @@ jobs:
               'status': 'BLOCKED',
               'auth': {'ok': False, 'status': 0, 'note': 'not proven because tracker report was not produced'},
               'tabs': [],
+              'expected_tab_count': expected_tabs,
               'visible_issue_count': 0,
               'info_line_count': 0,
-              'screenshot_missing_count': 13,
+              'screenshot_missing_count': expected_tabs,
               'ui_exception_count': 1,
               'global_exception': reason,
               'visible_issues': [],
@@ -127,6 +130,7 @@ jobs:
               f.write('# Dashboard Visible Issue Tracker\n\n')
               f.write(f"Generated: {data['generated_at']}\n\n")
               f.write('Status: **BLOCKED**\n\n')
+              f.write(f"Expected tab count: `{expected_tabs}`\n\n")
               f.write('Production-grade claim allowed: `false`\n\n')
               f.write('## Exact blocker\n\n')
               f.write(f'- {reason}\n')
@@ -143,13 +147,17 @@ jobs:
           import json, os
           p='reports/latest/dashboard_visible_issue_tracker/summary.json'
           d=json.load(open(p, encoding='utf-8'))
-          required=['generated_at','status','visible_issue_count','production_grade_claim_allowed']
+          required=['generated_at','status','visible_issue_count','production_grade_claim_allowed','expected_tab_count','tabs']
           missing=[k for k in required if k not in d]
           if missing:
               raise SystemExit(f'missing report keys: {missing}')
-          expected=d.get('status') == 'PASS'
-          if d.get('production_grade_claim_allowed') != expected:
-              raise SystemExit('production_grade_claim_allowed must be true only when status is PASS')
+          expected_tabs=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          if int(d.get('expected_tab_count') or 0) != expected_tabs:
+              raise SystemExit(f'expected_tab_count must equal {expected_tabs}')
+          scanned_tabs=len(d.get('tabs') or [])
+          pass_eligible=(d.get('status') == 'PASS' and scanned_tabs == expected_tabs)
+          if d.get('production_grade_claim_allowed') != pass_eligible:
+              raise SystemExit('production_grade_claim_allowed requires PASS and complete tab coverage')
           auth=d.get('auth') if isinstance(d.get('auth'),dict) else {}
           safe_auth={'ok': bool(auth.get('ok')), 'status': int(auth.get('status') or 0)}
           if auth.get('note'):
@@ -177,6 +185,8 @@ jobs:
           with open(p,'w',encoding='utf-8') as f: json.dump(d,f,indent=2)
           print(json.dumps({
               'status': d.get('status'),
+              'expected_tab_count': d.get('expected_tab_count'),
+              'scanned_tab_count': scanned_tabs,
               'visible_issue_count': d.get('visible_issue_count'),
               'screenshot_missing_count': d.get('screenshot_missing_count'),
               'ui_exception_count': d.get('ui_exception_count'),
@@ -200,16 +210,25 @@ jobs:
       - name: Enforce no visible UI blockers
         run: |
           python - <<'PY'
-          import json
+          import json, os
           p='reports/latest/dashboard_visible_issue_tracker/summary.json'
           d=json.load(open(p,encoding='utf-8'))
+          expected_tabs=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          scanned_tabs=len(d.get('tabs') or [])
           print(json.dumps({
               'status': d.get('status'),
+              'expected_tab_count': expected_tabs,
+              'scanned_tab_count': scanned_tabs,
               'visible_issue_count': d.get('visible_issue_count'),
               'screenshot_missing_count': d.get('screenshot_missing_count'),
               'ui_exception_count': d.get('ui_exception_count'),
               'auth_ok': bool(d.get('auth',{}).get('ok')),
               'production_grade_claim_allowed': d.get('production_grade_claim_allowed'),
           },indent=2))
-          raise SystemExit(0 if d.get('status') == 'PASS' else 1)
+          passed=(
+              d.get('status') == 'PASS'
+              and scanned_tabs == expected_tabs
+              and d.get('production_grade_claim_allowed') is True
+          )
+          raise SystemExit(0 if passed else 1)
           PY
