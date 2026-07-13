@@ -1,0 +1,157 @@
+import { chromium } from 'playwright'
+import fs from 'fs'
+import path from 'path'
+
+const base = (process.env.DASHBOARD_BASE_URL || 'https://genesis-system3-backend.onrender.com').replace(/\/+$/, '')
+const key = process.env.DASHBOARD_API_KEY || ''
+const outDir = path.join('reports', 'latest', 'dashboard_shell_diagnostic')
+fs.mkdirSync(outDir, { recursive: true })
+
+const expectedTabs = [
+  'Truth Control', 'Genesis Brain', 'E2E Proof', 'Overview', 'Sim Live',
+  'Option Chain', 'Signals', 'Trade', 'Paper Trades', 'Positions',
+  'Performance', 'ML Model', 'Broker', 'Alerts', 'System', 'Live Gate',
+]
+
+const safeText = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 240)
+const summary = {
+  generated_at: new Date().toISOString(),
+  base,
+  status: 'BLOCKED',
+  analyzer_mode: true,
+  live_trading_enabled: false,
+  order_routes_called: false,
+  secrets_persisted: false,
+  auth: { ok: false, status: 0 },
+  ui_response_status: 0,
+  final_url: '',
+  page_title: '',
+  body_text_length: 0,
+  root_child_count: 0,
+  visible_button_count: 0,
+  visible_link_count: 0,
+  expected_tab_count: expectedTabs.length,
+  matched_tab_count: 0,
+  matched_tabs: [],
+  safe_visible_controls: [],
+  console_error_types: [],
+  page_error_types: [],
+  blocker: 'NOT_RUN',
+  production_grade_claim_allowed: false,
+}
+
+let browser
+try {
+  browser = await chromium.launch({ headless: true })
+  const context = await browser.newContext({
+    viewport: { width: 1366, height: 768 },
+    extraHTTPHeaders: key ? { 'X-API-Key': key } : {},
+  })
+  const page = await context.newPage()
+  page.on('console', msg => {
+    if (msg.type() === 'error') summary.console_error_types.push('console.error')
+  })
+  page.on('pageerror', err => {
+    summary.page_error_types.push(err?.name || 'PageError')
+  })
+
+  const first = await page.goto(`${base}/ui/`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  summary.ui_response_status = first?.status() || 0
+
+  if (key) {
+    summary.auth = await page.evaluate(async apiKey => {
+      const response = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+        credentials: 'include',
+        body: JSON.stringify({ api_key: apiKey }),
+      })
+      return { ok: response.ok, status: response.status }
+    }, key).catch(() => ({ ok: false, status: 0 }))
+  }
+
+  const response = await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 }).catch(() => null)
+  if (response) summary.ui_response_status = response.status()
+  await page.waitForTimeout(8000)
+
+  const shell = await page.evaluate(expected => {
+    const visible = el => {
+      const style = getComputedStyle(el)
+      const rect = el.getBoundingClientRect()
+      return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
+    }
+    const controls = [...document.querySelectorAll('button,a')]
+      .filter(visible)
+      .map(el => (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+    const matched = expected.filter(title => controls.some(text => text === title || text.includes(title)))
+    return {
+      finalUrl: location.href,
+      title: document.title,
+      bodyLength: (document.body?.innerText || '').length,
+      rootChildCount: document.querySelector('#root')?.childElementCount || 0,
+      buttonCount: [...document.querySelectorAll('button')].filter(visible).length,
+      linkCount: [...document.querySelectorAll('a')].filter(visible).length,
+      controls: [...new Set(controls)].slice(0, 40),
+      matched,
+    }
+  }, expectedTabs)
+
+  summary.final_url = safeText(shell.finalUrl)
+  summary.page_title = safeText(shell.title)
+  summary.body_text_length = shell.bodyLength
+  summary.root_child_count = shell.rootChildCount
+  summary.visible_button_count = shell.buttonCount
+  summary.visible_link_count = shell.linkCount
+  summary.safe_visible_controls = shell.controls.map(safeText)
+  summary.matched_tabs = shell.matched
+  summary.matched_tab_count = shell.matched.length
+  summary.console_error_types = [...new Set(summary.console_error_types)]
+  summary.page_error_types = [...new Set(summary.page_error_types)]
+
+  if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
+  else if (summary.ui_response_status < 200 || summary.ui_response_status >= 400) summary.blocker = 'UI_HTTP_NOT_OK'
+  else if (summary.root_child_count === 0 || summary.body_text_length === 0) summary.blocker = 'FRONTEND_ROOT_EMPTY'
+  else if (summary.matched_tab_count !== expectedTabs.length) summary.blocker = 'DASHBOARD_SHELL_TABS_MISSING'
+  else if (summary.page_error_types.length || summary.console_error_types.length) summary.blocker = 'FRONTEND_RUNTIME_ERRORS_PRESENT'
+  else {
+    summary.status = 'PASS'
+    summary.blocker = 'NONE'
+  }
+} catch (err) {
+  summary.blocker = err?.name === 'TimeoutError' ? 'DASHBOARD_SHELL_TIMEOUT' : 'DASHBOARD_SHELL_EXCEPTION'
+  summary.page_error_types = [...new Set([...summary.page_error_types, err?.name || 'Error'])]
+} finally {
+  if (browser) await browser.close().catch(() => {})
+}
+
+summary.production_grade_claim_allowed = false
+fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
+fs.writeFileSync(path.join(outDir, 'summary.md'), [
+  '# Dashboard Shell Diagnostic',
+  '',
+  `Generated: ${summary.generated_at}`,
+  `Status: **${summary.status}**`,
+  `Blocker: **${summary.blocker}**`,
+  `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
+  `UI HTTP: \`${summary.ui_response_status}\``,
+  `Root children: \`${summary.root_child_count}\``,
+  `Body text length: \`${summary.body_text_length}\``,
+  `Matched tabs: \`${summary.matched_tab_count}/${summary.expected_tab_count}\``,
+  `Visible buttons: \`${summary.visible_button_count}\``,
+  `Visible links: \`${summary.visible_link_count}\``,
+  `Console error categories: \`${summary.console_error_types.join(', ') || 'none'}\``,
+  `Page error categories: \`${summary.page_error_types.join(', ') || 'none'}\``,
+  '',
+  'This report is analyzer-only. It never calls order routes, never persists credentials, and never permits a production-grade claim.',
+].join('\n'))
+
+console.log(JSON.stringify({
+  status: summary.status,
+  blocker: summary.blocker,
+  auth_ok: summary.auth.ok,
+  ui_http: summary.ui_response_status,
+  matched_tabs: `${summary.matched_tab_count}/${summary.expected_tab_count}`,
+  live_trading_enabled: false,
+  order_routes_called: false,
+}))
