@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T20:20:59.106534+00:00",
+  "generated_at": "2026-07-13T02:26:02.478171+00:00",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "auth": {
@@ -8,15 +8,16 @@
     "note": "not proven because tracker report was not produced"
   },
   "tabs": [],
+  "expected_tab_count": 16,
   "visible_issue_count": 0,
   "info_line_count": 0,
-  "screenshot_missing_count": 13,
+  "screenshot_missing_count": 16,
   "ui_exception_count": 1,
-  "global_exception": "visual tracker did not produce its required report; scan_step_outcome=skipped. Inspect dependency install, browser launch, Render reachability, and authentication.",
+  "global_exception": "visual tracker did not produce its required report; install_step_outcome=failure; scan_step_outcome=skipped. Inspect isolated Playwright installation, browser launch, Render reachability, and authentication.",
   "visible_issues": [],
   "info_lines": [],
   "todo": [
-    "visual tracker did not produce its required report; scan_step_outcome=skipped. Inspect dependency install, browser launch, Render reachability, and authentication."
+    "visual tracker did not produce its required report; install_step_outcome=failure; scan_step_outcome=skipped. Inspect isolated Playwright installation, browser launch, Render reachability, and authentication."
   ],
   "production_grade_claim_allowed": false,
   "analyzer_safety": {
