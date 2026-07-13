@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-13T16:25:05.555Z",
+  "generated_at": "2026-07-13T16:52:05.705Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "auth": {
-    "ok": true,
-    "status": 200
+    "ok": false,
+    "status": 502
   },
   "tabs": [
     {
@@ -256,6 +256,8 @@
   "global_exception": null,
   "visible_issues": [],
   "info_lines": [],
-  "todo": [],
+  "todo": [
+    "Dashboard auth session failed status=502"
+  ],
   "production_grade_claim_allowed": false
 }
