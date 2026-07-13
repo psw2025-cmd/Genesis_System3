@@ -1,0 +1,71 @@
+name: System3 Render Worker Preflight
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 * * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/system3-render-worker-preflight.yml'
+      - 'tools/system3_render_worker_preflight.py'
+      - 'scripts/cloud_worker.py'
+      - 'render.yaml'
+      - 'docs/SYSTEM3_DHAN_TOKEN_UPDATE_NOTE.md'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: system3-render-worker-preflight
+  cancel-in-progress: true
+
+jobs:
+  render-worker-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      WEB_SERVICE_URL: https://genesis-system3-backend.onrender.com
+      SYSTEM3_API_BASE: https://genesis-system3-backend.onrender.com
+      WORKER_PUSH_TOKEN: ${{ secrets.WORKER_PUSH_TOKEN }}
+      DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
+      DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+      DHAN_PIN: ${{ secrets.DHAN_PIN }}
+      DHAN_TOTP_SECRET: ${{ secrets.DHAN_TOTP_SECRET }}
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      ANALYZE_MODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run worker preflight
+        run: python tools/system3_render_worker_preflight.py || true
+      - name: Commit worker preflight proof
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/render_worker_preflight/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): update render worker preflight [skip ci]"
+          git push
+      - name: Report worker preflight status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('reports/latest/render_worker_preflight/summary.json')
+          if not p.exists():
+              print('worker preflight summary missing')
+              raise SystemExit(1)
+          data=json.load(open(p, encoding='utf-8'))
+          print(json.dumps({
+              'status': data.get('status'),
+              'blockers': data.get('blockers'),
+              'safety': data.get('safety'),
+              'note': 'Report-only: does not enable live trading and does not call order routes.'
+          }, indent=2))
+          raise SystemExit(0)
+          PY
