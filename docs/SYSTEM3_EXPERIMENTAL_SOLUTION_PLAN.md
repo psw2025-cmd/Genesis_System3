@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T16:15:42.495879+00:00`
+Generated UTC: `2026-07-13T16:24:11.965901+00:00`
 Status: **BLOCKED**
-Issues: `541`
+Issues: `537`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 197 issues
+### GITHUB_RENDER_FAILURE — 192 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -334,7 +334,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "Request failed with status code 502"}
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=46
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=44
 
 ### PAPER_LIFECYCLE — 8 issues
 
@@ -384,7 +384,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 
-### INSTALL_CREDENTIAL — 5 issues
+### INSTALL_CREDENTIAL — 6 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -392,11 +392,12 @@ Recommended fixes:
 - Never print or commit credential values.
 
 Top issues:
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29265662001 conclusion=failure commit=d3114ae550da632f314c596c702aea0742b59e9c
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29265638751 conclusion=failure commit=4a1bc058fa820256cf685cff9dc349d077e1aeee
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29265439316 conclusion=failure commit=ac65766bbbc93a2f4c5ac287493952f89e2d37ac
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29265422851 conclusion=failure commit=eb4d37840505b4af1240f9b68e81f9b2ff63084f
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29265421986 conclusion=failure commit=eb4d37840505b4af1240f9b68e81f9b2ff63084f
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29264833606 conclusion=failure commit=330361cb9f3e09ef56c0f555e40d8a307f8e3c8f
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29264632478 conclusion=failure commit=67ffb7df82230c601221253c4570f1090f79783a
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29263021919 conclusion=failure commit=3ef736f68fe396c6c0878a681205a451c910c107
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29262749242 conclusion=failure commit=f473eb6c91d93b67e6de3ac0a334b410f407ae03
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29262728474 conclusion=failure commit=f99d453c415e75657bdb5de2e7796ef1fc6a0dd7
 
 ### SCANNER_SIGNAL — 4 issues
 
