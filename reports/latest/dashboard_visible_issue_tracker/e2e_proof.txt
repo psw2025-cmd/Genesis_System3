@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:59:11 IST
+05:20:57 IST
 NIFTY
 24,198
 BNFTY
-58,103
+--
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -54,7 +54,7 @@ Live Gate
 LOCK
 End-to-End Visual Truth Proof
 Real broker/data truth only. Live money remains blocked until every row below passes.
-Recheck Now
+Checking...
 BLOCKED · FULL E2E
 Overall visual proof
 BLOCKED · API
@@ -65,36 +65,21 @@ PASS · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 7/13/2026, 11:28:54 PM · This panel is proof-only; it does not enable live orders.
+Last run: not yet · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
-Dhan broker connection	BLOCKED	502
+Dhan broker connection	BLOCKED	-
 Dhan access token/session	BLOCKED	-
-Real broker funds/margin	BLOCKED	502
-Real broker holdings response	BLOCKED	502
-Real broker positions response	BLOCKED	502
+Real broker funds/margin	BLOCKED	-
+Real broker holdings response	BLOCKED	-
+Real broker positions response	BLOCKED	-
 Real Dhan option chain for all watched symbols	BLOCKED	0/5
 No non-Dhan/stale/fallback markers in chain	PASS	clean
-Paper/analyzer P&L endpoint	BLOCKED	502
-Today paper lifecycle endpoint	BLOCKED	502
-Gate/risk endpoint visible	BLOCKED	502
+Paper/analyzer P&L endpoint	BLOCKED	-
+Today paper lifecycle endpoint	BLOCKED	-
+Gate/risk endpoint visible	BLOCKED	-
 Live-money switch blocked until separate proof	PASS	blocked
 Dhan Option Chain Proof
 SYMBOL	VISUAL STATUS	SOURCE	PRIORITY	STATUS	SPOT	CONTRACTS	REASON
-NIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
-BANKNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
-FINNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
-MIDCPNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
-SENSEX	BLOCKED	-	-	502	-	-	UNKNOWN
 Core API / Dashboard Data Proof
 ENDPOINT	HTTP	VISUAL STATUS	IMPORTANT STATUS
-/api/health	502	BLOCKED	-
-/api/state	502	BLOCKED	-
-/api/broker/dhan/status	502	BLOCKED	-
-/api/broker/funds	502	BLOCKED	-
-/api/broker/holdings	502	BLOCKED	-
-/api/broker/positions/live	502	BLOCKED	-
-/api/gain_rank	502	BLOCKED	-
-/api/pnl	502	BLOCKED	-
-/api/trades/today	502	BLOCKED	-
-/api/auto_gates	502	BLOCKED	-
