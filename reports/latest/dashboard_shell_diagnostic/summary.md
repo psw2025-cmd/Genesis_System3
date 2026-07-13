@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-13T20:53:46.031Z
+Generated: 2026-07-13T21:22:45.781Z
 Status: **BLOCKED**
 Blocker: **DASHBOARD_AUTH_NOT_PROVEN**
 Auth OK: `false` (HTTP 502)
