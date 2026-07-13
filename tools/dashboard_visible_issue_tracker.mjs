@@ -86,6 +86,31 @@ async function authenticate(page, summary) {
   }
 }
 
+async function clickDashboardTab(page, title) {
+  const candidates = [
+    page.getByRole('button', { name: title, exact: true }),
+    page.getByRole('link', { name: title, exact: true }),
+    page.locator('button').filter({ hasText: title }),
+    page.locator('a').filter({ hasText: title }),
+    page.locator(`[title=${JSON.stringify(title)}]`),
+    page.locator(`[aria-label=${JSON.stringify(title)}]`),
+    page.getByText(title, { exact: true }),
+  ]
+
+  const attempts = []
+  for (let index = 0; index < candidates.length; index += 1) {
+    const candidate = candidates[index].first()
+    try {
+      await candidate.waitFor({ state: 'visible', timeout: 3000 })
+      await candidate.click({ timeout: 8000 })
+      return { method_index: index, attempts }
+    } catch (err) {
+      attempts.push(`candidate_${index}:${String(err).split('\n')[0].slice(0, 180)}`)
+    }
+  }
+  throw new Error(`Unable to locate/click dashboard tab ${title}; ${attempts.join(' | ')}`)
+}
+
 async function scanTab(page, id, title) {
   const result = {
     id,
@@ -93,6 +118,7 @@ async function scanTab(page, id, title) {
     ok: false,
     screenshot: null,
     screenshot_ok: false,
+    navigation_method_index: null,
     blocker_lines: [],
     info_lines: [],
     red_elements: [],
@@ -101,8 +127,8 @@ async function scanTab(page, id, title) {
   }
 
   try {
-    const btn = page.locator(`button[title="${title}"]`).first()
-    await btn.click({ timeout: 25000 })
+    const navigation = await clickDashboardTab(page, title)
+    result.navigation_method_index = navigation.method_index
     await page.waitForTimeout(4500)
     const screenshot = path.join(outDir, `${id}.png`)
     await page.screenshot({ path: screenshot, fullPage: true })
