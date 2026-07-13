@@ -1,144 +1,8 @@
 {
-  "generated_utc": "2026-07-13T16:26:50.803951+00:00",
-  "issue_count": 461,
+  "generated_utc": "2026-07-13T16:32:24.933445+00:00",
+  "issue_count": 293,
   "lane_count": 13,
   "lanes": [
-    {
-      "issue_count": 158,
-      "lane": "UI_RED_VISUAL",
-      "recommended_fixes": [
-        "Use dashboard_visible_issue_tracker output as source of truth.",
-        "Fix root cause for each visible red/blocked/pending line; do not hide text.",
-        "Re-run tracker until visible_issue_count=0."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_003:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_015:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_023:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_035:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_043:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_055:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_063:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_073:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_075:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_079:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_083:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_092:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_093:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_095:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_099:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        }
-      ]
-    },
     {
       "issue_count": 113,
       "lane": "GITHUB_RENDER_FAILURE",
@@ -277,143 +141,143 @@
       ]
     },
     {
-      "issue_count": 57,
-      "lane": "BROKER_DHAN",
+      "issue_count": 41,
+      "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
-        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
-        "Treat token/auth/funds failure as connected=false.",
-        "Do not enable live orders."
+        "Use dashboard_visible_issue_tracker output as source of truth.",
+        "Fix root cause for each visible red/blocked/pending line; do not hide text.",
+        "Re-run tracker until visible_issue_count=0."
       ],
       "top_issues": [
         {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_003:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_015:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_023:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_035:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_043:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_055:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/positions/live",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_063:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_073:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_075:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_065:broker_truth: Broker endpoint server error: /api/broker/holdings",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_079:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_083:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_092:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_093:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_085:broker_truth: Broker endpoint server error: /api/broker/diagnose",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_095:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
+          "issue": "agent_099:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     },
     {
-      "issue_count": 38,
+      "issue_count": 31,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -549,7 +413,143 @@
       ]
     },
     {
-      "issue_count": 24,
+      "issue_count": 29,
+      "lane": "BROKER_DHAN",
+      "recommended_fixes": [
+        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
+        "Treat token/auth/funds failure as connected=false.",
+        "Do not enable live orders."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker endpoint server error: /api/broker/diagnose",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 21,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -658,21 +658,6 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tBLOCKED\\tYES\\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Real Dhan option chain for all watched symbols\\tBLOCKED\\t0/5\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Option Chain\", \"text\": \"DHAN DEGRADED\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -680,7 +665,7 @@
       ]
     },
     {
-      "issue_count": 16,
+      "issue_count": 11,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -734,31 +719,6 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"DHAN DEGRADED\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Options ML training summary is missing/not published.",
           "lane": "ML_TRAINING",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -771,81 +731,7 @@
       ]
     },
     {
-      "issue_count": 13,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=12",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ERROR\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"FAIL\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=107",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 11,
+      "issue_count": 10,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -899,11 +785,6 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"Request failed with status code 502\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "failed_count=44",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
@@ -911,52 +792,60 @@
       ]
     },
     {
-      "issue_count": 8,
-      "lane": "PAPER_LIFECYCLE",
+      "issue_count": 10,
+      "lane": "UNKNOWN",
       "recommended_fixes": [
-        "Require paper entry, exit, PnL, source/provenance.",
-        "Reject fake/fixture/mock rows.",
-        "Show order endpoints not called."
+        "Inspect source report, classify manually, add rule to planner."
       ],
       "top_issues": [
         {
-          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=12",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t502\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
         },
         {
-          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "blocker_count=14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -1003,6 +892,47 @@
         {
           "issue": "Trading router may be inactive if app.py duplicate routes are authoritative.",
           "lane": "ROUTE_CODE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 6,
+      "lane": "PAPER_LIFECYCLE",
+      "recommended_fixes": [
+        "Require paper entry, exit, PnL, source/provenance.",
+        "Reject fake/fixture/mock rows.",
+        "Show order endpoints not called."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -1090,7 +1020,7 @@
       ]
     },
     {
-      "issue_count": 4,
+      "issue_count": 2,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1107,16 +1037,6 @@
           "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
       ]
     }
