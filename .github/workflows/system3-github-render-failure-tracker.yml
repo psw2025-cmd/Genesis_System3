@@ -28,6 +28,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      SYSTEM3_RENDER_TRACKER_EXCLUDE_WORKFLOWS: System3 GitHub Render Failure Tracker
+      SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S: '12'
+      SYSTEM3_RENDER_TRACKER_GITHUB_TIMEOUT_S: '12'
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
@@ -36,14 +39,31 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Preflight non-secret diagnostics
+        run: |
+          mkdir -p reports/latest/github_render_failure_tracker docs
+          python - <<'PY'
+          import json, os, pathlib, sys
+          payload={
+            'python': sys.version.split()[0],
+            'github_repository': os.environ.get('GITHUB_REPOSITORY'),
+            'github_token_present': bool(os.environ.get('GITHUB_TOKEN')),
+            'dashboard_base_url_present': bool(os.environ.get('DASHBOARD_BASE_URL')),
+            'live_trading_enabled': os.environ.get('LIVE_TRADING_ENABLED'),
+            'system3_live_trading_allowed': os.environ.get('SYSTEM3_LIVE_TRADING_ALLOWED'),
+            'analyze_mode': os.environ.get('ANALYZE_MODE'),
+          }
+          pathlib.Path('reports/latest/github_render_failure_tracker/preflight.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
+          print(json.dumps(payload, indent=2))
+          PY
       - name: Track GitHub workflow and Render failures
-        run: python tools/system3_github_render_failure_tracker.py || true
+        run: python tools/system3_github_render_failure_tracker.py
       - name: Commit GitHub Render failure TODO
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md
+          git add reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md || true
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): update github render failure todo [skip ci]"
           git push
@@ -59,12 +79,14 @@ jobs:
           data=json.load(open(p, encoding='utf-8'))
           print(json.dumps({
               'tracker_status': data.get('status'),
+              'tracker_internal_status': data.get('tracker_internal_status'),
               'github_failed_count': data.get('github_failed_count'),
               'render_failed_count': data.get('render_failed_count'),
               'todo_count': data.get('todo_count'),
+              'excluded_workflows': data.get('excluded_workflows'),
               'live_trading_enabled': data.get('live_trading_enabled'),
               'order_routes_called': data.get('order_routes_called'),
-              'note': 'Report-only workflow: blockers are written to TODO; this tracker no longer fails itself solely because it detected blockers.'
+              'note': 'Report-only workflow: blockers are written to TODO; this tracker does not fail itself solely because it detected blockers.'
           }, indent=2))
           raise SystemExit(0)
           PY
