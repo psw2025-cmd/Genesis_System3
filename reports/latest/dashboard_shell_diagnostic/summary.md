@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-13T22:28:31.824Z
+Generated: 2026-07-13T22:35:31.953Z
 Status: **BLOCKED**
 Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Auth OK: `true` (HTTP 200)
