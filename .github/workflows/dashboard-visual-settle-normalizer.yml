@@ -1,0 +1,65 @@
+name: Dashboard Visual Settle Normalizer
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Dashboard Visible Issue Tracker
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dashboard-visual-settle-normalizer
+  cancel-in-progress: false
+
+jobs:
+  normalize-settle-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Normalize false unsettled evidence
+        run: python tools/dashboard_visual_settle_normalizer.py
+
+      - name: Commit normalized proof with conflict retry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f reports/latest/dashboard_visible_issue_tracker/summary.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "ci(proof): normalize dashboard settle evidence [skip ci]"
+          git push || (git pull --rebase origin main && git push)
+
+      - name: Enforce fail-closed claim state
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p,encoding='utf-8'))
+          if d.get('status') != 'PASS' and d.get('production_grade_claim_allowed') is not False:
+              raise SystemExit('blocked visual proof must prohibit production-grade claims')
+          if d.get('status') == 'PASS' and d.get('production_grade_claim_allowed') is not True:
+              raise SystemExit('PASS visual proof has inconsistent claim state')
+          print({
+              'status': d.get('status'),
+              'visible_issue_count': d.get('visible_issue_count'),
+              'unsettled_tab_count': d.get('unsettled_tab_count'),
+              'settle_normalized_tab_count': d.get('settle_normalized_tab_count'),
+              'production_grade_claim_allowed': d.get('production_grade_claim_allowed'),
+          })
+          PY
