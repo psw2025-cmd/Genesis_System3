@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-13T21:29:32.216Z
+Generated: 2026-07-13T21:37:09.689Z
 Status: **BLOCKED**
 Blocker: **DASHBOARD_SHELL_TABS_MISSING**
 Auth OK: `true` (HTTP 200)
