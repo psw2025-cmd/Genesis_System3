@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-13T15:26:13.831523+00:00",
-  "issue_count": 441,
+  "generated_utc": "2026-07-13T15:28:33.834254+00:00",
+  "issue_count": 485,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 104,
+      "issue_count": 127,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 35,
+      "issue_count": 50,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 33,
+      "issue_count": 35,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -549,7 +549,7 @@
       ]
     },
     {
-      "issue_count": 23,
+      "issue_count": 24,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -668,6 +668,11 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
+          "issue": "{\"tab\": \"Option Chain\", \"text\": \"DHAN DEGRADED\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -675,7 +680,7 @@
       ]
     },
     {
-      "issue_count": 14,
+      "issue_count": 16,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -734,6 +739,16 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"DHAN DEGRADED\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
           "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
@@ -756,7 +771,7 @@
       ]
     },
     {
-      "issue_count": 12,
+      "issue_count": 13,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
@@ -796,6 +811,11 @@
           "issue": "todo_count=46",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"ERROR\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
           "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
