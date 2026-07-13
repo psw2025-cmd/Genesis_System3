@@ -37,6 +37,7 @@ jobs:
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
       EXPECTED_DASHBOARD_TAB_COUNT: '16'
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.proof-node/ms-playwright
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,6 +46,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
       - name: Verify analyzer-only safety flags
         run: |
@@ -60,21 +62,36 @@ jobs:
       - name: Install isolated dashboard proof dependencies
         id: install
         continue-on-error: true
+        shell: bash
         run: |
+          set -euo pipefail
           rm -rf .proof-node node_modules
-          mkdir .proof-node
+          mkdir -p .proof-node
+
+          retry() {
+            local attempts="$1"
+            shift
+            local n=1
+            until "$@"; do
+              if [ "$n" -ge "$attempts" ]; then
+                echo "Command failed after ${n} attempts" >&2
+                return 1
+              fi
+              sleep_seconds=$((n * 10))
+              echo "Attempt ${n} failed; retrying in ${sleep_seconds}s" >&2
+              sleep "$sleep_seconds"
+              n=$((n + 1))
+            done
+          }
+
           cd .proof-node
           npm init -y >/dev/null 2>&1
-          npm install --ignore-scripts --no-audit --no-fund --package-lock=false playwright@1.52.0
-          # Keep host package installation out of this proof gate. Ubuntu-host
-          # dependency installation can fail independently of the browser
-          # download and was preventing the analyzer-safe scan from starting.
-          # Browser-launch dependency failures remain fail-closed in the scan.
-          npx playwright install chromium
+          retry 3 npm install --ignore-scripts --no-audit --no-fund --package-lock=false playwright@1.52.0
+          retry 3 npx playwright install chromium
           cd ..
+
           test -d .proof-node/node_modules/playwright
-          # Static ESM imports do not reliably honor NODE_PATH. Expose only the
-          # isolated proof dependencies at the repository root for this job.
+          test -d "$PLAYWRIGHT_BROWSERS_PATH"
           ln -s .proof-node/node_modules node_modules
           node --input-type=module -e "import('playwright').then(m => { if (!m.chromium) process.exit(1) })"
 
