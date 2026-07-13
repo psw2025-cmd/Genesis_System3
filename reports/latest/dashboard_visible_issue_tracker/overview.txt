@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-02:13:39 IST
+02:27:07 IST
 NIFTY
 24,198
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -56,6 +56,7 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
+API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
 BROKER
 CONNECTED
 Dhan read-only
@@ -72,26 +73,29 @@ Live Data Coverage
 market closed must not hide read-only data
 LOADED
 Health API
-live
+RENDER_UNAVAILABLE
 LOADED
 State API
 Market closed: Before pre-market (opens at 09:15)
 LOADED
 Broker Status API
-LOADED
+ERROR
 Funds API
-LOADED
+Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+ERROR
 Holdings API
+Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.
 LOADED
 Positions API
 LOADED
 P&L API
 pnl=0
-STALE
+LOADED
 Gain Rank / Scanner
+Render/backend returned 502 for /api/health. Keeping last good data where available.
 LOADED
 Auto Gates
-7 gates
+1 gates
 LOADED
 Alerts
 0 recent
@@ -99,35 +103,17 @@ LOADED
 Option Chain
 Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 Gate Matrix
-3/7 PASS
-PEND
-ML Accuracy (Spearman ρ)
-0/5 days · ρ=None · need ≥0.7
-PEND
-Profit / Expectancy
-expectancy=-196.14 · win_rate=0.3333
-PEND
-Paper Lifecycle
-market-session proof pending
-PASS
-Tick / Data Freshness
-tick_age=0.28s refresh=5s
-PASS
-Model Accuracy Report
-Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
-PEND
-Option Strike Visibility
-Run scripts/system3_option_visibility_audit.py
-PASS
-Equity F&O Eligibility
-Wire is_tradeable_fo_symbol() in ranking/paper trade path
+0/1 PASS
+FAIL
+Dashboard API Access
+Render/backend returned 502 for /api/auto_gates. Keeping last good data where available.
 System Health
 Mode
 PAPER
 QC Status
-PASS
+RENDER_UNAVAILABLE
 Data Source
-live
+RENDER_UNAVAILABLE
 Market
 CLOSED / DATA POLLING
 Live Allowed

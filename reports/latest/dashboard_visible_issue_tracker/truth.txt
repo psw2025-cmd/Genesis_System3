@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-02:12:33 IST
+02:26:01 IST
 NIFTY
 24,198
 BNFTY
@@ -10,11 +10,11 @@ BNFTY
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-LIVE
+OFF
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -54,24 +54,24 @@ Live Gate
 LOCK
 System Truth Control
 Full upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.
-Checking...
+Recheck All Layers
 BLOCKED
 Infrastructure / broker read path
 BLOCKED
 Money readiness
 Last run
--
+7/13/2026, 8:55:54 PM
 MONEY_READY_BLOCKED
 At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
 LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE
-Backend/API route health	BLOCKED	YES	health=0, state=0
+Backend/API route health	BLOCKED	YES	health=200, state=502
 Broker read-only connection	BLOCKED	YES	connected=false, broker=dhan, order_allowed=false
-Funds / margin truth	BLOCKED	YES	available=-, used=-, source=-
+Funds / margin truth	PASS	YES	available=1691.56, used=-, source=sdk
 Holdings and live positions read path	BLOCKED	YES	holdings=0, positions=0
-Dhan option-chain availability	BLOCKED	YES	enabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1
+Dhan option-chain availability	BLOCKED	YES	enabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=1/1, optional_safe_no_trade=0/1
 Universe / ranking candidates	BLOCKED	YES	candidate_rows=0, gain=0, scanner=0
 CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
-Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
-Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
+Paper/analyzer lifecycle	PARTIAL	NO	today_trade_rows=0, endpoint=200
+Risk gates and automation status	PASS	YES	auto_gates_http=200, status=ok
 Live-money safety lock	PASS	YES	live_flag=false, order_allowed=false
 Dashboard operator truth	PASS	YES	Generated from live endpoints. SENSEX is optional until official Dhan rows are proven; enabled universe remains no-fallback.
