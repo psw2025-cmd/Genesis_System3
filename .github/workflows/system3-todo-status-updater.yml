@@ -123,7 +123,12 @@ jobs:
               safe = {
                   'generated_at': current.get('generated_at') or current.get('generated_utc'),
                   'status': str(current.get('status') or 'BLOCKED').upper(),
-                  'failed_count': int(current.get('failed_count') or current.get('workflow_failed_count') or 0),
+                  'failed_count': int(
+                      current.get('failed_count')
+                      or current.get('workflow_failed_count')
+                      or current.get('github_failed_count')
+                      or 0
+                  ),
                   'source': 'github_render_failure_tracker',
               }
               failure_target.parent.mkdir(parents=True, exist_ok=True)
