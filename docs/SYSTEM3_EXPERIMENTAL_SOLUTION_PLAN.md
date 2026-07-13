@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T19:32:42.196063+00:00`
+Generated UTC: `2026-07-13T19:33:22.809347+00:00`
 Status: **BLOCKED**
-Issues: `408`
+Issues: `410`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 130 issues
+### GITHUB_RENDER_FAILURE — 129 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=29274674959 conclusion=failure commit=1badf5c213dd
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29274231332 conclusion=failure commit=1badf5c213dd
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29274231315 conclusion=failure commit=1badf5c213dd
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29274231289 conclusion=failure commit=1badf5c213dd
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29274229905 conclusion=failure commit=1badf5c213dd
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=29278567434 conclusion=failure commit=40f8ebfef038
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29278392362 conclusion=failure commit=47be4f808bf9
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29278427458 conclusion=failure commit=47be4f808bf9
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29278393020 conclusion=failure commit=47be4f808bf9
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29278392633 conclusion=failure commit=47be4f808bf9
 
 ### UI_RED_VISUAL — 110 issues
 
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### RENDER_DEPLOY — 33 issues
+### RENDER_DEPLOY — 36 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -285,7 +285,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=15
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20045ms markers=CHECKING..."}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "ASYNC_CONTENT_NOT_SETTLED after 20042ms"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 20045ms"}
