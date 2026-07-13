@@ -10,6 +10,7 @@ on:
       - '.github/workflows/system3-github-render-failure-tracker.yml'
       - 'tools/system3_github_render_failure_tracker.py'
       - 'tools/run_authenticated_failure_tracker.py'
+      - 'tools/dedupe_failure_tracker_report.py'
       - 'scripts/cloud_worker.py'
       - 'render.yaml'
       - 'docs/SYSTEM3_DHAN_TOKEN_UPDATE_NOTE.md'
@@ -111,9 +112,13 @@ jobs:
               'todo_count': 1,
               'github_failed_count': None,
               'render_failed_count': None,
+              'failed_workflows': [],
+              'render_failures': [],
               'live_trading_enabled': False,
               'order_routes_called': False,
               'secrets_printed': False,
+              'response_bodies_persisted': False,
+              'production_grade_claim_allowed': False,
               'report_only_no_self_failure_storm': True,
             }
             out.joinpath('summary.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
@@ -122,6 +127,10 @@ jobs:
             print(json.dumps(payload, indent=2))
             PY
           fi
+      - name: Normalize latest workflow blockers
+        if: always()
+        continue-on-error: true
+        run: python tools/dedupe_failure_tracker_report.py
       - name: Commit GitHub Render failure TODO
         if: always()
         continue-on-error: true
@@ -149,6 +158,8 @@ jobs:
               'github_failed_count': data.get('github_failed_count'),
               'render_failed_count': data.get('render_failed_count'),
               'todo_count': data.get('todo_count'),
+              'workflow_failure_count_semantics': data.get('workflow_failure_count_semantics'),
+              'historical_duplicate_failures_removed': data.get('historical_duplicate_failures_removed'),
               'excluded_workflows': data.get('excluded_workflows'),
               'live_trading_enabled': data.get('live_trading_enabled'),
               'order_routes_called': data.get('order_routes_called'),
