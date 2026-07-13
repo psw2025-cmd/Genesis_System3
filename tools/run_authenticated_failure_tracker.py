@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Run the GitHub/Render failure tracker with a dashboard session.
+"""Run the GitHub/Render failure tracker with dashboard authentication.
 
 Analyzer-safe proof helper:
 - Establishes only the read-only dashboard session used by protected proof endpoints.
-- Never prints or persists the API key, cookies, or response body.
+- Carries the dashboard API key only in-memory as a request header for protected probes.
+- Never prints or persists the API key, cookies, session data, or response body.
 - Does not call broker order routes.
 - Fails closed: the underlying tracker records authentication failures as blockers.
 """
@@ -47,7 +48,17 @@ def install_dashboard_session() -> None:
         with opener.open(request, timeout=12) as response:
             # Do not read, print, or persist the response body.
             ok = 200 <= int(response.status) < 300
-            os.environ["SYSTEM3_DASHBOARD_SESSION_STATUS"] = "AUTHENTICATED" if ok else "AUTH_FAILED"
+            os.environ["SYSTEM3_DASHBOARD_SESSION_STATUS"] = (
+                "AUTHENTICATED" if ok else "AUTH_FAILED"
+            )
+            if ok:
+                # The backend may protect read-only endpoints by either session cookie
+                # or X-API-Key. Keep both mechanisms in-memory. urllib merges these
+                # defaults with each tracker request without exposing the value.
+                opener.addheaders = [
+                    ("X-API-Key", api_key),
+                    ("Accept", "application/json"),
+                ]
     except urllib.error.HTTPError:
         os.environ["SYSTEM3_DASHBOARD_SESSION_STATUS"] = "AUTH_HTTP_ERROR"
     except Exception:
