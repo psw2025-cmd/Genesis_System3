@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-00:12:51 IST
+00:20:38 IST
 NIFTY
 24,198
 BNFTY
---
+58,103
 FINNIFTY
---
+26,827
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -76,21 +76,22 @@ live
 LOADED
 State API
 Market closed: Before pre-market (opens at 09:15)
-WAITING
+LOADED
 Broker Status API
-WAITING
+LOADED
 Funds API
-WAITING
+LOADED
 Holdings API
-WAITING
+LOADED
 Positions API
 LOADED
 P&L API
 pnl=0
 STALE
 Gain Rank / Scanner
-WAITING
+LOADED
 Auto Gates
+7 gates
 LOADED
 Alerts
 0 recent
@@ -98,25 +99,28 @@ LOADED
 Option Chain
 Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 Gate Matrix
-3/6 PASS
+3/7 PASS
 PEND
-ML Accuracy (Spearman rho)
-Accumulating - need 10 trading days
+ML Accuracy (Spearman ρ)
+0/5 days · ρ=None · need ≥0.7
 PEND
-Paper Lifecycle Proof
-Market session required
+Profit / Expectancy
+expectancy=-196.14 · win_rate=0.3333
+PEND
+Paper Lifecycle
+market-session proof pending
 PASS
 Tick / Data Freshness
-source: live
+tick_age=1.41s refresh=5s
 PASS
-Broker Connection
-Dhan connected
-FAIL
-Live Trading Gate
-OFF - hardcoded safety
+Model Accuracy Report
+Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
+PEND
+Option Strike Visibility
+Run scripts/system3_option_visibility_audit.py
 PASS
-Paper Mode Active
-CLOUD_PAPER_ENGINE=0, analyzer mode
+Equity F&O Eligibility
+Wire is_tradeable_fo_symbol() in ranking/paper trade path
 System Health
 Mode
 PAPER

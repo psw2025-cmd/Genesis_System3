@@ -1,11 +1,11 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-13T18:41:52.028Z
+Generated: 2026-07-13T18:49:57.969Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `41`
-Info line count: `111`
+Visible blocker count: `44`
+Info line count: `112`
 Screenshot missing count: `1`
 UI exception count: `1`
 Auth OK: `true`
@@ -25,6 +25,9 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - [ ] Fix visible UI blocker on Truth Control: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - [ ] Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - [ ] Fix visible UI blocker on Truth Control: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
+- [ ] Fix visible UI blocker on Genesis Brain: BLOCKED
+- [ ] Fix visible UI blocker on Genesis Brain: last scanner snapshot and staleness
+- [ ] Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
 - [ ] Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · FULL E2E
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · API
@@ -44,7 +47,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - [ ] Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof	PASS	blocked
 - [ ] Fix visible UI blocker on Overview: STALE
 - [ ] Fix visible UI blocker on Overview: PEND
-- [ ] Fix visible UI blocker on Overview: FAIL
+- [ ] Fix visible UI blocker on Overview: market-session proof pending
 - [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - [ ] Fix visible UI blocker on Paper Trades: BLOCKED
@@ -58,9 +61,9 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 | Tab | Status | Screenshot | Blockers | Info | Exceptions | Text file |
 |---|---|---:|---:|---:|---:|---|
 | Truth Control | BLOCKED | OK | 12 | 5 | 0 | truth.txt |
-| Genesis Brain | PASS | OK | 0 | 5 | 0 | genesis.txt |
+| Genesis Brain | BLOCKED | OK | 3 | 7 | 0 | genesis.txt |
 | E2E Proof | BLOCKED | OK | 17 | 5 | 0 | e2e_proof.txt |
-| Overview | BLOCKED | OK | 3 | 15 | 0 | overview.txt |
+| Overview | BLOCKED | OK | 3 | 14 | 0 | overview.txt |
 | Sim Live | BLOCKED | MISSING | 0 | 0 | 1 | sim_live.txt |
 | Option Chain | PASS | OK | 0 | 6 | 0 | chain.txt |
 | Signals | PASS | OK | 0 | 5 | 0 | signals.txt |
@@ -86,6 +89,9 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Truth Control**: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - **Truth Control**: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - **Truth Control**: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
+- **Genesis Brain**: BLOCKED
+- **Genesis Brain**: last scanner snapshot and staleness
+- **Genesis Brain**: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
 - **E2E Proof**: Real broker/data truth only. Live money remains blocked until every row below passes.
 - **E2E Proof**: BLOCKED · FULL E2E
 - **E2E Proof**: BLOCKED · API
@@ -105,7 +111,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **E2E Proof**: Live-money switch blocked until separate proof	PASS	blocked
 - **Overview**: STALE
 - **Overview**: PEND
-- **Overview**: FAIL
+- **Overview**: market-session proof pending
 - **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - **Paper Trades**: BLOCKED
@@ -126,6 +132,8 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Genesis Brain**: LIVE OFF
 - **Genesis Brain**: PAPER ONLY
 - **Genesis Brain**: Paper Trades
+- **Genesis Brain**: Next: enforce position sizing in paper lifecycle
+- **Genesis Brain**: "message": "I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS."
 - **E2E Proof**: MARKET CLOSED / DATA POLLING
 - **E2E Proof**: PAPER
 - **E2E Proof**: LIVE OFF
@@ -143,9 +151,8 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Overview**: market closed must not hide read-only data
 - **Overview**: Market closed: Before pre-market (opens at 09:15)
 - **Overview**: Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
-- **Overview**: Paper Lifecycle Proof
-- **Overview**: Paper Mode Active
-- **Overview**: CLOUD_PAPER_ENGINE=0, analyzer mode
+- **Overview**: Paper Lifecycle
+- **Overview**: Wire is_tradeable_fo_symbol() in ranking/paper trade path
 - **Option Chain**: MARKET CLOSED / DATA POLLING
 - **Option Chain**: PAPER
 - **Option Chain**: LIVE OFF
