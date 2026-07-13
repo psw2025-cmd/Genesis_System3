@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-07-13T13:16:21.189917Z`
+Generated UTC: `2026-07-13T14:11:26.190719Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `https://genesis-system3-backend.onrender.com`
 Excluded workflows: `System3 GitHub Render Failure Tracker`
-GitHub failed workflows: `9`
-Render failed endpoints: `9`
-TODO count: `18`
+GitHub failed workflows: `8`
+Render failed endpoints: `4`
+TODO count: `12`
 
 ## Rule
 
@@ -16,49 +16,37 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 
 ## TODO
 
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252920225 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252766022 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252763238 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252761114 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252752825 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252687933 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252684588 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632715 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632028 conclusion=cancelled commit=c9c2b8959a46
-- [ ] Fix Render endpoint /api/state: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/deploy/info: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/broker/funds: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/broker/holdings: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/paper: HTTP status 401 status=401
-- [ ] Fix Render endpoint /api/ml/performance: HTTP status 401 status=401
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256644761 conclusion=cancelled commit=4ee9da31c175
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256577231 conclusion=cancelled commit=4ee9da31c175
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256571287 conclusion=cancelled commit=4ee9da31c175
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256570513 conclusion=cancelled commit=4ee9da31c175
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256563848 conclusion=cancelled commit=4ee9da31c175
+- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29256551901 conclusion=cancelled commit=a05fd0a413f7
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256545865 conclusion=cancelled commit=a05fd0a413f7
+- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256543726 conclusion=cancelled commit=a05fd0a413f7
+- [ ] Fix Render endpoint /ui/: HTTP status 0 status=0
+- [ ] Fix Render endpoint /api/health: HTTP status 0 status=0
+- [ ] Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0
+- [ ] Fix Render endpoint /api/paper: HTTP status 0 status=0
 
 ## GitHub workflow failures
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| Dashboard Visible Issue Tracker | 29252920225 | cancelled | `c9c2b8959a46` | 2026-07-13T13:15:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252920225 |
-| System3 1000 Point TODO Status Updater | 29252766022 | cancelled | `c9c2b8959a46` | 2026-07-13T13:13:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252766022 |
-| Dashboard Visible Issue Tracker | 29252763238 | cancelled | `c9c2b8959a46` | 2026-07-13T13:13:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252763238 |
-| Dashboard Visible Issue Tracker | 29252761114 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252761114 |
-| Dashboard Visible Issue Tracker | 29252752825 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:00Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252752825 |
-| System3 1000 Point TODO Status Updater | 29252687933 | cancelled | `c9c2b8959a46` | 2026-07-13T13:11:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252687933 |
-| Dashboard Visible Issue Tracker | 29252684588 | cancelled | `c9c2b8959a46` | 2026-07-13T13:10:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252684588 |
-| System3 1000 Point TODO Status Updater | 29252632715 | cancelled | `c9c2b8959a46` | 2026-07-13T13:10:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632715 |
-| System3 1000 Point TODO Status Updater | 29252632028 | cancelled | `c9c2b8959a46` | 2026-07-13T13:09:11Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632028 |
+| Dashboard Visible Issue Tracker | 29256644761 | cancelled | `4ee9da31c175` | 2026-07-13T14:09:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256644761 |
+| Dashboard Visible Issue Tracker | 29256577231 | cancelled | `4ee9da31c175` | 2026-07-13T14:08:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256577231 |
+| Dashboard Visible Issue Tracker | 29256571287 | cancelled | `4ee9da31c175` | 2026-07-13T14:07:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256571287 |
+| Dashboard Visible Issue Tracker | 29256570513 | cancelled | `4ee9da31c175` | 2026-07-13T14:07:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256570513 |
+| Dashboard Visible Issue Tracker | 29256563848 | cancelled | `4ee9da31c175` | 2026-07-13T14:07:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256563848 |
+| System3 1000 Point TODO Status Updater | 29256551901 | cancelled | `a05fd0a413f7` | 2026-07-13T14:07:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256551901 |
+| Dashboard Visible Issue Tracker | 29256545865 | cancelled | `a05fd0a413f7` | 2026-07-13T14:06:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256545865 |
+| Dashboard Visible Issue Tracker | 29256543726 | cancelled | `a05fd0a413f7` | 2026-07-13T14:06:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256543726 |
 
 ## Render endpoint failures
 
 | Endpoint | Status | Reason | Classification |
 |---|---:|---|---|
-| `/api/state` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/deploy/info` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/broker/diagnose` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/broker/funds` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/broker/holdings` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/broker/positions/live` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/scanner/top_contract_gainers` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/paper` | 401 | HTTP status 401 | `mentions_auth_error` |
-| `/api/ml/performance` | 401 | HTTP status 401 | `mentions_auth_error` |
+| `/ui/` | 0 | HTTP status 0 | `none` |
+| `/api/health` | 0 | HTTP status 0 | `none` |
+| `/api/scanner/top_contract_gainers` | 0 | HTTP status 0 | `none` |
+| `/api/paper` | 0 | HTTP status 0 | `none` |

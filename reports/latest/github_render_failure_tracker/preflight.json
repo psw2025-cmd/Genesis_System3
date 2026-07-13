@@ -3,11 +3,12 @@
   "github_repository": "psw2025-cmd/Genesis_System3",
   "github_token_present": true,
   "dashboard_base_url_present": true,
+  "dashboard_api_key_present": true,
   "rate_limit": {
     "available": true,
-    "core_remaining": 4823,
+    "core_remaining": 4657,
     "core_limit": 5000,
-    "core_reset": 1783951137,
+    "core_reset": 1783954740,
     "actions_runner_registration_remaining": 10000
   },
   "live_trading_enabled": "0",

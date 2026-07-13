@@ -5,203 +5,134 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
+      "commit": "4ee9da31c175a593f1a22057f1c34e40bf5ac915",
       "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252920225",
-      "run_id": 29252920225,
-      "updated_at": "2026-07-13T13:15:17Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256644761",
+      "run_id": 29256644761,
+      "updated_at": "2026-07-13T14:09:30Z",
       "workflow": "Dashboard Visible Issue Tracker"
     },
     {
       "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
+      "commit": "4ee9da31c175a593f1a22057f1c34e40bf5ac915",
       "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252766022",
-      "run_id": 29252766022,
-      "updated_at": "2026-07-13T13:13:22Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256577231",
+      "run_id": 29256577231,
+      "updated_at": "2026-07-13T14:08:04Z",
+      "workflow": "Dashboard Visible Issue Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "4ee9da31c175a593f1a22057f1c34e40bf5ac915",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256571287",
+      "run_id": 29256571287,
+      "updated_at": "2026-07-13T14:07:07Z",
+      "workflow": "Dashboard Visible Issue Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "4ee9da31c175a593f1a22057f1c34e40bf5ac915",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256570513",
+      "run_id": 29256570513,
+      "updated_at": "2026-07-13T14:07:03Z",
+      "workflow": "Dashboard Visible Issue Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "4ee9da31c175a593f1a22057f1c34e40bf5ac915",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256563848",
+      "run_id": 29256563848,
+      "updated_at": "2026-07-13T14:07:02Z",
+      "workflow": "Dashboard Visible Issue Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "a05fd0a413f7d9b9319d7094436f992cd9dadcb0",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256551901",
+      "run_id": 29256551901,
+      "updated_at": "2026-07-13T14:07:13Z",
       "workflow": "System3 1000 Point TODO Status Updater"
     },
     {
       "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
+      "commit": "a05fd0a413f7d9b9319d7094436f992cd9dadcb0",
       "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252763238",
-      "run_id": 29252763238,
-      "updated_at": "2026-07-13T13:13:17Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256545865",
+      "run_id": 29256545865,
+      "updated_at": "2026-07-13T14:06:56Z",
       "workflow": "Dashboard Visible Issue Tracker"
     },
     {
       "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
+      "commit": "a05fd0a413f7d9b9319d7094436f992cd9dadcb0",
       "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252761114",
-      "run_id": 29252761114,
-      "updated_at": "2026-07-13T13:11:01Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29256543726",
+      "run_id": 29256543726,
+      "updated_at": "2026-07-13T14:06:41Z",
       "workflow": "Dashboard Visible Issue Tracker"
-    },
-    {
-      "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252752825",
-      "run_id": 29252752825,
-      "updated_at": "2026-07-13T13:11:00Z",
-      "workflow": "Dashboard Visible Issue Tracker"
-    },
-    {
-      "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252687933",
-      "run_id": 29252687933,
-      "updated_at": "2026-07-13T13:11:04Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252684588",
-      "run_id": 29252684588,
-      "updated_at": "2026-07-13T13:10:53Z",
-      "workflow": "Dashboard Visible Issue Tracker"
-    },
-    {
-      "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632715",
-      "run_id": 29252632715,
-      "updated_at": "2026-07-13T13:10:01Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "c9c2b8959a4626788baecda66d76e977f6814194",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29252632028",
-      "run_id": 29252632028,
-      "updated_at": "2026-07-13T13:09:11Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-07-13T13:16:21.189917Z",
-  "github_failed_count": 9,
+  "generated_utc": "2026-07-13T14:11:26.190719Z",
+  "github_failed_count": 8,
   "github_timeout_s": 12.0,
   "live_trading_enabled": false,
   "order_routes_called": false,
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-backend.onrender.com",
   "render_endpoint_timeout_s": 12.0,
-  "render_failed_count": 9,
+  "render_failed_count": 4,
   "render_failures": [
     {
       "classification": {
-        "mentions_auth_error": true,
+        "mentions_auth_error": false,
         "mentions_commit_or_sha": false,
         "mentions_server_error": false
       },
-      "endpoint": "/api/state",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/state"
+      "endpoint": "/ui/",
+      "error_type": "TimeoutError",
+      "reason": "HTTP status 0",
+      "status_code": 0,
+      "url": "https://genesis-system3-backend.onrender.com/ui/"
     },
     {
       "classification": {
-        "mentions_auth_error": true,
+        "mentions_auth_error": false,
         "mentions_commit_or_sha": false,
         "mentions_server_error": false
       },
-      "endpoint": "/api/deploy/info",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/deploy/info"
+      "endpoint": "/api/health",
+      "error_type": "TimeoutError",
+      "reason": "HTTP status 0",
+      "status_code": 0,
+      "url": "https://genesis-system3-backend.onrender.com/api/health"
     },
     {
       "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/diagnose",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/diagnose"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/funds",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/funds"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/holdings",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/positions/live",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/positions/live"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
+        "mentions_auth_error": false,
         "mentions_commit_or_sha": false,
         "mentions_server_error": false
       },
       "endpoint": "/api/scanner/top_contract_gainers",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
+      "error_type": "TimeoutError",
+      "reason": "HTTP status 0",
+      "status_code": 0,
       "url": "https://genesis-system3-backend.onrender.com/api/scanner/top_contract_gainers"
     },
     {
       "classification": {
-        "mentions_auth_error": true,
+        "mentions_auth_error": false,
         "mentions_commit_or_sha": false,
         "mentions_server_error": false
       },
       "endpoint": "/api/paper",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
+      "error_type": "TimeoutError",
+      "reason": "HTTP status 0",
+      "status_code": 0,
       "url": "https://genesis-system3-backend.onrender.com/api/paper"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/ml/performance",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-backend.onrender.com/api/ml/performance"
     }
   ],
   "report_only_no_self_failure_storm": true,
@@ -210,25 +141,19 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252920225 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252766022 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252763238 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252761114 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252752825 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252687933 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29252684588 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632715 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29252632028 conclusion=cancelled commit=c9c2b8959a46",
-    "Fix Render endpoint /api/state: HTTP status 401 status=401",
-    "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/funds: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/holdings: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401",
-    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401",
-    "Fix Render endpoint /api/paper: HTTP status 401 status=401",
-    "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401"
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256644761 conclusion=cancelled commit=4ee9da31c175",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256577231 conclusion=cancelled commit=4ee9da31c175",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256571287 conclusion=cancelled commit=4ee9da31c175",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256570513 conclusion=cancelled commit=4ee9da31c175",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256563848 conclusion=cancelled commit=4ee9da31c175",
+    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29256551901 conclusion=cancelled commit=a05fd0a413f7",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256545865 conclusion=cancelled commit=a05fd0a413f7",
+    "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29256543726 conclusion=cancelled commit=a05fd0a413f7",
+    "Fix Render endpoint /ui/: HTTP status 0 status=0",
+    "Fix Render endpoint /api/health: HTTP status 0 status=0",
+    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0",
+    "Fix Render endpoint /api/paper: HTTP status 0 status=0"
   ],
-  "todo_count": 18,
+  "todo_count": 12,
   "tracker_internal_status": "PASS"
 }
