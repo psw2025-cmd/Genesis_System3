@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-13T17:40:31.373809+00:00",
-  "issue_count": 379,
+  "generated_utc": "2026-07-13T17:42:51.671357+00:00",
+  "issue_count": 373,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 99,
+      "issue_count": 94,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 35,
+      "issue_count": 34,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -808,7 +808,7 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=108",
+          "issue": "info_line_count=94",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },

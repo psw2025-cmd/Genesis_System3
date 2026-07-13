@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-13T17:40:31.373809+00:00`
+Generated UTC: `2026-07-13T17:42:51.671357+00:00`
 Status: **BLOCKED**
-Issues: `379`
+Issues: `373`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29270319349 conclusion=failure commit=5cc5081c8024
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29269822011 conclusion=failure commit=2e9475e9b149
 
-### UI_RED_VISUAL — 99 issues
+### UI_RED_VISUAL — 94 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### BROKER_DHAN — 35 issues
+### BROKER_DHAN — 34 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -311,7 +311,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: todo_count=13
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=108
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=94
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
