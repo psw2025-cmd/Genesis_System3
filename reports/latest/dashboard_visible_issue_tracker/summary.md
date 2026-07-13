@@ -1,11 +1,11 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-13T17:17:04.434Z
+Generated: 2026-07-13T17:40:27.473Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `38`
-Info line count: `108`
+Visible blocker count: `35`
+Info line count: `94`
 Screenshot missing count: `1`
 UI exception count: `1`
 Auth OK: `true`
@@ -45,9 +45,6 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - [ ] Fix visible UI blocker on Overview: STALE
 - [ ] Fix visible UI blocker on Overview: PEND
 - [ ] Fix visible UI blocker on Overview: market-session proof pending
-- [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
-- [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
-- [ ] Fix visible UI blocker on Paper Trades: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
 - [ ] Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG
@@ -62,7 +59,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 | Option Chain | PASS | OK | 0 | 6 | 0 | chain.txt |
 | Signals | PASS | OK | 0 | 5 | 0 | signals.txt |
 | Trade | PASS | OK | 0 | 6 | 0 | trade.txt |
-| Paper Trades | BLOCKED | OK | 3 | 21 | 0 | paper.txt |
+| Paper Trades | PASS | OK | 0 | 7 | 0 | paper.txt |
 | Positions | PASS | OK | 0 | 7 | 0 | positions.txt |
 | Performance | PASS | OK | 0 | 6 | 0 | performance.txt |
 | ML Model | BLOCKED | OK | 2 | 5 | 0 | ml.txt |
@@ -103,9 +100,6 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Overview**: STALE
 - **Overview**: PEND
 - **Overview**: market-session proof pending
-- **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
-- **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
-- **Paper Trades**: BLOCKED
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
 - **Broker**: BLOCKED BY BACKEND FLAG
@@ -162,21 +156,7 @@ Every live sidebar tab must be scanned. Visible UI blockers remain TODO until au
 - **Paper Trades**: PAPER ONLY
 - **Paper Trades**: Paper Trades
 - **Paper Trades**: Paper Trading Console
-- **Paper Trades**: Recheck Paper Proof
-- **Paper Trades**: PAPER / ANALYZER SAFE
-- **Paper Trades**: Today Paper Entries
-- **Paper Trades**: Today Paper Exits
-- **Paper Trades**: Closed paper/analyzer records
-- **Paper Trades**: Paper Truth Provenance
-- **Paper Trades**: NO_PAPER_SOURCE
-- **Paper Trades**: Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.
-- **Paper Trades**: PAPER TRADING MODE (NO REAL ORDERS)
-- **Paper Trades**: Mode: PAPER | Data Source: NOT_READY | Broker: Connected
-- **Paper Trades**: Open Paper Positions (0)
-- **Paper Trades**: No open paper positions
-- **Paper Trades**: Today Paper Trade Proof
-- **Paper Trades**: Total Paper Exposure
-- **Paper Trades**: Paper UI does not call broker/order close endpoints.
+- **Paper Trades**: Loading paper/analyzer proof...
 - **Positions**: MARKET CLOSED / DATA POLLING
 - **Positions**: PAPER
 - **Positions**: LIVE OFF
