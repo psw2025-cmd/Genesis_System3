@@ -1,15 +1,15 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-13T20:42:45.025Z
+Generated: 2026-07-13T20:53:46.031Z
 Status: **BLOCKED**
-Blocker: **DASHBOARD_SHELL_TABS_MISSING**
-Auth OK: `true` (HTTP 200)
-UI HTTP: `200`
-Root children: `1`
-Body text length: `3368`
-Matched tabs: `15/16`
-Visible buttons: `18`
-Visible links: `5`
+Blocker: **DASHBOARD_AUTH_NOT_PROVEN**
+Auth OK: `false` (HTTP 502)
+UI HTTP: `502`
+Root children: `0`
+Body text length: `210`
+Matched tabs: `0/16`
+Visible buttons: `0`
+Visible links: `2`
 Console error categories: `console.error`
 Page error categories: `none`
 
