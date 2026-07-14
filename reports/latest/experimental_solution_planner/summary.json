@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-14T14:48:14.331418+00:00",
-  "issue_count": 551,
+  "generated_utc": "2026-07-14T14:50:47.510274+00:00",
+  "issue_count": 673,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 47,
+      "issue_count": 132,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,143 +277,7 @@
       ]
     },
     {
-      "issue_count": 43,
-      "lane": "RENDER_DEPLOY",
-      "recommended_fixes": [
-        "Verify /api/deploy/info exposes latest commit.",
-        "Force Render redeploy if commit mismatch or missing.",
-        "Run live dashboard screenshot proof after deploy."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_001:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_001:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_002:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_010:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_021:render_health: Render health failed /: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_021:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_022:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_030:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_041:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_041:render_health: Render health failed /api/health: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_042:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_050:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_062:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_070:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_082:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/deploy/info: status=502",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_090:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 41,
+      "issue_count": 48,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -549,7 +413,277 @@
       ]
     },
     {
-      "issue_count": 22,
+      "issue_count": 47,
+      "lane": "RENDER_DEPLOY",
+      "recommended_fixes": [
+        "Verify /api/deploy/info exposes latest commit.",
+        "Force Render redeploy if commit mismatch or missing.",
+        "Run live dashboard screenshot proof after deploy."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_001:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_001:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_002:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_010:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_022:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_030:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /api/health: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_042:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_050:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_062:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_070:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_082:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/deploy/info: status=502",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_090:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 26,
+      "lane": "UNKNOWN",
+      "recommended_fixes": [
+        "Inspect source report, classify manually, add rule to planner."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=53",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "system3_public_truth: status=FAIL",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "blocker_count=182",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5022ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5021ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5032ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5021ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5020ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Live Gate\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5018ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "info_line_count=112",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "unsettled_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 25,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -663,8 +797,124 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tBLOCKED\\tYES\\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Real Dhan option chain for all watched symbols\\tBLOCKED\\t0/5\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Option Chain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5022ms\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 18,
+      "lane": "ML_TRAINING",
+      "recommended_fixes": [
+        "Build real CE/PE dataset proof.",
+        "Train/test split and accuracy/AUC/Spearman proof.",
+        "Dashboard must show score and blocked reason if unavailable."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_049:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Options ML training summary is missing/not published.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING MODEL ARTIFACTS...\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "Options ML training summary is missing/not published.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
+          "lane": "ML_TRAINING",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -751,208 +1001,63 @@
       ]
     },
     {
-      "issue_count": 13,
-      "lane": "ML_TRAINING",
+      "issue_count": 10,
+      "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
-        "Build real CE/PE dataset proof.",
-        "Train/test split and accuracy/AUC/Spearman proof.",
-        "Dashboard must show score and blocked reason if unavailable."
+        "Require paper entry, exit, PnL, source/provenance.",
+        "Reject fake/fixture/mock rows.",
+        "Show order endpoints not called."
       ],
       "top_issues": [
         {
-          "issue": "agent_009:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_009:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_029:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_029:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_049:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_069:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_069:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_089:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_089:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "parallel_root_cause_audit: Options ML training summary is missing/not published.",
-          "lane": "ML_TRAINING",
+          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "Options ML training summary is missing/not published.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        },
-        {
-          "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 13,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=53",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "system3_public_truth: status=FAIL",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "blocker_count=182",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 9,
-      "lane": "WORKFLOW_CI",
-      "recommended_fixes": [
-        "Read workflow_failure_tracker TODO.",
-        "Fix failing workflow logs one by one.",
-        "Keep failed workflows in TODO until later successful run proves fixed."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwr",
-          "lane": "WORKFLOW_CI",
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t-\"}",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "failed_count=41",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5050ms\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
     },
@@ -1013,48 +1118,53 @@
       ]
     },
     {
-      "issue_count": 7,
-      "lane": "PAPER_LIFECYCLE",
+      "issue_count": 8,
+      "lane": "WORKFLOW_CI",
       "recommended_fixes": [
-        "Require paper entry, exit, PnL, source/provenance.",
-        "Reject fake/fixture/mock rows.",
-        "Show order endpoints not called."
+        "Read workflow_failure_tracker TODO.",
+        "Fix failing workflow logs one by one.",
+        "Keep failed workflows in TODO until later successful run proves fixed."
       ],
       "top_issues": [
         {
-          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "failed_count=41",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
@@ -1105,7 +1215,7 @@
       ]
     },
     {
-      "issue_count": 2,
+      "issue_count": 5,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1122,6 +1232,21 @@
           "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5023ms\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
       ]
     }
