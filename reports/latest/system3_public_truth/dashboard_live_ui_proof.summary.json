@@ -128,88 +128,78 @@
     }
   ],
   "base": "https://genesis-system3-backend.onrender.com",
-  "blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ],
+  "blockers": [],
   "chain_truth": [
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/NIFTY",
-      "ok": false,
+      "ok": true,
       "optional": false,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 24068.65,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/BANKNIFTY",
-      "ok": false,
+      "ok": true,
       "optional": false,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 57447.3,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/FINNIFTY",
-      "ok": false,
+      "ok": true,
       "optional": false,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 26515.25,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/MIDCPNIFTY",
-      "ok": false,
+      "ok": true,
       "optional": false,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 14729.7,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     },
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/SENSEX",
-      "ok": false,
+      "ok": true,
       "optional": true,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_last_verified_snapshot",
+      "spot": 77155.48,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "total_contracts": 160
     }
   ],
-  "final_verdict": "BLOCKED_NOT_TRADE_READY",
-  "generated_at": "2026-07-14T09:13:40.139Z",
+  "final_verdict": "PASS",
+  "generated_at": "2026-07-14T10:11:53.503Z",
   "infra_blockers": [],
-  "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ],
+  "trade_readiness_blockers": [],
   "ui": [
     {
       "bad_raw_error_or_loading": false,

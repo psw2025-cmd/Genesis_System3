@@ -1,70 +1,70 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "893ca11f05bd64449633a91a147914fa1dd314b1",
-  "generated_utc": "2026-07-14T09:13:17.566162Z",
+  "expected_commit": "9519d8920b6a7ef1ab1a314f3be828f813773946",
+  "generated_utc": "2026-07-14T10:09:18.286588Z",
   "key_facts": {
-    "broker_connected": false,
-    "chain_nifty_contracts": 0,
-    "portfolio_details_mode": "skipped_for_render_memory",
+    "broker_connected": true,
+    "chain_nifty_contracts": 160,
+    "portfolio_details_mode": null,
     "scheduler_healthy": false,
     "scheduler_received": false
   },
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 14.0,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.7,
+        "headroom_mb": 1547.9,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.3,
+        "pct_used": 14.0,
+        "rss_mb": 252.1,
         "status": "OK"
       },
-      "rss_mb": 361.3,
+      "rss_mb": 252.1,
       "status": "OK"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 14.0,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.7,
+        "headroom_mb": 1547.9,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.3,
+        "pct_used": 14.0,
+        "rss_mb": 252.1,
         "status": "OK"
       },
-      "rss_mb": 361.3,
+      "rss_mb": 252.1,
       "status": "OK"
     },
     "before": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 49.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.9,
+        "headroom_mb": 915.3,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.1,
+        "pct_used": 49.1,
+        "rss_mb": 884.7,
         "status": "OK"
       },
-      "rss_mb": 361.1,
+      "rss_mb": 884.7,
       "status": "OK"
     }
   },
   "verdict": "WARN",
   "warnings": [
     {
-      "key": "deploy_commit_mismatch",
+      "key": "endpoint_portfolio_unified",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=893ca11f05bd"
+      "message": "portfolio_unified failed: 502 HTTPError: 502 attempts=4"
     },
     {
-      "key": "broker_not_connected",
+      "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "broker status not connected: TOKEN_EXPIRED_OR_INVALID"
+      "message": "Render git_sha=[REDACTED] expected=9519d8920b6a"
     },
     {
       "key": "scheduler_no_worker_push",
@@ -72,9 +72,9 @@
       "message": "worker scheduler health has not been received"
     },
     {
-      "key": "chain_nifty_empty",
+      "key": "memory_before",
       "level": "WARNING",
-      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
+      "message": "RSS high: 884.7MB"
     }
   ]
 }
