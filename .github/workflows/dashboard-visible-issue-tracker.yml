@@ -37,6 +37,7 @@ jobs:
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
       EXPECTED_DASHBOARD_TAB_COUNT: '16'
+      DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '5000'
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.proof-node/ms-playwright
     steps:
       - uses: actions/checkout@v4
