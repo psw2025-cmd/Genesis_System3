@@ -1,0 +1,89 @@
+name: Dashboard Visible Proof Warmed
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dashboard-visible-proof-warmed.yml'
+      - 'tools/dashboard_authenticated_shell_warmup.mjs'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'dashboard/frontend/**'
+      - 'dashboard/backend/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-visible-proof-warmed
+  cancel-in-progress: true
+
+jobs:
+  warmed-visible-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '5000'
+      DASHBOARD_WARMUP_ATTEMPTS: '3'
+      DASHBOARD_WARMUP_WAIT_MS: '12000'
+      PLAYWRIGHT_BROWSERS_PATH: '0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Install isolated Playwright
+        run: |
+          set -euo pipefail
+          rm -rf .proof-node node_modules
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {"name":"system3-warmed-proof","private":true,"dependencies":{"playwright":"1.52.0"}}
+          JSON
+          npm install --prefix .proof-node --ignore-scripts --no-audit --no-fund --package-lock=false
+          .proof-node/node_modules/.bin/playwright install chromium
+          ln -s .proof-node/node_modules node_modules
+          node --input-type=module -e "import('playwright').then(async ({chromium}) => { const b=await chromium.launch({headless:true}); await b.close() })"
+
+      - name: Warm and prove authenticated dashboard shell
+        run: node tools/dashboard_authenticated_shell_warmup.mjs
+
+      - name: Run full visible issue tracker
+        run: node tools/dashboard_visible_issue_tracker.mjs
+
+      - name: Verify fail-closed proof contract
+        run: |
+          python - <<'PY'
+          import json
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p,encoding='utf-8'))
+          assert d.get('status') == 'PASS', d.get('status')
+          assert d.get('auth',{}).get('ok') is True
+          assert len(d.get('tabs') or []) == 16
+          assert d.get('production_grade_claim_allowed') is True
+          print({'status':'PASS','tabs':16,'live_trading':False,'analyzer_mode':True})
+          PY
+
+      - name: Upload sanitized proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-visible-proof-warmed
+          path: reports/latest/dashboard_visible_issue_tracker/
+          if-no-files-found: error
+          retention-days: 7
