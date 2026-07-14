@@ -1,20 +1,20 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T15:37:11.518Z
+Generated: 2026-07-14T15:56:37.537Z
 Status: **BLOCKED**
-Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
+Blocker: **DASHBOARD_AUTH_NOT_PROVEN**
 Render UI available: `true`
-Availability attempts: `1:502, 2:502, 3:200`
-Recovered after transient failure: `true`
-Auth OK: `true` (HTTP 200)
+Availability attempts: `1:200`
+Recovered after transient failure: `false`
+Auth OK: `false` (HTTP 502)
 UI HTTP: `200`
-Root children: `1`
-Body text length: `3361`
-Matched tabs: `15/16`
-Missing source-defined tabs: `Sim Live`
+Root children: `0`
+Body text length: `210`
+Matched tabs: `0/16`
+Missing source-defined tabs: `Truth Control, Genesis Brain, E2E Proof, Overview, Sim Live, Option Chain, Signals, Trade, Paper Trades, Positions, Performance, ML Model, Broker, Alerts, System, Live Gate`
 Deployed asset drift: `true`
-Visible buttons: `18`
-Visible links: `5`
+Visible buttons: `0`
+Visible links: `2`
 Console error categories: `console.error`
 Page error categories: `none`
 
