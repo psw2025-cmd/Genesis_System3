@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-14T04:23:46.721308Z",
+  "generated_utc": "2026-07-14T13:22:37.163283Z",
   "status": "PASS",
   "purpose": "Distinguish repository visual-contract regressions from deployed/runtime proof failures.",
   "safety": {
