@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T18:52:39.349347+00:00`
+Generated UTC: `2026-07-14T18:53:52.780107+00:00`
 Status: **BLOCKED**
-Issues: `568`
+Issues: `689`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29355408407 conclusion=failure commit=215306f8c933
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29355412722 conclusion=failure commit=215306f8c933
 
-### UI_RED_VISUAL — 116 issues
+### UI_RED_VISUAL — 193 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### BROKER_DHAN — 41 issues
+### BROKER_DHAN — 65 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 39 issues
+### RENDER_DEPLOY — 44 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -177,7 +177,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### OPTION_CHAIN — 24 issues
+### OPTION_CHAIN — 30 issues
 
 Recommended fixes:
 - Prove Dhan chain rows for enabled universe.
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### UNKNOWN — 19 issues
+### UNKNOWN — 27 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -289,11 +289,35 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: system3_public_truth: status=FAIL
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=177
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=94
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "ERROR"}
+
+### ML_TRAINING — 19 issues
+
+Recommended fixes:
+- Build real CE/PE dataset proof.
+- Train/test split and accuracy/AUC/Spearman proof.
+- Dashboard must show score and blocked reason if unavailable.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_009:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_009:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_029:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_029:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_049:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_069:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_069:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Options ML training summary is missing/not published.
+- `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: Fix visible UI blocker on ML Model: Training proof missing.
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "ASYNC_CONTENT_NOT_SETTLED after 5009ms"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "DHAN DEGRADED"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."}
 
 ### INSTALL_CREDENTIAL — 19 issues
 
@@ -319,31 +343,7 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29351268025 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29359517133 conclusion=failure commit=c25a3769c7806838b1b2625660b81ef171eccf02
 
-### ML_TRAINING — 17 issues
-
-Recommended fixes:
-- Build real CE/PE dataset proof.
-- Train/test split and accuracy/AUC/Spearman proof.
-- Dashboard must show score and blocked reason if unavailable.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_009:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_009:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_029:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_029:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_049:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_069:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_069:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Options ML training summary is missing/not published.
-- `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: Fix visible UI blocker on ML Model: Training proof missing.
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "BLOCKED"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
-
-### PAPER_LIFECYCLE — 13 issues
+### PAPER_LIFECYCLE — 10 issues
 
 Recommended fixes:
 - Require paper entry, exit, PnL, source/provenance.
@@ -358,11 +358,8 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "Today paper lifecycle endpoint\tBLOCKED\t-"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Error Loading Data"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Error: Request failed with status code 502"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Endpoint: /api/state Error: Request failed with status code 502"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "Today paper lifecycle endpoint\tBLOCKED\t502"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.
 
 ### WORKFLOW_CI — 9 issues
@@ -380,7 +377,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Performance", "text": "Failed to load performance data: 502"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "Request failed with status code 502"}
 - `reports/latest/workflow_failure_tracker/summary.json`: failed_count=43
 
 ### ROUTE_CODE — 9 issues
@@ -417,7 +414,7 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 
-### SCANNER_SIGNAL — 4 issues
+### SCANNER_SIGNAL — 6 issues
 
 Recommended fixes:
 - Verify top_contract_gainers returns real rows.
@@ -429,4 +426,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Signals", "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Signals", "text": "What Blocked Trading? Scanner Segments 0/4"}
 
