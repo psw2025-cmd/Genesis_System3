@@ -72,10 +72,13 @@ jobs:
           set -e
           python - <<'PY'
           import json, shutil
+          from datetime import datetime, timezone
           from pathlib import Path
 
           out = Path('reports/latest/dashboard_visual_production_proof')
           src = Path('reports/latest/dashboard_live_ui_proof')
+          shell_path = Path('reports/latest/dashboard_shell_diagnostic/summary.json')
+          tracker_path = Path('reports/latest/dashboard_visible_issue_tracker/summary.json')
           shutil.rmtree(out, ignore_errors=True)
           (out / 'screenshots').mkdir(parents=True, exist_ok=True)
 
@@ -93,13 +96,23 @@ jobs:
                   shutil.copy2(p, out / 'screenshots' / name)
               rows.append({'file': name, 'ok': ok, 'size_bytes': p.stat().st_size if p.exists() else 0})
 
-          source_summary_path = src / 'summary.json'
-          source = {}
-          source_error = None
-          try:
-              source = json.loads(source_summary_path.read_text(encoding='utf-8'))
-          except Exception as exc:
-              source_error = f'{type(exc).__name__}: {exc}'
+          def load_json(path):
+              try:
+                  return json.loads(path.read_text(encoding='utf-8')), None
+              except Exception as exc:
+                  return {}, f'{type(exc).__name__}: {exc}'
+
+          def parse_time(value):
+              if not value:
+                  return None
+              try:
+                  return datetime.fromisoformat(str(value).replace('Z', '+00:00')).astimezone(timezone.utc)
+              except Exception:
+                  return None
+
+          source, source_error = load_json(src / 'summary.json')
+          shell, shell_error = load_json(shell_path)
+          tracker, tracker_error = load_json(tracker_path)
 
           screenshot_gate = all(row['ok'] for row in rows)
           auth_ok = bool(source.get('auth', {}).get('ok'))
@@ -107,6 +120,41 @@ jobs:
           infra_blockers = list(source.get('infra_blockers') or [])
           visual_blockers = list(source.get('visual_blockers') or [])
           trade_readiness_blockers = list(source.get('trade_readiness_blockers') or [])
+          consistency_blockers = []
+
+          source_time = parse_time(source.get('generated_at'))
+          shell_time = parse_time(shell.get('generated_at'))
+          tracker_time = parse_time(tracker.get('generated_at'))
+          max_age_seconds = 20 * 60
+
+          if shell_error:
+              consistency_blockers.append('SHELL_PROOF_MISSING_OR_INVALID')
+          else:
+              if shell.get('status') != 'PASS':
+                  consistency_blockers.append(f"SHELL_STATUS:{shell.get('status', 'MISSING')}")
+              if shell.get('deployed_asset_drift_detected') is True:
+                  consistency_blockers.append('DEPLOYED_FRONTEND_ASSET_DRIFT')
+              if shell.get('matched_tab_count') != shell.get('expected_tab_count'):
+                  consistency_blockers.append(
+                      f"TAB_COVERAGE:{shell.get('matched_tab_count', 0)}/{shell.get('expected_tab_count', 0)}"
+                  )
+              if source_time and shell_time and abs((source_time - shell_time).total_seconds()) > max_age_seconds:
+                  consistency_blockers.append('SHELL_PROOF_NOT_TIME_ALIGNED')
+
+          if tracker_error:
+              consistency_blockers.append('VISIBLE_TRACKER_MISSING_OR_INVALID')
+          else:
+              if tracker.get('status') != 'PASS':
+                  consistency_blockers.append(f"VISIBLE_TRACKER_STATUS:{tracker.get('status', 'MISSING')}")
+              bad_tabs = [
+                  str(tab.get('title') or tab.get('id') or 'unknown')
+                  for tab in (tracker.get('tabs') or [])
+                  if tab.get('ok') is not True
+              ]
+              if bad_tabs:
+                  consistency_blockers.append(f"VISIBLE_TRACKER_BAD_TABS:{len(bad_tabs)}")
+              if source_time and tracker_time and abs((source_time - tracker_time).total_seconds()) > max_age_seconds:
+                  consistency_blockers.append('VISIBLE_TRACKER_NOT_TIME_ALIGNED')
 
           visual_gate_pass = (
               source_error is None
@@ -116,6 +164,7 @@ jobs:
               and not infra_blockers
               and not visual_blockers
               and not trade_readiness_blockers
+              and not consistency_blockers
           )
 
           summary = {
@@ -131,6 +180,15 @@ jobs:
               'infra_blockers': infra_blockers,
               'visual_blockers': visual_blockers,
               'trade_readiness_blockers': trade_readiness_blockers,
+              'consistency_blockers': consistency_blockers,
+              'corroborating_evidence': {
+                  'shell_generated_at': shell.get('generated_at'),
+                  'shell_status': shell.get('status'),
+                  'shell_tab_coverage': f"{shell.get('matched_tab_count', 0)}/{shell.get('expected_tab_count', 0)}",
+                  'visible_tracker_generated_at': tracker.get('generated_at'),
+                  'visible_tracker_status': tracker.get('status'),
+                  'visible_tracker_bad_tab_count': sum(1 for tab in (tracker.get('tabs') or []) if tab.get('ok') is not True),
+              },
               'screenshots': rows,
               'safety': {
                   'analyze_mode': True,
@@ -151,8 +209,11 @@ jobs:
               f"Screenshot gate: **{summary['screenshot_gate_pass']}**", '',
               '## Blockers',
           ]
-          blockers = infra_blockers + visual_blockers + trade_readiness_blockers
+          blockers = infra_blockers + visual_blockers + trade_readiness_blockers + consistency_blockers
           md.extend([f'- {item}' for item in blockers] if blockers else ['- none'])
+          md += ['', '## Corroborating evidence']
+          for key, value in summary['corroborating_evidence'].items():
+              md.append(f'- `{key}`: `{value}`')
           md += ['', '## Screenshots']
           for row in rows:
               md.append(f"- {'PASS' if row['ok'] else 'MISSING'} `{row['file']}` size=`{row['size_bytes']}`")
@@ -181,6 +242,7 @@ jobs:
               'infra_blockers': len(d['infra_blockers']),
               'visual_blockers': len(d['visual_blockers']),
               'trade_readiness_blockers': len(d['trade_readiness_blockers']),
+              'consistency_blockers': len(d['consistency_blockers']),
           }, indent=2))
           PY
       - name: Commit visual proof with conflict retry
