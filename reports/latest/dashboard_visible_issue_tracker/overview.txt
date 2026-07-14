@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-13:10:11 IST
+13:14:06 IST
 NIFTY
 --
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 --
 MARKET OPEN
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -58,7 +58,7 @@ LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 API status: NO_DHAN_DATA - NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available.
 BROKER
-CONNECTED
+API RESPONDED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -77,10 +77,11 @@ live
 LOADED
 State API
 Market open
-LOADED
+ERROR
 Broker Status API
-LOADED
+ERROR
 Funds API
+Client ID or user generated access token is invalid or expired.
 LOADED
 Holdings API
 LOADED
@@ -90,8 +91,9 @@ P&L API
 pnl=0
 STALE
 Gain Rank / Scanner
-WAITING
+LOADED
 Auto Gates
+7 gates
 LOADED
 Alerts
 0 recent
@@ -99,30 +101,33 @@ WAITING
 Option Chain
 NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 Gate Matrix
-3/6 PASS
+2/7 PASS
 PEND
-ML Accuracy (Spearman rho)
-Accumulating - need 10 trading days
+ML Accuracy (Spearman ρ)
+0/5 days · ρ=None · need ≥0.7
 PEND
-Paper Lifecycle Proof
-Market session required
-PASS
+Profit / Expectancy
+expectancy=-196.14 · win_rate=0.3333
+PEND
+Paper Lifecycle
+market-session proof pending
+PEND
 Tick / Data Freshness
-source: live
+tick_age=5.54s refresh=5s
 PASS
-Broker Connection
-Dhan connected
-FAIL
-Live Trading Gate
-OFF - hardcoded safety
+Model Accuracy Report
+Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
+PEND
+Option Strike Visibility
+Run scripts/system3_option_visibility_audit.py
 PASS
-Paper Mode Active
-CLOUD_PAPER_ENGINE=0, analyzer mode
+Equity F&O Eligibility
+Wire is_tradeable_fo_symbol() in ranking/paper trade path
 System Health
 Mode
 PAPER
 QC Status
-PASS
+NOT_READY
 Data Source
 live
 Market
