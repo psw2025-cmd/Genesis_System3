@@ -37,6 +37,8 @@ const summary = {
   auth: { ok: false, status: 0 },
   ui_response_status: 0,
   render_ui_available: false,
+  availability_attempts: [],
+  recovered_after_transient_failure: false,
   final_url: '',
   page_title: '',
   body_text_length: 0,
@@ -56,6 +58,33 @@ const summary = {
   production_grade_claim_allowed: false,
 }
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+async function gotoWithRecovery(page, url) {
+  const maxAttempts = Math.max(1, Math.min(4, Number(process.env.DASHBOARD_UI_MAX_ATTEMPTS || 3)))
+  const retryDelayMs = Math.max(1000, Math.min(30000, Number(process.env.DASHBOARD_UI_RETRY_DELAY_MS || 12000)))
+  let response = null
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let status = 0
+    let errorType = ''
+    try {
+      response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 })
+      status = response?.status() || 0
+    } catch (err) {
+      errorType = err?.name || 'NavigationError'
+    }
+
+    summary.availability_attempts.push({ attempt, status, error_type: errorType })
+    if (status >= 200 && status < 400) {
+      summary.recovered_after_transient_failure = attempt > 1
+      return response
+    }
+    if (attempt < maxAttempts) await sleep(retryDelayMs)
+  }
+  return response
+}
+
 let browser
 try {
   browser = await chromium.launch({ headless: true })
@@ -71,8 +100,8 @@ try {
     summary.page_error_types.push(err?.name || 'PageError')
   })
 
-  const first = await page.goto(`${base}/ui/`, { waitUntil: 'domcontentloaded', timeout: 90000 })
-  summary.ui_response_status = first?.status() || 0
+  const first = await gotoWithRecovery(page, `${base}/ui/`)
+  summary.ui_response_status = first?.status() || summary.availability_attempts.at(-1)?.status || 0
   summary.render_ui_available = summary.ui_response_status >= 200 && summary.ui_response_status < 400
 
   if (key && summary.render_ui_available) {
@@ -87,10 +116,10 @@ try {
     }, key).catch(() => ({ ok: false, status: 0 }))
   }
 
-  const response = await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 }).catch(() => null)
-  if (response) summary.ui_response_status = response.status()
-  summary.render_ui_available = summary.ui_response_status >= 200 && summary.ui_response_status < 400
-  await page.waitForTimeout(8000)
+  if (summary.render_ui_available) {
+    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => null)
+    await page.waitForTimeout(8000)
+  }
 
   const shell = await page.evaluate(expected => {
     const visible = el => {
@@ -131,7 +160,7 @@ try {
   summary.console_error_types = [...new Set(summary.console_error_types)]
   summary.page_error_types = [...new Set(summary.page_error_types)]
 
-  if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE'
+  if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE_AFTER_RETRIES'
   else if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
   else if (summary.root_child_count === 0 || summary.body_text_length === 0) summary.blocker = 'FRONTEND_ROOT_EMPTY'
   else if (summary.missing_tabs.length) summary.blocker = 'DEPLOYED_FRONTEND_ASSET_DRIFT'
@@ -156,6 +185,8 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Status: **${summary.status}**`,
   `Blocker: **${summary.blocker}**`,
   `Render UI available: \`${summary.render_ui_available}\``,
+  `Availability attempts: \`${summary.availability_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}`).join(', ') || 'none'}\``,
+  `Recovered after transient failure: \`${summary.recovered_after_transient_failure}\``,
   `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
   `UI HTTP: \`${summary.ui_response_status}\``,
   `Root children: \`${summary.root_child_count}\``,
@@ -175,6 +206,8 @@ console.log(JSON.stringify({
   status: summary.status,
   blocker: summary.blocker,
   render_ui_available: summary.render_ui_available,
+  availability_attempts: summary.availability_attempts,
+  recovered_after_transient_failure: summary.recovered_after_transient_failure,
   auth_ok: summary.auth.ok,
   ui_http: summary.ui_response_status,
   matched_tabs: `${summary.matched_tab_count}/${summary.expected_tab_count}`,
