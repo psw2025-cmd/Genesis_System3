@@ -1,19 +1,19 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T11:40:17.971Z
+Generated: 2026-07-14T11:43:43.293Z
 Status: **BLOCKED**
-Blocker: **FRONTEND_ROOT_EMPTY**
+Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Render UI available: `true`
 Auth OK: `true` (HTTP 200)
 UI HTTP: `200`
-Root children: `0`
-Body text length: `0`
-Matched tabs: `0/16`
-Missing source-defined tabs: `Truth Control, Genesis Brain, E2E Proof, Overview, Sim Live, Option Chain, Signals, Trade, Paper Trades, Positions, Performance, ML Model, Broker, Alerts, System, Live Gate`
+Root children: `1`
+Body text length: `575`
+Matched tabs: `15/16`
+Missing source-defined tabs: `Sim Live`
 Deployed asset drift: `true`
-Visible buttons: `0`
+Visible buttons: `15`
 Visible links: `0`
 Console error categories: `console.error`
-Page error categories: `SyntaxError`
+Page error categories: `none`
 
 This report is analyzer-only. It never calls order routes, never persists credentials, and never permits a production-grade claim.

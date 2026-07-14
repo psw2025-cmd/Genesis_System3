@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T11:40:17.971Z",
+  "generated_at": "2026-07-14T11:43:43.293Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -14,20 +14,18 @@
   "render_ui_available": true,
   "final_url": "https://genesis-system3-backend.onrender.com/ui/",
   "page_title": "System3 — Genesis AI Trading",
-  "body_text_length": 0,
-  "root_child_count": 0,
-  "visible_button_count": 0,
+  "body_text_length": 575,
+  "root_child_count": 1,
+  "visible_button_count": 15,
   "visible_link_count": 0,
   "expected_tab_count": 16,
   "expected_tabs_source": "dashboard/frontend/src/components/Sidebar.tsx",
-  "matched_tab_count": 0,
-  "matched_tabs": [],
-  "missing_tabs": [
+  "matched_tab_count": 15,
+  "matched_tabs": [
     "Truth Control",
     "Genesis Brain",
     "E2E Proof",
     "Overview",
-    "Sim Live",
     "Option Chain",
     "Signals",
     "Trade",
@@ -40,14 +38,31 @@
     "System",
     "Live Gate"
   ],
+  "missing_tabs": [
+    "Sim Live"
+  ],
   "deployed_asset_drift_detected": true,
-  "safe_visible_controls": [],
+  "safe_visible_controls": [
+    "Truth Control TRUTH",
+    "Genesis Brain",
+    "E2E Proof PROOF",
+    "Overview",
+    "Option Chain",
+    "Signals",
+    "Trade",
+    "Paper Trades",
+    "Positions",
+    "Performance",
+    "ML Model",
+    "Broker",
+    "Alerts",
+    "System",
+    "Live Gate LOCK"
+  ],
   "console_error_types": [
     "console.error"
   ],
-  "page_error_types": [
-    "SyntaxError"
-  ],
-  "blocker": "FRONTEND_ROOT_EMPTY",
+  "page_error_types": [],
+  "blocker": "DEPLOYED_FRONTEND_ASSET_DRIFT",
   "production_grade_claim_allowed": false
 }
