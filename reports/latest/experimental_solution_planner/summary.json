@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-14T13:44:35.542441+00:00",
-  "issue_count": 585,
+  "generated_utc": "2026-07-14T14:02:57.958922+00:00",
+  "issue_count": 605,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 255,
+      "issue_count": 257,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 109,
+      "issue_count": 127,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 54,
+      "issue_count": 47,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 47,
+      "issue_count": 46,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -549,7 +549,141 @@
       ]
     },
     {
-      "issue_count": 24,
+      "issue_count": 26,
+      "lane": "UNKNOWN",
+      "recommended_fixes": [
+        "Inspect source report, classify manually, add rule to planner."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=18",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "system3_public_truth: status=FAIL",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "blocker_count=183",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5008ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5008ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5010ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Live Gate\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "info_line_count=94",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "unsettled_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 25,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -663,12 +797,17 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on Truth Control: Dhan option-chain availability\tPASS\tYES\tenabled_ready=4/4, enabled_safe_no_trade=0/4, optional_ready=1/1, optional_safe_no_trade=0/1",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tBLOCKED\\tYES\\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\"}",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tPASS\\tYES\\tenabled_ready=4/4, enabled_safe_no_trade=0/4, optional_ready=1/1, optional_safe_no_trade=0/1\"}",
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Real Dhan option chain for all watched symbols\\tBLOCKED\\t0/5\"}",
+          "lane": "OPTION_CHAIN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Option Chain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -680,7 +819,7 @@
       ]
     },
     {
-      "issue_count": 17,
+      "issue_count": 18,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -749,6 +888,11 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5008ms\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
           "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
@@ -776,101 +920,7 @@
       ]
     },
     {
-      "issue_count": 17,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=18",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "system3_public_truth: status=FAIL",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "blocker_count=183",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ERROR\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=99",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=1",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 17,
+      "issue_count": 15,
       "lane": "INSTALL_CREDENTIAL",
       "recommended_fixes": [
         "Fix dependency/import/compile errors from secure audit.",
@@ -934,39 +984,29 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336990609 conclusion=failure commit=58d58e702b24911ec8be148e4d747352b80a8335",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29337760588 conclusion=failure commit=9827c6b237ea56e90301db9c8b1d0490b9e05eda",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336699029 conclusion=failure commit=77eebea0ed51aa1fb5f72ffa6f2d4942c5c6e9ab",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29337357453 conclusion=failure commit=4915e9aa936b58c268d40157801be29f5dc90c49",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336670706 conclusion=failure commit=a1697905e781b4b87498c2485a634360f29a5d72",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29337254099 conclusion=failure commit=fa229f44d21aa9e754f10b1e718d8f8ec43ee0de",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336617692 conclusion=failure commit=992488d036f8ab574f8644746db62f6bccbcaaf2",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336600118 conclusion=failure commit=35b0cbb703196b5c8cb86865b579a8e337dfe41b",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29336594135 conclusion=failure commit=ad847f20f86f8eca7e7441af5633e149ddb5fbd8",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29337248979 conclusion=failure commit=fa229f44d21aa9e754f10b1e718d8f8ec43ee0de",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 11,
+      "issue_count": 14,
       "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
         "Require paper entry, exit, PnL, source/provenance.",
@@ -1003,6 +1043,21 @@
           "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
           "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t-\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5010ms\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
           "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error Loading Data\"}",
@@ -1144,62 +1199,6 @@
       ]
     },
     {
-      "issue_count": 9,
-      "lane": "SCANNER_SIGNAL",
-      "recommended_fixes": [
-        "Verify top_contract_gainers returns real rows.",
-        "Require CE/PE side, strike, expiry, score, reason.",
-        "If market closed, report exact blocked reason, not fake signal."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Error Loading Data\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Error: Request failed with status code 502\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Signal data unavailable\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        }
-      ]
-    },
-    {
       "issue_count": 7,
       "lane": "FAKE_STALE_DATA",
       "recommended_fixes": [
@@ -1242,6 +1241,42 @@
           "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
           "lane": "FAKE_STALE_DATA",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 5,
+      "lane": "SCANNER_SIGNAL",
+      "recommended_fixes": [
+        "Verify top_contract_gainers returns real rows.",
+        "Require CE/PE side, strike, expiry, score, reason.",
+        "If market closed, report exact blocked reason, not fake signal."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
       ]
     }
