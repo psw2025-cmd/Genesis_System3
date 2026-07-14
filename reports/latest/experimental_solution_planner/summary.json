@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-14T03:38:17.452465+00:00",
-  "issue_count": 553,
+  "generated_utc": "2026-07-14T03:38:40.059809+00:00",
+  "issue_count": 552,
   "lane_count": 13,
   "lanes": [
     {
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 42,
+      "issue_count": 41,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
