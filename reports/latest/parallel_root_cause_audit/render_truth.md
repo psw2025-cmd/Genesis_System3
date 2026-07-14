@@ -5,7 +5,7 @@
 
 ## Findings
 - Public truth index exists.
-- Public truth commit: 8c78eb92b882c32e896ff2dec295cba73715755c
+- Public truth commit: 9519d8920b6a7ef1ab1a314f3be828f813773946
 - Dashboard live UI proof summary was present and PASS in stale public truth.
 
 ## Blockers
