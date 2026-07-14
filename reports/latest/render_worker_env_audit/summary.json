@@ -1,0 +1,35 @@
+{
+  "dhan_401_meaning": "Dhan token/client-id invalid or worker/backend not reloaded after token update",
+  "generated_utc": "2026-07-14T12:15:01.949679Z",
+  "live_flags": {
+    "ANALYZE_MODE": "1",
+    "LIVE_TRADING_ENABLED": "0",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+    "SYSTEM3_MODE": "analyzer"
+  },
+  "live_trading_enabled": false,
+  "missing_required": [
+    "DHAN_CLIENT_ID",
+    "DHAN_ACCESS_TOKEN",
+    "WORKER_PUSH_TOKEN"
+  ],
+  "optional_presence": {
+    "DASHBOARD_API_KEY": true,
+    "DHAN_APP_ID": false,
+    "DHAN_APP_SECRET": false,
+    "DHAN_PIN": false,
+    "DHAN_TOTP_SECRET": false
+  },
+  "order_routes_called": false,
+  "render_502_meaning": "backend web service crash/not started/wrong port/deploy blocked",
+  "required_presence": {
+    "DHAN_ACCESS_TOKEN": false,
+    "DHAN_CLIENT_ID": false,
+    "WEB_SERVICE_URL": true,
+    "WORKER_PUSH_TOKEN": false
+  },
+  "secrets_printed": false,
+  "status": "BLOCKED",
+  "worker_push_401_meaning": "WORKER_PUSH_TOKEN missing or different between Render web and worker",
+  "worker_push_token_required_on_both_services": true
+}
