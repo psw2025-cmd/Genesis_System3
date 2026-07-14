@@ -44,8 +44,32 @@ jobs:
           .proof-node/node_modules/.bin/playwright install --with-deps chromium
           ln -sfn "$PWD/.proof-node/node_modules" node_modules
 
-      - name: Run analyzer-safe shell diagnostic
-        run: node tools/dashboard_shell_diagnostic.mjs
+      - name: Run analyzer-safe shell diagnostic with bounded auth recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            node tools/dashboard_shell_diagnostic.mjs
+            result="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path('reports/latest/dashboard_shell_diagnostic/summary.json').read_text())
+          print(f"{d.get('status','BLOCKED')}|{d.get('blocker','UNKNOWN')}")
+          PY
+          )"
+            status="${result%%|*}"
+            blocker="${result#*|}"
+            echo "shell proof attempt ${attempt}: status=${status} blocker=${blocker}"
+            if [[ "$status" == "PASS" ]]; then
+              break
+            fi
+            if [[ "$blocker" != "DASHBOARD_AUTH_NOT_PROVEN" && "$blocker" != "AUTHENTICATED_FRONTEND_UNAVAILABLE_AFTER_RETRIES" && "$blocker" != "RENDER_UI_UNAVAILABLE_AFTER_RETRIES" ]]; then
+              break
+            fi
+            if [[ "$attempt" -lt 3 ]]; then
+              sleep $((attempt * 12))
+            fi
+          done
 
       - name: Reject unsafe report fields
         shell: bash
