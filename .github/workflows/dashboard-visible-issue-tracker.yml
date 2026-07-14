@@ -38,7 +38,7 @@ jobs:
       ANALYZE_MODE: '1'
       EXPECTED_DASHBOARD_TAB_COUNT: '16'
       DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '5000'
-      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.proof-node/ms-playwright
+      PLAYWRIGHT_BROWSERS_PATH: '0'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,12 +104,26 @@ jobs:
           stage=playwright_package_check
           printf '%s\n' "$stage" > "$stage_file"
           test -d .proof-node/node_modules/playwright
-          stage=browser_path_check
-          printf '%s\n' "$stage" > "$stage_file"
-          test -d "$PLAYWRIGHT_BROWSERS_PATH"
           stage=node_modules_link
           printf '%s\n' "$stage" > "$stage_file"
           ln -s .proof-node/node_modules node_modules
+          stage=browser_path_check
+          printf '%s\n' "$stage" > "$stage_file"
+          node --input-type=module - <<'NODE'
+          import fs from 'fs'
+          import { chromium } from 'playwright'
+          const executable = chromium.executablePath()
+          if (!executable || !fs.existsSync(executable)) process.exit(1)
+          console.log(JSON.stringify({ browser_executable_present: true }))
+          NODE
+          stage=browser_launch_smoke_check
+          printf '%s\n' "$stage" > "$stage_file"
+          node --input-type=module - <<'NODE'
+          import { chromium } from 'playwright'
+          const browser = await chromium.launch({ headless: true })
+          await browser.close()
+          console.log(JSON.stringify({ isolated_browser_launch: 'PASS' }))
+          NODE
           stage=esm_import_check
           printf '%s\n' "$stage" > "$stage_file"
           node --input-type=module -e "import('playwright').then(m => { if (!m.chromium) process.exit(1) })"
@@ -135,7 +149,7 @@ jobs:
           from datetime import datetime, timezone
           out='reports/latest/dashboard_visible_issue_tracker'
           expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
-          allowed_stages={'prepare_manifest','npm_install','chromium_download','playwright_package_check','browser_path_check','node_modules_link','esm_import_check','complete','not_recorded'}
+          allowed_stages={'prepare_manifest','npm_install','chromium_download','playwright_package_check','node_modules_link','browser_path_check','browser_launch_smoke_check','esm_import_check','complete','not_recorded'}
           stage='not_recorded'
           stage_path='.proof-node/install_failure_stage'
           if os.path.exists(stage_path):
@@ -144,7 +158,7 @@ jobs:
                   stage=candidate
           reason=(f"visual tracker did not produce its required report; install_step_outcome={os.environ.get('INSTALL_OUTCOME','unknown')}; "
                   f"install_failure_stage={stage}; scan_step_outcome={os.environ.get('SCAN_OUTCOME','unknown')}. "
-                  "Inspect the named installation stage, browser launch, Render reachability, and authentication.")
+                  "Inspect the named isolated-browser stage, Render reachability, and authentication.")
           data={
             'generated_at':datetime.now(timezone.utc).isoformat(), 'base':os.environ.get('DASHBOARD_BASE_URL',''),
             'status':'BLOCKED', 'auth':{'ok':False,'status':0,'note':'not proven because tracker report was not produced'},
@@ -156,7 +170,7 @@ jobs:
           }
           with open(f'{out}/summary.json','w',encoding='utf-8') as f: json.dump(data,f,indent=2)
           with open(f'{out}/summary.md','w',encoding='utf-8') as f:
-            f.write(f"# Dashboard Visible Issue Tracker\n\nGenerated: {data['generated_at']}\n\nStatus: **BLOCKED**\n\n## Exact blocker\n\n- {reason}\n")
+              f.write(f"# Dashboard Visible Issue Tracker\n\nGenerated: {data['generated_at']}\n\nStatus: **BLOCKED**\n\n## Exact blocker\n\n- {reason}\n")
           PY
 
       - name: Validate and sanitize report
