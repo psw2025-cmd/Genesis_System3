@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T01:49:37.356063+00:00`
+Generated UTC: `2026-07-14T01:55:59.176441+00:00`
 Status: **BLOCKED**
-Issues: `409`
+Issues: `408`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 116 issues
+### GITHUB_RENDER_FAILURE — 115 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -297,7 +297,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 
-### UNKNOWN — 16 issues
+### UNKNOWN — 15 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -316,8 +316,8 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=98
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: settle_normalized_tab_count=13
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
+- `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
 ### WORKFLOW_CI — 9 issues
 
@@ -398,7 +398,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"}
 
-### INSTALL_CREDENTIAL — 3 issues
+### INSTALL_CREDENTIAL — 4 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -406,7 +406,8 @@ Recommended fixes:
 - Never print or commit credential values.
 
 Top issues:
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29298701496 conclusion=failure commit=c0b41ca9df81698633f2235c9086915253ad891a
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29298626703 conclusion=failure commit=b0d224176ca31d115c4056916a19aa8801e56c92
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29298617682 conclusion=failure commit=2e2f98a65856a8c0e8d185e71d01656ad3ba4cc8
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29299526773 conclusion=failure commit=b760bd4d198d834b3ab1c27955272fbbf2e97396
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29299478617 conclusion=failure commit=7d7a0bb6f1a20a305ff09a4769e5ce828b489798
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29299466477 conclusion=failure commit=1a9a83bdc57330ecdaa237e8f244a3a17660f5d4
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29298979532 conclusion=failure commit=9cb4aef26fa9ba1da77f5e6761409ec88eb5f7f9
 
