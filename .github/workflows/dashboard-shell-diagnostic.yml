@@ -85,20 +85,60 @@ jobs:
               raise SystemExit(f'unsafe proof fields detected: {hits}')
           PY
 
-      - name: Publish current diagnostic
+      - name: Publish current diagnostic without rebasing stale evidence
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/dashboard_shell_diagnostic/summary.json reports/latest/dashboard_shell_diagnostic/summary.md
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "ci(proof): publish dashboard shell diagnostic [skip ci]"
-          for attempt in 1 2 3; do
-            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
-            sleep $((attempt * 3))
-          done
-          exit 1
+
+          validate_report() {
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('reports/latest/dashboard_shell_diagnostic/summary.json')
+          d = json.loads(p.read_text(encoding='utf-8'))
+          assert d.get('live_trading_enabled') is False
+          assert d.get('order_routes_called') is False
+          assert d.get('production_grade_claim_allowed') is False
+          text = p.read_text(encoding='utf-8').lower()
+          forbidden = ['api_key"', 'cookie"', 'authorization"', 'token"', 'secret"', 'response_body']
+          hits = [x for x in forbidden if x in text]
+          if hits:
+              raise SystemExit(f'unsafe proof fields detected: {hits}')
+          PY
+          }
+
+          commit_report() {
+            git add reports/latest/dashboard_shell_diagnostic/summary.json reports/latest/dashboard_shell_diagnostic/summary.md
+            if git diff --cached --quiet; then
+              return 2
+            fi
+            git commit -m "ci(proof): publish dashboard shell diagnostic [skip ci]"
+          }
+
+          validate_report
+          if ! commit_report; then
+            rc=$?
+            if [[ "$rc" -eq 2 ]]; then exit 0; fi
+            exit "$rc"
+          fi
+          if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+            exit 0
+          fi
+
+          # Another proof publisher moved main. Never rebase an already-generated
+          # report: regenerate it against the newest proof tree, validate, and push.
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+          node tools/dashboard_shell_diagnostic.mjs
+          validate_report
+          if ! commit_report; then
+            rc=$?
+            if [[ "$rc" -eq 2 ]]; then exit 0; fi
+            exit "$rc"
+          fi
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Enforce fail-closed result
         shell: bash
