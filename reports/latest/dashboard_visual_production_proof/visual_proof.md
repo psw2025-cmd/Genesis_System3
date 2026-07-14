@@ -1,45 +1,42 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-07-14T21:35:15.269Z
+Generated: 2026-07-14T22:35:48.671Z
 Base: https://genesis-system3-backend.onrender.com
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **FAIL**
+Source verdict: **PASS**
 Auth OK: **True**
 Screenshot gate: **True**
 
 ## Blockers
-- UI_FAIL:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
 - SHELL_STATUS:BLOCKED
 - DEPLOYED_FRONTEND_ASSET_DRIFT
 - TAB_COVERAGE:15/16
 - VISIBLE_TRACKER_STATUS:BLOCKED
-- VISIBLE_TRACKER_BAD_TABS:9
+- VISIBLE_TRACKER_BAD_TABS:16
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-14T21:29:51.782Z`
+- `shell_generated_at`: `2026-07-14T22:30:29.060Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `15/16`
-- `visible_tracker_generated_at`: `2026-07-14T21:30:55.466Z`
+- `visible_tracker_generated_at`: `2026-07-14T22:30:18.452Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `9`
+- `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`199866`
-- PASS `genesis.png` size=`101691`
-- PASS `e2e_proof.png` size=`187878`
-- PASS `overview.png` size=`152503`
-- PASS `chain.png` size=`223074`
-- PASS `signals.png` size=`100217`
-- PASS `paper.png` size=`113602`
-- PASS `positions.png` size=`111572`
-- PASS `broker.png` size=`146128`
-- PASS `performance.png` size=`108974`
-- PASS `ml.png` size=`134959`
-- PASS `gates.png` size=`112713`
-- PASS `mobile_390x844.png` size=`85975`
+- PASS `truth.png` size=`200044`
+- PASS `genesis.png` size=`280715`
+- PASS `e2e_proof.png` size=`187945`
+- PASS `overview.png` size=`152174`
+- PASS `chain.png` size=`223326`
+- PASS `signals.png` size=`100396`
+- PASS `paper.png` size=`176404`
+- PASS `positions.png` size=`111519`
+- PASS `broker.png` size=`145997`
+- PASS `performance.png` size=`111403`
+- PASS `ml.png` size=`140604`
+- PASS `gates.png` size=`141259`
+- PASS `mobile_390x844.png` size=`122501`
 
 ## truth.png
 
