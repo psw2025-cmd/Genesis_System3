@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T23:22:40.303Z",
+  "generated_at": "2026-07-14T23:26:00.477Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -17,11 +17,6 @@
   "availability_attempts": [
     {
       "attempt": 1,
-      "status": 502,
-      "error_type": ""
-    },
-    {
-      "attempt": 2,
       "status": 200,
       "error_type": ""
     }
@@ -32,18 +27,18 @@
       "status": 200,
       "error_type": "",
       "root_child_count": 1,
-      "body_text_length": 3360,
+      "body_text_length": 566,
       "rendered": true
     }
   ],
-  "recovered_after_transient_failure": true,
+  "recovered_after_transient_failure": false,
   "recovered_after_post_auth_failure": false,
   "final_url": "https://genesis-system3-backend.onrender.com/ui/",
   "page_title": "System3 — Genesis AI Trading",
-  "body_text_length": 3360,
+  "body_text_length": 566,
   "root_child_count": 1,
-  "visible_button_count": 18,
-  "visible_link_count": 5,
+  "visible_button_count": 15,
+  "visible_link_count": 0,
   "expected_tab_count": 16,
   "expected_tabs_source": "dashboard/frontend/src/components/Sidebar.tsx",
   "matched_tab_count": 15,
@@ -83,15 +78,7 @@
     "Broker",
     "Alerts",
     "System",
-    "Live Gate LOCK",
-    "Refresh",
-    "Voice Alert",
-    "Zerodha Varsity - Options Theory Greeks, volatility, moneyness, pricing education",
-    "Zerodha Varsity - Option Strategies Spreads, straddle, strangle, max pain, PCR, iron condor",
-    "Cboe Options Institute Global options education, risk management, strategy playbooks",
-    "NSE India Option Chain Indian option-chain truth: OI, volume, strike/expiry surface",
-    "DhanHQ API v2 Broker API, option chain, market feed, historical data, orders when gates pass",
-    "Let Agent Take Full Control"
+    "Live Gate LOCK"
   ],
   "console_error_types": [
     "console.error"
