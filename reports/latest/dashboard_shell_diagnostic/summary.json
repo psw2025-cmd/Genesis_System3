@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T22:10:40.258Z",
+  "generated_at": "2026-07-14T22:24:56.597Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -17,11 +17,6 @@
   "availability_attempts": [
     {
       "attempt": 1,
-      "status": 502,
-      "error_type": ""
-    },
-    {
-      "attempt": 2,
       "status": 200,
       "error_type": ""
     }
@@ -36,7 +31,7 @@
       "rendered": true
     }
   ],
-  "recovered_after_transient_failure": true,
+  "recovered_after_transient_failure": false,
   "recovered_after_post_auth_failure": false,
   "final_url": "https://genesis-system3-backend.onrender.com/ui/",
   "page_title": "System3 — Genesis AI Trading",

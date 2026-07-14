@@ -1,11 +1,11 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T22:10:40.258Z
+Generated: 2026-07-14T22:24:56.597Z
 Status: **BLOCKED**
 Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Render UI available: `true`
-Availability attempts: `1:502, 2:200`
-Recovered after transient failure: `true`
+Availability attempts: `1:200`
+Recovered after transient failure: `false`
 Auth OK: `true` (HTTP 200)
 Post-auth render attempts: `1:200:rendered`
 Recovered after post-auth failure: `false`
