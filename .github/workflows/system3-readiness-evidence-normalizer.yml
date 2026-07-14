@@ -1,0 +1,50 @@
+name: System3 Readiness Evidence Normalizer
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'reports/latest/system3_public_truth/index.json'
+      - 'reports/latest/todo_status_update/summary.json'
+      - 'tools/system3_readiness_evidence_normalizer.py'
+      - '.github/workflows/system3-readiness-evidence-normalizer.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: system3-readiness-evidence-normalizer
+  cancel-in-progress: true
+
+env:
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Normalize current proof evidence
+        run: python tools/system3_readiness_evidence_normalizer.py
+
+      - name: Commit sanitized report
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/latest/readiness_evidence_normalized/summary.json reports/latest/readiness_evidence_normalized/summary.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'ci(proof): publish normalized readiness evidence [skip ci]'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
