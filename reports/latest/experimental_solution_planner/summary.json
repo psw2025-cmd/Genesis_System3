@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-14T18:40:24.857902+00:00",
-  "issue_count": 577,
+  "generated_utc": "2026-07-14T18:50:42.652965+00:00",
+  "issue_count": 566,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 234,
+      "issue_count": 250,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 129,
+      "issue_count": 116,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 42,
+      "issue_count": 41,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -549,141 +549,7 @@
       ]
     },
     {
-      "issue_count": 26,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=12",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "system3_public_truth: status=FAIL",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "blocker_count=177",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5010ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Live Gate\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=94",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 25,
+      "issue_count": 24,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -807,11 +673,6 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Option Chain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -819,102 +680,105 @@
       ]
     },
     {
-      "issue_count": 18,
-      "lane": "ML_TRAINING",
+      "issue_count": 19,
+      "lane": "UNKNOWN",
       "recommended_fixes": [
-        "Build real CE/PE dataset proof.",
-        "Train/test split and accuracy/AUC/Spearman proof.",
-        "Dashboard must show score and blocked reason if unavailable."
+        "Inspect source report, classify manually, add rule to planner."
       ],
       "top_issues": [
         {
-          "issue": "agent_009:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_009:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_029:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_029:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_049:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_069:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_069:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
+          "issue": "todo_count=12",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "agent_089:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_089:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "parallel_root_cause_audit: Options ML training summary is missing/not published.",
-          "lane": "ML_TRAINING",
+          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
+          "lane": "UNKNOWN",
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
-          "lane": "ML_TRAINING",
+          "issue": "system3_public_truth: status=FAIL",
+          "lane": "UNKNOWN",
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
-          "lane": "ML_TRAINING",
+          "issue": "blocker_count=177",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
-          "lane": "ML_TRAINING",
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
-          "lane": "ML_TRAINING",
+          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
-          "lane": "ML_TRAINING",
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
-          "lane": "ML_TRAINING",
+          "issue": "info_line_count=94",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "Options ML training summary is missing/not published.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "issue": "unsettled_tab_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
-          "lane": "ML_TRAINING",
+          "issue": "settle_normalized_tab_count=13",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "blocker_count=14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -999,29 +863,125 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29355410813 conclusion=failure commit=215306f8c9339b5e00d86c58b93bf6eb04d09150",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29358798545 conclusion=failure commit=40576a24e8e9c58593be6e92e94f33972c21d14d",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29355390983 conclusion=failure commit=019d8dfd9decba2c9638f29b024309e69407009d",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29358557999 conclusion=failure commit=d8299fa1fda7cbfae49f12cde9ccb1529598acab",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29355345651 conclusion=failure commit=d0a3a41bc091cf0ea751099744ebf616a9108bdb",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29358532767 conclusion=failure commit=9594d2e042dd1a9740e5b7001b46d1c6d271d974",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29355329413 conclusion=failure commit=04c5583e0323352d53fac004a2953fa74599256b",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29358349952 conclusion=failure commit=569cffb24affbaa9aad6ba319e5b6e9bd8505957",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 14,
+      "issue_count": 17,
+      "lane": "ML_TRAINING",
+      "recommended_fixes": [
+        "Build real CE/PE dataset proof.",
+        "Train/test split and accuracy/AUC/Spearman proof.",
+        "Dashboard must show score and blocked reason if unavailable."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_009:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_029:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_049:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_069:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/performance: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_089:ml_training: ML proof issue at /api/ml/status: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Options ML training summary is missing/not published.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "Options ML training summary is missing/not published.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        },
+        {
+          "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 13,
       "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
         "Require paper entry, exit, PnL, source/provenance.",
@@ -1070,11 +1030,6 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5008ms\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error Loading Data\"}",
           "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
@@ -1102,7 +1057,7 @@
       ]
     },
     {
-      "issue_count": 11,
+      "issue_count": 9,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -1151,17 +1106,7 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29357612244 conclusion=cancelled commit=aa7fe0b00d34a66e631def3ec09d480081c2668c",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"branch\": \"main\", \"commit\": \"aa7fe0b00d34a66e631def3ec09d480081c2668c\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-14T18:22:50Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29357612244\", \"run_id\": 29357612244, \"updated_at\": \"2026-07-14T18:23:18Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "failed_count=35",
+          "issue": "failed_count=42",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1270,7 +1215,7 @@
       ]
     },
     {
-      "issue_count": 5,
+      "issue_count": 4,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1295,11 +1240,6 @@
         },
         {
           "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
