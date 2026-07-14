@@ -38,18 +38,22 @@ export function Sidebar() {
   const groups = ['main', 'market', 'trading', 'analysis', 'system']
 
   return (
-    <nav style={{
-      width: '190px',
-      background: 'var(--surface-2)',
-      borderRight: '1px solid var(--border)',
-      display: 'flex',
-      flexDirection: 'column',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-      flexShrink: 0,
-      padding: '10px 8px',
-      gap: '8px',
-    }}>
+    <nav
+      aria-label="Dashboard navigation"
+      data-dashboard-navigation="sidebar"
+      style={{
+        width: '190px',
+        background: 'var(--surface-2)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        flexShrink: 0,
+        padding: '10px 8px',
+        gap: '8px',
+      }}
+    >
       {groups.map(group => {
         const groupTabs = TABS.filter(t => t.group === group)
         return (
@@ -74,8 +78,13 @@ export function Sidebar() {
               return (
                 <button
                   key={id}
+                  type="button"
                   onClick={() => setActiveTab(id)}
                   title={label}
+                  aria-label={label}
+                  aria-current={active ? 'page' : undefined}
+                  data-dashboard-tab={id}
+                  data-dashboard-tab-label={label}
                   style={{
                     width: '100%',
                     minHeight: '38px',
