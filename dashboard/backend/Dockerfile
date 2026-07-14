@@ -2,12 +2,16 @@
 FROM node:20-slim AS frontend-builder
 WORKDIR /app/dashboard/frontend
 COPY dashboard/frontend/package*.json ./
-RUN npm install --legacy-peer-deps
+# Use the committed lockfile so Render cannot resolve a different dependency
+# graph from the one reviewed in the repository.
+RUN npm ci --legacy-peer-deps
 COPY dashboard/frontend/ ./
-# Fail the image build if the current React source cannot compile.
-# Never publish an image whose /ui assets are missing or stale because a
-# frontend build error was converted into a successful Docker layer.
-RUN npm run build && test -f dist/index.html
+# Fail the image build if the current React source cannot compile or if the
+# analyzer-only Sim Live control is absent from the generated bundle. This
+# prevents stale/incomplete frontend assets from being published as healthy.
+RUN npm run build \
+    && test -f dist/index.html \
+    && grep -R -q --include='*.js' 'Sim Live' dist/assets
 
 # ── Stage 2: Runtime (Python only, no Node.js) ────────────────────────
 # Node.js removed from runtime image — saves ~200MB RAM on free tier.
@@ -31,7 +35,8 @@ COPY . /app/
 # repository-carried dist directory.
 RUN rm -rf /app/dashboard/frontend/dist
 COPY --from=frontend-builder /app/dashboard/frontend/dist /app/dashboard/frontend/dist
-RUN test -f /app/dashboard/frontend/dist/index.html
+RUN test -f /app/dashboard/frontend/dist/index.html \
+    && grep -R -q --include='*.js' 'Sim Live' /app/dashboard/frontend/dist/assets
 
 RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
       python -m pip install --upgrade pip && \
