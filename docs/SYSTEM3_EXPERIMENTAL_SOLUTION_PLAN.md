@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T04:52:08.755594+00:00`
+Generated UTC: `2026-07-14T05:01:24.953946+00:00`
 Status: **BLOCKED**
-Issues: `543`
+Issues: `482`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 311 issues
+### GITHUB_RENDER_FAILURE — 251 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29303178591 conclusion=failure commit=c000deb3a438
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29303178575 conclusion=failure commit=c000deb3a438
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29303169416 conclusion=failure commit=6293a809c455
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29303169392 conclusion=failure commit=6293a809c455
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29303169391 conclusion=failure commit=6293a809c455
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29306773818 conclusion=failure commit=be36d9f9a257
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=29306903355 conclusion=failure commit=be52388ba1dc
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29307026190 conclusion=failure commit=33a408d50c18
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=29306773855 conclusion=cancelled commit=be36d9f9a257
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29307026236 conclusion=failure commit=33a408d50c18
 
 ### UI_RED_VISUAL — 49 issues
 
@@ -153,7 +153,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### BROKER_DHAN — 42 issues
+### BROKER_DHAN — 41 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -285,7 +285,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=53
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=23
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: system3_public_truth: status=FAIL
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=183
