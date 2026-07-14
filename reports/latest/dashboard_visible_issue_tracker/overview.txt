@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:01:00 IST
+04:17:13 IST
 NIFTY
-24,069
+--
 BNFTY
-57,447
+--
 FINNIFTY
 26,515
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-LIVE
+OFF
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -56,8 +56,9 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
+API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
 BROKER
-CONNECTED
+API RESPONDED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -72,62 +73,48 @@ Live Data Coverage
 market closed must not hide read-only data
 LOADED
 Health API
-live
-LOADED
+RENDER_UNAVAILABLE
+WAITING
 State API
-Market closed: Before pre-market (opens at 09:15)
-LOADED
+ERROR
 Broker Status API
-LOADED
+RENDER_UNAVAILABLE
+ERROR
 Funds API
-LOADED
+Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+ERROR
 Holdings API
-LOADED
+Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.
+ERROR
 Positions API
+Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.
 LOADED
 P&L API
 pnl=0
-STALE
+LOADED
 Gain Rank / Scanner
+Render/backend returned 502 for /api/health. Keeping last good data where available.
 LOADED
 Auto Gates
-7 gates
+1 gates
 LOADED
 Alerts
 0 recent
-LOADED
+MARKET_SESSION_ONLY
 Option Chain
-Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
+Render/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.
 Gate Matrix
-3/7 PASS
-PEND
-ML Accuracy (Spearman ρ)
-0/5 days · ρ=None · need ≥0.7
-PEND
-Profit / Expectancy
-expectancy=-196.14 · win_rate=0.3333
-PEND
-Paper Lifecycle
-market-session proof pending
-PASS
-Tick / Data Freshness
-tick_age=2.66s refresh=5s
-PASS
-Model Accuracy Report
-Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
-PEND
-Option Strike Visibility
-Run scripts/system3_option_visibility_audit.py
-PASS
-Equity F&O Eligibility
-Wire is_tradeable_fo_symbol() in ranking/paper trade path
+0/1 PASS
+FAIL
+Dashboard API Access
+Render/backend returned 502 for /api/alerts/recent. Keeping last good data where available.
 System Health
 Mode
 PAPER
 QC Status
-PASS
+RENDER_UNAVAILABLE
 Data Source
-live
+RENDER_UNAVAILABLE
 Market
 CLOSED / DATA POLLING
 Live Allowed
