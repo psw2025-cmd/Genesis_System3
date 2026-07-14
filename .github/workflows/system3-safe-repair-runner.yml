@@ -30,6 +30,10 @@ permissions:
   contents: write
   actions: read
 
+concurrency:
+  group: system3-safe-repair-runner
+  cancel-in-progress: true
+
 jobs:
   safe-repair-runner:
     runs-on: ubuntu-latest
@@ -50,13 +54,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install proof dependencies
+      - name: Install analyzer proof dependencies
+        shell: bash
         run: |
+          set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install fastapi pydantic requests pytz pytest
-          npm init -y >/dev/null 2>&1 || true
-          npm install playwright@1.49.1
-          npx playwright install chromium --with-deps
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {"name":"system3-safe-repair-proof","private":true,"version":"1.0.0","dependencies":{"playwright":"1.52.0"}}
+          JSON
+          npm install --prefix .proof-node --no-audit --no-fund --ignore-scripts
+          .proof-node/node_modules/.bin/playwright install chromium --with-deps
+          ln -sfn "$PWD/.proof-node/node_modules" node_modules
       - name: Run safe repair runner
         run: python tools/system3_safe_repair_runner.py || true
       - name: Refresh visible dashboard proof
@@ -65,19 +75,37 @@ jobs:
         run: python tools/system3_autopilot_proof_board.py || true
       - name: Commit safe repair proof
         if: always()
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add reports/latest/safe_repair_runner/ reports/latest/system3_auto_gates/ reports/latest/system3_auto_coordinator/ reports/latest/github_render_failure_tracker/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/autopilot_proof_board/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md config/human_approval_gate.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(safety): update safe repair runner proof [skip ci]"
-          git push
+          for attempt in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
       - name: Enforce safe repair proof
+        shell: bash
         run: |
           python - <<'PY'
           import json
-          p='reports/latest/safe_repair_runner/summary.json'
-          data=json.load(open(p, encoding='utf-8'))
-          print(json.dumps(data, indent=2)[:9000])
-          raise SystemExit(0 if data.get('status') == 'PASS' else 1)
+          from pathlib import Path
+
+          data = json.loads(Path('reports/latest/safe_repair_runner/summary.json').read_text(encoding='utf-8'))
+          safe = {
+              'status': data.get('status'),
+              'generated_at': data.get('generated_at') or data.get('generated_utc'),
+              'blocker_count': len(data.get('blockers') or data.get('todo') or []),
+              'analyzer_mode': True,
+              'live_trading_enabled': False,
+              'production_grade_claim_allowed': bool(data.get('production_grade_claim_allowed', False)),
+          }
+          print(json.dumps(safe, indent=2))
+          if safe['production_grade_claim_allowed']:
+              raise SystemExit('unsafe proof claim detected')
+          raise SystemExit(0 if safe['status'] == 'PASS' else 1)
           PY
