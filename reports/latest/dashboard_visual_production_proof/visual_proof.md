@@ -1,38 +1,33 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-07-14T06:59:09.088Z
+Generated: 2026-07-14T07:55:44.313Z
 Base: https://genesis-system3-backend.onrender.com
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **FAIL**
-Auth OK: **False**
+Source verdict: **BLOCKED_NOT_TRADE_READY**
+Auth OK: **True**
 Screenshot gate: **True**
 
 ## Blockers
-- AUTH_FAIL:502
-- CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/NIFTY:502
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/BANKNIFTY:502
-- CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/FINNIFTY:502
-- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/MIDCPNIFTY:502
+- CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+- CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 
 ## Screenshots
-- PASS `truth.png` size=`200492`
-- PASS `genesis.png` size=`97780`
-- PASS `e2e_proof.png` size=`183909`
-- PASS `overview.png` size=`157190`
-- PASS `chain.png` size=`114494`
-- PASS `signals.png` size=`124607`
-- PASS `paper.png` size=`169664`
-- PASS `positions.png` size=`108315`
-- PASS `broker.png` size=`152707`
-- PASS `performance.png` size=`108018`
-- PASS `ml.png` size=`135998`
-- PASS `gates.png` size=`136885`
-- PASS `mobile_390x844.png` size=`123877`
+- PASS `truth.png` size=`201051`
+- PASS `genesis.png` size=`278899`
+- PASS `e2e_proof.png` size=`193408`
+- PASS `overview.png` size=`157227`
+- PASS `chain.png` size=`114496`
+- PASS `signals.png` size=`124768`
+- PASS `paper.png` size=`169836`
+- PASS `positions.png` size=`108417`
+- PASS `broker.png` size=`152651`
+- PASS `performance.png` size=`108037`
+- PASS `ml.png` size=`136104`
+- PASS `gates.png` size=`137046`
+- PASS `mobile_390x844.png` size=`86249`
 
 ## truth.png
 

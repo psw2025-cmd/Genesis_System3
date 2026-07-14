@@ -1,91 +1,86 @@
 {
-  "generated_at": "2026-07-14T06:59:09.088Z",
+  "generated_at": "2026-07-14T07:55:44.313Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
   "source_summary_ok": true,
   "source_summary_error": null,
-  "source_final_verdict": "FAIL",
-  "auth_ok": false,
+  "source_final_verdict": "BLOCKED_NOT_TRADE_READY",
+  "auth_ok": true,
   "screenshot_gate_pass": true,
-  "infra_blockers": [
-    "AUTH_FAIL:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/NIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/BANKNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/FINNIFTY:502",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/MIDCPNIFTY:502"
-  ],
+  "infra_blockers": [],
   "visual_blockers": [],
-  "trade_readiness_blockers": [],
+  "trade_readiness_blockers": [
+    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+  ],
   "screenshots": [
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 200492
+      "size_bytes": 201051
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 97780
+      "size_bytes": 278899
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 183909
+      "size_bytes": 193408
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 157190
+      "size_bytes": 157227
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 114494
+      "size_bytes": 114496
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 124607
+      "size_bytes": 124768
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 169664
+      "size_bytes": 169836
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 108315
+      "size_bytes": 108417
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 152707
+      "size_bytes": 152651
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 108018
+      "size_bytes": 108037
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 135998
+      "size_bytes": 136104
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 136885
+      "size_bytes": 137046
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 123877
+      "size_bytes": 86249
     }
   ],
   "safety": {
