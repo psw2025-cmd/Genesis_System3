@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T05:38:04.541Z
+Generated: 2026-07-14T05:52:17.553Z
 Status: **BLOCKED**
 Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Render UI available: `true`
