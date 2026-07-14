@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-07T21:40:54.160622Z",
+  "generated_utc": "2026-07-14T21:24:34.596834Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -71,17 +71,18 @@
     },
     "EQUITY_FO_ELIGIBILITY_PROVEN": {
       "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
-      "pass": true,
-      "underlying_count": 211,
-      "blocker_id": null,
-      "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+      "pass": false,
+      "error": "No module named 'dotenv'",
+      "blocker_id": "SYS3-BLK-004",
+      "auto_action": "Verify security_id_list.csv OPTSTK universe loads"
     }
   },
-  "gates_passing": 2,
+  "gates_passing": 1,
   "gates_total": 7,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
+    "SYS3-BLK-004",
     "SYS3-BLK-005",
     "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
@@ -104,9 +105,20 @@
     "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
     "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
     "REST poll \u226410s counts for analyzer; WebSocket stream for live execution",
-    "Run scripts/system3_option_visibility_audit.py"
+    "Run scripts/system3_option_visibility_audit.py",
+    "Verify security_id_list.csv OPTSTK universe loads"
   ],
   "permanent_safety": [
     "LIVE_TRADING_DISABLED_BY_DESIGN"
-  ]
+  ],
+  "human_gate_sync": {
+    "synced": true,
+    "removed_gates": [],
+    "still_required": [
+      "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+      "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+      "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+      "WEBSOCKET_TICK_HEALTH_PROVEN"
+    ]
+  }
 }

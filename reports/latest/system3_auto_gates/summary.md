@@ -1,7 +1,7 @@
 # System3 Auto Gates
 
-Generated: `2026-07-07T21:40:54.160622Z`
-Gates passing: **2/7**
+Generated: `2026-07-14T21:24:34.596834Z`
+Gates passing: **1/7**
 Trade ready: **False**
 Analyzer ready: **False**
 
@@ -15,12 +15,13 @@ Analyzer ready: **False**
 | `WEBSOCKET_TICK_HEALTH_PROVEN` | `False` | `TICK_HEALTH_BLOCKER` |
 | `MODEL_ACCURACY_REPORT_PRESENT` | `True` | `-` |
 | `OPTION_STRIKE_VISIBILITY_PROVEN` | `False` | `SYS3-BLK-003` |
-| `EQUITY_FO_ELIGIBILITY_PROVEN` | `True` | `-` |
+| `EQUITY_FO_ELIGIBILITY_PROVEN` | `False` | `SYS3-BLK-004` |
 
 ## Open blockers
 
 - `PROFIT_BLOCKER`
 - `SYS3-BLK-003`
+- `SYS3-BLK-004`
 - `SYS3-BLK-005`
 - `SYS3-BLK-008`
 - `TICK_HEALTH_BLOCKER`
@@ -32,3 +33,4 @@ Analyzer ready: **False**
 - Run scripts/paper_lifecycle_proof.py during market hours with broker connected
 - REST poll ≤10s counts for analyzer; WebSocket stream for live execution
 - Run scripts/system3_option_visibility_audit.py
+- Verify security_id_list.csv OPTSTK universe loads
