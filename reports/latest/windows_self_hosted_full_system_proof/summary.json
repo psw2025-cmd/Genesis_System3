@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-13T14:42:12.290940Z",
+  "generated_utc": "2026-07-14T08:36:13.468030Z",
   "status": "BLOCKED",
   "base_url": "https://genesis-system3-backend.onrender.com",
   "runner": {
@@ -21,7 +21,7 @@
         "scripts/system3_gate_evaluator.py",
         "--sync-gates"
       ],
-      "started_utc": "2026-07-13T14:38:52.835624Z",
+      "started_utc": "2026-07-14T08:31:52.823689Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "scripts/system3_gate_evaluator.py",
@@ -31,8 +31,8 @@
       "ok": true,
       "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 2.61,
-      "finished_utc": "2026-07-13T14:38:55.445462Z"
+      "elapsed_sec": 4.42,
+      "finished_utc": "2026-07-14T08:31:57.244395Z"
     },
     {
       "cmd": [
@@ -40,42 +40,38 @@
         "tools/system3_auto_coordinator.py",
         "--full"
       ],
-      "started_utc": "2026-07-13T14:38:55.446457Z",
-      "actual_cmd": [
-        "C:\\Python310\\python.exe",
-        "tools/system3_auto_coordinator.py",
-        "--full"
-      ],
-      "returncode": 1,
+      "started_utc": "2026-07-14T08:31:57.245393Z",
       "ok": false,
-      "stdout_tail": "[PASS] markdown_inventory\n[FAIL] control_plane\n[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n",
+      "returncode": null,
+      "error": "timeout after 240s",
+      "stdout_tail": "",
       "stderr_tail": "",
-      "elapsed_sec": 166.52,
-      "finished_utc": "2026-07-13T14:41:41.964532Z"
+      "elapsed_sec": 240.04,
+      "finished_utc": "2026-07-14T08:35:57.280997Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
-      "started_utc": "2026-07-13T14:41:41.964532Z",
+      "started_utc": "2026-07-14T08:35:57.280997Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
       "returncode": 0,
       "ok": true,
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-13T14:41:47.945393Z\", \"github_failed_count\": 44, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 9, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 53, \"tracker_internal_status\": \"PASS\"}\n",
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-14T08:36:05.047870Z\", \"github_failed_count\": 37, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 9, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 46, \"tracker_internal_status\": \"PASS\"}\n",
       "stderr_tail": "",
-      "elapsed_sec": 6.0,
-      "finished_utc": "2026-07-13T14:41:47.966391Z"
+      "elapsed_sec": 7.81,
+      "finished_utc": "2026-07-14T08:36:05.092936Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/dashboard_visible_issue_tracker.mjs"
       ],
-      "started_utc": "2026-07-13T14:41:47.966391Z",
+      "started_utc": "2026-07-14T08:36:05.092936Z",
       "actual_cmd": [
         "node",
         "tools/dashboard_visible_issue_tracker.mjs"
@@ -83,26 +79,26 @@
       "returncode": 1,
       "ok": false,
       "stdout_tail": "",
-      "stderr_tail": "node:internal/modules/package_json_reader:316\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\tools\\dashboard_visible_issue_tracker.mjs\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:316:9)\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\n    at moduleResolve (node:internal/modules/esm/resolve:858:18)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:712:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:729:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:758:52)\n    at #resolve (node:internal/modules/esm/loader:694:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:614:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33) {\n  code: 'ERR_MODULE_NOT_FOUND'\n}\n\nNode.js v25.2.1\n",
-      "elapsed_sec": 0.1,
-      "finished_utc": "2026-07-13T14:41:48.070399Z"
+      "stderr_tail": "DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16\n",
+      "elapsed_sec": 2.3,
+      "finished_utc": "2026-07-14T08:36:07.388851Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
-      "started_utc": "2026-07-13T14:41:48.070399Z",
+      "started_utc": "2026-07-14T08:36:07.388851Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
       "returncode": 1,
       "ok": false,
-      "stdout_tail": "f92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29256939882 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29256939702 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29256939464 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29256935446 conclusion=cancelled commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29256935397 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29256935350 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29256931290 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29256930816 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29256930572 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29256912252 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29256912241 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29256903462 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29256903459 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29256903425 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 29256897383 conclusion=cancelled commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29256897225 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29256897175 conclusion=failure commit=92a60eddf0a939dc231aec5d9c5b61d31bc7af92\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29256886903 conclusion=failure commit=a50fcb474e01cbfefe911fb0d92b15a46d81499e\",\n    \"workflow_failure_tracker: failed_count=47\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=FAIL\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
+      "stdout_tail": "  \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29315421727 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29315421721 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29315421720 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29315421717 conclusion=cancelled commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29315421698 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 29315421691 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 29315421644 conclusion=failure commit=2ef78a5d1423ca9406163e0e03996876f58586c1\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29315251271 conclusion=failure commit=d8fd25dc57736c200e87760c787f8438d36994d8\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Market Session Proof Runner' run 29315250209 conclusion=failure commit=d8fd25dc57736c200e87760c787f8438d36994d8\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29315173168 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29315172868 conclusion=cancelled commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29315172848 conclusion=cancelled commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29315168044 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 29315168034 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29315167995 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29315167957 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29315167929 conclusion=failure commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29315167904 conclusion=cancelled commit=36dd2c832e3ce670b0be65520fb9b9e9446e2c7c\",\n    \"workflow_failure_tracker: failed_count=41\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=FAIL\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 0.19,
-      "finished_utc": "2026-07-13T14:41:48.258453Z"
+      "elapsed_sec": 0.41,
+      "finished_utc": "2026-07-14T08:36:07.797886Z"
     }
   ],
   "http_probes": [
@@ -111,7 +107,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/health",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.28,
+      "elapsed_sec": 0.33,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -120,7 +116,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/state",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.31,
+      "elapsed_sec": 0.32,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -129,7 +125,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.27,
+      "elapsed_sec": 0.29,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -138,7 +134,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.61,
+      "elapsed_sec": 0.63,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -147,7 +143,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.61,
+      "elapsed_sec": 0.64,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -165,7 +161,7 @@
       "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings",
       "ok": true,
       "status": 200,
-      "elapsed_sec": 0.61,
+      "elapsed_sec": 0.77,
       "error_category": "none",
       "response_body_persisted": false
     },
@@ -174,17 +170,17 @@
       "url": "https://genesis-system3-backend.onrender.com/api/broker/positions",
       "ok": false,
       "status": 404,
-      "elapsed_sec": 0.37,
+      "elapsed_sec": 0.35,
       "error_category": "route_not_found",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/scanner/top_contract_gainers",
       "url": "https://genesis-system3-backend.onrender.com/api/scanner/top_contract_gainers",
-      "ok": false,
-      "status": null,
-      "elapsed_sec": 20.03,
-      "error_category": "request_timeout",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 1.42,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
@@ -192,14 +188,14 @@
       "url": "https://genesis-system3-backend.onrender.com/api/simulation/live/state",
       "ok": false,
       "status": 404,
-      "elapsed_sec": 0.3,
+      "elapsed_sec": 0.28,
       "error_category": "route_not_found",
       "response_body_persisted": false
     }
   ],
   "reports": {
     "system3_auto_gates": {
-      "generated_utc": "2026-07-13T14:41:40.848358Z",
+      "generated_utc": "2026-07-14T08:36:07.205307Z",
       "gates": {
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
           "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -319,403 +315,340 @@
       "failed_workflows": [
         {
           "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
+          "commit": "2d35595b7343ed4cc4d26dbf64a7cdbd30bf54f9",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258172336",
-          "run_id": 29258172336,
-          "updated_at": "2026-07-13T14:30:07Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258169720",
-          "run_id": 29258169720,
-          "updated_at": "2026-07-13T14:29:48Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258169354",
-          "run_id": 29258169354,
-          "updated_at": "2026-07-13T14:29:45Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29318328704",
+          "run_id": 29318328704,
+          "updated_at": "2026-07-14T08:31:36Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
+          "commit": "bd0b1c47ebdb3f6eea111a9da88dc1ac5bec1f12",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258168729",
-          "run_id": 29258168729,
-          "updated_at": "2026-07-13T14:30:01Z",
-          "workflow": "System3 Secure Install Credential Audit"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317947164",
+          "run_id": 29317947164,
+          "updated_at": "2026-07-14T08:25:28Z",
+          "workflow": "Render Deploy Commit Proof"
         },
         {
           "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
+          "commit": "bd0b1c47ebdb3f6eea111a9da88dc1ac5bec1f12",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258168712",
-          "run_id": 29258168712,
-          "updated_at": "2026-07-13T14:29:47Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317947133",
+          "run_id": 29317947133,
+          "updated_at": "2026-07-14T08:30:07Z",
+          "workflow": "Genesis System3 Global Safety CI"
         },
         {
           "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
+          "commit": "bd0b1c47ebdb3f6eea111a9da88dc1ac5bec1f12",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258161636",
-          "run_id": 29258161636,
-          "updated_at": "2026-07-13T14:29:59Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258161410",
-          "run_id": 29258161410,
-          "updated_at": "2026-07-13T14:29:39Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258160940",
-          "run_id": 29258160940,
-          "updated_at": "2026-07-13T14:33:09Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "24cfb69e6f88283eda8bfbe99b73bd7e1edcfb6a",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258145959",
-          "run_id": 29258145959,
-          "updated_at": "2026-07-13T14:29:40Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258122961",
-          "run_id": 29258122961,
-          "updated_at": "2026-07-13T14:29:05Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258122751",
-          "run_id": 29258122751,
-          "updated_at": "2026-07-13T14:29:23Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258122732",
-          "run_id": 29258122732,
-          "updated_at": "2026-07-13T14:29:26Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258113088",
-          "run_id": 29258113088,
-          "updated_at": "2026-07-13T14:29:10Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258113045",
-          "run_id": 29258113045,
-          "updated_at": "2026-07-13T14:28:57Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258113038",
-          "run_id": 29258113038,
-          "updated_at": "2026-07-13T14:29:23Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258108878",
-          "run_id": 29258108878,
-          "updated_at": "2026-07-13T14:28:55Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258108161",
-          "run_id": 29258108161,
-          "updated_at": "2026-07-13T14:29:10Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258107926",
-          "run_id": 29258107926,
-          "updated_at": "2026-07-13T14:28:54Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "7dbc5f209978a5d32ea5c479f8127a97e6a216c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258068707",
-          "run_id": 29258068707,
-          "updated_at": "2026-07-13T14:28:38Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258038828",
-          "run_id": 29258038828,
-          "updated_at": "2026-07-13T14:28:50Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258037722",
-          "run_id": 29258037722,
-          "updated_at": "2026-07-13T14:28:42Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258036961",
-          "run_id": 29258036961,
-          "updated_at": "2026-07-13T14:28:12Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258036179",
-          "run_id": 29258036179,
-          "updated_at": "2026-07-13T14:27:51Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258035158",
-          "run_id": 29258035158,
-          "updated_at": "2026-07-13T14:27:49Z",
-          "workflow": "Dashboard Visual Proof Strict Gate"
-        },
-        {
-          "branch": "main",
-          "commit": "70b7435d78340bf392b978581d3be30596efd3d1",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29258034914",
-          "run_id": 29258034914,
-          "updated_at": "2026-07-13T14:28:00Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257721323",
-          "run_id": 29257721323,
-          "updated_at": "2026-07-13T14:23:38Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257721175",
-          "run_id": 29257721175,
-          "updated_at": "2026-07-13T14:26:33Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257720959",
-          "run_id": 29257720959,
-          "updated_at": "2026-07-13T14:23:25Z",
-          "workflow": "Dashboard Visual Proof Strict Gate"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257720628",
-          "run_id": 29257720628,
-          "updated_at": "2026-07-13T14:23:25Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257719137",
-          "run_id": 29257719137,
-          "updated_at": "2026-07-13T14:23:26Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257714751",
-          "run_id": 29257714751,
-          "updated_at": "2026-07-13T14:23:24Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257714701",
-          "run_id": 29257714701,
-          "updated_at": "2026-07-13T14:23:44Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257714161",
-          "run_id": 29257714161,
-          "updated_at": "2026-07-13T14:30:17Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "517b118cb13a4349c8cfc42427cfd5d17ecbccb0",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257707226",
-          "run_id": 29257707226,
-          "updated_at": "2026-07-13T14:23:30Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257685777",
-          "run_id": 29257685777,
-          "updated_at": "2026-07-13T14:22:58Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257683652",
-          "run_id": 29257683652,
-          "updated_at": "2026-07-13T14:23:12Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257682957",
-          "run_id": 29257682957,
-          "updated_at": "2026-07-13T14:23:11Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257669431",
-          "run_id": 29257669431,
-          "updated_at": "2026-07-13T14:22:43Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257667207",
-          "run_id": 29257667207,
-          "updated_at": "2026-07-13T14:23:02Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "f1cc02c3ec1dd068de9428f78696a1b54c5b1296",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257667169",
-          "run_id": 29257667169,
-          "updated_at": "2026-07-13T14:23:01Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "e138e24e7c0c83d2ca45228f6b09140cd3795bd3",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257643691",
-          "run_id": 29257643691,
-          "updated_at": "2026-07-13T14:22:39Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "e138e24e7c0c83d2ca45228f6b09140cd3795bd3",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257643659",
-          "run_id": 29257643659,
-          "updated_at": "2026-07-13T14:22:45Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "1a47264b2486c271443d8f1061a59b3ad0e969de",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257621410",
-          "run_id": 29257621410,
-          "updated_at": "2026-07-13T14:22:48Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317947079",
+          "run_id": 29317947079,
+          "updated_at": "2026-07-14T08:25:46Z",
           "workflow": "Permanent Repo Render Safety"
         },
         {
           "branch": "main",
-          "commit": "1a47264b2486c271443d8f1061a59b3ad0e969de",
+          "commit": "bd0b1c47ebdb3f6eea111a9da88dc1ac5bec1f12",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29257621375",
-          "run_id": 29257621375,
-          "updated_at": "2026-07-13T14:27:00Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317945980",
+          "run_id": 29317945980,
+          "updated_at": "2026-07-14T08:25:10Z",
+          "workflow": ".github/workflows/options-ml-training-proof.yml"
+        },
+        {
+          "branch": "main",
+          "commit": "e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317927147",
+          "run_id": 29317927147,
+          "updated_at": "2026-07-14T08:25:25Z",
+          "workflow": "Permanent Repo Render Safety"
+        },
+        {
+          "branch": "main",
+          "commit": "e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317927138",
+          "run_id": 29317927138,
+          "updated_at": "2026-07-14T08:25:13Z",
           "workflow": "Genesis System3 Global Safety CI"
+        },
+        {
+          "branch": "main",
+          "commit": "e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317927061",
+          "run_id": 29317927061,
+          "updated_at": "2026-07-14T08:29:31Z",
+          "workflow": "System3 Windows Self-Hosted Full Proof"
+        },
+        {
+          "branch": "main",
+          "commit": "e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317926063",
+          "run_id": 29317926063,
+          "updated_at": "2026-07-14T08:24:50Z",
+          "workflow": ".github/workflows/options-ml-training-proof.yml"
+        },
+        {
+          "branch": "main",
+          "commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317523089",
+          "run_id": 29317523089,
+          "updated_at": "2026-07-14T08:23:09Z",
+          "workflow": "System3 Full Auto Truth"
+        },
+        {
+          "branch": "main",
+          "commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317424316",
+          "run_id": 29317424316,
+          "updated_at": "2026-07-14T08:19:36Z",
+          "workflow": "Dashboard Live UI Proof"
+        },
+        {
+          "branch": "main",
+          "commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317249354",
+          "run_id": 29317249354,
+          "updated_at": "2026-07-14T08:13:50Z",
+          "workflow": "Permanent Repo Render Safety"
+        },
+        {
+          "branch": "main",
+          "commit": "8a7eeec780a513393e1e14116279ee66e691a743",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316634758",
+          "run_id": 29316634758,
+          "updated_at": "2026-07-14T08:03:04Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "8a7eeec780a513393e1e14116279ee66e691a743",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316634588",
+          "run_id": 29316634588,
+          "updated_at": "2026-07-14T08:11:49Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "dfd560eb44841cd1d159a189e7fac6bf7c0311bc",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316592255",
+          "run_id": 29316592255,
+          "updated_at": "2026-07-14T08:03:08Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "dfd560eb44841cd1d159a189e7fac6bf7c0311bc",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316592197",
+          "run_id": 29316592197,
+          "updated_at": "2026-07-14T08:02:30Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "dfd560eb44841cd1d159a189e7fac6bf7c0311bc",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316592080",
+          "run_id": 29316592080,
+          "updated_at": "2026-07-14T08:02:18Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "dfd560eb44841cd1d159a189e7fac6bf7c0311bc",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316591791",
+          "run_id": 29316591791,
+          "updated_at": "2026-07-14T08:03:10Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573516",
+          "run_id": 29316573516,
+          "updated_at": "2026-07-14T08:02:43Z",
+          "workflow": "Dashboard Shell Diagnostic"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573365",
+          "run_id": 29316573365,
+          "updated_at": "2026-07-14T08:02:03Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573364",
+          "run_id": 29316573364,
+          "updated_at": "2026-07-14T08:01:58Z",
+          "workflow": "Dashboard Visual Loading Postflight"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573314",
+          "run_id": 29316573314,
+          "updated_at": "2026-07-14T08:01:58Z",
+          "workflow": "Dashboard Visual Proof Strict Gate"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573301",
+          "run_id": 29316573301,
+          "updated_at": "2026-07-14T08:03:09Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573229",
+          "run_id": 29316573229,
+          "updated_at": "2026-07-14T08:02:06Z",
+          "workflow": "System3 1000 Point TODO Status Updater"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573168",
+          "run_id": 29316573168,
+          "updated_at": "2026-07-14T08:02:06Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316573118",
+          "run_id": 29316573118,
+          "updated_at": "2026-07-14T08:02:49Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316490859",
+          "run_id": 29316490859,
+          "updated_at": "2026-07-14T08:00:40Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316490814",
+          "run_id": 29316490814,
+          "updated_at": "2026-07-14T08:04:27Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316490783",
+          "run_id": 29316490783,
+          "updated_at": "2026-07-14T08:02:23Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316487040",
+          "run_id": 29316487040,
+          "updated_at": "2026-07-14T08:00:33Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316487036",
+          "run_id": 29316487036,
+          "updated_at": "2026-07-14T08:00:36Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316486998",
+          "run_id": 29316486998,
+          "updated_at": "2026-07-14T08:00:31Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "d46c9c50e5ad30249b6306616aeb77b5ff21c4f5",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316460852",
+          "run_id": 29316460852,
+          "updated_at": "2026-07-14T08:00:21Z",
+          "workflow": "System3 Backend Live Simulation Proof"
+        },
+        {
+          "branch": "main",
+          "commit": "01c87758f593b2a5abd9328db52a7a32338fc455",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316450039",
+          "run_id": 29316450039,
+          "updated_at": "2026-07-14T08:00:52Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "01c87758f593b2a5abd9328db52a7a32338fc455",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316449406",
+          "run_id": 29316449406,
+          "updated_at": "2026-07-14T08:00:12Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "01c87758f593b2a5abd9328db52a7a32338fc455",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316449347",
+          "run_id": 29316449347,
+          "updated_at": "2026-07-14T08:00:48Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "01c87758f593b2a5abd9328db52a7a32338fc455",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29316449329",
+          "run_id": 29316449329,
+          "updated_at": "2026-07-14T08:00:02Z",
+          "workflow": "System3 Experimental Solution Planner"
         }
       ],
-      "generated_utc": "2026-07-13T14:41:47.945393Z",
-      "github_failed_count": 44,
+      "generated_utc": "2026-07-14T08:36:05.047870Z",
+      "github_failed_count": 37,
       "github_timeout_s": 12.0,
       "live_trading_enabled": false,
       "order_routes_called": false,
@@ -839,50 +772,43 @@
       "secrets_printed": false,
       "status": "BLOCKED",
       "todo": [
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29258172336 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258169720 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29258169354 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29258168729 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29258168712 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29258161636 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258161410 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29258160940 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29258145959 conclusion=failure commit=24cfb69e6f88",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258122961 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29258122751 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29258122732 conclusion=cancelled commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29258113088 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258113045 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29258113038 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258108878 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29258108161 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29258107926 conclusion=cancelled commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29258068707 conclusion=failure commit=7dbc5f209978",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29258038828 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29258037722 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29258036961 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29258036179 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29258035158 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29258034914 conclusion=failure commit=70b7435d7834",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29257721323 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257721175 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29257720959 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257720628 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29257719137 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257714751 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257714701 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257714161 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29257707226 conclusion=failure commit=517b118cb13a",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257685777 conclusion=failure commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257683652 conclusion=failure commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29257682957 conclusion=cancelled commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29257669431 conclusion=failure commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29257667207 conclusion=failure commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29257667169 conclusion=failure commit=f1cc02c3ec1d",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29257643691 conclusion=failure commit=e138e24e7c0c",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29257643659 conclusion=failure commit=e138e24e7c0c",
-        "Fix GitHub workflow 'Permanent Repo Render Safety' run=29257621410 conclusion=failure commit=1a47264b2486",
-        "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29257621375 conclusion=failure commit=1a47264b2486",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29318328704 conclusion=failure commit=2d35595b7343",
+        "Fix GitHub workflow 'Render Deploy Commit Proof' run=29317947164 conclusion=failure commit=bd0b1c47ebdb",
+        "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29317947133 conclusion=failure commit=bd0b1c47ebdb",
+        "Fix GitHub workflow 'Permanent Repo Render Safety' run=29317947079 conclusion=failure commit=bd0b1c47ebdb",
+        "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29317945980 conclusion=failure commit=bd0b1c47ebdb",
+        "Fix GitHub workflow 'Permanent Repo Render Safety' run=29317927147 conclusion=failure commit=e1fe248a3a1f",
+        "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29317927138 conclusion=cancelled commit=e1fe248a3a1f",
+        "Fix GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29317927061 conclusion=cancelled commit=e1fe248a3a1f",
+        "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29317926063 conclusion=failure commit=e1fe248a3a1f",
+        "Fix GitHub workflow 'System3 Full Auto Truth' run=29317523089 conclusion=failure commit=e8a82f8c25fd",
+        "Fix GitHub workflow 'Dashboard Live UI Proof' run=29317424316 conclusion=failure commit=e8a82f8c25fd",
+        "Fix GitHub workflow 'Permanent Repo Render Safety' run=29317249354 conclusion=failure commit=e8a82f8c25fd",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316634758 conclusion=failure commit=8a7eeec780a5",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29316634588 conclusion=failure commit=8a7eeec780a5",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29316592255 conclusion=failure commit=dfd560eb4484",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29316592197 conclusion=failure commit=dfd560eb4484",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316592080 conclusion=failure commit=dfd560eb4484",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29316591791 conclusion=failure commit=dfd560eb4484",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29316573516 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316573365 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29316573364 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29316573314 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29316573301 conclusion=cancelled commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29316573229 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29316573168 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29316573118 conclusion=failure commit=7caffc4132cd",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316490859 conclusion=failure commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29316490814 conclusion=failure commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29316490783 conclusion=cancelled commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29316487040 conclusion=cancelled commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316487036 conclusion=failure commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29316486998 conclusion=cancelled commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=29316460852 conclusion=failure commit=d46c9c50e5ad",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29316450039 conclusion=failure commit=01c87758f593",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29316449406 conclusion=failure commit=01c87758f593",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29316449347 conclusion=failure commit=01c87758f593",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29316449329 conclusion=failure commit=01c87758f593",
         "Fix Render endpoint /api/state: HTTP status 401 status=401",
         "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
         "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
@@ -893,1646 +819,28 @@
         "Fix Render endpoint /api/paper: HTTP status 401 status=401",
         "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401"
       ],
-      "todo_count": 53,
+      "todo_count": 46,
       "tracker_internal_status": "PASS",
       "exists": true,
       "path": "C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\github_render_failure_tracker\\summary.json"
     },
     "dashboard_visible_issue_tracker": {
-      "generated_at": "2026-07-13T14:28:01.783Z",
+      "generated_at": "2026-07-14T08:36:07.299Z",
       "base": "https://genesis-system3-backend.onrender.com",
       "status": "BLOCKED",
-      "auth": {
-        "ok": true,
-        "status": 200
-      },
-      "tabs": [
-        {
-          "id": "truth",
-          "title": "Truth Control",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/truth.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 2,
-          "blocker_lines": [
-            "BLOCKED",
-            "MONEY_READY_BLOCKED",
-            "At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
-            "Backend/API route health\tBLOCKED\tYES\thealth=0, state=0",
-            "Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false",
-            "Funds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-",
-            "Holdings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0",
-            "Dhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1",
-            "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0",
-            "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload",
-            "Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0",
-            "Risk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:58:32 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSystem Truth Control\nFull upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.\nChecking...\nBLOCKED\nInfrastructure / broker read path\nBLOCKED\nMoney readiness\nLast run\n-\nMONEY_READY_BLOCKED\nAt least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.\nLAYER\tSTATUS\tREQUIRED FOR MONEY\tEVIDENCE\nBackend/API route health\tBLOCKED\tYES\thealth=0, state=0\nBroker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false\nFunds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-\nHoldings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0\nDhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\nUniverse / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0\nCE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload\nPaper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0\nRisk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-\nLive-money safety lock\tPASS\tYES\tlive_flag=false, order_allowed=false\nDashboard operator truth\tPASS\tYES\tGenerated from live endpoints. SENSEX is optional until official Dhan rows are proven; enabled universe remains no-fallback."
-        },
-        {
-          "id": "genesis",
-          "title": "Genesis Brain",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/genesis.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:58:37 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nGenesis is loading production command intelligence..."
-        },
-        {
-          "id": "e2e_proof",
-          "title": "E2E Proof",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/e2e_proof.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 2,
-          "blocker_lines": [
-            "Real broker/data truth only. Live money remains blocked until every row below passes.",
-            "BLOCKED \u00b7 FULL E2E",
-            "BLOCKED \u00b7 API",
-            "BLOCKED \u00b7 DHAN CHAIN",
-            "No non-Dhan/stale/fallback",
-            "BLOCKED \u00b7 TRADER READY",
-            "Dhan broker connection\tBLOCKED\t-",
-            "Dhan access token/session\tBLOCKED\t-",
-            "Real broker funds/margin\tBLOCKED\t-",
-            "Real broker holdings response\tBLOCKED\t-",
-            "Real broker positions response\tBLOCKED\t-",
-            "Real Dhan option chain for all watched symbols\tBLOCKED\t0/5",
-            "No non-Dhan/stale/fallback markers in chain\tPASS\tclean",
-            "Paper/analyzer P&L endpoint\tBLOCKED\t-",
-            "Today paper lifecycle endpoint\tBLOCKED\t-",
-            "Gate/risk endpoint visible\tBLOCKED\t-",
-            "Live-money switch blocked until separate proof\tPASS\tblocked"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:58:48 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nChecking...\nBLOCKED \u00b7 FULL E2E\nOverall visual proof\nBLOCKED \u00b7 API\nCore endpoints\nBLOCKED \u00b7 DHAN CHAIN\nReal Dhan option chain\nPASS \u00b7 NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED \u00b7 TRADER READY\nHuman readiness checklist\nLast run: not yet \u00b7 This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t-\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tBLOCKED\t-\nReal broker holdings response\tBLOCKED\t-\nReal broker positions response\tBLOCKED\t-\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tPASS\tclean\nPaper/analyzer P&L endpoint\tBLOCKED\t-\nToday paper lifecycle endpoint\tBLOCKED\t-\nGate/risk endpoint visible\tBLOCKED\t-\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS"
-        },
-        {
-          "id": "overview",
-          "title": "Overview",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/overview.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [
-            "STALE",
-            "PEND",
-            "market-session proof pending"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "ANALYZER / PAPER COMMAND CENTER",
-            "Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.",
-            "PAPER P&L",
-            "Paper only",
-            "market closed must not hide read-only data",
-            "Market closed: After hours (closed at 15:30)",
-            "Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks.",
-            "Paper Lifecycle",
-            "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
-          ],
-          "red_elements": [
-            {
-              "text": "STALE",
-              "className": "pill text-[10px] w-32 justify-center bg-amber/10 text-amber border border-amber/20",
-              "color": "rgb(245, 158, 11)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "PEND",
-              "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
-              "color": "rgb(245, 158, 11)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "PEND",
-              "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
-              "color": "rgb(245, 158, 11)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "PEND",
-              "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
-              "color": "rgb(245, 158, 11)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "PEND",
-              "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
-              "color": "rgb(245, 158, 11)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            }
-          ],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:58:52 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nBROKER\nCONNECTED\nDhan read-only\nPAPER P&L\n\u20b90\nCloud sim\nOPEN POSITIONS\n0\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nlive\nLOADED\nState API\nMarket closed: After hours (closed at 15:30)\nLOADED\nBroker Status API\nLOADED\nFunds API\nLOADED\nHoldings API\nLOADED\nPositions API\nLOADED\nP&L API\npnl=0\nSTALE\nGain Rank / Scanner\nLOADED\nAuto Gates\n7 gates\nLOADED\nAlerts\n0 recent\nLOADED\nOption Chain\nMarket closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks.\nGate Matrix\n3/7 PASS\nPEND\nML Accuracy (Spearman \u03c1)\n0/5 days \u00b7 \u03c1=None \u00b7 need \u22650.7\nPEND\nProfit / Expectancy\nexpectancy=-196.14 \u00b7 win_rate=0.3333\nPEND\nPaper Lifecycle\nmarket-session proof pending\nPASS\nTick / Data Freshness\ntick_age=6.98s refresh=5s\nPASS\nModel Accuracy Report\nRun scripts/system3_model_accuracy_tracker.py --api-base $CLOUD\nPEND\nOption Strike Visibility\nRun scripts/system3_option_visibility_audit.py\nPASS\nEquity F&O Eligibility\nWire is_tradeable_fo_symbol() in ranking/paper trade path\nSystem Health\nMode\nPAPER\nQC Status\nPASS\nData Source\nlive\nMarket\nCLOSED / DATA POLLING\nLive Allowed\nfalse\nLast Sync\n--"
-        },
-        {
-          "id": "sim_live",
-          "title": "Sim Live",
-          "ok": false,
-          "screenshot": null,
-          "screenshot_ok": false,
-          "navigation_method_index": null,
-          "blocker_lines": [],
-          "info_lines": [],
-          "red_elements": [],
-          "ui_exceptions": [
-            "Error: Unable to locate/click dashboard tab Sim Live; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
-          ],
-          "body_text_sample": ""
-        },
-        {
-          "id": "chain",
-          "title": "Option Chain",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/chain.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
-          ],
-          "red_elements": [
-            {
-              "text": "17.2%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "23.3%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.0%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "22.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.5%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "21.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "20.7%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.6%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "19.8%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "18.9%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.8%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "18.0%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.2%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.0%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.2%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.9%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.9%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.0%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.2%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.6%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.8%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.1%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.1%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.6%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "19.1%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "20.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.1%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "22.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "23.3%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            }
-          ],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:18 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nSPOT\n24,198\nPCR\n1.60\nCONTRACTS\n160\n+/-5 ATM\n+/-10 ATM\n+/-15 ATM\n+/-20 ATM\nNIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks.\nOI\tCHGOI\tVOL\tIV\tLTP\tBID\tSTRIKE\tASK\tLTP\tIV\tVOL\tCHGOI\tOI\n\n210K\n\t--\t2018K\t17.2%\t507.20\t505.5\t23,700\t8.4\t8.35\t23.3%\t119976K\t--\t\n10.6M\n\n\n94K\n\t--\t1328K\t15.0%\t457.80\t457.4\t23,750\t10.1\t10.05\t22.4%\t88519K\t--\t\n6.2M\n\n\n529K\n\t--\t10026K\t17.5%\t410.60\t409.5\t23,800\t12.2\t12.15\t21.5%\t201824K\t--\t\n11.4M\n\n\n312K\n\t--\t6890K\t16.7%\t362.30\t362.9\t23,850\t15.2\t15.20\t20.7%\t125454K\t--\t\n5.5M\n\n\n831K\n\t--\t42213K\t16.6%\t315.75\t315.7\t23,900\t18.9\t18.85\t19.8%\t246930K\t--\t\n10.5M\n\n\n475K\n\t--\t38588K\t16.3%\t270.95\t270.9\t23,950\t23.6\t23.50\t18.9%\t184233K\t--\t\n8.3M\n\n\n3.7M\n\t--\t218187K\t15.8%\t226.80\t227.1\t24,000\t29.6\t29.45\t18.0%\t541977K\t--\t\n25.4M\n\n\n1.5M\n\t--\t196264K\t15.2%\t184.65\t184.5\t24,050\t37.2\t37.15\t17.0%\t294152K\t--\t\n12.4M\n\n\n4.3M\n\t--\t413049K\t14.4%\t144.85\t144.6\t24,100\t47.3\t47.25\t16.2%\t483604K\t--\t\n19.4M\n\n\n4.9M\n\t--\t400970K\t13.9%\t109.10\t109.0\t24,150\t61.4\t61.40\t15.4%\t328084K\t--\t\n13.6M\n\n\n12.1M\n\t--\t677884K\t13.3%\t77.95\t78.0\t24,200ATM\t80.4\t80.35\t14.9%\t431429K\t--\t\n17.6M\n\n\n9.0M\n\t--\t440333K\t13.0%\t52.90\t52.9\t24,250\t105.1\t104.65\t14.4%\t145594K\t--\t\n6.0M\n\n\n12.8M\n\t--\t467993K\t12.7%\t34.20\t34.2\t24,300\t136.0\t135.70\t14.2%\t102684K\t--\t\n3.9M\n\n\n5.7M\n\t--\t266725K\t12.7%\t21.40\t21.4\t24,350\t173.4\t173.30\t14.6%\t21457K\t--\t\n796K\n\n\n9.5M\n\t--\t345096K\t12.8%\t13.25\t13.3\t24,400\t215.8\t215.20\t15.1%\t23934K\t--\t\n1.1M\n\n\n6.2M\n\t--\t192157K\t13.1%\t8.10\t8.1\t24,450\t260.7\t261.55\t16.4%\t3740K\t--\t\n304K\n\n\n17.3M\n\t--\t316389K\t13.6%\t5.35\t5.4\t24,500\t308.9\t308.00\t17.5%\t12122K\t--\t\n3.7M\n\n\n4.1M\n\t--\t144739K\t14.4%\t3.85\t3.8\t24,550\t356.3\t357.50\t19.1%\t665K\t--\t\n86K\n\n\n8.6M\n\t--\t186829K\t15.3%\t2.95\t3.0\t24,600\t405.9\t405.50\t20.5%\t1414K\t--\t\n392K\n\n\n3.4M\n\t--\t162592K\t16.1%\t2.30\t2.3\t24,650\t455.2\t456.05\t22.5%\t137K\t--\t\n61K\n\n\n8.9M\n\t--\t180053K\t16.7%\t1.65\t1.7\t24,700\t504.0\t504.00\t23.3%\t320K\t--\t\n129K"
-        },
-        {
-          "id": "signals",
-          "title": "Signals",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/signals.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:22 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLoading signals..."
-        },
-        {
-          "id": "trade",
-          "title": "Trade",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/trade.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
-          ],
-          "red_elements": [
-            {
-              "text": "17.2%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "23.3%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.0%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "22.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.5%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "21.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "20.7%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.6%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "19.8%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "18.9%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.8%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "18.0%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.2%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.0%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.2%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.9%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.9%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.0%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.2%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.6%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "12.8%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.1%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.1%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.4%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "13.6%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "17.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "14.4%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "19.1%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "15.3%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "20.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.1%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "22.5%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "16.7%",
-              "className": "tcell text-right text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "23.3%",
-              "className": "tcell text-left text-amber",
-              "color": "rgb(226, 232, 240)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            }
-          ],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:27 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nSPOT\n24,198\nPCR\n1.60\nCONTRACTS\n160\n+/-5 ATM\n+/-10 ATM\n+/-15 ATM\n+/-20 ATM\nNIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks.\nOI\tCHGOI\tVOL\tIV\tLTP\tBID\tSTRIKE\tASK\tLTP\tIV\tVOL\tCHGOI\tOI\n\n210K\n\t--\t2018K\t17.2%\t507.20\t505.5\t23,700\t8.4\t8.35\t23.3%\t119976K\t--\t\n10.6M\n\n\n94K\n\t--\t1328K\t15.0%\t457.80\t457.4\t23,750\t10.1\t10.05\t22.4%\t88519K\t--\t\n6.2M\n\n\n529K\n\t--\t10026K\t17.5%\t410.60\t409.5\t23,800\t12.2\t12.15\t21.5%\t201824K\t--\t\n11.4M\n\n\n312K\n\t--\t6890K\t16.7%\t362.30\t362.9\t23,850\t15.2\t15.20\t20.7%\t125454K\t--\t\n5.5M\n\n\n831K\n\t--\t42213K\t16.6%\t315.75\t315.7\t23,900\t18.9\t18.85\t19.8%\t246930K\t--\t\n10.5M\n\n\n475K\n\t--\t38588K\t16.3%\t270.95\t270.9\t23,950\t23.6\t23.50\t18.9%\t184233K\t--\t\n8.3M\n\n\n3.7M\n\t--\t218187K\t15.8%\t226.80\t227.1\t24,000\t29.6\t29.45\t18.0%\t541977K\t--\t\n25.4M\n\n\n1.5M\n\t--\t196264K\t15.2%\t184.65\t184.5\t24,050\t37.2\t37.15\t17.0%\t294152K\t--\t\n12.4M\n\n\n4.3M\n\t--\t413049K\t14.4%\t144.85\t144.6\t24,100\t47.3\t47.25\t16.2%\t483604K\t--\t\n19.4M\n\n\n4.9M\n\t--\t400970K\t13.9%\t109.10\t109.0\t24,150\t61.4\t61.40\t15.4%\t328084K\t--\t\n13.6M\n\n\n12.1M\n\t--\t677884K\t13.3%\t77.95\t78.0\t24,200ATM\t80.4\t80.35\t14.9%\t431429K\t--\t\n17.6M\n\n\n9.0M\n\t--\t440333K\t13.0%\t52.90\t52.9\t24,250\t105.1\t104.65\t14.4%\t145594K\t--\t\n6.0M\n\n\n12.8M\n\t--\t467993K\t12.7%\t34.20\t34.2\t24,300\t136.0\t135.70\t14.2%\t102684K\t--\t\n3.9M\n\n\n5.7M\n\t--\t266725K\t12.7%\t21.40\t21.4\t24,350\t173.4\t173.30\t14.6%\t21457K\t--\t\n796K\n\n\n9.5M\n\t--\t345096K\t12.8%\t13.25\t13.3\t24,400\t215.8\t215.20\t15.1%\t23934K\t--\t\n1.1M\n\n\n6.2M\n\t--\t192157K\t13.1%\t8.10\t8.1\t24,450\t260.7\t261.55\t16.4%\t3740K\t--\t\n304K\n\n\n17.3M\n\t--\t316389K\t13.6%\t5.35\t5.4\t24,500\t308.9\t308.00\t17.5%\t12122K\t--\t\n3.7M\n\n\n4.1M\n\t--\t144739K\t14.4%\t3.85\t3.8\t24,550\t356.3\t357.50\t19.1%\t665K\t--\t\n86K\n\n\n8.6M\n\t--\t186829K\t15.3%\t2.95\t3.0\t24,600\t405.9\t405.50\t20.5%\t1414K\t--\t\n392K\n\n\n3.4M\n\t--\t162592K\t16.1%\t2.30\t2.3\t24,650\t455.2\t456.05\t22.5%\t137K\t--\t\n61K\n\n\n8.9M\n\t--\t180053K\t16.7%\t1.65\t1.7\t24,700\t504.0\t504.00\t23.3%\t320K\t--\t\n129K\nINDEX SCANNER\nNo rankings available\nScanner has no current ranking rows."
-        },
-        {
-          "id": "paper",
-          "title": "Paper Trades",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/paper.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [
-            "System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.",
-            "Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.",
-            "BLOCKED"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "Paper Trading Console",
-            "Recheck Paper Proof",
-            "PAPER / ANALYZER SAFE",
-            "Today Paper Entries",
-            "Today Paper Exits",
-            "Closed paper/analyzer records",
-            "Paper Truth Provenance",
-            "NO_PAPER_SOURCE",
-            "Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.",
-            "PAPER TRADING MODE (NO REAL ORDERS)",
-            "Mode: PAPER | Data Source: NOT_READY | Broker: Connected",
-            "Open Paper Positions (0)",
-            "No open paper positions",
-            "Today Paper Trade Proof",
-            "Total Paper Exposure",
-            "Paper UI does not call broker/order close endpoints."
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:32 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nState Version: 8 | Positions Source: NO_POSITIONS | Last Refresh: 7/13/2026, 2:29:30 PM\nRecheck Paper Proof\nMode Safety\nPAPER / ANALYZER SAFE\nLive trading flag: OFF\nBroker Data\nCONNECTED\nSource: BROKER_CONNECTED_MARKET_CLOSED\nToday Paper Entries\n0\nFrom /api/trades/today\nToday Paper Exits\n0\nClosed paper/analyzer records\nPaper Truth Provenance\nSource file\nNO_PAPER_SOURCE\nDisplayed rows\n0\nFake/fixture rejected\n0\nOrder endpoints\nNOT CALLED\nVisual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.\n\ud83d\udcca\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Connected\nOpen Paper Positions (0)\nNo open paper positions\nReason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.\nToday Paper Trade Proof\nEntries (0)\n[]\nExits (0)\n[]\nPnL Summary\nTotal PnL:\n\u20b90.00\nUnrealized:\n\u20b90.00\nRealized:\n\u20b90.00\nOpen Positions:\n0\nToday Entries:\n0\nToday Exits:\n0\nRisk Panel\nMax Positions\n-\nCurrent: 0\nTotal Paper Exposure\n\u20b90.00\nLive Order Safety\nBLOCKED\nPaper UI does not call broker/order close endpoints."
-        },
-        {
-          "id": "positions",
-          "title": "Positions",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/positions.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "PAPER ONLY \u2014 NO REAL MONEY",
-            "Paper engine generates positions during market hours"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:36 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n\u20b90\nWIN RATE\n0.0%\nTRADES\n0\nOPEN\n0\nPAPER ONLY \u2014 NO REAL MONEY\nOPEN POSITIONS (0)\n\nNo open positions\n\nPaper engine generates positions during market hours"
-        },
-        {
-          "id": "performance",
-          "title": "Performance",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/performance.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "No performance data yet \u2014 paper engine has not closed any trades."
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:41 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 19:59:37 IST\n\nNo performance data yet \u2014 paper engine has not closed any trades.\n\nAPI status: /api/pnl responded OK, 0 trades \u00b7 checked 19:59:37 IST"
-        },
-        {
-          "id": "ml",
-          "title": "ML Model",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/ml.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [
-            "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
-            "BLOCKED",
-            "Training proof missing."
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:46 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nMODEL_NOT_PROVEN\nNo matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nNO\nProof records\n0\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration."
-        },
-        {
-          "id": "broker",
-          "title": "Broker",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/broker.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [
-            "BLOCKED BY BACKEND FLAG"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "NONE - MARKET CLOSED IS OK",
-            "MARKET CLOSED / READ-ONLY OK"
-          ],
-          "red_elements": [
-            {
-              "text": "NOT PROVIDED BY BROKER API",
-              "className": "num tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "BLOCKED BY BACKEND FLAG",
-              "className": "num tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "\u20b985,193",
-              "className": "num tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "--",
-              "className": "pill text-xs tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "--",
-              "className": "pill text-xs tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "--",
-              "className": "pill text-xs tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "--",
-              "className": "pill text-xs tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            },
-            {
-              "text": "--",
-              "className": "pill text-xs tx-down",
-              "color": "rgb(255, 77, 106)",
-              "backgroundColor": "rgba(0, 0, 0, 0)"
-            }
-          ],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:50 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nCONNECTED\nTruth\nREAD-ONLY BROKER PROOF OK\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nVALID\nHoldings API\nRESPONDED\nFunds API\nRESPONDED\nBroker Blocker\nNONE - MARKET CLOSED IS OK\nMarket State\nMARKET CLOSED / READ-ONLY OK\nData Visibility\nVISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nAvailable Balance\n\u20b91,692\nUsed Margin\n\u20b985,193\nTotal Balance\n\u20b91\nEQUITY HOLDINGS (11)\nSYMBOL\tQTY\tAVG COST\tLTP\tP&L\tP&L%\nPARADEEP\t165\t115.44\t143.38\t\u20b94,610\t+24.20%\nMRPL\t164\t188.52\t164.74\t\u20b9-3,900\t-12.62%\nSANDUMA\t230\t202.60\t203.25\t\u20b9150\t+0.32%\nCHENNPETRO\t31\t921.15\t1,157.90\t\u20b97,339\t+25.70%\nMAHSEAMLES\t50\t607.66\t591.85\t\u20b9-791\t-2.60%\nBAJAJHIND\t2100\t16.91\t17.70\t\u20b91,660\t+4.68%\nDWARKESH\t900\t39.22\t43.84\t\u20b94,160\t+11.79%\nRKFORGE\t40\t590.99\t565.50\t\u20b9-1,020\t-4.31%\nPAISALO\t880\t38.22\t72.30\t\u20b929,993\t+89.18%\nNMDC\t476\t84.48\t84.13\t\u20b9-167\t-0.41%\nAARTIIND\t49\t518.75\t484.30\t\u20b9-1,688\t-6.64%\nDHAN LIVE POSITIONS (5)\nSYMBOL\tSIDE\tQTY\tENTRY\tLTP\tP&L\nDWARKESH\t--\t-899\t43.86\t0.00\t\u20b918\nETERNAL-Jul2026-292.5-CE\t--\t0\t7.80\t0.00\t\u20b90\nKALYANKJIL-Jul2026-520-CE\t--\t1350\t23.60\t0.00\t\u20b91,215\nTCS-Jul2026-2220-CE\t--\t1125\t30.11\t0.00\t\u20b9-4,118\nKALYANKJIL-Jul2026-565-CE\t--\t1350\t14.25\t0.00\t\u20b9-4,253"
-        },
-        {
-          "id": "alerts",
-          "title": "Alerts",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/alerts.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n19:59:55 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n\nNo alerts"
-        },
-        {
-          "id": "system",
-          "title": "System",
-          "ok": true,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/system.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 0,
-          "blocker_lines": [],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "Paper Mode"
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n20:00:00 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nCONNECTED\nWebSocket\nLIVE\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nlive\nMarket State\nCLOSED / OFFLINE\nAPI Status\nOK / WAITING\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\ntrue\nQC Status\nPASS\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nLive trading permanently disabled in analyzer mode"
-        },
-        {
-          "id": "gates",
-          "title": "Live Gate",
-          "ok": false,
-          "screenshot": "reports/latest/dashboard_visible_issue_tracker/gates.png",
-          "screenshot_ok": true,
-          "navigation_method_index": 2,
-          "blocker_lines": [
-            "LIVE_TRADING_BLOCKED",
-            "Live trading blocked \u2014 see failed gates above"
-          ],
-          "info_lines": [
-            "MARKET CLOSED / DATA POLLING",
-            "PAPER",
-            "LIVE OFF",
-            "PAPER ONLY",
-            "Paper Trades",
-            "LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)",
-            "All technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data."
-          ],
-          "red_elements": [],
-          "ui_exceptions": [],
-          "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n20:00:10 IST\nNIFTY\n24,198\nBNFTY\n58,103\nFINNIFTY\n26,827\nMARKET CLOSED / DATA POLLING\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked \u2014 see failed gates above\n\nGATE CHECKLIST\n\u2705\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n\u2705\nkill_switch_off\nKill switch not activated\n\u274c\nhuman_approved\nNOT APPROVED \u2014 owner must set live_trading_approved=true in kill_switch.json\n\u274c\nvalidation_days\n0 validation days (need \u226510)\n\u274c\nml_accuracy_rho\nAvg Spearman \u03c1=0.000 (need \u22650.70)\n\u2705\nmax_loss_configured\nMax daily loss = \u20b95000 hardcoded in kill_switch.json\n\n\u26a0\ufe0f Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: \u20b95,000. System halts automatically when limit is hit."
-        }
-      ],
+      "auth": null,
+      "tabs": [],
       "expected_tab_count": 16,
-      "visible_issue_count": 41,
-      "info_line_count": 110,
-      "screenshot_missing_count": 1,
-      "ui_exception_count": 1,
-      "global_exception": null,
-      "visible_issues": [
-        {
-          "tab": "Truth Control",
-          "text": "BLOCKED"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "MONEY_READY_BLOCKED"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled."
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Backend/API route health\tBLOCKED\tYES\thealth=0, state=0"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Funds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Holdings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Dhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Risk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Real broker/data truth only. Live money remains blocked until every row below passes."
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "BLOCKED \u00b7 FULL E2E"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "BLOCKED \u00b7 API"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "BLOCKED \u00b7 DHAN CHAIN"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "No non-Dhan/stale/fallback"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "BLOCKED \u00b7 TRADER READY"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Dhan broker connection\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Dhan access token/session\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Real broker funds/margin\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Real broker holdings response\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Real broker positions response\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Real Dhan option chain for all watched symbols\tBLOCKED\t0/5"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "No non-Dhan/stale/fallback markers in chain\tPASS\tclean"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Paper/analyzer P&L endpoint\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Today paper lifecycle endpoint\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Gate/risk endpoint visible\tBLOCKED\t-"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Live-money switch blocked until separate proof\tPASS\tblocked"
-        },
-        {
-          "tab": "Overview",
-          "text": "STALE"
-        },
-        {
-          "tab": "Overview",
-          "text": "PEND"
-        },
-        {
-          "tab": "Overview",
-          "text": "market-session proof pending"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable."
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure."
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "BLOCKED"
-        },
-        {
-          "tab": "ML Model",
-          "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."
-        },
-        {
-          "tab": "ML Model",
-          "text": "BLOCKED"
-        },
-        {
-          "tab": "ML Model",
-          "text": "Training proof missing."
-        },
-        {
-          "tab": "Broker",
-          "text": "BLOCKED BY BACKEND FLAG"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "LIVE_TRADING_BLOCKED"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "Live trading blocked \u2014 see failed gates above"
-        }
-      ],
-      "info_lines": [
-        {
-          "tab": "Truth Control",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Truth Control",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Genesis Brain",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Genesis Brain",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Genesis Brain",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Genesis Brain",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Genesis Brain",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "PAPER"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "E2E Proof",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Overview",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Overview",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Overview",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Overview",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Overview",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Overview",
-          "text": "ANALYZER / PAPER COMMAND CENTER"
-        },
-        {
-          "tab": "Overview",
-          "text": "Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data."
-        },
-        {
-          "tab": "Overview",
-          "text": "PAPER P&L"
-        },
-        {
-          "tab": "Overview",
-          "text": "Paper only"
-        },
-        {
-          "tab": "Overview",
-          "text": "market closed must not hide read-only data"
-        },
-        {
-          "tab": "Overview",
-          "text": "Market closed: After hours (closed at 15:30)"
-        },
-        {
-          "tab": "Overview",
-          "text": "Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
-        },
-        {
-          "tab": "Overview",
-          "text": "Paper Lifecycle"
-        },
-        {
-          "tab": "Overview",
-          "text": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Option Chain",
-          "text": "NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
-        },
-        {
-          "tab": "Signals",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Signals",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Signals",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Signals",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Signals",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Trade",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Trade",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Trade",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Trade",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Trade",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Trade",
-          "text": "NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-13T09:51:38.030367+00:00 - Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Paper Trading Console"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Recheck Paper Proof"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "PAPER / ANALYZER SAFE"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Today Paper Entries"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Today Paper Exits"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Closed paper/analyzer records"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Paper Truth Provenance"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "NO_PAPER_SOURCE"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display."
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "PAPER TRADING MODE (NO REAL ORDERS)"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Mode: PAPER | Data Source: NOT_READY | Broker: Connected"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Open Paper Positions (0)"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "No open paper positions"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Today Paper Trade Proof"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Total Paper Exposure"
-        },
-        {
-          "tab": "Paper Trades",
-          "text": "Paper UI does not call broker/order close endpoints."
-        },
-        {
-          "tab": "Positions",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Positions",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Positions",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Positions",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Positions",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Positions",
-          "text": "PAPER ONLY \u2014 NO REAL MONEY"
-        },
-        {
-          "tab": "Positions",
-          "text": "Paper engine generates positions during market hours"
-        },
-        {
-          "tab": "Performance",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Performance",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Performance",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Performance",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Performance",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Performance",
-          "text": "No performance data yet \u2014 paper engine has not closed any trades."
-        },
-        {
-          "tab": "ML Model",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "ML Model",
-          "text": "PAPER"
-        },
-        {
-          "tab": "ML Model",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "ML Model",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "ML Model",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Broker",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Broker",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Broker",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Broker",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Broker",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Broker",
-          "text": "NONE - MARKET CLOSED IS OK"
-        },
-        {
-          "tab": "Broker",
-          "text": "MARKET CLOSED / READ-ONLY OK"
-        },
-        {
-          "tab": "Alerts",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Alerts",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Alerts",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Alerts",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Alerts",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "System",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "System",
-          "text": "PAPER"
-        },
-        {
-          "tab": "System",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "System",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "System",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "System",
-          "text": "Paper Mode"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "MARKET CLOSED / DATA POLLING"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "PAPER"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "LIVE OFF"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "PAPER ONLY"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "Paper Trades"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)"
-        },
-        {
-          "tab": "Live Gate",
-          "text": "All technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data."
-        }
-      ],
+      "visible_issue_count": 0,
+      "info_line_count": 0,
+      "screenshot_missing_count": 0,
+      "unsettled_tab_count": 0,
+      "ui_exception_count": 0,
+      "global_exception": "Error: browserType.launch: Executable doesn't exist at C:\\WINDOWS\\system32\\config\\systemprofile\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwright install                                              \u2551\n\u2551                                                                         \u2551\n\u2551 <3 Playwright Team                                                      \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+      "visible_issues": [],
+      "info_lines": [],
       "todo": [
-        "Fix visible UI blocker on Truth Control: BLOCKED",
-        "Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED",
-        "Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
-        "Fix visible UI blocker on Truth Control: Backend/API route health\tBLOCKED\tYES\thealth=0, state=0",
-        "Fix visible UI blocker on Truth Control: Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false",
-        "Fix visible UI blocker on Truth Control: Funds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-",
-        "Fix visible UI blocker on Truth Control: Holdings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0",
-        "Fix visible UI blocker on Truth Control: Dhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1",
-        "Fix visible UI blocker on Truth Control: Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0",
-        "Fix visible UI blocker on Truth Control: CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload",
-        "Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0",
-        "Fix visible UI blocker on Truth Control: Risk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-",
-        "Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.",
-        "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 FULL E2E",
-        "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 API",
-        "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 DHAN CHAIN",
-        "Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback",
-        "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 TRADER READY",
-        "Fix visible UI blocker on E2E Proof: Dhan broker connection\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Dhan access token/session\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Real broker funds/margin\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Real broker holdings response\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Real broker positions response\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Real Dhan option chain for all watched symbols\tBLOCKED\t0/5",
-        "Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback markers in chain\tPASS\tclean",
-        "Fix visible UI blocker on E2E Proof: Paper/analyzer P&L endpoint\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible\tBLOCKED\t-",
-        "Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof\tPASS\tblocked",
-        "Fix visible UI blocker on Overview: STALE",
-        "Fix visible UI blocker on Overview: PEND",
-        "Fix visible UI blocker on Overview: market-session proof pending",
-        "Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.",
-        "Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.",
-        "Fix visible UI blocker on Paper Trades: BLOCKED",
-        "Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
-        "Fix visible UI blocker on ML Model: BLOCKED",
-        "Fix visible UI blocker on ML Model: Training proof missing.",
-        "Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG",
-        "Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED",
-        "Fix visible UI blocker on Live Gate: Live trading blocked \u2014 see failed gates above"
+        "Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at C:\\WINDOWS\\system32\\config\\systemprofile\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwright install                                              \u2551\n\u2551                                                                         \u2551\n\u2551 <3 Playwright Team                                                      \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d"
       ],
       "production_grade_claim_allowed": false,
       "exists": true,
@@ -2555,27 +863,27 @@
     {
       "name": "C:\\Python310\\python.exe scripts/system3_gate_evaluator.py --sync-gates",
       "status": "PASS",
-      "detail": "rc=0 elapsed=2.61s"
+      "detail": "rc=0 elapsed=4.42s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=166.52s"
+      "detail": "timeout after 240s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_github_render_failure_tracker.py",
       "status": "PASS",
-      "detail": "rc=0 elapsed=6.0s"
+      "detail": "rc=0 elapsed=7.81s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.1s"
+      "detail": "rc=1 elapsed=2.3s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.19s"
+      "detail": "rc=1 elapsed=0.41s"
     },
     {
       "name": "HTTP /api/health",
@@ -2619,8 +927,8 @@
     },
     {
       "name": "HTTP /api/scanner/top_contract_gainers",
-      "status": "BLOCKED",
-      "detail": "request_timeout"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/simulation/live/state",
@@ -2659,11 +967,10 @@
     }
   ],
   "blockers": [
-    "Command blocked: C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full \u2014 1",
-    "Command blocked: C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs \u2014 node:internal/modules/package_json_reader:316\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\tools\\dashboard_visible_issue_tracker.mjs\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:316:9)\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\n    at moduleResolve (node:internal/modules/esm/resolve:858:18)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:712:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:729:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:758:52)\n    at #resolve (node:internal/modules/esm/loader:694:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:614:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:143:33) {\n  code: 'ERR_MODULE_NOT_FOUND'\n}\n\nNode.js v25.2.1\n",
+    "Command blocked: C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full \u2014 timeout after 240s",
+    "Command blocked: C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs \u2014 DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16\n",
     "Command blocked: C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py \u2014 1",
     "HTTP blocked: /api/broker/positions \u2014 404",
-    "HTTP blocked: /api/scanner/top_contract_gainers \u2014 request_timeout",
     "HTTP blocked: /api/simulation/live/state \u2014 404",
     "Report not PASS: system3_auto_gates \u2014 UNKNOWN",
     "Report not PASS: github_render_failure_tracker \u2014 BLOCKED",
