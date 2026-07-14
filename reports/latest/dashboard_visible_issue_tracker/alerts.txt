@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-09:20:52 IST
+10:07:06 IST
 NIFTY
 --
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 --
 MARKET OPEN
-DHAN DEGRADED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -53,6 +53,6 @@ System
 Live Gate
 LOCK
 
-Alerts unavailable: RENDER_UNAVAILABLE
+Alerts unavailable: NO_DHAN_DATA
 
-Render/backend returned 502 for /api/alerts/recent. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
