@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T20:34:31.996445+00:00`
+Generated UTC: `2026-07-14T20:40:09.237353+00:00`
 Status: **BLOCKED**
-Issues: `576`
+Issues: `575`
 Fix lanes: `13`
 
 ## Rule
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### UNKNOWN — 20 issues
+### UNKNOWN — 19 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
