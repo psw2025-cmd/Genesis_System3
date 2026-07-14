@@ -17,6 +17,11 @@ import re
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
 
+try:
+    from core.data.instruments_cache import get_instruments_df
+except ImportError:
+    get_instruments_df = None
+
 # NSE index F&O defaults (lot size used when instrument master unavailable)
 INDEX_FO_DEFAULTS: Dict[str, Dict[str, Any]] = {
     "NIFTY": {"lot_size": 50, "strike_step": 50, "exchange_segment": "NSE_FNO"},
@@ -219,9 +224,7 @@ def _lookup_instrument_master(
     trading_symbol: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     global _INSTRUMENTS_BY_SYMBOL, _INSTRUMENTS_BY_KEY, _LAST_DF_ID
-    try:
-        from core.data.instruments_cache import get_instruments_df
-    except ImportError:
+    if get_instruments_df is None:
         return None
 
     df = get_instruments_df()

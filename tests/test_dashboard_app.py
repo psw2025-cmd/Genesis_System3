@@ -22,12 +22,21 @@ if str(ROOT_DIR) not in sys.path:
 
 @pytest.fixture(scope="module")
 def app():
-    spec = importlib.util.spec_from_file_location(
-        "dashboard_backend_app_under_test", ROOT_DIR / "dashboard" / "backend" / "app.py"
-    )
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.app
+    import os
+    old_val = os.environ.get("REQUIRE_API_KEY")
+    os.environ["REQUIRE_API_KEY"] = "false"
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "dashboard_backend_app_under_test", ROOT_DIR / "dashboard" / "backend" / "app.py"
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.app
+    finally:
+        if old_val is not None:
+            os.environ["REQUIRE_API_KEY"] = old_val
+        else:
+            os.environ.pop("REQUIRE_API_KEY", None)
 
 
 async def _call(app, method: str, path: str, headers=None, json_body=None):

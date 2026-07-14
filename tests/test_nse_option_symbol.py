@@ -44,7 +44,7 @@ def test_parse_banknifty_symbol():
 def test_resolve_from_instrument_master():
     df = pd.DataFrame(json.loads(FIXTURE_INSTR.read_text(encoding="utf-8")))
 
-    with patch("core.data.instruments_cache.get_instruments_df", return_value=df):
+    with patch("core.brokers.dhan.nse_option_symbol.get_instruments_df", return_value=df):
         resolved = resolve_option_contract("NIFTY", 23500, "CE", expiry_date=SESSION_EXPIRY)
     assert resolved["trading_symbol"] == "NIFTY05FEB2623500CE"
     assert resolved["security_id"] == "52175"

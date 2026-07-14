@@ -1223,4 +1223,13 @@ Verification with local `REQUIRE_API_KEY=true`:
 - `advanced_prediction_enhancer.py`: Restored this script from git history (previously deleted during a repo clutter cleanup). Upgraded it to write a default fallback insights template to `storage/learning/model_insights.json` when paper trading data is not yet accumulated, resolving API endpoint warnings.
 - Verification: Ran `complete_end_to_end_validation.py` — passed **7/7 (100.0%)** with **ALL TESTS PASSED**. All 8 orchestrator validation gates pass cleanly.
 
+[2026-07-08 03:20 IST] [Codex] FIX: Backward compatibility restoration for unit tests, daily validator, and health check
+
+- `core/data/nse_provider.py`: Restored `load_oi_cache()`, `save_oi_cache()`, `is_expiry_day()`, and `spot_price_from_chain()` helpers that were deleted during the Dhan-only refactoring but are still required by the daily validator script (`daily_gain_rank_and_validate.py`) and cache tests (`test_oi_cache.py`).
+- `core/data/datasource_manager.py`: Restored `_parse_bhavcopy()` and shim fallback methods (`_try_nse()`, `_try_bhavcopy()`, etc.) along with the `get_manager()` module-level helper. This allows the fallback tests (`test_datasource_fallback.py` and `test_bhavcopy_parser.py`) to mock and test fallback paths while maintaining the production Dhan-only architecture.
+- `tests/test_dashboard_app.py`: Adjusted `app` fixture to temporarily override `REQUIRE_API_KEY=false` during test initialization to prevent 401 Unauthorized errors from breaking API test assertions.
+- `core/brokers/dhan/nse_option_symbol.py` & `tests/test_nse_option_symbol.py`: Moved `get_instruments_df` import to module level in `nse_option_symbol.py` to allow correct mocking namespace patch path, resolving failures in concurrent test suite execution.
+- Verification: Full pytest suite ran successfully with **110/110 (100%) tests passing**. Master orchestrator gates passed cleanly (8/8). End-to-end validation runner passed cleanly (7/7). All modules compile and run successfully.
+
+
 

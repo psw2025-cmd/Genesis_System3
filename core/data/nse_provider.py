@@ -98,3 +98,98 @@ def fetch_option_chain(symbol: str, expiry: str = "") -> Dict[str, Any]:
         return loop.run_until_complete(get_option_chain(symbol))
     except Exception:
         return _read_cached_chain(symbol)
+
+
+MARKET_CACHE_FILE = os.path.join(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")),
+    "state",
+    "market_cache.json",
+)
+
+MAX_OI_CACHE_AGE_DAYS = 3  # Stale after 3 calendar days (handles long weekends)
+
+
+def load_oi_cache() -> Dict[str, int]:
+    """
+    Loads previous session OI totals from state/market_cache.json.
+
+    Safety rules (Codex audit 2026-06-13):
+    - Stale after MAX_OI_CACHE_AGE_DAYS (avoids holiday/weekend stale data)
+    - Returns {} if cache date == today (guards against same-day overwrite)
+    - Returns {} if file missing/corrupt
+    """
+    from datetime import date, datetime
+
+    try:
+        with open(MARKET_CACHE_FILE) as f:
+            data = json.load(f)
+
+        cache_date_str = data.get("cache_date")
+        if cache_date_str:
+            cache_date = datetime.strptime(cache_date_str, "%Y-%m-%d").date()
+            today = date.today()
+            age_days = (today - cache_date).days
+
+            if age_days == 0:
+                # Same day — don't use as prev_oi (morning run guard)
+                logger.info("OI cache is from today — skipping as prev_oi (same-day guard)")
+                return {}
+            if age_days > MAX_OI_CACHE_AGE_DAYS:
+                logger.warning(f"OI cache is {age_days} days old — treating as stale (holiday guard)")
+                return {}
+
+        return data.get("oi_data", {})
+    except Exception:
+        return {}
+
+
+def load_oi_cache_raw() -> Dict:
+    """Returns the full cache dict including metadata. Used by dashboard."""
+    try:
+        with open(MARKET_CACHE_FILE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_oi_cache(oi_data: Dict[str, int]) -> None:
+    """
+    Saves current OI totals to state/market_cache.json for next session's prev_oi.
+    Stores cache_date so staleness can be detected on next read.
+    """
+    from datetime import date, datetime
+
+    os.makedirs(os.path.dirname(MARKET_CACHE_FILE), exist_ok=True)
+    payload = {
+        "last_updated": datetime.now().isoformat(timespec="seconds"),
+        "cache_date": date.today().isoformat(),
+        "oi_data": oi_data,
+    }
+    with open(MARKET_CACHE_FILE, "w") as f:
+        json.dump(payload, f, indent=2)
+    logger.info(f"OI cache saved for {payload['cache_date']}: {list(oi_data.keys())}")
+
+
+def is_expiry_day() -> bool:
+    """
+    Returns True if today is a Thursday (weekly NSE expiry day).
+    On expiry day, OI change scores should be disabled to avoid rollover distortion.
+    """
+    from datetime import date
+
+    return date.today().weekday() == 3  # Thursday = 3
+
+
+def spot_price_from_chain(chain_json: Dict[str, Any]) -> float:
+    """Extracts underlying spot price from option chain JSON."""
+    try:
+        if "spot" in chain_json:
+            return float(chain_json["spot"])
+        if "underlyingValue" in chain_json:
+            return float(chain_json["underlyingValue"])
+        if "records" in chain_json and "underlyingValue" in chain_json["records"]:
+            return float(chain_json["records"]["underlyingValue"])
+        return 0.0
+    except Exception:
+        return 0.0
+

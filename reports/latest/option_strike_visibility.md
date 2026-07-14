@@ -1,6 +1,6 @@
 # System3 Option Strike Visibility Audit
 
-Generated UTC: `2026-07-07T19:20:19.367427+00:00`
+Generated UTC: `2026-07-09T16:11:32.915078+00:00`
 
 ## Summary
 

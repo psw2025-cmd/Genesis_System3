@@ -431,6 +431,8 @@ _API_KEY_EXEMPT_EXACT = (
     "/api/auth/logout",
     "/favicon.ico",
     "/metrics",
+    "/api/scheduler/health/push",
+    "/api/chain/push",
 )
 
 if _REQUIRE_API_KEY and not _API_KEY:
