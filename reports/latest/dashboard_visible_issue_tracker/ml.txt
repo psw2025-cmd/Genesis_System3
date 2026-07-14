@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-13:00:17 IST
+13:11:09 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET CLOSED / DATA POLLING
-DHAN API ERR
+MARKET OPEN
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-LIVE
+OFF
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -60,7 +60,7 @@ Required proof: matured prediction history, post-market validation, accuracy/dri
 Active model
 NOT_PROVEN
 Fallback used
-NO
+UNKNOWN
 Proof records
 0
 Training status

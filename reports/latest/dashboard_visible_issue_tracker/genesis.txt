@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-12:59:04 IST
+13:09:55 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET CLOSED / DATA POLLING
-DHAN API ERR
+MARKET OPEN
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -52,89 +52,4 @@ Alerts
 System
 Live Gate
 LOCK
-GENESIS PRODUCTION COMMAND CENTER
-AI Options Automation Dashboard
-One official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.
-Refresh
-Voice Alert
-OPERATING MODE
-MARKET_OPEN_OPERATOR
-BROKER
-disconnected
-TRUTH SCORE
-75%
-MEMORY EVENTS
-3
-LIVE TRADING
-BLOCKED
-MARKET OPEN: TRADER MUST SEE
-✓
-broker connected/read-only latency
-✓
-live option chain contracts by symbol
-✓
-PCR, max pain, IV, OI buildup
-✓
-top gain-ranked symbols
-✓
-prediction BUY/SELL/HOLD confidence
-✓
-spread/liquidity risk
-✓
-open positions and P&L
-✓
-kill switch and daily-loss gate
-✓
-data truth score from at least two sources
-PREDICTION ACCURACY & GAIN RANK REQUIREMENTS
-ACCURACY GOAL
-90%
-Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
-Current blocker: Accumulate multi-day real prediction-vs-actual proof and improve IV/OI filters.
-GLOBAL RESEARCH SOURCES INTEGRATED
-Zerodha Varsity - Options Theory
-Greeks, volatility, moneyness, pricing education
-Zerodha Varsity - Option Strategies
-Spreads, straddle, strangle, max pain, PCR, iron condor
-Cboe Options Institute
-Global options education, risk management, strategy playbooks
-NSE India Option Chain
-Indian option-chain truth: OI, volume, strike/expiry surface
-DhanHQ API v2
-Broker API, option chain, market feed, historical data, orders when gates pass
-HIDDEN SECRETS LAB
-High IV favors defined-risk premium structures only after spread/liquidity checks.
-Verified: true | Impact: unproven_until_backtested
-OI concentration near a strike can create expiry pin risk; max pain is advisory, not a signal alone.
-Verified: true | Impact: risk_filter
-Volume plus OI change is stronger than volume alone for buildup classification.
-Verified: true | Impact: signal_quality_filter
-INTEGRATION MAP
-Broker
-Current: Dhan read-only + gated order endpoint
-Next: keep real-money disabled until proof gates pass
-Market data
-Current: Dhan/NSE/cache chain endpoints
-Next: add 2-source truth comparison per symbol
-Prediction
-Current: gain rank + signal confidence APIs
-Next: show multi-day rho/top-N trend on Genesis tab
-Risk
-Current: 2% trade risk, 5% daily loss policy displayed
-Next: enforce position sizing in paper lifecycle
-Learning
-Current: memory JSONL + research log
-Next: promote only after walk-forward improvement
-NEVER DIE MONITOR
-UPTIME SECONDS
-28155
-LAST SELF-HEAL
-startup_guard_checked
-ISSUES FIXED
-3
-TRUTH, COMPLIANCE, AND CONTROL
-Kill switch visible: live trading remains disabled until all proof gates pass.
-Let Agent Take Full Control
-{
-  "message": "I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS."
-}
+Genesis is loading production command intelligence...

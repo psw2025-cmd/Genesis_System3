@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-12:59:20 IST
+13:10:11 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET CLOSED / DATA POLLING
-DHAN API ERR
+MARKET OPEN
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -58,7 +58,7 @@ LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 API status: NO_DHAN_DATA - NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -73,14 +73,14 @@ Live Data Coverage
 market closed must not hide read-only data
 LOADED
 Health API
-RENDER_UNAVAILABLE
-WAITING
+live
+LOADED
 State API
-ERROR
+Market open
+LOADED
 Broker Status API
-ERROR
+LOADED
 Funds API
-Client ID or user generated access token is invalid or expired.
 LOADED
 Holdings API
 LOADED
@@ -90,47 +90,43 @@ P&L API
 pnl=0
 STALE
 Gain Rank / Scanner
-LOADED
+WAITING
 Auto Gates
-7 gates
 LOADED
 Alerts
 0 recent
-MARKET_SESSION_ONLY
+WAITING
 Option Chain
 NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 Gate Matrix
-2/7 PASS
+3/6 PASS
 PEND
-ML Accuracy (Spearman ρ)
-0/5 days · ρ=None · need ≥0.7
+ML Accuracy (Spearman rho)
+Accumulating - need 10 trading days
 PEND
-Profit / Expectancy
-expectancy=-196.14 · win_rate=0.3333
-PEND
-Paper Lifecycle
-market-session proof pending
-PEND
+Paper Lifecycle Proof
+Market session required
+PASS
 Tick / Data Freshness
-tick_age=2.06s refresh=5s
+source: live
 PASS
-Model Accuracy Report
-Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
-PEND
-Option Strike Visibility
-Run scripts/system3_option_visibility_audit.py
+Broker Connection
+Dhan connected
+FAIL
+Live Trading Gate
+OFF - hardcoded safety
 PASS
-Equity F&O Eligibility
-Wire is_tradeable_fo_symbol() in ranking/paper trade path
+Paper Mode Active
+CLOUD_PAPER_ENGINE=0, analyzer mode
 System Health
 Mode
 PAPER
 QC Status
-RENDER_UNAVAILABLE
+PASS
 Data Source
-RENDER_UNAVAILABLE
+live
 Market
-CLOSED / DATA POLLING
+OPEN
 Live Allowed
 false
 Last Sync
