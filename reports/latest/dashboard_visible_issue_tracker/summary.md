@@ -1,11 +1,11 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-14T21:04:38.618Z
+Generated: 2026-07-14T21:30:55.466Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `59`
-Info line count: `112`
+Visible blocker count: `56`
+Info line count: `110`
 Screenshot missing count: `1`
 Unsettled tab count: `16`
 UI exception count: `1`
@@ -14,7 +14,7 @@ Production-grade claim allowed: `false`
 ## Rule
 Every live sidebar tab must be scanned and its asynchronous content must settle before PASS. A timed-out tab is still captured but is recorded as ASYNC_CONTENT_NOT_SETTLED. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.
 ## TODO
-- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...
+- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...
 - [ ] Fix visible UI blocker on Truth Control: BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -27,7 +27,7 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on Truth Control: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - [ ] Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - [ ] Fix visible UI blocker on Truth Control: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
-- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5013ms
 - [ ] Fix visible UI blocker on Genesis Brain: BLOCKED
 - [ ] Fix visible UI blocker on Genesis Brain: last scanner snapshot and staleness
 - [ ] Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
@@ -49,51 +49,48 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint	BLOCKED	-
 - [ ] Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible	BLOCKED	-
 - [ ] Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof	PASS	blocked
-- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - [ ] Fix visible UI blocker on Overview: STALE
 - [ ] Fix visible UI blocker on Overview: PEND
 - [ ] Fix visible UI blocker on Overview: market-session proof pending
-- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5017ms
+- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5016ms
 - [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - [ ] Fix visible UI blocker on Paper Trades: BLOCKED
-- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5010ms
-- [ ] Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5007ms
-- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5010ms markers=CHECKING MODEL ARTIFACTS...
-- [ ] Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
+- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- [ ] Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
-- [ ] Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- [ ] Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5011ms
 - [ ] Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG
 - [ ] Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- [ ] Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- [ ] Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED
-- [ ] Fix visible UI blocker on Live Gate: Live trading blocked — see failed gates above
+- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- [ ] Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...
 ## Tab results
 | Tab | Status | Screenshot | Settled | Settle ms | Blockers | Info | Exceptions | Text file |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Truth Control | BLOCKED | OK | NO | 5018 | 13 | 5 | 0 | truth.txt |
-| Genesis Brain | BLOCKED | OK | NO | 5011 | 4 | 7 | 0 | genesis.txt |
+| Truth Control | BLOCKED | OK | NO | 5017 | 13 | 5 | 0 | truth.txt |
+| Genesis Brain | BLOCKED | OK | NO | 5013 | 4 | 7 | 0 | genesis.txt |
 | E2E Proof | BLOCKED | OK | NO | 5011 | 18 | 5 | 0 | e2e_proof.txt |
-| Overview | BLOCKED | OK | NO | 5018 | 4 | 14 | 0 | overview.txt |
+| Overview | BLOCKED | OK | NO | 5012 | 4 | 14 | 0 | overview.txt |
 | Sim Live | BLOCKED | MISSING | NO | 0 | 0 | 0 | 1 | sim_live.txt |
-| Option Chain | BLOCKED | OK | NO | 5013 | 1 | 6 | 0 | chain.txt |
-| Signals | BLOCKED | OK | NO | 5009 | 1 | 5 | 0 | signals.txt |
-| Trade | BLOCKED | OK | NO | 5013 | 1 | 6 | 0 | trade.txt |
-| Paper Trades | BLOCKED | OK | NO | 5011 | 4 | 21 | 0 | paper.txt |
-| Positions | BLOCKED | OK | NO | 5010 | 1 | 7 | 0 | positions.txt |
-| Performance | BLOCKED | OK | NO | 5007 | 1 | 6 | 0 | performance.txt |
-| ML Model | BLOCKED | OK | NO | 5010 | 4 | 5 | 0 | ml.txt |
-| Broker | BLOCKED | OK | NO | 5014 | 2 | 7 | 0 | broker.txt |
+| Option Chain | BLOCKED | OK | NO | 5017 | 1 | 6 | 0 | chain.txt |
+| Signals | BLOCKED | OK | NO | 5012 | 1 | 5 | 0 | signals.txt |
+| Trade | BLOCKED | OK | NO | 5014 | 1 | 6 | 0 | trade.txt |
+| Paper Trades | BLOCKED | OK | NO | 5016 | 4 | 21 | 0 | paper.txt |
+| Positions | BLOCKED | OK | NO | 5009 | 1 | 7 | 0 | positions.txt |
+| Performance | BLOCKED | OK | NO | 5010 | 1 | 6 | 0 | performance.txt |
+| ML Model | BLOCKED | OK | NO | 5011 | 3 | 5 | 0 | ml.txt |
+| Broker | BLOCKED | OK | NO | 5011 | 2 | 7 | 0 | broker.txt |
 | Alerts | BLOCKED | OK | NO | 5012 | 1 | 5 | 0 | alerts.txt |
-| System | BLOCKED | OK | NO | 5014 | 1 | 6 | 0 | system.txt |
-| Live Gate | BLOCKED | OK | NO | 5013 | 3 | 7 | 0 | gates.txt |
+| System | BLOCKED | OK | NO | 5012 | 1 | 6 | 0 | system.txt |
+| Live Gate | BLOCKED | OK | NO | 5013 | 1 | 5 | 0 | gates.txt |
 ## Visible blockers
-- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...
+- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...
 - **Truth Control**: BLOCKED
 - **Truth Control**: MONEY_READY_BLOCKED
 - **Truth Control**: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -106,7 +103,7 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Truth Control**: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - **Truth Control**: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - **Truth Control**: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
-- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
 - **Genesis Brain**: BLOCKED
 - **Genesis Brain**: last scanner snapshot and staleness
 - **Genesis Brain**: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
@@ -128,30 +125,27 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **E2E Proof**: Today paper lifecycle endpoint	BLOCKED	-
 - **E2E Proof**: Gate/risk endpoint visible	BLOCKED	-
 - **E2E Proof**: Live-money switch blocked until separate proof	PASS	blocked
-- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - **Overview**: STALE
 - **Overview**: PEND
 - **Overview**: market-session proof pending
-- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5017ms
+- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5016ms
 - **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
 - **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
 - **Paper Trades**: BLOCKED
-- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
-- **Performance**: ASYNC_CONTENT_NOT_SETTLED after 5007ms
-- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5010ms markers=CHECKING MODEL ARTIFACTS...
-- **ML Model**: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
+- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- **Performance**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
-- **Broker**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- **Broker**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
 - **Broker**: BLOCKED BY BACKEND FLAG
 - **Alerts**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- **System**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- **Live Gate**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- **Live Gate**: LIVE_TRADING_BLOCKED
-- **Live Gate**: Live trading blocked — see failed gates above
+- **System**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- **Live Gate**: ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...
 ## Informational lines
 - **Truth Control**: MARKET CLOSED / DATA POLLING
 - **Truth Control**: PAPER
@@ -263,5 +257,3 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Live Gate**: LIVE OFF
 - **Live Gate**: PAPER ONLY
 - **Live Gate**: Paper Trades
-- **Live Gate**: LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)
-- **Live Gate**: All technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.
