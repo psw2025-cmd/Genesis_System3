@@ -1,0 +1,24 @@
+{
+  "base_url": "https://genesis-system3-backend.onrender.com",
+  "blockers": [
+    "RENDER_DEPLOY_COMMIT_MISMATCH"
+  ],
+  "deployed_commit": "6bc924f782c7e0dc7e42a2a8bf01cfb37f86be0e",
+  "endpoint": "/api/deploy/info",
+  "error_category": null,
+  "exact_match": false,
+  "expected_commit": "bd0b1c47ebdb3f6eea111a9da88dc1ac5bec1f12",
+  "generated_utc": "2026-07-14T08:25:23.156473Z",
+  "http_status": 200,
+  "prefix_match": false,
+  "production_grade_claim_allowed": false,
+  "safety": {
+    "analyze_mode": "1",
+    "live_trading_enabled": "0",
+    "order_endpoints_called": false,
+    "response_body_persisted": false,
+    "secrets_written": false,
+    "system3_live_trading_allowed": "0"
+  },
+  "verdict": "BLOCKED"
+}
