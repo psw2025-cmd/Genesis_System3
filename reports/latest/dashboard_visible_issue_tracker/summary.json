@@ -305,8 +305,7 @@
   "global_exception": null,
   "visible_issues": [],
   "info_lines": [],
-  "todo": [
-    "Dashboard auth session failed status=502"
-  ],
-  "production_grade_claim_allowed": false
+  "todo": [],
+  "production_grade_claim_allowed": false,
+  "settle_normalized_tab_count": 0
 }
