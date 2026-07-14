@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-20:58:02 IST
+21:09:28 IST
 NIFTY
 24,069
 BNFTY
@@ -65,7 +65,7 @@ BLOCKED · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 7/14/2026, 3:28:00 PM · This panel is proof-only; it does not enable live orders.
+Last run: 7/14/2026, 3:39:27 PM · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
 Dhan broker connection	BLOCKED	200
