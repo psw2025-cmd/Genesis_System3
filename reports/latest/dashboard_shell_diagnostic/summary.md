@@ -1,22 +1,24 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T19:58:55.255Z
+Generated: 2026-07-14T20:31:11.266Z
 Status: **BLOCKED**
-Blocker: **FRONTEND_ROOT_EMPTY**
+Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Render UI available: `true`
 Availability attempts: `1:200`
 Recovered after transient failure: `false`
 Auth OK: `true` (HTTP 200)
+Post-auth render attempts: `1:200:rendered`
+Recovered after post-auth failure: `false`
 UI HTTP: `200`
-Authenticated dashboard rendered: `false`
-Tab coverage evaluated: `false`
-Root children: `0`
-Body text length: `210`
-Matched tabs: `0/16`
-Missing source-defined tabs: `not evaluated / none`
-Deployed asset drift: `false`
-Visible buttons: `0`
-Visible links: `2`
+Authenticated dashboard rendered: `true`
+Tab coverage evaluated: `true`
+Root children: `1`
+Body text length: `591`
+Matched tabs: `15/16`
+Missing source-defined tabs: `Sim Live`
+Deployed asset drift: `true`
+Visible buttons: `15`
+Visible links: `0`
 Console error categories: `console.error`
 Page error categories: `none`
 
