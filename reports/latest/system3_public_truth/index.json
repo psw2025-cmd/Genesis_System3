@@ -1,7 +1,7 @@
 {
-  "commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
-  "final_verdict": "FAIL",
-  "generated_utc": "2026-07-14T08:21:37.879444Z",
+  "commit": "893ca11f05bd64449633a91a147914fa1dd314b1",
+  "final_verdict": "BLOCKED_NOT_TRADE_READY",
+  "generated_utc": "2026-07-14T09:18:14.708903Z",
   "how_to_read": "Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.",
   "how_to_trigger": "Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.",
   "safety": {
@@ -17,8 +17,8 @@
       "summary_json": {
         "alerts": [],
         "deployed_commit": "[REDACTED]",
-        "expected_commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
-        "generated_utc": "2026-07-14T08:15:12.240503Z",
+        "expected_commit": "893ca11f05bd64449633a91a147914fa1dd314b1",
+        "generated_utc": "2026-07-14T09:13:17.566162Z",
         "key_facts": {
           "broker_connected": false,
           "chain_nifty_contracts": 0,
@@ -29,44 +29,44 @@
         "memory": {
           "after_chain": {
             "available": true,
-            "pct_used": 20.2,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1436.7,
+              "headroom_mb": 1438.7,
               "limit_mb": 1800,
-              "pct_used": 20.2,
-              "rss_mb": 363.3,
+              "pct_used": 20.1,
+              "rss_mb": 361.3,
               "status": "OK"
             },
-            "rss_mb": 363.3,
+            "rss_mb": 361.3,
             "status": "OK"
           },
           "after_portfolio": {
             "available": true,
-            "pct_used": 20.2,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1436.7,
+              "headroom_mb": 1438.7,
               "limit_mb": 1800,
-              "pct_used": 20.2,
-              "rss_mb": 363.3,
+              "pct_used": 20.1,
+              "rss_mb": 361.3,
               "status": "OK"
             },
-            "rss_mb": 363.3,
+            "rss_mb": 361.3,
             "status": "OK"
           },
           "before": {
             "available": true,
-            "pct_used": 20.2,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1437.0,
+              "headroom_mb": 1438.9,
               "limit_mb": 1800,
-              "pct_used": 20.2,
-              "rss_mb": 363.0,
+              "pct_used": 20.1,
+              "rss_mb": 361.1,
               "status": "OK"
             },
-            "rss_mb": 363.0,
+            "rss_mb": 361.1,
             "status": "OK"
           }
         },
@@ -75,7 +75,7 @@
           {
             "key": "deploy_commit_mismatch",
             "level": "WARNING",
-            "message": "Render git_sha=[REDACTED] expected=e8a82f8c25fd"
+            "message": "Render git_sha=[REDACTED] expected=893ca11f05bd"
           },
           {
             "key": "broker_not_connected",
@@ -303,7 +303,7 @@
           }
         ],
         "final_verdict": "BLOCKED_NOT_TRADE_READY",
-        "generated_at": "2026-07-14T08:15:30.003Z",
+        "generated_at": "2026-07-14T09:13:40.139Z",
         "infra_blockers": [],
         "trade_readiness_blockers": [
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -478,9 +478,6 @@
       "summary_json": {
         "base": "https://genesis-system3-backend.onrender.com",
         "blockers": [
-          "UI:Paper Trades:FORBIDDEN:/synthetic/i",
-          "UI:Paper Trades:FORBIDDEN:/fake/i",
-          "UI:Paper Trades:FORBIDDEN:/mock/i",
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
           "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
           "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -548,13 +545,9 @@
             "total_contracts": 0
           }
         ],
-        "final_verdict": "FAIL",
-        "generated_at": "2026-07-14T08:19:41.727Z",
-        "infra_blockers": [
-          "UI:Paper Trades:FORBIDDEN:/synthetic/i",
-          "UI:Paper Trades:FORBIDDEN:/fake/i",
-          "UI:Paper Trades:FORBIDDEN:/mock/i"
-        ],
+        "final_verdict": "BLOCKED_NOT_TRADE_READY",
+        "generated_at": "2026-07-14T09:16:17.438Z",
+        "infra_blockers": [],
         "trade_readiness_blockers": [
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
           "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -563,49 +556,49 @@
         ]
       },
       "summary_md": "permanent_live_log_watch.summary.md",
-      "verdict": "FAIL"
+      "verdict": "BLOCKED_NOT_TRADE_READY"
     }
   },
   "visual_screenshots": [
     {
       "file": "screenshots/truth.png",
       "ok": true,
-      "size_bytes": 199194
+      "size_bytes": 198896
     },
     {
       "file": "screenshots/signals.png",
       "ok": true,
-      "size_bytes": 123891
+      "size_bytes": 123886
     },
     {
       "file": "screenshots/paper.png",
       "ok": true,
-      "size_bytes": 169797
+      "size_bytes": 169625
     },
     {
       "file": "screenshots/broker.png",
       "ok": true,
-      "size_bytes": 151584
+      "size_bytes": 151065
     },
     {
       "file": "screenshots/ml.png",
       "ok": true,
-      "size_bytes": 134460
+      "size_bytes": 134248
     },
     {
       "file": "screenshots/gates.png",
       "ok": true,
-      "size_bytes": 134621
+      "size_bytes": 134444
     },
     {
       "file": "screenshots/overview.png",
       "ok": true,
-      "size_bytes": 155586
+      "size_bytes": 155310
     },
     {
       "file": "screenshots/mobile_390x844.png",
       "ok": true,
-      "size_bytes": 131613
+      "size_bytes": 131415
     }
   ],
   "workflow": "System3 Latest Truth Publish"

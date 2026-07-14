@@ -1,8 +1,8 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
-  "generated_utc": "2026-07-14T08:15:12.240503Z",
+  "expected_commit": "893ca11f05bd64449633a91a147914fa1dd314b1",
+  "generated_utc": "2026-07-14T09:13:17.566162Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
@@ -13,44 +13,44 @@
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 20.2,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1436.7,
+        "headroom_mb": 1438.7,
         "limit_mb": 1800,
-        "pct_used": 20.2,
-        "rss_mb": 363.3,
+        "pct_used": 20.1,
+        "rss_mb": 361.3,
         "status": "OK"
       },
-      "rss_mb": 363.3,
+      "rss_mb": 361.3,
       "status": "OK"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 20.2,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1436.7,
+        "headroom_mb": 1438.7,
         "limit_mb": 1800,
-        "pct_used": 20.2,
-        "rss_mb": 363.3,
+        "pct_used": 20.1,
+        "rss_mb": 361.3,
         "status": "OK"
       },
-      "rss_mb": 363.3,
+      "rss_mb": 361.3,
       "status": "OK"
     },
     "before": {
       "available": true,
-      "pct_used": 20.2,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1437.0,
+        "headroom_mb": 1438.9,
         "limit_mb": 1800,
-        "pct_used": 20.2,
-        "rss_mb": 363.0,
+        "pct_used": 20.1,
+        "rss_mb": 361.1,
         "status": "OK"
       },
-      "rss_mb": 363.0,
+      "rss_mb": 361.1,
       "status": "OK"
     }
   },
@@ -59,7 +59,7 @@
     {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=e8a82f8c25fd"
+      "message": "Render git_sha=[REDACTED] expected=893ca11f05bd"
     },
     {
       "key": "broker_not_connected",
