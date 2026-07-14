@@ -1,81 +1,87 @@
 {
-  "generated_at": null,
-  "base": null,
+  "generated_at": "2026-07-14T02:24:14.955Z",
+  "base": "https://genesis-system3-backend.onrender.com",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
-  "source_summary_ok": false,
-  "source_summary_error": "FileNotFoundError: [Errno 2] No such file or directory: 'reports/latest/dashboard_live_ui_proof/summary.json'",
-  "source_final_verdict": "MISSING",
-  "auth_ok": false,
-  "screenshot_gate_pass": false,
-  "infra_blockers": [],
-  "visual_blockers": [],
+  "source_summary_ok": true,
+  "source_summary_error": null,
+  "source_final_verdict": "FAIL",
+  "auth_ok": true,
+  "screenshot_gate_pass": true,
+  "infra_blockers": [
+    "UI_FAIL:Paper Trades"
+  ],
+  "visual_blockers": [
+    "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
+    "PAPER_TRUTH_NOT_VISIBLE:GLOBAL",
+    "OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI"
+  ],
   "trade_readiness_blockers": [],
   "screenshots": [
     {
       "file": "truth.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 200837
     },
     {
       "file": "genesis.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 102613
     },
     {
       "file": "e2e_proof.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 188199
     },
     {
       "file": "overview.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 152610
     },
     {
       "file": "chain.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 229210
     },
     {
       "file": "signals.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 100853
     },
     {
       "file": "paper.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 106114
     },
     {
       "file": "positions.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 112027
     },
     {
       "file": "broker.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 145428
     },
     {
       "file": "performance.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 105461
     },
     {
       "file": "ml.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 141907
     },
     {
       "file": "gates.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 112109
     },
     {
       "file": "mobile_390x844.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 26137
     }
   ],
   "safety": {
