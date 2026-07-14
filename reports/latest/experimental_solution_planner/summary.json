@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-14T22:21:56.022565+00:00",
+  "generated_utc": "2026-07-14T22:22:30.457741+00:00",
   "issue_count": 556,
   "lane_count": 13,
   "lanes": [
@@ -64,32 +64,32 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29369248907 conclusion=failure commit=e17654d0a474",
+          "issue": "Fix latest GitHub workflow 'System3 1000 Point TODO Status Updater' run=29372717476 conclusion=failure commit=b05b9a518544",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29368364220 conclusion=failure commit=d37330e5e152",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29371868626 conclusion=failure commit=1ae1057f52d7",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29368174220 conclusion=failure commit=64299c679b65",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29371859451 conclusion=failure commit=1ae1057f52d7",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29368491164 conclusion=failure commit=d85a5762ced5",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29371981107 conclusion=failure commit=3f0aca9eeb7b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29368324170 conclusion=failure commit=901aad25b95b",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29372003880 conclusion=failure commit=cb8be7d4ee92",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29368324117 conclusion=failure commit=901aad25b95b",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29371980914 conclusion=failure commit=3f0aca9eeb7b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -99,32 +99,32 @@
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"e17654d0a474cf56d3f362da4915e061cf78b173\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29369248907\", \"run_id\": 29369248907, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:22:09Z\", \"workflow\": \"System3 Experimental Solution Planner\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"b05b9a5185443fd977877b43da25be10476fe24c\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29372717476\", \"run_id\": 29372717476, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:21:47Z\", \"workflow\": \"System3 1000 Point TODO Status Updater\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"d37330e5e152f96a8a718b6ea1da88db23435cbb\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29368364220\", \"run_id\": 29368364220, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:16:23Z\", \"workflow\": \"System3 Windows Self-Hosted Full Proof\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"1ae1057f52d76094e709d1af3d94b93e82add5f2\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29371868626\", \"run_id\": 29371868626, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:20:15Z\", \"workflow\": \"System3 Windows Self-Hosted Full Proof\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"64299c679b659bccf930cfc22f9eca0d47b67a47\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29368174220\", \"run_id\": 29368174220, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:10:02Z\", \"workflow\": \"Dashboard Visible Issue Tracker\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"1ae1057f52d76094e709d1af3d94b93e82add5f2\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29371859451\", \"run_id\": 29371859451, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:11:16Z\", \"workflow\": \"Dashboard Visible Issue Tracker\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"d85a5762ced5e0f15e8e9358d8c2f36c6fbfb653\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29368491164\", \"run_id\": 29368491164, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:09:43Z\", \"workflow\": \"Dashboard Visual Proof Strict Gate\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"3f0aca9eeb7b9c508bc8c3c3336dfa049b0135ea\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29371981107\", \"run_id\": 29371981107, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:11:03Z\", \"workflow\": \"Dashboard Shell Diagnostic\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"901aad25b95b31d8cb3898ba7db4ac0c8074f2af\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29368324170\", \"run_id\": 29368324170, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:08:28Z\", \"workflow\": \"Dashboard Shell Diagnostic\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"cb8be7d4ee92018d8f889e4260e353c6e7a55e38\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29372003880\", \"run_id\": 29372003880, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:08:44Z\", \"workflow\": \"Dashboard Visual Proof Strict Gate\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"901aad25b95b31d8cb3898ba7db4ac0c8074f2af\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29368324117\", \"run_id\": 29368324117, \"status\": \"completed\", \"updated_at\": \"2026-07-14T21:07:04Z\", \"workflow\": \"Dashboard Visual Loading Postflight\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"3f0aca9eeb7b9c508bc8c3c3336dfa049b0135ea\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29371980914\", \"run_id\": 29371980914, \"status\": \"completed\", \"updated_at\": \"2026-07-14T22:08:17Z\", \"workflow\": \"Dashboard Visual Loading Postflight\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
