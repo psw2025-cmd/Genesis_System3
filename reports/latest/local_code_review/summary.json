@@ -1,0 +1,93 @@
+{
+  "generated_utc": "2026-07-14T21:11:23.606898Z",
+  "verdict": "PASS",
+  "cursor_review_alternative": true,
+  "changed_files": [
+    "config/human_approval_gate.json",
+    "reports/latest/friction_expectancy/summary.json",
+    "reports/latest/model_accuracy_report.json",
+    "reports/latest/model_accuracy_report.md",
+    "reports/latest/option_strike_visibility.json",
+    "reports/latest/option_strike_visibility.md",
+    "reports/latest/production_viability_bridge/latest.json",
+    "reports/latest/production_viability_bridge/summary.md",
+    "reports/latest/system3_auto_gates/summary.json",
+    "reports/latest/system3_auto_gates/summary.md"
+  ],
+  "python_changed_count": 0,
+  "steps": [
+    {
+      "name": "git_summary",
+      "status": "PASS",
+      "detail": "branch=main, changed_files=10",
+      "findings": [
+        {
+          "branch": "main",
+          "changed": [
+            "config/human_approval_gate.json",
+            "reports/latest/friction_expectancy/summary.json",
+            "reports/latest/model_accuracy_report.json",
+            "reports/latest/model_accuracy_report.md",
+            "reports/latest/option_strike_visibility.json",
+            "reports/latest/option_strike_visibility.md",
+            "reports/latest/production_viability_bridge/latest.json",
+            "reports/latest/production_viability_bridge/summary.md",
+            "reports/latest/system3_auto_gates/summary.json",
+            "reports/latest/system3_auto_gates/summary.md"
+          ],
+          "status_short": "M config/human_approval_gate.json\n M reports/latest/friction_expectancy/summary.json\n M reports/latest/model_accuracy_report.json\n M reports/latest/model_accuracy_report.md\n M reports/latest/option_strike_visibility.json\n M reports/latest/option_strike_visibility.md\n M reports/latest/production_viability_bridge/latest.json\n M reports/latest/production_viability_bridge/summary.md\n M reports/latest/system3_auto_gates/summary.json\n M reports/latest/system3_auto_gates/summary.md\n?? reports/latest/documentation_contradictions.md\n?? reports/latest/friction_expectancy/summary.md\n?? reports/latest/markdown_inventory.json\n?? reports/latest/markdown_inventory.md\n?? reports/latest/model_to_trade_gap/\n?? reports/latest/system3_blocker_report.json\n?? reports/latest/system3_blocker_report.md\n?? reports/latest/system3_control_plane_status.json\n?? reports/latest/system3_control_plane_status.md\n?? reports/latest/websocket_tick_health/"
+        }
+      ]
+    },
+    {
+      "name": "architecture_gate",
+      "status": "PASS",
+      "detail": "{\n  \"generated_at_utc\": \"2026-07-14T21:11:21.534467+00:00\",\n  \"policy\": \"Architecture and trading safety must be FULL PASS. Only ci.yml is the active workflow.\",\n  \"blocking\": true,\n  \"changed_files\": [],\n  \"checks\": [\n    {\n      \"name\": \"required_files_and_dirs\",\n      \"status\": \"PASS\",\n      \"missing_files\": [],\n      \"missing_dirs\": []\n    },\n    {\n      \"name\": \"critical_python_compile\",\n      \"status\": \"PASS\",\n      \"files_checked\": [\n        \"run_system3.py\",\n        \".github\\\\scripts\\\\root_architecture_gate.py\"\n      ],\n      \"failures\": []\n    },\n    {\n      \"name\": \"protected_runtime_paths_not_changed\",\n      \"status\": \"PASS\",\n      \"changed_files\": [],\n      \"violations\": []\n    },\n    {\n      \"name\": \"no_env_db_model_artifacts_changed\",\n      \"status\": \"PASS\",\n      \"blocked_files\": []\n    },\n    {\n      \"name\": \"no_secret_like_values_in_changed_files\",\n      \"status\": \"PASS\",\n      \"findings\": []\n    },\n    {\n      \"name\": \"no_obvious_live_trading_enablement_in_changed_files\",\n      \"status\": \"PASS\",\n      \"findings\": []\n    }\n  ],\n  \"status\": \"PASS\",\n  \"failed_count\": 0,\n  \"protected_scope\": {\n    \"trading_logic_changed\": false,\n    \"broker_config_changed\": false,\n    \"env_changed\": false,\n    \"database_changed\": false,\n    \"model_artifacts_changed\": false\n  }\n}",
+      "findings": []
+    },
+    {
+      "name": "verify_cursor_agent_bugs",
+      "status": "PASS",
+      "detail": "=== verify_cursor_agent_bugs ===\n\n[OK] Fake LIVE gating: live_allowed/live_blockers present; synthetic never LIVE\n[OK] At least 2 explicit except Exception in app.py (bare count=28, fix remaining for full PASS)\n[OK] No duplicate repo_root_path assignments found\n[OK] Logger check done (no attribution symbol found or has logger)\n\nResult: PASS",
+      "findings": []
+    },
+    {
+      "name": "py_compile",
+      "status": "SKIP",
+      "detail": "no changed Python files",
+      "findings": []
+    },
+    {
+      "name": "ast_static_scan",
+      "status": "SKIP",
+      "detail": "no changed Python files",
+      "findings": []
+    },
+    {
+      "name": "flake8",
+      "status": "SKIP",
+      "detail": "no changed Python files",
+      "findings": []
+    },
+    {
+      "name": "bandit",
+      "status": "SKIP",
+      "detail": "no changed Python files",
+      "findings": []
+    },
+    {
+      "name": "pytest",
+      "status": "SKIP",
+      "detail": "no mapped tests for changed files",
+      "findings": []
+    },
+    {
+      "name": "blocker_finder",
+      "status": "SKIP",
+      "detail": "use --full to run",
+      "findings": []
+    }
+  ],
+  "failed_steps": [],
+  "warning_steps": []
+}

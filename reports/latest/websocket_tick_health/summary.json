@@ -1,0 +1,14 @@
+{
+  "generated_utc": "2026-07-14T21:11:13.458292Z",
+  "pass": false,
+  "websocket_endpoint": "/ws/stream",
+  "evidence": {
+    "last_tick_age_sec": null,
+    "refresh_interval_sec": null,
+    "broker_connected": null,
+    "market_open": null,
+    "rest_fallback_active": false,
+    "note": "PASS with REST SSOT poll \u226410s for analyzer; WebSocket required for live execution"
+  },
+  "auto_action": "Expose last_tick_age_sec in /api/state from Dhan WebSocket feed"
+}

@@ -4,9 +4,11 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 184,
+    "data_candidate_count": 197,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
+      ".github/workflows/options-ml-training-proof.yml",
+      ".github/workflows/system3-broker-chain-semantic-gate.yml",
       "core/brokers/dhan/nse_option_symbol.py",
       "core/data/__init__ - Copy - Copy - Copy (3).py",
       "core/data/__init__.py",
@@ -115,21 +117,20 @@
       "models/xgboost_v1/SENSEX_xgb_meta.json",
       "models/xgboost_v1/SENSEX_xgb_model.pkl",
       "option_chain_automation_master.py",
+      "reports/latest/broker_chain_semantic_gate/summary.json",
+      "reports/latest/broker_chain_semantic_gate/summary.md",
       "reports/latest/dashboard_auto_snap/latest_chain_nifty.json",
       "reports/latest/dashboard_auto_snap/latest_ui_response.json",
+      "reports/latest/dashboard_visible_issue_tracker/chain.png",
+      "reports/latest/dashboard_visible_issue_tracker/chain.txt",
+      "reports/latest/dashboard_visual_production_proof/screenshots/chain.png",
       "reports/latest/dhan_advance_platform_verification/claim_verification_matrix.csv",
-      "reports/latest/dhan_advance_platform_verification/system3_mapping_matrix.csv",
-      "reports/latest/dhan_option_chain_schema_audit/summary.json",
-      "reports/latest/dhan_option_chain_schema_audit/summary.md",
-      "reports/latest/external_data_yahoo/yahoo_data_summary.json",
-      "reports/latest/fresh_data_automation_proof/README.md",
-      "reports/latest/fresh_data_automation_proof/summary.json",
-      "reports/latest/option_strike_visibility.json",
-      "reports/latest/option_strike_visibility.md"
+      "reports/latest/dhan_advance_platform_verification/system3_mapping_matrix.csv"
     ],
-    "dhan_india_candidate_count": 69,
+    "dhan_india_candidate_count": 72,
     "dhan_india_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
+      ".github/workflows/options-ml-training-proof.yml",
       "core/brokers/dhan/nse_option_symbol.py",
       "core/data/dhan_option_chain_parser.py",
       "core/data/nse_provider.py",
@@ -182,9 +183,11 @@
       "reports/latest/option_strike_visibility.json",
       "reports/latest/option_strike_visibility.md",
       "scripts/analyze_optionchain_master.py",
+      "scripts/build_options_history_contracts.py",
       "scripts/build_production_optionchain_master.py",
       "scripts/enhance_optionchain_with_predictions.py",
       "scripts/monitor_optionchain_performance.py",
+      "scripts/options_ce_pe_history_pipeline.py",
       "scripts/system3_option_visibility_audit.py",
       "scripts/update_optionchain_master.py",
       "scripts/verify_optionchain_master.py",
@@ -221,5 +224,7 @@
   "next_action": "Run broker data proof only in secure runtime with Angel/Binance secrets; fallback data must remain labelled as fallback, not broker-live proof.",
   "pass": true,
   "status": "PASS_WITH_WARNINGS",
-  "warnings": []
+  "warnings": [
+    "dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
+  ]
 }

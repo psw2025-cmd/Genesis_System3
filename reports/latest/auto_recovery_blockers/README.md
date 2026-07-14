@@ -1,6 +1,6 @@
 # Auto-Recovery Blocker Classification
 
-Generated UTC: 2026-07-07T21:45:57.000487+00:00
+Generated UTC: 2026-07-14T21:12:21.753408+00:00
 
 - Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
@@ -17,7 +17,7 @@ Generated UTC: 2026-07-07T21:45:57.000487+00:00
 
 ### MANUAL_SECRET_REQUIRED
 
-- None
+- `fresh_data_automation_proof:dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped`
 
 ### MANUAL_BROKER_LOGIN_REQUIRED
 

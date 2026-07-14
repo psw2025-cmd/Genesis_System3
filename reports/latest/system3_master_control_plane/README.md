@@ -1,6 +1,6 @@
 # System3 Master Control Plane
 
-Generated UTC: 2026-07-07T21:45:56.977828+00:00
+Generated UTC: 2026-07-14T21:12:21.712194+00:00
 
 - Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
@@ -14,7 +14,7 @@ Generated UTC: 2026-07-07T21:45:56.977828+00:00
 | `safety_and_secrets` | `PASS` | `True` | `0` | `0` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `deployment_and_endpoint_proof` | `PASS` | `True` | `0` | `0` |
-| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `0` |
+| `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `model_training_load_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `recent_backtest_walkforward_proof` | `PASS` | `True` | `0` | `0` |
 | `analyzer_paper_lifecycle_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `2` |

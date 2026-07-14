@@ -9,7 +9,7 @@
       "20260611",
       "20260612"
     ],
-    "candidate_count": 132,
+    "candidate_count": 135,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       "complete_end_to_end_validation.py",
@@ -108,6 +108,9 @@
       "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
       "reports/latest/broker_trader_validation/summary.json",
       "reports/latest/broker_trader_validation/summary.md",
+      "reports/latest/dashboard_visible_issue_tracker/performance.png",
+      "reports/latest/dashboard_visible_issue_tracker/performance.txt",
+      "reports/latest/dashboard_visual_production_proof/screenshots/performance.png",
       "reports/latest/recent_backtest_walkforward_proof/README.md",
       "reports/latest/recent_backtest_walkforward_proof/costed_walkforward_proof.json",
       "reports/latest/recent_backtest_walkforward_proof/summary.json",
@@ -127,10 +130,7 @@
       "scripts/pf_gated_backtest.py",
       "scripts/pre_trading_validation.py",
       "scripts/run_three_validation_cycles.py",
-      "scripts/test_performance_prediction.py",
-      "scripts/test_trade_logging_and_pnl.py",
-      "src/analytics/performance_metrics.py",
-      "src/outputs/paper_pnl_summary.json"
+      "scripts/test_performance_prediction.py"
     ],
     "compile_results": [
       {

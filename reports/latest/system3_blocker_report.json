@@ -1,0 +1,27 @@
+{
+  "summary": {
+    "generated_at_utc": "2026-07-14T21:11:19.696300+00:00",
+    "root": "C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3",
+    "api_base": "https://genesis-system3-backend.onrender.com",
+    "state_source": "api:https://genesis-system3-backend.onrender.com/api/state",
+    "state_error": "HTTP_ERROR_401: Unauthorized",
+    "broker_source": "api:https://genesis-system3-backend.onrender.com/api/broker/status",
+    "broker_error": "HTTP_ERROR_401: Unauthorized",
+    "total_blockers": 1,
+    "severity_counts": {
+      "MEDIUM": 1
+    },
+    "safety_status": "PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN"
+  },
+  "blockers": [
+    {
+      "blocker_id": "SYS3-BLK-RUNTIME-001",
+      "severity": "MEDIUM",
+      "area": "Runtime truth",
+      "title": "Runtime state not available to blocker finder",
+      "evidence": "HTTP_ERROR_401: Unauthorized",
+      "required_action": "Run with --api-base or provide local runtime state output.",
+      "status": "OPEN"
+    }
+  ]
+}

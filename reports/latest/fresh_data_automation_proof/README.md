@@ -1,6 +1,6 @@
 # fresh_data_automation_proof
 
-Generated UTC: 2026-07-07T21:45:56.961476+00:00
+Generated UTC: 2026-07-14T21:12:21.696193+00:00
 
 - Status: `PASS_WITH_WARNINGS`
 - Pass: `True`
@@ -12,7 +12,7 @@ Generated UTC: 2026-07-07T21:45:56.961476+00:00
 
 ## Warnings
 
-- None
+- `dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped`
 
 ## Next action
 
