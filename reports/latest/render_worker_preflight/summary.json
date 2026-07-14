@@ -1,12 +1,11 @@
 {
   "backend_base": "https://genesis-system3-backend.onrender.com",
   "blockers": [
-    "backend /api/health not reachable: status=0 error=TimeoutError",
-    "backend /api/state not reachable: status=502 error=HTTPError",
+    "backend /api/state not reachable: status=401 error=HTTPError",
     "DHAN_CLIENT_ID missing in worker env",
     "DHAN_ACCESS_TOKEN missing/too short in worker env",
     "WORKER_PUSH_TOKEN missing/too short in worker env",
-    "backend web service returning 502; worker push cannot succeed until backend restarts/deploys"
+    "WORKER_PUSH_TOKEN rejected by backend; token missing or different between web and worker"
   ],
   "env_checks": {
     "DHAN_ACCESS_TOKEN": {
@@ -52,27 +51,27 @@
       "present": false
     }
   },
-  "generated_utc": "2026-07-14T22:36:22.005844Z",
+  "generated_utc": "2026-07-14T23:34:19.841410Z",
   "probes": {
     "backend_health": {
-      "error_type": "TimeoutError",
-      "ok": false,
-      "status_code": 0
+      "error_type": null,
+      "ok": true,
+      "status_code": 200
     },
     "backend_state": {
       "error_type": "HTTPError",
       "ok": false,
-      "status_code": 502
+      "status_code": 401
     },
     "chain_push_probe": {
       "error_type": "HTTPError",
       "ok": false,
-      "status_code": 502
+      "status_code": 401
     },
     "scheduler_push_probe": {
       "error_type": "HTTPError",
       "ok": false,
-      "status_code": 502
+      "status_code": 401
     }
   },
   "safety": {
