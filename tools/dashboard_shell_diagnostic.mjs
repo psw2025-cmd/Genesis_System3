@@ -40,7 +40,9 @@ const summary = {
   authenticated_dashboard_rendered: false,
   tab_coverage_evaluated: false,
   availability_attempts: [],
+  post_auth_render_attempts: [],
   recovered_after_transient_failure: false,
+  recovered_after_post_auth_failure: false,
   final_url: '',
   page_title: '',
   body_text_length: 0,
@@ -87,6 +89,71 @@ async function gotoWithRecovery(page, url) {
   return response
 }
 
+async function inspectShell(page) {
+  return page.evaluate(expected => {
+    const visible = el => {
+      const style = getComputedStyle(el)
+      const rect = el.getBoundingClientRect()
+      return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
+    }
+    const controls = [...document.querySelectorAll('button,a')]
+      .filter(visible)
+      .map(el => (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').replace(/\s+/g, ' ').trim())
+      .filter(Boolean)
+    const matched = expected.filter(title => controls.some(text => text === title || text.includes(title)))
+    return {
+      finalUrl: location.href,
+      title: document.title,
+      bodyLength: (document.body?.innerText || '').length,
+      rootChildCount: document.querySelector('#root')?.childElementCount || 0,
+      buttonCount: [...document.querySelectorAll('button')].filter(visible).length,
+      linkCount: [...document.querySelectorAll('a')].filter(visible).length,
+      controls: [...new Set(controls)].slice(0, 40),
+      matched,
+    }
+  }, expectedTabs)
+}
+
+async function renderAuthenticatedShellWithRecovery(page) {
+  const maxAttempts = Math.max(1, Math.min(4, Number(process.env.DASHBOARD_POST_AUTH_MAX_ATTEMPTS || 3)))
+  const retryDelayMs = Math.max(1000, Math.min(30000, Number(process.env.DASHBOARD_POST_AUTH_RETRY_DELAY_MS || 8000)))
+  let latestShell = null
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let status = 0
+    let errorType = ''
+    try {
+      const response = attempt === 1
+        ? await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 })
+        : await page.goto(`${base}/ui/`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+      status = response?.status() || 0
+      await page.waitForTimeout(5000)
+      latestShell = await inspectShell(page)
+    } catch (err) {
+      errorType = err?.name || 'PostAuthRenderError'
+      latestShell = await inspectShell(page).catch(() => null)
+    }
+
+    const rendered = Boolean(
+      status >= 200 && status < 400 && latestShell && latestShell.rootChildCount > 0 && latestShell.bodyLength > 0
+    )
+    summary.post_auth_render_attempts.push({
+      attempt,
+      status,
+      error_type: errorType,
+      root_child_count: latestShell?.rootChildCount || 0,
+      body_text_length: latestShell?.bodyLength || 0,
+      rendered,
+    })
+    if (rendered) {
+      summary.recovered_after_post_auth_failure = attempt > 1
+      return latestShell
+    }
+    if (attempt < maxAttempts) await sleep(retryDelayMs)
+  }
+  return latestShell || await inspectShell(page)
+}
+
 let browser
 try {
   browser = await chromium.launch({ headless: true })
@@ -118,33 +185,9 @@ try {
     }, key).catch(() => ({ ok: false, status: 0 }))
   }
 
-  if (summary.render_ui_available) {
-    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => null)
-    await page.waitForTimeout(8000)
-  }
-
-  const shell = await page.evaluate(expected => {
-    const visible = el => {
-      const style = getComputedStyle(el)
-      const rect = el.getBoundingClientRect()
-      return style.visibility !== 'hidden' && style.display !== 'none' && rect.width > 0 && rect.height > 0
-    }
-    const controls = [...document.querySelectorAll('button,a')]
-      .filter(visible)
-      .map(el => (el.innerText || el.getAttribute('aria-label') || el.getAttribute('title') || '').replace(/\s+/g, ' ').trim())
-      .filter(Boolean)
-    const matched = expected.filter(title => controls.some(text => text === title || text.includes(title)))
-    return {
-      finalUrl: location.href,
-      title: document.title,
-      bodyLength: (document.body?.innerText || '').length,
-      rootChildCount: document.querySelector('#root')?.childElementCount || 0,
-      buttonCount: [...document.querySelectorAll('button')].filter(visible).length,
-      linkCount: [...document.querySelectorAll('a')].filter(visible).length,
-      controls: [...new Set(controls)].slice(0, 40),
-      matched,
-    }
-  }, expectedTabs)
+  const shell = summary.render_ui_available && summary.auth.ok
+    ? await renderAuthenticatedShellWithRecovery(page)
+    : await inspectShell(page)
 
   summary.final_url = safeText(shell.finalUrl)
   summary.page_title = safeText(shell.title)
@@ -168,7 +211,7 @@ try {
 
   if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE_AFTER_RETRIES'
   else if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
-  else if (!summary.authenticated_dashboard_rendered) summary.blocker = 'FRONTEND_ROOT_EMPTY'
+  else if (!summary.authenticated_dashboard_rendered) summary.blocker = 'AUTHENTICATED_FRONTEND_UNAVAILABLE_AFTER_RETRIES'
   else if (summary.missing_tabs.length) summary.blocker = 'DEPLOYED_FRONTEND_ASSET_DRIFT'
   else if (summary.page_error_types.length || summary.console_error_types.length) summary.blocker = 'FRONTEND_RUNTIME_ERRORS_PRESENT'
   else {
@@ -194,6 +237,8 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Availability attempts: \`${summary.availability_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}`).join(', ') || 'none'}\``,
   `Recovered after transient failure: \`${summary.recovered_after_transient_failure}\``,
   `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
+  `Post-auth render attempts: \`${summary.post_auth_render_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}:${item.rendered ? 'rendered' : 'empty'}`).join(', ') || 'none'}\``,
+  `Recovered after post-auth failure: \`${summary.recovered_after_post_auth_failure}\``,
   `UI HTTP: \`${summary.ui_response_status}\``,
   `Authenticated dashboard rendered: \`${summary.authenticated_dashboard_rendered}\``,
   `Tab coverage evaluated: \`${summary.tab_coverage_evaluated}\``,
@@ -217,6 +262,8 @@ console.log(JSON.stringify({
   availability_attempts: summary.availability_attempts,
   recovered_after_transient_failure: summary.recovered_after_transient_failure,
   auth_ok: summary.auth.ok,
+  post_auth_render_attempts: summary.post_auth_render_attempts,
+  recovered_after_post_auth_failure: summary.recovered_after_post_auth_failure,
   ui_http: summary.ui_response_status,
   authenticated_dashboard_rendered: summary.authenticated_dashboard_rendered,
   tab_coverage_evaluated: summary.tab_coverage_evaluated,
