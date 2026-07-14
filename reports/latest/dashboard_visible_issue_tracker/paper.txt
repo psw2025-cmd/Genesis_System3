@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-18:02:26 IST
+18:08:11 IST
 NIFTY
 24,069
 BNFTY
@@ -53,61 +53,4 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-State Version: 41 | Positions Source: NO_POSITIONS | Last Refresh: 7/14/2026, 12:32:24 PM
-Recheck Paper Proof
-Mode Safety
-PAPER / ANALYZER SAFE
-Live trading flag: OFF
-Broker Data
-CONNECTED
-Source: BROKER_CONNECTED_MARKET_CLOSED
-Today Paper Entries
-0
-From /api/trades/today
-Today Paper Exits
-0
-Closed paper/analyzer records
-Paper Truth Provenance
-Source file
-NO_PAPER_SOURCE
-Displayed rows
-0
-Fake/fixture rejected
-0
-Order endpoints
-NOT CALLED
-Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.
-📊
-PAPER TRADING MODE (NO REAL ORDERS)
-System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
-Mode: PAPER | Data Source: NOT_READY | Broker: Connected
-Open Paper Positions (0)
-No open paper positions
-Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
-Today Paper Trade Proof
-Entries (0)
-[]
-Exits (0)
-[]
-PnL Summary
-Total PnL:
-₹0.00
-Unrealized:
-₹0.00
-Realized:
-₹0.00
-Open Positions:
-0
-Today Entries:
-0
-Today Exits:
-0
-Risk Panel
-Max Positions
--
-Current: 0
-Total Paper Exposure
-₹0.00
-Live Order Safety
-BLOCKED
-Paper UI does not call broker/order close endpoints.
+Loading paper/analyzer proof...
