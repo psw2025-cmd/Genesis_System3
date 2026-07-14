@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T19:26:40.404Z",
+  "generated_at": "2026-07-14T19:31:53.165Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -24,7 +24,7 @@
   "recovered_after_transient_failure": false,
   "final_url": "https://genesis-system3-backend.onrender.com/ui/",
   "page_title": "System3 — Genesis AI Trading",
-  "body_text_length": 3368,
+  "body_text_length": 3369,
   "root_child_count": 1,
   "visible_button_count": 18,
   "visible_link_count": 5,
