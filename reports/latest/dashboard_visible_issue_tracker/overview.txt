@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-06:16:22 IST
+06:53:45 IST
 NIFTY
---
+24,198
 BNFTY
 58,103
 FINNIFTY
 26,827
 MARKET CLOSED / DATA POLLING
-DHAN DEGRADED
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -56,9 +56,8 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
-API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/dhan/status. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -73,15 +72,14 @@ Live Data Coverage
 market closed must not hide read-only data
 LOADED
 Health API
-RENDER_UNAVAILABLE
-WAITING
+live
+LOADED
 State API
-ERROR
+Market closed: Before pre-market (opens at 09:15)
+LOADED
 Broker Status API
-RENDER_UNAVAILABLE
-ERROR
+LOADED
 Funds API
-Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
 LOADED
 Holdings API
 LOADED
@@ -97,9 +95,9 @@ Auto Gates
 LOADED
 Alerts
 0 recent
-MARKET_SESSION_ONLY
+LOADED
 Option Chain
-Render/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.
+Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 Gate Matrix
 3/7 PASS
 PEND
@@ -113,7 +111,7 @@ Paper Lifecycle
 market-session proof pending
 PASS
 Tick / Data Freshness
-tick_age=3.67s refresh=5s
+tick_age=5.0s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -127,9 +125,9 @@ System Health
 Mode
 PAPER
 QC Status
-RENDER_UNAVAILABLE
+PASS
 Data Source
-RENDER_UNAVAILABLE
+live
 Market
 CLOSED / DATA POLLING
 Live Allowed

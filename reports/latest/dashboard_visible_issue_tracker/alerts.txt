@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-06:19:45 IST
+06:57:08 IST
 NIFTY
 24,198
 BNFTY
@@ -55,4 +55,4 @@ LOCK
 
 Alerts unavailable: RENDER_UNAVAILABLE
 
-Render/backend returned 502 for /api/broker/dhan/status. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+Render/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
