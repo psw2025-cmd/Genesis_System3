@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T12:15:40.510Z",
+  "generated_at": "2026-07-14T12:43:29.536Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "visual_gate_pass": true,
   "production_grade_claim_allowed": true,
@@ -15,67 +15,67 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 204087
+      "size_bytes": 205492
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 281262
+      "size_bytes": 102012
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 197260
+      "size_bytes": 187870
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 156866
+      "size_bytes": 152341
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 222981
+      "size_bytes": 223073
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 128549
+      "size_bytes": 100145
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 175789
+      "size_bytes": 176348
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 111415
+      "size_bytes": 111722
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 158453
+      "size_bytes": 150127
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 111031
+      "size_bytes": 111262
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 139841
+      "size_bytes": 140413
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 140798
+      "size_bytes": 112586
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 123074
+      "size_bytes": 122897
     }
   ],
   "safety": {
