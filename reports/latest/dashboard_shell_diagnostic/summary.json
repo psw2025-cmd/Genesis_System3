@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T10:39:49.136Z",
+  "generated_at": "2026-07-14T10:43:32.108Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -8,7 +8,7 @@
   "secrets_persisted": false,
   "auth": {
     "ok": false,
-    "status": 0
+    "status": 502
   },
   "ui_response_status": 502,
   "render_ui_available": false,

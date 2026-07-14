@@ -1,10 +1,10 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T10:39:49.136Z
+Generated: 2026-07-14T10:43:32.108Z
 Status: **BLOCKED**
 Blocker: **RENDER_UI_UNAVAILABLE**
 Render UI available: `false`
-Auth OK: `false` (HTTP 0)
+Auth OK: `false` (HTTP 502)
 UI HTTP: `502`
 Root children: `0`
 Body text length: `210`
