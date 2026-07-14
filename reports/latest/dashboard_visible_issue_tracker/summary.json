@@ -1285,5 +1285,5 @@
     "Fix visible UI blocker on Live Gate: DHAN DEGRADED"
   ],
   "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 14
+  "settle_normalized_tab_count": 0
 }
