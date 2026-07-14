@@ -1,0 +1,65 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+11:57:16 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+MARKET OPEN
+DHAN API ERR
+PAPER
+LIVE OFF
+WS
+OFF
+OWNER
+PRITAM S. WARGHADE
+LIVE
+OFF
+MODE
+PAPER ONLY
+DATA
+DHAN ONLY REQUIRED
+ML SCORE
+TRAINING PROOF REQUIRED
+PAPER
+PROVENANCE REQUIRED
+RENDER
+VISUAL PROOF REQUIRED
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Signals & Recommendations
+❌
+Error Loading Data
+Endpoint: /api/state
+HTTP Status: 502
+Error: Request failed with status code 502
+Retry
+INFO
+Signal data unavailable
+
+Backend did not return signal/state data. Check API health and deployment.

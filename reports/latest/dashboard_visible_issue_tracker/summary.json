@@ -1,83 +1,203 @@
 {
-  "generated_at": "2026-07-14T06:04:25.614Z",
+  "generated_at": "2026-07-14T06:26:02.554Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "auth": {
-    "ok": false,
-    "status": 502
+    "ok": true,
+    "status": 200
   },
   "tabs": [
     {
       "id": "truth",
       "title": "Truth Control",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/truth.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 2,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5018,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Truth Control; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutEr"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5018ms",
+        "BLOCKED",
+        "MONEY_READY_BLOCKED",
+        "At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
+        "Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false",
+        "Dhan option-chain availability\tPARTIAL\tYES\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1",
+        "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0",
+        "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "Paper/analyzer lifecycle\tPARTIAL\tNO\ttoday_trade_rows=0, endpoint=200"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:56:23 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSystem Truth Control\nFull upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.\nRecheck All Layers\nBLOCKED\nInfrastructure / broker read path\nBLOCKED\nMoney readiness\nLast run\n7/14/2026, 6:26:19 AM\nMONEY_READY_BLOCKED\nAt least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.\nLAYER\tSTATUS\tREQUIRED FOR MONEY\tEVIDENCE\nBackend/API route health\tPASS\tYES\thealth=200, state=200\nBroker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false\nFunds / margin truth\tPASS\tYES\tavailable=-, used=-, source=sdk\nHoldings and live positions read path\tPASS\tYES\tholdings=0, positions=0\nDhan option-chain availability\tPARTIAL\tYES\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1\nUniverse / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0\nCE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload\nPaper/analyzer lifecycle\tPARTIAL\tNO\ttoday_trade_rows=0, endpoint=200\nRisk gates and automation status\tPASS\tYES\tauto_gates_http=200, status=ok\nLive-money safety lock\tPASS\tYES\tlive_flag=false, order_allowed=false\nDashboard operator truth\tPASS\tYES\tGenerated from live endpoints. SENSEX is optional until official Dhan rows are proven; enabled universe remains no-fallback."
     },
     {
       "id": "genesis",
       "title": "Genesis Brain",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/genesis.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5016,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Genesis Brain; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutEr"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+        "BLOCKED",
+        "Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports."
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "Next: enforce position sizing in paper lifecycle",
+        "\"message\": \"I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS.\""
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:56:28 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nGENESIS PRODUCTION COMMAND CENTER\nAI Options Automation Dashboard\nOne official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.\nRefresh\nVoice Alert\nOPERATING MODE\nMARKET_OPEN_OPERATOR\nBROKER\ndisconnected\nTRUTH SCORE\n75%\nMEMORY EVENTS\n3\nLIVE TRADING\nBLOCKED\nMARKET OPEN: TRADER MUST SEE\n\u2713\nbroker connected/read-only latency\n\u2713\nlive option chain contracts by symbol\n\u2713\nPCR, max pain, IV, OI buildup\n\u2713\ntop gain-ranked symbols\n\u2713\nprediction BUY/SELL/HOLD confidence\n\u2713\nspread/liquidity risk\n\u2713\nopen positions and P&L\n\u2713\nkill switch and daily-loss gate\n\u2713\ndata truth score from at least two sources\nPREDICTION ACCURACY & GAIN RANK REQUIREMENTS\nACCURACY GOAL\n90%\nVisible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.\nCurrent blocker: Accumulate multi-day real prediction-vs-actual proof and improve IV/OI filters.\nGLOBAL RESEARCH SOURCES INTEGRATED\nZerodha Varsity - Options Theory\nGreeks, volatility, moneyness, pricing education\nZerodha Varsity - Option Strategies\nSpreads, straddle, strangle, max pain, PCR, iron condor\nCboe Options Institute\nGlobal options education, risk management, strategy playbooks\nNSE India Option Chain\nIndian option-chain truth: OI, volume, strike/expiry surface\nDhanHQ API v2\nBroker API, option chain, market feed, historical data, orders when gates pass\nHIDDEN SECRETS LAB\nHigh IV favors defined-risk premium structures only after spread/liquidity checks.\nVerified: true | Impact: unproven_until_backtested\nOI concentration near a strike can create expiry pin risk; max pain is advisory, not a signal alone.\nVerified: true | Impact: risk_filter\nVolume plus OI change is stronger than volume alone for buildup classification.\nVerified: true | Impact: signal_quality_filter\nINTEGRATION MAP\nBroker\nCurrent: Dhan read-only + gated order endpoint\nNext: keep real-money disabled until proof gates pass\nMarket data\nCurrent: Dhan/NSE/cache chain endpoints\nNext: add 2-source truth comparison per symbol\nPrediction\nCurrent: gain rank + signal confidence APIs\nNext: show multi-day rho/top-N trend on Genesis tab\nRisk\nCurrent: 2% trade risk, 5% daily loss policy displayed\nNext: enforce position sizing in paper lifecycle\nLearning\nCurrent: memory JSONL + research log\nNext: promote only after walk-forward improvement\nNEVER DIE MONITOR\nUPTIME SECONDS\n28155\nLAST SELF-HEAL\nstartup_guard_checked\nISSUES FIXED\n3\nTRUTH, COMPLIANCE, AND CONTROL\nKill switch visible: live trading remains disabled until all proof gates pass.\nLet Agent Take Full Control\n{\n  \"message\": \"I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS.\"\n}"
     },
     {
       "id": "e2e_proof",
       "title": "E2E Proof",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/e2e_proof.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 2,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
-      "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab E2E Proof; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      "settle_elapsed_ms": 5015,
+      "settle_remaining_markers": [
+        "CHECKING..."
       ],
-      "body_text_sample": ""
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...",
+        "Real broker/data truth only. Live money remains blocked until every row below passes.",
+        "BLOCKED \u00b7 FULL E2E",
+        "BLOCKED \u00b7 DHAN CHAIN",
+        "BLOCKED \u00b7 NO BAD SOURCE",
+        "No non-Dhan/stale/fallback",
+        "BLOCKED \u00b7 TRADER READY",
+        "Dhan broker connection\tBLOCKED\t200",
+        "Dhan access token/session\tBLOCKED\t-",
+        "Real Dhan option chain for all watched symbols\tBLOCKED\t0/5",
+        "No non-Dhan/stale/fallback markers in chain\tBLOCKED\tblocked marker found",
+        "Live-money switch blocked until separate proof\tPASS\tblocked",
+        "NIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+        "BANKNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+        "FINNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+        "MIDCPNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+        "SENSEX\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+      ],
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "Paper/analyzer P&L endpoint\tPASS\t200",
+        "Today paper lifecycle endpoint\tPASS\tcount=0",
+        "/api/state\t200\tPASS\tPAPER"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:56:39 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nRecheck Now\nBLOCKED \u00b7 FULL E2E\nOverall visual proof\nPASS \u00b7 API\nCore endpoints\nBLOCKED \u00b7 DHAN CHAIN\nReal Dhan option chain\nBLOCKED \u00b7 NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED \u00b7 TRADER READY\nHuman readiness checklist\nLast run: 7/14/2026, 6:26:39 AM \u00b7 This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t200\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tPASS\t200\nReal broker holdings response\tPASS\trows visible or empty broker response\nReal broker positions response\tPASS\trows visible or empty broker response\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tBLOCKED\tblocked marker found\nPaper/analyzer P&L endpoint\tPASS\t200\nToday paper lifecycle endpoint\tPASS\tcount=0\nGate/risk endpoint visible\tPASS\tok\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nBANKNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nFINNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nMIDCPNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nSENSEX\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS\n/api/health\t200\tPASS\tnot_ready\n/api/state\t200\tPASS\tPAPER\n/api/broker/dhan/status\t200\tPASS\tANALYZER\n/api/broker/funds\t200\tPASS\t-\n/api/broker/holdings\t200\tPASS\t-\n/api/broker/positions/live\t200\tPASS\t-\n/api/gain_rank\t200\tPASS\tno_data\n/api/pnl\t200\tPASS\t-\n/api/trades/today\t200\tPASS\t-\n/api/auto_gates\t200\tPASS\tok"
     },
     {
       "id": "overview",
       "title": "Overview",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/overview.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5013,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Overview; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5013ms",
+        "ERROR",
+        "Client ID or user generated access token is invalid or expired.",
+        "STALE",
+        "PEND",
+        "market-session proof pending"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "ANALYZER / PAPER COMMAND CENTER",
+        "Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.",
+        "PAPER P&L",
+        "Paper only",
+        "market closed must not hide read-only data",
+        "Paper Lifecycle",
+        "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+      ],
+      "red_elements": [
+        {
+          "text": "NO_DHAN_DATA",
+          "className": "font-mono text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "API RESPONDED",
+          "className": "num text-2xl font-bold text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "STALE",
+          "className": "pill text-[10px] w-32 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "WAITING",
+          "className": "pill text-[10px] w-32 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "PEND",
+          "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "PEND",
+          "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "PEND",
+          "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "PEND",
+          "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "PEND",
+          "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:56:44 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nAPI status: NO_DHAN_DATA - NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available.\nBROKER\nAPI RESPONDED\nDhan read-only\nPAPER P&L\n\u20b90\nCloud sim\nOPEN POSITIONS\n0\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nlive\nLOADED\nState API\nMarket open\nERROR\nBroker Status API\nERROR\nFunds API\nClient ID or user generated access token is invalid or expired.\nLOADED\nHoldings API\nLOADED\nPositions API\nLOADED\nP&L API\npnl=0\nSTALE\nGain Rank / Scanner\nLOADED\nAuto Gates\n7 gates\nLOADED\nAlerts\n0 recent\nWAITING\nOption Chain\nNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nGate Matrix\n2/7 PASS\nPEND\nML Accuracy (Spearman \u03c1)\n0/5 days \u00b7 \u03c1=None \u00b7 need \u22650.7\nPEND\nProfit / Expectancy\nexpectancy=-196.14 \u00b7 win_rate=0.3333\nPEND\nPaper Lifecycle\nmarket-session proof pending\nPEND\nTick / Data Freshness\ntick_age=0.77s refresh=5s\nPASS\nModel Accuracy Report\nRun scripts/system3_model_accuracy_tracker.py --api-base $CLOUD\nPEND\nOption Strike Visibility\nRun scripts/system3_option_visibility_audit.py\nPASS\nEquity F&O Eligibility\nWire is_tradeable_fo_symbol() in ranking/paper trade path\nSystem Health\nMode\nPAPER\nQC Status\nNOT_READY\nData Source\nlive\nMarket\nOPEN\nLive Allowed\nfalse\nLast Sync\n--"
     },
     {
       "id": "sim_live",
@@ -101,211 +221,1110 @@
       "id": "chain",
       "title": "Option Chain",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/chain.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5012,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Option Chain; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErr"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+        "Source: dhan / blocked_until_real_dhan_stream",
+        "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [
+        {
+          "text": "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "className": "card p-4 border border-amber/30 bg-amber/5",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgb(17, 24, 39)"
+        },
+        {
+          "text": "Live option-chain rows are not available for this selected symbol.",
+          "className": "text-sm text-amber font-semibold mt-1",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:10 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nLive option-chain rows are not available for this selected symbol.\nStatus: NO_DHAN_DATA\nSource: dhan / blocked_until_real_dhan_stream\nBackend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
     },
     {
       "id": "signals",
       "title": "Signals",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/signals.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Signals; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: l"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+        "Error Loading Data",
+        "Error: Request failed with status code 502",
+        "Signal data unavailable",
+        "\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry",
+        "Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [
+        {
+          "text": "\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry",
+          "className": "p-4 bg-red-900 border border-red-700 rounded-lg mb-4",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Error Loading Data",
+          "className": "text-lg font-bold text-red-200",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502",
+          "className": "text-sm text-red-300 space-y-1",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "/api/state",
+          "className": "bg-red-800 px-1 rounded",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Retry",
+          "className": "ml-4 px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-sm font-medium",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgb(239, 239, 239)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:16 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSignals & Recommendations\n\u274c\nError Loading Data\nEndpoint: /api/state\nHTTP Status: 502\nError: Request failed with status code 502\nRetry\nINFO\nSignal data unavailable\n\nBackend did not return signal/state data. Check API health and deployment."
     },
     {
       "id": "trade",
       "title": "Trade",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/trade.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Trade; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: loc"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+        "Source: dhan / blocked_until_real_dhan_stream",
+        "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [
+        {
+          "text": "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "className": "card p-4 border border-amber/30 bg-amber/5",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgb(17, 24, 39)"
+        },
+        {
+          "text": "Live option-chain rows are not available for this selected symbol.",
+          "className": "text-sm text-amber font-semibold mt-1",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:21 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nLive option-chain rows are not available for this selected symbol.\nStatus: NO_DHAN_DATA\nSource: dhan / blocked_until_real_dhan_stream\nBackend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\nINDEX SCANNER\nNo rankings available\nNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available."
     },
     {
       "id": "paper",
       "title": "Paper Trades",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/paper.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Paper Trades; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErr"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+        "Error Loading Data",
+        "Error: Request failed with status code 502",
+        "\u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry",
+        "Endpoint: /api/state Error: Request failed with status code 502"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "Paper Trading Console"
+      ],
+      "red_elements": [
+        {
+          "text": "\u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry",
+          "className": "p-4 bg-red-900 border border-red-700 rounded-lg mb-4",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Error Loading Data",
+          "className": "text-lg font-bold text-red-200",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Endpoint: /api/state Error: Request failed with status code 502",
+          "className": "text-sm text-red-300 space-y-1",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "/api/state",
+          "className": "bg-red-800 px-1 rounded",
+          "color": "rgb(226, 232, 240)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "Retry",
+          "className": "ml-4 px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-sm font-medium",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgb(239, 239, 239)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:26 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\n\u274c\nError Loading Data\nEndpoint: /api/state\nError: Request failed with status code 502\nRetry"
     },
     {
       "id": "positions",
       "title": "Positions",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/positions.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Positions; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "PAPER ONLY \u2014 NO REAL MONEY",
+        "Paper engine generates positions during market hours"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:31 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n\u20b90\nWIN RATE\n0.0%\nTRADES\n0\nOPEN\n0\nPAPER ONLY \u2014 NO REAL MONEY\nOPEN POSITIONS (0)\n\nNo open positions\n\nPaper engine generates positions during market hours"
     },
     {
       "id": "performance",
       "title": "Performance",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/performance.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5012,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Performance; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErro"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+        "Failed to load performance data: 502"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:36 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 11:57:32 IST\n\nFailed to load performance data: 502"
     },
     {
       "id": "ml",
       "title": "ML Model",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/ml.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5012,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab ML Model; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+        "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
+        "BLOCKED",
+        "Training proof missing."
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:41 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nMODEL_NOT_PROVEN\nNo matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nUNKNOWN\nProof records\n0\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration."
     },
     {
       "id": "broker",
       "title": "Broker",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/broker.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Broker; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+        "BLOCKED / TOKEN ERROR",
+        "BROKER AUTH BLOCKED - NOT READY",
+        "ERROR / INVALID OR EXPIRED",
+        "ERROR/BLOCKED",
+        "DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.",
+        "BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID",
+        "BLOCKED BY BACKEND FLAG",
+        "Failed to load funds: DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired."
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [
+        {
+          "text": "BLOCKED / TOKEN ERROR",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "BROKER AUTH BLOCKED - NOT READY",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "NOT PROVIDED BY BROKER API",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "ERROR / INVALID OR EXPIRED",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "ERROR/BLOCKED",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "BLOCKED BY BACKEND FLAG",
+          "className": "num tx-down",
+          "color": "rgb(255, 77, 106)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        }
+      ],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:46 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nBLOCKED / TOKEN ERROR\nTruth\nBROKER AUTH BLOCKED - NOT READY\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nERROR / INVALID OR EXPIRED\nHoldings API\nRESPONDED\nFunds API\nERROR/BLOCKED\nBroker Blocker\nDH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.\nMarket State\nMARKET OPEN\nData Visibility\nBLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nFailed to load funds: DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.\nMarket close is not the blocker. Check Dhan token/API response.\nEQUITY HOLDINGS (0)\n\nNo valid broker holdings truth available.\n\nDHAN LIVE POSITIONS (0)\n\nNo valid broker positions truth available."
     },
     {
       "id": "alerts",
       "title": "Alerts",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/alerts.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5008,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Alerts; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5008ms",
+        "Alerts unavailable: NO_DHAN_DATA"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:52 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n\nAlerts unavailable: NO_DHAN_DATA\n\nNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available."
     },
     {
       "id": "system",
       "title": "System",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/system.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5009,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab System; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5009ms",
+        "Broker not connected - real data unavailable"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades",
+        "Paper Mode"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:57:57 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN API ERR\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nDISCONNECTED\nWebSocket\nOFF\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nlive\nMarket State\nOPEN\nAPI Status\nNO_DHAN_DATA\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\nfalse\nQC Status\nNOT_READY\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nBroker not connected - real data unavailable"
     },
     {
       "id": "gates",
       "title": "Live Gate",
       "ok": false,
-      "screenshot": null,
-      "screenshot_ok": false,
-      "navigation_method_index": null,
+      "screenshot": "reports/latest/dashboard_visible_issue_tracker/gates.png",
+      "screenshot_ok": true,
+      "navigation_method_index": 2,
       "async_content_settled": false,
-      "settle_elapsed_ms": 0,
+      "settle_elapsed_ms": 5013,
       "settle_remaining_markers": [],
-      "blocker_lines": [],
-      "info_lines": [],
-      "red_elements": [],
-      "ui_exceptions": [
-        "Error: Unable to locate/click dashboard tab Live Gate; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      "blocker_lines": [
+        "ASYNC_CONTENT_NOT_SETTLED after 5013ms",
+        "DHAN DEGRADED"
       ],
-      "body_text_sample": ""
+      "info_lines": [
+        "PAPER",
+        "LIVE OFF",
+        "PAPER ONLY",
+        "Paper Trades"
+      ],
+      "red_elements": [],
+      "ui_exceptions": [],
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n11:58:08 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET OPEN\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n\u2014\n\nCHECKING\n\nGATE CHECKLIST\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: \u20b95,000. System halts automatically when limit is hit."
     }
   ],
   "expected_tab_count": 16,
-  "visible_issue_count": 0,
-  "info_line_count": 0,
-  "screenshot_missing_count": 16,
+  "visible_issue_count": 73,
+  "info_line_count": 77,
+  "screenshot_missing_count": 1,
   "unsettled_tab_count": 16,
-  "ui_exception_count": 16,
+  "ui_exception_count": 1,
   "global_exception": null,
-  "visible_issues": [],
-  "info_lines": [],
-  "todo": [],
-  "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 0
+  "visible_issues": [
+    {
+      "tab": "Truth Control",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5018ms"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "BLOCKED"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "MONEY_READY_BLOCKED"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled."
+    },
+    {
+      "tab": "Truth Control",
+      "text": "Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "Dhan option-chain availability\tPARTIAL\tYES\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "BLOCKED"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports."
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING..."
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Real broker/data truth only. Live money remains blocked until every row below passes."
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "BLOCKED \u00b7 FULL E2E"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "BLOCKED \u00b7 DHAN CHAIN"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "BLOCKED \u00b7 NO BAD SOURCE"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "No non-Dhan/stale/fallback"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "BLOCKED \u00b7 TRADER READY"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Dhan broker connection\tBLOCKED\t200"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Dhan access token/session\tBLOCKED\t-"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Real Dhan option chain for all watched symbols\tBLOCKED\t0/5"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "No non-Dhan/stale/fallback markers in chain\tBLOCKED\tblocked marker found"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Live-money switch blocked until separate proof\tPASS\tblocked"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "NIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "BANKNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "FINNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "MIDCPNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "SENSEX\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "Overview",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
+    },
+    {
+      "tab": "Overview",
+      "text": "ERROR"
+    },
+    {
+      "tab": "Overview",
+      "text": "Client ID or user generated access token is invalid or expired."
+    },
+    {
+      "tab": "Overview",
+      "text": "STALE"
+    },
+    {
+      "tab": "Overview",
+      "text": "PEND"
+    },
+    {
+      "tab": "Overview",
+      "text": "market-session proof pending"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "Source: dhan / blocked_until_real_dhan_stream"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "Signals",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
+    },
+    {
+      "tab": "Signals",
+      "text": "Error Loading Data"
+    },
+    {
+      "tab": "Signals",
+      "text": "Error: Request failed with status code 502"
+    },
+    {
+      "tab": "Signals",
+      "text": "Signal data unavailable"
+    },
+    {
+      "tab": "Signals",
+      "text": "\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry"
+    },
+    {
+      "tab": "Signals",
+      "text": "Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502"
+    },
+    {
+      "tab": "Trade",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+    },
+    {
+      "tab": "Trade",
+      "text": "Source: dhan / blocked_until_real_dhan_stream"
+    },
+    {
+      "tab": "Trade",
+      "text": "OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "Error Loading Data"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "Error: Request failed with status code 502"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "\u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "Endpoint: /api/state Error: Request failed with status code 502"
+    },
+    {
+      "tab": "Positions",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+    },
+    {
+      "tab": "Performance",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
+    },
+    {
+      "tab": "Performance",
+      "text": "Failed to load performance data: 502"
+    },
+    {
+      "tab": "ML Model",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
+    },
+    {
+      "tab": "ML Model",
+      "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."
+    },
+    {
+      "tab": "ML Model",
+      "text": "BLOCKED"
+    },
+    {
+      "tab": "ML Model",
+      "text": "Training proof missing."
+    },
+    {
+      "tab": "Broker",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
+    },
+    {
+      "tab": "Broker",
+      "text": "BLOCKED / TOKEN ERROR"
+    },
+    {
+      "tab": "Broker",
+      "text": "BROKER AUTH BLOCKED - NOT READY"
+    },
+    {
+      "tab": "Broker",
+      "text": "ERROR / INVALID OR EXPIRED"
+    },
+    {
+      "tab": "Broker",
+      "text": "ERROR/BLOCKED"
+    },
+    {
+      "tab": "Broker",
+      "text": "DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired."
+    },
+    {
+      "tab": "Broker",
+      "text": "BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID"
+    },
+    {
+      "tab": "Broker",
+      "text": "BLOCKED BY BACKEND FLAG"
+    },
+    {
+      "tab": "Broker",
+      "text": "Failed to load funds: DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired."
+    },
+    {
+      "tab": "Alerts",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5008ms"
+    },
+    {
+      "tab": "Alerts",
+      "text": "Alerts unavailable: NO_DHAN_DATA"
+    },
+    {
+      "tab": "System",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5009ms"
+    },
+    {
+      "tab": "System",
+      "text": "Broker not connected - real data unavailable"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "DHAN DEGRADED"
+    }
+  ],
+  "info_lines": [
+    {
+      "tab": "Truth Control",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Truth Control",
+      "text": "Paper/analyzer lifecycle\tPARTIAL\tNO\ttoday_trade_rows=0, endpoint=200"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "Next: enforce position sizing in paper lifecycle"
+    },
+    {
+      "tab": "Genesis Brain",
+      "text": "\"message\": \"I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS.\""
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "PAPER"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Paper/analyzer P&L endpoint\tPASS\t200"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "Today paper lifecycle endpoint\tPASS\tcount=0"
+    },
+    {
+      "tab": "E2E Proof",
+      "text": "/api/state\t200\tPASS\tPAPER"
+    },
+    {
+      "tab": "Overview",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Overview",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Overview",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Overview",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Overview",
+      "text": "ANALYZER / PAPER COMMAND CENTER"
+    },
+    {
+      "tab": "Overview",
+      "text": "Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data."
+    },
+    {
+      "tab": "Overview",
+      "text": "PAPER P&L"
+    },
+    {
+      "tab": "Overview",
+      "text": "Paper only"
+    },
+    {
+      "tab": "Overview",
+      "text": "market closed must not hide read-only data"
+    },
+    {
+      "tab": "Overview",
+      "text": "Paper Lifecycle"
+    },
+    {
+      "tab": "Overview",
+      "text": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Option Chain",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Signals",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Signals",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Signals",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Signals",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Trade",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Trade",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Trade",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Trade",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Paper Trades",
+      "text": "Paper Trading Console"
+    },
+    {
+      "tab": "Positions",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Positions",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Positions",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Positions",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Positions",
+      "text": "PAPER ONLY \u2014 NO REAL MONEY"
+    },
+    {
+      "tab": "Positions",
+      "text": "Paper engine generates positions during market hours"
+    },
+    {
+      "tab": "Performance",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Performance",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Performance",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Performance",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "ML Model",
+      "text": "PAPER"
+    },
+    {
+      "tab": "ML Model",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "ML Model",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "ML Model",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Broker",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Broker",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Broker",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Broker",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "Alerts",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Alerts",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Alerts",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Alerts",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "System",
+      "text": "PAPER"
+    },
+    {
+      "tab": "System",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "System",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "System",
+      "text": "Paper Trades"
+    },
+    {
+      "tab": "System",
+      "text": "Paper Mode"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "PAPER"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "LIVE OFF"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "PAPER ONLY"
+    },
+    {
+      "tab": "Live Gate",
+      "text": "Paper Trades"
+    }
+  ],
+  "todo": [
+    "Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5018ms",
+    "Fix visible UI blocker on Truth Control: BLOCKED",
+    "Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED",
+    "Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
+    "Fix visible UI blocker on Truth Control: Broker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false",
+    "Fix visible UI blocker on Truth Control: Dhan option-chain availability\tPARTIAL\tYES\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1",
+    "Fix visible UI blocker on Truth Control: Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0",
+    "Fix visible UI blocker on Truth Control: CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload",
+    "Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+    "Fix visible UI blocker on Genesis Brain: BLOCKED",
+    "Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.",
+    "Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...",
+    "Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.",
+    "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 FULL E2E",
+    "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 DHAN CHAIN",
+    "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 NO BAD SOURCE",
+    "Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback",
+    "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 TRADER READY",
+    "Fix visible UI blocker on E2E Proof: Dhan broker connection\tBLOCKED\t200",
+    "Fix visible UI blocker on E2E Proof: Dhan access token/session\tBLOCKED\t-",
+    "Fix visible UI blocker on E2E Proof: Real Dhan option chain for all watched symbols\tBLOCKED\t0/5",
+    "Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback markers in chain\tBLOCKED\tblocked marker found",
+    "Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof\tPASS\tblocked",
+    "Fix visible UI blocker on E2E Proof: NIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on E2E Proof: BANKNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on E2E Proof: FINNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on E2E Proof: MIDCPNIFTY\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on E2E Proof: SENSEX\tBLOCKED\tdhan\tdhan_only_no_rows\tNO_DHAN_DATA\t0\t0\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5013ms",
+    "Fix visible UI blocker on Overview: ERROR",
+    "Fix visible UI blocker on Overview: Client ID or user generated access token is invalid or expired.",
+    "Fix visible UI blocker on Overview: STALE",
+    "Fix visible UI blocker on Overview: PEND",
+    "Fix visible UI blocker on Overview: market-session proof pending",
+    "Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+    "Fix visible UI blocker on Option Chain: Source: dhan / blocked_until_real_dhan_stream",
+    "Fix visible UI blocker on Option Chain: OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+    "Fix visible UI blocker on Signals: Error Loading Data",
+    "Fix visible UI blocker on Signals: Error: Request failed with status code 502",
+    "Fix visible UI blocker on Signals: Signal data unavailable",
+    "Fix visible UI blocker on Signals: \u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry",
+    "Fix visible UI blocker on Signals: Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502",
+    "Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+    "Fix visible UI blocker on Trade: Source: dhan / blocked_until_real_dhan_stream",
+    "Fix visible UI blocker on Trade: OPTION CHAIN - NIFTY Live option-chain rows are not available for this selected symbol. Status: NO_DHAN_DATA Source: dhan / blocked_until_real_dhan_stream Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+    "Fix visible UI blocker on Paper Trades: Error Loading Data",
+    "Fix visible UI blocker on Paper Trades: Error: Request failed with status code 502",
+    "Fix visible UI blocker on Paper Trades: \u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry",
+    "Fix visible UI blocker on Paper Trades: Endpoint: /api/state Error: Request failed with status code 502",
+    "Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+    "Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+    "Fix visible UI blocker on Performance: Failed to load performance data: 502",
+    "Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+    "Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
+    "Fix visible UI blocker on ML Model: BLOCKED",
+    "Fix visible UI blocker on ML Model: Training proof missing.",
+    "Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+    "Fix visible UI blocker on Broker: BLOCKED / TOKEN ERROR",
+    "Fix visible UI blocker on Broker: BROKER AUTH BLOCKED - NOT READY",
+    "Fix visible UI blocker on Broker: ERROR / INVALID OR EXPIRED",
+    "Fix visible UI blocker on Broker: ERROR/BLOCKED",
+    "Fix visible UI blocker on Broker: DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.",
+    "Fix visible UI blocker on Broker: BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID",
+    "Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG",
+    "Fix visible UI blocker on Broker: Failed to load funds: DH-901 - Invalid_Authentication - Client ID or user generated access token is invalid or expired.",
+    "Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5008ms",
+    "Fix visible UI blocker on Alerts: Alerts unavailable: NO_DHAN_DATA",
+    "Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5009ms",
+    "Fix visible UI blocker on System: Broker not connected - real data unavailable",
+    "Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5013ms",
+    "Fix visible UI blocker on Live Gate: DHAN DEGRADED"
+  ],
+  "production_grade_claim_allowed": false
 }
