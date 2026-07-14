@@ -23,7 +23,9 @@ const tabs = [
   ['chain', 'Option Chain'], ['signals', 'Signals'], ['paper', 'Paper Trades'], ['positions', 'Positions'],
   ['broker', 'Broker'], ['performance', 'Performance'], ['ml', 'ML Model'], ['gates', 'Live Gate']
 ]
-const forbidden = [/csv_fallback/i, /STALE_CSV_FALLBACK/i, /synthetic/i, /fake/i, /mock/i, /bhavcopy/i, /yahoo/i, /Request failed with status code 401/i, /Loading funds/i, /Loading holdings/i, /Loading positions/i, /INTERNAL_UNVERIFIED/i]
+const forbidden = [/csv_fallback/i, /STALE_CSV_FALLBACK/i, /bhavcopy/i, /yahoo/i, /Request failed with status code 401/i, /Loading funds/i, /Loading holdings/i, /Loading positions/i, /INTERNAL_UNVERIFIED/i]
+const provenanceWords = [/\bsynthetic\b/i, /\bfake\b/i, /\bmock\b/i]
+const explicitRejection = /\b(reject(?:ed|ion)?|forbid(?:den)?|not allowed|must not|never use|disabled|blocked|excluded|no synthetic|no fake|no mock)\b/i
 
 function tryJson(text) { try { return JSON.parse(text) } catch { return null } }
 function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
@@ -32,7 +34,18 @@ function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
 function optionalNoise(text) { return /ML performance fetch failed|ML comparison fetch failed|\/api\/ml\/performance|\/api\/ml\/compare|fonts\.gstatic\.com|googleapis\.com\/css|woff2|WebSocket connection.*\/ws\/stream|Error during WebSocket handshake/i.test(text || '') }
 function transientBrowser502(text) { return /status of 502|Request failed with status code 502|AxiosError.*502/i.test(text || '') }
 function genericExternalNetFail(text) { return /Failed to load resource:\s*net::ERR_FAILED/i.test(text || '') }
-function scanForbidden(scope, text, blockers) { if (optionalNoise(text)) return; for (const re of forbidden) if (re.test(text || '')) blockers.push(`${scope}:FORBIDDEN:${re}`) }
+function scanForbidden(scope, text, blockers) {
+  if (optionalNoise(text)) return
+  const value = text || ''
+  for (const re of forbidden) if (re.test(value)) blockers.push(`${scope}:FORBIDDEN:${re}`)
+  if (!scope.startsWith('UI:')) return
+  for (const line of value.split(/\r?\n/)) {
+    if (explicitRejection.test(line)) continue
+    for (const re of provenanceWords) {
+      if (re.test(line)) blockers.push(`${scope}:FORBIDDEN:${re}`)
+    }
+  }
+}
 
 async function fetchWithRetry(page, ep, attempts = 5) {
   let last = null
