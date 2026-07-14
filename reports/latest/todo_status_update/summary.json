@@ -5,7 +5,7 @@
     "PARTIAL": 0,
     "PENDING": 0
   },
-  "generated_utc": "2026-07-14T14:47:48.942753+00:00",
+  "generated_utc": "2026-07-14T15:00:00.063112+00:00",
   "proof_state": {
     "contracts_pass": false,
     "has_360_matrix": true,
@@ -20,7 +20,7 @@
     "ml_blocked": false,
     "ml_pass": false,
     "ml_visible": false,
-    "owner_visible": false,
+    "owner_visible": true,
     "paper_visible": false,
     "parallel_blocked": true,
     "parallel_blocker_count": 14,
@@ -28,7 +28,7 @@
     "public_fail": true,
     "public_pass": false,
     "screenshots_ok": true,
-    "visual_pass": false,
+    "visual_pass": true,
     "workflow_blocked": true
   },
   "reason": "TODO file not found or empty: /home/runner/work/Genesis_System3/Genesis_System3/System3_Production_Grade_1000_Point_QC_TODO.md",
