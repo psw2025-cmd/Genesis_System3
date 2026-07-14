@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-22:58:15 IST
+23:01:52 IST
 NIFTY
 24,069
 BNFTY
@@ -14,7 +14,7 @@ DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -54,34 +54,10 @@ Live Gate
 LOCK
 Live Trading Gate
 
-3/6 gates passed
+Checking...
 
-LIVE_TRADING_BLOCKED
-
-Live trading blocked — see failed gates above
+CHECKING
 
 GATE CHECKLIST
-✅
-env_live_disabled
-LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)
-✅
-kill_switch_off
-Kill switch not activated
-❌
-human_approved
-NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json
-❌
-validation_days
-0 validation days (need ≥10)
-❌
-ml_accuracy_rho
-Avg Spearman ρ=0.000 (need ≥0.70)
-✅
-max_loss_configured
-Max daily loss = ₹5000 hardcoded in kill_switch.json
-
-⚠️ Gates not yet passed
-
-All technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.
 
 Live trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: ₹5,000. System halts automatically when limit is hit.
