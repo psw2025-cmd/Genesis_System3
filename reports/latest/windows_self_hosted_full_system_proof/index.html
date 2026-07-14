@@ -8,14 +8,14 @@ td,th{border:1px solid #334155;padding:9px;text-align:left;vertical-align:top} t
 .card{border:1px solid #334155;border-radius:14px;padding:14px;margin:14px 0;background:#111827} pre{white-space:pre-wrap;margin:0;color:#cbd5e1}
 </style></head><body>
 <h1>System3 Windows Self-Hosted Full System Proof</h1>
-<div class='meta'>Generated: 2026-07-14T20:21:08.810140Z | Runner OS: Windows-10-10.0.18362-SP0 | Base URL: https://genesis-system3-backend.onrender.com</div>
+<div class='meta'>Generated: 2026-07-14T23:10:24.920008Z | Runner OS: Windows-10-10.0.18362-SP0 | Base URL: https://genesis-system3-backend.onrender.com</div>
 <div class='card'><b>Final status:</b> <span class='blocked'>BLOCKED</span><br>
 <b>Live trading enabled:</b> false | <b>Order routes called:</b> false | <b>Analyzer mode:</b> true</div>
-<h2>Status board</h2><table><tr><th>Area</th><th>Status</th><th>Detail</th></tr><tr><td>C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates</td><td class='pass'>PASS</td><td>rc=0 elapsed=2.86s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_auto_coordinator.py --full</td><td class='pass'>PASS</td><td>rc=0 elapsed=212.01s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_github_render_failure_tracker.py</td><td class='pass'>PASS</td><td>rc=0 elapsed=6.63s</td></tr>
-<tr><td>C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=1.21s</td></tr>
-<tr><td>C:\Python310\python.exe tools/system3_autopilot_proof_board.py</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.25s</td></tr>
+<h2>Status board</h2><table><tr><th>Area</th><th>Status</th><th>Detail</th></tr><tr><td>C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates</td><td class='pass'>PASS</td><td>rc=0 elapsed=2.45s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_auto_coordinator.py --full</td><td class='pass'>PASS</td><td>rc=0 elapsed=166.19s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_github_render_failure_tracker.py</td><td class='pass'>PASS</td><td>rc=0 elapsed=5.31s</td></tr>
+<tr><td>C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=1.02s</td></tr>
+<tr><td>C:\Python310\python.exe tools/system3_autopilot_proof_board.py</td><td class='blocked'>BLOCKED</td><td>rc=1 elapsed=0.19s</td></tr>
 <tr><td>HTTP /api/health</td><td class='pass'>PASS</td><td>200</td></tr>
 <tr><td>HTTP /api/state</td><td class='pass'>PASS</td><td>200</td></tr>
 <tr><td>HTTP /api/status</td><td class='pass'>PASS</td><td>200</td></tr>
@@ -24,7 +24,7 @@ td,th{border:1px solid #334155;padding:9px;text-align:left;vertical-align:top} t
 <tr><td>HTTP /api/broker/funds</td><td class='pass'>PASS</td><td>200</td></tr>
 <tr><td>HTTP /api/broker/holdings</td><td class='pass'>PASS</td><td>200</td></tr>
 <tr><td>HTTP /api/broker/positions</td><td class='blocked'>BLOCKED</td><td>404</td></tr>
-<tr><td>HTTP /api/scanner/top_contract_gainers</td><td class='blocked'>BLOCKED</td><td>request_timeout</td></tr>
+<tr><td>HTTP /api/scanner/top_contract_gainers</td><td class='pass'>PASS</td><td>200</td></tr>
 <tr><td>HTTP /api/simulation/live/state</td><td class='blocked'>BLOCKED</td><td>404</td></tr>
 <tr><td>Report system3_auto_gates</td><td class='unknown'>UNKNOWN</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\system3_auto_gates\summary.json</td></tr>
 <tr><td>Report github_render_failure_tracker</td><td class='blocked'>BLOCKED</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\github_render_failure_tracker\summary.json</td></tr>
@@ -33,15 +33,15 @@ td,th{border:1px solid #334155;padding:9px;text-align:left;vertical-align:top} t
 <tr><td>Report safe_repair_runner</td><td class='missing'>MISSING</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\safe_repair_runner\summary.json</td></tr>
 <tr><td>Report market_session_proof_runner</td><td class='missing'>MISSING</td><td>C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\market_session_proof_runner\summary.json</td></tr></table>
 <h2>Blockers</h2><div class='card'><ul><li>Command blocked: C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs — DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16
-</li><li>Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1</li><li>HTTP blocked: /api/broker/positions — 404</li><li>HTTP blocked: /api/scanner/top_contract_gainers — request_timeout</li><li>HTTP blocked: /api/simulation/live/state — 404</li><li>Report not PASS: system3_auto_gates — UNKNOWN</li><li>Report not PASS: github_render_failure_tracker — BLOCKED</li><li>Report not PASS: dashboard_visible_issue_tracker — BLOCKED</li><li>Report not PASS: autopilot_proof_board — MISSING</li><li>Report not PASS: safe_repair_runner — MISSING</li><li>Report not PASS: market_session_proof_runner — MISSING</li></ul></div>
-<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Error category</th></tr><tr><td>/api/health</td><td class=pass>200</td><td>0.31</td><td>none</td></tr>
-<tr><td>/api/state</td><td class=pass>200</td><td>0.28</td><td>none</td></tr>
-<tr><td>/api/status</td><td class=pass>200</td><td>20.27</td><td>none</td></tr>
-<tr><td>/api/broker/status</td><td class=pass>200</td><td>0.61</td><td>none</td></tr>
+</li><li>Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1</li><li>HTTP blocked: /api/broker/positions — 404</li><li>HTTP blocked: /api/simulation/live/state — 404</li><li>Report not PASS: system3_auto_gates — UNKNOWN</li><li>Report not PASS: github_render_failure_tracker — BLOCKED</li><li>Report not PASS: dashboard_visible_issue_tracker — BLOCKED</li><li>Report not PASS: autopilot_proof_board — MISSING</li><li>Report not PASS: safe_repair_runner — MISSING</li><li>Report not PASS: market_session_proof_runner — MISSING</li></ul></div>
+<h2>HTTP proof probes</h2><table><tr><th>Endpoint</th><th>Status</th><th>Seconds</th><th>Error category</th></tr><tr><td>/api/health</td><td class=pass>200</td><td>0.28</td><td>none</td></tr>
+<tr><td>/api/state</td><td class=pass>200</td><td>0.27</td><td>none</td></tr>
+<tr><td>/api/status</td><td class=pass>200</td><td>0.27</td><td>none</td></tr>
+<tr><td>/api/broker/status</td><td class=pass>200</td><td>0.66</td><td>none</td></tr>
 <tr><td>/api/broker/dhan/status</td><td class=pass>200</td><td>0.63</td><td>none</td></tr>
-<tr><td>/api/broker/funds</td><td class=pass>200</td><td>0.62</td><td>none</td></tr>
-<tr><td>/api/broker/holdings</td><td class=pass>200</td><td>0.63</td><td>none</td></tr>
-<tr><td>/api/broker/positions</td><td class=blocked>404</td><td>0.32</td><td>route_not_found</td></tr>
-<tr><td>/api/scanner/top_contract_gainers</td><td class=blocked>None</td><td>20.03</td><td>request_timeout</td></tr>
-<tr><td>/api/simulation/live/state</td><td class=blocked>404</td><td>0.33</td><td>route_not_found</td></tr></table>
+<tr><td>/api/broker/funds</td><td class=pass>200</td><td>0.64</td><td>none</td></tr>
+<tr><td>/api/broker/holdings</td><td class=pass>200</td><td>0.61</td><td>none</td></tr>
+<tr><td>/api/broker/positions</td><td class=blocked>404</td><td>0.33</td><td>route_not_found</td></tr>
+<tr><td>/api/scanner/top_contract_gainers</td><td class=pass>200</td><td>0.58</td><td>none</td></tr>
+<tr><td>/api/simulation/live/state</td><td class=blocked>404</td><td>0.3</td><td>route_not_found</td></tr></table>
 </body></html>
