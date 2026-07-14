@@ -46,11 +46,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
-      - name: Install locked dashboard proof dependencies
+      - name: Install isolated dashboard proof dependencies
+        shell: bash
         run: |
-          npm ci --ignore-scripts
-          npx playwright install chromium --with-deps
+          set -euo pipefail
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {"name":"system3-dashboard-visual-proof","private":true,"version":"1.0.0","dependencies":{"playwright":"1.52.0"}}
+          JSON
+          npm install --prefix .proof-node --no-audit --no-fund --ignore-scripts
+          .proof-node/node_modules/.bin/playwright install chromium --with-deps
+          ln -sfn "$PWD/.proof-node/node_modules" node_modules
       - name: Assert analyzer-only safety flags
         run: |
           test "$ANALYZE_MODE" = "1"
