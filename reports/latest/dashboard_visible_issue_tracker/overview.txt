@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-20:19:06 IST
+20:30:59 IST
 NIFTY
 24,069
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 26,515
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -57,7 +57,7 @@ PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 BROKER
-CONNECTED
+API RESPONDED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -76,10 +76,11 @@ live
 LOADED
 State API
 Market closed: After hours (closed at 15:30)
-LOADED
+ERROR
 Broker Status API
-LOADED
+ERROR
 Funds API
+Client ID or user generated access token is invalid or expired.
 LOADED
 Holdings API
 LOADED
@@ -99,7 +100,7 @@ LOADED
 Option Chain
 Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 Gate Matrix
-3/7 PASS
+2/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
 0/5 days · ρ=None · need ≥0.7
@@ -109,9 +110,9 @@ expectancy=-196.14 · win_rate=0.3333
 PEND
 Paper Lifecycle
 market-session proof pending
-PASS
+PEND
 Tick / Data Freshness
-tick_age=3.5s refresh=5s
+tick_age=5.3s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -125,7 +126,7 @@ System Health
 Mode
 PAPER
 QC Status
-PASS
+NOT_READY
 Data Source
 live
 Market
