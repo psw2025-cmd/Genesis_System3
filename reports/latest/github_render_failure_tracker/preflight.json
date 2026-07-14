@@ -6,7 +6,7 @@
   "dashboard_api_key_present": true,
   "rate_limit": {
     "available": true,
-    "core_remaining": 4998,
+    "core_remaining": 4900,
     "core_limit": 5000,
     "core_reset": 1784034909,
     "actions_runner_registration_remaining": 10000
