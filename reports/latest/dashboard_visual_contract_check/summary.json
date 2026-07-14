@@ -1,0 +1,133 @@
+{
+  "generated_utc": "2026-07-14T04:23:46.721308Z",
+  "status": "PASS",
+  "purpose": "Distinguish repository visual-contract regressions from deployed/runtime proof failures.",
+  "safety": {
+    "analyze_mode": true,
+    "live_trading_enabled": false,
+    "system3_live_trading_allowed": false,
+    "network_calls": false,
+    "broker_order_endpoints_called": false,
+    "secrets_read_or_written": false
+  },
+  "paper_source_contract_complete": true,
+  "proof_marker_contract_complete": true,
+  "tab_contract_complete": true,
+  "checks": [
+    {
+      "scope": "paper_source",
+      "marker": "Paper Truth Provenance",
+      "ok": true
+    },
+    {
+      "scope": "paper_source",
+      "marker": "Fake/fixture rejected",
+      "ok": true
+    },
+    {
+      "scope": "paper_source",
+      "marker": "Order endpoints",
+      "ok": true
+    },
+    {
+      "scope": "paper_source",
+      "marker": "NOT CALLED",
+      "ok": true
+    },
+    {
+      "scope": "proof_contract",
+      "marker": "Paper Truth Provenance",
+      "ok": true
+    },
+    {
+      "scope": "proof_contract",
+      "marker": "Fake\\/fixture rejected",
+      "ok": true
+    },
+    {
+      "scope": "proof_contract",
+      "marker": "Order endpoints",
+      "ok": true
+    },
+    {
+      "scope": "proof_contract",
+      "marker": "NOT CALLED|BLOCKED",
+      "ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Truth Control",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Genesis Brain",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "E2E Proof",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Overview",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Option Chain",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Signals",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Paper Trades",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Positions",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Broker",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Performance",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "ML Model",
+      "source_ok": true,
+      "proof_ok": true
+    },
+    {
+      "scope": "tab_contract",
+      "title": "Live Gate",
+      "source_ok": true,
+      "proof_ok": true
+    }
+  ],
+  "blockers": [],
+  "interpretation": "If this report passes while live visual proof reports PAPER_TRUTH_NOT_VISIBLE, the remaining cause is deployed asset drift, tab navigation, or asynchronous runtime rendering\u2014not missing source labels.",
+  "production_grade_claim_allowed": false
+}
