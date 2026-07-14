@@ -1,18 +1,18 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T06:11:00.971Z
+Generated: 2026-07-14T06:29:01.043Z
 Status: **BLOCKED**
-Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
-Render UI available: `true`
-Auth OK: `true` (HTTP 200)
-UI HTTP: `200`
-Root children: `1`
-Body text length: `3354`
-Matched tabs: `15/16`
-Missing source-defined tabs: `Sim Live`
-Deployed asset drift: `true`
-Visible buttons: `18`
-Visible links: `5`
+Blocker: **RENDER_UI_UNAVAILABLE**
+Render UI available: `false`
+Auth OK: `false` (HTTP 0)
+UI HTTP: `502`
+Root children: `0`
+Body text length: `210`
+Matched tabs: `0/16`
+Missing source-defined tabs: `not evaluated / none`
+Deployed asset drift: `false`
+Visible buttons: `0`
+Visible links: `2`
 Console error categories: `console.error`
 Page error categories: `none`
 
