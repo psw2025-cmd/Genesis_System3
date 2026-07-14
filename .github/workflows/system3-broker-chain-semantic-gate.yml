@@ -1,0 +1,76 @@
+name: System3 Broker Chain Semantic Gate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10,40 3-10 * * 1-5'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/system3_broker_chain_semantic_gate.py'
+      - '.github/workflows/system3-broker-chain-semantic-gate.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: system3-broker-chain-semantic-gate
+  cancel-in-progress: true
+
+env:
+  SYSTEM3_MODE: analyzer
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+  DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+  DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+  SYSTEM3_REQUIRED_UNDERLYINGS: NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY
+
+jobs:
+  semantic-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run sanitized semantic proof
+        id: proof
+        continue-on-error: true
+        run: python tools/system3_broker_chain_semantic_gate.py
+
+      - name: Commit sanitized proof report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/broker_chain_semantic_gate/summary.json reports/latest/broker_chain_semantic_gate/summary.md
+          if git diff --cached --quiet; then
+            echo "No semantic proof changes"
+            exit 0
+          fi
+          git commit -m "ci(proof): publish broker chain semantic gate [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Enforce fail-closed readiness result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('reports/latest/broker_chain_semantic_gate/summary.json')
+          if not p.exists():
+              raise SystemExit('semantic proof summary missing')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          print('verdict=', data.get('final_verdict'))
+          print('broker_connected=', data.get('broker', {}).get('connected'))
+          print('mandatory_chains=', f"{data.get('required_chain_ready_count', 0)}/{data.get('required_chain_total', 0)}")
+          if data.get('final_verdict') != 'PASS':
+              raise SystemExit(2)
+          PY
