@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-07-14T16:56:34.377261+00:00`
+Generated UTC: `2026-07-14T16:58:28.915375+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `44`
+Failed workflow count: `42`
 
 ## Rule
 
@@ -12,6 +12,12 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 Autopilot Proof Board' run 29351738753 conclusion=failure commit=6906bd040166edf59b7cc5b2bbe2ed4613671e60
+- [ ] Fix workflow 'System3 Experimental Solution Planner' run 29351738543 conclusion=failure commit=6906bd040166edf59b7cc5b2bbe2ed4613671e60
+- [ ] Fix workflow 'System3 Secure Install Credential Audit' run 29351737596 conclusion=failure commit=6906bd040166edf59b7cc5b2bbe2ed4613671e60
+- [ ] Fix workflow 'System3 Experimental Solution Planner' run 29351715492 conclusion=failure commit=8b72bb63fb93192c5001b83d7da98ea8d06a3344
+- [ ] Fix workflow 'System3 Secure Install Credential Audit' run 29351715424 conclusion=failure commit=8b72bb63fb93192c5001b83d7da98ea8d06a3344
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 29351715400 conclusion=failure commit=8b72bb63fb93192c5001b83d7da98ea8d06a3344
 - [ ] Fix workflow 'System3 Experimental Solution Planner' run 29351561054 conclusion=failure commit=0fd5439f9f7d672f19bd04856a839c5bd0d170f2
 - [ ] Fix workflow 'System3 Autopilot Proof Board' run 29351479916 conclusion=failure commit=4178740e599665936a4a1423ba0f0353353f6af0
 - [ ] Fix workflow 'System3 Experimental Solution Planner' run 29351473931 conclusion=failure commit=4178740e599665936a4a1423ba0f0353353f6af0
@@ -48,19 +54,17 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 29351268085 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
 - [ ] Fix workflow 'System3 Secure Install Credential Audit' run 29351268025 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
 - [ ] Fix workflow 'Dashboard Visual Loading Postflight' run 29351268014 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
-- [ ] Fix workflow 'System3 Safe Repair Runner' run 29351267990 conclusion=cancelled commit=e67cf1aebe41b15f9d840fbea1208601608fb028
-- [ ] Fix workflow 'System3 Experimental Solution Planner' run 29351267970 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
-- [ ] Fix workflow 'Dashboard Shell Diagnostic' run 29351267922 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
-- [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 29350908685 conclusion=failure commit=6f7b68c5f044e03418ca1d22ac54fef4e6296036
-- [ ] Fix workflow 'System3 Experimental Solution Planner' run 29350808633 conclusion=failure commit=8acd68bd3a8d120c74f77c6205ed3d300024ec26
-- [ ] Fix workflow 'System3 Safe Repair Runner' run 29350808380 conclusion=cancelled commit=8acd68bd3a8d120c74f77c6205ed3d300024ec26
-- [ ] Fix workflow 'Dashboard Visible Issue Tracker' run 29350808329 conclusion=failure commit=8acd68bd3a8d120c74f77c6205ed3d300024ec26
-- [ ] Fix workflow 'Dashboard Visual Proof Strict Gate' run 29350805633 conclusion=failure commit=8acd68bd3a8d120c74f77c6205ed3d300024ec26
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 Autopilot Proof Board | 29351738753 | failure | `6906bd040166` | 2026-07-14T16:58:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351738753 |
+| System3 Experimental Solution Planner | 29351738543 | failure | `6906bd040166` | 2026-07-14T16:57:18Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351738543 |
+| System3 Secure Install Credential Audit | 29351737596 | failure | `6906bd040166` | 2026-07-14T16:57:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351737596 |
+| System3 Experimental Solution Planner | 29351715492 | failure | `8b72bb63fb93` | 2026-07-14T16:56:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351715492 |
+| System3 Secure Install Credential Audit | 29351715424 | failure | `8b72bb63fb93` | 2026-07-14T16:57:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351715424 |
+| System3 1000 Point TODO Status Updater | 29351715400 | failure | `8b72bb63fb93` | 2026-07-14T16:56:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351715400 |
 | System3 Experimental Solution Planner | 29351561054 | failure | `0fd5439f9f7d` | 2026-07-14T16:54:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351561054 |
 | System3 Autopilot Proof Board | 29351479916 | failure | `4178740e5996` | 2026-07-14T16:54:48Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351479916 |
 | System3 Experimental Solution Planner | 29351473931 | failure | `4178740e5996` | 2026-07-14T16:53:20Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351473931 |
@@ -97,11 +101,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 29351268085 | failure | `e67cf1aebe41` | 2026-07-14T16:50:20Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351268085 |
 | System3 Secure Install Credential Audit | 29351268025 | failure | `e67cf1aebe41` | 2026-07-14T16:50:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351268025 |
 | Dashboard Visual Loading Postflight | 29351268014 | failure | `e67cf1aebe41` | 2026-07-14T16:50:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351268014 |
-| System3 Safe Repair Runner | 29351267990 | cancelled | `e67cf1aebe41` | 2026-07-14T16:53:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351267990 |
-| System3 Experimental Solution Planner | 29351267970 | failure | `e67cf1aebe41` | 2026-07-14T16:50:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351267970 |
-| Dashboard Shell Diagnostic | 29351267922 | failure | `e67cf1aebe41` | 2026-07-14T16:51:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29351267922 |
-| System3 Backend Live Simulation Proof | 29350908685 | failure | `6f7b68c5f044` | 2026-07-14T16:45:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29350908685 |
-| System3 Experimental Solution Planner | 29350808633 | failure | `8acd68bd3a8d` | 2026-07-14T16:43:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29350808633 |
-| System3 Safe Repair Runner | 29350808380 | cancelled | `8acd68bd3a8d` | 2026-07-14T16:50:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29350808380 |
-| Dashboard Visible Issue Tracker | 29350808329 | failure | `8acd68bd3a8d` | 2026-07-14T16:52:49Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29350808329 |
-| Dashboard Visual Proof Strict Gate | 29350805633 | failure | `8acd68bd3a8d` | 2026-07-14T16:43:26Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29350805633 |
