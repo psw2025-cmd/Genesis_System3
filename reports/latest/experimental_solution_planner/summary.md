@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T00:29:43.528139+00:00`
+Generated UTC: `2026-07-14T00:30:19.972655+00:00`
 Status: **BLOCKED**
-Issues: `302`
+Issues: `282`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 126 issues
+### GITHUB_RENDER_FAILURE — 107 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -327,7 +327,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=46
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=36
 
 ### ROUTE_CODE — 7 issues
 
@@ -375,7 +375,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 
-### INSTALL_CREDENTIAL — 4 issues
+### INSTALL_CREDENTIAL — 3 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -383,10 +383,9 @@ Recommended fixes:
 - Never print or commit credential values.
 
 Top issues:
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293732208 conclusion=failure commit=3b53e02746d8e37b7ea10c3450bd157f9deedbe5
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293720480 conclusion=failure commit=c874750373fd2eb60bf3d787e68c5baa32fd0ee9
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293446344 conclusion=failure commit=7cc2d90c94071d3acf0ea8efc4ffc49506fbfd99
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293434613 conclusion=failure commit=dc71e4522883cb73f3e5789dd2e7e902f6925557
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29296061260 conclusion=failure commit=cf922b7f068a42a149eb3bd8afafb49e51744d6f
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29295176764 conclusion=failure commit=12979550203ae2db6dc7960d65b9220f60f2a178
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29294785070 conclusion=failure commit=1e2b4c81a9211ee3c8978fdb8294297d62d84211
 
 ### SCANNER_SIGNAL — 2 issues
 
