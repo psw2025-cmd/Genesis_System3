@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-07-14T16:35:25.196Z",
+  "generated_at": "2026-07-14T16:43:39.864Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "auth": {
-    "ok": false,
-    "status": 502
+    "ok": true,
+    "status": 200
   },
   "tabs": [
     {
@@ -306,6 +306,5 @@
   "visible_issues": [],
   "info_lines": [],
   "todo": [],
-  "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 0
+  "production_grade_claim_allowed": false
 }

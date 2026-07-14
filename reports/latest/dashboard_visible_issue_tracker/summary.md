@@ -1,5 +1,5 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-14T16:35:25.196Z
+Generated: 2026-07-14T16:43:39.864Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
@@ -9,12 +9,12 @@ Info line count: `0`
 Screenshot missing count: `16`
 Unsettled tab count: `16`
 UI exception count: `16`
-Auth OK: `false`
+Auth OK: `true`
 Production-grade claim allowed: `false`
 ## Rule
 Every live sidebar tab must be scanned and its asynchronous content must settle before PASS. A timed-out tab is still captured but is recorded as ASYNC_CONTENT_NOT_SETTLED. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.
 ## TODO
-- [ ] Dashboard auth session failed status=502
+- [x] No visible UI blockers detected.
 ## Tab results
 | Tab | Status | Screenshot | Settled | Settle ms | Blockers | Info | Exceptions | Text file |
 |---|---|---:|---:|---:|---:|---:|---:|---|
