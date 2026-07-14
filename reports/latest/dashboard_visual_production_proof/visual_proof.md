@@ -1,30 +1,32 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-07-14T13:23:08.038Z
+Generated: 2026-07-14T13:54:10.526Z
 Base: https://genesis-system3-backend.onrender.com
-Visual gate pass: **True**
-Production-grade claim allowed: **True**
-Source verdict: **PASS**
+Visual gate pass: **False**
+Production-grade claim allowed: **False**
+Source verdict: **FAIL**
 Auth OK: **True**
 Screenshot gate: **True**
 
 ## Blockers
-- none
+- UI_FAIL:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
 
 ## Screenshots
-- PASS `truth.png` size=`204447`
-- PASS `genesis.png` size=`281537`
-- PASS `e2e_proof.png` size=`197735`
-- PASS `overview.png` size=`157040`
-- PASS `chain.png` size=`223244`
-- PASS `signals.png` size=`128567`
-- PASS `paper.png` size=`175951`
-- PASS `positions.png` size=`111610`
-- PASS `broker.png` size=`158242`
-- PASS `performance.png` size=`110983`
-- PASS `ml.png` size=`140361`
-- PASS `gates.png` size=`141142`
-- PASS `mobile_390x844.png` size=`123117`
+- PASS `truth.png` size=`204821`
+- PASS `genesis.png` size=`100638`
+- PASS `e2e_proof.png` size=`186892`
+- PASS `overview.png` size=`166257`
+- PASS `chain.png` size=`222759`
+- PASS `signals.png` size=`99742`
+- PASS `paper.png` size=`105129`
+- PASS `positions.png` size=`110807`
+- PASS `broker.png` size=`159274`
+- PASS `performance.png` size=`110600`
+- PASS `ml.png` size=`139588`
+- PASS `gates.png` size=`140404`
+- PASS `mobile_390x844.png` size=`122782`
 
 ## truth.png
 
