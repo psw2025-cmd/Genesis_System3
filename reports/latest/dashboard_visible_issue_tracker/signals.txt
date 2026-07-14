@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:29:51 IST
+16:03:01 IST
 NIFTY
---
+24,069
 BNFTY
---
+57,447
 FINNIFTY
---
-MARKET OPEN
+26,515
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -52,4 +52,24 @@ Alerts
 System
 Live Gate
 LOCK
-Loading signals...
+Signals & Recommendations
+NO TRADE
+NO_TRADE
+What Blocked Trading?
+No Underlying
+Low Confidence
+Underlying
+N/A
+Strategy
+No signal generated
+Confidence
+N/A
+Explainability
+Reason
+No signal generated
+Source
+runtime_state
+What Blocked Trading?
+Scanner Segments
+0/4
+Download Signal Snapshot (JSON)

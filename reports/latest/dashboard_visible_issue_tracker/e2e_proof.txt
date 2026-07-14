@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:29:15 IST
+16:02:24 IST
 NIFTY
---
+24,069
 BNFTY
---
+57,447
 FINNIFTY
---
-MARKET OPEN
+26,515
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -59,13 +59,13 @@ BLOCKED · FULL E2E
 Overall visual proof
 PASS · API
 Core endpoints
-BLOCKED · DHAN CHAIN
+PASS · DHAN CHAIN
 Real Dhan option chain
 BLOCKED · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 7/14/2026, 9:59:14 AM · This panel is proof-only; it does not enable live orders.
+Last run: 7/14/2026, 10:32:23 AM · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
 Dhan broker connection	BLOCKED	200
@@ -73,7 +73,7 @@ Dhan access token/session	BLOCKED	-
 Real broker funds/margin	PASS	200
 Real broker holdings response	PASS	rows visible or empty broker response
 Real broker positions response	PASS	rows visible or empty broker response
-Real Dhan option chain for all watched symbols	BLOCKED	0/5
+Real Dhan option chain for all watched symbols	PASS	5/5
 No non-Dhan/stale/fallback markers in chain	BLOCKED	blocked marker found
 Paper/analyzer P&L endpoint	PASS	200
 Today paper lifecycle endpoint	PASS	count=0
@@ -81,11 +81,11 @@ Gate/risk endpoint visible	PASS	ok
 Live-money switch blocked until separate proof	PASS	blocked
 Dhan Option Chain Proof
 SYMBOL	VISUAL STATUS	SOURCE	PRIORITY	STATUS	SPOT	CONTRACTS	REASON
-NIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-BANKNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-FINNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-MIDCPNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-SENSEX	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+NIFTY	PASS	dhan	dhan_last_verified_snapshot	MARKET_CLOSED_DHAN_SNAPSHOT	24068.65	160	REAL_DHAN_VISIBLE
+BANKNIFTY	PASS	dhan	dhan_last_verified_snapshot	MARKET_CLOSED_DHAN_SNAPSHOT	57447.3	160	REAL_DHAN_VISIBLE
+FINNIFTY	PASS	dhan	dhan_last_verified_snapshot	MARKET_CLOSED_DHAN_SNAPSHOT	26515.25	160	REAL_DHAN_VISIBLE
+MIDCPNIFTY	PASS	dhan	dhan_last_verified_snapshot	MARKET_CLOSED_DHAN_SNAPSHOT	14729.7	160	REAL_DHAN_VISIBLE
+SENSEX	PASS	dhan	dhan_last_verified_snapshot	MARKET_CLOSED_DHAN_SNAPSHOT	77155.48	160	REAL_DHAN_VISIBLE
 Core API / Dashboard Data Proof
 ENDPOINT	HTTP	VISUAL STATUS	IMPORTANT STATUS
 /api/health	200	PASS	not_ready

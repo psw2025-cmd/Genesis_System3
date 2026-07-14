@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:28:59 IST
+16:02:08 IST
 NIFTY
---
+24,069
 BNFTY
---
+57,447
 FINNIFTY
---
-MARKET OPEN
+26,515
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -60,7 +60,7 @@ Infrastructure / broker read path
 BLOCKED
 Money readiness
 Last run
-7/14/2026, 9:58:55 AM
+7/14/2026, 10:32:04 AM
 MONEY_READY_BLOCKED
 At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
 LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE
@@ -68,7 +68,7 @@ Backend/API route health	PASS	YES	health=200, state=200
 Broker read-only connection	BLOCKED	YES	connected=false, broker=dhan, order_allowed=false
 Funds / margin truth	PASS	YES	available=-, used=-, source=sdk
 Holdings and live positions read path	PASS	YES	holdings=0, positions=0
-Dhan option-chain availability	PARTIAL	YES	enabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1
+Dhan option-chain availability	PASS	YES	enabled_ready=4/4, enabled_safe_no_trade=0/4, optional_ready=1/1, optional_safe_no_trade=0/1
 Universe / ranking candidates	BLOCKED	YES	candidate_rows=0, gain=0, scanner=0
 CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 Paper/analyzer lifecycle	PARTIAL	NO	today_trade_rows=0, endpoint=200

@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:30:27 IST
+16:03:37 IST
 NIFTY
---
+24,069
 BNFTY
---
+57,447
 FINNIFTY
---
-MARKET OPEN
+26,515
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -53,6 +53,4 @@ System
 Live Gate
 LOCK
 
-Alerts unavailable: NO_DHAN_DATA
-
-NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS Retrying slowly; last good truth remains visible where available.
+No alerts
