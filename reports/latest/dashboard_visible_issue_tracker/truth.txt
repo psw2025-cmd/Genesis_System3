@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-12:50:05 IST
+12:58:59 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET OPEN
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -60,7 +60,7 @@ Infrastructure / broker read path
 BLOCKED
 Money readiness
 Last run
-7/14/2026, 7:20:01 AM
+7/14/2026, 7:28:55 AM
 MONEY_READY_BLOCKED
 At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
 LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE

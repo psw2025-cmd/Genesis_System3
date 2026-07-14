@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-12:50:26 IST
+12:59:20 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET OPEN
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -73,10 +73,9 @@ Live Data Coverage
 market closed must not hide read-only data
 LOADED
 Health API
-live
-LOADED
+RENDER_UNAVAILABLE
+WAITING
 State API
-Market open
 ERROR
 Broker Status API
 ERROR
@@ -97,7 +96,7 @@ Auto Gates
 LOADED
 Alerts
 0 recent
-WAITING
+MARKET_SESSION_ONLY
 Option Chain
 NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 Gate Matrix
@@ -113,7 +112,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=6.47s refresh=5s
+tick_age=2.06s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -127,11 +126,11 @@ System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+RENDER_UNAVAILABLE
 Data Source
-live
+RENDER_UNAVAILABLE
 Market
-OPEN
+CLOSED / DATA POLLING
 Live Allowed
 false
 Last Sync

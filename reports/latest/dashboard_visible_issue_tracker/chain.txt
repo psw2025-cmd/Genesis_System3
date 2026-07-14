@@ -2,14 +2,14 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-12:50:52 IST
+12:59:46 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-MARKET OPEN
+MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
 LIVE OFF
@@ -58,7 +58,39 @@ FINNIFTY
 MIDCPNIFTY
 SENSEX
 OPTION CHAIN - NIFTY
-Live option-chain rows are not available for this selected symbol.
-Status: NO_DHAN_DATA
-Source: dhan / blocked_until_real_dhan_stream
-Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+Market closed: live option-chain rows are session-dependent only.
+NO_DHAN_DATA
+
+Broker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.
+
+Chain Status
+Market
+CLOSED
+Reason
+NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+Next Open
+--
+Data Source
+dhan
+Contracts
+0
+Spot
+--
+PCR
+--
+Last Scanner Snapshot
+Latest Date
+--
+Stale
+true
+Rank
+--
+Gain Score
+--
+Expected Move
+--
+Recommendation
+--
+Backend Message
+
+NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
