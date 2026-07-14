@@ -9,7 +9,7 @@
     "Active broker funds route is implemented in app.py.",
     "Active broker live positions route is implemented in app.py."
   ],
-  "generated_utc": "2026-07-12T11:56:17.403600+00:00",
+  "generated_utc": "2026-07-14T03:19:14.561513+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [
