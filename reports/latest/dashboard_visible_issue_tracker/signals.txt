@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:20:30 IST
+15:29:51 IST
 NIFTY
 --
 BNFTY
@@ -52,24 +52,4 @@ Alerts
 System
 Live Gate
 LOCK
-Signals & Recommendations
-NO TRADE
-NO_TRADE
-What Blocked Trading?
-No Underlying
-Low Confidence
-Underlying
-N/A
-Strategy
-No signal generated
-Confidence
-N/A
-Explainability
-Reason
-No signal generated
-Source
-runtime_state
-What Blocked Trading?
-Scanner Segments
-0/4
-Download Signal Snapshot (JSON)
+Loading signals...
