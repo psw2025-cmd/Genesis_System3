@@ -1,7 +1,7 @@
 # System3 Public Truth
 
-- Generated UTC: `2026-07-10T20:16:53.486255Z`
-- Commit: `8c78eb92b882c32e896ff2dec295cba73715755c`
+- Generated UTC: `2026-07-14T04:09:58.433855Z`
+- Commit: `a2f76348b16aed929ea5ce2f4cceff65aaaabc0c`
 - Final verdict: **FAIL**
 
 ## Safety
@@ -12,18 +12,18 @@
 - Secrets written: `false`
 
 ## Visual screenshots
-- PASS [screenshots/truth.png](screenshots/truth.png) size=`166664`
-- PASS [screenshots/signals.png](screenshots/signals.png) size=`80569`
-- PASS [screenshots/paper.png](screenshots/paper.png) size=`120298`
-- PASS [screenshots/broker.png](screenshots/broker.png) size=`108414`
-- PASS [screenshots/ml.png](screenshots/ml.png) size=`89738`
-- PASS [screenshots/gates.png](screenshots/gates.png) size=`102222`
-- PASS [screenshots/overview.png](screenshots/overview.png) size=`110584`
-- PASS [screenshots/mobile_390x844.png](screenshots/mobile_390x844.png) size=`84822`
+- PASS [screenshots/truth.png](screenshots/truth.png) size=`199327`
+- PASS [screenshots/signals.png](screenshots/signals.png) size=`124152`
+- PASS [screenshots/paper.png](screenshots/paper.png) size=`102287`
+- PASS [screenshots/broker.png](screenshots/broker.png) size=`151650`
+- PASS [screenshots/ml.png](screenshots/ml.png) size=`130342`
+- PASS [screenshots/gates.png](screenshots/gates.png) size=`108583`
+- PASS [screenshots/overview.png](screenshots/overview.png) size=`155869`
+- PASS [screenshots/mobile_390x844.png](screenshots/mobile_390x844.png) size=`25288`
 
 ## Source summaries
 - `cloud_runtime_check` present=`True` verdict=`WARN`
-- `dashboard_live_ui_proof` present=`True` verdict=`PASS`
+- `dashboard_live_ui_proof` present=`True` verdict=`FAIL`
 - `permanent_live_log_watch` present=`True` verdict=`FAIL`
 
 ## Read path

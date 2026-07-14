@@ -1,11 +1,11 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "8c78eb92b882c32e896ff2dec295cba73715755c",
-  "generated_utc": "2026-07-10T20:10:33.205997Z",
+  "expected_commit": "a2f76348b16aed929ea5ce2f4cceff65aaaabc0c",
+  "generated_utc": "2026-07-14T04:00:28.029861Z",
   "key_facts": {
     "broker_connected": false,
-    "chain_nifty_contracts": 160,
+    "chain_nifty_contracts": 0,
     "portfolio_details_mode": "skipped_for_render_memory",
     "scheduler_healthy": false,
     "scheduler_received": false
@@ -13,44 +13,44 @@
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 23.1,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1384.0,
+        "headroom_mb": 1438.2,
         "limit_mb": 1800,
-        "pct_used": 23.1,
-        "rss_mb": 416.0,
+        "pct_used": 20.1,
+        "rss_mb": 361.8,
         "status": "OK"
       },
-      "rss_mb": 416.0,
+      "rss_mb": 361.8,
       "status": "OK"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 23.1,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1384.0,
+        "headroom_mb": 1438.2,
         "limit_mb": 1800,
-        "pct_used": 23.1,
-        "rss_mb": 416.0,
+        "pct_used": 20.1,
+        "rss_mb": 361.8,
         "status": "OK"
       },
-      "rss_mb": 416.0,
+      "rss_mb": 361.8,
       "status": "OK"
     },
     "before": {
       "available": true,
-      "pct_used": 20.6,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1429.7,
+        "headroom_mb": 1438.4,
         "limit_mb": 1800,
-        "pct_used": 20.6,
-        "rss_mb": 370.3,
+        "pct_used": 20.1,
+        "rss_mb": 361.6,
         "status": "OK"
       },
-      "rss_mb": 370.3,
+      "rss_mb": 361.6,
       "status": "OK"
     }
   },
@@ -59,7 +59,7 @@
     {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=8c78eb92b882"
+      "message": "Render git_sha=[REDACTED] expected=a2f76348b16a"
     },
     {
       "key": "broker_not_connected",
@@ -70,6 +70,11 @@
       "key": "scheduler_no_worker_push",
       "level": "WARNING",
       "message": "worker scheduler health has not been received"
+    },
+    {
+      "key": "chain_nifty_empty",
+      "level": "WARNING",
+      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
     }
   ]
 }

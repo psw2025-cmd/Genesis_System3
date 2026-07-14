@@ -1,7 +1,7 @@
 {
-  "commit": "8c78eb92b882c32e896ff2dec295cba73715755c",
+  "commit": "a2f76348b16aed929ea5ce2f4cceff65aaaabc0c",
   "final_verdict": "FAIL",
-  "generated_utc": "2026-07-10T20:16:53.486255Z",
+  "generated_utc": "2026-07-14T04:09:58.433855Z",
   "how_to_read": "Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.",
   "how_to_trigger": "Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.",
   "safety": {
@@ -17,11 +17,11 @@
       "summary_json": {
         "alerts": [],
         "deployed_commit": "[REDACTED]",
-        "expected_commit": "8c78eb92b882c32e896ff2dec295cba73715755c",
-        "generated_utc": "2026-07-10T20:10:33.205997Z",
+        "expected_commit": "a2f76348b16aed929ea5ce2f4cceff65aaaabc0c",
+        "generated_utc": "2026-07-14T04:00:28.029861Z",
         "key_facts": {
           "broker_connected": false,
-          "chain_nifty_contracts": 160,
+          "chain_nifty_contracts": 0,
           "portfolio_details_mode": "skipped_for_render_memory",
           "scheduler_healthy": false,
           "scheduler_received": false
@@ -29,44 +29,44 @@
         "memory": {
           "after_chain": {
             "available": true,
-            "pct_used": 23.1,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1384.0,
+              "headroom_mb": 1438.2,
               "limit_mb": 1800,
-              "pct_used": 23.1,
-              "rss_mb": 416.0,
+              "pct_used": 20.1,
+              "rss_mb": 361.8,
               "status": "OK"
             },
-            "rss_mb": 416.0,
+            "rss_mb": 361.8,
             "status": "OK"
           },
           "after_portfolio": {
             "available": true,
-            "pct_used": 23.1,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1384.0,
+              "headroom_mb": 1438.2,
               "limit_mb": 1800,
-              "pct_used": 23.1,
-              "rss_mb": 416.0,
+              "pct_used": 20.1,
+              "rss_mb": 361.8,
               "status": "OK"
             },
-            "rss_mb": 416.0,
+            "rss_mb": 361.8,
             "status": "OK"
           },
           "before": {
             "available": true,
-            "pct_used": 20.6,
+            "pct_used": 20.1,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1429.7,
+              "headroom_mb": 1438.4,
               "limit_mb": 1800,
-              "pct_used": 20.6,
-              "rss_mb": 370.3,
+              "pct_used": 20.1,
+              "rss_mb": 361.6,
               "status": "OK"
             },
-            "rss_mb": 370.3,
+            "rss_mb": 361.6,
             "status": "OK"
           }
         },
@@ -75,7 +75,7 @@
           {
             "key": "deploy_commit_mismatch",
             "level": "WARNING",
-            "message": "Render git_sha=[REDACTED] expected=8c78eb92b882"
+            "message": "Render git_sha=[REDACTED] expected=a2f76348b16a"
           },
           {
             "key": "broker_not_connected",
@@ -86,6 +86,11 @@
             "key": "scheduler_no_worker_push",
             "level": "WARNING",
             "message": "worker scheduler health has not been received"
+          },
+          {
+            "key": "chain_nifty_empty",
+            "level": "WARNING",
+            "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
           }
         ]
       },
@@ -203,62 +208,89 @@
             "ok": true,
             "optional": false,
             "status": 200
+          },
+          {
+            "endpoint": "/api/ml/performance",
+            "ok": true,
+            "optional": false,
+            "status": 200
+          },
+          {
+            "endpoint": "/api/ml/compare",
+            "ok": true,
+            "optional": false,
+            "status": 200
+          },
+          {
+            "endpoint": "/api/paper",
+            "ok": true,
+            "optional": false,
+            "status": 200
           }
         ],
         "base": "https://genesis-system3-backend.onrender.com",
-        "blockers": [],
+        "blockers": [
+          "UI_FAIL:Paper Trades",
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
+          "PAPER_TRUTH_NOT_VISIBLE:GLOBAL",
+          "OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI"
+        ],
         "chain_truth": [
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/NIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "safe_blocked": false,
+            "safe_blocked": true,
             "source": "dhan",
-            "source_priority": "dhan_last_verified_snapshot",
-            "spot": 24212.8,
+            "source_priority": "dhan_only_no_rows",
+            "spot": 0,
             "stale": false,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/BANKNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "safe_blocked": false,
+            "safe_blocked": true,
             "source": "dhan",
-            "source_priority": "dhan_last_verified_snapshot",
-            "spot": 58082.7,
+            "source_priority": "dhan_only_no_rows",
+            "spot": 0,
             "stale": false,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/FINNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "safe_blocked": false,
+            "safe_blocked": true,
             "source": "dhan",
-            "source_priority": "dhan_last_verified_snapshot",
-            "spot": 26824.1,
+            "source_priority": "dhan_only_no_rows",
+            "spot": 0,
             "stale": false,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/MIDCPNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "safe_blocked": false,
+            "safe_blocked": true,
             "source": "dhan",
-            "source_priority": "dhan_last_verified_snapshot",
-            "spot": 14796,
+            "source_priority": "dhan_only_no_rows",
+            "spot": 0,
             "stale": false,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
             "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -274,16 +306,27 @@
             "total_contracts": 0
           }
         ],
-        "final_verdict": "PASS",
-        "generated_at": "2026-07-10T20:10:48.690Z",
-        "infra_blockers": [],
-        "trade_readiness_blockers": [],
+        "final_verdict": "FAIL",
+        "generated_at": "2026-07-14T04:00:45.948Z",
+        "infra_blockers": [
+          "UI_FAIL:Paper Trades"
+        ],
+        "trade_readiness_blockers": [
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+        ],
         "ui": [
           {
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "truth",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Truth Control",
             "truth_control_visible": true
@@ -292,7 +335,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "genesis",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Genesis Brain",
             "truth_control_visible": true
@@ -301,7 +348,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "e2e_proof",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "E2E Proof",
             "truth_control_visible": true
@@ -310,7 +361,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "overview",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Overview",
             "truth_control_visible": true
@@ -319,7 +374,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "chain",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Option Chain",
             "truth_control_visible": true
@@ -328,7 +387,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "signals",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Signals",
             "truth_control_visible": true
@@ -337,7 +400,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "paper",
-            "ok": true,
+            "ml_proof_visible": true,
+            "ok": false,
+            "owner_visible": true,
+            "paper_truth_visible": false,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Paper Trades",
             "truth_control_visible": true
@@ -346,7 +413,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "positions",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Positions",
             "truth_control_visible": true
@@ -355,7 +426,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "broker",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Broker",
             "truth_control_visible": true
@@ -364,7 +439,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "performance",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Performance",
             "truth_control_visible": true
@@ -373,7 +452,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "ml",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "ML Model",
             "truth_control_visible": true
@@ -382,7 +465,11 @@
             "bad_raw_error_or_loading": false,
             "e2e_has_trader_readiness": true,
             "id": "gates",
+            "ml_proof_visible": true,
             "ok": true,
+            "owner_visible": true,
+            "paper_truth_visible": true,
+            "safety_labels_visible": true,
             "screenshot_ok": true,
             "title": "Live Gate",
             "truth_control_visible": true
@@ -390,63 +477,79 @@
         ]
       },
       "summary_md": "dashboard_live_ui_proof.summary.md",
-      "verdict": "PASS"
+      "verdict": "FAIL"
     },
     "permanent_live_log_watch": {
       "present": true,
       "summary_json": {
         "base": "https://genesis-system3-backend.onrender.com",
         "blockers": [
-          "UI:ML Model:FORBIDDEN:/fake/i"
+          "UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
+          "UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
+          "UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
+          "UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
+          "UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
+          "UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
+          "UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
+          "UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
+          "UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
+          "UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
+          "UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
+          "UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
+          "TRUTH_CONTROL_NOT_VISIBLE",
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
         ],
         "chain_truth": [
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/NIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "priority": "dhan_last_verified_snapshot",
-            "safe_blocked": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
             "source": "dhan",
-            "spot": 24212.8,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/BANKNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "priority": "dhan_last_verified_snapshot",
-            "safe_blocked": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
             "source": "dhan",
-            "spot": 58082.7,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/FINNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "priority": "dhan_last_verified_snapshot",
-            "safe_blocked": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
             "source": "dhan",
-            "spot": 26824.1,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/MIDCPNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "priority": "dhan_last_verified_snapshot",
-            "safe_blocked": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
             "source": "dhan",
-            "spot": 14796,
-            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
-            "total_contracts": 160
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
             "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -462,11 +565,28 @@
           }
         ],
         "final_verdict": "FAIL",
-        "generated_at": "2026-07-10T20:14:53.515Z",
+        "generated_at": "2026-07-14T04:03:15.558Z",
         "infra_blockers": [
-          "UI:ML Model:FORBIDDEN:/fake/i"
+          "UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
+          "UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
+          "UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
+          "UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
+          "UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
+          "UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
+          "UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
+          "UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
+          "UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
+          "UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
+          "UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
+          "UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
+          "TRUTH_CONTROL_NOT_VISIBLE"
         ],
-        "trade_readiness_blockers": []
+        "trade_readiness_blockers": [
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+        ]
       },
       "summary_md": "permanent_live_log_watch.summary.md",
       "verdict": "FAIL"
@@ -476,42 +596,42 @@
     {
       "file": "screenshots/truth.png",
       "ok": true,
-      "size_bytes": 166664
+      "size_bytes": 199327
     },
     {
       "file": "screenshots/signals.png",
       "ok": true,
-      "size_bytes": 80569
+      "size_bytes": 124152
     },
     {
       "file": "screenshots/paper.png",
       "ok": true,
-      "size_bytes": 120298
+      "size_bytes": 102287
     },
     {
       "file": "screenshots/broker.png",
       "ok": true,
-      "size_bytes": 108414
+      "size_bytes": 151650
     },
     {
       "file": "screenshots/ml.png",
       "ok": true,
-      "size_bytes": 89738
+      "size_bytes": 130342
     },
     {
       "file": "screenshots/gates.png",
       "ok": true,
-      "size_bytes": 102222
+      "size_bytes": 108583
     },
     {
       "file": "screenshots/overview.png",
       "ok": true,
-      "size_bytes": 110584
+      "size_bytes": 155869
     },
     {
       "file": "screenshots/mobile_390x844.png",
       "ok": true,
-      "size_bytes": 84822
+      "size_bytes": 25288
     }
   ],
   "workflow": "System3 Latest Truth Publish"
