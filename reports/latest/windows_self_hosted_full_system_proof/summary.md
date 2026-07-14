@@ -1,6 +1,6 @@
 # System3 Windows Self-Hosted Full System Proof
 
-Generated: `2026-07-14T18:13:02.462647Z`
+Generated: `2026-07-14T20:21:08.810140Z`
 
 Final status: **BLOCKED**
 
@@ -12,11 +12,11 @@ Response bodies persisted: **false**.
 
 | Area | Status | Detail |
 |---|---|---|
-| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=2.55s |
-| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=185.4s |
-| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=6.0s |
-| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.19s |
-| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.24s |
+| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=2.86s |
+| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=212.01s |
+| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=6.63s |
+| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.21s |
+| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.25s |
 | HTTP /api/health | PASS | 200 |
 | HTTP /api/state | PASS | 200 |
 | HTTP /api/status | PASS | 200 |
@@ -25,7 +25,7 @@ Response bodies persisted: **false**.
 | HTTP /api/broker/funds | PASS | 200 |
 | HTTP /api/broker/holdings | PASS | 200 |
 | HTTP /api/broker/positions | BLOCKED | 404 |
-| HTTP /api/scanner/top_contract_gainers | PASS | 200 |
+| HTTP /api/scanner/top_contract_gainers | BLOCKED | request_timeout |
 | HTTP /api/simulation/live/state | BLOCKED | 404 |
 | Report system3_auto_gates | UNKNOWN | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\system3_auto_gates\summary.json |
 | Report github_render_failure_tracker | BLOCKED | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\github_render_failure_tracker\summary.json |
@@ -40,6 +40,7 @@ Response bodies persisted: **false**.
 
 - Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1
 - HTTP blocked: /api/broker/positions — 404
+- HTTP blocked: /api/scanner/top_contract_gainers — request_timeout
 - HTTP blocked: /api/simulation/live/state — 404
 - Report not PASS: system3_auto_gates — UNKNOWN
 - Report not PASS: github_render_failure_tracker — BLOCKED
