@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T13:45:07.277Z
+Generated: 2026-07-14T14:05:50.877Z
 Status: **BLOCKED**
 Blocker: **DEPLOYED_FRONTEND_ASSET_DRIFT**
 Render UI available: `true`
@@ -9,12 +9,12 @@ Recovered after transient failure: `false`
 Auth OK: `true` (HTTP 200)
 UI HTTP: `200`
 Root children: `1`
-Body text length: `567`
+Body text length: `3369`
 Matched tabs: `15/16`
 Missing source-defined tabs: `Sim Live`
 Deployed asset drift: `true`
-Visible buttons: `15`
-Visible links: `0`
+Visible buttons: `18`
+Visible links: `5`
 Console error categories: `console.error`
 Page error categories: `none`
 
