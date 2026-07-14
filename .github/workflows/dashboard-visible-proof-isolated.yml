@@ -1,0 +1,177 @@
+name: Dashboard Visible Proof Isolated
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dashboard-visible-proof-isolated.yml'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'dashboard/frontend/**'
+      - 'dashboard/backend/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dashboard-visible-proof-isolated
+  cancel-in-progress: false
+
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      EXPECTED_DASHBOARD_TAB_COUNT: '16'
+      DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '5000'
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.proof-node/browsers
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify analyzer-only safety flags
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$ANALYZE_MODE" = '1'
+          test "$LIVE_TRADING_ENABLED" = '0'
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = '0'
+
+      - name: Prepare isolated Playwright runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .proof-node node_modules reports/latest/dashboard_visible_issue_tracker
+          mkdir -p .proof-node "$PLAYWRIGHT_BROWSERS_PATH" reports/latest/dashboard_visible_issue_tracker
+          cat > .proof-node/package.json <<'JSON'
+          {
+            "name": "system3-isolated-visual-proof",
+            "private": true,
+            "version": "1.0.0",
+            "dependencies": {
+              "playwright": "1.52.0"
+            }
+          }
+          JSON
+          npm install --prefix .proof-node --ignore-scripts --no-audit --no-fund --package-lock=false
+          .proof-node/node_modules/.bin/playwright install chromium
+          ln -s .proof-node/node_modules node_modules
+
+      - name: Prove exact isolated browser executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          import fs from 'fs'
+          import { chromium } from 'playwright'
+          const executable = chromium.executablePath()
+          if (!executable || !fs.existsSync(executable)) {
+            throw new Error('isolated Chromium executable missing')
+          }
+          if (!executable.startsWith(process.env.PLAYWRIGHT_BROWSERS_PATH)) {
+            throw new Error('Chromium resolved outside isolated proof directory')
+          }
+          const browser = await chromium.launch({ headless: true })
+          await browser.close()
+          console.log(JSON.stringify({ isolated_browser_launch: 'PASS', browser_path_isolated: true }))
+          NODE
+
+      - name: Scan live dashboard
+        id: scan
+        continue-on-error: true
+        run: node tools/dashboard_visible_issue_tracker.mjs
+
+      - name: Create fail-closed evidence when scan is incomplete
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -s reports/latest/dashboard_visible_issue_tracker/summary.json; then exit 0; fi
+          python - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          out='reports/latest/dashboard_visible_issue_tracker'
+          os.makedirs(out, exist_ok=True)
+          data={
+            'generated_at':datetime.now(timezone.utc).isoformat(),
+            'base':os.environ.get('DASHBOARD_BASE_URL',''),
+            'status':'BLOCKED',
+            'auth':{'ok':False,'status':0,'note':'visual scan did not produce a report'},
+            'tabs':[],
+            'expected_tab_count':int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16')),
+            'visible_issue_count':0,
+            'screenshot_missing_count':int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16')),
+            'ui_exception_count':1,
+            'global_exception':'isolated visual scan incomplete',
+            'production_grade_claim_allowed':False,
+            'analyzer_safety':{
+              'analyze_mode':True,
+              'live_trading_enabled':False,
+              'system3_live_trading_allowed':False,
+              'order_routes_called':False,
+              'secrets_persisted':False
+            }
+          }
+          with open(f'{out}/summary.json','w',encoding='utf-8') as f: json.dump(data,f,indent=2)
+          PY
+
+      - name: Validate sanitized fail-closed contract
+        if: always()
+        shell: bash
+        env:
+          PROOF_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p,encoding='utf-8'))
+          expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          scanned=len(d.get('tabs') or [])
+          eligible=d.get('status')=='PASS' and scanned==expected
+          if bool(d.get('production_grade_claim_allowed')) != eligible:
+            raise SystemExit('invalid visual gate state')
+          serialized=json.dumps(d,sort_keys=True).lower()
+          forbidden=('password','cookie','authorization','api_key','response_body')
+          if any(term in serialized for term in forbidden):
+            raise SystemExit('sensitive proof field detected')
+          key=os.environ.get('PROOF_API_KEY','')
+          if key and key in json.dumps(d,sort_keys=True):
+            raise SystemExit('proof credential value detected')
+          print(json.dumps({'status':d.get('status'),'scanned_tabs':scanned,'expected_tabs':expected,'production_grade_claim_allowed':eligible}))
+          PY
+
+      - name: Publish latest visual proof
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f reports/latest/dashboard_visible_issue_tracker/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'ci(proof): publish isolated dashboard visible proof [skip ci]'
+          git push || (git pull --rebase origin main && git push)
+
+      - name: Enforce current complete visual PASS
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          d=json.load(open('reports/latest/dashboard_visible_issue_tracker/summary.json',encoding='utf-8'))
+          expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          passed=(d.get('status')=='PASS' and len(d.get('tabs') or [])==expected and d.get('production_grade_claim_allowed') is True)
+          raise SystemExit(0 if passed else 1)
+          PY
