@@ -9,6 +9,7 @@ type Probe = {
 }
 
 const CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const PROBE_TIMEOUT_MS = 3500
 
 const CORE_ENDPOINTS = [
   '/api/health',
@@ -78,6 +79,32 @@ function isLiveTradingBlocked(stateJson: any, brokerJson: any) {
   return !(raw === true || String(raw) === '1')
 }
 
+async function probeReadOnlyEndpoint(endpoint: string): Promise<Probe> {
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
+  try {
+    const response = await fetch(endpoint, {
+      credentials: 'include',
+      signal: controller.signal,
+      cache: 'no-store',
+    })
+    const text = await response.text()
+    let json: any = null
+    try { json = JSON.parse(text) } catch { json = { parse_error: true } }
+    return { endpoint, ok: response.ok, status: response.status, json }
+  } catch (err: any) {
+    const timedOut = err?.name === 'AbortError'
+    return {
+      endpoint,
+      ok: false,
+      status: 0,
+      error: timedOut ? `READ_ONLY_PROBE_TIMEOUT_${PROBE_TIMEOUT_MS}MS` : String(err?.name || 'FETCH_ERROR'),
+    }
+  } finally {
+    window.clearTimeout(timeout)
+  }
+}
+
 export function EndToEndProof() {
   const [probes, setProbes] = useState<Probe[]>([])
   const [loading, setLoading] = useState(true)
@@ -86,18 +113,7 @@ export function EndToEndProof() {
   async function runProof() {
     setLoading(true)
     const endpoints = [...CORE_ENDPOINTS, ...CHAIN_SYMBOLS.map(s => `/api/chain/${s}`)]
-    const results: Probe[] = []
-    for (const endpoint of endpoints) {
-      try {
-        const r = await fetch(endpoint, { credentials: 'include' })
-        const text = await r.text()
-        let json: any = null
-        try { json = JSON.parse(text) } catch { json = { raw: text.slice(0, 5000) } }
-        results.push({ endpoint, ok: r.ok, status: r.status, json })
-      } catch (err: any) {
-        results.push({ endpoint, ok: false, status: 0, error: String(err) })
-      }
-    }
+    const results = await Promise.all(endpoints.map(probeReadOnlyEndpoint))
     setProbes(results)
     setLastRun(new Date().toLocaleString())
     setLoading(false)
@@ -122,14 +138,14 @@ export function EndToEndProof() {
   const readiness = [
     { item: 'Dhan broker connection', ok: Boolean(broker?.ok && isBrokerConnected(broker.json)), evidence: broker?.json?.status || broker?.json?.token_status || broker?.status || '-' },
     { item: 'Dhan access token/session', ok: Boolean(broker?.ok && !/invalid|expired|unauthorized|token error/i.test(JSON.stringify(broker.json || {}))), evidence: broker?.json?.token_status || broker?.json?.status || '-' },
-    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.blocked && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || '-' },
-    { item: 'Real broker holdings response', ok: Boolean(holdings?.ok && holdings.json && holdings.json.success !== false), evidence: hasRows(holdings?.json, 'rows', 'holdings', 'data') ? 'rows visible or empty broker response' : (holdings?.json?.message || holdings?.status || '-') },
-    { item: 'Real broker positions response', ok: Boolean(positions?.ok && positions.json && positions.json.success !== false), evidence: hasRows(positions?.json, 'rows', 'positions', 'data') ? 'rows visible or empty broker response' : (positions?.json?.message || positions?.status || '-') },
+    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.blocked && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || funds?.error || '-' },
+    { item: 'Real broker holdings response', ok: Boolean(holdings?.ok && holdings.json && holdings.json.success !== false), evidence: hasRows(holdings?.json, 'rows', 'holdings', 'data') ? 'rows visible or empty broker response' : (holdings?.json?.message || holdings?.status || holdings?.error || '-') },
+    { item: 'Real broker positions response', ok: Boolean(positions?.ok && positions.json && positions.json.success !== false), evidence: hasRows(positions?.json, 'rows', 'positions', 'data') ? 'rows visible or empty broker response' : (positions?.json?.message || positions?.status || positions?.error || '-') },
     { item: 'Real Dhan option chain for all watched symbols', ok: chainPass, evidence: `${chains.filter(p => p.ok && isDhanChain(p.json)).length}/${CHAIN_SYMBOLS.length}` },
     { item: 'No non-Dhan/stale/fallback markers in chain', ok: noBadSource, evidence: noBadSource ? 'clean' : 'blocked marker found' },
-    { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || '-' },
-    { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || '-') },
-    { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || '-' },
+    { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || pnl?.error || '-' },
+    { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || trades?.error || '-') },
+    { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || gates?.error || '-' },
     { item: 'Live-money switch blocked until separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
   ]
   const readinessPass = readiness.every(r => r.ok)
@@ -147,7 +163,7 @@ export function EndToEndProof() {
         <button onClick={runProof} disabled={loading} style={{
           padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)',
           background: 'var(--surface-2)', color: 'var(--text-primary)', cursor: 'pointer'
-        }}>{loading ? 'Checking...' : 'Recheck Now'}</button>
+        }}>{loading ? 'Checking read-only endpoints…' : 'Recheck Now'}</button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
@@ -191,7 +207,7 @@ export function EndToEndProof() {
               <td className="tcell">{String(p.json?.status || p.status)}</td>
               <td className="tcell">{String(p.json?.spot ?? '-')}</td>
               <td className="tcell">{String(p.json?.total_contracts ?? (Array.isArray(p.json?.contracts) ? p.json.contracts.length : '-'))}</td>
-              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_VISIBLE' : blockedReason(p.json)}</td>
+              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_VISIBLE' : (p.error || blockedReason(p.json))}</td>
             </tr>
           })}
         </tbody>
