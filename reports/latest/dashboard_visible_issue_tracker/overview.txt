@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-00:04:41 IST
+00:08:42 IST
 NIFTY
 24,069
 BNFTY
@@ -10,7 +10,7 @@ BNFTY
 FINNIFTY
 26,515
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -57,7 +57,7 @@ PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹0
@@ -76,11 +76,10 @@ live
 LOADED
 State API
 Market closed: Before pre-market (opens at 09:15)
-ERROR
+LOADED
 Broker Status API
-ERROR
+LOADED
 Funds API
-Client ID or user generated access token is invalid or expired.
 LOADED
 Holdings API
 LOADED
@@ -126,7 +125,7 @@ System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+PASS
 Data Source
 live
 Market
