@@ -1,11 +1,11 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-14T18:38:00.964Z
+Generated: 2026-07-14T18:50:48.215Z
 Base: https://genesis-system3-backend.onrender.com
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `60`
-Info line count: `94`
+Visible blocker count: `108`
+Info line count: `107`
 Screenshot missing count: `1`
 Unsettled tab count: `16`
 UI exception count: `1`
@@ -14,7 +14,8 @@ Production-grade claim allowed: `false`
 ## Rule
 Every live sidebar tab must be scanned and its asynchronous content must settle before PASS. A timed-out tab is still captured but is recorded as ASYNC_CONTENT_NOT_SETTLED. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.
 ## TODO
-- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...
+- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...
+- [ ] Fix visible UI blocker on Truth Control: DHAN DEGRADED
 - [ ] Fix visible UI blocker on Truth Control: BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -27,74 +28,122 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on Truth Control: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - [ ] Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - [ ] Fix visible UI blocker on Truth Control: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
-- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- [ ] Fix visible UI blocker on Genesis Brain: BLOCKED
-- [ ] Fix visible UI blocker on Genesis Brain: last scanner snapshot and staleness
-- [ ] Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
-- [ ] Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...
+- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Genesis Brain: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Genesis Brain: Request failed with status code 502
+- [ ] Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5013ms
+- [ ] Fix visible UI blocker on E2E Proof: DHAN DEGRADED
 - [ ] Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · FULL E2E
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · API
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · DHAN CHAIN
 - [ ] Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · TRADER READY
-- [ ] Fix visible UI blocker on E2E Proof: Dhan broker connection	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: Dhan broker connection	BLOCKED	502
 - [ ] Fix visible UI blocker on E2E Proof: Dhan access token/session	BLOCKED	-
-- [ ] Fix visible UI blocker on E2E Proof: Real broker funds/margin	BLOCKED	-
-- [ ] Fix visible UI blocker on E2E Proof: Real broker holdings response	BLOCKED	-
-- [ ] Fix visible UI blocker on E2E Proof: Real broker positions response	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: Real broker funds/margin	BLOCKED	502
+- [ ] Fix visible UI blocker on E2E Proof: Real broker holdings response	BLOCKED	502
+- [ ] Fix visible UI blocker on E2E Proof: Real broker positions response	BLOCKED	502
 - [ ] Fix visible UI blocker on E2E Proof: Real Dhan option chain for all watched symbols	BLOCKED	0/5
 - [ ] Fix visible UI blocker on E2E Proof: No non-Dhan/stale/fallback markers in chain	PASS	clean
-- [ ] Fix visible UI blocker on E2E Proof: Paper/analyzer P&L endpoint	BLOCKED	-
-- [ ] Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint	BLOCKED	-
-- [ ] Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: Paper/analyzer P&L endpoint	BLOCKED	502
+- [ ] Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint	BLOCKED	502
+- [ ] Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible	BLOCKED	502
 - [ ] Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof	PASS	blocked
-- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on E2E Proof: NIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- [ ] Fix visible UI blocker on E2E Proof: BANKNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- [ ] Fix visible UI blocker on E2E Proof: FINNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- [ ] Fix visible UI blocker on E2E Proof: MIDCPNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- [ ] Fix visible UI blocker on E2E Proof: SENSEX	BLOCKED	-	-	502	-	-	UNKNOWN
+- [ ] Fix visible UI blocker on E2E Proof: /api/health	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/state	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/broker/dhan/status	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/broker/funds	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/broker/holdings	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/broker/positions/live	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/gain_rank	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/pnl	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/trades/today	502	BLOCKED	-
+- [ ] Fix visible UI blocker on E2E Proof: /api/auto_gates	502	BLOCKED	-
+- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- [ ] Fix visible UI blocker on Overview: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Overview: API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+- [ ] Fix visible UI blocker on Overview: RENDER_UNAVAILABLE
+- [ ] Fix visible UI blocker on Overview: ERROR
 - [ ] Fix visible UI blocker on Overview: STALE
-- [ ] Fix visible UI blocker on Overview: PEND
-- [ ] Fix visible UI blocker on Overview: market-session proof pending
-- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5015ms
-- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5010ms
-- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5008ms
-- [ ] Fix visible UI blocker on Paper Trades: Error Loading Data
-- [ ] Fix visible UI blocker on Paper Trades: Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Paper Trades: ❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry
-- [ ] Fix visible UI blocker on Paper Trades: Endpoint: /api/state Error: Request failed with status code 502
-- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- [ ] Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- [ ] Fix visible UI blocker on Performance: Failed to load performance data: 502
-- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5015ms
+- [ ] Fix visible UI blocker on Overview: FAIL
+- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on Option Chain: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Option Chain: Market closed: live option-chain rows are session-dependent only.
+- [ ] Fix visible UI blocker on Option Chain: Stale
+- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- [ ] Fix visible UI blocker on Signals: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Signals: What Blocked Trading?
+- [ ] Fix visible UI blocker on Signals: 0/4
+- [ ] Fix visible UI blocker on Signals: What Blocked Trading? No Underlying Low Confidence
+- [ ] Fix visible UI blocker on Signals: What Blocked Trading? Scanner Segments 0/4
+- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- [ ] Fix visible UI blocker on Trade: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Trade: Market closed: live option-chain rows are session-dependent only.
+- [ ] Fix visible UI blocker on Trade: Stale
+- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Paper Trades: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
+- [ ] Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
+- [ ] Fix visible UI blocker on Paper Trades: BLOCKED
+- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on Positions: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on Performance: DHAN DEGRADED
+- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- [ ] Fix visible UI blocker on ML Model: DHAN DEGRADED
 - [ ] Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
-- [ ] Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5015ms
+- [ ] Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Broker: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Broker: BLOCKED / TOKEN ERROR
+- [ ] Fix visible UI blocker on Broker: BROKER AUTH BLOCKED - NOT READY
+- [ ] Fix visible UI blocker on Broker: ERROR / INVALID OR EXPIRED
+- [ ] Fix visible UI blocker on Broker: ERROR/BLOCKED
+- [ ] Fix visible UI blocker on Broker: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+- [ ] Fix visible UI blocker on Broker: BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID
 - [ ] Fix visible UI blocker on Broker: BLOCKED BY BACKEND FLAG
-- [ ] Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- [ ] Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- [ ] Fix visible UI blocker on Broker: Failed to load funds: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+- [ ] Fix visible UI blocker on Broker: Failed to load holdings: Holdings: Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.
+- [ ] Fix visible UI blocker on Broker: Failed to load positions: Positions: Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.
+- [ ] Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Alerts: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Alerts: Alerts unavailable: RENDER_UNAVAILABLE
+- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on System: DHAN DEGRADED
+- [ ] Fix visible UI blocker on System: RENDER_UNAVAILABLE
+- [ ] Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5010ms
 - [ ] Fix visible UI blocker on Live Gate: DHAN DEGRADED
+- [ ] Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED
+- [ ] Fix visible UI blocker on Live Gate: Live trading blocked — see failed gates above
 ## Tab results
 | Tab | Status | Screenshot | Settled | Settle ms | Blockers | Info | Exceptions | Text file |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Truth Control | BLOCKED | OK | NO | 5015 | 13 | 5 | 0 | truth.txt |
-| Genesis Brain | BLOCKED | OK | NO | 5014 | 4 | 7 | 0 | genesis.txt |
-| E2E Proof | BLOCKED | OK | NO | 5013 | 18 | 5 | 0 | e2e_proof.txt |
-| Overview | BLOCKED | OK | NO | 5011 | 4 | 14 | 0 | overview.txt |
+| Truth Control | BLOCKED | OK | NO | 5016 | 14 | 5 | 0 | truth.txt |
+| Genesis Brain | BLOCKED | OK | NO | 5011 | 3 | 5 | 0 | genesis.txt |
+| E2E Proof | BLOCKED | OK | NO | 5013 | 34 | 5 | 0 | e2e_proof.txt |
+| Overview | BLOCKED | OK | NO | 5014 | 7 | 10 | 0 | overview.txt |
 | Sim Live | BLOCKED | MISSING | NO | 0 | 0 | 0 | 1 | sim_live.txt |
-| Option Chain | BLOCKED | OK | NO | 5015 | 1 | 6 | 0 | chain.txt |
-| Signals | BLOCKED | OK | NO | 5009 | 1 | 5 | 0 | signals.txt |
-| Trade | BLOCKED | OK | NO | 5010 | 1 | 6 | 0 | trade.txt |
-| Paper Trades | BLOCKED | OK | NO | 5008 | 5 | 6 | 0 | paper.txt |
-| Positions | BLOCKED | OK | NO | 5009 | 1 | 7 | 0 | positions.txt |
-| Performance | BLOCKED | OK | NO | 5009 | 2 | 5 | 0 | performance.txt |
-| ML Model | BLOCKED | OK | NO | 5015 | 4 | 5 | 0 | ml.txt |
-| Broker | BLOCKED | OK | NO | 5015 | 2 | 7 | 0 | broker.txt |
-| Alerts | BLOCKED | OK | NO | 5014 | 1 | 5 | 0 | alerts.txt |
-| System | BLOCKED | OK | NO | 5012 | 1 | 6 | 0 | system.txt |
-| Live Gate | BLOCKED | OK | NO | 5012 | 2 | 5 | 0 | gates.txt |
+| Option Chain | BLOCKED | OK | NO | 5010 | 4 | 6 | 0 | chain.txt |
+| Signals | BLOCKED | OK | NO | 5012 | 6 | 7 | 0 | signals.txt |
+| Trade | BLOCKED | OK | NO | 5009 | 4 | 6 | 0 | trade.txt |
+| Paper Trades | BLOCKED | OK | NO | 5011 | 5 | 21 | 0 | paper.txt |
+| Positions | BLOCKED | OK | NO | 5010 | 2 | 7 | 0 | positions.txt |
+| Performance | BLOCKED | OK | NO | 5010 | 2 | 6 | 0 | performance.txt |
+| ML Model | BLOCKED | OK | NO | 5009 | 5 | 5 | 0 | ml.txt |
+| Broker | BLOCKED | OK | NO | 5011 | 12 | 6 | 0 | broker.txt |
+| Alerts | BLOCKED | OK | NO | 5011 | 3 | 5 | 0 | alerts.txt |
+| System | BLOCKED | OK | NO | 5010 | 3 | 6 | 0 | system.txt |
+| Live Gate | BLOCKED | OK | NO | 5010 | 4 | 7 | 0 | gates.txt |
 ## Visible blockers
-- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...
+- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...
+- **Truth Control**: DHAN DEGRADED
 - **Truth Control**: BLOCKED
 - **Truth Control**: MONEY_READY_BLOCKED
 - **Truth Control**: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -107,53 +156,100 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Truth Control**: CE / PE decision evidence	BLOCKED	YES	No CE/PE side found in model/ranker/scanner payload
 - **Truth Control**: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - **Truth Control**: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
-- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- **Genesis Brain**: BLOCKED
-- **Genesis Brain**: last scanner snapshot and staleness
-- **Genesis Brain**: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
-- **E2E Proof**: ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...
+- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Genesis Brain**: DHAN DEGRADED
+- **Genesis Brain**: Request failed with status code 502
+- **E2E Proof**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
+- **E2E Proof**: DHAN DEGRADED
 - **E2E Proof**: Real broker/data truth only. Live money remains blocked until every row below passes.
 - **E2E Proof**: BLOCKED · FULL E2E
 - **E2E Proof**: BLOCKED · API
 - **E2E Proof**: BLOCKED · DHAN CHAIN
 - **E2E Proof**: No non-Dhan/stale/fallback
 - **E2E Proof**: BLOCKED · TRADER READY
-- **E2E Proof**: Dhan broker connection	BLOCKED	-
+- **E2E Proof**: Dhan broker connection	BLOCKED	502
 - **E2E Proof**: Dhan access token/session	BLOCKED	-
-- **E2E Proof**: Real broker funds/margin	BLOCKED	-
-- **E2E Proof**: Real broker holdings response	BLOCKED	-
-- **E2E Proof**: Real broker positions response	BLOCKED	-
+- **E2E Proof**: Real broker funds/margin	BLOCKED	502
+- **E2E Proof**: Real broker holdings response	BLOCKED	502
+- **E2E Proof**: Real broker positions response	BLOCKED	502
 - **E2E Proof**: Real Dhan option chain for all watched symbols	BLOCKED	0/5
 - **E2E Proof**: No non-Dhan/stale/fallback markers in chain	PASS	clean
-- **E2E Proof**: Paper/analyzer P&L endpoint	BLOCKED	-
-- **E2E Proof**: Today paper lifecycle endpoint	BLOCKED	-
-- **E2E Proof**: Gate/risk endpoint visible	BLOCKED	-
+- **E2E Proof**: Paper/analyzer P&L endpoint	BLOCKED	502
+- **E2E Proof**: Today paper lifecycle endpoint	BLOCKED	502
+- **E2E Proof**: Gate/risk endpoint visible	BLOCKED	502
 - **E2E Proof**: Live-money switch blocked until separate proof	PASS	blocked
-- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **E2E Proof**: NIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- **E2E Proof**: BANKNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- **E2E Proof**: FINNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- **E2E Proof**: MIDCPNIFTY	BLOCKED	-	-	502	-	-	UNKNOWN
+- **E2E Proof**: SENSEX	BLOCKED	-	-	502	-	-	UNKNOWN
+- **E2E Proof**: /api/health	502	BLOCKED	-
+- **E2E Proof**: /api/state	502	BLOCKED	-
+- **E2E Proof**: /api/broker/dhan/status	502	BLOCKED	-
+- **E2E Proof**: /api/broker/funds	502	BLOCKED	-
+- **E2E Proof**: /api/broker/holdings	502	BLOCKED	-
+- **E2E Proof**: /api/broker/positions/live	502	BLOCKED	-
+- **E2E Proof**: /api/gain_rank	502	BLOCKED	-
+- **E2E Proof**: /api/pnl	502	BLOCKED	-
+- **E2E Proof**: /api/trades/today	502	BLOCKED	-
+- **E2E Proof**: /api/auto_gates	502	BLOCKED	-
+- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- **Overview**: DHAN DEGRADED
+- **Overview**: API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+- **Overview**: RENDER_UNAVAILABLE
+- **Overview**: ERROR
 - **Overview**: STALE
-- **Overview**: PEND
-- **Overview**: market-session proof pending
-- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5015ms
-- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
-- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5008ms
-- **Paper Trades**: Error Loading Data
-- **Paper Trades**: Error: Request failed with status code 502
-- **Paper Trades**: ❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry
-- **Paper Trades**: Endpoint: /api/state Error: Request failed with status code 502
-- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- **Performance**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
-- **Performance**: Failed to load performance data: 502
-- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5015ms
+- **Overview**: FAIL
+- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **Option Chain**: DHAN DEGRADED
+- **Option Chain**: Market closed: live option-chain rows are session-dependent only.
+- **Option Chain**: Stale
+- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- **Signals**: DHAN DEGRADED
+- **Signals**: What Blocked Trading?
+- **Signals**: 0/4
+- **Signals**: What Blocked Trading? No Underlying Low Confidence
+- **Signals**: What Blocked Trading? Scanner Segments 0/4
+- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- **Trade**: DHAN DEGRADED
+- **Trade**: Market closed: live option-chain rows are session-dependent only.
+- **Trade**: Stale
+- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Paper Trades**: DHAN DEGRADED
+- **Paper Trades**: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
+- **Paper Trades**: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.
+- **Paper Trades**: BLOCKED
+- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **Positions**: DHAN DEGRADED
+- **Performance**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **Performance**: DHAN DEGRADED
+- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5009ms
+- **ML Model**: DHAN DEGRADED
 - **ML Model**: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
-- **Broker**: ASYNC_CONTENT_NOT_SETTLED after 5015ms
+- **Broker**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Broker**: DHAN DEGRADED
+- **Broker**: BLOCKED / TOKEN ERROR
+- **Broker**: BROKER AUTH BLOCKED - NOT READY
+- **Broker**: ERROR / INVALID OR EXPIRED
+- **Broker**: ERROR/BLOCKED
+- **Broker**: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+- **Broker**: BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID
 - **Broker**: BLOCKED BY BACKEND FLAG
-- **Alerts**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- **System**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- **Live Gate**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- **Broker**: Failed to load funds: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.
+- **Broker**: Failed to load holdings: Holdings: Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.
+- **Broker**: Failed to load positions: Positions: Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.
+- **Alerts**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Alerts**: DHAN DEGRADED
+- **Alerts**: Alerts unavailable: RENDER_UNAVAILABLE
+- **System**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **System**: DHAN DEGRADED
+- **System**: RENDER_UNAVAILABLE
+- **Live Gate**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
 - **Live Gate**: DHAN DEGRADED
+- **Live Gate**: LIVE_TRADING_BLOCKED
+- **Live Gate**: Live trading blocked — see failed gates above
 ## Informational lines
 - **Truth Control**: MARKET CLOSED / DATA POLLING
 - **Truth Control**: PAPER
@@ -165,8 +261,6 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Genesis Brain**: LIVE OFF
 - **Genesis Brain**: PAPER ONLY
 - **Genesis Brain**: Paper Trades
-- **Genesis Brain**: Next: enforce position sizing in paper lifecycle
-- **Genesis Brain**: "message": "I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS."
 - **E2E Proof**: MARKET CLOSED / DATA POLLING
 - **E2E Proof**: PAPER
 - **E2E Proof**: LIVE OFF
@@ -182,33 +276,46 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Overview**: PAPER P&L
 - **Overview**: Paper only
 - **Overview**: market closed must not hide read-only data
-- **Overview**: Market closed: Before pre-market (opens at 09:15)
-- **Overview**: Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
-- **Overview**: Paper Lifecycle
-- **Overview**: Wire is_tradeable_fo_symbol() in ranking/paper trade path
 - **Option Chain**: MARKET CLOSED / DATA POLLING
 - **Option Chain**: PAPER
 - **Option Chain**: LIVE OFF
 - **Option Chain**: PAPER ONLY
 - **Option Chain**: Paper Trades
-- **Option Chain**: NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-14T07:06:31.766571+00:00 - Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
+- **Option Chain**: Broker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.
 - **Signals**: MARKET CLOSED / DATA POLLING
 - **Signals**: PAPER
 - **Signals**: LIVE OFF
 - **Signals**: PAPER ONLY
 - **Signals**: Paper Trades
+- **Signals**: NO TRADE
+- **Signals**: No signal generated
 - **Trade**: MARKET CLOSED / DATA POLLING
 - **Trade**: PAPER
 - **Trade**: LIVE OFF
 - **Trade**: PAPER ONLY
 - **Trade**: Paper Trades
-- **Trade**: NIFTY source=dhan priority=dhan_last_verified_snapshot fetched=2026-07-14T07:06:31.766571+00:00 - Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
+- **Trade**: Broker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.
 - **Paper Trades**: MARKET CLOSED / DATA POLLING
 - **Paper Trades**: PAPER
 - **Paper Trades**: LIVE OFF
 - **Paper Trades**: PAPER ONLY
 - **Paper Trades**: Paper Trades
 - **Paper Trades**: Paper Trading Console
+- **Paper Trades**: Recheck Paper Proof
+- **Paper Trades**: PAPER / ANALYZER SAFE
+- **Paper Trades**: Today Paper Entries
+- **Paper Trades**: Today Paper Exits
+- **Paper Trades**: Closed paper/analyzer records
+- **Paper Trades**: Paper Truth Provenance
+- **Paper Trades**: NO_PAPER_SOURCE
+- **Paper Trades**: Visual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.
+- **Paper Trades**: PAPER TRADING MODE (NO REAL ORDERS)
+- **Paper Trades**: Mode: PAPER | Data Source: NOT_READY | Broker: Disconnected
+- **Paper Trades**: Open Paper Positions (0)
+- **Paper Trades**: No open paper positions
+- **Paper Trades**: Today Paper Trade Proof
+- **Paper Trades**: Total Paper Exposure
+- **Paper Trades**: Paper UI does not call broker/order close endpoints.
 - **Positions**: MARKET CLOSED / DATA POLLING
 - **Positions**: PAPER
 - **Positions**: LIVE OFF
@@ -221,6 +328,7 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Performance**: LIVE OFF
 - **Performance**: PAPER ONLY
 - **Performance**: Paper Trades
+- **Performance**: No performance data yet — paper engine has not closed any trades.
 - **ML Model**: MARKET CLOSED / DATA POLLING
 - **ML Model**: PAPER
 - **ML Model**: LIVE OFF
@@ -231,7 +339,6 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Broker**: LIVE OFF
 - **Broker**: PAPER ONLY
 - **Broker**: Paper Trades
-- **Broker**: NONE - MARKET CLOSED IS OK
 - **Broker**: MARKET CLOSED / READ-ONLY OK
 - **Alerts**: MARKET CLOSED / DATA POLLING
 - **Alerts**: PAPER
@@ -249,3 +356,5 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Live Gate**: LIVE OFF
 - **Live Gate**: PAPER ONLY
 - **Live Gate**: Paper Trades
+- **Live Gate**: LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)
+- **Live Gate**: All technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.
