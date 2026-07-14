@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-16:31:35 IST
+17:12:16 IST
 NIFTY
-24,069
+--
 BNFTY
-57,447
+--
 FINNIFTY
-26,515
+--
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -53,14 +53,14 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-State Version: 57 | Positions Source: NO_POSITIONS | Last Refresh: 7/14/2026, 11:01:31 AM
+State Version: 10 | Positions Source: NO_POSITIONS | Last Refresh: 7/14/2026, 11:42:12 AM
 Recheck Paper Proof
 Mode Safety
 PAPER / ANALYZER SAFE
 Live trading flag: OFF
 Broker Data
-NOT CONNECTED
-Source: MARKET_CLOSED_NO_BROKER
+CONNECTED
+Source: BROKER_CONNECTED_MARKET_CLOSED
 Today Paper Entries
 0
 From /api/trades/today
@@ -80,7 +80,7 @@ Visual gate requirement: paper rows must show analyzer-only provenance. Fake/moc
 📊
 PAPER TRADING MODE (NO REAL ORDERS)
 System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.
-Mode: PAPER | Data Source: NOT_READY | Broker: Disconnected
+Mode: PAPER | Data Source: NOT_READY | Broker: Connected
 Open Paper Positions (0)
 No open paper positions
 Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.

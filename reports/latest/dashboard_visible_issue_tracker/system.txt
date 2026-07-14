@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-16:32:06 IST
+17:12:47 IST
 NIFTY
-24,069
+--
 BNFTY
-57,447
+--
 FINNIFTY
-26,515
+--
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -62,11 +62,11 @@ DISABLED (hardcoded)
 Mode
 PAPER
 Data Source
-live
+RENDER_UNAVAILABLE
 Market State
 CLOSED / OFFLINE
 API Status
-OK / WAITING
+RENDER_UNAVAILABLE
 Performance
 Cycle Count
 0
@@ -75,7 +75,7 @@ Cycle Duration
 SLA Pass
 false
 QC Status
-NOT_READY
+RENDER_UNAVAILABLE
 Safety
 LIVE_TRADING_ENABLED
 0 (hardcoded)
@@ -86,4 +86,4 @@ false
 Broker Data Visibility
 READ-ONLY WHEN API RESPONDS
 Blocker 1
-Broker not connected - real data unavailable
+Render/backend returned 502 for /api/health. Keeping last good data where available.
