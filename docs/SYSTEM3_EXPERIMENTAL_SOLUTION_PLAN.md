@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T09:35:48.969724+00:00`
+Generated UTC: `2026-07-14T09:36:16.896818+00:00`
 Status: **BLOCKED**
-Issues: `580`
+Issues: `584`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 245 issues
+### GITHUB_RENDER_FAILURE — 250 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 38 issues
+### RENDER_DEPLOY — 37 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -338,8 +338,8 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29302874332 conclusion=failure commit=9c8a09e86dca2a17ac8b9c173bef8f8b7e8563ce
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29302654185 conclusion=failure commit=901554fe21d12574ed4b701548dea393af04e1f1
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29302606833 conclusion=failure commit=f1909e9ae4ae98dc8b016fc8e2b38ef92d053b4f
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29316592197 conclusion=failure commit=dfd560eb44841cd1d159a189e7fac6bf7c0311bc
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29316573168 conclusion=failure commit=7caffc4132cdb43294fe8887f62e74b63b0c829e
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29320278728 conclusion=failure commit=027a2ca8225afc877087e67f9657cbd950f20d03
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29320257273 conclusion=failure commit=be7a3bee9589a3ceaaeb7ecdf98343b50cf14490
 
 ### WORKFLOW_CI — 10 issues
 
@@ -356,9 +356,9 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 29317927138 conclusion=cancelled commit=e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "main", "commit": "e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6", "conclusion": "cancelled", "created_at": "2026-07-14T08:24:51Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317927138", "run_id": 29317927138, "updated_at": "2026-07-14T08:25:13Z", "workflow": "Genesis System3 Global Safety CI"}
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=30
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 29321441354 conclusion=cancelled commit=79e232efcb189bd9cf0e5618f427927b331634cc
+- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "main", "commit": "79e232efcb189bd9cf0e5618f427927b331634cc", "conclusion": "cancelled", "created_at": "2026-07-14T09:21:52Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29321441354", "run_id": 29321441354, "updated_at": "2026-07-14T09:22:12Z", "workflow": "Genesis System3 Global Safety CI"}
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=32
 
 ### ROUTE_CODE — 9 issues
 

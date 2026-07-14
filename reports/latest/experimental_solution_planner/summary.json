@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-14T09:35:48.969724+00:00",
-  "issue_count": 580,
+  "generated_utc": "2026-07-14T09:36:16.896818+00:00",
+  "issue_count": 584,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 245,
+      "issue_count": 250,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 38,
+      "issue_count": 37,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -944,12 +944,12 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29316592197 conclusion=failure commit=dfd560eb44841cd1d159a189e7fac6bf7c0311bc",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29320278728 conclusion=failure commit=027a2ca8225afc877087e67f9657cbd950f20d03",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29316573168 conclusion=failure commit=7caffc4132cdb43294fe8887f62e74b63b0c829e",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29320257273 conclusion=failure commit=be7a3bee9589a3ceaaeb7ecdf98343b50cf14490",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1000,17 +1000,17 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29317927138 conclusion=cancelled commit=e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6",
+          "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 29321441354 conclusion=cancelled commit=79e232efcb189bd9cf0e5618f427927b331634cc",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"e1fe248a3a1f1ae9627275a81de7735d2c3ba1f6\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-14T08:24:51Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29317927138\", \"run_id\": 29317927138, \"updated_at\": \"2026-07-14T08:25:13Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
+          "issue": "{\"branch\": \"main\", \"commit\": \"79e232efcb189bd9cf0e5618f427927b331634cc\", \"conclusion\": \"cancelled\", \"created_at\": \"2026-07-14T09:21:52Z\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29321441354\", \"run_id\": 29321441354, \"updated_at\": \"2026-07-14T09:22:12Z\", \"workflow\": \"Genesis System3 Global Safety CI\"}",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "failed_count=30",
+          "issue": "failed_count=32",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
