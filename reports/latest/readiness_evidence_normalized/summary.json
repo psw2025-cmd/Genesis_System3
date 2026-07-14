@@ -1,0 +1,45 @@
+{
+  "api_transport_pass": true,
+  "generated_utc": "2026-07-14T09:22:14.688781+00:00",
+  "infra_blockers": [],
+  "operational_blockers": [
+    {
+      "key": "deploy_commit_mismatch",
+      "message": "Render git_sha=[REDACTED] expected=893ca11f05bd"
+    },
+    {
+      "key": "broker_not_connected",
+      "message": "broker status not connected: TOKEN_EXPIRED_OR_INVALID"
+    },
+    {
+      "key": "scheduler_no_worker_push",
+      "message": "worker scheduler health has not been received"
+    },
+    {
+      "key": "chain_nifty_empty",
+      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
+    }
+  ],
+  "production_grade_claim_allowed": false,
+  "readiness_blockers": [
+    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+  ],
+  "safety": {
+    "analyze_mode": "1",
+    "broker_order_endpoints_called": false,
+    "live_trading_enabled": "0",
+    "secrets_read_or_written": false,
+    "system3_live_trading_allowed": "0"
+  },
+  "status": "BLOCKED_NOT_TRADE_READY",
+  "todo": {
+    "reason": "TODO file not found or empty: /home/runner/work/Genesis_System3/Genesis_System3/System3_Production_Grade_1000_Point_QC_TODO.md",
+    "status": "BLOCKED",
+    "total": 0
+  },
+  "trade_ready": false,
+  "visual_capture_pass": true
+}
