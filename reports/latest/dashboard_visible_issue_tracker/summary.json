@@ -1,19 +1,310 @@
 {
-  "generated_at": "2026-07-14T14:04:42.838Z",
+  "generated_at": "2026-07-14T14:24:53.229Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
-  "auth": null,
-  "tabs": [],
+  "auth": {
+    "ok": true,
+    "status": 200
+  },
+  "tabs": [
+    {
+      "id": "truth",
+      "title": "Truth Control",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Truth Control; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutEr"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "genesis",
+      "title": "Genesis Brain",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Genesis Brain; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutEr"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "e2e_proof",
+      "title": "E2E Proof",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab E2E Proof; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "overview",
+      "title": "Overview",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Overview; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "sim_live",
+      "title": "Sim Live",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Sim Live; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "chain",
+      "title": "Option Chain",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Option Chain; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErr"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "signals",
+      "title": "Signals",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Signals; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: l"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "trade",
+      "title": "Trade",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Trade; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: loc"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "paper",
+      "title": "Paper Trades",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Paper Trades; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErr"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "positions",
+      "title": "Positions",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Positions; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "performance",
+      "title": "Performance",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Performance; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutErro"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "ml",
+      "title": "ML Model",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab ML Model; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: "
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "broker",
+      "title": "Broker",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Broker; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "alerts",
+      "title": "Alerts",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Alerts; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "system",
+      "title": "System",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab System; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError: lo"
+      ],
+      "body_text_sample": ""
+    },
+    {
+      "id": "gates",
+      "title": "Live Gate",
+      "ok": false,
+      "screenshot": null,
+      "screenshot_ok": false,
+      "navigation_method_index": null,
+      "async_content_settled": false,
+      "settle_elapsed_ms": 0,
+      "settle_remaining_markers": [],
+      "blocker_lines": [],
+      "info_lines": [],
+      "red_elements": [],
+      "ui_exceptions": [
+        "Error: Unable to locate/click dashboard tab Live Gate; candidate_0:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_1:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_2:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_3:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_4:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_5:TimeoutError: locator.waitFor: Timeout 3000ms exceeded. | candidate_6:TimeoutError:"
+      ],
+      "body_text_sample": ""
+    }
+  ],
   "expected_tab_count": 16,
   "visible_issue_count": 0,
   "info_line_count": 0,
-  "screenshot_missing_count": 0,
-  "unsettled_tab_count": 0,
-  "ui_exception_count": 0,
-  "global_exception": "Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwright install                                              \u2551\n\u2551                                                                         \u2551\n\u2551 <3 Playwright Team                                                      \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+  "screenshot_missing_count": 16,
+  "unsettled_tab_count": 16,
+  "ui_exception_count": 16,
+  "global_exception": null,
   "visible_issues": [],
   "info_lines": [],
   "todo": [],
-  "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 0
+  "production_grade_claim_allowed": false
 }
