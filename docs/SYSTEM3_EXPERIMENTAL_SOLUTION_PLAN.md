@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T12:16:00.970306+00:00`
+Generated UTC: `2026-07-14T12:16:25.141797+00:00`
 Status: **BLOCKED**
-Issues: `574`
+Issues: `566`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 265 issues
+### GITHUB_RENDER_FAILURE — 257 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29328729777 conclusion=failure commit=ca8fe5ea3747
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29328729660 conclusion=failure commit=ca8fe5ea3747
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29328728474 conclusion=failure commit=ca8fe5ea3747
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Full Auto Truth' run=29327653390 conclusion=failure commit=e81dc305e68f
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29328184473 conclusion=failure commit=e81dc305e68f
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29331845175 conclusion=failure commit=9f5a437f6865
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29331783570 conclusion=failure commit=3dfad6a9df26
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 1000 Point TODO Status Updater' run=29331824300 conclusion=failure commit=4915bdf6b1ff
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Workflow Failure Tracker' run=29331811198 conclusion=failure commit=6eab4596e6a8
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dhan Only Data Truth Proof' run=29331783597 conclusion=failure commit=3dfad6a9df26
 
 ### UI_RED_VISUAL — 110 issues
 
@@ -285,7 +285,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=17
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=13
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: system3_public_truth: status=FAIL
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=183
