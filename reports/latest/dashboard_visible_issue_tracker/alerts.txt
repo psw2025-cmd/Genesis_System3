@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:18:20 IST
+04:27:16 IST
 NIFTY
---
+24,069
 BNFTY
---
+57,447
 FINNIFTY
 26,515
 MARKET CLOSED / DATA POLLING
-DHAN DEGRADED
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -53,6 +53,4 @@ System
 Live Gate
 LOCK
 
-Alerts unavailable: RENDER_UNAVAILABLE
-
-Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+No alerts
