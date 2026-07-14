@@ -77,9 +77,6 @@ jobs:
               except Exception:
                   return datetime.min.replace(tzinfo=timezone.utc)
 
-          # Always prefer the newer visible tracker when it is at least as current
-          # as the legacy visual report. This prevents a stale legacy PASS/BLOCKED
-          # file from masking a newer fail-closed 16-tab tracker result.
           visual_target = root / 'dashboard_visual_production_proof' / 'summary.json'
           visible_source = root / 'dashboard_visible_issue_tracker' / 'summary.json'
           legacy = read(visual_target)
@@ -113,8 +110,6 @@ jobs:
               visual_target.parent.mkdir(parents=True, exist_ok=True)
               visual_target.write_text(json.dumps(safe, indent=2, sort_keys=True), encoding='utf-8')
 
-          # Prefer the newer GitHub/Render failure tracker over a stale legacy
-          # workflow-failure report. Only safe counters and status are copied.
           failure_target = root / 'workflow_failure_tracker' / 'summary.json'
           render_source = root / 'github_render_failure_tracker' / 'summary.json'
           legacy = read(failure_target)
@@ -163,11 +158,40 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f reports/latest/todo_status_update/
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "ci(todo): update 1000 point proof status [skip ci]"
-          for attempt in 1 2 3; do
-            if git push; then exit 0; fi
-            git pull --rebase origin main
+
+          publish_report() {
+            git add -f reports/latest/todo_status_update/
+            if git diff --cached --quiet; then
+              return 0
+            fi
+            git commit -m "ci(todo): update 1000 point proof status [skip ci]"
+            git push origin HEAD:main
+          }
+
+          if publish_report; then
+            exit 0
+          fi
+
+          # Concurrent proof publishers frequently move main. The TODO report is
+          # derived evidence, so rebuild it on the newest main instead of trying
+          # to rebase a generated-file commit and risking a same-path conflict.
+          for attempt in 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            python tools/system3_todo_status_updater.py
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('reports/latest/todo_status_update/summary.json')
+          d = json.loads(p.read_text(encoding='utf-8'))
+          status = str(d.get('status') or '').upper()
+          allowed = d.get('production_grade_claim_allowed') is True
+          if status not in {'DONE', 'BLOCKED'} or (status != 'DONE' and allowed):
+              raise SystemExit('Regenerated TODO evidence failed closed validation')
+          PY
+            if publish_report; then
+              exit 0
+            fi
+            sleep $((attempt * 2))
           done
           exit 1
