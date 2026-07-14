@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T00:02:50.972044+00:00`
+Generated UTC: `2026-07-14T00:10:14.490473+00:00`
 Status: **BLOCKED**
-Issues: `444`
+Issues: `297`
 Fix lanes: `13`
 
 ## Rule
@@ -24,30 +24,6 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 | `reports/latest/system3_public_truth/index.json` | `FAIL` |
 
 ## Fix lanes
-
-### UI_RED_VISUAL — 134 issues
-
-Recommended fixes:
-- Use dashboard_visible_issue_tracker output as source of truth.
-- Fix root cause for each visible red/blocked/pending line; do not hide text.
-- Re-run tracker until visible_issue_count=0.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_003:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_015:install_dependencies: Install/credential audit blocked: 3 blockers
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_023:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_035:install_dependencies: Install/credential audit blocked: 3 blockers
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_043:frontend_ui_load: UI route failed to load.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
 ### GITHUB_RENDER_FAILURE — 120 issues
 
@@ -74,7 +50,31 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29292125357 conclusion=failure commit=bd40edb0b938
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 1000 Point TODO Status Updater' run=29292125402 conclusion=failure commit=bd40edb0b938
 
-### BROKER_DHAN — 53 issues
+### UI_RED_VISUAL — 41 issues
+
+Recommended fixes:
+- Use dashboard_visible_issue_tracker output as source of truth.
+- Fix root cause for each visible red/blocked/pending line; do not hide text.
+- Re-run tracker until visible_issue_count=0.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_003:frontend_ui_load: UI route failed to load.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_015:install_dependencies: Install/credential audit blocked: 3 blockers
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_023:frontend_ui_load: UI route failed to load.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_035:install_dependencies: Install/credential audit blocked: 3 blockers
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_043:frontend_ui_load: UI route failed to load.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
+
+### BROKER_DHAN — 30 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 36 issues
+### RENDER_DEPLOY — 29 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -177,7 +177,7 @@ Top issues:
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
 
-### OPTION_CHAIN — 26 issues
+### OPTION_CHAIN — 21 issues
 
 Recommended fixes:
 - Prove Dhan chain rows for enabled universe.
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### ML_TRAINING — 16 issues
+### ML_TRAINING — 11 issues
 
 Recommended fixes:
 - Build real CE/PE dataset proof.
@@ -290,14 +290,10 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_069:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/performance: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_089:ml_training: ML proof issue at /api/ml/status: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: Fix visible UI blocker on ML Model: Training proof missing.
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "DHAN DEGRADED"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "BLOCKED"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
+- `reports/latest/parallel_root_cause_audit/summary.json`: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
 
-### UNKNOWN — 16 issues
+### UNKNOWN — 11 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -310,37 +306,12 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
 - `reports/latest/github_render_failure_tracker/summary.json`: todo_count=11
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 20069ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 20050ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "ERROR"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "FAIL"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=90
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=3
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=16
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
+- `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=14
 
-### PAPER_LIFECYCLE — 12 issues
-
-Recommended fixes:
-- Require paper entry, exit, PnL, source/provenance.
-- Reject fake/fixture/mock rows.
-- Show order endpoints not called.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "Today paper lifecycle endpoint\tBLOCKED\t-"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Error Loading Data"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Error: Request failed with status code 502"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "❌ Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Paper Trades", "text": "Endpoint: /api/state Error: Request failed with status code 502"}
-- `reports/latest/parallel_root_cause_audit/summary.json`: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.
-
-### WORKFLOW_CI — 10 issues
+### WORKFLOW_CI — 9 issues
 
 Recommended fixes:
 - Read workflow_failure_tracker TODO.
@@ -356,7 +327,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: missing_report:reports/latest/autopilot_proof_board/summary.json
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Genesis Brain", "text": "Request failed with status code 502"}
 - `reports/latest/workflow_failure_tracker/summary.json`: failed_count=46
 
 ### ROUTE_CODE — 7 issues
@@ -375,6 +345,21 @@ Top issues:
 - `reports/latest/parallel_root_cause_audit/summary.json`: Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Trading router may be inactive if app.py duplicate routes are authoritative.
 
+### PAPER_LIFECYCLE — 6 issues
+
+Recommended fixes:
+- Require paper entry, exit, PnL, source/provenance.
+- Reject fake/fixture/mock rows.
+- Show order endpoints not called.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/parallel_root_cause_audit/summary.json`: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.
+
 ### FAKE_STALE_DATA — 6 issues
 
 Recommended fixes:
@@ -390,19 +375,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_097:stale_fake_synthetic: Fake/stale/source-risk words found: [{'file': 'dashboard/backend/app.py', 'word': 'synthetic'}, {'file': 'dashboard/backend/app.py', 'word': 'fake'}, {'file': 'dashboard/backend/app.py', 'word': 'fixture'}, {'file': 'dashboard/backend/app.py', 'word': 'yahoo'}, {'file': 'dashboard/backend/app.py', 'word': 'bhavcopy'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 'word': 'synthetic'}, {'file': 'dashboard/frontend/src/components/PaperTrading.tsx', 
 - `reports/latest/parallel_root_cause_audit/summary.json`: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 
-### SCANNER_SIGNAL — 4 issues
-
-Recommended fixes:
-- Verify top_contract_gainers returns real rows.
-- Require CE/PE side, strike, expiry, score, reason.
-- If market closed, report exact blocked reason, not fake signal.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "Universe / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload"}
-
 ### INSTALL_CREDENTIAL — 4 issues
 
 Recommended fixes:
@@ -415,4 +387,15 @@ Top issues:
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293720480 conclusion=failure commit=c874750373fd2eb60bf3d787e68c5baa32fd0ee9
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293446344 conclusion=failure commit=7cc2d90c94071d3acf0ea8efc4ffc49506fbfd99
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29293434613 conclusion=failure commit=dc71e4522883cb73f3e5789dd2e7e902f6925557
+
+### SCANNER_SIGNAL — 2 issues
+
+Recommended fixes:
+- Verify top_contract_gainers returns real rows.
+- Require CE/PE side, strike, expiry, score, reason.
+- If market closed, report exact blocked reason, not fake signal.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state
 
