@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T08:59:36.609477+00:00`
+Generated UTC: `2026-07-14T09:00:42.593702+00:00`
 Status: **BLOCKED**
-Issues: `468`
+Issues: `467`
 Fix lanes: `13`
 
 ## Rule
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### BROKER_DHAN — 40 issues
+### BROKER_DHAN — 39 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
