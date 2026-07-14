@@ -1728,5 +1728,5 @@
     "Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING..."
   ],
   "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 11
+  "settle_normalized_tab_count": 0
 }
