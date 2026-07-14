@@ -1,0 +1,69 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+02:36:18 IST
+NIFTY
+24,069
+BNFTY
+57,447
+FINNIFTY
+26,515
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+OWNER
+PRITAM S. WARGHADE
+LIVE
+OFF
+MODE
+PAPER ONLY
+DATA
+DHAN ONLY REQUIRED
+ML SCORE
+TRAINING PROOF REQUIRED
+PAPER
+PROVENANCE REQUIRED
+RENDER
+VISUAL PROOF REQUIRED
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+ML Model Truth
+This tab is proof-only. It does not train inline and does not invent metrics.
+MODEL_NOT_PROVEN
+No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
+Required proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.
+Active model
+NOT_PROVEN
+Fallback used
+NO
+Proof records
+0
+Training status
+BLOCKED
+Training proof missing.
+Next real fix is scheduler/model pipeline proof, not UI decoration.
