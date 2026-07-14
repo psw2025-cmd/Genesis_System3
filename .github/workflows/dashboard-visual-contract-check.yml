@@ -1,0 +1,62 @@
+name: Dashboard Visual Contract Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'tools/dashboard_visual_contract_check.py'
+      - 'tools/dashboard_live_ui_proof.mjs'
+      - 'dashboard/frontend/src/components/PaperTrading.tsx'
+      - 'dashboard/frontend/src/components/Sidebar.tsx'
+      - '.github/workflows/dashboard-visual-contract-check.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dashboard-visual-contract-check
+  cancel-in-progress: true
+
+env:
+  ANALYZE_MODE: '1'
+  LIVE_TRADING_ENABLED: '0'
+  SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+
+jobs:
+  visual-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run fail-closed source/proof contract check
+        run: python tools/dashboard_visual_contract_check.py
+
+      - name: Commit sanitized latest report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_visual_contract_check/
+          if git diff --cached --quiet; then
+            echo "No visual contract report changes"
+            exit 0
+          fi
+          git commit -m "ci(proof): publish dashboard visual contract check [skip ci]"
+          git pull --rebase origin main
+          git push
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-visual-contract-check
+          path: reports/latest/dashboard_visual_contract_check/
+          retention-days: 14
