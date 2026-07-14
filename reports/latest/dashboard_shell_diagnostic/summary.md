@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T14:46:45.930Z
+Generated: 2026-07-14T14:51:19.121Z
 Status: **BLOCKED**
 Blocker: **FRONTEND_ROOT_EMPTY**
 Render UI available: `true`
