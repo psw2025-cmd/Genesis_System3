@@ -1,8 +1,8 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "a2f76348b16aed929ea5ce2f4cceff65aaaabc0c",
-  "generated_utc": "2026-07-14T04:00:28.029861Z",
+  "expected_commit": "7205705cafe44b9ef89fc6a287f2d2cc37b647b9",
+  "generated_utc": "2026-07-14T06:14:53.316435Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
@@ -13,44 +13,44 @@
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 27.5,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.2,
+        "headroom_mb": 1305.1,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.8,
+        "pct_used": 27.5,
+        "rss_mb": 494.9,
         "status": "OK"
       },
-      "rss_mb": 361.8,
+      "rss_mb": 494.9,
       "status": "OK"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 27.5,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.2,
+        "headroom_mb": 1305.1,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.8,
+        "pct_used": 27.5,
+        "rss_mb": 494.9,
         "status": "OK"
       },
-      "rss_mb": 361.8,
+      "rss_mb": 494.9,
       "status": "OK"
     },
     "before": {
       "available": true,
-      "pct_used": 20.1,
+      "pct_used": 27.5,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1438.4,
+        "headroom_mb": 1305.1,
         "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.6,
+        "pct_used": 27.5,
+        "rss_mb": 494.9,
         "status": "OK"
       },
-      "rss_mb": 361.6,
+      "rss_mb": 494.9,
       "status": "OK"
     }
   },
@@ -59,7 +59,7 @@
     {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=a2f76348b16a"
+      "message": "Render git_sha=[REDACTED] expected=7205705cafe4"
     },
     {
       "key": "broker_not_connected",
@@ -75,6 +75,21 @@
       "key": "chain_nifty_empty",
       "level": "WARNING",
       "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
+    },
+    {
+      "key": "memory_before",
+      "level": "WARNING",
+      "message": "RSS high: 494.9MB"
+    },
+    {
+      "key": "memory_after_portfolio",
+      "level": "WARNING",
+      "message": "RSS high: 494.9MB"
+    },
+    {
+      "key": "memory_after_chain",
+      "level": "WARNING",
+      "message": "RSS high: 494.9MB"
     }
   ]
 }

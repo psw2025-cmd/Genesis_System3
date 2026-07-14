@@ -1,17 +1,17 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-14T04:03:15.558Z
+Generated: 2026-07-14T06:19:27.289Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
 Final verdict: **FAIL**
-Truth control visible: **false**
+Truth control visible: **true**
 
 ## Runtime Log Sources Captured
-- Browser console entries: 4
+- Browser console entries: 11
 - Page errors: 0
-- Request failures: 0
-- Network responses: 22
+- Request failures: 5
+- Network responses: 82
 
 ## Dhan Chain Truth
 - BLOCKED (required) /api/chain/NIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -40,105 +40,23 @@ Truth control visible: **false**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- FAIL Truth Control size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Truth Control"]').first()
-
-- FAIL Genesis Brain size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Genesis Brain"]').first()
-
-- FAIL E2E Proof size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="E2E Proof"]').first()
-
-- FAIL Overview size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Overview"]').first()
-
-- FAIL Option Chain size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Option Chain"]').first()
-
-- FAIL Signals size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Signals"]').first()
-
-- FAIL Paper Trades size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Paper Trades"]').first()
-
-- FAIL Positions size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Positions"]').first()
-
-- FAIL Broker size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Broker"]').first()
-
-- FAIL Performance size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Performance"]').first()
-
-- FAIL ML Model size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="ML Model"]').first()
-
-- FAIL Live Gate size=0 TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Live Gate"]').first()
-
+- PASS Truth Control size=199068
+- PASS Genesis Brain size=282666
+- PASS E2E Proof size=182184
+- PASS Overview size=155528
+- PASS Option Chain size=114227
+- PASS Signals size=123596
+- PASS Paper Trades size=169182
+- PASS Positions size=108049
+- PASS Broker size=151437
+- PASS Performance size=107053
+- PASS ML Model size=134013
+- PASS Live Gate size=134243
 
 ## Infrastructure Blockers
-- UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Truth Control"]').first()
-
-- UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Genesis Brain"]').first()
-
-- UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="E2E Proof"]').first()
-
-- UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Overview"]').first()
-
-- UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Option Chain"]').first()
-
-- UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Signals"]').first()
-
-- UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Paper Trades"]').first()
-
-- UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Positions"]').first()
-
-- UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Broker"]').first()
-
-- UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Performance"]').first()
-
-- UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="ML Model"]').first()
-
-- UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 25000ms exceeded.
-Call log:
-  - waiting for locator('button[title="Live Gate"]').first()
-
-- TRUTH_CONTROL_NOT_VISIBLE
+- UI:Paper Trades:FORBIDDEN:/synthetic/i
+- UI:Paper Trades:FORBIDDEN:/fake/i
+- UI:Paper Trades:FORBIDDEN:/mock/i
 
 ## Trading Readiness Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -148,7 +66,18 @@ Call log:
 
 ## Optional Data Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
-- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: the server responded with a status of 502 ()
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been block
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2' from origin 'https://genesis-syst
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2:net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2:net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2:net::ERR_FAILED
+- OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2:net::ERR_FAILED

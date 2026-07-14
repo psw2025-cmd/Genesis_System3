@@ -1,14 +1,14 @@
 # Dashboard Live UI Proof
 
-Generated: 2026-07-14T04:00:45.948Z
+Generated: 2026-07-14T06:15:14.713Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
-Final verdict: **FAIL**
+Final verdict: **BLOCKED_NOT_TRADE_READY**
 Owner badge visible: **true**
 Safety labels visible: **true**
 ML proof visible: **true**
-Paper truth visible: **false**
+Paper truth visible: **true**
 Trader readiness panel visible: **true**
 Truth control visible: **true**
 
@@ -16,9 +16,9 @@ Truth control visible: **true**
 - PASS OWNER_BADGE_VISIBLE
 - PASS SAFETY_LABELS_VISIBLE
 - PASS ML_PROOF_VISIBLE
-- FAIL PAPER_TRUTH_VISIBLE blocker=PAPER_TRUTH_NOT_VISIBLE:GLOBAL
+- PASS PAPER_TRUTH_VISIBLE
 - PASS MOBILE_SCREENSHOT_PRESENT
-- FAIL MOBILE_OWNER_OR_RESPONSIVE_UI blocker=OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI
+- PASS MOBILE_OWNER_OR_RESPONSIVE_UI
 
 ## Chain Truth
 - BLOCKED (required) /api/chain/NIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -57,7 +57,7 @@ Truth control visible: **true**
 - PASS Overview owner=true safety=true ml=true paper=true
 - PASS Option Chain owner=true safety=true ml=true paper=true
 - PASS Signals owner=true safety=true ml=true paper=true
-- FAIL Paper Trades owner=true safety=true ml=true paper=false
+- PASS Paper Trades owner=true safety=true ml=true paper=true
 - PASS Positions owner=true safety=true ml=true paper=true
 - PASS Broker owner=true safety=true ml=true paper=true
 - PASS Performance owner=true safety=true ml=true paper=true
@@ -65,12 +65,10 @@ Truth control visible: **true**
 - PASS Live Gate owner=true safety=true ml=true paper=true
 
 ## Infrastructure Blockers
-- UI_FAIL:Paper Trades
+- none
 
 ## Visual Blockers
-- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
-- OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI
+- none
 
 ## Trading Readiness Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -82,11 +80,7 @@ Truth control visible: **true**
 - CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 
 ## Required Solutions
-- UI_FAIL:Paper Trades: Fix UI route, tab rendering, loading state, or browser exception; rerun visual proof.
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
 - CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
 - CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
-- PAPER_TRUTH_NOT_VISIBLE:Paper Trades: Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.
-- PAPER_TRUTH_NOT_VISIBLE:GLOBAL: Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.
-- OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI: Ensure TopBar renders OWNER / PRITAM S. WARGHADE in desktop and mobile screenshots, then rerun visual proof.

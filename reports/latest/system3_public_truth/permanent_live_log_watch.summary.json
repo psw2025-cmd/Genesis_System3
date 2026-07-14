@@ -1,19 +1,9 @@
 {
   "base": "https://genesis-system3-backend.onrender.com",
   "blockers": [
-    "UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
-    "UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
-    "UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
-    "UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
-    "UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
-    "UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
-    "UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
-    "UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
-    "UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
-    "UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
-    "UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
-    "UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
-    "TRUTH_CONTROL_NOT_VISIBLE",
+    "UI:Paper Trades:FORBIDDEN:/synthetic/i",
+    "UI:Paper Trades:FORBIDDEN:/fake/i",
+    "UI:Paper Trades:FORBIDDEN:/mock/i",
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -82,21 +72,11 @@
     }
   ],
   "final_verdict": "FAIL",
-  "generated_at": "2026-07-14T04:03:15.558Z",
+  "generated_at": "2026-07-14T06:19:27.289Z",
   "infra_blockers": [
-    "UI_TAB_EXCEPTION:Truth Control:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Truth Control\"]').first()\n",
-    "UI_TAB_EXCEPTION:Genesis Brain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Genesis Brain\"]').first()\n",
-    "UI_TAB_EXCEPTION:E2E Proof:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"E2E Proof\"]').first()\n",
-    "UI_TAB_EXCEPTION:Overview:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Overview\"]').first()\n",
-    "UI_TAB_EXCEPTION:Option Chain:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Option Chain\"]').first()\n",
-    "UI_TAB_EXCEPTION:Signals:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Signals\"]').first()\n",
-    "UI_TAB_EXCEPTION:Paper Trades:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Paper Trades\"]').first()\n",
-    "UI_TAB_EXCEPTION:Positions:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Positions\"]').first()\n",
-    "UI_TAB_EXCEPTION:Broker:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Broker\"]').first()\n",
-    "UI_TAB_EXCEPTION:Performance:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Performance\"]').first()\n",
-    "UI_TAB_EXCEPTION:ML Model:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"ML Model\"]').first()\n",
-    "UI_TAB_EXCEPTION:Live Gate:TimeoutError: locator.click: Timeout 25000ms exceeded.\nCall log:\n  - waiting for locator('button[title=\"Live Gate\"]').first()\n",
-    "TRUTH_CONTROL_NOT_VISIBLE"
+    "UI:Paper Trades:FORBIDDEN:/synthetic/i",
+    "UI:Paper Trades:FORBIDDEN:/fake/i",
+    "UI:Paper Trades:FORBIDDEN:/mock/i"
   ],
   "trade_readiness_blockers": [
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
