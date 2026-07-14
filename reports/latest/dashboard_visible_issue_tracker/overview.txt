@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-04:55:28 IST
+04:59:26 IST
 NIFTY
 24,069
 BNFTY
@@ -14,7 +14,7 @@ DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -111,7 +111,7 @@ Paper Lifecycle
 market-session proof pending
 PASS
 Tick / Data Freshness
-tick_age=6.69s refresh=5s
+tick_age=6.55s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
