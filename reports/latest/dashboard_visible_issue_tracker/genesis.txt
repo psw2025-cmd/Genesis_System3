@@ -1,0 +1,140 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+03:36:19 IST
+NIFTY
+24,069
+BNFTY
+57,447
+FINNIFTY
+26,515
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+OWNER
+PRITAM S. WARGHADE
+LIVE
+OFF
+MODE
+PAPER ONLY
+DATA
+DHAN ONLY REQUIRED
+ML SCORE
+TRAINING PROOF REQUIRED
+PAPER
+PROVENANCE REQUIRED
+RENDER
+VISUAL PROOF REQUIRED
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+GENESIS PRODUCTION COMMAND CENTER
+AI Options Automation Dashboard
+One official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.
+Refresh
+Voice Alert
+OPERATING MODE
+OFF_MARKET_RESEARCH_AND_VALIDATION
+BROKER
+connected
+TRUTH SCORE
+75%
+MEMORY EVENTS
+3
+LIVE TRADING
+BLOCKED
+OFF-MARKET: TRADER MUST SEE
+✓
+last scanner snapshot and staleness
+✓
+prediction-vs-actual accuracy trend
+✓
+Spearman rho and top-N hit rate
+✓
+loss learning notes
+✓
+strategy research queue
+✓
+backtest/walk-forward status
+✓
+broker token health
+✓
+next market open checklist
+✓
+deployment and self-heal status
+PREDICTION ACCURACY & GAIN RANK REQUIREMENTS
+ACCURACY GOAL
+90%
+Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
+Current blocker: Accumulate multi-day real prediction-vs-actual proof and improve IV/OI filters.
+GLOBAL RESEARCH SOURCES INTEGRATED
+Zerodha Varsity - Options Theory
+Greeks, volatility, moneyness, pricing education
+Zerodha Varsity - Option Strategies
+Spreads, straddle, strangle, max pain, PCR, iron condor
+Cboe Options Institute
+Global options education, risk management, strategy playbooks
+NSE India Option Chain
+Indian option-chain truth: OI, volume, strike/expiry surface
+DhanHQ API v2
+Broker API, option chain, market feed, historical data, orders when gates pass
+HIDDEN SECRETS LAB
+High IV favors defined-risk premium structures only after spread/liquidity checks.
+Verified: true | Impact: unproven_until_backtested
+OI concentration near a strike can create expiry pin risk; max pain is advisory, not a signal alone.
+Verified: true | Impact: risk_filter
+Volume plus OI change is stronger than volume alone for buildup classification.
+Verified: true | Impact: signal_quality_filter
+INTEGRATION MAP
+Broker
+Current: Dhan read-only + gated order endpoint
+Next: keep real-money disabled until proof gates pass
+Market data
+Current: Dhan/NSE/cache chain endpoints
+Next: add 2-source truth comparison per symbol
+Prediction
+Current: gain rank + signal confidence APIs
+Next: show multi-day rho/top-N trend on Genesis tab
+Risk
+Current: 2% trade risk, 5% daily loss policy displayed
+Next: enforce position sizing in paper lifecycle
+Learning
+Current: memory JSONL + research log
+Next: promote only after walk-forward improvement
+NEVER DIE MONITOR
+UPTIME SECONDS
+28155
+LAST SELF-HEAL
+startup_guard_checked
+ISSUES FIXED
+3
+TRUTH, COMPLIANCE, AND CONTROL
+Kill switch visible: live trading remains disabled until all proof gates pass.
+Let Agent Take Full Control
+{
+  "message": "I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS."
+}
