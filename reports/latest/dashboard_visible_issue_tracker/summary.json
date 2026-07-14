@@ -1838,5 +1838,5 @@
     "Fix visible UI blocker on Live Gate: Live trading blocked \u2014 see failed gates above"
   ],
   "production_grade_claim_allowed": false,
-  "settle_normalized_tab_count": 13
+  "settle_normalized_tab_count": 0
 }
