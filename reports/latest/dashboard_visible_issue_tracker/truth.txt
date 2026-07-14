@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-11:19:44 IST
+11:29:31 IST
 NIFTY
 --
 BNFTY
@@ -60,7 +60,7 @@ Infrastructure / broker read path
 BLOCKED
 Money readiness
 Last run
-7/14/2026, 5:49:40 AM
+7/14/2026, 5:59:28 AM
 MONEY_READY_BLOCKED
 At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
 LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE
