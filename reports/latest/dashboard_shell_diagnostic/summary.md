@@ -1,16 +1,18 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-14T12:20:22.349Z
+Generated: 2026-07-14T12:28:38.904Z
 Status: **BLOCKED**
-Blocker: **RENDER_UI_UNAVAILABLE**
-Render UI available: `false`
-Auth OK: `true` (HTTP 200)
-UI HTTP: `502`
+Blocker: **DASHBOARD_AUTH_NOT_PROVEN**
+Render UI available: `true`
+Availability attempts: `1:200`
+Recovered after transient failure: `false`
+Auth OK: `false` (HTTP 502)
+UI HTTP: `200`
 Root children: `0`
 Body text length: `210`
 Matched tabs: `0/16`
-Missing source-defined tabs: `not evaluated / none`
-Deployed asset drift: `false`
+Missing source-defined tabs: `Truth Control, Genesis Brain, E2E Proof, Overview, Sim Live, Option Chain, Signals, Trade, Paper Trades, Positions, Performance, ML Model, Broker, Alerts, System, Live Gate`
+Deployed asset drift: `true`
 Visible buttons: `0`
 Visible links: `2`
 Console error categories: `console.error`
