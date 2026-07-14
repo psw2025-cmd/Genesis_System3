@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-14T22:49:51.671221+00:00",
-  "issue_count": 612,
+  "generated_utc": "2026-07-14T22:54:09.205415+00:00",
+  "issue_count": 611,
   "lane_count": 13,
   "lanes": [
     {
@@ -685,7 +685,7 @@
       ]
     },
     {
-      "issue_count": 20,
+      "issue_count": 19,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
@@ -773,11 +773,6 @@
         },
         {
           "issue": "unsettled_tab_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "settle_normalized_tab_count=13",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
