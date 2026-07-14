@@ -1,0 +1,100 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+12:50:21 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+MARKET OPEN
+DHAN API ERR
+PAPER
+LIVE OFF
+WS
+LIVE
+OWNER
+PRITAM S. WARGHADE
+LIVE
+OFF
+MODE
+PAPER ONLY
+DATA
+DHAN ONLY REQUIRED
+ML SCORE
+TRAINING PROOF REQUIRED
+PAPER
+PROVENANCE REQUIRED
+RENDER
+VISUAL PROOF REQUIRED
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+End-to-End Visual Truth Proof
+Real broker/data truth only. Live money remains blocked until every row below passes.
+Recheck Now
+BLOCKED · FULL E2E
+Overall visual proof
+PASS · API
+Core endpoints
+BLOCKED · DHAN CHAIN
+Real Dhan option chain
+BLOCKED · NO BAD SOURCE
+No non-Dhan/stale/fallback
+BLOCKED · TRADER READY
+Human readiness checklist
+Last run: 7/14/2026, 7:20:20 AM · This panel is proof-only; it does not enable live orders.
+Trader Readiness Truth Checklist
+REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
+Dhan broker connection	BLOCKED	200
+Dhan access token/session	BLOCKED	-
+Real broker funds/margin	PASS	200
+Real broker holdings response	PASS	rows visible or empty broker response
+Real broker positions response	PASS	rows visible or empty broker response
+Real Dhan option chain for all watched symbols	BLOCKED	0/5
+No non-Dhan/stale/fallback markers in chain	BLOCKED	blocked marker found
+Paper/analyzer P&L endpoint	PASS	200
+Today paper lifecycle endpoint	PASS	count=0
+Gate/risk endpoint visible	PASS	ok
+Live-money switch blocked until separate proof	PASS	blocked
+Dhan Option Chain Proof
+SYMBOL	VISUAL STATUS	SOURCE	PRIORITY	STATUS	SPOT	CONTRACTS	REASON
+NIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+BANKNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+FINNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+MIDCPNIFTY	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+SENSEX	BLOCKED	dhan	dhan_only_no_rows	NO_DHAN_DATA	0	0	NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+Core API / Dashboard Data Proof
+ENDPOINT	HTTP	VISUAL STATUS	IMPORTANT STATUS
+/api/health	200	PASS	not_ready
+/api/state	200	PASS	PAPER
+/api/broker/dhan/status	200	PASS	ANALYZER
+/api/broker/funds	200	PASS	-
+/api/broker/holdings	200	PASS	-
+/api/broker/positions/live	200	PASS	-
+/api/gain_rank	200	PASS	no_data
+/api/pnl	200	PASS	-
+/api/trades/today	200	PASS	-
+/api/auto_gates	200	PASS	ok
