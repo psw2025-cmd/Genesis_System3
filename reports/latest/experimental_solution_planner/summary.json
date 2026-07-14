@@ -1,144 +1,8 @@
 {
-  "generated_utc": "2026-07-14T00:36:59.322005+00:00",
-  "issue_count": 382,
+  "generated_utc": "2026-07-14T00:50:10.498011+00:00",
+  "issue_count": 355,
   "lane_count": 13,
   "lanes": [
-    {
-      "issue_count": 110,
-      "lane": "UI_RED_VISUAL",
-      "recommended_fixes": [
-        "Use dashboard_visible_issue_tracker output as source of truth.",
-        "Fix root cause for each visible red/blocked/pending line; do not hide text.",
-        "Re-run tracker until visible_issue_count=0."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_003:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_015:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_023:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_035:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_043:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_055:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_063:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_073:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_075:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_079:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_083:frontend_ui_load: UI route failed to load.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_092:visible_ui_issues: Dashboard visible issue tracker summary missing.",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_093:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_095:install_dependencies: Install/credential audit blocked: 3 blockers",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_099:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
-          "lane": "UI_RED_VISUAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        }
-      ]
-    },
     {
       "issue_count": 107,
       "lane": "GITHUB_RENDER_FAILURE",
@@ -273,6 +137,142 @@
           "issue": "{\"branch\": \"main\", \"commit\": \"e7a92e286d5de36133dfcb44e70b1e8396d84715\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29295843047\", \"run_id\": 29295843047, \"updated_at\": \"2026-07-14T00:27:54Z\", \"workflow\": \"Permanent Repo Render Safety\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 96,
+      "lane": "UI_RED_VISUAL",
+      "recommended_fixes": [
+        "Use dashboard_visible_issue_tracker output as source of truth.",
+        "Fix root cause for each visible red/blocked/pending line; do not hide text.",
+        "Re-run tracker until visible_issue_count=0."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_003:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_012:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_013:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_015:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_019:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_023:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_032:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_033:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_035:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_039:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_043:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_052:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_055:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_063:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_072:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_073:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_075:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_079:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_083:frontend_ui_load: UI route failed to load.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_092:visible_ui_issues: Dashboard visible issue tracker summary missing.",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_093:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_095:install_dependencies: Install/credential audit blocked: 3 blockers",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_099:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']",
+          "lane": "UI_RED_VISUAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     },
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 32,
+      "issue_count": 31,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -549,7 +549,7 @@
       ]
     },
     {
-      "issue_count": 23,
+      "issue_count": 22,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -663,11 +663,6 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Option Chain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20050ms\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -675,131 +670,7 @@
       ]
     },
     {
-      "issue_count": 23,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20059ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20045ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20050ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20051ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20051ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20037ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20046ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20047ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20043ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Live Gate\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20048ms\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=115",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 16,
+      "issue_count": 15,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -858,11 +729,6 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20043ms\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
@@ -885,6 +751,90 @@
         {
           "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
           "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 15,
+      "lane": "UNKNOWN",
+      "recommended_fixes": [
+        "Inspect source report, classify manually, add rule to planner."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20059ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "info_line_count=115",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "unsettled_tab_count=2",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "settle_normalized_tab_count=14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "blocker_count=14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -946,7 +896,7 @@
       ]
     },
     {
-      "issue_count": 8,
+      "issue_count": 7,
       "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
         "Require paper entry, exit, PnL, source/provenance.",
@@ -981,11 +931,6 @@
         },
         {
           "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20050ms\"}",
           "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -1084,7 +1029,7 @@
       ]
     },
     {
-      "issue_count": 5,
+      "issue_count": 4,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1109,11 +1054,6 @@
         },
         {
           "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 20051ms\"}",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
