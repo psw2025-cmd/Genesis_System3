@@ -37,6 +37,8 @@ const summary = {
   auth: { ok: false, status: 0 },
   ui_response_status: 0,
   render_ui_available: false,
+  authenticated_dashboard_rendered: false,
+  tab_coverage_evaluated: false,
   availability_attempts: [],
   recovered_after_transient_failure: false,
   final_url: '',
@@ -151,18 +153,22 @@ try {
   summary.visible_button_count = shell.buttonCount
   summary.visible_link_count = shell.linkCount
   summary.safe_visible_controls = shell.controls.map(safeText)
-  summary.matched_tabs = shell.matched
-  summary.matched_tab_count = shell.matched.length
-  summary.missing_tabs = summary.render_ui_available
-    ? expectedTabs.filter(title => !shell.matched.includes(title))
+  summary.authenticated_dashboard_rendered = Boolean(
+    summary.render_ui_available && summary.auth.ok && shell.rootChildCount > 0 && shell.bodyLength > 0
+  )
+  summary.tab_coverage_evaluated = summary.authenticated_dashboard_rendered
+  summary.matched_tabs = summary.tab_coverage_evaluated ? shell.matched : []
+  summary.matched_tab_count = summary.matched_tabs.length
+  summary.missing_tabs = summary.tab_coverage_evaluated
+    ? expectedTabs.filter(title => !summary.matched_tabs.includes(title))
     : []
-  summary.deployed_asset_drift_detected = summary.render_ui_available && summary.missing_tabs.length > 0
+  summary.deployed_asset_drift_detected = summary.tab_coverage_evaluated && summary.missing_tabs.length > 0
   summary.console_error_types = [...new Set(summary.console_error_types)]
   summary.page_error_types = [...new Set(summary.page_error_types)]
 
   if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE_AFTER_RETRIES'
   else if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
-  else if (summary.root_child_count === 0 || summary.body_text_length === 0) summary.blocker = 'FRONTEND_ROOT_EMPTY'
+  else if (!summary.authenticated_dashboard_rendered) summary.blocker = 'FRONTEND_ROOT_EMPTY'
   else if (summary.missing_tabs.length) summary.blocker = 'DEPLOYED_FRONTEND_ASSET_DRIFT'
   else if (summary.page_error_types.length || summary.console_error_types.length) summary.blocker = 'FRONTEND_RUNTIME_ERRORS_PRESENT'
   else {
@@ -189,6 +195,8 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   `Recovered after transient failure: \`${summary.recovered_after_transient_failure}\``,
   `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
   `UI HTTP: \`${summary.ui_response_status}\``,
+  `Authenticated dashboard rendered: \`${summary.authenticated_dashboard_rendered}\``,
+  `Tab coverage evaluated: \`${summary.tab_coverage_evaluated}\``,
   `Root children: \`${summary.root_child_count}\``,
   `Body text length: \`${summary.body_text_length}\``,
   `Matched tabs: \`${summary.matched_tab_count}/${summary.expected_tab_count}\``,
@@ -210,6 +218,8 @@ console.log(JSON.stringify({
   recovered_after_transient_failure: summary.recovered_after_transient_failure,
   auth_ok: summary.auth.ok,
   ui_http: summary.ui_response_status,
+  authenticated_dashboard_rendered: summary.authenticated_dashboard_rendered,
+  tab_coverage_evaluated: summary.tab_coverage_evaluated,
   matched_tabs: `${summary.matched_tab_count}/${summary.expected_tab_count}`,
   missing_tabs: summary.missing_tabs,
   deployed_asset_drift_detected: summary.deployed_asset_drift_detected,
