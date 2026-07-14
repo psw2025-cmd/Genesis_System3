@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-14T20:27:42.964462+00:00`
+Generated UTC: `2026-07-14T20:28:06.199325+00:00`
 Status: **BLOCKED**
-Issues: `576`
+Issues: `575`
 Fix lanes: `13`
 
 ## Rule
@@ -273,28 +273,6 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### UNKNOWN — 19 issues
-
-Recommended fixes:
-- Inspect source report, classify manually, add rule to planner.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
-- `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=20
-- `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
-- `reports/latest/autopilot_proof_board/summary.json`: system3_public_truth: status=FAIL
-- `reports/latest/autopilot_proof_board/summary.json`: blocker_count=177
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING..."}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=112
-
 ### INSTALL_CREDENTIAL — 19 issues
 
 Recommended fixes:
@@ -318,6 +296,28 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29351373244 conclusion=failure commit=7f2f929df88df47160da7c8dfe2fdb3c4894e712
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29351268025 conclusion=failure commit=e67cf1aebe41b15f9d840fbea1208601608fb028
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29363879986 conclusion=failure commit=6d5e8d5f02fe09189e3d5ffde3a78e06e5c94f46
+
+### UNKNOWN — 18 issues
+
+Recommended fixes:
+- Inspect source report, classify manually, add rule to planner.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
+- `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=20
+- `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
+- `reports/latest/autopilot_proof_board/summary.json`: system3_public_truth: status=FAIL
+- `reports/latest/autopilot_proof_board/summary.json`: blocker_count=177
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Truth Control", "text": "ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "E2E Proof", "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING..."}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "Overview", "text": "PEND"}
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
+- `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=112
 
 ### ML_TRAINING — 17 issues
 

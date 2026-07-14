@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-14T20:27:42.964462+00:00",
-  "issue_count": 576,
+  "generated_utc": "2026-07-14T20:28:06.199325+00:00",
+  "issue_count": 575,
   "lane_count": 13,
   "lanes": [
     {
@@ -681,110 +681,6 @@
     },
     {
       "issue_count": 19,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=20",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "system3_public_truth: status=FAIL",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "blocker_count=177",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=112",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "settle_normalized_tab_count=13",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 19,
       "lane": "INSTALL_CREDENTIAL",
       "recommended_fixes": [
         "Fix dependency/import/compile errors from secure audit.",
@@ -886,6 +782,105 @@
           "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29363692061 conclusion=failure commit=27301b363e272b4f2e829f7b8ea8562f97b27924",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 18,
+      "lane": "UNKNOWN",
+      "recommended_fixes": [
+        "Inspect source report, classify manually, add rule to planner."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=20",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "system3_public_truth: status=FAIL",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "blocker_count=177",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "info_line_count=112",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "unsettled_tab_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
+        },
+        {
+          "issue": "blocker_count=14",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
     },
