@@ -53,11 +53,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/genesis.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
         "DHAN DEGRADED",
         "Request failed with status code 502"
       ],
@@ -70,7 +69,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:21:56 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nRequest failed with status code 502"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:21:56 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nRequest failed with status code 502",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "e2e_proof",
@@ -79,11 +79,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/e2e_proof.png",
       "screenshot_ok": true,
       "navigation_method_index": 2,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5013,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5013ms",
         "DHAN DEGRADED",
         "Real broker/data truth only. Live money remains blocked until every row below passes.",
         "BLOCKED \u00b7 FULL E2E",
@@ -127,7 +126,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:07 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nRecheck Now\nBLOCKED \u00b7 FULL E2E\nOverall visual proof\nBLOCKED \u00b7 API\nCore endpoints\nBLOCKED \u00b7 DHAN CHAIN\nReal Dhan option chain\nPASS \u00b7 NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED \u00b7 TRADER READY\nHuman readiness checklist\nLast run: 7/14/2026, 6:52:04 PM \u00b7 This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t502\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tBLOCKED\t502\nReal broker holdings response\tBLOCKED\t502\nReal broker positions response\tBLOCKED\t502\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tPASS\tclean\nPaper/analyzer P&L endpoint\tBLOCKED\t502\nToday paper lifecycle endpoint\tBLOCKED\t502\nGate/risk endpoint visible\tBLOCKED\t502\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nBANKNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nFINNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nMIDCPNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nSENSEX\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS\n/api/health\t502\tBLOCKED\t-\n/api/state\t502\tBLOCKED\t-\n/api/broker/dhan/status\t502\tBLOCKED\t-\n/api/broker/funds\t502\tBLOCKED\t-\n/api/broker/holdings\t502\tBLOCKED\t-\n/api/broker/positions/live\t502\tBLOCKED\t-\n/api/gain_rank\t502\tBLOCKED\t-\n/api/pnl\t502\tBLOCKED\t-\n/api/trades/today\t502\tBLOCKED\t-\n/api/auto_gates\t502\tBLOCKED\t-"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:07 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nRecheck Now\nBLOCKED \u00b7 FULL E2E\nOverall visual proof\nBLOCKED \u00b7 API\nCore endpoints\nBLOCKED \u00b7 DHAN CHAIN\nReal Dhan option chain\nPASS \u00b7 NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED \u00b7 TRADER READY\nHuman readiness checklist\nLast run: 7/14/2026, 6:52:04 PM \u00b7 This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t502\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tBLOCKED\t502\nReal broker holdings response\tBLOCKED\t502\nReal broker positions response\tBLOCKED\t502\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tPASS\tclean\nPaper/analyzer P&L endpoint\tBLOCKED\t502\nToday paper lifecycle endpoint\tBLOCKED\t502\nGate/risk endpoint visible\tBLOCKED\t502\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nBANKNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nFINNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nMIDCPNIFTY\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nSENSEX\tBLOCKED\t-\t-\t502\t-\t-\tUNKNOWN\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS\n/api/health\t502\tBLOCKED\t-\n/api/state\t502\tBLOCKED\t-\n/api/broker/dhan/status\t502\tBLOCKED\t-\n/api/broker/funds\t502\tBLOCKED\t-\n/api/broker/holdings\t502\tBLOCKED\t-\n/api/broker/positions/live\t502\tBLOCKED\t-\n/api/gain_rank\t502\tBLOCKED\t-\n/api/pnl\t502\tBLOCKED\t-\n/api/trades/today\t502\tBLOCKED\t-\n/api/auto_gates\t502\tBLOCKED\t-",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "overview",
@@ -136,11 +136,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/overview.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5014,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5014ms",
         "DHAN DEGRADED",
         "API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.",
         "RENDER_UNAVAILABLE",
@@ -193,7 +192,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:12 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nAPI status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.\nBROKER\nAPI RESPONDED\nDhan read-only\nPAPER P&L\n\u20b90\nCloud sim\nOPEN POSITIONS\n0\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nRENDER_UNAVAILABLE\nWAITING\nState API\nERROR\nBroker Status API\nRENDER_UNAVAILABLE\nERROR\nFunds API\nRender/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nERROR\nHoldings API\nRender/backend returned 502 for /api/broker/holdings. Keeping last good data where available.\nERROR\nPositions API\nRender/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.\nLOADED\nP&L API\npnl=0\nSTALE\nGain Rank / Scanner\nLOADED\nAuto Gates\n1 gates\nLOADED\nAlerts\n0 recent\nMARKET_SESSION_ONLY\nOption Chain\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nGate Matrix\n0/1 PASS\nFAIL\nDashboard API Access\nRender/backend returned 502 for /api/alerts/recent. Keeping last good data where available.\nSystem Health\nMode\nPAPER\nQC Status\nRENDER_UNAVAILABLE\nData Source\nRENDER_UNAVAILABLE\nMarket\nCLOSED / DATA POLLING\nLive Allowed\nfalse\nLast Sync\n--"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:12 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nOFF\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nAPI status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.\nBROKER\nAPI RESPONDED\nDhan read-only\nPAPER P&L\n\u20b90\nCloud sim\nOPEN POSITIONS\n0\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nRENDER_UNAVAILABLE\nWAITING\nState API\nERROR\nBroker Status API\nRENDER_UNAVAILABLE\nERROR\nFunds API\nRender/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nERROR\nHoldings API\nRender/backend returned 502 for /api/broker/holdings. Keeping last good data where available.\nERROR\nPositions API\nRender/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.\nLOADED\nP&L API\npnl=0\nSTALE\nGain Rank / Scanner\nLOADED\nAuto Gates\n1 gates\nLOADED\nAlerts\n0 recent\nMARKET_SESSION_ONLY\nOption Chain\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nGate Matrix\n0/1 PASS\nFAIL\nDashboard API Access\nRender/backend returned 502 for /api/alerts/recent. Keeping last good data where available.\nSystem Health\nMode\nPAPER\nQC Status\nRENDER_UNAVAILABLE\nData Source\nRENDER_UNAVAILABLE\nMarket\nCLOSED / DATA POLLING\nLive Allowed\nfalse\nLast Sync\n--",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "sim_live",
@@ -220,11 +220,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/chain.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
         "DHAN DEGRADED",
         "Market closed: live option-chain rows are session-dependent only.",
         "Stale"
@@ -264,7 +263,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:38 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nMarket closed: live option-chain rows are session-dependent only.\nNO_DHAN_DATA\n\nBroker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.\n\nChain Status\nMarket\nCLOSED\nReason\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nNext Open\n--\nData Source\ndhan\nContracts\n0\nSpot\n--\nPCR\n--\nLast Scanner Snapshot\nLatest Date\n--\nStale\ntrue\nRank\n--\nGain Score\n--\nExpected Move\n--\nRecommendation\n--\nBackend Message\n\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:38 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nMarket closed: live option-chain rows are session-dependent only.\nNO_DHAN_DATA\n\nBroker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.\n\nChain Status\nMarket\nCLOSED\nReason\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nNext Open\n--\nData Source\ndhan\nContracts\n0\nSpot\n--\nPCR\n--\nLast Scanner Snapshot\nLatest Date\n--\nStale\ntrue\nRank\n--\nGain Score\n--\nExpected Move\n--\nRecommendation\n--\nBackend Message\n\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "signals",
@@ -273,11 +273,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/signals.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5012,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
         "DHAN DEGRADED",
         "What Blocked Trading?",
         "0/4",
@@ -308,7 +307,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:43 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSignals & Recommendations\nNO TRADE\nNO_TRADE\nWhat Blocked Trading?\nNo Underlying\nLow Confidence\nUnderlying\nN/A\nStrategy\nNo signal generated\nConfidence\nN/A\nExplainability\nReason\nNo signal generated\nSource\nruntime_state\nWhat Blocked Trading?\nScanner Segments\n0/4\nDownload Signal Snapshot (JSON)"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:43 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSignals & Recommendations\nNO TRADE\nNO_TRADE\nWhat Blocked Trading?\nNo Underlying\nLow Confidence\nUnderlying\nN/A\nStrategy\nNo signal generated\nConfidence\nN/A\nExplainability\nReason\nNo signal generated\nSource\nruntime_state\nWhat Blocked Trading?\nScanner Segments\n0/4\nDownload Signal Snapshot (JSON)",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "trade",
@@ -317,11 +317,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/trade.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5009,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5009ms",
         "DHAN DEGRADED",
         "Market closed: live option-chain rows are session-dependent only.",
         "Stale"
@@ -361,7 +360,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:49 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nMarket closed: live option-chain rows are session-dependent only.\nNO_DHAN_DATA\n\nBroker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.\n\nChain Status\nMarket\nCLOSED\nReason\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nNext Open\n--\nData Source\ndhan\nContracts\n0\nSpot\n--\nPCR\n--\nLast Scanner Snapshot\nLatest Date\n--\nStale\ntrue\nRank\n--\nGain Score\n--\nExpected Move\n--\nRecommendation\n--\nBackend Message\n\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\n\nINDEX SCANNER\nNo rankings available\nRender/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:49 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nOPTION CHAIN - NIFTY\nMarket closed: live option-chain rows are session-dependent only.\nNO_DHAN_DATA\n\nBroker, paper P&L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.\n\nChain Status\nMarket\nCLOSED\nReason\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\nNext Open\n--\nData Source\ndhan\nContracts\n0\nSpot\n--\nPCR\n--\nLast Scanner Snapshot\nLatest Date\n--\nStale\ntrue\nRank\n--\nGain Score\n--\nExpected Move\n--\nRecommendation\n--\nBackend Message\n\nRender/backend returned 502 for /api/chain/NIFTY. Keeping last good data where available.\n\nINDEX SCANNER\nNo rankings available\nRender/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "paper",
@@ -370,11 +370,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/paper.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
         "DHAN DEGRADED",
         "System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.",
         "Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.",
@@ -412,7 +411,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:54 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nState Version: 15 | Positions Source: NO_POSITIONS | Last Refresh: 7/14/2026, 6:52:50 PM\nRecheck Paper Proof\nMode Safety\nPAPER / ANALYZER SAFE\nLive trading flag: OFF\nBroker Data\nNOT CONNECTED\nSource: MARKET_CLOSED_NO_BROKER\nToday Paper Entries\n0\nFrom /api/trades/today\nToday Paper Exits\n0\nClosed paper/analyzer records\nPaper Truth Provenance\nSource file\nNO_PAPER_SOURCE\nDisplayed rows\n0\nFake/fixture rejected\n0\nOrder endpoints\nNOT CALLED\nVisual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.\n\ud83d\udcca\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Disconnected\nOpen Paper Positions (0)\nNo open paper positions\nReason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.\nToday Paper Trade Proof\nEntries (0)\n[]\nExits (0)\n[]\nPnL Summary\nTotal PnL:\n\u20b90.00\nUnrealized:\n\u20b90.00\nRealized:\n\u20b90.00\nOpen Positions:\n0\nToday Entries:\n0\nToday Exits:\n0\nRisk Panel\nMax Positions\n-\nCurrent: 0\nTotal Paper Exposure\n\u20b90.00\nLive Order Safety\nBLOCKED\nPaper UI does not call broker/order close endpoints."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:54 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nState Version: 15 | Positions Source: NO_POSITIONS | Last Refresh: 7/14/2026, 6:52:50 PM\nRecheck Paper Proof\nMode Safety\nPAPER / ANALYZER SAFE\nLive trading flag: OFF\nBroker Data\nNOT CONNECTED\nSource: MARKET_CLOSED_NO_BROKER\nToday Paper Entries\n0\nFrom /api/trades/today\nToday Paper Exits\n0\nClosed paper/analyzer records\nPaper Truth Provenance\nSource file\nNO_PAPER_SOURCE\nDisplayed rows\n0\nFake/fixture rejected\n0\nOrder endpoints\nNOT CALLED\nVisual gate requirement: paper rows must show analyzer-only provenance. Fake/mock/fixture/synthetic/fallback rows must be rejected before display.\n\ud83d\udcca\nPAPER TRADING MODE (NO REAL ORDERS)\nSystem is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.\nMode: PAPER | Data Source: NOT_READY | Broker: Disconnected\nOpen Paper Positions (0)\nNo open paper positions\nReason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.\nToday Paper Trade Proof\nEntries (0)\n[]\nExits (0)\n[]\nPnL Summary\nTotal PnL:\n\u20b90.00\nUnrealized:\n\u20b90.00\nRealized:\n\u20b90.00\nOpen Positions:\n0\nToday Entries:\n0\nToday Exits:\n0\nRisk Panel\nMax Positions\n-\nCurrent: 0\nTotal Paper Exposure\n\u20b90.00\nLive Order Safety\nBLOCKED\nPaper UI does not call broker/order close endpoints.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "positions",
@@ -421,11 +421,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/positions.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
         "DHAN DEGRADED"
       ],
       "info_lines": [
@@ -439,7 +438,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:59 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n\u20b90\nWIN RATE\n0.0%\nTRADES\n0\nOPEN\n0\nPAPER ONLY \u2014 NO REAL MONEY\nOPEN POSITIONS (0)\n\nNo open positions\n\nPaper engine generates positions during market hours"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:22:59 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n\u20b90\nWIN RATE\n0.0%\nTRADES\n0\nOPEN\n0\nPAPER ONLY \u2014 NO REAL MONEY\nOPEN POSITIONS (0)\n\nNo open positions\n\nPaper engine generates positions during market hours",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "performance",
@@ -448,11 +448,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/performance.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
         "DHAN DEGRADED"
       ],
       "info_lines": [
@@ -465,7 +464,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:04 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 00:23:00 IST\n\nNo performance data yet \u2014 paper engine has not closed any trades.\n\nAPI status: /api/pnl responded OK, 0 trades \u00b7 checked 00:23:00 IST"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:04 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 00:23:00 IST\n\nNo performance data yet \u2014 paper engine has not closed any trades.\n\nAPI status: /api/pnl responded OK, 0 trades \u00b7 checked 00:23:00 IST",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "ml",
@@ -474,11 +474,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/ml.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5009,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5009ms",
         "DHAN DEGRADED",
         "No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
         "BLOCKED",
@@ -493,7 +492,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:09 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nMODEL_NOT_PROVEN\nNo matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nNO\nProof records\n0\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:09 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nMODEL_NOT_PROVEN\nNo matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nNO\nProof records\n0\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "broker",
@@ -502,11 +502,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/broker.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
         "DHAN DEGRADED",
         "BLOCKED / TOKEN ERROR",
         "BROKER AUTH BLOCKED - NOT READY",
@@ -584,7 +583,8 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:14 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nBLOCKED / TOKEN ERROR\nTruth\nBROKER AUTH BLOCKED - NOT READY\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nERROR / INVALID OR EXPIRED\nHoldings API\nERROR/BLOCKED\nFunds API\nERROR/BLOCKED\nBroker Blocker\n502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nMarket State\nMARKET CLOSED / READ-ONLY OK\nData Visibility\nBLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nFailed to load funds: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nMarket close is not the blocker. Check Dhan token/API response.\nEQUITY HOLDINGS (0)\n\nFailed to load holdings: Holdings: Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.\n\nDHAN LIVE POSITIONS (0)\n\nFailed to load positions: Positions: Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:14 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nBLOCKED / TOKEN ERROR\nTruth\nBROKER AUTH BLOCKED - NOT READY\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nERROR / INVALID OR EXPIRED\nHoldings API\nERROR/BLOCKED\nFunds API\nERROR/BLOCKED\nBroker Blocker\n502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nMarket State\nMARKET CLOSED / READ-ONLY OK\nData Visibility\nBLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nFailed to load funds: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.\nMarket close is not the blocker. Check Dhan token/API response.\nEQUITY HOLDINGS (0)\n\nFailed to load holdings: Holdings: Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.\n\nDHAN LIVE POSITIONS (0)\n\nFailed to load positions: Positions: Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "alerts",
@@ -593,11 +593,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/alerts.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
         "DHAN DEGRADED",
         "Alerts unavailable: RENDER_UNAVAILABLE"
       ],
@@ -610,7 +609,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:19 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n\nAlerts unavailable: RENDER_UNAVAILABLE\n\nRender/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:19 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n\nAlerts unavailable: RENDER_UNAVAILABLE\n\nRender/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "system",
@@ -619,11 +619,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/system.png",
       "screenshot_ok": true,
       "navigation_method_index": 0,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
         "DHAN DEGRADED",
         "RENDER_UNAVAILABLE"
       ],
@@ -637,7 +636,8 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:25 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nDISCONNECTED\nWebSocket\nLIVE\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nRENDER_UNAVAILABLE\nMarket State\nCLOSED / OFFLINE\nAPI Status\nRENDER_UNAVAILABLE\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\nfalse\nQC Status\nRENDER_UNAVAILABLE\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nRender/backend returned 502 for /api/health. Keeping last good data where available."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:25 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nDISCONNECTED\nWebSocket\nLIVE\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nRENDER_UNAVAILABLE\nMarket State\nCLOSED / OFFLINE\nAPI Status\nRENDER_UNAVAILABLE\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\nfalse\nQC Status\nRENDER_UNAVAILABLE\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nRender/backend returned 502 for /api/health. Keeping last good data where available.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     },
     {
       "id": "gates",
@@ -646,11 +646,10 @@
       "screenshot": "reports/latest/dashboard_visible_issue_tracker/gates.png",
       "screenshot_ok": true,
       "navigation_method_index": 2,
-      "async_content_settled": false,
+      "async_content_settled": true,
       "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
         "DHAN DEGRADED",
         "LIVE_TRADING_BLOCKED",
         "Live trading blocked \u2014 see failed gates above"
@@ -666,14 +665,15 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:36 IST\nNIFTY\n24,069\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked \u2014 see failed gates above\n\nGATE CHECKLIST\n\u2705\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n\u2705\nkill_switch_off\nKill switch not activated\n\u274c\nhuman_approved\nNOT APPROVED \u2014 owner must set live_trading_approved=true in kill_switch.json\n\u274c\nvalidation_days\n0 validation days (need \u226510)\n\u274c\nml_accuracy_rho\nAvg Spearman \u03c1=0.000 (need \u22650.70)\n\u2705\nmax_loss_configured\nMax daily loss = \u20b95000 hardcoded in kill_switch.json\n\n\u26a0\ufe0f Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: \u20b95,000. System halts automatically when limit is hit."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\n00:23:36 IST\nNIFTY\n24,069\nBNFTY\n--\nFINNIFTY\n--\nMARKET CLOSED / DATA POLLING\nDHAN DEGRADED\nPAPER\nLIVE OFF\nWS\nLIVE\nOWNER\nPRITAM S. WARGHADE\nLIVE\nOFF\nMODE\nPAPER ONLY\nDATA\nDHAN ONLY REQUIRED\nML SCORE\nTRAINING PROOF REQUIRED\nPAPER\nPROVENANCE REQUIRED\nRENDER\nVISUAL PROOF REQUIRED\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked \u2014 see failed gates above\n\nGATE CHECKLIST\n\u2705\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n\u2705\nkill_switch_off\nKill switch not activated\n\u274c\nhuman_approved\nNOT APPROVED \u2014 owner must set live_trading_approved=true in kill_switch.json\n\u274c\nvalidation_days\n0 validation days (need \u226510)\n\u274c\nml_accuracy_rho\nAvg Spearman \u03c1=0.000 (need \u22650.70)\n\u2705\nmax_loss_configured\nMax daily loss = \u20b95000 hardcoded in kill_switch.json\n\n\u26a0\ufe0f Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: \u20b95,000. System halts automatically when limit is hit.",
+      "settle_normalization": "KNOWN_LOADING_MARKERS_CLEARED_VOLATILE_SHELL_TEXT_IGNORED"
     }
   ],
   "expected_tab_count": 16,
-  "visible_issue_count": 108,
+  "visible_issue_count": 94,
   "info_line_count": 107,
   "screenshot_missing_count": 1,
-  "unsettled_tab_count": 16,
+  "unsettled_tab_count": 2,
   "ui_exception_count": 1,
   "global_exception": null,
   "visible_issues": [
@@ -735,19 +735,11 @@
     },
     {
       "tab": "Genesis Brain",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
-    },
-    {
-      "tab": "Genesis Brain",
       "text": "DHAN DEGRADED"
     },
     {
       "tab": "Genesis Brain",
       "text": "Request failed with status code 502"
-    },
-    {
-      "tab": "E2E Proof",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
     },
     {
       "tab": "E2E Proof",
@@ -883,10 +875,6 @@
     },
     {
       "tab": "Overview",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms"
-    },
-    {
-      "tab": "Overview",
       "text": "DHAN DEGRADED"
     },
     {
@@ -911,10 +899,6 @@
     },
     {
       "tab": "Option Chain",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
-    },
-    {
-      "tab": "Option Chain",
       "text": "DHAN DEGRADED"
     },
     {
@@ -924,10 +908,6 @@
     {
       "tab": "Option Chain",
       "text": "Stale"
-    },
-    {
-      "tab": "Signals",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
     },
     {
       "tab": "Signals",
@@ -951,10 +931,6 @@
     },
     {
       "tab": "Trade",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5009ms"
-    },
-    {
-      "tab": "Trade",
       "text": "DHAN DEGRADED"
     },
     {
@@ -964,10 +940,6 @@
     {
       "tab": "Trade",
       "text": "Stale"
-    },
-    {
-      "tab": "Paper Trades",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
     },
     {
       "tab": "Paper Trades",
@@ -987,23 +959,11 @@
     },
     {
       "tab": "Positions",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
-    },
-    {
-      "tab": "Positions",
       "text": "DHAN DEGRADED"
     },
     {
       "tab": "Performance",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
-    },
-    {
-      "tab": "Performance",
       "text": "DHAN DEGRADED"
-    },
-    {
-      "tab": "ML Model",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5009ms"
     },
     {
       "tab": "ML Model",
@@ -1020,10 +980,6 @@
     {
       "tab": "ML Model",
       "text": "Training proof missing."
-    },
-    {
-      "tab": "Broker",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
     },
     {
       "tab": "Broker",
@@ -1071,10 +1027,6 @@
     },
     {
       "tab": "Alerts",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
-    },
-    {
-      "tab": "Alerts",
       "text": "DHAN DEGRADED"
     },
     {
@@ -1083,19 +1035,11 @@
     },
     {
       "tab": "System",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
-    },
-    {
-      "tab": "System",
       "text": "DHAN DEGRADED"
     },
     {
       "tab": "System",
       "text": "RENDER_UNAVAILABLE"
-    },
-    {
-      "tab": "Live Gate",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
     },
     {
       "tab": "Live Gate",
@@ -1555,10 +1499,8 @@
     "Fix visible UI blocker on Truth Control: CE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload",
     "Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0",
     "Fix visible UI blocker on Truth Control: Risk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-",
-    "Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
     "Fix visible UI blocker on Genesis Brain: DHAN DEGRADED",
     "Fix visible UI blocker on Genesis Brain: Request failed with status code 502",
-    "Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5013ms",
     "Fix visible UI blocker on E2E Proof: DHAN DEGRADED",
     "Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.",
     "Fix visible UI blocker on E2E Proof: BLOCKED \u00b7 FULL E2E",
@@ -1592,42 +1534,33 @@
     "Fix visible UI blocker on E2E Proof: /api/pnl\t502\tBLOCKED\t-",
     "Fix visible UI blocker on E2E Proof: /api/trades/today\t502\tBLOCKED\t-",
     "Fix visible UI blocker on E2E Proof: /api/auto_gates\t502\tBLOCKED\t-",
-    "Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5014ms",
     "Fix visible UI blocker on Overview: DHAN DEGRADED",
     "Fix visible UI blocker on Overview: API status: RENDER_UNAVAILABLE - Render/backend returned 502 for /api/health. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.",
     "Fix visible UI blocker on Overview: RENDER_UNAVAILABLE",
     "Fix visible UI blocker on Overview: ERROR",
     "Fix visible UI blocker on Overview: STALE",
     "Fix visible UI blocker on Overview: FAIL",
-    "Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on Option Chain: DHAN DEGRADED",
     "Fix visible UI blocker on Option Chain: Market closed: live option-chain rows are session-dependent only.",
     "Fix visible UI blocker on Option Chain: Stale",
-    "Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
     "Fix visible UI blocker on Signals: DHAN DEGRADED",
     "Fix visible UI blocker on Signals: What Blocked Trading?",
     "Fix visible UI blocker on Signals: 0/4",
     "Fix visible UI blocker on Signals: What Blocked Trading? No Underlying Low Confidence",
     "Fix visible UI blocker on Signals: What Blocked Trading? Scanner Segments 0/4",
-    "Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5009ms",
     "Fix visible UI blocker on Trade: DHAN DEGRADED",
     "Fix visible UI blocker on Trade: Market closed: live option-chain rows are session-dependent only.",
     "Fix visible UI blocker on Trade: Stale",
-    "Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
     "Fix visible UI blocker on Paper Trades: DHAN DEGRADED",
     "Fix visible UI blocker on Paper Trades: System is in PAPER mode. All trades are simulated. No real money orders will be placed. Broker not ready - real data unavailable.",
     "Fix visible UI blocker on Paper Trades: Reason: paper engine has no open position, market is closed, Dhan data is blocked, or paper gate rejected the setup. This is not a live-order failure.",
     "Fix visible UI blocker on Paper Trades: BLOCKED",
-    "Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on Positions: DHAN DEGRADED",
-    "Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on Performance: DHAN DEGRADED",
-    "Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5009ms",
     "Fix visible UI blocker on ML Model: DHAN DEGRADED",
     "Fix visible UI blocker on ML Model: No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.",
     "Fix visible UI blocker on ML Model: BLOCKED",
     "Fix visible UI blocker on ML Model: Training proof missing.",
-    "Fix visible UI blocker on Broker: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
     "Fix visible UI blocker on Broker: DHAN DEGRADED",
     "Fix visible UI blocker on Broker: BLOCKED / TOKEN ERROR",
     "Fix visible UI blocker on Broker: BROKER AUTH BLOCKED - NOT READY",
@@ -1639,16 +1572,14 @@
     "Fix visible UI blocker on Broker: Failed to load funds: 502 - RENDER_UNAVAILABLE - Render/backend returned 502 for /api/broker/funds. Keeping last good data where available.",
     "Fix visible UI blocker on Broker: Failed to load holdings: Holdings: Render/backend returned 502 for /api/broker/holdings. Keeping last good data where available.",
     "Fix visible UI blocker on Broker: Failed to load positions: Positions: Render/backend returned 502 for /api/broker/positions/live. Keeping last good data where available.",
-    "Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
     "Fix visible UI blocker on Alerts: DHAN DEGRADED",
     "Fix visible UI blocker on Alerts: Alerts unavailable: RENDER_UNAVAILABLE",
-    "Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on System: DHAN DEGRADED",
     "Fix visible UI blocker on System: RENDER_UNAVAILABLE",
-    "Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on Live Gate: DHAN DEGRADED",
     "Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED",
     "Fix visible UI blocker on Live Gate: Live trading blocked \u2014 see failed gates above"
   ],
-  "production_grade_claim_allowed": false
+  "production_grade_claim_allowed": false,
+  "settle_normalized_tab_count": 14
 }
