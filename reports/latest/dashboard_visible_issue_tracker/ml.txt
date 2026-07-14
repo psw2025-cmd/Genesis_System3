@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-06:56:28 IST
+07:09:11 IST
 NIFTY
 24,198
 BNFTY
@@ -14,7 +14,7 @@ DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
-LIVE
+OFF
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -60,7 +60,7 @@ Required proof: matured prediction history, post-market validation, accuracy/dri
 Active model
 NOT_PROVEN
 Fallback used
-NO
+UNKNOWN
 Proof records
 0
 Training status
