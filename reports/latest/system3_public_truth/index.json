@@ -1,7 +1,7 @@
 {
-  "commit": "7205705cafe44b9ef89fc6a287f2d2cc37b647b9",
+  "commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
   "final_verdict": "FAIL",
-  "generated_utc": "2026-07-14T06:21:26.133150Z",
+  "generated_utc": "2026-07-14T08:21:37.879444Z",
   "how_to_read": "Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.",
   "how_to_trigger": "Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.",
   "safety": {
@@ -17,8 +17,8 @@
       "summary_json": {
         "alerts": [],
         "deployed_commit": "[REDACTED]",
-        "expected_commit": "7205705cafe44b9ef89fc6a287f2d2cc37b647b9",
-        "generated_utc": "2026-07-14T06:14:53.316435Z",
+        "expected_commit": "e8a82f8c25fd18781202b218e5e8a612e616cd29",
+        "generated_utc": "2026-07-14T08:15:12.240503Z",
         "key_facts": {
           "broker_connected": false,
           "chain_nifty_contracts": 0,
@@ -29,44 +29,44 @@
         "memory": {
           "after_chain": {
             "available": true,
-            "pct_used": 27.5,
+            "pct_used": 20.2,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1305.1,
+              "headroom_mb": 1436.7,
               "limit_mb": 1800,
-              "pct_used": 27.5,
-              "rss_mb": 494.9,
+              "pct_used": 20.2,
+              "rss_mb": 363.3,
               "status": "OK"
             },
-            "rss_mb": 494.9,
+            "rss_mb": 363.3,
             "status": "OK"
           },
           "after_portfolio": {
             "available": true,
-            "pct_used": 27.5,
+            "pct_used": 20.2,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1305.1,
+              "headroom_mb": 1436.7,
               "limit_mb": 1800,
-              "pct_used": 27.5,
-              "rss_mb": 494.9,
+              "pct_used": 20.2,
+              "rss_mb": 363.3,
               "status": "OK"
             },
-            "rss_mb": 494.9,
+            "rss_mb": 363.3,
             "status": "OK"
           },
           "before": {
             "available": true,
-            "pct_used": 27.5,
+            "pct_used": 20.2,
             "raw": {
               "gc_triggered": false,
-              "headroom_mb": 1305.1,
+              "headroom_mb": 1437.0,
               "limit_mb": 1800,
-              "pct_used": 27.5,
-              "rss_mb": 494.9,
+              "pct_used": 20.2,
+              "rss_mb": 363.0,
               "status": "OK"
             },
-            "rss_mb": 494.9,
+            "rss_mb": 363.0,
             "status": "OK"
           }
         },
@@ -75,7 +75,7 @@
           {
             "key": "deploy_commit_mismatch",
             "level": "WARNING",
-            "message": "Render git_sha=[REDACTED] expected=7205705cafe4"
+            "message": "Render git_sha=[REDACTED] expected=e8a82f8c25fd"
           },
           {
             "key": "broker_not_connected",
@@ -91,21 +91,6 @@
             "key": "chain_nifty_empty",
             "level": "WARNING",
             "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
-          },
-          {
-            "key": "memory_before",
-            "level": "WARNING",
-            "message": "RSS high: 494.9MB"
-          },
-          {
-            "key": "memory_after_portfolio",
-            "level": "WARNING",
-            "message": "RSS high: 494.9MB"
-          },
-          {
-            "key": "memory_after_chain",
-            "level": "WARNING",
-            "message": "RSS high: 494.9MB"
           }
         ]
       },
@@ -318,7 +303,7 @@
           }
         ],
         "final_verdict": "BLOCKED_NOT_TRADE_READY",
-        "generated_at": "2026-07-14T06:15:14.713Z",
+        "generated_at": "2026-07-14T08:15:30.003Z",
         "infra_blockers": [],
         "trade_readiness_blockers": [
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -564,7 +549,7 @@
           }
         ],
         "final_verdict": "FAIL",
-        "generated_at": "2026-07-14T06:19:27.289Z",
+        "generated_at": "2026-07-14T08:19:41.727Z",
         "infra_blockers": [
           "UI:Paper Trades:FORBIDDEN:/synthetic/i",
           "UI:Paper Trades:FORBIDDEN:/fake/i",
@@ -585,42 +570,42 @@
     {
       "file": "screenshots/truth.png",
       "ok": true,
-      "size_bytes": 198899
+      "size_bytes": 199194
     },
     {
       "file": "screenshots/signals.png",
       "ok": true,
-      "size_bytes": 123803
+      "size_bytes": 123891
     },
     {
       "file": "screenshots/paper.png",
       "ok": true,
-      "size_bytes": 169633
+      "size_bytes": 169797
     },
     {
       "file": "screenshots/broker.png",
       "ok": true,
-      "size_bytes": 151291
+      "size_bytes": 151584
     },
     {
       "file": "screenshots/ml.png",
       "ok": true,
-      "size_bytes": 134215
+      "size_bytes": 134460
     },
     {
       "file": "screenshots/gates.png",
       "ok": true,
-      "size_bytes": 134503
+      "size_bytes": 134621
     },
     {
       "file": "screenshots/overview.png",
       "ok": true,
-      "size_bytes": 155404
+      "size_bytes": 155586
     },
     {
       "file": "screenshots/mobile_390x844.png",
       "ok": true,
-      "size_bytes": 131362
+      "size_bytes": 131613
     }
   ],
   "workflow": "System3 Latest Truth Publish"

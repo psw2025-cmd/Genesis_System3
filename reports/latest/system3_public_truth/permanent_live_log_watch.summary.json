@@ -72,7 +72,7 @@
     }
   ],
   "final_verdict": "FAIL",
-  "generated_at": "2026-07-14T06:19:27.289Z",
+  "generated_at": "2026-07-14T08:19:41.727Z",
   "infra_blockers": [
     "UI:Paper Trades:FORBIDDEN:/synthetic/i",
     "UI:Paper Trades:FORBIDDEN:/fake/i",

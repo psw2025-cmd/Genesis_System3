@@ -202,7 +202,7 @@
     }
   ],
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
-  "generated_at": "2026-07-14T06:15:14.713Z",
+  "generated_at": "2026-07-14T08:15:30.003Z",
   "infra_blockers": [],
   "trade_readiness_blockers": [
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",

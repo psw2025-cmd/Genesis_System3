@@ -1,6 +1,6 @@
 # Permanent Live Log Watch
 
-Generated: 2026-07-14T06:19:27.289Z
+Generated: 2026-07-14T08:19:41.727Z
 Base: https://genesis-system3-backend.onrender.com
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
@@ -40,18 +40,18 @@ Truth control visible: **true**
 - PASS 200  /api/auto_gates
 
 ## Screenshots
-- PASS Truth Control size=199068
-- PASS Genesis Brain size=282666
-- PASS E2E Proof size=182184
-- PASS Overview size=155528
-- PASS Option Chain size=114227
-- PASS Signals size=123596
-- PASS Paper Trades size=169182
-- PASS Positions size=108049
-- PASS Broker size=151437
-- PASS Performance size=107053
-- PASS ML Model size=134013
-- PASS Live Gate size=134243
+- PASS Truth Control size=199272
+- PASS Genesis Brain size=282771
+- PASS E2E Proof size=190600
+- PASS Overview size=155665
+- PASS Option Chain size=114380
+- PASS Signals size=123890
+- PASS Paper Trades size=169489
+- PASS Positions size=107914
+- PASS Broker size=151530
+- PASS Performance size=107780
+- PASS ML Model size=134184
+- PASS Live Gate size=134477
 
 ## Infrastructure Blockers
 - UI:Paper Trades:FORBIDDEN:/synthetic/i
