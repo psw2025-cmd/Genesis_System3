@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-14T05:49:34.881843+00:00",
-  "issue_count": 611,
+  "generated_utc": "2026-07-14T05:51:46.162367+00:00",
+  "issue_count": 636,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 124,
+      "issue_count": 135,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 56,
+      "issue_count": 58,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -549,7 +549,7 @@
       ]
     },
     {
-      "issue_count": 34,
+      "issue_count": 35,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -685,7 +685,7 @@
       ]
     },
     {
-      "issue_count": 19,
+      "issue_count": 27,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
@@ -742,7 +742,22 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms markers=CHECKING...\"}",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5020ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5016ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING...\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5016ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -757,39 +772,54 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
+          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5014ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Live Gate\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5010ms\"}",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
           "issue": "expected_tab_count=16",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=97",
+          "issue": "info_line_count=95",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "unsettled_tab_count=2",
+          "issue": "unsettled_tab_count=16",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "settle_normalized_tab_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
     },
     {
-      "issue_count": 17,
+      "issue_count": 18,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -854,6 +884,11 @@
         },
         {
           "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -1078,7 +1113,7 @@
       ]
     },
     {
-      "issue_count": 7,
+      "issue_count": 8,
       "lane": "PAPER_LIFECYCLE",
       "recommended_fixes": [
         "Require paper entry, exit, PnL, source/provenance.",
@@ -1115,6 +1150,11 @@
           "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
           "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
           "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
@@ -1170,7 +1210,7 @@
       ]
     },
     {
-      "issue_count": 5,
+      "issue_count": 6,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1195,6 +1235,11 @@
         },
         {
           "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
