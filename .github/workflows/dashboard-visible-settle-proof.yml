@@ -1,0 +1,136 @@
+name: Dashboard Visible Settle Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15,45 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dashboard-visible-settle-proof.yml'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'dashboard/frontend/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-visible-settle-proof
+  cancel-in-progress: true
+
+jobs:
+  settle-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '20000'
+      PLAYWRIGHT_BROWSERS_PATH: '0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Install isolated Playwright Chromium
+        run: |
+          set -euo pipefail
+          rm -rf .proof-node node_modules
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {
+            "name": "system3-visible-settle-proof",
+            "private": true,
+            "version": "1.0.0",
+            "dependencies": {"playwright": "1.52.0"}
+          }
+          JSON
+          npm install --prefix .proof-node --ignore-scripts --no-audit --no-fund --package-lock=false
+          .proof-node/node_modules/.bin/playwright install chromium
+          ln -s .proof-node/node_modules node_modules
+          node --input-type=module - <<'NODE'
+          import fs from 'fs'
+          import { chromium } from 'playwright'
+          const executable = chromium.executablePath()
+          if (!executable || !fs.existsSync(executable)) process.exit(1)
+          const browser = await chromium.launch({ headless: true })
+          await browser.close()
+          NODE
+
+      - name: Run read-only 20-second settle proof
+        continue-on-error: true
+        run: |
+          rm -rf reports/latest/dashboard_visible_issue_tracker
+          mkdir -p reports/latest/dashboard_visible_issue_tracker
+          node tools/dashboard_visible_issue_tracker.mjs
+
+      - name: Validate fail-closed sanitized evidence
+        if: always()
+        env:
+          PROOF_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          if not os.path.exists(p):
+              raise SystemExit('visual settle report missing')
+          d=json.load(open(p,encoding='utf-8'))
+          safety=d.get('analyzer_safety') or {}
+          assert safety.get('analyze_mode') is True
+          assert safety.get('live_trading_enabled') is False
+          assert safety.get('system3_live_trading_allowed') is False
+          assert d.get('production_grade_claim_allowed') is bool(d.get('status') == 'PASS' and len(d.get('tabs') or []) == 16)
+          forbidden=('password','secret','token','cookie','authorization','api_key','response_body')
+          def walk(v):
+              hits=[]
+              if isinstance(v,dict):
+                  for k,x in v.items():
+                      if any(s in str(k).lower() for s in forbidden): hits.append(str(k))
+                      hits.extend(walk(x))
+              elif isinstance(v,list):
+                  for x in v: hits.extend(walk(x))
+              return hits
+          serialized=json.dumps(d,sort_keys=True)
+          key=os.environ.get('PROOF_API_KEY','')
+          if walk(d) or (key and key in serialized):
+              raise SystemExit('sensitive field or value detected')
+          assert all(int(t.get('settle_elapsed_ms') or 0) <= 61000 for t in d.get('tabs') or [])
+          print(json.dumps({
+              'status': d.get('status'),
+              'auth_ok': bool((d.get('auth') or {}).get('ok')),
+              'scanned_tabs': len(d.get('tabs') or []),
+              'unsettled_tabs': d.get('unsettled_tab_count'),
+              'visible_issues': d.get('visible_issue_count'),
+              'production_grade_claim_allowed': d.get('production_grade_claim_allowed')
+          },indent=2))
+          PY
+
+      - name: Upload sanitized visual settle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-visible-settle-proof-${{ github.run_id }}
+          path: reports/latest/dashboard_visible_issue_tracker/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce current live PASS only
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('reports/latest/dashboard_visible_issue_tracker/summary.json',encoding='utf-8'))
+          passed=(d.get('status')=='PASS' and len(d.get('tabs') or [])==16 and d.get('production_grade_claim_allowed') is True)
+          raise SystemExit(0 if passed else 1)
+          PY
