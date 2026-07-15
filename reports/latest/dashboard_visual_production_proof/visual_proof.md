@@ -1,14 +1,18 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-07-15T09:01:46.654Z
+Generated: 2026-07-15T09:56:08.683Z
 Base: https://genesis-system3-backend.onrender.com
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **BLOCKED_NOT_TRADE_READY**
+Source verdict: **FAIL**
 Auth OK: **True**
 Screenshot gate: **True**
 
 ## Blockers
+- UI_FAIL:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
+- OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -17,30 +21,30 @@ Screenshot gate: **True**
 - DEPLOYED_FRONTEND_ASSET_DRIFT
 - TAB_COVERAGE:15/16
 - VISIBLE_TRACKER_STATUS:BLOCKED
-- VISIBLE_TRACKER_NOT_TIME_ALIGNED
+- VISIBLE_TRACKER_BAD_TABS:16
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-15T08:53:16.183Z`
+- `shell_generated_at`: `2026-07-15T09:51:09.804Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `15/16`
-- `visible_tracker_generated_at`: `2026-07-15T08:25:16.547Z`
+- `visible_tracker_generated_at`: `2026-07-15T09:43:08.452Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `0`
+- `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`201098`
-- PASS `genesis.png` size=`278761`
-- PASS `e2e_proof.png` size=`193583`
-- PASS `overview.png` size=`157076`
-- PASS `chain.png` size=`114509`
-- PASS `signals.png` size=`124700`
-- PASS `paper.png` size=`170135`
-- PASS `positions.png` size=`108354`
-- PASS `broker.png` size=`152495`
-- PASS `performance.png` size=`107628`
-- PASS `ml.png` size=`135917`
-- PASS `gates.png` size=`136875`
-- PASS `mobile_390x844.png` size=`123797`
+- PASS `truth.png` size=`201616`
+- PASS `genesis.png` size=`97642`
+- PASS `e2e_proof.png` size=`189449`
+- PASS `overview.png` size=`178953`
+- PASS `chain.png` size=`131702`
+- PASS `signals.png` size=`125623`
+- PASS `paper.png` size=`110335`
+- PASS `positions.png` size=`108538`
+- PASS `broker.png` size=`160440`
+- PASS `performance.png` size=`101158`
+- PASS `ml.png` size=`138082`
+- PASS `gates.png` size=`108576`
+- PASS `mobile_390x844.png` size=`26270`
 
 ## truth.png
 
