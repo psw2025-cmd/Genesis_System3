@@ -2,19 +2,19 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-06:56:51 IST
+09:55:51 IST
 NIFTY
-24,069
+--
 BNFTY
-57,447
+--
 FINNIFTY
-26,515
-MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+--
+MARKET OPEN
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 OWNER
 PRITAM S. WARGHADE
 LIVE
@@ -54,13 +54,13 @@ Live Gate
 LOCK
 ML Model Truth
 This tab is proof-only. It does not train inline and does not invent metrics.
-MODEL_NOT_PROVEN
-No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
+CHECKING
+Checking model artifacts...
 Required proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.
 Active model
 NOT_PROVEN
 Fallback used
-NO
+UNKNOWN
 Proof records
 0
 Training status
