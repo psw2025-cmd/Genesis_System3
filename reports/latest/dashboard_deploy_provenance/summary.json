@@ -1,27 +1,15 @@
 {
-  "generated_at": "2026-07-15T09:01:47.311294+00:00",
+  "generated_at": "2026-07-15T09:56:46.181503+00:00",
   "base": "https://genesis-system3-backend.onrender.com",
   "manifest_path": "/ui/assets/deploy-provenance.json",
   "status": "BLOCKED",
-  "http_status": 502,
+  "http_status": 404,
   "content_type": "",
   "error_type": "HTTP_ERROR",
   "attempts": [
     {
       "attempt": 1,
-      "http_status": 502,
-      "content_type": "",
-      "error_type": "HTTP_ERROR"
-    },
-    {
-      "attempt": 2,
-      "http_status": 502,
-      "content_type": "",
-      "error_type": "HTTP_ERROR"
-    },
-    {
-      "attempt": 3,
-      "http_status": 502,
+      "http_status": 404,
       "content_type": "",
       "error_type": "HTTP_ERROR"
     }
@@ -31,7 +19,7 @@
   "deployed_sidebar_sha256": "",
   "source_match": false,
   "sim_live_required": false,
-  "blocker": "DEPLOY_PROVENANCE_TRANSIENT_FAILURE_AFTER_RETRIES",
+  "blocker": "DEPLOY_PROVENANCE_NOT_PUBLISHED",
   "analyzer_mode": true,
   "live_trading_enabled": false,
   "order_routes_called": false,
