@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-15T10:45:50.385683+00:00",
-  "issue_count": 628,
+  "generated_utc": "2026-07-15T10:51:54.115755+00:00",
+  "issue_count": 638,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 129,
+      "issue_count": 130,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 47,
+      "issue_count": 46,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 40,
+      "issue_count": 39,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -737,22 +737,22 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...\"}",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
+          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE...\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...\"}",
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
+          "issue": "{\"tab\": \"Overview\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5016ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -762,27 +762,27 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
+          "issue": "{\"tab\": \"Trade\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
+          "issue": "{\"tab\": \"Positions\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
+          "issue": "{\"tab\": \"Performance\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "issue": "{\"tab\": \"Alerts\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
+          "issue": "{\"tab\": \"System\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5009ms\"}",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -797,7 +797,7 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=110",
+          "issue": "info_line_count=92",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -819,7 +819,7 @@
       ]
     },
     {
-      "issue_count": 17,
+      "issue_count": 18,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -888,7 +888,12 @@
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=CHECKING MODEL ARTIFACTS...\"}",
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5011ms\"}",
+          "lane": "ML_TRAINING",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
           "lane": "ML_TRAINING",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -910,6 +915,87 @@
         {
           "issue": "Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.",
           "lane": "ML_TRAINING",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 14,
+      "lane": "PAPER_LIFECYCLE",
+      "recommended_fixes": [
+        "Require paper entry, exit, PnL, source/provenance.",
+        "Reject fake/fixture/mock rows.",
+        "Show order endpoints not called."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t-\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error Loading Data\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error: Request failed with status code 502\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"\u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Endpoint: /api/state Error: Request failed with status code 502\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -987,62 +1073,118 @@
     },
     {
       "issue_count": 10,
-      "lane": "PAPER_LIFECYCLE",
+      "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
-        "Require paper entry, exit, PnL, source/provenance.",
-        "Reject fake/fixture/mock rows.",
-        "Show order endpoints not called."
+        "Verify top_contract_gainers returns real rows.",
+        "Require CE/PE side, strike, expiry, score, reason.",
+        "If market closed, report exact blocked reason, not fake signal."
       ],
       "top_issues": [
         {
-          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
+          "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
+          "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
+          "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t-\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
+          "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5012ms\"}",
+          "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
+          "issue": "{\"tab\": \"Signals\", \"text\": \"Error Loading Data\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"Error: Request failed with status code 502\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"Signal data unavailable\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Signals\", \"text\": \"Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502\"}",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 9,
+      "lane": "WORKFLOW_CI",
+      "recommended_fixes": [
+        "Read workflow_failure_tracker TODO.",
+        "Fix failing workflow logs one by one.",
+        "Keep failed workflows in TODO until later successful run proves fixed."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "{\"tab\": \"Performance\", \"text\": \"Failed to load performance data: 502\"}",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+        },
+        {
+          "issue": "failed_count=38",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },
@@ -1103,57 +1245,6 @@
       ]
     },
     {
-      "issue_count": 8,
-      "lane": "WORKFLOW_CI",
-      "recommended_fixes": [
-        "Read workflow_failure_tracker TODO.",
-        "Fix failing workflow logs one by one.",
-        "Keep failed workflows in TODO until later successful run proves fixed."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "failed_count=38",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
       "issue_count": 7,
       "lane": "FAKE_STALE_DATA",
       "recommended_fixes": [
@@ -1196,42 +1287,6 @@
           "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
           "lane": "FAKE_STALE_DATA",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 5,
-      "lane": "SCANNER_SIGNAL",
-      "recommended_fixes": [
-        "Verify top_contract_gainers returns real rows.",
-        "Require CE/PE side, strike, expiry, score, reason.",
-        "If market closed, report exact blocked reason, not fake signal."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
       ]
     }
