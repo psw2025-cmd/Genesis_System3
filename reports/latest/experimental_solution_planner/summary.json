@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-15T09:29:55.263850+00:00",
-  "issue_count": 603,
+  "generated_utc": "2026-07-15T09:37:58.419343+00:00",
+  "issue_count": 460,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 270,
+      "issue_count": 238,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,84 +64,84 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Permanent Repo Render Safety' run=29404327238 conclusion=failure commit=9d1841099953",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29404707069 conclusion=failure commit=b588fffc13f9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Genesis System3 Global Safety CI' run=29404327196 conclusion=failure commit=9d1841099953",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29404447411 conclusion=failure commit=340e5b003700",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29404325918 conclusion=failure commit=9d1841099953",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29404677428 conclusion=failure commit=3820a0783831",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=29404302036 conclusion=failure commit=060af88697ac",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29404706949 conclusion=failure commit=b588fffc13f9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Proof Current' run=29404087470 conclusion=failure commit=c40b568de4e5",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29404713132 conclusion=failure commit=b588fffc13f9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Full Auto Truth' run=29403944316 conclusion=failure commit=286e40cb2733",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29404706956 conclusion=failure commit=b588fffc13f9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Live UI Proof' run=29403838454 conclusion=failure commit=286e40cb2733",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29404707074 conclusion=failure commit=b588fffc13f9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Permanent Repo Render Safety' run=29403663713 conclusion=failure commit=286e40cb2733",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29404327169 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29403455379 conclusion=failure commit=9ce582299bb2",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=29404327205 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29403453412 conclusion=failure commit=9ce582299bb2",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29404327023 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29403412385 conclusion=failure commit=28f577a1f9cb",
+          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29404327238 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29403411629 conclusion=failure commit=28f577a1f9cb",
+          "issue": "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29404327196 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29403409376 conclusion=failure commit=28f577a1f9cb",
+          "issue": "Fix latest GitHub workflow 'System3 Full Auto Truth' run=29403944316 conclusion=failure commit=286e40cb2733",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29403408540 conclusion=failure commit=28f577a1f9cb",
+          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29404325918 conclusion=failure commit=9d1841099953",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29403384977 conclusion=failure commit=933987466eae",
+          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29404302036 conclusion=failure commit=060af88697ac",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 124,
+      "issue_count": 50,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 54,
+      "issue_count": 40,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -537,19 +537,19 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
+          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": true, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/state\", \"error_type\": null, \"reason\": \"HTTP status 401\", \"status_code\": 401, \"url\": \"https://genesis-system3-backend.onrender.com/api/state\"}",
+          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 34,
+      "issue_count": 22,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -663,29 +663,14 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on Truth Control: Dhan option-chain availability\tPARTIAL\tYES\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1",
+          "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tPARTIAL\\tYES\\tenabled_ready=0/4, enabled_safe_no_trade=4/4, optional_ready=0/1, optional_safe_no_trade=1/1\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Real Dhan option chain for all watched symbols\\tBLOCKED\\t0/5\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"NIFTY\\tBLOCKED\\tdhan\\tdhan_only_no_rows\\tNO_DHAN_DATA\\t0\\t0\\tNO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
     },
     {
-      "issue_count": 17,
+      "issue_count": 13,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -749,26 +734,6 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Options ML training summary is missing/not published.",
           "lane": "ML_TRAINING",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -781,7 +746,7 @@
       ]
     },
     {
-      "issue_count": 17,
+      "issue_count": 13,
       "lane": "UNKNOWN",
       "recommended_fixes": [
         "Inspect source report, classify manually, add rule to planner."
@@ -818,7 +783,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=43",
+          "issue": "todo_count=28",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -833,32 +798,12 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"ERROR\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "expected_tab_count=16",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "info_line_count=97",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=1",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "settle_normalized_tab_count=15",
+          "issue": "unsettled_tab_count=16",
           "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
@@ -1145,7 +1090,7 @@
       ]
     },
     {
-      "issue_count": 5,
+      "issue_count": 2,
       "lane": "SCANNER_SIGNAL",
       "recommended_fixes": [
         "Verify top_contract_gainers returns real rows.",
@@ -1162,21 +1107,6 @@
           "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
           "lane": "SCANNER_SIGNAL",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"What Blocked Trading? Scanner Segments 0/4\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         }
       ]
     }
