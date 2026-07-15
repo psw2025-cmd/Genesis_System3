@@ -1,107 +1,96 @@
 {
-  "generated_at": "2026-07-15T09:56:08.683Z",
+  "generated_at": "2026-07-15T10:54:09.137Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
   "source_summary_ok": true,
   "source_summary_error": null,
-  "source_final_verdict": "FAIL",
+  "source_final_verdict": "PASS",
   "auth_ok": true,
   "screenshot_gate_pass": true,
-  "infra_blockers": [
-    "UI_FAIL:Paper Trades"
-  ],
-  "visual_blockers": [
-    "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
-    "PAPER_TRUTH_NOT_VISIBLE:GLOBAL",
-    "OWNER_BADGE_NOT_VISIBLE:MOBILE_OR_RESPONSIVE_UI"
-  ],
-  "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ],
+  "infra_blockers": [],
+  "visual_blockers": [],
+  "trade_readiness_blockers": [],
   "consistency_blockers": [
     "SHELL_STATUS:BLOCKED",
     "DEPLOYED_FRONTEND_ASSET_DRIFT",
     "TAB_COVERAGE:15/16",
     "VISIBLE_TRACKER_STATUS:BLOCKED",
-    "VISIBLE_TRACKER_BAD_TABS:16"
+    "VISIBLE_TRACKER_BAD_TABS:11"
   ],
   "corroborating_evidence": {
-    "shell_generated_at": "2026-07-15T09:51:09.804Z",
+    "shell_generated_at": "2026-07-15T10:47:55.742Z",
     "shell_status": "BLOCKED",
     "shell_tab_coverage": "15/16",
-    "visible_tracker_generated_at": "2026-07-15T09:43:08.452Z",
+    "visible_tracker_generated_at": "2026-07-15T10:49:18.595Z",
     "visible_tracker_status": "BLOCKED",
-    "visible_tracker_bad_tab_count": 16
+    "visible_tracker_bad_tab_count": 11
   },
   "screenshots": [
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 201616
+      "size_bytes": 200686
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 97642
+      "size_bytes": 280950
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 189449
+      "size_bytes": 188156
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 178953
+      "size_bytes": 152165
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 131702
+      "size_bytes": 227005
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 125623
+      "size_bytes": 100221
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 110335
+      "size_bytes": 176131
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 108538
+      "size_bytes": 111797
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 160440
+      "size_bytes": 145974
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 101158
+      "size_bytes": 111466
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 138082
+      "size_bytes": 135041
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 108576
+      "size_bytes": 112930
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 26270
+      "size_bytes": 122821
     }
   ],
   "safety": {
