@@ -9,9 +9,13 @@ COPY dashboard/frontend/ ./
 # Fail the image build if the current React source cannot compile or if the
 # analyzer-only Sim Live control is absent from the generated bundle. This
 # prevents stale/incomplete frontend assets from being published as healthy.
+# A deterministic, non-secret source fingerprint is also published with the
+# static assets so live proof can distinguish deployment drift from UI failure.
 RUN npm run build \
     && test -f dist/index.html \
-    && grep -R -q --include='*.js' 'Sim Live' dist/assets
+    && grep -R -q --include='*.js' 'Sim Live' dist/assets \
+    && sidebar_sha="$(sha256sum src/components/Sidebar.tsx | awk '{print $1}')" \
+    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false}\n' "$sidebar_sha" > dist/deploy-provenance.json
 
 # ── Stage 2: Runtime (Python only, no Node.js) ────────────────────────
 # Node.js removed from runtime image — saves ~200MB RAM on free tier.
@@ -36,6 +40,7 @@ COPY . /app/
 RUN rm -rf /app/dashboard/frontend/dist
 COPY --from=frontend-builder /app/dashboard/frontend/dist /app/dashboard/frontend/dist
 RUN test -f /app/dashboard/frontend/dist/index.html \
+    && test -f /app/dashboard/frontend/dist/deploy-provenance.json \
     && grep -R -q --include='*.js' 'Sim Live' /app/dashboard/frontend/dist/assets
 
 RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
