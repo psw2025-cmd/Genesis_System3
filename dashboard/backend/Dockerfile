@@ -1,6 +1,13 @@
 # ── Stage 1: Build React frontend (Node.js only needed here) ──────────
 FROM node:20-slim AS frontend-builder
 WORKDIR /app/dashboard/frontend
+
+# Increment only when production proof shows Render serving a stale frontend
+# despite newer reviewed source. This is a non-secret cache epoch; changing it
+# forces the frontend-builder layer to rebuild without altering runtime logic.
+ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260715_1
+ENV SYSTEM3_FRONTEND_BUILD_EPOCH=${SYSTEM3_FRONTEND_BUILD_EPOCH}
+
 COPY dashboard/frontend/package*.json ./
 # Use the committed lockfile so Render cannot resolve a different dependency
 # graph from the one reviewed in the repository.
@@ -12,11 +19,12 @@ COPY dashboard/frontend/ ./
 # A deterministic, non-secret source fingerprint is published inside the
 # Vite assets directory. Unlike an arbitrary SPA-root path, /ui/assets/* must
 # resolve to a real static file and cannot be silently replaced by index.html.
-RUN npm run build \
+RUN printf '%s\n' "$SYSTEM3_FRONTEND_BUILD_EPOCH" > .system3-frontend-build-epoch \
+    && npm run build \
     && test -f dist/index.html \
     && grep -R -q --include='*.js' 'Sim Live' dist/assets \
     && sidebar_sha="$(sha256sum src/components/Sidebar.tsx | awk '{print $1}')" \
-    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false}\n' "$sidebar_sha" > dist/assets/deploy-provenance.json
+    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false,"build_epoch":"%s"}\n' "$sidebar_sha" "$SYSTEM3_FRONTEND_BUILD_EPOCH" > dist/assets/deploy-provenance.json
 
 # ── Stage 2: Runtime (Python only, no Node.js) ────────────────────────
 # Node.js removed from runtime image — saves ~200MB RAM on free tier.
