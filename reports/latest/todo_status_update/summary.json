@@ -5,7 +5,7 @@
     "PARTIAL": 0,
     "PENDING": 0
   },
-  "generated_utc": "2026-07-15T10:35:45.999693+00:00",
+  "generated_utc": "2026-07-15T10:37:27.340201+00:00",
   "proof_state": {
     "contracts_pass": false,
     "has_360_matrix": true,
@@ -27,7 +27,7 @@
     "proof_bar_visible": false,
     "public_fail": false,
     "public_pass": false,
-    "screenshots_ok": false,
+    "screenshots_ok": true,
     "visual_pass": false,
     "workflow_blocked": true
   },
