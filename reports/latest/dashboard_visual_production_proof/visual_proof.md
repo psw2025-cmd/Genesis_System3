@@ -1,6 +1,6 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-07-15T04:24:24.873Z
+Generated: 2026-07-15T05:12:34.278Z
 Base: https://genesis-system3-backend.onrender.com
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
@@ -14,33 +14,34 @@ Screenshot gate: **True**
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - SHELL_STATUS:BLOCKED
-- TAB_COVERAGE:0/16
-- SHELL_PROOF_NOT_TIME_ALIGNED
+- DEPLOYED_FRONTEND_ASSET_DRIFT
+- TAB_COVERAGE:15/16
 - VISIBLE_TRACKER_STATUS:BLOCKED
+- VISIBLE_TRACKER_BAD_TABS:14
 - VISIBLE_TRACKER_NOT_TIME_ALIGNED
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-15T03:19:21.544Z`
+- `shell_generated_at`: `2026-07-15T05:06:59.542Z`
 - `shell_status`: `BLOCKED`
-- `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-07-15T01:42:13.747Z`
+- `shell_tab_coverage`: `15/16`
+- `visible_tracker_generated_at`: `2026-07-15T04:24:12.467Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `0`
+- `visible_tracker_bad_tab_count`: `14`
 
 ## Screenshots
-- PASS `truth.png` size=`200536`
-- PASS `genesis.png` size=`279182`
-- PASS `e2e_proof.png` size=`193965`
-- PASS `overview.png` size=`157390`
-- PASS `chain.png` size=`114613`
-- PASS `signals.png` size=`124782`
-- PASS `paper.png` size=`169971`
-- PASS `positions.png` size=`108507`
-- PASS `broker.png` size=`153155`
-- PASS `performance.png` size=`108093`
-- PASS `ml.png` size=`136097`
-- PASS `gates.png` size=`137215`
-- PASS `mobile_390x844.png` size=`123986`
+- PASS `truth.png` size=`200923`
+- PASS `genesis.png` size=`278783`
+- PASS `e2e_proof.png` size=`193341`
+- PASS `overview.png` size=`157137`
+- PASS `chain.png` size=`114397`
+- PASS `signals.png` size=`124529`
+- PASS `paper.png` size=`169672`
+- PASS `positions.png` size=`108334`
+- PASS `broker.png` size=`152411`
+- PASS `performance.png` size=`107971`
+- PASS `ml.png` size=`135921`
+- PASS `gates.png` size=`136865`
+- PASS `mobile_390x844.png` size=`123733`
 
 ## truth.png
 
