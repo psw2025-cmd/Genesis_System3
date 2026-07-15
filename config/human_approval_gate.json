@@ -11,7 +11,7 @@
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-  "gates_synced_utc": "2026-07-15T00:30:26.224521Z",
+  "gates_synced_utc": "2026-07-15T01:42:07.118320Z",
   "gates_passing": 1,
   "gates_total": 7
 }
