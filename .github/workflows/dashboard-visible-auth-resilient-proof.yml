@@ -1,0 +1,194 @@
+name: Dashboard Visible Auth-Resilient Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17,47 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dashboard-visible-auth-resilient-proof.yml'
+      - 'tools/dashboard_visible_issue_tracker.mjs'
+      - 'dashboard/frontend/**'
+      - 'dashboard/backend/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-visible-auth-resilient-proof
+  cancel-in-progress: false
+
+jobs:
+  visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      EXPECTED_DASHBOARD_TAB_COUNT: '16'
+      DASHBOARD_TAB_SETTLE_TIMEOUT_MS: '20000'
+      PLAYWRIGHT_BROWSERS_PATH: '0'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify analyzer-only safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$ANALYZE_MODE" = '1'
+          test "$LIVE_TRADING_ENABLED" = '0'
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = '0'
+
+      - name: Install isolated visual-proof browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .proof-node node_modules
+          mkdir -p .proof-node
+          cat > .proof-node/package.json <<'JSON'
+          {
+            "name": "system3-auth-resilient-visual-proof",
+            "private": true,
+            "version": "1.0.0",
+            "dependencies": { "playwright": "1.52.0" }
+          }
+          JSON
+          npm install --prefix .proof-node --ignore-scripts --no-audit --no-fund --package-lock=false
+          .proof-node/node_modules/.bin/playwright install chromium
+          ln -s .proof-node/node_modules node_modules
+          node --input-type=module - <<'NODE'
+          import fs from 'fs'
+          import { chromium } from 'playwright'
+          const executable = chromium.executablePath()
+          if (!executable || !fs.existsSync(executable)) process.exit(1)
+          const browser = await chromium.launch({ headless: true })
+          await browser.close()
+          console.log(JSON.stringify({ isolated_browser_launch: 'PASS' }))
+          NODE
+
+      - name: Run visual tracker with bounded transient-auth retries
+        id: proof
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          report='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          final_rc=1
+
+          for attempt in 1 2 3; do
+            rm -rf reports/latest/dashboard_visible_issue_tracker
+            mkdir -p reports/latest/dashboard_visible_issue_tracker
+
+            set +e
+            node tools/dashboard_visible_issue_tracker.mjs
+            rc=$?
+            set -e
+            final_rc=$rc
+
+            if [[ ! -s "$report" ]]; then
+              echo "visual report missing on attempt=$attempt" >&2
+              [[ "$attempt" -lt 3 ]] && sleep $((attempt * 10))
+              continue
+            fi
+
+            read -r auth_ok auth_status status < <(python - <<'PY'
+          import json
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p,encoding='utf-8'))
+          a=d.get('auth') if isinstance(d.get('auth'),dict) else {}
+          print(str(bool(a.get('ok'))).lower(), int(a.get('status') or 0), str(d.get('status') or 'UNKNOWN'))
+          PY
+            )
+            echo "attempt=$attempt auth_ok=$auth_ok auth_status=$auth_status proof_status=$status"
+
+            if [[ "$auth_ok" == 'true' ]]; then
+              break
+            fi
+
+            case "$auth_status" in
+              0|429|500|502|503|504)
+                if [[ "$attempt" -lt 3 ]]; then sleep $((attempt * 15)); fi
+                ;;
+              *)
+                echo "deterministic authentication failure; not retrying" >&2
+                break
+                ;;
+            esac
+          done
+
+          exit "$final_rc"
+
+      - name: Validate fail-closed sanitized evidence
+        if: always()
+        env:
+          PROOF_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          if not os.path.exists(p):
+              raise SystemExit('visual proof report missing')
+          d=json.load(open(p,encoding='utf-8'))
+          expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          safety=d.get('analyzer_safety') if isinstance(d.get('analyzer_safety'),dict) else {}
+          assert safety.get('analyze_mode') is True
+          assert safety.get('live_trading_enabled') is False
+          assert safety.get('system3_live_trading_allowed') is False
+          eligible=(d.get('status')=='PASS' and len(d.get('tabs') or [])==expected)
+          assert bool(d.get('production_grade_claim_allowed')) == eligible
+          forbidden=('password','secret','token','cookie','authorization','api_key','response_body')
+          def walk(v,path='root'):
+              hits=[]
+              if isinstance(v,dict):
+                  for k,x in v.items():
+                      if any(s in str(k).lower() for s in forbidden): hits.append(f'{path}.{k}')
+                      hits.extend(walk(x,f'{path}.{k}'))
+              elif isinstance(v,list):
+                  for i,x in enumerate(v): hits.extend(walk(x,f'{path}[{i}]'))
+              return hits
+          serialized=json.dumps(d,sort_keys=True)
+          key=os.environ.get('PROOF_API_KEY','')
+          if walk(d) or (key and key in serialized):
+              raise SystemExit('sensitive field/value detected in visual proof')
+          print(json.dumps({
+              'status':d.get('status'),
+              'auth_ok':bool((d.get('auth') or {}).get('ok')),
+              'auth_status':int((d.get('auth') or {}).get('status') or 0),
+              'scanned_tabs':len(d.get('tabs') or []),
+              'expected_tabs':expected,
+              'visible_issue_count':d.get('visible_issue_count'),
+              'production_grade_claim_allowed':d.get('production_grade_claim_allowed'),
+          },indent=2))
+          PY
+
+      - name: Upload current sanitized visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-visible-auth-resilient-proof
+          path: reports/latest/dashboard_visible_issue_tracker/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce current live visual PASS
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          d=json.load(open('reports/latest/dashboard_visible_issue_tracker/summary.json',encoding='utf-8'))
+          expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          passed=(d.get('status')=='PASS' and len(d.get('tabs') or [])==expected and d.get('production_grade_claim_allowed') is True)
+          raise SystemExit(0 if passed else 1)
+          PY
