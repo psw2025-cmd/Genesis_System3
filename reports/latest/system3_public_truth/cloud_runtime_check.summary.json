@@ -1,11 +1,11 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "9519d8920b6a7ef1ab1a314f3be828f813773946",
-  "generated_utc": "2026-07-14T10:09:18.286588Z",
+  "expected_commit": "3559642ea760b44957cb2445b4ca1a463eb80a83",
+  "generated_utc": "2026-07-15T04:00:57.737936Z",
   "key_facts": {
-    "broker_connected": true,
-    "chain_nifty_contracts": 160,
+    "broker_connected": false,
+    "chain_nifty_contracts": 0,
     "portfolio_details_mode": null,
     "scheduler_healthy": false,
     "scheduler_received": false
@@ -41,16 +41,16 @@
     },
     "before": {
       "available": true,
-      "pct_used": 49.1,
+      "pct_used": 27.3,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 915.3,
+        "headroom_mb": 1308.0,
         "limit_mb": 1800,
-        "pct_used": 49.1,
-        "rss_mb": 884.7,
+        "pct_used": 27.3,
+        "rss_mb": 492.0,
         "status": "OK"
       },
-      "rss_mb": 884.7,
+      "rss_mb": 492.0,
       "status": "OK"
     }
   },
@@ -64,7 +64,12 @@
     {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=9519d8920b6a"
+      "message": "Render git_sha=[REDACTED] expected=3559642ea760"
+    },
+    {
+      "key": "broker_not_connected",
+      "level": "WARNING",
+      "message": "broker status not connected: TOKEN_EXPIRED_OR_INVALID"
     },
     {
       "key": "scheduler_no_worker_push",
@@ -72,9 +77,14 @@
       "message": "worker scheduler health has not been received"
     },
     {
+      "key": "chain_nifty_empty",
+      "level": "WARNING",
+      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
+    },
+    {
       "key": "memory_before",
       "level": "WARNING",
-      "message": "RSS high: 884.7MB"
+      "message": "RSS high: 492.0MB"
     }
   ]
 }
