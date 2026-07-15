@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-15T01:42:07.118271Z",
+  "generated_utc": "2026-07-15T10:41:50.171944Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -45,7 +45,7 @@
     "WEBSOCKET_TICK_HEALTH_PROVEN": {
       "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
       "pass": false,
-      "report_exists": false,
+      "report_exists": true,
       "last_tick_age_sec": null,
       "refresh_interval_sec": null,
       "blocker_id": "TICK_HEALTH_BLOCKER",

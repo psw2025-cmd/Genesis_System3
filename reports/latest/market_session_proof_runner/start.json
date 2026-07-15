@@ -1,0 +1,14 @@
+{
+  "generated_utc": "2026-07-15T10:40:15.148227+00:00",
+  "purpose": "market_session_red_gate_resolution",
+  "live_trading_enabled": false,
+  "order_routes_called": false,
+  "targets": [
+    "ML validation days",
+    "tick health",
+    "paper lifecycle",
+    "option strike visibility",
+    "profit expectancy",
+    "dashboard visual proof"
+  ]
+}
