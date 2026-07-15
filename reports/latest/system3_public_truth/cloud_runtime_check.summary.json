@@ -1,70 +1,65 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "3559642ea760b44957cb2445b4ca1a463eb80a83",
-  "generated_utc": "2026-07-15T04:00:57.737936Z",
+  "expected_commit": "286e40cb2733f3296ea80ffbd6953d84f9ff12b2",
+  "generated_utc": "2026-07-15T09:14:37.594109Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
-    "portfolio_details_mode": null,
+    "portfolio_details_mode": "skipped_for_render_memory",
     "scheduler_healthy": false,
     "scheduler_received": false
   },
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 14.0,
+      "pct_used": 22.5,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1547.9,
+        "headroom_mb": 1394.7,
         "limit_mb": 1800,
-        "pct_used": 14.0,
-        "rss_mb": 252.1,
+        "pct_used": 22.5,
+        "rss_mb": 405.3,
         "status": "OK"
       },
-      "rss_mb": 252.1,
+      "rss_mb": 405.3,
       "status": "OK"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 14.0,
+      "pct_used": 22.5,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1547.9,
+        "headroom_mb": 1394.7,
         "limit_mb": 1800,
-        "pct_used": 14.0,
-        "rss_mb": 252.1,
+        "pct_used": 22.5,
+        "rss_mb": 405.3,
         "status": "OK"
       },
-      "rss_mb": 252.1,
+      "rss_mb": 405.3,
       "status": "OK"
     },
     "before": {
       "available": true,
-      "pct_used": 27.3,
+      "pct_used": 20.1,
       "raw": {
         "gc_triggered": false,
-        "headroom_mb": 1308.0,
+        "headroom_mb": 1438.9,
         "limit_mb": 1800,
-        "pct_used": 27.3,
-        "rss_mb": 492.0,
+        "pct_used": 20.1,
+        "rss_mb": 361.1,
         "status": "OK"
       },
-      "rss_mb": 492.0,
+      "rss_mb": 361.1,
       "status": "OK"
     }
   },
   "verdict": "WARN",
   "warnings": [
     {
-      "key": "endpoint_portfolio_unified",
-      "level": "WARNING",
-      "message": "portfolio_unified failed: 502 HTTPError: 502 attempts=4"
-    },
-    {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=3559642ea760"
+      "message": "Render git_sha=[REDACTED] expected=286e40cb2733"
     },
     {
       "key": "broker_not_connected",
@@ -80,11 +75,6 @@
       "key": "chain_nifty_empty",
       "level": "WARNING",
       "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
-    },
-    {
-      "key": "memory_before",
-      "level": "WARNING",
-      "message": "RSS high: 492.0MB"
     }
   ]
 }
