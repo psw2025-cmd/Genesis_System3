@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-15T11:06:30.939517+00:00",
-  "issue_count": 614,
+  "generated_utc": "2026-07-15T11:32:01.629179+00:00",
+  "issue_count": 587,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 294,
+      "issue_count": 264,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,77 +64,77 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29408755341 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29411552045 conclusion=failure commit=4ed7c087ca81",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29408755283 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=29410329769 conclusion=failure commit=e8ecbfc4a9e5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29408755252 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=29410368720 conclusion=failure commit=313ca8bf96b8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29408755248 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29411552048 conclusion=failure commit=4ed7c087ca81",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29408755230 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29411551164 conclusion=failure commit=4ed7c087ca81",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29408752396 conclusion=failure commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29410673941 conclusion=failure commit=521c2a4d160c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29408752378 conclusion=cancelled commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29410987588 conclusion=failure commit=592176b114fb",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29408752371 conclusion=cancelled commit=1eb0a1ba6efc",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29410961247 conclusion=failure commit=592176b114fb",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29408738417 conclusion=failure commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29411048424 conclusion=failure commit=592176b114fb",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29408738397 conclusion=cancelled commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29410865407 conclusion=failure commit=521c2a4d160c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29408738284 conclusion=cancelled commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29410469840 conclusion=failure commit=c5c1b82b2679",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29408737872 conclusion=failure commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29410469397 conclusion=failure commit=c5c1b82b2679",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29408737851 conclusion=cancelled commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29410469847 conclusion=failure commit=c5c1b82b2679",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29408737828 conclusion=cancelled commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29410469427 conclusion=failure commit=c5c1b82b2679",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29408736053 conclusion=failure commit=6e8df1c1e5d9",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29410373332 conclusion=failure commit=313ca8bf96b8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 39,
+      "issue_count": 42,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -537,12 +537,12 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
+          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": true, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/state\", \"error_type\": null, \"reason\": \"HTTP status 401\", \"status_code\": 401, \"url\": \"https://genesis-system3-backend.onrender.com/api/state\"}",
+          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -717,7 +717,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=46",
+          "issue": "todo_count=32",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
