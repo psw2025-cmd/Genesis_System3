@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-15T12:56:26.494332+00:00`
+Generated UTC: `2026-07-15T12:57:21.091638+00:00`
 Status: **BLOCKED**
-Issues: `558`
+Issues: `557`
 Fix lanes: `13`
 
 ## Rule
@@ -297,7 +297,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "BLOCKED"}
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: {"tab": "ML Model", "text": "Training proof missing."}
 
-### UNKNOWN — 17 issues
+### UNKNOWN — 16 issues
 
 Recommended fixes:
 - Inspect source report, classify manually, add rule to planner.
@@ -317,7 +317,7 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: info_line_count=117
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=1
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: settle_normalized_tab_count=15
+- `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 
 ### INSTALL_CREDENTIAL — 12 issues
 
