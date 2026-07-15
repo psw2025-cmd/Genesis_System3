@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-15T12:00:36.702364+00:00",
-  "issue_count": 585,
+  "generated_utc": "2026-07-15T12:31:11.705451+00:00",
+  "issue_count": 458,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 261,
+      "issue_count": 249,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,84 +64,84 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29411552045 conclusion=failure commit=4ed7c087ca81",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=29415052690 conclusion=failure commit=8664e154ff76",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=29410329769 conclusion=failure commit=e8ecbfc4a9e5",
+          "issue": "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29415052614 conclusion=failure commit=8664e154ff76",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=29410368720 conclusion=failure commit=313ca8bf96b8",
+          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29415052618 conclusion=failure commit=8664e154ff76",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29411552048 conclusion=failure commit=4ed7c087ca81",
+          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29415051799 conclusion=failure commit=8664e154ff76",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29411551164 conclusion=failure commit=4ed7c087ca81",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29414186459 conclusion=failure commit=d80a95378c7e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29410673941 conclusion=failure commit=521c2a4d160c",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29413558711 conclusion=failure commit=493e713f7a2b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29410987588 conclusion=failure commit=592176b114fb",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29414359393 conclusion=failure commit=0ed6ff882f43",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29410961247 conclusion=failure commit=592176b114fb",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29413923514 conclusion=failure commit=d80a95378c7e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29411048424 conclusion=failure commit=592176b114fb",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29413579203 conclusion=failure commit=04a8d914e870",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29410865407 conclusion=failure commit=521c2a4d160c",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29413624497 conclusion=failure commit=c56d27a0ae0b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29410469840 conclusion=failure commit=c5c1b82b2679",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29413559125 conclusion=failure commit=493e713f7a2b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29410469397 conclusion=failure commit=c5c1b82b2679",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29413578530 conclusion=failure commit=04a8d914e870",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29410469847 conclusion=failure commit=c5c1b82b2679",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29413559377 conclusion=failure commit=493e713f7a2b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29410469427 conclusion=failure commit=c5c1b82b2679",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29412852295 conclusion=failure commit=fbfa758c8525",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29410373332 conclusion=failure commit=313ca8bf96b8",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29413061004 conclusion=failure commit=aefba0375b95",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 118,
+      "issue_count": 50,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 45,
+      "issue_count": 34,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 42,
+      "issue_count": 31,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -537,19 +537,19 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
+          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/scanner/top_contract_gainers\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/api/scanner/top_contract_gainers\"}",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
+          "issue": "render_failed_count=1",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 24,
+      "issue_count": 22,
       "lane": "OPTION_CHAIN",
       "recommended_fixes": [
         "Prove Dhan chain rows for enabled universe.",
@@ -663,16 +663,6 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Dhan option-chain availability\\tBLOCKED\\tYES\\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Real Dhan option chain for all watched symbols\\tBLOCKED\\t0/5\"}",
-          "lane": "OPTION_CHAIN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Current user visual proof showed scanner segments 0/4 and enabled universe 0/4.",
           "lane": "OPTION_CHAIN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -680,106 +670,7 @@
       ]
     },
     {
-      "issue_count": 18,
-      "lane": "UNKNOWN",
-      "recommended_fixes": [
-        "Inspect source report, classify manually, add rule to planner."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "issue_count=143",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "todo_count=32",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "blocker_count=163",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5015ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Genesis Brain\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5013ms markers=GENESIS IS LOADING PRODUCTION COMMAND INTELLIGENCE...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"ASYNC_CONTENT_NOT_SETTLED after 5017ms markers=CHECKING...\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Overview\", \"text\": \"PEND\"}",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "expected_tab_count=16",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "info_line_count=92",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "unsettled_tab_count=4",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "blocker_count=3",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/secure_install_credential_audit/summary.json"
-        },
-        {
-          "issue": "blocker_count=12",
-          "lane": "UNKNOWN",
-          "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 17,
+      "issue_count": 13,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
         "Build real CE/PE dataset proof.",
@@ -843,26 +734,6 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix visible UI blocker on ML Model: Training proof missing.",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"BLOCKED\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"ML Model\", \"text\": \"Training proof missing.\"}",
-          "lane": "ML_TRAINING",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
           "issue": "Options ML training summary is missing/not published.",
           "lane": "ML_TRAINING",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
@@ -876,76 +747,74 @@
     },
     {
       "issue_count": 13,
-      "lane": "PAPER_LIFECYCLE",
+      "lane": "UNKNOWN",
       "recommended_fixes": [
-        "Require paper entry, exit, PnL, source/provenance.",
-        "Reject fake/fixture/mock rows.",
-        "Show order endpoints not called."
+        "Inspect source report, classify manually, add rule to planner."
       ],
       "top_issues": [
         {
-          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_014:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_034:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_054:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14",
+          "lane": "UNKNOWN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "issue_count=143",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "todo_count=19",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "dashboard_visual_production_proof: status=UNKNOWN",
+          "lane": "UNKNOWN",
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Paper/analyzer lifecycle\\tBLOCKED\\tNO\\ttoday_trade_rows=0, endpoint=0\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "blocker_count=163",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "expected_tab_count=16",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"E2E Proof\", \"text\": \"Today paper lifecycle endpoint\\tBLOCKED\\t-\"}",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "unsettled_tab_count=16",
+          "lane": "UNKNOWN",
           "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error Loading Data\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "blocker_count=3",
+          "lane": "UNKNOWN",
+          "report": "reports/latest/secure_install_credential_audit/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Error: Request failed with status code 502\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"\u274c Error Loading Data Endpoint: /api/state Error: Request failed with status code 502 Retry\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Paper Trades\", \"text\": \"Endpoint: /api/state Error: Request failed with status code 502\"}",
-          "lane": "PAPER_LIFECYCLE",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
-          "lane": "PAPER_LIFECYCLE",
+          "issue": "blocker_count=12",
+          "lane": "UNKNOWN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
@@ -1028,62 +897,6 @@
     },
     {
       "issue_count": 9,
-      "lane": "WORKFLOW_CI",
-      "recommended_fixes": [
-        "Read workflow_failure_tracker TODO.",
-        "Fix failing workflow logs one by one.",
-        "Keep failed workflows in TODO until later successful run proves fixed."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "{\"tab\": \"Performance\", \"text\": \"Failed to load performance data: 502\"}",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
-        },
-        {
-          "issue": "failed_count=37",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 9,
       "lane": "ROUTE_CODE",
       "recommended_fixes": [
         "Patch active dashboard/backend/app.py route if routers are disabled.",
@@ -1139,58 +952,99 @@
       ]
     },
     {
-      "issue_count": 9,
-      "lane": "SCANNER_SIGNAL",
+      "issue_count": 8,
+      "lane": "WORKFLOW_CI",
       "recommended_fixes": [
-        "Verify top_contract_gainers returns real rows.",
-        "Require CE/PE side, strike, expiry, score, reason.",
-        "If market closed, report exact blocked reason, not fake signal."
+        "Read workflow_failure_tracker TODO.",
+        "Fix failing workflow logs one by one.",
+        "Keep failed workflows in TODO until later successful run proves fixed."
       ],
       "top_issues": [
         {
-          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
-          "lane": "SCANNER_SIGNAL",
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
-          "lane": "SCANNER_SIGNAL",
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"Universe / ranking candidates\\tBLOCKED\\tYES\\tcandidate_rows=0, gain=0, scanner=0\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Truth Control\", \"text\": \"CE / PE decision evidence\\tBLOCKED\\tYES\\tNo CE/PE side found in model/ranker/scanner payload\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Error Loading Data\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Error: Request failed with status code 502\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Signal data unavailable\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"\u274c Error Loading Data Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502 Retry\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "failed_count=37",
+          "lane": "WORKFLOW_CI",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 7,
+      "lane": "PAPER_LIFECYCLE",
+      "recommended_fixes": [
+        "Require paper entry, exit, PnL, source/provenance.",
+        "Reject fake/fixture/mock rows.",
+        "Show order endpoints not called."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_008:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "{\"tab\": \"Signals\", \"text\": \"Endpoint: /api/state HTTP Status: 502 Error: Request failed with status code 502\"}",
-          "lane": "SCANNER_SIGNAL",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
+          "issue": "agent_028:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_048:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_068:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_088:paper_lifecycle: Paper lifecycle/provenance issue visible: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "Paper lifecycle needs real candidate -> paper entry -> exit -> PnL proof, not only UI panel.",
+          "lane": "PAPER_LIFECYCLE",
+          "report": "reports/latest/parallel_root_cause_audit/summary.json"
         }
       ]
     },
@@ -1237,6 +1091,27 @@
           "issue": "Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.",
           "lane": "FAKE_STALE_DATA",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 2,
+      "lane": "SCANNER_SIGNAL",
+      "recommended_fixes": [
+        "Verify top_contract_gainers returns real rows.",
+        "Require CE/PE side, strike, expiry, score, reason.",
+        "If market closed, report exact blocked reason, not fake signal."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_047:scanner_signals: Scanner/signals endpoint server error: /api/scanner/top_contract_gainers",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_087:scanner_signals: Scanner/signals endpoint server error: /api/state",
+          "lane": "SCANNER_SIGNAL",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     }
