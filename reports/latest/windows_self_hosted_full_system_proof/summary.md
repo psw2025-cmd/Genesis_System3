@@ -1,6 +1,6 @@
 # System3 Windows Self-Hosted Full System Proof
 
-Generated: `2026-07-15T00:07:12.490519Z`
+Generated: `2026-07-15T05:42:13.135968Z`
 
 Final status: **BLOCKED**
 
@@ -12,19 +12,19 @@ Response bodies persisted: **false**.
 
 | Area | Status | Detail |
 |---|---|---|
-| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=2.13s |
-| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=160.56s |
-| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=7.1s |
-| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.0s |
-| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.21s |
-| HTTP /api/health | BLOCKED | 502 |
-| HTTP /api/state | BLOCKED | 502 |
-| HTTP /api/status | BLOCKED | 502 |
-| HTTP /api/broker/status | BLOCKED | 502 |
-| HTTP /api/broker/dhan/status | BLOCKED | 502 |
-| HTTP /api/broker/funds | BLOCKED | 502 |
-| HTTP /api/broker/holdings | BLOCKED | 502 |
-| HTTP /api/broker/positions | BLOCKED | 502 |
+| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=2.3s |
+| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=169.12s |
+| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=7.73s |
+| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.06s |
+| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.15s |
+| HTTP /api/health | PASS | 200 |
+| HTTP /api/state | PASS | 200 |
+| HTTP /api/status | PASS | 200 |
+| HTTP /api/broker/status | PASS | 200 |
+| HTTP /api/broker/dhan/status | PASS | 200 |
+| HTTP /api/broker/funds | PASS | 200 |
+| HTTP /api/broker/holdings | BLOCKED | request_timeout |
+| HTTP /api/broker/positions | BLOCKED | request_timeout |
 | HTTP /api/scanner/top_contract_gainers | BLOCKED | 502 |
 | HTTP /api/simulation/live/state | BLOCKED | 502 |
 | Report system3_auto_gates | UNKNOWN | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\system3_auto_gates\summary.json |
@@ -39,14 +39,8 @@ Response bodies persisted: **false**.
 - Command blocked: C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs — DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16
 
 - Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1
-- HTTP blocked: /api/health — 502
-- HTTP blocked: /api/state — 502
-- HTTP blocked: /api/status — 502
-- HTTP blocked: /api/broker/status — 502
-- HTTP blocked: /api/broker/dhan/status — 502
-- HTTP blocked: /api/broker/funds — 502
-- HTTP blocked: /api/broker/holdings — 502
-- HTTP blocked: /api/broker/positions — 502
+- HTTP blocked: /api/broker/holdings — request_timeout
+- HTTP blocked: /api/broker/positions — request_timeout
 - HTTP blocked: /api/scanner/top_contract_gainers — 502
 - HTTP blocked: /api/simulation/live/state — 502
 - Report not PASS: system3_auto_gates — UNKNOWN
