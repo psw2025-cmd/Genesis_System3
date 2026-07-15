@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -20,40 +21,65 @@ SIDEBAR = ROOT / "dashboard/frontend/src/components/Sidebar.tsx"
 OUT = ROOT / "reports/latest/dashboard_deploy_provenance"
 BASE = os.environ.get("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
 URL = f"{BASE}/ui/assets/deploy-provenance.json"
+MAX_ATTEMPTS = 3
+TRANSIENT_HTTP = {429, 500, 502, 503, 504}
+
+
+def fetch_manifest() -> tuple[int, str, dict, str, list[dict]]:
+    """Fetch the public manifest with bounded retries for transient failures."""
+    attempts: list[dict] = []
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        http_status = 0
+        content_type = ""
+        remote: dict = {}
+        error_type = ""
+        try:
+            request = urllib.request.Request(
+                URL,
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache",
+                    "Accept": "application/json",
+                    "User-Agent": "system3-analyzer-proof/3",
+                },
+            )
+            with urllib.request.urlopen(request, timeout=20) as response:
+                http_status = int(response.status)
+                content_type = str(response.headers.get("Content-Type") or "").lower()
+                body = response.read(4096)
+                if "json" not in content_type:
+                    error_type = "NON_JSON_STATIC_RESPONSE"
+                else:
+                    remote = json.loads(body.decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            http_status = int(exc.code)
+            error_type = "HTTP_ERROR"
+        except (urllib.error.URLError, TimeoutError):
+            error_type = "NETWORK_OR_TIMEOUT"
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            error_type = "INVALID_MANIFEST"
+
+        attempts.append(
+            {
+                "attempt": attempt,
+                "http_status": http_status,
+                "content_type": content_type,
+                "error_type": error_type,
+            }
+        )
+
+        transient = http_status in TRANSIENT_HTTP or error_type == "NETWORK_OR_TIMEOUT"
+        if not transient or attempt == MAX_ATTEMPTS:
+            return http_status, content_type, remote, error_type, attempts
+        time.sleep(attempt * 2)
+
+    return 0, "", {}, "NETWORK_OR_TIMEOUT", attempts
 
 
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     local_sha = hashlib.sha256(SIDEBAR.read_bytes()).hexdigest()
-    http_status = 0
-    content_type = ""
-    remote: dict = {}
-    error_type = ""
-    try:
-        request = urllib.request.Request(
-            URL,
-            headers={
-                "Cache-Control": "no-cache",
-                "Pragma": "no-cache",
-                "Accept": "application/json",
-                "User-Agent": "system3-analyzer-proof/2",
-            },
-        )
-        with urllib.request.urlopen(request, timeout=20) as response:
-            http_status = int(response.status)
-            content_type = str(response.headers.get("Content-Type") or "").lower()
-            body = response.read(4096)
-            if "json" not in content_type:
-                error_type = "NON_JSON_STATIC_RESPONSE"
-            else:
-                remote = json.loads(body.decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        http_status = int(exc.code)
-        error_type = "HTTP_ERROR"
-    except (urllib.error.URLError, TimeoutError):
-        error_type = "NETWORK_OR_TIMEOUT"
-    except (json.JSONDecodeError, UnicodeDecodeError):
-        error_type = "INVALID_MANIFEST"
+    http_status, content_type, remote, error_type, attempts = fetch_manifest()
 
     remote_sha = str(remote.get("sidebar_sha256") or "")
     safe_manifest = (
@@ -69,6 +95,8 @@ def main() -> int:
     blocker = "" if matched else (
         "DEPLOY_PROVENANCE_NOT_PUBLISHED" if http_status == 404 else
         "DEPLOYED_FRONTEND_SOURCE_MISMATCH" if safe_manifest else
+        "DEPLOY_PROVENANCE_TRANSIENT_FAILURE_AFTER_RETRIES"
+        if http_status in TRANSIENT_HTTP or error_type == "NETWORK_OR_TIMEOUT" else
         "DEPLOY_PROVENANCE_STATIC_ASSET_INVALID"
     )
     data = {
@@ -79,6 +107,8 @@ def main() -> int:
         "http_status": http_status,
         "content_type": content_type,
         "error_type": error_type,
+        "attempts": attempts,
+        "recovered_after_transient_failure": matched and len(attempts) > 1,
         "local_sidebar_sha256": local_sha,
         "deployed_sidebar_sha256": remote_sha,
         "source_match": matched,
@@ -97,6 +127,8 @@ def main() -> int:
         f"Status: **{status}**\n\n"
         f"- Manifest path: `{data['manifest_path']}`\n"
         f"- HTTP: `{http_status}`\n"
+        f"- Attempts: `{len(attempts)}`\n"
+        f"- Recovered after transient failure: `{data['recovered_after_transient_failure']}`\n"
         f"- Content type: `{content_type or 'unknown'}`\n"
         f"- Source fingerprint match: `{matched}`\n"
         f"- Blocker: `{blocker or 'none'}`\n"
