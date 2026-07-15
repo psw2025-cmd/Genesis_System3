@@ -1798,5 +1798,5 @@
     "live_trading_enabled": false,
     "system3_live_trading_allowed": false
   },
-  "settle_normalized_tab_count": 15
+  "settle_normalized_tab_count": 0
 }
