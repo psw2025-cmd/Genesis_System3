@@ -9,7 +9,7 @@
     "Paper UI now has provenance panel.",
     "Inactive/route trading module contains fake fixture rejection logic."
   ],
-  "generated_utc": "2026-07-15T08:25:16.291929+00:00",
+  "generated_utc": "2026-07-15T09:24:43.572780+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [

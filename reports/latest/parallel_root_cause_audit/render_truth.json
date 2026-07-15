@@ -6,9 +6,9 @@
   "description": "Render deploy/public truth freshness",
   "findings": [
     "Public truth index exists.",
-    "Public truth commit: 3559642ea760b44957cb2445b4ca1a463eb80a83"
+    "Public truth commit: 286e40cb2733f3296ea80ffbd6953d84f9ff12b2"
   ],
-  "generated_utc": "2026-07-15T08:25:16.289528+00:00",
+  "generated_utc": "2026-07-15T09:24:43.570902+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [
