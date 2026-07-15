@@ -305,13 +305,12 @@
   "global_exception": null,
   "visible_issues": [],
   "info_lines": [],
-  "todo": [
-    "Dashboard auth session failed status=503"
-  ],
+  "todo": [],
   "production_grade_claim_allowed": false,
   "analyzer_safety": {
     "analyze_mode": true,
     "live_trading_enabled": false,
     "system3_live_trading_allowed": false
-  }
+  },
+  "settle_normalized_tab_count": 0
 }
