@@ -1,15 +1,15 @@
 # Dashboard Deploy Provenance
 
-Generated: 2026-07-15T07:01:37.665379+00:00
+Generated: 2026-07-15T07:56:55.384506+00:00
 
 Status: **BLOCKED**
 
 - Manifest path: `/ui/assets/deploy-provenance.json`
-- HTTP: `404`
-- Attempts: `1`
+- HTTP: `502`
+- Attempts: `3`
 - Recovered after transient failure: `False`
 - Content type: `unknown`
 - Source fingerprint match: `False`
-- Blocker: `DEPLOY_PROVENANCE_NOT_PUBLISHED`
+- Blocker: `DEPLOY_PROVENANCE_TRANSIENT_FAILURE_AFTER_RETRIES`
 - Analyzer mode: `ON`
 - Live trading: `OFF`
