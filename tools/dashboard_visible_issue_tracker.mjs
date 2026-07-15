@@ -248,6 +248,11 @@ const summary = {
   info_lines: [],
   todo: [],
   production_grade_claim_allowed: false,
+  analyzer_safety: {
+    analyze_mode: process.env.ANALYZE_MODE === '1',
+    live_trading_enabled: process.env.LIVE_TRADING_ENABLED === '1',
+    system3_live_trading_allowed: process.env.SYSTEM3_LIVE_TRADING_ALLOWED === '1',
+  },
 }
 
 let browser = null
