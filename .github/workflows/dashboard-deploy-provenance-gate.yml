@@ -13,7 +13,7 @@ on:
       - '.github/workflows/dashboard-deploy-provenance-gate.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: dashboard-deploy-provenance-gate
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   provenance:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     env:
       DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
       ANALYZE_MODE: '1'
@@ -30,6 +30,8 @@ jobs:
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Verify analyzer-only safety flags
         run: |
@@ -37,8 +39,62 @@ jobs:
           test "$LIVE_TRADING_ENABLED" = "0"
           test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
 
-      - name: Check deployed frontend provenance
-        run: python tools/dashboard_deploy_provenance_gate.py
+      - name: Generate sanitized deployed frontend provenance
+        id: gate
+        shell: bash
+        run: |
+          set +e
+          python tools/dashboard_deploy_provenance_gate.py
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate sanitized evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('reports/latest/dashboard_deploy_provenance/summary.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['analyzer_mode'] is True
+          assert data['live_trading_enabled'] is False
+          assert data['order_routes_called'] is False
+          assert data['secrets_persisted'] is False
+          assert data['production_grade_claim_allowed'] is False
+          forbidden = {'token', 'password', 'secret', 'cookie', 'authorization', 'api_key'}
+          assert not (forbidden & {str(k).lower() for k in data})
+          PY
+
+      - name: Publish latest sanitized provenance report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/latest/dashboard_deploy_provenance/summary.json reports/latest/dashboard_deploy_provenance/summary.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "ci(proof): publish dashboard deploy provenance [skip ci]"
+          if git push origin HEAD:main; then
+            exit 0
+          fi
+
+          # Another proof publisher moved main. Regenerate from the newest tree;
+          # never rebase stale generated evidence.
+          git fetch origin main
+          git reset --hard origin/main
+          set +e
+          python tools/dashboard_deploy_provenance_gate.py
+          set -e
+          git add reports/latest/dashboard_deploy_provenance/summary.json reports/latest/dashboard_deploy_provenance/summary.md
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "ci(proof): publish dashboard deploy provenance [skip ci]"
+          git push origin HEAD:main
 
       - name: Upload sanitized provenance evidence
         if: always()
@@ -48,3 +104,9 @@ jobs:
           path: reports/latest/dashboard_deploy_provenance/
           if-no-files-found: error
           retention-days: 14
+
+      - name: Enforce fail-closed provenance gate
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.gate.outputs.rc }}" = "0"
