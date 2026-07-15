@@ -211,15 +211,70 @@ jobs:
                             'production_grade_claim_allowed':d.get('production_grade_claim_allowed')},indent=2))
           PY
 
-      - name: Commit visible issue report with conflict retry
+      - name: Publish current visible evidence without rebasing stale reports
         if: always()
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f reports/latest/dashboard_visible_issue_tracker/
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "ci(proof): publish dashboard visible issue tracker [skip ci]"
-          git push || (git pull --rebase origin main && git push)
+
+          validate_report() {
+            python - <<'PY'
+          import json, os
+          p='reports/latest/dashboard_visible_issue_tracker/summary.json'
+          d=json.load(open(p,encoding='utf-8'))
+          expected=int(os.environ.get('EXPECTED_DASHBOARD_TAB_COUNT','16'))
+          assert d.get('analyzer_safety',{}).get('analyze_mode') is True
+          assert d.get('analyzer_safety',{}).get('live_trading_enabled') is False
+          assert d.get('analyzer_safety',{}).get('system3_live_trading_allowed') is False
+          assert bool(d.get('production_grade_claim_allowed')) == (d.get('status') == 'PASS' and len(d.get('tabs') or []) == expected)
+          forbidden=('password','secret','token','cookie','authorization','api_key','response_body')
+          def walk(v):
+            hits=[]
+            if isinstance(v,dict):
+              for k,x in v.items():
+                if any(s in str(k).lower() for s in forbidden): hits.append(str(k))
+                hits.extend(walk(x))
+            elif isinstance(v,list):
+              for x in v: hits.extend(walk(x))
+            return hits
+          if walk(d): raise SystemExit('sensitive field detected in visual proof')
+          PY
+          }
+
+          commit_report() {
+            git add -f reports/latest/dashboard_visible_issue_tracker/
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "ci(proof): publish dashboard visible issue tracker [skip ci]"
+          }
+
+          validate_report
+          if ! commit_report; then
+            rc=$?
+            if [[ "$rc" -eq 2 ]]; then exit 0; fi
+            exit "$rc"
+          fi
+          if git push origin "HEAD:${GITHUB_REF_NAME}"; then exit 0; fi
+
+          # Another proof publisher moved main. Discard the stale generated report,
+          # rerun the read-only tracker on the newest tree, validate, then publish.
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+          rm -rf reports/latest/dashboard_visible_issue_tracker
+          mkdir -p reports/latest/dashboard_visible_issue_tracker
+          node tools/dashboard_visible_issue_tracker.mjs || true
+          if [[ ! -s reports/latest/dashboard_visible_issue_tracker/summary.json ]]; then
+            echo 'regenerated visual tracker report missing after concurrent publish' >&2
+            exit 1
+          fi
+          validate_report
+          if ! commit_report; then
+            rc=$?
+            if [[ "$rc" -eq 2 ]]; then exit 0; fi
+            exit "$rc"
+          fi
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Enforce no visible UI blockers
         run: |
