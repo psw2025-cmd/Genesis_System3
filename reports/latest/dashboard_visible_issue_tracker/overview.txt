@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-16:14:13 IST
+16:20:14 IST
 NIFTY
 24,078
 BNFTY
@@ -99,7 +99,7 @@ LOADED
 Option Chain
 Market closed — showing last verified Dhan option-chain snapshot, not live ticks.
 Gate Matrix
-2/7 PASS
+3/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
 0/5 days · ρ=None · need ≥0.7
@@ -109,9 +109,9 @@ expectancy=-196.14 · win_rate=0.3333
 PEND
 Paper Lifecycle
 market-session proof pending
-PEND
+PASS
 Tick / Data Freshness
-tick_age=1.08s refresh=5s
+tick_age=5.0s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
