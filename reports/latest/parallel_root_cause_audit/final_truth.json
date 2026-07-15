@@ -1,14 +1,13 @@
 {
-  "blocker_count": 2,
+  "blocker_count": 1,
   "blockers": [
-    "Final public truth is FAIL.",
     "Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof."
   ],
   "description": "Final truth aggregation and stale verdict risk",
   "findings": [
     "Final public truth exists but must be checked for freshness."
   ],
-  "generated_utc": "2026-07-15T01:42:13.472411+00:00",
+  "generated_utc": "2026-07-15T08:25:16.292965+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [

@@ -1,16 +1,14 @@
 {
-  "blocker_count": 2,
+  "blocker_count": 1,
   "blockers": [
-    "Public truth final verdict is FAIL.",
     "Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness."
   ],
   "description": "Render deploy/public truth freshness",
   "findings": [
     "Public truth index exists.",
-    "Public truth commit: 9519d8920b6a7ef1ab1a314f3be828f813773946",
-    "Dashboard live UI proof summary was present and PASS in stale public truth."
+    "Public truth commit: 3559642ea760b44957cb2445b4ca1a463eb80a83"
   ],
-  "generated_utc": "2026-07-15T01:42:13.388302+00:00",
+  "generated_utc": "2026-07-15T08:25:16.289528+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [
