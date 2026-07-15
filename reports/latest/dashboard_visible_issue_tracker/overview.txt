@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-09:54:54 IST
+10:59:49 IST
 NIFTY
 --
 BNFTY
@@ -113,7 +113,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=5.27s refresh=5s
+tick_age=0.53s refresh=5s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD

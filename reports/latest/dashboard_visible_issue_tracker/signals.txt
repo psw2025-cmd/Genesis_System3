@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-09:55:25 IST
+11:00:25 IST
 NIFTY
 --
 BNFTY
@@ -52,4 +52,14 @@ Alerts
 System
 Live Gate
 LOCK
-Loading signals...
+Signals & Recommendations
+❌
+Error Loading Data
+Endpoint: /api/state
+HTTP Status: 502
+Error: Request failed with status code 502
+Retry
+INFO
+Signal data unavailable
+
+Backend did not return signal/state data. Check API health and deployment.

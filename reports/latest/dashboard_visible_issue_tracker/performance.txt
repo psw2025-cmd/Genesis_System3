@@ -2,7 +2,7 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-09:55:46 IST
+11:00:53 IST
 NIFTY
 --
 BNFTY
@@ -53,6 +53,8 @@ System
 Live Gate
 LOCK
 Performance
-last checked 09:55:42 IST
+last checked 11:00:47 IST
 
-Failed to load performance data: 502
+No performance data yet — paper engine has not closed any trades.
+
+API status: /api/pnl responded OK, 0 trades · checked 11:00:47 IST
