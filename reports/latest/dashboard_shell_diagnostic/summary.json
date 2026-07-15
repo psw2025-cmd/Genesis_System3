@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T13:01:29.574Z",
+  "generated_at": "2026-07-15T13:35:21.025Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "analyzer_mode": true,
@@ -51,6 +51,7 @@
     "console.error"
   ],
   "page_error_types": [],
-  "blocker": "RENDER_UI_UNAVAILABLE_AFTER_RETRIES",
-  "production_grade_claim_allowed": false
+  "blocker": "RENDER_SERVICE_SUSPENDED",
+  "production_grade_claim_allowed": false,
+  "render_service_suspended": true
 }

@@ -1,9 +1,10 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-15T13:01:29.574Z
+Generated: 2026-07-15T13:35:21.025Z
 Status: **BLOCKED**
-Blocker: **RENDER_UI_UNAVAILABLE_AFTER_RETRIES**
+Blocker: **RENDER_SERVICE_SUSPENDED**
 Render UI available: `false`
+Render service suspended: `true`
 Availability attempts: `1:503, 2:503, 3:503`
 Recovered after transient failure: `false`
 Auth OK: `false` (HTTP 0)
