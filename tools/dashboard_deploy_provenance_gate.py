@@ -19,20 +19,34 @@ ROOT = Path(__file__).resolve().parents[1]
 SIDEBAR = ROOT / "dashboard/frontend/src/components/Sidebar.tsx"
 OUT = ROOT / "reports/latest/dashboard_deploy_provenance"
 BASE = os.environ.get("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
-URL = f"{BASE}/ui/deploy-provenance.json"
+URL = f"{BASE}/ui/assets/deploy-provenance.json"
 
 
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     local_sha = hashlib.sha256(SIDEBAR.read_bytes()).hexdigest()
     http_status = 0
+    content_type = ""
     remote: dict = {}
     error_type = ""
     try:
-        request = urllib.request.Request(URL, headers={"Cache-Control": "no-cache", "User-Agent": "system3-analyzer-proof/1"})
+        request = urllib.request.Request(
+            URL,
+            headers={
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+                "Accept": "application/json",
+                "User-Agent": "system3-analyzer-proof/2",
+            },
+        )
         with urllib.request.urlopen(request, timeout=20) as response:
             http_status = int(response.status)
-            remote = json.loads(response.read(4096).decode("utf-8"))
+            content_type = str(response.headers.get("Content-Type") or "").lower()
+            body = response.read(4096)
+            if "json" not in content_type:
+                error_type = "NON_JSON_STATIC_RESPONSE"
+            else:
+                remote = json.loads(body.decode("utf-8"))
     except urllib.error.HTTPError as exc:
         http_status = int(exc.code)
         error_type = "HTTP_ERROR"
@@ -44,6 +58,7 @@ def main() -> int:
     remote_sha = str(remote.get("sidebar_sha256") or "")
     safe_manifest = (
         http_status == 200
+        and "json" in content_type
         and remote.get("schema") == 1
         and remote.get("sim_live_required") is True
         and remote.get("live_trading_enabled") is False
@@ -54,13 +69,15 @@ def main() -> int:
     blocker = "" if matched else (
         "DEPLOY_PROVENANCE_NOT_PUBLISHED" if http_status == 404 else
         "DEPLOYED_FRONTEND_SOURCE_MISMATCH" if safe_manifest else
-        "DEPLOY_PROVENANCE_UNAVAILABLE_OR_INVALID"
+        "DEPLOY_PROVENANCE_STATIC_ASSET_INVALID"
     )
     data = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "base": BASE,
+        "manifest_path": "/ui/assets/deploy-provenance.json",
         "status": status,
         "http_status": http_status,
+        "content_type": content_type,
         "error_type": error_type,
         "local_sidebar_sha256": local_sha,
         "deployed_sidebar_sha256": remote_sha,
@@ -78,7 +95,9 @@ def main() -> int:
         "# Dashboard Deploy Provenance\n\n"
         f"Generated: {data['generated_at']}\n\n"
         f"Status: **{status}**\n\n"
+        f"- Manifest path: `{data['manifest_path']}`\n"
         f"- HTTP: `{http_status}`\n"
+        f"- Content type: `{content_type or 'unknown'}`\n"
         f"- Source fingerprint match: `{matched}`\n"
         f"- Blocker: `{blocker or 'none'}`\n"
         "- Analyzer mode: `ON`\n- Live trading: `OFF`\n",
