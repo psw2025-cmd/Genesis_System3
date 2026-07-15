@@ -1,0 +1,50 @@
+name: Dashboard Deploy Provenance Gate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/backend/Dockerfile'
+      - 'dashboard/frontend/src/components/Sidebar.tsx'
+      - 'tools/dashboard_deploy_provenance_gate.py'
+      - '.github/workflows/dashboard-deploy-provenance-gate.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-deploy-provenance-gate
+  cancel-in-progress: true
+
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      ANALYZE_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify analyzer-only safety flags
+        run: |
+          test "$ANALYZE_MODE" = "1"
+          test "$LIVE_TRADING_ENABLED" = "0"
+          test "$SYSTEM3_LIVE_TRADING_ALLOWED" = "0"
+
+      - name: Check deployed frontend provenance
+        run: python tools/dashboard_deploy_provenance_gate.py
+
+      - name: Upload sanitized provenance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-deploy-provenance
+          path: reports/latest/dashboard_deploy_provenance/
+          if-no-files-found: error
+          retention-days: 14
