@@ -8,7 +8,6 @@ No chat screenshot dependency. No secret printing. No live orders.
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
@@ -25,7 +24,7 @@ def read_json(rel: str) -> Dict[str, Any]:
     try:
         return json.loads(p.read_text(encoding="utf-8", errors="replace"))
     except Exception as exc:
-        return {"_error": str(exc)}
+        return {"_error": type(exc).__name__}
 
 
 def read_text(rel: str) -> str:
@@ -35,23 +34,78 @@ def read_text(rel: str) -> str:
     return p.read_text(encoding="utf-8", errors="replace")
 
 
+def compact_blocker(value: Any) -> str:
+    """Return useful, sanitized blocker text without copying entire payloads."""
+    if not isinstance(value, dict):
+        return str(value)[:300]
+
+    workflow = value.get("workflow")
+    if workflow:
+        conclusion = value.get("conclusion") or value.get("status") or "unknown"
+        run_id = value.get("run_id")
+        suffix = f" run={run_id}" if run_id is not None else ""
+        return f"workflow={workflow} conclusion={conclusion}{suffix}"[:300]
+
+    endpoint = value.get("endpoint")
+    if endpoint:
+        reason = value.get("reason") or value.get("error_type") or "failed"
+        status_code = value.get("status_code")
+        suffix = f" status={status_code}" if status_code is not None else ""
+        return f"endpoint={endpoint} reason={reason}{suffix}"[:300]
+
+    safe_keys = (
+        "gate",
+        "name",
+        "status",
+        "reason",
+        "error_type",
+        "blocker",
+        "conclusion",
+    )
+    safe = {key: value.get(key) for key in safe_keys if value.get(key) is not None}
+    if safe:
+        return json.dumps(safe, ensure_ascii=False, sort_keys=True)[:300]
+    return "structured blocker evidence present"
+
+
 def report_status(name: str, data: Dict[str, Any], missing_blocker: str) -> Dict[str, Any]:
     if not data:
-        return {"name": name, "status": "MISSING", "blockers": [missing_blocker]}
+        return {
+            "name": name,
+            "status": "MISSING",
+            "blockers": [missing_blocker],
+            "raw_blocker_count": 1,
+        }
+
     status = str(data.get("status") or data.get("final_verdict") or data.get("verdict") or "UNKNOWN")
-    blockers: List[str] = []
+    raw_blockers: List[str] = []
     for key in ("blockers", "todo", "visible_issues", "render_failures", "failed_workflows"):
         val = data.get(key)
         if isinstance(val, list):
-            for x in val[:200]:
-                if isinstance(x, dict):
-                    blockers.append(json.dumps(x, ensure_ascii=False)[:300])
-                else:
-                    blockers.append(str(x)[:300])
-    for count_key in ("failed_count", "visible_issue_count", "screenshot_missing_count", "ui_exception_count", "github_failed_count", "render_failed_count", "todo_count"):
+            raw_blockers.extend(compact_blocker(item) for item in val)
+
+    for count_key in (
+        "failed_count",
+        "visible_issue_count",
+        "screenshot_missing_count",
+        "ui_exception_count",
+        "github_failed_count",
+        "github_pending_count",
+        "render_failed_count",
+        "todo_count",
+    ):
         if data.get(count_key):
-            blockers.append(f"{count_key}={data.get(count_key)}")
-    return {"name": name, "status": status, "blockers": blockers}
+            raw_blockers.append(f"{count_key}={data.get(count_key)}")
+
+    # Preserve order while removing duplicate summaries. This prevents repeated
+    # historical/run-level payloads from inflating the current proof-board count.
+    blockers = list(dict.fromkeys(raw_blockers))
+    return {
+        "name": name,
+        "status": status,
+        "blockers": blockers[:100],
+        "raw_blocker_count": len(raw_blockers),
+    }
 
 
 def main() -> int:
@@ -80,12 +134,23 @@ def main() -> int:
     gate_rows = []
     pass_statuses = {"PASS", "DONE", "OK"}
     soft_statuses = {"PARTIAL", "WARN"}
-    for s in sources:
-        raw = str(s["status"]).upper()
+    for source in sources:
+        raw = str(source["status"]).upper()
         gate_status = "PASS" if raw in pass_statuses else "PARTIAL" if raw in soft_statuses else "BLOCKED"
         if gate_status != "PASS":
-            blockers.extend([f"{s['name']}: {b}" for b in (s.get("blockers") or [f"status={s['status']}"])])
-        gate_rows.append({"gate": s["name"], "raw_status": s["status"], "gate_status": gate_status, "blocker_count": len(s.get("blockers") or [])})
+            blockers.extend(
+                f"{source['name']}: {blocker}"
+                for blocker in (source.get("blockers") or [f"status={source['status']}"])
+            )
+        gate_rows.append(
+            {
+                "gate": source["name"],
+                "raw_status": source["status"],
+                "gate_status": gate_status,
+                "blocker_count": len(source.get("blockers") or []),
+                "raw_blocker_count": source.get("raw_blocker_count", 0),
+            }
+        )
 
     core_gates = {
         "render_visual": any(x["gate"] == "dashboard_visible_issue_tracker" and x["gate_status"] == "PASS" for x in gate_rows),
@@ -96,10 +161,11 @@ def main() -> int:
         "todo_zero": any(x["gate"] == "todo_status_update" and x["gate_status"] == "PASS" for x in gate_rows),
         "public_truth_pass": any(x["gate"] == "system3_public_truth" and x["gate_status"] == "PASS" for x in gate_rows),
     }
-    for k, v in core_gates.items():
-        if not v:
-            blockers.append(f"core_gate_blocked:{k}")
+    for key, passed in core_gates.items():
+        if not passed:
+            blockers.append(f"core_gate_blocked:{key}")
 
+    blockers = list(dict.fromkeys(blockers))
     final_status = "PASS" if not blockers and all(core_gates.values()) else "BLOCKED"
     payload = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
@@ -148,13 +214,22 @@ def main() -> int:
         "| Gate | Status |",
         "|---|---:|",
     ]
-    for k, v in core_gates.items():
-        lines.append(f"| {k} | {'PASS' if v else 'BLOCKED'} |")
-    lines += ["", "## Source reports", "", "| Report | Raw status | Gate status | Blockers |", "|---|---|---|---:|"]
-    for r in gate_rows:
-        lines.append(f"| {r['gate']} | {r['raw_status']} | {r['gate_status']} | {r['blocker_count']} |")
+    for key, passed in core_gates.items():
+        lines.append(f"| {key} | {'PASS' if passed else 'BLOCKED'} |")
+    lines += [
+        "",
+        "## Source reports",
+        "",
+        "| Report | Raw status | Gate status | Current blockers | Raw entries |",
+        "|---|---|---|---:|---:|",
+    ]
+    for row in gate_rows:
+        lines.append(
+            f"| {row['gate']} | {row['raw_status']} | {row['gate_status']} | "
+            f"{row['blocker_count']} | {row['raw_blocker_count']} |"
+        )
     lines += ["", "## Blockers", ""]
-    lines += [f"- [ ] {b}" for b in payload["blockers"]] or ["- [x] None"]
+    lines += [f"- [ ] {blocker}" for blocker in payload["blockers"]] or ["- [x] None"]
 
     md = "\n".join(lines) + "\n"
     (OUT / "summary.md").write_text(md, encoding="utf-8")
