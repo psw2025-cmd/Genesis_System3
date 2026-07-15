@@ -2,15 +2,15 @@ SYSTEM3
 AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
-15:24:04 IST
+15:37:27 IST
 NIFTY
---
+24,078
 BNFTY
---
+57,747
 FINNIFTY
---
-MARKET OPEN
-DHAN API ERR
+26,657
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -58,34 +58,34 @@ One official UI for broker status, prediction quality, gain ranking, risk gates,
 Refresh
 Voice Alert
 OPERATING MODE
-MARKET_OPEN_OPERATOR
+OFF_MARKET_RESEARCH_AND_VALIDATION
 BROKER
-disconnected
+connected
 TRUTH SCORE
 75%
 MEMORY EVENTS
 3
 LIVE TRADING
 BLOCKED
-MARKET OPEN: TRADER MUST SEE
+OFF-MARKET: TRADER MUST SEE
 ✓
-broker connected/read-only latency
+last scanner snapshot and staleness
 ✓
-live option chain contracts by symbol
+prediction-vs-actual accuracy trend
 ✓
-PCR, max pain, IV, OI buildup
+Spearman rho and top-N hit rate
 ✓
-top gain-ranked symbols
+loss learning notes
 ✓
-prediction BUY/SELL/HOLD confidence
+strategy research queue
 ✓
-spread/liquidity risk
+backtest/walk-forward status
 ✓
-open positions and P&L
+broker token health
 ✓
-kill switch and daily-loss gate
+next market open checklist
 ✓
-data truth score from at least two sources
+deployment and self-heal status
 PREDICTION ACCURACY & GAIN RANK REQUIREMENTS
 ACCURACY GOAL
 90%
