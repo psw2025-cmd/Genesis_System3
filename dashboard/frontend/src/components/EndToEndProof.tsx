@@ -10,6 +10,8 @@ type Probe = {
 
 const CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
 const PROBE_TIMEOUT_MS = 3500
+const PROBE_CONCURRENCY = 3
+const RATE_LIMIT_RETRY_MS = 1200
 
 const CORE_ENDPOINTS = [
   '/api/health',
@@ -79,7 +81,11 @@ function isLiveTradingBlocked(stateJson: any, brokerJson: any) {
   return !(raw === true || String(raw) === '1')
 }
 
-async function probeReadOnlyEndpoint(endpoint: string): Promise<Probe> {
+function wait(ms: number) {
+  return new Promise(resolve => window.setTimeout(resolve, ms))
+}
+
+async function probeReadOnlyEndpoint(endpoint: string, allowRateLimitRetry = true): Promise<Probe> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
   try {
@@ -91,6 +97,16 @@ async function probeReadOnlyEndpoint(endpoint: string): Promise<Probe> {
     const text = await response.text()
     let json: any = null
     try { json = JSON.parse(text) } catch { json = { parse_error: true } }
+
+    if (response.status === 429 && allowRateLimitRetry) {
+      const retryAfterSeconds = Number(response.headers.get('retry-after') || 0)
+      const retryDelay = retryAfterSeconds > 0
+        ? Math.min(retryAfterSeconds * 1000, 3000)
+        : RATE_LIMIT_RETRY_MS
+      await wait(retryDelay)
+      return probeReadOnlyEndpoint(endpoint, false)
+    }
+
     return { endpoint, ok: response.ok, status: response.status, json }
   } catch (err: any) {
     const timedOut = err?.name === 'AbortError'
@@ -105,6 +121,24 @@ async function probeReadOnlyEndpoint(endpoint: string): Promise<Probe> {
   }
 }
 
+async function probeWithBoundedConcurrency(endpoints: string[]): Promise<Probe[]> {
+  const results = new Array<Probe>(endpoints.length)
+  let nextIndex = 0
+
+  async function worker() {
+    while (true) {
+      const index = nextIndex
+      nextIndex += 1
+      if (index >= endpoints.length) return
+      results[index] = await probeReadOnlyEndpoint(endpoints[index])
+    }
+  }
+
+  const workerCount = Math.min(PROBE_CONCURRENCY, endpoints.length)
+  await Promise.all(Array.from({ length: workerCount }, () => worker()))
+  return results
+}
+
 export function EndToEndProof() {
   const [probes, setProbes] = useState<Probe[]>([])
   const [loading, setLoading] = useState(true)
@@ -113,7 +147,7 @@ export function EndToEndProof() {
   async function runProof() {
     setLoading(true)
     const endpoints = [...CORE_ENDPOINTS, ...CHAIN_SYMBOLS.map(s => `/api/chain/${s}`)]
-    const results = await Promise.all(endpoints.map(probeReadOnlyEndpoint))
+    const results = await probeWithBoundedConcurrency(endpoints)
     setProbes(results)
     setLastRun(new Date().toLocaleString())
     setLoading(false)
