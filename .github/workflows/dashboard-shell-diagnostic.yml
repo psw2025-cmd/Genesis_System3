@@ -48,8 +48,44 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          normalize_render_state() {
+            python - <<'PY'
+          import json
+          from pathlib import Path
+
+          json_path = Path('reports/latest/dashboard_shell_diagnostic/summary.json')
+          md_path = Path('reports/latest/dashboard_shell_diagnostic/summary.md')
+          data = json.loads(json_path.read_text(encoding='utf-8'))
+          title = str(data.get('page_title') or '').strip()
+          suspended = title.casefold() == 'service suspended'
+          data['render_service_suspended'] = suspended
+          if suspended:
+              data['status'] = 'BLOCKED'
+              data['blocker'] = 'RENDER_SERVICE_SUSPENDED'
+              data['production_grade_claim_allowed'] = False
+          json_path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+
+          if md_path.exists():
+              text = md_path.read_text(encoding='utf-8')
+              if suspended:
+                  lines = text.splitlines()
+                  lines = [
+                      'Blocker: **RENDER_SERVICE_SUSPENDED**' if line.startswith('Blocker: **') else line
+                      for line in lines
+                  ]
+                  marker = f"Render service suspended: `{str(suspended).lower()}`"
+                  if not any(line.startswith('Render service suspended:') for line in lines):
+                      insert_at = next((i + 1 for i, line in enumerate(lines) if line.startswith('Render UI available:')), 0)
+                      lines.insert(insert_at, marker)
+                  text = '\n'.join(lines) + '\n'
+              md_path.write_text(text, encoding='utf-8')
+          PY
+          }
+
           for attempt in 1 2 3; do
             node tools/dashboard_shell_diagnostic.mjs
+            normalize_render_state
             result="$(python - <<'PY'
           import json
           from pathlib import Path
@@ -92,6 +128,40 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          normalize_render_state() {
+            python - <<'PY'
+          import json
+          from pathlib import Path
+
+          json_path = Path('reports/latest/dashboard_shell_diagnostic/summary.json')
+          md_path = Path('reports/latest/dashboard_shell_diagnostic/summary.md')
+          data = json.loads(json_path.read_text(encoding='utf-8'))
+          title = str(data.get('page_title') or '').strip()
+          suspended = title.casefold() == 'service suspended'
+          data['render_service_suspended'] = suspended
+          if suspended:
+              data['status'] = 'BLOCKED'
+              data['blocker'] = 'RENDER_SERVICE_SUSPENDED'
+              data['production_grade_claim_allowed'] = False
+          json_path.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+
+          if md_path.exists():
+              text = md_path.read_text(encoding='utf-8')
+              if suspended:
+                  lines = text.splitlines()
+                  lines = [
+                      'Blocker: **RENDER_SERVICE_SUSPENDED**' if line.startswith('Blocker: **') else line
+                      for line in lines
+                  ]
+                  marker = f"Render service suspended: `{str(suspended).lower()}`"
+                  if not any(line.startswith('Render service suspended:') for line in lines):
+                      insert_at = next((i + 1 for i, line in enumerate(lines) if line.startswith('Render UI available:')), 0)
+                      lines.insert(insert_at, marker)
+                  text = '\n'.join(lines) + '\n'
+              md_path.write_text(text, encoding='utf-8')
+          PY
+          }
+
           validate_report() {
             python - <<'PY'
           import json
@@ -132,6 +202,7 @@ jobs:
           git fetch origin "${GITHUB_REF_NAME}"
           git reset --hard "origin/${GITHUB_REF_NAME}"
           node tools/dashboard_shell_diagnostic.mjs
+          normalize_render_state
           validate_report
           if ! commit_report; then
             rc=$?
