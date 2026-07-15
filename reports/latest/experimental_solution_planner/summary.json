@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-15T02:09:51.805647+00:00",
-  "issue_count": 531,
+  "generated_utc": "2026-07-15T03:04:09.913795+00:00",
+  "issue_count": 461,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 304,
+      "issue_count": 250,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,77 +64,77 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29382218286 conclusion=failure commit=9f30cf6b8050",
+          "issue": "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=29384061148 conclusion=failure commit=af2c809fc57c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382218258 conclusion=failure commit=9f30cf6b8050",
+          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29384061100 conclusion=failure commit=af2c809fc57c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29382214811 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=29384061145 conclusion=failure commit=af2c809fc57c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29382214743 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=29384060705 conclusion=failure commit=af2c809fc57c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29382214701 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29383293610 conclusion=failure commit=7285ab99b389",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382214700 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29383336666 conclusion=failure commit=26a7f98be94b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29382212768 conclusion=cancelled commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29383416129 conclusion=failure commit=8106421eb1d2",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382212760 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29383352029 conclusion=failure commit=9a22795f433d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29382212519 conclusion=cancelled commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29383351994 conclusion=failure commit=9a22795f433d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382212510 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29383336670 conclusion=failure commit=26a7f98be94b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Safe Repair Runner' run=29382212507 conclusion=cancelled commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29383336638 conclusion=failure commit=26a7f98be94b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29382208434 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29383112545 conclusion=failure commit=bc31097245ee",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382208433 conclusion=failure commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29382809318 conclusion=failure commit=3753a9bbaad1",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29382208352 conclusion=cancelled commit=a15adeeec524",
+          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=29383018960 conclusion=failure commit=bc31097245ee",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29382187118 conclusion=failure commit=ad2704fa44d4",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29382762326 conclusion=failure commit=3753a9bbaad1",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -277,143 +277,7 @@
       ]
     },
     {
-      "issue_count": 43,
-      "lane": "RENDER_DEPLOY",
-      "recommended_fixes": [
-        "Verify /api/deploy/info exposes latest commit.",
-        "Force Render redeploy if commit mismatch or missing.",
-        "Run live dashboard screenshot proof after deploy."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_001:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_001:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_002:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_010:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_021:render_health: Render health failed /: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_021:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_022:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_030:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_041:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_041:render_health: Render health failed /api/health: status=0 error=TimeoutError: The read operation timed out",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_042:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_050:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_061:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_062:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_070:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_081:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_082:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/deploy/info: status=502",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_090:public_truth: Public truth final verdict is FAIL.",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": \"TimeoutError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
-          "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 41,
+      "issue_count": 35,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -545,6 +409,142 @@
           "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
           "lane": "BROKER_DHAN",
           "report": "reports/latest/render_100_agent_swarm/summary.json"
+        }
+      ]
+    },
+    {
+      "issue_count": 33,
+      "lane": "RENDER_DEPLOY",
+      "recommended_fixes": [
+        "Verify /api/deploy/info exposes latest commit.",
+        "Force Render redeploy if commit mismatch or missing.",
+        "Run live dashboard screenshot proof after deploy."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_001:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_001:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_002:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_010:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_021:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_022:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_030:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /ui/: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_041:render_health: Render health failed /api/health: status=0 error=TimeoutError: The read operation timed out",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_042:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_050:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_061:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_062:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_070:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /ui/: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQK",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_081:render_health: Render health failed /api/health: status=502 error=<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_082:deploy_freshness: Deploy info endpoint missing/failing; cannot prove Render deployed latest commit.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/deploy/info: status=502",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_090:public_truth: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "github_render_failure_tracker: {\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/deploy/info\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/api/deploy/info\"}",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "parallel_root_cause_audit: Public truth final verdict is FAIL.",
+          "lane": "RENDER_DEPLOY",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         }
       ]
     },
@@ -869,7 +869,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=50",
+          "issue": "todo_count=15",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
