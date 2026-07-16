@@ -6,9 +6,9 @@
   "dashboard_api_key_present": true,
   "rate_limit": {
     "available": true,
-    "core_remaining": 4969,
+    "core_remaining": 4981,
     "core_limit": 5000,
-    "core_reset": 1784204237,
+    "core_reset": 1784208057,
     "actions_runner_registration_remaining": 10000
   },
   "live_trading_enabled": "0",
