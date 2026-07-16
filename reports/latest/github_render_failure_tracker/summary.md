@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-07-16T17:30:36.027532Z`
+Generated UTC: `2026-07-16T18:25:34.228714Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `https://genesis-system3-backend.onrender.com`
-GitHub workflows whose newest observed run failed: `14`
-GitHub workflows currently queued/in progress: `4`
+GitHub workflows whose newest observed run failed: `13`
+GitHub workflows currently queued/in progress: `3`
 Render failed endpoints: `12`
-TODO count: `26`
+TODO count: `25`
 
 ## Rule
 
@@ -16,20 +16,19 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 ## TODO
 
-- [ ] Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29518909967 conclusion=failure commit=ed70cf20abff
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29518878023 conclusion=failure commit=ed70cf20abff
-- [ ] Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29519089158 conclusion=failure commit=faa5538b3fae
-- [ ] Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29519124544 conclusion=failure commit=c9f276c0b7e8
-- [ ] Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29519175290 conclusion=failure commit=63da42f8b14c
-- [ ] Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29519120742 conclusion=failure commit=620923889d2f
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29519090429 conclusion=failure commit=faa5538b3fae
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29519089605 conclusion=failure commit=faa5538b3fae
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29516850169 conclusion=cancelled commit=cfa6f9012722
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29517095223 conclusion=failure commit=209300a1c52c
-- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=29517018419 conclusion=failure commit=209300a1c52c
-- [ ] Fix latest GitHub workflow 'System3 Render Worker Preflight' run=29516907082 conclusion=failure commit=cfa6f9012722
-- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=29516873416 conclusion=failure commit=cfa6f9012722
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29516339318 conclusion=failure commit=e05184d4248c
+- [ ] Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29523049083 conclusion=failure commit=51bad37e06c2
+- [ ] Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29522964512 conclusion=failure commit=1a68af0e6c37
+- [ ] Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29523148238 conclusion=failure commit=f20f527cd5b9
+- [ ] Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29523176665 conclusion=failure commit=58ba8096d150
+- [ ] Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29523219779 conclusion=failure commit=baa7a0e53dd4
+- [ ] Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29523175972 conclusion=failure commit=58ba8096d150
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29523174573 conclusion=failure commit=58ba8096d150
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29523148320 conclusion=failure commit=f20f527cd5b9
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29520907333 conclusion=cancelled commit=5ff8db34e2bf
+- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29522328880 conclusion=failure commit=a476c0f84283
+- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29521165583 conclusion=failure commit=743e4df734ff
+- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=29521073629 conclusion=failure commit=743e4df734ff
+- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=29520950822 conclusion=failure commit=4cfda1d001ec
 - [ ] Fix Render endpoint /: HTTP status 502 status=502
 - [ ] Fix Render endpoint /ui/: HTTP status 502 status=502
 - [ ] Fix Render endpoint /api/health: HTTP status 502 status=502
@@ -47,29 +46,27 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| System3 Windows Self-Hosted Full Proof | 29518909967 | failure | `ed70cf20abff` | 2026-07-16T17:19:47Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29518909967 |
-| Dashboard Visible Settle Proof | 29518878023 | failure | `ed70cf20abff` | 2026-07-16T17:19:46Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29518878023 |
-| Dashboard Shell Diagnostic | 29519089158 | failure | `faa5538b3fae` | 2026-07-16T17:19:39Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519089158 |
-| System3 Autopilot Proof Board | 29519124544 | failure | `c9f276c0b7e8` | 2026-07-16T17:17:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519124544 |
-| System3 Experimental Solution Planner | 29519175290 | failure | `63da42f8b14c` | 2026-07-16T17:17:50Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519175290 |
-| System3 Secure Install Credential Audit | 29519120742 | failure | `620923889d2f` | 2026-07-16T17:17:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519120742 |
-| Dashboard Visual Loading Postflight | 29519090429 | failure | `faa5538b3fae` | 2026-07-16T17:16:36Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519090429 |
-| Dashboard Visual Proof Strict Gate | 29519089605 | failure | `faa5538b3fae` | 2026-07-16T17:16:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29519089605 |
-| Dashboard Visual Production Proof | 29516850169 | cancelled | `cfa6f9012722` | 2026-07-16T17:14:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29516850169 |
-| Dashboard Visible Proof Warmed | 29517095223 | failure | `209300a1c52c` | 2026-07-16T16:48:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29517095223 |
-| System3 Backend Live Simulation Proof | 29517018419 | failure | `209300a1c52c` | 2026-07-16T16:47:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29517018419 |
-| System3 Render Worker Preflight | 29516907082 | failure | `cfa6f9012722` | 2026-07-16T16:45:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29516907082 |
-| Dashboard Deploy Provenance Gate | 29516873416 | failure | `cfa6f9012722` | 2026-07-16T16:45:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29516873416 |
-| Dashboard Visible Proof Current | 29516339318 | failure | `e05184d4248c` | 2026-07-16T16:43:33Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29516339318 |
+| System3 Windows Self-Hosted Full Proof | 29523049083 | failure | `51bad37e06c2` | 2026-07-16T18:21:06Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523049083 |
+| Dashboard Visible Settle Proof | 29522964512 | failure | `1a68af0e6c37` | 2026-07-16T18:18:14Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29522964512 |
+| Dashboard Shell Diagnostic | 29523148238 | failure | `f20f527cd5b9` | 2026-07-16T18:17:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523148238 |
+| System3 Autopilot Proof Board | 29523176665 | failure | `58ba8096d150` | 2026-07-16T18:16:18Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523176665 |
+| System3 Experimental Solution Planner | 29523219779 | failure | `baa7a0e53dd4` | 2026-07-16T18:15:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523219779 |
+| System3 Secure Install Credential Audit | 29523175972 | failure | `58ba8096d150` | 2026-07-16T18:15:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523175972 |
+| Dashboard Visual Proof Strict Gate | 29523174573 | failure | `58ba8096d150` | 2026-07-16T18:15:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523174573 |
+| Dashboard Visual Loading Postflight | 29523148320 | failure | `f20f527cd5b9` | 2026-07-16T18:14:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29523148320 |
+| Dashboard Visual Production Proof | 29520907333 | cancelled | `5ff8db34e2bf` | 2026-07-16T18:13:15Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29520907333 |
+| Dashboard Visible Proof Current | 29522328880 | failure | `a476c0f84283` | 2026-07-16T18:09:26Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29522328880 |
+| Dashboard Visible Proof Warmed | 29521165583 | failure | `743e4df734ff` | 2026-07-16T17:47:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29521165583 |
+| System3 Backend Live Simulation Proof | 29521073629 | failure | `743e4df734ff` | 2026-07-16T17:45:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29521073629 |
+| Dashboard Deploy Provenance Gate | 29520950822 | failure | `4cfda1d001ec` | 2026-07-16T17:44:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29520950822 |
 
 ## Pending workflow runs
 
 | Workflow | Run | Status | Updated |
 |---|---:|---|---|
-| System3 Workflow Failure Tracker | 29520053856 | queued | 2026-07-16T17:30:34Z |
-| System3 Safe Repair Runner | 29519838622 | in_progress | 2026-07-16T17:27:31Z |
-| Dashboard Visible Issue Tracker | 29519095016 | in_progress | 2026-07-16T17:19:31Z |
-| Dashboard Visible Auth-Resilient Proof | 29519228498 | in_progress | 2026-07-16T17:18:30Z |
+| Dashboard Visible Issue Tracker | 29523159806 | in_progress | 2026-07-16T18:21:53Z |
+| System3 Safe Repair Runner | 29523548222 | in_progress | 2026-07-16T18:21:17Z |
+| Dashboard Visible Auth-Resilient Proof | 29522922603 | in_progress | 2026-07-16T18:11:29Z |
 
 ## Render endpoint failures
 
