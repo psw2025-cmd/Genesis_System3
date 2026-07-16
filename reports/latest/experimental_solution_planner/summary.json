@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-16T04:07:26.431168+00:00",
+  "generated_utc": "2026-07-16T04:33:22.883625+00:00",
   "issue_count": 477,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 255,
+      "issue_count": 254,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -670,6 +670,87 @@
       ]
     },
     {
+      "issue_count": 14,
+      "lane": "INSTALL_CREDENTIAL",
+      "recommended_fixes": [
+        "Fix dependency/import/compile errors from secure audit.",
+        "Verify credentials via redacted secure env checks only.",
+        "Never print or commit credential values."
+      ],
+      "top_issues": [
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406582513 conclusion=failure commit=4b15dce458fb74a03bb104836f1ef21fa8dd3216",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406552188 conclusion=failure commit=39ae0190e86b0de4e6c6e0771626bbc5ef852861",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406510719 conclusion=failure commit=39785331ea0db8906c01e184ed64bb9bfce56338",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29470559454 conclusion=failure commit=ce0546da2d717161af0165a0df04f56c92903a14",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29470543644 conclusion=failure commit=a12de1ffb04f87dbe4712b90ba8c132668901a84",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29470037357 conclusion=failure commit=8615023044acd9f5430775fca805b6c18246dbb3",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29470025475 conclusion=failure commit=614b7ac75dd89e476c95cf5d60857286d9a75930",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29470022597 conclusion=failure commit=614b7ac75dd89e476c95cf5d60857286d9a75930",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
       "issue_count": 13,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
@@ -816,82 +897,6 @@
           "issue": "blocker_count=12",
           "lane": "UNKNOWN",
           "report": "reports/latest/parallel_root_cause_audit/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 13,
-      "lane": "INSTALL_CREDENTIAL",
-      "recommended_fixes": [
-        "Fix dependency/import/compile errors from secure audit.",
-        "Verify credentials via redacted secure env checks only.",
-        "Never print or commit credential values."
-      ],
-      "top_issues": [
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406582513 conclusion=failure commit=4b15dce458fb74a03bb104836f1ef21fa8dd3216",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406552188 conclusion=failure commit=39ae0190e86b0de4e6c6e0771626bbc5ef852861",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406510719 conclusion=failure commit=39785331ea0db8906c01e184ed64bb9bfce56338",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29469590066 conclusion=failure commit=49e775478023603a3c48a87bb6c13513a171aa65",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29469092625 conclusion=failure commit=790b87a09e9764e75549a16cef247398b457c197",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29469078641 conclusion=failure commit=7b9f166c6b07298a5686fe32c3bdc250f4185be1",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29468611520 conclusion=failure commit=c3ba93034335ec6008f5cf0e158e6bc20ab1d012",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
       ]
     },

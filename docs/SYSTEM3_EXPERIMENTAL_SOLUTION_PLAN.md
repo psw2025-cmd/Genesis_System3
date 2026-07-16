@@ -1,6 +1,6 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-16T04:07:26.431168+00:00`
+Generated UTC: `2026-07-16T04:33:22.883625+00:00`
 Status: **BLOCKED**
 Issues: `477`
 Fix lanes: `13`
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 255 issues
+### GITHUB_RENDER_FAILURE — 254 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -273,6 +273,29 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
+### INSTALL_CREDENTIAL — 14 issues
+
+Recommended fixes:
+- Fix dependency/import/compile errors from secure audit.
+- Verify credentials via redacted secure env checks only.
+- Never print or commit credential values.
+
+Top issues:
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406582513 conclusion=failure commit=4b15dce458fb74a03bb104836f1ef21fa8dd3216
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406552188 conclusion=failure commit=39ae0190e86b0de4e6c6e0771626bbc5ef852861
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406510719 conclusion=failure commit=39785331ea0db8906c01e184ed64bb9bfce56338
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29470559454 conclusion=failure commit=ce0546da2d717161af0165a0df04f56c92903a14
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29470543644 conclusion=failure commit=a12de1ffb04f87dbe4712b90ba8c132668901a84
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29470037357 conclusion=failure commit=8615023044acd9f5430775fca805b6c18246dbb3
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29470025475 conclusion=failure commit=614b7ac75dd89e476c95cf5d60857286d9a75930
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29470022597 conclusion=failure commit=614b7ac75dd89e476c95cf5d60857286d9a75930
+
 ### ML_TRAINING — 13 issues
 
 Recommended fixes:
@@ -314,28 +337,6 @@ Top issues:
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: unsettled_tab_count=16
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=12
-
-### INSTALL_CREDENTIAL — 13 issues
-
-Recommended fixes:
-- Fix dependency/import/compile errors from secure audit.
-- Verify credentials via redacted secure env checks only.
-- Never print or commit credential values.
-
-Top issues:
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406582513 conclusion=failure commit=4b15dce458fb74a03bb104836f1ef21fa8dd3216
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406552188 conclusion=failure commit=39ae0190e86b0de4e6c6e0771626bbc5ef852861
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29406510719 conclusion=failure commit=39785331ea0db8906c01e184ed64bb9bfce56338
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29469590066 conclusion=failure commit=49e775478023603a3c48a87bb6c13513a171aa65
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29469092625 conclusion=failure commit=790b87a09e9764e75549a16cef247398b457c197
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29469078641 conclusion=failure commit=7b9f166c6b07298a5686fe32c3bdc250f4185be1
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29468611520 conclusion=failure commit=c3ba93034335ec6008f5cf0e158e6bc20ab1d012
 
 ### ROUTE_CODE — 9 issues
 
