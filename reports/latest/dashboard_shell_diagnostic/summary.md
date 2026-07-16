@@ -1,25 +1,24 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-16T15:15:31.776Z
+Generated: 2026-07-16T15:37:40.235Z
 Status: **BLOCKED**
-Blocker: **RENDER_SERVICE_SUSPENDED**
+Blocker: **RENDER_UI_UNAVAILABLE_AFTER_RETRIES**
 Render UI available: `false`
-Render service suspended: `true`
-Availability attempts: `1:503, 2:503, 3:503`
+Availability attempts: `1:502, 2:502, 3:502`
 Recovered after transient failure: `false`
 Auth OK: `false` (HTTP 0)
 Post-auth render attempts: `none`
 Recovered after post-auth failure: `false`
-UI HTTP: `503`
+UI HTTP: `502`
 Authenticated dashboard rendered: `false`
 Tab coverage evaluated: `false`
 Root children: `0`
-Body text length: `45`
+Body text length: `210`
 Matched tabs: `0/16`
 Missing source-defined tabs: `not evaluated / none`
 Deployed asset drift: `false`
 Visible buttons: `0`
-Visible links: `0`
+Visible links: `2`
 Console error categories: `console.error`
 Page error categories: `none`
 
