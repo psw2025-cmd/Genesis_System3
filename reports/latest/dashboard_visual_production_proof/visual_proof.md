@@ -12,15 +12,14 @@ Screenshot gate: **False**
 - SHELL_STATUS:BLOCKED
 - TAB_COVERAGE:0/16
 - VISIBLE_TRACKER_STATUS:BLOCKED
-- VISIBLE_TRACKER_BAD_TABS:16
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-16T09:45:08.851Z`
+- `shell_generated_at`: `2026-07-16T10:43:01.321Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-07-16T09:49:26.627Z`
+- `visible_tracker_generated_at`: `2026-07-16T10:47:35.429Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `16`
+- `visible_tracker_bad_tab_count`: `0`
 
 ## Screenshots
 - MISSING `truth.png` size=`0`
