@@ -1,11 +1,11 @@
 # Dashboard Deploy Provenance
 
-Generated: 2026-07-16T14:56:43.010557+00:00
+Generated: 2026-07-16T15:47:58.929443+00:00
 
 Status: **BLOCKED**
 
 - Manifest path: `/ui/assets/deploy-provenance.json`
-- HTTP: `503`
+- HTTP: `502`
 - Attempts: `3`
 - Recovered after transient failure: `False`
 - Content type: `unknown`
