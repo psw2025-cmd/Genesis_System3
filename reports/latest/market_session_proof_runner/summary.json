@@ -1,15 +1,16 @@
 {
   "analyzer_ready": false,
   "autopilot_status": "BLOCKED",
-  "gates_passing": 2,
+  "gates_passing": 1,
   "gates_total": 7,
-  "generated_utc": "2026-07-16T04:54:05.812232+00:00",
+  "generated_utc": "2026-07-16T10:49:05.019169+00:00",
   "live_trading_enabled": false,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
     "SYS3-BLK-004",
     "SYS3-BLK-005",
+    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "order_routes_called": false,
@@ -19,6 +20,7 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "trade_ready": false,
