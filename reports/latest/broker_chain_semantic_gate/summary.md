@@ -1,6 +1,6 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-07-16T05:33:31.536673Z`
+- Generated UTC: `2026-07-16T06:28:32.440421Z`
 - Final verdict: **BLOCKED_NOT_TRADE_READY**
 - Broker connected: `False` (HTTP_503)
 - Funds semantic proof: `False`
