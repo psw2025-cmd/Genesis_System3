@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-16T18:03:34.957Z",
+  "generated_at": "2026-07-16T18:34:15.321Z",
   "base": "https://genesis-system3-backend.onrender.com",
   "status": "BLOCKED",
   "auth": {
@@ -305,12 +305,13 @@
   "global_exception": null,
   "visible_issues": [],
   "info_lines": [],
-  "todo": [],
+  "todo": [
+    "Dashboard auth session failed status=502"
+  ],
   "production_grade_claim_allowed": false,
   "analyzer_safety": {
     "analyze_mode": true,
     "live_trading_enabled": false,
     "system3_live_trading_allowed": false
-  },
-  "settle_normalized_tab_count": 0
+  }
 }
