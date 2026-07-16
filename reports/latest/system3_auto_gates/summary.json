@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-15T10:41:50.171944Z",
+  "generated_utc": "2026-07-16T04:52:40.266554Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -34,12 +34,12 @@
     },
     "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
       "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-      "pass": false,
+      "pass": true,
       "report_exists": true,
-      "full_lifecycle_proven": false,
+      "full_lifecycle_proven": true,
       "broker_connected": true,
       "market_open": false,
-      "blocker_id": "SYS3-BLK-008",
+      "blocker_id": null,
       "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
     },
     "WEBSOCKET_TICK_HEALTH_PROVEN": {
@@ -77,19 +77,18 @@
       "auto_action": "Verify security_id_list.csv OPTSTK universe loads"
     }
   },
-  "gates_passing": 1,
+  "gates_passing": 2,
   "gates_total": 7,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
     "SYS3-BLK-004",
     "SYS3-BLK-005",
-    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "prediction_accuracy_blocked": true,
   "profit_blocked": true,
-  "lifecycle_blocked": true,
+  "lifecycle_blocked": false,
   "human_approval": true,
   "live_trading_enabled": false,
   "trade_ready": false,
@@ -97,13 +96,11 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "recommended_auto_actions": [
     "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
     "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
-    "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
     "REST poll \u226410s counts for analyzer; WebSocket stream for live execution",
     "Run scripts/system3_option_visibility_audit.py",
     "Verify security_id_list.csv OPTSTK universe loads"
@@ -117,7 +114,6 @@
     "still_required": [
       "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
       "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-      "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
       "WEBSOCKET_TICK_HEALTH_PROVEN"
     ]
   }

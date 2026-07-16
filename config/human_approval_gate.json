@@ -7,11 +7,10 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-  "gates_synced_utc": "2026-07-15T10:41:50.172000Z",
-  "gates_passing": 1,
+  "gates_synced_utc": "2026-07-16T04:52:40.266614Z",
+  "gates_passing": 2,
   "gates_total": 7
 }

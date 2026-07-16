@@ -2,920 +2,63 @@
   "after": [
     {
       "endpoint": "/api/health",
-      "json": {
-        "broker": {
-          "connected": true,
-          "error": null,
-          "name": "dhan",
-          "status": "connected"
-        },
-        "broker_status": "connected",
-        "cycle_count": 0,
-        "daily_pnl": 0.0,
-        "data_source": "live",
-        "last_fetch": "2026-07-15T16:13:14.351606+05:30",
-        "live_allowed": false,
-        "live_blockers": [
-          "Live trading permanently disabled in analyzer mode"
-        ],
-        "market": {
-          "is_open": false,
-          "reason": "closed"
-        },
-        "market_status": "closed",
-        "message": "ANALYZER_READY - Broker connected, paper mode active",
-        "mode": "PAPER",
-        "open_positions": 0,
-        "performance_sla": {
-          "cycle_duration_sec": 0,
-          "fetch_duration_sec": 0,
-          "sla_pass": true,
-          "strategy_duration_sec": 0
-        },
-        "qc_failures": [],
-        "qc_status": "PASS",
-        "refresh_interval": 5,
-        "status": "ok",
-        "total_pnl": 0.0,
-        "trades_executed": 0
-      },
-      "ok": true,
-      "sample": "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Live trading permanently disabled in analyzer mode\"],\"broker\":{\"connected\":true,\"name\":\"dhan\",\"status\":\"connected\",\"error\":null},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":\"2026-07-15T16:13:14.351606+05:30\",\"qc_status\":\"PASS\",\"qc_failures\":[],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":true},\"message\":\"ANALYZER_READY - Broker connected, paper mode active\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/state",
-      "json": {
-        "alerts": [],
-        "broker": {
-          "access_token_present": true,
-          "auto_refresh": {
-            "attempted": false,
-            "cooldown_remaining_s": 13,
-            "cooldown_s": 300,
-            "reason": "TOKEN_EXPIRED_OR_INVALID",
-            "skipped": "COOLDOWN",
-            "success": false
-          },
-          "broker": "dhan",
-          "client_id_present": true,
-          "connected": true,
-          "credentials_present": true,
-          "env_source": "core.utils.env_loader",
-          "error": null,
-          "latency_ms": 269,
-          "live_trading_enabled": false,
-          "mode": "ANALYZER",
-          "name": "dhan",
-          "order_placement_allowed": false,
-          "sdk_available": true,
-          "status": "connected"
-        },
-        "cycle_count": 76,
-        "data_source": "BROKER_CONNECTED_MARKET_CLOSED",
-        "last_cycle_ts_iso": "2026-07-15T16:13:13.584975+05:30",
-        "last_fetch_ts_iso": "2026-07-15T16:13:13.584975+05:30",
-        "last_tick_age_sec": 5.0,
-        "market": {
-          "current_time_ist": "2026-07-15T16:13:13.584182+05:30",
-          "is_open": false,
-          "next_open": "2026-07-16 09:15:00 IST",
-          "reason": "Market closed: After hours (closed at 15:30)"
-        },
-        "mode": "PAPER",
-        "model": {
-          "active": null,
-          "fallback_used": false,
-          "metrics": {},
-          "type": null
-        },
-        "pnl": {
-          "day_total": 0.0,
-          "realized": 0.0,
-          "total": 0.0,
-          "unrealized": 0.0
-        },
-        "positions": [],
-        "positions_source": "NO_POSITIONS",
-        "qc": {
-          "contracts_total": 0,
-          "failures": [],
-          "reasons": [],
-          "status": "PASS",
-          "underlyings": 0
-        },
-        "reconciliation": {
-          "mismatches": [],
-          "status": "OK",
-          "timestamp": "2026-07-15T16:07:59.742053+05:30"
-        },
-        "refresh_interval": 5,
-        "risk": {
-          "concentration": 0.0,
-          "es95": 0.0,
-          "exposure": 0.0,
-          "greeks": {
-            "delta": 0.0,
-            "gamma": 0.0,
-            "theta": 0.0,
-            "vega": 0.0
-          },
-          "limits": {
-            "breaches": [],
-            "status": "PASS"
-          },
-          "var95": 0.0
-        },
-        "signals": {
-          "confidence": 0,
-          "last_signal": null,
-          "reason": "No signal generated",
-          "status": "NO_TRADE",
-          "underlying": null
-        },
-        "state_version": 76,
-        "tick_health": {
-          "last_tick_age_sec": 5.0,
-          "market_open": false,
-          "refresh_interval_sec": 5,
-          "source": "rest_poll_ssot",
-          "websocket_endpoint": "/ws/stream"
-        },
-        "timestamp_ist": "2026-07-15T16:13:13.584975+05:30",
-        "timestamp_utc": "2026-07-15T10:43:13.584975Z"
-      },
-      "ok": true,
-      "sample": "{\"state_version\":76,\"timestamp_utc\":\"2026-07-15T10:43:13.584975Z\",\"timestamp_ist\":\"2026-07-15T16:13:13.584975+05:30\",\"mode\":\"PAPER\",\"data_source\":\"BROKER_CONNECTED_MARKET_CLOSED\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"next_open\":\"2026-07-16 09:15:00 IST\",\"current_time_ist\":\"2026-07-15T16:13:13.584182+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":269,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false,\"reason\":\"TOKEN_EXPIRED_OR_INVALID\",\"cooldown_s\":300,\"skipped\":\"COOLDOWN\",\"cooldown_remaining_s\":13},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\",\"name\":\"dhan\",\"status\":\"connected\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/status",
-      "json": {
-        "backend": {
-          "port": 8000,
-          "running": true,
-          "uptime_estimate": "running"
-        },
-        "data": {
-          "fresh": false,
-          "last_update": "2026-07-12T11:57:24",
-          "market_status": {
-            "current_time_ist": null,
-            "is_open": false,
-            "next_open": "2026-07-16 09:15:00 IST",
-            "reason": "Market closed: After hours (closed at 15:30)",
-            "seconds_until_open": null
-          },
-          "source": "real"
-        },
-        "endpoints": {
-          "chain": "/api/chain/{underlying}",
-          "health": "/api/health",
-          "perf": "/api/perf",
-          "pnl": "/api/pnl",
-          "positions": "/api/positions",
-          "signals": "/api/signal/top"
-        },
-        "frontend": {
-          "expected_url": "http://localhost:3000",
-          "status": "should_be_running"
-        },
-        "health": false,
-        "status": "ok",
-        "timestamp": "2026-07-15T16:13:14.611953+05:30"
-      },
-      "ok": true,
-      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-15T16:13:14.611953+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"current_time_ist\":null,\"next_open\":\"2026-07-16 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":\"2026-07-12T11:57:24\"},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/status",
-      "json": {
-        "access_token_present": true,
-        "auto_refresh": {
-          "attempted": false,
-          "success": false
-        },
-        "broker": "dhan",
-        "client_id_present": true,
-        "connected": true,
-        "credentials_present": true,
-        "env_source": "core.utils.env_loader",
-        "error": null,
-        "latency_ms": 267,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "sdk_available": true
-      },
-      "ok": true,
-      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":267,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "json": {
-        "access_token_present": true,
-        "auto_refresh": {
-          "attempted": false,
-          "success": false
-        },
-        "broker": "dhan",
-        "client_id_present": true,
-        "connected": true,
-        "credentials_present": true,
-        "env_source": "core.utils.env_loader",
-        "error": null,
-        "latency_ms": 267,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "sdk_available": true
-      },
-      "ok": true,
-      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":true,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":267,\"error\":null,\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/funds",
-      "json": {
-        "data": {
-          "availabelBalance": 46.07,
-          "blockedPayoutAmount": 0.0,
-          "collateralAmount": 0.0,
-          "dhanClientId": "1106583741",
-          "receiveableAmount": 0.0,
-          "sodLimit": 4989.76,
-          "utilizedAmount": 23149.0,
-          "withdrawableBalance": 0.0
-        },
-        "live_trading_enabled": false,
-        "normalized": {
-          "available_balance": 46.07,
-          "raw": {
-            "availabelBalance": 46.07,
-            "blockedPayoutAmount": 0.0,
-            "collateralAmount": 0.0,
-            "dhanClientId": "1106583741",
-            "receiveableAmount": 0.0,
-            "sodLimit": 4989.76,
-            "utilizedAmount": 23149.0,
-            "withdrawableBalance": 0.0
-          },
-          "total_limit": 4989.76,
-          "utilized_amount": 23149.0
-        },
-        "order_placement_allowed": false,
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"normalized\":{\"available_balance\":46.07,\"utilized_amount\":23149.0,\"total_limit\":4989.76,\"raw\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":46.07,\"sodLimit\":4989.76,\"collateralAmount\":0.0,\"receiveableAmount\":0.0,\"utilizedAmount\":23149.0,\"blockedPayoutAmount\":0.0,\"withdrawableBalance\":0.0}},\"success\":true,\"data\":{\"dhanClientId\":\"1106583741\",\"availabelBalance\":46.07,\"sodLimit\":4989.76,\"collateralAmount\":0.0,\"receiveableAmount\":0.0,\"utilizedAmount\":23149.0,\"blockedPayoutAmount\":0.0,\"withdrawableBalance\":0.0}}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/holdings",
-      "json": {
-        "count": 11,
-        "data": [
-          {
-            "availableQty": 165,
-            "avgCostPrice": 115.44,
-            "collateralQty": 0,
-            "dpQty": 165,
-            "exchange": "ALL",
-            "isin": "INE088F01024",
-            "lastTradedPrice": 141.66,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "9741",
-            "t1Qty": 0,
-            "totalQty": 165,
-            "tradingSymbol": "PARADEEP"
-          },
-          {
-            "availableQty": 164,
-            "avgCostPrice": 188.52232,
-            "collateralQty": 0,
-            "dpQty": 164,
-            "exchange": "ALL",
-            "isin": "INE103A01014",
-            "lastTradedPrice": 157.47,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "2283",
-            "t1Qty": 0,
-            "totalQty": 164,
-            "tradingSymbol": "MRPL"
-          },
-          {
-            "availableQty": 230,
-            "avgCostPrice": 202.59615,
-            "collateralQty": 0,
-            "dpQty": 230,
-            "exchange": "ALL",
-            "isin": "INE149K01016",
-            "lastTradedPrice": 200.32,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "18359",
-            "t1Qty": 0,
-            "totalQty": 230,
-            "tradingSymbol": "SANDUMA"
-          },
-          {
-            "availableQty": 31,
-            "avgCostPrice": 921.15,
-            "collateralQty": 0,
-            "dpQty": 31,
-            "exchange": "ALL",
-            "isin": "INE178A01016",
-            "lastTradedPrice": 1157.2,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "2049",
-            "t1Qty": 0,
-            "totalQty": 31,
-            "tradingSymbol": "CHENNPETRO"
-          },
-          {
-            "availableQty": 50,
-            "avgCostPrice": 607.664,
-            "collateralQty": 0,
-            "dpQty": 50,
-            "exchange": "ALL",
-            "isin": "INE271B01025",
-            "lastTradedPrice": 588.75,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "2088",
-            "t1Qty": 0,
-            "totalQty": 50,
-            "tradingSymbol": "MAHSEAMLES"
-          },
-          {
-            "availableQty": 2100,
-            "avgCostPrice": 16.90938,
-            "collateralQty": 0,
-            "dpQty": 2100,
-            "exchange": "ALL",
-            "isin": "INE306A01021",
-            "lastTradedPrice": 17.18,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "308",
-            "t1Qty": 0,
-            "totalQty": 2100,
-            "tradingSymbol": "BAJAJHIND"
-          },
-          {
-            "availableQty": 1,
-            "avgCostPrice": 39.218,
-            "collateralQty": 0,
-            "dpQty": 1,
-            "exchange": "ALL",
-            "isin": "INE366A01041",
-            "lastTradedPrice": 43.31,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "11667",
-            "t1Qty": 0,
-            "totalQty": 1,
-            "tradingSymbol": "DWARKESH"
-          },
-          {
-            "availableQty": 40,
-            "avgCostPrice": 590.99,
-            "collateralQty": 0,
-            "dpQty": 40,
-            "exchange": "ALL",
-            "isin": "INE399G01023",
-            "lastTradedPrice": 563.5,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "11411",
-            "t1Qty": 0,
-            "totalQty": 40,
-            "tradingSymbol": "RKFORGE"
-          },
-          {
-            "availableQty": 880,
-            "avgCostPrice": 38.21761,
-            "collateralQty": 0,
-            "dpQty": 880,
-            "exchange": "ALL",
-            "isin": "INE420C01059",
-            "lastTradedPrice": 72.03,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "25468",
-            "t1Qty": 0,
-            "totalQty": 880,
-            "tradingSymbol": "PAISALO"
-          },
-          {
-            "availableQty": 476,
-            "avgCostPrice": 84.48,
-            "collateralQty": 0,
-            "dpQty": 476,
-            "exchange": "ALL",
-            "isin": "INE584A01023",
-            "lastTradedPrice": 84.89,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "15332",
-            "t1Qty": 0,
-            "totalQty": 476,
-            "tradingSymbol": "NMDC"
-          },
-          {
-            "availableQty": 49,
-            "avgCostPrice": 518.75,
-            "collateralQty": 0,
-            "dpQty": 49,
-            "exchange": "ALL",
-            "isin": "INE769A01020",
-            "lastTradedPrice": 500.7,
-            "mtf_qty": 0,
-            "mtf_t1_qty": 0,
-            "securityId": "7",
-            "t1Qty": 0,
-            "totalQty": 49,
-            "tradingSymbol": "AARTIIND"
-          }
-        ],
-        "live_trading_enabled": false,
-        "order_placement_allowed": false,
-        "rows": [
-          {
-            "avg_price": 115.44,
-            "current_value": 23373.899999999998,
-            "ltp": 141.66,
-            "pnl": 4326.3,
-            "pnl_pct": 22.713097713097714,
-            "quantity": 165.0,
-            "raw": {
-              "availableQty": 165,
-              "avgCostPrice": 115.44,
-              "collateralQty": 0,
-              "dpQty": 165,
-              "exchange": "ALL",
-              "isin": "INE088F01024",
-              "lastTradedPrice": 141.66,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "9741",
-              "t1Qty": 0,
-              "totalQty": 165,
-              "tradingSymbol": "PARADEEP"
-            },
-            "symbol": "PARADEEP"
-          },
-          {
-            "avg_price": 188.52232,
-            "current_value": 25825.079999999998,
-            "ltp": 157.47,
-            "pnl": -5092.580480000001,
-            "pnl_pct": -16.47142895334622,
-            "quantity": 164.0,
-            "raw": {
-              "availableQty": 164,
-              "avgCostPrice": 188.52232,
-              "collateralQty": 0,
-              "dpQty": 164,
-              "exchange": "ALL",
-              "isin": "INE103A01014",
-              "lastTradedPrice": 157.47,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "2283",
-              "t1Qty": 0,
-              "totalQty": 164,
-              "tradingSymbol": "MRPL"
-            },
-            "symbol": "MRPL"
-          },
-          {
-            "avg_price": 202.59615,
-            "current_value": 46073.6,
-            "ltp": 200.32,
-            "pnl": -523.5145000000002,
-            "pnl_pct": -1.1234912410724494,
-            "quantity": 230.0,
-            "raw": {
-              "availableQty": 230,
-              "avgCostPrice": 202.59615,
-              "collateralQty": 0,
-              "dpQty": 230,
-              "exchange": "ALL",
-              "isin": "INE149K01016",
-              "lastTradedPrice": 200.32,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "18359",
-              "t1Qty": 0,
-              "totalQty": 230,
-              "tradingSymbol": "SANDUMA"
-            },
-            "symbol": "SANDUMA"
-          },
-          {
-            "avg_price": 921.15,
-            "current_value": 35873.200000000004,
-            "ltp": 1157.2,
-            "pnl": 7317.550000000002,
-            "pnl_pct": 25.625576724746253,
-            "quantity": 31.0,
-            "raw": {
-              "availableQty": 31,
-              "avgCostPrice": 921.15,
-              "collateralQty": 0,
-              "dpQty": 31,
-              "exchange": "ALL",
-              "isin": "INE178A01016",
-              "lastTradedPrice": 1157.2,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "2049",
-              "t1Qty": 0,
-              "totalQty": 31,
-              "tradingSymbol": "CHENNPETRO"
-            },
-            "symbol": "CHENNPETRO"
-          },
-          {
-            "avg_price": 607.664,
-            "current_value": 29437.5,
-            "ltp": 588.75,
-            "pnl": -945.6999999999994,
-            "pnl_pct": -3.1125753705995396,
-            "quantity": 50.0,
-            "raw": {
-              "availableQty": 50,
-              "avgCostPrice": 607.664,
-              "collateralQty": 0,
-              "dpQty": 50,
-              "exchange": "ALL",
-              "isin": "INE271B01025",
-              "lastTradedPrice": 588.75,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "2088",
-              "t1Qty": 0,
-              "totalQty": 50,
-              "tradingSymbol": "MAHSEAMLES"
-            },
-            "symbol": "MAHSEAMLES"
-          },
-          {
-            "avg_price": 16.90938,
-            "current_value": 36078.0,
-            "ltp": 17.18,
-            "pnl": 568.3020000000021,
-            "pnl_pct": 1.6004134983068625,
-            "quantity": 2100.0,
-            "raw": {
-              "availableQty": 2100,
-              "avgCostPrice": 16.90938,
-              "collateralQty": 0,
-              "dpQty": 2100,
-              "exchange": "ALL",
-              "isin": "INE306A01021",
-              "lastTradedPrice": 17.18,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "308",
-              "t1Qty": 0,
-              "totalQty": 2100,
-              "tradingSymbol": "BAJAJHIND"
-            },
-            "symbol": "BAJAJHIND"
-          },
-          {
-            "avg_price": 39.218,
-            "current_value": 43.31,
-            "ltp": 43.31,
-            "pnl": 4.091999999999999,
-            "pnl_pct": 10.433984394920696,
-            "quantity": 1.0,
-            "raw": {
-              "availableQty": 1,
-              "avgCostPrice": 39.218,
-              "collateralQty": 0,
-              "dpQty": 1,
-              "exchange": "ALL",
-              "isin": "INE366A01041",
-              "lastTradedPrice": 43.31,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "11667",
-              "t1Qty": 0,
-              "totalQty": 1,
-              "tradingSymbol": "DWARKESH"
-            },
-            "symbol": "DWARKESH"
-          },
-          {
-            "avg_price": 590.99,
-            "current_value": 22540.0,
-            "ltp": 563.5,
-            "pnl": -1099.6000000000004,
-            "pnl_pct": -4.651516946141222,
-            "quantity": 40.0,
-            "raw": {
-              "availableQty": 40,
-              "avgCostPrice": 590.99,
-              "collateralQty": 0,
-              "dpQty": 40,
-              "exchange": "ALL",
-              "isin": "INE399G01023",
-              "lastTradedPrice": 563.5,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "11411",
-              "t1Qty": 0,
-              "totalQty": 40,
-              "tradingSymbol": "RKFORGE"
-            },
-            "symbol": "RKFORGE"
-          },
-          {
-            "avg_price": 38.21761,
-            "current_value": 63386.4,
-            "ltp": 72.03,
-            "pnl": 29754.9032,
-            "pnl_pct": 88.47332420839503,
-            "quantity": 880.0,
-            "raw": {
-              "availableQty": 880,
-              "avgCostPrice": 38.21761,
-              "collateralQty": 0,
-              "dpQty": 880,
-              "exchange": "ALL",
-              "isin": "INE420C01059",
-              "lastTradedPrice": 72.03,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "25468",
-              "t1Qty": 0,
-              "totalQty": 880,
-              "tradingSymbol": "PAISALO"
-            },
-            "symbol": "PAISALO"
-          },
-          {
-            "avg_price": 84.48,
-            "current_value": 40407.64,
-            "ltp": 84.89,
-            "pnl": 195.15999999999838,
-            "pnl_pct": 0.4853219696969656,
-            "quantity": 476.0,
-            "raw": {
-              "availableQty": 476,
-              "avgCostPrice": 84.48,
-              "collateralQty": 0,
-              "dpQty": 476,
-              "exchange": "ALL",
-              "isin": "INE584A01023",
-              "lastTradedPrice": 84.89,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "15332",
-              "t1Qty": 0,
-              "totalQty": 476,
-              "tradingSymbol": "NMDC"
-            },
-            "symbol": "NMDC"
-          },
-          {
-            "avg_price": 518.75,
-            "current_value": 24534.3,
-            "ltp": 500.7,
-            "pnl": -884.4500000000005,
-            "pnl_pct": -3.4795180722891588,
-            "quantity": 49.0,
-            "raw": {
-              "availableQty": 49,
-              "avgCostPrice": 518.75,
-              "collateralQty": 0,
-              "dpQty": 49,
-              "exchange": "ALL",
-              "isin": "INE769A01020",
-              "lastTradedPrice": 500.7,
-              "mtf_qty": 0,
-              "mtf_t1_qty": 0,
-              "securityId": "7",
-              "t1Qty": 0,
-              "totalQty": 49,
-              "tradingSymbol": "AARTIIND"
-            },
-            "symbol": "AARTIIND"
-          }
-        ],
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":11,\"rows\":[{\"symbol\":\"PARADEEP\",\"quantity\":165.0,\"avg_price\":115.44,\"ltp\":141.66,\"current_value\":23373.899999999998,\"pnl\":4326.3,\"pnl_pct\":22.713097713097714,\"raw\":{\"exchange\":\"ALL\",\"tradingSymbol\":\"PARADEEP\",\"securityId\":\"9741\",\"isin\":\"INE088F01024\",\"totalQty\":165,\"dpQty\":165,\"t1Qty\":0,\"mtf_t1_qty\":0,\"mtf_qty\":0,\"availableQty\":165,\"collateralQty\":0,\"avgCostPrice\":115.44,\"lastTradedPrice\":141.66}},{\"symbol\":\"MRPL\",\"quantity\":164.0,\"avg_price\":188.52232,\"ltp\":157.47,\"current_value\":25825.079999999998,\"pnl\":-5092.580480000001,\"pnl_pct\":-16.47142895334622,\"raw\":{\"exchange\":\"ALL\",\"tradingSymbol\":\"MRPL\",\"securityId\":\"2283\",\"isin\":\"INE103A01014\",\"totalQty\":164,\"dpQty\":164,\"t1Qty\":0,\"mtf_t1_qty\":0,\"mtf_qty\":0,\"availableQty\":164,\"collateralQty\":0,\"avgCostPrice\":188.52232,\"lastTradedPrice\":157.47}},{\"symbol\":\"SANDUMA\",\"quantity\":230.0,\"avg_price\":202.59615,\"ltp\":200.32,\"current_value\":46073.6,\"",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/positions/live",
-      "json": {
-        "count": 2,
-        "data": [
-          {
-            "buyAvg": 106.42,
-            "buyQty": 625,
-            "carryForwardBuyQty": 250,
-            "carryForwardBuyValue": 22862.5,
-            "carryForwardSellQty": 0,
-            "carryForwardSellValue": 0.0,
-            "costPrice": 106.06,
-            "crossCurrency": false,
-            "dayBuyQty": 375,
-            "dayBuyValue": 43650.0,
-            "daySellQty": 625,
-            "daySellValue": 78731.25,
-            "dhanClientId": "1106583741",
-            "drvExpiryDate": "2026-07-28",
-            "drvOptionType": "CALL",
-            "drvStrikePrice": 9000.0,
-            "exchangeSegment": "NSE_FNO",
-            "multiplier": 1000,
-            "netQty": 0,
-            "positionType": "CLOSED",
-            "productType": "MARGIN",
-            "rbiReferenceRate": 1.0,
-            "realizedProfit": 12218.75,
-            "securityId": "69282",
-            "sellAvg": 125.97,
-            "sellQty": 625,
-            "tradingSymbol": "APOLLOHOSP-Jul2026-9000-CE",
-            "unrealizedProfit": 0.0
-          },
-          {
-            "buyAvg": 8.735714,
-            "buyQty": 17500,
-            "carryForwardBuyQty": 7500,
-            "carryForwardBuyValue": 61875.0,
-            "carryForwardSellQty": 0,
-            "carryForwardSellValue": 0.0,
-            "costPrice": 8.885715,
-            "crossCurrency": false,
-            "dayBuyQty": 10000,
-            "dayBuyValue": 91000.0,
-            "daySellQty": 7500,
-            "daySellValue": 51375.0,
-            "dhanClientId": "1106583741",
-            "drvExpiryDate": "2026-07-28",
-            "drvOptionType": "CALL",
-            "drvStrikePrice": 445.0,
-            "exchangeSegment": "NSE_FNO",
-            "multiplier": 1000,
-            "netQty": 10000,
-            "positionType": "LONG",
-            "productType": "MARGIN",
-            "rbiReferenceRate": 1.0,
-            "realizedProfit": -14142.86,
-            "securityId": "76994",
-            "sellAvg": 6.85,
-            "sellQty": 7500,
-            "tradingSymbol": "BIOCON-Jul2026-445-CE",
-            "unrealizedProfit": -28857.14
-          }
-        ],
-        "live_trading_enabled": false,
-        "order_placement_allowed": false,
-        "rows": [
-          {
-            "avg_price": 106.42,
-            "ltp": 0.0,
-            "net_qty": 0.0,
-            "product": "MARGIN",
-            "raw": {
-              "buyAvg": 106.42,
-              "buyQty": 625,
-              "carryForwardBuyQty": 250,
-              "carryForwardBuyValue": 22862.5,
-              "carryForwardSellQty": 0,
-              "carryForwardSellValue": 0.0,
-              "costPrice": 106.06,
-              "crossCurrency": false,
-              "dayBuyQty": 375,
-              "dayBuyValue": 43650.0,
-              "daySellQty": 625,
-              "daySellValue": 78731.25,
-              "dhanClientId": "1106583741",
-              "drvExpiryDate": "2026-07-28",
-              "drvOptionType": "CALL",
-              "drvStrikePrice": 9000.0,
-              "exchangeSegment": "NSE_FNO",
-              "multiplier": 1000,
-              "netQty": 0,
-              "positionType": "CLOSED",
-              "productType": "MARGIN",
-              "rbiReferenceRate": 1.0,
-              "realizedProfit": 12218.75,
-              "securityId": "69282",
-              "sellAvg": 125.97,
-              "sellQty": 625,
-              "tradingSymbol": "APOLLOHOSP-Jul2026-9000-CE",
-              "unrealizedProfit": 0.0
-            },
-            "realized_pnl": 12218.75,
-            "symbol": "APOLLOHOSP-Jul2026-9000-CE",
-            "trading_symbol": "APOLLOHOSP-Jul2026-9000-CE",
-            "unrealized_pnl": 0.0
-          },
-          {
-            "avg_price": 8.735714,
-            "ltp": 0.0,
-            "net_qty": 10000.0,
-            "product": "MARGIN",
-            "raw": {
-              "buyAvg": 8.735714,
-              "buyQty": 17500,
-              "carryForwardBuyQty": 7500,
-              "carryForwardBuyValue": 61875.0,
-              "carryForwardSellQty": 0,
-              "carryForwardSellValue": 0.0,
-              "costPrice": 8.885715,
-              "crossCurrency": false,
-              "dayBuyQty": 10000,
-              "dayBuyValue": 91000.0,
-              "daySellQty": 7500,
-              "daySellValue": 51375.0,
-              "dhanClientId": "1106583741",
-              "drvExpiryDate": "2026-07-28",
-              "drvOptionType": "CALL",
-              "drvStrikePrice": 445.0,
-              "exchangeSegment": "NSE_FNO",
-              "multiplier": 1000,
-              "netQty": 10000,
-              "positionType": "LONG",
-              "productType": "MARGIN",
-              "rbiReferenceRate": 1.0,
-              "realizedProfit": -14142.86,
-              "securityId": "76994",
-              "sellAvg": 6.85,
-              "sellQty": 7500,
-              "tradingSymbol": "BIOCON-Jul2026-445-CE",
-              "unrealizedProfit": -28857.14
-            },
-            "realized_pnl": -14142.86,
-            "symbol": "BIOCON-Jul2026-445-CE",
-            "trading_symbol": "BIOCON-Jul2026-445-CE",
-            "unrealized_pnl": -28857.14
-          }
-        ],
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":2,\"rows\":[{\"symbol\":\"APOLLOHOSP-Jul2026-9000-CE\",\"trading_symbol\":\"APOLLOHOSP-Jul2026-9000-CE\",\"product\":\"MARGIN\",\"net_qty\":0.0,\"avg_price\":106.42,\"ltp\":0.0,\"unrealized_pnl\":0.0,\"realized_pnl\":12218.75,\"raw\":{\"dhanClientId\":\"1106583741\",\"tradingSymbol\":\"APOLLOHOSP-Jul2026-9000-CE\",\"securityId\":\"69282\",\"positionType\":\"CLOSED\",\"exchangeSegment\":\"NSE_FNO\",\"productType\":\"MARGIN\",\"buyAvg\":106.42,\"costPrice\":106.06,\"buyQty\":625,\"sellAvg\":125.97,\"sellQty\":625,\"netQty\":0,\"realizedProfit\":12218.75,\"unrealizedProfit\":0.0,\"rbiReferenceRate\":1.0,\"multiplier\":1000,\"carryForwardBuyQty\":250,\"carryForwardSellQty\":0,\"carryForwardBuyValue\":22862.5,\"carryForwardSellValue\":0.0,\"dayBuyQty\":375,\"daySellQty\":625,\"dayBuyValue\":43650.0,\"daySellValue\":78731.25,\"drvExpiryDate\":\"2026-07-28\",\"drvOptionType\":\"CALL\",\"drvStrikePrice\":9000.0,\"crossCurrency\":false}},{\"symbol\":\"BIOCON-Jul2026-445-CE\",\"trading_symbol\":\"B",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/approval/status",
-      "json": {
-        "approved_by": "PRITAM S. WARGHADE",
-        "approved_utc": "2026-06-24T02:30:00+05:30",
-        "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
-        "dashboard_status": "PASS",
-        "generated_utc": "2026-07-15T10:43:16.947917Z",
-        "human_approval": true,
-        "live_trading_enabled": false,
-        "live_trading_env_flip_authorized": false,
-        "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-        "production_ready_for_real_money": false,
-        "scope": "Full owner trust for world-class development, automation, and performance optimization.",
-        "technical_gates_pending_count": 4,
-        "technical_gates_still_required": [
-          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-          "WEBSOCKET_TICK_HEALTH_PROVEN"
-        ]
-      },
-      "ok": true,
-      "sample": "{\"generated_utc\":\"2026-07-15T10:43:16.947917Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/kill-switch/status",
-      "json": {
-        "details": "Kill switch not activated",
-        "kill_active": false,
-        "kill_switch_path": "/app/storage/live/kill_switch.json",
-        "status": "OK"
-      },
-      "ok": true,
-      "sample": "{\"status\":\"OK\",\"kill_active\":false,\"details\":\"Kill switch not activated\",\"kill_switch_path\":\"/app/storage/live/kill_switch.json\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     }
   ],
   "analyzer_ready": false,
@@ -924,352 +67,63 @@
   "before": [
     {
       "endpoint": "/api/health",
-      "json": {
-        "broker": {
-          "connected": false,
-          "error": "Broker not connected",
-          "status": "disconnected"
-        },
-        "broker_status": "disconnected",
-        "cycle_count": 0,
-        "daily_pnl": 0.0,
-        "data_source": "live",
-        "last_fetch": null,
-        "live_allowed": false,
-        "live_blockers": [
-          "Broker not connected - real data unavailable"
-        ],
-        "market": {
-          "is_open": false,
-          "reason": "closed"
-        },
-        "market_status": "closed",
-        "message": "BROKER_NOT_READY - Real data unavailable",
-        "mode": "PAPER",
-        "open_positions": 0,
-        "performance_sla": {
-          "cycle_duration_sec": 0,
-          "fetch_duration_sec": 0,
-          "sla_pass": false,
-          "strategy_duration_sec": 0
-        },
-        "qc_failures": [
-          "Broker not connected - real data unavailable"
-        ],
-        "qc_status": "NOT_READY",
-        "refresh_interval": 5,
-        "status": "not_ready",
-        "total_pnl": 0.0,
-        "trades_executed": 0
-      },
-      "ok": true,
-      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/state",
-      "json": {
-        "alerts": [],
-        "broker": {
-          "access_token_present": true,
-          "auto_refresh": {
-            "attempted": false,
-            "cooldown_remaining_s": 103,
-            "cooldown_s": 300,
-            "reason": "TOKEN_EXPIRED_OR_INVALID",
-            "skipped": "COOLDOWN",
-            "success": false
-          },
-          "broker": "dhan",
-          "client_id_present": true,
-          "connected": false,
-          "credentials_present": true,
-          "env_source": "core.utils.env_loader",
-          "error": "TOKEN_EXPIRED_OR_INVALID",
-          "latency_ms": 263,
-          "live_trading_enabled": false,
-          "mode": "ANALYZER",
-          "order_placement_allowed": false,
-          "sdk_available": true
-        },
-        "cycle_count": 55,
-        "data_source": "MARKET_CLOSED_NO_BROKER",
-        "last_cycle_ts_iso": "2026-07-15T16:11:43.385046+05:30",
-        "last_fetch_ts_iso": "2026-07-15T16:11:43.385046+05:30",
-        "last_tick_age_sec": 5.27,
-        "market": {
-          "current_time_ist": "2026-07-15T16:11:43.383838+05:30",
-          "is_open": false,
-          "next_open": "2026-07-16 09:15:00 IST",
-          "reason": "Market closed: After hours (closed at 15:30)"
-        },
-        "mode": "PAPER",
-        "model": {
-          "active": null,
-          "fallback_used": false,
-          "metrics": {},
-          "type": null
-        },
-        "pnl": {
-          "day_total": 0.0,
-          "realized": 0.0,
-          "total": 0.0,
-          "unrealized": 0.0
-        },
-        "positions": [],
-        "positions_source": "NO_POSITIONS",
-        "qc": {
-          "contracts_total": 0,
-          "failures": [],
-          "reasons": [],
-          "status": "PASS",
-          "underlyings": 0
-        },
-        "reconciliation": {
-          "mismatches": [],
-          "status": "OK",
-          "timestamp": "2026-07-15T16:07:59.742053+05:30"
-        },
-        "refresh_interval": 5,
-        "risk": {
-          "concentration": 0.0,
-          "es95": 0.0,
-          "exposure": 0.0,
-          "greeks": {
-            "delta": 0.0,
-            "gamma": 0.0,
-            "theta": 0.0,
-            "vega": 0.0
-          },
-          "limits": {
-            "breaches": [],
-            "status": "PASS"
-          },
-          "var95": 0.0
-        },
-        "signals": {
-          "confidence": 0,
-          "last_signal": null,
-          "reason": "No signal generated",
-          "status": "NO_TRADE",
-          "underlying": null
-        },
-        "state_version": 55,
-        "tick_health": {
-          "last_tick_age_sec": 5.27,
-          "market_open": false,
-          "refresh_interval_sec": 5,
-          "source": "rest_poll_ssot",
-          "websocket_endpoint": "/ws/stream"
-        },
-        "timestamp_ist": "2026-07-15T16:11:43.385046+05:30",
-        "timestamp_utc": "2026-07-15T10:41:43.385045Z"
-      },
-      "ok": true,
-      "sample": "{\"state_version\":55,\"timestamp_utc\":\"2026-07-15T10:41:43.385045Z\",\"timestamp_ist\":\"2026-07-15T16:11:43.385046+05:30\",\"mode\":\"PAPER\",\"data_source\":\"MARKET_CLOSED_NO_BROKER\",\"market\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"next_open\":\"2026-07-16 09:15:00 IST\",\"current_time_ist\":\"2026-07-15T16:11:43.383838+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":263,\"error\":\"TOKEN_EXPIRED_OR_INVALID\",\"auto_refresh\":{\"attempted\":false,\"success\":false,\"reason\":\"TOKEN_EXPIRED_OR_INVALID\",\"cooldown_s\":300,\"skipped\":\"COOLDOWN\",\"cooldown_remaining_s\":103},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/status",
-      "json": {
-        "backend": {
-          "port": 8000,
-          "running": true,
-          "uptime_estimate": "running"
-        },
-        "data": {
-          "fresh": false,
-          "last_update": "2026-07-12T11:57:24",
-          "market_status": {
-            "current_time_ist": null,
-            "is_open": false,
-            "next_open": "2026-07-16 09:15:00 IST",
-            "reason": "Market closed: After hours (closed at 15:30)",
-            "seconds_until_open": null
-          },
-          "source": "real"
-        },
-        "endpoints": {
-          "chain": "/api/chain/{underlying}",
-          "health": "/api/health",
-          "perf": "/api/perf",
-          "pnl": "/api/pnl",
-          "positions": "/api/positions",
-          "signals": "/api/signal/top"
-        },
-        "frontend": {
-          "expected_url": "http://localhost:3000",
-          "status": "should_be_running"
-        },
-        "health": false,
-        "status": "ok",
-        "timestamp": "2026-07-15T16:11:45.983492+05:30"
-      },
-      "ok": true,
-      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-15T16:11:45.983492+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Market closed: After hours (closed at 15:30)\",\"current_time_ist\":null,\"next_open\":\"2026-07-16 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":\"2026-07-12T11:57:24\"},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/status",
-      "json": {
-        "access_token_present": true,
-        "auto_refresh": {
-          "attempted": false,
-          "cooldown_remaining_s": 74,
-          "cooldown_s": 300,
-          "reason": "TOKEN_EXPIRED_OR_INVALID",
-          "skipped": "COOLDOWN",
-          "success": false
-        },
-        "broker": "dhan",
-        "client_id_present": true,
-        "connected": false,
-        "credentials_present": true,
-        "env_source": "core.utils.env_loader",
-        "error": "TOKEN_EXPIRED_OR_INVALID",
-        "latency_ms": 262,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "sdk_available": true
-      },
-      "ok": true,
-      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":262,\"error\":\"TOKEN_EXPIRED_OR_INVALID\",\"auto_refresh\":{\"attempted\":false,\"success\":false,\"reason\":\"TOKEN_EXPIRED_OR_INVALID\",\"cooldown_s\":300,\"skipped\":\"COOLDOWN\",\"cooldown_remaining_s\":74},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "json": {
-        "access_token_present": true,
-        "auto_refresh": {
-          "attempted": false,
-          "cooldown_remaining_s": 73,
-          "cooldown_s": 300,
-          "reason": "TOKEN_EXPIRED_OR_INVALID",
-          "skipped": "COOLDOWN",
-          "success": false
-        },
-        "broker": "dhan",
-        "client_id_present": true,
-        "connected": false,
-        "credentials_present": true,
-        "env_source": "core.utils.env_loader",
-        "error": "TOKEN_EXPIRED_OR_INVALID",
-        "latency_ms": 264,
-        "live_trading_enabled": false,
-        "mode": "ANALYZER",
-        "order_placement_allowed": false,
-        "sdk_available": true
-      },
-      "ok": true,
-      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":true,\"client_id_present\":true,\"access_token_present\":true,\"latency_ms\":264,\"error\":\"TOKEN_EXPIRED_OR_INVALID\",\"auto_refresh\":{\"attempted\":false,\"success\":false,\"reason\":\"TOKEN_EXPIRED_OR_INVALID\",\"cooldown_s\":300,\"skipped\":\"COOLDOWN\",\"cooldown_remaining_s\":73},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/funds",
-      "json": {
-        "data": {
-          "data": "",
-          "remarks": {
-            "error_code": "DH-901",
-            "error_message": "Client ID or user generated access token is invalid or expired.",
-            "error_type": "Invalid_Authentication"
-          },
-          "status": "failure"
-        },
-        "live_trading_enabled": false,
-        "normalized": {
-          "available_balance": null,
-          "raw": {
-            "data": "",
-            "remarks": {
-              "error_code": "DH-901",
-              "error_message": "Client ID or user generated access token is invalid or expired.",
-              "error_type": "Invalid_Authentication"
-            },
-            "status": "failure"
-          },
-          "total_limit": null,
-          "utilized_amount": null
-        },
-        "order_placement_allowed": false,
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"normalized\":{\"available_balance\":null,\"utilized_amount\":null,\"total_limit\":null,\"raw\":{\"status\":\"failure\",\"remarks\":{\"error_code\":\"DH-901\",\"error_type\":\"Invalid_Authentication\",\"error_message\":\"Client ID or user generated access token is invalid or expired.\"},\"data\":\"\"}},\"success\":true,\"data\":{\"status\":\"failure\",\"remarks\":{\"error_code\":\"DH-901\",\"error_type\":\"Invalid_Authentication\",\"error_message\":\"Client ID or user generated access token is invalid or expired.\"},\"data\":\"\"}}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/holdings",
-      "json": {
-        "count": 0,
-        "data": [],
-        "live_trading_enabled": false,
-        "order_placement_allowed": false,
-        "rows": [],
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":0,\"rows\":[],\"success\":true,\"data\":[]}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/broker/positions/live",
-      "json": {
-        "count": 0,
-        "data": [],
-        "live_trading_enabled": false,
-        "order_placement_allowed": false,
-        "rows": [],
-        "source": "sdk",
-        "success": true,
-        "validated": true
-      },
-      "ok": true,
-      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"sdk\",\"validated\":true,\"count\":0,\"rows\":[],\"success\":true,\"data\":[]}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/approval/status",
-      "json": {
-        "approved_by": "PRITAM S. WARGHADE",
-        "approved_utc": "2026-06-24T02:30:00+05:30",
-        "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
-        "dashboard_status": "PASS",
-        "generated_utc": "2026-07-15T10:41:48.281797Z",
-        "human_approval": true,
-        "live_trading_enabled": false,
-        "live_trading_env_flip_authorized": false,
-        "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-        "production_ready_for_real_money": false,
-        "scope": "Full owner trust for world-class development, automation, and performance optimization.",
-        "technical_gates_pending_count": 4,
-        "technical_gates_still_required": [
-          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-          "WEBSOCKET_TICK_HEALTH_PROVEN"
-        ]
-      },
-      "ok": true,
-      "sample": "{\"generated_utc\":\"2026-07-15T10:41:48.281797Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     },
     {
       "endpoint": "/api/kill-switch/status",
-      "json": {
-        "details": "Kill switch not activated",
-        "kill_active": false,
-        "kill_switch_path": "/app/storage/live/kill_switch.json",
-        "status": "OK"
-      },
-      "ok": true,
-      "sample": "{\"status\":\"OK\",\"kill_active\":false,\"details\":\"Kill switch not activated\",\"kill_switch_path\":\"/app/storage/live/kill_switch.json\"}",
-      "status": 200
+      "ok": false,
+      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <title>Service Suspended</title>\n</head>\n<body>\nThis service has been suspended by its owner.\n</body>\n</html>\n",
+      "status": 503
     }
   ],
   "blocked_reasons": [
@@ -1289,7 +143,7 @@
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 1,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-004\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n"
+      "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-004\",\n    \"SYS3-BLK-005\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n"
     },
     {
       "cmd": [
@@ -1302,7 +156,7 @@
       "exit_code": 1,
       "passed": false,
       "stderr_tail": "",
-      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote /home/runner/work/Genesis_System3/Genesis_System3/reports/latest/system3_auto_coordinator/summary.md\n"
+      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] paper_lifecycle\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote /home/runner/work/Genesis_System3/Genesis_System3/reports/latest/system3_auto_coordinator/summary.md\n"
     },
     {
       "cmd": [
@@ -1358,7 +212,7 @@
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-15T10:43:11.141228+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://genesis-system3-backend.onrender.com\",\n  \"state_source\": \"api:https://genesis-system3-backend.onrender.com/api/state\",\n  \"state_error\": \"HTTP_ERROR_401: Unauthorized\",\n  \"broker_source\": \"api:https://genesis-system3-backend.onrender.com/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_401: Unauthorized\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
+      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-16T04:54:01.785679+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://genesis-system3-backend.onrender.com\",\n  \"state_source\": \"api:https://genesis-system3-backend.onrender.com/api/state\",\n  \"state_error\": \"HTTP_ERROR_503: Service Unavailable\",\n  \"broker_source\": \"api:https://genesis-system3-backend.onrender.com/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_503: Service Unavailable\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
     },
     {
       "cmd": [
@@ -1368,13 +222,13 @@
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-15T10:43:14.264540Z\", \"github_failed_count\": 37, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 9, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 46, \"tracker_internal_status\": \"PASS\"}\n"
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-16T04:54:04.671253Z\", \"github_failed_count\": 37, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 49, \"tracker_internal_status\": \"PASS\"}\n"
     }
   ],
-  "endpoint_fail_count": 0,
-  "gates_passing": 1,
+  "endpoint_fail_count": 10,
+  "gates_passing": 2,
   "gates_total": 7,
-  "generated_utc": "2026-07-15T10:43:17.279487Z",
+  "generated_utc": "2026-07-16T04:54:05.759031Z",
   "github_render_status": "BLOCKED",
   "live_trading_enabled": false,
   "open_blockers": [
@@ -1382,7 +236,6 @@
     "SYS3-BLK-003",
     "SYS3-BLK-004",
     "SYS3-BLK-005",
-    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "order_routes_called": false,
@@ -1392,7 +245,6 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "trade_ready": false,
