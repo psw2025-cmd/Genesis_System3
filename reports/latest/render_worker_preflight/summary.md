@@ -1,16 +1,17 @@
 # System3 Render Worker Preflight
 
-Generated UTC: `2026-07-16T14:57:06.414897Z`
+Generated UTC: `2026-07-16T17:43:32.521531Z`
 Status: **BLOCKED**
 Backend base: `https://genesis-system3-backend.onrender.com`
 
 ## Blockers
 
-- [ ] backend /api/health not reachable: status=503 error=HTTPError
-- [ ] backend /api/state not reachable: status=503 error=HTTPError
+- [ ] backend /api/health not reachable: status=502 error=HTTPError
+- [ ] backend /api/state not reachable: status=502 error=HTTPError
 - [ ] DHAN_CLIENT_ID missing in worker env
 - [ ] DHAN_ACCESS_TOKEN missing/too short in worker env
 - [ ] WORKER_PUSH_TOKEN missing/too short in worker env
+- [ ] backend web service returning 502; worker push cannot succeed until backend restarts/deploys
 
 ## Safe env presence checks
 
