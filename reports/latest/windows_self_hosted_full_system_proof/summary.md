@@ -1,6 +1,6 @@
 # System3 Windows Self-Hosted Full System Proof
 
-Generated: `2026-07-15T11:21:06.508311Z`
+Generated: `2026-07-16T08:38:51.524364Z`
 
 Final status: **BLOCKED**
 
@@ -12,21 +12,21 @@ Response bodies persisted: **false**.
 
 | Area | Status | Detail |
 |---|---|---|
-| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=3.33s |
-| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=194.22s |
-| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=6.24s |
-| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.5s |
-| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.3s |
-| HTTP /api/health | PASS | 200 |
-| HTTP /api/state | PASS | 200 |
-| HTTP /api/status | PASS | 200 |
-| HTTP /api/broker/status | PASS | 200 |
-| HTTP /api/broker/dhan/status | PASS | 200 |
-| HTTP /api/broker/funds | PASS | 200 |
-| HTTP /api/broker/holdings | PASS | 200 |
-| HTTP /api/broker/positions | BLOCKED | 404 |
-| HTTP /api/scanner/top_contract_gainers | BLOCKED | request_timeout |
-| HTTP /api/simulation/live/state | BLOCKED | 404 |
+| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=4.16s |
+| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | BLOCKED | timeout after 240s |
+| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=5.84s |
+| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.7s |
+| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.35s |
+| HTTP /api/health | BLOCKED | 503 |
+| HTTP /api/state | BLOCKED | 503 |
+| HTTP /api/status | BLOCKED | 503 |
+| HTTP /api/broker/status | BLOCKED | 503 |
+| HTTP /api/broker/dhan/status | BLOCKED | 503 |
+| HTTP /api/broker/funds | BLOCKED | 503 |
+| HTTP /api/broker/holdings | BLOCKED | 503 |
+| HTTP /api/broker/positions | BLOCKED | 503 |
+| HTTP /api/scanner/top_contract_gainers | BLOCKED | 503 |
+| HTTP /api/simulation/live/state | BLOCKED | 503 |
 | Report system3_auto_gates | UNKNOWN | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\system3_auto_gates\summary.json |
 | Report github_render_failure_tracker | BLOCKED | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\github_render_failure_tracker\summary.json |
 | Report dashboard_visible_issue_tracker | BLOCKED | C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3\reports\latest\dashboard_visible_issue_tracker\summary.json |
@@ -36,12 +36,20 @@ Response bodies persisted: **false**.
 
 ## Blockers
 
+- Command blocked: C:\Python310\python.exe tools/system3_auto_coordinator.py --full — timeout after 240s
 - Command blocked: C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs — DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16
 
 - Command blocked: C:\Python310\python.exe tools/system3_autopilot_proof_board.py — 1
-- HTTP blocked: /api/broker/positions — 404
-- HTTP blocked: /api/scanner/top_contract_gainers — request_timeout
-- HTTP blocked: /api/simulation/live/state — 404
+- HTTP blocked: /api/health — 503
+- HTTP blocked: /api/state — 503
+- HTTP blocked: /api/status — 503
+- HTTP blocked: /api/broker/status — 503
+- HTTP blocked: /api/broker/dhan/status — 503
+- HTTP blocked: /api/broker/funds — 503
+- HTTP blocked: /api/broker/holdings — 503
+- HTTP blocked: /api/broker/positions — 503
+- HTTP blocked: /api/scanner/top_contract_gainers — 503
+- HTTP blocked: /api/simulation/live/state — 503
 - Report not PASS: system3_auto_gates — UNKNOWN
 - Report not PASS: github_render_failure_tracker — BLOCKED
 - Report not PASS: dashboard_visible_issue_tracker — BLOCKED
