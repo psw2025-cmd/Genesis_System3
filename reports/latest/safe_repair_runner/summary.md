@@ -1,6 +1,6 @@
 # System3 Safe Repair Runner
 
-Generated UTC: `2026-07-16T10:49:04.960254Z`
+Generated UTC: `2026-07-17T04:54:35.107969Z`
 Status: **BLOCKED**
 API base: `https://genesis-system3-backend.onrender.com`
 
@@ -13,11 +13,11 @@ API base: `https://genesis-system3-backend.onrender.com`
 
 ## Gate summary
 
-- Gates: `1/7`
+- Gates: `2/7`
 - Trade ready: `False`
 - Analyzer ready: `False`
-- Open blockers: `['PROFIT_BLOCKER', 'SYS3-BLK-003', 'SYS3-BLK-004', 'SYS3-BLK-005', 'SYS3-BLK-008', 'TICK_HEALTH_BLOCKER']`
-- Technical gates still required: `['ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS', 'POSITIVE_NET_EXPECTANCY_AFTER_COSTS', 'REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF', 'WEBSOCKET_TICK_HEALTH_PROVEN']`
+- Open blockers: `['PROFIT_BLOCKER', 'SYS3-BLK-003', 'SYS3-BLK-004', 'SYS3-BLK-005', 'TICK_HEALTH_BLOCKER']`
+- Technical gates still required: `['ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS', 'POSITIVE_NET_EXPECTANCY_AFTER_COSTS', 'WEBSOCKET_TICK_HEALTH_PROVEN']`
 
 ## Proof summary
 
@@ -37,16 +37,16 @@ API base: `https://genesis-system3-backend.onrender.com`
 
 | Endpoint | OK | Status |
 |---|---:|---:|
-| `/api/health` | `False` | `503` |
-| `/api/state` | `False` | `503` |
-| `/api/status` | `False` | `503` |
-| `/api/broker/status` | `False` | `503` |
-| `/api/broker/dhan/status` | `False` | `503` |
-| `/api/broker/funds` | `False` | `503` |
-| `/api/broker/holdings` | `False` | `503` |
-| `/api/broker/positions/live` | `False` | `503` |
-| `/api/approval/status` | `False` | `503` |
-| `/api/kill-switch/status` | `False` | `503` |
+| `/api/health` | `False` | `502` |
+| `/api/state` | `False` | `502` |
+| `/api/status` | `False` | `502` |
+| `/api/broker/status` | `False` | `502` |
+| `/api/broker/dhan/status` | `False` | `502` |
+| `/api/broker/funds` | `False` | `502` |
+| `/api/broker/holdings` | `False` | `502` |
+| `/api/broker/positions/live` | `False` | `502` |
+| `/api/approval/status` | `False` | `502` |
+| `/api/kill-switch/status` | `False` | `502` |
 
 ## Commands
 
