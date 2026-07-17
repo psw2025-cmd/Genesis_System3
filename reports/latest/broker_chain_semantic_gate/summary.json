@@ -2,38 +2,38 @@
   "base": "https://genesis-system3-backend.onrender.com",
   "broker": {
     "connected": false,
-    "http": 503,
-    "reason": "HTTP_503"
+    "http": 502,
+    "reason": "HTTP_502"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
-    "http": 503,
-    "reason": "HTTP_503",
+    "http": 502,
+    "reason": "HTTP_502",
     "semantic_ok": false
   },
-  "generated_utc": "2026-07-16T10:22:20.033205Z",
+  "generated_utc": "2026-07-17T04:15:30.327368Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "BROKER:HTTP_503",
-    "FUNDS:HTTP_503",
-    "CHAIN:NIFTY:HTTP_503",
-    "CHAIN:BANKNIFTY:HTTP_503",
-    "CHAIN:FINNIFTY:HTTP_503",
-    "CHAIN:MIDCPNIFTY:HTTP_503"
+    "BROKER:HTTP_502",
+    "FUNDS:HTTP_502",
+    "CHAIN:NIFTY:HTTP_502",
+    "CHAIN:BANKNIFTY:HTTP_502",
+    "CHAIN:FINNIFTY:HTTP_502",
+    "CHAIN:MIDCPNIFTY:HTTP_502"
   ],
   "required_chain_ready_count": 0,
   "required_chain_total": 4,
   "required_chains": [
     {
       "contracts": 0,
-      "error": "HTTP_503",
-      "http": 503,
+      "error": "HTTP_502",
+      "http": 502,
       "priority": null,
       "ready": false,
-      "reason": "HTTP_503",
+      "reason": "HTTP_502",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -43,11 +43,11 @@
     },
     {
       "contracts": 0,
-      "error": "HTTP_503",
-      "http": 503,
+      "error": "HTTP_502",
+      "http": 502,
       "priority": null,
       "ready": false,
-      "reason": "HTTP_503",
+      "reason": "HTTP_502",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -57,11 +57,11 @@
     },
     {
       "contracts": 0,
-      "error": "HTTP_503",
-      "http": 503,
+      "error": "HTTP_502",
+      "http": 502,
       "priority": null,
       "ready": false,
-      "reason": "HTTP_503",
+      "reason": "HTTP_502",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -71,11 +71,11 @@
     },
     {
       "contracts": 0,
-      "error": "HTTP_503",
-      "http": 503,
+      "error": "HTTP_502",
+      "http": 502,
       "priority": null,
       "ready": false,
-      "reason": "HTTP_503",
+      "reason": "HTTP_502",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -87,10 +87,10 @@
   "secrets_written": false,
   "system3_live_trading_allowed": false,
   "transport_failures": [
-    "BROKER_STATUS_HTTP_503",
-    "CHAIN_NIFTY_HTTP_503",
-    "CHAIN_BANKNIFTY_HTTP_503",
-    "CHAIN_FINNIFTY_HTTP_503",
-    "CHAIN_MIDCPNIFTY_HTTP_503"
+    "BROKER_STATUS_HTTP_502",
+    "CHAIN_NIFTY_HTTP_502",
+    "CHAIN_BANKNIFTY_HTTP_502",
+    "CHAIN_FINNIFTY_HTTP_502",
+    "CHAIN_MIDCPNIFTY_HTTP_502"
   ]
 }

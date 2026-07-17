@@ -1,8 +1,8 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-07-16T10:22:20.033205Z`
+- Generated UTC: `2026-07-17T04:15:30.327368Z`
 - Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (HTTP_503)
+- Broker connected: `False` (HTTP_502)
 - Funds semantic proof: `False`
 - Mandatory chains ready: `0/4`
 - Analyzer mode: `ON`
@@ -11,15 +11,15 @@
 - Secrets written: `false`
 
 ## Mandatory chains
-- NIFTY: BLOCKED http=503 source=None status=None contracts=0 stale=False
-- BANKNIFTY: BLOCKED http=503 source=None status=None contracts=0 stale=False
-- FINNIFTY: BLOCKED http=503 source=None status=None contracts=0 stale=False
-- MIDCPNIFTY: BLOCKED http=503 source=None status=None contracts=0 stale=False
+- NIFTY: BLOCKED http=502 source=None status=None contracts=0 stale=False
+- BANKNIFTY: BLOCKED http=502 source=None status=None contracts=0 stale=False
+- FINNIFTY: BLOCKED http=502 source=None status=None contracts=0 stale=False
+- MIDCPNIFTY: BLOCKED http=502 source=None status=None contracts=0 stale=False
 
 ## Blockers
-- BROKER:HTTP_503
-- FUNDS:HTTP_503
-- CHAIN:NIFTY:HTTP_503
-- CHAIN:BANKNIFTY:HTTP_503
-- CHAIN:FINNIFTY:HTTP_503
-- CHAIN:MIDCPNIFTY:HTTP_503
+- BROKER:HTTP_502
+- FUNDS:HTTP_502
+- CHAIN:NIFTY:HTTP_502
+- CHAIN:BANKNIFTY:HTTP_502
+- CHAIN:FINNIFTY:HTTP_502
+- CHAIN:MIDCPNIFTY:HTTP_502
