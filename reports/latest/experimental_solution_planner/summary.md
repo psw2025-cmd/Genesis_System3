@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-17T11:24:41.916069+00:00`
+Generated UTC: `2026-07-17T11:30:22.344836+00:00`
 Status: **BLOCKED**
-Issues: `485`
+Issues: `487`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 261 issues
+### GITHUB_RENDER_FAILURE — 263 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29573436103 conclusion=failure commit=e3d582479247
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29573468859 conclusion=failure commit=79700d2ce397
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29573435690 conclusion=failure commit=e3d582479247
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29571636136 conclusion=cancelled commit=5b7569548e6d
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Permanent Repo Render Safety' run=29572471320 conclusion=failure commit=5b0a53256786
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29576746752 conclusion=failure commit=9016cd9506cd
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29576702945 conclusion=failure commit=d37fbd396b17
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29576696379 conclusion=failure commit=d37fbd396b17
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29574943186 conclusion=cancelled commit=e70c4d7b6a27
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=29575089127 conclusion=failure commit=e4d24f2ab2df
 
 ### UI_RED_VISUAL — 50 issues
 
@@ -331,7 +331,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=29
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=30
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=171
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
