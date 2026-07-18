@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-18T23:01:59.465509+00:00",
-  "issue_count": 477,
+  "generated_utc": "2026-07-18T23:02:51.469820+00:00",
+  "issue_count": 469,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 253,
+      "issue_count": 244,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -670,7 +670,7 @@
       ]
     },
     {
-      "issue_count": 15,
+      "issue_count": 16,
       "lane": "INSTALL_CREDENTIAL",
       "recommended_fixes": [
         "Fix dependency/import/compile errors from secure audit.",
@@ -739,17 +739,22 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29663732030 conclusion=failure commit=53703aad5f48b4a1fc428044faf5cf5c2de73e91",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29664502532 conclusion=failure commit=261b5a072bd725d9a2f32bc44b0152d6b485e73a",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29663719446 conclusion=failure commit=e34f17fa4a5015bac34884f5f54f63ec3f8f0b52",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29664475768 conclusion=failure commit=de2d7a3dae43b71e73c568c3fa2ca517811c7069",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29663225976 conclusion=failure commit=6a6ebba44291a37d8a96ab74fccb86aab8e777cb",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29664461317 conclusion=failure commit=6d017c5a68663cb5118e8c934f65b95a929f3458",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29664113375 conclusion=failure commit=e15ecc3c56e53dd9c6044a3de6fc9ed305d15913",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1006,7 +1011,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "failed_count=41",
+          "issue": "failed_count=37",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
