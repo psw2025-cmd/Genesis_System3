@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-18T06:28:40.036829+00:00",
-  "issue_count": 481,
+  "generated_utc": "2026-07-18T06:40:41.222523+00:00",
+  "issue_count": 474,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 256,
+      "issue_count": 248,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,77 +64,77 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29632688422 conclusion=failure commit=b789394e964a",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29633960638 conclusion=failure commit=f8099b753802",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29632701210 conclusion=failure commit=643465bd4426",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29633960888 conclusion=failure commit=f8099b753802",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29632722695 conclusion=failure commit=995f5aa88da0",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29634025906 conclusion=failure commit=57ddfbe687d5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29632697987 conclusion=failure commit=643465bd4426",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29633755792 conclusion=failure commit=70a9027e4817",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29632688427 conclusion=failure commit=b789394e964a",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29634036519 conclusion=failure commit=afdd389e7eb5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29632688437 conclusion=failure commit=b789394e964a",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29634052107 conclusion=failure commit=ae20b443e8e8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29632471160 conclusion=failure commit=31c7a3a6a105",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29634036507 conclusion=failure commit=afdd389e7eb5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29632473108 conclusion=failure commit=31c7a3a6a105",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29634025892 conclusion=failure commit=57ddfbe687d5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29631767211 conclusion=cancelled commit=1cac54f95c96",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29634025905 conclusion=failure commit=57ddfbe687d5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29632252653 conclusion=failure commit=dbc2ce1e426e",
-          "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29631828934 conclusion=failure commit=4035e7a2a839",
-          "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix latest GitHub workflow 'System3 Render Worker Preflight' run=29631780421 conclusion=failure commit=1cac54f95c96",
-          "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=29631813359 conclusion=failure commit=4035e7a2a839",
-          "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=29631770402 conclusion=failure commit=1cac54f95c96",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29633298893 conclusion=failure commit=f9f9f122cb89",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
           "issue": "Fix Render endpoint /: HTTP status 502 status=502",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /ui/: HTTP status 502 status=502",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /api/health: HTTP status 502 status=502",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /api/state: HTTP status 502 status=502",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /api/broker/diagnose: HTTP status 502 status=502",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -277,6 +277,142 @@
       ]
     },
     {
+      "issue_count": 40,
+      "lane": "BROKER_DHAN",
+      "recommended_fixes": [
+        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
+        "Treat token/auth/funds failure as connected=false.",
+        "Do not enable live orders."
+      ],
+      "top_issues": [
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/positions/live",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker endpoint server error: /api/broker/holdings",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker endpoint server error: /api/broker/diagnose",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        },
+        {
+          "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
+          "lane": "BROKER_DHAN",
+          "report": "reports/latest/render_100_agent_swarm/summary.json"
+        }
+      ]
+    },
+    {
       "issue_count": 39,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
@@ -409,142 +545,6 @@
           "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/\", \"error_type\": null, \"reason\": \"HTTP status 502\", \"status_code\": 502, \"url\": \"https://genesis-system3-backend.onrender.com/\"}",
           "lane": "RENDER_DEPLOY",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 39,
-      "lane": "BROKER_DHAN",
-      "recommended_fixes": [
-        "Check broker diagnose/funds/holdings/positions read-only endpoints.",
-        "Treat token/auth/funds failure as connected=false.",
-        "Do not enable live orders."
-      ],
-      "top_issues": [
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_045:broker_truth: Broker endpoint server error: /api/broker/positions/live",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_064:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_065:broker_truth: Broker endpoint server error: /api/broker/holdings",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_065:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_084:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_085:broker_truth: Broker endpoint server error: /api/broker/diagnose",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
-        },
-        {
-          "issue": "agent_085:broker_truth: Broker/auth issue visible at /api/broker/funds: {\"detail\":\"Missing or invalid dashboard API session\"}",
-          "lane": "BROKER_DHAN",
-          "report": "reports/latest/render_100_agent_swarm/summary.json"
         }
       ]
     },
@@ -874,7 +874,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=26",
+          "issue": "todo_count=22",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
