@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-19T23:40:58.277395+00:00`
+Generated UTC: `2026-07-19T23:48:21.933804+00:00`
 Status: **BLOCKED**
-Issues: `469`
+Issues: `471`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 242 issues
+### GITHUB_RENDER_FAILURE — 247 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### INSTALL_CREDENTIAL — 18 issues
+### INSTALL_CREDENTIAL — 15 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -293,9 +293,9 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553491113 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553487362 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553034655 conclusion=failure commit=d365c5e06a6029d05e8a6d867e56895f3baa14cf
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29707607740 conclusion=failure commit=c67ec4c04f15e1510126b3651800c823c3b8303e
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29707278598 conclusion=failure commit=950626754f5397c7308dc2560b45dc83df5af010
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29707267527 conclusion=failure commit=015b028523dafb08cea64655573da3f81894d057
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29708281267 conclusion=failure commit=9f3ee1231d49319d7dddde2436dc8c14cae3e24b
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29708268534 conclusion=failure commit=ad99713dd9a4204dd42af7f25a67cf602c4eae42
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29707774227 conclusion=failure commit=e57d9495e82845d085afd2871d6388f93dfed7e0
 
 ### ML_TRAINING — 13 issues
 
@@ -372,7 +372,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=37
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=38
 
 ### PAPER_LIFECYCLE — 7 issues
 
