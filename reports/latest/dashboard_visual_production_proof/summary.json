@@ -18,10 +18,10 @@
     "VISIBLE_TRACKER_BAD_TABS:16"
   ],
   "corroborating_evidence": {
-    "shell_generated_at": "2026-07-19T12:24:19.405Z",
+    "shell_generated_at": "2026-07-19T13:46:49.398Z",
     "shell_status": "BLOCKED",
     "shell_tab_coverage": "0/16",
-    "visible_tracker_generated_at": "2026-07-19T12:27:23.724Z",
+    "visible_tracker_generated_at": "2026-07-19T13:38:27.074Z",
     "visible_tracker_status": "BLOCKED",
     "visible_tracker_bad_tab_count": 16
   },
