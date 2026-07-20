@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-20T19:14:03.056Z
+Generated: 2026-07-20T19:28:16.904Z
 Status: **BLOCKED**
 Blocker: **RENDER_UI_UNAVAILABLE_AFTER_RETRIES**
 Render UI available: `false`
