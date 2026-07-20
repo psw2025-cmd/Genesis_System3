@@ -1,9 +1,9 @@
 # System3 Autopilot Latest Status
 
-Generated UTC: `2026-07-17T04:52:59.951724+00:00`
+Generated UTC: `2026-07-20T05:06:16.826371+00:00`
 Owner/operator: **PRITAM S. WARGHADE**
 Status: **BLOCKED**
-Blockers: `171`
+Blockers: `169`
 
 ## Non-negotiable rules
 
@@ -31,9 +31,9 @@ Blockers: `171`
 |---|---|---|---:|---:|
 | secure_install_credential_audit | BLOCKED | BLOCKED | 6 | 6 |
 | dashboard_visible_issue_tracker | BLOCKED | BLOCKED | 1 | 1 |
-| github_render_failure_tracker | BLOCKED | BLOCKED | 100 | 103 |
+| github_render_failure_tracker | BLOCKED | BLOCKED | 100 | 105 |
 | parallel_root_cause_audit | BLOCKED | BLOCKED | 12 | 12 |
-| workflow_failure_tracker | BLOCKED | BLOCKED | 42 | 42 |
+| workflow_failure_tracker | BLOCKED | BLOCKED | 40 | 40 |
 | todo_status_update | BLOCKED | BLOCKED | 0 | 0 |
 | dashboard_visual_production_proof | UNKNOWN | BLOCKED | 0 | 0 |
 | system3_public_truth | BLOCKED_NOT_TRADE_READY | BLOCKED | 0 | 0 |
@@ -49,44 +49,45 @@ Blockers: `171`
 - [ ] dashboard_visible_issue_tracker: Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell
 ╔═════════════════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright Test or Playwright w
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29555714353 conclusion=failure commit=9211f0714a8e
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555681958 conclusion=failure commit=29b43b8b02ee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29555681939 conclusion=failure commit=29b43b8b02ee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29555681918 conclusion=failure commit=29b43b8b02ee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29555681910 conclusion=failure commit=29b43b8b02ee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29555681901 conclusion=failure commit=29b43b8b02ee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Settle Proof' run=29555672347 conclusion=failure commit=10406ef9e65a
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555294636 conclusion=failure commit=0311faa1e82c
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555294612 conclusion=failure commit=0311faa1e82c
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29555283195 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29555283180 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29555283175 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555283172 conclusion=cancelled commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555283162 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29555283152 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555281264 conclusion=cancelled commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555281254 conclusion=failure commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29555281251 conclusion=cancelled commit=6f0747c5eefd
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555267395 conclusion=failure commit=c443b8555b34
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555267375 conclusion=cancelled commit=c443b8555b34
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29555267369 conclusion=cancelled commit=c443b8555b34
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29555255385 conclusion=failure commit=c443b8555b34
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29555242470 conclusion=failure commit=a68a7ee7dedc
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29555242468 conclusion=failure commit=a68a7ee7dedc
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555242458 conclusion=failure commit=a68a7ee7dedc
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29555239069 conclusion=failure commit=9ad94f2724ab
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Settle Normalizer' run=29555226565 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29555226552 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29555226541 conclusion=cancelled commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29555226539 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29555226523 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555226520 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555226512 conclusion=cancelled commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29555226506 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29555224573 conclusion=cancelled commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29555224513 conclusion=failure commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29555224497 conclusion=cancelled commit=19d9ae856e5d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29555223899 conclusion=cancelled commit=19d9ae856e5d
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29718091566 conclusion=failure commit=96e21bceff5a
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29718048407 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29718048399 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29718048398 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29718048395 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29718048390 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29718048383 conclusion=failure commit=cfd87769cb7b
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29718011647 conclusion=failure commit=f17caaf07846
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Settle Proof' run=29718000472 conclusion=failure commit=f17caaf07846
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Current' run=29717773339 conclusion=failure commit=000e811b3983
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717683818 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717683815 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29717683473 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29717683459 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29717683455 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29717683452 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717683450 conclusion=cancelled commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717683449 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717681596 conclusion=failure commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717681582 conclusion=cancelled commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29717681541 conclusion=cancelled commit=60a8ccf15d53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717668053 conclusion=cancelled commit=1e4c7ff72e19
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29717668039 conclusion=cancelled commit=1e4c7ff72e19
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717668032 conclusion=failure commit=1e4c7ff72e19
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29717657423 conclusion=failure commit=1e4c7ff72e19
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29717646954 conclusion=failure commit=ccc2699f81b7
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29717646176 conclusion=failure commit=ccc2699f81b7
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717646167 conclusion=failure commit=ccc2699f81b7
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29717646164 conclusion=failure commit=ccc2699f81b7
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717638503 conclusion=failure commit=fe95e9e09083
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29717638459 conclusion=cancelled commit=fe95e9e09083
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717638455 conclusion=cancelled commit=fe95e9e09083
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=29717633525 conclusion=cancelled commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29717633523 conclusion=failure commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29717633519 conclusion=failure commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=29717633513 conclusion=failure commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29717633512 conclusion=cancelled commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29717633504 conclusion=failure commit=81b4deb9ce53
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=29717633501 conclusion=failure commit=81b4deb9ce53
 - [ ] github_render_failure_tracker: Fix Render endpoint /: HTTP status 502 status=502
 - [ ] github_render_failure_tracker: Fix Render endpoint /ui/: HTTP status 502 status=502
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/health: HTTP status 502 status=502
@@ -111,44 +112,43 @@ Blockers: `171`
 - [ ] github_render_failure_tracker: endpoint=/api/scanner/top_contract_gainers reason=HTTP status 502 status=502
 - [ ] github_render_failure_tracker: endpoint=/api/paper reason=HTTP status 502 status=502
 - [ ] github_render_failure_tracker: endpoint=/api/ml/performance reason=HTTP status 502 status=502
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29555714353
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555681958
-- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29555681939
-- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=failure run=29555681918
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29555681910
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29555681901
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Settle Proof conclusion=failure run=29555672347
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555294636
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=failure run=29555294612
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29555283195
-- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29555283180
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29555283175
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29555283172
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555283162
-- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=failure run=29555283152
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29555281264
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555281254
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29555281251
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555267395
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29555267375
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29555267369
-- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29555255385
-- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29555242470
-- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29555242468
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555242458
-- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29555239069
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Settle Normalizer conclusion=failure run=29555226565
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29555226552
-- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=cancelled run=29555226541
-- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29555226539
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29555226523
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555226520
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29555226512
-- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29555226506
-- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29555224573
-- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29555224513
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29555224497
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29555223899
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29718091566
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29718048407
+- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=failure run=29718048399
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=failure run=29718048398
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29718048395
+- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29718048390
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29718048383
+- [ ] github_render_failure_tracker: workflow=System3 Windows Self-Hosted Full Proof conclusion=failure run=29718011647
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Settle Proof conclusion=failure run=29718000472
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Current conclusion=failure run=29717773339
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717683818
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=failure run=29717683815
+- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=failure run=29717683473
+- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29717683459
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29717683455
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Proof Strict Gate conclusion=failure run=29717683452
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29717683450
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717683449
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717681596
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29717681582
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29717681541
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29717668053
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29717668039
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717668032
+- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29717657423
+- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29717646954
+- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29717646176
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717646167
+- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29717646164
+- [ ] github_render_failure_tracker: workflow=System3 Experimental Solution Planner conclusion=failure run=29717638503
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Issue Tracker conclusion=cancelled run=29717638459
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29717638455
+- [ ] github_render_failure_tracker: workflow=System3 Safe Repair Runner conclusion=cancelled run=29717633525
+- [ ] github_render_failure_tracker: workflow=System3 Secure Install Credential Audit conclusion=failure run=29717633523
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Loading Postflight conclusion=failure run=29717633519
+- [ ] github_render_failure_tracker: workflow=System3 Autopilot Proof Board conclusion=failure run=29717633513
+- [ ] github_render_failure_tracker: workflow=Dashboard Shell Diagnostic conclusion=cancelled run=29717633512
 - [ ] parallel_root_cause_audit: Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.
 - [ ] parallel_root_cause_audit: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 - [ ] parallel_root_cause_audit: Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.
@@ -161,48 +161,46 @@ Blockers: `171`
 - [ ] parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
 - [ ] parallel_root_cause_audit: Need fresh screenshot after latest commits; older screenshots do not prove current UI.
 - [ ] parallel_root_cause_audit: Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Windows Self-Hosted Workflow Migration' run 29555085410 conclusion=failure commit=b4cf29a7d8e6a658d3c31793fa5e2f3dc296fd7f
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 29554399546 conclusion=failure commit=af1ae290180e485a863a46044e15933649b75cad
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29553937164 conclusion=failure commit=9455c14e80f8ab0c484725111fadab7c50a1dfcd
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Live UI Proof' run 29553860204 conclusion=cancelled commit=9455c14e80f8ab0c484725111fadab7c50a1dfcd
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Latest Truth Publish' run 29553778030 conclusion=cancelled commit=9455c14e80f8ab0c484725111fadab7c50a1dfcd
-- [ ] workflow_failure_tracker: Fix workflow 'Permanent Repo Render Safety' run 29553720084 conclusion=failure commit=9455c14e80f8ab0c484725111fadab7c50a1dfcd
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29553564740 conclusion=failure commit=088736d5a5dee0c9c4777e97b3183ab952b7f194
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553564694 conclusion=failure commit=088736d5a5dee0c9c4777e97b3183ab952b7f194
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553542394 conclusion=failure commit=ab68a0a9c73a5a3b1c07cbcc1e3fc031f95de84f
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553542313 conclusion=failure commit=ab68a0a9c73a5a3b1c07cbcc1e3fc031f95de84f
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553542298 conclusion=failure commit=ab68a0a9c73a5a3b1c07cbcc1e3fc031f95de84f
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553542288 conclusion=failure commit=ab68a0a9c73a5a3b1c07cbcc1e3fc031f95de84f
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29553534485 conclusion=cancelled commit=dcdaff4ae0feddae46e15b02f3051d58e5d30aff
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29553534416 conclusion=failure commit=dcdaff4ae0feddae46e15b02f3051d58e5d30aff
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553534382 conclusion=failure commit=dcdaff4ae0feddae46e15b02f3051d58e5d30aff
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29553526074 conclusion=cancelled commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553526060 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29553526058 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553526053 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553526051 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29553526050 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 29553526028 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29553523630 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553523607 conclusion=failure commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29553523597 conclusion=cancelled commit=7357818202f8ca929f0a33a4fa782387738e06eb
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553506549 conclusion=failure commit=ad25e73a324bc4f948888a4267b0a7196aa12684
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553502659 conclusion=failure commit=ad25e73a324bc4f948888a4267b0a7196aa12684
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553502654 conclusion=failure commit=ad25e73a324bc4f948888a4267b0a7196aa12684
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553502653 conclusion=failure commit=ad25e73a324bc4f948888a4267b0a7196aa12684
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553502013 conclusion=failure commit=ad25e73a324bc4f948888a4267b0a7196aa12684
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553491113 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553491112 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553491090 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29553487386 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553487366 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553487362 conclusion=failure commit=329ad7b772ef0d97d09ef9af2795628420002eba
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 29553478374 conclusion=cancelled commit=5c811b8d658a34c9dcca35bf08e18faf56fdbb7a
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29553478352 conclusion=cancelled commit=5c811b8d658a34c9dcca35bf08e18faf56fdbb7a
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29553034655 conclusion=failure commit=d365c5e06a6029d05e8a6d867e56895f3baa14cf
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29553034629 conclusion=failure commit=d365c5e06a6029d05e8a6d867e56895f3baa14cf
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29553034560 conclusion=failure commit=d365c5e06a6029d05e8a6d867e56895f3baa14cf
-- [ ] workflow_failure_tracker: failed_count=41
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Windows Self-Hosted Workflow Migration' run 29717524076 conclusion=failure commit=4d8358311ca0501c01e474f422e46e7fb4c6ee66
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 29716854670 conclusion=failure commit=efc690681fc80f27218a2a39e3bc3313e2c9d4e3
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29716709324 conclusion=failure commit=efc690681fc80f27218a2a39e3bc3313e2c9d4e3
+- [ ] workflow_failure_tracker: Fix workflow 'Permanent Repo Render Safety' run 29716365919 conclusion=failure commit=efc690681fc80f27218a2a39e3bc3313e2c9d4e3
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715728742 conclusion=failure commit=662c6ef801dd861c9b667a133dc205c5a4092912
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29715728736 conclusion=failure commit=662c6ef801dd861c9b667a133dc205c5a4092912
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29715708880 conclusion=failure commit=f318da2fd880de13828a52ced2a64ff2ac611397
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715708875 conclusion=failure commit=f318da2fd880de13828a52ced2a64ff2ac611397
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715708846 conclusion=failure commit=f318da2fd880de13828a52ced2a64ff2ac611397
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715707791 conclusion=failure commit=f318da2fd880de13828a52ced2a64ff2ac611397
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715697134 conclusion=failure commit=49b3af63d0109b9161c27b3141111f7a95b3fd70
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29715697131 conclusion=failure commit=49b3af63d0109b9161c27b3141111f7a95b3fd70
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29715697124 conclusion=cancelled commit=49b3af63d0109b9161c27b3141111f7a95b3fd70
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715694279 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715694221 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29715694193 conclusion=cancelled commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 29715694190 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29715694189 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29715694185 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29715694184 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715692398 conclusion=failure commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29715692395 conclusion=cancelled commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29715692393 conclusion=cancelled commit=7a78e75d50830019fa8cbeb98194d152da1a6b04
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715673247 conclusion=failure commit=569cb21fe004fe9e7cd0cf63262cfe5d89294dbf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715669462 conclusion=failure commit=569cb21fe004fe9e7cd0cf63262cfe5d89294dbf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29715669440 conclusion=failure commit=569cb21fe004fe9e7cd0cf63262cfe5d89294dbf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715669432 conclusion=failure commit=569cb21fe004fe9e7cd0cf63262cfe5d89294dbf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715667254 conclusion=failure commit=569cb21fe004fe9e7cd0cf63262cfe5d89294dbf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715657833 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715657832 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29715657792 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29715654131 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29715654096 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29715654087 conclusion=failure commit=653b62a647bd7a778f0a6237032721b29f6b00e9
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29715644991 conclusion=cancelled commit=f0cb57636731e4602d7b119b3c539f2f81f08a77
+- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 29715644950 conclusion=cancelled commit=f0cb57636731e4602d7b119b3c539f2f81f08a77
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29715277110 conclusion=failure commit=c439595dea7b539c8573f35027c780d67b8cbc23
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29715277089 conclusion=failure commit=c439595dea7b539c8573f35027c780d67b8cbc23
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29715277043 conclusion=failure commit=c439595dea7b539c8573f35027c780d67b8cbc23
+- [ ] workflow_failure_tracker: failed_count=39
 - [ ] todo_status_update: status=BLOCKED
 - [ ] dashboard_visual_production_proof: status=UNKNOWN
 - [ ] system3_public_truth: status=BLOCKED_NOT_TRADE_READY
