@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-20T16:33:07.679896+00:00`
+Generated UTC: `2026-07-20T17:00:41.089256+00:00`
 Status: **BLOCKED**
-Issues: `468`
+Issues: `473`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 245 issues
+### GITHUB_RENDER_FAILURE — 249 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -73,6 +73,30 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
+
+### BROKER_DHAN — 40 issues
+
+Recommended fixes:
+- Check broker diagnose/funds/holdings/positions read-only endpoints.
+- Treat token/auth/funds failure as connected=false.
+- Do not enable live orders.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
 ### RENDER_DEPLOY — 39 issues
 
@@ -152,30 +176,6 @@ Top issues:
   font-style: normal;
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
-
-### BROKER_DHAN — 39 issues
-
-Recommended fixes:
-- Check broker diagnose/funds/holdings/positions read-only endpoints.
-- Treat token/auth/funds failure as connected=false.
-- Do not enable live orders.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
 ### OPTION_CHAIN — 22 issues
 
@@ -291,10 +291,10 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29725265273 conclusion=failure commit=d803dd2310956ac2f3f985b3b34770b3098329a9
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29725214683 conclusion=failure commit=a5a375a3aeed6f081864fb3b259b0193fe236fbd
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29725196760 conclusion=failure commit=e369f5921fdc69468d6e754616c3dce423ddf51b
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759126902 conclusion=failure commit=3bcefedcbad6f5998e6085b7d23e4406b8dc48e9
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759051233 conclusion=failure commit=2c00be24dbf03e508ff9992e8b55cfb5ff4f5628
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759022676 conclusion=failure commit=f3f0a835446e0ecc1306c83b69c04e0728c0bda5
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29758158176 conclusion=failure commit=f4543e738e886ed8f8946e3f96648ee8e49dc171
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29760079550 conclusion=failure commit=663bc9714ed477d92eca03da4a29356760c0b5fa
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759999069 conclusion=failure commit=b64b8a1c1f94b25d0911cebd73c2e2f950070002
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759541093 conclusion=failure commit=4a28ac1faaf9c256d61d1548acfd6bd44d63d886
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29759509771 conclusion=failure commit=3f7ade91368ec76f25ba92ead97be3603f603d62
 
 ### ML_TRAINING — 13 issues
 
@@ -371,7 +371,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=39
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=41
 
 ### PAPER_LIFECYCLE — 7 issues
 
