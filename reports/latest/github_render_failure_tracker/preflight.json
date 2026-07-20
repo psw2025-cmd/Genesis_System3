@@ -5,8 +5,11 @@
   "dashboard_base_url_present": true,
   "dashboard_api_key_present": true,
   "rate_limit": {
-    "available": false,
-    "error_type": "HTTPError"
+    "available": true,
+    "core_remaining": 4999,
+    "core_limit": 5000,
+    "core_reset": 1784514948,
+    "actions_runner_registration_remaining": 10000
   },
   "live_trading_enabled": "0",
   "system3_live_trading_allowed": "0",
