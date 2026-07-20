@@ -15,10 +15,10 @@ Screenshot gate: **False**
 - VISIBLE_TRACKER_BAD_TABS:16
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-19T23:23:58.038Z`
+- `shell_generated_at`: `2026-07-20T00:48:32.394Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-07-19T23:27:02.092Z`
+- `visible_tracker_generated_at`: `2026-07-20T00:39:53.331Z`
 - `visible_tracker_status`: `BLOCKED`
 - `visible_tracker_bad_tab_count`: `16`
 
