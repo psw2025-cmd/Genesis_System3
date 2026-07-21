@@ -1,6 +1,6 @@
 # System3 Windows Self-Hosted Full System Proof
 
-Generated: `2026-07-19T06:16:40.614142Z`
+Generated: `2026-07-21T06:16:14.741750Z`
 
 Final status: **BLOCKED**
 
@@ -12,11 +12,11 @@ Response bodies persisted: **false**.
 
 | Area | Status | Detail |
 |---|---|---|
-| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=3.7s |
-| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=200.41s |
-| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=7.92s |
-| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.35s |
-| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.25s |
+| C:\Python310\python.exe scripts/system3_gate_evaluator.py --sync-gates | PASS | rc=0 elapsed=4.18s |
+| C:\Python310\python.exe tools/system3_auto_coordinator.py --full | PASS | rc=0 elapsed=231.38s |
+| C:\Python310\python.exe tools/system3_github_render_failure_tracker.py | PASS | rc=0 elapsed=7.81s |
+| C:\Python310\python.exe tools/dashboard_visible_issue_tracker.mjs | BLOCKED | rc=1 elapsed=1.19s |
+| C:\Python310\python.exe tools/system3_autopilot_proof_board.py | BLOCKED | rc=1 elapsed=0.3s |
 | HTTP /api/health | BLOCKED | 502 |
 | HTTP /api/state | BLOCKED | 502 |
 | HTTP /api/status | BLOCKED | 502 |
