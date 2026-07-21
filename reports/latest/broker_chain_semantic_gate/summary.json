@@ -11,7 +11,7 @@
     "reason": "HTTP_502",
     "semantic_ok": false
   },
-  "generated_utc": "2026-07-21T08:32:11.109264Z",
+  "generated_utc": "2026-07-21T09:31:40.119318Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
