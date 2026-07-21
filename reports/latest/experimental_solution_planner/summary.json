@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-21T10:38:45.816749+00:00",
-  "issue_count": 456,
+  "generated_utc": "2026-07-21T10:43:46.220932+00:00",
+  "issue_count": 474,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 232,
+      "issue_count": 250,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,77 +64,77 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29819605127 conclusion=failure commit=198e86f341c5",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29822929004 conclusion=failure commit=c2fc5e68e80b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29819568982 conclusion=failure commit=198e86f341c5",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29822958357 conclusion=failure commit=0ee9e68a8857",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29819616950 conclusion=failure commit=7c2b5fe67508",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29823004534 conclusion=failure commit=c56d4dfe3bbc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29819605166 conclusion=failure commit=198e86f341c5",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29822958367 conclusion=failure commit=0ee9e68a8857",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29819605148 conclusion=failure commit=198e86f341c5",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29822928999 conclusion=failure commit=c2fc5e68e80b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29819605250 conclusion=failure commit=198e86f341c5",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29822928945 conclusion=failure commit=c2fc5e68e80b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29818613760 conclusion=failure commit=504a60da7580",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=29820889824 conclusion=cancelled commit=1ef2f7a53f9b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29822509441 conclusion=failure commit=cd9f37ec2ed3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /ui/: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=29821005536 conclusion=failure commit=3036fc477afe",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/health: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=29820147639 conclusion=cancelled commit=03d8870338f3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/state: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29820873066 conclusion=failure commit=30a437057f1b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/broker/diagnose: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29820829537 conclusion=failure commit=30a437057f1b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/broker/positions/live: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=29821048081 conclusion=failure commit=3036fc477afe",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=29821072026 conclusion=failure commit=3036fc477afe",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/paper: HTTP status 502 status=502",
+          "issue": "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=29820913556 conclusion=failure commit=1ef2f7a53f9b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -869,7 +869,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=19",
+          "issue": "todo_count=28",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
