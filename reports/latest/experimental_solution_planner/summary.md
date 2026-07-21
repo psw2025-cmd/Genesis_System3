@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-21T04:50:46.253836+00:00`
+Generated UTC: `2026-07-21T05:05:17.691429+00:00`
 Status: **BLOCKED**
-Issues: `486`
+Issues: `491`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 259 issues
+### GITHUB_RENDER_FAILURE — 263 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=29795873808 conclusion=failure commit=dcd3a4ef359c
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29796356531 conclusion=failure commit=9a57c6fbb7fc
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29796377920 conclusion=failure commit=23d3c029dd3d
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29796408115 conclusion=failure commit=a2e3ec789f25
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29796377888 conclusion=failure commit=23d3c029dd3d
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=29802346705 conclusion=failure commit=7bc0947e0ad1
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29802331816 conclusion=failure commit=89a1fd5a8637
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=29802440108 conclusion=failure commit=8de7a3319612
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=29802323696 conclusion=failure commit=89a1fd5a8637
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29802337517 conclusion=failure commit=89a1fd5a8637
 
 ### UI_RED_VISUAL — 50 issues
 
@@ -73,6 +73,30 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_053:todo_status: TODO status is not complete: BLOCKED counts={'BLOCKED': 1, 'DONE': 0, 'PARTIAL': 0, 'PENDING': 0}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
+
+### BROKER_DHAN — 40 issues
+
+Recommended fixes:
+- Check broker diagnose/funds/holdings/positions read-only endpoints.
+- Treat token/auth/funds failure as connected=false.
+- Do not enable live orders.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
 ### RENDER_DEPLOY — 39 issues
 
@@ -152,30 +176,6 @@ Top issues:
   font-style: normal;
   font-stretch: normal;
   src: url("data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcg
-
-### BROKER_DHAN — 39 issues
-
-Recommended fixes:
-- Check broker diagnose/funds/holdings/positions read-only endpoints.
-- Treat token/auth/funds failure as connected=false.
-- Do not enable live orders.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_005:broker_truth: Broker/auth issue visible at /api/broker/positions/live: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker/auth issue visible at /api/broker/holdings: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_025:broker_truth: Broker endpoint server error: /api/broker/positions/live
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/diagnose: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_044:backend_api_smoke: Backend API smoke failed /api/broker/funds: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/diagnose: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
 ### OPTION_CHAIN — 22 issues
 
@@ -331,7 +331,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=27
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=29
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=168
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
