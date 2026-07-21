@@ -1,6 +1,6 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-21T09:46:31.989217+00:00`
+Generated UTC: `2026-07-21T09:51:21.293972+00:00`
 Status: **BLOCKED**
 Issues: `462`
 Fix lanes: `13`
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29815371419 conclusion=failure commit=e8265e5b9882
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29815401009 conclusion=failure commit=09dc3b69ae59
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29815439048 conclusion=failure commit=eaa673edea4f
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29815400957 conclusion=failure commit=09dc3b69ae59
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29815371337 conclusion=failure commit=e8265e5b9882
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29819605127 conclusion=failure commit=198e86f341c5
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29819568982 conclusion=failure commit=198e86f341c5
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29819616950 conclusion=failure commit=7c2b5fe67508
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29819605166 conclusion=failure commit=198e86f341c5
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29819605148 conclusion=failure commit=198e86f341c5
 
 ### UI_RED_VISUAL — 50 issues
 

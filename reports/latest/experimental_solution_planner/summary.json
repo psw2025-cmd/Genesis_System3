@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-21T09:46:31.989217+00:00",
+  "generated_utc": "2026-07-21T09:51:21.293972+00:00",
   "issue_count": 462,
   "lane_count": 13,
   "lanes": [
@@ -64,37 +64,37 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29815371419 conclusion=failure commit=e8265e5b9882",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29819605127 conclusion=failure commit=198e86f341c5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29815401009 conclusion=failure commit=09dc3b69ae59",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29819568982 conclusion=failure commit=198e86f341c5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29815439048 conclusion=failure commit=eaa673edea4f",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29819616950 conclusion=failure commit=7c2b5fe67508",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29815400957 conclusion=failure commit=09dc3b69ae59",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29819605166 conclusion=failure commit=198e86f341c5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29815371337 conclusion=failure commit=e8265e5b9882",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29819605148 conclusion=failure commit=198e86f341c5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29815371308 conclusion=failure commit=e8265e5b9882",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29819605250 conclusion=failure commit=198e86f341c5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29814649955 conclusion=failure commit=e0384fab291d",
+          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=29818613760 conclusion=failure commit=504a60da7580",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
