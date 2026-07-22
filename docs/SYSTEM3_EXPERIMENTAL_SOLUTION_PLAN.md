@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-22T10:31:38.462051+00:00`
+Generated UTC: `2026-07-22T10:35:35.882854+00:00`
 Status: **BLOCKED**
-Issues: `465`
+Issues: `459`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 243 issues
+### GITHUB_RENDER_FAILURE — 237 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -332,9 +332,9 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29855118710 conclusion=failure commit=e302f4bf32d816990056ac4089e65e86886a0fa3
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29854251730 conclusion=failure commit=8724f5b5586e920ef3eb9977108ecc37a5f7e7cb
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29853379324 conclusion=failure commit=3b0e9be666045576e08f8923f803e25681697fac
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29909600349 conclusion=failure commit=57db49704c80f2aae42f2538d8f35d414950ce59
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29909530201 conclusion=failure commit=6821e00b800da09658ff70abb3e085f0bdef677e
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29908966483 conclusion=failure commit=caf2257568e7cbb89e42134465167c65189f1bf9
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29912241934 conclusion=failure commit=b0bc9d26860f61f506e7e76b25a1fe056e95a44e
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29911416881 conclusion=failure commit=c590996d1fd6568a928d38458112f4630ab333f7
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 29911392618 conclusion=failure commit=61c794a66f1027f5235476d4a6dc3ad2791b44e3
 
 ### ROUTE_CODE — 9 issues
 
@@ -369,7 +369,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=39
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=36
 
 ### PAPER_LIFECYCLE — 7 issues
 
