@@ -1,6 +1,6 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-22T23:14:10.330387+00:00`
+Generated UTC: `2026-07-22T23:22:11.877283+00:00`
 Status: **BLOCKED**
 Issues: `470`
 Fix lanes: `13`
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29962383817 conclusion=failure commit=8444e455fd92
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29962397715 conclusion=failure commit=6ce7c59fe0ef
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29962338851 conclusion=failure commit=0800ad309202
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29962383803 conclusion=failure commit=8444e455fd92
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29962383883 conclusion=failure commit=8444e455fd92
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29965488240 conclusion=failure commit=a0383367a3d8
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=29965136652 conclusion=failure commit=8e133f3be199
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29965497748 conclusion=failure commit=2da560ddb755
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29965488276 conclusion=failure commit=a0383367a3d8
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29965456703 conclusion=failure commit=e5e368da4aa8
 
 ### UI_RED_VISUAL — 50 issues
 
