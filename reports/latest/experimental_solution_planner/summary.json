@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-23T10:44:26.142014+00:00",
-  "issue_count": 438,
+  "generated_utc": "2026-07-23T10:45:45.781170+00:00",
+  "issue_count": 436,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 216,
+      "issue_count": 214,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,37 +64,32 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=29996610119 conclusion=failure commit=c83afc876336",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30000385823 conclusion=failure commit=1eb4b2042eac",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=29996648026 conclusion=failure commit=677a9adbe8a1",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30000427419 conclusion=failure commit=ec7faa383db4",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=29996564366 conclusion=failure commit=9dd5a0f31ead",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30000427466 conclusion=failure commit=ec7faa383db4",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=29996610008 conclusion=failure commit=c83afc876336",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30000427421 conclusion=failure commit=ec7faa383db4",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=29996610219 conclusion=failure commit=c83afc876336",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30000427450 conclusion=failure commit=ec7faa383db4",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29996609998 conclusion=failure commit=c83afc876336",
-          "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29995238818 conclusion=failure commit=9ce62f7c7ff0",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=29999219910 conclusion=failure commit=32e4b7910926",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -135,6 +130,11 @@
         },
         {
           "issue": "Fix Render endpoint /api/paper: HTTP status 502 status=502",
+          "lane": "GITHUB_RENDER_FAILURE",
+          "report": "reports/latest/github_render_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix Render endpoint /api/ml/performance: HTTP status 502 status=502",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -783,7 +783,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=19",
+          "issue": "todo_count=18",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
