@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-23T02:12:46.429867+00:00",
-  "issue_count": 483,
+  "generated_utc": "2026-07-23T02:26:42.895927+00:00",
+  "issue_count": 487,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 258,
+      "issue_count": 262,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -739,17 +739,17 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29971635545 conclusion=failure commit=b63bd749c95765e5798bc4439f15ff2e3e00887b",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29973809093 conclusion=failure commit=a20ded9797c286e863882029a4841c9c09458c5d",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29971070077 conclusion=failure commit=d4b3d5fe3ec608de94ff71cfe768b12c6bd20993",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29973230891 conclusion=failure commit=5308c83c87a87274d6611dfa0dcfaa6cf9d2d206",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29971054840 conclusion=failure commit=f1e9e8d8c25792f24bc6f8fd1dc2d7ae62c92fef",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 29973212136 conclusion=failure commit=6a1dd6a08ef0c21965a1553390e3b35c6b17dd63",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -1006,7 +1006,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "failed_count=39",
+          "issue": "failed_count=41",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
