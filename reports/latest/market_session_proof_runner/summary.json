@@ -3,7 +3,7 @@
   "autopilot_status": "BLOCKED",
   "gates_passing": 2,
   "gates_total": 7,
-  "generated_utc": "2026-07-20T08:08:21.513505+00:00",
+  "generated_utc": "2026-07-23T05:01:05.540713+00:00",
   "live_trading_enabled": false,
   "open_blockers": [
     "PROFIT_BLOCKER",
