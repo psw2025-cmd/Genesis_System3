@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-07-23T17:32:35.052037Z`
+Generated UTC: `2026-07-23T17:34:19.583530Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `https://genesis-system3-backend.onrender.com`
 Excluded workflows: `System3 GitHub Render Failure Tracker`
-GitHub failed workflows: `42`
+GitHub failed workflows: `41`
 Render failed endpoints: `12`
-TODO count: `54`
+TODO count: `53`
 
 ## Rule
 
@@ -16,6 +16,11 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 
 ## TODO
 
+- [ ] Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029893891 conclusion=failure commit=259031e41f2a
+- [ ] Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30029890958 conclusion=failure commit=259031e41f2a
+- [ ] Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029867992 conclusion=failure commit=6bc8b7c641e7
+- [ ] Fix GitHub workflow 'System3 Autopilot Proof Board' run=30029762863 conclusion=failure commit=b1683ffba457
+- [ ] Fix GitHub workflow 'System3 Safe Repair Runner' run=30029762829 conclusion=cancelled commit=b1683ffba457
 - [ ] Fix GitHub workflow 'System3 Safe Repair Runner' run=30029523268 conclusion=cancelled commit=f3684c9f38d9
 - [ ] Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029034315 conclusion=failure commit=546802581ff0
 - [ ] Fix GitHub workflow 'System3 Safe Repair Runner' run=30029034219 conclusion=cancelled commit=546802581ff0
@@ -52,12 +57,6 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 - [ ] Fix GitHub workflow 'System3 Experimental Solution Planner' run=30028752023 conclusion=failure commit=d40df75a916b
 - [ ] Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30028752004 conclusion=failure commit=d40df75a916b
 - [ ] Fix GitHub workflow 'System3 Autopilot Proof Board' run=30028751254 conclusion=failure commit=d40df75a916b
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30028751250 conclusion=cancelled commit=d40df75a916b
-- [ ] Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30028733994 conclusion=cancelled commit=b78f7065a4b8
-- [ ] Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30028733856 conclusion=cancelled commit=b78f7065a4b8
-- [ ] Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30028597021 conclusion=failure commit=4b859b548665
-- [ ] Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30028596959 conclusion=failure commit=4b859b548665
-- [ ] Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30028596901 conclusion=cancelled commit=4b859b548665
 - [ ] Fix Render endpoint /: HTTP status 502 status=502
 - [ ] Fix Render endpoint /ui/: HTTP status 502 status=502
 - [ ] Fix Render endpoint /api/health: HTTP status 502 status=502
@@ -75,6 +74,11 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 Experimental Solution Planner | 30029893891 | failure | `259031e41f2a` | 2026-07-23T17:33:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029893891 |
+| System3 Secure Install Credential Audit | 30029890958 | failure | `259031e41f2a` | 2026-07-23T17:33:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029890958 |
+| System3 Experimental Solution Planner | 30029867992 | failure | `6bc8b7c641e7` | 2026-07-23T17:32:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029867992 |
+| System3 Autopilot Proof Board | 30029762863 | failure | `b1683ffba457` | 2026-07-23T17:32:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029762863 |
+| System3 Safe Repair Runner | 30029762829 | cancelled | `b1683ffba457` | 2026-07-23T17:32:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029762829 |
 | System3 Safe Repair Runner | 30029523268 | cancelled | `f3684c9f38d9` | 2026-07-23T17:31:51Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029523268 |
 | System3 Experimental Solution Planner | 30029034315 | failure | `546802581ff0` | 2026-07-23T17:21:20Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029034315 |
 | System3 Safe Repair Runner | 30029034219 | cancelled | `546802581ff0` | 2026-07-23T17:28:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30029034219 |
@@ -111,12 +115,6 @@ Every failed GitHub workflow and Render endpoint failure stays in this TODO unti
 | System3 Experimental Solution Planner | 30028752023 | failure | `d40df75a916b` | 2026-07-23T17:17:14Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028752023 |
 | System3 Secure Install Credential Audit | 30028752004 | failure | `d40df75a916b` | 2026-07-23T17:17:27Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028752004 |
 | System3 Autopilot Proof Board | 30028751254 | failure | `d40df75a916b` | 2026-07-23T17:19:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028751254 |
-| System3 1000 Point TODO Status Updater | 30028751250 | cancelled | `d40df75a916b` | 2026-07-23T17:18:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028751250 |
-| Dashboard Visible Issue Tracker | 30028733994 | cancelled | `b78f7065a4b8` | 2026-07-23T17:18:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028733994 |
-| System3 1000 Point TODO Status Updater | 30028733856 | cancelled | `b78f7065a4b8` | 2026-07-23T17:17:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028733856 |
-| System3 Secure Install Credential Audit | 30028597021 | failure | `4b859b548665` | 2026-07-23T17:15:15Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028597021 |
-| Dashboard Visual Loading Postflight | 30028596959 | failure | `4b859b548665` | 2026-07-23T17:15:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028596959 |
-| Dashboard Shell Diagnostic | 30028596901 | cancelled | `4b859b548665` | 2026-07-23T17:18:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30028596901 |
 
 ## Render endpoint failures
 
