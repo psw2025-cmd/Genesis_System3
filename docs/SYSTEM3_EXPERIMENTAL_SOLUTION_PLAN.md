@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-24T04:13:41.532441+00:00`
+Generated UTC: `2026-07-24T04:14:05.799745+00:00`
 Status: **BLOCKED**
-Issues: `402`
+Issues: `401`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029893891 conclusion=failure commit=259031e41f2a
 - `reports/latest/autopilot_proof_board/summary.json`: github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30029890958 conclusion=failure commit=259031e41f2a
 
-### UI_RED_VISUAL — 49 issues
+### UI_RED_VISUAL — 48 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
