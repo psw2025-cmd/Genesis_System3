@@ -79,6 +79,7 @@ jobs:
           git add reports/latest/autopilot_proof_board/ reports/latest/github_render_failure_tracker/ reports/latest/secure_install_credential_audit/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/parallel_root_cause_audit/ reports/latest/workflow_failure_tracker/ reports/latest/todo_status_update/ docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): update autopilot proof board [skip ci]"
+          git pull origin main --rebase
           git push
       - name: Enforce autopilot proof board
         run: |
