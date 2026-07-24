@@ -20,7 +20,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/chain/BANKNIFTY"
+    "url": "https://127.0.0.1:8000/api/chain/BANKNIFTY"
   },
   "chain_finnifty": {
     "bytes": 198,
@@ -43,7 +43,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/chain/FINNIFTY"
+    "url": "https://127.0.0.1:8000/api/chain/FINNIFTY"
   },
   "chain_midcpnifty": {
     "bytes": 200,
@@ -66,7 +66,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/chain/MIDCPNIFTY"
+    "url": "https://127.0.0.1:8000/api/chain/MIDCPNIFTY"
   },
   "chain_nifty": {
     "bytes": 195,
@@ -89,7 +89,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY"
+    "url": "https://127.0.0.1:8000/api/chain/NIFTY"
   },
   "health": {
     "bytes": 682,
@@ -139,7 +139,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/health"
+    "url": "https://127.0.0.1:8000/api/health"
   },
   "qc": {
     "bytes": 244,
@@ -163,7 +163,7 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/qc"
+    "url": "https://127.0.0.1:8000/api/qc"
   },
   "qc_runtime": {
     "bytes": 22,
@@ -177,7 +177,7 @@
     "sha256": "<redacted>",
     "status": 404,
     "text_preview": "{\"detail\":\"Not Found\"}",
-    "url": "https://genesis-system3-backend.onrender.com/api/qc/runtime"
+    "url": "https://127.0.0.1:8000/api/qc/runtime"
   },
   "state": {
     "bytes": 1672,
@@ -283,6 +283,6 @@
     "sha256": "<redacted>",
     "status": 200,
     "text_preview": null,
-    "url": "https://genesis-system3-backend.onrender.com/api/state"
+    "url": "https://127.0.0.1:8000/api/state"
   }
 }

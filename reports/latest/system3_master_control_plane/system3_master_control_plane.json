@@ -29,7 +29,7 @@
         ],
         "secret_style_filename_count": 0,
         "secret_style_filenames": [],
-        "tracked_file_count": 2356
+        "tracked_file_count": 2357
       },
       "gate": "safety_and_secrets",
       "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
@@ -477,6 +477,7 @@
             "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
             "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
             "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
+            "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json",
             "reports/latest/analyzer_paper_lifecycle_proof/README.md",
             "reports/latest/analyzer_paper_lifecycle_proof/lifecycle_events.json",
             "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
@@ -613,44 +614,44 @@
         "base_url_env_name": "SYSTEM3_PUBLIC_BACKEND_URL or PUBLIC_BACKEND_URL",
         "endpoint_results": [
           {
-            "checked_utc": "2026-07-24T03:50:23.265632+00:00",
+            "checked_utc": "2026-07-24T04:06:34.638366+00:00",
             "ok": true,
             "snippet": "{\"message\":\"System3 Ultra Dashboard API\",\"status\":\"running\",\"backend_url\":\"http://127.0.0.1:8000\",\"dashboard_url\":\"http://127.0.0.1:8000\",\"api_docs\":\"http://127.0.0.1:8000/docs\",\"health\":\"http://127.0.0.1:8000/api/health\",\"state\":\"http://127.0.0.1:8000/api/state\",\"relative_paths\":{\"api_docs\":\"/docs\",\"health\":\"/api/health\",\"state\":\"/api/state\",\"broker_status\":\"/api/broker/status\",\"dashboard\":\"/ui\"}}",
             "status": 200,
             "url": "http://127.0.0.1:8000/"
           },
           {
-            "checked_utc": "2026-07-24T03:50:23.288500+00:00",
+            "checked_utc": "2026-07-24T04:06:34.653366+00:00",
             "ok": true,
             "snippet": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>System3 Genesis API - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\noauth2Redirect",
             "status": 200,
             "url": "http://127.0.0.1:8000/docs"
           },
           {
-            "checked_utc": "2026-07-24T03:50:23.294496+00:00",
+            "checked_utc": "2026-07-24T04:06:34.658369+00:00",
             "ok": true,
             "snippet": "{\"status\":\"success\",\"data\":{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"open\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":true,\"reason\":\"open\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}}",
             "status": 200,
             "url": "http://127.0.0.1:8000/health"
           },
           {
-            "checked_utc": "2026-07-24T03:50:23.302499+00:00",
+            "checked_utc": "2026-07-24T04:06:34.667367+00:00",
             "ok": true,
             "snippet": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"open\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":true,\"reason\":\"open\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
             "status": 200,
             "url": "http://127.0.0.1:8000/api/health"
           },
           {
-            "checked_utc": "2026-07-24T03:50:23.310497+00:00",
+            "checked_utc": "2026-07-24T04:06:34.674371+00:00",
             "ok": true,
             "snippet": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
             "status": 200,
             "url": "http://127.0.0.1:8000/api/broker/status"
           },
           {
-            "checked_utc": "2026-07-24T03:50:23.390030+00:00",
+            "checked_utc": "2026-07-24T04:06:34.755365+00:00",
             "ok": true,
-            "snippet": "{\"state_version\":6170,\"timestamp_utc\":\"2026-07-24T03:50:23.364912Z\",\"timestamp_ist\":\"2026-07-24T09:20:23.364912+05:30\",\"mode\":\"PAPER\",\"data_source\":\"NOT_READY\",\"market\":{\"is_open\":true,\"reason\":\"Market open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:20:21.823299+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\"",
+            "snippet": "{\"state_version\":6384,\"timestamp_utc\":\"2026-07-24T04:06:34.729368Z\",\"timestamp_ist\":\"2026-07-24T09:36:34.729368+05:30\",\"mode\":\"PAPER\",\"data_source\":\"NOT_READY\",\"market\":{\"is_open\":true,\"reason\":\"Market open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:36:32.342810+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\"",
             "status": 200,
             "url": "http://127.0.0.1:8000/api/state"
           }
@@ -1217,7 +1218,7 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "candidate_count": 102,
+        "candidate_count": 103,
         "candidates_sample": [
           "config/live_trade_config.json",
           "config/live_trade_config.py",
@@ -1282,6 +1283,7 @@
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json",
           "reports/latest/analyzer_paper_lifecycle_proof/README.md",
           "reports/latest/analyzer_paper_lifecycle_proof/lifecycle_events.json",
           "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
@@ -1326,6 +1328,7 @@
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
           "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
+          "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json",
           "reports/latest/analyzer_paper_lifecycle_proof/README.md",
           "reports/latest/analyzer_paper_lifecycle_proof/lifecycle_events.json",
           "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
@@ -1435,7 +1438,7 @@
       ]
     }
   ],
-  "generated_utc": "2026-07-24T03:50:23.653744+00:00",
+  "generated_utc": "2026-07-24T04:06:35.010889+00:00",
   "live_trading_enabled": false,
   "manual_only_items": [
     "broker OTP/manual login/session renewal when required",

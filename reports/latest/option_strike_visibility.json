@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generated_at_utc": "2026-07-24T03:42:32.016923+00:00",
+    "generated_at_utc": "2026-07-24T03:53:41.373542+00:00",
     "signal_source": "api:http://127.0.0.1:8000/api/gain_rank",
     "option_master_source": "security_id_list.csv",
     "rows": 4,

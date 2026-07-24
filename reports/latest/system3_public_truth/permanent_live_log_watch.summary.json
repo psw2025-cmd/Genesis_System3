@@ -1,5 +1,5 @@
 {
-  "base": "https://genesis-system3-backend.onrender.com",
+  "base": "https://127.0.0.1:8000",
   "blockers": [
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",

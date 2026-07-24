@@ -1,7 +1,7 @@
 {
   "generated_ist": "2026-07-07T23:30:57+05:30",
   "verdict": "PASS_WITH_WARNINGS",
-  "production_ui": "https://genesis-system3-backend.onrender.com/ui",
+  "production_ui": "https://127.0.0.1:8000/ui",
   "deployed_bundle": "index-sWIXlwq8.js",
   "compile": {
     "backend_py_compile": "PASS",

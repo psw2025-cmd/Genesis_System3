@@ -751,7 +751,7 @@ have false-alarmed here and the new logic does not.
 
 ---
 
-### [2026-07-02] [Claude] MITIGATION: live 502 crash-loop on genesis-system3-backend.onrender.com — two safety nets shipped, real fix (worker split) still pending
+### [2026-07-02] [Claude] MITIGATION: live 502 crash-loop on 127.0.0.1:8000 — two safety nets shipped, real fix (worker split) still pending
 
 **Found via:** live polling of the deployed `/api/health` endpoint during market hours — service pattern was
 UP ~5s, DOWN ~40s, repeating (Render killing + restarting the single web container, `--workers 1` on the
@@ -875,7 +875,7 @@ fetch on the web dyno. The "Market Closed" lock screen in `OptionChain.tsx` stil
 the case data is genuinely unavailable (worker down/redeploying, or an underlying outside the pushed set),
 but should no longer be the default after-hours experience.
 
-**Verification done:** reproduced the bug live against `genesis-system3-backend.onrender.com` before the
+**Verification done:** reproduced the bug live against `127.0.0.1:8000` before the
 fix (`/api/chain/NIFTY` → empty `MARKET_CLOSED` stub as above; also caught the backend mid-502-crash-loop
 restart cycle, unrelated pre-existing symptom, self-recovered within ~40s). `ast.parse` syntax check on
 both changed files. Manually traced the throttle logic (`last_closed_push` epoch-0 initialization fires

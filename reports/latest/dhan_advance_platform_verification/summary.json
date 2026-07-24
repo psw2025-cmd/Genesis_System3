@@ -14,7 +14,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/health"
+      "url": "https://127.0.0.1:8000/api/health"
     },
     {
       "endpoint": "/api/state",
@@ -22,7 +22,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/state"
+      "url": "https://127.0.0.1:8000/api/state"
     },
     {
       "endpoint": "/api/broker/dhan/status",
@@ -30,7 +30,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status"
+      "url": "https://127.0.0.1:8000/api/broker/dhan/status"
     },
     {
       "endpoint": "/api/broker/holdings",
@@ -38,7 +38,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/holdings"
+      "url": "https://127.0.0.1:8000/api/broker/holdings"
     },
     {
       "endpoint": "/api/broker/funds",
@@ -46,7 +46,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/funds"
+      "url": "https://127.0.0.1:8000/api/broker/funds"
     },
     {
       "endpoint": "/api/broker/positions/live",
@@ -54,7 +54,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/positions/live"
+      "url": "https://127.0.0.1:8000/api/broker/positions/live"
     },
     {
       "endpoint": "/api/instruments/health",
@@ -62,7 +62,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/instruments/health"
+      "url": "https://127.0.0.1:8000/api/instruments/health"
     },
     {
       "endpoint": "/api/underlyings",
@@ -70,7 +70,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/underlyings"
+      "url": "https://127.0.0.1:8000/api/underlyings"
     },
     {
       "endpoint": "/api/chain/NIFTY",
@@ -78,7 +78,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY"
+      "url": "https://127.0.0.1:8000/api/chain/NIFTY"
     },
     {
       "endpoint": "/api/auto_gates",
@@ -86,7 +86,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/auto_gates"
+      "url": "https://127.0.0.1:8000/api/auto_gates"
     },
     {
       "endpoint": "/api/paper",
@@ -94,7 +94,7 @@
       "ok": true,
       "source": "live_safe_get",
       "status": 200,
-      "url": "https://genesis-system3-backend.onrender.com/api/paper"
+      "url": "https://127.0.0.1:8000/api/paper"
     }
   ],
   "evaluate_dhan_cloud_later": true,

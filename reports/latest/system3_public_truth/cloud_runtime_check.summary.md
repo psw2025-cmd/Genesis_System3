@@ -2,7 +2,7 @@
 
 - Generated UTC: `2026-07-15T09:14:37.594109Z`
 - Verdict: **WARN**
-- Base URL: `https://genesis-system3-backend.onrender.com`
+- Base URL: `https://127.0.0.1:8000`
 - Expected commit: `286e40cb2733f3296ea80ffbd6953d84f9ff12b2`
 - Deployed commit: `[REDACTED]`
 

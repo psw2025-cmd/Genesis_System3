@@ -1,7 +1,7 @@
 {
   "generated_utc": "2026-06-27T20:36:03.135690Z",
-  "dashboard_url": "https://genesis-system3-backend.onrender.com/ui",
-  "backend_url": "https://genesis-system3-backend.onrender.com",
+  "dashboard_url": "https://127.0.0.1:8000/ui",
+  "backend_url": "https://127.0.0.1:8000",
   "frontend_header": "react",
   "critical": [],
   "warnings": [],

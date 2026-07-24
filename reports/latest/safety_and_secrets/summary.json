@@ -22,7 +22,7 @@
     ],
     "secret_style_filename_count": 0,
     "secret_style_filenames": [],
-    "tracked_file_count": 2356
+    "tracked_file_count": 2357
   },
   "gate": "safety_and_secrets",
   "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",

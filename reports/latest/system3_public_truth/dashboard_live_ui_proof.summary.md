@@ -1,7 +1,7 @@
 # Dashboard Live UI Proof
 
 Generated: 2026-07-15T09:14:54.282Z
-Base: https://genesis-system3-backend.onrender.com
+Base: https://127.0.0.1:8000
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
 Final verdict: **BLOCKED_NOT_TRADE_READY**

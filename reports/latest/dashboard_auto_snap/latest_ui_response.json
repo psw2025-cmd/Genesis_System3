@@ -1,5 +1,5 @@
 {
-  "url": "https://genesis-system3-backend.onrender.com/ui",
+  "url": "https://127.0.0.1:8000/ui",
   "ok": true,
   "status": 200,
   "elapsed_s": 0.881,

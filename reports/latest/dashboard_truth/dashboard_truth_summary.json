@@ -6,7 +6,7 @@
   "self_captured_screenshot_evidence": {
     "captured_by": "this session, via npx playwright screenshot CLI (not the Node API - avoided requiring an npm install under tight disk space)",
     "file": "reports/latest/dashboard_truth/screenshots/ui_overview_20260702_2105ist.png",
-    "url": "https://genesis-system3-backend.onrender.com/ui",
+    "url": "https://127.0.0.1:8000/ui",
     "visible_elements_confirmed": [
       "SYSTEM3 PSW header, live clock (21:05:12 IST)",
       "MARKET CLOSED badge (red)",
@@ -23,7 +23,7 @@
   "user_provided_screenshot_evidence_17_38_ist": {
     "captured_by": "user, shared in-conversation during this session",
     "captured_after": "PR #54 (TopBar undefined 'chain' variable fix) deployed",
-    "url": "https://genesis-system3-backend.onrender.com/ui",
+    "url": "https://127.0.0.1:8000/ui",
     "visible_elements_confirmed": [
       "PAPER TRADING MODE (NO REAL ORDERS) banner text",
       "PAPER badge in top bar",

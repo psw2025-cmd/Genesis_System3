@@ -1,8 +1,8 @@
 # Local Code Review (Cursor Review alternative)
 
-- Generated: `2026-07-24T03:42:11.379982Z`
+- Generated: `2026-07-24T03:53:21.860674Z`
 - Verdict: **FAIL**
-- Changed files: **36**
+- Changed files: **59**
 
 > Free local review — no Cursor AI credits required.
 
@@ -24,21 +24,36 @@
 
 - `check_integrity.py`
 - `config/human_approval_gate.json`
+- `docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md`
 - `docs/project_control/SYSTEM3_MASTER_STATUS.md`
 - `reports/latest/analyzer_paper_lifecycle_proof/README.md`
 - `reports/latest/analyzer_paper_lifecycle_proof/summary.json`
 - `reports/latest/auto_recovery_blockers/README.md`
 - `reports/latest/auto_recovery_blockers/auto_recovery_blockers.json`
+- `reports/latest/broker_trader_validation/summary.json`
+- `reports/latest/broker_trader_validation/summary.md`
+- `reports/latest/dashboard_full_audit/summary.json`
+- `reports/latest/dashboard_full_audit/summary.md`
 - `reports/latest/dashboard_truth_proof/README.md`
 - `reports/latest/dashboard_truth_proof/summary.json`
 - `reports/latest/deployment_and_endpoint_proof/README.md`
 - `reports/latest/deployment_and_endpoint_proof/summary.json`
+- `reports/latest/documentation_contradictions.md`
 - `reports/latest/fresh_data_automation_proof/README.md`
 - `reports/latest/fresh_data_automation_proof/summary.json`
 - `reports/latest/friction_expectancy/summary.json`
+- `reports/latest/friction_expectancy/summary.md`
 - `reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json`
+- `reports/latest/github_render_failure_tracker/summary.json`
+- `reports/latest/github_render_failure_tracker/summary.md`
+- `reports/latest/local_code_review/REVIEW.md`
+- `reports/latest/local_code_review/summary.json`
+- `reports/latest/markdown_inventory.json`
+- `reports/latest/markdown_inventory.md`
 - `reports/latest/model_accuracy_report.json`
 - `reports/latest/model_accuracy_report.md`
+- `reports/latest/model_to_trade_gap/summary.json`
+- `reports/latest/model_to_trade_gap/summary.md`
 - `reports/latest/model_training_load_proof/README.md`
 - `reports/latest/model_training_load_proof/summary.json`
 - `reports/latest/option_strike_visibility.json`
@@ -50,57 +65,68 @@
 - `reports/latest/recent_backtest_walkforward_proof/summary.json`
 - `reports/latest/repo_authority_and_duplicate_control/README.md`
 - `reports/latest/repo_authority_and_duplicate_control/summary.json`
+- `reports/latest/safe_repair_runner/summary.json`
+- `reports/latest/safe_repair_runner/summary.md`
 - `reports/latest/safety_and_secrets/README.md`
 - `reports/latest/safety_and_secrets/summary.json`
 - `reports/latest/system3_auto_coordinator/summary.json`
 - `reports/latest/system3_auto_coordinator/summary.md`
 - `reports/latest/system3_auto_gates/summary.json`
 - `reports/latest/system3_auto_gates/summary.md`
+- `reports/latest/system3_blocker_report.json`
+- `reports/latest/system3_blocker_report.md`
+- `reports/latest/system3_control_plane_status.json`
+- `reports/latest/system3_control_plane_status.md`
 - `reports/latest/system3_master_control_plane/README.md`
 - `reports/latest/system3_master_control_plane/system3_master_control_plane.json`
+- `reports/latest/websocket_tick_health/summary.json`
+- `reports/latest/websocket_tick_health/summary.md`
 
 ## Details
 
 ### git_summary — PASS
 
 ```
-branch=main, changed_files=36
+branch=main, changed_files=59
 ```
 
 Findings: 1
-- `{"branch": "main", "changed": ["check_integrity.py", "config/human_approval_gate.json", "docs/project_control/SYSTEM3_MASTER_STATUS.md", "reports/latest/analyzer_paper_lifecycle_proof/README.md", "reports/latest/analyzer_paper_lifecycle_proof/summary.json", "reports/latest/auto_recovery_blockers/README.md", "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json", "reports/latest/dashboard_truth_proof/README.md", "reports/latest/dashboard_truth_proof/summary.json", "reports/latest/deployment_and_endpoint_proof/README.md", "reports/latest/deployment_and_endpoint_proof/summary.json", "reports/latest/fresh_data_automation_proof/README.md", "reports/latest/fresh_data_automation_proof/summary.json", "reports/latest/friction_expectancy/summary.json", "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json", "reports/latest/model_accuracy_report.json", "reports/latest/model_accuracy_report.md", "reports/latest/model_training_load_proof/README.md", "reports/latest/model_training_load_proof/summary.json", "reports/latest/option_strike_visibility.json", "reports/latest/option_strike_visibility.md", "reports/latest/production_viability_bridge/latest.json", "reports/latest/production_viability_bridge/summary.md", "reports/latest/proof_status_matrix/proof_status_matrix.json", "reports/latest/recent_backtest_walkforward_proof/README.md", "reports/latest/recent_backtest_walkforward_proof/summary.json", "reports/latest/repo_authority_and_duplicate_control/README.md", "reports/latest/repo_authority_and_duplicate_control/summary.json", "reports/latest/safety_and_secrets/README.md", "reports/latest/safety_and_secrets/summary.json", "reports/latest/system3_auto_coordinator/summary.json", "reports/latest/system3_auto_coordinator/summary.md", "reports/latest/system3_auto_gates/summary.json", "reports/latest/system3_auto_gates/summary.md", "reports/latest/system3_master_control_plane/README.md", "reports/latest/system3_master_control_plane/system3_master_control_plane.json"], "status_short": "M config/human_approval_gate.json\n M docs/project_control/SYSTEM3_MASTER_STATUS.md\n M reports/latest/analyzer_paper_lifecycle_proof/README.md\n M reports/latest/analyzer_paper_lifecycle_proof/summary.json\n M reports/latest/auto_recovery_blockers/README.md\n M reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\n M reports/latest/dashboard_truth_proof/README.md\n M reports/latest/dashboard_truth_proof/summary.json\n M reports/latest/deployment_and_endpoint_proof/README.md\n M reports/latest/deployment_and_endpoint_proof/summary.json\n M reports/latest/fresh_data_automation_proof/README.md\n M reports/latest/fresh_data_automation_proof/summary.json\n M reports/latest/friction_expectancy/summary.json\n M reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json\n M reports/latest/model_accuracy_report.json\n M reports/latest/model_accuracy_report.md\n M reports/latest/model_training_load_proof/README.md\n M reports/latest/model_training_load_proof/summary.json\n M reports/latest/option_strike_visibility.json\n M reports/latest/option_strike_visibility.md\n M reports/latest/production_viability_bridge/latest.json\n M reports/latest/production_viability_bridge/summary.md\n M reports/latest/proof_status_matrix/proof_status_matrix.json\n M reports/latest/recent_backtest_walkforward_proof/README.md\n M reports/latest/recent_backtest_walkforward_proof/summary.json\n M reports/latest/repo_authority_and_duplicate_control/README.md\n M reports/latest/repo_authority_and_duplicate_control/summary.json\n M reports/latest/safety_and_secrets/README.md\n M reports/latest/safety_and_secrets/summary.json\n M reports/latest/system3_auto_coordinator/summary.json\n M reports/latest/system3_auto_coordinator/summary.md\n M reports/latest/system3_auto_gates/summary.json\n M reports/latest/system3_auto_gates/summary.md\n M reports/latest/system3_master_control_plane/README.md\n M reports/latest/system3_master_control_plane/system3_master_control_plane.json\n?? reports/latest/documentation_contradictions.md\n?? reports/latest/friction_expectancy/summary.md\n?? reports/latest/local_code_review/\n?? reports/latest/markdown_inventory.json\n?? reports/latest/markdown_inventory.md\n?? reports/latest/model_to_trade_gap/\n?? reports/latest/system3_blocker_report.json\n?? reports/latest/system3_blocker_report.md\n?? reports/latest/system3_control_plane_status.json\n?? reports/latest/system3_control_plane_status.md\n?? reports/latest/websocket_tick_health/"}`
+- `{"branch": "main", "changed": ["check_integrity.py", "config/human_approval_gate.json", "docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md", "docs/project_control/SYSTEM3_MASTER_STATUS.md", "reports/latest/analyzer_paper_lifecycle_proof/README.md", "reports/latest/analyzer_paper_lifecycle_proof/summary.json", "reports/latest/auto_recovery_blockers/README.md", "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json", "reports/latest/broker_trader_validation/summary.json", "reports/latest/broker_trader_validation/summary.md", "reports/latest/dashboard_full_audit/summary.json", "reports/latest/dashboard_full_audit/summary.md", "reports/latest/dashboard_truth_proof/README.md", "reports/latest/dashboard_truth_proof/summary.json", "reports/latest/deployment_and_endpoint_proof/README.md", "reports/latest/deployment_and_endpoint_proof/summary.json", "reports/latest/documentation_contradictions.md", "reports/latest/fresh_data_automation_proof/README.md", "reports/latest/fresh_data_automation_proof/summary.json", "reports/latest/friction_expectancy/summary.json", "reports/latest/friction_expectancy/summary.md", "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json", "reports/latest/github_render_failure_tracker/summary.json", "reports/latest/github_render_failure_tracker/summary.md", "reports/latest/local_code_review/REVIEW.md", "reports/latest/local_code_review/summary.json", "reports/latest/markdown_inventory.json", "reports/latest/markdown_inventory.md", "reports/latest/model_accuracy_report.json", "reports/latest/model_accuracy_report.md", "reports/latest/model_to_trade_gap/summary.json", "reports/latest/model_to_trade_gap/summary.md", "reports/latest/model_training_load_proof/README.md", "reports/latest/model_training_load_proof/summary.json", "reports/latest/option_strike_visibility.json", "reports/latest/option_strike_visibility.md", "reports/latest/production_viability_bridge/latest.json", "reports/latest/production_viability_bridge/summary.md", "reports/latest/proof_status_matrix/proof_status_matrix.json", "reports/latest/recent_backtest_walkforward_proof/README.md", "reports/latest/recent_backtest_walkforward_proof/summary.json", "reports/latest/repo_authority_and_duplicate_control/README.md", "reports/latest/repo_authority_and_duplicate_control/summary.json", "reports/latest/safe_repair_runner/summary.json", "reports/latest/safe_repair_runner/summary.md", "reports/latest/safety_and_secrets/README.md", "reports/latest/safety_and_secrets/summary.json", "reports/latest/system3_auto_coordinator/summary.json", "reports/latest/system3_auto_coordinator/summary.md", "reports/latest/system3_auto_gates/summary.json", "reports/latest/system3_auto_gates/summary.md", "reports/latest/system3_blocker_report.json", "reports/latest/system3_blocker_report.md", "reports/latest/system3_control_plane_status.json", "reports/latest/system3_control_plane_status.md", "reports/latest/system3_master_control_plane/README.md", "reports/latest/system3_master_control_plane/system3_master_control_plane.json", "reports/latest/websocket_tick_health/summary.json", "reports/latest/websocket_tick_health/summary.md"], "status_short": "M config/human_approval_gate.json\n M docs/project_control/SYSTEM3_MASTER_STATUS.md\n M reports/latest/analyzer_paper_lifecycle_proof/README.md\n M reports/latest/analyzer_paper_lifecycle_proof/summary.json\n M reports/latest/auto_recovery_blockers/README.md\n M reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\n M reports/latest/dashboard_truth_proof/README.md\n M reports/latest/deployment_and_endpoint_proof/README.md\n M reports/latest/deployment_and_endpoint_proof/summary.json\n M reports/latest/fresh_data_automation_proof/README.md\n M reports/latest/friction_expectancy/summary.json\n M reports/latest/friction_expectancy/summary.md\n M reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json\n M reports/latest/model_accuracy_report.json\n M reports/latest/model_accuracy_report.md\n M reports/latest/model_to_trade_gap/summary.json\n M reports/latest/model_training_load_proof/README.md\n M reports/latest/production_viability_bridge/latest.json\n M reports/latest/production_viability_bridge/summary.md\n M reports/latest/proof_status_matrix/proof_status_matrix.json\n M reports/latest/recent_backtest_walkforward_proof/README.md\n M reports/latest/repo_authority_and_duplicate_control/README.md\n M reports/latest/safety_and_secrets/README.md\n M reports/latest/system3_auto_gates/summary.json\n M reports/latest/system3_auto_gates/summary.md\n M reports/latest/system3_blocker_report.json\n M reports/latest/system3_blocker_report.md\n M reports/latest/system3_master_control_plane/README.md\n M reports/latest/system3_master_control_plane/system3_master_control_plane.json\n M reports/latest/websocket_tick_health/summary.json\n M reports/latest/websocket_tick_health/summary.md\n?? reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json"}`
 
 ### architecture_gate — PASS
 
 ```
-{
-  "generated_at_utc": "2026-07-24T03:42:09.064267+00:00",
-  "policy": "Architecture and trading safety must be FULL PASS. Only ci.yml is the active workflow.",
-  "blocking": true,
-  "changed_files": [
-    "check_integrity.py"
-  ],
-  "checks": [
-    {
-      "name": "required_files_and_dirs",
-      "status": "PASS",
-      "missing_files": [],
-      "missing_dirs": []
-    },
-    {
-      "name": "critical_python_compile",
-      "status": "PASS",
-      "files_checked": [
-        "run_system3.py",
-        ".github\\scripts\\root_architecture_gate.py"
-      ],
-      "failures": []
-    },
-    {
-      "name": "protected_runtime_paths_not_changed",
-      "status": "PASS",
-      "changed_files": [
-        "check_integrity.py"
+json",
+        "reports/latest/model_accuracy_report.md",
+        "reports/latest/model_to_trade_gap/summary.json",
+        "reports/latest/model_to_trade_gap/summary.md",
+        "reports/latest/model_training_load_proof/README.md",
+        "reports/latest/model_training_load_proof/summary.json",
+        "reports/latest/option_strike_visibility.json",
+        "reports/latest/option_strike_visibility.md",
+        "reports/latest/production_viability_bridge/latest.json",
+        "reports/latest/production_viability_bridge/summary.md",
+        "reports/latest/proof_status_matrix/proof_status_matrix.json",
+        "reports/latest/recent_backtest_walkforward_proof/README.md",
+        "reports/latest/recent_backtest_walkforward_proof/summary.json",
+        "reports/latest/repo_authority_and_duplicate_control/README.md",
+        "reports/latest/repo_authority_and_duplicate_control/summary.json",
+        "reports/latest/safe_repair_runner/summary.json",
+        "reports/latest/safe_repair_runner/summary.md",
+        "reports/latest/safety_and_secrets/README.md",
+        "reports/latest/safety_and_secrets/summary.json",
+        "reports/latest/system3_auto_coordinator/summary.json",
+        "reports/latest/system3_auto_coordinator/summary.md",
+        "reports/latest/system3_auto_gates/summary.json",
+        "reports/latest/system3_auto_gates/summary.md",
+        "reports/latest/system3_blocker_report.json",
+        "reports/latest/system3_blocker_report.md",
+        "reports/latest/system3_control_plane_status.json",
+        "reports/latest/system3_control_plane_status.md",
+        "reports/latest/system3_master_control_plane/README.md",
+        "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
+        "reports/latest/websocket_tick_health/summary.json",
+        "reports/latest/websocket_tick_health/summary.md"
       ],
       "violations": []
     },

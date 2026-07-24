@@ -1,7 +1,7 @@
 # Permanent Live Log Watch
 
 Generated: 2026-07-15T09:17:23.173Z
-Base: https://genesis-system3-backend.onrender.com
+Base: https://127.0.0.1:8000
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
 Final verdict: **BLOCKED_NOT_TRADE_READY**
@@ -66,13 +66,13 @@ Truth control visible: **true**
 - CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2' from origin 'https://genesis-system
 - TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
-- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been block
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2' from origin 'https://127.0.0.1:8000' has been block
 - TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
-- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2' from origin 'https://127.0.0.1:8000' has been bl
 - TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2' from origin 'https://genesis-syst
 - TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
-- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://genesis-system3-backend.onrender.com' has been bl
+- OPTIONAL_BROWSER_NOISE:error Access to font at 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2' from origin 'https://127.0.0.1:8000' has been bl
 - TRANSIENT_BROWSER_NOISE_AFTER_API_PASS:error Failed to load resource: net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2:net::ERR_FAILED
 - OPTIONAL_REQUEST_FAILED:https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2:net::ERR_FAILED

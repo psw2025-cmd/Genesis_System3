@@ -1,5 +1,5 @@
 {
-  "base_url": "https://genesis-system3-backend.onrender.com",
+  "base_url": "https://127.0.0.1:8000",
   "blockers": [
     "RENDER_DEPLOY_COMMIT_MISMATCH"
   ],

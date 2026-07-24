@@ -55,7 +55,7 @@
       "name": "truth_bridge",
       "passed": true,
       "exit_code": 0,
-      "stdout_tail": "ckend.onrender.com/api/qc\n[INFO] Fetching chain_NIFTY -> https://genesis-system3-backend.onrender.com/api/chain/NIFTY\n[INFO] Fetching chain_BANKNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/BANKNIFTY\n[INFO] Fetching chain_FINNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/FINNIFTY\n[INFO] Fetching chain_MIDCPNIFTY -> https://genesis-system3-backend.onrender.com/api/chain/MIDCPNIFTY\n[DONE] Reports generated without Python:\n  C:\\System3\\Genesis_System3\\reports\\latest\\system3_truth_bridge\\summary.md\n  C:\\System3\\Genesis_System3\\reports\\latest\\production_viability_bridge\\summary.md\n\nOptional upload:\n  git add reports/latest/system3_truth_bridge reports/latest/production_viability_bridge\n  git commit -m 'proof: update PowerShell truth bridge reports'\n  git push\n",
+      "stdout_tail": "ckend.onrender.com/api/qc\n[INFO] Fetching chain_NIFTY -> https://127.0.0.1:8000/api/chain/NIFTY\n[INFO] Fetching chain_BANKNIFTY -> https://127.0.0.1:8000/api/chain/BANKNIFTY\n[INFO] Fetching chain_FINNIFTY -> https://127.0.0.1:8000/api/chain/FINNIFTY\n[INFO] Fetching chain_MIDCPNIFTY -> https://127.0.0.1:8000/api/chain/MIDCPNIFTY\n[DONE] Reports generated without Python:\n  C:\\System3\\Genesis_System3\\reports\\latest\\system3_truth_bridge\\summary.md\n  C:\\System3\\Genesis_System3\\reports\\latest\\production_viability_bridge\\summary.md\n\nOptional upload:\n  git add reports/latest/system3_truth_bridge reports/latest/production_viability_bridge\n  git commit -m 'proof: update PowerShell truth bridge reports'\n  git push\n",
       "stderr_tail": ""
     }
   ],

@@ -2,7 +2,7 @@
   "auto_repair_allowed": false,
   "blockers": [],
   "evidence": {
-    "candidate_count": 102,
+    "candidate_count": 103,
     "candidates_sample": [
       "config/live_trade_config.json",
       "config/live_trade_config.py",
@@ -67,6 +67,7 @@
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
+      "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json",
       "reports/latest/analyzer_paper_lifecycle_proof/README.md",
       "reports/latest/analyzer_paper_lifecycle_proof/lifecycle_events.json",
       "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",
@@ -111,6 +112,7 @@
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_142129.json",
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162724.json",
       "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260614_162812.json",
+      "reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20260724_092306.json",
       "reports/latest/analyzer_paper_lifecycle_proof/README.md",
       "reports/latest/analyzer_paper_lifecycle_proof/lifecycle_events.json",
       "reports/latest/analyzer_paper_lifecycle_proof/pnl_reconciliation.json",

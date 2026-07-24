@@ -1,6 +1,6 @@
 {
   "alerts": [],
-  "base_url": "https://genesis-system3-backend.onrender.com",
+  "base_url": "https://127.0.0.1:8000",
   "deployed_commit": "[REDACTED]",
   "endpoints": {
     "broker_deps": {
@@ -10,7 +10,7 @@
       "ok": false,
       "status_code": 503,
       "text_preview": "Service Unavailable",
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/deps",
+      "url": "https://127.0.0.1:8000/api/broker/deps",
       "url_path": "/api/broker/deps"
     },
     "broker_dhan_status": {
@@ -20,7 +20,7 @@
       "ok": false,
       "status_code": 503,
       "text_preview": "Service Unavailable",
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
+      "url": "https://127.0.0.1:8000/api/broker/dhan/status",
       "url_path": "/api/broker/dhan/status"
     },
     "broker_status": {
@@ -40,7 +40,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/broker/status",
+      "url": "https://127.0.0.1:8000/api/broker/status",
       "url_path": "/api/broker/status"
     },
     "chain_nifty": {
@@ -59,7 +59,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY",
+      "url": "https://127.0.0.1:8000/api/chain/NIFTY",
       "url_path": "/api/chain/NIFTY"
     },
     "deploy_info": {
@@ -74,7 +74,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/deploy/info",
+      "url": "https://127.0.0.1:8000/api/deploy/info",
       "url_path": "/api/deploy/info"
     },
     "health": {
@@ -120,7 +120,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/health",
+      "url": "https://127.0.0.1:8000/api/health",
       "url_path": "/api/health"
     },
     "memory_after_chain": {
@@ -137,7 +137,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/memory",
+      "url": "https://127.0.0.1:8000/api/memory",
       "url_path": "/api/memory"
     },
     "memory_after_portfolio": {
@@ -154,7 +154,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/memory",
+      "url": "https://127.0.0.1:8000/api/memory",
       "url_path": "/api/memory"
     },
     "memory_before": {
@@ -171,7 +171,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/memory",
+      "url": "https://127.0.0.1:8000/api/memory",
       "url_path": "/api/memory"
     },
     "portfolio_unified": {
@@ -428,7 +428,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/portfolio/unified",
+      "url": "https://127.0.0.1:8000/api/portfolio/unified",
       "url_path": "/api/portfolio/unified"
     },
     "scheduler_health": {
@@ -546,7 +546,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/scheduler/health",
+      "url": "https://127.0.0.1:8000/api/scheduler/health",
       "url_path": "/api/scheduler/health"
     },
     "state": {
@@ -648,7 +648,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/state",
+      "url": "https://127.0.0.1:8000/api/state",
       "url_path": "/api/state"
     },
     "underlyings": {
@@ -669,7 +669,7 @@
       "ok": true,
       "status_code": 200,
       "text_preview": null,
-      "url": "https://genesis-system3-backend.onrender.com/api/underlyings",
+      "url": "https://127.0.0.1:8000/api/underlyings",
       "url_path": "/api/underlyings"
     }
   },

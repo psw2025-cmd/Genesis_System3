@@ -1,6 +1,6 @@
 # System3 Production Viability Bridge
 
-Generated UTC: `2026-07-24T03:42:07.793072+00:00`
+Generated UTC: `2026-07-24T03:53:15.666356+00:00`
 
 ## Summary
 
@@ -10,16 +10,15 @@ Generated UTC: `2026-07-24T03:42:07.793072+00:00`
 | `paper_analyzer_allowed` | `True` |
 | `strategy_quarantined_for_live` | `True` |
 | `highest_severity` | `CRITICAL` |
-| `blocker_count` | `10` |
+| `blocker_count` | `9` |
 | `warning_count` | `3` |
-| `severity_counts` | `{'CRITICAL': 3, 'HIGH': 7, 'MEDIUM': 3}` |
+| `severity_counts` | `{'CRITICAL': 2, 'HIGH': 7, 'MEDIUM': 3}` |
 
 ## Blockers
 
 | Severity | Code | Message | Action |
 |---|---|---|---|
 | CRITICAL | `TRADE_READY_FALSE` | Full pipeline readiness is false. | Keep live disabled; clear pipeline blockers. |
-| CRITICAL | `REAL_MARKET_PAPER_LIFECYCLE_MISSING` | Real market paper lifecycle is not proven. | Run market-session analyzer paper lifecycle proof. |
 | CRITICAL | `RAW_LIFECYCLE_DRY_RUN` | Raw lifecycle proof is simulation/dry-run. | Do not mark production ready from dry-run proof. |
 | HIGH | `FRESH_BROKER_DATA_NOT_PROVEN` | Fresh broker live data proof is missing. | Run secure runtime broker freshness proof. |
 | HIGH | `MODEL_PROMOTION_BLOCKED` | Model promotion is blocked. | Require policy + validation proof before promotion. |

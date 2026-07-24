@@ -1,8 +1,8 @@
 # System3 Dashboard Auto Snapshot
 
 Generated UTC: `2026-06-27T20:36:03.135690Z`
-Dashboard URL: `https://genesis-system3-backend.onrender.com/ui`
-Backend URL: `https://genesis-system3-backend.onrender.com`
+Dashboard URL: `https://127.0.0.1:8000/ui`
+Backend URL: `https://127.0.0.1:8000`
 Frontend header: `react`
 Final verdict: **PASS**
 

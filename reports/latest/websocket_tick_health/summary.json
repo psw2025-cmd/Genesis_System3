@@ -1,12 +1,12 @@
 {
-  "generated_utc": "2026-07-24T03:42:32.637854Z",
+  "generated_utc": "2026-07-24T03:53:42.289982Z",
   "pass": false,
   "websocket_endpoint": "/ws/stream",
   "evidence": {
-    "last_tick_age_sec": 5.01,
+    "last_tick_age_sec": 5.03,
     "refresh_interval_sec": 5,
     "broker_connected": false,
-    "market_open": false,
+    "market_open": true,
     "rest_fallback_active": true,
     "note": "PASS with REST SSOT poll \u226410s for analyzer; WebSocket required for live execution"
   },

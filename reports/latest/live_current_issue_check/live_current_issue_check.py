@@ -13,7 +13,7 @@ ROOT = Path.cwd()
 OUT = ROOT / "reports" / "latest" / "live_current_issue_check"
 OUT.mkdir(parents=True, exist_ok=True)
 
-BASE_URL = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+BASE_URL = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://127.0.0.1:8000").rstrip("/")
 
 ENDPOINTS = [
     "/",

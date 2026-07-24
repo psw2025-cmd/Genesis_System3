@@ -1,8 +1,8 @@
 {
   "anomaly_audit_verdict": "PASS_ANALYZER_PAPER_ONLY",
-  "backend_url": "https://genesis-system3-backend.onrender.com",
+  "backend_url": "https://127.0.0.1:8000",
   "critical_failures": [],
-  "dashboard_url": "https://genesis-system3-backend.onrender.com/ui",
+  "dashboard_url": "https://127.0.0.1:8000/ui",
   "endpoint_count": 8,
   "endpoint_ok_count": 7,
   "files_generated": [

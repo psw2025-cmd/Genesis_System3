@@ -10,5 +10,5 @@
   "sha256": "<redacted>",
   "status": 404,
   "text_preview": "{\"detail\":\"Not Found\"}",
-  "url": "https://genesis-system3-backend.onrender.com/api/qc/runtime"
+  "url": "https://127.0.0.1:8000/api/qc/runtime"
 }

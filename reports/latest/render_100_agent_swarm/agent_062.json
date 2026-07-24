@@ -6,7 +6,7 @@
       "latency_ms": 161,
       "ok": false,
       "status_code": 502,
-      "url": "https://genesis-system3-backend.onrender.com/api/deploy/info"
+      "url": "https://127.0.0.1:8000/api/deploy/info"
     }
   },
   "findings": [

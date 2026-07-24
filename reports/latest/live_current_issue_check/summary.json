@@ -2,7 +2,7 @@
   "generated_utc": "2026-06-14T16:23:15.425037+00:00",
   "repo_head": "7d23907f1b38e669a84dac16905839e433102084",
   "origin_head": "7d23907f1b38e669a84dac16905839e433102084",
-  "base_url": "https://genesis-system3-backend.onrender.com",
+  "base_url": "https://127.0.0.1:8000",
   "issue_count": 15,
   "critical_count": 0,
   "high_count": 5,

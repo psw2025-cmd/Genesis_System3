@@ -18,10 +18,10 @@
           "Broker not connected - real data unavailable"
         ],
         "market": {
-          "is_open": false,
-          "reason": "closed"
+          "is_open": true,
+          "reason": "open"
         },
-        "market_status": "closed",
+        "market_status": "open",
         "message": "BROKER_NOT_READY - Real data unavailable",
         "mode": "PAPER",
         "open_positions": 0,
@@ -41,7 +41,7 @@
         "trades_executed": 0
       },
       "ok": true,
-      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
+      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"open\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":true,\"reason\":\"open\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
       "status": 200
     },
     {
@@ -65,16 +65,16 @@
           "order_placement_allowed": false,
           "sdk_available": true
         },
-        "cycle_count": 6072,
-        "data_source": "MARKET_CLOSED_NO_BROKER",
-        "last_cycle_ts_iso": "2026-07-24T09:12:32.964493+05:30",
-        "last_fetch_ts_iso": "2026-07-24T09:12:32.964493+05:30",
-        "last_tick_age_sec": 5.01,
+        "cycle_count": 6220,
+        "data_source": "NOT_READY",
+        "last_cycle_ts_iso": "2026-07-24T09:23:43.179503+05:30",
+        "last_fetch_ts_iso": "2026-07-24T09:23:43.179503+05:30",
+        "last_tick_age_sec": 0.46,
         "market": {
-          "current_time_ist": "2026-07-24T09:12:29.477283+05:30",
-          "is_open": false,
+          "current_time_ist": "2026-07-24T09:23:43.178503+05:30",
+          "is_open": true,
           "next_open": "2026-07-24 09:15:00 IST",
-          "reason": "Pre-market window (9:00-9:15 AM) - Market not open"
+          "reason": "Market open"
         },
         "mode": "PAPER",
         "model": {
@@ -127,19 +127,19 @@
           "status": "NO_TRADE",
           "underlying": null
         },
-        "state_version": 6072,
+        "state_version": 6220,
         "tick_health": {
-          "last_tick_age_sec": 5.01,
-          "market_open": false,
+          "last_tick_age_sec": 0.46,
+          "market_open": true,
           "refresh_interval_sec": 5,
           "source": "rest_poll_ssot",
           "websocket_endpoint": "/ws/stream"
         },
-        "timestamp_ist": "2026-07-24T09:12:32.964493+05:30",
-        "timestamp_utc": "2026-07-24T03:42:32.964493Z"
+        "timestamp_ist": "2026-07-24T09:23:43.179503+05:30",
+        "timestamp_utc": "2026-07-24T03:53:43.179503Z"
       },
       "ok": true,
-      "sample": "{\"state_version\":6072,\"timestamp_utc\":\"2026-07-24T03:42:32.964493Z\",\"timestamp_ist\":\"2026-07-24T09:12:32.964493+05:30\",\"mode\":\"PAPER\",\"data_source\":\"MARKET_CLOSED_NO_BROKER\",\"market\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:12:29.477283+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,",
+      "sample": "{\"state_version\":6220,\"timestamp_utc\":\"2026-07-24T03:53:43.179503Z\",\"timestamp_ist\":\"2026-07-24T09:23:43.179503+05:30\",\"mode\":\"PAPER\",\"data_source\":\"NOT_READY\",\"market\":{\"is_open\":true,\"reason\":\"Market open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:23:43.178503+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,\"es95\":0.0,\"exposure\":0.0,\"concentration\":0.0,\"greeks\"",
       "status": 200
     },
     {
@@ -155,10 +155,8 @@
           "last_update": null,
           "market_status": {
             "current_time_ist": null,
-            "is_open": false,
-            "next_open": "2026-07-24 09:15:00 IST",
-            "reason": "Pre-market window (9:00-9:15 AM) - Market not open",
-            "seconds_until_open": null
+            "is_open": true,
+            "reason": "Market open"
           },
           "source": "real"
         },
@@ -176,10 +174,10 @@
         },
         "health": false,
         "status": "ok",
-        "timestamp": "2026-07-24T09:12:33.540941+05:30"
+        "timestamp": "2026-07-24T09:23:43.440547+05:30"
       },
       "ok": true,
-      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:12:33.540941+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"current_time_ist\":null,\"next_open\":\"2026-07-24 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
+      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:23:43.440547+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":true,\"reason\":\"Market open\",\"current_time_ist\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
       "status": 200
     },
     {
@@ -290,23 +288,22 @@
         "approved_utc": "2026-06-24T02:30:00+05:30",
         "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
         "dashboard_status": "PASS",
-        "generated_utc": "2026-07-24T03:42:33.867068Z",
+        "generated_utc": "2026-07-24T03:53:43.771562Z",
         "human_approval": true,
         "live_trading_enabled": false,
         "live_trading_env_flip_authorized": false,
         "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
         "production_ready_for_real_money": false,
         "scope": "Full owner trust for world-class development, automation, and performance optimization.",
-        "technical_gates_pending_count": 4,
+        "technical_gates_pending_count": 3,
         "technical_gates_still_required": [
           "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
           "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
           "WEBSOCKET_TICK_HEALTH_PROVEN"
         ]
       },
       "ok": true,
-      "sample": "{\"generated_utc\":\"2026-07-24T03:42:33.867068Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
+      "sample": "{\"generated_utc\":\"2026-07-24T03:53:43.771562Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":3,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
       "status": 200
     },
     {
@@ -344,10 +341,10 @@
           "Broker not connected - real data unavailable"
         ],
         "market": {
-          "is_open": false,
-          "reason": "closed"
+          "is_open": true,
+          "reason": "open"
         },
-        "market_status": "closed",
+        "market_status": "open",
         "message": "BROKER_NOT_READY - Real data unavailable",
         "mode": "PAPER",
         "open_positions": 0,
@@ -367,7 +364,7 @@
         "trades_executed": 0
       },
       "ok": true,
-      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
+      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"open\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":true,\"reason\":\"open\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
       "status": 200
     },
     {
@@ -391,16 +388,16 @@
           "order_placement_allowed": false,
           "sdk_available": true
         },
-        "cycle_count": 6058,
-        "data_source": "MARKET_CLOSED_NO_BROKER",
-        "last_cycle_ts_iso": "2026-07-24T09:11:56.942225+05:30",
-        "last_fetch_ts_iso": "2026-07-24T09:11:56.942225+05:30",
-        "last_tick_age_sec": 5.02,
+        "cycle_count": 6202,
+        "data_source": "NOT_READY",
+        "last_cycle_ts_iso": "2026-07-24T09:22:57.959694+05:30",
+        "last_fetch_ts_iso": "2026-07-24T09:22:57.959694+05:30",
+        "last_tick_age_sec": 5.03,
         "market": {
-          "current_time_ist": "2026-07-24T09:11:56.941299+05:30",
-          "is_open": false,
+          "current_time_ist": "2026-07-24T09:22:57.958692+05:30",
+          "is_open": true,
           "next_open": "2026-07-24 09:15:00 IST",
-          "reason": "Pre-market window (9:00-9:15 AM) - Market not open"
+          "reason": "Market open"
         },
         "mode": "PAPER",
         "model": {
@@ -453,19 +450,19 @@
           "status": "NO_TRADE",
           "underlying": null
         },
-        "state_version": 6058,
+        "state_version": 6202,
         "tick_health": {
-          "last_tick_age_sec": 5.02,
-          "market_open": false,
+          "last_tick_age_sec": 5.03,
+          "market_open": true,
           "refresh_interval_sec": 5,
           "source": "rest_poll_ssot",
           "websocket_endpoint": "/ws/stream"
         },
-        "timestamp_ist": "2026-07-24T09:11:56.942225+05:30",
-        "timestamp_utc": "2026-07-24T03:41:56.942225Z"
+        "timestamp_ist": "2026-07-24T09:22:57.959694+05:30",
+        "timestamp_utc": "2026-07-24T03:52:57.959694Z"
       },
       "ok": true,
-      "sample": "{\"state_version\":6058,\"timestamp_utc\":\"2026-07-24T03:41:56.942225Z\",\"timestamp_ist\":\"2026-07-24T09:11:56.942225+05:30\",\"mode\":\"PAPER\",\"data_source\":\"MARKET_CLOSED_NO_BROKER\",\"market\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:11:56.941299+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,",
+      "sample": "{\"state_version\":6202,\"timestamp_utc\":\"2026-07-24T03:52:57.959694Z\",\"timestamp_ist\":\"2026-07-24T09:22:57.959694+05:30\",\"mode\":\"PAPER\",\"data_source\":\"NOT_READY\",\"market\":{\"is_open\":true,\"reason\":\"Market open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:22:57.958692+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,\"es95\":0.0,\"exposure\":0.0,\"concentration\":0.0,\"greeks\"",
       "status": 200
     },
     {
@@ -481,10 +478,8 @@
           "last_update": null,
           "market_status": {
             "current_time_ist": null,
-            "is_open": false,
-            "next_open": "2026-07-24 09:15:00 IST",
-            "reason": "Pre-market window (9:00-9:15 AM) - Market not open",
-            "seconds_until_open": null
+            "is_open": true,
+            "reason": "Market open"
           },
           "source": "real"
         },
@@ -502,10 +497,10 @@
         },
         "health": false,
         "status": "ok",
-        "timestamp": "2026-07-24T09:11:59.490461+05:30"
+        "timestamp": "2026-07-24T09:23:01.365088+05:30"
       },
       "ok": true,
-      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:11:59.490461+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"current_time_ist\":null,\"next_open\":\"2026-07-24 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
+      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:23:01.365088+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":true,\"reason\":\"Market open\",\"current_time_ist\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
       "status": 200
     },
     {
@@ -616,7 +611,7 @@
         "approved_utc": "2026-06-24T02:30:00+05:30",
         "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
         "dashboard_status": "PASS",
-        "generated_utc": "2026-07-24T03:41:59.800185Z",
+        "generated_utc": "2026-07-24T03:53:01.703112Z",
         "human_approval": true,
         "live_trading_enabled": false,
         "live_trading_env_flip_authorized": false,
@@ -632,7 +627,7 @@
         ]
       },
       "ok": true,
-      "sample": "{\"generated_utc\":\"2026-07-24T03:41:59.800185Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
+      "sample": "{\"generated_utc\":\"2026-07-24T03:53:01.703112Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
       "status": 200
     },
     {
@@ -678,7 +673,7 @@
       "exit_code": 1,
       "passed": false,
       "stderr_tail": "",
-      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[FAIL] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n"
+      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] paper_lifecycle\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[FAIL] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n"
     },
     {
       "cmd": [
@@ -734,7 +729,7 @@
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:42:32.986483+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
+      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:53:42.748012+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
     },
     {
       "cmd": [
@@ -744,20 +739,19 @@
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-24T03:42:33.499179Z\", \"github_failed_count\": 1, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 0, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 1, \"tracker_internal_status\": \"PASS\"}\n"
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-24T03:53:43.393411Z\", \"github_failed_count\": 1, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 0, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 1, \"tracker_internal_status\": \"PASS\"}\n"
     }
   ],
   "endpoint_fail_count": 0,
-  "gates_passing": 2,
+  "gates_passing": 3,
   "gates_total": 7,
-  "generated_utc": "2026-07-24T03:42:33.933966Z",
+  "generated_utc": "2026-07-24T03:53:43.830281Z",
   "github_render_status": "BLOCKED",
   "live_trading_enabled": false,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
     "SYS3-BLK-005",
-    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "order_routes_called": false,
@@ -767,7 +761,6 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "trade_ready": false,

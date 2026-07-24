@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generated_at_utc": "2026-07-24T03:42:32.986483+00:00",
+    "generated_at_utc": "2026-07-24T03:53:42.748012+00:00",
     "root": "C:\\System3\\Genesis_System3",
     "api_base": "http://127.0.0.1:8000",
     "state_source": "api:http://127.0.0.1:8000/api/state",

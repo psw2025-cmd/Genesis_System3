@@ -3,7 +3,7 @@
   "mode": "ANALYZER_PAPER_ONLY",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
-  "cloud_url": "https://genesis-system3-backend.onrender.com",
+  "cloud_url": "https://127.0.0.1:8000",
   "agents": [
     {
       "id": "gate_orchestrator",

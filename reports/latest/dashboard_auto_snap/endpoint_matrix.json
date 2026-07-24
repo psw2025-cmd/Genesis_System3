@@ -1,6 +1,6 @@
 {
   "health": {
-    "url": "https://genesis-system3-backend.onrender.com/api/health",
+    "url": "https://127.0.0.1:8000/api/health",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.406,
@@ -11,7 +11,7 @@
     "error": null
   },
   "state": {
-    "url": "https://genesis-system3-backend.onrender.com/api/state",
+    "url": "https://127.0.0.1:8000/api/state",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.405,
@@ -22,7 +22,7 @@
     "error": null
   },
   "qc": {
-    "url": "https://genesis-system3-backend.onrender.com/api/qc",
+    "url": "https://127.0.0.1:8000/api/qc",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.881,
@@ -33,7 +33,7 @@
     "error": null
   },
   "broker_status": {
-    "url": "https://genesis-system3-backend.onrender.com/api/broker/dhan/status",
+    "url": "https://127.0.0.1:8000/api/broker/dhan/status",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.66,
@@ -44,7 +44,7 @@
     "error": null
   },
   "instruments_health": {
-    "url": "https://genesis-system3-backend.onrender.com/api/instruments/health",
+    "url": "https://127.0.0.1:8000/api/instruments/health",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.917,
@@ -55,7 +55,7 @@
     "error": null
   },
   "underlyings": {
-    "url": "https://genesis-system3-backend.onrender.com/api/underlyings",
+    "url": "https://127.0.0.1:8000/api/underlyings",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.409,
@@ -66,7 +66,7 @@
     "error": null
   },
   "chain_nifty": {
-    "url": "https://genesis-system3-backend.onrender.com/api/chain/NIFTY",
+    "url": "https://127.0.0.1:8000/api/chain/NIFTY",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.846,
@@ -77,7 +77,7 @@
     "error": null
   },
   "auto_gates": {
-    "url": "https://genesis-system3-backend.onrender.com/api/auto_gates",
+    "url": "https://127.0.0.1:8000/api/auto_gates",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.41,
@@ -88,7 +88,7 @@
     "error": null
   },
   "paper": {
-    "url": "https://genesis-system3-backend.onrender.com/api/paper",
+    "url": "https://127.0.0.1:8000/api/paper",
     "ok": true,
     "status": 200,
     "elapsed_s": 0.413,

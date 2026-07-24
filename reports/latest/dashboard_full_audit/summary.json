@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-24T03:42:25.732328Z",
+  "generated_utc": "2026-07-24T03:53:30.611269Z",
   "cloud_url": "http://127.0.0.1:8000",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
@@ -93,12 +93,11 @@
   "blockers": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN",
     "LIVE_TRADING_DISABLED_BY_DESIGN"
   ],
   "auto_gates": {
-    "gates_passing": 2,
+    "gates_passing": 3,
     "gates_total": 7,
     "runtime_driven": true,
     "prediction_accuracy_blocked": true,

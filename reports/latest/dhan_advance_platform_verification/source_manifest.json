@@ -132,7 +132,7 @@
     "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_state.json",
     "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\endpoint_matrix.json",
     "C:\\System3\\Genesis_System3_snap\\reports\\latest\\dashboard_auto_snap\\latest_chain_nifty.json",
-    "https://genesis-system3-backend.onrender.com/ui",
-    "https://genesis-system3-backend.onrender.com"
+    "https://127.0.0.1:8000/ui",
+    "https://127.0.0.1:8000"
   ]
 }

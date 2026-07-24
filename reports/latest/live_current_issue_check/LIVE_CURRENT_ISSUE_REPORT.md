@@ -2,7 +2,7 @@
 
 - Generated UTC: `2026-06-14T16:23:15.425037+00:00`
 - Repo HEAD: `7d23907f1b38e669a84dac16905839e433102084`
-- Backend URL: `https://genesis-system3-backend.onrender.com`
+- Backend URL: `https://127.0.0.1:8000`
 - Verdict: `ANALYZER_ONLY_REVIEW`
 - Broker connected: `True`
 - Broker error: `None`

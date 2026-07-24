@@ -131,7 +131,7 @@ SYSTEM3_MODE=analyzer
 ANALYZE_MODE=1
 LIVE_TRADING_ENABLED=0
 SYSTEM3_LIVE_TRADING_ALLOWED=0
-WEB_SERVICE_URL=https://genesis-system3-backend.onrender.com
+WEB_SERVICE_URL=https://127.0.0.1:8000
 ```
 
 Risk:
@@ -166,7 +166,7 @@ Use this PowerShell command from laptop:
 ```powershell
 $TOKEN="PASTE_NEW_WORKER_PUSH_TOKEN_HERE"
 
-curl.exe -i -X POST "https://genesis-system3-backend.onrender.com/api/scheduler/health/push" `
+curl.exe -i -X POST "https://127.0.0.1:8000/api/scheduler/health/push" `
   -H "Content-Type: application/json" `
   -H "X-Worker-Token: $TOKEN" `
   --data "{""daemon_heartbeat"":""manual-test"",""daemon_pid"":0,""jobs"":{},""jobs_status_today"":{},""fired_keys_today"":[]}"
