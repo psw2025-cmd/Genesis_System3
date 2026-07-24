@@ -1,7 +1,7 @@
 {
-  "generated_utc": "2026-07-21T19:55:38.083740Z",
+  "generated_utc": "2026-07-24T06:16:17.626342Z",
   "status": "BLOCKED",
-  "base_url": "https://127.0.0.1:8000",
+  "base_url": "http://127.0.0.1:8000",
   "runner": {
     "platform": "Windows-10-10.0.18362-SP0",
     "machine": "AMD64",
@@ -21,7 +21,7 @@
         "scripts/system3_gate_evaluator.py",
         "--sync-gates"
       ],
-      "started_utc": "2026-07-21T19:52:35.580402Z",
+      "started_utc": "2026-07-24T06:12:08.246153Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "scripts/system3_gate_evaluator.py",
@@ -31,8 +31,8 @@
       "ok": true,
       "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 2.3,
-      "finished_utc": "2026-07-21T19:52:37.875557Z"
+      "elapsed_sec": 4.17,
+      "finished_utc": "2026-07-24T06:12:12.414084Z"
     },
     {
       "cmd": [
@@ -40,42 +40,38 @@
         "tools/system3_auto_coordinator.py",
         "--full"
       ],
-      "started_utc": "2026-07-21T19:52:37.875557Z",
-      "actual_cmd": [
-        "C:\\Python310\\python.exe",
-        "tools/system3_auto_coordinator.py",
-        "--full"
-      ],
-      "returncode": 0,
-      "ok": true,
-      "stdout_tail": "[PASS] markdown_inventory\n[FAIL] control_plane\n[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[PASS] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n",
+      "started_utc": "2026-07-24T06:12:12.414084Z",
+      "ok": false,
+      "returncode": null,
+      "error": "timeout after 240s",
+      "stdout_tail": "",
       "stderr_tail": "",
-      "elapsed_sec": 165.79,
-      "finished_utc": "2026-07-21T19:55:23.665757Z"
+      "elapsed_sec": 240.02,
+      "finished_utc": "2026-07-24T06:16:12.431181Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
-      "started_utc": "2026-07-21T19:55:23.665949Z",
+      "started_utc": "2026-07-24T06:16:12.431181Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
       "returncode": 0,
       "ok": true,
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-21T19:55:32.626491Z\", \"github_failed_count\": 42, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 54, \"tracker_internal_status\": \"PASS\"}\n",
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-24T06:16:14.989590Z\", \"github_failed_count\": 44, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 0, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 44, \"tracker_internal_status\": \"PASS\"}\n",
       "stderr_tail": "",
-      "elapsed_sec": 8.98,
-      "finished_utc": "2026-07-21T19:55:32.644802Z"
+      "elapsed_sec": 2.59,
+      "finished_utc": "2026-07-24T06:16:15.020587Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/dashboard_visible_issue_tracker.mjs"
       ],
-      "started_utc": "2026-07-21T19:55:32.644802Z",
+      "started_utc": "2026-07-24T06:16:15.021588Z",
       "actual_cmd": [
         "node",
         "tools/dashboard_visible_issue_tracker.mjs"
@@ -84,122 +80,122 @@
       "ok": false,
       "stdout_tail": "",
       "stderr_tail": "DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16\n",
-      "elapsed_sec": 1.02,
-      "finished_utc": "2026-07-21T19:55:33.661729Z"
+      "elapsed_sec": 1.77,
+      "finished_utc": "2026-07-24T06:16:16.790469Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
-      "started_utc": "2026-07-21T19:55:33.661729Z",
+      "started_utc": "2026-07-24T06:16:16.791469Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
       "returncode": 1,
       "ok": false,
-      "stdout_tail": "\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29861532545 conclusion=failure commit=d533351fc894e16602ab7d203cabbb7e913a17ed\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29861532487 conclusion=failure commit=d533351fc894e16602ab7d203cabbb7e913a17ed\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29861502286 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 29861502280 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Settle Normalizer' run 29861502264 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29861502260 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 29861502251 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 29861502232 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29861502222 conclusion=cancelled commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 29861502215 conclusion=failure commit=1533ca4a3d84363b60cce6625f9d4b6b3c453119\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29860741815 conclusion=failure commit=29d6826d2d29689b1c852f7eab819abc64d29e37\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29860741434 conclusion=failure commit=29d6826d2d29689b1c852f7eab819abc64d29e37\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 29860734801 conclusion=cancelled commit=29d6826d2d29689b1c852f7eab819abc64d29e37\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29860733564 conclusion=failure commit=29d6826d2d29689b1c852f7eab819abc64d29e37\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 29860733210 conclusion=cancelled commit=29d6826d2d29689b1c852f7eab819abc64d29e37\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29860691923 conclusion=failure commit=9842827539dd76cb7c801d34a71b552ee83f12d4\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 29860686014 conclusion=failure commit=9842827539dd76cb7c801d34a71b552ee83f12d4\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 29860685872 conclusion=failure commit=9842827539dd76cb7c801d34a71b552ee83f12d4\",\n    \"workflow_failure_tracker: failed_count=40\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=BLOCKED_NOT_TRADE_READY\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
+      "stdout_tail": " Fix workflow 'Dashboard Shell Diagnostic' run 30069369660 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30069369644 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 30069369638 conclusion=cancelled commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 30069369636 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30069369635 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 30069369630 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30069369620 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Settle Normalizer' run 30069369619 conclusion=failure commit=7deb3dcff633724956ea41fd94d35686caf564a0\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30069358813 conclusion=failure commit=35084dd8bf59e6cbd679c8889774c2918ffff06a\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30069358812 conclusion=failure commit=35084dd8bf59e6cbd679c8889774c2918ffff06a\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30069358797 conclusion=failure commit=35084dd8bf59e6cbd679c8889774c2918ffff06a\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30069355135 conclusion=failure commit=83c88fecf23938774b037ad74cbc7a2fa0bd3499\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30069355120 conclusion=failure commit=83c88fecf23938774b037ad74cbc7a2fa0bd3499\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30069355111 conclusion=failure commit=83c88fecf23938774b037ad74cbc7a2fa0bd3499\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30069355109 conclusion=cancelled commit=83c88fecf23938774b037ad74cbc7a2fa0bd3499\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 30069344412 conclusion=failure commit=4f6e2174b4e74030316f5ddfeae8e8d985bac264\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30069344400 conclusion=cancelled commit=4f6e2174b4e74030316f5ddfeae8e8d985bac264\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30069343622 conclusion=failure commit=4f6e2174b4e74030316f5ddfeae8e8d985bac264\",\n    \"workflow_failure_tracker: failed_count=43\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=BLOCKED_NOT_TRADE_READY\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 0.2,
-      "finished_utc": "2026-07-21T19:55:33.859513Z"
+      "elapsed_sec": 0.36,
+      "finished_utc": "2026-07-24T06:16:17.151065Z"
     }
   ],
   "http_probes": [
     {
       "endpoint": "/api/health",
-      "url": "https://127.0.0.1:8000/api/health",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.31,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/health",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.02,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/state",
-      "url": "https://127.0.0.1:8000/api/state",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.27,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/state",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.01,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/status",
-      "url": "https://127.0.0.1:8000/api/status",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 1.3,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/status",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.01,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/status",
-      "url": "https://127.0.0.1:8000/api/broker/status",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.27,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/broker/status",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.08,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "url": "https://127.0.0.1:8000/api/broker/dhan/status",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.29,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/broker/dhan/status",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.09,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/funds",
-      "url": "https://127.0.0.1:8000/api/broker/funds",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.27,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/broker/funds",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.06,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/holdings",
-      "url": "https://127.0.0.1:8000/api/broker/holdings",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.28,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/broker/holdings",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.06,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/broker/positions",
-      "url": "https://127.0.0.1:8000/api/broker/positions",
+      "url": "http://127.0.0.1:8000/api/broker/positions",
       "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.26,
-      "error_category": "backend_server_error",
+      "status": 404,
+      "elapsed_sec": 0.06,
+      "error_category": "route_not_found",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/scanner/top_contract_gainers",
-      "url": "https://127.0.0.1:8000/api/scanner/top_contract_gainers",
-      "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.66,
-      "error_category": "backend_server_error",
+      "url": "http://127.0.0.1:8000/api/scanner/top_contract_gainers",
+      "ok": true,
+      "status": 200,
+      "elapsed_sec": 0.01,
+      "error_category": "none",
       "response_body_persisted": false
     },
     {
       "endpoint": "/api/simulation/live/state",
-      "url": "https://127.0.0.1:8000/api/simulation/live/state",
+      "url": "http://127.0.0.1:8000/api/simulation/live/state",
       "ok": false,
-      "status": 502,
-      "elapsed_sec": 0.3,
-      "error_category": "backend_server_error",
+      "status": 404,
+      "elapsed_sec": 0.01,
+      "error_category": "route_not_found",
       "response_body_persisted": false
     }
   ],
   "reports": {
     "system3_auto_gates": {
-      "generated_utc": "2026-07-21T19:55:22.728373Z",
+      "generated_utc": "2026-07-24T06:13:52.272914Z",
       "gates": {
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
           "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -234,20 +230,20 @@
         },
         "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
           "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-          "pass": false,
+          "pass": true,
           "report_exists": true,
-          "full_lifecycle_proven": false,
+          "full_lifecycle_proven": true,
           "broker_connected": true,
           "market_open": false,
-          "blocker_id": "SYS3-BLK-008",
+          "blocker_id": null,
           "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
         },
         "WEBSOCKET_TICK_HEALTH_PROVEN": {
           "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
           "pass": false,
           "report_exists": true,
-          "last_tick_age_sec": null,
-          "refresh_interval_sec": null,
+          "last_tick_age_sec": 1.74,
+          "refresh_interval_sec": 5,
           "blocker_id": "TICK_HEALTH_BLOCKER",
           "auto_action": "REST poll \u226410s counts for analyzer; WebSocket stream for live execution"
         },
@@ -264,7 +260,7 @@
         "OPTION_STRIKE_VISIBILITY_PROVEN": {
           "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
           "pass": false,
-          "rows": 1,
+          "rows": 4,
           "paper_trade_allowed_count": 0,
           "blocker_id": "SYS3-BLK-003",
           "auto_action": "Run scripts/system3_option_visibility_audit.py"
@@ -277,18 +273,17 @@
           "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
         }
       },
-      "gates_passing": 2,
+      "gates_passing": 3,
       "gates_total": 7,
       "open_blockers": [
         "PROFIT_BLOCKER",
         "SYS3-BLK-003",
         "SYS3-BLK-005",
-        "SYS3-BLK-008",
         "TICK_HEALTH_BLOCKER"
       ],
       "prediction_accuracy_blocked": true,
       "profit_blocked": true,
-      "lifecycle_blocked": true,
+      "lifecycle_blocked": false,
       "human_approval": true,
       "live_trading_enabled": false,
       "trade_ready": false,
@@ -296,13 +291,11 @@
       "technical_gates_still_required": [
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
         "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-        "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
         "WEBSOCKET_TICK_HEALTH_PROVEN"
       ],
       "recommended_auto_actions": [
         "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
         "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
-        "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
         "REST poll \u226410s counts for analyzer; WebSocket stream for live execution",
         "Run scripts/system3_option_visibility_audit.py"
       ],
@@ -319,607 +312,470 @@
       "failed_workflows": [
         {
           "branch": "main",
-          "commit": "64e3133c5e42197098a7e2e71a7524d80d9b39f2",
+          "commit": "285f13ac6feccaac8a0ca0c0e4a724ad82f4f92a",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29863399538",
-          "run_id": 29863399538,
-          "updated_at": "2026-07-21T19:54:00Z",
-          "workflow": "Dashboard Visible Proof Warmed"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071492743",
+          "run_id": 30071492743,
+          "updated_at": "2026-07-24T06:11:45Z",
+          "workflow": "Dashboard Visible Auth-Resilient Proof"
         },
         {
           "branch": "main",
-          "commit": "64e3133c5e42197098a7e2e71a7524d80d9b39f2",
+          "commit": "285f13ac6feccaac8a0ca0c0e4a724ad82f4f92a",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29863305999",
-          "run_id": 29863305999,
-          "updated_at": "2026-07-21T19:52:13Z",
-          "workflow": "System3 Backend Live Simulation Proof"
-        },
-        {
-          "branch": "main",
-          "commit": "64e3133c5e42197098a7e2e71a7524d80d9b39f2",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29863210303",
-          "run_id": 29863210303,
-          "updated_at": "2026-07-21T19:50:37Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071489228",
+          "run_id": 30071489228,
+          "updated_at": "2026-07-24T06:10:34Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "d26050ac01eaec62391b5f08f97431016b48486d",
+          "commit": "285f13ac6feccaac8a0ca0c0e4a724ad82f4f92a",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29863116893",
-          "run_id": 29863116893,
-          "updated_at": "2026-07-21T19:49:39Z",
-          "workflow": "Dashboard Deploy Provenance Gate"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071391492",
+          "run_id": 30071391492,
+          "updated_at": "2026-07-24T06:08:50Z",
+          "workflow": "Dashboard Visible Settle Proof"
         },
         {
           "branch": "main",
-          "commit": "3d548f150b03a3f6751dda146f795430869c207c",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862438964",
-          "run_id": 29862438964,
-          "updated_at": "2026-07-21T19:51:35Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159962",
+          "run_id": 30071159962,
+          "updated_at": "2026-07-24T06:05:31Z",
+          "workflow": "Dashboard Shell Diagnostic"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159947",
+          "run_id": 30071159947,
+          "updated_at": "2026-07-24T06:04:08Z",
+          "workflow": "Dashboard Visual Settle Normalizer"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159945",
+          "run_id": 30071159945,
+          "updated_at": "2026-07-24T06:03:56Z",
+          "workflow": "Dashboard Visual Loading Postflight"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159935",
+          "run_id": 30071159935,
+          "updated_at": "2026-07-24T06:03:58Z",
+          "workflow": "Dashboard Visual Proof Strict Gate"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159928",
+          "run_id": 30071159928,
+          "updated_at": "2026-07-24T06:06:18Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159925",
+          "run_id": 30071159925,
+          "updated_at": "2026-07-24T06:04:07Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "a8b399d8a1ada70974706c46d3db06b55bd13a62",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071159917",
+          "run_id": 30071159917,
+          "updated_at": "2026-07-24T06:03:56Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "3aea8f31cb1f5183530581452751e006de8bbdf9",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071155326",
+          "run_id": 30071155326,
+          "updated_at": "2026-07-24T06:03:51Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "3aea8f31cb1f5183530581452751e006de8bbdf9",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071155317",
+          "run_id": 30071155317,
+          "updated_at": "2026-07-24T06:04:17Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "3aea8f31cb1f5183530581452751e006de8bbdf9",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071155285",
+          "run_id": 30071155285,
+          "updated_at": "2026-07-24T06:03:50Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "3aea8f31cb1f5183530581452751e006de8bbdf9",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071154504",
+          "run_id": 30071154504,
+          "updated_at": "2026-07-24T06:04:27Z",
           "workflow": "Dashboard Visible Proof Current"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862351366",
-          "run_id": 29862351366,
-          "updated_at": "2026-07-21T19:50:41Z",
+          "commit": "1dc8ad86c67c899ae84609fe5a68ee4cb705cf93",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071144290",
+          "run_id": 30071144290,
+          "updated_at": "2026-07-24T06:03:42Z",
           "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862351363",
-          "run_id": 29862351363,
-          "updated_at": "2026-07-21T19:46:36Z",
+          "commit": "1dc8ad86c67c899ae84609fe5a68ee4cb705cf93",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071144269",
+          "run_id": 30071144269,
+          "updated_at": "2026-07-24T06:03:42Z",
           "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
+          "commit": "1dc8ad86c67c899ae84609fe5a68ee4cb705cf93",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862351353",
-          "run_id": 29862351353,
-          "updated_at": "2026-07-21T19:38:20Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071144257",
+          "run_id": 30071144257,
+          "updated_at": "2026-07-24T06:03:39Z",
           "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862347132",
-          "run_id": 29862347132,
-          "updated_at": "2026-07-21T19:38:16Z",
-          "workflow": "Dashboard Visual Loading Postflight"
+          "commit": "2041465ac644908c16713619ed3351bc37ac1017",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071128556",
+          "run_id": 30071128556,
+          "updated_at": "2026-07-24T06:03:43Z",
+          "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
+          "commit": "2041465ac644908c16713619ed3351bc37ac1017",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862347055",
-          "run_id": 29862347055,
-          "updated_at": "2026-07-21T19:41:28Z",
-          "workflow": "Dashboard Shell Diagnostic"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071128550",
+          "run_id": 30071128550,
+          "updated_at": "2026-07-24T06:03:22Z",
+          "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
+          "commit": "2041465ac644908c16713619ed3351bc37ac1017",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862347047",
-          "run_id": 29862347047,
-          "updated_at": "2026-07-21T19:38:26Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071128538",
+          "run_id": 30071128538,
+          "updated_at": "2026-07-24T06:03:44Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "2041465ac644908c16713619ed3351bc37ac1017",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071118425",
+          "run_id": 30071118425,
+          "updated_at": "2026-07-24T06:03:52Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "51cd124320613c6a1051e05232f6f7011e8ad2e8",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071095805",
+          "run_id": 30071095805,
+          "updated_at": "2026-07-24T06:02:54Z",
           "workflow": "System3 Secure Install Credential Audit"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
+          "commit": "51cd124320613c6a1051e05232f6f7011e8ad2e8",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862346978",
-          "run_id": 29862346978,
-          "updated_at": "2026-07-21T19:38:16Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071095770",
+          "run_id": 30071095770,
+          "updated_at": "2026-07-24T06:02:38Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "51cd124320613c6a1051e05232f6f7011e8ad2e8",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071095769",
+          "run_id": 30071095769,
+          "updated_at": "2026-07-24T06:03:39Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "51cd124320613c6a1051e05232f6f7011e8ad2e8",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071092523",
+          "run_id": 30071092523,
+          "updated_at": "2026-07-24T06:03:26Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070448",
+          "run_id": 30071070448,
+          "updated_at": "2026-07-24T06:02:12Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070429",
+          "run_id": 30071070429,
+          "updated_at": "2026-07-24T06:03:06Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070400",
+          "run_id": 30071070400,
+          "updated_at": "2026-07-24T06:02:12Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862346975",
-          "run_id": 29862346975,
-          "updated_at": "2026-07-21T19:38:19Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862346875",
-          "run_id": 29862346875,
-          "updated_at": "2026-07-21T19:38:13Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862342680",
-          "run_id": 29862342680,
-          "updated_at": "2026-07-21T19:38:13Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862342283",
-          "run_id": 29862342283,
-          "updated_at": "2026-07-21T19:38:14Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "a094d87c90e62629058000f009afd5b77f355584",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862342176",
-          "run_id": 29862342176,
-          "updated_at": "2026-07-21T19:38:09Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "cb31a45334cfd3fe137dc921800b9c8595ec9ac7",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862315869",
-          "run_id": 29862315869,
-          "updated_at": "2026-07-21T19:37:51Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "cb31a45334cfd3fe137dc921800b9c8595ec9ac7",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862315835",
-          "run_id": 29862315835,
-          "updated_at": "2026-07-21T19:38:06Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "cb31a45334cfd3fe137dc921800b9c8595ec9ac7",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862315791",
-          "run_id": 29862315791,
-          "updated_at": "2026-07-21T19:38:16Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "cb31a45334cfd3fe137dc921800b9c8595ec9ac7",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862305207",
-          "run_id": 29862305207,
-          "updated_at": "2026-07-21T19:38:36Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862283707",
-          "run_id": 29862283707,
-          "updated_at": "2026-07-21T19:37:53Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862283388",
-          "run_id": 29862283388,
-          "updated_at": "2026-07-21T19:37:23Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862283382",
-          "run_id": 29862283382,
-          "updated_at": "2026-07-21T19:37:42Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862281182",
-          "run_id": 29862281182,
-          "updated_at": "2026-07-21T19:38:10Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862281158",
-          "run_id": 29862281158,
-          "updated_at": "2026-07-21T19:37:19Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862280858",
-          "run_id": 29862280858,
-          "updated_at": "2026-07-21T19:37:30Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070390",
+          "run_id": 30071070390,
+          "updated_at": "2026-07-24T06:02:22Z",
           "workflow": "System3 Secure Install Credential Audit"
         },
         {
           "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862280774",
-          "run_id": 29862280774,
-          "updated_at": "2026-07-21T19:38:02Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862277500",
-          "run_id": 29862277500,
-          "updated_at": "2026-07-21T19:37:20Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862277270",
-          "run_id": 29862277270,
-          "updated_at": "2026-07-21T19:38:25Z",
-          "workflow": "Dashboard Shell Diagnostic"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862277235",
-          "run_id": 29862277235,
-          "updated_at": "2026-07-21T19:37:25Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862277222",
-          "run_id": 29862277222,
-          "updated_at": "2026-07-21T19:38:12Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862277216",
-          "run_id": 29862277216,
-          "updated_at": "2026-07-21T19:37:15Z",
-          "workflow": "Dashboard Visual Proof Strict Gate"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862276881",
-          "run_id": 29862276881,
-          "updated_at": "2026-07-21T19:37:13Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "de9cf7fdf1f58debbb45d464a2e1956e4a3da3c4",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862276796",
-          "run_id": 29862276796,
-          "updated_at": "2026-07-21T19:37:14Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070374",
+          "run_id": 30071070374,
+          "updated_at": "2026-07-24T06:02:09Z",
           "workflow": "Dashboard Visual Loading Postflight"
         },
         {
           "branch": "main",
-          "commit": "17e750072c8e161c0b80e052f55c66f5decab0fa",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862272965",
-          "run_id": 29862272965,
-          "updated_at": "2026-07-21T19:37:08Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070366",
+          "run_id": 30071070366,
+          "updated_at": "2026-07-24T06:03:57Z",
+          "workflow": "Dashboard Shell Diagnostic"
+        },
+        {
+          "branch": "main",
+          "commit": "a08eaaac17b9a60d4e22463658d6f1c118f8d670",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071070361",
+          "run_id": 30071070361,
+          "updated_at": "2026-07-24T06:03:18Z",
           "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "17e750072c8e161c0b80e052f55c66f5decab0fa",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862272584",
-          "run_id": 29862272584,
-          "updated_at": "2026-07-21T19:37:13Z",
+          "commit": "f492148d057f6b6c48fcfa8d63b7a8b793d5b5c0",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071024669",
+          "run_id": 30071024669,
+          "updated_at": "2026-07-24T06:01:56Z",
           "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "17e750072c8e161c0b80e052f55c66f5decab0fa",
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862272571",
-          "run_id": 29862272571,
-          "updated_at": "2026-07-21T19:37:12Z",
-          "workflow": "System3 Experimental Solution Planner"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006197",
+          "run_id": 30071006197,
+          "updated_at": "2026-07-24T06:00:49Z",
+          "workflow": "Dashboard Visual Loading Postflight"
         },
         {
           "branch": "main",
-          "commit": "9771a1c8d60e18c8e571266eb9a2034be13f3222",
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862251151",
-          "run_id": 29862251151,
-          "updated_at": "2026-07-21T19:37:46Z",
-          "workflow": "System3 Autopilot Proof Board"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006185",
+          "run_id": 30071006185,
+          "updated_at": "2026-07-24T06:00:50Z",
+          "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "9771a1c8d60e18c8e571266eb9a2034be13f3222",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862250677",
-          "run_id": 29862250677,
-          "updated_at": "2026-07-21T19:36:58Z",
-          "workflow": "System3 Experimental Solution Planner"
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006184",
+          "run_id": 30071006184,
+          "updated_at": "2026-07-24T06:02:34Z",
+          "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "9771a1c8d60e18c8e571266eb9a2034be13f3222",
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862250638",
-          "run_id": 29862250638,
-          "updated_at": "2026-07-21T19:37:07Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006161",
+          "run_id": 30071006161,
+          "updated_at": "2026-07-24T06:01:00Z",
           "workflow": "System3 Secure Install Credential Audit"
         },
         {
           "branch": "main",
-          "commit": "9771a1c8d60e18c8e571266eb9a2034be13f3222",
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006140",
+          "run_id": 30071006140,
+          "updated_at": "2026-07-24T06:02:16Z",
+          "workflow": "Dashboard Shell Diagnostic"
+        },
+        {
+          "branch": "main",
+          "commit": "be7ced4d7549210fb5346e8e0d55a506a3e3e3e5",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/29862250596",
-          "run_id": 29862250596,
-          "updated_at": "2026-07-21T19:37:39Z",
-          "workflow": "System3 Autopilot Proof Board"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071006132",
+          "run_id": 30071006132,
+          "updated_at": "2026-07-24T06:00:53Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "5ba47af7fb6506c7658262f068831e2c15892478",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071000894",
+          "run_id": 30071000894,
+          "updated_at": "2026-07-24T06:00:44Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "5ba47af7fb6506c7658262f068831e2c15892478",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071000893",
+          "run_id": 30071000893,
+          "updated_at": "2026-07-24T06:00:47Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "5ba47af7fb6506c7658262f068831e2c15892478",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30071000870",
+          "run_id": 30071000870,
+          "updated_at": "2026-07-24T06:01:12Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "5ba47af7fb6506c7658262f068831e2c15892478",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30070991064",
+          "run_id": 30070991064,
+          "updated_at": "2026-07-24T06:00:38Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "5ba47af7fb6506c7658262f068831e2c15892478",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30070991033",
+          "run_id": 30070991033,
+          "updated_at": "2026-07-24T06:00:36Z",
+          "workflow": "System3 Safe Repair Runner"
         }
       ],
-      "generated_utc": "2026-07-21T19:55:32.626491Z",
-      "github_failed_count": 42,
+      "generated_utc": "2026-07-24T06:16:14.989590Z",
+      "github_failed_count": 44,
       "github_timeout_s": 12.0,
       "live_trading_enabled": false,
       "order_routes_called": false,
       "production_grade_claim_allowed": false,
-      "render_base": "https://127.0.0.1:8000",
+      "render_base": "http://127.0.0.1:8000",
       "render_endpoint_timeout_s": 12.0,
-      "render_failed_count": 12,
-      "render_failures": [
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/ui/",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/ui/"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/health",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/health"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/state",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/state"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/deploy/info",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/deploy/info"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/broker/diagnose",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/broker/diagnose"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/broker/funds",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/broker/funds"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/broker/holdings",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/broker/holdings"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/broker/positions/live",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/broker/positions/live"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/scanner/top_contract_gainers",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/scanner/top_contract_gainers"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/paper",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/paper"
-        },
-        {
-          "classification": {
-            "mentions_auth_error": false,
-            "mentions_commit_or_sha": false,
-            "mentions_server_error": false
-          },
-          "endpoint": "/api/ml/performance",
-          "error_type": null,
-          "reason": "HTTP status 502",
-          "status_code": 502,
-          "url": "https://127.0.0.1:8000/api/ml/performance"
-        }
-      ],
+      "render_failed_count": 0,
+      "render_failures": [],
       "report_only_no_self_failure_storm": true,
       "repository": "psw2025-cmd/Genesis_System3",
       "response_bodies_persisted": false,
       "secrets_printed": false,
       "status": "BLOCKED",
       "todo": [
-        "Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=29863399538 conclusion=failure commit=64e3133c5e42",
-        "Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=29863305999 conclusion=failure commit=64e3133c5e42",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29863210303 conclusion=failure commit=64e3133c5e42",
-        "Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=29863116893 conclusion=failure commit=d26050ac01ea",
-        "Fix GitHub workflow 'Dashboard Visible Proof Current' run=29862438964 conclusion=failure commit=3d548f150b03",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29862351366 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862351363 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862351353 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29862347132 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29862347055 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29862347047 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29862346978 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862346975 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862346875 conclusion=cancelled commit=a094d87c90e6",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29862342680 conclusion=cancelled commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862342283 conclusion=failure commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862342176 conclusion=cancelled commit=a094d87c90e6",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862315869 conclusion=failure commit=cb31a45334cf",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29862315835 conclusion=cancelled commit=cb31a45334cf",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862315791 conclusion=cancelled commit=cb31a45334cf",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29862305207 conclusion=failure commit=cb31a45334cf",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862283707 conclusion=cancelled commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862283388 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29862283382 conclusion=cancelled commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29862281182 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862281158 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29862280858 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29862280774 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862277500 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=29862277270 conclusion=cancelled commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29862277235 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=29862277222 conclusion=cancelled commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=29862277216 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862276881 conclusion=cancelled commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=29862276796 conclusion=failure commit=de9cf7fdf1f5",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=29862272965 conclusion=cancelled commit=17e750072c8e",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=29862272584 conclusion=cancelled commit=17e750072c8e",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862272571 conclusion=failure commit=17e750072c8e",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29862251151 conclusion=failure commit=9771a1c8d60e",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=29862250677 conclusion=failure commit=9771a1c8d60e",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=29862250638 conclusion=failure commit=9771a1c8d60e",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=29862250596 conclusion=failure commit=9771a1c8d60e",
-        "Fix Render endpoint /: HTTP status 502 status=502",
-        "Fix Render endpoint /ui/: HTTP status 502 status=502",
-        "Fix Render endpoint /api/health: HTTP status 502 status=502",
-        "Fix Render endpoint /api/state: HTTP status 502 status=502",
-        "Fix Render endpoint /api/deploy/info: HTTP status 502 status=502",
-        "Fix Render endpoint /api/broker/diagnose: HTTP status 502 status=502",
-        "Fix Render endpoint /api/broker/funds: HTTP status 502 status=502",
-        "Fix Render endpoint /api/broker/holdings: HTTP status 502 status=502",
-        "Fix Render endpoint /api/broker/positions/live: HTTP status 502 status=502",
-        "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 502 status=502",
-        "Fix Render endpoint /api/paper: HTTP status 502 status=502",
-        "Fix Render endpoint /api/ml/performance: HTTP status 502 status=502"
+        "Fix GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30071492743 conclusion=failure commit=285f13ac6fec",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30071489228 conclusion=failure commit=285f13ac6fec",
+        "Fix GitHub workflow 'Dashboard Visible Settle Proof' run=30071391492 conclusion=failure commit=285f13ac6fec",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30071159962 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'Dashboard Visual Settle Normalizer' run=30071159947 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30071159945 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30071159935 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071159928 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30071159925 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071159917 conclusion=failure commit=a8b399d8a1ad",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071155326 conclusion=failure commit=3aea8f31cb1f",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30071155317 conclusion=failure commit=3aea8f31cb1f",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071155285 conclusion=cancelled commit=3aea8f31cb1f",
+        "Fix GitHub workflow 'Dashboard Visible Proof Current' run=30071154504 conclusion=failure commit=3aea8f31cb1f",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30071144290 conclusion=cancelled commit=1dc8ad86c67c",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071144269 conclusion=cancelled commit=1dc8ad86c67c",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071144257 conclusion=failure commit=1dc8ad86c67c",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071128556 conclusion=cancelled commit=2041465ac644",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071128550 conclusion=failure commit=2041465ac644",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30071128538 conclusion=failure commit=2041465ac644",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30071118425 conclusion=failure commit=2041465ac644",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30071095805 conclusion=failure commit=51cd12432061",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071095770 conclusion=failure commit=51cd12432061",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30071095769 conclusion=failure commit=51cd12432061",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30071092523 conclusion=failure commit=51cd12432061",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071070448 conclusion=failure commit=a08eaaac17b9",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30071070429 conclusion=failure commit=a08eaaac17b9",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30071070400 conclusion=failure commit=a08eaaac17b9",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30071070390 conclusion=failure commit=a08eaaac17b9",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30071070374 conclusion=failure commit=a08eaaac17b9",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30071070366 conclusion=cancelled commit=a08eaaac17b9",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071070361 conclusion=cancelled commit=a08eaaac17b9",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30071024669 conclusion=failure commit=f492148d057f",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30071006197 conclusion=failure commit=be7ced4d7549",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30071006185 conclusion=failure commit=be7ced4d7549",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071006184 conclusion=cancelled commit=be7ced4d7549",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30071006161 conclusion=failure commit=be7ced4d7549",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30071006140 conclusion=cancelled commit=be7ced4d7549",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071006132 conclusion=failure commit=be7ced4d7549",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30071000894 conclusion=cancelled commit=5ba47af7fb65",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30071000893 conclusion=failure commit=5ba47af7fb65",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30071000870 conclusion=failure commit=5ba47af7fb65",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30070991064 conclusion=failure commit=5ba47af7fb65",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30070991033 conclusion=cancelled commit=5ba47af7fb65"
       ],
-      "todo_count": 54,
+      "todo_count": 44,
       "tracker_internal_status": "PASS",
       "exists": true,
       "path": "C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\github_render_failure_tracker\\summary.json"
     },
     "dashboard_visible_issue_tracker": {
-      "generated_at": "2026-07-21T19:55:33.619Z",
-      "base": "https://127.0.0.1:8000",
+      "generated_at": "2026-07-24T06:16:16.720Z",
+      "base": "http://127.0.0.1:8000",
       "status": "BLOCKED",
       "auth": null,
       "tabs": [],
@@ -952,128 +808,128 @@
       "after": [
         {
           "endpoint": "/api/health",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/state",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/dhan/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/funds",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/holdings",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/positions/live",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/approval/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/kill-switch/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         }
       ],
       "analyzer_ready": false,
-      "api_base": "https://127.0.0.1:8000",
+      "api_base": "http://127.0.0.1:8000",
       "autopilot_status": "BLOCKED",
       "before": [
         {
           "endpoint": "/api/health",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/state",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/dhan/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/funds",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/holdings",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/broker/positions/live",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/approval/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         },
         {
           "endpoint": "/api/kill-switch/status",
+          "error": "URLError: <urlopen error [Errno 111] Connection refused>",
           "ok": false,
-          "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-          "status": 502
+          "status": 0
         }
       ],
       "blocked_reasons": [
@@ -1101,7 +957,7 @@
             "tools/system3_auto_coordinator.py",
             "--full",
             "--api-base",
-            "https://127.0.0.1:8000"
+            "http://127.0.0.1:8000"
           ],
           "exit_code": 1,
           "passed": false,
@@ -1113,7 +969,7 @@
             "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
             "scripts/system3_model_accuracy_tracker.py",
             "--api-base",
-            "https://127.0.0.1:8000"
+            "http://127.0.0.1:8000"
           ],
           "exit_code": 0,
           "passed": true,
@@ -1125,7 +981,7 @@
             "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
             "scripts/system3_option_visibility_audit.py",
             "--api-base",
-            "https://127.0.0.1:8000"
+            "http://127.0.0.1:8000"
           ],
           "exit_code": 0,
           "passed": true,
@@ -1157,12 +1013,12 @@
             "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
             "scripts/system3_blocker_finder.py",
             "--api-base",
-            "https://127.0.0.1:8000"
+            "http://127.0.0.1:8000"
           ],
           "exit_code": 0,
           "passed": true,
           "stderr_tail": "",
-          "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-20T08:08:16.074574+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://127.0.0.1:8000\",\n  \"state_source\": \"api:https://127.0.0.1:8000/api/state\",\n  \"state_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"broker_source\": \"api:https://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
+          "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T04:57:41.558284+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": \"FETCH_ERROR: URLError: <urlopen error [Errno 111] Connection refused>\",\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": \"FETCH_ERROR: URLError: <urlopen error [Errno 111] Connection refused>\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
         },
         {
           "cmd": [
@@ -1172,13 +1028,13 @@
           "exit_code": 0,
           "passed": true,
           "stderr_tail": "",
-          "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-20T08:08:20.062073Z\", \"github_failed_count\": 40, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 52, \"tracker_internal_status\": \"PASS\"}\n"
+          "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-24T04:57:42.755815Z\", \"github_failed_count\": 43, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 55, \"tracker_internal_status\": \"PASS\"}\n"
         }
       ],
       "endpoint_fail_count": 10,
       "gates_passing": 2,
       "gates_total": 7,
-      "generated_utc": "2026-07-20T08:08:21.457790Z",
+      "generated_utc": "2026-07-24T04:57:42.768204Z",
       "github_render_status": "BLOCKED",
       "live_trading_enabled": false,
       "open_blockers": [
@@ -1208,7 +1064,7 @@
       "autopilot_status": "BLOCKED",
       "gates_passing": 2,
       "gates_total": 7,
-      "generated_utc": "2026-07-20T08:08:21.513505+00:00",
+      "generated_utc": "2026-07-24T04:57:42.827964+00:00",
       "live_trading_enabled": false,
       "open_blockers": [
         "PROFIT_BLOCKER",
@@ -1237,77 +1093,77 @@
     {
       "name": "C:\\Python310\\python.exe scripts/system3_gate_evaluator.py --sync-gates",
       "status": "PASS",
-      "detail": "rc=0 elapsed=2.3s"
+      "detail": "rc=0 elapsed=4.17s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full",
-      "status": "PASS",
-      "detail": "rc=0 elapsed=165.79s"
+      "status": "BLOCKED",
+      "detail": "timeout after 240s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_github_render_failure_tracker.py",
       "status": "PASS",
-      "detail": "rc=0 elapsed=8.98s"
+      "detail": "rc=0 elapsed=2.59s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=1.02s"
+      "detail": "rc=1 elapsed=1.77s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.2s"
+      "detail": "rc=1 elapsed=0.36s"
     },
     {
       "name": "HTTP /api/health",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/state",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/status",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/broker/status",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/broker/dhan/status",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/broker/funds",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/broker/holdings",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/broker/positions",
       "status": "BLOCKED",
-      "detail": "502"
+      "detail": "404"
     },
     {
       "name": "HTTP /api/scanner/top_contract_gainers",
-      "status": "BLOCKED",
-      "detail": "502"
+      "status": "PASS",
+      "detail": "200"
     },
     {
       "name": "HTTP /api/simulation/live/state",
       "status": "BLOCKED",
-      "detail": "502"
+      "detail": "404"
     },
     {
       "name": "Report system3_auto_gates",
@@ -1341,18 +1197,11 @@
     }
   ],
   "blockers": [
+    "Command blocked: C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full \u2014 timeout after 240s",
     "Command blocked: C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs \u2014 DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16\n",
     "Command blocked: C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py \u2014 1",
-    "HTTP blocked: /api/health \u2014 502",
-    "HTTP blocked: /api/state \u2014 502",
-    "HTTP blocked: /api/status \u2014 502",
-    "HTTP blocked: /api/broker/status \u2014 502",
-    "HTTP blocked: /api/broker/dhan/status \u2014 502",
-    "HTTP blocked: /api/broker/funds \u2014 502",
-    "HTTP blocked: /api/broker/holdings \u2014 502",
-    "HTTP blocked: /api/broker/positions \u2014 502",
-    "HTTP blocked: /api/scanner/top_contract_gainers \u2014 502",
-    "HTTP blocked: /api/simulation/live/state \u2014 502",
+    "HTTP blocked: /api/broker/positions \u2014 404",
+    "HTTP blocked: /api/simulation/live/state \u2014 404",
     "Report not PASS: system3_auto_gates \u2014 UNKNOWN",
     "Report not PASS: github_render_failure_tracker \u2014 BLOCKED",
     "Report not PASS: dashboard_visible_issue_tracker \u2014 BLOCKED",
