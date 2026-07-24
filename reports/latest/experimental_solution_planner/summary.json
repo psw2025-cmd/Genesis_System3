@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-24T03:35:05.256111+00:00",
-  "issue_count": 457,
+  "generated_utc": "2026-07-24T03:51:11.929058+00:00",
+  "issue_count": 426,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 234,
+      "issue_count": 218,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,79 +64,79 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30064456692 conclusion=failure commit=f5e5a2e3cbce",
+          "issue": "GITHUB_TOKEN unavailable; cannot query workflow failures.",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30064406048 conclusion=failure commit=60dfc9321f73",
+          "issue": "{\"conclusion\": \"blocked\", \"todo\": \"GITHUB_TOKEN unavailable; cannot query workflow failures.\", \"workflow\": \"GITHUB_API\"}",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30064405997 conclusion=failure commit=60dfc9321f73",
+          "issue": "github_failed_count=1",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30064300969 conclusion=failure commit=ee1b9eed7405",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029893891 conclusion=failure commit=259031e41f2a",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30029890958 conclusion=failure commit=259031e41f2a",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /ui/: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029867992 conclusion=failure commit=6bc8b7c641e7",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/health: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Autopilot Proof Board' run=30029762863 conclusion=failure commit=b1683ffba457",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/state: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=30029762829 conclusion=cancelled commit=b1683ffba457",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/broker/diagnose: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=30029523268 conclusion=cancelled commit=f3684c9f38d9",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/broker/positions/live: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029034315 conclusion=failure commit=546802581ff0",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=30029034219 conclusion=cancelled commit=546802581ff0",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/paper: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30028923046 conclusion=cancelled commit=44404960fa66",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/ml/performance: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Safe Repair Runner' run=30028922882 conclusion=cancelled commit=44404960fa66",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"f5e5a2e3cbceeabbc1d08bf043a9aeae0f271efa\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30064456692\", \"run_id\": 30064456692, \"status\": \"completed\", \"updated_at\": \"2026-07-24T03:31:55Z\", \"workflow\": \".github/workflows/options-ml-training-proof.yml\"}",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30028922788 conclusion=failure commit=44404960fa66",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"branch\": \"main\", \"commit\": \"60dfc9321f73c07635a2238477d423fa9befd37b\", \"conclusion\": \"failure\", \"html_url\": \"https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30064406048\", \"run_id\": 30064406048, \"status\": \"completed\", \"updated_at\": \"2026-07-24T03:30:51Z\", \"workflow\": \"Dashboard Visual Loading Postflight\"}",
+          "issue": "github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30028888572 conclusion=failure commit=29bc67726000",
           "lane": "GITHUB_RENDER_FAILURE",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         }
       ]
     },
@@ -277,7 +277,7 @@
       ]
     },
     {
-      "issue_count": 45,
+      "issue_count": 33,
       "lane": "BROKER_DHAN",
       "recommended_fixes": [
         "Check broker diagnose/funds/holdings/positions read-only endpoints.",
@@ -413,7 +413,7 @@
       ]
     },
     {
-      "issue_count": 32,
+      "issue_count": 29,
       "lane": "RENDER_DEPLOY",
       "recommended_fixes": [
         "Verify /api/deploy/info exposes latest commit.",
@@ -537,14 +537,14 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /api/deploy/info: HTTP status 0 status=0",
+          "issue": "github_render_failure_tracker: endpoint=/api/deploy/info reason=HTTP status 502 status=502",
           "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "{\"classification\": {\"mentions_auth_error\": false, \"mentions_commit_or_sha\": false, \"mentions_server_error\": false}, \"endpoint\": \"/api/deploy/info\", \"error_type\": \"URLError\", \"reason\": \"HTTP status 0\", \"status_code\": 0, \"url\": \"http://127.0.0.1:8000/api/deploy/info\"}",
+          "issue": "parallel_root_cause_audit: Need compare public truth commit with latest repository head and Render deploy info; static repo audit cannot prove Render freshness.",
           "lane": "RENDER_DEPLOY",
-          "report": "reports/latest/github_render_failure_tracker/summary.json"
+          "report": "reports/latest/autopilot_proof_board/summary.json"
         }
       ]
     },
@@ -879,7 +879,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=16",
+          "issue": "todo_count=1",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },

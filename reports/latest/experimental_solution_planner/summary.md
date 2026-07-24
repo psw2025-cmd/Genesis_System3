@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-24T03:35:05.256111+00:00`
+Generated UTC: `2026-07-24T03:51:11.929058+00:00`
 Status: **BLOCKED**
-Issues: `457`
+Issues: `426`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 234 issues
+### GITHUB_RENDER_FAILURE — 218 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30064456692 conclusion=failure commit=f5e5a2e3cbce
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30064406048 conclusion=failure commit=60dfc9321f73
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30064405997 conclusion=failure commit=60dfc9321f73
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30064300969 conclusion=failure commit=ee1b9eed7405
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix Render endpoint /: HTTP status 0 status=0
+- `reports/latest/github_render_failure_tracker/summary.json`: GITHUB_TOKEN unavailable; cannot query workflow failures.
+- `reports/latest/github_render_failure_tracker/summary.json`: {"conclusion": "blocked", "todo": "GITHUB_TOKEN unavailable; cannot query workflow failures.", "workflow": "GITHUB_API"}
+- `reports/latest/github_render_failure_tracker/summary.json`: github_failed_count=1
+- `reports/latest/autopilot_proof_board/summary.json`: github_render_failure_tracker: Fix GitHub workflow 'System3 Experimental Solution Planner' run=30029893891 conclusion=failure commit=259031e41f2a
+- `reports/latest/autopilot_proof_board/summary.json`: github_render_failure_tracker: Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30029890958 conclusion=failure commit=259031e41f2a
 
 ### UI_RED_VISUAL — 49 issues
 
@@ -74,7 +74,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_055:install_dependencies: Install/credential audit blocked: 3 blockers
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_059:proof_files: Required proof files missing: ['reports/latest/autopilot_proof_board/summary.json', 'reports/latest/dashboard_visible_issue_tracker/summary.json']
 
-### BROKER_DHAN — 45 issues
+### BROKER_DHAN — 33 issues
 
 Recommended fixes:
 - Check broker diagnose/funds/holdings/positions read-only endpoints.
@@ -98,7 +98,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker/auth issue visible at /api/broker/funds: {"detail":"Missing or invalid dashboard API session"}
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_045:broker_truth: Broker endpoint server error: /api/broker/holdings
 
-### RENDER_DEPLOY — 32 issues
+### RENDER_DEPLOY — 29 issues
 
 Recommended fixes:
 - Verify /api/deploy/info exposes latest commit.
@@ -331,7 +331,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_074:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_094:root_cause_matrix: Parallel root-cause blockers remain: 14
 - `reports/latest/render_100_agent_swarm/summary.json`: issue_count=143
-- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=16
+- `reports/latest/github_render_failure_tracker/summary.json`: todo_count=1
 - `reports/latest/autopilot_proof_board/summary.json`: dashboard_visual_production_proof: status=UNKNOWN
 - `reports/latest/autopilot_proof_board/summary.json`: blocker_count=172
 - `reports/latest/dashboard_visible_issue_tracker/summary.json`: expected_tab_count=16
