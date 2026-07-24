@@ -1,6 +1,6 @@
 # Dashboard Shell Diagnostic
 
-Generated: 2026-07-24T13:36:23.563Z
+Generated: 2026-07-24T14:14:42.587Z
 Status: **BLOCKED**
 Blocker: **DASHBOARD_SHELL_EXCEPTION**
 Render UI available: `false`
