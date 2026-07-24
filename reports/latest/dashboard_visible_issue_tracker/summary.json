@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T14:55:45.797Z",
+  "generated_at": "2026-07-24T14:56:56.827Z",
   "base": "http://127.0.0.1:8000",
   "status": "BLOCKED",
   "auth": null,
@@ -13,12 +13,13 @@
   "global_exception": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/ui/\nCall log:\n  - navigating to \"http://127.0.0.1:8000/ui/\", waiting until \"domcontentloaded\"\n",
   "visible_issues": [],
   "info_lines": [],
-  "todo": [],
+  "todo": [
+    "Live dashboard UI scan failed before tab scan: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/ui/\nCall log:\n  - navigating to \"http://127.0.0.1:8000/ui/\", waiting until \"domcontentloaded\"\n"
+  ],
   "production_grade_claim_allowed": false,
   "analyzer_safety": {
     "analyze_mode": true,
     "live_trading_enabled": false,
     "system3_live_trading_allowed": false
-  },
-  "settle_normalized_tab_count": 0
+  }
 }
