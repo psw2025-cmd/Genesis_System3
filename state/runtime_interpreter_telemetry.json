@@ -1,7 +1,7 @@
 {
-  "timestamp": "2025-12-10T08:21:25.629112",
-  "python_executable": "C:\\Genesis_System3\\venv\\Scripts\\python.exe",
-  "expected_python": "C:\\Genesis_System3\\venv\\Scripts\\python.exe",
-  "venv_active": true,
-  "site_packages_source": "C:\\Genesis_System3\\venv\\Lib\\site-packages"
+  "timestamp": "2026-07-22T00:16:20.057694",
+  "python_executable": "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
+  "expected_python": "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
+  "venv_active": false,
+  "site_packages_source": "C:\\System3\\Genesis_System3\\venv\\Lib\\site-packages"
 }
