@@ -15,7 +15,7 @@
 - `CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS`
 
 ## Operational blockers
-- `deploy_commit_mismatch` — Render git_sha=[REDACTED] expected=893ca11f05bd
+- `deploy_commit_mismatch` — Render git_sha=[REDACTED] expected=286e40cb2733
 - `broker_not_connected` — broker status not connected: TOKEN_EXPIRED_OR_INVALID
 - `scheduler_no_worker_push` — worker scheduler health has not been received
 - `chain_nifty_empty` — NIFTY chain empty/status=NO_DHAN_DATA source=dhan
