@@ -2,128 +2,650 @@
   "after": [
     {
       "endpoint": "/api/health",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "broker": {
+          "connected": false,
+          "error": "Broker not connected",
+          "status": "disconnected"
+        },
+        "broker_status": "disconnected",
+        "cycle_count": 0,
+        "daily_pnl": 0.0,
+        "data_source": "live",
+        "last_fetch": null,
+        "live_allowed": false,
+        "live_blockers": [
+          "Broker not connected - real data unavailable"
+        ],
+        "market": {
+          "is_open": false,
+          "reason": "closed"
+        },
+        "market_status": "closed",
+        "message": "BROKER_NOT_READY - Real data unavailable",
+        "mode": "PAPER",
+        "open_positions": 0,
+        "performance_sla": {
+          "cycle_duration_sec": 0,
+          "fetch_duration_sec": 0,
+          "sla_pass": false,
+          "strategy_duration_sec": 0
+        },
+        "qc_failures": [
+          "Broker not connected - real data unavailable"
+        ],
+        "qc_status": "NOT_READY",
+        "refresh_interval": 5,
+        "status": "not_ready",
+        "total_pnl": 0.0,
+        "trades_executed": 0
+      },
+      "ok": true,
+      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/state",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "alerts": [],
+        "broker": {
+          "access_token_present": false,
+          "auto_refresh": {
+            "attempted": false,
+            "success": false
+          },
+          "broker": "dhan",
+          "client_id_present": false,
+          "connected": false,
+          "credentials_present": false,
+          "env_source": "core.utils.env_loader",
+          "error": "CONFIG_MISSING",
+          "live_trading_enabled": false,
+          "mode": "ANALYZER",
+          "order_placement_allowed": false,
+          "sdk_available": true
+        },
+        "cycle_count": 6072,
+        "data_source": "MARKET_CLOSED_NO_BROKER",
+        "last_cycle_ts_iso": "2026-07-24T09:12:32.964493+05:30",
+        "last_fetch_ts_iso": "2026-07-24T09:12:32.964493+05:30",
+        "last_tick_age_sec": 5.01,
+        "market": {
+          "current_time_ist": "2026-07-24T09:12:29.477283+05:30",
+          "is_open": false,
+          "next_open": "2026-07-24 09:15:00 IST",
+          "reason": "Pre-market window (9:00-9:15 AM) - Market not open"
+        },
+        "mode": "PAPER",
+        "model": {
+          "active": null,
+          "fallback_used": false,
+          "metrics": {},
+          "type": null
+        },
+        "pnl": {
+          "day_total": 0.0,
+          "realized": 0.0,
+          "total": 0.0,
+          "unrealized": 0.0
+        },
+        "positions": [],
+        "positions_source": "NO_POSITIONS",
+        "qc": {
+          "contracts_total": 0,
+          "failures": [],
+          "reasons": [],
+          "status": "PASS",
+          "underlyings": 0
+        },
+        "reconciliation": {
+          "mismatches": [],
+          "status": "OK",
+          "timestamp": "2026-07-24T09:07:20.292353+05:30"
+        },
+        "refresh_interval": 5,
+        "risk": {
+          "concentration": 0.0,
+          "es95": 0.0,
+          "exposure": 0.0,
+          "greeks": {
+            "delta": 0.0,
+            "gamma": 0.0,
+            "theta": 0.0,
+            "vega": 0.0
+          },
+          "limits": {
+            "breaches": [],
+            "status": "PASS"
+          },
+          "var95": 0.0
+        },
+        "signals": {
+          "confidence": 0,
+          "last_signal": null,
+          "reason": "No signal generated",
+          "status": "NO_TRADE",
+          "underlying": null
+        },
+        "state_version": 6072,
+        "tick_health": {
+          "last_tick_age_sec": 5.01,
+          "market_open": false,
+          "refresh_interval_sec": 5,
+          "source": "rest_poll_ssot",
+          "websocket_endpoint": "/ws/stream"
+        },
+        "timestamp_ist": "2026-07-24T09:12:32.964493+05:30",
+        "timestamp_utc": "2026-07-24T03:42:32.964493Z"
+      },
+      "ok": true,
+      "sample": "{\"state_version\":6072,\"timestamp_utc\":\"2026-07-24T03:42:32.964493Z\",\"timestamp_ist\":\"2026-07-24T09:12:32.964493+05:30\",\"mode\":\"PAPER\",\"data_source\":\"MARKET_CLOSED_NO_BROKER\",\"market\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:12:29.477283+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,",
+      "status": 200
     },
     {
       "endpoint": "/api/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "backend": {
+          "port": 8000,
+          "running": true,
+          "uptime_estimate": "running"
+        },
+        "data": {
+          "fresh": false,
+          "last_update": null,
+          "market_status": {
+            "current_time_ist": null,
+            "is_open": false,
+            "next_open": "2026-07-24 09:15:00 IST",
+            "reason": "Pre-market window (9:00-9:15 AM) - Market not open",
+            "seconds_until_open": null
+          },
+          "source": "real"
+        },
+        "endpoints": {
+          "chain": "/api/chain/{underlying}",
+          "health": "/api/health",
+          "perf": "/api/perf",
+          "pnl": "/api/pnl",
+          "positions": "/api/positions",
+          "signals": "/api/signal/top"
+        },
+        "frontend": {
+          "expected_url": "http://localhost:3000",
+          "status": "should_be_running"
+        },
+        "health": false,
+        "status": "ok",
+        "timestamp": "2026-07-24T09:12:33.540941+05:30"
+      },
+      "ok": true,
+      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:12:33.540941+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"current_time_ist\":null,\"next_open\":\"2026-07-24 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "access_token_present": false,
+        "auto_refresh": {
+          "attempted": false,
+          "success": false
+        },
+        "broker": "dhan",
+        "client_id_present": false,
+        "connected": false,
+        "credentials_present": false,
+        "env_source": "core.utils.env_loader",
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "mode": "ANALYZER",
+        "order_placement_allowed": false,
+        "sdk_available": true
+      },
+      "ok": true,
+      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "access_token_present": false,
+        "auto_refresh": {
+          "attempted": false,
+          "success": false
+        },
+        "broker": "dhan",
+        "client_id_present": false,
+        "connected": false,
+        "credentials_present": false,
+        "env_source": "core.utils.env_loader",
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "mode": "ANALYZER",
+        "order_placement_allowed": false,
+        "sdk_available": true
+      },
+      "ok": true,
+      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/funds",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "data": {},
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "normalized": {
+          "available_balance": null,
+          "raw": {},
+          "total_limit": null,
+          "utilized_amount": null
+        },
+        "order_placement_allowed": false,
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"normalized\":{\"available_balance\":null,\"utilized_amount\":null,\"total_limit\":null,\"raw\":{}},\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":{}}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/holdings",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "count": 0,
+        "data": [],
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "rows": [],
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"count\":0,\"rows\":[],\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":[]}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/positions/live",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "count": 0,
+        "data": [],
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "rows": [],
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"count\":0,\"rows\":[],\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":[]}",
+      "status": 200
     },
     {
       "endpoint": "/api/approval/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "approved_by": "PRITAM S. WARGHADE",
+        "approved_utc": "2026-06-24T02:30:00+05:30",
+        "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
+        "dashboard_status": "PASS",
+        "generated_utc": "2026-07-24T03:42:33.867068Z",
+        "human_approval": true,
+        "live_trading_enabled": false,
+        "live_trading_env_flip_authorized": false,
+        "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
+        "production_ready_for_real_money": false,
+        "scope": "Full owner trust for world-class development, automation, and performance optimization.",
+        "technical_gates_pending_count": 4,
+        "technical_gates_still_required": [
+          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+          "WEBSOCKET_TICK_HEALTH_PROVEN"
+        ]
+      },
+      "ok": true,
+      "sample": "{\"generated_utc\":\"2026-07-24T03:42:33.867068Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/kill-switch/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "details": "Kill switch not activated",
+        "kill_active": false,
+        "kill_switch_path": "C:\\System3\\Genesis_System3\\storage\\live\\kill_switch.json",
+        "status": "OK"
+      },
+      "ok": true,
+      "sample": "{\"status\":\"OK\",\"kill_active\":false,\"details\":\"Kill switch not activated\",\"kill_switch_path\":\"C:\\\\System3\\\\Genesis_System3\\\\storage\\\\live\\\\kill_switch.json\"}",
+      "status": 200
     }
   ],
   "analyzer_ready": false,
-  "api_base": "https://genesis-system3-backend.onrender.com",
+  "api_base": "http://127.0.0.1:8000",
   "autopilot_status": "BLOCKED",
   "before": [
     {
       "endpoint": "/api/health",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "broker": {
+          "connected": false,
+          "error": "Broker not connected",
+          "status": "disconnected"
+        },
+        "broker_status": "disconnected",
+        "cycle_count": 0,
+        "daily_pnl": 0.0,
+        "data_source": "live",
+        "last_fetch": null,
+        "live_allowed": false,
+        "live_blockers": [
+          "Broker not connected - real data unavailable"
+        ],
+        "market": {
+          "is_open": false,
+          "reason": "closed"
+        },
+        "market_status": "closed",
+        "message": "BROKER_NOT_READY - Real data unavailable",
+        "mode": "PAPER",
+        "open_positions": 0,
+        "performance_sla": {
+          "cycle_duration_sec": 0,
+          "fetch_duration_sec": 0,
+          "sla_pass": false,
+          "strategy_duration_sec": 0
+        },
+        "qc_failures": [
+          "Broker not connected - real data unavailable"
+        ],
+        "qc_status": "NOT_READY",
+        "refresh_interval": 5,
+        "status": "not_ready",
+        "total_pnl": 0.0,
+        "trades_executed": 0
+      },
+      "ok": true,
+      "sample": "{\"status\":\"not_ready\",\"mode\":\"PAPER\",\"broker_status\":\"disconnected\",\"market_status\":\"closed\",\"data_source\":\"live\",\"live_allowed\":false,\"live_blockers\":[\"Broker not connected - real data unavailable\"],\"broker\":{\"connected\":false,\"status\":\"disconnected\",\"error\":\"Broker not connected\"},\"market\":{\"is_open\":false,\"reason\":\"closed\"},\"cycle_count\":0,\"refresh_interval\":5,\"last_fetch\":null,\"qc_status\":\"NOT_READY\",\"qc_failures\":[\"Broker not connected - real data unavailable\"],\"trades_executed\":0,\"open_positions\":0,\"total_pnl\":0.0,\"daily_pnl\":0.0,\"performance_sla\":{\"cycle_duration_sec\":0,\"fetch_duration_sec\":0,\"strategy_duration_sec\":0,\"sla_pass\":false},\"message\":\"BROKER_NOT_READY - Real data unavailable\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/state",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "alerts": [],
+        "broker": {
+          "access_token_present": false,
+          "auto_refresh": {
+            "attempted": false,
+            "success": false
+          },
+          "broker": "dhan",
+          "client_id_present": false,
+          "connected": false,
+          "credentials_present": false,
+          "env_source": "core.utils.env_loader",
+          "error": "CONFIG_MISSING",
+          "live_trading_enabled": false,
+          "mode": "ANALYZER",
+          "order_placement_allowed": false,
+          "sdk_available": true
+        },
+        "cycle_count": 6058,
+        "data_source": "MARKET_CLOSED_NO_BROKER",
+        "last_cycle_ts_iso": "2026-07-24T09:11:56.942225+05:30",
+        "last_fetch_ts_iso": "2026-07-24T09:11:56.942225+05:30",
+        "last_tick_age_sec": 5.02,
+        "market": {
+          "current_time_ist": "2026-07-24T09:11:56.941299+05:30",
+          "is_open": false,
+          "next_open": "2026-07-24 09:15:00 IST",
+          "reason": "Pre-market window (9:00-9:15 AM) - Market not open"
+        },
+        "mode": "PAPER",
+        "model": {
+          "active": null,
+          "fallback_used": false,
+          "metrics": {},
+          "type": null
+        },
+        "pnl": {
+          "day_total": 0.0,
+          "realized": 0.0,
+          "total": 0.0,
+          "unrealized": 0.0
+        },
+        "positions": [],
+        "positions_source": "NO_POSITIONS",
+        "qc": {
+          "contracts_total": 0,
+          "failures": [],
+          "reasons": [],
+          "status": "PASS",
+          "underlyings": 0
+        },
+        "reconciliation": {
+          "mismatches": [],
+          "status": "OK",
+          "timestamp": "2026-07-24T09:07:20.292353+05:30"
+        },
+        "refresh_interval": 5,
+        "risk": {
+          "concentration": 0.0,
+          "es95": 0.0,
+          "exposure": 0.0,
+          "greeks": {
+            "delta": 0.0,
+            "gamma": 0.0,
+            "theta": 0.0,
+            "vega": 0.0
+          },
+          "limits": {
+            "breaches": [],
+            "status": "PASS"
+          },
+          "var95": 0.0
+        },
+        "signals": {
+          "confidence": 0,
+          "last_signal": null,
+          "reason": "No signal generated",
+          "status": "NO_TRADE",
+          "underlying": null
+        },
+        "state_version": 6058,
+        "tick_health": {
+          "last_tick_age_sec": 5.02,
+          "market_open": false,
+          "refresh_interval_sec": 5,
+          "source": "rest_poll_ssot",
+          "websocket_endpoint": "/ws/stream"
+        },
+        "timestamp_ist": "2026-07-24T09:11:56.942225+05:30",
+        "timestamp_utc": "2026-07-24T03:41:56.942225Z"
+      },
+      "ok": true,
+      "sample": "{\"state_version\":6058,\"timestamp_utc\":\"2026-07-24T03:41:56.942225Z\",\"timestamp_ist\":\"2026-07-24T09:11:56.942225+05:30\",\"mode\":\"PAPER\",\"data_source\":\"MARKET_CLOSED_NO_BROKER\",\"market\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"next_open\":\"2026-07-24 09:15:00 IST\",\"current_time_ist\":\"2026-07-24T09:11:56.941299+05:30\"},\"broker\":{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"},\"qc\":{\"status\":\"PASS\",\"reasons\":[],\"contracts_total\":0,\"underlyings\":0,\"failures\":[]},\"signals\":{\"status\":\"NO_TRADE\",\"underlying\":null,\"confidence\":0,\"reason\":\"No signal generated\",\"last_signal\":null},\"positions\":[],\"pnl\":{\"unrealized\":0.0,\"realized\":0.0,\"total\":0.0,\"day_total\":0.0},\"risk\":{\"var95\":0.0,",
+      "status": 200
     },
     {
       "endpoint": "/api/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "backend": {
+          "port": 8000,
+          "running": true,
+          "uptime_estimate": "running"
+        },
+        "data": {
+          "fresh": false,
+          "last_update": null,
+          "market_status": {
+            "current_time_ist": null,
+            "is_open": false,
+            "next_open": "2026-07-24 09:15:00 IST",
+            "reason": "Pre-market window (9:00-9:15 AM) - Market not open",
+            "seconds_until_open": null
+          },
+          "source": "real"
+        },
+        "endpoints": {
+          "chain": "/api/chain/{underlying}",
+          "health": "/api/health",
+          "perf": "/api/perf",
+          "pnl": "/api/pnl",
+          "positions": "/api/positions",
+          "signals": "/api/signal/top"
+        },
+        "frontend": {
+          "expected_url": "http://localhost:3000",
+          "status": "should_be_running"
+        },
+        "health": false,
+        "status": "ok",
+        "timestamp": "2026-07-24T09:11:59.490461+05:30"
+      },
+      "ok": true,
+      "sample": "{\"status\":\"ok\",\"timestamp\":\"2026-07-24T09:11:59.490461+05:30\",\"backend\":{\"running\":true,\"port\":8000,\"uptime_estimate\":\"running\"},\"frontend\":{\"expected_url\":\"http://localhost:3000\",\"status\":\"should_be_running\"},\"data\":{\"source\":\"real\",\"market_status\":{\"is_open\":false,\"reason\":\"Pre-market window (9:00-9:15 AM) - Market not open\",\"current_time_ist\":null,\"next_open\":\"2026-07-24 09:15:00 IST\",\"seconds_until_open\":null},\"fresh\":false,\"last_update\":null},\"health\":false,\"endpoints\":{\"health\":\"/api/health\",\"chain\":\"/api/chain/{underlying}\",\"signals\":\"/api/signal/top\",\"positions\":\"/api/positions\",\"pnl\":\"/api/pnl\",\"perf\":\"/api/perf\"}}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "access_token_present": false,
+        "auto_refresh": {
+          "attempted": false,
+          "success": false
+        },
+        "broker": "dhan",
+        "client_id_present": false,
+        "connected": false,
+        "credentials_present": false,
+        "env_source": "core.utils.env_loader",
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "mode": "ANALYZER",
+        "order_placement_allowed": false,
+        "sdk_available": true
+      },
+      "ok": true,
+      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/dhan/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "access_token_present": false,
+        "auto_refresh": {
+          "attempted": false,
+          "success": false
+        },
+        "broker": "dhan",
+        "client_id_present": false,
+        "connected": false,
+        "credentials_present": false,
+        "env_source": "core.utils.env_loader",
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "mode": "ANALYZER",
+        "order_placement_allowed": false,
+        "sdk_available": true
+      },
+      "ok": true,
+      "sample": "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"connected\":false,\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"credentials_present\":false,\"client_id_present\":false,\"access_token_present\":false,\"error\":\"CONFIG_MISSING\",\"auto_refresh\":{\"attempted\":false,\"success\":false},\"sdk_available\":true,\"env_source\":\"core.utils.env_loader\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/funds",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "data": {},
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "normalized": {
+          "available_balance": null,
+          "raw": {},
+          "total_limit": null,
+          "utilized_amount": null
+        },
+        "order_placement_allowed": false,
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"normalized\":{\"available_balance\":null,\"utilized_amount\":null,\"total_limit\":null,\"raw\":{}},\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":{}}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/holdings",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "count": 0,
+        "data": [],
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "rows": [],
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"count\":0,\"rows\":[],\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":[]}",
+      "status": 200
     },
     {
       "endpoint": "/api/broker/positions/live",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "count": 0,
+        "data": [],
+        "error": "CONFIG_MISSING",
+        "live_trading_enabled": false,
+        "order_placement_allowed": false,
+        "rows": [],
+        "source": "dhan_readonly",
+        "success": false,
+        "validated": false
+      },
+      "ok": true,
+      "sample": "{\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"source\":\"dhan_readonly\",\"validated\":false,\"count\":0,\"rows\":[],\"success\":false,\"error\":\"CONFIG_MISSING\",\"data\":[]}",
+      "status": 200
     },
     {
       "endpoint": "/api/approval/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "approved_by": "PRITAM S. WARGHADE",
+        "approved_utc": "2026-06-24T02:30:00+05:30",
+        "dashboard_reason": "Owner approved \u2014 PRITAM S. WARGHADE",
+        "dashboard_status": "PASS",
+        "generated_utc": "2026-07-24T03:41:59.800185Z",
+        "human_approval": true,
+        "live_trading_enabled": false,
+        "live_trading_env_flip_authorized": false,
+        "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
+        "production_ready_for_real_money": false,
+        "scope": "Full owner trust for world-class development, automation, and performance optimization.",
+        "technical_gates_pending_count": 4,
+        "technical_gates_still_required": [
+          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+          "WEBSOCKET_TICK_HEALTH_PROVEN"
+        ]
+      },
+      "ok": true,
+      "sample": "{\"generated_utc\":\"2026-07-24T03:41:59.800185Z\",\"human_approval\":true,\"approved_by\":\"PRITAM S. WARGHADE\",\"approved_utc\":\"2026-06-24T02:30:00+05:30\",\"scope\":\"Full owner trust for world-class development, automation, and performance optimization.\",\"live_trading_enabled\":false,\"live_trading_env_flip_authorized\":false,\"dashboard_status\":\"PASS\",\"dashboard_reason\":\"Owner approved \u2014 PRITAM S. WARGHADE\",\"technical_gates_still_required\":[\"ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS\",\"POSITIVE_NET_EXPECTANCY_AFTER_COSTS\",\"REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF\",\"WEBSOCKET_TICK_HEALTH_PROVEN\"],\"technical_gates_pending_count\":4,\"production_ready_for_real_money\":false,\"note\":\"Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.\"}",
+      "status": 200
     },
     {
       "endpoint": "/api/kill-switch/status",
-      "ok": false,
-      "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>502</title>\n    <style>@font-face {\n  font-family: \"Roobert\";\n  font-weight: 500;\n  font-style: normal;\n  font-stretch: normal;\n  src: url(\"data:font/woff2;base64,d09GMk9UVE8AAKewAAwAAAABa6QAAKdfAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKmehqCHhuC4UocpRQGYACLBgE2AiQDkygEBgWFRwcgW8pqkQKZcr0u0nk2H+gc25rBL5CqkDOqYXNqo87dNmL1mgByHi4yIGwcgLFJz2f/////f/pSkaHKgl52HEgorIWX0m0/lzuLglQtUxbMiGh9qonlnolc+1JbmihzmbbylQ/Xs2Knu/rUH62ibhOWZkpgVpo4nLnvzMOZ87/06Lk2hMnbe1EpM1cUezJlZtqCZIKYIPYeoS6VhFPJXNa5j7Y8LmH67MF2qJYI49/FNzQbwX7cqeRUbzyDffdLybw5cxRTIbdy4y5BVskcP6vu3uo+6GtnQl/up3nkVnDZmKlEpYHB1w/usr46inVsWjdEIE2gBgoC36WYsC4qXJjwYb9YbH9vayYROp/tXkp72nOEOvigu6g0+gsN/z6hg7+Ga7wNb8j2p2kypxDmhZipdHuzSaKxAmIassxsPiDbztOUdESnEj+YhrsptpjfP0Hqxu9m0n7j/zGR6I7LbDy56KLRVoGx6yFqcqyz6j2en9u998cYY4wxBowxxhjRI2rAqBAp6RKUahWwULEQCwsLURAJI7GwEBUQEbERFaMoFbH8cO4rM0neNG3/64f8LjCo",
-      "status": 502
+      "json": {
+        "details": "Kill switch not activated",
+        "kill_active": false,
+        "kill_switch_path": "C:\\System3\\Genesis_System3\\storage\\live\\kill_switch.json",
+        "status": "OK"
+      },
+      "ok": true,
+      "sample": "{\"status\":\"OK\",\"kill_active\":false,\"details\":\"Kill switch not activated\",\"kill_switch_path\":\"C:\\\\System3\\\\Genesis_System3\\\\storage\\\\live\\\\kill_switch.json\"}",
+      "status": 200
     }
   ],
   "blocked_reasons": [
@@ -136,34 +658,34 @@
   "commands": [
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_gate_evaluator.py",
         "--sync-gates"
       ],
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-004\",\n    \"SYS3-BLK-005\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n"
+      "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "tools/system3_auto_coordinator.py",
         "--full",
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "exit_code": 1,
       "passed": false,
       "stderr_tail": "",
-      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] paper_lifecycle\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[PASS] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote /home/runner/work/Genesis_System3/Genesis_System3/reports/latest/system3_auto_coordinator/summary.md\n"
+      "stdout_tail": "[PASS] friction_expectancy\n[PASS] websocket_tick_health\n[PASS] model_to_trade_gap\n[PASS] post_market_pipeline\n[PASS] blocker_finder\n[PASS] viability_bridge\n[FAIL] local_review\n[FAIL] pytest\n[PASS] master_orchestrator\n[FAIL] dashboard_audit\n[FAIL] broker_validation\nWrote C:\\System3\\Genesis_System3\\reports\\latest\\system3_auto_coordinator\\summary.md\n"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_model_accuracy_tracker.py",
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "exit_code": 0,
       "passed": true,
@@ -172,19 +694,19 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_option_visibility_audit.py",
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_OPTION_VISIBILITY_AUDIT_COMPLETE\n{\n  \"rows\": 1,\n  \"signal_source\": \"no-signal-source-found\",\n  \"option_master_source\": \"security_id_list.csv\"\n}\n"
+      "stdout_tail": "SYSTEM3_OPTION_VISIBILITY_AUDIT_COMPLETE\n{\n  \"rows\": 4,\n  \"signal_source\": \"api:http://127.0.0.1:8000/api/gain_rank\",\n  \"option_master_source\": \"security_id_list.csv\"\n}\n"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_friction_expectancy_proof.py"
       ],
       "exit_code": 0,
@@ -194,7 +716,7 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/websocket_tick_health_proof.py"
       ],
       "exit_code": 0,
@@ -204,38 +726,38 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_blocker_finder.py",
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-23T05:01:01.192955+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://genesis-system3-backend.onrender.com\",\n  \"state_source\": \"api:https://genesis-system3-backend.onrender.com/api/state\",\n  \"state_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"broker_source\": \"api:https://genesis-system3-backend.onrender.com/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
+      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:42:32.986483+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
       "exit_code": 0,
       "passed": true,
       "stderr_tail": "",
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-23T05:01:04.222500Z\", \"github_failed_count\": 40, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 52, \"tracker_internal_status\": \"PASS\"}\n"
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-24T03:42:33.499179Z\", \"github_failed_count\": 1, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 0, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 1, \"tracker_internal_status\": \"PASS\"}\n"
     }
   ],
-  "endpoint_fail_count": 10,
+  "endpoint_fail_count": 0,
   "gates_passing": 2,
   "gates_total": 7,
-  "generated_utc": "2026-07-23T05:01:05.482353Z",
+  "generated_utc": "2026-07-24T03:42:33.933966Z",
   "github_render_status": "BLOCKED",
   "live_trading_enabled": false,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
-    "SYS3-BLK-004",
     "SYS3-BLK-005",
+    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "order_routes_called": false,
@@ -245,6 +767,7 @@
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "trade_ready": false,

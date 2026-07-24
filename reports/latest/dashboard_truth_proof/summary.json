@@ -3,7 +3,7 @@
   "blockers": [],
   "evidence": {
     "api_db_report_reconciliation_proven": false,
-    "backend_file_count": 43,
+    "backend_file_count": 46,
     "browser_visual_truth_proven": false,
     "compile_results": [
       {
@@ -50,8 +50,8 @@
       "warnings"
     ],
     "dashboard_endpoint_coverage_report_present": true,
-    "dashboard_file_count": 109,
-    "frontend_file_count": 59
+    "dashboard_file_count": 115,
+    "frontend_file_count": 62
   },
   "gate": "dashboard_truth_proof",
   "next_action": "Run dashboard endpoint coverage plus browser screenshot proof; dashboard must show blockers and never claim ready until gates pass.",

@@ -1,14 +1,14 @@
 # safety_and_secrets
 
-Generated UTC: 2026-07-07T21:45:56.942707+00:00
+Generated UTC: 2026-07-24T03:50:23.628465+00:00
 
-- Status: `PASS`
-- Pass: `True`
+- Status: `FAIL`
+- Pass: `False`
 - Auto repair allowed: `False`
 
 ## Blockers
 
-- None
+- `possible_secret_like_content_in_tracked_text`
 
 ## Warnings
 

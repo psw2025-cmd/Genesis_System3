@@ -1,14 +1,14 @@
 # Dashboard Full Audit
 
-Generated: `2026-06-23T21:26:44.354519Z`
-Verdict: **PASS_WITH_WARNINGS**
+Generated: `2026-07-24T03:42:25.732328Z`
+Verdict: **NOT_PROVEN**
 Real money ready: **False**
 
 ## Bugs
-- none
+- [MEDIUM] PAPER_HISTORY_EMPTY: Paper summary exists but trade history empty
 
 ## Missing endpoints
-- /api/chain/NIFTY
+- none
 
 ## Blockers for live trading
 - LIVE_TRADING_DISABLED_BY_DESIGN

@@ -1,13 +1,13 @@
 {
-  "generated_utc": "2026-07-23T05:00:58.007922Z",
+  "generated_utc": "2026-07-24T03:42:26.043602Z",
   "mode": "FULL_AUTO_COORDINATION",
-  "api_base": "https://genesis-system3-backend.onrender.com",
-  "market_session_open": true,
+  "api_base": "http://127.0.0.1:8000",
+  "market_session_open": false,
   "live_trading_enabled": false,
   "agents": [
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_friction_expectancy_proof.py"
       ],
       "passed": true,
@@ -18,7 +18,7 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/websocket_tick_health_proof.py"
       ],
       "passed": true,
@@ -29,18 +29,7 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
-        "scripts/paper_lifecycle_proof.py"
-      ],
-      "passed": true,
-      "exit_code": 0,
-      "stdout_tail": "completed\": \"2026-07-23T04:59:39.462063+00:00\",\n  \"dry_run\": false,\n  \"market_status\": \"Market open (10:29 IST)\",\n  \"broker_connected\": false,\n  \"signal\": {\n    \"symbol\": \"NIFTY\",\n    \"strike\": 24000,\n    \"option_type\": \"CE\",\n    \"expiry\": \"2026-06-19\",\n    \"instrument_token\": \"FALLBACK_TOKEN\",\n    \"entry_price\": 100.0,\n    \"target_price\": 120.0,\n    \"stop_loss\": 85.0,\n    \"confidence\": 0.55,\n    \"signal_id\": \"FALL_04C5D57C\",\n    \"source\": \"BHAVCOPY_FALLBACK\"\n  },\n  \"entry_order\": {\n    \"order_id\": \"PAPER_5EECDA45B522\",\n    \"symbol\": \"NIFTY\",\n    \"instrument_token\": \"FALLBACK_TOKEN\",\n    \"strike\": 24000,\n    \"option_type\": \"CE\",\n    \"expiry\": \"2026-06-19\",\n    \"entry_time\": \"2026-07-23T04:59:38.949160+00:00\",\n    \"entry_price\": 100.0,\n    \"quantity\": 1,\n    \"order_type\": \"PAPER_MARKET\",\n    \"status\": \"FILLED\",\n    \"fill_price\": 100.0,\n    \"fill_time\": \"2026-07-23T04:59:38.949160+00:00\",\n    \"slippage_pct\": 0.0,\n    \"note\": \"PAPER/ANALYZER mode \\u2014 no real order placed\"\n  },\n  \"exit_record\": {\n    \"order_id\": \"PAPER_5EECDA45B522\",\n    \"exit_time\": \"2026-07-23T04:59:39.461555+00:00\",\n    \"exit_price\": 105.0,\n    \"exit_reason\": \"PAPER_TIMEOUT_PROOF\",\n    \"pnl_per_unit\": 5.0,\n    \"pnl_total\": 5.0,\n    \"target_price\": 120.0,\n    \"stop_loss\": 85.0,\n    \"brokerage_estimate\": 20.0,\n    \"slippage_estimate\": 0.1,\n    \"net_pnl\": -15.0,\n    \"reconciled\": true,\n    \"note\": \"PAPER/ANALYZER mode \\u2014 simulated exit\"\n  },\n  \"reconciled\": true,\n  \"all_mandatory_fields_present\": true,\n  \"mandatory_field_check\": {\n    \"signal_id\": \"FALL_04C5D57C\",\n    \"symbol\": \"NIFTY\",\n    \"instrument_token\": \"FALLBACK_TOKEN\",\n    \"expiry\": \"2026-06-19\",\n    \"strike\": 24000,\n    \"option_type\": \"CE\",\n    \"entry_time\": \"2026-07-23T04:59:38.949160+00:00\",\n    \"entry_price\": 100.0,\n    \"exit_time\": \"2026-07-23T04:59:39.461555+00:00\",\n    \"exit_price\": 105.0,\n    \"pnl_total\": 5.0,\n    \"net_pnl\": -15.0\n  },\n  \"status\": \"PASS\",\n  \"live_trading_enabled\": false,\n  \"system3_live_trading_allowed\": false\n}\n",
-      "stderr_tail": "",
-      "agent": "paper_lifecycle"
-    },
-    {
-      "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_model_to_trade_gap_proof.py"
       ],
       "passed": true,
@@ -51,53 +40,53 @@
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_post_market_auto_pipeline.py"
       ],
       "passed": true,
       "exit_code": 0,
-      "stdout_tail": "SYSTEM3_MODEL_ACCURACY_TRACKER_COMPLETE\n{\n  \"rows\": 1,\n  \"sources\": []\n}\nSYSTEM3_FRICTION_EXPECTANCY_COMPLETE\n{\n  \"pass\": false,\n  \"expectancy\": -196.14\n}\n{\n  \"pass\": false\n}\n{\n  \"pass\": false\n}\nSYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-004\",\n    \"SYS3-BLK-005\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n{\n  \"blocker_count\": 9,\n  \"highest_severity\": \"CRITICAL\",\n  \"paper_analyzer_allowed\": true,\n  \"production_live_ready\": false,\n  \"severity_counts\": {\n    \"CRITICAL\": 2,\n    \"HIGH\": 7,\n    \"MEDIUM\": 3\n  },\n  \"strategy_quarantined_for_live\": true,\n  \"warning_count\": 3\n}\nSYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-23T04:59:40.918462+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://genesis-system3-backend.onrender.com\",\n  \"state_source\": \"api:https://genesis-system3-backend.onrender.com/api/state\",\n  \"state_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"broker_source\": \"api:https://genesis-system3-backend.onrender.com/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\nPOST_MARKET_AUTO_PIPELINE_COMPLETE\n",
+      "stdout_tail": "SYSTEM3_MODEL_ACCURACY_TRACKER_COMPLETE\n{\n  \"rows\": 1,\n  \"sources\": []\n}\nSYSTEM3_FRICTION_EXPECTANCY_COMPLETE\n{\n  \"pass\": false,\n  \"expectancy\": -196.14\n}\n{\n  \"pass\": false\n}\n{\n  \"pass\": false\n}\nSYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n{\n  \"blocker_count\": 10,\n  \"highest_severity\": \"CRITICAL\",\n  \"paper_analyzer_allowed\": true,\n  \"production_live_ready\": false,\n  \"severity_counts\": {\n    \"CRITICAL\": 3,\n    \"HIGH\": 7,\n    \"MEDIUM\": 3\n  },\n  \"strategy_quarantined_for_live\": true,\n  \"warning_count\": 3\n}\nSYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:42:07.199701+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\nPOST_MARKET_AUTO_PIPELINE_COMPLETE\n",
       "stderr_tail": "",
       "agent": "post_market_pipeline"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_blocker_finder.py",
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "passed": true,
       "exit_code": 0,
-      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-23T04:59:41.151453+00:00\",\n  \"root\": \"/home/runner/work/Genesis_System3/Genesis_System3\",\n  \"api_base\": \"https://genesis-system3-backend.onrender.com\",\n  \"state_source\": \"api:https://genesis-system3-backend.onrender.com/api/state\",\n  \"state_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"broker_source\": \"api:https://genesis-system3-backend.onrender.com/api/broker/status\",\n  \"broker_error\": \"HTTP_ERROR_502: Bad Gateway\",\n  \"total_blockers\": 1,\n  \"severity_counts\": {\n    \"MEDIUM\": 1\n  },\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n",
+      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:42:07.583072+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n",
       "stderr_tail": "",
       "agent": "blocker_finder"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_production_viability_bridge.py"
       ],
       "passed": true,
       "exit_code": 0,
-      "stdout_tail": "{\n  \"blocker_count\": 9,\n  \"highest_severity\": \"CRITICAL\",\n  \"paper_analyzer_allowed\": true,\n  \"production_live_ready\": false,\n  \"severity_counts\": {\n    \"CRITICAL\": 2,\n    \"HIGH\": 7,\n    \"MEDIUM\": 3\n  },\n  \"strategy_quarantined_for_live\": true,\n  \"warning_count\": 3\n}\n",
+      "stdout_tail": "{\n  \"blocker_count\": 10,\n  \"highest_severity\": \"CRITICAL\",\n  \"paper_analyzer_allowed\": true,\n  \"production_live_ready\": false,\n  \"severity_counts\": {\n    \"CRITICAL\": 3,\n    \"HIGH\": 7,\n    \"MEDIUM\": 3\n  },\n  \"strategy_quarantined_for_live\": true,\n  \"warning_count\": 3\n}\n",
       "stderr_tail": "",
       "agent": "viability_bridge"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "tools/local_code_review.py"
       ],
-      "passed": true,
-      "exit_code": 0,
-      "stdout_tail": "Local code review verdict: PASS\nReport: /home/runner/work/Genesis_System3/Genesis_System3/reports/latest/local_code_review/REVIEW.md\n  [PASS] git_summary\n  [PASS] architecture_gate\n  [PASS] verify_cursor_agent_bugs\n  [SKIP] py_compile\n  [SKIP] ast_static_scan\n  [SKIP] flake8\n  [SKIP] bandit\n  [SKIP] pytest\n  [SKIP] blocker_finder\n",
+      "passed": false,
+      "exit_code": 1,
+      "stdout_tail": "Local code review verdict: FAIL\nReport: C:\\System3\\Genesis_System3\\reports\\latest\\local_code_review\\REVIEW.md\n  [PASS] git_summary\n  [PASS] architecture_gate\n  [PASS] verify_cursor_agent_bugs\n  [PASS] py_compile\n  [PASS] ast_static_scan\n  [FAIL] flake8\n  [SKIP] bandit\n  [FAIL] pytest\n  [SKIP] blocker_finder\n",
       "stderr_tail": "",
       "agent": "local_review"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "-m",
         "pytest",
         "tests/",
@@ -105,49 +94,49 @@
         "--tb=no"
       ],
       "passed": false,
-      "exit_code": 2,
-      "stdout_tail": "\n=========================== short test summary info ============================\nERROR tests/test_bhavcopy_parser.py\nERROR tests/test_datasource_fallback.py\nERROR tests/test_dhan_option_chain_parser.py\nERROR tests/test_dhan_payload_normalizer.py\nERROR tests/test_equity_option_scanner.py\nERROR tests/test_forward_signal_integrity.py\nERROR tests/test_nse_option_symbol.py\nERROR tests/test_qc_runtime_anomaly.py\nERROR tests/test_qc_validator_dhan_aliases.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 9 errors during collection !!!!!!!!!!!!!!!!!!!!\n",
-      "stderr_tail": "",
+      "exit_code": 1,
+      "stdout_tail": "",
+      "stderr_tail": "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe: No module named pytest\n",
       "agent": "pytest"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "scripts/system3_master_proof_orchestrator.py"
       ],
       "passed": true,
       "exit_code": 0,
-      "stdout_tail": "{\n  \"blocker_count\": 1,\n  \"fail_count\": 1,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-07-23T04:59:44.528747+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 7,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"TRADE_READY_BLOCKED\",\n  \"warning_count\": 6\n}\n",
+      "stdout_tail": "{\n  \"blocker_count\": 1,\n  \"fail_count\": 1,\n  \"gate_count\": 8,\n  \"generated_utc\": \"2026-07-24T03:42:15.553285+00:00\",\n  \"live_trading_enabled\": false,\n  \"pass_count\": 7,\n  \"reports\": [\n    \"reports/latest/system3_master_control_plane/system3_master_control_plane.json\",\n    \"reports/latest/proof_status_matrix/proof_status_matrix.json\",\n    \"reports/latest/auto_recovery_blockers/auto_recovery_blockers.json\",\n    \"docs/project_control/SYSTEM3_MASTER_STATUS.md\"\n  ],\n  \"trade_ready\": false,\n  \"verdict\": \"TRADE_READY_BLOCKED\",\n  \"warning_count\": 6\n}\n",
       "stderr_tail": "",
       "agent": "master_orchestrator"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "tools/dashboard_full_audit.py"
       ],
       "passed": false,
       "exit_code": 1,
-      "stdout_tail": "Wrote /home/runner/work/Genesis_System3/Genesis_System3/reports/latest/dashboard_full_audit/summary.md\n",
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\dashboard_full_audit\\summary.md\n",
       "stderr_tail": "",
       "agent": "dashboard_audit"
     },
     {
       "cmd": [
-        "/opt/hostedtoolcache/Python/3.11.15/x64/bin/python",
+        "C:\\System3\\Genesis_System3\\venv\\Scripts\\python.exe",
         "tools/broker_trader_validation.py"
       ],
       "passed": false,
       "exit_code": 1,
-      "stdout_tail": "",
-      "stderr_tail": "    response = meth(req, response)\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/urllib/request.py\", line 634, in http_response\n    response = self.parent.error(\n               ^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/urllib/request.py\", line 563, in error\n    return self._call_chain(*args)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/urllib/request.py\", line 496, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/urllib/request.py\", line 643, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 502: Bad Gateway\n",
+      "stdout_tail": "Wrote C:\\System3\\Genesis_System3\\reports\\latest\\broker_trader_validation\\summary.md\n",
+      "stderr_tail": "",
       "agent": "broker_validation"
     }
   ],
-  "agents_passed": 9,
-  "agents_total": 12,
+  "agents_passed": 7,
+  "agents_total": 11,
   "gates": {
-    "generated_utc": "2026-07-23T04:59:40.144195Z",
+    "generated_utc": "2026-07-24T03:42:06.511150Z",
     "gates": {
       "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
         "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -182,20 +171,20 @@
       },
       "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
         "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-        "pass": true,
+        "pass": false,
         "report_exists": true,
-        "full_lifecycle_proven": true,
+        "full_lifecycle_proven": false,
         "broker_connected": true,
         "market_open": false,
-        "blocker_id": null,
+        "blocker_id": "SYS3-BLK-008",
         "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
       },
       "WEBSOCKET_TICK_HEALTH_PROVEN": {
         "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
         "pass": false,
         "report_exists": true,
-        "last_tick_age_sec": null,
-        "refresh_interval_sec": null,
+        "last_tick_age_sec": 2.35,
+        "refresh_interval_sec": 5,
         "blocker_id": "TICK_HEALTH_BLOCKER",
         "auto_action": "REST poll \u226410s counts for analyzer; WebSocket stream for live execution"
       },
@@ -212,17 +201,17 @@
       "OPTION_STRIKE_VISIBILITY_PROVEN": {
         "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
         "pass": false,
-        "rows": 1,
+        "rows": 4,
         "paper_trade_allowed_count": 0,
         "blocker_id": "SYS3-BLK-003",
         "auto_action": "Run scripts/system3_option_visibility_audit.py"
       },
       "EQUITY_FO_ELIGIBILITY_PROVEN": {
         "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
-        "pass": false,
-        "error": "No module named 'dotenv'",
-        "blocker_id": "SYS3-BLK-004",
-        "auto_action": "Verify security_id_list.csv OPTSTK universe loads"
+        "pass": true,
+        "underlying_count": 211,
+        "blocker_id": null,
+        "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
       }
     },
     "gates_passing": 2,
@@ -230,13 +219,13 @@
     "open_blockers": [
       "PROFIT_BLOCKER",
       "SYS3-BLK-003",
-      "SYS3-BLK-004",
       "SYS3-BLK-005",
+      "SYS3-BLK-008",
       "TICK_HEALTH_BLOCKER"
     ],
     "prediction_accuracy_blocked": true,
     "profit_blocked": true,
-    "lifecycle_blocked": false,
+    "lifecycle_blocked": true,
     "human_approval": true,
     "live_trading_enabled": false,
     "trade_ready": false,
@@ -244,14 +233,15 @@
     "technical_gates_still_required": [
       "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
       "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+      "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
       "WEBSOCKET_TICK_HEALTH_PROVEN"
     ],
     "recommended_auto_actions": [
       "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
       "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
+      "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
       "REST poll \u226410s counts for analyzer; WebSocket stream for live execution",
-      "Run scripts/system3_option_visibility_audit.py",
-      "Verify security_id_list.csv OPTSTK universe loads"
+      "Run scripts/system3_option_visibility_audit.py"
     ],
     "permanent_safety": [
       "LIVE_TRADING_DISABLED_BY_DESIGN"
@@ -262,30 +252,36 @@
       "still_required": [
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
         "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+        "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
         "WEBSOCKET_TICK_HEALTH_PROVEN"
       ]
     }
   },
   "prediction_accuracy_blocked": true,
   "profit_blocked": true,
-  "lifecycle_blocked": false,
+  "lifecycle_blocked": true,
   "trade_ready": false,
   "analyzer_ready": false,
   "open_blockers": [
     "PROFIT_BLOCKER",
     "SYS3-BLK-003",
-    "SYS3-BLK-004",
     "SYS3-BLK-005",
+    "SYS3-BLK-008",
     "TICK_HEALTH_BLOCKER"
   ],
   "technical_gates_still_required": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
     "WEBSOCKET_TICK_HEALTH_PROVEN"
   ],
   "verdict": "AUTO_COORDINATION_COMPLETE_PROOFS_PENDING",
   "human_required": [],
   "permanent_safety": [
     "LIVE_TRADING_DISABLED_BY_DESIGN"
+  ],
+  "market_session_auto_scheduled": [
+    "daily_gain_validate 15:35 IST",
+    "paper_lifecycle_proof 09:30 IST"
   ]
 }

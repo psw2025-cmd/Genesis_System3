@@ -1,9 +1,9 @@
 {
-  "generated_utc": "2026-06-23T21:26:44.354519Z",
-  "cloud_url": "https://genesis-system3-backend.onrender.com",
+  "generated_utc": "2026-07-24T03:42:25.732328Z",
+  "cloud_url": "http://127.0.0.1:8000",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
-  "real_money_ready": true,
+  "real_money_ready": false,
   "endpoints": {
     "/api/state": {
       "ok": true,
@@ -33,13 +33,25 @@
       "ok": true,
       "status": 200
     },
+    "/api/scanner/top_contract_gainers": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/scanner/equity_options": {
+      "ok": true,
+      "status": 200
+    },
+    "/api/scanner/segments": {
+      "ok": true,
+      "status": 200
+    },
     "/api/accuracy_trend": {
       "ok": true,
       "status": 200
     },
-    "/api/chain/NIFTY": {
-      "ok": false,
-      "status": 0
+    "/api/auto_gates": {
+      "ok": true,
+      "status": 200
     },
     "/api/portfolio/unified": {
       "ok": true,
@@ -64,23 +76,38 @@
     "/api/broker/truth": {
       "ok": true,
       "status": 200
+    },
+    "/api/chain/NIFTY": {
+      "ok": true,
+      "status": 200
     }
   },
-  "bugs_found": [],
-  "missing_endpoints": [
-    "/api/chain/NIFTY"
+  "bugs_found": [
+    {
+      "id": "PAPER_HISTORY_EMPTY",
+      "severity": "MEDIUM",
+      "detail": "Paper summary exists but trade history empty"
+    }
   ],
+  "missing_endpoints": [],
   "blockers": [
-    "LIVE_TRADING_DISABLED_BY_DESIGN",
-    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
-    "ML_ACCURACY_RHO_BELOW_0_70",
-    "POSITIVE_NET_EXPECTANCY_NOT_PROVEN",
-    "WEBSOCKET_TICK_HEALTH_NOT_PROVEN"
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+    "WEBSOCKET_TICK_HEALTH_PROVEN",
+    "LIVE_TRADING_DISABLED_BY_DESIGN"
   ],
+  "auto_gates": {
+    "gates_passing": 2,
+    "gates_total": 7,
+    "runtime_driven": true,
+    "prediction_accuracy_blocked": true,
+    "profit_blocked": true
+  },
   "pytest": {
-    "passed": true,
-    "exit_code": 0,
-    "stdout": ".........                                                                [100%]"
+    "passed": false,
+    "exit_code": 1,
+    "stdout": ""
   },
   "dashboard_tabs_verified": [
     "System Control",
@@ -101,5 +128,5 @@
     "Real market-day paper lifecycle",
     "Broker holdings panel on cloud after deploy"
   ],
-  "verdict": "PASS_WITH_WARNINGS"
+  "verdict": "NOT_PROVEN"
 }

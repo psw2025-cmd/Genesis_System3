@@ -1,8 +1,8 @@
 # System3 Safe Repair Runner
 
-Generated UTC: `2026-07-23T05:01:05.482353Z`
+Generated UTC: `2026-07-24T03:42:33.933966Z`
 Status: **BLOCKED**
-API base: `https://genesis-system3-backend.onrender.com`
+API base: `http://127.0.0.1:8000`
 
 ## Safety
 
@@ -16,8 +16,8 @@ API base: `https://genesis-system3-backend.onrender.com`
 - Gates: `2/7`
 - Trade ready: `False`
 - Analyzer ready: `False`
-- Open blockers: `['PROFIT_BLOCKER', 'SYS3-BLK-003', 'SYS3-BLK-004', 'SYS3-BLK-005', 'TICK_HEALTH_BLOCKER']`
-- Technical gates still required: `['ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS', 'POSITIVE_NET_EXPECTANCY_AFTER_COSTS', 'WEBSOCKET_TICK_HEALTH_PROVEN']`
+- Open blockers: `['PROFIT_BLOCKER', 'SYS3-BLK-003', 'SYS3-BLK-005', 'SYS3-BLK-008', 'TICK_HEALTH_BLOCKER']`
+- Technical gates still required: `['ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS', 'POSITIVE_NET_EXPECTANCY_AFTER_COSTS', 'REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF', 'WEBSOCKET_TICK_HEALTH_PROVEN']`
 
 ## Proof summary
 
@@ -37,26 +37,26 @@ API base: `https://genesis-system3-backend.onrender.com`
 
 | Endpoint | OK | Status |
 |---|---:|---:|
-| `/api/health` | `False` | `502` |
-| `/api/state` | `False` | `502` |
-| `/api/status` | `False` | `502` |
-| `/api/broker/status` | `False` | `502` |
-| `/api/broker/dhan/status` | `False` | `502` |
-| `/api/broker/funds` | `False` | `502` |
-| `/api/broker/holdings` | `False` | `502` |
-| `/api/broker/positions/live` | `False` | `502` |
-| `/api/approval/status` | `False` | `502` |
-| `/api/kill-switch/status` | `False` | `502` |
+| `/api/health` | `True` | `200` |
+| `/api/state` | `True` | `200` |
+| `/api/status` | `True` | `200` |
+| `/api/broker/status` | `True` | `200` |
+| `/api/broker/dhan/status` | `True` | `200` |
+| `/api/broker/funds` | `True` | `200` |
+| `/api/broker/holdings` | `True` | `200` |
+| `/api/broker/positions/live` | `True` | `200` |
+| `/api/approval/status` | `True` | `200` |
+| `/api/kill-switch/status` | `True` | `200` |
 
 ## Commands
 
 | Command | PASS |
 |---|---:|
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/system3_gate_evaluator.py --sync-gates` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python tools/system3_auto_coordinator.py --full --api-base https://genesis-system3-backend.onrender.com` | `False` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/system3_model_accuracy_tracker.py --api-base https://genesis-system3-backend.onrender.com` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/system3_option_visibility_audit.py --api-base https://genesis-system3-backend.onrender.com` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/system3_friction_expectancy_proof.py` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/websocket_tick_health_proof.py` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python scripts/system3_blocker_finder.py --api-base https://genesis-system3-backend.onrender.com` | `True` |
-| `/opt/hostedtoolcache/Python/3.11.15/x64/bin/python tools/system3_github_render_failure_tracker.py` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/system3_gate_evaluator.py --sync-gates` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe tools/system3_auto_coordinator.py --full --api-base http://127.0.0.1:8000` | `False` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/system3_model_accuracy_tracker.py --api-base http://127.0.0.1:8000` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/system3_option_visibility_audit.py --api-base http://127.0.0.1:8000` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/system3_friction_expectancy_proof.py` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/websocket_tick_health_proof.py` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe scripts/system3_blocker_finder.py --api-base http://127.0.0.1:8000` | `True` |
+| `C:\System3\Genesis_System3\venv\Scripts\python.exe tools/system3_github_render_failure_tracker.py` | `True` |

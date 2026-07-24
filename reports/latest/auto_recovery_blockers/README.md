@@ -1,8 +1,8 @@
 # Auto-Recovery Blocker Classification
 
-Generated UTC: 2026-07-07T21:45:57.000487+00:00
+Generated UTC: 2026-07-24T03:50:23.674979+00:00
 
-- Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
+- Verdict: `TRADE_READY_BLOCKED`
 - Trade ready: `False`
 
 ## Categories
@@ -17,7 +17,8 @@ Generated UTC: 2026-07-07T21:45:57.000487+00:00
 
 ### MANUAL_SECRET_REQUIRED
 
-- None
+- `safety_and_secrets:possible_secret_like_content_in_tracked_text`
+- `fresh_data_automation_proof:dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped`
 
 ### MANUAL_BROKER_LOGIN_REQUIRED
 

@@ -1,0 +1,142 @@
+{
+  "generated_at_utc": "2026-07-24T03:39:09.317958+00:00",
+  "root": "C:\\System3\\Genesis_System3",
+  "api_base": "http://127.0.0.1:8000",
+  "overall_verdict": "FAIL_FORBIDDEN_REPORT_PATH",
+  "script_runs": [
+    {
+      "name": "markdown_inventory",
+      "path": "scripts/system3_markdown_inventory.py",
+      "returncode": 2,
+      "status": "FAIL",
+      "stdout_tail": "",
+      "stderr_tail": "usage: system3_markdown_inventory.py [-h] [--root ROOT]\nsystem3_markdown_inventory.py: error: unrecognized arguments: --api-base http://127.0.0.1:8000\n"
+    },
+    {
+      "name": "option_visibility",
+      "path": "scripts/system3_option_visibility_audit.py",
+      "returncode": 0,
+      "status": "PASS",
+      "stdout_tail": "SYSTEM3_OPTION_VISIBILITY_AUDIT_COMPLETE\n{\n  \"rows\": 4,\n  \"signal_source\": \"api:http://127.0.0.1:8000/api/gain_rank\",\n  \"option_master_source\": \"security_id_list.csv\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "model_accuracy",
+      "path": "scripts/system3_model_accuracy_tracker.py",
+      "returncode": 0,
+      "status": "PASS",
+      "stdout_tail": "SYSTEM3_MODEL_ACCURACY_TRACKER_COMPLETE\n{\n  \"rows\": 1,\n  \"sources\": []\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "blocker_finder",
+      "path": "scripts/system3_blocker_finder.py",
+      "returncode": 0,
+      "status": "PASS",
+      "stdout_tail": "SYSTEM3_BLOCKER_FINDER_COMPLETE\n{\n  \"generated_at_utc\": \"2026-07-24T03:39:08.974870+00:00\",\n  \"root\": \"C:\\\\System3\\\\Genesis_System3\",\n  \"api_base\": \"http://127.0.0.1:8000\",\n  \"state_source\": \"api:http://127.0.0.1:8000/api/state\",\n  \"state_error\": null,\n  \"broker_source\": \"api:http://127.0.0.1:8000/api/broker/status\",\n  \"broker_error\": null,\n  \"total_blockers\": 0,\n  \"severity_counts\": {},\n  \"safety_status\": \"PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "report_status": {
+    "reports": {
+      "reports/latest/markdown_inventory.json": {
+        "exists": true,
+        "size_bytes": 492366
+      },
+      "reports/latest/markdown_inventory.md": {
+        "exists": true,
+        "size_bytes": 126958
+      },
+      "reports/latest/documentation_contradictions.md": {
+        "exists": true,
+        "size_bytes": 116055
+      },
+      "reports/latest/option_strike_visibility.json": {
+        "exists": true,
+        "size_bytes": 3110
+      },
+      "reports/latest/option_strike_visibility.md": {
+        "exists": true,
+        "size_bytes": 1606
+      },
+      "reports/latest/model_accuracy_report.json": {
+        "exists": true,
+        "size_bytes": 878
+      },
+      "reports/latest/model_accuracy_report.md": {
+        "exists": true,
+        "size_bytes": 851
+      },
+      "reports/latest/system3_blocker_report.json": {
+        "exists": true,
+        "size_bytes": 492
+      },
+      "reports/latest/system3_blocker_report.md": {
+        "exists": true,
+        "size_bytes": 724
+      }
+    },
+    "blocker_summary": {
+      "generated_at_utc": "2026-07-24T03:39:08.974870+00:00",
+      "root": "C:\\System3\\Genesis_System3",
+      "api_base": "http://127.0.0.1:8000",
+      "state_source": "api:http://127.0.0.1:8000/api/state",
+      "state_error": null,
+      "broker_source": "api:http://127.0.0.1:8000/api/broker/status",
+      "broker_error": null,
+      "total_blockers": 0,
+      "severity_counts": {},
+      "safety_status": "PAPER_SAFETY_NOT_BLOCKED_BY_STATIC_SCAN"
+    },
+    "markdown_summary": {
+      "generated_at_utc": "2026-07-24T03:39:00.967173+00:00",
+      "root": "C:\\System3\\Genesis_System3",
+      "total_markdown_files": 795,
+      "required_active_docs_present": 10,
+      "required_active_docs_total": 10,
+      "missing_required_active_docs": [],
+      "class_counts": {
+        "HISTORICAL_REPORT": 537,
+        "UNKNOWN": 31,
+        "DUPLICATE_RISK": 199,
+        "REFERENCE": 18,
+        "ACTIVE_CONTROL": 10
+      },
+      "risk_term_file_count": 535,
+      "strong_ready_file_count": 61,
+      "duplicate_risk_file_count": 310,
+      "contradiction_file_count": 526,
+      "open_blockers_detected": true
+    },
+    "option_summary": {
+      "generated_at_utc": "2026-07-24T03:39:07.968997+00:00",
+      "signal_source": "api:http://127.0.0.1:8000/api/gain_rank",
+      "option_master_source": "security_id_list.csv",
+      "rows": 4,
+      "paper_trade_allowed_count": 0,
+      "blocked_count": 4
+    },
+    "model_summary": {
+      "generated_at_utc": "2026-07-24T03:39:08.545002+00:00",
+      "sources": [],
+      "rows": 1,
+      "proof_pass_count": 0,
+      "blocked_count": 1,
+      "direction_known_count": 0,
+      "direction_hit_rate": null,
+      "option_profitable_known_count": 0
+    }
+  },
+  "forbidden_report_paths": [
+    "reports/latest/render_token_audit",
+    "reports/latest/safety_and_secrets",
+    "reports/latest/secure_install_credential_audit",
+    "reports/latest/render_token_audit/summary.json",
+    "reports/latest/render_token_audit/summary.md",
+    "reports/latest/safety_and_secrets/readme.md",
+    "reports/latest/safety_and_secrets/summary.json",
+    "reports/latest/secure_install_credential_audit/summary.json",
+    "reports/latest/secure_install_credential_audit/summary.md"
+  ],
+  "missing_reports": []
+}

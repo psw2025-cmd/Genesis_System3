@@ -1,5 +1,6 @@
 # Broker Trader Validation
 
+Source: **cloud**
 Overall: **BROKER_OFFLINE**
 Valid fields: **0/8** (0%)
 Broker connected: **False**

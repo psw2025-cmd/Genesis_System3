@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-06-23T21:26:45.211310Z",
+  "generated_utc": "2026-07-24T03:42:26.018611Z",
   "live_trading_enabled": false,
   "order_placement_allowed": false,
   "broker": {
@@ -16,7 +16,7 @@
       "attempted": false,
       "success": false
     },
-    "sdk_available": false,
+    "sdk_available": true,
     "env_source": "core.utils.env_loader"
   },
   "broker_connected": false,
@@ -97,5 +97,6 @@
     "rows": [],
     "raw_rows": []
   },
-  "data_source": "BROKER_OFFLINE"
+  "data_source": "BROKER_OFFLINE",
+  "proof_source": "cloud"
 }

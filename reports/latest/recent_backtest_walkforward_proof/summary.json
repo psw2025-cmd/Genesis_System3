@@ -9,7 +9,7 @@
       "20260611",
       "20260612"
     ],
-    "candidate_count": 132,
+    "candidate_count": 130,
     "candidates_sample": [
       "\"docs/System3 Phases 10\\342\\200\\22320 \\342\\200\\223 Ultra Mode Validation & Usage Plan (Safe  Read-Only).md\"",
       "complete_end_to_end_validation.py",
@@ -130,7 +130,7 @@
       "scripts/test_performance_prediction.py",
       "scripts/test_trade_logging_and_pnl.py",
       "src/analytics/performance_metrics.py",
-      "src/outputs/paper_pnl_summary.json"
+      "src/selector/strategy_engine.py"
     ],
     "compile_results": [
       {
