@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-24T03:33:26.680649+00:00`
+Generated UTC: `2026-07-24T03:35:05.256111+00:00`
 Status: **BLOCKED**
-Issues: `458`
+Issues: `457`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30064300969 conclusion=failure commit=ee1b9eed7405
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix Render endpoint /: HTTP status 0 status=0
 
-### UI_RED_VISUAL — 50 issues
+### UI_RED_VISUAL — 49 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
