@@ -1,6 +1,6 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-24T03:03:36.456366+00:00`
+Generated UTC: `2026-07-24T03:04:21.499752+00:00`
 Status: **BLOCKED**
 Issues: `492`
 Fix lanes: `13`
@@ -44,11 +44,11 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30058804951 conclusion=failure commit=12faa7770c42
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30058822654 conclusion=failure commit=0abc86eb6f89
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30058844691 conclusion=failure commit=4fe234398ad0
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30058821480 conclusion=failure commit=0abc86eb6f89
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30058804997 conclusion=failure commit=12faa7770c42
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30063194762 conclusion=failure commit=f96acd3933f2
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30063227985 conclusion=failure commit=f96acd3933f2
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30063193233 conclusion=failure commit=5c52e56b29ca
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30063177736 conclusion=failure commit=80df1b233bfb
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30063177675 conclusion=failure commit=80df1b233bfb
 
 ### UI_RED_VISUAL — 50 issues
 
