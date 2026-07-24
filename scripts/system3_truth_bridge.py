@@ -19,7 +19,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-DEFAULT_BASE_URL = "https://genesis-system3-backend.onrender.com"
+DEFAULT_BASE_URL = "http://127.0.0.1:8000"
 DEFAULT_UNDERLYINGS = "NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY"
 
 PROOF_FILES = {

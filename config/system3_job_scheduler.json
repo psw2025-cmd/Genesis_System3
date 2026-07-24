@@ -46,7 +46,7 @@
       "script": "tools/system3_auto_coordinator.py",
       "args": [
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "enabled": true,
       "type": "daily",
@@ -277,7 +277,7 @@
       "script": "tools/system3_auto_coordinator.py",
       "args": [
         "--api-base",
-        "https://genesis-system3-backend.onrender.com"
+        "http://127.0.0.1:8000"
       ],
       "enabled": true,
       "type": "daily",

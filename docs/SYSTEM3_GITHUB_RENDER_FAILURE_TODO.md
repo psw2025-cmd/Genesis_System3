@@ -4,7 +4,7 @@ Generated UTC: `2026-07-24T03:03:43.513250Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
-Render base: `https://genesis-system3-backend.onrender.com`
+Render base: `http://127.0.0.1:8000`
 GitHub workflows whose newest observed run failed: `14`
 GitHub workflows currently queued/in progress: `2`
 Render failed endpoints: `12`

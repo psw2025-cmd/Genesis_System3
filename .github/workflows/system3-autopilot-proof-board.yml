@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_BASE_URL: http://127.0.0.1:8000
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'

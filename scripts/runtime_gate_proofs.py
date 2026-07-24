@@ -23,7 +23,7 @@ def _api_base() -> str:
         val = os.environ.get(key)
         if val:
             return val.rstrip("/")
-    return "https://genesis-system3-backend.onrender.com"
+    return "http://127.0.0.1:8000"
 
 
 def _stale(path: Path, max_age: int = MAX_AGE_SEC) -> bool:

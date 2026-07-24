@@ -34,7 +34,7 @@ Requires these env vars (set in Render dashboard → Environment):
   DHAN_PIN, DHAN_TOTP_SECRET
   DHAN_ACCESS_TOKEN     (initial; auto-refreshed afterward)
   CLOUD_WORKER=true     (set automatically in render.yaml)
-  WEB_SERVICE_URL        e.g. https://genesis-system3-backend.onrender.com
+  WEB_SERVICE_URL        e.g. http://127.0.0.1:8000
                           (defaults to the production URL if unset)
   WORKER_PUSH_TOKEN      shared secret; must match the web service's
                           WORKER_PUSH_TOKEN env var exactly.
@@ -223,7 +223,7 @@ def _run_job_scheduler():
 # ---------------------------------------------------------------------------
 # Thread 4: Scheduler health push (worker -> web, see ARCHITECTURE note above)
 # ---------------------------------------------------------------------------
-_DEFAULT_WEB_URL = "https://genesis-system3-backend.onrender.com"
+_DEFAULT_WEB_URL = "http://127.0.0.1:8000"
 _SCHEDULER_STATE_FILE = ROOT / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
 _SCHEDULER_ALERT_FILE = ROOT / "state" / "scheduler_config_alert.json"
 _PUSH_INTERVAL_S = 30

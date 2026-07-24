@@ -20,8 +20,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-BACKEND_URL = os.getenv("BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://genesis-system3-backend.onrender.com/ui").rstrip("/")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://127.0.0.1:8000/ui").rstrip("/")
 OUT_DIR = Path("reports/latest/qc_forensic_anomaly_audit")
 SNAP_DIR = Path("reports/latest/dashboard_auto_snap")
 TIMEOUT_S = int(os.getenv("QC_RUNTIME_AUDIT_TIMEOUT_S", "25") or "25")

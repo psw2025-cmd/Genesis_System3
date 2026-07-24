@@ -30,8 +30,8 @@ jobs:
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'
-      DASHBOARD_BASE_URL: ${{ secrets.DASHBOARD_BASE_URL || 'https://genesis-system3-backend.onrender.com' }}
-      SYSTEM3_API_BASE: ${{ secrets.DASHBOARD_BASE_URL || 'https://genesis-system3-backend.onrender.com' }}
+      DASHBOARD_BASE_URL: ${{ secrets.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000' }}
+      SYSTEM3_API_BASE: ${{ secrets.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000' }}
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

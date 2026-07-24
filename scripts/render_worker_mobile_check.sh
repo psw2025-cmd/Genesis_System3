@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-BASE_URL="${WEB_SERVICE_URL:-https://genesis-system3-backend.onrender.com}"
+BASE_URL="${WEB_SERVICE_URL:-http://127.0.0.1:8000}"
 TOKEN="${WORKER_PUSH_TOKEN:-}"
 
 echo "========================================"

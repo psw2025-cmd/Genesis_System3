@@ -375,7 +375,7 @@ else:
 # CORS misconfiguration (any site can read authenticated responses).
 # Override/extend via ALLOWED_ORIGINS env var (comma-separated).
 _default_allowed_origins = [
-    "https://genesis-system3-backend.onrender.com",
+    "http://127.0.0.1:8000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
@@ -549,7 +549,7 @@ except Exception as _e:
 # Root route - helpful message
 @app.api_route("/", methods=["GET", "HEAD"])
 async def root():
-    base_url = os.environ.get("PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+    base_url = os.environ.get("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
     dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")
     return {
         "message": "System3 Ultra Dashboard API",

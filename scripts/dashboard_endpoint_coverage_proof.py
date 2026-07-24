@@ -25,7 +25,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 BASE_URL = os.environ.get(
     "SYSTEM3_PUBLIC_BACKEND_URL",
-    "https://genesis-system3-backend.onrender.com",
+    "http://127.0.0.1:8000",
 ).rstrip("/")
 
 REQUIRED_ENDPOINTS = [

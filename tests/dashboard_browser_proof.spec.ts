@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const DASHBOARD_URL = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com/ui';
+const DASHBOARD_URL = process.env.DASHBOARD_URL || 'http://127.0.0.1:8000/ui';
 const REPORT_DIR = path.join('reports', 'latest', 'dashboard_browser_proof');
 const SCREENSHOT_DIR = path.join(REPORT_DIR, 'screenshots');
 

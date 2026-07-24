@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "websocket_tick_health"
-CLOUD = os.environ.get("SYSTEM3_API_BASE", "https://genesis-system3-backend.onrender.com").rstrip("/")
+CLOUD = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
 
 
 def main() -> int:

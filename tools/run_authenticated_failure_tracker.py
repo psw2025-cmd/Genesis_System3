@@ -26,7 +26,7 @@ os.environ.setdefault("SYSTEM3_RENDER_TRACKER_ENDPOINT_TIMEOUT_S", "30")
 
 def install_dashboard_session() -> None:
     base = os.environ.get(
-        "DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com"
+        "DASHBOARD_BASE_URL", "http://127.0.0.1:8000"
     ).rstrip("/")
     api_key = os.environ.get("DASHBOARD_API_KEY", "")
 

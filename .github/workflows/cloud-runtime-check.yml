@@ -6,7 +6,7 @@ on:
       base_url:
         description: "Render backend base URL"
         required: false
-        default: "https://genesis-system3-backend.onrender.com"
+        default: "http://127.0.0.1:8000"
   push:
     branches: [main]
     paths-ignore:
@@ -42,7 +42,7 @@ jobs:
 
       - name: Run cloud runtime check
         env:
-          CLOUD_RUNTIME_BASE_URL: ${{ github.event.inputs.base_url || 'https://genesis-system3-backend.onrender.com' }}
+          CLOUD_RUNTIME_BASE_URL: ${{ github.event.inputs.base_url || 'http://127.0.0.1:8000' }}
           CLOUD_RUNTIME_TIMEOUT_S: "20"
           # Keep checks read-only/analyzer-only. These envs do not enable live.
           LIVE_TRADING_ENABLED: "0"

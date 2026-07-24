@@ -78,7 +78,7 @@ def _backend_url() -> str:
     port = os.environ.get("PORT")
     if port:
         return f"http://127.0.0.1:{port}"
-    return os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+    return os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
 
 
 def check_broker_connection(dry_run: bool) -> dict:

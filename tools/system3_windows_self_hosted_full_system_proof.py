@@ -20,7 +20,7 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "windows_self_hosted_full_system_proof"
-BASE_URL = os.environ.get("DASHBOARD_BASE_URL") or os.environ.get("SYSTEM3_API_BASE") or "https://genesis-system3-backend.onrender.com"
+BASE_URL = os.environ.get("DASHBOARD_BASE_URL") or os.environ.get("SYSTEM3_API_BASE") or "http://127.0.0.1:8000"
 BASE_URL = BASE_URL.rstrip("/")
 
 PROOF_COMMANDS = [

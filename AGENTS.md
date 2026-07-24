@@ -324,7 +324,7 @@ Small improvements stack. The system that wins long-term is the one that improve
 
 ## MULTI-AI COORDINATION PLAYBOOK (Claude + Cursor + Codex + Gemini)
 
-**Owner:** Pritam S. Warghade | **Repo:** `psw2025-cmd/Genesis_System3` | **Cloud:** https://genesis-system3-backend.onrender.com/ui
+**Owner:** Pritam S. Warghade | **Repo:** `psw2025-cmd/Genesis_System3` | **Cloud:** http://127.0.0.1:8000/ui
 
 ### Agent roles
 | Agent | Tool | Primary job |

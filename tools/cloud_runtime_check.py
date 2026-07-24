@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
-DEFAULT_BASE_URL = "https://genesis-system3-backend.onrender.com"
+DEFAULT_BASE_URL = "http://127.0.0.1:8000"
 REPORT_DIR = Path("reports/latest/cloud_runtime_check")
 
 SECRET_KEY_RE = re.compile(

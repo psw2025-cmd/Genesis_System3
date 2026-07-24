@@ -10,7 +10,7 @@ import * as path from 'path';
 // the overview page again — a false PASS that never actually exercised any
 // tab. Selecting by the button's `title` attribute (which IS present and
 // unique per tab) actually drives real navigation.
-const BASE_URL = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com/ui';
+const BASE_URL = process.env.DASHBOARD_URL || 'http://127.0.0.1:8000/ui';
 const OUT_DIR = path.join('..', '..', 'reports', 'latest', 'ui_route_verification');
 const SCREENSHOT_DIR = path.join(OUT_DIR, 'screenshots');
 

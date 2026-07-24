@@ -15,7 +15,7 @@ from subprocess_helpers import playwright_test_cmd
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT = ROOT / "reports" / "latest" / "pending_tasks_closure"
-CLOUD = "https://genesis-system3-backend.onrender.com"
+CLOUD = "http://127.0.0.1:8000"
 
 AUTOMATED_TASKS = [
     ("post_market_pipeline", [sys.executable, "scripts/system3_post_market_auto_pipeline.py"]),

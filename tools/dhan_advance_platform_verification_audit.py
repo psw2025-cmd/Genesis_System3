@@ -25,8 +25,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT_DIR = ROOT / "reports" / "latest" / "dashboard_auto_snap"
 OUT_DIR = ROOT / "reports" / "latest" / "dhan_advance_platform_verification"
 LOCAL_DHAN_DOCS = Path(r"C:\System3\Genesis_System3\dhan-api-docs.md")
-BACKEND_URL = os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
-DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "https://genesis-system3-backend.onrender.com/ui")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "http://127.0.0.1:8000/ui")
 
 OFFICIAL_DOC_URLS = [
     "https://docs.dhanhq.co/",

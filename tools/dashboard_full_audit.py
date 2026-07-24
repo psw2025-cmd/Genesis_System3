@@ -16,7 +16,7 @@ REPORT = ROOT / "reports" / "latest" / "dashboard_full_audit"
 import os
 
 BASE = os.environ.get(
-    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
 ).rstrip("/")
 
 REQUIRED_ENDPOINTS = [

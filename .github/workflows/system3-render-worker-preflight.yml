@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
-      WEB_SERVICE_URL: https://genesis-system3-backend.onrender.com
-      SYSTEM3_API_BASE: https://genesis-system3-backend.onrender.com
+      WEB_SERVICE_URL: http://127.0.0.1:8000
+      SYSTEM3_API_BASE: http://127.0.0.1:8000
       WORKER_PUSH_TOKEN: ${{ secrets.WORKER_PUSH_TOKEN }}
       DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
       DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}

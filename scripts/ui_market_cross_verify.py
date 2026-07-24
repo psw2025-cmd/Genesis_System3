@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "ui_market_cross_verify"
 CLOUD = os.environ.get(
     "SYSTEM3_API_BASE",
-    "https://genesis-system3-backend.onrender.com",
+    "http://127.0.0.1:8000",
 ).rstrip("/")
 
 ENDPOINTS = [

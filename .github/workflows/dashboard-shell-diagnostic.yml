@@ -21,7 +21,7 @@ jobs:
       ANALYZE_MODE: "1"
       LIVE_TRADING_ENABLED: "0"
       SYSTEM3_LIVE_TRADING_ALLOWED: "0"
-      DASHBOARD_BASE_URL: "https://genesis-system3-backend.onrender.com"
+      DASHBOARD_BASE_URL: "http://127.0.0.1:8000"
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
     steps:
       - uses: actions/checkout@v4

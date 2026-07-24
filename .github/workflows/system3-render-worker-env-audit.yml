@@ -31,7 +31,7 @@ jobs:
       DHAN_TOTP_SECRET: ${{ secrets.DHAN_TOTP_SECRET }}
       WORKER_PUSH_TOKEN: ${{ secrets.WORKER_PUSH_TOKEN }}
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
-      WEB_SERVICE_URL: https://genesis-system3-backend.onrender.com
+      WEB_SERVICE_URL: http://127.0.0.1:8000
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'

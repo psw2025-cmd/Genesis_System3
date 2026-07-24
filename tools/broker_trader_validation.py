@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT = ROOT / "reports" / "latest" / "broker_trader_validation"
-CLOUD = "https://genesis-system3-backend.onrender.com"
+CLOUD = "http://127.0.0.1:8000"
 
 
 def fetch_cloud_truth() -> dict:

@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "render_100_agent_swarm"
-BASE = os.environ.get("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+BASE = os.environ.get("DASHBOARD_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 
 FOCUS_AREAS = [
     "render_health",

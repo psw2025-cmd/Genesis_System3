@@ -968,7 +968,7 @@ possible — it let a locally-built, sourcemapped, real-git-HEAD frontend talk t
 backend same-origin, avoiding the CORS wall that blocks a cross-origin `VITE_API_BASE_URL` override.
 
 **Verification done (real browser, not text-only):** rebuilt current `main` locally with sourcemaps, served
-via `vite --port 5174` proxying to `https://genesis-system3-backend.onrender.com`, ran
+via `vite --port 5174` proxying to `http://127.0.0.1:8000`, ran
 `tools/playwright-setup/verify_all_ui_tabs.spec.ts` against it. Overview tab rendered the live dynamic gate
 data (`3/7 PASS`, real expectancy/rho numbers matching the curl'd API response) with zero console errors and
 zero crash — screenshot: `reports/latest/ui_route_verification/screenshots/overview.png`. All 12 tabs
@@ -1078,8 +1078,8 @@ Safety:
 ### [2026-07-07] [Codex] FIX: Public health endpoints exempt from dashboard API session auth
 
 User reported production curl results:
-- `https://genesis-system3-backend.onrender.com/health` returned 401 `Missing or invalid dashboard API session`
-- `https://genesis-system3-backend.onrender.com/api/system_health` returned 401
+- `http://127.0.0.1:8000/health` returned 401 `Missing or invalid dashboard API session`
+- `http://127.0.0.1:8000/api/system_health` returned 401
 
 Root cause:
 - Auth middleware exempted `/api/health`, docs, UI, and auth routes, but not root `/health`, `/healthz`, or `/api/system_health`.

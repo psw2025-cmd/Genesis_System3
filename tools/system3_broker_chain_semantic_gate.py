@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-BASE = os.getenv("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+BASE = os.getenv("DASHBOARD_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 API_KEY = os.getenv("DASHBOARD_API_KEY", "")
 OUT = Path("reports/latest/broker_chain_semantic_gate")
 REQUIRED = [s.strip().upper() for s in os.getenv(

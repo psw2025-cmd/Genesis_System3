@@ -22,7 +22,7 @@ git pull
 python -m compileall .
 npm install
 npx playwright install chromium
-DASHBOARD_URL=https://genesis-system3-backend.onrender.com/ui npx playwright test
+DASHBOARD_URL=http://127.0.0.1:8000/ui npx playwright test
 ```
 
 On Windows also run:

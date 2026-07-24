@@ -19,7 +19,7 @@ from typing import Any, Dict
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "render_worker_preflight"
-DEFAULT_BACKEND = "https://genesis-system3-backend.onrender.com"
+DEFAULT_BACKEND = "http://127.0.0.1:8000"
 
 
 def utc() -> str:

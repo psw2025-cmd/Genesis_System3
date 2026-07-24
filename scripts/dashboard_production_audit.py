@@ -35,7 +35,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "dashboard_production_audit"
 
-DEFAULT_CLOUD = "https://genesis-system3-backend.onrender.com"
+DEFAULT_CLOUD = "http://127.0.0.1:8000"
 
 # Every dashboard tab → APIs it depends on (micro-level map)
 TAB_API_MAP: Dict[str, List[str]] = {

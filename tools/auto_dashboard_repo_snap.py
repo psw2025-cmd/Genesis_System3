@@ -20,8 +20,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple
 
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "https://genesis-system3-backend.onrender.com/ui").rstrip("/")
-BACKEND_URL = os.getenv("BACKEND_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://127.0.0.1:8000/ui").rstrip("/")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
 SNAP_DIR = Path(os.getenv("SNAP_DIR", "reports/latest/dashboard_auto_snap"))
 AUTO_GIT_PUSH = os.getenv("AUTO_GIT_PUSH", "1").strip().lower() in {"1", "true", "yes", "on"}
 GIT_PUSH_INTERVAL_S = int(os.getenv("GIT_PUSH_INTERVAL_S", "300") or "300")

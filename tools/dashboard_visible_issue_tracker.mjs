@@ -2,7 +2,7 @@ import { chromium } from 'playwright'
 import fs from 'fs'
 import path from 'path'
 
-const base = (process.env.DASHBOARD_BASE_URL || 'https://genesis-system3-backend.onrender.com').replace(/\/+$/, '')
+const base = (process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
 const key = process.env.DASHBOARD_API_KEY || ''
 const outDir = path.join('reports', 'latest', 'dashboard_visible_issue_tracker')
 fs.mkdirSync(outDir, { recursive: true })

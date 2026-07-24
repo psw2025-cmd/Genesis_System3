@@ -45,7 +45,7 @@ def main() -> int:
 
     if not args.fast:
         env = os.environ.copy()
-        env["DASHBOARD_URL"] = "https://genesis-system3-backend.onrender.com/ui"
+        env["DASHBOARD_URL"] = "http://127.0.0.1:8000/ui"
         try:
             results["playwright"] = run(playwright_test_cmd(), env=env, timeout=300)
         except FileNotFoundError:

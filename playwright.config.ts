@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const DASHBOARD_URL = process.env.DASHBOARD_URL || 'https://genesis-system3-backend.onrender.com/ui';
+const DASHBOARD_URL = process.env.DASHBOARD_URL || 'http://127.0.0.1:8000/ui';
 const SCREENSHOT_DIR = 'reports/latest/dashboard_browser_proof/screenshots';
 
 export default defineConfig({

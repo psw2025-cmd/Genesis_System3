@@ -9,7 +9,7 @@ Set-Location $RepoRoot
 
 $BaseUrl = $env:SYSTEM3_BASE_URL
 if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
-    $BaseUrl = "https://genesis-system3-backend.onrender.com"
+    $BaseUrl = "http://127.0.0.1:8000"
 }
 $UnderlyingsRaw = $env:SYSTEM3_UNDERLYINGS
 if ([string]::IsNullOrWhiteSpace($UnderlyingsRaw)) {

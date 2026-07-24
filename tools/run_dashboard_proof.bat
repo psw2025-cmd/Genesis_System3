@@ -12,7 +12,7 @@ echo [INFO] Installing Chromium...
 set NODE_PATH=%CD%\tools\playwright-setup\node_modules
 call npx --prefix tools\playwright-setup playwright install chromium
 echo [INFO] Running dashboard proof tests...
-set DASHBOARD_URL=https://genesis-system3-backend.onrender.com/ui
+set DASHBOARD_URL=http://127.0.0.1:8000/ui
 call npx --prefix tools\playwright-setup playwright test
 echo [DONE] Reports:
 echo   reports\latest\dashboard_browser_proof\summary.md

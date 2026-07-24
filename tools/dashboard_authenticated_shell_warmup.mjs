@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
 
-const base = (process.env.DASHBOARD_BASE_URL || 'https://genesis-system3-backend.onrender.com').replace(/\/+$/, '')
+const base = (process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
 const key = process.env.DASHBOARD_API_KEY || ''
 const attempts = Math.min(Math.max(Number(process.env.DASHBOARD_WARMUP_ATTEMPTS || 3), 1), 5)
 const waitMs = Math.min(Math.max(Number(process.env.DASHBOARD_WARMUP_WAIT_MS || 12000), 2000), 30000)

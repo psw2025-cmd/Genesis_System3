@@ -62,7 +62,7 @@ DEFER_INSTRUMENT_WARMUP=0
 ### Worker service env
 
 ```text
-WEB_SERVICE_URL=https://genesis-system3-backend.onrender.com
+WEB_SERVICE_URL=http://127.0.0.1:8000
 CLOUD_WORKER=true
 CLOUD_PAPER_ENGINE=1
 SYSTEM3_PAPER_PIPELINE_V8_ENABLED=1

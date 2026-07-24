@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_BASE_URL: http://127.0.0.1:8000
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
     steps:
       - uses: actions/checkout@v4

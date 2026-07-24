@@ -401,7 +401,7 @@ def endpoint_check(url: str, timeout: float = 12.0) -> dict[str, Any]:
         return {"url": url, "checked_utc": started, "ok": False, "status": None, "error": repr(exc), "snippet": ""}
 
 
-_RENDER_BACKEND_URL = "https://genesis-system3-backend.onrender.com"
+_RENDER_BACKEND_URL = "http://127.0.0.1:8000"
 
 
 def gate_deployment_endpoint() -> GateResult:

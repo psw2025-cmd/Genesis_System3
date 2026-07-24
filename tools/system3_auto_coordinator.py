@@ -8,7 +8,7 @@ Does NOT enable live trading or modify secrets/.env.
 Usage:
   python tools/system3_auto_coordinator.py
   python tools/system3_auto_coordinator.py --full
-  python tools/system3_auto_coordinator.py --api-base https://genesis-system3-backend.onrender.com
+  python tools/system3_auto_coordinator.py --api-base http://127.0.0.1:8000
 
 Outputs:
   reports/latest/system3_auto_coordinator/summary.json
@@ -29,7 +29,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "system3_auto_coordinator"
-DEFAULT_CLOUD = "https://genesis-system3-backend.onrender.com"
+DEFAULT_CLOUD = "http://127.0.0.1:8000"
 
 
 def _utc() -> str:

@@ -18,7 +18,7 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "safe_repair_runner"
-API_BASE = os.environ.get("SYSTEM3_API_BASE", "https://genesis-system3-backend.onrender.com").rstrip("/")
+API_BASE = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
 
 ENDPOINTS = [
     "/api/health",

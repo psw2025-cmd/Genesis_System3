@@ -28,7 +28,7 @@ Use these paths exactly.
 | Active GitHub self-hosted runner repo | `C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3` |
 | Old/local OpenAlgo repo | `C:\openalgo-main` |
 | Local dashboard URL | `http://127.0.0.1:8010/ui` or `http://127.0.0.1:5000/ui` depending which server is running |
-| Render dashboard URL | `https://genesis-system3-backend.onrender.com/ui` |
+| Render dashboard URL | `http://127.0.0.1:8000/ui` |
 | GitHub repo | `psw2025-cmd/Genesis_System3` |
 | Proof reports | `reports\latest\...` |
 
@@ -412,7 +412,7 @@ Use Render only after local and self-hosted proof are clean.
 Check these routes:
 
 ```powershell
-$base="https://genesis-system3-backend.onrender.com"
+$base="http://127.0.0.1:8000"
 $routes=@(
 "/api/health",
 "/api/state",

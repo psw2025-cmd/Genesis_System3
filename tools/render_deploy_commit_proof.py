@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 BASE_URL = os.environ.get(
-    "RENDER_DEPLOY_BASE_URL", "https://genesis-system3-backend.onrender.com"
+    "RENDER_DEPLOY_BASE_URL", "http://127.0.0.1:8000"
 ).rstrip("/")
 EXPECTED = os.environ.get("GITHUB_SHA", "").strip().lower()
 TIMEOUT = float(os.environ.get("RENDER_DEPLOY_TIMEOUT_S", "20"))

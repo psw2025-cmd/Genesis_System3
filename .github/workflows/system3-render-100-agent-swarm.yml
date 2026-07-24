@@ -40,7 +40,7 @@ jobs:
                    81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
                    91, 92, 93, 94, 95, 96, 97, 98, 99, 100]
     env:
-      DASHBOARD_BASE_URL: https://genesis-system3-backend.onrender.com
+      DASHBOARD_BASE_URL: http://127.0.0.1:8000
       LIVE_TRADING_ENABLED: '0'
       SYSTEM3_LIVE_TRADING_ALLOWED: '0'
       ANALYZE_MODE: '1'

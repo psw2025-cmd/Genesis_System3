@@ -10,7 +10,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 IST  = timezone(timedelta(hours=5, minutes=30))
-BASE = os.environ.get("DASHBOARD_URL", "https://genesis-system3-backend.onrender.com")
+BASE = os.environ.get("DASHBOARD_URL", "http://127.0.0.1:8000")
 OUT  = Path("reports/latest/dashboard_ui_proof")
 OUT.mkdir(parents=True, exist_ok=True)
 

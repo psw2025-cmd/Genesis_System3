@@ -16,10 +16,10 @@ Updated by ChatGPT automation on 2026-06-07.
 - Backend entry: `dashboard/backend/app.py`
 - Runtime command: `uvicorn dashboard.backend.app:app --host 0.0.0.0 --port 8000`
 - Current public backend:
-  - Root: `https://genesis-system3-backend.onrender.com/`
-  - Docs: `https://genesis-system3-backend.onrender.com/docs`
-  - Health: `https://genesis-system3-backend.onrender.com/api/health`
-  - State: `https://genesis-system3-backend.onrender.com/api/state`
+  - Root: `http://127.0.0.1:8000/`
+  - Docs: `http://127.0.0.1:8000/docs`
+  - Health: `http://127.0.0.1:8000/api/health`
+  - State: `http://127.0.0.1:8000/api/state`
 
 ## Completed repo-side actions
 

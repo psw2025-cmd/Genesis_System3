@@ -26,7 +26,7 @@ from costed_walkforward_proof import compute_cost  # noqa: E402
 
 CLOUD = os.environ.get(
     "SYSTEM3_API_BASE",
-    "https://genesis-system3-backend.onrender.com",
+    "http://127.0.0.1:8000",
 ).rstrip("/")
 
 TRADE_SOURCES = [

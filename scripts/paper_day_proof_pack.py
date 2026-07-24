@@ -62,7 +62,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "reports" / "latest" / "paper_day_proof"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-CLOUD = os.environ.get("SYSTEM3_API_BASE", "https://genesis-system3-backend.onrender.com").rstrip("/")
+CLOUD = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
 SCHEDULER_STATE_FILE = ROOT / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
 GAIN_RANK_HISTORY = ROOT / "state" / "gain_rank_history.json"
 PERF_BENCHMARK_DIR = ROOT / "reports" / "latest" / "performance_benchmark"

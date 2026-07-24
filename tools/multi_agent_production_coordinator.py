@@ -17,7 +17,7 @@ REPORTS = ROOT / "reports" / "latest" / "production_grade_readiness"
 import os
 
 BASE_URL = os.environ.get(
-    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "https://genesis-system3-backend.onrender.com")
+    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
 ).rstrip("/")
 
 if str(ROOT) not in sys.path:

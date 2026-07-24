@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SIDEBAR = ROOT / "dashboard/frontend/src/components/Sidebar.tsx"
 OUT = ROOT / "reports/latest/dashboard_deploy_provenance"
-BASE = os.environ.get("DASHBOARD_BASE_URL", "https://genesis-system3-backend.onrender.com").rstrip("/")
+BASE = os.environ.get("DASHBOARD_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 URL = f"{BASE}/ui/assets/deploy-provenance.json"
 MAX_ATTEMPTS = 3
 TRANSIENT_HTTP = {429, 500, 502, 503, 504}

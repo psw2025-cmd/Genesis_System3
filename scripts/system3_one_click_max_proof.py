@@ -38,7 +38,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-DEFAULT_RENDER_API = "https://genesis-system3-backend.onrender.com"
+DEFAULT_RENDER_API = "http://127.0.0.1:8000"
 LOCALHOST_APIS = ["http://127.0.0.1:8000", "http://127.0.0.1:5000", "http://localhost:8000", "http://localhost:5000"]
 
 REPORTS_TO_PRESERVE = [
