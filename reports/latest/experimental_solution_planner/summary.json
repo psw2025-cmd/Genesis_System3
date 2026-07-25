@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-25T21:51:25.057254+00:00",
-  "issue_count": 491,
+  "generated_utc": "2026-07-25T22:19:15.112212+00:00",
+  "issue_count": 487,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 269,
+      "issue_count": 266,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,77 +64,77 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30175268707 conclusion=failure commit=add8bc1172d5",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30176869309 conclusion=failure commit=62f3a08a510e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30174909010 conclusion=failure commit=1585a0eec912",
+          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30177227706 conclusion=failure commit=62f3a08a510e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30174981261 conclusion=failure commit=1585a0eec912",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30176950520 conclusion=failure commit=62f3a08a510e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30174963833 conclusion=failure commit=1585a0eec912",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30176939406 conclusion=failure commit=62f3a08a510e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30174887429 conclusion=failure commit=1585a0eec912",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30176849094 conclusion=failure commit=62f3a08a510e",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30174537005 conclusion=failure commit=cff5b35311a4",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30176562764 conclusion=failure commit=bc5a5eed6764",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30174381622 conclusion=failure commit=9d727c33dc50",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30176434783 conclusion=failure commit=a4297c12f7c3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30174374952 conclusion=failure commit=38becea59af2",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30176430005 conclusion=failure commit=a3af419ba6d5",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30174381609 conclusion=failure commit=9d727c33dc50",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30176434800 conclusion=failure commit=a4297c12f7c3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30174381598 conclusion=failure commit=9d727c33dc50",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30176434767 conclusion=failure commit=a4297c12f7c3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30174381628 conclusion=failure commit=9d727c33dc50",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30176434782 conclusion=failure commit=a4297c12f7c3",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30174344831 conclusion=failure commit=059353972119",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30176407473 conclusion=failure commit=966c28c454a0",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30173903198 conclusion=failure commit=a9222d883661",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30176012727 conclusion=failure commit=b4c0b970e19f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30173868366 conclusion=failure commit=85516e46568a",
+          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30175970451 conclusion=failure commit=81e72009e26b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix Render endpoint /: HTTP status 0 status=0",
+          "issue": "Fix latest GitHub workflow 'System3 Render Worker Preflight' run=30175904668 conclusion=failure commit=5d08d27b4adc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
@@ -670,7 +670,7 @@
       ]
     },
     {
-      "issue_count": 15,
+      "issue_count": 14,
       "lane": "INSTALL_CREDENTIAL",
       "recommended_fixes": [
         "Fix dependency/import/compile errors from secure audit.",
@@ -729,27 +729,22 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30175933049 conclusion=failure commit=439b8f19d9e44d725f53dd458e70978b2da678c6",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30176434800 conclusion=failure commit=a4297c12f7c37872246f0ab1b0506e377b4a3a22",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30175917848 conclusion=failure commit=5e2c015b2098949ed5e07b002ed16610637972b5",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30176410162 conclusion=failure commit=565f846df32bec59ffafe7c9c9d2b902cd4dadbe",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30175914763 conclusion=failure commit=b133cbd361a4c78417fb34e46c5b3b6f6c1e1b81",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30176391309 conclusion=failure commit=42695eddc0fd5ff8da0bc9a91f086a0cedd9bd45",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30175905107 conclusion=failure commit=5d08d27b4adc117ffa010ce91a9a9da1d6149c31",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30175902566 conclusion=failure commit=241665c3183311a1489bc981f6db1c47e0c2ba93",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30176379048 conclusion=failure commit=9abd3a91b58b94dee705440d3eb9787efbcbf01a",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
@@ -869,7 +864,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=26",
+          "issue": "todo_count=27",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -1001,7 +996,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "failed_count=45",
+          "issue": "failed_count=42",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
