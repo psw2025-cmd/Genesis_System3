@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-25T15:29:59.346226+00:00",
+  "generated_utc": "2026-07-25T15:40:27.786910+00:00",
   "issue_count": 483,
   "lane_count": 13,
   "lanes": [
@@ -729,22 +729,22 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30161977342 conclusion=failure commit=2cfa62f662ad799164478c3542d3b5ddf7cd2463",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30163728587 conclusion=failure commit=b6b13486ac50987765c9668a858d04d891329fde",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30161938223 conclusion=failure commit=5f8290dda1ecf02d5f8758a72616e1cf9c4c0396",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30163681965 conclusion=failure commit=abf246e7d89164e18696670b1a9abd5e0553a96b",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30161924594 conclusion=failure commit=62731c6485f804938be297b59391ea0cdf4e14b9",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30163665978 conclusion=failure commit=6715ff9adada80f0bac198bfdc517e554a2f94e3",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30161881340 conclusion=failure commit=ad825cb7af28bdf86ee7ce785c42f02fbdccedd2",
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30163600909 conclusion=failure commit=976077175245104c3b3336bf3e2861635856922a",
           "lane": "INSTALL_CREDENTIAL",
           "report": "reports/latest/workflow_failure_tracker/summary.json"
         }
