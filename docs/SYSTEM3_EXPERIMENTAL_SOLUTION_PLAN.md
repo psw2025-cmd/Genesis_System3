@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-25T19:30:57.656711+00:00`
+Generated UTC: `2026-07-25T19:31:23.569130+00:00`
 Status: **BLOCKED**
-Issues: `493`
+Issues: `492`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30171111304 conclusion=failure commit=40f1147044b5
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30170978070 conclusion=failure commit=40f1147044b5
 
-### UI_RED_VISUAL — 50 issues
+### UI_RED_VISUAL — 49 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
