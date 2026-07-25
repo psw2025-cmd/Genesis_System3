@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-25T07:57:20.077407+00:00`
+Generated UTC: `2026-07-25T08:41:55.523356+00:00`
 Status: **BLOCKED**
-Issues: `486`
+Issues: `487`
 Fix lanes: `13`
 
 ## Rule
@@ -44,13 +44,13 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_071:workflow_failures: Workflow failure tracker status=BLOCKED
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failures present: failed_count=22
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_091:workflow_failures: Workflow failure tracker status=BLOCKED
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30149604203 conclusion=failure commit=ad82b4832e02
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30148557427 conclusion=failure commit=d5e6ba0c8df0
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30148688676 conclusion=failure commit=ad82b4832e02
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30148651753 conclusion=failure commit=6b1baf061e31
-- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30148666690 conclusion=failure commit=4c0145285d3a
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30151434521 conclusion=failure commit=001c8ba50b47
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30150387410 conclusion=failure commit=001c8ba50b47
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30150139804 conclusion=failure commit=71a94755640d
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30150318875 conclusion=failure commit=001c8ba50b47
+- `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30150272749 conclusion=failure commit=001c8ba50b47
 
-### UI_RED_VISUAL — 49 issues
+### UI_RED_VISUAL — 50 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
