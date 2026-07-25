@@ -1,5 +1,5 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-07-25T11:58:43.881Z
+Generated: 2026-07-25T11:59:21.751Z
 Base: http://127.0.0.1:8000
 Status: **BLOCKED**
 Expected tab count: `16`
