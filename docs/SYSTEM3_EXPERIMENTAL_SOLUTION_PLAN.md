@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-25T08:57:14.972203+00:00`
+Generated UTC: `2026-07-25T08:57:33.836577+00:00`
 Status: **BLOCKED**
-Issues: `485`
+Issues: `484`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30150318875 conclusion=failure commit=001c8ba50b47
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30150272749 conclusion=failure commit=001c8ba50b47
 
-### UI_RED_VISUAL — 50 issues
+### UI_RED_VISUAL — 49 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
