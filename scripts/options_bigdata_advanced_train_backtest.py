@@ -1,26 +1,16 @@
 #!/usr/bin/env python3
 """Train advanced analyzer-only models on the complete NSE F&O archive.
 
-Workflow:
-1. Generate daily option-contract features from every persisted session.
-2. Use a chronological train/validation/frozen-test split with embargo.
-3. Fit the incremental baseline on every valid training row.
-4. Tune a LightGBM challenger with Optuna on a deterministic sample spanning
-   every training day.
-5. Select ensemble weight, top-k and probability threshold on validation only.
-6. Refit both models on all train+validation history.
-7. Open the frozen test exactly once with 40/80/120/200 bps cost stress.
-8. Generate a normalized INR paper ledger for visibility, explicitly not a
-   broker-fill or historical-lot-size P&L claim.
-
-Live trading and order placement remain disabled in every output.
+The pipeline uses chronological train/validation/frozen-test partitions,
+next-session-open execution targets, conservative stop-before-target ordering,
+explicit no-fill outcomes, transaction-cost stress and capped portfolio
+exposure. Live trading and order placement remain disabled.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
-import math
 import os
 import sys
 from dataclasses import asdict
@@ -35,6 +25,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.options_research.advanced_model import (
+    MAX_DAILY_EXPOSURE,
+    PER_TRADE_ALLOCATION,
     SelectionConfig,
     deterministic_sample,
     evaluate_files,
@@ -70,7 +62,7 @@ def fit_final_lightgbm(files: list[Path], best_params: dict, max_rows: int, seed
 
     frame = deterministic_sample(files, max_rows=max_rows, seed=seed)
     x = frame[FEATURE_COLUMNS].astype(np.float32)
-    y = frame["target_net_return"].clip(-0.99, 5.0).astype(np.float32)
+    y = frame["target_net_return"].astype(np.float32)
     params = dict(best_params)
     model = lgb.LGBMRegressor(
         objective="huber",
@@ -90,15 +82,9 @@ def fit_final_lightgbm(files: list[Path], best_params: dict, max_rows: int, seed
 
 
 def walk_forward_baseline(files: list[Path], folds: int, cost_bps: float) -> dict:
-    """Anchored expanding-window proof before the frozen test.
-
-    These folds use only pre-frozen-test sessions. They are diagnostic evidence,
-    not hyperparameter selection for the final frozen test.
-    """
+    """Anchored expanding-window diagnostics using only pre-frozen sessions."""
     if folds <= 0 or len(files) < 120:
         return {"folds_requested": folds, "folds_executed": 0, "rows": []}
-    from src.options_research.advanced_model import evaluate_files
-
     rows = []
     total = len(files)
     initial = max(60, int(total * 0.45))
@@ -112,7 +98,7 @@ def walk_forward_baseline(files: list[Path], folds: int, cost_bps: float) -> dic
         if len(test) < 10:
             continue
         scaler, regressor, classifier, training = train_incremental(train, epochs=1)
-        config = SelectionConfig(lightgbm_weight=0.0, top_k=3, min_probability=0.50)
+        config = SelectionConfig(lightgbm_weight=0.0, top_k=3, min_probability=0.0)
         metrics, _ = evaluate_files(
             test, scaler, regressor, classifier, None, config, [float(cost_bps)]
         )
@@ -146,17 +132,27 @@ def walk_forward_baseline(files: list[Path], folds: int, cost_bps: float) -> dic
     }
 
 
-def candidate_assessment(frozen: dict, base_cost_bps: float) -> dict:
+def candidate_assessment(
+    frozen: dict,
+    base_cost_bps: float,
+    selected_config: SelectionConfig,
+) -> dict:
     key = str(float(base_cost_bps))
     metric = frozen["cost_stress"][key]
+    probability_gate = (
+        selected_config.min_probability <= 0
+        or (frozen.get("row_roc_auc") or 0) > 0.50
+    )
     gates = {
-        "minimum_trades_1000": int(metric["trades"] >= 1000),
-        "positive_mean_daily_return": int(metric["mean_daily_return"] > 0),
+        "minimum_filled_trades_400": int(metric["trades"] >= 400),
+        "fill_rate_above_80pct": int((frozen.get("fill_rate") or 0) >= 0.80),
+        "positive_mean_portfolio_daily_return": int(metric["mean_daily_return"] > 0),
         "profit_factor_above_1": int((metric["profit_factor"] or 0) > 1.0),
         "sharpe_above_0": int((metric["annualized_sharpe"] or 0) > 0),
-        "max_drawdown_below_50pct": int(metric["max_drawdown"] < 0.50),
+        "max_drawdown_below_25pct": int(metric["max_drawdown"] < 0.25),
         "positive_rank_correlation": int((frozen.get("median_daily_spearman") or 0) > 0),
-        "roc_auc_above_random": int((frozen.get("row_roc_auc") or 0) > 0.50),
+        "top_k_overlap_above_5pct": int((frozen.get("mean_top_k_overlap") or 0) > 0.05),
+        "classifier_unused_or_auc_above_random": int(probability_gate),
     }
     passed = sum(gates.values())
     return {
@@ -165,7 +161,10 @@ def candidate_assessment(frozen: dict, base_cost_bps: float) -> dict:
         "gates_total": len(gates),
         "gates": gates,
         "promotion_allowed": False,
-        "reason": "Research candidate only; real broker fills and forward paper proof are still required.",
+        "reason": (
+            "Research candidate only; forward paper trading, broker fill/slippage "
+            "reconciliation and operational risk gates remain mandatory."
+        ),
     }
 
 
@@ -262,11 +261,13 @@ def main() -> int:
         "baseline_classifier": final_classifier,
         "challenger": final_challenger,
         "selection": asdict(best_config),
+        "per_trade_allocation": PER_TRADE_ALLOCATION,
+        "maximum_daily_exposure": MAX_DAILY_EXPOSURE,
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }, model_path)
 
-    assessment = candidate_assessment(frozen, args.base_cost_bps)
+    assessment = candidate_assessment(frozen, args.base_cost_bps, best_config)
     proof = {
         "status": "EXECUTED",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
@@ -285,6 +286,21 @@ def main() -> int:
         "frozen_test": frozen,
         "paper_simulation": paper,
         "candidate_assessment": assessment,
+        "execution_assumptions": {
+            "signal_data_cutoff": "SESSION_T_CLOSE",
+            "entry": "SESSION_T_PLUS_1_OPEN",
+            "stop_loss_pct": generation.get("stop_loss_pct"),
+            "take_profit_pct": generation.get("take_profit_pct"),
+            "same_bar_stop_before_target": True,
+            "minimum_premium": generation.get("minimum_premium"),
+            "minimum_volume": generation.get("minimum_volume"),
+            "minimum_open_interest": generation.get("minimum_open_interest"),
+            "minimum_days_to_expiry": generation.get("minimum_days_to_expiry"),
+            "maximum_days_to_expiry": generation.get("maximum_days_to_expiry"),
+            "per_trade_allocation": PER_TRADE_ALLOCATION,
+            "maximum_daily_exposure": MAX_DAILY_EXPOSURE,
+            "no_fill_return": 0.0,
+        },
         "model_path": str(model_path),
         "model_bytes": model_path.stat().st_size,
         "model_sha256": sha256_file(model_path),
