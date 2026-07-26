@@ -1,4 +1,4 @@
-"""Normalize legacy/UDiFF NSE option files and generate future-return features."""
+"""Normalize NSE options and generate leakage-safe next-session execution targets."""
 from __future__ import annotations
 
 import re
@@ -18,6 +18,13 @@ FEATURE_COLUMNS = [
     "month_sin", "month_cos",
 ]
 KEY_COLUMNS = ["symbol", "expiry", "strike", "option_type", "instrument"]
+MIN_PREMIUM = 10.0
+MIN_VOLUME = 100.0
+MIN_OI = 500.0
+MIN_DAYS_TO_EXPIRY = 2.0
+MAX_DAYS_TO_EXPIRY = 45.0
+STOP_LOSS_PCT = 0.30
+TAKE_PROFIT_PCT = 0.60
 
 
 def pick(columns: Iterable[str], *candidates: str) -> str | None:
@@ -30,6 +37,19 @@ def file_trade_date(path: Path) -> pd.Timestamp:
     if not match:
         raise ValueError(f"date not found in {path.name}")
     return pd.Timestamp(datetime.strptime(match.group(1), "%Y%m%d").date())
+
+
+def parse_mixed_dates(series: pd.Series) -> pd.Series:
+    """Parse ISO dates first and legacy NSE DD-MON-YYYY dates second."""
+    raw = series.astype("string").fillna("").str.strip()
+    parsed = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
+    remaining = parsed.isna()
+    if remaining.any():
+        parsed.loc[remaining] = pd.to_datetime(raw.loc[remaining], format="%d-%b-%Y", errors="coerce")
+    remaining = parsed.isna()
+    if remaining.any():
+        parsed.loc[remaining] = pd.to_datetime(raw.loc[remaining], errors="coerce", dayfirst=True)
+    return parsed
 
 
 def normalize_options(frame: pd.DataFrame, path: Path) -> pd.DataFrame:
@@ -59,19 +79,19 @@ def normalize_options(frame: pd.DataFrame, path: Path) -> pd.DataFrame:
     for name, column in names.items():
         if column:
             out[name] = frame[column]
-    instrument = out["instrument"].fillna("").astype(str).str.upper().str.strip()
-    side = out["option_type"].fillna("").astype(str).str.upper().str.strip()
+    instrument = out["instrument"].astype("string").fillna("").str.upper().str.strip()
+    side = out["option_type"].astype("string").fillna("").str.upper().str.strip()
     mask = side.isin({"CE", "PE", "CALL", "PUT"}) | instrument.isin({"IDO", "STO", "OPTIDX", "OPTSTK"})
     raw_option_rows = int(mask.sum())
     out = out.loc[mask].copy()
     out["instrument"] = instrument.loc[mask].replace({"IDO": "OPTIDX", "STO": "OPTSTK"})
     out["option_type"] = side.loc[mask].replace({"CALL": "CE", "PUT": "PE"})
-    out["symbol"] = out["symbol"].fillna("").astype(str).str.upper().str.strip()
-    out["expiry"] = pd.to_datetime(out["expiry"], errors="coerce", dayfirst=True).dt.normalize()
+    out["symbol"] = out["symbol"].astype("string").fillna("").str.upper().str.strip()
+    out["expiry"] = parse_mixed_dates(out["expiry"]).dt.normalize()
     for column in ["strike", "open", "high", "low", "close", "settle", "underlying_price", "volume", "oi", "change_oi"]:
         out[column] = pd.to_numeric(out[column], errors="coerce") if column in out else np.nan
     if names["trade_date"]:
-        out["trade_date"] = pd.to_datetime(out["trade_date"], errors="coerce", dayfirst=True).dt.normalize()
+        out["trade_date"] = parse_mixed_dates(out["trade_date"]).dt.normalize()
     else:
         out["trade_date"] = file_trade_date(path)
     out["trade_date"] = out["trade_date"].fillna(file_trade_date(path))
@@ -153,24 +173,68 @@ def generate_features(data_root: Path, feature_root: Path, base_cost_bps: float)
             current_raw.attrs.get("quarantined_invalid_traded_option_rows", 0)
         )
         if prior_enriched is not None:
-            next_values = current_raw[KEY_COLUMNS + ["close", "volume"]].rename(columns={"close": "next_close", "volume": "next_volume"})
-            matched = prior_enriched.merge(next_values, on=KEY_COLUMNS, how="inner", validate="one_to_one")
-            stats["matched_contract_rows"] += len(matched)
-            matched["gross_return"] = matched["next_close"] / matched["close"] - 1
-            matched["target_net_return"] = matched["gross_return"] - base_cost_bps / 10000.0
+            next_values = current_raw[KEY_COLUMNS + ["open", "high", "low", "close", "volume"]].rename(columns={
+                "open": "next_open", "high": "next_high", "low": "next_low",
+                "close": "next_close", "volume": "next_volume",
+            })
+            matched = prior_enriched.merge(next_values, on=KEY_COLUMNS, how="left", validate="one_to_one")
+            next_contract = matched["next_close"].notna()
+            valid_next_prices = matched[["next_open", "next_high", "next_low", "next_close"]].fillna(0).gt(0).all(axis=1)
+            fillable = next_contract & valid_next_prices & matched["next_volume"].fillna(0).gt(0)
+            entry = matched["next_open"]
+            stop = entry * (1.0 - STOP_LOSS_PCT)
+            target = entry * (1.0 + TAKE_PROFIT_PCT)
+            exit_price = np.where(
+                matched["next_low"].le(stop),
+                stop,
+                np.where(matched["next_high"].ge(target), target, matched["next_close"]),
+            )
+            matched["target_fillable"] = fillable.astype(np.int8)
+            matched["gross_return"] = np.where(fillable, exit_price / entry - 1.0, 0.0)
+            matched["target_net_return"] = np.where(
+                fillable, matched["gross_return"] - base_cost_bps / 10000.0, 0.0
+            )
             matched["target_positive"] = (matched["target_net_return"] > 0).astype(np.int8)
-            tradable = matched[
-                (matched["close"] > 1) & (matched["next_close"] > 0) & (matched["volume"] > 0)
-                & (matched["next_volume"] > 0) & (matched["oi"] > 0) & (matched["days_to_expiry"] >= 1)
-            ].replace([np.inf, -np.inf], np.nan).dropna(subset=FEATURE_COLUMNS + ["gross_return", "target_net_return"])
+
+            signal_liquid = (
+                matched["close"].ge(MIN_PREMIUM)
+                & matched["volume"].ge(MIN_VOLUME)
+                & matched["oi"].ge(MIN_OI)
+                & matched["days_to_expiry"].between(MIN_DAYS_TO_EXPIRY, MAX_DAYS_TO_EXPIRY)
+            )
+            candidate = matched.loc[signal_liquid].replace([np.inf, -np.inf], np.nan)
+            tradable = candidate.dropna(subset=FEATURE_COLUMNS + ["close", "volume", "oi"])
+
+            stats["prior_contract_rows"] += len(matched)
+            stats["matched_next_contract_rows"] += int(next_contract.sum())
+            stats["unmatched_next_contract_rows"] += int((~next_contract).sum())
+            stats["signal_liquid_rows"] += int(signal_liquid.sum())
+            stats["next_fillable_rows"] += int((signal_liquid & fillable).sum())
+            stats["next_no_fill_rows"] += int((signal_liquid & ~fillable).sum())
             stats["tradable_feature_rows"] += len(tradable)
             stats["filtered_feature_rows"] += len(matched) - len(tradable)
             if not tradable.empty:
                 trade_date = pd.Timestamp(tradable["trade_date"].iloc[0])
                 output = feature_root / str(trade_date.year) / f"{trade_date:%Y%m%d}_features.parquet"
                 output.parent.mkdir(parents=True, exist_ok=True)
-                columns = KEY_COLUMNS + ["trade_date"] + FEATURE_COLUMNS + ["gross_return", "target_net_return", "target_positive", "close", "volume", "oi"]
+                columns = KEY_COLUMNS + ["trade_date"] + FEATURE_COLUMNS + [
+                    "gross_return", "target_net_return", "target_positive", "target_fillable",
+                    "close", "volume", "oi",
+                ]
                 tradable[columns].to_parquet(output, index=False, compression="zstd")
                 stats["feature_files"] += 1
         prior_raw, prior_enriched = current_raw, current_enriched
-    return {**dict(stats), "base_cost_bps": base_cost_bps}
+    return {
+        **dict(stats),
+        "base_cost_bps": base_cost_bps,
+        "entry_rule": "NEXT_SESSION_OPEN",
+        "stop_loss_pct": STOP_LOSS_PCT,
+        "take_profit_pct": TAKE_PROFIT_PCT,
+        "same_bar_stop_before_target": True,
+        "minimum_premium": MIN_PREMIUM,
+        "minimum_volume": MIN_VOLUME,
+        "minimum_open_interest": MIN_OI,
+        "minimum_days_to_expiry": MIN_DAYS_TO_EXPIRY,
+        "maximum_days_to_expiry": MAX_DAYS_TO_EXPIRY,
+        "future_fill_filter_used_for_candidate_selection": False,
+    }
