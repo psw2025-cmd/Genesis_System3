@@ -205,6 +205,65 @@ jobs:
             storage/nse_eod_smoke/nse_fo_eod/
           if-no-files-found: error
 
+  self-hosted-nse-eod-backfill:
+    if: github.event_name == 'pull_request'
+    runs-on: self-hosted
+    timeout-minutes: 355
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      SYSTEM3_RESEARCH_DATA_ROOT: 'C:\System3ResearchData\Genesis_System3\options'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install archive dependencies
+        shell: pwsh
+        run: python -m pip install pandas requests pyarrow --quiet
+      - name: Create persistent external root
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path $env:SYSTEM3_RESEARCH_DATA_ROOT | Out-Null
+      - name: Download next 250 unfinished weekdays
+        shell: pwsh
+        run: |
+          python scripts/options_bigdata_download.py download-nse `
+            --start 2016-07-26 --end 2026-07-24 --limit 250 `
+            --data-root $env:SYSTEM3_RESEARCH_DATA_ROOT `
+            --report-dir reports/latest/options_bigdata_self_hosted_backfill
+          $exitCode = $LASTEXITCODE
+          if (-not (Test-Path reports/latest/options_bigdata_self_hosted_backfill/summary.json)) {
+            throw "Backfill summary missing; downloader exit code=$exitCode"
+          }
+          Write-Host "downloader_exit_code=$exitCode"
+          exit 0
+      - name: Verify automatically when backfill reaches zero remaining
+        shell: pwsh
+        run: |
+          $report = "reports/latest/options_bigdata_self_hosted_backfill"
+          Copy-Item "$report/summary.json" "$report/batch_summary.json" -Force
+          $batch = Get-Content "$report/batch_summary.json" -Raw | ConvertFrom-Json
+          Write-Host "expected=$($batch.nse_expected_weekdays)"
+          Write-Host "completed=$($batch.nse_completed_objects)"
+          Write-Host "remaining=$($batch.nse_remaining_weekdays)"
+          Write-Host "rows=$($batch.valid_rows)"
+          Write-Host "bytes=$($batch.valid_bytes)"
+          if ([int]$batch.nse_remaining_weekdays -eq 0) {
+            python scripts/options_bigdata_download.py verify `
+              --start 2016-07-26 --end 2026-07-24 `
+              --data-root $env:SYSTEM3_RESEARCH_DATA_ROOT `
+              --report-dir $report
+            if ($LASTEXITCODE -ne 0) { throw "Final full verification failed" }
+            Copy-Item "$report/summary.json" "$report/full_verify_summary.json" -Force
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: self-hosted-nse-eod-backfill-${{ github.run_id }}
+          path: reports/latest/options_bigdata_self_hosted_backfill/
+          if-no-files-found: error
+
   self-hosted-research-batch:
     if: github.event_name == 'workflow_dispatch' && inputs.action != 'plan'
     runs-on: self-hosted
