@@ -83,9 +83,11 @@ def test_verify_data_detects_clean_partition(tmp_path: Path):
     assert result["status"] == "PASS"
     assert result["files_checked"] == 1
     assert result["rows_checked"] == 2
+    assert result["traded_rows_checked"] == 2
+    assert result["no_trade_rows"] == 0
 
 
-def test_verify_udiff_schema_and_detects_bad_high(tmp_path: Path):
+def test_verify_udiff_schema_and_detects_bad_traded_high(tmp_path: Path):
     data_root = tmp_path / "data"
     frame = pd.DataFrame({
         "OpnPric": [10, 11], "HghPric": [12, 10], "LwPric": [9, 9], "ClsPric": [11, 12],
@@ -96,9 +98,27 @@ def test_verify_udiff_schema_and_detects_bad_high(tmp_path: Path):
     register(manifest, output, "NSE_FO_EOD", 2)
     result = verify_data(data_root, manifest)
     assert result["status"] == "FAIL"
-    assert result["invalid_ohlc_rows"] == 1
+    assert result["invalid_traded_ohlc_rows"] == 1
+    assert result["partial_traded_ohlc_rows"] == 0
     assert result["missing_ohlc_schema_files"] == 0
     assert result["missing_volume_oi_schema_files"] == 0
+
+
+def test_verify_allows_zero_ohlc_for_no_trade_contract(tmp_path: Path):
+    data_root = tmp_path / "data"
+    frame = pd.DataFrame({
+        "OpnPric": [0], "HghPric": [0], "LwPric": [0], "ClsPric": [25.5],
+        "TtlTradgVol": [0], "OpnIntrst": [450],
+    })
+    output = write_frame(frame, data_root / "nse_fo_eod" / "no_trade.parquet")
+    manifest = Manifest(data_root / "manifest.sqlite3")
+    register(manifest, output, "NSE_FO_EOD", 1)
+    result = verify_data(data_root, manifest)
+    assert result["status"] == "PASS"
+    assert result["traded_rows_checked"] == 0
+    assert result["no_trade_rows"] == 1
+    assert result["invalid_traded_ohlc_rows"] == 0
+    assert result["partial_traded_ohlc_rows"] == 0
 
 
 def test_manifest_preserves_completed_status_for_resume(tmp_path: Path):
