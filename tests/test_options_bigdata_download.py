@@ -26,8 +26,6 @@ def test_relative_strikes_index_and_stock():
 def test_plan_exact_request_count():
     universe = [Underlying("NIFTY", "13", "OPTIDX"), Underlying("RELIANCE", "2885", "OPTSTK")]
     plan = build_plan(universe, date(2026, 1, 1), date(2026, 1, 31), interval="5")
-    # 1 chunk: index 2 flags*(21 near + 7 next + 7 far)*2 sides = 140;
-    # stock 1 flag*3*7*2 = 42.
     assert len(plan) == 182
     assert len({req.key for req in plan}) == 182
 
@@ -61,6 +59,15 @@ def test_flatten_rolling_response():
     assert frame.loc[1, "oi"] == 1100
 
 
+def register(manifest: Manifest, output: Path, source: str, rows: int):
+    from scripts.options_bigdata_download import sha256_file
+    manifest.upsert(
+        object_key=source, source=source, symbol="NIFTY", start_date="2026-01-01", end_date="2026-01-02",
+        status="DOWNLOADED", rows=rows, bytes=output.stat().st_size, sha256=sha256_file(output), path=str(output),
+        http_status=200, error="", updated_utc="2026-01-02T00:00:00Z",
+    )
+
+
 def test_verify_data_detects_clean_partition(tmp_path: Path):
     data_root = tmp_path / "data"
     frame = pd.DataFrame({
@@ -71,16 +78,27 @@ def test_verify_data_detects_clean_partition(tmp_path: Path):
     })
     output = write_frame(frame, data_root / "dhan_rolling" / "clean.parquet")
     manifest = Manifest(data_root / "manifest.sqlite3")
-    from scripts.options_bigdata_download import sha256_file
-    manifest.upsert(
-        object_key="x", source="DHAN_ROLLING", symbol="NIFTY", start_date="2026-01-01", end_date="2026-01-02",
-        status="DOWNLOADED", rows=2, bytes=output.stat().st_size, sha256=sha256_file(output), path=str(output),
-        http_status=200, error="", updated_utc="2026-01-02T00:00:00Z",
-    )
+    register(manifest, output, "DHAN_ROLLING", 2)
     result = verify_data(data_root, manifest)
     assert result["status"] == "PASS"
     assert result["files_checked"] == 1
     assert result["rows_checked"] == 2
+
+
+def test_verify_udiff_schema_and_detects_bad_high(tmp_path: Path):
+    data_root = tmp_path / "data"
+    frame = pd.DataFrame({
+        "OpnPric": [10, 11], "HghPric": [12, 10], "LwPric": [9, 9], "ClsPric": [11, 12],
+        "TtlTradgVol": [100, 110], "OpnIntrst": [1000, 1100],
+    })
+    output = write_frame(frame, data_root / "nse_fo_eod" / "bad.parquet")
+    manifest = Manifest(data_root / "manifest.sqlite3")
+    register(manifest, output, "NSE_FO_EOD", 2)
+    result = verify_data(data_root, manifest)
+    assert result["status"] == "FAIL"
+    assert result["invalid_ohlc_rows"] == 1
+    assert result["missing_ohlc_schema_files"] == 0
+    assert result["missing_volume_oi_schema_files"] == 0
 
 
 def test_manifest_preserves_completed_status_for_resume(tmp_path: Path):
