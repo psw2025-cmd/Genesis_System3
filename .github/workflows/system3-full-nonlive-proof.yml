@@ -1,0 +1,285 @@
+name: System3 Full Non-Live Proof
+
+on:
+  pull_request:
+    paths:
+      - "dashboard/**"
+      - "scripts/system3_full_nonlive_inventory.py"
+      - "scripts/capture_dashboard_proof.py"
+      - ".github/workflows/system3-full-nonlive-proof.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: system3-full-nonlive-proof-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-system-ui-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      SYSTEM3_MODE: "PAPER"
+      ANALYZE_MODE: "1"
+      DEV_PROXY_TARGET: "http://127.0.0.1:8000"
+      PROOF_ROOT: "reports/latest/system3_full_nonlive_proof"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: dashboard/frontend/package-lock.json
+
+      - name: Prepare proof folders
+        run: mkdir -p "$PROOF_ROOT" "$PROOF_ROOT/logs" "$PROOF_ROOT/api" "$PROOF_ROOT/ui"
+
+      - name: Recursive tracked-repository inventory
+        run: >-
+          python scripts/system3_full_nonlive_inventory.py
+          --root . --output "$PROOF_ROOT/inventory"
+
+      - name: Install Python system dependencies
+        continue-on-error: true
+        run: |
+          set +e
+          python -m pip install --upgrade pip > "$PROOF_ROOT/logs/pip_upgrade.log" 2>&1
+          python -m pip install -r requirements.txt -r requirements-research.txt -r dashboard/backend/requirements.txt pytest requests playwright > "$PROOF_ROOT/logs/pip_install.log" 2>&1
+          echo $? > "$PROOF_ROOT/pip_install.exit"
+          exit 0
+
+      - name: Install frontend and browser dependencies
+        continue-on-error: true
+        run: |
+          set +e
+          cd dashboard/frontend
+          npm ci > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/npm_ci.log" 2>&1
+          echo $? > "$GITHUB_WORKSPACE/$PROOF_ROOT/npm_ci.exit"
+          cd "$GITHUB_WORKSPACE"
+          python -m playwright install chromium > "$PROOF_ROOT/logs/playwright_install.log" 2>&1
+          echo $? > "$PROOF_ROOT/playwright_install.exit"
+          exit 0
+
+      - name: Python compile proof
+        continue-on-error: true
+        run: |
+          set +e
+          python -m compileall -q core src dashboard/backend scripts tests > "$PROOF_ROOT/logs/compileall.log" 2>&1
+          echo $? > "$PROOF_ROOT/compileall.exit"
+          exit 0
+
+      - name: Full pytest collection proof
+        continue-on-error: true
+        run: |
+          set +e
+          timeout 900 python -m pytest --collect-only -q > "$PROOF_ROOT/logs/pytest_collect.log" 2>&1
+          echo $? > "$PROOF_ROOT/pytest_collect.exit"
+          exit 0
+
+      - name: Full pytest execution proof
+        continue-on-error: true
+        run: |
+          set +e
+          timeout 1800 python -m pytest -q --disable-warnings --maxfail=100 > "$PROOF_ROOT/logs/pytest_full.log" 2>&1
+          echo $? > "$PROOF_ROOT/pytest_full.exit"
+          exit 0
+
+      - name: Frontend TypeScript production build
+        continue-on-error: true
+        run: |
+          set +e
+          cd dashboard/frontend
+          npm run build > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_build.log" 2>&1
+          echo $? > "$GITHUB_WORKSPACE/$PROOF_ROOT/frontend_build.exit"
+          cd "$GITHUB_WORKSPACE"
+          exit 0
+
+      - name: Start analyzer-only backend
+        continue-on-error: true
+        run: |
+          set +e
+          cd dashboard/backend
+          nohup python -m uvicorn app:app --host 127.0.0.1 --port 8000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/backend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/backend_error.log" &
+          echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/backend.pid"
+          cd "$GITHUB_WORKSPACE"
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health || true)
+            if [ "$code" = "200" ]; then break; fi
+            sleep 1
+          done
+          echo "$code" > "$PROOF_ROOT/backend_health.status"
+          exit 0
+
+      - name: Test required backend APIs
+        continue-on-error: true
+        shell: python
+        run: |
+          import hashlib, json, time
+          from pathlib import Path
+          import requests
+          output = Path("reports/latest/system3_full_nonlive_proof/api")
+          output.mkdir(parents=True, exist_ok=True)
+          endpoints = [
+              "/api/health", "/api/qc", "/api/signal/top", "/api/positions",
+              "/api/pnl", "/api/perf", "/api/audit/secrets",
+          ]
+          rows = []
+          for endpoint in endpoints:
+              started = time.perf_counter()
+              try:
+                  response = requests.get(f"http://127.0.0.1:8000{endpoint}", timeout=15)
+                  body = response.content
+                  body_file = output / (endpoint.strip("/").replace("/", "_") + ".body")
+                  body_file.write_bytes(body)
+                  rows.append({
+                      "endpoint": endpoint,
+                      "status_code": response.status_code,
+                      "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+                      "bytes": len(body),
+                      "sha256": hashlib.sha256(body).hexdigest(),
+                      "content_type": response.headers.get("content-type", ""),
+                      "json_valid": bool(response.headers.get("content-type", "").startswith("application/json")),
+                  })
+              except Exception as error:
+                  rows.append({
+                      "endpoint": endpoint, "status_code": 0,
+                      "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+                      "bytes": 0, "sha256": "", "content_type": "", "json_valid": False,
+                      "error": f"{type(error).__name__}: {error}",
+                  })
+          summary = {
+              "endpoint_count": len(rows),
+              "status_200_count": sum(row["status_code"] == 200 for row in rows),
+              "non_200_count": sum(row["status_code"] != 200 for row in rows),
+              "rows": rows,
+              "live_trading_enabled": False,
+              "order_placement_allowed": False,
+          }
+          (output / "api_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(summary, indent=2))
+
+      - name: Start frontend development server
+        continue-on-error: true
+        run: |
+          set +e
+          cd dashboard/frontend
+          nohup npm run dev -- --host 127.0.0.1 --port 3000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_error.log" &
+          echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/frontend.pid"
+          cd "$GITHUB_WORKSPACE"
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ui/ || true)
+            if [ "$code" = "200" ]; then break; fi
+            sleep 1
+          done
+          echo "$code" > "$PROOF_ROOT/frontend_http.status"
+          exit 0
+
+      - name: Capture all dashboard tabs
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/capture_dashboard_proof.py \
+            --url http://127.0.0.1:3000/ui/ \
+            --output "$PROOF_ROOT/ui" > "$PROOF_ROOT/logs/ui_capture.log" 2>&1
+          echo $? > "$PROOF_ROOT/ui_capture.exit"
+          exit 0
+
+      - name: Build machine-readable full-system summary
+        if: always()
+        shell: python
+        run: |
+          import json, re
+          from pathlib import Path
+          root = Path("reports/latest/system3_full_nonlive_proof")
+          def read_int(name, default=-1):
+              try: return int((root / name).read_text().strip())
+              except Exception: return default
+          def load(path, default):
+              try: return json.loads(path.read_text())
+              except Exception: return default
+          collect_text = (root / "logs/pytest_collect.log").read_text(errors="replace") if (root / "logs/pytest_collect.log").exists() else ""
+          full_text = (root / "logs/pytest_full.log").read_text(errors="replace") if (root / "logs/pytest_full.log").exists() else ""
+          collected = None
+          matches = re.findall(r"(\d+) tests? collected", collect_text)
+          if matches: collected = int(matches[-1])
+          status_matches = re.findall(r"(\d+) passed", full_text)
+          failed_matches = re.findall(r"(\d+) failed", full_text)
+          skipped_matches = re.findall(r"(\d+) skipped", full_text)
+          errors_matches = re.findall(r"(\d+) errors?", full_text)
+          inventory = load(root / "inventory/inventory_summary.json", {})
+          api = load(root / "api/api_summary.json", {})
+          ui = load(root / "ui/dashboard_ui_summary.json", {})
+          summary = {
+              "inventory": inventory,
+              "dependency_install_exit": read_int("pip_install.exit"),
+              "npm_ci_exit": read_int("npm_ci.exit"),
+              "playwright_install_exit": read_int("playwright_install.exit"),
+              "compile_exit": read_int("compileall.exit"),
+              "pytest_collect_exit": read_int("pytest_collect.exit"),
+              "pytest_collected": collected,
+              "pytest_full_exit": read_int("pytest_full.exit"),
+              "pytest_passed_reported": int(status_matches[-1]) if status_matches else 0,
+              "pytest_failed_reported": int(failed_matches[-1]) if failed_matches else 0,
+              "pytest_skipped_reported": int(skipped_matches[-1]) if skipped_matches else 0,
+              "pytest_errors_reported": int(errors_matches[-1]) if errors_matches else 0,
+              "frontend_build_exit": read_int("frontend_build.exit"),
+              "backend_health_status": read_int("backend_health.status", 0),
+              "frontend_http_status": read_int("frontend_http.status", 0),
+              "api": api,
+              "ui": ui,
+              "live_trading_enabled": False,
+              "real_orders_attempted": 0,
+              "order_placement_allowed": False,
+          }
+          critical = {
+              "inventory_missing_files": inventory.get("missing_tracked_files", -1),
+              "compile_exit": summary["compile_exit"],
+              "pytest_full_exit": summary["pytest_full_exit"],
+              "frontend_build_exit": summary["frontend_build_exit"],
+              "backend_health_status": summary["backend_health_status"],
+              "api_non_200": api.get("non_200_count", -1),
+              "ui_tabs_failed": ui.get("tabs_failed", -1),
+          }
+          summary["critical_gates"] = critical
+          summary["critical_pass_count"] = sum([
+              critical["inventory_missing_files"] == 0,
+              critical["compile_exit"] == 0,
+              critical["pytest_full_exit"] == 0,
+              critical["frontend_build_exit"] == 0,
+              critical["backend_health_status"] == 200,
+              critical["api_non_200"] == 0,
+              critical["ui_tabs_failed"] == 0,
+          ])
+          summary["critical_gate_count"] = 7
+          summary["status"] = "PASS" if summary["critical_pass_count"] == 7 else "FAIL"
+          (root / "full_system_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(summary, indent=2))
+
+      - name: Upload full-system and dashboard proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system3-full-nonlive-proof-${{ github.run_id }}
+          path: reports/latest/system3_full_nonlive_proof/
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Enforce critical non-live gates
+        if: always()
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          summary = json.loads(Path("reports/latest/system3_full_nonlive_proof/full_system_summary.json").read_text())
+          if summary["status"] != "PASS":
+              raise SystemExit(2)
