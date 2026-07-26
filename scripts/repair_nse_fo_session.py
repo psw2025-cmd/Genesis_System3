@@ -44,6 +44,8 @@ def candidates(day: date) -> list[str]:
     return [
         f"https://archives.nseindia.com/{relative}",
         f"https://nsearchives.nseindia.com/{relative}",
+        f"https://www1.nseindia.com/{relative}",
+        f"http://www1.nseindia.com/{relative}",
     ]
 
 
@@ -148,7 +150,11 @@ def main() -> int:
         attempt = {"url": url}
         try:
             response = session.get(url, timeout=90, allow_redirects=True)
-            attempt.update({"http_status": response.status_code, "response_bytes": len(response.content)})
+            attempt.update({
+                "http_status": response.status_code,
+                "response_bytes": len(response.content),
+                "final_url": response.url,
+            })
             response.raise_for_status()
             with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
                 csv_names = [name for name in archive.namelist() if name.lower().endswith(".csv")]
