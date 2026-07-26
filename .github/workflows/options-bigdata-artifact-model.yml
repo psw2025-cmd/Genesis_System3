@@ -6,6 +6,8 @@ on:
       - "src/options_research/advanced_model.py"
       - "src/options_research/eod_features.py"
       - "src/options_research/eod_model.py"
+      - "src/options_research/manifest.py"
+      - "scripts/profile_options_archive.py"
       - "scripts/repair_nse_fo_session.py"
       - "scripts/reconcile_nse_fo_calendar.py"
       - "scripts/options_bigdata_advanced_train_backtest.py"
@@ -66,7 +68,7 @@ jobs:
           echo "data_root=$data_root" | tee -a "$REPORT_ROOT/reused_archive.txt"
           echo "parquet_files=$files" | tee -a "$REPORT_ROOT/reused_archive.txt"
           echo "archive_bytes=$bytes" | tee -a "$REPORT_ROOT/reused_archive.txt"
-          test "$files" -ge 2466
+          test "$files" -eq 2466
           df -h .
 
       - name: Install calendar model and test dependencies
@@ -81,6 +83,8 @@ jobs:
             src/options_research/advanced_model.py \
             src/options_research/eod_features.py \
             src/options_research/eod_model.py \
+            src/options_research/manifest.py \
+            scripts/profile_options_archive.py \
             scripts/repair_nse_fo_session.py \
             scripts/reconcile_nse_fo_calendar.py \
             scripts/options_bigdata_advanced_train_backtest.py
@@ -108,7 +112,7 @@ jobs:
           --end 2026-07-24
           --output-dir "$REPORT_ROOT/calendar"
 
-      - name: Verify raw archive and preserve every counter
+      - name: Verify raw archive with rebased manifest paths
         continue-on-error: true
         run: |
           set +e
@@ -118,7 +122,7 @@ jobs:
           echo $? > "$REPORT_ROOT/raw_verify.exit"
           exit 0
 
-      - name: Profile complete reused archive
+      - name: Stream-profile complete reused archive
         run: >-
           python scripts/profile_options_archive.py
           --data-root "$DATA_ROOT"
@@ -165,11 +169,22 @@ jobs:
           assert calendar["documented_source_unavailable_sessions"] <= 1, calendar
           assert calendar["archive_session_coverage"] >= 0.9995, calendar
           assert calendar["synthetic_sessions_inserted"] == 0, calendar
-          assert profile["files"] >= 2466, profile
+
+          assert profile["status"] == "PASS", profile
+          assert profile["files"] == 2466, profile
+          assert profile["files_profiled"] == 2466, profile
+          assert profile["file_errors"] == 0, profile
           assert profile["rows"] >= 100_000_000, profile
-          assert verify.get("missing_files", 0) == 0, verify
-          assert verify.get("unreadable_files", 0) == 0, verify
-          assert verify.get("sha_mismatches", 0) == 0, verify
+          assert profile["option_rows"] > 0, profile
+          assert profile["all_columns_loaded"] is False, profile
+
+          assert verify.get("files_checked", 0) == 2466, verify
+          assert verify.get("rebased_manifest_paths", 0) == 2466, verify
+          assert verify.get("rows_checked", 0) >= 100_000_000, verify
+          assert verify.get("missing_files", -1) == 0, verify
+          assert verify.get("unreadable_files", -1) == 0, verify
+          assert verify.get("sha_mismatches", -1) == 0, verify
+
           assert model["split"]["test_days"] >= 400, model["split"]
           assert model["frozen_test"]["trades"] >= 500, model["frozen_test"]
           assert model["all_valid_pretest_rows_used_by_baseline"] is True, model
