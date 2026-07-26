@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-26T07:47:07.023760Z",
+  "generated_utc": "2026-07-26T08:45:43.543799Z",
   "status": "BLOCKED",
   "base_url": "http://127.0.0.1:8000",
   "runner": {
@@ -21,7 +21,7 @@
         "scripts/system3_gate_evaluator.py",
         "--sync-gates"
       ],
-      "started_utc": "2026-07-26T07:42:05.451219Z",
+      "started_utc": "2026-07-26T08:40:48.524327Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "scripts/system3_gate_evaluator.py",
@@ -31,8 +31,8 @@
       "ok": true,
       "stdout_tail": "SYSTEM3_GATE_EVALUATOR_COMPLETE\n{\n  \"gates_passing\": 2,\n  \"trade_ready\": false,\n  \"open_blockers\": [\n    \"PROFIT_BLOCKER\",\n    \"SYS3-BLK-003\",\n    \"SYS3-BLK-005\",\n    \"SYS3-BLK-008\",\n    \"TICK_HEALTH_BLOCKER\"\n  ]\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 12.12,
-      "finished_utc": "2026-07-26T07:42:17.572323Z"
+      "elapsed_sec": 4.04,
+      "finished_utc": "2026-07-26T08:40:52.565837Z"
     },
     {
       "cmd": [
@@ -40,38 +40,38 @@
         "tools/system3_auto_coordinator.py",
         "--full"
       ],
-      "started_utc": "2026-07-26T07:42:17.572323Z",
+      "started_utc": "2026-07-26T08:40:52.566835Z",
       "ok": false,
       "returncode": null,
       "error": "timeout after 240s",
       "stdout_tail": "",
       "stderr_tail": "",
       "elapsed_sec": 240.02,
-      "finished_utc": "2026-07-26T07:46:17.592209Z"
+      "finished_utc": "2026-07-26T08:44:52.582978Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
-      "started_utc": "2026-07-26T07:46:17.592209Z",
+      "started_utc": "2026-07-26T08:44:52.582978Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_github_render_failure_tracker.py"
       ],
       "returncode": 0,
       "ok": true,
-      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-26T07:46:43.547369Z\", \"github_failed_count\": 44, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 56, \"tracker_internal_status\": \"PASS\"}\n",
+      "stdout_tail": "{\"excluded_workflows\": [\"System3 GitHub Render Failure Tracker\"], \"generated_utc\": \"2026-07-26T08:45:21.367219Z\", \"github_failed_count\": 42, \"live_trading_enabled\": false, \"order_routes_called\": false, \"render_failed_count\": 12, \"report_only_no_self_failure_storm\": true, \"response_bodies_persisted\": false, \"status\": \"BLOCKED\", \"todo_count\": 54, \"tracker_internal_status\": \"PASS\"}\n",
       "stderr_tail": "",
-      "elapsed_sec": 25.98,
-      "finished_utc": "2026-07-26T07:46:43.576173Z"
+      "elapsed_sec": 28.81,
+      "finished_utc": "2026-07-26T08:45:21.392269Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/dashboard_visible_issue_tracker.mjs"
       ],
-      "started_utc": "2026-07-26T07:46:43.576173Z",
+      "started_utc": "2026-07-26T08:45:21.392269Z",
       "actual_cmd": [
         "node",
         "tools/dashboard_visible_issue_tracker.mjs"
@@ -80,25 +80,25 @@
       "ok": false,
       "stdout_tail": "",
       "stderr_tail": "DASHBOARD_VISIBLE_ISSUES_BLOCKED issues=0 screenshots_missing=0 unsettled_tabs=0 exceptions=0 auth_ok=false tabs=0/16\n",
-      "elapsed_sec": 1.71,
-      "finished_utc": "2026-07-26T07:46:45.290514Z"
+      "elapsed_sec": 1.64,
+      "finished_utc": "2026-07-26T08:45:23.036761Z"
     },
     {
       "cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
-      "started_utc": "2026-07-26T07:46:45.290514Z",
+      "started_utc": "2026-07-26T08:45:23.036761Z",
       "actual_cmd": [
         "C:\\Python310\\python.exe",
         "tools/system3_autopilot_proof_board.py"
       ],
       "returncode": 1,
       "ok": false,
-      "stdout_tail": "lure_tracker: Fix workflow 'Dashboard Visual Settle Normalizer' run 30192339429 conclusion=failure commit=fe4a37d3142cf15b7916899ee9a33cd31465265b\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30192331198 conclusion=failure commit=e58b812dbf5a4d0c820ad8efd2574f9b23c1dbeb\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30192329943 conclusion=failure commit=e58b812dbf5a4d0c820ad8efd2574f9b23c1dbeb\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30192329939 conclusion=failure commit=e58b812dbf5a4d0c820ad8efd2574f9b23c1dbeb\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30192329930 conclusion=failure commit=e58b812dbf5a4d0c820ad8efd2574f9b23c1dbeb\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30192327589 conclusion=cancelled commit=e208d36fbbf4f072faae2be58459a46010b40362\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30192327581 conclusion=failure commit=e208d36fbbf4f072faae2be58459a46010b40362\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30192327571 conclusion=failure commit=e208d36fbbf4f072faae2be58459a46010b40362\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30192327567 conclusion=failure commit=e208d36fbbf4f072faae2be58459a46010b40362\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 30192317794 conclusion=failure commit=75a28889cb66150902688fb759f06006019a506b\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30192317792 conclusion=cancelled commit=75a28889cb66150902688fb759f06006019a506b\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30192314885 conclusion=failure commit=a7e3fbc7f630e4ad1e4a2a74ea7a56b84e609074\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30192294426 conclusion=failure commit=a7e3fbc7f630e4ad1e4a2a74ea7a56b84e609074\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 30192137163 conclusion=failure commit=a7e3fbc7f630e4ad1e4a2a74ea7a56b84e609074\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Proof Strict Gate' run 30191950907 conclusion=failure commit=025e94e5844a1e877a44311bec905d597bf2d73e\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 30191950906 conclusion=failure commit=025e94e5844a1e877a44311bec905d597bf2d73e\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 30191950904 conclusion=failure commit=025e94e5844a1e877a44311bec905d597bf2d73e\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30191950902 conclusion=failure commit=025e94e5844a1e877a44311bec905d597bf2d73e\",\n    \"workflow_failure_tracker: failed_count=45\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=BLOCKED_NOT_TRADE_READY\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
+      "stdout_tail": "acker: Fix workflow 'System3 Secure Install Credential Audit' run 30193803738 conclusion=failure commit=df3b416b3e0e1a559deac6eee6d573a3f86a84b1\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30193791390 conclusion=failure commit=039e2ab0a36e31e2238789f4282a89aab8b6f5f3\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30193791385 conclusion=failure commit=039e2ab0a36e31e2238789f4282a89aab8b6f5f3\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30193791368 conclusion=failure commit=039e2ab0a36e31e2238789f4282a89aab8b6f5f3\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30193788928 conclusion=failure commit=dc3735ad46a372f179b69fbf8ea812184cd867c2\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30193788915 conclusion=failure commit=dc3735ad46a372f179b69fbf8ea812184cd867c2\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Autopilot Proof Board' run 30193788866 conclusion=failure commit=dc3735ad46a372f179b69fbf8ea812184cd867c2\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Settle Proof' run 30193782297 conclusion=failure commit=048daa4f669a8e07966f2f9b76f8e083eedb6b84\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visible Issue Tracker' run 30193781382 conclusion=failure commit=048daa4f669a8e07966f2f9b76f8e083eedb6b84\",\n    \"workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30193781341 conclusion=cancelled commit=048daa4f669a8e07966f2f9b76f8e083eedb6b84\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30193771437 conclusion=failure commit=0c84170553c6921c54052d880ebeecf42c978c13\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30193764253 conclusion=failure commit=0c84170553c6921c54052d880ebeecf42c978c13\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30193753336 conclusion=failure commit=0c84170553c6921c54052d880ebeecf42c978c13\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Shell Diagnostic' run 30193569178 conclusion=failure commit=f9b6f38e0e6346b59cc16126c549261b97c02e95\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Experimental Solution Planner' run 30193569176 conclusion=failure commit=f9b6f38e0e6346b59cc16126c549261b97c02e95\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30193569155 conclusion=failure commit=f9b6f38e0e6346b59cc16126c549261b97c02e95\",\n    \"workflow_failure_tracker: Fix workflow 'Dashboard Visual Loading Postflight' run 30193569147 conclusion=failure commit=f9b6f38e0e6346b59cc16126c549261b97c02e95\",\n    \"workflow_failure_tracker: Fix workflow 'System3 Safe Repair Runner' run 30193569144 conclusion=failure commit=f9b6f38e0e6346b59cc16126c549261b97c02e95\",\n    \"workflow_failure_tracker: failed_count=43\",\n    \"todo_status_update: status=BLOCKED\",\n    \"dashboard_visual_production_proof: status=UNKNOWN\",\n    \"system3_public_truth: status=BLOCKED_NOT_TRADE_READY\",\n    \"core_gate_blocked:render_visual\",\n    \"core_gate_blocked:github_render_health\",\n    \"core_gate_blocked:backend_frontend_install\",\n    \"core_gate_blocked:workflow_health\",\n    \"core_gate_blocked:root_cause_zero\",\n    \"core_gate_blocked:todo_zero\",\n    \"core_gate_blocked:public_truth_pass\"\n  ],\n  \"proof_files\": {\n    \"this_summary\": \"reports/latest/autopilot_proof_board/summary.json\",\n    \"this_markdown\": \"reports/latest/autopilot_proof_board/summary.md\",\n    \"visible_ui_issues\": \"reports/latest/dashboard_visible_issue_tracker/summary.md\",\n    \"github_render_failures\": \"docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md\",\n    \"workflow_failures\": \"docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md\",\n    \"todo_status\": \"reports/latest/todo_status_update/summary.md\",\n    \"public_truth\": \"reports/latest/system3_public_truth/index.md\"\n  }\n}\n",
       "stderr_tail": "",
-      "elapsed_sec": 0.57,
-      "finished_utc": "2026-07-26T07:46:45.862498Z"
+      "elapsed_sec": 0.39,
+      "finished_utc": "2026-07-26T08:45:23.426866Z"
     }
   ],
   "http_probes": [
@@ -107,7 +107,7 @@
       "url": "http://127.0.0.1:8000/api/health",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.01,
+      "elapsed_sec": 2.02,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -117,7 +117,7 @@
       "url": "http://127.0.0.1:8000/api/state",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.01,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -137,7 +137,7 @@
       "url": "http://127.0.0.1:8000/api/broker/status",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.02,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -147,7 +147,7 @@
       "url": "http://127.0.0.1:8000/api/broker/dhan/status",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.1,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -157,7 +157,7 @@
       "url": "http://127.0.0.1:8000/api/broker/funds",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.1,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -167,7 +167,7 @@
       "url": "http://127.0.0.1:8000/api/broker/holdings",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.4,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -177,7 +177,7 @@
       "url": "http://127.0.0.1:8000/api/broker/positions",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.1,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -187,7 +187,7 @@
       "url": "http://127.0.0.1:8000/api/scanner/top_contract_gainers",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.01,
+      "elapsed_sec": 2.0,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -197,7 +197,7 @@
       "url": "http://127.0.0.1:8000/api/simulation/live/state",
       "ok": false,
       "status": null,
-      "elapsed_sec": 2.39,
+      "elapsed_sec": 2.01,
       "error_category": "network_error",
       "error_type": "URLError",
       "response_body_persisted": false
@@ -205,7 +205,7 @@
   ],
   "reports": {
     "system3_auto_gates": {
-      "generated_utc": "2026-07-26T07:43:58.401185Z",
+      "generated_utc": "2026-07-26T08:42:59.485934Z",
       "gates": {
         "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
           "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -270,7 +270,7 @@
         "OPTION_STRIKE_VISIBILITY_PROVEN": {
           "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
           "pass": false,
-          "rows": 1,
+          "rows": 4,
           "paper_trade_allowed_count": 0,
           "blocker_id": "SYS3-BLK-003",
           "auto_action": "Run scripts/system3_option_visibility_audit.py"
@@ -325,403 +325,385 @@
       "failed_workflows": [
         {
           "branch": "main",
-          "commit": "4aef56a7b3125855bda79f7d60da649335727dfe",
+          "commit": "eadd0778980d9da3f26affeaf39e595d5cdf9a65",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30193241879",
-          "run_id": 30193241879,
-          "updated_at": "2026-07-26T07:42:19Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194971365",
+          "run_id": 30194971365,
+          "updated_at": "2026-07-26T08:39:17Z",
           "workflow": "Dashboard Visible Auth-Resilient Proof"
         },
         {
           "branch": "main",
-          "commit": "4aef56a7b3125855bda79f7d60da649335727dfe",
+          "commit": "eadd0778980d9da3f26affeaf39e595d5cdf9a65",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30193224709",
-          "run_id": 30193224709,
-          "updated_at": "2026-07-26T07:40:42Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194965196",
+          "run_id": 30194965196,
+          "updated_at": "2026-07-26T08:37:57Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "315a85fd22fc998caf50e283e3e4a0e89e0e2412",
+          "commit": "b91b4602685b5beb70e26986ff40b0865c8b3903",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192851596",
-          "run_id": 30192851596,
-          "updated_at": "2026-07-26T07:28:30Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194598976",
+          "run_id": 30194598976,
+          "updated_at": "2026-07-26T08:26:10Z",
           "workflow": "Dashboard Visible Proof Current"
         },
         {
           "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799099",
-          "run_id": 30192799099,
-          "updated_at": "2026-07-26T07:26:33Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799096",
-          "run_id": 30192799096,
-          "updated_at": "2026-07-26T07:26:22Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194493140",
+          "run_id": 30194493140,
+          "updated_at": "2026-07-26T08:22:10Z",
           "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799079",
-          "run_id": 30192799079,
-          "updated_at": "2026-07-26T07:28:08Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194493136",
+          "run_id": 30194493136,
+          "updated_at": "2026-07-26T08:24:31Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194493111",
+          "run_id": 30194493111,
+          "updated_at": "2026-07-26T08:23:16Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492479",
+          "run_id": 30194492479,
+          "updated_at": "2026-07-26T08:23:44Z",
           "workflow": "Dashboard Shell Diagnostic"
         },
         {
           "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799075",
-          "run_id": 30192799075,
-          "updated_at": "2026-07-26T07:26:23Z",
-          "workflow": "Dashboard Visual Loading Postflight"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799071",
-          "run_id": 30192799071,
-          "updated_at": "2026-07-26T07:28:52Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799070",
-          "run_id": 30192799070,
-          "updated_at": "2026-07-26T07:26:19Z",
-          "workflow": "Dashboard Visual Proof Strict Gate"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192799003",
-          "run_id": 30192799003,
-          "updated_at": "2026-07-26T07:27:29Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192798995",
-          "run_id": 30192798995,
-          "updated_at": "2026-07-26T07:26:12Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192798980",
-          "run_id": 30192798980,
-          "updated_at": "2026-07-26T07:26:23Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192797577",
-          "run_id": 30192797577,
-          "updated_at": "2026-07-26T07:26:48Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192797512",
-          "run_id": 30192797512,
-          "updated_at": "2026-07-26T07:26:12Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "1f83db0281e3912eee1d628374a806fbfa9604fb",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192797494",
-          "run_id": 30192797494,
-          "updated_at": "2026-07-26T07:26:17Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "098673a4327a7602851df72fe79432f70ae542f8",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192780280",
-          "run_id": 30192780280,
-          "updated_at": "2026-07-26T07:25:45Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "098673a4327a7602851df72fe79432f70ae542f8",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192780276",
-          "run_id": 30192780276,
-          "updated_at": "2026-07-26T07:26:25Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "098673a4327a7602851df72fe79432f70ae542f8",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192780273",
-          "run_id": 30192780273,
-          "updated_at": "2026-07-26T07:26:09Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "3e71bee886b37291d8d8c676312446f0261ad308",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192775415",
-          "run_id": 30192775415,
-          "updated_at": "2026-07-26T07:26:13Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "a3ec46f963cc1c24ae83ac23b46488d053d74243",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192767352",
-          "run_id": 30192767352,
-          "updated_at": "2026-07-26T07:26:09Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192762698",
-          "run_id": 30192762698,
-          "updated_at": "2026-07-26T07:25:12Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192762697",
-          "run_id": 30192762697,
-          "updated_at": "2026-07-26T07:25:19Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492453",
+          "run_id": 30194492453,
+          "updated_at": "2026-07-26T08:22:18Z",
           "workflow": "System3 Secure Install Credential Audit"
         },
         {
           "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192762672",
-          "run_id": 30192762672,
-          "updated_at": "2026-07-26T07:26:06Z",
-          "workflow": "System3 Autopilot Proof Board"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492439",
+          "run_id": 30194492439,
+          "updated_at": "2026-07-26T08:22:12Z",
+          "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759923",
-          "run_id": 30192759923,
-          "updated_at": "2026-07-26T07:25:05Z",
-          "workflow": "Dashboard Visual Loading Postflight"
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492438",
+          "run_id": 30194492438,
+          "updated_at": "2026-07-26T08:22:03Z",
+          "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759895",
-          "run_id": 30192759895,
-          "updated_at": "2026-07-26T07:25:16Z",
-          "workflow": "System3 Secure Install Credential Audit"
-        },
-        {
-          "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759893",
-          "run_id": 30192759893,
-          "updated_at": "2026-07-26T07:25:03Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492435",
+          "run_id": 30194492435,
+          "updated_at": "2026-07-26T08:22:07Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492427",
+          "run_id": 30194492427,
+          "updated_at": "2026-07-26T08:22:11Z",
+          "workflow": "Dashboard Visual Loading Postflight"
+        },
+        {
+          "branch": "main",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759892",
-          "run_id": 30192759892,
-          "updated_at": "2026-07-26T07:26:26Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492218",
+          "run_id": 30194492218,
+          "updated_at": "2026-07-26T08:22:01Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492196",
+          "run_id": 30194492196,
+          "updated_at": "2026-07-26T08:22:09Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "3e939c30650397ecfb8731cd8183c9d30e046b28",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194492189",
+          "run_id": 30194492189,
+          "updated_at": "2026-07-26T08:22:35Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "4c422fc7ce9714ce1aeef06cf2b805e37760c353",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194473743",
+          "run_id": 30194473743,
+          "updated_at": "2026-07-26T08:21:35Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "4c422fc7ce9714ce1aeef06cf2b805e37760c353",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194473742",
+          "run_id": 30194473742,
+          "updated_at": "2026-07-26T08:21:58Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "4c422fc7ce9714ce1aeef06cf2b805e37760c353",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194473725",
+          "run_id": 30194473725,
+          "updated_at": "2026-07-26T08:22:15Z",
+          "workflow": "System3 Safe Repair Runner"
+        },
+        {
+          "branch": "main",
+          "commit": "4c422fc7ce9714ce1aeef06cf2b805e37760c353",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194472939",
+          "run_id": 30194472939,
+          "updated_at": "2026-07-26T08:22:22Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "34a17f47a9f13420e93c29ccf4f2eb7f9181cfce",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194459137",
+          "run_id": 30194459137,
+          "updated_at": "2026-07-26T08:21:19Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "34a17f47a9f13420e93c29ccf4f2eb7f9181cfce",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194459134",
+          "run_id": 30194459134,
+          "updated_at": "2026-07-26T08:21:08Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "34a17f47a9f13420e93c29ccf4f2eb7f9181cfce",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194459130",
+          "run_id": 30194459130,
+          "updated_at": "2026-07-26T08:21:57Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "34a17f47a9f13420e93c29ccf4f2eb7f9181cfce",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194458118",
+          "run_id": 30194458118,
+          "updated_at": "2026-07-26T08:21:59Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447283",
+          "run_id": 30194447283,
+          "updated_at": "2026-07-26T08:20:42Z",
+          "workflow": "Dashboard Visual Proof Strict Gate"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447257",
+          "run_id": 30194447257,
+          "updated_at": "2026-07-26T08:20:42Z",
+          "workflow": "Dashboard Visual Loading Postflight"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447249",
+          "run_id": 30194447249,
+          "updated_at": "2026-07-26T08:21:21Z",
+          "workflow": "System3 Autopilot Proof Board"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447232",
+          "run_id": 30194447232,
+          "updated_at": "2026-07-26T08:20:50Z",
+          "workflow": "System3 Secure Install Credential Audit"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447228",
+          "run_id": 30194447228,
+          "updated_at": "2026-07-26T08:20:40Z",
+          "workflow": "System3 Experimental Solution Planner"
+        },
+        {
+          "branch": "main",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447224",
+          "run_id": 30194447224,
+          "updated_at": "2026-07-26T08:22:09Z",
           "workflow": "Dashboard Shell Diagnostic"
         },
         {
           "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759882",
-          "run_id": 30192759882,
-          "updated_at": "2026-07-26T07:25:03Z",
-          "workflow": "System3 Experimental Solution Planner"
-        },
-        {
-          "branch": "main",
-          "commit": "dec8c93be99673dad94ae71f59f7db67cda83c94",
+          "commit": "9a2b5115eb7ab23fd8b71ab7aed8481ce3022fa2",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192759876",
-          "run_id": 30192759876,
-          "updated_at": "2026-07-26T07:25:48Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194447214",
+          "run_id": 30194447214,
+          "updated_at": "2026-07-26T08:21:37Z",
           "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752922",
-          "run_id": 30192752922,
-          "updated_at": "2026-07-26T07:24:57Z",
-          "workflow": "Dashboard Shell Diagnostic"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406707",
+          "run_id": 30194406707,
+          "updated_at": "2026-07-26T08:21:04Z",
+          "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752889",
-          "run_id": 30192752889,
-          "updated_at": "2026-07-26T07:24:51Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406650",
+          "run_id": 30194406650,
+          "updated_at": "2026-07-26T08:19:24Z",
           "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752886",
-          "run_id": 30192752886,
-          "updated_at": "2026-07-26T07:24:48Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406647",
+          "run_id": 30194406647,
+          "updated_at": "2026-07-26T08:19:23Z",
           "workflow": "Dashboard Visual Proof Strict Gate"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752881",
-          "run_id": 30192752881,
-          "updated_at": "2026-07-26T07:24:57Z",
-          "workflow": "System3 1000 Point TODO Status Updater"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406640",
+          "run_id": 30194406640,
+          "updated_at": "2026-07-26T08:20:48Z",
+          "workflow": "Dashboard Shell Diagnostic"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752880",
-          "run_id": 30192752880,
-          "updated_at": "2026-07-26T07:24:49Z",
-          "workflow": "Dashboard Visual Loading Postflight"
-        },
-        {
-          "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752873",
-          "run_id": 30192752873,
-          "updated_at": "2026-07-26T07:25:30Z",
-          "workflow": "System3 Autopilot Proof Board"
-        },
-        {
-          "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752870",
-          "run_id": 30192752870,
-          "updated_at": "2026-07-26T07:25:06Z",
-          "workflow": "System3 Safe Repair Runner"
-        },
-        {
-          "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192752865",
-          "run_id": 30192752865,
-          "updated_at": "2026-07-26T07:25:04Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406630",
+          "run_id": 30194406630,
+          "updated_at": "2026-07-26T08:19:32Z",
           "workflow": "System3 Secure Install Credential Audit"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192751625",
-          "run_id": 30192751625,
-          "updated_at": "2026-07-26T07:24:42Z",
-          "workflow": "System3 Safe Repair Runner"
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406625",
+          "run_id": 30194406625,
+          "updated_at": "2026-07-26T08:19:25Z",
+          "workflow": "Dashboard Visual Loading Postflight"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "5b20ca09b2df0786e0bf095b3fe7522f8c6ea73f",
           "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192751603",
-          "run_id": 30192751603,
-          "updated_at": "2026-07-26T07:24:51Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194406059",
+          "run_id": 30194406059,
+          "updated_at": "2026-07-26T08:20:29Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "aa68057d8ec5f677711e54c8ee0e383ea926de3a",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194400569",
+          "run_id": 30194400569,
+          "updated_at": "2026-07-26T08:19:49Z",
+          "workflow": "Dashboard Visible Issue Tracker"
+        },
+        {
+          "branch": "main",
+          "commit": "aa68057d8ec5f677711e54c8ee0e383ea926de3a",
+          "conclusion": "failure",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194400547",
+          "run_id": 30194400547,
+          "updated_at": "2026-07-26T08:19:11Z",
           "workflow": "System3 Experimental Solution Planner"
         },
         {
           "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192751598",
-          "run_id": 30192751598,
-          "updated_at": "2026-07-26T07:25:28Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "f1ca2a5124b2f48323eb9fe574aeaee7adf86363",
+          "commit": "aa68057d8ec5f677711e54c8ee0e383ea926de3a",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192751567",
-          "run_id": 30192751567,
-          "updated_at": "2026-07-26T07:24:39Z",
-          "workflow": "Dashboard Visible Issue Tracker"
-        },
-        {
-          "branch": "main",
-          "commit": "b4e4cefbaa79a3bf77f504670c77f900c854df97",
-          "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192745809",
-          "run_id": 30192745809,
-          "updated_at": "2026-07-26T07:24:39Z",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194400533",
+          "run_id": 30194400533,
+          "updated_at": "2026-07-26T08:19:13Z",
           "workflow": "System3 Safe Repair Runner"
         },
         {
           "branch": "main",
-          "commit": "b4e4cefbaa79a3bf77f504670c77f900c854df97",
-          "conclusion": "failure",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192745790",
-          "run_id": 30192745790,
-          "updated_at": "2026-07-26T07:24:35Z",
-          "workflow": "System3 Experimental Solution Planner"
+          "commit": "aa68057d8ec5f677711e54c8ee0e383ea926de3a",
+          "conclusion": "cancelled",
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194398825",
+          "run_id": 30194398825,
+          "updated_at": "2026-07-26T08:19:01Z",
+          "workflow": "Dashboard Visible Issue Tracker"
         },
         {
           "branch": "main",
-          "commit": "b4e4cefbaa79a3bf77f504670c77f900c854df97",
+          "commit": "aa68057d8ec5f677711e54c8ee0e383ea926de3a",
           "conclusion": "cancelled",
-          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30192745787",
-          "run_id": 30192745787,
-          "updated_at": "2026-07-26T07:24:38Z",
-          "workflow": "Dashboard Visible Issue Tracker"
+          "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30194398805",
+          "run_id": 30194398805,
+          "updated_at": "2026-07-26T08:19:01Z",
+          "workflow": "System3 Safe Repair Runner"
         }
       ],
-      "generated_utc": "2026-07-26T07:46:43.547369Z",
-      "github_failed_count": 44,
+      "generated_utc": "2026-07-26T08:45:21.367219Z",
+      "github_failed_count": 42,
       "github_timeout_s": 12.0,
       "live_trading_enabled": false,
       "order_routes_called": false,
@@ -881,50 +863,48 @@
       "secrets_printed": false,
       "status": "BLOCKED",
       "todo": [
-        "Fix GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30193241879 conclusion=failure commit=4aef56a7b312",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30193224709 conclusion=failure commit=4aef56a7b312",
-        "Fix GitHub workflow 'Dashboard Visible Proof Current' run=30192851596 conclusion=failure commit=315a85fd22fc",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30192799099 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192799096 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30192799079 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30192799075 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192799071 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30192799070 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192799003 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192798995 conclusion=cancelled commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192798980 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192797577 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192797512 conclusion=cancelled commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192797494 conclusion=failure commit=1f83db0281e3",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192780280 conclusion=failure commit=098673a4327a",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192780276 conclusion=cancelled commit=098673a4327a",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192780273 conclusion=failure commit=098673a4327a",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30192775415 conclusion=failure commit=3e71bee886b3",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30192767352 conclusion=failure commit=a3ec46f963cc",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192762698 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30192762697 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30192762672 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30192759923 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30192759895 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30192759893 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30192759892 conclusion=cancelled commit=dec8c93be996",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192759882 conclusion=failure commit=dec8c93be996",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192759876 conclusion=cancelled commit=dec8c93be996",
-        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30192752922 conclusion=cancelled commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192752889 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30192752886 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30192752881 conclusion=cancelled commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30192752880 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30192752873 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192752870 conclusion=cancelled commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30192752865 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192751625 conclusion=cancelled commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192751603 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192751598 conclusion=failure commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192751567 conclusion=cancelled commit=f1ca2a5124b2",
-        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30192745809 conclusion=cancelled commit=b4e4cefbaa79",
-        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30192745790 conclusion=failure commit=b4e4cefbaa79",
-        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30192745787 conclusion=cancelled commit=b4e4cefbaa79",
+        "Fix GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30194971365 conclusion=failure commit=eadd0778980d",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30194965196 conclusion=failure commit=eadd0778980d",
+        "Fix GitHub workflow 'Dashboard Visible Proof Current' run=30194598976 conclusion=failure commit=b91b4602685b",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194493140 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194493136 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194493111 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30194492479 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30194492453 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194492439 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194492438 conclusion=cancelled commit=3e939c306503",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30194492435 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30194492427 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194492218 conclusion=cancelled commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194492196 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194492189 conclusion=failure commit=3e939c306503",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194473743 conclusion=failure commit=4c422fc7ce97",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194473742 conclusion=failure commit=4c422fc7ce97",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194473725 conclusion=cancelled commit=4c422fc7ce97",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30194472939 conclusion=failure commit=4c422fc7ce97",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30194459137 conclusion=failure commit=34a17f47a9f1",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194459134 conclusion=failure commit=34a17f47a9f1",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30194459130 conclusion=failure commit=34a17f47a9f1",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30194458118 conclusion=failure commit=34a17f47a9f1",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30194447283 conclusion=failure commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30194447257 conclusion=failure commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'System3 Autopilot Proof Board' run=30194447249 conclusion=failure commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30194447232 conclusion=failure commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194447228 conclusion=failure commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30194447224 conclusion=cancelled commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194447214 conclusion=cancelled commit=9a2b5115eb7a",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194406707 conclusion=cancelled commit=5b20ca09b2df",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194406650 conclusion=failure commit=5b20ca09b2df",
+        "Fix GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30194406647 conclusion=failure commit=5b20ca09b2df",
+        "Fix GitHub workflow 'Dashboard Shell Diagnostic' run=30194406640 conclusion=cancelled commit=5b20ca09b2df",
+        "Fix GitHub workflow 'System3 Secure Install Credential Audit' run=30194406630 conclusion=failure commit=5b20ca09b2df",
+        "Fix GitHub workflow 'Dashboard Visual Loading Postflight' run=30194406625 conclusion=failure commit=5b20ca09b2df",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194406059 conclusion=failure commit=5b20ca09b2df",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194400569 conclusion=failure commit=aa68057d8ec5",
+        "Fix GitHub workflow 'System3 Experimental Solution Planner' run=30194400547 conclusion=failure commit=aa68057d8ec5",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194400533 conclusion=cancelled commit=aa68057d8ec5",
+        "Fix GitHub workflow 'Dashboard Visible Issue Tracker' run=30194398825 conclusion=cancelled commit=aa68057d8ec5",
+        "Fix GitHub workflow 'System3 Safe Repair Runner' run=30194398805 conclusion=cancelled commit=aa68057d8ec5",
         "Fix Render endpoint /: HTTP status 0 status=0",
         "Fix Render endpoint /ui/: HTTP status 0 status=0",
         "Fix Render endpoint /api/health: HTTP status 0 status=0",
@@ -938,13 +918,13 @@
         "Fix Render endpoint /api/paper: HTTP status 0 status=0",
         "Fix Render endpoint /api/ml/performance: HTTP status 0 status=0"
       ],
-      "todo_count": 56,
+      "todo_count": 54,
       "tracker_internal_status": "PASS",
       "exists": true,
       "path": "C:\\actions-runner-genesis\\_work\\Genesis_System3\\Genesis_System3\\reports\\latest\\github_render_failure_tracker\\summary.json"
     },
     "dashboard_visible_issue_tracker": {
-      "generated_at": "2026-07-26T07:46:45.230Z",
+      "generated_at": "2026-07-26T08:45:22.967Z",
       "base": "http://127.0.0.1:8000",
       "status": "BLOCKED",
       "auth": null,
@@ -1263,7 +1243,7 @@
     {
       "name": "C:\\Python310\\python.exe scripts/system3_gate_evaluator.py --sync-gates",
       "status": "PASS",
-      "detail": "rc=0 elapsed=12.12s"
+      "detail": "rc=0 elapsed=4.04s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_auto_coordinator.py --full",
@@ -1273,17 +1253,17 @@
     {
       "name": "C:\\Python310\\python.exe tools/system3_github_render_failure_tracker.py",
       "status": "PASS",
-      "detail": "rc=0 elapsed=25.98s"
+      "detail": "rc=0 elapsed=28.81s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/dashboard_visible_issue_tracker.mjs",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=1.71s"
+      "detail": "rc=1 elapsed=1.64s"
     },
     {
       "name": "C:\\Python310\\python.exe tools/system3_autopilot_proof_board.py",
       "status": "BLOCKED",
-      "detail": "rc=1 elapsed=0.57s"
+      "detail": "rc=1 elapsed=0.39s"
     },
     {
       "name": "HTTP /api/health",
