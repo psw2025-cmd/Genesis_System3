@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-26T15:30:24.812281+00:00`
+Generated UTC: `2026-07-26T15:39:46.430347+00:00`
 Status: **BLOCKED**
-Issues: `444`
+Issues: `478`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 215 issues
+### GITHUB_RENDER_FAILURE — 257 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -273,29 +273,28 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### WORKFLOW_CI — 20 issues
+### INSTALL_CREDENTIAL — 14 issues
 
 Recommended fixes:
-- Read workflow_failure_tracker TODO.
-- Fix failing workflow logs one by one.
-- Keep failed workflows in TODO until later successful run proves fixed.
+- Fix dependency/import/compile errors from secure audit.
+- Verify credentials via redacted secure env checks only.
+- Never print or commit credential values.
 
 Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207562426 conclusion=cancelled commit=8ef914384cd53936bdf3faa7c2b96e8d6ebf79c3
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207521249 conclusion=cancelled commit=37492963863173c2b0121257b9ba45a15ee97bb4
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207491058 conclusion=cancelled commit=e670f8a27d7dde14293ed5c4816101f7622bbd10
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207456919 conclusion=cancelled commit=2c837a1fd473bca1060de9bad54f28bafc1b3ebb
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207376025 conclusion=cancelled commit=cc7526fee3bcd09e7e04a60958c32df336848f4f
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30207335578 conclusion=cancelled commit=02652b273e13505be588e9a89d825da17a3d89f8
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "8ef914384cd53936bdf3faa7c2b96e8d6ebf79c3", "conclusion": "cancelled", "created_at": "2026-07-26T15:08:22Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30207562426", "run_id": 30207562426, "updated_at": "2026-07-26T15:09:15Z", "workflow": "Genesis System3 Global Safety CI"}
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "37492963863173c2b0121257b9ba45a15ee97bb4", "conclusion": "cancelled", "created_at": "2026-07-26T15:07:09Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30207521249", "run_id": 30207521249, "updated_at": "2026-07-26T15:08:23Z", "workflow": "Genesis System3 Global Safety CI"}
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID
+- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066239507 conclusion=failure commit=bd9f3e780162fd2342e6fe878ef1f8fe95b4fc8b
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066227594 conclusion=failure commit=a20f46745dfa5bf8597afd5522a1b3afed1c8c36
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066209847 conclusion=failure commit=6b78e22c456c5ba36a1c672f31c954bf508d21b2
+- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066156338 conclusion=failure commit=4f4f39da04969104e109d25402f0b111f99d0551
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30208337739 conclusion=failure commit=991fbf1d36b8b21ca4434eedf8a30c5b40f1f54b
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30208284793 conclusion=failure commit=e77151970765ad253f035d30702861e39ac0a0b0
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30208270487 conclusion=failure commit=2bfde3387f57792782161c1cd5a916030f28f1ec
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30208208704 conclusion=failure commit=78f8ecb5882470659e12383b3d1a7b4c8cd18413
 
 ### ML_TRAINING — 13 issues
 
@@ -338,25 +337,6 @@ Top issues:
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=12
 
-### INSTALL_CREDENTIAL — 10 issues
-
-Recommended fixes:
-- Fix dependency/import/compile errors from secure audit.
-- Verify credentials via redacted secure env checks only.
-- Never print or commit credential values.
-
-Top issues:
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID
-- `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066239507 conclusion=failure commit=bd9f3e780162fd2342e6fe878ef1f8fe95b4fc8b
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066227594 conclusion=failure commit=a20f46745dfa5bf8597afd5522a1b3afed1c8c36
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066209847 conclusion=failure commit=6b78e22c456c5ba36a1c672f31c954bf508d21b2
-- `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066156338 conclusion=failure commit=4f4f39da04969104e109d25402f0b111f99d0551
-
 ### ROUTE_CODE — 9 issues
 
 Recommended fixes:
@@ -374,6 +354,23 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: parallel_root_cause_audit: Trading router may be inactive if app.py duplicate routes are authoritative.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Trading router may be inactive if app.py duplicate routes are authoritative.
+
+### WORKFLOW_CI — 8 issues
+
+Recommended fixes:
+- Read workflow_failure_tracker TODO.
+- Fix failing workflow logs one by one.
+- Keep failed workflows in TODO until later successful run proves fixed.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=41
 
 ### PAPER_LIFECYCLE — 7 issues
 
