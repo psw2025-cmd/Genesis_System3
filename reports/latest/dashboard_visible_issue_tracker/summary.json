@@ -1,8 +1,11 @@
 {
-  "generated_at": "2026-07-26T18:24:43.920Z",
+  "generated_at": "2026-07-26T18:26:55.000Z",
   "base": "http://127.0.0.1:8000",
   "status": "BLOCKED",
-  "auth": null,
+  "auth": {
+    "ok": false,
+    "status": 0
+  },
   "tabs": [],
   "expected_tab_count": 16,
   "visible_issue_count": 0,
