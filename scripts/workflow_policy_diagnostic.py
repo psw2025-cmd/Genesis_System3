@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
+OUTPUT = ROOT / "reports" / "latest" / "workflow_policy_diagnostic" / "summary.json"
 RULES = {
     "write_permission": re.compile(r"contents:\s*write|actions:\s*write|packages:\s*write|pull-requests:\s*write|issues:\s*write", re.I),
     "auto_write": re.compile(r"git\s+push|gh\s+pr\s+merge|gh\s+release|create-pull-request|peter-evans/create-pull-request|--auto-fix|auto_fix|autofix", re.I),
@@ -30,6 +31,8 @@ def main() -> int:
                         "text": line.strip()[:300],
                     })
     payload = {"workflow_files": len(files), "finding_count": len(findings), "findings": findings}
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
 
