@@ -7,6 +7,7 @@ on:
       - "scripts/system3_full_nonlive_inventory.py"
       - "scripts/capture_dashboard_proof.py"
       - "scripts/inject_live_simulation_routes.py"
+      - "scripts/inject_research_proof_routes.py"
       - ".github/workflows/system3-full-nonlive-proof.yml"
   workflow_dispatch:
 
@@ -70,13 +71,15 @@ jobs:
           echo $? > "$PROOF_ROOT/playwright_install.exit"
           exit 0
 
-      - name: Inject isolated analyzer-only simulation routes
+      - name: Inject isolated analyzer-only simulation and research routes
         continue-on-error: true
         run: |
           set +e
           python scripts/inject_live_simulation_routes.py > "$PROOF_ROOT/logs/simulation_route_inject.log" 2>&1
           echo $? > "$PROOF_ROOT/simulation_route_inject.exit"
-          git diff --numstat dashboard/backend/app.py > "$PROOF_ROOT/simulation_route_inject.numstat"
+          python scripts/inject_research_proof_routes.py > "$PROOF_ROOT/logs/research_route_inject.log" 2>&1
+          echo $? > "$PROOF_ROOT/research_route_inject.exit"
+          git diff --numstat dashboard/backend/app.py > "$PROOF_ROOT/route_inject.numstat"
           exit 0
 
       - name: Python compile proof
@@ -145,6 +148,7 @@ jobs:
               "/api/health", "/api/qc", "/api/signal/top", "/api/positions",
               "/api/pnl", "/api/perf", "/api/audit/secrets",
               "/api/simulation/live/state?scenario=trend",
+              "/api/research/model-proof",
           ]
           rows = []
           for endpoint in endpoints:
@@ -156,9 +160,10 @@ jobs:
                   body_file = output / f"{safe_name}.body"
                   body_file.write_bytes(body)
                   try:
-                      response.json()
+                      payload = response.json()
                       json_valid = True
                   except Exception:
+                      payload = None
                       json_valid = False
                   rows.append({
                       "endpoint": endpoint,
@@ -168,6 +173,7 @@ jobs:
                       "sha256": hashlib.sha256(body).hexdigest(),
                       "content_type": response.headers.get("content-type", ""),
                       "json_valid": json_valid,
+                      "payload_status": payload.get("status") if isinstance(payload, dict) else None,
                   })
               except Exception as error:
                   rows.append({
@@ -227,6 +233,7 @@ jobs:
               "npm_ci_exit": read_int("npm_ci.exit"),
               "playwright_install_exit": read_int("playwright_install.exit"),
               "simulation_route_inject_exit": read_int("simulation_route_inject.exit"),
+              "research_route_inject_exit": read_int("research_route_inject.exit"),
               "compile_exit": read_int("compileall.exit"),
               "pytest_collect_exit": read_int("pytest_collect.exit"),
               "pytest_collected": int(matches[-1]) if matches else None,
@@ -248,6 +255,7 @@ jobs:
               "inventory_missing_files": inventory.get("missing_tracked_files", -1),
               "dependency_install_exit": summary["dependency_install_exit"],
               "simulation_route_inject_exit": summary["simulation_route_inject_exit"],
+              "research_route_inject_exit": summary["research_route_inject_exit"],
               "compile_exit": summary["compile_exit"],
               "pytest_full_exit": summary["pytest_full_exit"],
               "frontend_build_exit": summary["frontend_build_exit"],
@@ -264,6 +272,7 @@ jobs:
               critical["inventory_missing_files"] == 0,
               critical["dependency_install_exit"] == 0,
               critical["simulation_route_inject_exit"] == 0,
+              critical["research_route_inject_exit"] == 0,
               critical["compile_exit"] == 0,
               critical["pytest_full_exit"] == 0,
               critical["frontend_build_exit"] == 0,
@@ -275,8 +284,8 @@ jobs:
               critical["ui_page_errors"] == 0,
               critical["ui_http_non_2xx"] == 0,
           ])
-          summary["critical_gate_count"] = 13
-          summary["status"] = "PASS" if summary["critical_pass_count"] == 13 else "FAIL"
+          summary["critical_gate_count"] = 14
+          summary["status"] = "PASS" if summary["critical_pass_count"] == 14 else "FAIL"
           (root / "full_system_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
