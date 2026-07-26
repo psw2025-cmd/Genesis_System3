@@ -70,10 +70,21 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
     if limit:
         records = records[:limit]
     counters = {
-        "files_checked": 0, "rows_checked": 0, "sha_mismatches": 0, "missing_files": 0,
-        "unreadable_files": 0, "empty_files": 0, "duplicate_rows": 0, "invalid_ohlc_rows": 0,
-        "negative_volume_oi_rows": 0, "missing_required_column_files": 0,
-        "missing_ohlc_schema_files": 0, "missing_volume_oi_schema_files": 0,
+        "files_checked": 0,
+        "rows_checked": 0,
+        "sha_mismatches": 0,
+        "missing_files": 0,
+        "unreadable_files": 0,
+        "empty_files": 0,
+        "duplicate_rows": 0,
+        "traded_rows_checked": 0,
+        "no_trade_rows": 0,
+        "partial_traded_ohlc_rows": 0,
+        "invalid_traded_ohlc_rows": 0,
+        "negative_volume_oi_rows": 0,
+        "missing_required_column_files": 0,
+        "missing_ohlc_schema_files": 0,
+        "missing_volume_oi_schema_files": 0,
     }
     for record in records:
         path = Path(str(record.get("path") or ""))
@@ -101,29 +112,37 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         high_col = pick_column(frame, ("high", "HghPric", "HIGH"))
         low_col = pick_column(frame, ("low", "LwPric", "LOW"))
         close_col = pick_column(frame, ("close", "ClsPric", "CLOSE"))
+        volume_col = pick_column(frame, ("volume", "TtlTradgVol", "CONTRACTS"))
+        oi_col = pick_column(frame, ("oi", "OpnIntrst", "OPEN_INT"))
+
+        if not volume_col or not oi_col:
+            counters["missing_volume_oi_schema_files"] += 1
+        volume = pd.to_numeric(frame[volume_col], errors="coerce") if volume_col else pd.Series(0, index=frame.index)
+        oi = pd.to_numeric(frame[oi_col], errors="coerce") if oi_col else pd.Series(0, index=frame.index)
+        counters["negative_volume_oi_rows"] += int(((volume < 0) | (oi < 0)).fillna(False).sum())
+
         if all((open_col, high_col, low_col, close_col)):
             ohlc = frame[[open_col, high_col, low_col, close_col]].apply(pd.to_numeric, errors="coerce")
             ohlc.columns = ["open", "high", "low", "close"]
-            invalid = (
+            traded = volume.fillna(0) > 0
+            counters["traded_rows_checked"] += int(traded.sum())
+            counters["no_trade_rows"] += int((~traded).sum())
+
+            complete_traded = traded & ohlc.notna().all(axis=1) & (ohlc > 0).all(axis=1)
+            partial_traded = traded & ~complete_traded
+            invalid_traded = complete_traded & (
                 (ohlc["high"] < ohlc[["open", "close", "low"]].max(axis=1))
                 | (ohlc["low"] > ohlc[["open", "close", "high"]].min(axis=1))
-                | (ohlc < 0).any(axis=1)
             )
-            counters["invalid_ohlc_rows"] += int(invalid.fillna(False).sum())
+            counters["partial_traded_ohlc_rows"] += int(partial_traded.sum())
+            counters["invalid_traded_ohlc_rows"] += int(invalid_traded.sum())
         else:
             counters["missing_ohlc_schema_files"] += 1
 
-        volume_col = pick_column(frame, ("volume", "TtlTradgVol", "CONTRACTS"))
-        oi_col = pick_column(frame, ("oi", "OpnIntrst", "OPEN_INT"))
-        if not volume_col or not oi_col:
-            counters["missing_volume_oi_schema_files"] += 1
-        for column in (volume_col, oi_col):
-            if column:
-                counters["negative_volume_oi_rows"] += int(
-                    (pd.to_numeric(frame[column], errors="coerce") < 0).fillna(False).sum()
-                )
-    failures = sum(value for key, value in counters.items() if key not in {"files_checked", "rows_checked"})
+    non_failure_metrics = {"files_checked", "rows_checked", "traded_rows_checked", "no_trade_rows"}
+    failures = sum(value for key, value in counters.items() if key not in non_failure_metrics)
     return {
         "status": "PASS" if failures == 0 and counters["files_checked"] > 0 else "FAIL",
-        "manifest_valid_records": len(records), **counters,
+        "manifest_valid_records": len(records),
+        **counters,
     }
