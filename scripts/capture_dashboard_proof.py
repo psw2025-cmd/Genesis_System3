@@ -10,6 +10,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from playwright.sync_api import sync_playwright
 
@@ -27,6 +28,11 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def normalized_url(url: str) -> str:
+    parts = urlsplit(url)
+    return f"{parts.scheme}://{parts.netloc}{parts.path}" + (f"?{parts.query}" if parts.query else "")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:3000")
@@ -40,7 +46,7 @@ def main() -> int:
     console_errors: list[str] = []
     page_errors: list[str] = []
     failed_requests: list[dict[str, str]] = []
-    response_statuses: dict[str, int] = {}
+    responses: list[dict[str, object]] = []
     tab_results: list[dict[str, object]] = []
 
     with sync_playwright() as playwright:
@@ -50,11 +56,16 @@ def main() -> int:
         page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
         page.on("pageerror", lambda error: page_errors.append(str(error)))
         page.on("requestfailed", lambda request: failed_requests.append({
-            "url": request.url,
+            "url": normalized_url(request.url),
             "failure": str(request.failure),
             "method": request.method,
         }))
-        page.on("response", lambda response: response_statuses.__setitem__(response.url, response.status))
+        page.on("response", lambda response: responses.append({
+            "url": normalized_url(response.url),
+            "status": response.status,
+            "method": response.request.method,
+            "resource_type": response.request.resource_type,
+        }))
 
         navigation = page.goto(args.url, wait_until="domcontentloaded", timeout=args.timeout_ms)
         page.wait_for_selector('[data-dashboard-navigation="sidebar"]', timeout=args.timeout_ms)
@@ -64,19 +75,24 @@ def main() -> int:
 
         for tab in TABS:
             started_errors = len(console_errors) + len(page_errors)
+            started_responses = len(responses)
             selector = f'[data-dashboard-tab="{tab}"]'
             result: dict[str, object] = {"tab": tab, "selector": selector}
             try:
                 page.locator(selector).click(timeout=10000)
-                page.wait_for_timeout(1200)
+                page.wait_for_timeout(1500)
                 path = shots / f"{tab}.png"
                 page.screenshot(path=str(path), full_page=False)
+                tab_responses = responses[started_responses:]
                 result.update({
                     "status": "PASS",
                     "screenshot": str(path),
                     "bytes": path.stat().st_size,
                     "sha256": sha256(path),
                     "new_browser_errors": len(console_errors) + len(page_errors) - started_errors,
+                    "new_http_responses": len(tab_responses),
+                    "new_non_2xx_responses": sum(not 200 <= int(item["status"]) < 300 for item in tab_responses),
+                    "non_2xx_responses": [item for item in tab_responses if not 200 <= int(item["status"]) < 300][:100],
                 })
             except Exception as error:
                 result.update({"status": "FAIL", "error": f"{type(error).__name__}: {error}"})
@@ -87,6 +103,15 @@ def main() -> int:
         browser.close()
 
     passed = sum(result["status"] == "PASS" for result in tab_results)
+    non_2xx = [item for item in responses if not 200 <= int(item["status"]) < 300]
+    status_counts = {
+        str(status): sum(int(item["status"]) == status for item in responses)
+        for status in sorted({int(item["status"]) for item in responses})
+    }
+    non_2xx_url_counts: dict[str, int] = {}
+    for item in non_2xx:
+        key = f"{item['method']} {item['status']} {item['url']}"
+        non_2xx_url_counts[key] = non_2xx_url_counts.get(key, 0) + 1
     summary = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "url": args.url,
@@ -99,15 +124,15 @@ def main() -> int:
         "console_error_count": len(console_errors),
         "page_error_count": len(page_errors),
         "failed_request_count": len(failed_requests),
-        "http_response_count": len(response_statuses),
-        "http_status_counts": {
-            str(status): sum(value == status for value in response_statuses.values())
-            for status in sorted(set(response_statuses.values()))
-        },
+        "http_response_count": len(responses),
+        "http_non_2xx_count": len(non_2xx),
+        "http_status_counts": status_counts,
+        "non_2xx_url_counts": dict(sorted(non_2xx_url_counts.items())),
+        "non_2xx_responses": non_2xx[:300],
         "tab_results": tab_results,
-        "console_errors": console_errors[:200],
-        "page_errors": page_errors[:200],
-        "failed_requests": failed_requests[:200],
+        "console_errors": console_errors[:300],
+        "page_errors": page_errors[:300],
+        "failed_requests": failed_requests[:300],
         "final_html": str(html_path),
         "final_html_sha256": sha256(html_path),
         "live_trading_enabled": False,
