@@ -99,7 +99,8 @@ def enrich_day(day: pd.DataFrame, prior: pd.DataFrame | None) -> pd.DataFrame:
     weekday, month = out["trade_date"].dt.weekday, out["trade_date"].dt.month
     out["weekday_sin"], out["weekday_cos"] = np.sin(2 * np.pi * weekday / 7), np.cos(2 * np.pi * weekday / 7)
     out["month_sin"], out["month_cos"] = np.sin(2 * np.pi * month / 12), np.cos(2 * np.pi * month / 12)
-    for column in ["prev_close_return", "prev_volume_change", "prev_oi_change", "underlying_return"]:
+    lag_features = ["prev_close_return", "prev_volume_change", "prev_oi_change", "underlying_return"]
+    for column in lag_features:
         out[column] = 0.0
     if prior is not None and not prior.empty:
         lag = prior[KEY_COLUMNS + ["close", "volume", "oi", "underlying_price"]].rename(columns={
@@ -110,7 +111,10 @@ def enrich_day(day: pd.DataFrame, prior: pd.DataFrame | None) -> pd.DataFrame:
         out["prev_volume_change"] = out["volume"] / out["lag_volume"].replace(0, np.nan) - 1
         out["prev_oi_change"] = out["oi"] / out["lag_oi"].replace(0, np.nan) - 1
         out["underlying_return"] = out["underlying_price"] / out["lag_underlying_price"].replace(0, np.nan) - 1
-    return out.replace([np.inf, -np.inf], np.nan)
+    out = out.replace([np.inf, -np.inf], np.nan)
+    out[lag_features] = out[lag_features].fillna(0.0).clip(lower=-10.0, upper=10.0)
+    out["moneyness_pct"] = out["moneyness_pct"].fillna(0.0).clip(lower=-5.0, upper=5.0)
+    return out
 
 
 def generate_features(data_root: Path, feature_root: Path, base_cost_bps: float) -> dict:
