@@ -36,9 +36,7 @@ class Manifest:
     def upsert(self, **row: object) -> None:
         values = [row.get(column) for column in self.COLUMNS]
         marks = ",".join("?" for _ in self.COLUMNS)
-        self.db.execute(
-            f"INSERT OR REPLACE INTO objects ({','.join(self.COLUMNS)}) VALUES ({marks})", values,
-        )
+        self.db.execute(f"INSERT OR REPLACE INTO objects ({','.join(self.COLUMNS)}) VALUES ({marks})", values)
         self.db.commit()
 
     def records(self) -> list[dict]:
@@ -62,6 +60,11 @@ def read_data_file(path: Path) -> pd.DataFrame:
     raise ValueError(f"unsupported data file: {path}")
 
 
+def pick_column(frame: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
+    mapping = {str(column).lower(): str(column) for column in frame.columns}
+    return next((mapping[name.lower()] for name in candidates if name.lower() in mapping), None)
+
+
 def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
     records = [row for row in manifest.records() if row.get("status") in {"DOWNLOADED", "EXISTS_VALID"}]
     if limit:
@@ -70,6 +73,7 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         "files_checked": 0, "rows_checked": 0, "sha_mismatches": 0, "missing_files": 0,
         "unreadable_files": 0, "empty_files": 0, "duplicate_rows": 0, "invalid_ohlc_rows": 0,
         "negative_volume_oi_rows": 0, "missing_required_column_files": 0,
+        "missing_ohlc_schema_files": 0, "missing_volume_oi_schema_files": 0,
     }
     for record in records:
         path = Path(str(record.get("path") or ""))
@@ -92,16 +96,29 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         if record.get("source") == "DHAN_ROLLING":
             missing = set(REQUIRED_DATA + ["timestamp", "underlying", "option_type"]) - set(frame.columns)
             counters["missing_required_column_files"] += int(bool(missing))
-        if {"open", "high", "low", "close"}.issubset(frame.columns):
-            ohlc = frame[["open", "high", "low", "close"]].apply(pd.to_numeric, errors="coerce")
+
+        open_col = pick_column(frame, ("open", "OpnPric", "OPEN"))
+        high_col = pick_column(frame, ("high", "HghPric", "HIGH"))
+        low_col = pick_column(frame, ("low", "LwPric", "LOW"))
+        close_col = pick_column(frame, ("close", "ClsPric", "CLOSE"))
+        if all((open_col, high_col, low_col, close_col)):
+            ohlc = frame[[open_col, high_col, low_col, close_col]].apply(pd.to_numeric, errors="coerce")
+            ohlc.columns = ["open", "high", "low", "close"]
             invalid = (
                 (ohlc["high"] < ohlc[["open", "close", "low"]].max(axis=1))
                 | (ohlc["low"] > ohlc[["open", "close", "high"]].min(axis=1))
                 | (ohlc < 0).any(axis=1)
             )
             counters["invalid_ohlc_rows"] += int(invalid.fillna(False).sum())
-        for column in ("volume", "oi"):
-            if column in frame.columns:
+        else:
+            counters["missing_ohlc_schema_files"] += 1
+
+        volume_col = pick_column(frame, ("volume", "TtlTradgVol", "CONTRACTS"))
+        oi_col = pick_column(frame, ("oi", "OpnIntrst", "OPEN_INT"))
+        if not volume_col or not oi_col:
+            counters["missing_volume_oi_schema_files"] += 1
+        for column in (volume_col, oi_col):
+            if column:
                 counters["negative_volume_oi_rows"] += int(
                     (pd.to_numeric(frame[column], errors="coerce") < 0).fillna(False).sum()
                 )
