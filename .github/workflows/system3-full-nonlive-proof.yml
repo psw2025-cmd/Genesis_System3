@@ -26,6 +26,7 @@ jobs:
       SYSTEM3_LIVE_TRADING_ALLOWED: "0"
       SYSTEM3_MODE: "PAPER"
       ANALYZE_MODE: "1"
+      VITE_API_BASE_URL: "http://127.0.0.1:8000"
       DEV_PROXY_TARGET: "http://127.0.0.1:8000"
       PROOF_ROOT: "reports/latest/system3_full_nonlive_proof"
     steps:
@@ -176,12 +177,12 @@ jobs:
           (output / "api_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
-      - name: Start frontend development server
+      - name: Start built frontend production preview
         continue-on-error: true
         run: |
           set +e
           cd dashboard/frontend
-          nohup npm run dev -- --host 127.0.0.1 --port 3000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_error.log" &
+          nohup npm run preview -- --host 127.0.0.1 --port 3000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_error.log" &
           echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/frontend.pid"
           cd "$GITHUB_WORKSPACE"
           code=0
@@ -257,6 +258,9 @@ jobs:
               "backend_health_status": summary["backend_health_status"],
               "api_non_200": api.get("non_200_count", -1),
               "ui_tabs_failed": ui.get("tabs_failed", -1),
+              "ui_console_errors": ui.get("console_error_count", -1),
+              "ui_page_errors": ui.get("page_error_count", -1),
+              "ui_http_non_2xx": ui.get("http_non_2xx_count", -1),
           }
           summary["critical_gates"] = critical
           summary["critical_pass_count"] = sum([
@@ -268,9 +272,12 @@ jobs:
               critical["backend_health_status"] == 200,
               critical["api_non_200"] == 0,
               critical["ui_tabs_failed"] == 0,
+              critical["ui_console_errors"] == 0,
+              critical["ui_page_errors"] == 0,
+              critical["ui_http_non_2xx"] == 0,
           ])
-          summary["critical_gate_count"] = 8
-          summary["status"] = "PASS" if summary["critical_pass_count"] == 8 else "FAIL"
+          summary["critical_gate_count"] = 11
+          summary["status"] = "PASS" if summary["critical_pass_count"] == 11 else "FAIL"
           (root / "full_system_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
