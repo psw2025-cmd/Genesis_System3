@@ -9,8 +9,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
+import traceback
 from collections import Counter
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -151,7 +157,7 @@ def profile_archive(data_root: Path) -> dict:
                 "error": f"{type(exc).__name__}: {exc}",
             })
 
-    result = {
+    return {
         "status": "PASS" if not file_errors else "FAIL",
         "files": len(files),
         "files_profiled": len(files) - len(file_errors),
@@ -178,7 +184,6 @@ def profile_archive(data_root: Path) -> dict:
         "average_columns_read_per_file": columns_read_total / len(files) if files else 0.0,
         "all_columns_loaded": False,
     }
-    return result
 
 
 def main() -> int:
@@ -186,8 +191,16 @@ def main() -> int:
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    result = profile_archive(args.data_root)
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        result = profile_archive(args.data_root)
+    except BaseException as exc:
+        result = {
+            "status": "FATAL",
+            "fatal_error": f"{type(exc).__name__}: {exc}",
+            "traceback": traceback.format_exc(),
+            "data_root": str(args.data_root),
+        }
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result["status"] == "PASS" else 2
