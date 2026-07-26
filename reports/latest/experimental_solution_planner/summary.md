@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-26T14:33:54.719952+00:00`
+Generated UTC: `2026-07-26T14:35:54.699627+00:00`
 Status: **BLOCKED**
-Issues: `460`
+Issues: `461`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30204820023 conclusion=failure commit=ebf552ee744e
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30205003852 conclusion=failure commit=62bdf022ed96
 
-### UI_RED_VISUAL — 49 issues
+### UI_RED_VISUAL — 50 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
