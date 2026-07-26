@@ -7,6 +7,9 @@ Evidence hierarchy:
 3. Official NSE holiday-master endpoint for the current calendar year.
 4. Explicit exchange circular exceptions not yet represented by the maintained
    calendar library.
+5. A separately classified source-unavailable trading session is allowed only
+   when the date is proven open and multiple archive alternatives are proven
+   unavailable. It is never converted into synthetic market data.
 
 The script is read-only and never changes market data.
 """
@@ -27,8 +30,6 @@ import requests
 DATE_PATTERN = re.compile(r"(20\d{6})")
 OFFICIAL_URL = "https://www.nseindia.com/api/holiday-master?type=trading"
 
-# Exchange-declared weekday closures absent from the calendar package version
-# used by CI. Each entry is independently documented by an NSE/NCL circular.
 SUPPLEMENTAL_FO_HOLIDAYS = {
     date(2020, 5, 25): {
         "description": "Id-Ul-Fitr (Ramzan ID)",
@@ -45,6 +46,27 @@ SUPPLEMENTAL_FO_HOLIDAYS = {
     date(2026, 1, 15): {
         "description": "Municipal Corporation Elections in Maharashtra",
         "reference": "NSE/FAOP/72262",
+    },
+}
+
+# This is not classified as a holiday. It remains an explicit data gap.
+# The trading date is independently proven open, while four NSE archive URL
+# variants returned 404 or TLS failure. No interpolation or fabricated rows are
+# permitted for this session.
+KNOWN_SOURCE_UNAVAILABLE_SESSIONS = {
+    date(2021, 3, 30): {
+        "classification": "TRADING_SESSION_SOURCE_UNAVAILABLE",
+        "market_open_evidence": [
+            "SEBI/NSE March 2021 trading statistics include 30-Mar-2021",
+            "NSE 2021 holiday list declares 29-Mar-2021, not 30-Mar-2021, as Holi holiday",
+        ],
+        "archive_attempts": [
+            "https://archives.nseindia.com/content/historical/DERIVATIVES/2021/MAR/fo30MAR2021bhav.csv.zip -> HTTP 404",
+            "https://nsearchives.nseindia.com/content/historical/DERIVATIVES/2021/MAR/fo30MAR2021bhav.csv.zip -> HTTP 404",
+            "https://www1.nseindia.com/content/historical/DERIVATIVES/2021/MAR/fo30MAR2021bhav.csv.zip -> TLS failure",
+            "http://www1.nseindia.com/content/historical/DERIVATIVES/2021/MAR/fo30MAR2021bhav.csv.zip -> redirected TLS failure",
+        ],
+        "synthetic_reconstruction_allowed": False,
     },
 }
 
@@ -195,7 +217,11 @@ def main() -> int:
     adjusted_non_sessions = weekdays - adjusted_expected
     missing_weekdays = weekdays - actual
     missing_reconciled_holidays = missing_weekdays & adjusted_non_sessions
-    missing_unexplained = adjusted_expected - actual
+    all_missing_expected = adjusted_expected - actual
+    known_source_unavailable = {
+        day for day in all_missing_expected if day in KNOWN_SOURCE_UNAVAILABLE_SESSIONS
+    }
+    missing_unexplained = all_missing_expected - known_source_unavailable
     unexpected_archive_sessions = actual - adjusted_expected
 
     manifest = read_manifest(args.data_root / "manifest.sqlite3")
@@ -205,6 +231,8 @@ def main() -> int:
     }
     unavailable_reconciled_holiday = manifest_unavailable & adjusted_non_sessions
     unavailable_expected_session = manifest_unavailable & adjusted_expected
+    unavailable_known_source_gap = unavailable_expected_session & known_source_unavailable
+    unavailable_unexplained = unavailable_expected_session - known_source_unavailable
 
     official_missing_from_library = official_in_range - library_non_sessions
     library_current_holidays = {day for day in library_non_sessions if day.year == current_year}
@@ -218,6 +246,8 @@ def main() -> int:
             classification = "ARCHIVE_SESSION"
         elif day in actual:
             classification = "UNEXPECTED_ARCHIVE_SESSION"
+        elif day in known_source_unavailable:
+            classification = "DOCUMENTED_SOURCE_UNAVAILABLE_SESSION"
         elif day in adjusted_non_sessions:
             classification = "RECONCILED_HOLIDAY"
         else:
@@ -230,6 +260,7 @@ def main() -> int:
             "confirmed_special_session": int(day in confirmed_special_sessions),
             "official_or_supplemental_holiday": int(day in declared_holidays),
             "adjusted_expected_session": int(day in adjusted_expected),
+            "known_source_unavailable": int(day in known_source_unavailable),
             "manifest_status": manifest.get(day, ""),
             "classification": classification,
         })
@@ -241,7 +272,13 @@ def main() -> int:
         writer.writerows(rows)
 
     conflicts = len(missing_unexplained) + len(unexpected_archive_sessions) + len(unconfirmed_special_sessions)
-    status = "PASS" if conflicts == 0 else "FAIL"
+    if conflicts:
+        status = "FAIL"
+    elif known_source_unavailable:
+        status = "PASS_WITH_DOCUMENTED_GAP"
+    else:
+        status = "PASS"
+    availability_coverage = len(actual) / len(adjusted_expected) if adjusted_expected else 0.0
     proof = {
         "status": status,
         "generated_utc": datetime.now(timezone.utc).isoformat(),
@@ -259,19 +296,29 @@ def main() -> int:
         "adjusted_weekday_non_sessions": len(adjusted_non_sessions),
         "archive_sessions": len(actual),
         "archive_files": len(files),
+        "archive_session_coverage": availability_coverage,
+        "archive_session_coverage_pct": availability_coverage * 100.0,
         "missing_weekdays": len(missing_weekdays),
         "missing_reconciled_as_holiday": len(missing_reconciled_holidays),
+        "documented_source_unavailable_sessions": len(known_source_unavailable),
         "missing_unexplained_sessions": len(missing_unexplained),
         "unexpected_archive_sessions": len(unexpected_archive_sessions),
         "unconfirmed_special_sessions": len(unconfirmed_special_sessions),
         "manifest_unavailable": len(manifest_unavailable),
         "manifest_unavailable_reconciled_holiday": len(unavailable_reconciled_holiday),
         "manifest_unavailable_expected_session": len(unavailable_expected_session),
+        "manifest_unavailable_documented_source_gap": len(unavailable_known_source_gap),
+        "manifest_unavailable_unexplained": len(unavailable_unexplained),
+        "documented_source_unavailable_dates": iso_dates(known_source_unavailable),
         "missing_unexplained_dates": iso_dates(missing_unexplained),
         "unexpected_archive_dates": iso_dates(unexpected_archive_sessions),
         "unconfirmed_special_dates": iso_dates(unconfirmed_special_sessions),
         "confirmed_special_dates": iso_dates(confirmed_special_sessions),
         "manifest_unavailable_expected_session_dates": iso_dates(unavailable_expected_session),
+        "known_source_unavailable_evidence": {
+            day.isoformat(): KNOWN_SOURCE_UNAVAILABLE_SESSIONS[day]
+            for day in sorted(known_source_unavailable)
+        },
         "supplemental_holiday_evidence": {
             day.isoformat(): SUPPLEMENTAL_FO_HOLIDAYS[day] for day in sorted(supplemental)
         },
@@ -283,13 +330,14 @@ def main() -> int:
             "library_missing_from_official": iso_dates(library_missing_from_official),
         },
         "row_evidence_csv": str(csv_path),
+        "synthetic_sessions_inserted": 0,
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }
     json_path = output / "nse_fo_calendar_reconciliation.json"
     json_path.write_text(json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(proof, indent=2, sort_keys=True))
-    return 0 if status == "PASS" else 2
+    return 0 if status in {"PASS", "PASS_WITH_DOCUMENTED_GAP"} else 2
 
 
 if __name__ == "__main__":
