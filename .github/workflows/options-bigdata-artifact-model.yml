@@ -1,0 +1,204 @@
+name: Options Big-Data Artifact Model
+
+on:
+  pull_request:
+    paths:
+      - "src/options_research/advanced_model.py"
+      - "src/options_research/eod_features.py"
+      - "src/options_research/eod_model.py"
+      - "scripts/reconcile_nse_fo_calendar.py"
+      - "scripts/options_bigdata_advanced_train_backtest.py"
+      - "tests/test_options_advanced_model.py"
+      - "requirements-research.txt"
+      - ".github/workflows/options-bigdata-artifact-model.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: options-bigdata-artifact-model-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calendar-train-frozen-paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      WORK_ROOT: storage/artifact_model_work
+      REPORT_ROOT: reports/latest/options_bigdata_artifact_model
+      SOURCE_RUN_ID: "30219786428"
+      SOURCE_ARTIFACT: genesis-system3-nse-fo-history-model-20160726-20260724
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Download existing 1.70 GB archive artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: genesis-system3-nse-fo-history-model-20160726-20260724
+          path: reuse_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 30219786428
+
+      - name: Resolve and prove reused archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=$(find reuse_artifact -type f -name manifest.sqlite3 | head -n 1)
+          test -n "$manifest"
+          data_root=$(dirname "$manifest")
+          data_root=$(realpath "$data_root")
+          echo "DATA_ROOT=$data_root" >> "$GITHUB_ENV"
+          mkdir -p "$REPORT_ROOT" "$WORK_ROOT"
+          files=$(find "$data_root/nse_fo_eod" -type f -name '*.parquet' | wc -l)
+          bytes=$(du -sb "$data_root" | awk '{print $1}')
+          echo "source_run_id=$SOURCE_RUN_ID" | tee "$REPORT_ROOT/reused_archive.txt"
+          echo "source_artifact=$SOURCE_ARTIFACT" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          echo "data_root=$data_root" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          echo "parquet_files=$files" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          echo "archive_bytes=$bytes" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          test "$files" -ge 2400
+          df -h .
+
+      - name: Install calendar model and test dependencies
+        run: >-
+          python -m pip install
+          pandas pyarrow scipy scikit-learn joblib requests pytest
+          pandas-market-calendars lightgbm optuna
+
+      - name: Compile and run focused advanced tests
+        run: |
+          python -m py_compile \
+            src/options_research/advanced_model.py \
+            src/options_research/eod_features.py \
+            src/options_research/eod_model.py \
+            scripts/reconcile_nse_fo_calendar.py \
+            scripts/options_bigdata_advanced_train_backtest.py
+          python -m pytest -q \
+            tests/test_options_bigdata_download.py \
+            tests/test_options_bigdata_eod.py \
+            tests/test_options_advanced_model.py
+
+      - name: Reconcile every archive date against NSE calendar
+        run: >-
+          python scripts/reconcile_nse_fo_calendar.py
+          --data-root "$DATA_ROOT"
+          --start 2016-07-26
+          --end 2026-07-24
+          --output-dir "$REPORT_ROOT/calendar"
+
+      - name: Verify raw archive and preserve every counter
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/options_bigdata_download.py verify \
+            --start 2016-07-26 --end 2026-07-24 --limit 0 \
+            --data-root "$DATA_ROOT" --report-dir "$REPORT_ROOT/raw_verify"
+          echo $? > "$REPORT_ROOT/raw_verify.exit"
+          exit 0
+
+      - name: Profile complete reused archive
+        run: >-
+          python scripts/profile_options_archive.py
+          --data-root "$DATA_ROOT"
+          --output "$REPORT_ROOT/archive_profile.json"
+
+      - name: Train all-row baseline tune challenger and open frozen holdout
+        run: >-
+          python scripts/options_bigdata_advanced_train_backtest.py
+          --data-root "$DATA_ROOT"
+          --work-root "$WORK_ROOT"
+          --report-root "$REPORT_ROOT/model"
+          --base-cost-bps 80
+          --embargo-days 1
+          --baseline-epochs 2
+          --optuna-trials 8
+          --challenger-train-rows 750000
+          --challenger-valid-rows 150000
+          --challenger-final-rows 1000000
+          --walk-forward-folds 2
+          --paper-capital-inr 100000
+
+      - name: Build final numerical proof and enforce non-live gates
+        shell: python
+        run: |
+          import hashlib, json
+          from pathlib import Path
+
+          report = Path("reports/latest/options_bigdata_artifact_model")
+          calendar = json.loads((report / "calendar/nse_fo_calendar_reconciliation.json").read_text())
+          profile = json.loads((report / "archive_profile.json").read_text())
+          model = json.loads((report / "model/advanced_model_backtest_proof.json").read_text())
+          verify_path = report / "raw_verify/summary.json"
+          verify = json.loads(verify_path.read_text()) if verify_path.exists() else {}
+          raw_verify_exit = int((report / "raw_verify.exit").read_text().strip())
+
+          assert calendar["status"] == "PASS", calendar
+          assert calendar["missing_unexplained_sessions"] == 0, calendar
+          assert calendar["unexpected_archive_sessions"] == 0, calendar
+          assert profile["files"] >= 2400, profile
+          assert profile["rows"] >= 100_000_000, profile
+          assert verify.get("missing_files", 0) == 0, verify
+          assert verify.get("unreadable_files", 0) == 0, verify
+          assert verify.get("sha_mismatches", 0) == 0, verify
+          assert model["split"]["test_days"] >= 400, model["split"]
+          assert model["frozen_test"]["trades"] >= 500, model["frozen_test"]
+          assert model["all_valid_pretest_rows_used_by_baseline"] is True, model
+          assert model["frozen_test_opened_after_validation_selection"] is True, model
+          assert model["live_trading_enabled"] is False, model
+          assert model["order_placement_allowed"] is False, model
+          assert model["real_orders_attempted"] == 0, model
+          assert model["promotion_allowed"] is False, model
+
+          files = sorted(path for path in report.rglob("*") if path.is_file())
+          artifacts = []
+          for path in files:
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              artifacts.append({
+                  "path": str(path), "bytes": path.stat().st_size, "sha256": digest,
+              })
+          proof = {
+              "status": "PASS",
+              "source_archive_run_id": 30219786428,
+              "source_archive_artifact_id": 8637345633,
+              "source_archive_artifact_digest": "sha256:e3e4387b8dd68e92926d0e3cc8e031dfed9178f92ea563ee0d6fabde239d3a79",
+              "calendar": calendar,
+              "archive_profile": profile,
+              "raw_verify_exit": raw_verify_exit,
+              "raw_verify": verify,
+              "model_backtest": model,
+              "artifact_count_before_final_proof": len(artifacts),
+              "artifacts": artifacts,
+              "live_trading_enabled": False,
+              "order_placement_allowed": False,
+              "real_orders_attempted": 0,
+              "promotion_allowed": False,
+          }
+          (report / "artifact_model_final_proof.json").write_text(
+              json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          print(json.dumps(proof, indent=2, sort_keys=True))
+
+      - name: Show disk and output counts
+        if: always()
+        run: |
+          df -h .
+          du -sh reuse_artifact "$WORK_ROOT" "$REPORT_ROOT" || true
+          find "$REPORT_ROOT" -type f -printf '%s %p\n' | sort -n || true
+
+      - name: Upload calendar model backtest and paper proof only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-bigdata-artifact-model-${{ github.run_id }}
+          path: reports/latest/options_bigdata_artifact_model/
+          retention-days: 30
+          if-no-files-found: error
