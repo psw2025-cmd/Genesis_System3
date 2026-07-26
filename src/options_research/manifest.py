@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -65,6 +66,31 @@ def pick_column(frame: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
     return next((mapping[name.lower()] for name in candidates if name.lower() in mapping), None)
 
 
+def safe_text(series: pd.Series) -> pd.Series:
+    """Normalize object, Arrow string and categorical columns without fillna category errors."""
+    return series.astype("string").fillna("").str.upper().str.strip()
+
+
+def resolve_record_path(manifest: Manifest, record: dict) -> tuple[Path, bool]:
+    """Resolve paths after a GitHub artifact moves to a different runner directory.
+
+    Manifest rows contain the original absolute path. Reused workflow artifacts
+    preserve the relative data layout but not the original runner prefix.
+    """
+    raw = Path(str(record.get("path") or ""))
+    if raw.exists():
+        return raw, False
+    if record.get("source") == "NSE_FO_EOD":
+        try:
+            day = date.fromisoformat(str(record.get("start_date") or ""))
+            candidate = manifest.path.parent / "nse_fo_eod" / str(day.year) / f"{day:%Y%m%d}_fo.parquet"
+            if candidate.exists():
+                return candidate, True
+        except Exception:
+            pass
+    return raw, False
+
+
 def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
     records = [row for row in manifest.records() if row.get("status") in {"DOWNLOADED", "EXISTS_VALID"}]
     if limit:
@@ -72,6 +98,7 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
     counters = {
         "files_checked": 0,
         "rows_checked": 0,
+        "rebased_manifest_paths": 0,
         "sha_mismatches": 0,
         "missing_files": 0,
         "unreadable_files": 0,
@@ -89,7 +116,8 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         "missing_volume_oi_schema_files": 0,
     }
     for record in records:
-        path = Path(str(record.get("path") or ""))
+        path, rebased = resolve_record_path(manifest, record)
+        counters["rebased_manifest_paths"] += int(rebased)
         if not path.exists():
             counters["missing_files"] += 1
             continue
@@ -140,14 +168,8 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
             )
             counters["partial_traded_ohlc_rows"] += int(partial_traded.sum())
 
-            instrument = (
-                frame[instrument_col].fillna("").astype(str).str.upper().str.strip()
-                if instrument_col else pd.Series("", index=frame.index)
-            )
-            option_type = (
-                frame[option_type_col].fillna("").astype(str).str.upper().str.strip()
-                if option_type_col else pd.Series("", index=frame.index)
-            )
+            instrument = safe_text(frame[instrument_col]) if instrument_col else pd.Series("", index=frame.index)
+            option_type = safe_text(frame[option_type_col]) if option_type_col else pd.Series("", index=frame.index)
             option_mask = instrument.isin({"IDO", "STO", "OPTIDX", "OPTSTK"}) | option_type.isin({"CE", "PE", "CALL", "PUT"})
             futures_mask = instrument.isin({"IDF", "STF", "FUTIDX", "FUTSTK"}) | instrument.str.contains("FUT", regex=False)
             counters["invalid_traded_option_ohlc_rows"] += int((invalid_traded & option_mask).sum())
