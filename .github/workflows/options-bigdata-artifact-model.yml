@@ -6,6 +6,7 @@ on:
       - "src/options_research/advanced_model.py"
       - "src/options_research/eod_features.py"
       - "src/options_research/eod_model.py"
+      - "scripts/repair_nse_fo_session.py"
       - "scripts/reconcile_nse_fo_calendar.py"
       - "scripts/options_bigdata_advanced_train_backtest.py"
       - "tests/test_options_advanced_model.py"
@@ -63,8 +64,8 @@ jobs:
           echo "source_run_id=$SOURCE_RUN_ID" | tee "$REPORT_ROOT/reused_archive.txt"
           echo "source_artifact=$SOURCE_ARTIFACT" | tee -a "$REPORT_ROOT/reused_archive.txt"
           echo "data_root=$data_root" | tee -a "$REPORT_ROOT/reused_archive.txt"
-          echo "parquet_files=$files" | tee -a "$REPORT_ROOT/reused_archive.txt"
-          echo "archive_bytes=$bytes" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          echo "parquet_files_before_repair=$files" | tee -a "$REPORT_ROOT/reused_archive.txt"
+          echo "archive_bytes_before_repair=$bytes" | tee -a "$REPORT_ROOT/reused_archive.txt"
           test "$files" -ge 2400
           df -h .
 
@@ -80,12 +81,20 @@ jobs:
             src/options_research/advanced_model.py \
             src/options_research/eod_features.py \
             src/options_research/eod_model.py \
+            scripts/repair_nse_fo_session.py \
             scripts/reconcile_nse_fo_calendar.py \
             scripts/options_bigdata_advanced_train_backtest.py
           python -m pytest -q \
             tests/test_options_bigdata_download.py \
             tests/test_options_bigdata_eod.py \
             tests/test_options_advanced_model.py
+
+      - name: Repair the one proven missing trading session
+        run: >-
+          python scripts/repair_nse_fo_session.py
+          --date 2021-03-30
+          --data-root "$DATA_ROOT"
+          --output-dir "$REPORT_ROOT/session_repair"
 
       - name: Reconcile every archive date against NSE calendar
         run: >-
@@ -134,6 +143,7 @@ jobs:
           from pathlib import Path
 
           report = Path("reports/latest/options_bigdata_artifact_model")
+          repair = json.loads((report / "session_repair/repair_session.json").read_text())
           calendar = json.loads((report / "calendar/nse_fo_calendar_reconciliation.json").read_text())
           profile = json.loads((report / "archive_profile.json").read_text())
           model = json.loads((report / "model/advanced_model_backtest_proof.json").read_text())
@@ -141,10 +151,15 @@ jobs:
           verify = json.loads(verify_path.read_text()) if verify_path.exists() else {}
           raw_verify_exit = int((report / "raw_verify.exit").read_text().strip())
 
+          assert repair["status"] in {"REPAIRED", "EXISTS_VALID"}, repair
+          assert repair["verification"]["positive_option_volume_rows"] > 0, repair
           assert calendar["status"] == "PASS", calendar
           assert calendar["missing_unexplained_sessions"] == 0, calendar
           assert calendar["unexpected_archive_sessions"] == 0, calendar
-          assert profile["files"] >= 2400, profile
+          assert calendar["unconfirmed_special_sessions"] == 0, calendar
+          assert calendar["manifest_unavailable_expected_session"] == 0, calendar
+          assert calendar["adjusted_expected_sessions"] == calendar["archive_sessions"], calendar
+          assert profile["files"] >= 2467, profile
           assert profile["rows"] >= 100_000_000, profile
           assert verify.get("missing_files", 0) == 0, verify
           assert verify.get("unreadable_files", 0) == 0, verify
@@ -170,6 +185,7 @@ jobs:
               "source_archive_run_id": 30219786428,
               "source_archive_artifact_id": 8637345633,
               "source_archive_artifact_digest": "sha256:e3e4387b8dd68e92926d0e3cc8e031dfed9178f92ea563ee0d6fabde239d3a79",
+              "session_repair": repair,
               "calendar": calendar,
               "archive_profile": profile,
               "raw_verify_exit": raw_verify_exit,
