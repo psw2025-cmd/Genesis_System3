@@ -11,6 +11,7 @@ on:
       - "scripts/repair_nse_fo_session.py"
       - "scripts/reconcile_nse_fo_calendar.py"
       - "scripts/options_bigdata_advanced_train_backtest.py"
+      - "tests/test_options_bigdata_eod.py"
       - "tests/test_options_advanced_model.py"
       - "requirements-research.txt"
       - ".github/workflows/options-bigdata-artifact-model.yml"
@@ -147,7 +148,7 @@ jobs:
       - name: Build final numerical proof and enforce non-live gates
         shell: python
         run: |
-          import hashlib, json
+          import csv, hashlib, json, math
           from pathlib import Path
 
           report = Path("reports/latest/options_bigdata_artifact_model")
@@ -156,9 +157,15 @@ jobs:
           calendar = json.loads((report / "calendar/nse_fo_calendar_reconciliation.json").read_text())
           profile = json.loads((report / "archive_profile.json").read_text())
           model = json.loads((report / "model/advanced_model_backtest_proof.json").read_text())
+          paper = json.loads((report / "model/normalized_paper_summary.json").read_text())
           verify_path = report / "raw_verify/summary.json"
           verify = json.loads(verify_path.read_text()) if verify_path.exists() else {}
           raw_verify_exit = int((report / "raw_verify.exit").read_text().strip())
+
+          with (report / "model/frozen_selected_trades.csv").open(newline="", encoding="utf-8") as handle:
+              selected_rows = list(csv.DictReader(handle))
+          with (report / "model/normalized_paper_daily.csv").open(newline="", encoding="utf-8") as handle:
+              paper_days = list(csv.DictReader(handle))
 
           assert repair["status"] in {"REPAIRED", "EXISTS_VALID", "FAILED"}, repair
           assert calendar["status"] in {"PASS", "PASS_WITH_DOCUMENTED_GAP"}, calendar
@@ -185,8 +192,41 @@ jobs:
           assert verify.get("unreadable_files", -1) == 0, verify
           assert verify.get("sha_mismatches", -1) == 0, verify
 
+          generation = model["feature_generation"]
+          frozen = model["frozen_test"]
+          assumptions = model["execution_assumptions"]
+          assert generation["entry_rule"] == "NEXT_SESSION_OPEN", generation
+          assert generation["future_fill_filter_used_for_candidate_selection"] is False, generation
+          assert generation["minimum_premium"] >= 10, generation
+          assert generation["minimum_volume"] >= 100, generation
+          assert generation["minimum_open_interest"] >= 500, generation
+          assert assumptions["same_bar_stop_before_target"] is True, assumptions
+          assert assumptions["per_trade_allocation"] == 0.05, assumptions
+          assert assumptions["maximum_daily_exposure"] == 0.15, assumptions
           assert model["split"]["test_days"] >= 400, model["split"]
-          assert model["frozen_test"]["trades"] >= 500, model["frozen_test"]
+          assert frozen["attempted_trades"] >= 400, frozen
+          assert frozen["filled_trades"] + frozen["rejected_no_fill"] == frozen["attempted_trades"], frozen
+          assert 0 <= frozen["fill_rate"] <= 1, frozen
+          assert len(selected_rows) == frozen["attempted_trades"], (len(selected_rows), frozen)
+
+          gross = [float(row["gross_return"]) for row in selected_rows if int(row["target_fillable"]) == 1]
+          assert gross, "no filled selected trades"
+          assert min(gross) >= -0.3000001, min(gross)
+          assert max(gross) <= 0.6000001, max(gross)
+
+          daily_returns = [float(row["portfolio_net_return"]) for row in paper_days]
+          exposures = [float(row["daily_gross_exposure"]) for row in paper_days]
+          assert daily_returns, "paper ledger is empty"
+          assert min(daily_returns) >= -0.0460001, min(daily_returns)
+          assert max(daily_returns) <= 0.0900001, max(daily_returns)
+          assert max(exposures) <= 0.1500001, max(exposures)
+          assert math.isfinite(float(paper["ending_capital_inr"])), paper
+          assert paper["attempted_trades"] == frozen["attempted_trades"], (paper, frozen)
+          assert paper["filled_trades"] == frozen["filled_trades"], (paper, frozen)
+          assert paper["rejected_no_fill"] == frozen["rejected_no_fill"], (paper, frozen)
+          assert paper["historical_lot_sizes_used"] is False, paper
+          assert paper["broker_fills_used"] is False, paper
+
           assert model["all_valid_pretest_rows_used_by_baseline"] is True, model
           assert model["frozen_test_opened_after_validation_selection"] is True, model
           assert model["live_trading_enabled"] is False, model
@@ -198,11 +238,13 @@ jobs:
           artifacts = []
           for path in files:
               digest = hashlib.sha256(path.read_bytes()).hexdigest()
-              artifacts.append({
-                  "path": str(path), "bytes": path.stat().st_size, "sha256": digest,
-              })
+              artifacts.append({"path": str(path), "bytes": path.stat().st_size, "sha256": digest})
           proof = {
               "status": "PASS",
+              "pipeline_executed": True,
+              "research_candidate": bool(model["candidate_assessment"]["research_candidate"]),
+              "research_gates_passed": model["candidate_assessment"]["gates_passed"],
+              "research_gates_total": model["candidate_assessment"]["gates_total"],
               "source_archive_run_id": 30219786428,
               "source_archive_artifact_id": 8637345633,
               "source_archive_artifact_digest": "sha256:e3e4387b8dd68e92926d0e3cc8e031dfed9178f92ea563ee0d6fabde239d3a79",
