@@ -95,27 +95,30 @@ def train_incremental(train_files: list[Path], epochs: int = 2):
 def max_drawdown(returns: list[float]) -> float:
     if not returns:
         return 0.0
-    equity = np.cumprod(1 + np.asarray(returns, dtype=float))
+    bounded = np.clip(np.asarray(returns, dtype=float), -0.999, 10.0)
+    equity = np.cumprod(1 + bounded)
     peak = np.maximum.accumulate(equity)
     return float(np.max((peak - equity) / np.maximum(peak, 1e-12)))
 
 
-def evaluate(files: list[Path], scaler, reg, clf, top_k: int, costs: list[float]) -> dict:
+def evaluate(files: list[Path], scaler, reg, clf, top_k: int, costs: list[float], row_sample_per_day: int = 2000) -> dict:
     returns_by_cost = {str(cost): [] for cost in costs}
     rho_values: list[float] = []
     overlap_values: list[float] = []
     row_truth: list[int] = []
     row_prob: list[float] = []
-    days = candidates = trades = base_wins = 0
+    total_rows = days = candidates = trades = base_wins = 0
     symbol_counts: Counter[str] = Counter()
     for _, frame in iter_batches(files):
         x = scaler.transform(frame[FEATURE_COLUMNS].astype(float).to_numpy())
         frame = frame.copy()
         frame["prediction"] = reg.predict(x)
-        probability = clf.predict_proba(x)[:, 1]
-        frame["probability"] = probability
-        row_truth.extend(frame["target_positive"].astype(int).tolist())
-        row_prob.extend(probability.tolist())
+        frame["probability"] = clf.predict_proba(x)[:, 1]
+        total_rows += len(frame)
+        stride = max(1, len(frame) // max(row_sample_per_day, 1))
+        sampled = frame.iloc[::stride].head(row_sample_per_day)
+        row_truth.extend(sampled["target_positive"].astype(int).tolist())
+        row_prob.extend(sampled["probability"].astype(float).tolist())
         predicted = frame.sort_values(["symbol", "prediction"], ascending=[True, False]).groupby("symbol", observed=True).head(1)
         actual = frame.sort_values(["symbol", "gross_return"], ascending=[True, False]).groupby("symbol", observed=True).head(1)
         selected = predicted.nlargest(min(top_k, len(predicted)), "prediction")
@@ -152,6 +155,8 @@ def evaluate(files: list[Path], scaler, reg, clf, top_k: int, costs: list[float]
     brier = float(np.mean((np.asarray(row_prob) - np.asarray(row_truth)) ** 2)) if row_truth else None
     return {
         "days": days,
+        "rows_scored": total_rows,
+        "row_metric_sample": len(row_truth),
         "candidate_underlying_days": candidates,
         "trades": trades,
         "base_cost_wins": base_wins,
