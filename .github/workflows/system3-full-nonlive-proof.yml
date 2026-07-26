@@ -6,6 +6,7 @@ on:
       - "dashboard/**"
       - "scripts/system3_full_nonlive_inventory.py"
       - "scripts/capture_dashboard_proof.py"
+      - "scripts/inject_live_simulation_routes.py"
       - ".github/workflows/system3-full-nonlive-proof.yml"
   workflow_dispatch:
 
@@ -54,7 +55,7 @@ jobs:
         run: |
           set +e
           python -m pip install --upgrade pip > "$PROOF_ROOT/logs/pip_upgrade.log" 2>&1
-          python -m pip install -r requirements.txt -r requirements-research.txt -r dashboard/backend/requirements.txt pytest requests playwright > "$PROOF_ROOT/logs/pip_install.log" 2>&1
+          python -m pip install -r requirements.txt -r requirements-research.txt pytest requests playwright > "$PROOF_ROOT/logs/pip_install.log" 2>&1
           echo $? > "$PROOF_ROOT/pip_install.exit"
           exit 0
 
@@ -112,6 +113,7 @@ jobs:
           nohup python -m uvicorn app:app --host 127.0.0.1 --port 8000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/backend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/backend_error.log" &
           echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/backend.pid"
           cd "$GITHUB_WORKSPACE"
+          code=0
           for i in $(seq 1 60); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/health || true)
             if [ "$code" = "200" ]; then break; fi
@@ -141,6 +143,11 @@ jobs:
                   body = response.content
                   body_file = output / (endpoint.strip("/").replace("/", "_") + ".body")
                   body_file.write_bytes(body)
+                  try:
+                      response.json()
+                      json_valid = True
+                  except Exception:
+                      json_valid = False
                   rows.append({
                       "endpoint": endpoint,
                       "status_code": response.status_code,
@@ -148,7 +155,7 @@ jobs:
                       "bytes": len(body),
                       "sha256": hashlib.sha256(body).hexdigest(),
                       "content_type": response.headers.get("content-type", ""),
-                      "json_valid": bool(response.headers.get("content-type", "").startswith("application/json")),
+                      "json_valid": json_valid,
                   })
               except Exception as error:
                   rows.append({
@@ -161,6 +168,7 @@ jobs:
               "endpoint_count": len(rows),
               "status_200_count": sum(row["status_code"] == 200 for row in rows),
               "non_200_count": sum(row["status_code"] != 200 for row in rows),
+              "valid_json_count": sum(row["json_valid"] for row in rows),
               "rows": rows,
               "live_trading_enabled": False,
               "order_placement_allowed": False,
@@ -176,6 +184,7 @@ jobs:
           nohup npm run dev -- --host 127.0.0.1 --port 3000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_error.log" &
           echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/frontend.pid"
           cd "$GITHUB_WORKSPACE"
+          code=0
           for i in $(seq 1 60); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ui/ || true)
             if [ "$code" = "200" ]; then break; fi
@@ -209,9 +218,7 @@ jobs:
               except Exception: return default
           collect_text = (root / "logs/pytest_collect.log").read_text(errors="replace") if (root / "logs/pytest_collect.log").exists() else ""
           full_text = (root / "logs/pytest_full.log").read_text(errors="replace") if (root / "logs/pytest_full.log").exists() else ""
-          collected = None
           matches = re.findall(r"(\d+) tests? collected", collect_text)
-          if matches: collected = int(matches[-1])
           status_matches = re.findall(r"(\d+) passed", full_text)
           failed_matches = re.findall(r"(\d+) failed", full_text)
           skipped_matches = re.findall(r"(\d+) skipped", full_text)
@@ -226,7 +233,7 @@ jobs:
               "playwright_install_exit": read_int("playwright_install.exit"),
               "compile_exit": read_int("compileall.exit"),
               "pytest_collect_exit": read_int("pytest_collect.exit"),
-              "pytest_collected": collected,
+              "pytest_collected": int(matches[-1]) if matches else None,
               "pytest_full_exit": read_int("pytest_full.exit"),
               "pytest_passed_reported": int(status_matches[-1]) if status_matches else 0,
               "pytest_failed_reported": int(failed_matches[-1]) if failed_matches else 0,
@@ -243,6 +250,7 @@ jobs:
           }
           critical = {
               "inventory_missing_files": inventory.get("missing_tracked_files", -1),
+              "dependency_install_exit": summary["dependency_install_exit"],
               "compile_exit": summary["compile_exit"],
               "pytest_full_exit": summary["pytest_full_exit"],
               "frontend_build_exit": summary["frontend_build_exit"],
@@ -253,6 +261,7 @@ jobs:
           summary["critical_gates"] = critical
           summary["critical_pass_count"] = sum([
               critical["inventory_missing_files"] == 0,
+              critical["dependency_install_exit"] == 0,
               critical["compile_exit"] == 0,
               critical["pytest_full_exit"] == 0,
               critical["frontend_build_exit"] == 0,
@@ -260,8 +269,8 @@ jobs:
               critical["api_non_200"] == 0,
               critical["ui_tabs_failed"] == 0,
           ])
-          summary["critical_gate_count"] = 7
-          summary["status"] = "PASS" if summary["critical_pass_count"] == 7 else "FAIL"
+          summary["critical_gate_count"] = 8
+          summary["status"] = "PASS" if summary["critical_pass_count"] == 8 else "FAIL"
           (root / "full_system_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
