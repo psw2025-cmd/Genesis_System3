@@ -14,10 +14,10 @@ Screenshot gate: **False**
 - VISIBLE_TRACKER_STATUS:BLOCKED
 
 ## Corroborating evidence
-- `shell_generated_at`: `2026-07-26T13:37:48.043Z`
+- `shell_generated_at`: `2026-07-26T14:38:49.525Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-07-26T13:40:05.310Z`
+- `visible_tracker_generated_at`: `2026-07-26T14:39:55.638Z`
 - `visible_tracker_status`: `BLOCKED`
 - `visible_tracker_bad_tab_count`: `0`
 
