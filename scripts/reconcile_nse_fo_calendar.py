@@ -49,10 +49,6 @@ SUPPLEMENTAL_FO_HOLIDAYS = {
     },
 }
 
-# This is not classified as a holiday. It remains an explicit data gap.
-# The trading date is independently proven open, while four NSE archive URL
-# variants returned 404 or TLS failure. No interpolation or fabricated rows are
-# permitted for this session.
 KNOWN_SOURCE_UNAVAILABLE_SESSIONS = {
     date(2021, 3, 30): {
         "classification": "TRADING_SESSION_SOURCE_UNAVAILABLE",
@@ -87,6 +83,26 @@ def pick(frame: pd.DataFrame, *names: str) -> str | None:
     return next((mapping[name.lower()] for name in names if name.lower() in mapping), None)
 
 
+def parse_trade_dates(series: pd.Series) -> pd.Series:
+    """Parse ISO dates first, then legacy DD-MON-YYYY dates.
+
+    A universal dayfirst=True incorrectly converts 2024-11-01 to 2024-01-11.
+    """
+    raw = series.astype(str).str.strip()
+    parsed = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
+    remaining = parsed.isna()
+    if remaining.any():
+        parsed.loc[remaining] = pd.to_datetime(
+            raw.loc[remaining], format="%d-%b-%Y", errors="coerce"
+        )
+    remaining = parsed.isna()
+    if remaining.any():
+        parsed.loc[remaining] = pd.to_datetime(
+            raw.loc[remaining], errors="coerce", dayfirst=True
+        )
+    return parsed
+
+
 def archive_session_evidence(path: Path, expected_day: date) -> dict:
     try:
         frame = pd.read_parquet(path)
@@ -102,7 +118,7 @@ def archive_session_evidence(path: Path, expected_day: date) -> dict:
         ]
         if missing:
             return {"valid": False, "error": f"missing columns {missing}"}
-        internal = pd.to_datetime(frame[date_col], errors="coerce", dayfirst=True).dt.date
+        internal = parse_trade_dates(frame[date_col]).dt.date
         internal_dates = sorted({value.isoformat() for value in internal.dropna().unique()})
         instrument = frame[instrument_col].fillna("").astype(str).str.upper().str.strip()
         option_type = frame[option_col].fillna("").astype(str).str.upper().str.strip()
