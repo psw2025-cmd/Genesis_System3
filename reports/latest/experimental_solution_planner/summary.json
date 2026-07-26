@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-26T09:20:38.936077+00:00",
-  "issue_count": 486,
+  "generated_utc": "2026-07-26T09:41:40.071509+00:00",
+  "issue_count": 487,
   "lane_count": 13,
   "lanes": [
     {
@@ -64,67 +64,67 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30195172313 conclusion=failure commit=eadd0778980d",
+          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30196804392 conclusion=failure commit=aec5baf2cb55",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30194929534 conclusion=failure commit=eadd0778980d",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30196476822 conclusion=failure commit=100bf9a74634",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30194971365 conclusion=failure commit=eadd0778980d",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30196551829 conclusion=failure commit=100bf9a74634",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30194965196 conclusion=failure commit=eadd0778980d",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30196531380 conclusion=failure commit=100bf9a74634",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30194598976 conclusion=failure commit=b91b4602685b",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30196267552 conclusion=failure commit=821d303140c8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30194492479 conclusion=failure commit=3e939c306503",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30196306044 conclusion=failure commit=00a394ce1e0b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30194493111 conclusion=failure commit=3e939c306503",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30196282061 conclusion=failure commit=f6afb09c700f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30194472939 conclusion=failure commit=4c422fc7ce97",
+          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30196282063 conclusion=failure commit=f6afb09c700f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30194492453 conclusion=failure commit=3e939c306503",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30196267551 conclusion=failure commit=821d303140c8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30194492427 conclusion=failure commit=3e939c306503",
+          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30196245874 conclusion=failure commit=8440890c5265",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30194493140 conclusion=failure commit=3e939c306503",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30196267830 conclusion=failure commit=821d303140c8",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30193921767 conclusion=failure commit=550e7f19fc6a",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30195809997 conclusion=failure commit=532fa2e424fc",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30193906515 conclusion=failure commit=550e7f19fc6a",
+          "issue": "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30195776570 conclusion=failure commit=28cc7efd86c9",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 49,
+      "issue_count": 50,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
