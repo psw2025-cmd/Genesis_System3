@@ -62,6 +62,7 @@ def normalize_options(frame: pd.DataFrame, path: Path) -> pd.DataFrame:
     instrument = out["instrument"].fillna("").astype(str).str.upper().str.strip()
     side = out["option_type"].fillna("").astype(str).str.upper().str.strip()
     mask = side.isin({"CE", "PE", "CALL", "PUT"}) | instrument.isin({"IDO", "STO", "OPTIDX", "OPTSTK"})
+    raw_option_rows = int(mask.sum())
     out = out.loc[mask].copy()
     out["instrument"] = instrument.loc[mask].replace({"IDO": "OPTIDX", "STO": "OPTSTK"})
     out["option_type"] = side.loc[mask].replace({"CALL": "CE", "PUT": "PE"})
@@ -76,7 +77,25 @@ def normalize_options(frame: pd.DataFrame, path: Path) -> pd.DataFrame:
     out["trade_date"] = out["trade_date"].fillna(file_trade_date(path))
     out = out.dropna(subset=["symbol", "expiry", "strike", "option_type", "open", "high", "low", "close"])
     out = out[(out["symbol"] != "") & (out["close"] > 0) & (out[["open", "high", "low"]] >= 0).all(axis=1)]
-    return out.sort_values(KEY_COLUMNS).drop_duplicates(KEY_COLUMNS, keep="last").reset_index(drop=True)
+
+    traded = out["volume"].fillna(0) > 0
+    complete_positive = (out[["open", "high", "low", "close"]] > 0).all(axis=1)
+    valid_ordering = (
+        (out["high"] >= out[["open", "close", "low"]].max(axis=1))
+        & (out["low"] <= out[["open", "close", "high"]].min(axis=1))
+    )
+    invalid_traded = traded & ~(complete_positive & valid_ordering)
+    no_trade_rows = int((~traded).sum())
+    invalid_traded_rows = int(invalid_traded.sum())
+    out = out.loc[~invalid_traded].copy()
+    out = out.sort_values(KEY_COLUMNS).drop_duplicates(KEY_COLUMNS, keep="last").reset_index(drop=True)
+    out.attrs.update({
+        "raw_option_rows": raw_option_rows,
+        "normalized_option_rows": int(len(out)),
+        "no_trade_option_rows": no_trade_rows,
+        "quarantined_invalid_traded_option_rows": invalid_traded_rows,
+    })
+    return out
 
 
 def enrich_day(day: pd.DataFrame, prior: pd.DataFrame | None) -> pd.DataFrame:
@@ -127,7 +146,12 @@ def generate_features(data_root: Path, feature_root: Path, base_cost_bps: float)
         current_raw = normalize_options(pd.read_parquet(path), path)
         current_enriched = enrich_day(current_raw, prior_raw)
         stats["archive_files"] += 1
+        stats["raw_option_rows"] += int(current_raw.attrs.get("raw_option_rows", len(current_raw)))
         stats["input_option_rows"] += len(current_raw)
+        stats["no_trade_option_rows"] += int(current_raw.attrs.get("no_trade_option_rows", 0))
+        stats["quarantined_invalid_traded_option_rows"] += int(
+            current_raw.attrs.get("quarantined_invalid_traded_option_rows", 0)
+        )
         if prior_enriched is not None:
             next_values = current_raw[KEY_COLUMNS + ["close", "volume"]].rename(columns={"close": "next_close", "volume": "next_volume"})
             matched = prior_enriched.merge(next_values, on=KEY_COLUMNS, how="inner", validate="one_to_one")
