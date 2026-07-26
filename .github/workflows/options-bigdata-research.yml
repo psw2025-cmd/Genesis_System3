@@ -215,10 +215,11 @@ jobs:
       SYSTEM3_RESEARCH_DATA_ROOT: 'C:\System3ResearchData\Genesis_System3\options'
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
+      - name: Prove installed Python
+        shell: pwsh
+        run: |
+          python --version
+          python -c "import sys; print(sys.executable)"
       - name: Install archive dependencies
         shell: pwsh
         run: python -m pip install pandas requests pyarrow --quiet
@@ -276,10 +277,11 @@ jobs:
       DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
+      - name: Prove installed Python
+        shell: pwsh
+        run: |
+          python --version
+          python -c "import sys; print(sys.executable)"
       - name: Require persistent external data root
         shell: pwsh
         run: |
