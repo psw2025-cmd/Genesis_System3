@@ -111,11 +111,13 @@ jobs:
           assert verify["status"] == "PASS", verify
           for key in (
               "sha_mismatches", "missing_files", "unreadable_files", "empty_files",
-              "duplicate_rows", "invalid_ohlc_rows", "negative_volume_oi_rows",
-              "missing_required_column_files", "missing_ohlc_schema_files",
-              "missing_volume_oi_schema_files",
+              "duplicate_rows", "partial_traded_ohlc_rows", "invalid_traded_ohlc_rows",
+              "negative_volume_oi_rows", "missing_required_column_files",
+              "missing_ohlc_schema_files", "missing_volume_oi_schema_files",
           ):
               assert verify[key] == 0, (key, verify[key])
+          assert verify["traded_rows_checked"] > 0, verify
+          assert verify["no_trade_rows"] > 0, verify
           assert profile["files"] == verify["files_checked"], (profile, verify)
           assert profile["rows"] == verify["rows_checked"], (profile, verify)
           assert profile["option_rows"] > 0, profile
