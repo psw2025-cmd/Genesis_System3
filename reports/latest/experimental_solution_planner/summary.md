@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-26T22:25:59.296587+00:00`
+Generated UTC: `2026-07-26T22:36:26.364210+00:00`
 Status: **BLOCKED**
-Issues: `448`
+Issues: `446`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 225 issues
+### GITHUB_RENDER_FAILURE — 224 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -273,29 +273,6 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### WORKFLOW_CI — 14 issues
-
-Recommended fixes:
-- Read workflow_failure_tracker TODO.
-- Fix failing workflow logs one by one.
-- Keep failed workflows in TODO until later successful run proves fixed.
-
-Top issues:
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
-- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30222819632 conclusion=cancelled commit=90f54f2939cb34d61f5521dc787538af20d11d61
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30222621160 conclusion=cancelled commit=6c396c6ffff2e5cf993eb748aa0cfae796633727
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30222576627 conclusion=cancelled commit=885a10a77308b4e41411a0c63981e8d8a5f5fef9
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "90f54f2939cb34d61f5521dc787538af20d11d61", "conclusion": "cancelled", "created_at": "2026-07-26T22:16:53Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30222819632", "run_id": 30222819632, "updated_at": "2026-07-26T22:17:42Z", "workflow": "Genesis System3 Global Safety CI"}
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "6c396c6ffff2e5cf993eb748aa0cfae796633727", "conclusion": "cancelled", "created_at": "2026-07-26T22:11:06Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30222621160", "run_id": 30222621160, "updated_at": "2026-07-26T22:16:55Z", "workflow": "Genesis System3 Global Safety CI"}
-- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "885a10a77308b4e41411a0c63981e8d8a5f5fef9", "conclusion": "cancelled", "created_at": "2026-07-26T22:09:50Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30222576627", "run_id": 30222576627, "updated_at": "2026-07-26T22:11:07Z", "workflow": "Genesis System3 Global Safety CI"}
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=28
-
 ### ML_TRAINING — 13 issues
 
 Recommended fixes:
@@ -318,6 +295,27 @@ Top issues:
 - `reports/latest/parallel_root_cause_audit/summary.json`: Options ML training summary is missing/not published.
 - `reports/latest/parallel_root_cause_audit/summary.json`: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
 
+### WORKFLOW_CI — 12 issues
+
+Recommended fixes:
+- Read workflow_failure_tracker TODO.
+- Fix failing workflow logs one by one.
+- Keep failed workflows in TODO until later successful run proves fixed.
+
+Top issues:
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/health: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_004:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_024:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_064:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/health: status=0
+- `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30223178947 conclusion=cancelled commit=42bb73d7eb486178b620aa91bd1419d9b6812c14
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30223159843 conclusion=cancelled commit=3a1fc0e7d772d087a93bdee8a8c125801b755905
+- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "42bb73d7eb486178b620aa91bd1419d9b6812c14", "conclusion": "cancelled", "created_at": "2026-07-26T22:27:42Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30223178947", "run_id": 30223178947, "updated_at": "2026-07-26T22:28:43Z", "workflow": "Genesis System3 Global Safety CI"}
+- `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "3a1fc0e7d772d087a93bdee8a8c125801b755905", "conclusion": "cancelled", "created_at": "2026-07-26T22:27:09Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30223159843", "run_id": 30223159843, "updated_at": "2026-07-26T22:27:44Z", "workflow": "Genesis System3 Global Safety CI"}
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=27
+
 ### UNKNOWN — 12 issues
 
 Recommended fixes:
@@ -337,7 +335,7 @@ Top issues:
 - `reports/latest/secure_install_credential_audit/summary.json`: blocker_count=3
 - `reports/latest/parallel_root_cause_audit/summary.json`: blocker_count=12
 
-### INSTALL_CREDENTIAL — 10 issues
+### INSTALL_CREDENTIAL — 11 issues
 
 Recommended fixes:
 - Fix dependency/import/compile errors from secure audit.
@@ -355,6 +353,7 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066227594 conclusion=failure commit=a20f46745dfa5bf8597afd5522a1b3afed1c8c36
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066209847 conclusion=failure commit=6b78e22c456c5ba36a1c672f31c954bf508d21b2
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30066156338 conclusion=failure commit=4f4f39da04969104e109d25402f0b111f99d0551
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30223117494 conclusion=failure commit=94a0fbe69203219924495383eb4ab7da9bc6527f
 
 ### ROUTE_CODE — 9 issues
 
