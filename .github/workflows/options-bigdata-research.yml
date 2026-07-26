@@ -125,7 +125,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: options-bigdata-focused-proof
-          path: reports/latest/options_bigdata_research/
+          path: |
+            reports/latest/options_bigdata_research/
+            reports/latest/workflow_policy_diagnostic/
           if-no-files-found: error
 
   self-hosted-research-batch:
