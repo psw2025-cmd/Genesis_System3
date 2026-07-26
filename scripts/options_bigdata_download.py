@@ -5,8 +5,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from src.options_research import (
     Manifest, RollingRequest, Underlying, build_plan, download_dhan, download_nse_eod,
@@ -14,7 +19,6 @@ from src.options_research import (
     relative_strikes, sha256_file, verify_data as _verify_data, write_frame,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_ROOT = Path(os.getenv("SYSTEM3_RESEARCH_DATA_ROOT", ROOT / "storage" / "research_options"))
 DEFAULT_REPORT_DIR = ROOT / "reports" / "latest" / "options_bigdata_research"
 
