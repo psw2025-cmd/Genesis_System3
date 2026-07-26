@@ -21,6 +21,7 @@ from src.options_research import (
 
 DEFAULT_DATA_ROOT = Path(os.getenv("SYSTEM3_RESEARCH_DATA_ROOT", ROOT / "storage" / "research_options"))
 DEFAULT_REPORT_DIR = ROOT / "reports" / "latest" / "options_bigdata_research"
+VERIFIED_STATUSES = {"PASS", "PASS_WITH_QUARANTINE"}
 
 
 def verify_data(data_root: Path, manifest: Manifest, limit: int | None = None) -> dict:
@@ -129,7 +130,7 @@ def main() -> int:
         payload = {**counts, **_nse_progress(manifest, start, end), **_verify_data(manifest, args.limit)}
         write_report(args.report_dir, payload)
         print(json.dumps(payload, indent=2))
-        return 0 if payload["status"] == "PASS" else 2
+        return 0 if payload["status"] in VERIFIED_STATUSES else 2
 
     results: dict[str, object] = {}
     if args.command in {"download-nse", "all"}:
