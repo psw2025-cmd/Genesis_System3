@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "src/options_research/manifest.py"
+      - "scripts/diagnose_nse_ohlc.py"
       - "tests/test_options_bigdata_download.py"
       - ".github/workflows/options-verifier-diagnostic.yml"
 
@@ -32,15 +33,22 @@ jobs:
           python scripts/options_bigdata_download.py download-nse
           --start 2026-07-24 --end 2026-07-24 --limit 1
           --data-root "$DATA_ROOT" --report-dir "$REPORT_ROOT"
+      - name: Diagnose exact invalid traded OHLC rows
+        run: >-
+          python scripts/diagnose_nse_ohlc.py
+          --input "$DATA_ROOT/nse_fo_eod/2026/20260724_fo.parquet"
+          --output "$REPORT_ROOT/invalid_ohlc_rows.json"
       - name: Run verifier without hiding counters
         continue-on-error: true
         run: >-
           python scripts/options_bigdata_download.py verify
           --start 2026-07-24 --end 2026-07-24 --limit 0
           --data-root "$DATA_ROOT" --report-dir "$REPORT_ROOT"
-      - name: Print exact summary
+      - name: Print exact summary and invalid rows
         if: always()
-        run: cat "$REPORT_ROOT/summary.json" || true
+        run: |
+          cat "$REPORT_ROOT/summary.json" || true
+          cat "$REPORT_ROOT/invalid_ohlc_rows.json" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
