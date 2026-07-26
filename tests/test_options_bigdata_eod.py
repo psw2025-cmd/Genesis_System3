@@ -25,6 +25,7 @@ def test_normalize_udiff_filters_futures(tmp_path: Path):
     assert len(result) == 1
     assert result.iloc[0]["instrument"] == "OPTSTK"
     assert result.iloc[0]["option_type"] == "CE"
+    assert str(result.iloc[0]["trade_date"].date()) == "2026-07-24"
 
 
 def test_normalize_legacy_schema(tmp_path: Path):
@@ -39,9 +40,10 @@ def test_normalize_legacy_schema(tmp_path: Path):
     assert len(result) == 1
     assert result.iloc[0]["instrument"] == "OPTIDX"
     assert result.iloc[0]["option_type"] == "PE"
+    assert str(result.iloc[0]["trade_date"].date()) == "2020-01-02"
 
 
-def test_generate_features_uses_next_session_only(tmp_path: Path):
+def test_generate_features_uses_next_open_and_conservative_exit(tmp_path: Path):
     data_root = tmp_path / "data"
     feature_root = tmp_path / "features"
     year = data_root / "nse_fo_eod" / "2026"
@@ -52,10 +54,33 @@ def test_generate_features_uses_next_session_only(tmp_path: Path):
     files = sorted(feature_root.glob("**/*.parquet"))
     assert stats["archive_files"] == 3
     assert stats["feature_files"] == 2
+    assert stats["entry_rule"] == "NEXT_SESSION_OPEN"
+    assert stats["future_fill_filter_used_for_candidate_selection"] is False
     first = pd.read_parquet(files[0])
     assert len(first) == 1
-    assert abs(first.iloc[0]["gross_return"] - 0.10) < 1e-12
+    expected = 110.0 / 109.0 - 1.0
+    assert abs(first.iloc[0]["gross_return"] - expected) < 1e-12
+    assert first.iloc[0]["target_fillable"] == 1
     assert set(FEATURE_COLUMNS).issubset(first.columns)
+
+
+def test_generate_features_keeps_signal_but_marks_next_session_no_fill(tmp_path: Path):
+    data_root = tmp_path / "data"
+    feature_root = tmp_path / "features"
+    year = data_root / "nse_fo_eod" / "2026"
+    year.mkdir(parents=True)
+    first = udiff_day("2026-07-22", 100.0)
+    second = udiff_day("2026-07-23", 110.0)
+    second.loc[0, "TtlTradgVol"] = 0
+    first.to_parquet(year / "20260722_fo.parquet", index=False)
+    second.to_parquet(year / "20260723_fo.parquet", index=False)
+    stats = generate_features(data_root, feature_root, base_cost_bps=80)
+    feature = pd.read_parquet(next(feature_root.glob("**/*.parquet")))
+    assert len(feature) == 1
+    assert feature.iloc[0]["target_fillable"] == 0
+    assert feature.iloc[0]["gross_return"] == 0
+    assert feature.iloc[0]["target_net_return"] == 0
+    assert stats["next_no_fill_rows"] == 1
 
 
 def make_feature_file(path: Path, day: str, symbols=("AAA", "BBB", "CCC")):
@@ -66,7 +91,8 @@ def make_feature_file(path: Path, day: str, symbols=("AAA", "BBB", "CCC")):
             "symbol": symbol, "expiry": pd.Timestamp("2027-01-01"), "strike": 100 + index,
             "option_type": "CE", "instrument": "OPTSTK", "trade_date": pd.Timestamp(day),
             "gross_return": 0.02 * (index + 1), "target_net_return": 0.02 * (index + 1) - 0.008,
-            "target_positive": 1, "close": 10, "volume": 100, "oi": 1000,
+            "target_positive": 1, "target_fillable": 1,
+            "close": 10, "volume": 100, "oi": 1000,
         })
         rows.append(row)
     pd.DataFrame(rows).to_parquet(path, index=False)
