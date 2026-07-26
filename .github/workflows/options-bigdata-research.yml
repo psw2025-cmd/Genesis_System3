@@ -8,6 +8,7 @@ on:
       - "src/options_research/**"
       - "scripts/options_bigdata_*.py"
       - "scripts/options_research_train_backtest.py"
+      - "scripts/workflow_policy_diagnostic.py"
       - "tests/test_options_bigdata_*.py"
       - "tests/test_options_research_train_backtest.py"
       - "requirements-research.txt"
@@ -17,6 +18,7 @@ on:
       - "src/options_research/**"
       - "scripts/options_bigdata_*.py"
       - "scripts/options_research_train_backtest.py"
+      - "scripts/workflow_policy_diagnostic.py"
       - "tests/test_options_bigdata_*.py"
       - "tests/test_options_research_train_backtest.py"
       - "requirements-research.txt"
@@ -67,6 +69,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Print global workflow-policy matches
+        run: python scripts/workflow_policy_diagnostic.py
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -83,6 +87,7 @@ jobs:
           scripts/options_bigdata_download.py
           scripts/options_bigdata_full_pipeline.py
           scripts/options_research_train_backtest.py
+          scripts/workflow_policy_diagnostic.py
       - name: Run focused tests
         run: >-
           python -m pytest -q
