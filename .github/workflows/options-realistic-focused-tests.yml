@@ -1,0 +1,58 @@
+name: Options Realistic Focused Tests
+
+on:
+  pull_request:
+    paths:
+      - "src/options_research/advanced_model.py"
+      - "src/options_research/eod_features.py"
+      - "scripts/options_bigdata_advanced_train_backtest.py"
+      - "tests/test_options_bigdata_eod.py"
+      - "tests/test_options_advanced_model.py"
+      - ".github/workflows/options-realistic-focused-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  realistic-backtest-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install focused dependencies
+        run: python -m pip install pandas pyarrow numpy scipy scikit-learn joblib pytest
+      - name: Compile changed research code
+        run: |
+          python -m py_compile \
+            src/options_research/eod_features.py \
+            src/options_research/advanced_model.py \
+            scripts/options_bigdata_advanced_train_backtest.py
+      - name: Run verbose focused tests and preserve exact log
+        continue-on-error: true
+        run: |
+          set +e
+          mkdir -p reports/latest/options_realistic_focused_tests
+          python -m pytest -vv --tb=long \
+            tests/test_options_bigdata_eod.py \
+            tests/test_options_advanced_model.py \
+            > reports/latest/options_realistic_focused_tests/pytest.log 2>&1
+          code=$?
+          echo "$code" > reports/latest/options_realistic_focused_tests/pytest.exit
+          cat reports/latest/options_realistic_focused_tests/pytest.log
+          exit 0
+      - name: Upload exact focused-test proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-realistic-focused-tests-${{ github.run_id }}
+          path: reports/latest/options_realistic_focused_tests/
+          if-no-files-found: error
+      - name: Enforce focused tests
+        if: always()
+        run: |
+          code=$(cat reports/latest/options_realistic_focused_tests/pytest.exit)
+          test "$code" -eq 0
