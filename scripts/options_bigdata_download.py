@@ -45,6 +45,16 @@ def write_report(report_dir: Path, payload: dict) -> None:
     (report_dir / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _resolve_dhan_plan(args: argparse.Namespace, start: date, end: date) -> tuple[list[Underlying], list[RollingRequest], Path]:
+    security_master = args.security_master
+    if not security_master.exists() or security_master.stat().st_size == 0:
+        security_master = args.data_root / "reference" / "api-scrip-master-detailed.csv"
+        download_security_master(security_master)
+    exchanges = tuple(value.strip().upper() for value in args.exchanges.split(",") if value.strip())
+    universe = load_universe(security_master, exchanges)
+    return universe, build_plan(universe, start, end, args.interval), security_master
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["plan", "download-nse", "download-dhan", "verify", "all"])
@@ -64,24 +74,25 @@ def main() -> int:
 
     ensure_analyzer_only()
     start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
-    security_master = args.security_master
-    if not security_master.exists() or security_master.stat().st_size == 0:
-        security_master = args.data_root / "reference" / "api-scrip-master-detailed.csv"
-        download_security_master(security_master)
-    exchanges = tuple(value.strip().upper() for value in args.exchanges.split(",") if value.strip())
-    universe = load_universe(security_master, exchanges)
-    plan = build_plan(universe, start, end, args.interval)
-    counts = {
-        "underlyings": len(universe),
-        "index_underlyings": sum(item.instrument == "OPTIDX" for item in universe),
-        "stock_underlyings": sum(item.instrument == "OPTSTK" for item in universe),
-        "nse_underlyings": sum(item.exchange_segment == "NSE_FNO" for item in universe),
-        "bse_underlyings": sum(item.exchange_segment == "BSE_FNO" for item in universe),
-        "security_master": str(security_master),
-        "dhan_planned_requests": len(plan),
-        "date_start": start.isoformat(), "date_end": end.isoformat(),
+    counts: dict[str, object] = {
+        "underlyings": 0, "index_underlyings": 0, "stock_underlyings": 0,
+        "nse_underlyings": 0, "bse_underlyings": 0, "security_master": None,
+        "dhan_planned_requests": 0, "date_start": start.isoformat(), "date_end": end.isoformat(),
         "interval_minutes": int(args.interval), "data_root": str(args.data_root),
     }
+    plan: list[RollingRequest] = []
+    if args.command in {"plan", "download-dhan", "all"}:
+        universe, plan, security_master = _resolve_dhan_plan(args, start, end)
+        counts.update({
+            "underlyings": len(universe),
+            "index_underlyings": sum(item.instrument == "OPTIDX" for item in universe),
+            "stock_underlyings": sum(item.instrument == "OPTSTK" for item in universe),
+            "nse_underlyings": sum(item.exchange_segment == "NSE_FNO" for item in universe),
+            "bse_underlyings": sum(item.exchange_segment == "BSE_FNO" for item in universe),
+            "security_master": str(security_master),
+            "dhan_planned_requests": len(plan),
+        })
+
     if args.command == "plan":
         payload = {"status": "PLAN_ONLY", **counts, "downloaded_rows": 0, "downloaded_files": 0}
         write_report(args.report_dir, payload)
