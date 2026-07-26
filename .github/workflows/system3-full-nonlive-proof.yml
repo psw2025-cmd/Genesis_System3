@@ -26,8 +26,6 @@ jobs:
       SYSTEM3_LIVE_TRADING_ALLOWED: "0"
       SYSTEM3_MODE: "PAPER"
       ANALYZE_MODE: "1"
-      VITE_API_BASE_URL: "http://127.0.0.1:8000"
-      DEV_PROXY_TARGET: "http://127.0.0.1:8000"
       PROOF_ROOT: "reports/latest/system3_full_nonlive_proof"
     steps:
       - uses: actions/checkout@v4
@@ -72,6 +70,15 @@ jobs:
           echo $? > "$PROOF_ROOT/playwright_install.exit"
           exit 0
 
+      - name: Inject isolated analyzer-only simulation routes
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/inject_live_simulation_routes.py > "$PROOF_ROOT/logs/simulation_route_inject.log" 2>&1
+          echo $? > "$PROOF_ROOT/simulation_route_inject.exit"
+          git diff --numstat dashboard/backend/app.py > "$PROOF_ROOT/simulation_route_inject.numstat"
+          exit 0
+
       - name: Python compile proof
         continue-on-error: true
         run: |
@@ -106,7 +113,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           exit 0
 
-      - name: Start analyzer-only backend
+      - name: Start analyzer-only backend with built UI
         continue-on-error: true
         run: |
           set +e
@@ -121,13 +128,15 @@ jobs:
             sleep 1
           done
           echo "$code" > "$PROOF_ROOT/backend_health.status"
+          ui_code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/ui/ || true)
+          echo "$ui_code" > "$PROOF_ROOT/frontend_http.status"
           exit 0
 
       - name: Test required backend APIs
         continue-on-error: true
         shell: python
         run: |
-          import hashlib, json, time
+          import hashlib, json, re, time
           from pathlib import Path
           import requests
           output = Path("reports/latest/system3_full_nonlive_proof/api")
@@ -135,6 +144,7 @@ jobs:
           endpoints = [
               "/api/health", "/api/qc", "/api/signal/top", "/api/positions",
               "/api/pnl", "/api/perf", "/api/audit/secrets",
+              "/api/simulation/live/state?scenario=trend",
           ]
           rows = []
           for endpoint in endpoints:
@@ -142,7 +152,8 @@ jobs:
               try:
                   response = requests.get(f"http://127.0.0.1:8000{endpoint}", timeout=15)
                   body = response.content
-                  body_file = output / (endpoint.strip("/").replace("/", "_") + ".body")
+                  safe_name = re.sub(r"[^A-Za-z0-9_.-]+", "_", endpoint.strip("/"))
+                  body_file = output / f"{safe_name}.body"
                   body_file.write_bytes(body)
                   try:
                       response.json()
@@ -177,29 +188,12 @@ jobs:
           (output / "api_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
-      - name: Start built frontend production preview
-        continue-on-error: true
-        run: |
-          set +e
-          cd dashboard/frontend
-          nohup npm run preview -- --host 127.0.0.1 --port 3000 > "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend.log" 2> "$GITHUB_WORKSPACE/$PROOF_ROOT/logs/frontend_error.log" &
-          echo $! > "$GITHUB_WORKSPACE/$PROOF_ROOT/frontend.pid"
-          cd "$GITHUB_WORKSPACE"
-          code=0
-          for i in $(seq 1 60); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ui/ || true)
-            if [ "$code" = "200" ]; then break; fi
-            sleep 1
-          done
-          echo "$code" > "$PROOF_ROOT/frontend_http.status"
-          exit 0
-
-      - name: Capture all dashboard tabs
+      - name: Capture all same-origin dashboard tabs
         continue-on-error: true
         run: |
           set +e
           python scripts/capture_dashboard_proof.py \
-            --url http://127.0.0.1:3000/ui/ \
+            --url http://127.0.0.1:8000/ui/ \
             --output "$PROOF_ROOT/ui" > "$PROOF_ROOT/logs/ui_capture.log" 2>&1
           echo $? > "$PROOF_ROOT/ui_capture.exit"
           exit 0
@@ -232,6 +226,7 @@ jobs:
               "dependency_install_exit": read_int("pip_install.exit"),
               "npm_ci_exit": read_int("npm_ci.exit"),
               "playwright_install_exit": read_int("playwright_install.exit"),
+              "simulation_route_inject_exit": read_int("simulation_route_inject.exit"),
               "compile_exit": read_int("compileall.exit"),
               "pytest_collect_exit": read_int("pytest_collect.exit"),
               "pytest_collected": int(matches[-1]) if matches else None,
@@ -252,10 +247,12 @@ jobs:
           critical = {
               "inventory_missing_files": inventory.get("missing_tracked_files", -1),
               "dependency_install_exit": summary["dependency_install_exit"],
+              "simulation_route_inject_exit": summary["simulation_route_inject_exit"],
               "compile_exit": summary["compile_exit"],
               "pytest_full_exit": summary["pytest_full_exit"],
               "frontend_build_exit": summary["frontend_build_exit"],
               "backend_health_status": summary["backend_health_status"],
+              "frontend_http_status": summary["frontend_http_status"],
               "api_non_200": api.get("non_200_count", -1),
               "ui_tabs_failed": ui.get("tabs_failed", -1),
               "ui_console_errors": ui.get("console_error_count", -1),
@@ -266,18 +263,20 @@ jobs:
           summary["critical_pass_count"] = sum([
               critical["inventory_missing_files"] == 0,
               critical["dependency_install_exit"] == 0,
+              critical["simulation_route_inject_exit"] == 0,
               critical["compile_exit"] == 0,
               critical["pytest_full_exit"] == 0,
               critical["frontend_build_exit"] == 0,
               critical["backend_health_status"] == 200,
+              critical["frontend_http_status"] == 200,
               critical["api_non_200"] == 0,
               critical["ui_tabs_failed"] == 0,
               critical["ui_console_errors"] == 0,
               critical["ui_page_errors"] == 0,
               critical["ui_http_non_2xx"] == 0,
           ])
-          summary["critical_gate_count"] = 11
-          summary["status"] = "PASS" if summary["critical_pass_count"] == 11 else "FAIL"
+          summary["critical_gate_count"] = 13
+          summary["status"] = "PASS" if summary["critical_pass_count"] == 13 else "FAIL"
           (root / "full_system_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
           print(json.dumps(summary, indent=2))
 
