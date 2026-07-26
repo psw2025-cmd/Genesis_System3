@@ -87,9 +87,10 @@ def test_verify_data_detects_clean_partition(tmp_path: Path):
     assert result["no_trade_rows"] == 0
 
 
-def test_verify_udiff_schema_and_detects_bad_traded_high(tmp_path: Path):
+def test_verify_udiff_schema_quarantines_bad_traded_future_high(tmp_path: Path):
     data_root = tmp_path / "data"
     frame = pd.DataFrame({
+        "FinInstrmTp": ["STF", "STF"],
         "OpnPric": [10, 11], "HghPric": [12, 10], "LwPric": [9, 9], "ClsPric": [11, 12],
         "TtlTradgVol": [100, 110], "OpnIntrst": [1000, 1100],
     })
@@ -97,9 +98,12 @@ def test_verify_udiff_schema_and_detects_bad_traded_high(tmp_path: Path):
     manifest = Manifest(data_root / "manifest.sqlite3")
     register(manifest, output, "NSE_FO_EOD", 2)
     result = verify_data(data_root, manifest)
-    assert result["status"] == "FAIL"
-    assert result["invalid_traded_ohlc_rows"] == 1
+    assert result["status"] == "PASS_WITH_QUARANTINE"
+    assert result["quarantined_invalid_market_rows"] == 1
+    assert result["invalid_traded_futures_ohlc_rows"] == 1
+    assert result["invalid_traded_option_ohlc_rows"] == 0
     assert result["partial_traded_ohlc_rows"] == 0
+    assert result["structural_failure_count"] == 0
     assert result["missing_ohlc_schema_files"] == 0
     assert result["missing_volume_oi_schema_files"] == 0
 
@@ -117,7 +121,7 @@ def test_verify_allows_zero_ohlc_for_no_trade_contract(tmp_path: Path):
     assert result["status"] == "PASS"
     assert result["traded_rows_checked"] == 0
     assert result["no_trade_rows"] == 1
-    assert result["invalid_traded_ohlc_rows"] == 0
+    assert result["quarantined_invalid_market_rows"] == 0
     assert result["partial_traded_ohlc_rows"] == 0
 
 
