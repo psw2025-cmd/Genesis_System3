@@ -80,7 +80,9 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         "traded_rows_checked": 0,
         "no_trade_rows": 0,
         "partial_traded_ohlc_rows": 0,
-        "invalid_traded_ohlc_rows": 0,
+        "invalid_traded_option_ohlc_rows": 0,
+        "invalid_traded_futures_ohlc_rows": 0,
+        "invalid_traded_unclassified_ohlc_rows": 0,
         "negative_volume_oi_rows": 0,
         "missing_required_column_files": 0,
         "missing_ohlc_schema_files": 0,
@@ -114,6 +116,8 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
         close_col = pick_column(frame, ("close", "ClsPric", "CLOSE"))
         volume_col = pick_column(frame, ("volume", "TtlTradgVol", "CONTRACTS"))
         oi_col = pick_column(frame, ("oi", "OpnIntrst", "OPEN_INT"))
+        instrument_col = pick_column(frame, ("instrument", "FinInstrmTp", "INSTRUMENT"))
+        option_type_col = pick_column(frame, ("option_type", "OptnTp", "OPTION_TYP"))
 
         if not volume_col or not oi_col:
             counters["missing_volume_oi_schema_files"] += 1
@@ -135,14 +139,44 @@ def verify_data(manifest: Manifest, limit: int | None = None) -> dict:
                 | (ohlc["low"] > ohlc[["open", "close", "high"]].min(axis=1))
             )
             counters["partial_traded_ohlc_rows"] += int(partial_traded.sum())
-            counters["invalid_traded_ohlc_rows"] += int(invalid_traded.sum())
+
+            instrument = (
+                frame[instrument_col].fillna("").astype(str).str.upper().str.strip()
+                if instrument_col else pd.Series("", index=frame.index)
+            )
+            option_type = (
+                frame[option_type_col].fillna("").astype(str).str.upper().str.strip()
+                if option_type_col else pd.Series("", index=frame.index)
+            )
+            option_mask = instrument.isin({"IDO", "STO", "OPTIDX", "OPTSTK"}) | option_type.isin({"CE", "PE", "CALL", "PUT"})
+            futures_mask = instrument.isin({"IDF", "STF", "FUTIDX", "FUTSTK"}) | instrument.str.contains("FUT", regex=False)
+            counters["invalid_traded_option_ohlc_rows"] += int((invalid_traded & option_mask).sum())
+            counters["invalid_traded_futures_ohlc_rows"] += int((invalid_traded & ~option_mask & futures_mask).sum())
+            counters["invalid_traded_unclassified_ohlc_rows"] += int((invalid_traded & ~option_mask & ~futures_mask).sum())
         else:
             counters["missing_ohlc_schema_files"] += 1
 
-    non_failure_metrics = {"files_checked", "rows_checked", "traded_rows_checked", "no_trade_rows"}
-    failures = sum(value for key, value in counters.items() if key not in non_failure_metrics)
+    quarantine_rows = (
+        counters["invalid_traded_option_ohlc_rows"]
+        + counters["invalid_traded_futures_ohlc_rows"]
+        + counters["invalid_traded_unclassified_ohlc_rows"]
+    )
+    structural_failure_keys = {
+        "sha_mismatches", "missing_files", "unreadable_files", "empty_files", "duplicate_rows",
+        "partial_traded_ohlc_rows", "negative_volume_oi_rows", "missing_required_column_files",
+        "missing_ohlc_schema_files", "missing_volume_oi_schema_files",
+    }
+    structural_failures = sum(counters[key] for key in structural_failure_keys)
+    if structural_failures > 0 or counters["files_checked"] == 0:
+        status = "FAIL"
+    elif quarantine_rows > 0:
+        status = "PASS_WITH_QUARANTINE"
+    else:
+        status = "PASS"
     return {
-        "status": "PASS" if failures == 0 and counters["files_checked"] > 0 else "FAIL",
+        "status": status,
         "manifest_valid_records": len(records),
+        "quarantined_invalid_market_rows": quarantine_rows,
+        "structural_failure_count": structural_failures,
         **counters,
     }
