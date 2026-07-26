@@ -130,6 +130,66 @@ jobs:
             reports/latest/workflow_policy_diagnostic/
           if-no-files-found: error
 
+  hosted-nse-eod-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install archive dependencies
+        run: python -m pip install pandas requests pyarrow
+      - name: Download one real NSE F&O session
+        run: >-
+          python scripts/options_bigdata_download.py download-nse
+          --start 2026-07-24 --end 2026-07-24 --limit 1
+          --data-root storage/nse_eod_smoke
+          --report-dir reports/latest/options_bigdata_nse_smoke
+      - name: Preserve download summary
+        run: cp reports/latest/options_bigdata_nse_smoke/summary.json reports/latest/options_bigdata_nse_smoke/download_summary.json
+      - name: Verify downloaded session
+        run: >-
+          python scripts/options_bigdata_download.py verify
+          --start 2026-07-24 --end 2026-07-24
+          --data-root storage/nse_eod_smoke
+          --report-dir reports/latest/options_bigdata_nse_smoke
+      - name: Assert rows, bytes, hash, and safety
+        shell: python
+        run: |
+          import json, sqlite3
+          from pathlib import Path
+          report = Path("reports/latest/options_bigdata_nse_smoke")
+          download = json.loads((report / "download_summary.json").read_text())
+          verify = json.loads((report / "summary.json").read_text())
+          db = sqlite3.connect("storage/nse_eod_smoke/manifest.sqlite3")
+          row = db.execute("SELECT status, rows, bytes, sha256, path FROM objects WHERE source='NSE_FO_EOD'").fetchone()
+          assert download["results"]["nse"]["downloaded_days"] == 1, download
+          assert download["results"]["nse"]["rows"] > 0, download
+          assert verify["status"] == "PASS", verify
+          assert verify["files_checked"] == 1, verify
+          assert verify["rows_checked"] > 0, verify
+          assert row and row[0] == "DOWNLOADED", row
+          assert row[1] > 0 and row[2] > 0 and len(row[3]) == 64, row
+          proof = {
+            "trade_date": "2026-07-24", "status": row[0], "rows": row[1], "bytes": row[2],
+            "sha256": row[3], "path": row[4], "verify": verify,
+            "live_trading_enabled": False, "order_placement_allowed": False,
+          }
+          (report / "nse_eod_smoke_proof.json").write_text(json.dumps(proof, indent=2, sort_keys=True) + "\n")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: real-nse-fo-eod-smoke
+          path: |
+            reports/latest/options_bigdata_nse_smoke/
+            storage/nse_eod_smoke/manifest.sqlite3
+            storage/nse_eod_smoke/nse_fo_eod/
+          if-no-files-found: error
+
   self-hosted-research-batch:
     if: github.event_name == 'workflow_dispatch' && inputs.action != 'plan'
     runs-on: self-hosted
