@@ -8,9 +8,11 @@ on:
       - "src/options_research/**"
       - "scripts/options_bigdata_*.py"
       - "scripts/options_research_train_backtest.py"
+      - "scripts/profile_options_dataset.py"
       - "scripts/workflow_policy_diagnostic.py"
       - "tests/test_options_bigdata_*.py"
       - "tests/test_options_research_train_backtest.py"
+      - "tests/test_profile_options_dataset.py"
       - "requirements-research.txt"
       - ".github/workflows/options-bigdata-research.yml"
   pull_request:
@@ -18,9 +20,11 @@ on:
       - "src/options_research/**"
       - "scripts/options_bigdata_*.py"
       - "scripts/options_research_train_backtest.py"
+      - "scripts/profile_options_dataset.py"
       - "scripts/workflow_policy_diagnostic.py"
       - "tests/test_options_bigdata_*.py"
       - "tests/test_options_research_train_backtest.py"
+      - "tests/test_profile_options_dataset.py"
       - "requirements-research.txt"
       - ".github/workflows/options-bigdata-research.yml"
   workflow_dispatch:
@@ -87,6 +91,7 @@ jobs:
           scripts/options_bigdata_download.py
           scripts/options_bigdata_full_pipeline.py
           scripts/options_research_train_backtest.py
+          scripts/profile_options_dataset.py
           scripts/workflow_policy_diagnostic.py
       - name: Run focused tests
         run: >-
@@ -94,6 +99,7 @@ jobs:
           tests/test_options_bigdata_download.py
           tests/test_options_bigdata_full_pipeline.py
           tests/test_options_research_train_backtest.py
+          tests/test_profile_options_dataset.py
       - name: Build deterministic planning master
         shell: python
         run: |
@@ -158,7 +164,12 @@ jobs:
           --start 2026-07-24 --end 2026-07-24
           --data-root storage/nse_eod_smoke
           --report-dir reports/latest/options_bigdata_nse_smoke
-      - name: Assert rows, bytes, hash, and safety
+      - name: Profile option contract composition
+        run: >-
+          python scripts/profile_options_dataset.py
+          --input storage/nse_eod_smoke/nse_fo_eod/2026/20260724_fo.parquet
+          --output reports/latest/options_bigdata_nse_smoke/dataset_profile.json
+      - name: Assert rows, bytes, hash, profile, and safety
         shell: python
         run: |
           import json, sqlite3
@@ -166,6 +177,7 @@ jobs:
           report = Path("reports/latest/options_bigdata_nse_smoke")
           download = json.loads((report / "download_summary.json").read_text())
           verify = json.loads((report / "summary.json").read_text())
+          profile = json.loads((report / "dataset_profile.json").read_text())
           db = sqlite3.connect("storage/nse_eod_smoke/manifest.sqlite3")
           row = db.execute("SELECT status, rows, bytes, sha256, path FROM objects WHERE source='NSE_FO_EOD'").fetchone()
           assert download["results"]["nse"]["downloaded_days"] == 1, download
@@ -173,11 +185,14 @@ jobs:
           assert verify["status"] == "PASS", verify
           assert verify["files_checked"] == 1, verify
           assert verify["rows_checked"] > 0, verify
+          assert profile["rows"] == verify["rows_checked"], profile
+          assert profile["option_rows"] > 0, profile
+          assert profile["distinct_option_symbols"] > 0, profile
           assert row and row[0] == "DOWNLOADED", row
           assert row[1] > 0 and row[2] > 0 and len(row[3]) == 64, row
           proof = {
             "trade_date": "2026-07-24", "status": row[0], "rows": row[1], "bytes": row[2],
-            "sha256": row[3], "path": row[4], "verify": verify,
+            "sha256": row[3], "path": row[4], "verify": verify, "profile": profile,
             "live_trading_enabled": False, "order_placement_allowed": False,
           }
           (report / "nse_eod_smoke_proof.json").write_text(json.dumps(proof, indent=2, sort_keys=True) + "\n")
