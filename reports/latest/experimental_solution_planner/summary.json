@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-26T15:54:42.004286+00:00",
-  "issue_count": 486,
+  "generated_utc": "2026-07-26T15:55:09.500611+00:00",
+  "issue_count": 485,
   "lane_count": 13,
   "lanes": [
     {
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 50,
+      "issue_count": 49,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
