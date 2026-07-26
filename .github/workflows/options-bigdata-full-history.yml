@@ -5,7 +5,10 @@ on:
     paths:
       - "src/options_research/**"
       - "scripts/options_bigdata_download.py"
+      - "scripts/options_bigdata_eod_train_backtest.py"
       - "scripts/profile_options_archive.py"
+      - "tests/test_options_bigdata_download.py"
+      - "tests/test_options_bigdata_eod.py"
       - ".github/workflows/options-bigdata-full-history.yml"
 
 permissions:
@@ -23,6 +26,7 @@ jobs:
       LIVE_TRADING_ENABLED: "0"
       SYSTEM3_LIVE_TRADING_ALLOWED: "0"
       DATA_ROOT: storage/full_nse_fo_history
+      WORK_ROOT: storage/full_nse_fo_research_work
       REPORT_ROOT: reports/latest/options_bigdata_full_history
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +34,18 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - name: Install archive dependencies
-        run: python -m pip install pandas requests pyarrow
+      - name: Install archive and model dependencies
+        run: python -m pip install pandas requests pyarrow scipy scikit-learn joblib pytest
+      - name: Compile and run focused EOD tests
+        run: |
+          python -m py_compile \
+            src/options_research/manifest.py \
+            src/options_research/eod_features.py \
+            src/options_research/eod_model.py \
+            scripts/options_bigdata_download.py \
+            scripts/options_bigdata_eod_train_backtest.py \
+            scripts/profile_options_archive.py
+          python -m pytest -q tests/test_options_bigdata_download.py tests/test_options_bigdata_eod.py
       - name: Show initial disk
         run: df -h .
       - name: Download complete history pass 1
@@ -73,6 +87,16 @@ jobs:
           python scripts/profile_options_archive.py
           --data-root "$DATA_ROOT"
           --output "$REPORT_ROOT/archive_profile.json"
+      - name: Generate features, train all chronological rows, and test frozen holdout
+        run: >-
+          python scripts/options_bigdata_eod_train_backtest.py
+          --data-root "$DATA_ROOT"
+          --work-root "$WORK_ROOT"
+          --report-root "$REPORT_ROOT"
+          --base-cost-bps 80
+          --top-k 3
+          --embargo-days 1
+          --epochs 2
       - name: Assert completion and create final proof
         shell: python
         run: |
@@ -81,24 +105,32 @@ jobs:
           report = Path("reports/latest/options_bigdata_full_history")
           verify = json.loads((report / "full_verify_summary.json").read_text())
           profile = json.loads((report / "archive_profile.json").read_text())
+          model = json.loads((report / "eod_model_backtest_proof.json").read_text())
           assert verify["nse_remaining_weekdays"] == 0, verify
           assert verify["nse_retryable_failed_objects"] == 0, verify
           assert verify["status"] == "PASS", verify
           for key in (
               "sha_mismatches", "missing_files", "unreadable_files", "empty_files",
               "duplicate_rows", "invalid_ohlc_rows", "negative_volume_oi_rows",
-              "missing_required_column_files",
+              "missing_required_column_files", "missing_ohlc_schema_files",
+              "missing_volume_oi_schema_files",
           ):
               assert verify[key] == 0, (key, verify[key])
           assert profile["files"] == verify["files_checked"], (profile, verify)
           assert profile["rows"] == verify["rows_checked"], (profile, verify)
           assert profile["option_rows"] > 0, profile
+          assert model["all_valid_train_rows_used"] is True, model
+          assert model["split"]["test_days"] >= 400, model["split"]
+          assert model["frozen_test"]["trades"] >= 1000, model["frozen_test"]
+          assert model["live_trading_enabled"] is False, model
+          assert model["promotion_allowed"] is False, model
           proof = {
               "status": "PASS",
               "requested_start": "2016-07-26",
               "requested_end": "2026-07-24",
               "verify": verify,
               "profile": profile,
+              "eod_model_backtest": model,
               "live_trading_enabled": False,
               "order_placement_allowed": False,
               "model_promotion_allowed": False,
@@ -108,15 +140,16 @@ jobs:
           )
       - name: Show final disk
         if: always()
-        run: df -h . && du -sh "$DATA_ROOT" "$REPORT_ROOT" || true
+        run: df -h . && du -sh "$DATA_ROOT" "$WORK_ROOT" "$REPORT_ROOT" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: genesis-system3-nse-fo-history-20160726-20260724
+          name: genesis-system3-nse-fo-history-model-20160726-20260724
           path: |
             reports/latest/options_bigdata_full_history/
             storage/full_nse_fo_history/manifest.sqlite3
             storage/full_nse_fo_history/nse_fo_eod/
+            storage/full_nse_fo_research_work/eod_features/
           compression-level: 0
           retention-days: 30
           if-no-files-found: error
