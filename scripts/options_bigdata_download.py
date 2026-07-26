@@ -55,6 +55,31 @@ def _resolve_dhan_plan(args: argparse.Namespace, start: date, end: date) -> tupl
     return universe, build_plan(universe, start, end, args.interval), security_master
 
 
+def _nse_progress(manifest: Manifest, start: date, end: date) -> dict:
+    expected = sum(
+        1 for index in range((end - start).days + 1)
+        if (start + timedelta(days=index)).weekday() < 5
+    )
+    records = [
+        record for record in manifest.records()
+        if record.get("source") == "NSE_FO_EOD"
+        and start.isoformat() <= str(record.get("start_date") or "") <= end.isoformat()
+    ]
+    statuses: dict[str, int] = {}
+    for record in records:
+        status = str(record.get("status") or "UNKNOWN")
+        statuses[status] = statuses.get(status, 0) + 1
+    completed = sum(statuses.get(status, 0) for status in ("DOWNLOADED", "EXISTS_VALID", "UNAVAILABLE"))
+    return {
+        "nse_expected_weekdays": expected,
+        "nse_manifest_objects": len(records),
+        "nse_completed_objects": completed,
+        "nse_remaining_weekdays": max(0, expected - completed),
+        "nse_retryable_failed_objects": statuses.get("FAILED", 0),
+        "nse_status_counts": statuses,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["plan", "download-nse", "download-dhan", "verify", "all"])
@@ -101,7 +126,7 @@ def main() -> int:
 
     manifest = Manifest(args.data_root / "manifest.sqlite3")
     if args.command == "verify":
-        payload = {**counts, **_verify_data(manifest, args.limit)}
+        payload = {**counts, **_nse_progress(manifest, start, end), **_verify_data(manifest, args.limit)}
         write_report(args.report_dir, payload)
         print(json.dumps(payload, indent=2))
         return 0 if payload["status"] == "PASS" else 2
@@ -117,7 +142,7 @@ def main() -> int:
     failed = any(isinstance(result, dict) and result.get("failed", 0) for result in results.values())
     payload = {
         "status": "BLOCKED" if blocked else ("PARTIAL" if failed else "PASS"),
-        **counts, **manifest.summary(), "results": results,
+        **counts, **_nse_progress(manifest, start, end), **manifest.summary(), "results": results,
     }
     write_report(args.report_dir, payload)
     print(json.dumps(payload, indent=2))
