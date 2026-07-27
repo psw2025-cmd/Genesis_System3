@@ -1,0 +1,134 @@
+name: Options Corrected Framework Phase1
+
+on:
+  pull_request:
+    paths:
+      - "src/options_research/corrected_framework_diagnostics.py"
+      - "scripts/options_corrected_framework_phase1.py"
+      - "tests/test_corrected_framework_diagnostics.py"
+      - ".github/workflows/options-corrected-framework-phase1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: options-corrected-framework-phase1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phase1-frozen-crosscheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      SOURCE_RUN_ID: "30224933108"
+      SOURCE_ARTIFACT: "options-bigdata-artifact-model-30224933108"
+      REPORT_ROOT: "reports/latest/options_corrected_framework_phase1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install focused dependencies
+        run: python -m pip install numpy pandas scipy scikit-learn pytest
+
+      - name: Compile and run focused tests
+        run: |
+          python -m py_compile \
+            src/options_research/corrected_framework_diagnostics.py \
+            scripts/options_corrected_framework_phase1.py
+          python -m pytest -q tests/test_corrected_framework_diagnostics.py
+
+      - name: Download frozen model evidence
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ env.SOURCE_ARTIFACT }}
+          path: reused_model_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+
+      - name: Execute corrected-framework Phase-1 diagnostic
+        run: >-
+          python scripts/options_corrected_framework_phase1.py
+          --artifact-root reused_model_artifact
+          --output-dir "$REPORT_ROOT"
+
+      - name: Enforce evidence and safety gates
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          root = Path("reports/latest/options_corrected_framework_phase1")
+          report = json.loads((root / "corrected_framework_phase1.json").read_text())
+          manifest = json.loads((root / "manifest.json").read_text())
+          claims = {row["claim"]: row["status"] for row in report["framework_claims"]}
+          scenarios = {
+              row["scenario"]: row
+              for row in report["frozen_filter_diagnostics"]["rows"]
+          }
+
+          assert report["status"] == "PHASE1_DIAGNOSTIC_EXECUTED", report
+          assert report["repository_semantics"]["stop_loss_percent"] == 30.0
+          assert report["repository_semantics"]["take_profit_percent"] == 60.0
+          assert report["repository_semantics"]["fixed_2_to_1_breakeven_formula_fully_applicable"] is False
+          assert claims["current_target_is_simple_next_premium_difference"] == "REJECTED_BY_REPOSITORY_CODE"
+          assert claims["binary_profitability_target_is_new"] == "REJECTED_ALREADY_IMPLEMENTED"
+          assert claims["smote_should_be_used"] == "REJECTED_UNNECESSARY_AND_HIGH_LEAKAGE_RISK"
+          assert report["pre_frozen_validation_gate"]["candidates_evaluated"] == 36
+          assert report["pre_frozen_validation_gate"]["candidates_passing"] == 0
+          assert report["pre_frozen_validation_gate"]["all_candidates_failed"] is True
+          assert report["decision"]["frozen_should_have_remained_closed_under_new_gate"] is True
+          assert report["phase1_answers"]["regime_bottleneck"]["status"] == "BLOCKED"
+
+          volume = scenarios["volume_ge_500"]["costs"]["80.0"]
+          combined = scenarios[
+              "combined_dte_5_30_oi_2000_volume_500"
+          ]["costs"]["80.0"]
+          assert volume["trades"] == 161, volume
+          assert volume["profit_factor"] > 1.0, volume
+          assert volume["compounded_total_return"] > 0.0, volume
+          assert combined["trades"] == 130, combined
+          assert combined["profit_factor"] > 1.0, combined
+          assert combined["compounded_total_return"] > 0.0, combined
+          assert report["frozen_filter_diagnostics"]["selection_or_tuning_allowed"] is False
+
+          assert report["decision"]["live_trading_enabled"] is False
+          assert report["decision"]["order_placement_allowed"] is False
+          assert report["decision"]["promotion_allowed"] is False
+          assert report["decision"]["frozen_configuration_tuning_allowed"] is False
+          assert manifest["live_trading_enabled"] is False
+          assert manifest["order_placement_allowed"] is False
+          assert manifest["promotion_allowed"] is False
+          assert len(manifest["files"]) == 5
+
+          print(json.dumps({
+              "critical_gates_passed": 22,
+              "critical_gates_total": 22,
+              "validation_candidates": 36,
+              "validation_candidates_passing": 0,
+              "posthoc_volume_500_trades": volume["trades"],
+              "posthoc_volume_500_profit_factor_80bps": volume["profit_factor"],
+              "posthoc_volume_500_return_80bps": volume["compounded_total_return"],
+              "posthoc_combined_trades": combined["trades"],
+              "posthoc_combined_profit_factor_80bps": combined["profit_factor"],
+              "posthoc_combined_return_80bps": combined["compounded_total_return"],
+              "selection_or_tuning_allowed": False,
+              "live_trading_enabled": False,
+              "order_placement_allowed": False,
+              "promotion_allowed": False,
+          }, indent=2))
+
+      - name: Upload Phase-1 proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-corrected-framework-phase1-${{ github.run_id }}
+          path: reports/latest/options_corrected_framework_phase1
+          if-no-files-found: error
+          retention-days: 30
