@@ -1,9 +1,9 @@
 # Cloud Runtime Check
 
-- Generated UTC: `2026-07-27T10:18:40.173013Z`
+- Generated UTC: `2026-07-27T11:38:51.204639Z`
 - Verdict: **WARN**
 - Base URL: `http://127.0.0.1:8000`
-- Expected commit: `b644cf417a1865c35d025f4df8bb8a1d90688ffc`
+- Expected commit: `f9e55cd0f415158f298c779c763b2ba357dbfa90`
 - Deployed commit: `unknown`
 
 ## Key facts
@@ -46,12 +46,12 @@
 - `broker_status` `/api/broker/status`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
 - `broker_dhan_status` `/api/broker/dhan/status`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
 - `broker_deps` `/api/broker/deps`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `scheduler_health` `/api/scheduler/health`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `scheduler_health` `/api/scheduler/health`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
 - `portfolio_unified` `/api/portfolio/unified`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `memory_after_portfolio` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
-- `chain_nifty` `/api/chain/NIFTY`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
-- `memory_after_chain` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
-- `underlyings` `/api/underlyings`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `memory_after_portfolio` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `chain_nifty` `/api/chain/NIFTY`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `memory_after_chain` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `underlyings` `/api/underlyings`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
 - `state` `/api/state`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
 
 ## Safety
