@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-27T21:40:41.813046+00:00`
+Generated UTC: `2026-07-27T21:41:03.874885+00:00`
 Status: **BLOCKED**
-Issues: `491`
+Issues: `490`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30304155668 conclusion=failure commit=efa95603bc58
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30304103633 conclusion=failure commit=9f0120ab22fb
 
-### UI_RED_VISUAL — 49 issues
+### UI_RED_VISUAL — 48 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
