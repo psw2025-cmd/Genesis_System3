@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-27T07:27:52.341826+00:00`
+Generated UTC: `2026-07-27T07:43:56.543034+00:00`
 Status: **BLOCKED**
-Issues: `468`
+Issues: `471`
 Fix lanes: `13`
 
 ## Rule
@@ -25,7 +25,7 @@ Use this plan to fix root causes by lane. Do not claim resolved until proof repo
 
 ## Fix lanes
 
-### GITHUB_RENDER_FAILURE — 249 issues
+### GITHUB_RENDER_FAILURE — 251 issues
 
 Recommended fixes:
 - Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30242577839 conclusion=failure commit=d742e714106a
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30242114883 conclusion=failure commit=e711e429a1c9
 
-### UI_RED_VISUAL — 48 issues
+### UI_RED_VISUAL — 49 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -329,11 +329,11 @@ Top issues:
 - `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY
 - `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID
 - `reports/latest/autopilot_proof_board/summary.json`: secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30240067661 conclusion=failure commit=7d0a844877fc6164bb9bcc71bc2b443626b56b15
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30240051227 conclusion=failure commit=6be597fd9a07bbbee25d03d2a9d16a9fb3c8b499
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30240049449 conclusion=failure commit=6be597fd9a07bbbee25d03d2a9d16a9fb3c8b499
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30240031860 conclusion=failure commit=0566d352da69d29110d8756999e267efda4a2a5b
-- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30240027972 conclusion=failure commit=0566d352da69d29110d8756999e267efda4a2a5b
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30246211475 conclusion=failure commit=3f4c3cb60ba55ee5a3e42e77b44434f249ea49e3
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30246186771 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30246186296 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30246167802 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048
+- `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'System3 Secure Install Credential Audit' run 30246162503 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048
 
 ### WORKFLOW_CI — 10 issues
 
@@ -352,7 +352,7 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234783276 conclusion=cancelled commit=cd11807b15762fad09c4780c0bc359abdde5495a
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234761296 conclusion=cancelled commit=d506687cd01de6adfd5e19745a0b4cc184c05d3a
-- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=40
+- `reports/latest/workflow_failure_tracker/summary.json`: failed_count=41
 
 ### ROUTE_CODE — 9 issues
 
