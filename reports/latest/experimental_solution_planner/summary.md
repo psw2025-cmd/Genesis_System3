@@ -1,6 +1,6 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-27T05:19:24.257417+00:00`
+Generated UTC: `2026-07-27T05:19:50.544497+00:00`
 Status: **BLOCKED**
 Issues: `439`
 Fix lanes: `13`
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30238522024 conclusion=failure commit=1ffb29c8bbd7
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30238403541 conclusion=failure commit=1ffb29c8bbd7
 
-### UI_RED_VISUAL — 48 issues
+### UI_RED_VISUAL — 49 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
@@ -273,7 +273,7 @@ Top issues:
   fon
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_066:option_chain: Option-chain proof blocked for FINNIFTY: status=401 sample={"detail":"Missing or invalid dashboard API session"}
 
-### WORKFLOW_CI — 15 issues
+### WORKFLOW_CI — 14 issues
 
 Recommended fixes:
 - Read workflow_failure_tracker TODO.
@@ -290,12 +290,6 @@ Top issues:
 - `reports/latest/render_100_agent_swarm/summary.json`: agent_084:backend_api_smoke: Backend API smoke failed /api/state: status=502
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234783276 conclusion=cancelled commit=cd11807b15762fad09c4780c0bc359abdde5495a
 - `reports/latest/autopilot_proof_board/summary.json`: workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234761296 conclusion=cancelled commit=d506687cd01de6adfd5e19745a0b4cc184c05d3a
-- `reports/latest/dashboard_visible_issue_tracker/summary.json`: Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell
-╔═════════════════════════════════════════════════════════════════════════╗
-║ Looks like Playwright Test or Playwright was just installed or updated. ║
-║ Please run the following command to download new browsers:              ║
-║                                                                         ║
-║     npx playwr
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30234783276 conclusion=cancelled commit=cd11807b15762fad09c4780c0bc359abdde5495a
 - `reports/latest/workflow_failure_tracker/summary.json`: Fix workflow 'Genesis System3 Global Safety CI' run 30234761296 conclusion=cancelled commit=d506687cd01de6adfd5e19745a0b4cc184c05d3a
 - `reports/latest/workflow_failure_tracker/summary.json`: {"branch": "feat/nonlive-equity-options-bigdata-pipeline", "commit": "cd11807b15762fad09c4780c0bc359abdde5495a", "conclusion": "cancelled", "created_at": "2026-07-27T03:30:58Z", "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30234783276", "run_id": 30234783276, "updated_at": "2026-07-27T03:35:15Z", "workflow": "Genesis System3 Global Safety CI"}

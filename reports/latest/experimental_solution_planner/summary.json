@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-27T05:19:24.257417+00:00",
+  "generated_utc": "2026-07-27T05:19:50.544497+00:00",
   "issue_count": 439,
   "lane_count": 13,
   "lanes": [
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "issue_count": 48,
+      "issue_count": 49,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -670,7 +670,7 @@
       ]
     },
     {
-      "issue_count": 15,
+      "issue_count": 14,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -722,11 +722,6 @@
           "issue": "workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234761296 conclusion=cancelled commit=d506687cd01de6adfd5e19745a0b4cc184c05d3a",
           "lane": "WORKFLOW_CI",
           "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwr",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
           "issue": "Fix workflow 'Genesis System3 Global Safety CI' run 30234783276 conclusion=cancelled commit=cd11807b15762fad09c4780c0bc359abdde5495a",
