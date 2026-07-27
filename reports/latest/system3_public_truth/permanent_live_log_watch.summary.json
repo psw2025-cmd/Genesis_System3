@@ -1,80 +1,15 @@
 {
-  "base": "https://127.0.0.1:8000",
+  "base": "http://127.0.0.1:8000",
   "blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    "TOP_LEVEL_EXCEPTION:Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/api/auth/status\nCall log:\n  - navigating to \"http://127.0.0.1:8000/api/auth/status\", waiting until \"networkidle\"\n",
+    "REQUEST_FAILED:http://127.0.0.1:8000/api/auth/status:net::ERR_CONNECTION_REFUSED"
   ],
-  "chain_truth": [
-    {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-      "endpoint": "/api/chain/NIFTY",
-      "ok": false,
-      "optional": false,
-      "priority": "dhan_only_no_rows",
-      "safe_blocked": true,
-      "source": "dhan",
-      "spot": 0,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
-    },
-    {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-      "endpoint": "/api/chain/BANKNIFTY",
-      "ok": false,
-      "optional": false,
-      "priority": "dhan_only_no_rows",
-      "safe_blocked": true,
-      "source": "dhan",
-      "spot": 0,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
-    },
-    {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-      "endpoint": "/api/chain/FINNIFTY",
-      "ok": false,
-      "optional": false,
-      "priority": "dhan_only_no_rows",
-      "safe_blocked": true,
-      "source": "dhan",
-      "spot": 0,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
-    },
-    {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-      "endpoint": "/api/chain/MIDCPNIFTY",
-      "ok": false,
-      "optional": false,
-      "priority": "dhan_only_no_rows",
-      "safe_blocked": true,
-      "source": "dhan",
-      "spot": 0,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
-    },
-    {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-      "endpoint": "/api/chain/SENSEX",
-      "ok": false,
-      "optional": true,
-      "priority": "dhan_only_no_rows",
-      "safe_blocked": true,
-      "source": "dhan",
-      "spot": 0,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
-    }
+  "chain_truth": [],
+  "final_verdict": "FAIL",
+  "generated_at": "2026-07-27T04:25:43.881Z",
+  "infra_blockers": [
+    "TOP_LEVEL_EXCEPTION:Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/api/auth/status\nCall log:\n  - navigating to \"http://127.0.0.1:8000/api/auth/status\", waiting until \"networkidle\"\n",
+    "REQUEST_FAILED:http://127.0.0.1:8000/api/auth/status:net::ERR_CONNECTION_REFUSED"
   ],
-  "final_verdict": "BLOCKED_NOT_TRADE_READY",
-  "generated_at": "2026-07-15T09:17:23.173Z",
-  "infra_blockers": [],
-  "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ]
+  "trade_readiness_blockers": []
 }

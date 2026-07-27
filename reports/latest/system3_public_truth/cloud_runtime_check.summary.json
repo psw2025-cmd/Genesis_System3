@@ -1,70 +1,97 @@
 {
   "alerts": [],
-  "deployed_commit": "[REDACTED]",
-  "expected_commit": "286e40cb2733f3296ea80ffbd6953d84f9ff12b2",
-  "generated_utc": "2026-07-15T09:14:37.594109Z",
+  "deployed_commit": "",
+  "expected_commit": "75329a8eb8869dd5d584c7db5f7c231b04b84721",
+  "generated_utc": "2026-07-27T04:16:30.628259Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
-    "portfolio_details_mode": "skipped_for_render_memory",
+    "portfolio_details_mode": null,
     "scheduler_healthy": false,
     "scheduler_received": false
   },
   "memory": {
     "after_chain": {
-      "available": true,
-      "pct_used": 22.5,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 1394.7,
-        "limit_mb": 1800,
-        "pct_used": 22.5,
-        "rss_mb": 405.3,
-        "status": "OK"
-      },
-      "rss_mb": 405.3,
-      "status": "OK"
+      "available": false
     },
     "after_portfolio": {
-      "available": true,
-      "pct_used": 22.5,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 1394.7,
-        "limit_mb": 1800,
-        "pct_used": 22.5,
-        "rss_mb": 405.3,
-        "status": "OK"
-      },
-      "rss_mb": 405.3,
-      "status": "OK"
+      "available": false
     },
     "before": {
-      "available": true,
-      "pct_used": 20.1,
-      "raw": {
-        "gc_triggered": false,
-        "headroom_mb": 1438.9,
-        "limit_mb": 1800,
-        "pct_used": 20.1,
-        "rss_mb": 361.1,
-        "status": "OK"
-      },
-      "rss_mb": 361.1,
-      "status": "OK"
+      "available": false
     }
   },
   "verdict": "WARN",
   "warnings": [
     {
-      "key": "deploy_commit_mismatch",
+      "key": "endpoint_deploy_info",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=286e40cb2733"
+      "message": "deploy_info failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_health",
+      "level": "WARNING",
+      "message": "health failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_memory_before",
+      "level": "WARNING",
+      "message": "memory_before failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_broker_status",
+      "level": "WARNING",
+      "message": "broker_status failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_broker_dhan_status",
+      "level": "WARNING",
+      "message": "broker_dhan_status failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_broker_deps",
+      "level": "WARNING",
+      "message": "broker_deps failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_scheduler_health",
+      "level": "WARNING",
+      "message": "scheduler_health failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_portfolio_unified",
+      "level": "WARNING",
+      "message": "portfolio_unified failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_memory_after_portfolio",
+      "level": "WARNING",
+      "message": "memory_after_portfolio failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_chain_nifty",
+      "level": "WARNING",
+      "message": "chain_nifty failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_memory_after_chain",
+      "level": "WARNING",
+      "message": "memory_after_chain failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_underlyings",
+      "level": "WARNING",
+      "message": "underlyings failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
+    },
+    {
+      "key": "endpoint_state",
+      "level": "WARNING",
+      "message": "state failed: 0 URLError: <urlopen error [Errno 111] Connection refused> attempts=4"
     },
     {
       "key": "broker_not_connected",
       "level": "WARNING",
-      "message": "broker status not connected: TOKEN_EXPIRED_OR_INVALID"
+      "message": "broker status not connected: None"
     },
     {
       "key": "scheduler_no_worker_push",
@@ -74,7 +101,7 @@
     {
       "key": "chain_nifty_empty",
       "level": "WARNING",
-      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
+      "message": "NIFTY chain empty/status=None source=None"
     }
   ]
 }
