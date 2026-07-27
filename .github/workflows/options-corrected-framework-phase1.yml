@@ -36,14 +36,26 @@ jobs:
           cache: pip
 
       - name: Install focused dependencies
-        run: python -m pip install numpy pandas scipy scikit-learn pytest
+        run: python -m pip install numpy pandas scipy scikit-learn pytest requests
 
-      - name: Compile and run focused tests
+      - name: Compile and run focused tests with durable logs
+        shell: bash
         run: |
+          set +e
+          mkdir -p "$REPORT_ROOT"
           python -m py_compile \
             src/options_research/corrected_framework_diagnostics.py \
-            scripts/options_corrected_framework_phase1.py
-          python -m pytest -q tests/test_corrected_framework_diagnostics.py
+            scripts/options_corrected_framework_phase1.py \
+            > "$REPORT_ROOT/compile.log" 2>&1
+          compile_rc=$?
+          python -m pytest -q tests/test_corrected_framework_diagnostics.py \
+            > "$REPORT_ROOT/pytest.log" 2>&1
+          pytest_rc=$?
+          echo "$compile_rc" > "$REPORT_ROOT/compile.exit"
+          echo "$pytest_rc" > "$REPORT_ROOT/pytest.exit"
+          cat "$REPORT_ROOT/compile.log"
+          cat "$REPORT_ROOT/pytest.log"
+          exit 0
 
       - name: Download frozen model evidence
         uses: actions/download-artifact@v5
@@ -54,10 +66,25 @@ jobs:
           run-id: ${{ env.SOURCE_RUN_ID }}
 
       - name: Execute corrected-framework Phase-1 diagnostic
-        run: >-
-          python scripts/options_corrected_framework_phase1.py
-          --artifact-root reused_model_artifact
-          --output-dir "$REPORT_ROOT"
+        shell: bash
+        run: |
+          set +e
+          python scripts/options_corrected_framework_phase1.py \
+            --artifact-root reused_model_artifact \
+            --output-dir "$REPORT_ROOT" \
+            > "$REPORT_ROOT/execution.log" 2>&1
+          echo $? > "$REPORT_ROOT/execution.exit"
+          cat "$REPORT_ROOT/execution.log"
+          exit 0
+
+      - name: Upload Phase-1 proof and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-corrected-framework-phase1-${{ github.run_id }}
+          path: reports/latest/options_corrected_framework_phase1
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Enforce evidence and safety gates
         shell: python
@@ -66,6 +93,12 @@ jobs:
           from pathlib import Path
 
           root = Path("reports/latest/options_corrected_framework_phase1")
+          compile_exit = int((root / "compile.exit").read_text().strip())
+          pytest_exit = int((root / "pytest.exit").read_text().strip())
+          execution_exit = int((root / "execution.exit").read_text().strip())
+          assert compile_exit == 0, (compile_exit, (root / "compile.log").read_text())
+          assert pytest_exit == 0, (pytest_exit, (root / "pytest.log").read_text())
+          assert execution_exit == 0, (execution_exit, (root / "execution.log").read_text())
           report = json.loads((root / "corrected_framework_phase1.json").read_text())
           manifest = json.loads((root / "manifest.json").read_text())
           claims = {row["claim"]: row["status"] for row in report["framework_claims"]}
@@ -124,11 +157,3 @@ jobs:
               "order_placement_allowed": False,
               "promotion_allowed": False,
           }, indent=2))
-
-      - name: Upload Phase-1 proof
-        uses: actions/upload-artifact@v4
-        with:
-          name: options-corrected-framework-phase1-${{ github.run_id }}
-          path: reports/latest/options_corrected_framework_phase1
-          if-no-files-found: error
-          retention-days: 30
