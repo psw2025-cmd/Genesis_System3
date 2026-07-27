@@ -1,10 +1,10 @@
 {
-  "generated_utc": "2026-07-27T07:47:34.342359+00:00",
-  "issue_count": 471,
+  "generated_utc": "2026-07-27T09:08:10.926443+00:00",
+  "issue_count": 495,
   "lane_count": 13,
   "lanes": [
     {
-      "issue_count": 251,
+      "issue_count": 272,
       "lane": "GITHUB_RENDER_FAILURE",
       "recommended_fixes": [
         "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
@@ -64,84 +64,84 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30242600271 conclusion=failure commit=d742e714106a",
+          "issue": "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30250881315 conclusion=failure commit=35c090c6d18f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30242834234 conclusion=failure commit=d742e714106a",
+          "issue": "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=30250829799 conclusion=failure commit=35c090c6d18f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30242800724 conclusion=failure commit=d742e714106a",
+          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30251413503 conclusion=failure commit=35c090c6d18f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30242577839 conclusion=failure commit=d742e714106a",
+          "issue": "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=30250961399 conclusion=failure commit=35c090c6d18f",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30242114883 conclusion=failure commit=e711e429a1c9",
+          "issue": "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30249055437 conclusion=failure commit=bc2fd873c06c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30242115922 conclusion=failure commit=e711e429a1c9",
+          "issue": "Fix latest GitHub workflow 'System3 Safe Repair Runner' run=30248625357 conclusion=failure commit=bc2fd873c06c",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30242093428 conclusion=failure commit=96ccbce680cb",
+          "issue": "Fix latest GitHub workflow 'System3 Windows Self-Hosted Full Proof' run=30248006230 conclusion=failure commit=7777a1e2bb2d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30242114829 conclusion=failure commit=e711e429a1c9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Auth-Resilient Proof' run=30248148411 conclusion=failure commit=7777a1e2bb2d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Experimental Solution Planner' run=30242114904 conclusion=failure commit=e711e429a1c9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Proof Strict Gate' run=30248127611 conclusion=failure commit=7777a1e2bb2d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30242114799 conclusion=failure commit=e711e429a1c9",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Settle Proof' run=30248002956 conclusion=failure commit=7777a1e2bb2d",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Autopilot Proof Board' run=30242066922 conclusion=failure commit=d1e23173356d",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30247503154 conclusion=failure commit=be5e387a0d82",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30242048417 conclusion=failure commit=768772529b0c",
+          "issue": "Fix latest GitHub workflow 'Dashboard Shell Diagnostic' run=30247424289 conclusion=failure commit=dbcb6f9b595b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30240839151 conclusion=failure commit=333a345c0360",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visible Issue Tracker' run=30247382228 conclusion=failure commit=93804c0a7d42",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30241266131 conclusion=failure commit=2d97c8b14f9d",
+          "issue": "Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30247424191 conclusion=failure commit=dbcb6f9b595b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
         {
-          "issue": "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=30240753003 conclusion=failure commit=333a345c0360",
+          "issue": "Fix latest GitHub workflow 'Dashboard Visual Loading Postflight' run=30247424249 conclusion=failure commit=dbcb6f9b595b",
           "lane": "GITHUB_RENDER_FAILURE",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         }
       ]
     },
     {
-      "issue_count": 49,
+      "issue_count": 48,
       "lane": "UI_RED_VISUAL",
       "recommended_fixes": [
         "Use dashboard_visible_issue_tracker output as source of truth.",
@@ -670,6 +670,97 @@
       ]
     },
     {
+      "issue_count": 16,
+      "lane": "INSTALL_CREDENTIAL",
+      "recommended_fixes": [
+        "Fix dependency/import/compile errors from secure audit.",
+        "Verify credentials via redacted secure env checks only.",
+        "Never print or commit credential values."
+      ],
+      "top_issues": [
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30246211475 conclusion=failure commit=3f4c3cb60ba55ee5a3e42e77b44434f249ea49e3",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30246186771 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30246186296 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30246167802 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "workflow_failure_tracker: Fix workflow 'System3 Secure Install Credential Audit' run 30246162503 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/autopilot_proof_board/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246211475 conclusion=failure commit=3f4c3cb60ba55ee5a3e42e77b44434f249ea49e3",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246186771 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246186296 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246167802 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        },
+        {
+          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246162503 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
+          "lane": "INSTALL_CREDENTIAL",
+          "report": "reports/latest/workflow_failure_tracker/summary.json"
+        }
+      ]
+    },
+    {
       "issue_count": 13,
       "lane": "ML_TRAINING",
       "recommended_fixes": [
@@ -783,7 +874,7 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "todo_count=29",
+          "issue": "todo_count=31",
           "lane": "UNKNOWN",
           "report": "reports/latest/github_render_failure_tracker/summary.json"
         },
@@ -798,7 +889,7 @@
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
         {
-          "issue": "blocker_count=151",
+          "issue": "blocker_count=171",
           "lane": "UNKNOWN",
           "report": "reports/latest/autopilot_proof_board/summary.json"
         },
@@ -820,73 +911,7 @@
       ]
     },
     {
-      "issue_count": 11,
-      "lane": "INSTALL_CREDENTIAL",
-      "recommended_fixes": [
-        "Fix dependency/import/compile errors from secure audit.",
-        "Verify credentials via redacted secure env checks only.",
-        "Never print or commit credential values."
-      ],
-      "top_issues": [
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DASHBOARD_API_KEY",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_CLIENT_ID",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Required secret missing from workflow env: DHAN_ACCESS_TOKEN",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DASHBOARD_API_KEY",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_CLIENT_ID",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "secure_install_credential_audit: Add/verify required secret in secure store: DHAN_ACCESS_TOKEN",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246211475 conclusion=failure commit=3f4c3cb60ba55ee5a3e42e77b44434f249ea49e3",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246186771 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246186296 conclusion=failure commit=d607232c99986dd079ec661f6f96a5bf5b728544",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246167802 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        },
-        {
-          "issue": "Fix workflow 'System3 Secure Install Credential Audit' run 30246162503 conclusion=failure commit=68f682fcb2c7169fe192c0c65581c753c63a4048",
-          "lane": "INSTALL_CREDENTIAL",
-          "report": "reports/latest/workflow_failure_tracker/summary.json"
-        }
-      ]
-    },
-    {
-      "issue_count": 10,
+      "issue_count": 9,
       "lane": "WORKFLOW_CI",
       "recommended_fixes": [
         "Read workflow_failure_tracker TODO.",
@@ -930,14 +955,9 @@
           "report": "reports/latest/render_100_agent_swarm/summary.json"
         },
         {
-          "issue": "workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234783276 conclusion=cancelled commit=cd11807b15762fad09c4780c0bc359abdde5495a",
+          "issue": "Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell\n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Looks like Playwright Test or Playwright was just installed or updated. \u2551\n\u2551 Please run the following command to download new browsers:              \u2551\n\u2551                                                                         \u2551\n\u2551     npx playwr",
           "lane": "WORKFLOW_CI",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
-        },
-        {
-          "issue": "workflow_failure_tracker: Fix workflow 'Genesis System3 Global Safety CI' run 30234761296 conclusion=cancelled commit=d506687cd01de6adfd5e19745a0b4cc184c05d3a",
-          "lane": "WORKFLOW_CI",
-          "report": "reports/latest/autopilot_proof_board/summary.json"
+          "report": "reports/latest/dashboard_visible_issue_tracker/summary.json"
         },
         {
           "issue": "failed_count=41",
