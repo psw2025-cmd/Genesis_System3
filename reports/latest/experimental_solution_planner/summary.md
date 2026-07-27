@@ -1,8 +1,8 @@
 # System3 Experimental Solution Plan
 
-Generated UTC: `2026-07-27T19:51:25.787571+00:00`
+Generated UTC: `2026-07-27T19:52:00.536297+00:00`
 Status: **BLOCKED**
-Issues: `478`
+Issues: `477`
 Fix lanes: `13`
 
 ## Rule
@@ -50,7 +50,7 @@ Top issues:
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'Dashboard Visible Proof Current' run=30296447396 conclusion=failure commit=0ec05db6284a
 - `reports/latest/github_render_failure_tracker/summary.json`: Fix latest GitHub workflow 'System3 Secure Install Credential Audit' run=30296468900 conclusion=failure commit=21184e537936
 
-### UI_RED_VISUAL — 49 issues
+### UI_RED_VISUAL — 48 issues
 
 Recommended fixes:
 - Use dashboard_visible_issue_tracker output as source of truth.
