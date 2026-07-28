@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-07-28T03:04:30.163274+00:00`
+Generated UTC: `2026-07-28T03:23:40.744801+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `36`
+Failed workflow count: `33`
 
 ## Rule
 
@@ -12,6 +12,7 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30325750819 conclusion=failure commit=80004f38ff7021ff9dd000a404c78f3ba9691715
 - [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30324838537 conclusion=failure commit=614a25e0ecd194cacc547d479694bc06acde57d4
 - [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30321988573 conclusion=failure commit=614a25e0ecd194cacc547d479694bc06acde57d4
 - [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 30321867673 conclusion=failure commit=614a25e0ecd194cacc547d479694bc06acde57d4
@@ -44,15 +45,12 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 Experimental Solution Planner' run 30315677275 conclusion=failure commit=60a0d19a79d812cb1f1cc9b209a8ae086eebcc7d
 - [ ] Fix workflow 'System3 Safe Repair Runner' run 30315677197 conclusion=cancelled commit=60a0d19a79d812cb1f1cc9b209a8ae086eebcc7d
 - [ ] Fix workflow 'Dashboard Visible Issue Tracker' run 30315677184 conclusion=failure commit=60a0d19a79d812cb1f1cc9b209a8ae086eebcc7d
-- [ ] Fix workflow 'System3 Autopilot Proof Board' run 30315662242 conclusion=failure commit=91896c76df082c8d738ee6065330e061645cd4a1
-- [ ] Fix workflow 'System3 Experimental Solution Planner' run 30315655114 conclusion=failure commit=91896c76df082c8d738ee6065330e061645cd4a1
-- [ ] Fix workflow 'System3 Safe Repair Runner' run 30315655106 conclusion=cancelled commit=91896c76df082c8d738ee6065330e061645cd4a1
-- [ ] Fix workflow 'Dashboard Visible Issue Tracker' run 30315655099 conclusion=failure commit=91896c76df082c8d738ee6065330e061645cd4a1
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Visual Production Proof | 30325750819 | failure | `80004f38ff70` | 2026-07-28T03:23:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30325750819 |
 | System3 GitHub Render Failure Tracker | 30324838537 | failure | `614a25e0ecd1` | 2026-07-28T03:03:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30324838537 |
 | Dashboard Visible Proof Warmed | 30321988573 | failure | `614a25e0ecd1` | 2026-07-28T02:03:36Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30321988573 |
 | System3 Backend Live Simulation Proof | 30321867673 | failure | `614a25e0ecd1` | 2026-07-28T02:00:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30321867673 |
@@ -85,7 +83,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 Experimental Solution Planner | 30315677275 | failure | `60a0d19a79d8` | 2026-07-27T23:55:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315677275 |
 | System3 Safe Repair Runner | 30315677197 | cancelled | `60a0d19a79d8` | 2026-07-27T23:55:25Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315677197 |
 | Dashboard Visible Issue Tracker | 30315677184 | failure | `60a0d19a79d8` | 2026-07-27T23:55:47Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315677184 |
-| System3 Autopilot Proof Board | 30315662242 | failure | `91896c76df08` | 2026-07-27T23:55:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315662242 |
-| System3 Experimental Solution Planner | 30315655114 | failure | `91896c76df08` | 2026-07-27T23:54:43Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315655114 |
-| System3 Safe Repair Runner | 30315655106 | cancelled | `91896c76df08` | 2026-07-27T23:54:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315655106 |
-| Dashboard Visible Issue Tracker | 30315655099 | failure | `91896c76df08` | 2026-07-27T23:55:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315655099 |
