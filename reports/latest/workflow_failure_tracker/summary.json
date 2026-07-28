@@ -1,6 +1,36 @@
 {
-  "failed_count": 25,
+  "failed_count": 26,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "67405fb51dd9c0008934c9efb1e2a87cf7d3adfe",
+      "conclusion": "failure",
+      "created_at": "2026-07-28T15:06:53Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30371755661",
+      "run_id": 30371755661,
+      "updated_at": "2026-07-28T15:07:49Z",
+      "workflow": "Dashboard Visible Proof Warmed"
+    },
+    {
+      "branch": "main",
+      "commit": "67405fb51dd9c0008934c9efb1e2a87cf7d3adfe",
+      "conclusion": "failure",
+      "created_at": "2026-07-28T15:06:05Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30371691347",
+      "run_id": 30371691347,
+      "updated_at": "2026-07-28T15:08:35Z",
+      "workflow": "System3 Backend Live Simulation Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "09690081581ed7916f272e6425efb217e4cf9420",
+      "conclusion": "cancelled",
+      "created_at": "2026-07-28T15:04:44Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30371576400",
+      "run_id": 30371576400,
+      "updated_at": "2026-07-28T15:05:11Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "a01981cf58bfd5e0dba593c537ced763c5665523",
@@ -230,33 +260,16 @@
       "run_id": 30355740884,
       "updated_at": "2026-07-28T11:41:00Z",
       "workflow": "System3 GitHub Render Failure Tracker"
-    },
-    {
-      "branch": "main",
-      "commit": "99efd9e3ad7f6be7eccfd74eff0df9cdc73f089d",
-      "conclusion": "failure",
-      "created_at": "2026-07-28T11:26:21Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30354784400",
-      "run_id": 30354784400,
-      "updated_at": "2026-07-28T11:26:47Z",
-      "workflow": "System3 Broker Chain Semantic Gate"
-    },
-    {
-      "branch": "main",
-      "commit": "99efd9e3ad7f6be7eccfd74eff0df9cdc73f089d",
-      "conclusion": "failure",
-      "created_at": "2026-07-28T11:18:28Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30354258089",
-      "run_id": 30354258089,
-      "updated_at": "2026-07-28T11:43:13Z",
-      "workflow": "System3 Full Auto Truth"
     }
   ],
-  "generated_utc": "2026-07-28T15:04:55.793823+00:00",
+  "generated_utc": "2026-07-28T15:17:21.265404+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visible Proof Warmed' run 30371755661 conclusion=failure commit=67405fb51dd9c0008934c9efb1e2a87cf7d3adfe",
+    "Fix workflow 'System3 Backend Live Simulation Proof' run 30371691347 conclusion=failure commit=67405fb51dd9c0008934c9efb1e2a87cf7d3adfe",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30371576400 conclusion=cancelled commit=09690081581ed7916f272e6425efb217e4cf9420",
     "Fix workflow 'System3 Render Worker Preflight' run 30371560319 conclusion=failure commit=a01981cf58bfd5e0dba593c537ced763c5665523",
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 30371533203 conclusion=failure commit=a01981cf58bfd5e0dba593c537ced763c5665523",
     "Fix workflow 'Dashboard Visual Production Proof' run 30371495753 conclusion=failure commit=a01981cf58bfd5e0dba593c537ced763c5665523",
@@ -279,8 +292,6 @@
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 30356762597 conclusion=failure commit=b8755c4894ac03a5756729838383fcf2170a026c",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30356752024 conclusion=cancelled commit=b8755c4894ac03a5756729838383fcf2170a026c",
     "Fix workflow 'Dashboard Visual Production Proof' run 30356689299 conclusion=failure commit=b8755c4894ac03a5756729838383fcf2170a026c",
-    "Fix workflow 'System3 GitHub Render Failure Tracker' run 30355740884 conclusion=failure commit=d8163a073605fbf3be55707b04fc81e668d53c2a",
-    "Fix workflow 'System3 Broker Chain Semantic Gate' run 30354784400 conclusion=failure commit=99efd9e3ad7f6be7eccfd74eff0df9cdc73f089d",
-    "Fix workflow 'System3 Full Auto Truth' run 30354258089 conclusion=failure commit=99efd9e3ad7f6be7eccfd74eff0df9cdc73f089d"
+    "Fix workflow 'System3 GitHub Render Failure Tracker' run 30355740884 conclusion=failure commit=d8163a073605fbf3be55707b04fc81e668d53c2a"
   ]
 }
