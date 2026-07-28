@@ -1,6 +1,26 @@
 {
-  "failed_count": 42,
+  "failed_count": 40,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "7d73a6c3349858ee20fddc97f9566f61b1f54cfc",
+      "conclusion": "failure",
+      "created_at": "2026-07-28T00:51:19Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30318549692",
+      "run_id": 30318549692,
+      "updated_at": "2026-07-28T00:51:29Z",
+      "workflow": "System3 Render Worker Preflight"
+    },
+    {
+      "branch": "main",
+      "commit": "7d73a6c3349858ee20fddc97f9566f61b1f54cfc",
+      "conclusion": "failure",
+      "created_at": "2026-07-28T00:50:31Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30318511226",
+      "run_id": 30318511226,
+      "updated_at": "2026-07-28T00:51:22Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "d804ab9f6814e303da6f6df8ee98979040e3d9f8",
@@ -380,53 +400,15 @@
       "run_id": 30315523494,
       "updated_at": "2026-07-27T23:52:15Z",
       "workflow": "Dashboard Visual Proof Strict Gate"
-    },
-    {
-      "branch": "main",
-      "commit": "94a9ae914050832b348fc279f62369da3ce4317f",
-      "conclusion": "cancelled",
-      "created_at": "2026-07-27T23:52:06Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523225",
-      "run_id": 30315523225,
-      "updated_at": "2026-07-27T23:52:11Z",
-      "workflow": "System3 Safe Repair Runner"
-    },
-    {
-      "branch": "main",
-      "commit": "94a9ae914050832b348fc279f62369da3ce4317f",
-      "conclusion": "failure",
-      "created_at": "2026-07-27T23:52:06Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523194",
-      "run_id": 30315523194,
-      "updated_at": "2026-07-27T23:52:17Z",
-      "workflow": "Dashboard Visual Loading Postflight"
-    },
-    {
-      "branch": "main",
-      "commit": "94a9ae914050832b348fc279f62369da3ce4317f",
-      "conclusion": "failure",
-      "created_at": "2026-07-27T23:52:06Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523138",
-      "run_id": 30315523138,
-      "updated_at": "2026-07-27T23:52:29Z",
-      "workflow": "System3 Secure Install Credential Audit"
-    },
-    {
-      "branch": "main",
-      "commit": "94a9ae914050832b348fc279f62369da3ce4317f",
-      "conclusion": "cancelled",
-      "created_at": "2026-07-27T23:52:06Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523091",
-      "run_id": 30315523091,
-      "updated_at": "2026-07-27T23:53:48Z",
-      "workflow": "Dashboard Shell Diagnostic"
     }
   ],
-  "generated_utc": "2026-07-28T00:32:41.763292+00:00",
+  "generated_utc": "2026-07-28T00:51:30.857600+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 Render Worker Preflight' run 30318549692 conclusion=failure commit=7d73a6c3349858ee20fddc97f9566f61b1f54cfc",
+    "Fix workflow 'Dashboard Visual Production Proof' run 30318511226 conclusion=failure commit=7d73a6c3349858ee20fddc97f9566f61b1f54cfc",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30317486181 conclusion=failure commit=d804ab9f6814e303da6f6df8ee98979040e3d9f8",
     "Fix workflow 'Dashboard Visible Auth-Resilient Proof' run 30316443824 conclusion=failure commit=dcd6da9169a4db15b05d513d078e444f4b40f27c",
     "Fix workflow 'Dashboard Visual Proof Strict Gate' run 30316428933 conclusion=failure commit=dcd6da9169a4db15b05d513d078e444f4b40f27c",
@@ -464,10 +446,6 @@
     "Fix workflow 'System3 Experimental Solution Planner' run 30315526177 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f",
     "Fix workflow 'System3 Safe Repair Runner' run 30315526097 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f",
     "Fix workflow 'Dashboard Visible Issue Tracker' run 30315526088 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f",
-    "Fix workflow 'Dashboard Visual Proof Strict Gate' run 30315523494 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f",
-    "Fix workflow 'System3 Safe Repair Runner' run 30315523225 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f",
-    "Fix workflow 'Dashboard Visual Loading Postflight' run 30315523194 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f",
-    "Fix workflow 'System3 Secure Install Credential Audit' run 30315523138 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f",
-    "Fix workflow 'Dashboard Shell Diagnostic' run 30315523091 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f"
+    "Fix workflow 'Dashboard Visual Proof Strict Gate' run 30315523494 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f"
   ]
 }

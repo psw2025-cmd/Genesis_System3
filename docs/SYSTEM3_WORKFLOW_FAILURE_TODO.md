@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-07-28T00:32:41.763292+00:00`
+Generated UTC: `2026-07-28T00:51:30.857600+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `42`
+Failed workflow count: `40`
 
 ## Rule
 
@@ -12,6 +12,8 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 Render Worker Preflight' run 30318549692 conclusion=failure commit=7d73a6c3349858ee20fddc97f9566f61b1f54cfc
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30318511226 conclusion=failure commit=7d73a6c3349858ee20fddc97f9566f61b1f54cfc
 - [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30317486181 conclusion=failure commit=d804ab9f6814e303da6f6df8ee98979040e3d9f8
 - [ ] Fix workflow 'Dashboard Visible Auth-Resilient Proof' run 30316443824 conclusion=failure commit=dcd6da9169a4db15b05d513d078e444f4b40f27c
 - [ ] Fix workflow 'Dashboard Visual Proof Strict Gate' run 30316428933 conclusion=failure commit=dcd6da9169a4db15b05d513d078e444f4b40f27c
@@ -50,15 +52,13 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 Safe Repair Runner' run 30315526097 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f
 - [ ] Fix workflow 'Dashboard Visible Issue Tracker' run 30315526088 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f
 - [ ] Fix workflow 'Dashboard Visual Proof Strict Gate' run 30315523494 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f
-- [ ] Fix workflow 'System3 Safe Repair Runner' run 30315523225 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f
-- [ ] Fix workflow 'Dashboard Visual Loading Postflight' run 30315523194 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f
-- [ ] Fix workflow 'System3 Secure Install Credential Audit' run 30315523138 conclusion=failure commit=94a9ae914050832b348fc279f62369da3ce4317f
-- [ ] Fix workflow 'Dashboard Shell Diagnostic' run 30315523091 conclusion=cancelled commit=94a9ae914050832b348fc279f62369da3ce4317f
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 Render Worker Preflight | 30318549692 | failure | `7d73a6c33498` | 2026-07-28T00:51:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30318549692 |
+| Dashboard Visual Production Proof | 30318511226 | failure | `7d73a6c33498` | 2026-07-28T00:51:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30318511226 |
 | System3 GitHub Render Failure Tracker | 30317486181 | failure | `d804ab9f6814` | 2026-07-28T00:30:33Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30317486181 |
 | Dashboard Visible Auth-Resilient Proof | 30316443824 | failure | `dcd6da9169a4` | 2026-07-28T00:10:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30316443824 |
 | Dashboard Visual Proof Strict Gate | 30316428933 | failure | `dcd6da9169a4` | 2026-07-28T00:09:06Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30316428933 |
@@ -97,7 +97,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 Safe Repair Runner | 30315526097 | cancelled | `94a9ae914050` | 2026-07-27T23:54:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315526097 |
 | Dashboard Visible Issue Tracker | 30315526088 | cancelled | `94a9ae914050` | 2026-07-27T23:52:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315526088 |
 | Dashboard Visual Proof Strict Gate | 30315523494 | failure | `94a9ae914050` | 2026-07-27T23:52:15Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523494 |
-| System3 Safe Repair Runner | 30315523225 | cancelled | `94a9ae914050` | 2026-07-27T23:52:11Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523225 |
-| Dashboard Visual Loading Postflight | 30315523194 | failure | `94a9ae914050` | 2026-07-27T23:52:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523194 |
-| System3 Secure Install Credential Audit | 30315523138 | failure | `94a9ae914050` | 2026-07-27T23:52:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523138 |
-| Dashboard Shell Diagnostic | 30315523091 | cancelled | `94a9ae914050` | 2026-07-27T23:53:48Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30315523091 |
