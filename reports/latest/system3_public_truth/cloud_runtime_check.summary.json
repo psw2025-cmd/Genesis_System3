@@ -1,8 +1,8 @@
 {
   "alerts": [],
   "deployed_commit": "",
-  "expected_commit": "f9e55cd0f415158f298c779c763b2ba357dbfa90",
-  "generated_utc": "2026-07-27T11:38:51.204639Z",
+  "expected_commit": "ec440ea6a6b7c5a8498749ffa8eb0132483a1f2d",
+  "generated_utc": "2026-07-28T04:01:34.755104Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
