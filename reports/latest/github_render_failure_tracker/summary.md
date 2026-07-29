@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-07-29T16:30:46.346632Z`
+Generated UTC: `2026-07-29T17:27:49.901590Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `http://127.0.0.1:8000`
-GitHub workflows whose newest observed run failed: `10`
+GitHub workflows whose newest observed run failed: `11`
 GitHub workflows currently queued/in progress: `0`
 Render failed endpoints: `12`
-TODO count: `22`
+TODO count: `23`
 
 ## Rule
 
@@ -16,10 +16,11 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 ## TODO
 
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30468050399 conclusion=failure commit=99247d0e2641
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30468375936 conclusion=failure commit=95444d15268d
-- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30468279753 conclusion=failure commit=95444d15268d
-- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30468108765 conclusion=failure commit=99247d0e2641
+- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30472357220 conclusion=failure commit=804707525af6
+- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30472261411 conclusion=failure commit=804707525af6
+- [ ] Fix latest GitHub workflow 'System3 Render Worker Preflight' run=30472057311 conclusion=failure commit=9d308a006c58
+- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30472018057 conclusion=failure commit=9d308a006c58
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30471949337 conclusion=failure commit=9d308a006c58
 - [ ] Fix latest GitHub workflow 'System3 Full Auto Truth' run=30447187262 conclusion=failure commit=413447021918
 - [ ] Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30447853460 conclusion=failure commit=413447021918
 - [ ] Fix latest GitHub workflow 'Dashboard Live UI Proof' run=30447032852 conclusion=failure commit=bf60c2b8c371
@@ -43,10 +44,11 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| Dashboard Visual Production Proof | 30468050399 | failure | `99247d0e2641` | 2026-07-29T15:58:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30468050399 |
-| Dashboard Visible Proof Warmed | 30468375936 | failure | `95444d15268d` | 2026-07-29T15:58:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30468375936 |
-| System3 Backend Live Simulation Proof | 30468279753 | failure | `95444d15268d` | 2026-07-29T15:56:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30468279753 |
-| Dashboard Deploy Provenance Gate | 30468108765 | failure | `99247d0e2641` | 2026-07-29T15:55:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30468108765 |
+| Dashboard Visible Proof Warmed | 30472357220 | failure | `804707525af6` | 2026-07-29T16:48:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30472357220 |
+| System3 Backend Live Simulation Proof | 30472261411 | failure | `804707525af6` | 2026-07-29T16:46:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30472261411 |
+| System3 Render Worker Preflight | 30472057311 | failure | `9d308a006c58` | 2026-07-29T16:43:44Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30472057311 |
+| Dashboard Deploy Provenance Gate | 30472018057 | failure | `9d308a006c58` | 2026-07-29T16:43:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30472018057 |
+| Dashboard Visual Production Proof | 30471949337 | failure | `9d308a006c58` | 2026-07-29T16:43:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30471949337 |
 | System3 Full Auto Truth | 30447187262 | failure | `413447021918` | 2026-07-29T11:45:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30447187262 |
 | System3 Broker Chain Semantic Gate | 30447853460 | failure | `413447021918` | 2026-07-29T11:31:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30447853460 |
 | Dashboard Live UI Proof | 30447032852 | failure | `bf60c2b8c371` | 2026-07-29T11:18:42Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30447032852 |
