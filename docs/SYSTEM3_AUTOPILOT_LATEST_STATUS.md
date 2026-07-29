@@ -1,6 +1,6 @@
 # System3 Autopilot Latest Status
 
-Generated UTC: `2026-07-29T04:55:26.330414+00:00`
+Generated UTC: `2026-07-29T08:00:11.595650+00:00`
 Owner/operator: **PRITAM S. WARGHADE**
 Status: **BLOCKED**
 Blockers: `130`
@@ -49,29 +49,29 @@ Blockers: `130`
 - [ ] dashboard_visible_issue_tracker: Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell
 ╔═════════════════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright Test or Playwright w
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30422641994 conclusion=failure commit=21176045c695
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30421813510 conclusion=failure commit=a99b1938a8cc
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30421367925 conclusion=failure commit=85a3b7d3f77f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Live UI Proof' run=30421239001 conclusion=failure commit=85a3b7d3f77f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Permanent Repo Render Safety' run=30421067469 conclusion=failure commit=85a3b7d3f77f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=30419691745 conclusion=failure commit=85a3b7d3f77f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=30419628020 conclusion=failure commit=85a3b7d3f77f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Render Worker Preflight' run=30419489645 conclusion=failure commit=ef4b83d216ed
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=30419469750 conclusion=failure commit=3b1cd8923c6b
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30419457329 conclusion=cancelled commit=3b1cd8923c6b
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30419409611 conclusion=failure commit=3b1cd8923c6b
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=30415757262 conclusion=failure commit=d667409d9ee1
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=30415663623 conclusion=failure commit=d667409d9ee1
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Render Worker Preflight' run=30415500957 conclusion=failure commit=adcc51494561
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=30415474103 conclusion=failure commit=c6313b3debab
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30415461294 conclusion=cancelled commit=72a8c12e4c8f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30415422245 conclusion=failure commit=72a8c12e4c8f
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=30412511878 conclusion=failure commit=0522e164c158
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=30412501508 conclusion=failure commit=0522e164c158
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30412456137 conclusion=cancelled commit=ec7ac506ce21
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Render Worker Preflight' run=30412435086 conclusion=failure commit=e86d16e056a7
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=30412418886 conclusion=failure commit=e86d16e056a7
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30412399134 conclusion=failure commit=e86d16e056a7
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Live UI Proof' run=30433707601 conclusion=failure commit=506c561f061c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30432291205 conclusion=failure commit=8268c18b8b55
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=30431087391 conclusion=failure commit=c427dcdb223a
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=30431004435 conclusion=failure commit=c427dcdb223a
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=30430792027 conclusion=failure commit=705dfc2b1f90
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30430780878 conclusion=cancelled commit=705dfc2b1f90
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30430727483 conclusion=failure commit=705dfc2b1f90
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30430264048 conclusion=failure commit=705dfc2b1f90
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Live UI Proof' run=30429941372 conclusion=failure commit=705dfc2b1f90
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Latest Truth Publish' run=30429619719 conclusion=failure commit=e4358af40c1d
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Permanent Repo Render Safety' run=30429429276 conclusion=failure commit=e4358af40c1d
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30428734659 conclusion=failure commit=e47e51cec233
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30425688291 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30425495353 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Live UI Proof' run=30425453462 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Latest Truth Publish' run=30425421611 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Permanent Repo Render Safety' run=30425397734 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visible Proof Warmed' run=30425225556 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Backend Live Simulation Proof' run=30425167133 conclusion=failure commit=90922c9a581c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Render Worker Preflight' run=30425022292 conclusion=failure commit=adc441ea55d3
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Deploy Provenance Gate' run=30424989935 conclusion=failure commit=c5d22f4c93b2
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30424988995 conclusion=cancelled commit=c5d22f4c93b2
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30424945631 conclusion=failure commit=30681c9fb89e
 - [ ] github_render_failure_tracker: Fix Render endpoint /: HTTP status 0 status=0
 - [ ] github_render_failure_tracker: Fix Render endpoint /ui/: HTTP status 0 status=0
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/health: HTTP status 0 status=0
@@ -96,29 +96,29 @@ Blockers: `130`
 - [ ] github_render_failure_tracker: endpoint=/api/scanner/top_contract_gainers reason=HTTP status 0 status=0
 - [ ] github_render_failure_tracker: endpoint=/api/paper reason=HTTP status 0 status=0
 - [ ] github_render_failure_tracker: endpoint=/api/ml/performance reason=HTTP status 0 status=0
-- [ ] github_render_failure_tracker: workflow=System3 Windows Self-Hosted Workflow Migration conclusion=failure run=30422641994
-- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30421813510
-- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30421367925
-- [ ] github_render_failure_tracker: workflow=Dashboard Live UI Proof conclusion=failure run=30421239001
-- [ ] github_render_failure_tracker: workflow=Permanent Repo Render Safety conclusion=failure run=30421067469
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Warmed conclusion=failure run=30419691745
-- [ ] github_render_failure_tracker: workflow=System3 Backend Live Simulation Proof conclusion=failure run=30419628020
-- [ ] github_render_failure_tracker: workflow=System3 Render Worker Preflight conclusion=failure run=30419489645
-- [ ] github_render_failure_tracker: workflow=Dashboard Deploy Provenance Gate conclusion=failure run=30419469750
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30419457329
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30419409611
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Warmed conclusion=failure run=30415757262
-- [ ] github_render_failure_tracker: workflow=System3 Backend Live Simulation Proof conclusion=failure run=30415663623
-- [ ] github_render_failure_tracker: workflow=System3 Render Worker Preflight conclusion=failure run=30415500957
-- [ ] github_render_failure_tracker: workflow=Dashboard Deploy Provenance Gate conclusion=failure run=30415474103
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30415461294
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30415422245
-- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Warmed conclusion=failure run=30412511878
-- [ ] github_render_failure_tracker: workflow=System3 Backend Live Simulation Proof conclusion=failure run=30412501508
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30412456137
-- [ ] github_render_failure_tracker: workflow=System3 Render Worker Preflight conclusion=failure run=30412435086
-- [ ] github_render_failure_tracker: workflow=Dashboard Deploy Provenance Gate conclusion=failure run=30412418886
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30412399134
+- [ ] github_render_failure_tracker: workflow=Dashboard Live UI Proof conclusion=failure run=30433707601
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30432291205
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Warmed conclusion=failure run=30431087391
+- [ ] github_render_failure_tracker: workflow=System3 Backend Live Simulation Proof conclusion=failure run=30431004435
+- [ ] github_render_failure_tracker: workflow=Dashboard Deploy Provenance Gate conclusion=failure run=30430792027
+- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30430780878
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30430727483
+- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30430264048
+- [ ] github_render_failure_tracker: workflow=Dashboard Live UI Proof conclusion=failure run=30429941372
+- [ ] github_render_failure_tracker: workflow=System3 Latest Truth Publish conclusion=failure run=30429619719
+- [ ] github_render_failure_tracker: workflow=Permanent Repo Render Safety conclusion=failure run=30429429276
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30428734659
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30425688291
+- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30425495353
+- [ ] github_render_failure_tracker: workflow=Dashboard Live UI Proof conclusion=failure run=30425453462
+- [ ] github_render_failure_tracker: workflow=System3 Latest Truth Publish conclusion=failure run=30425421611
+- [ ] github_render_failure_tracker: workflow=Permanent Repo Render Safety conclusion=failure run=30425397734
+- [ ] github_render_failure_tracker: workflow=Dashboard Visible Proof Warmed conclusion=failure run=30425225556
+- [ ] github_render_failure_tracker: workflow=System3 Backend Live Simulation Proof conclusion=failure run=30425167133
+- [ ] github_render_failure_tracker: workflow=System3 Render Worker Preflight conclusion=failure run=30425022292
+- [ ] github_render_failure_tracker: workflow=Dashboard Deploy Provenance Gate conclusion=failure run=30424989935
+- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30424988995
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30424945631
 - [ ] github_render_failure_tracker: github_failed_count=23
 - [ ] github_render_failure_tracker: render_failed_count=12
 - [ ] github_render_failure_tracker: todo_count=35
@@ -134,33 +134,33 @@ Blockers: `130`
 - [ ] parallel_root_cause_audit: Actual high model score is not proven until dataset rows, train/test rows, accuracy/AUC, and model artifact are visible.
 - [ ] parallel_root_cause_audit: Need fresh screenshot after latest commits; older screenshots do not prove current UI.
 - [ ] parallel_root_cause_audit: Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30431087391 conclusion=failure commit=c427dcdb223a2641262e15258c56c00a5afeddd2
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Backend Live Simulation Proof' run 30431004435 conclusion=failure commit=c427dcdb223a2641262e15258c56c00a5afeddd2
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30430792027 conclusion=failure commit=705dfc2b1f90dc8f1c57968e88f98a70b084bf38
+- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30430780878 conclusion=cancelled commit=705dfc2b1f90dc8f1c57968e88f98a70b084bf38
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30430727483 conclusion=failure commit=705dfc2b1f90dc8f1c57968e88f98a70b084bf38
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Live UI Proof' run 30429941372 conclusion=failure commit=705dfc2b1f90dc8f1c57968e88f98a70b084bf38
+- [ ] workflow_failure_tracker: Fix workflow 'System3 GitHub Render Failure Tracker' run 30429769566 conclusion=failure commit=e4358af40c1dc3db50022a98e50460858b5c3681
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Latest Truth Publish' run 30429619719 conclusion=failure commit=e4358af40c1dc3db50022a98e50460858b5c3681
+- [ ] workflow_failure_tracker: Fix workflow 'Permanent Repo Render Safety' run 30429429276 conclusion=failure commit=e4358af40c1dc3db50022a98e50460858b5c3681
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30428734659 conclusion=failure commit=e47e51cec2338fe39fa06ebd8f60aa278889f367
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30425688291 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Full Auto Truth' run 30425495353 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Live UI Proof' run 30425453462 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Latest Truth Publish' run 30425421611 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'Permanent Repo Render Safety' run 30425397734 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30425225556 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Backend Live Simulation Proof' run 30425167133 conclusion=failure commit=90922c9a581ca9af199116684ddc43b496fa725c
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30425022292 conclusion=failure commit=adc441ea55d3d15411b1a1393bf39d1567d2459d
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30424989935 conclusion=failure commit=c5d22f4c93b2188f035d21010e4b7e2d9150f150
+- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30424988995 conclusion=cancelled commit=c5d22f4c93b2188f035d21010e4b7e2d9150f150
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30424945631 conclusion=failure commit=30681c9fb89e52b57ed63f99d2fb5654dca0a6bf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Market Session Proof Runner' run 30424847319 conclusion=failure commit=30681c9fb89e52b57ed63f99d2fb5654dca0a6bf
+- [ ] workflow_failure_tracker: Fix workflow 'System3 GitHub Render Failure Tracker' run 30424019162 conclusion=failure commit=9f36abcc881d981add8c3429a571952ab4b3eaec
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Market Session Proof Runner' run 30423486776 conclusion=failure commit=ad3909bc1ce3dec894b2b1c8968f37ebf193c0db
 - [ ] workflow_failure_tracker: Fix workflow 'System3 Windows Self-Hosted Workflow Migration' run 30422641994 conclusion=failure commit=21176045c6951a2947bc74e5f2a7026e25e47e5a
 - [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30421813510 conclusion=failure commit=a99b1938a8ccf8c57df8075cb5749eebe2c1d091
 - [ ] workflow_failure_tracker: Fix workflow 'System3 Full Auto Truth' run 30421367925 conclusion=failure commit=85a3b7d3f77fcbbfc47c5240ffd3d95eb6b3b595
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Live UI Proof' run 30421239001 conclusion=failure commit=85a3b7d3f77fcbbfc47c5240ffd3d95eb6b3b595
-- [ ] workflow_failure_tracker: Fix workflow 'Permanent Repo Render Safety' run 30421067469 conclusion=failure commit=85a3b7d3f77fcbbfc47c5240ffd3d95eb6b3b595
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30419691745 conclusion=failure commit=85a3b7d3f77fcbbfc47c5240ffd3d95eb6b3b595
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Backend Live Simulation Proof' run 30419628020 conclusion=failure commit=85a3b7d3f77fcbbfc47c5240ffd3d95eb6b3b595
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30419489645 conclusion=failure commit=ef4b83d216edf5f3b3953e1e0761cdd8eeeacfaf
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30419469750 conclusion=failure commit=3b1cd8923c6bbd14c2a080aa497b9e316923d6e0
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30419457329 conclusion=cancelled commit=3b1cd8923c6bbd14c2a080aa497b9e316923d6e0
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30419409611 conclusion=failure commit=3b1cd8923c6bbd14c2a080aa497b9e316923d6e0
-- [ ] workflow_failure_tracker: Fix workflow 'System3 GitHub Render Failure Tracker' run 30418475622 conclusion=failure commit=d667409d9ee1511207fc273ce5d5c0bafe214b25
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30415757262 conclusion=failure commit=d667409d9ee1511207fc273ce5d5c0bafe214b25
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Backend Live Simulation Proof' run 30415663623 conclusion=failure commit=d667409d9ee1511207fc273ce5d5c0bafe214b25
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30415500957 conclusion=failure commit=adcc514945612f1c168314d5d1801dcd0755bc0e
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30415474103 conclusion=failure commit=c6313b3debab1ac6297c5869615344a1b6808fe5
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30415461294 conclusion=cancelled commit=72a8c12e4c8fa42f8bdd14f15ee96d4ff1dce3fe
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30415422245 conclusion=failure commit=72a8c12e4c8fa42f8bdd14f15ee96d4ff1dce3fe
-- [ ] workflow_failure_tracker: Fix workflow 'System3 GitHub Render Failure Tracker' run 30414439415 conclusion=failure commit=0522e164c15872d30c373b87e2922aca568f6846
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30412511878 conclusion=failure commit=0522e164c15872d30c373b87e2922aca568f6846
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Backend Live Simulation Proof' run 30412501508 conclusion=failure commit=0522e164c15872d30c373b87e2922aca568f6846
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30412456137 conclusion=cancelled commit=ec7ac506ce212bb47169f3614624780f5ba662ea
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Render Worker Preflight' run 30412435086 conclusion=failure commit=e86d16e056a70664fa212ca1c612bb7bc48c0427
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Deploy Provenance Gate' run 30412418886 conclusion=failure commit=e86d16e056a70664fa212ca1c612bb7bc48c0427
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30412399134 conclusion=failure commit=e86d16e056a70664fa212ca1c612bb7bc48c0427
-- [ ] workflow_failure_tracker: Fix workflow 'System3 GitHub Render Failure Tracker' run 30411259983 conclusion=failure commit=58078db408c2ccf87c0d37fb24e79ef11b9147e9
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visible Proof Warmed' run 30408686427 conclusion=failure commit=e3cd5482ba7007e53869139887acd5f417ff0bc1
 - [ ] workflow_failure_tracker: failed_count=27
 - [ ] todo_status_update: status=BLOCKED
 - [ ] dashboard_visual_production_proof: status=UNKNOWN
