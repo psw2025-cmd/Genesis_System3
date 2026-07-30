@@ -5,43 +5,43 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "442c769c0306546daebcb397021a0d325e80fe4a",
+      "commit": "4d861b08095151fd0e2b2c46930c86a3867b07d0",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30544539562",
-      "run_id": 30544539562,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30549717919",
+      "run_id": 30549717919,
       "status": "completed",
-      "updated_at": "2026-07-30T12:55:19Z",
+      "updated_at": "2026-07-30T14:02:47Z",
       "workflow": "Dashboard Visible Proof Warmed"
     },
     {
       "branch": "main",
-      "commit": "442c769c0306546daebcb397021a0d325e80fe4a",
+      "commit": "4d861b08095151fd0e2b2c46930c86a3867b07d0",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30544448644",
-      "run_id": 30544448644,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30549528293",
+      "run_id": 30549528293,
       "status": "completed",
-      "updated_at": "2026-07-30T12:53:40Z",
+      "updated_at": "2026-07-30T14:00:08Z",
       "workflow": "System3 Backend Live Simulation Proof"
     },
     {
       "branch": "main",
-      "commit": "8db9a70f989edf9187d2370202dc88383fc0a9db",
+      "commit": "7fe79efa17787b6ee4710301fdeab4e3da4ee5e6",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30544269389",
-      "run_id": 30544269389,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30549199982",
+      "run_id": 30549199982,
       "status": "completed",
-      "updated_at": "2026-07-30T12:52:08Z",
-      "workflow": "Dashboard Visual Production Proof"
+      "updated_at": "2026-07-30T13:56:06Z",
+      "workflow": "Dashboard Deploy Provenance Gate"
     },
     {
       "branch": "main",
-      "commit": "8db9a70f989edf9187d2370202dc88383fc0a9db",
+      "commit": "7fe79efa17787b6ee4710301fdeab4e3da4ee5e6",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30544321968",
-      "run_id": 30544321968,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30549113365",
+      "run_id": 30549113365,
       "status": "completed",
-      "updated_at": "2026-07-30T12:52:02Z",
-      "workflow": "Dashboard Deploy Provenance Gate"
+      "updated_at": "2026-07-30T13:55:23Z",
+      "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
@@ -104,7 +104,7 @@
       "workflow": "System3 Market Session Proof Runner"
     }
   ],
-  "generated_utc": "2026-07-30T13:35:02.289246Z",
+  "generated_utc": "2026-07-30T14:46:26.211182Z",
   "github_failed_count": 10,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -270,10 +270,10 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30544539562 conclusion=failure commit=442c769c0306",
-    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30544448644 conclusion=failure commit=442c769c0306",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30544269389 conclusion=failure commit=8db9a70f989e",
-    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30544321968 conclusion=failure commit=8db9a70f989e",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30549717919 conclusion=failure commit=4d861b080951",
+    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30549528293 conclusion=failure commit=4d861b080951",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30549199982 conclusion=failure commit=7fe79efa1778",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30549113365 conclusion=failure commit=7fe79efa1778",
     "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30537933819 conclusion=failure commit=a17f2e82da73",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30537748617 conclusion=failure commit=a17f2e82da73",
     "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30538301176 conclusion=failure commit=a17f2e82da73",
