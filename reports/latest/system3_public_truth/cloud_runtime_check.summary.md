@@ -1,9 +1,9 @@
 # Cloud Runtime Check
 
-- Generated UTC: `2026-07-30T08:16:46.287824Z`
+- Generated UTC: `2026-07-30T09:20:53.487780Z`
 - Verdict: **WARN**
 - Base URL: `http://127.0.0.1:8000`
-- Expected commit: `fb8c1d5af900f9ee517d91a11f1b24e5c0647af5`
+- Expected commit: `a95d6dabedbc5b93a45963b5489266ccc0870b69`
 - Deployed commit: `unknown`
 
 ## Key facts
@@ -44,15 +44,15 @@
 - `health` `/api/health`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
 - `memory_before` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
 - `broker_status` `/api/broker/status`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `broker_dhan_status` `/api/broker/dhan/status`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `broker_deps` `/api/broker/deps`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `broker_dhan_status` `/api/broker/dhan/status`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `broker_deps` `/api/broker/deps`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
 - `scheduler_health` `/api/scheduler/health`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `portfolio_unified` `/api/portfolio/unified`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `memory_after_portfolio` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
-- `chain_nifty` `/api/chain/NIFTY`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `portfolio_unified` `/api/portfolio/unified`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `memory_after_portfolio` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `chain_nifty` `/api/chain/NIFTY`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
 - `memory_after_chain` `/api/memory`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `underlyings` `/api/underlyings`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
-- `state` `/api/state`: ok=`False`, status=`0`, latency_ms=`0.3`, attempts=`4`
+- `underlyings` `/api/underlyings`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
+- `state` `/api/state`: ok=`False`, status=`0`, latency_ms=`0.4`, attempts=`4`
 
 ## Safety
 - This check does not call order placement, modification, cancellation, or live-trading enablement endpoints.
