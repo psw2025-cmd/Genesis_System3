@@ -1,7 +1,7 @@
 {
-  "commit": "ea70905bc2ecc477b16d8d3b44cd6f57874b7939",
+  "commit": "1f601b77c82458b669391350a178c629c52d3dbf",
   "final_verdict": "FAIL",
-  "generated_utc": "2026-07-30T06:28:08.623827Z",
+  "generated_utc": "2026-07-30T07:30:48.467627Z",
   "how_to_read": "Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.",
   "how_to_trigger": "Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.",
   "safety": {
@@ -17,8 +17,8 @@
       "summary_json": {
         "alerts": [],
         "deployed_commit": "",
-        "expected_commit": "ea70905bc2ecc477b16d8d3b44cd6f57874b7939",
-        "generated_utc": "2026-07-30T06:18:56.581999Z",
+        "expected_commit": "1f601b77c82458b669391350a178c629c52d3dbf",
+        "generated_utc": "2026-07-30T07:21:35.246417Z",
         "key_facts": {
           "broker_connected": false,
           "chain_nifty_contracts": 0,
@@ -140,7 +140,7 @@
         ],
         "chain_truth": [],
         "final_verdict": "FAIL",
-        "generated_at": "2026-07-30T06:28:08.523Z",
+        "generated_at": "2026-07-30T07:30:48.373Z",
         "infra_blockers": [
           "TOP_LEVEL_EXCEPTION:Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/api/auth/status\nCall log:\n  - navigating to \"http://127.0.0.1:8000/api/auth/status\", waiting until \"networkidle\"\n",
           "REQUEST_FAILED:http://127.0.0.1:8000/api/auth/status:net::ERR_CONNECTION_REFUSED"
