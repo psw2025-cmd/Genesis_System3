@@ -17,7 +17,7 @@ Screenshot gate: **False**
 - `shell_generated_at`: `2026-07-27T23:56:42.530Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-07-30T04:52:03.328Z`
+- `visible_tracker_generated_at`: `2026-07-30T10:50:33.614Z`
 - `visible_tracker_status`: `BLOCKED`
 - `visible_tracker_bad_tab_count`: `0`
 
