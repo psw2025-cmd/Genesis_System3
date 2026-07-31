@@ -5,52 +5,42 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "95e59ef03f407d6ff4702295f6104c6ede234cbf",
+      "commit": "e597de61c501698f85b18f20dfa8170e4fe7a055",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30629081734",
-      "run_id": 30629081734,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30632759873",
+      "run_id": 30632759873,
       "status": "completed",
-      "updated_at": "2026-07-31T12:02:02Z",
+      "updated_at": "2026-07-31T13:01:30Z",
       "workflow": "Dashboard Visible Proof Warmed"
     },
     {
       "branch": "main",
-      "commit": "95e59ef03f407d6ff4702295f6104c6ede234cbf",
+      "commit": "e597de61c501698f85b18f20dfa8170e4fe7a055",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30628965008",
-      "run_id": 30628965008,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30632639579",
+      "run_id": 30632639579,
       "status": "completed",
-      "updated_at": "2026-07-31T11:59:48Z",
+      "updated_at": "2026-07-31T12:59:18Z",
       "workflow": "System3 Backend Live Simulation Proof"
     },
     {
       "branch": "main",
-      "commit": "c2de8a21be028418e8fcf27ff76d42bcfcaa319f",
+      "commit": "03ac46cb6e2c0b3acb2e19aa438285d2d00ae4f7",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30628794891",
-      "run_id": 30628794891,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30632432784",
+      "run_id": 30632432784,
       "status": "completed",
-      "updated_at": "2026-07-31T11:56:53Z",
-      "workflow": "System3 Render Worker Preflight"
-    },
-    {
-      "branch": "main",
-      "commit": "56bc4ff0f78a69598c14b94f1d0f77e7ffa614b0",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30628769795",
-      "run_id": 30628769795,
-      "status": "completed",
-      "updated_at": "2026-07-31T11:56:49Z",
+      "updated_at": "2026-07-31T12:56:05Z",
       "workflow": "Dashboard Deploy Provenance Gate"
     },
     {
       "branch": "main",
-      "commit": "56bc4ff0f78a69598c14b94f1d0f77e7ffa614b0",
+      "commit": "8204b59791a8a22ac5ee41cd660239bb01a00645",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30628693485",
-      "run_id": 30628693485,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30632350941",
+      "run_id": 30632350941,
       "status": "completed",
-      "updated_at": "2026-07-31T11:55:52Z",
+      "updated_at": "2026-07-31T12:55:05Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -114,27 +104,16 @@
       "workflow": "System3 Market Session Proof Runner"
     }
   ],
-  "generated_utc": "2026-07-31T12:39:03.335307Z",
-  "github_failed_count": 11,
-  "github_pending_count": 1,
+  "generated_utc": "2026-07-31T13:34:11.733674Z",
+  "github_failed_count": 10,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [
-    {
-      "branch": "main",
-      "commit": "22a09589444e2e85e7be1cf0ab3a5cccd39dd31d",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30630822154",
-      "run_id": 30630822154,
-      "status": "in_progress",
-      "updated_at": "2026-07-31T12:29:53Z",
-      "workflow": "Cloud Runtime Check"
-    }
-  ],
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
   "render_base": "http://127.0.0.1:8000",
   "render_endpoint_timeout_s": 30.0,
@@ -291,11 +270,10 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30629081734 conclusion=failure commit=95e59ef03f40",
-    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30628965008 conclusion=failure commit=95e59ef03f40",
-    "Fix latest GitHub workflow 'System3 Render Worker Preflight' run=30628794891 conclusion=failure commit=c2de8a21be02",
-    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30628769795 conclusion=failure commit=56bc4ff0f78a",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30628693485 conclusion=failure commit=56bc4ff0f78a",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30632759873 conclusion=failure commit=e597de61c501",
+    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30632639579 conclusion=failure commit=e597de61c501",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30632432784 conclusion=failure commit=03ac46cb6e2c",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30632350941 conclusion=failure commit=8204b59791a8",
     "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30626904525 conclusion=failure commit=1164098dbfde",
     "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30627316004 conclusion=failure commit=1164098dbfde",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30626482567 conclusion=failure commit=d806ee0d20bb",
@@ -315,7 +293,7 @@
     "Fix Render endpoint /api/paper: HTTP status 0 status=0",
     "Fix Render endpoint /api/ml/performance: HTTP status 0 status=0"
   ],
-  "todo_count": 23,
+  "todo_count": 22,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
