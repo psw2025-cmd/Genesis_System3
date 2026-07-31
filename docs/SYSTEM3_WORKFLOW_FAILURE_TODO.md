@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-07-31T09:17:55.263903+00:00`
+Generated UTC: `2026-07-31T09:28:12.020659+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `25`
+Failed workflow count: `27`
 
 ## Rule
 
@@ -12,6 +12,10 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30619777203 conclusion=failure commit=18570f6be834a0b6709257779a26674d9078ba41
+- [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 30619570565 conclusion=failure commit=08ab848d5553da77bd3d5c1fd45d8c2aafa9f1b6
+- [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 30619556339 conclusion=failure commit=08ab848d5553da77bd3d5c1fd45d8c2aafa9f1b6
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30619409539 conclusion=cancelled commit=6a4e213e7b6080e9e78be433babedb6ef80e23fc
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30619339893 conclusion=failure commit=deed8c00dd0b349c7ff46aee2ea556e65eb3e34f
 - [ ] Fix workflow 'Permanent Repo Render Safety' run 30618654310 conclusion=failure commit=deed8c00dd0b349c7ff46aee2ea556e65eb3e34f
 - [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30616745372 conclusion=failure commit=c34dab2807934a23e566d7444c39cbb37f51e5e5
@@ -35,13 +39,15 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30611327854 conclusion=failure commit=272c1021c57f76a49f18c27de4dd5dfc62028abf
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30611208769 conclusion=failure commit=272c1021c57f76a49f18c27de4dd5dfc62028abf
 - [ ] Fix workflow 'Permanent Repo Render Safety' run 30611038208 conclusion=failure commit=272c1021c57f76a49f18c27de4dd5dfc62028abf
-- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30607794788 conclusion=failure commit=33a2a4dfcf221db866ca34f33802f158689dab03
-- [ ] Fix workflow 'System3 Full Auto Truth' run 30607610795 conclusion=failure commit=33a2a4dfcf221db866ca34f33802f158689dab03
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Visible Proof Warmed | 30619777203 | failure | `18570f6be834` | 2026-07-31T09:24:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30619777203 |
+| Dashboard Deploy Provenance Gate | 30619570565 | failure | `08ab848d5553` | 2026-07-31T09:20:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30619570565 |
+| System3 Backend Live Simulation Proof | 30619556339 | failure | `08ab848d5553` | 2026-07-31T09:20:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30619556339 |
+| System3 1000 Point TODO Status Updater | 30619409539 | cancelled | `6a4e213e7b60` | 2026-07-31T09:18:09Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30619409539 |
 | Dashboard Visual Production Proof | 30619339893 | failure | `deed8c00dd0b` | 2026-07-31T09:17:45Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30619339893 |
 | Permanent Repo Render Safety | 30618654310 | failure | `deed8c00dd0b` | 2026-07-31T09:15:20Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30618654310 |
 | System3 Broker Chain Semantic Gate | 30616745372 | failure | `c34dab280793` | 2026-07-31T08:34:09Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30616745372 |
@@ -65,5 +71,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 GitHub Render Failure Tracker | 30611327854 | failure | `272c1021c57f` | 2026-07-31T06:59:46Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30611327854 |
 | System3 Latest Truth Publish | 30611208769 | failure | `272c1021c57f` | 2026-07-31T07:07:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30611208769 |
 | Permanent Repo Render Safety | 30611038208 | failure | `272c1021c57f` | 2026-07-31T07:03:31Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30611038208 |
-| System3 Broker Chain Semantic Gate | 30607794788 | failure | `33a2a4dfcf22` | 2026-07-31T05:48:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30607794788 |
-| System3 Full Auto Truth | 30607610795 | failure | `33a2a4dfcf22` | 2026-07-31T06:09:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30607610795 |
