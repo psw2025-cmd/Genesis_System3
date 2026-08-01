@@ -1,6 +1,56 @@
 {
-  "failed_count": 26,
+  "failed_count": 28,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "8d4fa29a88b06b2236e48ad665796ba23805a6ec",
+      "conclusion": "failure",
+      "created_at": "2026-08-01T10:01:06Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30694881662",
+      "run_id": 30694881662,
+      "updated_at": "2026-08-01T10:02:23Z",
+      "workflow": "Dashboard Visible Proof Warmed"
+    },
+    {
+      "branch": "main",
+      "commit": "8d4fa29a88b06b2236e48ad665796ba23805a6ec",
+      "conclusion": "failure",
+      "created_at": "2026-08-01T09:59:21Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30694819647",
+      "run_id": 30694819647,
+      "updated_at": "2026-08-01T09:59:48Z",
+      "workflow": "System3 Backend Live Simulation Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "9bb812fbd393687b7247b02f9ff358ea7eb38fe3",
+      "conclusion": "failure",
+      "created_at": "2026-08-01T09:56:08Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30694719008",
+      "run_id": 30694719008,
+      "updated_at": "2026-08-01T09:56:27Z",
+      "workflow": "System3 Render Worker Preflight"
+    },
+    {
+      "branch": "main",
+      "commit": "49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
+      "conclusion": "failure",
+      "created_at": "2026-08-01T09:55:35Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30694699364",
+      "run_id": 30694699364,
+      "updated_at": "2026-08-01T09:56:09Z",
+      "workflow": "Dashboard Deploy Provenance Gate"
+    },
+    {
+      "branch": "main",
+      "commit": "49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-01T09:55:29Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30694696266",
+      "run_id": 30694696266,
+      "updated_at": "2026-08-01T09:55:49Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
@@ -230,43 +280,18 @@
       "run_id": 30685973311,
       "updated_at": "2026-08-01T05:32:15Z",
       "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "b4ddaecbeb29faa9c668bd5ace6caa2c8d8ccb2c",
-      "conclusion": "failure",
-      "created_at": "2026-08-01T05:29:10Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30685916942",
-      "run_id": 30685916942,
-      "updated_at": "2026-08-01T05:29:33Z",
-      "workflow": "System3 Backend Live Simulation Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "0a3a428986bcbfb06c4e94de567c1d47b7edefd1",
-      "conclusion": "failure",
-      "created_at": "2026-08-01T05:26:05Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30685821955",
-      "run_id": 30685821955,
-      "updated_at": "2026-08-01T05:26:22Z",
-      "workflow": "System3 Render Worker Preflight"
-    },
-    {
-      "branch": "main",
-      "commit": "2d79c2c4ce9a6669e097f62d224b5386681b9554",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-01T05:25:32Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30685804714",
-      "run_id": 30685804714,
-      "updated_at": "2026-08-01T05:25:55Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-08-01T09:55:38.282240+00:00",
+  "generated_utc": "2026-08-01T10:09:21.551890+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visible Proof Warmed' run 30694881662 conclusion=failure commit=8d4fa29a88b06b2236e48ad665796ba23805a6ec",
+    "Fix workflow 'System3 Backend Live Simulation Proof' run 30694819647 conclusion=failure commit=8d4fa29a88b06b2236e48ad665796ba23805a6ec",
+    "Fix workflow 'System3 Render Worker Preflight' run 30694719008 conclusion=failure commit=9bb812fbd393687b7247b02f9ff358ea7eb38fe3",
+    "Fix workflow 'Dashboard Deploy Provenance Gate' run 30694699364 conclusion=failure commit=49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30694696266 conclusion=cancelled commit=49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
     "Fix workflow 'Dashboard Visual Production Proof' run 30694664421 conclusion=failure commit=49a7fcd5bb470645feffcdf3c7d1c861ea9120fb",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30694154454 conclusion=failure commit=4c65e3e47d54721ebd20481420b795fde384d276",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30692950356 conclusion=failure commit=e1e67c6b2f3b92be195d34310963ee8141fd4541",
@@ -289,9 +314,6 @@
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30689073758 conclusion=cancelled commit=5808033789c9d5d8506ca06b479eb5f85b9874d3",
     "Fix workflow 'Dashboard Visual Production Proof' run 30689041534 conclusion=failure commit=5808033789c9d5d8506ca06b479eb5f85b9874d3",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30688524428 conclusion=failure commit=8f5929a8f52adfeb88a1e5fbdf249218700e1497",
-    "Fix workflow 'Dashboard Visible Proof Warmed' run 30685973311 conclusion=failure commit=b4ddaecbeb29faa9c668bd5ace6caa2c8d8ccb2c",
-    "Fix workflow 'System3 Backend Live Simulation Proof' run 30685916942 conclusion=failure commit=b4ddaecbeb29faa9c668bd5ace6caa2c8d8ccb2c",
-    "Fix workflow 'System3 Render Worker Preflight' run 30685821955 conclusion=failure commit=0a3a428986bcbfb06c4e94de567c1d47b7edefd1",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30685804714 conclusion=cancelled commit=2d79c2c4ce9a6669e097f62d224b5386681b9554"
+    "Fix workflow 'Dashboard Visible Proof Warmed' run 30685973311 conclusion=failure commit=b4ddaecbeb29faa9c668bd5ace6caa2c8d8ccb2c"
   ]
 }
