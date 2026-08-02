@@ -36,20 +36,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Verify workflow policy and trading safety
         shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
 
           # Legacy workflows remain quarantined; every new or modified workflow must satisfy this policy.
           echo "Scanning new or changed workflow files..."
           workflows=()
+          if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]] && ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          fi
+
           if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             mapfile -t workflows < <(
               git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" --                 '.github/workflows/*.yml' '.github/workflows/*.yaml' | sort
