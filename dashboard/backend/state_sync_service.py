@@ -5,6 +5,8 @@ Ensures SSOT stays up-to-date with the trading system
 
 import asyncio
 import json
+import os
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -25,7 +27,10 @@ class StateSyncService:
         self.state_store = state_store
         self.outputs_dir = Path(outputs_dir)
         self._running = False
-        self._sync_interval = 5  # Sync every 5 seconds
+        # Cloud Run uses 60s to stay comfortably inside Firestore free quotas;
+        # local development retains the historical 5s default.
+        requested_interval = int(os.environ.get("SYSTEM3_SYNC_INTERVAL_S", "5"))
+        self._sync_interval = min(300, max(5, requested_interval))
         self._consecutive_failures = 0
 
     async def start(self):

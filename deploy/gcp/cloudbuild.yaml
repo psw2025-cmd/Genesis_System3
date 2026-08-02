@@ -1,0 +1,29 @@
+substitutions:
+  _REGION: asia-south1
+  _REPOSITORY: system3-containers
+  _IMAGE: genesis-system3
+  _IMAGE_TAG: unset
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        [[ "${_IMAGE_TAG}" =~ ^[0-9a-f]{40}$ ]] || {
+          echo "_IMAGE_TAG must be the full 40-character merged commit SHA" >&2
+          exit 2
+        }
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file=dashboard/backend/Dockerfile
+      - --tag=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${_IMAGE_TAG}
+      - .
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE}:${_IMAGE_TAG}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
