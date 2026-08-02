@@ -31,9 +31,52 @@ class RuntimeStateStore:
         self._state_version = 0
         self._lock = threading.Lock()
         self._last_update = None
+        self._remote_backend = None
+        self._remote_backend_required = os.environ.get("SYSTEM3_STATE_BACKEND_REQUIRED", "0").strip().lower() in (
+            "1", "true", "yes", "on"
+        )
+        self._remote_refresh_interval = max(
+            1.0, float(os.environ.get("SYSTEM3_STATE_REFRESH_S", "5"))
+        )
+        self._last_remote_refresh_monotonic = 0.0
+
+        backend_name = os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower()
+        if backend_name not in ("file", "local", "firestore"):
+            raise ValueError(f"Unsupported SYSTEM3_STATE_BACKEND={backend_name!r}")
+        if backend_name == "firestore":
+            try:
+                from dashboard.backend.firestore_state_backend import FirestoreStateBackend
+
+                self._remote_backend = FirestoreStateBackend()
+            except Exception as exc:
+                if self._remote_backend_required:
+                    raise RuntimeError("Firestore state backend is required but unavailable") from exc
+                print(f"[WARNING][state_store] Firestore unavailable; using local files: {exc}")
 
         # Initialize state
         self._initialize_state()
+
+    def _enforce_safety_invariants(self, state: Dict[str, Any]) -> None:
+        """Cloud persistence must never re-enable live execution."""
+        state["mode"] = "PAPER"
+        state["live_trading_enabled"] = False
+        safety = state.setdefault("safety", {})
+        if not isinstance(safety, dict):
+            safety = {}
+            state["safety"] = safety
+        safety["live_trading_enabled"] = False
+        safety["execution_mode"] = "ANALYZER"
+
+    def _enforce_safety_invariants(self, state: Dict[str, Any]) -> None:
+        """Cloud persistence must never re-enable live execution."""
+        state["mode"] = "PAPER"
+        state["live_trading_enabled"] = False
+        safety = state.setdefault("safety", {})
+        if not isinstance(safety, dict):
+            safety = {}
+            state["safety"] = safety
+        safety["live_trading_enabled"] = False
+        safety["execution_mode"] = "ANALYZER"
 
     def _check_broker_connectivity(self) -> Dict[str, Any]:
         """Check broker connectivity and return status - uses health.json as source of truth"""
@@ -125,6 +168,7 @@ class RuntimeStateStore:
                 self._state["broker"] = self._check_broker_connectivity()
 
             self._deep_merge(self._state, updates)
+            self._enforce_safety_invariants(self._state)
             self._save_state()
             return self._state_version
 
@@ -137,8 +181,23 @@ class RuntimeStateStore:
                 base[key] = value
 
     def get_state(self) -> Dict[str, Any]:
-        """Get current state snapshot (thread-safe)"""
+        """Get a state snapshot and periodically refresh shared cloud state."""
         with self._lock:
+            now = time.monotonic()
+            if self._remote_backend is not None and (
+                now - self._last_remote_refresh_monotonic >= self._remote_refresh_interval
+            ):
+                self._last_remote_refresh_monotonic = now
+                try:
+                    loaded = self._remote_backend.load()
+                    if loaded:
+                        self._enforce_safety_invariants(loaded)
+                        loaded_version = int(loaded.get("state_version", 0) or 0)
+                        if loaded_version >= self._state_version:
+                            self._state = loaded
+                            self._state_version = loaded_version
+                except Exception as exc:
+                    print(f"[WARNING][state_store] Firestore refresh failed; serving cached state: {exc}")
             return json.loads(json.dumps(self._state))
 
     def get_state_version(self) -> int:
@@ -155,29 +214,75 @@ class RuntimeStateStore:
             json.dump(data, f, indent=2)
         os.replace(tmp_path, path)
 
+    def _save_local_state(self, include_snapshots: bool = True) -> None:
+        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+        state_file = self.outputs_dir / "runtime_state.json"
+        self._atomic_write_json(state_file, self._state)
+
+        if not include_snapshots:
+            return
+        snapshots_dir = self.outputs_dir / "state_snapshots"
+        snapshots_dir.mkdir(exist_ok=True)
+        snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
+        self._atomic_write_json(snapshot_file, self._state)
+
+        snapshot_files = sorted(
+            snapshots_dir.glob("state_*.json"),
+            key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
+        )
+        if len(snapshot_files) > 1000:
+            for old_file in snapshot_files[:-1000]:
+                try:
+                    old_file.unlink()
+                except Exception:
+                    pass
+
+    def _save_local_state(self, include_snapshots: bool = True) -> None:
+        self.outputs_dir.mkdir(parents=True, exist_ok=True)
+        state_file = self.outputs_dir / "runtime_state.json"
+        self._atomic_write_json(state_file, self._state)
+
+        if not include_snapshots:
+            return
+        snapshots_dir = self.outputs_dir / "state_snapshots"
+        snapshots_dir.mkdir(exist_ok=True)
+        snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
+        self._atomic_write_json(snapshot_file, self._state)
+
+        snapshot_files = sorted(
+            snapshots_dir.glob("state_*.json"),
+            key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
+        )
+        if len(snapshot_files) > 1000:
+            for old_file in snapshot_files[:-1000]:
+                try:
+                    old_file.unlink()
+                except Exception:
+                    pass
+
     def _save_state(self):
-        """Save state to file for persistence"""
+        """Persist to Firestore in cloud mode, otherwise use atomic local files."""
+        if self._remote_backend is not None:
+            try:
+                persisted = self._remote_backend.save(self._state)
+                self._enforce_safety_invariants(persisted)
+                self._state = persisted
+                self._state_version = int(persisted.get("state_version", self._state_version) or 0)
+                self._last_remote_refresh_monotonic = time.monotonic()
+                if os.environ.get("SYSTEM3_LOCAL_STATE_MIRROR", "1").strip().lower() in (
+                    "1", "true", "yes", "on"
+                ):
+                    self._save_local_state(include_snapshots=False)
+                return
+            except Exception as exc:
+                if self._remote_backend_required:
+                    raise RuntimeError("Required Firestore state write failed") from exc
+                print(f"[WARNING][state_store] Firestore write failed; using local files: {exc}")
+
         try:
-            state_file = self.outputs_dir / "runtime_state.json"
-            self._atomic_write_json(state_file, self._state)
-
-            snapshots_dir = self.outputs_dir / "state_snapshots"
-            snapshots_dir.mkdir(exist_ok=True)
-            snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-            self._atomic_write_json(snapshot_file, self._state)
-
-            snapshot_files = sorted(
-                snapshots_dir.glob("state_*.json"),
-                key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
-            )
-            if len(snapshot_files) > 1000:
-                for old_file in snapshot_files[:-1000]:
-                    try:
-                        old_file.unlink()
-                    except Exception:
-                        pass
-        except Exception as e:
-            print(f"Warning: Failed to save state: {e}")
+            self._save_local_state(include_snapshots=True)
+        except Exception as exc:
+            print(f"Warning: Failed to save state: {exc}")
 
     def load_state(self):
         """Load state from file if exists. On a corrupt/unparseable file,
@@ -186,6 +291,36 @@ class RuntimeStateStore:
         in logs from a normal first boot, and easy to miss. Now renames the
         corrupt file aside for forensics and prints a loud, unmissable
         marker so this shows up in any log-based alerting."""
+        if self._remote_backend is not None:
+            try:
+                loaded = self._remote_backend.load()
+                self._last_remote_refresh_monotonic = time.monotonic()
+                if loaded:
+                    self._enforce_safety_invariants(loaded)
+                    with self._lock:
+                        self._state = loaded
+                        self._state_version = int(loaded.get("state_version", 0) or 0)
+                return
+            except Exception as exc:
+                if self._remote_backend_required:
+                    raise RuntimeError("Required Firestore state load failed") from exc
+                print(f"[WARNING][state_store] Firestore load failed; trying local state: {exc}")
+
+        if self._remote_backend is not None:
+            try:
+                loaded = self._remote_backend.load()
+                self._last_remote_refresh_monotonic = time.monotonic()
+                if loaded:
+                    self._enforce_safety_invariants(loaded)
+                    with self._lock:
+                        self._state = loaded
+                        self._state_version = int(loaded.get("state_version", 0) or 0)
+                return
+            except Exception as exc:
+                if self._remote_backend_required:
+                    raise RuntimeError("Required Firestore state load failed") from exc
+                print(f"[WARNING][state_store] Firestore load failed; trying local state: {exc}")
+
         state_file = self.outputs_dir / "runtime_state.json"
         if not state_file.exists():
             return
@@ -193,8 +328,9 @@ class RuntimeStateStore:
             with open(state_file, "r") as f:
                 loaded = json.load(f)
             with self._lock:
+                self._enforce_safety_invariants(loaded)
                 self._state = loaded
-                self._state_version = loaded.get("state_version", 0)
+                self._state_version = int(loaded.get("state_version", 0) or 0)
         except Exception as e:
             quarantine_path = state_file.with_suffix(f".corrupt.{int(time.time())}.json")
             try:
@@ -370,5 +506,4 @@ def get_state_store(outputs_dir: Optional[Path] = None) -> RuntimeStateStore:
             outputs_dir = Path(__file__).parent.parent.parent / "outputs"
         _state_store = RuntimeStateStore(outputs_dir)
         _state_store.load_state()
-        _state_store.sync_from_files()
     return _state_store
