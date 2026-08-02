@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-08-02T20:20:58.935595Z`
+Generated UTC: `2026-08-02T20:48:45.554793Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `http://127.0.0.1:8000`
-GitHub workflows whose newest observed run failed: `6`
-GitHub workflows currently queued/in progress: `1`
+GitHub workflows whose newest observed run failed: `2`
+GitHub workflows currently queued/in progress: `14`
 Render failed endpoints: `12`
-TODO count: `18`
+TODO count: `14`
 
 ## Rule
 
@@ -16,12 +16,8 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 ## TODO
 
-- [ ] Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30765245535 conclusion=failure commit=8cb138eb5ac4
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30764058915 conclusion=failure commit=9e4d08147bd2
-- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30764017237 conclusion=failure commit=9e4d08147bd2
-- [ ] Fix latest GitHub workflow 'System3 Render Worker Preflight' run=30763942519 conclusion=failure commit=2a366284b496
-- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30763925678 conclusion=failure commit=2a366284b496
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30763912432 conclusion=failure commit=2a366284b496
+- [ ] Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30766449998 conclusion=failure commit=1e8dca59755e
+- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30765986506 conclusion=failure commit=0eb1d76b2bfe
 - [ ] Fix Render endpoint /: HTTP status 0 status=0
 - [ ] Fix Render endpoint /ui/: HTTP status 0 status=0
 - [ ] Fix Render endpoint /api/health: HTTP status 0 status=0
@@ -39,18 +35,27 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| .github/workflows/options-ml-training-proof.yml | 30765245535 | failure | `8cb138eb5ac4` | 2026-08-02T20:16:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30765245535 |
-| Dashboard Visible Proof Warmed | 30764058915 | failure | `9e4d08147bd2` | 2026-08-02T19:45:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30764058915 |
-| System3 Backend Live Simulation Proof | 30764017237 | failure | `9e4d08147bd2` | 2026-08-02T19:44:00Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30764017237 |
-| System3 Render Worker Preflight | 30763942519 | failure | `2a366284b496` | 2026-08-02T19:41:50Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30763942519 |
-| Dashboard Deploy Provenance Gate | 30763925678 | failure | `2a366284b496` | 2026-08-02T19:41:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30763925678 |
-| Dashboard Visual Production Proof | 30763912432 | failure | `2a366284b496` | 2026-08-02T19:41:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30763912432 |
+| .github/workflows/options-ml-training-proof.yml | 30766449998 | failure | `1e8dca59755e` | 2026-08-02T20:48:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766449998 |
+| System3 Backend Live Simulation Proof | 30765986506 | failure | `0eb1d76b2bfe` | 2026-08-02T20:36:27Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30765986506 |
 
 ## Pending workflow runs
 
 | Workflow | Run | Status | Updated |
 |---|---:|---|---|
-| Genesis System3 Global Safety CI | 30765247899 | queued | 2026-08-02T20:17:48Z |
+| Dashboard Deploy Provenance Gate | 30766450412 | in_progress | 2026-08-02T20:48:42Z |
+| Dashboard Visible Proof Isolated | 30766450429 | in_progress | 2026-08-02T20:48:41Z |
+| Genesis System3 Global Safety CI | 30766450393 | in_progress | 2026-08-02T20:48:41Z |
+| Cloud Runtime Check | 30766450476 | in_progress | 2026-08-02T20:48:40Z |
+| Dashboard Live UI Proof | 30766450431 | in_progress | 2026-08-02T20:48:40Z |
+| System3 Render Worker Preflight | 30766450423 | in_progress | 2026-08-02T20:48:40Z |
+| Dashboard Visual Production Proof | 30766450413 | in_progress | 2026-08-02T20:48:40Z |
+| System3 Render Worker Issue Proof | 30766450398 | in_progress | 2026-08-02T20:48:40Z |
+| System3 Render Worker Env Audit | 30766450397 | in_progress | 2026-08-02T20:48:40Z |
+| Dashboard Visible Proof Warmed | 30766450394 | in_progress | 2026-08-02T20:48:40Z |
+| Graph Update: pip in /dashboard/backend #1500739048 | 30766451450 | queued | 2026-08-02T20:48:39Z |
+| Permanent Repo Render Safety | 30766450408 | queued | 2026-08-02T20:48:37Z |
+| System3 Parallel Root-Cause Audit | 30766450401 | queued | 2026-08-02T20:48:37Z |
+| System3 Latest Truth Publish | 30766450382 | queued | 2026-08-02T20:48:37Z |
 
 ## Render endpoint failures
 
