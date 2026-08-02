@@ -20,11 +20,15 @@ after explicit approval.
 ## Build (Stage 3 only)
 
 ```bash
+MERGED_SHA="$(git rev-parse HEAD)"
+[[ "$MERGED_SHA" =~ ^[0-9a-f]{40}$ ]]
 gcloud builds submit --project=system3-openalgo-safe \
-  --config=deploy/gcp/cloudbuild.yaml .
+  --config=deploy/gcp/cloudbuild.yaml \
+  --substitutions="_IMAGE_TAG=${MERGED_SHA}" .
 ```
 
-Use the immutable commit-SHA image printed by Cloud Build. Never deploy `latest`.
+Build only the exact merged `main` commit. The build rejects short, empty, or
+non-SHA tags. Never deploy `latest`.
 
 ## Deploy health-only web service (Stage 3 only)
 
