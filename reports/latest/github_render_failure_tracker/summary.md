@@ -1,14 +1,14 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-08-02T08:48:03.463556Z`
+Generated UTC: `2026-08-02T09:40:16.414595Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
 Render base: `http://127.0.0.1:8000`
-GitHub workflows whose newest observed run failed: `5`
+GitHub workflows whose newest observed run failed: `6`
 GitHub workflows currently queued/in progress: `0`
 Render failed endpoints: `12`
-TODO count: `17`
+TODO count: `18`
 
 ## Rule
 
@@ -16,10 +16,11 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 ## TODO
 
-- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30739016111 conclusion=failure commit=2265732a2e5b
-- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30738951061 conclusion=failure commit=2265732a2e5b
-- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30738812149 conclusion=failure commit=6d4cb6285329
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30738778784 conclusion=failure commit=7fde26176514
+- [ ] Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30741008503 conclusion=failure commit=fc2831da9edd
+- [ ] Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30740976005 conclusion=failure commit=fc2831da9edd
+- [ ] Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30740920877 conclusion=failure commit=9a105854d07c
+- [ ] Fix latest GitHub workflow 'System3 Render Worker Preflight' run=30740932366 conclusion=failure commit=9a105854d07c
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30740885933 conclusion=failure commit=9a105854d07c
 - [ ] Fix latest GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30732685725 conclusion=failure commit=07b199fc2eaf
 - [ ] Fix Render endpoint /: HTTP status 0 status=0
 - [ ] Fix Render endpoint /ui/: HTTP status 0 status=0
@@ -38,10 +39,11 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| Dashboard Visible Proof Warmed | 30739016111 | failure | `2265732a2e5b` | 2026-08-02T08:04:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30739016111 |
-| System3 Backend Live Simulation Proof | 30738951061 | failure | `2265732a2e5b` | 2026-08-02T08:01:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30738951061 |
-| Dashboard Deploy Provenance Gate | 30738812149 | failure | `6d4cb6285329` | 2026-08-02T07:58:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30738812149 |
-| Dashboard Visual Production Proof | 30738778784 | failure | `7fde26176514` | 2026-08-02T07:57:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30738778784 |
+| Dashboard Visible Proof Warmed | 30741008503 | failure | `fc2831da9edd` | 2026-08-02T09:04:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30741008503 |
+| System3 Backend Live Simulation Proof | 30740976005 | failure | `fc2831da9edd` | 2026-08-02T09:03:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740976005 |
+| Dashboard Deploy Provenance Gate | 30740920877 | failure | `9a105854d07c` | 2026-08-02T09:01:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740920877 |
+| System3 Render Worker Preflight | 30740932366 | failure | `9a105854d07c` | 2026-08-02T09:01:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740932366 |
+| Dashboard Visual Production Proof | 30740885933 | failure | `9a105854d07c` | 2026-08-02T09:01:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740885933 |
 | System3 Windows Self-Hosted Workflow Migration | 30732685725 | failure | `07b199fc2eaf` | 2026-08-02T04:38:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30732685725 |
 
 ## Pending workflow runs
