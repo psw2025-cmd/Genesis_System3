@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-02T11:49:12.670989+00:00`
+Generated UTC: `2026-08-02T12:24:23.171711+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `27`
+Failed workflow count: `26`
 
 ## Rule
 
@@ -12,6 +12,7 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30747716914 conclusion=failure commit=a728a3d8d82c95880f675dfeefbc29c16738ceb6
 - [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30746335839 conclusion=failure commit=2402a6e0cc325f6aaa99609bf1b345a906967fb5
 - [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 30746307470 conclusion=failure commit=2402a6e0cc325f6aaa99609bf1b345a906967fb5
 - [ ] Fix workflow 'System3 Render Worker Preflight' run 30746248118 conclusion=failure commit=636528b407b99439beb7b15e49c9f75bccd78d57
@@ -37,13 +38,12 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30740923466 conclusion=cancelled commit=9a105854d07c2a0d7432973955b557d2886bef2a
 - [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 30740920877 conclusion=failure commit=9a105854d07c2a0d7432973955b557d2886bef2a
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30740885933 conclusion=failure commit=9a105854d07c2a0d7432973955b557d2886bef2a
-- [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30740478673 conclusion=failure commit=801f1b5b3d8c0bb90a4cf7579adbd3d42a45e158
-- [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30739016111 conclusion=failure commit=2265732a2e5b864c21955023072a24060ecfdd8d
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 GitHub Render Failure Tracker | 30747716914 | failure | `a728a3d8d82c` | 2026-08-02T12:23:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30747716914 |
 | Dashboard Visible Proof Warmed | 30746335839 | failure | `2402a6e0cc32` | 2026-08-02T11:44:44Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30746335839 |
 | System3 Backend Live Simulation Proof | 30746307470 | failure | `2402a6e0cc32` | 2026-08-02T11:43:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30746307470 |
 | System3 Render Worker Preflight | 30746248118 | failure | `636528b407b9` | 2026-08-02T11:41:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30746248118 |
@@ -69,5 +69,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 30740923466 | cancelled | `9a105854d07c` | 2026-08-02T09:01:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740923466 |
 | Dashboard Deploy Provenance Gate | 30740920877 | failure | `9a105854d07c` | 2026-08-02T09:01:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740920877 |
 | Dashboard Visual Production Proof | 30740885933 | failure | `9a105854d07c` | 2026-08-02T09:01:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740885933 |
-| System3 GitHub Render Failure Tracker | 30740478673 | failure | `801f1b5b3d8c` | 2026-08-02T08:48:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30740478673 |
-| Dashboard Visible Proof Warmed | 30739016111 | failure | `2265732a2e5b` | 2026-08-02T08:04:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30739016111 |
