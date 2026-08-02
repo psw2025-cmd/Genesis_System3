@@ -5,42 +5,42 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "ca11ba5df3aa3933f8318aeba15513babe798cbb",
+      "commit": "8c12f0757fd673225a9cb784aaa90db80b0722fd",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30742885978",
-      "run_id": 30742885978,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30744584358",
+      "run_id": 30744584358,
       "status": "completed",
-      "updated_at": "2026-08-02T10:01:27Z",
+      "updated_at": "2026-08-02T10:52:52Z",
       "workflow": "Dashboard Visible Proof Warmed"
     },
     {
       "branch": "main",
-      "commit": "ca11ba5df3aa3933f8318aeba15513babe798cbb",
+      "commit": "8c12f0757fd673225a9cb784aaa90db80b0722fd",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30742827381",
-      "run_id": 30742827381,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30744548777",
+      "run_id": 30744548777,
       "status": "completed",
-      "updated_at": "2026-08-02T09:59:22Z",
+      "updated_at": "2026-08-02T10:51:21Z",
       "workflow": "System3 Backend Live Simulation Proof"
     },
     {
       "branch": "main",
-      "commit": "67c60a6c6d329922781c554e13130a2cce3725cc",
+      "commit": "7374f09863888b8c32427cc8ef0b5b1b85427a94",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30742709047",
-      "run_id": 30742709047,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30744480427",
+      "run_id": 30744480427,
       "status": "completed",
-      "updated_at": "2026-08-02T09:55:47Z",
+      "updated_at": "2026-08-02T10:49:29Z",
       "workflow": "Dashboard Deploy Provenance Gate"
     },
     {
       "branch": "main",
-      "commit": "67c60a6c6d329922781c554e13130a2cce3725cc",
+      "commit": "7374f09863888b8c32427cc8ef0b5b1b85427a94",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30742676697",
-      "run_id": 30742676697,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30744456326",
+      "run_id": 30744456326,
       "status": "completed",
-      "updated_at": "2026-08-02T09:55:06Z",
+      "updated_at": "2026-08-02T10:48:59Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -54,7 +54,7 @@
       "workflow": "System3 Windows Self-Hosted Workflow Migration"
     }
   ],
-  "generated_utc": "2026-08-02T10:32:14.795285Z",
+  "generated_utc": "2026-08-02T11:27:13.441843Z",
   "github_failed_count": 5,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -220,10 +220,10 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30742885978 conclusion=failure commit=ca11ba5df3aa",
-    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30742827381 conclusion=failure commit=ca11ba5df3aa",
-    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30742709047 conclusion=failure commit=67c60a6c6d32",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30742676697 conclusion=failure commit=67c60a6c6d32",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30744584358 conclusion=failure commit=8c12f0757fd6",
+    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30744548777 conclusion=failure commit=8c12f0757fd6",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30744480427 conclusion=failure commit=7374f0986388",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30744456326 conclusion=failure commit=7374f0986388",
     "Fix latest GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30732685725 conclusion=failure commit=07b199fc2eaf",
     "Fix Render endpoint /: HTTP status 0 status=0",
     "Fix Render endpoint /ui/: HTTP status 0 status=0",
