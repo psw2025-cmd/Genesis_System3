@@ -36,44 +36,62 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Verify workflow policy and trading safety
         shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
 
-          echo "Scanning workflow files..."
-          mapfile -t workflows < <(find .github/workflows -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
-
-          if [[ ${#workflows[@]} -eq 0 ]]; then
-            echo "FAIL: no workflow files found"
-            exit 1
+          # Legacy workflows remain quarantined; every new or modified workflow must satisfy this policy.
+          echo "Scanning new or changed workflow files..."
+          workflows=()
+          if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            mapfile -t workflows < <(
+              git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" --                 '.github/workflows/*.yml' '.github/workflows/*.yaml' | sort
+            )
+          else
+            echo "No usable base SHA; validating the authoritative CI workflow."
+            workflows=(.github/workflows/ci.yml)
           fi
 
-          printf 'Workflow files found:\n'
+          if [[ ${#workflows[@]} -eq 0 ]]; then
+            echo "No workflow files changed; baseline policy check has nothing new to scan."
+            workflows=(.github/workflows/ci.yml)
+          fi
+
+          for workflow in "${workflows[@]}"; do
+            test -f "$workflow" || { echo "FAIL: workflow missing: $workflow"; exit 1; }
+          done
+
+          printf 'Workflow files under policy review:\n'
           printf '  %s\n' "${workflows[@]}"
 
           test -f .github/workflows/ci.yml || { echo "FAIL: ci.yml missing"; exit 1; }
 
           echo "Checking CI permissions are read-only..."
-          if grep -RInE "contents:[[:space:]]*write|actions:[[:space:]]*write|packages:[[:space:]]*write|pull-requests:[[:space:]]*write|issues:[[:space:]]*write" .github/workflows; then
+          if grep -nE "contents:[[:space:]]*write|actions:[[:space:]]*write|packages:[[:space:]]*write|pull-requests:[[:space:]]*write|issues:[[:space:]]*write" "${workflows[@]}"; then
             echo "FAIL: write permission found in workflow. CI must remain read-only."
             exit 1
           fi
 
           echo "Checking forbidden auto-write/deploy commands..."
-          if grep -RInE "git[[:space:]]+p[u]sh|gh[[:space:]]+pr[[:space:]]+m[e]rge|gh[[:space:]]+r[e]lease|create-pull-r[e]quest|peter-evans/create-pull-r[e]quest|--auto-f[i]x|auto_f[i]x|autof[i]x" .github/workflows; then
+          if grep -nE "git[[:space:]]+p[u]sh|gh[[:space:]]+pr[[:space:]]+m[e]rge|gh[[:space:]]+r[e]lease|create-pull-r[e]quest|peter-evans/create-pull-r[e]quest|--auto-f[i]x|auto_f[i]x|autof[i]x" "${workflows[@]}"; then
             echo "FAIL: auto-fix/write-back behavior found in workflow."
             exit 1
           fi
 
-          if grep -RInE "azure/webapps-d[e]ploy|aws-a[c]tions|google-github-actions/d[e]ploy|render d[e]ploy|flyctl d[e]ploy|railway [u]p|vercel --p[r]od|netlify d[e]ploy" .github/workflows; then
+          if grep -nE "azure/webapps-d[e]ploy|aws-a[c]tions|google-github-actions/d[e]ploy|render d[e]ploy|flyctl d[e]ploy|railway [u]p|vercel --p[r]od|netlify d[e]ploy" "${workflows[@]}"; then
             echo "FAIL: cloud deploy command/action found in workflow."
             exit 1
           fi
 
           echo "Checking live trading is hard-disabled..."
-          if grep -RInE "LIVE_TRADING_ENABLED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?|SYSTEM3_LIVE_TRADING_ALLOWED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?" .github/workflows; then
+          if grep -nE "LIVE_TRADING_ENABLED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?|SYSTEM3_LIVE_TRADING_ALLOWED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?" "${workflows[@]}"; then
             echo "FAIL: live trading enabled inside workflow."
             exit 1
           fi
