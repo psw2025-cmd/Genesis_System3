@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-02T22:19:20.709584+00:00`
+Generated UTC: `2026-08-02T22:35:12.167011+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `27`
+Failed workflow count: `26`
 
 ## Rule
 
@@ -12,6 +12,7 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30770383337 conclusion=failure commit=d97213ba1c9082339fdcd481a8e6fca30d24945d
 - [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30769819657 conclusion=failure commit=830ec5e1997a8ee8af78051811a8ad6e0540c05f
 - [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30768331147 conclusion=failure commit=d7133f093ae91c799a311f1036cb131b676789bb
 - [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 30768289954 conclusion=failure commit=d7133f093ae91c799a311f1036cb131b676789bb
@@ -37,13 +38,12 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30766450394 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30766450382 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30766449998 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6
-- [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30766020242 conclusion=failure commit=0eb1d76b2bfeb7499c04040af82276a8b45e345a
-- [ ] Fix workflow 'System3 Backend Live Simulation Proof' run 30765986506 conclusion=failure commit=0eb1d76b2bfeb7499c04040af82276a8b45e345a
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Visual Production Proof | 30770383337 | failure | `d97213ba1c90` | 2026-08-02T22:34:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30770383337 |
 | System3 GitHub Render Failure Tracker | 30769819657 | failure | `830ec5e1997a` | 2026-08-02T22:18:46Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30769819657 |
 | Dashboard Visible Proof Warmed | 30768331147 | failure | `d7133f093ae9` | 2026-08-02T21:39:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30768331147 |
 | System3 Backend Live Simulation Proof | 30768289954 | failure | `d7133f093ae9` | 2026-08-02T21:37:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30768289954 |
@@ -69,5 +69,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Dashboard Visible Proof Warmed | 30766450394 | failure | `1e8dca59755e` | 2026-08-02T20:49:27Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766450394 |
 | System3 Latest Truth Publish | 30766450382 | failure | `1e8dca59755e` | 2026-08-02T20:59:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766450382 |
 | .github/workflows/options-ml-training-proof.yml | 30766449998 | failure | `1e8dca59755e` | 2026-08-02T20:48:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766449998 |
-| Dashboard Visible Proof Warmed | 30766020242 | failure | `0eb1d76b2bfe` | 2026-08-02T20:37:39Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766020242 |
-| System3 Backend Live Simulation Proof | 30765986506 | failure | `0eb1d76b2bfe` | 2026-08-02T20:36:27Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30765986506 |

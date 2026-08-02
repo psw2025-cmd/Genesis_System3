@@ -1,6 +1,16 @@
 {
-  "failed_count": 27,
+  "failed_count": 26,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "d97213ba1c9082339fdcd481a8e6fca30d24945d",
+      "conclusion": "failure",
+      "created_at": "2026-08-02T22:34:05Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30770383337",
+      "run_id": 30770383337,
+      "updated_at": "2026-08-02T22:34:58Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "830ec5e1997a8ee8af78051811a8ad6e0540c05f",
@@ -250,33 +260,14 @@
       "run_id": 30766449998,
       "updated_at": "2026-08-02T20:48:37Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
-      "commit": "0eb1d76b2bfeb7499c04040af82276a8b45e345a",
-      "conclusion": "failure",
-      "created_at": "2026-08-02T20:36:51Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30766020242",
-      "run_id": 30766020242,
-      "updated_at": "2026-08-02T20:37:39Z",
-      "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "0eb1d76b2bfeb7499c04040af82276a8b45e345a",
-      "conclusion": "failure",
-      "created_at": "2026-08-02T20:35:57Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30765986506",
-      "run_id": 30765986506,
-      "updated_at": "2026-08-02T20:36:27Z",
-      "workflow": "System3 Backend Live Simulation Proof"
     }
   ],
-  "generated_utc": "2026-08-02T22:19:20.709584+00:00",
+  "generated_utc": "2026-08-02T22:35:12.167011+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30770383337 conclusion=failure commit=d97213ba1c9082339fdcd481a8e6fca30d24945d",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30769819657 conclusion=failure commit=830ec5e1997a8ee8af78051811a8ad6e0540c05f",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30768331147 conclusion=failure commit=d7133f093ae91c799a311f1036cb131b676789bb",
     "Fix workflow 'System3 Backend Live Simulation Proof' run 30768289954 conclusion=failure commit=d7133f093ae91c799a311f1036cb131b676789bb",
@@ -301,8 +292,6 @@
     "Fix workflow 'System3 Render Worker Env Audit' run 30766450397 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30766450394 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6",
     "Fix workflow 'System3 Latest Truth Publish' run 30766450382 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30766449998 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6",
-    "Fix workflow 'Dashboard Visible Proof Warmed' run 30766020242 conclusion=failure commit=0eb1d76b2bfeb7499c04040af82276a8b45e345a",
-    "Fix workflow 'System3 Backend Live Simulation Proof' run 30765986506 conclusion=failure commit=0eb1d76b2bfeb7499c04040af82276a8b45e345a"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30766449998 conclusion=failure commit=1e8dca59755e203306d96c7400d4b5cda15792d6"
   ]
 }
