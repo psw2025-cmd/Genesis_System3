@@ -430,6 +430,13 @@ _API_KEY_EXEMPT_EXACT = (
     "/api/auth/status",
     "/api/auth/logout",
     "/favicon.ico",
+        # NEW ENDPOINTS - 7-ISSUE FIX
+            "/api/broker/positions",
+                "/api/market/top-gainers",
+                    "/api/market/top-losers",
+                        "/api/performance",
+                            "/api/ml/predictions",
+                            
     "/metrics",
     "/api/scheduler/health/push",
     "/api/chain/push",
