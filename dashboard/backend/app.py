@@ -4648,8 +4648,8 @@ async def market_top_micro_loop():
                         top_n=5,
                         market_top_n=40,
                         include_equity=True,
-                        equity_limit=16,
-                        overall_timeout_s=70.0,
+                        equity_limit=8,
+                        overall_timeout_s=95.0,
                         rotate_equity=True,
                     )
                     report = merge_market_top_reports(report, with_eq, market_top_n=25)
@@ -4665,7 +4665,7 @@ async def market_top_micro_loop():
                 report["data_provenance"] = "DHAN_OPTION_CHAIN_LIVE"
                 return report
 
-            report = await _run_blocking(_refresh, timeout=120.0)
+            report = await _run_blocking(_refresh, timeout=150.0)
             if int(report.get("contracts_scored_total") or 0) > 0:
                 for key in (
                     "scanner_gainers:5:25:1",

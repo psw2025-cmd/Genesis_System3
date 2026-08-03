@@ -305,24 +305,26 @@ def fetch_chains_for_market(
 
         remaining = overall_timeout_s - (time.monotonic() - started)
         if equity_syms and remaining > 12.0:
-            with ThreadPoolExecutor(max_workers=min(4, len(equity_syms))) as pool:
-                futs = {pool.submit(_fetch_one, u): u for u in equity_syms}
+            # Dhan option-chain rate limit ≈ 1 unique request / 3s. Parallel fan-out
+            # for equities returns empty and Market Top never sees DIVISLAB/LTM/etc.
+            for underlying in equity_syms:
+                if (time.monotonic() - started) >= overall_timeout_s - 3.0:
+                    chains.setdefault(
+                        underlying,
+                        {"contracts": [], "underlying": underlying, "status": "SKIPPED_TIMEOUT"},
+                    )
+                    continue
                 try:
-                    for fut in as_completed(futs, timeout=max(8.0, remaining - 2.0)):
-                        underlying, ch = fut.result()
-                        chains[underlying] = ch
-                        if (time.monotonic() - started) >= overall_timeout_s:
-                            break
-                except Exception:
-                    # Partial equity is acceptable — return what we have.
-                    pass
-                for fut, underlying in futs.items():
-                    if not fut.done():
-                        fut.cancel()
-                        chains.setdefault(
-                            underlying,
-                            {"contracts": [], "underlying": underlying, "status": "SKIPPED_TIMEOUT"},
-                        )
+                    time.sleep(3.15)
+                    underlying2, ch = _fetch_one(underlying)
+                    chains[underlying2] = ch
+                except Exception as eq_exc:
+                    chains[underlying] = {
+                        "contracts": [],
+                        "underlying": underlying,
+                        "status": "ERROR",
+                        "error": str(eq_exc)[:160],
+                    }
     except Exception as exc:
         for underlying in symbols:
             chains.setdefault(underlying, {"contracts": [], "error": str(exc)[:200]})

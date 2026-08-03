@@ -312,8 +312,29 @@ class DataSourceManager:
                     df["expiry"] = resolved_expiry
                     return df, spot
             else:
+                remarks = ""
+                if isinstance(resp, dict):
+                    remarks = str(resp.get("remarks") or resp.get("error_message") or resp)[:180]
+                logger.warning(f"[DSM] Dhan option_chain non-success for {sym}: {remarks or resp}")
+                # Dhan OC rate limit ~1 req/3s — one bounded retry.
+                time.sleep(3.2)
+                if hasattr(dhan, "option_chain"):
+                    resp = dhan.option_chain(
+                        under_security_id=int(sec_id),
+                        under_exchange_segment=segment,
+                        expiry=resolved_expiry,
+                    )
+                if resp and isinstance(resp, dict) and resp.get("status") == "success":
+                    from core.data import dhan_option_chain_parser as parser
+
+                    df, spot = parser.parse_dhan_option_chain_payload(resp)
+                    if df is not None and not df.empty:
+                        df = df.copy()
+                        df["expiry_date"] = resolved_expiry
+                        df["expiry"] = resolved_expiry
+                        return df, spot
                 logger.warning(
-                    f"[DSM] Dhan option_chain non-success for {sym}: "
+                    f"[DSM] Dhan option_chain retry failed for {sym}: "
                     f"{str((resp or {}).get('remarks') if isinstance(resp, dict) else resp)[:160]}"
                 )
         except Exception as e:
