@@ -3,6 +3,36 @@
   "failed_runs": [
     {
       "branch": "main",
+      "commit": "58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
+      "conclusion": "failure",
+      "created_at": "2026-08-03T13:21:45Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30817594931",
+      "run_id": 30817594931,
+      "updated_at": "2026-08-03T13:22:38Z",
+      "workflow": "Dashboard Visible Proof Warmed"
+    },
+    {
+      "branch": "main",
+      "commit": "58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
+      "conclusion": "failure",
+      "created_at": "2026-08-03T13:20:59Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30817536202",
+      "run_id": 30817536202,
+      "updated_at": "2026-08-03T13:21:27Z",
+      "workflow": "System3 Backend Live Simulation Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "13ad18a3d9d760320c286bd56df018d4a39c1e73",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-03T13:19:05Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30817391105",
+      "run_id": 30817391105,
+      "updated_at": "2026-08-03T13:19:29Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
       "commit": "e2bd71fd046ff7d49c595cd366a18fcbb6e9b453",
       "conclusion": "failure",
       "created_at": "2026-08-03T13:18:30Z",
@@ -210,43 +240,16 @@
       "run_id": 30803550952,
       "updated_at": "2026-08-03T09:57:17Z",
       "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "3ae0a30631de491802c13f6090b5296218531f8c",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-03T09:56:49Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803540436",
-      "run_id": 30803540436,
-      "updated_at": "2026-08-03T09:56:59Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "3f5ebe842c7945c55429940bf8e199426321ce3d",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-03T09:56:36Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803525525",
-      "run_id": 30803525525,
-      "updated_at": "2026-08-03T09:56:53Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "3f5ebe842c7945c55429940bf8e199426321ce3d",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T09:56:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803525061",
-      "run_id": 30803525061,
-      "updated_at": "2026-08-03T09:56:47Z",
-      "workflow": "System3 Workflow Failure Tracker"
     }
   ],
-  "generated_utc": "2026-08-03T13:19:13.913402+00:00",
+  "generated_utc": "2026-08-03T13:27:27.142013+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visible Proof Warmed' run 30817594931 conclusion=failure commit=58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
+    "Fix workflow 'System3 Backend Live Simulation Proof' run 30817536202 conclusion=failure commit=58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30817391105 conclusion=cancelled commit=13ad18a3d9d760320c286bd56df018d4a39c1e73",
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 30817346783 conclusion=failure commit=e2bd71fd046ff7d49c595cd366a18fcbb6e9b453",
     "Fix workflow 'Dashboard Visual Production Proof' run 30817329490 conclusion=failure commit=e2bd71fd046ff7d49c595cd366a18fcbb6e9b453",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30816176508 conclusion=failure commit=0c36652dc4d529840ced78bd1b6d3e1915a378fc",
@@ -267,9 +270,6 @@
     "Fix workflow 'Dashboard Live UI Proof' run 30805130748 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
     "Fix workflow 'System3 Latest Truth Publish' run 30804939935 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
     "Fix workflow 'Permanent Repo Render Safety' run 30804774505 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30803550952 conclusion=cancelled commit=3ae0a30631de491802c13f6090b5296218531f8c",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30803540436 conclusion=cancelled commit=3ae0a30631de491802c13f6090b5296218531f8c",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30803525525 conclusion=cancelled commit=3f5ebe842c7945c55429940bf8e199426321ce3d",
-    "Fix workflow 'System3 Workflow Failure Tracker' run 30803525061 conclusion=failure commit=3f5ebe842c7945c55429940bf8e199426321ce3d"
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30803550952 conclusion=cancelled commit=3ae0a30631de491802c13f6090b5296218531f8c"
   ]
 }
