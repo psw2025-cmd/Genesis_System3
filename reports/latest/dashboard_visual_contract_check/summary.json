@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-08-03T19:21:27.372666Z",
+  "generated_utc": "2026-08-03T23:33:56.870702Z",
   "status": "BLOCKED",
   "purpose": "Distinguish repository visual-contract regressions from deployed/runtime proof failures.",
   "safety": {
