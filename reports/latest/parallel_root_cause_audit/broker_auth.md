@@ -1,14 +1,13 @@
 # Parallel Audit — broker_auth
 
 - Status: **BLOCKED**
-- Blockers: `1`
+- Blockers: `2`
 
 ## Findings
 - Broker UI has token-aware connected logic.
-- Backend has broker diagnose endpoint for env/token probe.
-- Backend checks Dhan env presence in diagnose route.
 
 ## Blockers
+- Backend broker diagnose endpoint missing.
 - Actual Dhan auth cannot be proven by static repo; needs Render API probe and user refreshed token if invalid.
 
 ## Required fixes

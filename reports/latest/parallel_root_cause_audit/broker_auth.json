@@ -1,15 +1,14 @@
 {
-  "blocker_count": 1,
+  "blocker_count": 2,
   "blockers": [
+    "Backend broker diagnose endpoint missing.",
     "Actual Dhan auth cannot be proven by static repo; needs Render API probe and user refreshed token if invalid."
   ],
   "description": "Dhan broker auth and connected-vs-token contradiction",
   "findings": [
-    "Broker UI has token-aware connected logic.",
-    "Backend has broker diagnose endpoint for env/token probe.",
-    "Backend checks Dhan env presence in diagnose route."
+    "Broker UI has token-aware connected logic."
   ],
-  "generated_utc": "2026-07-23T17:34:19.647751+00:00",
+  "generated_utc": "2026-08-03T21:15:31.260123+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [
