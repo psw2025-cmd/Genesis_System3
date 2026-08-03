@@ -158,6 +158,57 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
     universe = load_equity_fo_universe()
     df, bhav_date = _load_latest_bhavcopy_df()
     rows = _parse_equity_option_rows(df) if df is not None else []
+    live_chains: Dict[str, Any] = {}
+    live_chain_ok = 0
+
+    # When bhavcopy is absent (Cloud ephemeral FS), pull Dhan option chains for
+    # priority equity FO names so the Equity Options panel is not empty.
+    if not rows:
+        try:
+            from core.data.datasource_manager import DataSourceManager
+            from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+            dsm = DataSourceManager()
+            # Keep Cloud Run under request budget / Dhan rate limits.
+            priority = list(universe.get("priority_underlyings") or PRIORITY_EQUITY_FO)[:3]
+            for sym in priority:
+                try:
+                    chain = fetch_chain_for_api(dsm, sym)
+                    if not chain or int(chain.get("total_contracts") or 0) <= 0:
+                        continue
+                    live_chains[sym] = {
+                        "underlying": sym,
+                        "spot": chain.get("spot"),
+                        "total_contracts": chain.get("total_contracts"),
+                        "pcr": chain.get("pcr"),
+                        "expiry_date": chain.get("expiry_date"),
+                        "status": chain.get("status"),
+                        "data_source": chain.get("data_source"),
+                        "sample_contracts": (chain.get("contracts") or [])[:6],
+                    }
+                    live_chain_ok += 1
+                    # Rank rows from live chain by OI for CE/PE lists
+                    for c in chain.get("contracts") or []:
+                        rows.append(
+                            {
+                                "underlying": sym,
+                                "option_type": str(c.get("option_type") or "").upper(),
+                                "strike": float(c.get("strike") or 0),
+                                "ltp": float(c.get("ltp") or 0),
+                                "oi": int(c.get("oi") or 0),
+                                "oi_change": int(c.get("oi_change") or 0),
+                                "volume": int(c.get("volume") or 0),
+                                "gain_pct": float(c.get("oi_change") or 0),
+                                "gain_metric": "live_oi_change",
+                                "expiry_date": c.get("expiry_date") or chain.get("expiry_date") or "",
+                                "instrument_type": "OPTSTK",
+                            }
+                        )
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
     scan = scan_equity_top_gainers(rows, priority_only=priority_only, top_n=top_n) if rows else {}
 
     segments = {
@@ -168,7 +219,7 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
             "api": "/api/scanner/top_contract_gainers",
         },
         "equity_options": {
-            "implemented": bool(universe.get("implemented")),
+            "implemented": bool(universe.get("implemented")) or live_chain_ok > 0,
             "underlying_count": universe.get("underlying_count", 0),
             "contract_count": universe.get("contract_count", 0),
             "instrument_type": "OPTSTK",
@@ -176,8 +227,13 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
             "api": "/api/scanner/equity_options",
             "bhavcopy_date": bhav_date,
             "contracts_parsed": len(rows),
-            "live_chain_per_stock": False,
-            "note": "Full per-stock Dhan chain scan deferred — uses bhavcopy OPTSTK + security master",
+            "live_chain_per_stock": live_chain_ok > 0,
+            "live_chains_ok": live_chain_ok,
+            "note": (
+                "Live Dhan equity option chains for priority FO names"
+                if live_chain_ok > 0
+                else "Full per-stock Dhan chain scan deferred — uses bhavcopy OPTSTK + security master"
+            ),
         },
         "cash_equity": {
             "implemented": True,
@@ -189,13 +245,18 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
 
     return {
         "generated_utc": _utc_now(),
-        "status": "ok" if universe.get("implemented") else "partial",
+        "status": "ok" if (universe.get("implemented") or live_chain_ok > 0) else "partial",
         "segments": segments,
         "universe": universe,
+        "live_chains": live_chains,
         "scanner": {
             **scan,
-            "gain_metric": "oi_buildup_pct",
-            "gain_metric_note": "Bhavcopy EOD — OI buildup % used when intraday LTP change unavailable",
+            "gain_metric": "oi_buildup_pct" if bhav_date else ("live_oi_change" if rows else "unavailable"),
+            "gain_metric_note": (
+                "Bhavcopy EOD — OI buildup % used when intraday LTP change unavailable"
+                if bhav_date
+                else "Live Dhan option-chain OI change used because local bhavcopy is absent"
+            ),
             "bhavcopy_date": bhav_date,
             "data_available": bool(rows),
         },

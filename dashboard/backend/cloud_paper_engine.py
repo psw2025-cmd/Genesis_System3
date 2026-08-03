@@ -154,12 +154,25 @@ class CloudPaperEngine:
             mny = abs(spot - strike) / spot * 100.0
             if mny > NEAR_ATM_PCT:
                 continue
-            # OI change column is dOI in the chain CSV
             oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
-            cands.append({"underlying": underlying, "strike": strike, "option_type": ot, "ltp": ltp, "oi_chg": oi_chg})
+            vol = abs(float(c.get("volume", 0) or 0))
+            score = oi_chg * 10.0 + vol
+            cands.append(
+                {
+                    "underlying": underlying,
+                    "strike": strike,
+                    "option_type": ot,
+                    "ltp": ltp,
+                    "oi_chg": oi_chg,
+                    "volume": vol,
+                    "score": score,
+                    "expiry_date": c.get("expiry_date") or c.get("expiry") or chain.get("expiry_date"),
+                    "security_id": c.get("security_id"),
+                }
+            )
         if not cands:
             return None
-        cands.sort(key=lambda x: x["oi_chg"], reverse=True)
+        cands.sort(key=lambda x: x["score"], reverse=True)
         return cands[0]
 
     def step(self, chains: List[Dict[str, Any]], max_open: int = 3):
@@ -205,7 +218,19 @@ class CloudPaperEngine:
                 self._append_trade_csv(closed, "CLOSE")
             else:
                 pos["current_price"] = round(cur, 2)
-                pos["unrealized_pnl"] = _compute_net_pnl(entry, cur, pos["underlying"])
+                pos["ltp"] = round(cur, 2)
+                unreal = _compute_net_pnl(entry, cur, pos["underlying"])
+                pos["unrealized_pnl"] = unreal
+                pos["unrealizedProfit"] = unreal
+                pos["buyAvg"] = entry
+                pos["costPrice"] = entry
+                pos["netQty"] = pos.get("qty") or pos.get("netQty")
+                if not pos.get("stop_loss"):
+                    pos["stop_loss"] = round(entry * (1.0 - SL_PCT / 100.0), 2)
+                if not pos.get("target"):
+                    pos["target"] = round(entry * (1.0 + TARGET_PCT / 100.0), 2)
+                pos["provenance"] = pos.get("provenance") or "PAPER_CLOUD_SIM"
+                pos["broker_order_endpoints_called"] = False
                 still_open.append(pos)
         self.open_positions = still_open
 
@@ -214,7 +239,7 @@ class CloudPaperEngine:
             best = None
             for ch in chains:
                 sig = self._pick_signal(ch)
-                if sig and (best is None or sig["oi_chg"] > best["oi_chg"]):
+                if sig and (best is None or sig.get("score", sig.get("oi_chg", 0)) > best.get("score", best.get("oi_chg", 0))):
                     best = sig
             if best:
                 # Avoid duplicate open on same contract
@@ -226,18 +251,51 @@ class CloudPaperEngine:
                 )
                 if not dup:
                     self.seq += 1
+                    entry = round(best["ltp"], 2)
+                    expiry = str(best.get("expiry_date") or best.get("expiry") or "")
+                    trading_symbol = (
+                        f"{best['underlying']}{expiry.replace('-', '') if expiry else ''}"
+                        f"{int(best['strike'])}{best['option_type']}"
+                    )
                     pos = {
                         "position_id": f"POS_{self.seq:04d}",
                         "action": "OPEN",
+                        "status": "OPEN",
                         "underlying": best["underlying"],
+                        "symbol": best["underlying"],
+                        "trading_symbol": trading_symbol,
+                        "security_id": best.get("security_id"),
                         "strike": best["strike"],
                         "option_type": best["option_type"],
-                        "entry_price": round(best["ltp"], 2),
-                        "current_price": round(best["ltp"], 2),
+                        "drvOptionType": "CALL" if best["option_type"] == "CE" else "PUT",
+                        "drvStrikePrice": best["strike"],
+                        "drvExpiryDate": expiry or None,
+                        "expiry_date": expiry or None,
+                        "positionType": "LONG",
+                        "productType": "INTRADAY",
+                        "exchangeSegment": "NSE_FNO",
+                        "buyAvg": entry,
+                        "costPrice": entry,
+                        "entry_price": entry,
+                        "current_price": entry,
+                        "ltp": entry,
+                        "netQty": LOT_SIZES.get(best["underlying"], 50),
                         "qty": LOT_SIZES.get(best["underlying"], 50),
+                        "buyQty": LOT_SIZES.get(best["underlying"], 50),
+                        "sellQty": 0,
                         "strategy": f"BUY_{best['option_type']}",
+                        "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
+                        "target": round(entry * (1.0 + TARGET_PCT / 100.0), 2),
                         "unrealized_pnl": 0.0,
+                        "realizedProfit": 0.0,
+                        "unrealizedProfit": 0.0,
+                        "data_source": "dhan_option_chain_live",
+                        "market_data_source": "DHAN_LIVE",
+                        "quote_source": "DHAN_OPTION_CHAIN",
+                        "provenance": "PAPER_CLOUD_SIM",
+                        "broker_order_endpoints_called": False,
                         "timestamp": now.isoformat(),
+                        "entry_time": now.isoformat(),
                         "time_ist": _ist_str(now),
                     }
                     self.open_positions.append(pos)

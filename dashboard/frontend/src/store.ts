@@ -13,6 +13,7 @@ interface DashboardState {
   chain: Record<string, any>
   paper: any
   gainRank: any
+  marketTop: any
   alerts: any[]
   autoGates: any
   apiStatus: any
@@ -37,6 +38,7 @@ interface DashboardState {
   setChain: (sym: string, d: any) => void
   setPaper: (d: any) => void
   setGainRank: (d: any) => void
+  setMarketTop: (d: any) => void
   setAlerts: (d: any[]) => void
   setAutoGates: (d: any) => void
   setPnl: (d: any) => void
@@ -59,6 +61,7 @@ export const useStore = create<DashboardState>((set) => ({
   chain: {},
   paper: null,
   gainRank: null,
+  marketTop: null,
   alerts: [],
   autoGates: null,
   apiStatus: null,
@@ -80,6 +83,7 @@ export const useStore = create<DashboardState>((set) => ({
   setChain: (sym, data) => set((s) => ({ chain: { ...s.chain, [sym]: data } })),
   setPaper: (paper) => set({ paper }),
   setGainRank: (gainRank) => set({ gainRank }),
+  setMarketTop: (marketTop) => set({ marketTop, lastSync: new Date().toISOString() }),
   setAlerts: (alerts) => set({ alerts }),
   setAutoGates: (autoGates) => set({ autoGates }),
   setPnl: (pnl) => set({ pnl }),
@@ -91,4 +95,3 @@ export const useStore = create<DashboardState>((set) => ({
   setActiveTab: (activeTab) => set({ activeTab }),
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
 }))
-

@@ -35,14 +35,22 @@ export function PerformanceTab() {
   const { gainRank, paper } = useStore()
   const [pnl, setPnl] = useState<PnlData | null>(null)
   const [pnlError, setPnlError] = useState<string | null>(null)
+  const [backtest, setBacktest] = useState<any>(null)
   const [lastChecked, setLastChecked] = useState<string>('')
 
   useEffect(() => {
     let mounted = true
     const load = async () => {
       try {
-        const data = await fetchJSON('/api/pnl')
-        if (mounted) { setPnl(data); setPnlError(null) }
+        const [pnlData, btData] = await Promise.all([
+          fetchJSON('/api/pnl'),
+          fetchJSON('/api/backtest/results').catch(() => null),
+        ])
+        if (mounted) {
+          setPnl(pnlData)
+          setBacktest(btData)
+          setPnlError(null)
+        }
       } catch (e: any) {
         if (mounted) setPnlError(e.message ?? 'fetch failed')
       } finally {
@@ -60,10 +68,11 @@ export function PerformanceTab() {
   const totalTrades = summary.total_trades ?? 0
   const winning     = summary.winning_trades ?? 0
   const losing      = summary.losing_trades ?? 0
+  const openPos     = summary.open_positions ?? paper?.positions?.open_count ?? 0
 
   // ρ history from gain_rank (file-based, always available)
   const rankHistory: any[] = gainRank?.history ?? []
-  const hasData = totalTrades > 0 || rankHistory.length > 0
+  const hasData = totalTrades > 0 || Number(openPos) > 0 || rankHistory.length > 0 || backtest?.status === 'ok'
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
@@ -85,7 +94,7 @@ export function PerformanceTab() {
       {!pnlError && !hasData && (
         <div className="card p-4">
           <p style={{ color: 'var(--text-mut)', fontSize: '.85rem' }}>
-            No performance data yet — paper engine has not closed any trades.
+            No performance data yet — paper engine has not opened/closed any trades.
           </p>
           <p style={{ color: 'var(--text-mut)', fontSize: '.75rem', marginTop: '6px' }}>
             API status: /api/pnl {pnl ? 'responded OK, 0 trades' : 'loading'} · checked {lastChecked || '--'} IST
@@ -95,15 +104,24 @@ export function PerformanceTab() {
 
       {hasData && (
         <>
-          {/* KPI row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Total P&L" value={fmtCr(totalPnl)} color={signClass(totalPnl)} sub="Realized + Unrealized" />
             <StatCard label="Win Rate"  value={`${(winRate ?? 0).toFixed(1)}%`} color={winRate >= 50 ? 'tx-up' : 'tx-down'} />
             <StatCard label="Total Trades" value={String(totalTrades)} sub={`${winning}W / ${losing}L`} />
-            <StatCard label="Expectancy" value={totalTrades > 0 ? fmtCr(totalPnl / totalTrades) : '--'} color={signClass(totalPnl)} />
+            <StatCard label="Open Paper" value={String(openPos)} sub="Cloud paper engine" />
           </div>
 
-          {/* ML accuracy / ρ history */}
+          {backtest?.status === 'ok' && (
+            <div className="card p-4">
+              <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '10px' }}>
+                Backtest / Walk-Forward Proof
+              </h3>
+              <pre style={{ fontSize: '.7rem', color: 'var(--text-mut)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-mono)' }}>
+                {JSON.stringify(backtest.summary || { status: backtest.status }, null, 2).slice(0, 1200)}
+              </pre>
+            </div>
+          )}
+
           <div className="card p-4">
             <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '10px' }}>
               ML Accuracy (Spearman ρ) — {rankHistory.length} day history
@@ -128,7 +146,6 @@ export function PerformanceTab() {
             )}
           </div>
 
-          {/* Recent closed trades */}
           {(pnl?.history?.length ?? 0) > 0 && (
             <div className="card" style={{ overflow: 'hidden' }}>
               <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border)', background: 'var(--surface-2)' }}>

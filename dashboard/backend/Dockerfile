@@ -5,7 +5,7 @@ WORKDIR /app/dashboard/frontend
 # Increment only when production proof shows Render serving a stale frontend
 # despite newer reviewed source. This is a non-secret cache epoch; changing it
 # forces the frontend-builder layer to rebuild without altering runtime logic.
-ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260715_1
+ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260803_market_top_paper_prod_28
 ENV SYSTEM3_FRONTEND_BUILD_EPOCH=${SYSTEM3_FRONTEND_BUILD_EPOCH}
 
 COPY dashboard/frontend/package*.json ./
@@ -68,13 +68,14 @@ RUN useradd --create-home --shell /bin/false appuser \
   && chown -R appuser:appuser /app
 
 USER appuser
-EXPOSE 8000
+EXPOSE 8080
 
+# Cloud Run injects PORT (typically 8080). Do not hardcode 8000.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -fsS "http://localhost:${PORT:-8000}/api/health" || exit 1
+  CMD curl -fsS "http://localhost:${PORT:-8080}/api/health" || exit 1
 
 # Memory-safe uvicorn config:
 # --limit-max-requests 1000: restart after 1000 requests (prevents leaks)
 # --timeout-keep-alive 20: faster connection cleanup
 # --limit-concurrency 50: allow dashboard burst polling without uvicorn 503s
-CMD ["sh", "-c", "exec uvicorn dashboard.backend.app:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --timeout-keep-alive 20 --limit-max-requests 1000 --limit-concurrency 50"]
+CMD ["sh", "-c", "exec uvicorn dashboard.backend.app:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1 --timeout-keep-alive 20 --limit-max-requests 1000 --limit-concurrency 50"]

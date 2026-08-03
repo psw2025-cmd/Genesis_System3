@@ -26,15 +26,31 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const proofItems = [
+  const { autoGates, brokerConnected, paper, health } = useStore()
+  const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
+  const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
+  const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
+  const profitGate = gatesObj.POSITIVE_NET_EXPECTANCY_AFTER_COSTS || proofList.find((g: any) => /expectancy|profit/i.test(String(g?.label || g?.gate_id || '')))
+  const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
+  const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
+  const profitOk = Boolean(profitGate?.pass ?? profitGate?.ok)
+  const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
+  const mlLabel = mlOk
+    ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
+    : `TRAINING ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
+  const paperLabel = paperOk
+    ? 'LIFECYCLE PROVEN'
+    : (profitOk ? 'PROVENANCE PENDING' : `EXPECTANCY ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? 'N/A'}`)
+  const renderOk = Boolean(brokerConnected || health?.broker_status === 'connected')
+  const proofItems: Array<[string, string, boolean]> = [
     ['OWNER', 'PRITAM S. WARGHADE', true],
     ['LIVE', 'OFF', true],
     ['MODE', 'PAPER ONLY', true],
-    ['DATA', 'DHAN ONLY REQUIRED', true],
-    ['ML SCORE', 'TRAINING PROOF REQUIRED', false],
-    ['PAPER', 'PROVENANCE REQUIRED', false],
-    ['RENDER', 'VISUAL PROOF REQUIRED', false],
-  ] as const
+    ['DATA', brokerConnected ? 'DHAN CONNECTED' : 'DHAN ONLY REQUIRED', brokerConnected],
+    ['ML SCORE', mlLabel, mlOk],
+    ['PAPER', paperLabel, paperOk],
+    ['RENDER', renderOk ? 'BROKER UI LIVE' : 'VISUAL PROOF REQUIRED', renderOk],
+  ]
 
   return (
     <div
@@ -57,7 +73,7 @@ function ProductionProofBar() {
         boxShadow: '0 0 28px rgba(59,130,246,.20), inset 0 0 18px rgba(0,232,122,.08)',
         backdropFilter: 'blur(10px)',
       }}
-      title="Production-grade proof bar — any unproven gate stays BLOCKED / REQUIRED"
+      title="Production-grade proof bar — values come from /api/auto_gates + broker health"
     >
       {proofItems.map(([label, value, safe]) => (
         <div key={label} style={{

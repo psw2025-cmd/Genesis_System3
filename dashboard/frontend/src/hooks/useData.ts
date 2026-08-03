@@ -10,7 +10,7 @@ const TRANSIENT_STATUS = new Set([0, 429, 502, 503, 504, 520, 521, 522, 523, 524
 const isTransient = (status?: number) => TRANSIENT_STATUS.has(Number(status ?? -1))
 
 const ENABLED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
-const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX']
+const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX', 'RELIANCE', 'HDFCBANK', 'TCS', 'INFY', 'ICICIBANK']
 const isOptionalChain = (sym: string) => OPTIONAL_CHAIN_SYMBOLS.includes(String(sym || '').toUpperCase())
 
 const CORE_POLL_MS = 120000
@@ -144,11 +144,15 @@ function isRealDhanChainPayload(data: any) {
   const priority = String(data.source_priority || '').toLowerCase()
   const status = String(data.status || '').toUpperCase()
   const combined = `${source} ${priority} ${status}`
-  if (data.stale === true) return false
-  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(combined)) return false
+  // Reject fake/non-Dhan sources. Allow market-closed verified Dhan snapshots.
+  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock)/i.test(combined)) return false
+  if (data.stale === true && !/MARKET_CLOSED|SNAPSHOT/i.test(status) && data.snapshot !== true && data.live !== false) {
+    return false
+  }
   const contracts = Number(data.total_contracts || (Array.isArray(data.contracts) ? data.contracts.length : 0))
   const spot = Number(data.spot || 0)
-  return source === 'dhan' && spot > 0 && contracts > 0
+  const dhanish = source === 'dhan' || priority.startsWith('dhan') || priority.includes('worker_push')
+  return dhanish && spot > 0 && contracts > 0
 }
 
 function keepLastGood(previous: any, apiStatus: any, label: string) {
@@ -184,7 +188,7 @@ function delay(ms: number) {
 
 export function useData() {
   const {
-    setHealth, setState, setPaper, setGainRank,
+    setHealth, setState, setPaper, setGainRank, setMarketTop,
     setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
     setPnl, setApiStatus,
@@ -265,13 +269,33 @@ export function useData() {
     try {
       const data = await fetchJSON(`/api/chain/${sym}`)
       if (!isRealDhanChainPayload(data)) {
+        const prev = useStore.getState().chain?.[sym]
+        if (prev && isRealDhanChainPayload(prev)) {
+          setChain(sym, {
+            ...prev,
+            snapshot: true,
+            live: false,
+            verified_live_dhan: false,
+            status: prev.status || 'MARKET_CLOSED_DHAN_SNAPSHOT',
+            message: data?.message || data?.blocked_reason || 'Showing last verified Dhan snapshot (market closed)',
+          })
+          return
+        }
         const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
         if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/chain/${sym}`, message: blocked.blocked_reason })
         setChain(sym, blocked)
         return
       }
       markSuccess(`chain_${sym}`)
-      setChain(sym, { ...data, stale: false, blocked: false, verified_live_dhan: true, optional: isOptionalChain(sym) })
+      const isSnapshot = data?.snapshot === true || data?.live === false || /MARKET_CLOSED/i.test(String(data?.status || ''))
+      setChain(sym, {
+        ...data,
+        stale: Boolean(isSnapshot || data?.stale),
+        blocked: false,
+        verified_live_dhan: !isSnapshot,
+        verified_dhan_snapshot: Boolean(isSnapshot),
+        optional: isOptionalChain(sym),
+      })
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       const prev = useStore.getState().chain?.[sym]
@@ -328,11 +352,68 @@ export function useData() {
       try {
         const m = JSON.parse(ev.data)
         if (m.type === 'health_update' && m.data) setHealth(m.data)
+        if (m.type === 'paper_update' && m.data) setPaper(m.data)
+        if (m.type === 'positions_update' && m.data) {
+          const prev = useStore.getState().paper || {}
+          setPaper({
+            ...prev,
+            positions: m.data,
+          })
+        }
+        if (m.type === 'pnl_update' && m.data) {
+          setPnl(m.data)
+          const prev = useStore.getState().paper || {}
+          setPaper({
+            ...prev,
+            pnl: m.data?.summary ? m.data : { summary: m.data, history: m.data?.history || [] },
+          })
+        }
+        if (m.type === 'market_top_update' && m.data) {
+          setMarketTop({
+            ...m.data,
+            stream_mode: m.data.stream_mode || 'ultra_micro',
+            ws_timestamp: m.timestamp,
+          })
+          const table = m.data.market_top_table || []
+          if (Array.isArray(table) && table.length) {
+            const rankings = table.slice(0, 25).map((row: any) => {
+              const opt = String(row.option_type || '').toUpperCase()
+              return {
+                rank: row.rank,
+                underlying: String(row.underlying || row.symbol || '').toUpperCase(),
+                direction: opt === 'CE' ? 'UP' : 'DOWN',
+                option_type: opt,
+                strike: row.strike,
+                expiry_date: row.expiry_date,
+                ltp: row.ltp,
+                change: row.change ?? row.change_rs,
+                volume: row.volume,
+                oi: row.oi,
+                gain_rank: Number(row.gain_pct || 0),
+                gain_pct: Number(row.gain_pct || 0),
+                option_eligible: true,
+                recommendation: 'WATCH',
+                market_match_note: row.market_match_note,
+                data_provenance: row.data_provenance,
+                refreshed_at: row.refreshed_at || m.data.refreshed_at,
+                source: 'ws_market_top_micro',
+              }
+            })
+            setGainRank({
+              status: 'ok',
+              rankings,
+              latest: { date: new Date().toISOString().slice(0, 10), rankings, source: 'ws_market_top_micro' },
+              source: 'ws_market_top_micro',
+              refreshed_at: m.data.refreshed_at,
+            })
+          }
+        }
+        if (m.type === 'heartbeat') setWsStatus('live')
       } catch {
         // ignore malformed websocket message
       }
     }
-  }, [setHealth, setWsStatus])
+  }, [setHealth, setWsStatus, setPaper, setPnl, setMarketTop, setGainRank])
 
   useEffect(() => {
     unmountedRef.current = false
@@ -356,7 +437,7 @@ export function useData() {
   }, [poll, pollBroker, pollSecondary, wsConnect])
 
   useEffect(() => {
-    const active = ENABLED_CHAIN_SYMBOLS.includes(chainSymbol) ? chainSymbol : 'NIFTY'
+    const active = String(chainSymbol || 'NIFTY').toUpperCase()
     pollChain(active)
     const activeTimer = setInterval(() => pollChain(active), ACTIVE_CHAIN_POLL_MS)
 

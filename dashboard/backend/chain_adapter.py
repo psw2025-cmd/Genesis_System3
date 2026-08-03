@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-from core.brokers.dhan.nse_option_symbol import enrich_option_row
+from core.brokers.dhan.nse_option_symbol import build_trading_symbol
 
 
 def _int_env(name: str, default: int) -> int:
@@ -62,10 +62,11 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
     if not hasattr(dsm, "fetch_option_chain"):
         return None
     result = dsm.fetch_option_chain(underlying.upper())
-    if not result:
+    # DSM returns (None, 0.0) on miss — treat as empty, not a valid payload.
+    if not result or result[0] is None:
         return None
     df, spot = result
-    if df is None or df.empty:
+    if df is None or getattr(df, "empty", True):
         return None
 
     df = _limit_chain_df(df, spot)
@@ -82,6 +83,16 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         if chain_expiry is None:
             chain_expiry = row.get("expiry") or row.get("expiry_date")
         row_source = _normalize_chain_source(row.get("source", "dhan"))
+        ltp_val = float(row.get("ltp", row.get("last_price", 0)) or 0)
+        prev_close = float(row.get("previous_close_price", row.get("previous_close", 0)) or 0)
+        # Prefer computed LTP vs previous_close. Dhan often sends change_percent=0
+        # even when previous_close and ltp differ materially.
+        if ltp_val > 0 and prev_close > 0:
+            change_rs = ltp_val - prev_close
+            change_pct = (ltp_val - prev_close) / prev_close * 100.0
+        else:
+            change_rs = 0.0
+            change_pct = float(row.get("change_percent", row.get("pChange", 0)) or 0)
         base = {
             "underlying": underlying.upper(),
             "strike": strike,
@@ -89,7 +100,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
             "oi": oi,
             "oi_change": int(row.get("change_in_oi", row.get("oi_change", oi - prev_oi)) or 0),
             "volume": int(row.get("volume", 0) or 0),
-            "ltp": float(row.get("ltp", row.get("last_price", 0)) or 0),
+            "ltp": ltp_val,
             "iv": float(row.get("iv", 0) or 0),
             "delta": float(row.get("delta", 0) or 0),
             "gamma": float(row.get("gamma", 0) or 0),
@@ -97,15 +108,28 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
             "vega": float(row.get("vega", 0) or 0),
             "top_bid_price": float(row.get("top_bid_price", 0) or 0),
             "top_ask_price": float(row.get("top_ask_price", 0) or 0),
-            "previous_close_price": float(row.get("previous_close_price", 0) or 0),
-            "change_percent": float(row.get("change_percent", row.get("pChange", 0)) or 0),
+            "previous_close_price": prev_close,
+            "change": change_rs,
+            "change_percent": change_pct,
             "security_id": row.get("security_id") or row.get("token"),
             "trading_symbol": row.get("trading_symbol") or row.get("tradingSymbol") or row.get("symbol"),
-            "expiry_date": row.get("expiry") or row.get("expiry_date"),
+            "expiry_date": row.get("expiry") or row.get("expiry_date") or chain_expiry,
             "source": row_source,
             "data_source": row_source,
         }
-        contracts.append(enrich_option_row(base, default_expiry=chain_expiry))
+        # Fast path for dashboard: Dhan already supplies security_id. Avoid
+        # per-row instrument-master enrich (125k-row scan) that freezes /api/chain.
+        if not base.get("trading_symbol") and chain_expiry:
+            try:
+                built = build_trading_symbol(
+                    underlying.upper(), chain_expiry, strike, opt
+                )
+                if built:
+                    base["trading_symbol"] = built
+                    base["symbol"] = built
+            except Exception:
+                pass
+        contracts.append(base)
 
     if not contracts:
         return None

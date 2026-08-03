@@ -1,0 +1,370 @@
+{
+  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "endpoints": {
+    "/api/health": {
+      "ok": true,
+      "ms": 78,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "status",
+        "mode",
+        "broker_status",
+        "market_status",
+        "data_source",
+        "live_allowed",
+        "live_blockers",
+        "broker",
+        "market",
+        "cycle_count"
+      ]
+    },
+    "/api/state": {
+      "ok": true,
+      "ms": 80,
+      "error": null,
+      "status": "PAPER",
+      "keys": [
+        "state_version",
+        "timestamp_utc",
+        "timestamp_ist",
+        "mode",
+        "data_source",
+        "market",
+        "broker",
+        "qc",
+        "signals",
+        "positions"
+      ]
+    },
+    "/api/paper": {
+      "ok": true,
+      "ms": 68,
+      "error": null,
+      "status": null,
+      "keys": [
+        "positions",
+        "pnl"
+      ],
+      "open_count": 0,
+      "total_pnl": 0.0,
+      "total_trades": 0
+    },
+    "/api/pnl": {
+      "ok": true,
+      "ms": 66,
+      "error": null,
+      "status": null,
+      "keys": [
+        "history",
+        "summary"
+      ],
+      "total_pnl": 0.0,
+      "total_trades": 0
+    },
+    "/api/trades/today": {
+      "ok": true,
+      "ms": 92,
+      "error": null,
+      "status": null,
+      "keys": [
+        "date",
+        "market_hours",
+        "total_trades",
+        "entries",
+        "exits",
+        "count",
+        "sources"
+      ]
+    },
+    "/api/gain_rank": {
+      "ok": true,
+      "ms": 71,
+      "error": null,
+      "status": "no_data",
+      "keys": [
+        "status",
+        "latest",
+        "history",
+        "is_today",
+        "stale"
+      ]
+    },
+    "/api/learning/status": {
+      "ok": true,
+      "ms": 69,
+      "error": null,
+      "status": "inactive",
+      "keys": [
+        "status",
+        "message",
+        "last_update",
+        "total_cycles",
+        "latest_insights",
+        "updated_at"
+      ],
+      "active": null,
+      "message": "Learning system not started yet"
+    },
+    "/api/learning/insights": {
+      "ok": true,
+      "ms": 73,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "status",
+        "message",
+        "win_rate",
+        "total_trades",
+        "profitable_trades",
+        "best_strategy",
+        "best_underlying",
+        "updated_at"
+      ]
+    },
+    "/api/simulation/live/state": {
+      "ok": true,
+      "ms": 65,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "status",
+        "mode",
+        "scenario",
+        "generated_utc",
+        "broker",
+        "market",
+        "risk",
+        "option_chain",
+        "signals",
+        "positions"
+      ]
+    },
+    "/api/alerts": {
+      "ok": true,
+      "ms": 72,
+      "error": null,
+      "status": "NO_DATA",
+      "keys": [
+        "alerts",
+        "status",
+        "reason"
+      ]
+    },
+    "/api/alerts/recent?limit=10": {
+      "ok": true,
+      "ms": 73,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "status",
+        "alerts",
+        "count"
+      ]
+    },
+    "/api/auto_gates": {
+      "ok": true,
+      "ms": 70,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "generated_utc",
+        "status",
+        "source",
+        "runtime_driven",
+        "market_open",
+        "market_reason",
+        "broker_connected",
+        "gates",
+        "gates_passing",
+        "gates_total"
+      ]
+    },
+    "/api/live-trading/gate": {
+      "ok": true,
+      "ms": 76,
+      "error": null,
+      "status": "LIVE_TRADING_BLOCKED",
+      "keys": [
+        "gate_open",
+        "gates",
+        "summary",
+        "verdict",
+        "message",
+        "live_trading_status"
+      ]
+    },
+    "/api/broker/funds": {
+      "ok": true,
+      "ms": 160,
+      "error": null,
+      "status": null,
+      "keys": [
+        "live_trading_enabled",
+        "order_placement_allowed",
+        "source",
+        "validated",
+        "normalized",
+        "success",
+        "data"
+      ]
+    },
+    "/api/broker/holdings": {
+      "ok": true,
+      "ms": 161,
+      "error": null,
+      "status": null,
+      "keys": [
+        "live_trading_enabled",
+        "order_placement_allowed",
+        "source",
+        "validated",
+        "count",
+        "rows",
+        "success",
+        "data"
+      ]
+    },
+    "/api/broker/positions/live": {
+      "ok": true,
+      "ms": 162,
+      "error": null,
+      "status": null,
+      "keys": [
+        "live_trading_enabled",
+        "order_placement_allowed",
+        "source",
+        "validated",
+        "count",
+        "rows",
+        "success",
+        "data"
+      ]
+    },
+    "/api/scanner/top_contract_gainers?top_n=5": {
+      "ok": true,
+      "ms": 357,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "generated_utc",
+        "segments",
+        "segments_implemented",
+        "segments_total",
+        "all_segments_live",
+        "missing_segments",
+        "by_segment",
+        "market_wide",
+        "chains_fetched",
+        "status"
+      ]
+    },
+    "/api/scanner/equity_options?top_n=5": {
+      "ok": true,
+      "ms": 20415,
+      "error": null,
+      "status": "ok",
+      "keys": [
+        "generated_utc",
+        "status",
+        "segments",
+        "universe",
+        "live_chains",
+        "scanner",
+        "implementation_gaps"
+      ]
+    },
+    "/api/chain/NIFTY": {
+      "ok": true,
+      "ms": 2317,
+      "error": null,
+      "status": "MARKET_OPEN",
+      "keys": [
+        "underlying",
+        "spot",
+        "pcr",
+        "contracts",
+        "total_contracts",
+        "data_source",
+        "source_priority",
+        "status",
+        "stale",
+        "fetched_at_utc"
+      ],
+      "n": 160,
+      "spot": 24579.75
+    },
+    "/api/deploy/info": {
+      "ok": true,
+      "ms": 71,
+      "error": null,
+      "status": null,
+      "keys": [
+        "git_sha",
+        "git_branch",
+        "service_name",
+        "deployed_at_known"
+      ]
+    },
+    "/api/paper/pipeline/status": {
+      "ok": true,
+      "ms": 82,
+      "error": null,
+      "status": "not_ready",
+      "keys": [
+        "status",
+        "pipeline",
+        "generated_utc",
+        "safety",
+        "latest_run",
+        "ledger_counts",
+        "recent_forecasts",
+        "recent_paper_orders",
+        "recent_blockers",
+        "next_action"
+      ]
+    },
+    "/api/ml/models": {
+      "ok": false,
+      "ms": 68,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    },
+    "/api/models/status": {
+      "ok": false,
+      "ms": 71,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    },
+    "/api/performance/summary": {
+      "ok": false,
+      "ms": 80,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    },
+    "/api/accuracy/trend": {
+      "ok": false,
+      "ms": 62,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    },
+    "/api/backtest/results": {
+      "ok": false,
+      "ms": 74,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    },
+    "/api/backtests/latest": {
+      "ok": false,
+      "ms": 67,
+      "error": "HTTP Error 404: Not Found",
+      "status": null,
+      "keys": []
+    }
+  }
+}

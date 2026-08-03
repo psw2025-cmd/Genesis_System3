@@ -3,7 +3,7 @@ import { useStore } from '../store'
 import { PriceCell } from './ui/PriceCell'
 import { fmt, cn } from '../lib/utils'
 
-const SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'RELIANCE', 'HDFCBANK', 'TCS', 'INFY', 'ICICIBANK']
 
 interface Contract {
   strike: number

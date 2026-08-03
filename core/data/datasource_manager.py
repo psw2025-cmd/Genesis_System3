@@ -24,16 +24,17 @@ class DataSourceManager:
     Backward-compatible: fetch_option_chain() returns (DataFrame, spot_price).
     """
 
+    # Dhan optionchain APIs require INTEGER under_security_id (string IDs fail silently).
     _DHAN_SECURITY_IDS = {
-        "NIFTY": "13",
-        "BANKNIFTY": "25",
-        "FINNIFTY": "27",
-        "MIDCPNIFTY": "442",
-        "SENSEX": "51",
+        "NIFTY": 13,
+        "BANKNIFTY": 25,
+        "FINNIFTY": 27,
+        "MIDCPNIFTY": 442,
+        "SENSEX": 51,
     }
 
     # Dhan option-chain segment is not identical for every index.
-    # Keep env override so Render can correct a broker-side segment without code deploy:
+    # Keep env override so Cloud can correct a broker-side segment without code deploy:
     #   DHAN_OPTION_CHAIN_SEGMENT_SENSEX=<broker accepted value>
     _DHAN_SEGMENTS = {
         "NIFTY": "IDX_I",
@@ -46,6 +47,7 @@ class DataSourceManager:
     def __init__(self):
         self._client = None
         self._cache = {}
+        self._equity_sec_ids: Dict[str, int] = {}
 
     def _get_client(self):
         if self._client is None:
@@ -63,25 +65,134 @@ class DataSourceManager:
         return self._client
 
     @staticmethod
+    def _as_int_security_id(value: Any) -> Optional[int]:
+        try:
+            if value is None or value == "":
+                return None
+            return int(str(value).strip())
+        except Exception:
+            return None
+
+    def _resolve_underlying(self, sym: str) -> Tuple[Optional[int], str]:
+        """Return (security_id:int, exchange_segment) for index or equity FO."""
+        sym_u = sym.upper()
+        env_id = self._as_int_security_id(os.environ.get(f"DHAN_SECURITY_ID_{sym_u}", ""))
+        env_seg = (os.environ.get(f"DHAN_OPTION_CHAIN_SEGMENT_{sym_u}", "") or "").strip()
+        if env_id is not None:
+            return env_id, env_seg or self._DHAN_SEGMENTS.get(sym_u, "IDX_I")
+
+        if sym_u in self._DHAN_SECURITY_IDS:
+            return (
+                int(self._DHAN_SECURITY_IDS[sym_u]),
+                env_seg or self._DHAN_SEGMENTS.get(sym_u, "IDX_I"),
+            )
+
+        if sym_u in self._equity_sec_ids:
+            return self._equity_sec_ids[sym_u], env_seg or "NSE_EQ"
+
+        # Resolve NSE equity underlying id from security master (OPTSTK parents).
+        try:
+            from core.brokers.dhan.equity_fo_universe import is_equity_fo_symbol
+
+            if not is_equity_fo_symbol(sym_u):
+                return None, ""
+        except Exception:
+            pass
+
+        master = ROOT / "security_id_list.csv"
+        if not master.exists():
+            return None, ""
+        try:
+            df = pd.read_csv(master, low_memory=False)
+            cols = {c.upper(): c for c in df.columns}
+            exch_c = cols.get("SEM_EXM_EXCH_ID") or cols.get("EXCH_ID")
+            inst_c = cols.get("SEM_INSTRUMENT_NAME") or cols.get("INSTRUMENT")
+            seg_c = cols.get("SEM_SEGMENT") or cols.get("SEGMENT")
+            sid_c = cols.get("SEM_SMST_SECURITY_ID") or cols.get("SECURITY_ID")
+            name_c = cols.get("SM_SYMBOL_NAME") or cols.get("SYMBOL_NAME")
+            tsym_c = cols.get("SEM_TRADING_SYMBOL") or cols.get("SEM_CUSTOM_SYMBOL")
+            if not sid_c:
+                return None, ""
+            work = df
+            if exch_c:
+                work = work[work[exch_c].astype(str).str.upper() == "NSE"]
+            # Prefer EQ cash underlying row; fall back to any OPTSTK row's underlying map via EQ.
+            if inst_c and seg_c:
+                eq = work[
+                    (work[inst_c].astype(str).str.upper() == "EQUITY")
+                    & (work[seg_c].astype(str).str.upper().isin(["E", "EQ", "CASH"]))
+                ]
+            else:
+                eq = work
+            if name_c is not None and not eq.empty:
+                hit = eq[eq[name_c].astype(str).str.strip().str.upper() == sym_u]
+            else:
+                hit = eq.iloc[0:0]
+            if hit.empty and tsym_c is not None and not eq.empty:
+                hit = eq[eq[tsym_c].astype(str).str.strip().str.upper() == sym_u]
+            if hit.empty:
+                return None, ""
+            sid = self._as_int_security_id(hit.iloc[0][sid_c])
+            if sid is None:
+                return None, ""
+            self._equity_sec_ids[sym_u] = sid
+            return sid, env_seg or "NSE_EQ"
+        except Exception as exc:
+            logger.warning(f"[DSM] equity security id resolve failed for {sym_u}: {exc}")
+            return None, ""
+
+    @staticmethod
     def _nearest_expiry() -> str:
-        """Return nearest Thursday as YYYY-MM-DD for Dhan option_chain fallback."""
+        """Calendar fallback only — prefer broker expiry_list when available."""
         override = os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
         if override:
             return override
 
         today = date.today()
-        days_ahead = (3 - today.weekday()) % 7
+        # NIFTY weekly is Monday; keep nearest Mon as last-resort fallback.
+        days_ahead = (0 - today.weekday()) % 7
         if days_ahead == 0:
             days_ahead = 7
         return (today + timedelta(days=days_ahead)).strftime("%Y-%m-%d")
 
-    def _option_chain_expiry(self, sym: str, expiry: str = "") -> str:
-        """Resolve option-chain expiry without requiring a code deploy."""
-        return (
+    @staticmethod
+    def _extract_expiry_list(resp: Any) -> list:
+        if not isinstance(resp, dict) or resp.get("status") != "success":
+            return []
+        data = resp.get("data")
+        # SDK nest: data.data = [dates...]; HTTP: data = [dates...]
+        for _ in range(3):
+            if isinstance(data, list):
+                return [str(x) for x in data if x]
+            if isinstance(data, dict):
+                if isinstance(data.get("data"), list):
+                    return [str(x) for x in data.get("data") if x]
+                data = data.get("data")
+                continue
+            break
+        return []
+
+    def _option_chain_expiry(self, dhan: Any, sec_id: int, segment: str, sym: str, expiry: str = "") -> str:
+        """Resolve expiry via env override, then Dhan expiry_list, then calendar fallback."""
+        explicit = (
             (expiry or "").strip()
             or os.environ.get(f"DHAN_OPTION_CHAIN_EXPIRY_{sym.upper()}", "").strip()
-            or self._nearest_expiry()
+            or os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
         )
+        if explicit:
+            return explicit
+        try:
+            if hasattr(dhan, "expiry_list"):
+                resp = dhan.expiry_list(
+                    under_security_id=int(sec_id),
+                    under_exchange_segment=segment,
+                )
+                dates = self._extract_expiry_list(resp)
+                if dates:
+                    return dates[0]
+        except Exception as exc:
+            logger.warning(f"[DSM] expiry_list failed for {sym}: {exc}")
+        return self._nearest_expiry()
 
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         """
@@ -142,7 +253,7 @@ class DataSourceManager:
             try:
                 data = json.loads(cache_path.read_text())
                 spot = float(data.get("spot", 0))
-                strikes = data.get("strikes", [])
+                strikes = data.get("strikes") or data.get("contracts") or []
                 if strikes:
                     df = pd.DataFrame(strikes)
                     return df, spot
@@ -155,47 +266,56 @@ class DataSourceManager:
         sym = symbol.upper()
         try:
             dhan = self._get_client()
-            if dhan is not None:
-                resp = None
+            if dhan is None:
+                return None
+
+            resp = None
+            parser_name = "parse_dhan_option_chain_payload"
+            sec_id, segment = self._resolve_underlying(sym)
+            if sec_id is None:
+                logger.warning(f"[DSM] No Dhan security id configured for {sym}")
+                return None
+
+            resolved_expiry = self._option_chain_expiry(dhan, sec_id, segment, sym, expiry)
+            logger.info(
+                f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} seg={segment} expiry={resolved_expiry}"
+            )
+
+            if hasattr(dhan, "option_chain"):
+                resp = dhan.option_chain(
+                    under_security_id=int(sec_id),
+                    under_exchange_segment=segment,
+                    expiry=resolved_expiry,
+                )
+            elif hasattr(dhan, "get_option_chain"):
+                resp = dhan.get_option_chain(
+                    UnderlyingScrip=int(sec_id),
+                    UnderlyingSeg=segment,
+                    Expiry=resolved_expiry,
+                )
                 parser_name = "parse_option_chain_to_df"
+            else:
+                logger.warning("[DSM] Dhan client has no option-chain method")
+                return None
 
-                if hasattr(dhan, "get_option_chain"):
-                    resp = dhan.get_option_chain(
-                        UnderlyingScrip=sym,
-                        UnderlyingSeg="IDX_I",
-                        Expiry=expiry,
-                    )
-                elif hasattr(dhan, "option_chain"):
-                    sec_id = self._DHAN_SECURITY_IDS.get(sym)
-                    if sec_id:
-                        resolved_expiry = self._option_chain_expiry(sym, expiry)
-                        logger.info(
-                            f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} expiry={resolved_expiry}"
-                        )
-                        segment = os.environ.get(
-                            f"DHAN_OPTION_CHAIN_SEGMENT_{sym}",
-                            self._DHAN_SEGMENTS.get(sym, "IDX_I"),
-                        ).strip() or "IDX_I"
-                        resp = dhan.option_chain(
-                            under_security_id=sec_id,
-                            under_exchange_segment=segment,
-                            expiry=resolved_expiry,
-                        )
-                        parser_name = "parse_dhan_option_chain_payload"
-                    else:
-                        logger.warning(f"[DSM] No Dhan security id configured for {sym}")
+            if resp and isinstance(resp, dict) and resp.get("status") == "success":
+                from core.data import dhan_option_chain_parser as parser
+
+                if parser_name == "parse_dhan_option_chain_payload":
+                    df, spot = parser.parse_dhan_option_chain_payload(resp)
                 else:
-                    logger.warning("[DSM] Dhan client has no option-chain method")
-
-                if resp and isinstance(resp, dict) and resp.get("status") == "success":
-                    from core.data import dhan_option_chain_parser as parser
-
-                    if parser_name == "parse_dhan_option_chain_payload":
-                        df, spot = parser.parse_dhan_option_chain_payload(resp)
-                    else:
-                        df, spot = parser.parse_option_chain_to_df(resp, sym)
-                    if df is not None and not df.empty:
-                        return df, spot
+                    df, spot = parser.parse_option_chain_to_df(resp, sym)
+                if df is not None and not df.empty:
+                    # Dhan OC legs omit expiry; stamp the expiry we requested.
+                    df = df.copy()
+                    df["expiry_date"] = resolved_expiry
+                    df["expiry"] = resolved_expiry
+                    return df, spot
+            else:
+                logger.warning(
+                    f"[DSM] Dhan option_chain non-success for {sym}: "
+                    f"{str((resp or {}).get('remarks') if isinstance(resp, dict) else resp)[:160]}"
+                )
         except Exception as e:
             logger.warning(f"[DSM] Dhan fetch_option_chain failed for {sym}: {e}")
         return None

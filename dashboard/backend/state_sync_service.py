@@ -174,10 +174,16 @@ class StateSyncService:
             if pnl_file.exists():
                 pnl_data = json.loads(pnl_file.read_text())
                 updates["pnl"] = {
-                    "unrealized": pnl_data.get("unrealized_pnl", 0.0),
-                    "realized": pnl_data.get("realized_pnl", 0.0),
+                    "unrealized": pnl_data.get(
+                        "total_unrealized_pnl",
+                        pnl_data.get("unrealized_pnl", pnl_data.get("unrealized", 0.0)),
+                    ),
+                    "realized": pnl_data.get(
+                        "total_realized_pnl",
+                        pnl_data.get("realized_pnl", pnl_data.get("realized", 0.0)),
+                    ),
                     "total": pnl_data.get("total_pnl", 0.0),
-                    "day_total": pnl_data.get("daily_pnl", 0.0),
+                    "day_total": pnl_data.get("daily_pnl", pnl_data.get("day_total", 0.0)),
                 }
         except Exception as e:
             print(f"Error syncing PnL: {e}")

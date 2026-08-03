@@ -1,0 +1,69 @@
+{
+  "revision": "genesis-system3-web-00027-khv",
+  "tick": {
+    "status": "ok",
+    "open": 1
+  },
+  "paper": {
+    "mode": "PAPER",
+    "positions_source": "PAPER_CLOUD_SIM",
+    "data_source": "DHAN_LIVE_MARK_TO_MARKET",
+    "broker_order_endpoints_called": false,
+    "paper_truth": {
+      "source_file": "/app/src/outputs/positions_live.json",
+      "displayed_rows": 1,
+      "fake_fixture_rows_rejected": 0,
+      "broker_order_endpoints_called": false,
+      "order_endpoints_label": "INTENTIONALLY_NOT_CALLED_PAPER_SAFE",
+      "mark_to_market": "DHAN_OPTION_CHAIN_LTP",
+      "aligned_to": [
+        "dhanhq.co/docs/v2/portfolio positions fields",
+        "local paper simulation (Dhan has no live-token paper sandbox)"
+      ],
+      "note": "Paper fills are simulated; LTP/PnL use live Dhan chain. Real /orders endpoints are never called."
+    },
+    "n_positions": 1,
+    "sample": {
+      "position_id": "POS_0001",
+      "action": "OPEN",
+      "status": "OPEN",
+      "underlying": "NIFTY",
+      "symbol": "NIFTY",
+      "trading_symbol": "NIFTY2026080424600PE",
+      "security_id": 65872,
+      "strike": 24600.0,
+      "option_type": "PE",
+      "drvOptionType": "PUT",
+      "drvStrikePrice": 24600.0,
+      "drvExpiryDate": "2026-08-04",
+      "expiry_date": "2026-08-04",
+      "positionType": "LONG",
+      "productType": "INTRADAY",
+      "exchangeSegment": "NSE_FNO",
+      "buyAvg": 66.75,
+      "costPrice": 66.75,
+      "entry_price": 66.75,
+      "current_price": 66.75,
+      "ltp": 66.75,
+      "netQty": 75,
+      "qty": 75,
+      "buyQty": 75,
+      "sellQty": 0,
+      "strategy": "BUY_PE",
+      "stop_loss": 58.74,
+      "target": 78.77,
+      "unrealized_pnl": -66.25,
+      "realizedProfit": 0.0,
+      "unrealizedProfit": -66.25,
+      "data_source": "dhan_option_chain_live",
+      "market_data_source": "DHAN_LIVE",
+      "quote_source": "DHAN_OPTION_CHAIN",
+      "provenance": "PAPER_CLOUD_SIM",
+      "broker_order_endpoints_called": false,
+      "timestamp": "2026-08-03T12:35:14.187241+05:30",
+      "entry_time": "2026-08-03T12:35:14.187241+05:30",
+      "time_ist": "2026-08-03 12:35:14 IST"
+    }
+  },
+  "live_trading": "OFF"
+}

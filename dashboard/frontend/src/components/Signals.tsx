@@ -4,6 +4,7 @@ import { API_BASE } from '../config'
 import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
 import { AuthUnlock } from './AuthUnlock'
+import { MarketTopCePeTable } from './MarketTopCePeTable'
 
 type SignalView = {
   action: string
@@ -26,6 +27,10 @@ type SignalView = {
 }
 
 function firstCandidateFromScanner(scanner: any): any | null {
+  const table = scanner?.market_top_table || scanner?.market_wide?.top_combined_list || []
+  if (Array.isArray(table) && table.length) {
+    return table[0]
+  }
   const paths = [
     scanner?.market_wide?.top_ce,
     scanner?.market_wide?.top_pe,
@@ -102,11 +107,10 @@ export default function Signals() {
   const [error, setError] = useState<{endpoint: string, status?: number, message: string} | null>(null)
 
   const fetchData = async () => {
-    setIsLoading(true)
     try {
       const [stateRes, scannerRes, gainRes] = await Promise.allSettled([
         axios.get(`${API_BASE}/api/state`),
-        axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5`),
+        axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`),
         axios.get(`${API_BASE}/api/gain_rank`),
       ])
 
@@ -287,6 +291,10 @@ export default function Signals() {
             <div><div className="text-sm text-gray-400">Target</div><div className="text-lg">Rs {signal.target?.toFixed(2) || 'N/A'}</div></div>
           </div>
         )}
+      </div>
+
+      <div className="bg-gray-800 rounded-lg overflow-hidden h-[420px]">
+        <MarketTopCePeTable compact pollMs={15000} />
       </div>
 
       <div className="bg-gray-800 p-6 rounded-lg">

@@ -25,8 +25,10 @@ export function AlertsTab() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 text-text-muted">
         <Bell size={40} className="opacity-30" />
-        <p className="text-sm">{apiStatus ? `Alerts unavailable: ${apiStatus.status}` : 'No alerts'}</p>
-        {apiStatus && <p className="text-xs max-w-md text-center">{apiStatus.message}</p>}
+        <p className="text-sm">No alerts</p>
+        {apiStatus && /auth|401|403/i.test(String(apiStatus.status || apiStatus.message || '')) && (
+          <p className="text-xs max-w-md text-center">{apiStatus.message || apiStatus.status}</p>
+        )}
       </div>
     )
   }

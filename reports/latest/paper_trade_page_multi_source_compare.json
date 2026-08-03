@@ -1,0 +1,46 @@
+{
+  "generated": "2026-08-03",
+  "topic": "Paper Trading Console — multi-source comparison",
+  "sources": [
+    {
+      "name": "DhanHQ v2 Portfolio/Positions",
+      "url": "https://dhanhq.co/docs/v2/portfolio/",
+      "required_fields": [
+        "tradingSymbol", "securityId", "positionType", "exchangeSegment", "productType",
+        "buyAvg", "buyQty", "costPrice", "netQty", "realizedProfit", "unrealizedProfit",
+        "drvExpiryDate", "drvOptionType", "drvStrikePrice"
+      ],
+      "note": "Official live broker positions API — no paper mode on production token"
+    },
+    {
+      "name": "DhanHQ v2 Orders",
+      "url": "https://dhanhq.co/docs/v2/orders/",
+      "required_fields": ["order book", "trades", "place/modify/cancel"],
+      "note": "Must remain NOT CALLED while LIVE_TRADING_ENABLED=0"
+    },
+    {
+      "name": "OpenAlgo Dhan Sandbox docs",
+      "url": "https://docs.openalgo.in/connect-brokers/brokers/dhan-sandbox",
+      "note": "Sandbox uses separate client id/token — not the live Cloud Run token"
+    },
+    {
+      "name": "Industry paper dashboards (IBKR/TradeView/kit patterns)",
+      "required_ui": [
+        "open positions grid", "entry/avg cost", "live LTP", "unrealized PnL color",
+        "realized PnL", "SL/TP", "order status empty or sim ledger", "mode banner PAPER"
+      ]
+    }
+  ],
+  "genesis_mapping": {
+    "fills": "PAPER_CLOUD_SIM local ledger",
+    "mark_to_market": "Dhan option-chain LTP",
+    "orders_api": "INTENTIONALLY_NOT_CALLED_PAPER_SAFE",
+    "ui_tab": "Paper Trades → PaperTrading.tsx"
+  },
+  "bugs_fixed": [
+    "DataSourceWarning showed NOT_READY even when Dhan connected",
+    "Order endpoints NOT CALLED looked like failure — now labeled intentional paper safety",
+    "NO_PAPER_SOURCE when positions existed — now shows ledger path + PAPER_CLOUD_SIM",
+    "Missing Dhan-aligned columns (CE/PE, strike, expiry, buyAvg, LTP, unrealized, SL/TP, product)"
+  ]
+}

@@ -5,13 +5,27 @@ import { fmtCr, fmt, signClass, cn } from '../lib/utils'
 export function Positions() {
   const { paper } = useStore()
 
-  const positions: any[] = paper?.positions?.open_positions ?? []
-  const closed:   any[] = paper?.pnl?.summary?.closed_positions ?? []
-  const summary          = paper?.pnl?.summary ?? {}
+  const posBlock = paper?.positions
+  const positions: any[] = Array.isArray(posBlock)
+    ? posBlock
+    : Array.isArray(posBlock?.positions)
+      ? posBlock.positions
+      : Array.isArray(posBlock?.open_positions)
+        ? posBlock.open_positions
+        : []
+  const closed: any[] = Array.isArray(paper?.pnl?.summary?.closed_positions)
+    ? paper.pnl.summary.closed_positions
+    : Array.isArray(paper?.pnl?.closed_positions)
+      ? paper.pnl.closed_positions
+      : []
+  const summary = paper?.pnl?.summary ?? paper?.pnl ?? {}
 
-  const totalPnl  = summary.total_pnl ?? 0
-  const winRate   = summary.win_rate ?? 0
-  const totalTrades = summary.total_trades ?? 0
+  const totalPnl = Number(
+    summary.total_pnl
+    ?? ((Number(summary.total_unrealized_pnl ?? 0) + Number(summary.total_realized_pnl ?? 0)) || 0)
+  )
+  const winRate = Number(summary.win_rate ?? 0)
+  const totalTrades = Number(summary.total_trades ?? closed.length ?? 0)
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">

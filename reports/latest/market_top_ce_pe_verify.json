@@ -1,0 +1,41 @@
+{
+  "revision": "genesis-system3-web-00025-sws",
+  "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui",
+  "live_trading": "OFF",
+  "status": "ok",
+  "stream_mode": "ultra_micro",
+  "rows": 25,
+  "nonzero": 22,
+  "ce": 17,
+  "pe": 8,
+  "expiry_filled": 25,
+  "symbols": [
+    "BANKNIFTY",
+    "INFY",
+    "NIFTY",
+    "TCS"
+  ],
+  "top2": [
+    {
+      "rank": 1,
+      "underlying": "NIFTY",
+      "option_type": "CE",
+      "expiry_date": "2026-08-04",
+      "strike": 24650.0,
+      "ltp": 36.9,
+      "change": 27.7,
+      "gain_pct": 301.087,
+      "volume": 157627925,
+      "oi": 11356150
+    }
+  ],
+  "sample_pe": {
+    "rank": 18,
+    "underlying": "TCS",
+    "option_type": "PE",
+    "expiry_date": "2026-08-25",
+    "strike": 1840.0,
+    "ltp": 1.2,
+    "gain_pct": 33.3333
+  }
+}

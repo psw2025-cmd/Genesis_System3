@@ -29,13 +29,21 @@ function brokerFailure(obj: any): { bad: boolean; message: string } {
   const code = remarks?.error_code ?? raw?.error_code ?? obj?.error_code ?? ''
   const typ = remarks?.error_type ?? raw?.error_type ?? obj?.error_type ?? ''
   const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
-  const detail = JSON.stringify([msg, code, typ]).toLowerCase()
-  const bad = obj?.success === false || obj?.blocked === true || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized')
+  const detail = JSON.stringify([msg, code, typ, obj?.error]).toLowerCase()
+  // Rate-limit / transient transport failures must NOT be painted as token expiry.
+  if (detail.includes('rate_limit') || code === 429 || status === 'rate_limit') {
+    return { bad: false, message: 'rate_limited_transient' }
+  }
+  const bad = obj?.success === false || obj?.blocked === true || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized') || detail.includes('dh-901')
   return { bad, message: [code, typ, msg].filter(Boolean).join(' - ') }
 }
 
-function brokerClientId(status: any) {
-  return String(status?.client_id ?? status?.clientId ?? status?.dhan_client_id ?? status?.account_id ?? 'NOT PROVIDED BY BROKER API')
+function brokerClientId(status: any, funds?: any) {
+  const fromStatus = status?.client_id ?? status?.clientId ?? status?.dhan_client_id ?? status?.dhanClientId ?? status?.account_id
+  const raw = funds?.normalized?.raw ?? funds?.raw ?? funds?.data ?? funds
+  const fromFunds = raw?.dhanClientId ?? raw?.dhan_client_id ?? raw?.clientId
+  const val = fromStatus ?? fromFunds
+  return String(val || 'NOT PROVIDED BY BROKER API')
 }
 
 function liveTradingState(state: any, brokerStatus: any) {
@@ -54,8 +62,9 @@ export function BrokerPanel() {
   const holdingsFailure = brokerFailure(brokerHoldings)
   const positionsFailure = brokerFailure(brokerPositions)
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const brokerTokenBad = fundsFailure.bad || statusFailure.bad
-  const brokerTruthConnected = Boolean(brokerConnected && !brokerTokenBad && !authBlocked)
+  const brokerTruthConnected = Boolean(brokerConnected === true || brokerStatus?.connected === true)
+  // Do not paint TOKEN ERROR when broker truth is already connected (rate-limit false fails).
+  const brokerTokenBad = (!brokerTruthConnected) && (fundsFailure.bad || statusFailure.bad)
   const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'BLOCKED / TOKEN ERROR' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
   const fundsError = Boolean(brokerFunds && (brokerFunds.success === false || brokerFunds.blocked === true || fundsFailure.bad))
   const fundsLoading = brokerFunds == null
@@ -84,7 +93,7 @@ export function BrokerPanel() {
         <Row label="Status" value={brokerTruthConnected ? 'CONNECTED' : dataState} color={brokerTruthConnected ? 'tx-up' : brokerApiResponded && !brokerTokenBad ? 'tx-amber' : 'tx-down'} />
         <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH BLOCKED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
         <Row label="Mode" value="READ-ONLY BROKER PROOF" />
-        <Row label="Client ID" value={brokerClientId(brokerStatus)} color={brokerClientId(brokerStatus).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
+        <Row label="Client ID" value={brokerClientId(brokerStatus, brokerFunds)} color={brokerClientId(brokerStatus, brokerFunds).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
         <Row label="Token Status" value={brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
         <Row label="Holdings API" value={holdingsError ? 'ERROR/BLOCKED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
         <Row label="Funds API" value={fundsError ? 'ERROR/BLOCKED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />

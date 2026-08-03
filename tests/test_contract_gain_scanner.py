@@ -20,6 +20,17 @@ def test_compute_gain_from_change_percent():
     assert compute_contract_gain_pct(c) == pytest.approx(15.5)
 
 
+def test_compute_gain_ignores_zero_broker_change_percent():
+    """Broker often sends change_percent=0 even when LTP vs prev close is huge."""
+    c = {
+        "ltp": 59.9,
+        "previous_close_price": 14.9,
+        "change_percent": 0.0,
+        "option_type": "CE",
+    }
+    assert compute_contract_gain_pct(c) == pytest.approx((59.9 - 14.9) / 14.9 * 100.0)
+
+
 def test_scan_segment_finds_top_ce_and_pe():
     contracts = [
         {
@@ -56,6 +67,35 @@ def test_scan_segment_finds_top_ce_and_pe():
     assert result["top_pe"]["gain_pct"] == pytest.approx(20.0)
     assert result["top_ce"]["strike"] == 24000
     assert len(result["top_ce_list"]) >= 2
+
+
+def test_market_top_table_ranks_combined_ce_pe():
+    chains = {
+        "NIFTY": {
+            "contracts": [
+                {"option_type": "CE", "strike": 24600, "ltp": 59.9, "previous_close_price": 14.9, "volume": 1000},
+                {"option_type": "PE", "strike": 24500, "ltp": 40, "previous_close_price": 20, "volume": 800},
+            ],
+            "status": "OK",
+        },
+        "RELIANCE": {
+            "contracts": [
+                {"option_type": "CE", "strike": 1400, "ltp": 12, "previous_close_price": 3, "volume": 500},
+            ],
+            "status": "OK",
+        },
+        "BANKNIFTY": {"contracts": []},
+        "FINNIFTY": {"contracts": []},
+        "MIDCPNIFTY": {"contracts": []},
+    }
+    report = scan_all_segments_from_chains(chains, market_top_n=10)
+    table = report["market_top_table"]
+    assert len(table) >= 2
+    assert table[0]["rank"] == 1
+    assert table[0]["underlying"] == "NIFTY"
+    assert table[0]["gain_pct"] == pytest.approx((59.9 - 14.9) / 14.9 * 100.0)
+    assert any(r["underlying"] == "RELIANCE" for r in table)
+    assert any(r["option_type"] == "PE" for r in table)
 
 
 def test_scan_all_segments_implementation_matrix():

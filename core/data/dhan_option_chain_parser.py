@@ -106,6 +106,31 @@ def _iter_list_rows(items: Any, initial_spot: float = 0.0) -> Tuple[List[Dict[st
     return rows, spot
 
 
+def _unwrap_option_chain_data(payload: Any) -> Any:
+    """Normalize SDK/HTTP wrappers to the dict that holds last_price + oc.
+
+    DhanHQ Python SDK often nests one extra level:
+      {"status":"success","data":{"status":"success","data":{"last_price":...,"oc":{...}}}}
+    Direct HTTP usually returns:
+      {"status":"success","data":{"last_price":...,"oc":{...}}}
+    """
+    if not isinstance(payload, dict):
+        return payload
+    data = payload.get("data", payload)
+    # Unwrap repeated {"status","data"} shells until oc/last_price appear.
+    for _ in range(3):
+        if not isinstance(data, dict):
+            break
+        if data.get("oc") is not None or data.get("last_price") is not None:
+            break
+        nested = data.get("data")
+        if isinstance(nested, dict):
+            data = nested
+            continue
+        break
+    return data
+
+
 def parse_dhan_option_chain_payload(payload: Any) -> Tuple[pd.DataFrame, float]:
     """
     Parse Dhan option_chain API response.
@@ -118,7 +143,7 @@ def parse_dhan_option_chain_payload(payload: Any) -> Tuple[pd.DataFrame, float]:
     were present; callers must not silently substitute CSV/synthetic data as live.
     """
     if isinstance(payload, dict):
-        data = payload.get("data", payload)
+        data = _unwrap_option_chain_data(payload)
         if isinstance(data, dict):
             official_rows, spot = _iter_official_oc_rows(data)
             if official_rows:
