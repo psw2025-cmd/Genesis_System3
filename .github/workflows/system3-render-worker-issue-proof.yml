@@ -140,4 +140,4 @@ jobs:
           git commit -m "ci(worker): publish render worker issue proof [skip ci]"
           if git push; then exit 0; fi
           git pull --rebase origin main
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin

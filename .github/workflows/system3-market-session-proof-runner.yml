@@ -123,7 +123,7 @@ jobs:
           git add reports/latest/market_session_proof_runner/ reports/latest/system3_auto_gates/ reports/latest/system3_auto_coordinator/ reports/latest/dashboard_visible_issue_tracker/ reports/latest/autopilot_proof_board/ reports/latest/safe_repair_runner/ reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md docs/SYSTEM3_AUTOPILOT_LATEST_STATUS.md config/human_approval_gate.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): update market-session gate proof [skip ci]"
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin
       - name: Enforce market-session proof
         run: |
           python - <<'PY'

@@ -227,7 +227,7 @@ jobs:
             exit 0
           fi
           git commit -m "ci(proof): publish latest system3 truth [skip ci]"
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin
 
       - name: Upload latest truth artifact
         uses: actions/upload-artifact@v4

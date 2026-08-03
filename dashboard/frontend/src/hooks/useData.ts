@@ -168,7 +168,7 @@ function keepLastGood(previous: any, apiStatus: any, label: string) {
     transient_error: true,
     degraded_at: new Date().toISOString(),
     last_warning: `${label}: ${apiStatus?.message || 'temporary API failure'}`,
-    status: previous.status || 'STALE_LAST_GOOD',
+    status: previous.status || 'TRANSIENT_CACHE',
   }
 }
 

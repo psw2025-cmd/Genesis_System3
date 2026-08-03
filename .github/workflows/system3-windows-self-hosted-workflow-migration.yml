@@ -38,7 +38,7 @@ jobs:
             exit 0
           }
           git commit -m "ci: migrate workflows to Windows self-hosted runner [skip ci]"
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin
       - name: Enforce migration report exists
         shell: pwsh
         run: |

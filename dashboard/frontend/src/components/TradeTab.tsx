@@ -132,7 +132,7 @@ export function TradeTab() {
             {equityRows.length === 0 ? (
               <div className="p-4 text-center text-text-muted text-xs space-y-2">
                 <div className="font-semibold text-text-primary">No equity option rows</div>
-                <div>{equityErr || equity?.scanner?.gain_metric_note || equity?.message || 'Waiting for Dhan equity option chain / bhavcopy.'}</div>
+                <div>{equityErr || equity?.scanner?.gain_metric_note || equity?.message || 'Waiting for Dhan equity option chain snapshot.'}</div>
               </div>
             ) : (
               equityRows.map((row, i) => (

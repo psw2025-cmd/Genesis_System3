@@ -55,7 +55,7 @@ jobs:
           git add reports/latest/options_contract_builder/ reports/latest/options_ml_training/ state/options_history/contracts.csv state/options_history/dataset/ce_pe_dataset.csv state/models/options_ce_pe_model.joblib 2>/dev/null || true
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(ml): publish CE PE options training proof [skip ci]"
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin
       - name: Upload CE/PE ML artifacts
         uses: actions/upload-artifact@v4
         if: always()

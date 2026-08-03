@@ -74,7 +74,7 @@ jobs:
           git add reports/latest/parallel_root_cause_audit/
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(audit): publish parallel root-cause audit [skip ci]"
-          git push
+          bash tools/ci_git_push_with_rebase.sh main origin
       - name: Enforce no production-grade claim
         run: |
           python - <<'PY'

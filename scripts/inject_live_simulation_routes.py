@@ -17,9 +17,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "dashboard" / "backend" / "app.py"
 MARKER = "# SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES"
-BLOCK = f'''
+# Outer quotes are ''' so inner """ docstrings and dict `{}` literals stay valid.
+BLOCK = '''
 
-{MARKER}
+''' + MARKER + '''
 @app.get("/api/simulation/live/state")
 async def get_virtual_live_simulation_state(scenario: str = "trend"):
     """Backend virtual live-market simulation feed. No real broker/orders."""

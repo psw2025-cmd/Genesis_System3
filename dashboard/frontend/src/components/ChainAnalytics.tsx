@@ -44,7 +44,7 @@ export default function ChainAnalytics() {
   }
 
   // Handle broker not ready - show NOT_READY status
-  const isNotReady = chainData.data_source === 'not_ready' || chainData.data_source === 'synthetic' || chainData.status === 'NOT_READY'
+  const isNotReady = chainData.data_source === 'not_ready' || chainData.status === 'NOT_READY'
 
   if (chainData.message && chainData.total_contracts === 0) {
     return (

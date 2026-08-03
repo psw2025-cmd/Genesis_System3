@@ -101,31 +101,7 @@ jobs:
         run: |
           mkdir -p reports/latest/github_render_failure_tracker docs
           if [ ! -f reports/latest/github_render_failure_tracker/summary.json ]; then
-            python - <<'PY'
-            import json, pathlib, datetime
-            out=pathlib.Path('reports/latest/github_render_failure_tracker')
-            payload={
-              'generated_utc': datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z',
-              'status': 'BLOCKED',
-              'tracker_internal_status': 'FAILED_BEFORE_SUMMARY',
-              'todo': ['Tracker script failed before summary.json was written; inspect checkout/setup/preflight/tracker step logs.'],
-              'todo_count': 1,
-              'github_failed_count': None,
-              'render_failed_count': None,
-              'failed_workflows': [],
-              'render_failures': [],
-              'live_trading_enabled': False,
-              'order_routes_called': False,
-              'secrets_printed': False,
-              'response_bodies_persisted': False,
-              'production_grade_claim_allowed': False,
-              'report_only_no_self_failure_storm': True,
-            }
-            out.joinpath('summary.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
-            out.joinpath('summary.md').write_text('# System3 GitHub + Render Failure TODO\n\nStatus: **BLOCKED**\n\nTracker failed before writing normal summary. Inspect workflow step logs.\n', encoding='utf-8')
-            pathlib.Path('docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md').write_text(out.joinpath('summary.md').read_text(encoding='utf-8'), encoding='utf-8')
-            print(json.dumps(payload, indent=2))
-            PY
+            python tools/write_github_render_tracker_fallback.py
           fi
       - name: Normalize latest workflow blockers
         if: always()
@@ -140,8 +116,7 @@ jobs:
           git add reports/latest/github_render_failure_tracker/ docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md || true
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "ci(proof): update github render failure todo [skip ci]"
-          git pull --rebase origin main || true
-          git push || echo "WARN: git push failed; report remains in this run artifact/log and will retry next run."
+          bash tools/ci_git_push_with_rebase.sh main origin || echo "WARN: git push failed; report remains in this run artifact/log and will retry next run."
       - name: Report tracker status without creating failure storm
         if: always()
         run: |
