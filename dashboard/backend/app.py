@@ -7996,3 +7996,84 @@ async def get_ml_predictions():
         predictions = state.get("ml_predictions", []) or []
         return {"predictions": predictions[:5], "count": len(predictions), "status": "ok"}
     except: return {"predictions": [], "status": "error"}
+
+# SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES
+@app.get("/api/simulation/live/state")
+async def get_virtual_live_simulation_state(scenario: str = "trend"):
+    """Backend virtual live-market simulation feed. No real broker/orders."""
+    try:
+        from dashboard.backend.live_simulation_service import build_virtual_live_state
+    except ImportError:
+        from live_simulation_service import build_virtual_live_state
+    payload = build_virtual_live_state(scenario=scenario)
+    payload["api_route"] = "/api/simulation/live/state"
+    payload["live_trading_enabled"] = False
+    payload["order_placement_allowed"] = False
+    payload["real_broker_routes_called"] = False
+    return payload
+
+
+@app.get("/api/simulation/live/chain")
+async def get_virtual_live_simulation_chain(scenario: str = "trend"):
+    """Virtual option chain shaped like a backend feed; simulation only."""
+    try:
+        from dashboard.backend.live_simulation_service import build_virtual_live_state
+    except ImportError:
+        from live_simulation_service import build_virtual_live_state
+    payload = build_virtual_live_state(scenario=scenario)
+    return {
+        "status": "SIMULATION_ONLY",
+        "api_route": "/api/simulation/live/chain",
+        "scenario": payload.get("scenario"),
+        "generated_utc": payload.get("generated_utc"),
+        "rows": payload.get("option_chain") or [],
+        "row_count": len(payload.get("option_chain") or []),
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "real_broker_routes_called": False,
+    }
+
+
+@app.get("/api/simulation/live/signals")
+async def get_virtual_live_simulation_signals(scenario: str = "trend"):
+    """Virtual CE/PE signal feed; simulation only."""
+    try:
+        from dashboard.backend.live_simulation_service import build_virtual_live_state
+    except ImportError:
+        from live_simulation_service import build_virtual_live_state
+    payload = build_virtual_live_state(scenario=scenario)
+    return {
+        "status": "SIMULATION_ONLY",
+        "api_route": "/api/simulation/live/signals",
+        "scenario": payload.get("scenario"),
+        "generated_utc": payload.get("generated_utc"),
+        "rows": payload.get("signals") or [],
+        "row_count": len(payload.get("signals") or []),
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "real_broker_routes_called": False,
+    }
+
+
+@app.get("/api/simulation/live/paper")
+async def get_virtual_live_simulation_paper(scenario: str = "trend"):
+    """Virtual paper lifecycle tape; simulation only."""
+    try:
+        from dashboard.backend.live_simulation_service import build_virtual_live_state
+    except ImportError:
+        from live_simulation_service import build_virtual_live_state
+    payload = build_virtual_live_state(scenario=scenario)
+    paper = payload.get("paper") or {}
+    return {
+        "status": "SIMULATION_ONLY",
+        "api_route": "/api/simulation/live/paper",
+        "scenario": payload.get("scenario"),
+        "generated_utc": payload.get("generated_utc"),
+        "orders": paper.get("orders") or [],
+        "total_pnl": paper.get("total_pnl"),
+        "currency": "INR",
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "real_broker_routes_called": False,
+    }
+
