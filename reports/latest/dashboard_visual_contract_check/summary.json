@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-07-24T03:32:41.650661Z",
-  "status": "PASS",
+  "generated_utc": "2026-08-03T07:22:10.921091Z",
+  "status": "BLOCKED",
   "purpose": "Distinguish repository visual-contract regressions from deployed/runtime proof failures.",
   "safety": {
     "analyze_mode": true,
@@ -10,7 +10,7 @@
     "broker_order_endpoints_called": false,
     "secrets_read_or_written": false
   },
-  "paper_source_contract_complete": true,
+  "paper_source_contract_complete": false,
   "proof_marker_contract_complete": true,
   "tab_contract_complete": true,
   "checks": [
@@ -27,7 +27,7 @@
     {
       "scope": "paper_source",
       "marker": "Order endpoints",
-      "ok": true
+      "ok": false
     },
     {
       "scope": "paper_source",
@@ -127,7 +127,9 @@
       "proof_ok": true
     }
   ],
-  "blockers": [],
+  "blockers": [
+    "PAPER_SOURCE_MARKER_MISSING:Order endpoints"
+  ],
   "interpretation": "If this report passes while live visual proof reports PAPER_TRUTH_NOT_VISIBLE, the remaining cause is deployed asset drift, tab navigation, or asynchronous runtime rendering\u2014not missing source labels.",
   "production_grade_claim_allowed": false
 }
