@@ -1400,6 +1400,54 @@ async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = Fals
         return {"status": "error", "error": str(e)[:300]}
 
 
+@app.get("/api/scanner/moneycontrol_gainers")
+async def get_moneycontrol_option_gainers(top_n: int = 25, refresh: bool = False):
+    """Moneycontrol All Options Top Gainers — LIVE_SCRAPED reference only (not live trading truth)."""
+    top_n = min(max(int(top_n or 25), 1), 50)
+    cache_key = f"moneycontrol_gainers:{top_n}"
+    if not refresh:
+        hit = _cache_get(cache_key, 90.0)
+        if hit is not None:
+            return hit
+        disk = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
+        if disk.exists():
+            try:
+                data = json.loads(disk.read_text(encoding="utf-8"))
+                if isinstance(data, dict) and data.get("market_top_table"):
+                    return _cache_set(cache_key, data)
+            except Exception:
+                pass
+    try:
+        from dashboard.backend.moneycontrol_option_gainers import fetch_moneycontrol_option_gainers
+
+        report = await _run_blocking(fetch_moneycontrol_option_gainers, top_n, 25.0, timeout=40.0)
+        if isinstance(report, dict):
+            report["ready_for_live"] = False
+            report["live_trading_enabled"] = False
+            return _cache_set(cache_key, report)
+        return {"status": "error", "market_top_table": [], "ready_for_live": False}
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)[:300],
+            "market_top_table": [],
+            "data_provenance": "LIVE_SCRAPED",
+            "ready_for_live": False,
+            "live_trading_enabled": False,
+        }
+
+
+@app.get("/api/scanner/market_top_diagnose")
+async def get_market_top_diagnose():
+    """Auto-diagnose why Moneycontrol high-risers may be missing from Dhan Market Top."""
+    try:
+        from dashboard.backend.contract_gain_scanner import diagnose_market_top_gap
+
+        return await _run_blocking(diagnose_market_top_gap, timeout=20.0)
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:300], "live_trading_enabled": False}
+
+
 @app.get("/api/scanner/segments")
 async def get_scanner_segments():
     """Implementation matrix: index OPTIDX vs equity OPTSTK vs cash equity."""
@@ -4569,6 +4617,7 @@ async def market_top_micro_loop():
 
     Rebuilds ranked table every ~15s into API cache + state file so /ws/stream
     can push updates every 3s without blocking on Dhan option-chain scans.
+    Rotating equity shards merge into prior state for Moneycontrol-parity coverage.
     """
     await asyncio.sleep(3)
     while True:
@@ -4578,7 +4627,15 @@ async def market_top_micro_loop():
             def _refresh():
                 from dashboard.backend.contract_gain_scanner import (
                     build_top_contract_gainers_report,
+                    merge_market_top_reports,
                 )
+
+                prior = {}
+                if _MARKET_TOP_STATE_FILE.exists():
+                    try:
+                        prior = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+                    except Exception:
+                        prior = {}
 
                 # Fast index board first so UI/WS never wait on equity fan-out.
                 report = build_top_contract_gainers_report(
@@ -4589,23 +4646,26 @@ async def market_top_micro_loop():
                 try:
                     with_eq = build_top_contract_gainers_report(
                         top_n=5,
-                        market_top_n=25,
+                        market_top_n=40,
                         include_equity=True,
+                        equity_limit=16,
+                        overall_timeout_s=70.0,
+                        rotate_equity=True,
                     )
-                    if int(with_eq.get("contracts_scored_total") or 0) >= int(
-                        report.get("contracts_scored_total") or 0
-                    ):
-                        report = with_eq
+                    report = merge_market_top_reports(report, with_eq, market_top_n=25)
                 except Exception as eq_exc:
                     report["equity_enrich_error"] = str(eq_exc)[:200]
+                if prior and int(prior.get("contracts_scored_total") or 0) > 0:
+                    report = merge_market_top_reports(prior, report, market_top_n=25)
                 scored = int(report.get("contracts_scored_total") or 0)
                 report["status"] = "ok" if scored > 0 else report.get("status") or "no_data"
                 report["market_open"] = bool(_market_open_from_state())
                 report["stream_mode"] = "ultra_micro"
                 report["streamed_at"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
+                report["data_provenance"] = "DHAN_OPTION_CHAIN_LIVE"
                 return report
 
-            report = await _run_blocking(_refresh, timeout=110.0)
+            report = await _run_blocking(_refresh, timeout=120.0)
             if int(report.get("contracts_scored_total") or 0) > 0:
                 for key in (
                     "scanner_gainers:5:25:1",
@@ -4620,12 +4680,44 @@ async def market_top_micro_loop():
                     print(f"[market-top-micro] state write failed: {write_exc}")
                 print(
                     f"[market-top-micro] ok rows={len(report.get('market_top_table') or [])} "
-                    f"scored={report.get('contracts_scored_total')}"
+                    f"scored={report.get('contracts_scored_total')} "
+                    f"shard={report.get('shard_last_syms')}"
                 )
         except Exception as exc:
             print(f"[market-top-micro] refresh failed: {exc}")
         elapsed = time.time() - started
         await asyncio.sleep(max(5.0, _MARKET_TOP_MICRO_INTERVAL_S - elapsed))
+
+
+async def moneycontrol_gainers_micro_loop():
+    """Background scrape of Moneycontrol All Options Top Gainers (REFERENCE ONLY)."""
+    await asyncio.sleep(8)
+    while True:
+        started = time.time()
+        try:
+            if os.environ.get("MONEYCONTROL_SCRAPE", "1") in ("0", "false", "False"):
+                await asyncio.sleep(60)
+                continue
+
+            def _scrape():
+                from dashboard.backend.moneycontrol_option_gainers import fetch_moneycontrol_option_gainers
+
+                return fetch_moneycontrol_option_gainers(top_n=25, timeout_s=25.0)
+
+            report = await _run_blocking(_scrape, timeout=40.0)
+            if report and (report.get("market_top_table") or report.get("status") == "ok"):
+                _cache_set("moneycontrol_gainers:25", report)
+                try:
+                    path = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+                except Exception as write_exc:
+                    print(f"[mc-gainers] state write failed: {write_exc}")
+                print(f"[mc-gainers] rows={len(report.get('market_top_table') or [])} status={report.get('status')}")
+        except Exception as exc:
+            print(f"[mc-gainers] scrape failed: {exc}")
+        elapsed = time.time() - started
+        await asyncio.sleep(max(45.0, 90.0 - elapsed))
 
 
 async def cloud_paper_trading_loop():
@@ -4656,7 +4748,7 @@ async def cloud_paper_trading_loop():
 
                 engine = get_paper_engine(OUTPUTS_DIR)
 
-                # Fetch live chains for all index symbols
+                # Fetch live chains for index + high-rise equity seeds from Market Top
                 chains = []
                 for sym in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]:
                     try:
@@ -4665,6 +4757,34 @@ async def cloud_paper_trading_loop():
                             chains.append(ch)
                     except Exception:
                         continue
+
+                # Prefer today's Dhan Market Top equity high-risers for paper discovery
+                # (still PAPER ONLY — never places broker orders).
+                try:
+                    mt = _cache_get("scanner_gainers:5:25:1")
+                    if mt is None and _MARKET_TOP_STATE_FILE.exists():
+                        mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+                    seed_syms = []
+                    for row in (mt or {}).get("market_top_table") or []:
+                        sym = str(row.get("underlying") or row.get("symbol") or "").upper()
+                        if not sym or sym in {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"}:
+                            continue
+                        if sym not in seed_syms:
+                            seed_syms.append(sym)
+                        if len(seed_syms) >= 4:
+                            break
+                    for sym in seed_syms:
+                        try:
+                            ch = await get_chain(sym)
+                            if ch and ch.get("contracts"):
+                                ch["paper_seed"] = "market_top_high_rise"
+                                chains.append(ch)
+                        except Exception:
+                            continue
+                    if seed_syms:
+                        setattr(engine, "last_high_rise_seeds", seed_syms)
+                except Exception as seed_exc:
+                    print(f"[paper-loop] high-rise seed skipped: {seed_exc}")
 
                 if chains:
                     engine.step(chains, max_open=3)
@@ -4782,6 +4902,7 @@ async def startup():
     # Ultra-micro Market Top CE/PE refresh → feeds /ws/stream + scanner cache
     if os.environ.get("MARKET_TOP_MICRO_STREAM", "1") not in ("0", "false", "False"):
         asyncio.create_task(market_top_micro_loop())
+        asyncio.create_task(moneycontrol_gainers_micro_loop())
         print("[market-top-micro] started (MARKET_TOP_MICRO_STREAM enabled)")
     else:
         print("[market-top-micro] disabled via MARKET_TOP_MICRO_STREAM=0")

@@ -41,6 +41,36 @@ PRIORITY_EQUITY_FO = [
     "NTPC",
 ]
 
+# High-beta / frequent Moneycontrol option-gainer names (rotated into Market Top scan).
+# These are present in OPTSTK master but were never scanned when equity_limit=4 of PRIORITY only.
+HIGH_MOMENTUM_EQUITY_FO = [
+    "DIVISLAB",
+    "LTM",
+    "PAYTM",
+    "JUBLFOOD",
+    "TVSMOTOR",
+    "SIEMENS",
+    "APLAPOLLO",
+    "BAJAJFINSV",
+    "HYUNDAI",
+    "ASHOKLEY",
+    "GAIL",
+    "ABCAPITAL",
+    "GODFRYPHLP",
+    "INDIGO",
+    "MUTHOOTFIN",
+    "SHRIRAMFIN",
+    "SHREECEM",
+    "BAJFINANCE",
+    "TATACONSUM",
+    "IRFC",
+    "JIOFIN",
+    "YESBANK",
+    "AMBUJACEM",
+    "TECHM",
+    "MPHASIS",
+]
+
 
 @lru_cache(maxsize=1)
 def load_equity_fo_universe() -> Dict[str, Any]:
@@ -93,12 +123,19 @@ def load_equity_fo_universe() -> Dict[str, Any]:
 
     sorted_names = sorted(underlyings)
     priority = [s for s in PRIORITY_EQUITY_FO if s in underlyings]
+    momentum = [s for s in HIGH_MOMENTUM_EQUITY_FO if s in underlyings]
+    # Momentum first for Moneycontrol-parity scanning, then classic liquid names.
+    scan_priority: List[str] = []
+    for name in momentum + priority:
+        if name not in scan_priority:
+            scan_priority.append(name)
     return {
         "source": "security_id_list.csv",
         "underlying_count": len(sorted_names),
         "contract_count": contract_count,
         "underlyings": sorted_names,
-        "priority_underlyings": priority,
+        "priority_underlyings": scan_priority or priority,
+        "momentum_underlyings": momentum,
         "sample_contracts": sample_contracts,
         "implemented": len(sorted_names) > 0,
         "instrument_type": "OPTSTK",

@@ -25,7 +25,14 @@ from typing import Any, Dict, List, Optional
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
-LOT_SIZES = {"NIFTY": 75, "BANKNIFTY": 30, "FINNIFTY": 40, "MIDCPNIFTY": 75, "SENSEX": 20}
+LOT_SIZES = {
+    "NIFTY": 75,
+    "BANKNIFTY": 30,
+    "FINNIFTY": 40,
+    "MIDCPNIFTY": 75,
+    "SENSEX": 20,
+}
+DEFAULT_EQUITY_LOT = 1
 BROKERAGE_PER_SIDE = 20.0
 STT_RATE = 0.000625
 EXCHANGE_TXN_CHARGE = 0.0005
@@ -36,6 +43,7 @@ SLIPPAGE_PCT = 0.001
 SL_PCT = 12.0
 TARGET_PCT = 18.0
 NEAR_ATM_PCT = 3.0
+HIGH_RISE_NEAR_ATM_PCT = 8.0
 
 
 def _now_ist() -> datetime:
@@ -133,11 +141,16 @@ class CloudPaperEngine:
             self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Pick one near-ATM contract by highest OI change. Phantom-guarded.
-        Chain contracts are single-option rows: {strike, option_type, ltp, oi, dOI, ...}."""
+        """Pick one near-ATM contract.
+
+        Default: highest OI change. High-rise seeded chains prefer LTP % gain
+        (today's Moneycontrol-like movers) while remaining PAPER-only.
+        """
         contracts = chain.get("contracts", [])
         spot = float(chain.get("spot", 0) or chain.get("spot_price", 0) or 0)
         underlying = chain.get("underlying", "NIFTY")
+        high_rise = str(chain.get("paper_seed") or "") == "market_top_high_rise"
+        atm_cap = HIGH_RISE_NEAR_ATM_PCT if high_rise else NEAR_ATM_PCT
         if spot <= 0 or not contracts:
             return None
         cands = []
@@ -147,16 +160,21 @@ class CloudPaperEngine:
             if ot not in ("CE", "PE"):
                 continue
             ltp = float(c.get("ltp", 0) or c.get("mid_price", 0) or 0)
-            if ltp < 10:
+            if ltp < (5 if high_rise else 10):
                 continue
             if _is_phantom(ltp, strike, spot, ot):
                 continue
             mny = abs(spot - strike) / spot * 100.0
-            if mny > NEAR_ATM_PCT:
+            if mny > atm_cap:
                 continue
             oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
             vol = abs(float(c.get("volume", 0) or 0))
-            score = oi_chg * 10.0 + vol
+            prev = float(c.get("previous_close_price") or c.get("previous_close") or c.get("prev_close") or 0)
+            gain_pct = ((ltp - prev) / prev * 100.0) if prev > 0 else 0.0
+            if high_rise:
+                score = gain_pct * 1000.0 + vol
+            else:
+                score = oi_chg * 10.0 + vol
             cands.append(
                 {
                     "underlying": underlying,
@@ -165,9 +183,11 @@ class CloudPaperEngine:
                     "ltp": ltp,
                     "oi_chg": oi_chg,
                     "volume": vol,
+                    "gain_pct": round(gain_pct, 4),
                     "score": score,
                     "expiry_date": c.get("expiry_date") or c.get("expiry") or chain.get("expiry_date"),
                     "security_id": c.get("security_id"),
+                    "strategy": "HIGH_RISE_PAPER" if high_rise else "OI_FLOW_PAPER",
                 }
             )
         if not cands:
@@ -279,11 +299,11 @@ class CloudPaperEngine:
                         "entry_price": entry,
                         "current_price": entry,
                         "ltp": entry,
-                        "netQty": LOT_SIZES.get(best["underlying"], 50),
-                        "qty": LOT_SIZES.get(best["underlying"], 50),
-                        "buyQty": LOT_SIZES.get(best["underlying"], 50),
+                        "netQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                        "qty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                        "buyQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
                         "sellQty": 0,
-                        "strategy": f"BUY_{best['option_type']}",
+                        "strategy": best.get("strategy") or f"BUY_{best['option_type']}",
                         "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
                         "target": round(entry * (1.0 + TARGET_PCT / 100.0), 2),
                         "unrealized_pnl": 0.0,

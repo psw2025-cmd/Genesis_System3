@@ -184,12 +184,9 @@ def scan_all_segments_from_chains(
 
     ce_all = sorted([r for r in all_scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
     pe_all = sorted([r for r in all_scored if r["option_type"] == "PE"], key=lambda x: x["gain_pct"], reverse=True)
-    # Board must show both CE and PE (broker Top Gainers style), not CE-only domination.
-    pe_slots = min(10, max(5, market_top_n // 3), len(pe_all))
-    ce_slots = max(0, market_top_n - pe_slots)
-    mixed = list(ce_all[:ce_slots]) + list(pe_all[:pe_slots])
-    mixed = sorted(mixed, key=lambda x: x["gain_pct"], reverse=True)
-    combined = mixed if mixed else sorted(all_scored, key=lambda x: x["gain_pct"], reverse=True)
+    # Moneycontrol-style: pure % gain ranking across CE+PE (no forced CE/PE slot mix).
+    # Index domination is handled by separate equity_focus board when requested.
+    combined = sorted(all_scored, key=lambda x: x["gain_pct"], reverse=True)
 
     index_keys = set(INDEX_SEGMENTS)
     implemented_index = sum(1 for u in INDEX_SEGMENTS if segments.get(u, {}).get("implemented"))
@@ -213,33 +210,76 @@ def scan_all_segments_from_chains(
         },
         "market_top_table": _rank_table(combined, market_top_n, refreshed_at),
         "contracts_scored_total": len(all_scored),
+        "ranking_mode": "pure_gain_pct",
     }
 
 
-def _equity_scan_universe(limit: int = 12) -> List[str]:
+_SHARD_STATE: Dict[str, Any] = {"cursor": 0, "last_syms": []}
+
+
+def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
+    """Return equity FO names for this scan tick.
+
+    Momentum + priority first; optional cursor rotation walks the full OPTSTK
+    universe in shards so Cloud Run never fans out all ~211 chains in one request.
+    """
     try:
-        from core.brokers.dhan.equity_fo_universe import PRIORITY_EQUITY_FO, load_equity_fo_universe
+        from core.brokers.dhan.equity_fo_universe import (
+            HIGH_MOMENTUM_EQUITY_FO,
+            PRIORITY_EQUITY_FO,
+            load_equity_fo_universe,
+        )
 
         universe = load_equity_fo_universe()
-        priority = list(universe.get("priority_underlyings") or PRIORITY_EQUITY_FO)
-        return priority[: max(3, min(limit, 20))]
+        priority = list(universe.get("priority_underlyings") or [])
+        if not priority:
+            priority = [s for s in (HIGH_MOMENTUM_EQUITY_FO + PRIORITY_EQUITY_FO) if True]
+        all_names = list(universe.get("underlyings") or [])
+        limit = max(3, min(int(limit or 12), 40))
+
+        # Always include head of momentum/priority so today's MC names are eligible.
+        selected: List[str] = []
+        for name in priority:
+            if name not in selected:
+                selected.append(name)
+            if len(selected) >= max(8, limit // 2):
+                break
+
+        if rotate and all_names:
+            cursor = int(_SHARD_STATE.get("cursor") or 0) % max(1, len(all_names))
+            shard = []
+            for i in range(len(all_names)):
+                name = all_names[(cursor + i) % len(all_names)]
+                if name in selected:
+                    continue
+                shard.append(name)
+                if len(selected) + len(shard) >= limit:
+                    break
+            selected.extend(shard)
+            _SHARD_STATE["cursor"] = (cursor + max(1, limit // 2)) % max(1, len(all_names))
+        else:
+            selected = selected[:limit]
+
+        _SHARD_STATE["last_syms"] = selected[:limit]
+        return selected[:limit]
     except Exception:
-        return ["RELIANCE", "HDFCBANK", "TCS", "INFY", "ICICIBANK", "SBIN", "ITC", "BAJFINANCE"]
+        return ["DIVISLAB", "LTM", "PAYTM", "JUBLFOOD", "RELIANCE", "HDFCBANK", "TCS", "INFY"][: max(3, min(limit, 20))]
 
 
 def fetch_chains_for_market(
     include_equity: bool = True,
     equity_limit: int = 8,
     overall_timeout_s: float = 75.0,
+    rotate_equity: bool = True,
 ) -> Dict[str, Dict[str, Any]]:
-    """Fetch option chains for index + priority equity FO names.
+    """Fetch option chains for index + priority/rotated equity FO names.
 
     Equity fetches are best-effort under a time budget so Cloud Run does not 503.
     """
     chains: Dict[str, Dict[str, Any]] = {}
     symbols = list(INDEX_SEGMENTS)
     if include_equity:
-        for sym in _equity_scan_universe(equity_limit):
+        for sym in _equity_scan_universe(equity_limit, rotate=rotate_equity):
             if sym not in symbols:
                 symbols.append(sym)
     try:
@@ -294,18 +334,138 @@ def fetch_chains_for_segments() -> Dict[str, Dict[str, Any]]:
     return fetch_chains_for_market(include_equity=False)
 
 
+def merge_market_top_reports(base: Dict[str, Any], incoming: Dict[str, Any], market_top_n: int = 25) -> Dict[str, Any]:
+    """Merge two scanner reports by pure gain_pct (keeps rolling shard memory)."""
+    if not base:
+        return incoming or {}
+    if not incoming:
+        return base
+    by_key: Dict[str, Dict[str, Any]] = {}
+    for report in (base, incoming):
+        for row in report.get("market_top_table") or []:
+            if not isinstance(row, dict):
+                continue
+            key = (
+                f"{row.get('underlying')}|{row.get('option_type')}|{row.get('strike')}|"
+                f"{row.get('expiry_date') or row.get('expiry')}"
+            )
+            prev = by_key.get(key)
+            if prev is None or float(row.get("gain_pct") or -1e18) >= float(prev.get("gain_pct") or -1e18):
+                by_key[key] = dict(row)
+    combined = sorted(by_key.values(), key=lambda x: float(x.get("gain_pct") or 0), reverse=True)
+    refreshed_at = incoming.get("refreshed_at") or base.get("refreshed_at") or _ist_now_str()
+    out = dict(incoming)
+    out["market_top_table"] = _rank_table(combined, market_top_n, refreshed_at)
+    out["market_wide"] = dict(incoming.get("market_wide") or {})
+    out["market_wide"]["top_combined_list"] = out["market_top_table"]
+    out["contracts_scored_total"] = max(
+        int(base.get("contracts_scored_total") or 0),
+        int(incoming.get("contracts_scored_total") or 0),
+        len(combined),
+    )
+    scanned = set(base.get("chains_fetched") or []) | set(incoming.get("chains_fetched") or [])
+    out["chains_fetched"] = sorted(scanned)
+    out["underlyings_scanned"] = len(scanned)
+    out["ranking_mode"] = "pure_gain_pct_merged"
+    out["shard_cursor"] = _SHARD_STATE.get("cursor")
+    out["shard_last_syms"] = list(_SHARD_STATE.get("last_syms") or [])
+    return out
+
+
 def build_top_contract_gainers_report(
     top_n: int = 5,
     market_top_n: int = 25,
     include_equity: bool = True,
+    equity_limit: Optional[int] = None,
+    overall_timeout_s: Optional[float] = None,
+    rotate_equity: bool = True,
+    equity_only_board: bool = False,
 ) -> Dict[str, Any]:
+    eq_limit = 16 if include_equity else 0
+    if equity_limit is not None:
+        eq_limit = int(equity_limit)
+    timeout = 70.0 if include_equity else 45.0
+    if overall_timeout_s is not None:
+        timeout = float(overall_timeout_s)
     chains = fetch_chains_for_market(
         include_equity=include_equity,
-        equity_limit=4 if include_equity else 0,
-        overall_timeout_s=55.0 if include_equity else 45.0,
+        equity_limit=eq_limit,
+        overall_timeout_s=timeout,
+        rotate_equity=rotate_equity,
     )
+    if equity_only_board:
+        chains = {k: v for k, v in chains.items() if k not in INDEX_SEGMENTS}
     report = scan_all_segments_from_chains(chains, top_n=top_n, market_top_n=market_top_n)
     report["chains_fetched"] = list(chains.keys())
     report["include_equity"] = include_equity
+    report["equity_limit"] = eq_limit
+    report["equity_only_board"] = equity_only_board
+    report["shard_cursor"] = _SHARD_STATE.get("cursor")
+    report["shard_last_syms"] = list(_SHARD_STATE.get("last_syms") or [])
     report["status"] = "ok" if report.get("contracts_scored_total", 0) > 0 else "no_data"
+    report["diagnose"] = {
+        "why_not_moneycontrol_parity": (
+            "Dhan Market Top scans a rotating equity FO shard + indices; "
+            "Moneycontrol ranks essentially all NSE option contracts. "
+            "Use /api/scanner/moneycontrol_gainers for LIVE_SCRAPED reference."
+        ),
+        "equity_limit": eq_limit,
+        "shard_last_syms": list(_SHARD_STATE.get("last_syms") or []),
+        "live_trading_enabled": False,
+    }
     return report
+
+
+def diagnose_market_top_gap(expected_symbols: Optional[List[str]] = None) -> Dict[str, Any]:
+    """Auto-diagnose why Moneycontrol high-risers may be missing from Dhan Market Top."""
+    expected = [
+        s.upper()
+        for s in (
+            expected_symbols
+            or [
+                "DIVISLAB",
+                "LTM",
+                "PAYTM",
+                "JUBLFOOD",
+                "TVSMOTOR",
+                "SIEMENS",
+                "APLAPOLLO",
+                "BAJAJFINSV",
+            ]
+        )
+    ]
+    try:
+        from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe
+
+        universe = load_equity_fo_universe()
+        names = set(universe.get("underlyings") or [])
+        priority = list(universe.get("priority_underlyings") or [])
+    except Exception as exc:
+        return {"status": "ERROR", "error": str(exc)[:200]}
+
+    in_master = [s for s in expected if s in names]
+    missing_master = [s for s in expected if s not in names]
+    in_priority = [s for s in expected if s in priority]
+    not_in_priority_head = [s for s in expected if s in names and s not in priority[:16]]
+    return {
+        "status": "ok",
+        "expected": expected,
+        "in_fo_master": in_master,
+        "missing_from_fo_master": missing_master,
+        "in_scan_priority": in_priority,
+        "not_in_priority_head16": not_in_priority_head,
+        "fo_underlying_count": len(names),
+        "shard_cursor": _SHARD_STATE.get("cursor"),
+        "shard_last_syms": list(_SHARD_STATE.get("last_syms") or []),
+        "root_cause_if_absent_on_board": (
+            "Symbol may be in FO master but not yet reached by rotating equity shard, "
+            "or Dhan chain returned no LTP/prev_close for gain calc, or index contracts "
+            "outranked it on pure gain_pct. Moneycontrol scrape board is separate LIVE_SCRAPED truth."
+        ),
+        "remediation": [
+            "Keep market_top_micro_loop running so shards rotate through OPTSTK",
+            "Compare /api/scanner/moneycontrol_gainers (LIVE_SCRAPED) vs Dhan market_top_table",
+            "Paper may seed from high-rise rows; live money stays OFF until gates pass",
+        ],
+        "live_trading_enabled": False,
+    }
