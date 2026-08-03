@@ -17,9 +17,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "dashboard" / "backend" / "app.py"
 MARKER = "# SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES"
-BLOCK = f'''
+BLOCK = r'''
 
-{MARKER}
+__MARKER__
 @app.get("/api/simulation/live/state")
 async def get_virtual_live_simulation_state(scenario: str = "trend"):
     """Backend virtual live-market simulation feed. No real broker/orders."""
@@ -98,7 +98,7 @@ async def get_virtual_live_simulation_paper(scenario: str = "trend"):
         "order_placement_allowed": False,
         "real_broker_routes_called": False,
     }
-'''
+'''.replace("__MARKER__", MARKER)
 
 
 def main() -> int:

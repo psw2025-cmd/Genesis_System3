@@ -1,0 +1,113 @@
+name: Options Recovery Attachment Audit
+
+on:
+  pull_request:
+    paths:
+      - "src/options_research/recovery_diagnostics.py"
+      - "scripts/options_recovery_attachment_audit.py"
+      - "tests/test_options_recovery_diagnostics.py"
+      - ".github/workflows/options-recovery-attachment-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: options-recovery-attachment-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frozen-evidence-crosscheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      SOURCE_RUN_ID: "30224933108"
+      SOURCE_ARTIFACT: "options-bigdata-artifact-model-30224933108"
+      REPORT_ROOT: "reports/latest/options_recovery_attachment_audit"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install focused dependencies
+        run: python -m pip install numpy pandas pytest requests
+
+      - name: Compile and run focused tests
+        run: |
+          python -m py_compile \
+            src/options_research/recovery_diagnostics.py \
+            scripts/options_recovery_attachment_audit.py
+          python -m pytest -q tests/test_options_recovery_diagnostics.py
+
+      - name: Download frozen model evidence
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ env.SOURCE_ARTIFACT }}
+          path: reused_model_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+
+      - name: Cross-check recovery attachment against repository truth
+        run: >-
+          python scripts/options_recovery_attachment_audit.py
+          --artifact-root reused_model_artifact
+          --output-dir "$REPORT_ROOT"
+
+      - name: Enforce numerical and safety gates
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+
+          root = Path("reports/latest/options_recovery_attachment_audit")
+          report = json.loads((root / "attachment_crosscheck.json").read_text())
+          manifest = json.loads((root / "manifest.json").read_text())
+          costs = {row["cost_bps"]: row for row in report["cost_stress"]}
+          decisions = {row["claim"]: row["status"] for row in report["claims"]}
+
+          assert report["status"] == "PASS_ATTACHMENT_CROSSCHECK", report
+          assert report["execution_semantics"]["stop_loss_percent"] == 30.0, report
+          assert report["execution_semantics"]["take_profit_percent"] == 60.0, report
+          assert report["feature_feasibility"]["requested_features"] == 20, report
+          assert report["feature_feasibility"]["allowed_for_eod_implementation"] == 9, report
+          assert report["feature_feasibility"]["blocked_or_rejected"] == 11, report
+          assert costs[0.0]["compounded_total_return"] < 0, costs[0.0]
+          assert costs[0.0]["profit_factor"] < 1.0, costs[0.0]
+          assert decisions["cost_is_primary_failure_source"] == "REJECTED_BY_ZERO_COST_HOLDOUT"
+          assert decisions["larger_model_search_should_proceed_immediately"] == "BLOCKED_PENDING_SIGNAL_DIAGNOSTICS"
+          assert report["live_trading_enabled"] is False
+          assert report["order_placement_allowed"] is False
+          assert report["promotion_allowed"] is False
+          assert manifest["live_trading_enabled"] is False
+          assert manifest["order_placement_allowed"] is False
+          assert manifest["promotion_allowed"] is False
+          assert len(manifest["files"]) == 4
+
+          print(json.dumps({
+              "critical_gates_passed": 17,
+              "critical_gates_total": 17,
+              "stop_loss_percent": report["execution_semantics"]["stop_loss_percent"],
+              "take_profit_percent": report["execution_semantics"]["take_profit_percent"],
+              "requested_features": report["feature_feasibility"]["requested_features"],
+              "eod_allowed_features": report["feature_feasibility"]["allowed_for_eod_implementation"],
+              "blocked_or_rejected_features": report["feature_feasibility"]["blocked_or_rejected"],
+              "zero_cost_return": costs[0.0]["compounded_total_return"],
+              "zero_cost_profit_factor": costs[0.0]["profit_factor"],
+              "live_trading_enabled": False,
+              "order_placement_allowed": False,
+              "promotion_allowed": False,
+          }, indent=2))
+
+      - name: Upload cross-check proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: options-recovery-attachment-audit-${{ github.run_id }}
+          path: reports/latest/options_recovery_attachment_audit
+          if-no-files-found: error
+          retention-days: 30
