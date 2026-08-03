@@ -7940,3 +7940,52 @@ async def genesis_production_brief():
         "production_verdict": "ANALYZER_PRODUCTION_UI_READY__LIVE_TRADING_STILL_BLOCKED",
     })
 
+
+@app.get("/api/broker/positions")
+async def get_broker_positions():
+    try:
+        if not _BROKER_CLIENT: return {"positions": [], "status": "error"}
+        positions = _BROKER_CLIENT.get_positions() if hasattr(_BROKER_CLIENT, 'get_positions') else []
+        formatted = [{"symbol": str(p.get("symbol", "")), "qty": int(p.get("qty", 0)), "ltp": float(p.get("ltp", 0)), "pnl": float(p.get("pnl", 0))} for p in (positions or [])]
+        return {"positions": formatted, "count": len(formatted), "status": "ok"}
+    except: return {"positions": [], "status": "error"}
+
+@app.get("/api/market/top-gainers")
+async def get_market_top_gainers():
+    try:
+        result = await get_top_contract_gainers() if asyncio.iscoroutinefunction(get_top_contract_gainers) else get_top_contract_gainers()
+        if isinstance(result, dict) and "data" in result:
+            gainers = sorted(result["data"], key=lambda x: x.get("ce_gain_percent", 0), reverse=True)[:10]
+            return {"gainers": gainers, "status": "ok"}
+        return {"gainers": [], "status": "no_data"}
+    except: return {"gainers": [], "status": "error"}
+
+@app.get("/api/market/top-losers")
+async def get_market_top_losers():
+    try:
+        result = await get_top_contract_gainers() if asyncio.iscoroutinefunction(get_top_contract_gainers) else get_top_contract_gainers()
+        if isinstance(result, dict) and "data" in result:
+            losers = sorted(result["data"], key=lambda x: x.get("ce_gain_percent", 0))[:10]
+            return {"losers": losers, "status": "ok"}
+        return {"losers": [], "status": "no_data"}
+    except: return {"losers": [], "status": "error"}
+
+@app.get("/api/performance")
+async def get_performance_metrics():
+    try:
+        state = _get_runtime_state()
+        return {
+            "daily_pnl": float(state.get("daily_pnl", 0)),
+            "total_pnl": float(state.get("total_pnl", 0)),
+            "trades_executed": int(state.get("trades_executed", 0)),
+            "status": "ok"
+        }
+    except: return {"daily_pnl": 0, "total_pnl": 0, "status": "error"}
+
+@app.get("/api/ml/predictions")
+async def get_ml_predictions():
+    try:
+        state = _get_runtime_state()
+        predictions = state.get("ml_predictions", []) or []
+        return {"predictions": predictions[:5], "count": len(predictions), "status": "ok"}
+    except: return {"predictions": [], "status": "error"}
