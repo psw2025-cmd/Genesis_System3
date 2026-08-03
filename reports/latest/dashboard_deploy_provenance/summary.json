@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-03T18:54:11.061027+00:00",
+  "generated_at": "2026-08-03T19:55:28.892396+00:00",
   "base": "http://127.0.0.1:8000",
   "manifest_path": "/ui/assets/deploy-provenance.json",
   "status": "BLOCKED",
@@ -27,7 +27,7 @@
     }
   ],
   "recovered_after_transient_failure": false,
-  "local_sidebar_sha256": "1475a24801555b3eb11913626a09bcc924d10bce32b4eaae15bca76d9740ff19",
+  "local_sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
   "deployed_sidebar_sha256": "",
   "source_match": false,
   "sim_live_required": false,
