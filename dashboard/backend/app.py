@@ -5383,6 +5383,148 @@ async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data
         return {"status": "ERROR", "message": str(e)}
 
 
+def _ml_accuracy_report_record(report_json: Path) -> Dict[str, Any]:
+    """Build an honest proof record from model_accuracy_report.json (fail-closed)."""
+    try:
+        rep = json.loads(report_json.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return {
+            "status": "ERROR",
+            "model_proof_ready": False,
+            "total_predictions": 0,
+            "avg_accuracy": None,
+            "avg_confidence": None,
+            "blocker_reason": str(exc)[:160],
+            "source_file": str(report_json),
+        }
+
+    summary = rep.get("summary") if isinstance(rep.get("summary"), dict) else {}
+    rows = rep.get("rows") if isinstance(rep.get("rows"), list) else []
+    proof_pass = int(summary.get("proof_pass_count") or 0)
+    blocked = int(summary.get("blocked_count") or 0)
+    hit_rate = summary.get("direction_hit_rate")
+    known = int(summary.get("direction_known_count") or 0)
+    blocker = None
+    for row in rows:
+        if isinstance(row, dict) and row.get("blocker_reason"):
+            blocker = str(row.get("blocker_reason"))
+            break
+    if blocker is None and blocked > 0:
+        blocker = "ACCURACY_REPORT_BLOCKED"
+    model_proof_ready = bool(proof_pass > 0 and blocked == 0 and hit_rate is not None)
+    status = "PROVEN_ANALYZER_ONLY" if model_proof_ready else ("BLOCKED" if blocked > 0 or proof_pass == 0 else "LOADED")
+    return {
+        "status": status,
+        "model_proof_ready": model_proof_ready,
+        "total_predictions": known if known > 0 else (proof_pass if model_proof_ready else 0),
+        "avg_accuracy": float(hit_rate) if hit_rate is not None else None,
+        "avg_confidence": None,
+        "proof_pass_count": proof_pass,
+        "blocked_count": blocked,
+        "direction_hit_rate": hit_rate,
+        "rows": summary.get("rows"),
+        "generated_at_utc": summary.get("generated_at_utc"),
+        "blocker_reason": blocker,
+        "source_file": str(report_json),
+        "ready_for_live": False,
+    }
+
+
+def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
+    """Normalize options_ml_training_summary.json into UI-compatible proof fields."""
+    try:
+        data = json.loads(options_ml.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return {
+            "status": "ERROR",
+            "model_proof_ready": False,
+            "total_predictions": 0,
+            "avg_accuracy": None,
+            "avg_confidence": None,
+            "blocker_reason": str(exc)[:160],
+            "source_file": str(options_ml),
+        }
+    if not isinstance(data, dict):
+        return {
+            "status": "BLOCKED",
+            "model_proof_ready": False,
+            "total_predictions": 0,
+            "avg_accuracy": None,
+            "avg_confidence": None,
+            "blocker_reason": "INVALID_OPTIONS_ML_SUMMARY",
+            "source_file": str(options_ml),
+        }
+    status_raw = str(data.get("status") or "").upper()
+    ready = status_raw == "PASS" and bool(data.get("model_proof_ready", True))
+    results = data.get("results") if isinstance(data.get("results"), dict) else {}
+    best = data.get("best_model")
+    best_metrics = results.get(best, {}) if best and isinstance(results.get(best), dict) else {}
+    out = dict(data)
+    out.update(
+        {
+            "status": "PROVEN_ANALYZER_ONLY" if ready else (status_raw or "BLOCKED"),
+            "model_proof_ready": ready,
+            "total_predictions": int(data.get("dataset_rows") or data.get("total_predictions") or 0),
+            "avg_accuracy": best_metrics.get("accuracy", data.get("avg_accuracy")),
+            "avg_confidence": data.get("avg_confidence"),
+            "blocker_reason": None if ready else (data.get("reason") or status_raw or "OPTIONS_ML_NOT_PASS"),
+            "source_file": str(options_ml),
+            "ready_for_live": False,
+        }
+    )
+    return out
+
+
+def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
+    """Aggregate fail-closed proof flags from the merged model map."""
+    usable = {k: v for k, v in models.items() if k != "status" and isinstance(v, dict)}
+    proven = {k: v for k, v in usable.items() if bool(v.get("model_proof_ready"))}
+    blocked = {
+        k: v
+        for k, v in usable.items()
+        if not bool(v.get("model_proof_ready"))
+        and str(v.get("status") or "").upper() in {"BLOCKED", "ERROR", "NOT_TRAINED", "LOADED"}
+    }
+    # Artifacts that exist but are not proven count as blocked for messaging.
+    if not blocked:
+        blocked = {k: v for k, v in usable.items() if k not in proven}
+    any_proven = bool(proven)
+    blockers = []
+    for name, rec in blocked.items():
+        reason = rec.get("blocker_reason") or rec.get("message") or rec.get("status")
+        if reason:
+            blockers.append(f"{name}:{reason}")
+    if any_proven:
+        message = (
+            f"Loaded {len(proven)} proven model performance record(s) "
+            "(analyzer-only). Live readiness remains blocked until forward paper validation passes."
+        )
+        status = "PROVEN_ANALYZER_ONLY"
+    elif usable:
+        message = (
+            f"Loaded {len(usable)} blocked accuracy artifact(s). Model not proven — "
+            "missing matured prediction history / post-market validation."
+        )
+        if blockers:
+            message = f"{message} Blocker: {blockers[0]}"
+        status = "BLOCKED"
+    else:
+        message = (
+            "No matured ML training/performance artifact is available. "
+            "This means model is not proven trained/ready yet."
+        )
+        status = "BLOCKED"
+    return {
+        "model_proof_ready": any_proven,
+        "status": status,
+        "message": message,
+        "model_count": len(usable),
+        "proven_count": len(proven),
+        "blocked_count": len(blocked),
+        "ready_for_live": False,
+    }
+
+
 @app.get("/api/ml/performance")
 async def get_ml_performance(model_name: Optional[str] = None):
     """Get ML model performance from tracker + on-disk proof reports."""
@@ -5399,43 +5541,54 @@ async def get_ml_performance(model_name: Optional[str] = None):
     except Exception as e:
         performance["error"] = str(e)[:200]
 
-    # Always merge file proof so ML tab is not blank on Cloud.
+    # Always merge file proof so ML tab is not blank on Cloud — but fail-closed on readiness.
     report_json = ROOT_DIR / "reports" / "latest" / "model_accuracy_report.json"
     options_ml = ROOT_DIR / "reports" / "latest" / "options_ml_training_summary.json"
     models = performance.get("models") if isinstance(performance.get("models"), dict) else {}
+    # Drop placeholder status-only keys from tracker before merging real artifacts.
+    if "status" in models and isinstance(models.get("status"), dict) and "model_proof_ready" not in models["status"]:
+        models.pop("status", None)
     if report_json.exists():
-        try:
-            rep = json.loads(report_json.read_text(encoding="utf-8"))
-            summary = rep.get("summary") or {}
-            models["model_accuracy_report"] = {
-                "status": "BLOCKED" if int(summary.get("blocked_count") or 0) > 0 else "LOADED",
-                "proof_pass_count": summary.get("proof_pass_count"),
-                "blocked_count": summary.get("blocked_count"),
-                "direction_hit_rate": summary.get("direction_hit_rate"),
-                "rows": summary.get("rows"),
-                "generated_at_utc": summary.get("generated_at_utc"),
-                "source_file": str(report_json),
-            }
-        except Exception as exc:
-            models["model_accuracy_report"] = {"status": "ERROR", "error": str(exc)[:160]}
+        models["model_accuracy_report"] = _ml_accuracy_report_record(report_json)
     if options_ml.exists():
-        try:
-            models["options_ml_training"] = json.loads(options_ml.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+        models["options_ml_training"] = _ml_options_training_record(options_ml)
+    # Normalize tracker models that lack explicit proof flags (assume not proven).
+    for key, rec in list(models.items()):
+        if key == "status" or not isinstance(rec, dict):
+            continue
+        if "model_proof_ready" not in rec:
+            has_metrics = rec.get("avg_accuracy") is not None and int(rec.get("total_predictions") or 0) > 0
+            rec["model_proof_ready"] = bool(has_metrics)
+            rec.setdefault("status", "PROVEN_ANALYZER_ONLY" if has_metrics else "BLOCKED")
+            rec.setdefault("ready_for_live", False)
+            if not has_metrics:
+                rec.setdefault("blocker_reason", "TRACKER_METRICS_INCOMPLETE")
     if not models:
         models["status"] = {
             "status": "NOT_TRAINED",
+            "model_proof_ready": False,
+            "total_predictions": 0,
+            "avg_accuracy": None,
+            "avg_confidence": None,
             "message": "No proven ML artifacts yet — analyzer/paper only until validation days exist",
+            "blocker_reason": "NO_ML_ARTIFACTS",
         }
+    summary = _ml_models_proof_summary(models)
     performance["models"] = models
-    performance["model_count"] = len([k for k in models.keys() if k != "status"])
-    return {"status": "ok", "performance": performance}
+    performance.update(summary)
+    return {
+        "status": "ok",
+        "performance": performance,
+        "model_proof_ready": summary["model_proof_ready"],
+        "proof_status": summary["status"],
+        "message": summary["message"],
+        "ready_for_live": False,
+    }
 
 
 @app.get("/api/ml/compare")
 async def compare_ml_models():
-    """Compare ML models + surface proof artifacts."""
+    """Compare ML models + surface proof artifacts (single merged map, no double-count)."""
     comparison: Dict[str, Any] = {"models": {}}
     try:
         if ADVANCED_FEATURES_AVAILABLE:
@@ -5458,10 +5611,31 @@ async def compare_ml_models():
         comparison["models"] = {
             "status": {
                 "status": "NOT_TRAINED",
+                "model_proof_ready": False,
                 "message": "No comparable model proofs yet",
+                "blocker_reason": "NO_ML_ARTIFACTS",
             }
         }
-    return {"status": "ok", "comparison": comparison}
+    summary = _ml_models_proof_summary(comparison["models"] if isinstance(comparison.get("models"), dict) else {})
+    comparison.update(summary)
+    proven = {
+        k: v
+        for k, v in (comparison.get("models") or {}).items()
+        if k != "status" and isinstance(v, dict) and bool(v.get("model_proof_ready"))
+    }
+    best_model = None
+    if proven:
+        best_name = next(iter(proven.keys()))
+        best_model = {"name": best_name, "metrics": proven[best_name]}
+    return {
+        "status": "ok",
+        "comparison": comparison,
+        "best_model": best_model,
+        "model_proof_ready": summary["model_proof_ready"],
+        "proof_status": summary["status"],
+        "message": summary["message"],
+        "ready_for_live": False,
+    }
 
 
 @app.get("/api/backtest/results")
