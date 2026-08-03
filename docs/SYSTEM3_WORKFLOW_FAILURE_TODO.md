@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-03T12:04:57.888652+00:00`
+Generated UTC: `2026-08-03T13:19:13.913402+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `29`
+Failed workflow count: `24`
 
 ## Rule
 
@@ -12,7 +12,11 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 30817346783 conclusion=failure commit=e2bd71fd046ff7d49c595cd366a18fcbb6e9b453
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30817329490 conclusion=failure commit=e2bd71fd046ff7d49c595cd366a18fcbb6e9b453
+- [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30816176508 conclusion=failure commit=0c36652dc4d529840ced78bd1b6d3e1915a378fc
 - [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30811080508 conclusion=failure commit=509c96d505423ead924e68758e5566c19e48b224
+- [ ] Fix workflow 'System3 Full Auto Truth' run 30810589818 conclusion=failure commit=509c96d505423ead924e68758e5566c19e48b224
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 30810495753 conclusion=failure commit=509c96d505423ead924e68758e5566c19e48b224
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30810426189 conclusion=failure commit=509c96d505423ead924e68758e5566c19e48b224
 - [ ] Fix workflow 'Permanent Repo Render Safety' run 30810401783 conclusion=failure commit=509c96d505423ead924e68758e5566c19e48b224
@@ -32,21 +36,16 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30803540436 conclusion=cancelled commit=3ae0a30631de491802c13f6090b5296218531f8c
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30803525525 conclusion=cancelled commit=3f5ebe842c7945c55429940bf8e199426321ce3d
 - [ ] Fix workflow 'System3 Workflow Failure Tracker' run 30803525061 conclusion=failure commit=3f5ebe842c7945c55429940bf8e199426321ce3d
-- [ ] Fix workflow 'Cloud Runtime Check' run 30803488350 conclusion=cancelled commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30803488042 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Dashboard Live UI Proof' run 30803488007 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 30803487994 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30803487978 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'System3 Latest Truth Publish' run 30803487794 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Permanent Repo Render Safety' run 30803487735 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'Dashboard Visible Proof Isolated' run 30803487489 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
-- [ ] Fix workflow 'System3 Parallel Root-Cause Audit' run 30803487416 conclusion=failure commit=c789ce37a9977ea861814f244d43298bb25e4422
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Deploy Provenance Gate | 30817346783 | failure | `e2bd71fd046f` | 2026-08-03T13:18:57Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30817346783 |
+| Dashboard Visual Production Proof | 30817329490 | failure | `e2bd71fd046f` | 2026-08-03T13:19:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30817329490 |
+| System3 GitHub Render Failure Tracker | 30816176508 | failure | `0c36652dc4d5` | 2026-08-03T13:03:44Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30816176508 |
 | System3 Broker Chain Semantic Gate | 30811080508 | failure | `509c96d50542` | 2026-08-03T11:50:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30811080508 |
+| System3 Full Auto Truth | 30810589818 | failure | `509c96d50542` | 2026-08-03T12:07:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30810589818 |
 | Dashboard Live UI Proof | 30810495753 | failure | `509c96d50542` | 2026-08-03T11:41:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30810495753 |
 | System3 Latest Truth Publish | 30810426189 | failure | `509c96d50542` | 2026-08-03T11:50:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30810426189 |
 | Permanent Repo Render Safety | 30810401783 | failure | `509c96d50542` | 2026-08-03T11:49:08Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30810401783 |
@@ -66,12 +65,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 30803540436 | cancelled | `3ae0a30631de` | 2026-08-03T09:56:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803540436 |
 | System3 1000 Point TODO Status Updater | 30803525525 | cancelled | `3f5ebe842c79` | 2026-08-03T09:56:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803525525 |
 | System3 Workflow Failure Tracker | 30803525061 | failure | `3f5ebe842c79` | 2026-08-03T09:56:47Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803525061 |
-| Cloud Runtime Check | 30803488350 | cancelled | `c789ce37a997` | 2026-08-03T10:03:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803488350 |
-| Dashboard Visible Proof Warmed | 30803488042 | failure | `c789ce37a997` | 2026-08-03T09:56:50Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803488042 |
-| Dashboard Live UI Proof | 30803488007 | failure | `c789ce37a997` | 2026-08-03T09:56:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803488007 |
-| Dashboard Deploy Provenance Gate | 30803487994 | failure | `c789ce37a997` | 2026-08-03T09:56:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487994 |
-| Dashboard Visual Production Proof | 30803487978 | failure | `c789ce37a997` | 2026-08-03T09:56:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487978 |
-| System3 Latest Truth Publish | 30803487794 | failure | `c789ce37a997` | 2026-08-03T10:05:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487794 |
-| Permanent Repo Render Safety | 30803487735 | failure | `c789ce37a997` | 2026-08-03T10:05:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487735 |
-| Dashboard Visible Proof Isolated | 30803487489 | failure | `c789ce37a997` | 2026-08-03T09:56:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487489 |
-| System3 Parallel Root-Cause Audit | 30803487416 | failure | `c789ce37a997` | 2026-08-03T09:56:32Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803487416 |
