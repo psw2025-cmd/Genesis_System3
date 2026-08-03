@@ -1,6 +1,26 @@
 {
-  "failed_count": 23,
+  "failed_count": 22,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "684a8eb49e64a84ab9c4f2a07a4f2a257ca047a2",
+      "conclusion": "failure",
+      "created_at": "2026-08-03T15:16:16Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30826696112",
+      "run_id": 30826696112,
+      "updated_at": "2026-08-03T15:17:15Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "f03c9be69cfb08635a75d579ecedb36ed76e4fb1",
+      "conclusion": "failure",
+      "created_at": "2026-08-03T15:01:26Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30825493886",
+      "run_id": 30825493886,
+      "updated_at": "2026-08-03T15:01:42Z",
+      "workflow": "System3 GitHub Render Failure Tracker"
+    },
     {
       "branch": "main",
       "commit": "58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
@@ -200,43 +220,15 @@
       "run_id": 30805353778,
       "updated_at": "2026-08-03T10:47:58Z",
       "workflow": "System3 Full Auto Truth"
-    },
-    {
-      "branch": "main",
-      "commit": "879be299f3ed25b22bbcf5edb980115db2d56598",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T10:19:49Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30805130748",
-      "run_id": 30805130748,
-      "updated_at": "2026-08-03T10:20:19Z",
-      "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "879be299f3ed25b22bbcf5edb980115db2d56598",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T10:16:55Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30804939935",
-      "run_id": 30804939935,
-      "updated_at": "2026-08-03T10:26:47Z",
-      "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "879be299f3ed25b22bbcf5edb980115db2d56598",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T10:14:28Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30804774505",
-      "run_id": 30804774505,
-      "updated_at": "2026-08-03T10:23:58Z",
-      "workflow": "Permanent Repo Render Safety"
     }
   ],
-  "generated_utc": "2026-08-03T14:21:24.251531+00:00",
+  "generated_utc": "2026-08-03T15:17:26.373836+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30826696112 conclusion=failure commit=684a8eb49e64a84ab9c4f2a07a4f2a257ca047a2",
+    "Fix workflow 'System3 GitHub Render Failure Tracker' run 30825493886 conclusion=failure commit=f03c9be69cfb08635a75d579ecedb36ed76e4fb1",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30817594931 conclusion=failure commit=58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
     "Fix workflow 'System3 Backend Live Simulation Proof' run 30817536202 conclusion=failure commit=58743ecdbb7923f255f57cdfcb1a869ab9131bbd",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30817391105 conclusion=cancelled commit=13ad18a3d9d760320c286bd56df018d4a39c1e73",
@@ -256,9 +248,6 @@
     "Fix workflow 'System3 Market Session Proof Runner' run 30808393357 conclusion=failure commit=63a7adba2564824007bbf378a5d9631ca4c0355b",
     "Fix workflow 'System3 GitHub Render Failure Tracker' run 30808062756 conclusion=failure commit=fc8e314d76d89d5bc6296e030068e829caac4ee5",
     "Fix workflow 'System3 Broker Chain Semantic Gate' run 30805561530 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
-    "Fix workflow 'System3 Full Auto Truth' run 30805353778 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
-    "Fix workflow 'Dashboard Live UI Proof' run 30805130748 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
-    "Fix workflow 'System3 Latest Truth Publish' run 30804939935 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598",
-    "Fix workflow 'Permanent Repo Render Safety' run 30804774505 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598"
+    "Fix workflow 'System3 Full Auto Truth' run 30805353778 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598"
   ]
 }
