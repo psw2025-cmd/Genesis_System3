@@ -5,23 +5,13 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "c9dc0d0bd6d199a1054c0408708d71343c1de4cf",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30859484731",
-      "run_id": 30859484731,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862676858",
+      "run_id": 30862676858,
       "status": "completed",
-      "updated_at": "2026-08-03T22:40:34Z",
-      "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "c9dc0d0bd6d199a1054c0408708d71343c1de4cf",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30859392028",
-      "run_id": 30859392028,
-      "status": "completed",
-      "updated_at": "2026-08-03T22:38:34Z",
-      "workflow": "System3 Backend Live Simulation Proof"
+      "updated_at": "2026-08-03T23:33:40Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
     },
     {
       "branch": "main",
@@ -32,88 +22,169 @@
       "status": "completed",
       "updated_at": "2026-08-03T22:37:00Z",
       "workflow": "Dashboard Deploy Provenance Gate"
-    },
-    {
-      "branch": "main",
-      "commit": "c049242a92f75d5899a029af356c627643fbe8c0",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30859243349",
-      "run_id": 30859243349,
-      "status": "completed",
-      "updated_at": "2026-08-03T22:36:54Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853857015",
-      "run_id": 30853857015,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:25:22Z",
-      "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853857029",
-      "run_id": 30853857029,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:25:06Z",
-      "workflow": "Permanent Repo Render Safety"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853857005",
-      "run_id": 30853857005,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:23:12Z",
-      "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853857016",
-      "run_id": 30853857016,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:16:02Z",
-      "workflow": "Dashboard Visible Proof Isolated"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853857052",
-      "run_id": 30853857052,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:15:55Z",
-      "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "4d69f889d293f994e4b2ffa6e605328d35349493",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30853856099",
-      "run_id": 30853856099,
-      "status": "completed",
-      "updated_at": "2026-08-03T21:15:21Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-03T23:23:17.588152Z",
-  "github_failed_count": 10,
-  "github_pending_count": 0,
+  "generated_utc": "2026-08-03T23:33:49.581096Z",
+  "github_failed_count": 2,
+  "github_pending_count": 15,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [],
+  "pending_workflows": [
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677442",
+      "run_id": 30862677442,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:48Z",
+      "workflow": "Dashboard Visible Proof Warmed"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677483",
+      "run_id": 30862677483,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:46Z",
+      "workflow": "Dashboard Visible Proof Isolated"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677494",
+      "run_id": 30862677494,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:45Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677440",
+      "run_id": 30862677440,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:45Z",
+      "workflow": "Cloud Runtime Check"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677521",
+      "run_id": 30862677521,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:44Z",
+      "workflow": "Permanent Repo Render Safety"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677497",
+      "run_id": 30862677497,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:44Z",
+      "workflow": "System3 Backend Live Simulation Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677488",
+      "run_id": 30862677488,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:44Z",
+      "workflow": "System3 Latest Truth Publish"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677478",
+      "run_id": 30862677478,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:44Z",
+      "workflow": "Dashboard Visual Contract Check"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677490",
+      "run_id": 30862677490,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:43Z",
+      "workflow": "System3 Render Worker Preflight"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677472",
+      "run_id": 30862677472,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:43Z",
+      "workflow": "System3 Workflow Failure Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677460",
+      "run_id": 30862677460,
+      "status": "in_progress",
+      "updated_at": "2026-08-03T23:33:43Z",
+      "workflow": "System3 Render Worker Issue Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677486",
+      "run_id": 30862677486,
+      "status": "queued",
+      "updated_at": "2026-08-03T23:33:41Z",
+      "workflow": "System3 Render Worker Env Audit"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677482",
+      "run_id": 30862677482,
+      "status": "queued",
+      "updated_at": "2026-08-03T23:33:41Z",
+      "workflow": "System3 Parallel Root-Cause Audit"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677452",
+      "run_id": 30862677452,
+      "status": "queued",
+      "updated_at": "2026-08-03T23:33:41Z",
+      "workflow": "Dashboard Live UI Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "32f201c606a7b88be9e2a9fad6d25f9c510118e6",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30862677433",
+      "run_id": 30862677433,
+      "status": "queued",
+      "updated_at": "2026-08-03T23:33:41Z",
+      "workflow": "Dashboard Visual Production Proof"
+    }
+  ],
   "production_grade_claim_allowed": false,
   "render_base": "http://127.0.0.1:8000",
   "render_endpoint_timeout_s": 30.0,
@@ -270,16 +341,8 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=30859484731 conclusion=failure commit=c9dc0d0bd6d1",
-    "Fix latest GitHub workflow 'System3 Backend Live Simulation Proof' run=30859392028 conclusion=failure commit=c9dc0d0bd6d1",
+    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30862676858 conclusion=failure commit=32f201c606a7",
     "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30859290269 conclusion=failure commit=c049242a92f7",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30859243349 conclusion=failure commit=c049242a92f7",
-    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30853857015 conclusion=failure commit=4d69f889d293",
-    "Fix latest GitHub workflow 'Permanent Repo Render Safety' run=30853857029 conclusion=failure commit=4d69f889d293",
-    "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30853857005 conclusion=failure commit=4d69f889d293",
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=30853857016 conclusion=failure commit=4d69f889d293",
-    "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=30853857052 conclusion=failure commit=4d69f889d293",
-    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30853856099 conclusion=failure commit=4d69f889d293",
     "Fix Render endpoint /: HTTP status 0 status=0",
     "Fix Render endpoint /ui/: HTTP status 0 status=0",
     "Fix Render endpoint /api/health: HTTP status 0 status=0",
@@ -293,7 +356,7 @@
     "Fix Render endpoint /api/paper: HTTP status 0 status=0",
     "Fix Render endpoint /api/ml/performance: HTTP status 0 status=0"
   ],
-  "todo_count": 22,
+  "todo_count": 14,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
