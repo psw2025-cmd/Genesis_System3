@@ -1,18 +1,19 @@
 # System3 Auto Coordinator
 
-Generated: `2026-07-31T11:02:15.334458Z`
+Generated: `2026-08-03T05:06:38.320140Z`
 Verdict: **AUTO_COORDINATION_COMPLETE_PROOFS_PENDING**
-Agents: **8/11** PASS
-Gates: **1/7**
+Agents: **9/12** PASS
+Gates: **2/7**
 
 ## Prediction / Profit blockers
 - Prediction accuracy blocked: `True`
 - Profit blocked: `True`
-- Lifecycle blocked: `True`
+- Lifecycle blocked: `False`
 
 ## Agents
 - **friction_expectancy**: PASS
 - **websocket_tick_health**: PASS
+- **paper_lifecycle**: PASS
 - **model_to_trade_gap**: PASS
 - **post_market_pipeline**: PASS
 - **blocker_finder**: PASS
@@ -29,5 +30,4 @@ Gates: **1/7**
 - `SYS3-BLK-003`
 - `SYS3-BLK-004`
 - `SYS3-BLK-005`
-- `SYS3-BLK-008`
 - `TICK_HEALTH_BLOCKER`
