@@ -60,7 +60,7 @@ function StatusRow({ label, value, tone }: { label: string; value: string | numb
 }
 
 export function OptionChain() {
-  const { chainSymbol, setChainSymbol, chain, marketOpen, state, gainRank } = useStore()
+  const { chainSymbol, setChainSymbol, chain, marketOpen, state } = useStore()
   const data      = chain[chainSymbol]
   const atmRef    = useRef<HTMLTableRowElement>(null)
   const [filter, setFilter] = useState(10)
@@ -83,10 +83,6 @@ export function OptionChain() {
   const fetchedAt = data?.fetched_at_utc ?? data?.snapshot_time ?? data?.generated_at ?? '--'
   const marketReason = String(state?.market?.reason ?? data?.message ?? (marketOpen ? 'Market open' : 'Market closed'))
   const nextOpen = String(state?.market?.next_open ?? '--')
-  const latestSignals = gainRank?.latest?.predictions ?? gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
-  const latestSignal = Array.isArray(latestSignals)
-    ? latestSignals.find((r: any) => r?.underlying === chainSymbol)
-    : null
 
   const strikeMap = new Map<number, { CE?: Contract; PE?: Contract }>()
   for (const c of contracts) {
@@ -106,70 +102,8 @@ export function OptionChain() {
 
   const maxOI = Math.max(...contracts.map(c => c.oi ?? 0), 1)
 
-  if (contracts.length === 0 && !marketOpen) {
-    return (
-      <div className="p-6 space-y-4 overflow-y-auto h-full">
-        <div className="flex items-center gap-2 flex-wrap">
-          {SYMBOLS.map(sym => (
-            <button key={sym}
-              onClick={() => setChainSymbol(sym)}
-              className={cn(
-                'px-3 py-1 rounded text-xs font-mono font-semibold transition-colors',
-                chainSymbol === sym
-                  ? 'bg-accent text-white'
-                  : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
-              )}
-            >{sym}</button>
-          ))}
-        </div>
-
-        <div className="card p-4 border border-amber/30 bg-amber/5">
-          <div className="flex items-center justify-between gap-4 mb-3">
-            <div>
-              <div className="text-xs text-text-muted uppercase tracking-wider">Option Chain - {chainSymbol}</div>
-              <div className="text-sm text-text-primary font-semibold">Market closed: live option-chain rows are session-dependent only.</div>
-            </div>
-            <span className="pill text-[10px] bg-amber/10 text-amber border border-amber/20">{status}</span>
-          </div>
-          <p className="text-xs text-text-muted leading-5">
-            Broker, paper P&amp;L, scanner snapshots, gates, alerts, and health/state data must remain visible. Market close is not a reason for an empty dashboard.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="card p-4">
-            <h3 className="text-sm font-semibold text-text-primary mb-3">Chain Status</h3>
-            <StatusRow label="Market" value={marketOpen ? 'OPEN' : 'CLOSED'} tone={marketOpen ? 'ok' : 'warn'} />
-            <StatusRow label="Reason" value={marketReason} />
-            <StatusRow label="Next Open" value={nextOpen} />
-            <StatusRow label="Data Source" value={String(dataSource)} />
-            <StatusRow label="Contracts" value={contracts.length} tone="warn" />
-            <StatusRow label="Spot" value={spot ? fmt(spot, 0) : '--'} />
-            <StatusRow label="PCR" value={typeof pcr === 'number' ? pcr.toFixed(2) : String(pcr)} />
-          </div>
-
-          <div className="card p-4">
-            <h3 className="text-sm font-semibold text-text-primary mb-3">Last Scanner Snapshot</h3>
-            <StatusRow label="Latest Date" value={String(gainRank?.latest_date ?? gainRank?.latest?.date ?? '--')} tone={gainRank?.stale ? 'warn' : 'ok'} />
-            <StatusRow label="Stale" value={String(gainRank?.stale ?? '--')} tone={gainRank?.stale ? 'warn' : 'ok'} />
-            <StatusRow label="Rank" value={String(latestSignal?.rank ?? '--')} />
-            <StatusRow label="Gain Score" value={latestSignal?.gain_score != null ? `${latestSignal.gain_score}%` : '--'} />
-            <StatusRow label="Expected Move" value={latestSignal?.expected_move_pct != null ? `${latestSignal.expected_move_pct}%` : '--'} />
-            <StatusRow label="Recommendation" value={String(latestSignal?.recommendation ?? '--')} tone={latestSignal?.recommendation === 'TRADE' ? 'ok' : undefined} />
-          </div>
-        </div>
-
-        {data?.message && (
-          <div className="card p-4">
-            <h3 className="text-sm font-semibold text-text-primary mb-2">Backend Message</h3>
-            <p className="text-xs text-text-muted font-mono">{data.message}</p>
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  if (status === 'NOT_READY' || chainMismatch || (contracts.length === 0 && marketOpen)) {
+  // Always prefer a visible chain table when we have rows (live OR closed-session snapshot).
+  if (contracts.length === 0) {
     return (
       <div className="p-6 space-y-4 overflow-y-auto h-full">
         <div className="flex items-center gap-2 flex-wrap">
@@ -187,9 +121,13 @@ export function OptionChain() {
         </div>
         <div className="card p-4 border border-amber/30 bg-amber/5">
           <div className="text-xs text-text-muted uppercase tracking-wider">Option Chain - {chainSymbol}</div>
-          <div className="text-sm text-amber font-semibold mt-1">Live option-chain rows are not available for this selected symbol.</div>
+          <div className="text-sm text-amber font-semibold mt-1">
+            {marketOpen ? 'Waiting for live Dhan option-chain stream…' : 'No chain rows yet (market closed — last snapshot not loaded).'}
+          </div>
           <div className="text-xs text-text-muted mt-3 leading-5">
             Status: <span className="font-mono">{String(status)}</span><br />
+            Market: <span className="font-mono">{marketOpen ? 'OPEN' : 'CLOSED'}</span> · {marketReason}<br />
+            Next open: <span className="font-mono">{nextOpen}</span><br />
             Source: <span className="font-mono">{String(dataSource)} / {String(sourcePriority)}</span><br />
             Backend: <span className="font-mono">{data?.message || 'No contracts returned by backend.'}</span>
           </div>
@@ -202,6 +140,9 @@ export function OptionChain() {
       </div>
     )
   }
+
+  const streamLive = Boolean(marketOpen && (data?.verified_live_dhan || data?.live === true) && !stale)
+  const streamLabel = streamLive ? 'LIVE STREAM' : (marketOpen ? 'POLLING' : 'SESSION SNAPSHOT')
 
   return (
     <div className="flex flex-col h-full">
@@ -221,6 +162,10 @@ export function OptionChain() {
         </div>
 
         <div className="flex items-center gap-4 ml-auto">
+          <span className={cn(
+            'pill text-[10px] border',
+            streamLive ? 'bg-up/10 text-up border-up/20' : 'bg-amber/10 text-amber border-amber/20'
+          )}>{streamLabel}</span>
           <div className="flex items-center gap-1.5">
             <span className="text-text-muted text-xs">SPOT</span>
             <span className="num text-sm font-semibold text-text-primary">{spot ? fmt(spot, 0) : '--'}</span>
@@ -246,9 +191,9 @@ export function OptionChain() {
         </div>
       </div>
 
-      {(stale || data?.message || sourcePriority !== '--') && (
-        <div className={cn('px-4 py-2 border-b border-border text-xs font-mono', stale ? 'text-amber bg-amber/5' : 'text-text-muted')}>
-          {stale ? 'STALE / FALLBACK DATA - ' : ''}
+      {(stale || data?.message || sourcePriority !== '--' || !streamLive) && (
+        <div className={cn('px-4 py-2 border-b border-border text-xs font-mono', stale || !streamLive ? 'text-amber bg-amber/5' : 'text-text-muted')}>
+          {streamLive ? 'LIVE DHAN STREAM - ' : (marketOpen ? 'MARKET OPEN / CATCHING UP - ' : 'AFTER HOURS SNAPSHOT - ')}
           {chainSymbol} source={String(dataSource)} priority={String(sourcePriority)}
           {snapshotAge != null ? ` age=${snapshotAge}s` : ''}
           {fetchedAt !== '--' ? ` fetched=${String(fetchedAt)}` : ''}

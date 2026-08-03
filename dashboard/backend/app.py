@@ -1620,10 +1620,12 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 _PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = (
     {}
 )  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
-_PUSHED_CHAIN_FRESH_S = 30  # worker pushes every ~20s during market hours; treat
-# anything older than this as stale and fall back to the inline live fetch.
-_PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker pushes every ~300s off-hours (cloud_worker.py
-# _CHAIN_PUSH_CLOSED_INTERVAL_S) — give it 2x that before treating it as stale.
+# Serve push/micro-loop snapshots as fresh for 45s. Falling back to live Dhan OC
+# too early is what collapses market-hours streaming under Dhan's ~1 req/3s limit.
+_PUSHED_CHAIN_FRESH_S = 45
+_PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) before live fetch
+_PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker/micro-loop off-hours window
+_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
 
 
 @app.post("/api/chain/push")
@@ -2377,8 +2379,10 @@ _TTL_BROKER = 30  # holdings, positions, funds — Dhan API calls
 _TTL_PAPER = 15  # paper positions/pnl — changes each tick
 _TTL_SCANNER = 20  # market top CE/PE — micro-refreshed by background loop
 _MARKET_TOP_STATE_FILE = ROOT_DIR / "state" / "market_top_ce_pe.json"
-_MARKET_TOP_MICRO_INTERVAL_S = 15.0
+_MARKET_TOP_MICRO_INTERVAL_S = 30.0  # leave Dhan OC budget for index chain stream
 _WS_MARKET_TOP_PUSH_S = 3.0
+_WS_CHAIN_PUSH_S_OPEN = 3.0
+_WS_CHAIN_PUSH_S_CLOSED = 15.0
 _TTL_ACCURACY = 120  # accuracy trend — file read, slow
 _TTL_PERF = 120  # performance data
 _TTL_PORTFOLIO = 30  # portfolio/unified
@@ -3012,42 +3016,61 @@ async def get_underlyings():
     return {"underlyings": DEFAULT_UNDERLYINGS}
 
 
-_TTL_CHAIN = 8  # option chain — frontend polls every 5s per client; DataSourceManager()
-# construction + live Dhan fetch inside is expensive (instrument master lookup +
-# network call). Without this cache, every open browser tab re-triggers that full
-# cost every 5s, which was a leading suspect for OOM-driven 502 crash loops on the
-# 512MB Render Starter box during market hours (2026-07-02 forensic investigation).
+_TTL_CHAIN = 20  # local dyno cache — keep longer so UI/WS do not stampede Dhan
+
+
+def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
+    pushed = _PUSHED_CHAIN_CACHE.get(sym)
+    if not pushed or not isinstance(pushed.get("data"), dict):
+        return None
+    age_s = _time_module.time() - float(pushed.get("received_at") or 0)
+    market_open = bool(pushed.get("market_open", True))
+    fresh_window = _PUSHED_CHAIN_FRESH_S if market_open else _PUSHED_CHAIN_FRESH_S_CLOSED
+    data = dict(pushed["data"] or {})
+    if not data:
+        return None
+    data.setdefault("status", "MARKET_OPEN" if market_open else "MARKET_CLOSED")
+    data.setdefault("data_source", data.get("data_source") or "dhan")
+    data["source_priority"] = data.get("source_priority") or "index_micro_or_worker_push"
+    data["snapshot_age_seconds"] = round(age_s, 1)
+    if age_s < fresh_window:
+        data["stale"] = False
+        data["live"] = bool(market_open)
+        return data
+    if age_s < _PUSHED_CHAIN_STALE_SERVE_S:
+        # Prefer last good rows over a rate-limit empty response during market hours.
+        data["stale"] = True
+        data["live"] = False
+        data["message"] = data.get("message") or (
+            f"Serving last good Dhan chain ({round(age_s)}s old) while paced refresh catches up"
+        )
+        return data
+    return None
 
 
 @app.get("/api/chain/{underlying}")
 async def get_chain(underlying: str):
     """Get option chain for specific underlying.
 
-    Preference order: (1) fresh worker-pushed snapshot — precomputed off-dyno,
-    zero cost to this process, see push_chain_snapshots above; (2) short local
-    TTL cache (_TTL_CHAIN) of a prior inline fetch on THIS dyno; (3) inline
-    live fetch (_get_chain_uncached) as the last resort, for underlyings the
-    worker doesn't push or when the worker itself is down/stale.
+    Preference order: (1) fresh/stale-but-usable push/micro-loop snapshot;
+    (2) short local TTL cache; (3) paced inline live fetch as last resort.
     """
     sym = underlying.upper()
-    pushed = _PUSHED_CHAIN_CACHE.get(sym)
-    if pushed:
-        fresh_window = _PUSHED_CHAIN_FRESH_S if pushed.get("market_open", True) else _PUSHED_CHAIN_FRESH_S_CLOSED
-        age_s = _time_module.time() - pushed["received_at"]
-        if age_s < fresh_window:
-            data = dict(pushed["data"] or {})
-            data.setdefault("status", "MARKET_OPEN" if pushed.get("market_open", True) else "MARKET_CLOSED")
-            data.setdefault("data_source", "worker_push")
-            data["source_priority"] = "worker_push"
-            data["snapshot_age_seconds"] = round(age_s, 1)
-            data["stale"] = False
-            return data
+    pushed = _chain_from_push_cache(sym)
+    if pushed is not None:
+        return pushed
 
     cache_key = f"chain_{sym}"
     _hit = _cache_get(cache_key, _TTL_CHAIN)
     if _hit is not None:
         return _hit
     result = await _get_chain_uncached(underlying)
+    if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
+        _PUSHED_CHAIN_CACHE[sym] = {
+            "data": result,
+            "received_at": _time_module.time(),
+            "market_open": bool(result.get("live", _market_open_from_state())),
+        }
     return _cache_set(cache_key, result)
 
 
@@ -4472,6 +4495,12 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(1)  # Check every second
 
             now = datetime.now(pytz.timezone("Asia/Kolkata")).timestamp()
+            # Re-evaluate market hours each tick so a WS opened pre-open still streams live.
+            if MARKET_DETECTION_AVAILABLE:
+                try:
+                    market_open_now, market_close_reason = is_market_open()
+                except Exception:
+                    pass
 
             # Stream live health from API every 5s (not only local health.json)
             if now - last_health_send >= 5:
@@ -4552,27 +4581,46 @@ async def websocket_endpoint(websocket: WebSocket):
                 except Exception:
                     pass
 
-            # Lightweight chain spot stream every 8s during market hours
-            if market_open_now and now - last_chain_send >= 8:
+            # CRITICAL: WS must NEVER call get_chain()/live Dhan here.
+            # Live OC is owned by index_chain_micro_loop (paced). WS only fans out cache.
+            chain_push_every = _WS_CHAIN_PUSH_S_OPEN if market_open_now else _WS_CHAIN_PUSH_S_CLOSED
+            if now - last_chain_send >= chain_push_every:
                 try:
                     spots = {}
-                    for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"):
-                        try:
-                            ch = await get_chain(sym)
-                            if isinstance(ch, dict) and float(ch.get("spot") or 0) > 0:
-                                spots[sym] = {
-                                    "spot": ch.get("spot"),
-                                    "n": ch.get("total_contracts"),
-                                    "status": ch.get("status"),
-                                    "src": ch.get("data_source"),
-                                }
-                        except Exception:
+                    ages = {}
+                    for sym in _INDEX_STREAM_SYMBOLS:
+                        ch = _chain_from_push_cache(sym)
+                        if ch is None:
+                            hit = _cache_get(f"chain_{sym}", 120.0)
+                            ch = hit if isinstance(hit, dict) else None
+                        if not isinstance(ch, dict) or float(ch.get("spot") or 0) <= 0:
                             continue
+                        spots[sym] = {
+                            "spot": ch.get("spot"),
+                            "n": ch.get("total_contracts") or len(ch.get("contracts") or []),
+                            "status": ch.get("status"),
+                            "src": ch.get("data_source"),
+                            "age_s": ch.get("snapshot_age_seconds"),
+                        }
+                        ages[sym] = ch.get("snapshot_age_seconds")
+                        if sym == "NIFTY" and (ch.get("contracts") or []):
+                            await websocket.send_json(
+                                {
+                                    "type": "chain_update",
+                                    "symbol": sym,
+                                    "data": ch,
+                                    "timestamp": datetime.now(
+                                        pytz.timezone("Asia/Kolkata")
+                                    ).isoformat(),
+                                }
+                            )
                     if spots:
                         await websocket.send_json(
                             {
                                 "type": "chain_spots_update",
                                 "data": spots,
+                                "market_open": market_open_now,
+                                "cache_ages_s": ages,
                                 "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
                             }
                         )
@@ -4585,10 +4633,20 @@ async def websocket_endpoint(websocket: WebSocket):
             # Send heartbeat every 10 seconds (more reliable than modulo)
             if now - last_heartbeat_send >= 10:
                 try:
+                    cache_health = {}
+                    for sym in _INDEX_STREAM_SYMBOLS:
+                        pushed = _PUSHED_CHAIN_CACHE.get(sym) or {}
+                        age = None
+                        if pushed.get("received_at"):
+                            age = round(_time_module.time() - float(pushed["received_at"]), 1)
+                        cache_health[sym] = age
                     await websocket.send_json(
                         {
                             "type": "heartbeat",
                             "market_open": market_open_now,
+                            "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
+                            "chain_cache_ages_s": cache_health,
+                            "stream_ok": any(v is not None and v < 60 for v in cache_health.values()),
                             "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
                         }
                     )
@@ -4612,14 +4670,52 @@ async def websocket_endpoint(websocket: WebSocket):
             active_connections.remove(websocket)
 
 
+async def index_chain_micro_loop():
+    """Paced index option-chain warmer for market-hours streaming.
+
+    Owns live Dhan OC for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY. WS + UI must
+    read `_PUSHED_CHAIN_CACHE` only — never fan-out live OC themselves.
+    """
+    await asyncio.sleep(2)
+    idx = 0
+    while True:
+        sym = _INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]
+        idx += 1
+        open_now = bool(_market_open_from_state())
+        try:
+            result = await _get_chain_uncached(sym)
+            if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
+                payload = dict(result)
+                payload["stream_mode"] = "index_chain_micro"
+                payload["live"] = open_now
+                payload["snapshot"] = not open_now
+                if open_now and not payload.get("status"):
+                    payload["status"] = "MARKET_OPEN"
+                _PUSHED_CHAIN_CACHE[sym] = {
+                    "data": payload,
+                    "received_at": _time_module.time(),
+                    "market_open": open_now,
+                }
+                _cache_set(f"chain_{sym}", payload)
+                print(
+                    f"[index-chain-micro] {sym} spot={payload.get('spot')} "
+                    f"n={payload.get('total_contracts') or len(payload.get('contracts') or [])} "
+                    f"open={open_now}"
+                )
+        except Exception as exc:
+            print(f"[index-chain-micro] {sym} failed: {exc}")
+        # DSM already enforces ~3.4s OC gap; small yield between symbols.
+        await asyncio.sleep(0.4 if open_now else 20.0)
+
+
 async def market_top_micro_loop():
     """Background ultra-micro refresh for Market Top CE/PE board.
 
-    Rebuilds ranked table every ~15s into API cache + state file so /ws/stream
-    can push updates every 3s without blocking on Dhan option-chain scans.
+    Rebuilds ranked table on a slower cadence so index_chain_micro_loop keeps
+    Dhan OC budget for Trade/TopBar streaming. /ws/stream reads cache only.
     Rotating equity shards merge into prior state for Moneycontrol-parity coverage.
     """
-    await asyncio.sleep(3)
+    await asyncio.sleep(8)
     while True:
         started = time.time()
         try:
@@ -4898,6 +4994,13 @@ async def startup():
         print("[paper-loop] started (CLOUD_PAPER_ENGINE enabled)")
     else:
         print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0 (not started)")
+
+    # Index chain warmer FIRST — this is what makes market-hours UI stream.
+    if os.environ.get("INDEX_CHAIN_MICRO_STREAM", "1") not in ("0", "false", "False"):
+        asyncio.create_task(index_chain_micro_loop())
+        print("[index-chain-micro] started (INDEX_CHAIN_MICRO_STREAM enabled)")
+    else:
+        print("[index-chain-micro] disabled via INDEX_CHAIN_MICRO_STREAM=0")
 
     # Ultra-micro Market Top CE/PE refresh → feeds /ws/stream + scanner cache
     if os.environ.get("MARKET_TOP_MICRO_STREAM", "1") not in ("0", "false", "False"):

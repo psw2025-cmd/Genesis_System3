@@ -95,8 +95,7 @@ export function TradeTab() {
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
-      {/* Market Top: dominant board, scrollable — not crushed into 42% */}
-      <div className="flex-[1.15] min-h-[260px] max-h-[52%] border-b border-border flex-shrink-0 overflow-hidden">
+      <div className="h-[46%] min-h-[240px] border-b border-border flex-shrink-0 overflow-hidden">
         <MarketTopCePeTable onSelectUnderlying={(sym) => setChainSymbol(sym)} />
       </div>
 
@@ -110,11 +109,11 @@ export function TradeTab() {
           </div>
         </div>
 
-        <div className="w-72 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
+        <div className="w-72 flex flex-col flex-shrink-0 min-h-0 overflow-hidden bg-surface">
           <div className="px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
             <h2 className="text-xs font-semibold text-text-primary uppercase tracking-wider">Index / Rank Feed</h2>
           </div>
-          <div className="max-h-[45%] overflow-y-auto border-b border-border">
+          <div className="flex-1 min-h-0 overflow-y-auto border-b border-border">
             {rankings.length === 0 ? (
               <div className="p-4 text-center text-text-muted text-xs space-y-2">
                 <div className="font-semibold text-text-primary">{apiStatus?.status === 'API_AUTH_REQUIRED' ? 'API authentication required' : 'No rankings available'}</div>

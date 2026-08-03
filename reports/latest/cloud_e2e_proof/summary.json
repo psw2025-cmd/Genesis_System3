@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "generated_at_ist": "2026-08-03T16:38:23",
+  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "expected_epoch": "20260803_e2e_full_cloud_40",
+  "observed_epoch": "20260803_e2e_full_cloud_40",
+  "pass_count": 10,
+  "fail_count": 0,
+  "failed": [],
+  "overall_pass": true,
+  "live_trading_enabled": false,
+  "checks": [
+    {
+      "id": "provenance_epoch",
+      "pass": true,
+      "detail": {
+        "expected": "20260803_e2e_full_cloud_40",
+        "got": "20260803_e2e_full_cloud_40",
+        "http": 200
+      }
+    },
+    {
+      "id": "provenance_badges",
+      "pass": true,
+      "detail": {
+        "schema": 1,
+        "sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
+        "sim_live_required": true,
+        "live_trading_enabled": false,
+        "cloud_build_badge": true,
+        "session_snapshot_ui": true,
+        "build_epoch": "20260803_e2e_full_cloud_40"
+      }
+    },
+    {
+      "id": "ui_html_assets",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "has_js": true,
+        "snippet": "<!doctype html>\n<html lang=\"en\" class=\"dark\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>System3 \u2014 Genesis AI Trading</title>\n  <link rel=\"icon\" href=\"data:image/svg"
+      }
+    },
+    {
+      "id": "health_ok",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "broker": "connected",
+        "market": "closed",
+        "live_allowed": false
+      }
+    },
+    {
+      "id": "chain_NIFTY",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "spot": 24774.3,
+        "contracts": 160,
+        "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+        "source_priority": "dhan_last_verified_snapshot",
+        "age_s": 103.4
+      }
+    },
+    {
+      "id": "chain_BANKNIFTY",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "spot": 58247.95,
+        "contracts": 160,
+        "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+        "source_priority": "dhan_last_verified_snapshot",
+        "age_s": 83.5
+      }
+    },
+    {
+      "id": "chain_FINNIFTY",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "spot": 26984.45,
+        "contracts": 160,
+        "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+        "source_priority": "dhan_last_verified_snapshot",
+        "age_s": null
+      }
+    },
+    {
+      "id": "chain_MIDCPNIFTY",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "spot": 14898.15,
+        "contracts": 160,
+        "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+        "source_priority": "dhan_last_verified_snapshot",
+        "age_s": 7.0
+      }
+    },
+    {
+      "id": "market_top",
+      "pass": true,
+      "detail": {
+        "http": 200,
+        "rows": 25,
+        "status": "ok",
+        "stream_mode": "ultra_micro",
+        "sample": [
+          "DIVISLAB CE 3383.871",
+          "DIVISLAB CE 3281.8182",
+          "LTM CE 745.2229"
+        ]
+      }
+    },
+    {
+      "id": "auth_status",
+      "pass": true,
+      "detail": {
+        "required": true,
+        "configured": true,
+        "authenticated": true,
+        "mode": "session_cookie_or_header"
+      }
+    }
+  ]
+}

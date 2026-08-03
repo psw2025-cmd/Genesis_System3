@@ -37,73 +37,71 @@ function ProductionProofBar() {
   const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
-    : `TRAINING ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
+    : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const paperLabel = paperOk
-    ? 'LIFECYCLE PROVEN'
-    : (profitOk ? 'PROVENANCE PENDING' : `EXPECTANCY ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? 'N/A'}`)
+    ? 'PAPER OK'
+    : (profitOk ? 'PROVENANCE' : `EXP ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? '—'}`)
   const renderOk = Boolean(brokerConnected || health?.broker_status === 'connected')
   const proofItems: Array<[string, string, boolean]> = [
-    ['OWNER', 'PRITAM S. WARGHADE', true],
     ['LIVE', 'OFF', true],
-    ['MODE', 'PAPER ONLY', true],
-    ['DATA', brokerConnected ? 'DHAN CONNECTED' : 'DHAN ONLY REQUIRED', brokerConnected],
-    ['ML SCORE', mlLabel, mlOk],
+    ['MODE', 'PAPER', true],
+    ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
+    ['ML', mlLabel, mlOk],
     ['PAPER', paperLabel, paperOk],
-    ['RENDER', renderOk ? 'BROKER UI LIVE' : 'VISUAL PROOF REQUIRED', renderOk],
+    ['UI', renderOk ? 'LIVE' : 'CHECK', renderOk],
   ]
 
   return (
     <div
       data-testid="production-proof-bar"
-      aria-label="Production proof bar for Pritam S. Warghade"
+      aria-label="Production proof status"
+      title="Proof status from /api/auto_gates + broker health"
       style={{
-        position: 'fixed',
-        left: '12px',
-        right: '12px',
-        bottom: '12px',
-        zIndex: 9999,
-        pointerEvents: 'none',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(128px, 1fr))',
-        gap: '6px',
-        padding: '8px',
-        borderRadius: '16px',
-        background: 'linear-gradient(135deg, rgba(2,6,23,.94), rgba(15,23,42,.88))',
-        border: '1px solid rgba(59,130,246,.40)',
-        boxShadow: '0 0 28px rgba(59,130,246,.20), inset 0 0 18px rgba(0,232,122,.08)',
-        backdropFilter: 'blur(10px)',
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '6px 12px',
+        minHeight: '36px',
+        background: 'var(--surface-1)',
+        borderBottom: '1px solid var(--border)',
+        overflowX: 'auto',
       }}
-      title="Production-grade proof bar — values come from /api/auto_gates + broker health"
     >
+      <span style={{
+        color: 'var(--text-mut)',
+        fontSize: '10px',
+        fontFamily: 'var(--font-mono)',
+        fontWeight: 700,
+        letterSpacing: '0.08em',
+        whiteSpace: 'nowrap',
+      }}>PROOF</span>
       {proofItems.map(([label, value, safe]) => (
-        <div key={label} style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2px',
-          minWidth: 0,
-          padding: '6px 8px',
-          borderRadius: '10px',
-          background: safe ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.10)',
-          border: safe ? '1px solid rgba(0,232,122,.26)' : '1px solid rgba(245,158,11,.30)',
-        }}>
+        <div
+          key={label}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '3px 8px',
+            borderRadius: '6px',
+            background: safe ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.10)',
+            border: safe ? '1px solid rgba(0,232,122,.28)' : '1px solid rgba(245,158,11,.28)',
+            whiteSpace: 'nowrap',
+          }}
+        >
           <span style={{
             color: 'var(--text-mut)',
-            fontSize: '.48rem',
-            lineHeight: 1,
+            fontSize: '10px',
             fontFamily: 'var(--font-mono)',
-            letterSpacing: '.18em',
-            fontWeight: 900,
-            whiteSpace: 'nowrap',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
           }}>{label}</span>
           <span style={{
-            color: safe ? 'var(--accent)' : 'var(--amber)',
-            fontSize: '.62rem',
-            lineHeight: 1.1,
-            fontWeight: 950,
-            letterSpacing: '.06em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            color: safe ? 'var(--up)' : 'var(--amber)',
+            fontSize: '11px',
+            fontFamily: 'var(--font-mono)',
+            fontWeight: 700,
           }}>{value}</span>
         </div>
       ))}
@@ -141,9 +139,9 @@ export default function App() {
                   background: 'var(--surface)', overflow: 'hidden' }}>
       <TopBar />
       <ProductionProofBar />
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', paddingBottom: '76px' }}>
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <Sidebar />
-        <main style={{ flex: 1, overflow: 'hidden' }}>
+        <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
           <Content />
         </main>
       </div>

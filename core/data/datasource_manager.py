@@ -8,6 +8,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import threading
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -15,6 +17,22 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[2]
+
+# Dhan option-chain hard limit is ~1 request / 3s across the whole process.
+# Without a process-wide gate, Market Top + WS + UI polls stampede Dhan during
+# market hours and every consumer sees empty/NO_DHAN_DATA while "WS LIVE" lies.
+_DHAN_OC_LOCK = threading.Lock()
+_DHAN_OC_LAST_TS = 0.0
+_DHAN_OC_MIN_GAP_S = float(os.environ.get("DHAN_OC_MIN_GAP_S", "3.4"))
+
+
+def _pace_dhan_option_chain_call() -> None:
+    """Block until the global Dhan OC gap has elapsed (must hold _DHAN_OC_LOCK)."""
+    global _DHAN_OC_LAST_TS
+    wait = _DHAN_OC_MIN_GAP_S - (time.time() - _DHAN_OC_LAST_TS)
+    if wait > 0:
+        time.sleep(wait)
+    _DHAN_OC_LAST_TS = time.time()
 
 
 class DataSourceManager:
@@ -264,82 +282,86 @@ class DataSourceManager:
 
     def _fetch_dhan_real(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
         sym = symbol.upper()
-        try:
-            dhan = self._get_client()
-            if dhan is None:
-                return None
+        # Serialize ALL Dhan OC traffic (expiry_list + option_chain + retry).
+        with _DHAN_OC_LOCK:
+            try:
+                dhan = self._get_client()
+                if dhan is None:
+                    return None
 
-            resp = None
-            parser_name = "parse_dhan_option_chain_payload"
-            sec_id, segment = self._resolve_underlying(sym)
-            if sec_id is None:
-                logger.warning(f"[DSM] No Dhan security id configured for {sym}")
-                return None
+                resp = None
+                parser_name = "parse_dhan_option_chain_payload"
+                sec_id, segment = self._resolve_underlying(sym)
+                if sec_id is None:
+                    logger.warning(f"[DSM] No Dhan security id configured for {sym}")
+                    return None
 
-            resolved_expiry = self._option_chain_expiry(dhan, sec_id, segment, sym, expiry)
-            logger.info(
-                f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} seg={segment} expiry={resolved_expiry}"
-            )
-
-            if hasattr(dhan, "option_chain"):
-                resp = dhan.option_chain(
-                    under_security_id=int(sec_id),
-                    under_exchange_segment=segment,
-                    expiry=resolved_expiry,
+                _pace_dhan_option_chain_call()
+                resolved_expiry = self._option_chain_expiry(dhan, sec_id, segment, sym, expiry)
+                logger.info(
+                    f"[DSM] Dhan option_chain fetch: {sym} sec_id={sec_id} seg={segment} expiry={resolved_expiry}"
                 )
-            elif hasattr(dhan, "get_option_chain"):
-                resp = dhan.get_option_chain(
-                    UnderlyingScrip=int(sec_id),
-                    UnderlyingSeg=segment,
-                    Expiry=resolved_expiry,
-                )
-                parser_name = "parse_option_chain_to_df"
-            else:
-                logger.warning("[DSM] Dhan client has no option-chain method")
-                return None
 
-            if resp and isinstance(resp, dict) and resp.get("status") == "success":
-                from core.data import dhan_option_chain_parser as parser
-
-                if parser_name == "parse_dhan_option_chain_payload":
-                    df, spot = parser.parse_dhan_option_chain_payload(resp)
-                else:
-                    df, spot = parser.parse_option_chain_to_df(resp, sym)
-                if df is not None and not df.empty:
-                    # Dhan OC legs omit expiry; stamp the expiry we requested.
-                    df = df.copy()
-                    df["expiry_date"] = resolved_expiry
-                    df["expiry"] = resolved_expiry
-                    return df, spot
-            else:
-                remarks = ""
-                if isinstance(resp, dict):
-                    remarks = str(resp.get("remarks") or resp.get("error_message") or resp)[:180]
-                logger.warning(f"[DSM] Dhan option_chain non-success for {sym}: {remarks or resp}")
-                # Dhan OC rate limit ~1 req/3s — one bounded retry.
-                time.sleep(3.2)
+                _pace_dhan_option_chain_call()
                 if hasattr(dhan, "option_chain"):
                     resp = dhan.option_chain(
                         under_security_id=int(sec_id),
                         under_exchange_segment=segment,
                         expiry=resolved_expiry,
                     )
+                elif hasattr(dhan, "get_option_chain"):
+                    resp = dhan.get_option_chain(
+                        UnderlyingScrip=int(sec_id),
+                        UnderlyingSeg=segment,
+                        Expiry=resolved_expiry,
+                    )
+                    parser_name = "parse_option_chain_to_df"
+                else:
+                    logger.warning("[DSM] Dhan client has no option-chain method")
+                    return None
+
                 if resp and isinstance(resp, dict) and resp.get("status") == "success":
                     from core.data import dhan_option_chain_parser as parser
 
-                    df, spot = parser.parse_dhan_option_chain_payload(resp)
+                    if parser_name == "parse_dhan_option_chain_payload":
+                        df, spot = parser.parse_dhan_option_chain_payload(resp)
+                    else:
+                        df, spot = parser.parse_option_chain_to_df(resp, sym)
                     if df is not None and not df.empty:
+                        # Dhan OC legs omit expiry; stamp the expiry we requested.
                         df = df.copy()
                         df["expiry_date"] = resolved_expiry
                         df["expiry"] = resolved_expiry
                         return df, spot
-                logger.warning(
-                    f"[DSM] Dhan option_chain retry failed for {sym}: "
-                    f"{str((resp or {}).get('remarks') if isinstance(resp, dict) else resp)[:160]}"
-                )
-        except Exception as e:
-            logger.warning(f"[DSM] Dhan fetch_option_chain failed for {sym}: {e}")
-        return None
+                else:
+                    remarks = ""
+                    if isinstance(resp, dict):
+                        remarks = str(resp.get("remarks") or resp.get("error_message") or resp)[:180]
+                    logger.warning(f"[DSM] Dhan option_chain non-success for {sym}: {remarks or resp}")
+                    # One bounded retry still respects the global OC gap.
+                    _pace_dhan_option_chain_call()
+                    if hasattr(dhan, "option_chain"):
+                        resp = dhan.option_chain(
+                            under_security_id=int(sec_id),
+                            under_exchange_segment=segment,
+                            expiry=resolved_expiry,
+                        )
+                    if resp and isinstance(resp, dict) and resp.get("status") == "success":
+                        from core.data import dhan_option_chain_parser as parser
+
+                        df, spot = parser.parse_dhan_option_chain_payload(resp)
+                        if df is not None and not df.empty:
+                            df = df.copy()
+                            df["expiry_date"] = resolved_expiry
+                            df["expiry"] = resolved_expiry
+                            return df, spot
+                    logger.warning(
+                        f"[DSM] Dhan option_chain retry failed for {sym}: "
+                        f"{str((resp or {}).get('remarks') if isinstance(resp, dict) else resp)[:160]}"
+                    )
+            except Exception as e:
+                logger.warning(f"[DSM] Dhan fetch_option_chain failed for {sym}: {e}")
+            return None
 
     def get_option_chain(self, symbol: str, expiry: str = "") -> Dict[str, Any]:
         """New-style API — returns dict directly."""

@@ -13,12 +13,17 @@ const ENABLED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
 const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX', 'RELIANCE', 'HDFCBANK', 'TCS', 'INFY', 'ICICIBANK']
 const isOptionalChain = (sym: string) => OPTIONAL_CHAIN_SYMBOLS.includes(String(sym || '').toUpperCase())
 
-const CORE_POLL_MS = 120000
-const BROKER_POLL_MS = 300000
-const SECONDARY_POLL_MS = 300000
-const ACTIVE_CHAIN_POLL_MS = 120000
-const TOPBAR_CHAIN_POLL_MS = 300000
-const STAGGER_MS = 2500
+// HTTP is backup only. Live market-hours ticks must come from WS cache pushes.
+// Fast HTTP chain polls during market hours were stampeding Dhan (~1 OC / 3s).
+const CORE_POLL_MS_OPEN = 20000
+const CORE_POLL_MS_CLOSED = 60000
+const BROKER_POLL_MS = 120000
+const SECONDARY_POLL_MS = 180000
+const ACTIVE_CHAIN_POLL_MS_OPEN = 30000
+const ACTIVE_CHAIN_POLL_MS_CLOSED = 60000
+const TOPBAR_CHAIN_POLL_MS_OPEN = 60000
+const TOPBAR_CHAIN_POLL_MS_CLOSED = 180000
+const STAGGER_MS = 2000
 
 class ApiRequestError extends Error {
   status: number
@@ -270,14 +275,16 @@ export function useData() {
       const data = await fetchJSON(`/api/chain/${sym}`)
       if (!isRealDhanChainPayload(data)) {
         const prev = useStore.getState().chain?.[sym]
-        if (prev && isRealDhanChainPayload(prev)) {
+        // Never wipe a previously good chain for empty/rate-limited/closed payloads.
+        if (prev && (isRealDhanChainPayload(prev) || (Array.isArray(prev.contracts) && prev.contracts.length > 0 && Number(prev.spot || 0) > 0))) {
           setChain(sym, {
             ...prev,
             snapshot: true,
             live: false,
             verified_live_dhan: false,
-            status: prev.status || 'MARKET_CLOSED_DHAN_SNAPSHOT',
-            message: data?.message || data?.blocked_reason || 'Showing last verified Dhan snapshot (market closed)',
+            stale: true,
+            status: prev.status || 'DHAN_LAST_GOOD',
+            message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh unavailable)',
           })
           return
         }
@@ -295,13 +302,14 @@ export function useData() {
         verified_live_dhan: !isSnapshot,
         verified_dhan_snapshot: Boolean(isSnapshot),
         optional: isOptionalChain(sym),
+        stream_tick_at: new Date().toISOString(),
       })
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       const prev = useStore.getState().chain?.[sym]
-      const retainTransient = isTransient(apiStatus.code)
+      const retain = isTransient(apiStatus.code) || apiStatus.status === 'API_AUTH_REQUIRED' || Boolean(prev?.contracts?.length)
       if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, apiStatus)
-      if (retainTransient && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
+      if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
       else setChain(sym, blockedChain(sym, apiStatus))
     }
   }, [setChain, markFailure, markSuccess])
@@ -351,6 +359,11 @@ export function useData() {
     ws.onmessage = (ev) => {
       try {
         const m = JSON.parse(ev.data)
+        if (m.type === 'market_status') {
+          if (typeof m.market_open === 'boolean') {
+            useStore.setState({ marketOpen: m.market_open })
+          }
+        }
         if (m.type === 'health_update' && m.data) setHealth(m.data)
         if (m.type === 'paper_update' && m.data) setPaper(m.data)
         if (m.type === 'positions_update' && m.data) {
@@ -367,6 +380,38 @@ export function useData() {
             ...prev,
             pnl: m.data?.summary ? m.data : { summary: m.data, history: m.data?.history || [] },
           })
+        }
+        if (m.type === 'chain_spots_update' && m.data && typeof m.data === 'object') {
+          Object.entries(m.data).forEach(([sym, info]: [string, any]) => {
+            const key = String(sym || '').toUpperCase()
+            if (!key || !info) return
+            const prev = useStore.getState().chain?.[key] || { underlying: key, contracts: [] }
+            setChain(key, {
+              ...prev,
+              underlying: key,
+              spot: Number(info.spot || prev.spot || 0),
+              total_contracts: info.n ?? prev.total_contracts,
+              status: info.status || prev.status,
+              data_source: info.src || prev.data_source || 'dhan',
+              stream_tick_at: m.timestamp || new Date().toISOString(),
+              live: Boolean(useStore.getState().marketOpen),
+            })
+          })
+        }
+        if (m.type === 'chain_update' && m.data) {
+          const sym = String(m.data.underlying || m.symbol || '').toUpperCase()
+          if (sym && isRealDhanChainPayload(m.data)) {
+            const isSnapshot = m.data?.snapshot === true || m.data?.live === false || /MARKET_CLOSED/i.test(String(m.data?.status || ''))
+            setChain(sym, {
+              ...m.data,
+              stale: Boolean(isSnapshot || m.data?.stale),
+              blocked: false,
+              verified_live_dhan: !isSnapshot,
+              verified_dhan_snapshot: Boolean(isSnapshot),
+              optional: isOptionalChain(sym),
+              stream_tick_at: m.timestamp || new Date().toISOString(),
+            })
+          }
         }
         if (m.type === 'market_top_update' && m.data) {
           setMarketTop({
@@ -408,12 +453,19 @@ export function useData() {
             })
           }
         }
-        if (m.type === 'heartbeat') setWsStatus('live')
+        if (m.type === 'heartbeat') {
+          // Only flag stream failure during market hours when chain cache is empty/stale.
+          if (m.market_open && m.stream_ok === false) setWsStatus('error')
+          else setWsStatus('live')
+          if (typeof m.market_open === 'boolean') {
+            useStore.setState({ marketOpen: m.market_open })
+          }
+        }
       } catch {
         // ignore malformed websocket message
       }
     }
-  }, [setHealth, setWsStatus, setPaper, setPnl, setMarketTop, setGainRank])
+  }, [setHealth, setWsStatus, setPaper, setPnl, setMarketTop, setGainRank, setChain])
 
   useEffect(() => {
     unmountedRef.current = false
@@ -422,15 +474,28 @@ export function useData() {
     setTimeout(() => { if (!unmountedRef.current) pollSecondary() }, STAGGER_MS * 2)
     wsConnect()
 
-    const coreTimer = setInterval(poll, CORE_POLL_MS)
-    const brokerTimer = setInterval(pollBroker, BROKER_POLL_MS)
-    const secTimer = setInterval(pollSecondary, SECONDARY_POLL_MS)
+    let coreTimer: ReturnType<typeof setInterval> | null = null
+    let brokerTimer: ReturnType<typeof setInterval> | null = null
+    let secTimer: ReturnType<typeof setInterval> | null = null
+
+    const armTimers = () => {
+      if (coreTimer) clearInterval(coreTimer)
+      if (brokerTimer) clearInterval(brokerTimer)
+      if (secTimer) clearInterval(secTimer)
+      const open = useStore.getState().marketOpen
+      coreTimer = setInterval(poll, open ? CORE_POLL_MS_OPEN : CORE_POLL_MS_CLOSED)
+      brokerTimer = setInterval(pollBroker, BROKER_POLL_MS)
+      secTimer = setInterval(pollSecondary, SECONDARY_POLL_MS)
+    }
+    armTimers()
+    const modeTimer = setInterval(armTimers, 30000)
 
     return () => {
       unmountedRef.current = true
-      clearInterval(coreTimer)
-      clearInterval(brokerTimer)
-      clearInterval(secTimer)
+      if (coreTimer) clearInterval(coreTimer)
+      if (brokerTimer) clearInterval(brokerTimer)
+      if (secTimer) clearInterval(secTimer)
+      clearInterval(modeTimer)
       if (wsReconnectTimerRef.current) clearTimeout(wsReconnectTimerRef.current)
       wsRef.current?.close()
     }
@@ -439,20 +504,32 @@ export function useData() {
   useEffect(() => {
     const active = String(chainSymbol || 'NIFTY').toUpperCase()
     pollChain(active)
-    const activeTimer = setInterval(() => pollChain(active), ACTIVE_CHAIN_POLL_MS)
+
+    let activeTimer: ReturnType<typeof setInterval> | null = null
+    let topBarTimer: ReturnType<typeof setInterval> | null = null
+
+    const armChainTimers = () => {
+      if (activeTimer) clearInterval(activeTimer)
+      if (topBarTimer) clearInterval(topBarTimer)
+      const open = useStore.getState().marketOpen
+      activeTimer = setInterval(() => pollChain(active), open ? ACTIVE_CHAIN_POLL_MS_OPEN : ACTIVE_CHAIN_POLL_MS_CLOSED)
+      topBarTimer = setInterval(() => {
+        ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
+          if (sym !== active) setTimeout(() => { if (!unmountedRef.current) pollChain(sym) }, STAGGER_MS * (idx + 1))
+        })
+      }, open ? TOPBAR_CHAIN_POLL_MS_OPEN : TOPBAR_CHAIN_POLL_MS_CLOSED)
+    }
 
     ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
       if (sym !== active) setTimeout(() => { if (!unmountedRef.current) pollChain(sym) }, STAGGER_MS * (idx + 1))
     })
-    const topBarTimer = setInterval(() => {
-      ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
-        if (sym !== active) setTimeout(() => { if (!unmountedRef.current) pollChain(sym) }, STAGGER_MS * (idx + 1))
-      })
-    }, TOPBAR_CHAIN_POLL_MS)
+    armChainTimers()
+    const modeTimer = setInterval(armChainTimers, 30000)
 
     return () => {
-      clearInterval(activeTimer)
-      clearInterval(topBarTimer)
+      if (activeTimer) clearInterval(activeTimer)
+      if (topBarTimer) clearInterval(topBarTimer)
+      clearInterval(modeTimer)
     }
   }, [chainSymbol, pollChain])
 }

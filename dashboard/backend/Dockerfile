@@ -5,7 +5,7 @@ WORKDIR /app/dashboard/frontend
 # Increment only when production proof shows Render serving a stale frontend
 # despite newer reviewed source. This is a non-secret cache epoch; changing it
 # forces the frontend-builder layer to rebuild without altering runtime logic.
-ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260803_ui_trade_market_top_fix_33
+ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260803_e2e_full_cloud_40
 ENV SYSTEM3_FRONTEND_BUILD_EPOCH=${SYSTEM3_FRONTEND_BUILD_EPOCH}
 
 COPY dashboard/frontend/package*.json ./
@@ -23,8 +23,10 @@ RUN printf '%s\n' "$SYSTEM3_FRONTEND_BUILD_EPOCH" > .system3-frontend-build-epoc
     && npm run build \
     && test -f dist/index.html \
     && grep -R -q --include='*.js' 'Sim Live' dist/assets \
+    && grep -R -q --include='*.js' 'CLOUD BUILD' dist/assets \
+    && grep -R -q --include='*.js' 'SESSION SNAPSHOT' dist/assets \
     && sidebar_sha="$(sha256sum src/components/Sidebar.tsx | awk '{print $1}')" \
-    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false,"build_epoch":"%s"}\n' "$sidebar_sha" "$SYSTEM3_FRONTEND_BUILD_EPOCH" > dist/assets/deploy-provenance.json
+    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false,"cloud_build_badge":true,"session_snapshot_ui":true,"build_epoch":"%s"}\n' "$sidebar_sha" "$SYSTEM3_FRONTEND_BUILD_EPOCH" > dist/assets/deploy-provenance.json
 
 # ── Stage 2: Runtime (Python only, no Node.js) ────────────────────────
 # Node.js removed from runtime image — saves ~200MB RAM on free tier.

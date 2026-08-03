@@ -2,6 +2,41 @@ import { useState, useEffect } from 'react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
 
+function CloudBuildBadge() {
+  const [epoch, setEpoch] = useState<string>('')
+  useEffect(() => {
+    let alive = true
+    fetch(`${window.location.origin}/ui/assets/deploy-provenance.json?t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!alive || !j) return
+        setEpoch(String(j.build_epoch || j.buildEpoch || ''))
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
+  if (!epoch) return null
+  const short = epoch.length > 22 ? epoch.slice(-18) : epoch
+  return (
+    <div
+      data-testid="cloud-build-badge"
+      title={`Cloud frontend build epoch: ${epoch}`}
+      style={{
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        padding: '3px 8px', borderRadius: '8px',
+        background: 'rgba(0,232,122,.08)', border: '1px solid rgba(0,232,122,.30)',
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ fontSize: '.45rem', color: 'var(--text-mut)', letterSpacing: '.14em', fontFamily: 'var(--font-mono)' }}>CLOUD BUILD</span>
+      <span style={{ fontSize: '.58rem', color: 'var(--up)', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '.04em' }}>{short}</span>
+    </div>
+  )
+}
+
 function Clock() {
   const [time, setTime] = useState('')
   useEffect(() => {
@@ -14,20 +49,25 @@ function Clock() {
   return <span className="num" style={{ color:'var(--accent)', fontSize:'1rem', fontWeight:600, letterSpacing:'.05em' }}>{time} IST</span>
 }
 
-function IndexChip({ symbol, spot, chg }: { symbol:string; spot?:number; chg?:number }) {
+function IndexChip({ symbol, spot, chg, live }: { symbol:string; spot?:number; chg?:number; live?:boolean }) {
   const isUp = (chg ?? 0) >= 0
   return (
     <div style={{ display:'flex', alignItems:'center', gap:'5px', padding:'3px 10px',
-                  background:'var(--surface-2)', borderRadius:'6px', border:'1px solid var(--border)' }}>
+                  background:'var(--surface-2)', borderRadius:'6px',
+                  border: live ? '1px solid rgba(0,232,122,.35)' : '1px solid var(--border)' }}>
       <span style={{ fontSize:'.6rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)', fontWeight:700 }}>{symbol}</span>
       <span className="num" style={{ fontSize:'.8rem', fontWeight:700, color:'var(--text-pri)' }}>
         {spot ? fmt(spot, 0) : '--'}
       </span>
-      {chg != null && spot && (
+      {chg != null && spot ? (
         <span className="num" style={{ fontSize:'.55rem', color: isUp ? 'var(--up)' : 'var(--down)' }}>
-          {isUp ? 'UP' : 'DOWN'}{Math.abs(chg).toFixed(1)}%
+          {isUp ? '+' : ''}{chg.toFixed(2)}%
         </span>
-      )}
+      ) : spot ? (
+        <span style={{ fontSize:'.5rem', color: live ? 'var(--up)' : 'var(--amber)', fontFamily:'var(--font-mono)', fontWeight:700 }}>
+          {live ? 'LIVE' : 'SNAP'}
+        </span>
+      ) : null}
     </div>
   )
 }
@@ -43,9 +83,10 @@ function hasBrokerApiError(obj: any): boolean {
 export function TopBar() {
   const {
     wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain,
-    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, lastSync,
   } = useStore()
   const rho = state?.signals?.spearman_rho ?? null
+  const streamLive = marketOpen && wsStatus === 'live'
 
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'RENDER_UNAVAILABLE'
@@ -66,7 +107,8 @@ export function TopBar() {
   const getSpot = (sym: string) => {
     const chainData = chain[sym]
     if (chainData?.spot && chainData.spot > 0) {
-      return { spot: chainData.spot, chg: null }
+      const chg = chainData.change_pct ?? chainData.pct_change ?? chainData.spot_change_pct ?? null
+      return { spot: chainData.spot, chg: chg == null ? null : Number(chg) }
     }
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
     const entry = rankings.find((r: any) => r.underlying === sym)
@@ -77,6 +119,12 @@ export function TopBar() {
   const nifty    = getSpot('NIFTY')
   const bnfty    = getSpot('BANKNIFTY')
   const finnifty = getSpot('FINNIFTY')
+  const syncAgeSec = (() => {
+    if (!lastSync || lastSync === '--') return null
+    const t = Date.parse(lastSync)
+    if (!Number.isFinite(t)) return null
+    return Math.max(0, Math.round((Date.now() - t) / 1000))
+  })()
 
   return (
     <header style={{
@@ -97,15 +145,25 @@ export function TopBar() {
           <span style={{ fontSize:'.5rem', color:'var(--text-mut)', letterSpacing:'.18em', fontFamily:'var(--font-mono)' }}>OWNER</span>
           <span style={{ fontSize:'.7rem', color:'var(--text-pri)', fontWeight:900, letterSpacing:'.08em' }}>PRITAM S. WARGHADE</span>
         </div>
+        <CloudBuildBadge />
       </div>
       <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
       <Clock />
       <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
 
       <div style={{ display:'flex', gap:'6px', flex:1, overflow:'hidden' }}>
-        <IndexChip symbol="NIFTY"    spot={nifty?.spot}    chg={nifty?.chg ?? undefined} />
-        <IndexChip symbol="BNFTY"    spot={bnfty?.spot}    chg={bnfty?.chg ?? undefined} />
-        <IndexChip symbol="FINNIFTY" spot={finnifty?.spot} chg={finnifty?.chg ?? undefined} />
+        <IndexChip symbol="NIFTY"    spot={nifty?.spot}    chg={nifty?.chg ?? undefined} live={streamLive && Boolean(nifty?.spot)} />
+        <IndexChip symbol="BNFTY"    spot={bnfty?.spot}    chg={bnfty?.chg ?? undefined} live={streamLive && Boolean(bnfty?.spot)} />
+        <IndexChip symbol="FINNIFTY" spot={finnifty?.spot} chg={finnifty?.chg ?? undefined} live={streamLive && Boolean(finnifty?.spot)} />
+        {syncAgeSec != null && (
+          <div style={{ display:'flex', alignItems:'center', padding:'3px 8px', borderRadius:'6px',
+                        background:'var(--surface-2)', border:'1px solid var(--border)' }}
+               title="Seconds since last dashboard stream/poll tick">
+            <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)', color: syncAgeSec <= 15 ? 'var(--up)' : 'var(--amber)' }}>
+              TICK {syncAgeSec}s
+            </span>
+          </div>
+        )}
       </div>
 
       <div style={{ display:'flex', alignItems:'center', gap:'5px', flexShrink:0 }}>

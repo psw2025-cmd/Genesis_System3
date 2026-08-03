@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { API_BASE, API_HEADERS } from '../config'
 import { useStore } from '../store'
 import { fmt, cn } from '../lib/utils'
+import { AuthUnlock } from './AuthUnlock'
 
 const BASE = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '')
 
@@ -51,7 +52,7 @@ function fmtInt(n: number): string {
 }
 
 export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs = 15000 }: Props) {
-  const { marketTop, wsStatus, setMarketTop } = useStore()
+  const { marketTop, wsStatus, setMarketTop, apiStatus } = useStore()
   const [board, setBoard] = useState<BoardKind>('moneycontrol')
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
@@ -64,53 +65,81 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
 
   useEffect(() => {
     let alive = true
+    const fetchJson = async (path: string, timeoutMs = 12000) => {
+      const ctrl = new AbortController()
+      const timer = window.setTimeout(() => ctrl.abort(), timeoutMs)
+      try {
+        const r = await fetch(`${BASE}${path}`, {
+          credentials: 'include',
+          headers: { Accept: 'application/json', ...API_HEADERS },
+          signal: ctrl.signal,
+        })
+        let body: any = null
+        try { body = await r.json() } catch { body = null }
+        return { ok: r.ok, status: r.status, body }
+      } finally {
+        window.clearTimeout(timer)
+      }
+    }
+
     const load = async () => {
       try {
-        const [r, mc] = await Promise.all([
-          fetch(`${BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`, {
-            credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS },
-          }),
-          fetch(`${BASE}/api/scanner/moneycontrol_gainers?top_n=25`, {
-            credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS },
-          }),
+        const [r, mc] = await Promise.allSettled([
+          fetchJson('/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true', 14000),
+          fetchJson('/api/scanner/moneycontrol_gainers?top_n=25', 12000),
         ])
         if (!alive) return
-        if (r.ok) {
-          const data = await r.json()
-          const table: MarketTopRow[] = data?.market_top_table || data?.market_wide?.top_combined_list || []
-          setPollRows(Array.isArray(table) ? table : [])
-          setPollMeta({
-            status: data?.status,
-            refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
-            scored: data?.contracts_scored_total,
-            note: data?.note,
-            error: data?.error,
-          })
-          if (Array.isArray(table) && table.length) {
-            setMarketTop({
-              market_top_table: table,
-              refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
-              contracts_scored_total: data?.contracts_scored_total,
+
+        if (r.status === 'fulfilled') {
+          if (r.value.ok) {
+            const data = r.value.body || {}
+            const table: MarketTopRow[] = data?.market_top_table || data?.market_wide?.top_combined_list || []
+            setPollRows(Array.isArray(table) ? table : [])
+            setPollMeta({
               status: data?.status,
-              stream_mode: data?.stream_mode || 'http_poll',
+              refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
+              scored: data?.contracts_scored_total,
+              note: data?.note,
+              error: data?.error,
             })
+            if (Array.isArray(table) && table.length) {
+              setMarketTop({
+                market_top_table: table,
+                refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
+                contracts_scored_total: data?.contracts_scored_total,
+                status: data?.status,
+                stream_mode: data?.stream_mode || 'http_poll',
+              })
+            }
+            setErr('')
+          } else if (r.value.status === 401) {
+            setErr('API authentication required')
+            setPollMeta({ status: 'auth_required', error: 'Unlock dashboard API session to load Dhan Market Top' })
+          } else {
+            setErr(`Dhan board HTTP ${r.value.status}`)
           }
         } else {
-          setErr(`Dhan board HTTP ${r.status}`)
+          setErr('Dhan board request timed out')
         }
-        if (mc.ok) {
-          const mcData = await mc.json()
-          setMcRows(Array.isArray(mcData?.market_top_table) ? mcData.market_top_table : [])
-          setMcMeta({
-            status: mcData?.status,
-            refreshed_at: mcData?.refreshed_at,
-            note: mcData?.note,
-            error: mcData?.error,
-          })
+
+        if (mc.status === 'fulfilled') {
+          if (mc.value.ok) {
+            const mcData = mc.value.body || {}
+            setMcRows(Array.isArray(mcData?.market_top_table) ? mcData.market_top_table : [])
+            setMcMeta({
+              status: mcData?.status,
+              refreshed_at: mcData?.refreshed_at,
+              note: mcData?.note,
+              error: mcData?.error,
+            })
+          } else if (mc.value.status === 401) {
+            setMcMeta({ status: 'auth_required', error: 'Unlock dashboard API session to load Moneycontrol board' })
+          } else {
+            setMcMeta({ status: 'error', error: `Moneycontrol HTTP ${mc.value.status}` })
+          }
         } else {
-          setMcMeta({ status: 'error', error: `Moneycontrol HTTP ${mc.status}` })
+          setMcMeta({ status: 'timeout', error: 'Moneycontrol request timed out' })
         }
-        setErr('')
       } catch (e: any) {
         if (alive) setErr(String(e?.message || e))
       } finally {
@@ -132,9 +161,16 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
     : (marketTop?.refreshed_at || pollMeta.refreshed_at || rows?.[0]?.refreshed_at)
   const status = board === 'moneycontrol' ? mcMeta.status : (marketTop?.status || pollMeta.status)
   const streaming = wsStatus === 'live' && wsRows.length > 0
-  const emptyNote = board === 'moneycontrol'
+  const boardNote = board === 'moneycontrol'
     ? (mcMeta.error || mcMeta.note || 'Waiting for Moneycontrol All Options Top Gainers…')
     : (err || pollMeta.error || pollMeta.note || 'Waiting for Dhan option-chain gainers…')
+  const authRequired = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || status === 'auth_required'
+    || /auth|API authentication|Unlock dashboard/i.test(String(err || mcMeta.error || pollMeta.error || ''))
+    || (!loading && rows.length === 0 && /timeout/i.test(String(boardNote)))
+  const emptyNote = authRequired
+    ? 'Dashboard API session required. Unlock once to load Market Top boards.'
+    : boardNote
 
   const subtitle = useMemo(() => {
     if (board === 'moneycontrol') {
@@ -184,7 +220,13 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
           >
             DHAN LIVE
           </button>
-          <span className="pill text-[10px] bg-surface-2 text-text-muted border border-border">
+          <span className={cn(
+            'pill text-[10px] border',
+            streaming ? 'bg-up/10 text-up border-up/20' : 'bg-surface-2 text-text-muted border-border',
+          )}>
+            {streaming ? 'WS STREAM' : 'HTTP POLL'}
+          </span>
+          <span className="pill text-[10px] bg-down/10 text-down border border-down/20">
             LIVE OFF
           </span>
         </div>
@@ -192,11 +234,12 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
 
       {rows.length === 0 ? (
         <div className="flex-1 flex items-center justify-center p-6 text-center text-text-muted text-xs">
-          <div>
-            <div className="font-semibold text-text-primary mb-1">
-              {loading ? 'Loading market top…' : 'No gainer rows yet'}
+          <div className="max-w-md mx-auto space-y-3">
+            <div className="font-semibold text-text-primary">
+              {loading ? 'Loading market top…' : (authRequired ? 'API unlock required' : 'No gainer rows yet')}
             </div>
-            <div className="max-w-md mx-auto">{emptyNote}</div>
+            <div>{emptyNote}</div>
+            {authRequired && <AuthUnlock compact />}
           </div>
         </div>
       ) : (

@@ -70,11 +70,11 @@ export function Sidebar() {
             </div>
             {groupTabs.map(({ id, label, Icon }) => {
               const active = activeTab === id
-              const marketDim = ['chain', 'signals', 'trade'].includes(id) && !marketOpen
               const isGenesis = id === 'genesis'
               const isProof = id === 'e2e-proof'
               const isTruth = id === 'truth'
               const isSim = id === 'sim-live'
+              const highlight = isGenesis || isProof || isTruth || isSim
               return (
                 <button
                   key={id}
@@ -87,33 +87,33 @@ export function Sidebar() {
                   data-dashboard-tab-label={label}
                   style={{
                     width: '100%',
-                    minHeight: '38px',
+                    minHeight: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
                     border: active ? '1px solid var(--accent)' : '1px solid transparent',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: active ? 'var(--surface-3)' : isGenesis || isProof || isTruth || isSim ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
-                    opacity: marketDim ? 0.45 : 1,
+                    background: active ? 'var(--surface-3)' : highlight ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
                     transition: 'all 0.12s',
                     position: 'relative',
-                    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
-                    padding: '8px 10px',
+                    color: active ? 'var(--text-pri)' : 'var(--text-sec)',
+                    padding: '7px 10px',
                     textAlign: 'left',
                   }}
                 >
                   <Icon
-                    size={16}
-                    color={active || isGenesis || isProof || isTruth || isSim ? 'var(--accent)' : 'var(--text-mut)'}
+                    size={15}
+                    color={active || highlight ? 'var(--accent)' : 'var(--text-mut)'}
                     style={{ flexShrink: 0 }}
                   />
                   <span style={{
                     fontSize: '12px',
-                    fontWeight: active || isGenesis || isProof || isTruth || isSim ? 700 : 600,
+                    fontWeight: active || highlight ? 700 : 500,
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
+                    color: 'inherit',
                   }}>
                     {label}
                   </span>
@@ -124,10 +124,13 @@ export function Sidebar() {
                       background: brokerConnected ? 'var(--up)' : 'var(--down)',
                     }} />
                   )}
-                  {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>TRUTH</span>}
-                  {id === 'e2e-proof' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>PROOF</span>}
-                  {id === 'sim-live' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>SIM</span>}
-                  {id === 'gates' && <span style={{ marginLeft: 'auto', fontSize: '10px' }}>LOCK</span>}
+                  {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}
+                  {id === 'e2e-proof' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>PROOF</span>}
+                  {id === 'sim-live' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>SIM</span>}
+                  {id === 'gates' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>LOCK</span>}
+                  {['chain', 'signals', 'trade'].includes(id) && !marketOpen && (
+                    <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--amber)' }}>POLL</span>
+                  )}
                 </button>
               )
             })}

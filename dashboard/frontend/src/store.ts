@@ -70,17 +70,24 @@ export const useStore = create<DashboardState>((set) => ({
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
-  activeTab: 'genesis',
+  activeTab: 'overview',
   chainSymbol: 'NIFTY',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
   setHealth: (health) => set({
     health,
     brokerConnected: health?.broker?.connected ?? false,
-    marketOpen: health?.market?.is_open ?? false,
+    marketOpen: Boolean(health?.market?.is_open ?? health?.market_status === 'open'),
+    lastSync: new Date().toISOString(),
   }),
-  setState: (state) => set({ state }),
-  setChain: (sym, data) => set((s) => ({ chain: { ...s.chain, [sym]: data } })),
+  setState: (state) => set((s) => ({
+    state,
+    marketOpen: state?.market?.is_open != null ? Boolean(state.market.is_open) : s.marketOpen,
+  })),
+  setChain: (sym, data) => set((s) => ({
+    chain: { ...s.chain, [sym]: data },
+    lastSync: new Date().toISOString(),
+  })),
   setPaper: (paper) => set({ paper }),
   setGainRank: (gainRank) => set({ gainRank }),
   setMarketTop: (marketTop) => set({ marketTop, lastSync: new Date().toISOString() }),
