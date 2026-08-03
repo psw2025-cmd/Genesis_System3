@@ -1,0 +1,78 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+_e2e_full_cloud_40
+05:12:53 IST
+NIFTY
+24,774
+SNAP
+BNFTY
+58,248
+SNAP
+FINNIFTY
+26,984
+SNAP
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+POLL
+Signals
+POLL
+TRADING
+Trade
+POLL
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+NET P&L
+₹0
+WIN RATE
+0.0%
+TRADES
+0
+OPEN
+0
+PAPER ONLY — NO REAL MONEY
+OPEN POSITIONS (0)
+
+No open positions
+
+Paper engine generates positions during market hours

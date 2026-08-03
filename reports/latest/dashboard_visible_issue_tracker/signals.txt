@@ -1,0 +1,75 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+_e2e_full_cloud_40
+05:12:38 IST
+NIFTY
+24,774
+SNAP
+BNFTY
+58,248
+SNAP
+FINNIFTY
+26,984
+SNAP
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+POLL
+Signals
+POLL
+TRADING
+Trade
+POLL
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Signals & Recommendations
+SIGNAL DATA LOCKED
+Dashboard API auth is required before signals can be read.
+This is a read-only lock. Live trading remains disabled.
+READ-ONLY BROKER UNLOCK
+Broker funds, holdings, and positions require dashboard API auth.
+Unlock
+LOCK
+Signals locked
+
+Enter the Dashboard API key to unlock read-only signal, broker, paper, scanner and gate data.
