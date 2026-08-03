@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-03T15:28:07.742659+00:00`
+Generated UTC: `2026-08-03T16:21:25.457768+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `25`
+Failed workflow count: `24`
 
 ## Rule
 
@@ -36,7 +36,6 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30809425305 conclusion=cancelled commit=d5cbc873053bf84dc099e1969942dde562a4957b
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30809370268 conclusion=failure commit=172c02e5da6aac27ee2b002d11fd01db468b996c
 - [ ] Fix workflow 'System3 Market Session Proof Runner' run 30808393357 conclusion=failure commit=63a7adba2564824007bbf378a5d9631ca4c0355b
-- [ ] Fix workflow 'System3 GitHub Render Failure Tracker' run 30808062756 conclusion=failure commit=fc8e314d76d89d5bc6296e030068e829caac4ee5
 
 ## Failed run details
 
@@ -66,4 +65,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 30809425305 | cancelled | `d5cbc873053b` | 2026-08-03T11:25:09Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30809425305 |
 | Dashboard Visual Production Proof | 30809370268 | failure | `172c02e5da6a` | 2026-08-03T11:24:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30809370268 |
 | System3 Market Session Proof Runner | 30808393357 | failure | `63a7adba2564` | 2026-08-03T11:16:43Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30808393357 |
-| System3 GitHub Render Failure Tracker | 30808062756 | failure | `fc8e314d76d8` | 2026-08-03T11:04:48Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30808062756 |

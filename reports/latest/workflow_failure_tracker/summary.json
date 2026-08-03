@@ -1,5 +1,5 @@
 {
-  "failed_count": 25,
+  "failed_count": 24,
   "failed_runs": [
     {
       "branch": "main",
@@ -240,19 +240,9 @@
       "run_id": 30808393357,
       "updated_at": "2026-08-03T11:16:43Z",
       "workflow": "System3 Market Session Proof Runner"
-    },
-    {
-      "branch": "main",
-      "commit": "fc8e314d76d89d5bc6296e030068e829caac4ee5",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T11:04:33Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30808062756",
-      "run_id": 30808062756,
-      "updated_at": "2026-08-03T11:04:48Z",
-      "workflow": "System3 GitHub Render Failure Tracker"
     }
   ],
-  "generated_utc": "2026-08-03T15:28:07.742659+00:00",
+  "generated_utc": "2026-08-03T16:21:25.457768+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
@@ -280,7 +270,6 @@
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 30809433053 conclusion=failure commit=d5cbc873053bf84dc099e1969942dde562a4957b",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30809425305 conclusion=cancelled commit=d5cbc873053bf84dc099e1969942dde562a4957b",
     "Fix workflow 'Dashboard Visual Production Proof' run 30809370268 conclusion=failure commit=172c02e5da6aac27ee2b002d11fd01db468b996c",
-    "Fix workflow 'System3 Market Session Proof Runner' run 30808393357 conclusion=failure commit=63a7adba2564824007bbf378a5d9631ca4c0355b",
-    "Fix workflow 'System3 GitHub Render Failure Tracker' run 30808062756 conclusion=failure commit=fc8e314d76d89d5bc6296e030068e829caac4ee5"
+    "Fix workflow 'System3 Market Session Proof Runner' run 30808393357 conclusion=failure commit=63a7adba2564824007bbf378a5d9631ca4c0355b"
   ]
 }
