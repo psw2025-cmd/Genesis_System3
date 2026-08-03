@@ -94,21 +94,24 @@ export function TradeTab() {
   const liveOk = Number(equity?.segments?.equity_options?.live_chains_ok || 0)
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="h-[42%] min-h-[220px] border-b border-border flex-shrink-0">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      {/* Market Top: dominant board, scrollable — not crushed into 42% */}
+      <div className="flex-[1.15] min-h-[260px] max-h-[52%] border-b border-border flex-shrink-0 overflow-hidden">
         <MarketTopCePeTable onSelectUnderlying={(sym) => setChainSymbol(sym)} />
       </div>
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        <div className="flex-1 flex flex-col overflow-hidden border-r border-border">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden border-r border-border">
           <div className="px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
             <h2 className="text-xs font-semibold text-text-primary uppercase tracking-wider">Option Chain</h2>
           </div>
-          <OptionChain />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <OptionChain />
+          </div>
         </div>
 
-        <div className="w-72 flex flex-col flex-shrink-0 overflow-hidden">
-          <div className="px-4 py-2 border-b border-border bg-surface-1">
+        <div className="w-72 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
+          <div className="px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
             <h2 className="text-xs font-semibold text-text-primary uppercase tracking-wider">Index / Rank Feed</h2>
           </div>
           <div className="max-h-[45%] overflow-y-auto border-b border-border">
@@ -122,11 +125,11 @@ export function TradeTab() {
             )}
           </div>
 
-          <div className="px-4 py-2 border-b border-border bg-surface-1 flex items-center justify-between">
+          <div className="px-4 py-2 border-b border-border bg-surface-1 flex items-center justify-between flex-shrink-0">
             <h2 className="text-xs font-semibold text-text-primary uppercase tracking-wider">Equity Options</h2>
             <span className="text-[10px] font-mono text-text-muted">{liveOk > 0 ? `${liveOk} live` : 'EOD/live'}</span>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             {equityRows.length === 0 ? (
               <div className="p-4 text-center text-text-muted text-xs space-y-2">
                 <div className="font-semibold text-text-primary">No equity option rows</div>

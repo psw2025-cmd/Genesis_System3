@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { API_BASE, API_HEADERS } from '../config'
 import { useStore } from '../store'
 import { fmt, cn } from '../lib/utils'
@@ -23,169 +23,80 @@ type MarketTopRow = {
   data_provenance?: string
 }
 
+type BoardKind = 'moneycontrol' | 'dhan'
+
 type Props = {
   onSelectUnderlying?: (symbol: string) => void
   compact?: boolean
   pollMs?: number
 }
 
-function GainersTable({
-  title,
-  badge,
-  badgeClass,
-  rows,
-  refreshedAt,
-  scored,
-  status,
-  streamLabel,
-  emptyNote,
-  onSelectUnderlying,
-  loading,
-  err,
-}: {
-  title: string
-  badge: string
-  badgeClass: string
-  rows: MarketTopRow[]
-  refreshedAt?: string
-  scored?: number
-  status?: string
-  streamLabel: string
-  emptyNote: string
-  onSelectUnderlying?: (symbol: string) => void
-  loading?: boolean
-  err?: string
-}) {
-  return (
-    <div className="flex flex-col overflow-hidden h-full min-h-[280px] border border-border rounded-md bg-surface">
-      <div className="px-4 py-2 border-b border-border bg-surface-1 flex items-center justify-between gap-3 flex-shrink-0">
-        <div>
-          <h2 className="text-xs font-semibold text-text-primary uppercase tracking-wider">{title}</h2>
-          <div className="text-[10px] text-text-muted font-mono">
-            {refreshedAt ? `Refreshed ${refreshedAt}` : loading ? 'Loading…' : 'Waiting'}
-            {scored != null ? ` · ${scored} scored` : ''}
-            {status ? ` · ${status}` : ''}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className={cn('pill text-[10px] border', badgeClass)}>{badge}</span>
-          <span className="pill text-[10px] bg-surface-2 text-text-muted border border-border">{streamLabel}</span>
-        </div>
-      </div>
+function fmtExpiry(raw?: string): string {
+  if (!raw) return '—'
+  const s = String(raw).trim()
+  // Already Moneycontrol-like: 25-Aug-26
+  if (/^\d{1,2}-[A-Za-z]{3}-\d{2}$/.test(s)) return s
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (!m) return s
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const dd = String(Number(m[3]))
+  const mon = months[Number(m[2]) - 1] || m[2]
+  const yy = m[1].slice(2)
+  return `${dd}-${mon}-${yy}`
+}
 
-      {err && rows.length === 0 ? (
-        <div className="p-4 text-center text-text-muted text-xs space-y-1">
-          <div className="font-semibold text-text-primary">{loading ? 'Scanning…' : 'No rows yet'}</div>
-          <div>{err}</div>
-        </div>
-      ) : rows.length === 0 ? (
-        <div className="p-4 text-center text-text-muted text-xs space-y-1">
-          <div className="font-semibold text-text-primary">{loading ? 'Scanning…' : 'No rows yet'}</div>
-          <div>{emptyNote}</div>
-        </div>
-      ) : (
-        <div className="overflow-auto flex-1">
-          <table className="w-full min-w-[1100px] text-left">
-            <thead className="sticky top-0 z-10">
-              <tr className="bg-emerald-800 text-white text-[10px] uppercase tracking-wider">
-                {[
-                  'Rank', 'Symbol', 'Expiry', 'CE/PE', 'Strike', 'LTP', 'Change', 'Gain %',
-                  'Volume', 'OI', 'Note', 'Refreshed', 'Provenance',
-                ].map((h) => (
-                  <th key={h} className="px-2 py-2 font-semibold whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, i) => {
-                const symbol = String(row.symbol || row.underlying || '').toUpperCase()
-                const gain = Number(row.gain_pct || 0)
-                const change = Number(row.change ?? row.change_rs ?? 0)
-                const opt = String(row.option_type || '').toUpperCase()
-                return (
-                  <tr
-                    key={`${symbol}-${opt}-${row.strike}-${i}`}
-                    className={cn(
-                      'border-b border-border text-xs font-mono cursor-pointer hover:bg-surface-2',
-                      i % 2 === 0 ? 'bg-emerald-50/5' : 'bg-transparent',
-                    )}
-                    onClick={() => symbol && onSelectUnderlying?.(symbol)}
-                  >
-                    <td className="px-2 py-1.5 text-text-muted">{row.rank ?? i + 1}</td>
-                    <td className="px-2 py-1.5 font-semibold text-text-primary">{symbol}</td>
-                    <td className="px-2 py-1.5 text-text-secondary">{row.expiry_date || '—'}</td>
-                    <td className={cn('px-2 py-1.5 font-semibold', opt === 'CE' ? 'text-up' : 'text-down')}>{opt || '—'}</td>
-                    <td className="px-2 py-1.5 num">{fmt(Number(row.strike || 0), 0)}</td>
-                    <td className="px-2 py-1.5 num">{fmt(Number(row.ltp || 0), 2)}</td>
-                    <td className={cn('px-2 py-1.5 num', change >= 0 ? 'text-up' : 'text-down')}>{fmt(change, 2)}</td>
-                    <td className="px-2 py-1.5 num font-semibold text-red-500">{fmt(gain, 2)}%</td>
-                    <td className="px-2 py-1.5 num">{fmt(Number(row.volume || 0), 0)}</td>
-                    <td className="px-2 py-1.5 num">{fmt(Number(row.oi || 0), 0)}</td>
-                    <td className="px-2 py-1.5 text-[10px] text-text-muted max-w-[180px] truncate">
-                      {row.market_match_note || `GAINER (+${fmt(gain, 2)}%)`}
-                    </td>
-                    <td className="px-2 py-1.5 text-[10px] text-text-muted whitespace-nowrap">
-                      {row.refreshed_at || refreshedAt || '—'}
-                    </td>
-                    <td className="px-2 py-1.5 text-[10px] text-text-muted">{row.data_provenance || '—'}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  )
+function fmtInt(n: number): string {
+  if (!Number.isFinite(n)) return '—'
+  return Math.round(n).toLocaleString('en-IN')
 }
 
 export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs = 15000 }: Props) {
   const { marketTop, wsStatus, setMarketTop } = useStore()
+  const [board, setBoard] = useState<BoardKind>('moneycontrol')
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
   const [mcRows, setMcRows] = useState<MarketTopRow[]>([])
   const [mcMeta, setMcMeta] = useState<{ status?: string; refreshed_at?: string; note?: string; error?: string }>({})
-  const [diag, setDiag] = useState<string>('')
-
-  const wsRows: MarketTopRow[] = Array.isArray(marketTop?.market_top_table) ? marketTop.market_top_table : []
   const [pollRows, setPollRows] = useState<MarketTopRow[]>([])
   const [pollMeta, setPollMeta] = useState<{ status?: string; refreshed_at?: string; scored?: number; note?: string; error?: string }>({})
+
+  const wsRows: MarketTopRow[] = Array.isArray(marketTop?.market_top_table) ? marketTop.market_top_table : []
 
   useEffect(() => {
     let alive = true
     const load = async () => {
       try {
-        const [r, mc, dg] = await Promise.all([
+        const [r, mc] = await Promise.all([
           fetch(`${BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`, {
             credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS },
           }),
           fetch(`${BASE}/api/scanner/moneycontrol_gainers?top_n=25`, {
             credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS },
           }),
-          fetch(`${BASE}/api/scanner/market_top_diagnose`, {
-            credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS },
-          }),
         ])
-        if (!r.ok) throw new Error(`HTTP ${r.status}`)
-        const data = await r.json()
-        const table: MarketTopRow[] = data?.market_top_table || data?.market_wide?.top_combined_list || []
         if (!alive) return
-        setPollRows(Array.isArray(table) ? table : [])
-        setPollMeta({
-          status: data?.status,
-          refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
-          scored: data?.contracts_scored_total,
-          note: data?.diagnose?.why_not_moneycontrol_parity || data?.note,
-          error: data?.error,
-        })
-        if (Array.isArray(table) && table.length) {
-          setMarketTop({
-            market_top_table: table,
-            refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
-            contracts_scored_total: data?.contracts_scored_total,
+        if (r.ok) {
+          const data = await r.json()
+          const table: MarketTopRow[] = data?.market_top_table || data?.market_wide?.top_combined_list || []
+          setPollRows(Array.isArray(table) ? table : [])
+          setPollMeta({
             status: data?.status,
-            stream_mode: data?.stream_mode || 'http_poll',
+            refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
+            scored: data?.contracts_scored_total,
+            note: data?.note,
+            error: data?.error,
           })
+          if (Array.isArray(table) && table.length) {
+            setMarketTop({
+              market_top_table: table,
+              refreshed_at: data?.refreshed_at || table?.[0]?.refreshed_at,
+              contracts_scored_total: data?.contracts_scored_total,
+              status: data?.status,
+              stream_mode: data?.stream_mode || 'http_poll',
+            })
+          }
+        } else {
+          setErr(`Dhan board HTTP ${r.status}`)
         }
         if (mc.ok) {
           const mcData = await mc.json()
@@ -196,11 +107,8 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
             note: mcData?.note,
             error: mcData?.error,
           })
-        }
-        if (dg.ok) {
-          const d = await dg.json()
-          const missing = (d?.not_in_priority_head16 || []).slice(0, 6).join(',')
-          setDiag(missing ? `Rotate pending for: ${missing}` : (d?.root_cause_if_absent_on_board || ''))
+        } else {
+          setMcMeta({ status: 'error', error: `Moneycontrol HTTP ${mc.status}` })
         }
         setErr('')
       } catch (e: any) {
@@ -217,54 +125,132 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
     }
   }, [pollMs, setMarketTop])
 
-  const rows = wsRows.length ? wsRows : pollRows
-  const refreshedAt = marketTop?.refreshed_at || pollMeta.refreshed_at || rows?.[0]?.refreshed_at
-  const scored = marketTop?.contracts_scored_total ?? pollMeta.scored
-  const status = marketTop?.status || pollMeta.status
+  const dhanRows = wsRows.length ? wsRows : pollRows
+  const rows = board === 'moneycontrol' ? mcRows : dhanRows
+  const refreshedAt = board === 'moneycontrol'
+    ? (mcMeta.refreshed_at || rows?.[0]?.refreshed_at)
+    : (marketTop?.refreshed_at || pollMeta.refreshed_at || rows?.[0]?.refreshed_at)
+  const status = board === 'moneycontrol' ? mcMeta.status : (marketTop?.status || pollMeta.status)
   const streaming = wsStatus === 'live' && wsRows.length > 0
-  const streamLabel = streaming
-    ? `ULTRA MICRO · ${marketTop?.stream_mode || 'ws'}`
-    : wsStatus === 'live'
-      ? 'WS LIVE · waiting table'
-      : 'HTTP POLL'
+  const emptyNote = board === 'moneycontrol'
+    ? (mcMeta.error || mcMeta.note || 'Waiting for Moneycontrol All Options Top Gainers…')
+    : (err || pollMeta.error || pollMeta.note || 'Waiting for Dhan option-chain gainers…')
+
+  const subtitle = useMemo(() => {
+    if (board === 'moneycontrol') {
+      return 'Reference board (LIVE_SCRAPED) · not used for live orders'
+    }
+    return streaming
+      ? `Dhan live · ${marketTop?.stream_mode || 'ultra_micro'}`
+      : 'Dhan live · trading truth for paper MTM'
+  }, [board, streaming, marketTop?.stream_mode])
 
   return (
-    <div className={cn('flex flex-col gap-3 overflow-hidden', compact ? 'h-full' : '')}>
-      <div className="text-[10px] text-text-muted px-1">
-        Why Moneycontrol parity lagged: Dhan board previously scanned only 4 priority equities.
-        Now rotates OPTSTK shards + Moneycontrol LIVE_SCRAPED reference. Paper may seed high-risers; live money stays OFF.
-        {diag ? ` · ${diag}` : ''}
+    <div className={cn('flex flex-col h-full min-h-0 overflow-hidden bg-surface', compact && 'text-[11px]')}>
+      <div className="px-3 py-2 border-b border-border bg-surface-1 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+        <div className="min-w-0">
+          <div className="text-xs font-semibold text-text-primary uppercase tracking-wider">
+            {board === 'moneycontrol' ? 'All-India Top Option Gainers' : 'Market Top CE / PE'}
+          </div>
+          <div className="text-[10px] text-text-muted font-mono truncate">
+            {refreshedAt ? `Refreshed ${refreshedAt}` : loading ? 'Loading…' : 'Waiting'}
+            {status ? ` · ${status}` : ''}
+            {` · ${rows.length} rows`}
+            {` · ${subtitle}`}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <button
+            type="button"
+            className={cn(
+              'pill border text-[10px]',
+              board === 'moneycontrol'
+                ? 'bg-amber/10 text-amber border-amber/30'
+                : 'bg-surface-2 text-text-muted border-border',
+            )}
+            onClick={() => setBoard('moneycontrol')}
+          >
+            MONEYCONTROL
+          </button>
+          <button
+            type="button"
+            className={cn(
+              'pill border text-[10px]',
+              board === 'dhan'
+                ? 'bg-up/10 text-up border-up/20'
+                : 'bg-surface-2 text-text-muted border-border',
+            )}
+            onClick={() => setBoard('dhan')}
+          >
+            DHAN LIVE
+          </button>
+          <span className="pill text-[10px] bg-surface-2 text-text-muted border border-border">
+            LIVE OFF
+          </span>
+        </div>
       </div>
-      <div className={cn('grid gap-3', compact ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-2')}>
-        <GainersTable
-          title="Moneycontrol All-India Top Option Gainers [% Gain]"
-          badge="LIVE SCRAPED"
-          badgeClass="bg-amber/10 text-amber border-amber/30"
-          rows={mcRows}
-          refreshedAt={mcMeta.refreshed_at}
-          scored={mcRows.length}
-          status={mcMeta.status}
-          streamLabel="REFERENCE ONLY"
-          emptyNote={mcMeta.error || mcMeta.note || 'Waiting for Moneycontrol scrape…'}
-          onSelectUnderlying={onSelectUnderlying}
-          loading={loading && mcRows.length === 0}
-          err={mcMeta.error}
-        />
-        <GainersTable
-          title="Market Top CE / PE (Dhan Live)"
-          badge="DHAN LIVE"
-          badgeClass="bg-up/10 text-up border-up/20"
-          rows={rows}
-          refreshedAt={refreshedAt}
-          scored={scored}
-          status={status}
-          streamLabel={streamLabel}
-          emptyNote={pollMeta.note || 'Waiting for live Dhan option-chain gainers.'}
-          onSelectUnderlying={onSelectUnderlying}
-          loading={loading && rows.length === 0}
-          err={err || pollMeta.error}
-        />
-      </div>
+
+      {rows.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center p-6 text-center text-text-muted text-xs">
+          <div>
+            <div className="font-semibold text-text-primary mb-1">
+              {loading ? 'Loading market top…' : 'No gainer rows yet'}
+            </div>
+            <div className="max-w-md mx-auto">{emptyNote}</div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0 overflow-auto">
+          <table className="w-full min-w-[980px] text-left border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr style={{ background: '#065f46' }}>
+                {['#', 'Symbol', 'Expiry', 'Type', 'Strike', 'LTP', 'Change', 'Gain %', 'Volume', 'OI', 'Source'].map((h) => (
+                  <th
+                    key={h}
+                    className="px-2 py-2 text-[10px] font-semibold uppercase tracking-wider text-white whitespace-nowrap"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => {
+                const symbol = String(row.symbol || row.underlying || '').toUpperCase()
+                const gain = Number(row.gain_pct || 0)
+                const change = Number(row.change ?? row.change_rs ?? 0)
+                const opt = String(row.option_type || '').toUpperCase()
+                const prov = row.data_provenance || (board === 'moneycontrol' ? 'LIVE_SCRAPED' : 'DHAN_OPTION_CHAIN_LIVE')
+                return (
+                  <tr
+                    key={`${board}-${symbol}-${opt}-${row.strike}-${i}`}
+                    className={cn(
+                      'border-b border-border text-xs font-mono cursor-pointer hover:bg-surface-2',
+                      i % 2 === 0 ? 'bg-surface' : 'bg-surface-1',
+                    )}
+                    onClick={() => symbol && onSelectUnderlying?.(symbol)}
+                    title={row.market_match_note || undefined}
+                  >
+                    <td className="px-2 py-1.5 text-text-muted">{row.rank ?? i + 1}</td>
+                    <td className="px-2 py-1.5 font-semibold text-text-primary">{symbol}</td>
+                    <td className="px-2 py-1.5 text-text-secondary whitespace-nowrap">{fmtExpiry(row.expiry_date)}</td>
+                    <td className={cn('px-2 py-1.5 font-semibold', opt === 'CE' ? 'text-up' : 'text-down')}>{opt || '—'}</td>
+                    <td className="px-2 py-1.5 num text-right">{fmtInt(Number(row.strike || 0))}</td>
+                    <td className="px-2 py-1.5 num text-right">{fmt(Number(row.ltp || 0), 2)}</td>
+                    <td className={cn('px-2 py-1.5 num text-right', change >= 0 ? 'text-up' : 'text-down')}>
+                      {fmt(change, 2)}
+                    </td>
+                    <td className="px-2 py-1.5 num text-right font-semibold text-down">{fmt(gain, 2)}%</td>
+                    <td className="px-2 py-1.5 num text-right">{fmtInt(Number(row.volume || 0))}</td>
+                    <td className="px-2 py-1.5 num text-right">{fmtInt(Number(row.oi || 0))}</td>
+                    <td className="px-2 py-1.5 text-[10px] text-text-muted whitespace-nowrap">{prov}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }
