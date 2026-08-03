@@ -33,15 +33,15 @@ class DataSourceManager:
         "SENSEX": 51,
     }
 
-    # Dhan option-chain segment is not identical for every index.
-    # Keep env override so Cloud can correct a broker-side segment without code deploy:
-    #   DHAN_OPTION_CHAIN_SEGMENT_SENSEX=<broker accepted value>
+    # Dhan option-chain UnderlyingSeg for index underlyings (NSE + BSE Sensex)
+    # is IDX_I. IDX_B fails silently on expiry_list/optionchain for SENSEX=51.
+    # Env override still available: DHAN_OPTION_CHAIN_SEGMENT_SENSEX=<value>
     _DHAN_SEGMENTS = {
         "NIFTY": "IDX_I",
         "BANKNIFTY": "IDX_I",
         "FINNIFTY": "IDX_I",
         "MIDCPNIFTY": "IDX_I",
-        "SENSEX": "IDX_B",
+        "SENSEX": "IDX_I",
     }
 
     def __init__(self):
