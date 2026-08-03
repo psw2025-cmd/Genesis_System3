@@ -1,19 +1,50 @@
 {
-  "generated_at": null,
-  "base": null,
+  "generated_at": "2026-08-03T23:42:07.627Z",
+  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
-  "source_summary_ok": false,
-  "source_summary_error": "FileNotFoundError: [Errno 2] No such file or directory: 'reports/latest/dashboard_live_ui_proof/summary.json'",
-  "source_final_verdict": "MISSING",
+  "source_summary_ok": true,
+  "source_summary_error": null,
+  "source_final_verdict": "FAIL",
   "auth_ok": false,
-  "screenshot_gate_pass": false,
-  "infra_blockers": [],
-  "visual_blockers": [],
+  "screenshot_gate_pass": true,
+  "infra_blockers": [
+    "AUTH_FAIL:401",
+    "API_FAIL:/api/deploy/info:401",
+    "API_FAIL:/api/state:401",
+    "API_FAIL:/api/broker/dhan/status:401",
+    "API_FAIL:/api/broker/funds:401",
+    "API_FAIL:/api/broker/holdings:401",
+    "API_FAIL:/api/broker/positions/live:401",
+    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN",
+    "API_FAIL:/api/chain/NIFTY:401",
+    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN",
+    "API_FAIL:/api/chain/BANKNIFTY:401",
+    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN",
+    "API_FAIL:/api/chain/FINNIFTY:401",
+    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN",
+    "API_FAIL:/api/chain/MIDCPNIFTY:401",
+    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN",
+    "API_FAIL:/api/chain/SENSEX:401",
+    "API_FAIL:/api/gain_rank:401",
+    "API_FAIL:/api/scanner/top_contract_gainers?top_n=5:401",
+    "API_FAIL:/api/pnl:401",
+    "API_FAIL:/api/trades/today:401",
+    "API_FAIL:/api/auto_gates:401",
+    "API_FAIL:/api/ml/performance:401",
+    "API_FAIL:/api/ml/compare:401",
+    "API_FAIL:/api/paper:401",
+    "UI_FAIL:Paper Trades"
+  ],
+  "visual_blockers": [
+    "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
+    "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
+  ],
   "trade_readiness_blockers": [],
   "consistency_blockers": [
     "SHELL_STATUS:BLOCKED",
     "TAB_COVERAGE:0/16",
+    "SHELL_PROOF_NOT_TIME_ALIGNED",
     "VISIBLE_TRACKER_STATUS:BLOCKED"
   ],
   "corroborating_evidence": {
@@ -27,68 +58,68 @@
   "screenshots": [
     {
       "file": "truth.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 166832
     },
     {
       "file": "genesis.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 254525
     },
     {
       "file": "e2e_proof.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 159404
     },
     {
       "file": "overview.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 135455
     },
     {
       "file": "chain.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 199989
     },
     {
       "file": "signals.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 111250
     },
     {
       "file": "paper.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 83031
     },
     {
       "file": "positions.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 80299
     },
     {
       "file": "broker.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 118387
     },
     {
       "file": "performance.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 71680
     },
     {
       "file": "ml.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 111588
     },
     {
       "file": "gates.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 90550
     },
     {
       "file": "mobile_390x844.png",
-      "ok": false,
-      "size_bytes": 0
+      "ok": true,
+      "size_bytes": 84749
     }
   ],
   "safety": {
