@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 40
     env:
       SYSTEM3_API_BASE: http://127.0.0.1:8000
-      DASHBOARD_BASE_URL: http://127.0.0.1:8000
+      DASHBOARD_BASE_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
       DASHBOARD_API_KEY: ${{ secrets.DASHBOARD_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       LIVE_TRADING_ENABLED: '0'

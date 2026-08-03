@@ -98,10 +98,7 @@ jobs:
             exit 0
           fi
           git commit -m "ci(sim): inject backend live simulation routes [skip ci]"
-          for attempt in 1 2 3; do
-            if git push; then exit 0; fi
-            echo "Push attempt ${attempt} failed; rebasing onto latest main"
-            git pull --rebase origin main
-          done
-          echo "Unable to publish injected route after three attempts"
-          exit 1
+          git add -A
+          git stash push -u -m "ci-sim-temp" || true
+          bash tools/ci_git_push_with_rebase.sh main origin
+          git stash pop || true
