@@ -1,8 +1,8 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-08-03T11:50:18.779092Z`
+- Generated UTC: `2026-08-03T23:41:43.232576Z`
 - Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (URLERROR)
+- Broker connected: `False` (HTTP_401)
 - Funds semantic proof: `False`
 - Mandatory chains ready: `0/4`
 - Analyzer mode: `ON`
@@ -11,15 +11,15 @@
 - Secrets written: `false`
 
 ## Mandatory chains
-- NIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- BANKNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- FINNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- MIDCPNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
+- NIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
+- BANKNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
+- FINNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
+- MIDCPNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
 
 ## Blockers
-- BROKER:URLERROR
-- FUNDS:URLERROR
-- CHAIN:NIFTY:URLERROR
-- CHAIN:BANKNIFTY:URLERROR
-- CHAIN:FINNIFTY:URLERROR
-- CHAIN:MIDCPNIFTY:URLERROR
+- BROKER:HTTP_401
+- FUNDS:HTTP_401
+- CHAIN:NIFTY:HTTP_401
+- CHAIN:BANKNIFTY:HTTP_401
+- CHAIN:FINNIFTY:HTTP_401
+- CHAIN:MIDCPNIFTY:HTTP_401

@@ -1,39 +1,39 @@
 {
-  "base": "http://127.0.0.1:8000",
+  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
     "connected": false,
-    "http": 0,
-    "reason": "URLERROR"
+    "http": 401,
+    "reason": "HTTP_401"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
-    "http": 0,
-    "reason": "URLERROR",
+    "http": 401,
+    "reason": "HTTP_401",
     "semantic_ok": false
   },
-  "generated_utc": "2026-08-03T11:50:18.779092Z",
+  "generated_utc": "2026-08-03T23:41:43.232576Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "BROKER:URLERROR",
-    "FUNDS:URLERROR",
-    "CHAIN:NIFTY:URLERROR",
-    "CHAIN:BANKNIFTY:URLERROR",
-    "CHAIN:FINNIFTY:URLERROR",
-    "CHAIN:MIDCPNIFTY:URLERROR"
+    "BROKER:HTTP_401",
+    "FUNDS:HTTP_401",
+    "CHAIN:NIFTY:HTTP_401",
+    "CHAIN:BANKNIFTY:HTTP_401",
+    "CHAIN:FINNIFTY:HTTP_401",
+    "CHAIN:MIDCPNIFTY:HTTP_401"
   ],
   "required_chain_ready_count": 0,
   "required_chain_total": 4,
   "required_chains": [
     {
       "contracts": 0,
-      "error": "URLERROR",
-      "http": 0,
+      "error": "HTTP_401",
+      "http": 401,
       "priority": null,
       "ready": false,
-      "reason": "URLERROR",
+      "reason": "HTTP_401",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -43,11 +43,11 @@
     },
     {
       "contracts": 0,
-      "error": "URLERROR",
-      "http": 0,
+      "error": "HTTP_401",
+      "http": 401,
       "priority": null,
       "ready": false,
-      "reason": "URLERROR",
+      "reason": "HTTP_401",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -57,11 +57,11 @@
     },
     {
       "contracts": 0,
-      "error": "URLERROR",
-      "http": 0,
+      "error": "HTTP_401",
+      "http": 401,
       "priority": null,
       "ready": false,
-      "reason": "URLERROR",
+      "reason": "HTTP_401",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -71,11 +71,11 @@
     },
     {
       "contracts": 0,
-      "error": "URLERROR",
-      "http": 0,
+      "error": "HTTP_401",
+      "http": 401,
       "priority": null,
       "ready": false,
-      "reason": "URLERROR",
+      "reason": "HTTP_401",
       "source": null,
       "spot_present": false,
       "stale": false,
@@ -87,10 +87,10 @@
   "secrets_written": false,
   "system3_live_trading_allowed": false,
   "transport_failures": [
-    "BROKER_STATUS_HTTP_0",
-    "CHAIN_NIFTY_HTTP_0",
-    "CHAIN_BANKNIFTY_HTTP_0",
-    "CHAIN_FINNIFTY_HTTP_0",
-    "CHAIN_MIDCPNIFTY_HTTP_0"
+    "BROKER_STATUS_HTTP_401",
+    "CHAIN_NIFTY_HTTP_401",
+    "CHAIN_BANKNIFTY_HTTP_401",
+    "CHAIN_FINNIFTY_HTTP_401",
+    "CHAIN_MIDCPNIFTY_HTTP_401"
   ]
 }
