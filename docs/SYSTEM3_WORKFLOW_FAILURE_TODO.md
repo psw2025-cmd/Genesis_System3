@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-03T13:27:27.142013+00:00`
+Generated UTC: `2026-08-03T14:21:24.251531+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `24`
+Failed workflow count: `23`
 
 ## Rule
 
@@ -35,7 +35,6 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 30805130748 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30804939935 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598
 - [ ] Fix workflow 'Permanent Repo Render Safety' run 30804774505 conclusion=failure commit=879be299f3ed25b22bbcf5edb980115db2d56598
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30803550952 conclusion=cancelled commit=3ae0a30631de491802c13f6090b5296218531f8c
 
 ## Failed run details
 
@@ -64,4 +63,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Dashboard Live UI Proof | 30805130748 | failure | `879be299f3ed` | 2026-08-03T10:20:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30805130748 |
 | System3 Latest Truth Publish | 30804939935 | failure | `879be299f3ed` | 2026-08-03T10:26:47Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30804939935 |
 | Permanent Repo Render Safety | 30804774505 | failure | `879be299f3ed` | 2026-08-03T10:23:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30804774505 |
-| System3 1000 Point TODO Status Updater | 30803550952 | cancelled | `3ae0a30631de` | 2026-08-03T09:57:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30803550952 |
