@@ -1,6 +1,16 @@
 {
-  "failed_count": 10,
+  "failed_count": 12,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "ec5e6ae02cafe61325fbb00b0adf42c1424144e0",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-04T19:35:11Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943956794",
+      "run_id": 30943956794,
+      "updated_at": "2026-08-04T19:35:35Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "f5a33e7e3ab7d353ed78ae7b2a64ce03c83d31ba",
@@ -30,6 +40,16 @@
       "run_id": 30943168583,
       "updated_at": "2026-08-04T19:27:11Z",
       "workflow": "Dashboard Visible Proof Isolated"
+    },
+    {
+      "branch": "main",
+      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T19:24:57Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943168334",
+      "run_id": 30943168334,
+      "updated_at": "2026-08-04T19:37:35Z",
+      "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
@@ -102,14 +122,16 @@
       "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-08-04T19:35:19.965894+00:00",
+  "generated_utc": "2026-08-04T19:37:54.241759+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30943956794 conclusion=cancelled commit=ec5e6ae02cafe61325fbb00b0adf42c1424144e0",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30943879104 conclusion=failure commit=f5a33e7e3ab7d353ed78ae7b2a64ce03c83d31ba",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30943227579 conclusion=cancelled commit=3f2bda99d435330a43f8492e2204ec7305cce4cb",
     "Fix workflow 'Dashboard Visible Proof Isolated' run 30943168583 conclusion=failure commit=62369b05f1535c8aa64bc73253a8a73a880367e5",
+    "Fix workflow 'Dashboard Visual Production Proof' run 30943168334 conclusion=failure commit=62369b05f1535c8aa64bc73253a8a73a880367e5",
     "Fix workflow 'Cloud Runtime Check' run 30943168314 conclusion=cancelled commit=62369b05f1535c8aa64bc73253a8a73a880367e5",
     "Fix workflow 'Genesis System3 Global Safety CI' run 30943167915 conclusion=failure commit=62369b05f1535c8aa64bc73253a8a73a880367e5",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30943166207 conclusion=failure commit=62369b05f1535c8aa64bc73253a8a73a880367e5",
