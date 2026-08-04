@@ -337,7 +337,7 @@ else:
     state_store = None
 
 # Warm instruments master — sync from Dhan CDN if stale, then load cache.
-# Set DEFER_INSTRUMENT_WARMUP=1 on Render to skip eager load at startup and
+# Set DEFER_INSTRUMENT_WARMUP=1 on Cloud Run to skip eager load at startup and
 # save ~150-200 MB peak RAM (instruments still lazy-load via /api/instruments/health).
 if os.environ.get("DEFER_INSTRUMENT_WARMUP", "0").strip().lower() not in ("1", "true", "yes", "on"):
     try:
@@ -399,7 +399,7 @@ app.add_middleware(
 # deploys, since the frontend has no way to send a key until it is
 # rebuilt with a matching VITE_API_KEY baked in. Enable deliberately:
 #   1. Set API_KEY=<random-secret> and REQUIRE_API_KEY=true on the
-#      backend (Render dashboard env vars).
+#      backend (Cloud Run → Service → Variables & Secrets).
 #   2. Set the same value as VITE_API_KEY in the frontend's build env
 #      and rebuild/redeploy the frontend.
 #   3. Only then does this actually enforce - until both sides are
@@ -1586,8 +1586,8 @@ async def get_auto_gates(refresh: bool = False):
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------
-# CRITICAL ARCHITECTURE NOTE: Render's `web` and `worker` services
-# (render.yaml) run as two SEPARATE containers with separate ephemeral
+# CRITICAL ARCHITECTURE NOTE: On Google Cloud Run, `web` and `worker` services
+# run as two SEPARATE containers with separate ephemeral
 # filesystems — no shared disk is configured. The job scheduler daemon
 # (core/engine/system3_phase82_job_scheduler.py) runs inside the WORKER
 # service via scripts/cloud_worker.py. A web-service endpoint that reads
@@ -1597,7 +1597,7 @@ async def get_auto_gates(refresh: bool = False):
 # Fix: the worker actively PUSHES its heartbeat/job-status to the web
 # service over HTTP every scheduler tick (~60s, see job scheduler daemon
 # loop), authenticated with a shared secret (WORKER_PUSH_TOKEN env var,
-# set identically on both Render services). The web service holds the
+# set identically on both Cloud Run services). The web service holds the
 # latest pushed snapshot in memory and serves it back from GET. If the
 # worker never pushes (e.g. not deployed, crashed, or token mismatch),
 # GET correctly reports unhealthy/stale instead of silently looking like
@@ -1622,9 +1622,9 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
     """
     Called by the WORKER service (scripts/cloud_worker.py Thread 4) on
     every scheduler tick to push its real state to the web service,
-    since the two run on separate Render containers with no shared
+    since the two run on separate Cloud Run containers with no shared
     filesystem. Requires X-Worker-Token header matching WORKER_PUSH_TOKEN
-    env var (set identically on both services in the Render dashboard)
+    env var (set identically on both Cloud Run services via Variables & Secrets)
     when that env var is configured; if it is not set on this (web)
     side, push is accepted unauthenticated (local/dev convenience).
     """
@@ -1749,7 +1749,7 @@ async def get_deploy_info():
         "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
         "live_trading_enabled": False,
         "deployed_at_known": bool(git_sha),
-        "render_git_commit_legacy": os.environ.get("RENDER_GIT_COMMIT", ""),
+        "render_git_commit_legacy": os.environ.get("RENDER_GIT_COMMIT", ""),  # kept for backward compat, prefer GCP_GIT_COMMIT
     }
 
 
@@ -1770,19 +1770,30 @@ async def get_live_trading_gate():
     Returns gate_open=true ONLY when ALL pass.
     This is what the dashboard "Go Live" button checks first.
     Live trading remains OFF until human gives explicit approval phrase.
+    Response includes failing_reasons list for clear observability.
     """
     gates = []
     gate_open = True
 
-    def gate(name: str, passed: bool, detail: str):
+    def gate(name: str, passed: bool, detail: str, fix_hint: str = ""):
         nonlocal gate_open
         if not passed:
             gate_open = False
-        gates.append({"gate": name, "passed": passed, "detail": detail})
+        gates.append({
+            "gate": name,
+            "passed": passed,
+            "detail": detail,
+            "fix_hint": fix_hint,
+        })
 
     # Gate 1: Safety env vars
     live_env = os.environ.get("LIVE_TRADING_ENABLED", "0")
-    gate("env_live_disabled", live_env == "0", f"LIVE_TRADING_ENABLED={live_env} (must be 0 for paper, 1 for live)")
+    gate(
+        "env_live_disabled",
+        live_env == "0",
+        f"LIVE_TRADING_ENABLED={live_env} (must be 0 for paper, 1 for live)",
+        fix_hint="Set LIVE_TRADING_ENABLED=1 in Cloud Run → Variables & Secrets only after all gates pass",
+    )
 
     # Gate 2: Kill switch
     try:
@@ -1791,6 +1802,7 @@ async def get_live_trading_gate():
             "kill_switch_off",
             not ks.get("kill_switch_activated", False),
             "Kill switch not activated" if not ks.get("kill_switch_activated") else "KILL SWITCH ACTIVE",
+            fix_hint="Set kill_switch_activated=false in config/kill_switch.json to clear the kill switch",
         )
         gate(
             "human_approved",
@@ -1800,17 +1812,14 @@ async def get_live_trading_gate():
                 if ks.get("live_trading_approved")
                 else "NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json"
             ),
+            fix_hint="POST /api/live-trading/approve with the required approval phrase",
         )
     except Exception as e:
-        gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
+        gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}",
+             fix_hint="Ensure config/kill_switch.json exists and is valid JSON")
 
     # Gate 3: ML accuracy — Spearman rho >= 0.70 over 10+ days
     try:
-        history = (
-            json.loads((_VAL_DIR.parent / "gain_rank_history.json").read_text())
-            if (_VAL_DIR.parent / "gain_rank_history.json").exists()
-            else []
-        )
         val_files = list(_VAL_DIR.glob("market_validation_*.json")) if _VAL_DIR.exists() else []
         rhos = []
         for vf in val_files:
@@ -1819,34 +1828,51 @@ async def get_live_trading_gate():
             if rho is not None:
                 rhos.append(rho)
         avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
-        gate("validation_days", len(val_files) >= 10, f"{len(val_files)} validation days (need ≥10)")
-        gate("ml_accuracy_rho", avg_rho >= 0.70, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
+        gate(
+            "validation_days",
+            len(val_files) >= 10,
+            f"{len(val_files)} validation days (need ≥10)",
+            fix_hint="Run the daily validation job on ≥10 market days to accumulate Spearman ρ records",
+        )
+        gate(
+            "ml_accuracy_rho",
+            avg_rho >= 0.70,
+            f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)",
+            fix_hint="Improve ML model or increase training data until Spearman ρ ≥ 0.70 across 10+ days",
+        )
     except Exception as e:
-        gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
+        gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}",
+             fix_hint="Ensure state/market_validations/ directory contains valid market_validation_*.json files")
 
     # Gate 4: Max daily loss set
     try:
-        # Use kill_switch.json for max_loss (avoid yaml dependency)
-        # Risk config also in kill_switch since both updated together
         ks_data = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
         max_loss = ks_data.get("max_daily_loss_inr", 0)
         gate(
             "max_loss_configured",
             max_loss > 0 and max_loss <= 10000,
             f"Max daily loss = ₹{max_loss} hardcoded in kill_switch.json",
+            fix_hint="Set max_daily_loss_inr to a value between 1 and 10000 in config/kill_switch.json",
         )
     except Exception as e:
-        gate("max_loss_configured", False, f"Could not read max loss config: {e}")
+        gate("max_loss_configured", False, f"Could not read max loss config: {e}",
+             fix_hint="Ensure config/kill_switch.json contains max_daily_loss_inr field")
+
+    failing_reasons = [
+        f"[{g['gate']}] {g['detail']}" + (f" — Fix: {g['fix_hint']}" if g.get("fix_hint") else "")
+        for g in gates if not g["passed"]
+    ]
 
     return {
         "gate_open": gate_open,
         "gates": gates,
+        "failing_reasons": failing_reasons,
         "summary": f"{sum(1 for g in gates if g['passed'])}/{len(gates)} gates passed",
         "verdict": "LIVE_TRADING_ALLOWED" if gate_open else "LIVE_TRADING_BLOCKED",
         "message": (
             "All gates pass — ready for live trading after human approval"
             if gate_open
-            else "Live trading blocked — see failed gates above"
+            else "Live trading blocked — see failing_reasons for details"
         ),
         "live_trading_status": "OFF — remains off until all gates pass",
     }
@@ -1857,7 +1883,7 @@ async def approve_live_trading(payload: Dict[str, Any]):
     """
     Human approval endpoint. Requires exact phrase to prevent accidental activation.
     Even after approval, LIVE_TRADING_ENABLED env var must be manually set to 1
-    on Render dashboard — this cannot be done via API.
+    on Cloud Run (GCP) → Variables & Secrets — this cannot be done via API.
     """
     REQUIRED_PHRASE = "I APPROVE LIVE TRADING WITH MAX LOSS RS 5000"
     phrase = payload.get("approval_phrase", "").strip().upper()
@@ -1889,19 +1915,119 @@ async def approve_live_trading(payload: Dict[str, Any]):
         return {"approved": False, "message": f"Failed to save approval: {e}"}
 
 
-@app.get("/api/scheduler/health")
+# ---------------------------------------------------------------------------
+# Cloud Run environment diagnostics — shows missing/present required env vars
+# ---------------------------------------------------------------------------
+
+_REQUIRED_ENV_VARS = [
+    ("DHAN_CLIENT_ID", "Dhan broker client ID — required for broker API"),
+    ("DHAN_ACCESS_TOKEN", "Dhan broker access token — required for broker API"),
+    ("LIVE_TRADING_ENABLED", "Must be '0' for paper/analyzer mode; '1' only for live"),
+    ("WORKER_PUSH_TOKEN", "Shared secret between web and worker Cloud Run services"),
+    ("GOOGLE_CLOUD_PROJECT", "GCP project ID — used for Cloud Run metadata"),
+    ("GCP_REGION", "Cloud Run region (e.g. asia-south1)"),
+    ("CLOUD_MODE", "Set to '1' when running on Cloud Run (enables cloud-specific paths)"),
+]
+
+_OPTIONAL_ENV_VARS = [
+    ("DEFER_INSTRUMENT_WARMUP", "Set to '1' on Cloud Run to skip eager instrument load"),
+    ("API_KEY", "Dashboard API key — enable with REQUIRE_API_KEY=true"),
+    ("REQUIRE_API_KEY", "Set to 'true' to enforce API key auth on dashboard"),
+    ("LOG_LEVEL", "Python logging level (DEBUG/INFO/WARNING/ERROR)"),
+]
+
+
+@app.get("/api/diagnostics")
+async def get_diagnostics():
+    """
+    Cloud Run environment diagnostics endpoint.
+    Reports which required/optional env vars are present or missing
+    so operators can quickly identify misconfigured deployments.
+    Secret values are NEVER returned — only presence/absence is reported.
+    """
+    required_status = []
+    missing_required = []
+    for var, description in _REQUIRED_ENV_VARS:
+        val = os.environ.get(var)
+        present = val is not None and val.strip() != ""
+        entry = {
+            "var": var,
+            "present": present,
+            "description": description,
+        }
+        # For non-secret informational vars, include the value (masked for tokens)
+        _secret_vars = {"DHAN_ACCESS_TOKEN", "WORKER_PUSH_TOKEN", "API_KEY"}
+        if present and var not in _secret_vars:
+            entry["value"] = val.strip()
+        elif present:
+            entry["value"] = "***" + val.strip()[-4:] if len(val.strip()) > 4 else "***"
+        if not present:
+            missing_required.append(var)
+        required_status.append(entry)
+
+    optional_status = []
+    for var, description in _OPTIONAL_ENV_VARS:
+        val = os.environ.get(var)
+        present = val is not None and val.strip() != ""
+        entry = {
+            "var": var,
+            "present": present,
+            "description": description,
+        }
+        _secret_vars_opt = {"API_KEY"}
+        if present and var not in _secret_vars_opt:
+            entry["value"] = val.strip()
+        elif present:
+            entry["value"] = "***"
+        optional_status.append(entry)
+
+    # Filesystem writability check — important for Cloud Run ephemeral FS
+    fs_checks = {}
+    for label, path in [
+        ("state_dir", ROOT_DIR / "state"),
+        ("config_dir", ROOT_DIR / "config"),
+        ("outputs_dir", ROOT_DIR / "src" / "outputs"),
+    ]:
+        try:
+            test_file = Path(path) / ".diag_write_test"
+            Path(path).mkdir(parents=True, exist_ok=True)
+            test_file.write_text("ok")
+            test_file.unlink()
+            fs_checks[label] = {"writable": True, "path": str(path)}
+        except Exception as exc:
+            fs_checks[label] = {"writable": False, "path": str(path), "error": str(exc)[:120]}
+
+    all_required_present = len(missing_required) == 0
+    return {
+        "status": "ok" if all_required_present else "missing_required_vars",
+        "all_required_present": all_required_present,
+        "missing_required": missing_required,
+        "required_vars": required_status,
+        "optional_vars": optional_status,
+        "filesystem": fs_checks,
+        "runtime": {
+            "python_version": sys.version,
+            "root_dir": str(ROOT_DIR),
+            "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
+            "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+
 async def get_scheduler_health():
     """
     Job scheduler health, as last pushed by the worker service (see
     /api/scheduler/health/push above). NOT a local-file read — the
-    scheduler daemon runs on a different Render container than this web
+    scheduler daemon runs on a different Cloud Run container than this web
     service, so local files here would always be empty.
 
     `healthy=False` covers three real failure modes:
       1. Worker has never pushed at all (never deployed / crashed at boot)
       2. Worker's own config_alert is set (broken scheduler config)
       3. Last push is older than STALE_THRESHOLD_S (worker thread died
-         but the worker process itself is still up, so Render wouldn't
+         but the worker process itself is still up, so Cloud Run wouldn't
          restart it — this is exactly the silent-failure shape that
          caused the original bug)
     """
@@ -2142,7 +2268,7 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
 active_connections: List[WebSocket] = []
 _MAX_WS_CONNECTIONS = 20  # hard cap — this is a small-team dashboard, not a
 # consumer product. Each open connection runs its own dedicated per-second
-# loop on the single Render worker process (--workers 1, 512MB Starter box);
+# loop on the single Cloud Run worker process (--workers 1);
 # an unbounded number of stale/reconnecting tabs is an unbounded amount of
 # background work with no ceiling. Rejecting past this cap is a cheap safety
 # net against that becoming an OOM source (2026-07-02 forensic investigation).
@@ -2440,7 +2566,7 @@ class HealthResponse(BaseModel):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# TTL CACHE — Prevents Render 503 cascade on cold-start and poll overload
+# TTL CACHE — Prevents 503 cascade on cold-start and poll overload
 # Heavy APIs cache their results. Cache is in-process dict (no Redis needed).
 # TTLs chosen for trading: broker data 30s, scanner 60s, accuracy 120s.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -3816,7 +3942,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 pass
 
         # ALWAYS try Dhan P0 first when market is open (or as fallback)
-        # chain_raw_live.csv on Render is from repo clone — may be months old
+        # chain_raw_live.csv from repo clone — may be months old
         # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
         try:
             from core.data.datasource_manager import DataSourceManager
@@ -7664,7 +7790,7 @@ async def runner_status():
 
     try:
         # Read heartbeat file directly — spawning runner.py as subprocess is
-        # unsafe on 512Mi Render (imports all modules, spikes RAM to OOM).
+        # unsafe on memory-constrained Cloud Run (imports all modules, spikes RAM to OOM).
         heartbeat_file = ROOT_DIR / "system3_daily_heartbeat.json"
         if heartbeat_file.exists():
             try:
