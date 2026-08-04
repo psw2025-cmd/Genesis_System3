@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T11:08:44.534Z",
+  "generated_at": "2026-08-04T11:56:34.360Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -35,62 +35,62 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 166210
+      "size_bytes": 165932
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 254543
+      "size_bytes": 254499
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 164209
+      "size_bytes": 164358
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 124155
+      "size_bytes": 124163
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 195216
+      "size_bytes": 195277
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 156629
+      "size_bytes": 156050
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 162853
+      "size_bytes": 162421
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 80518
+      "size_bytes": 80558
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 122303
+      "size_bytes": 122362
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 136468
+      "size_bytes": 136678
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 134569
+      "size_bytes": 134780
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 118684
+      "size_bytes": 118835
     },
     {
       "file": "mobile_390x844.png",
