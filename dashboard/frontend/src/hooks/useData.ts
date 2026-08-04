@@ -222,7 +222,11 @@ export function useData() {
 
   const markSuccess = useCallback((group: string) => {
     failureCountRef.current[group] = 0
-  }, [])
+    // Clear sticky NETWORK_ERROR / CLOUD_UNAVAILABLE once a group recovers,
+    // otherwise TopBar stays DHAN DEGRADED forever after one failed poll.
+    const remaining = Object.values(failureCountRef.current).some((n) => Number(n) > 0)
+    if (!remaining) setApiStatus(null as any)
+  }, [setApiStatus])
 
   const pollBroker = useCallback(async () => {
     try {

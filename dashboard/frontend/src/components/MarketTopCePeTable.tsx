@@ -53,7 +53,7 @@ function fmtInt(n: number): string {
 
 export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs = 15000 }: Props) {
   const { marketTop, wsStatus, setMarketTop, apiStatus } = useStore()
-  const [board, setBoard] = useState<BoardKind>('moneycontrol')
+  const [board, setBoard] = useState<BoardKind>('dhan')
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
   const [mcRows, setMcRows] = useState<MarketTopRow[]>([])
@@ -162,8 +162,13 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
   const status = board === 'moneycontrol' ? mcMeta.status : (marketTop?.status || pollMeta.status)
   const streaming = wsStatus === 'live' && wsRows.length > 0
   const boardNote = board === 'moneycontrol'
-    ? (mcMeta.error || mcMeta.note || 'Waiting for Moneycontrol All Options Top Gainers…')
-    : (err || pollMeta.error || pollMeta.note || 'Waiting for Dhan option-chain gainers…')
+    ? (
+        String(mcMeta.status || '').toUpperCase().includes('FAIL')
+        || String(mcMeta.error || '').includes('403')
+          ? 'Moneycontrol blocked (403) — use Dhan board for trading truth'
+          : (mcMeta.error || mcMeta.note || 'Moneycontrol is reference-only; Dhan remains order/paper truth')
+      )
+    : (err || pollMeta.error || pollMeta.note || marketTop?.message || 'Waiting for Dhan option-chain gainers…')
   const authRequired = apiStatus?.status === 'API_AUTH_REQUIRED'
     || status === 'auth_required'
     || /auth|API authentication|Unlock dashboard/i.test(String(err || mcMeta.error || pollMeta.error || ''))

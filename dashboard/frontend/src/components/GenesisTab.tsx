@@ -28,7 +28,7 @@ const small: React.CSSProperties = { color: 'var(--text-mut)', fontSize: 12, lin
 const title: React.CSSProperties = { color: 'var(--text-primary)', fontSize: 13, fontWeight: 800, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }
 
 async function getData(path: string) {
-  const res = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS })
+  const res = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 10000 })
   return res.data?.data ?? res.data
 }
 
@@ -64,18 +64,33 @@ export function GenesisTab() {
   const load = async () => {
     setState(s => ({ ...s, loading: true, error: undefined }))
     try {
-      const [brief, brain, lab, monitor, hunger, truth, health, system, final] = await Promise.all([
-        getData('/genesis-production-brief'),
-        getData('/autonomous-brain'),
-        getData('/hidden-secrets-lab'),
-        getData('/never-die-monitor'),
-        getData('/hunger-meter'),
-        getData('/data-truth-score'),
-        getData('/health'),
-        getData('/api/system_health'),
-        getData('/final-message'),
-      ])
-      setState({ brief, brain, lab, monitor, hunger, truth, health, system, final, loading: false })
+      const paths = [
+        '/genesis-production-brief',
+        '/autonomous-brain',
+        '/hidden-secrets-lab',
+        '/never-die-monitor',
+        '/hunger-meter',
+        '/data-truth-score',
+        '/health',
+        '/api/system_health',
+        '/final-message',
+      ] as const
+      const settled = await Promise.allSettled(paths.map((p) => getData(p)))
+      const val = (i: number) => (settled[i].status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<any>).value : { error: String((settled[i] as PromiseRejectedResult).reason?.message || settled[i]) })
+      const failed = settled.filter((x) => x.status === 'rejected').length
+      setState({
+        brief: val(0),
+        brain: val(1),
+        lab: val(2),
+        monitor: val(3),
+        hunger: val(4),
+        truth: val(5),
+        health: val(6),
+        system: val(7),
+        final: val(8),
+        loading: false,
+        error: failed === paths.length ? 'Genesis APIs failed' : undefined,
+      })
     } catch (e: any) {
       setState({ loading: false, error: e?.response?.data?.detail || e?.message || 'Genesis APIs failed' })
     }

@@ -179,8 +179,10 @@ def fetch_moneycontrol_option_gainers(top_n: int = 25, timeout_s: float = 25.0) 
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
                 ),
-                "Accept": "text/html,application/xhtml+xml",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-IN,en;q=0.9",
+                "Referer": "https://www.moneycontrol.com/stocks/fno/marketstats/options/gainers/",
+                "Cache-Control": "no-cache",
             },
             method="GET",
         )

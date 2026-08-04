@@ -78,7 +78,11 @@ function chainPass(x: any): boolean {
   const status = String(x.status || '').toUpperCase()
   const contracts = Number(x.total_contracts || (Array.isArray(x.contracts) ? x.contracts.length : 0))
   const spot = Number(x.spot || 0)
-  return source === 'dhan' && !x.blocked && x.stale !== true && spot > 0 && contracts > 0 && ['OK', 'MARKET_OPEN', 'MARKET_CLOSED_DHAN_SNAPSHOT', 'EOD_SNAPSHOT'].includes(status)
+  if (source !== 'dhan' || x.blocked || spot <= 0 || contracts <= 0) return false
+  // After-hours Dhan snapshots are valid proof (stale=true is expected when market closed).
+  if (['MARKET_CLOSED_DHAN_SNAPSHOT', 'EOD_SNAPSHOT', 'MARKET_CLOSED'].includes(status)) return true
+  if (['OK', 'MARKET_OPEN'].includes(status) && x.stale !== true) return true
+  return false
 }
 
 function safeNoTradeChain(x: any): boolean {
@@ -95,18 +99,65 @@ export function SystemTruthControl() {
   async function run() {
     setLoading(true); setError('')
     try {
+      // Prefer batch endpoints — avoid stampeding 4× slow after-hours /api/chain calls.
       const entries = await Promise.all([
-        ['health', axios.get(`${API_BASE}/api/health`)], ['state', axios.get(`${API_BASE}/api/state`)],
-        ['broker', axios.get(`${API_BASE}/api/broker/dhan/status`)], ['funds', axios.get(`${API_BASE}/api/broker/funds`)],
-        ['holdings', axios.get(`${API_BASE}/api/broker/holdings`)], ['positions', axios.get(`${API_BASE}/api/broker/positions/live`)],
-        ['gain', axios.get(`${API_BASE}/api/gain_rank`)], ['scanner', axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5`)],
-        ['pnl', axios.get(`${API_BASE}/api/pnl`)], ['trades', axios.get(`${API_BASE}/api/trades/today`)], ['gates', axios.get(`${API_BASE}/api/auto_gates`)],
-        ...ALL_CHAIN_SYMBOLS.map(sym => [`chain_${sym}`, axios.get(`${API_BASE}/api/chain/${sym}`)] as any),
+        ['health', axios.get(`${API_BASE}/api/health`, { timeout: 12000 })],
+        ['state', axios.get(`${API_BASE}/api/state`, { timeout: 12000 })],
+        ['batch_broker', axios.get(`${API_BASE}/api/batch/positions-holdings`, { timeout: 20000 })],
+        ['batch_market', axios.get(`${API_BASE}/api/batch/market-data`, { timeout: 20000 })],
+        ['batch_chains', axios.get(`${API_BASE}/api/batch/chains`, { timeout: 12000 })],
+        ['scanner', axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5`, { timeout: 15000 })],
+        ['trades', axios.get(`${API_BASE}/api/trades/today`, { timeout: 12000 })],
       ].map(async ([key, promise]: any) => {
         try { const res = await promise; return [key, { ok: true, status: res.status, data: res.data }] }
         catch (err: any) { return [key, { ok: false, status: err?.response?.status || 0, error: err?.message || String(err) }] }
       }))
-      setData(Object.fromEntries(entries)); setLastRun(new Date().toLocaleString())
+      const mapped: Record<string, any> = Object.fromEntries(entries)
+      const brokerBatch = mapped.batch_broker?.data || {}
+      const marketBatch = mapped.batch_market?.data || {}
+      const chainsBatch = mapped.batch_chains?.data?.chains || {}
+      mapped.broker = {
+        ok: mapped.batch_broker?.ok && brokerBatch?.broker_status?.connected === true,
+        status: mapped.batch_broker?.status || 0,
+        data: brokerBatch.broker_status || {},
+      }
+      mapped.funds = {
+        ok: mapped.batch_broker?.ok && brokerBatch?.funds?.success !== false,
+        status: mapped.batch_broker?.status || 0,
+        data: brokerBatch.funds || {},
+      }
+      mapped.holdings = {
+        ok: mapped.batch_broker?.ok && brokerBatch?.holdings?.success !== false,
+        status: mapped.batch_broker?.status || 0,
+        data: brokerBatch.holdings || {},
+      }
+      mapped.positions = {
+        ok: mapped.batch_broker?.ok && brokerBatch?.positions?.success !== false,
+        status: mapped.batch_broker?.status || 0,
+        data: brokerBatch.positions || {},
+      }
+      mapped.gain = {
+        ok: mapped.batch_market?.ok && Boolean(marketBatch?.gain_rank),
+        status: mapped.batch_market?.status || 0,
+        data: marketBatch.gain_rank || {},
+      }
+      mapped.gates = {
+        ok: mapped.batch_market?.ok && Boolean(marketBatch?.auto_gates),
+        status: mapped.batch_market?.status || 0,
+        data: marketBatch.auto_gates || {},
+      }
+      mapped.pnl = {
+        ok: mapped.batch_market?.ok,
+        status: mapped.batch_market?.status || 0,
+        data: marketBatch.pnl || {},
+      }
+      for (const sym of ALL_CHAIN_SYMBOLS) {
+        const payload = chainsBatch[sym]
+        mapped[`chain_${sym}`] = payload
+          ? { ok: true, status: 200, data: payload }
+          : { ok: false, status: 0, error: 'missing_from_batch_chains' }
+      }
+      setData(mapped); setLastRun(new Date().toLocaleString())
     } catch (err: any) { setError(err?.message || String(err)) }
     finally { setLoading(false) }
   }

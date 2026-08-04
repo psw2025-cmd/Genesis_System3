@@ -117,7 +117,23 @@ export function PerformanceTab() {
                 Backtest / Walk-Forward Proof
               </h3>
               <pre style={{ fontSize: '.7rem', color: 'var(--text-mut)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-mono)' }}>
-                {JSON.stringify(backtest.summary || { status: backtest.status }, null, 2).slice(0, 1200)}
+                {JSON.stringify(
+                  backtest.costed_walkforward
+                    || {
+                      status: backtest.summary?.status,
+                      blockers: backtest.summary?.blockers,
+                      warnings: backtest.summary?.warnings,
+                      evidence: backtest.summary?.evidence
+                        ? {
+                            ...backtest.summary.evidence,
+                            // never show orchestrator file-path scans as trade candidates
+                            candidates_sample: undefined,
+                          }
+                        : undefined,
+                    },
+                  null,
+                  2,
+                ).slice(0, 1200)}
               </pre>
             </div>
           )}

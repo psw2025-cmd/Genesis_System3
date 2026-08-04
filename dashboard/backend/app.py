@@ -3564,7 +3564,7 @@ async def get_chain(underlying: str):
     return _cache_set(cache_key, result)
 
 
-async def _get_chain_uncached(underlying: str):
+async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = None):
     """Get option chain for specific underlying"""
     try:
         # Check market status first
@@ -3701,8 +3701,13 @@ async def _get_chain_uncached(underlying: str):
 
                     return fetch_chain_for_api(DataSourceManager(), underlying.upper())
 
+                _closed_to = (
+                    float(closed_timeout_s)
+                    if closed_timeout_s is not None
+                    else _CHAIN_LIVE_TIMEOUT_CLOSED_S
+                )
                 closed_chain = await _run_blocking(
-                    _closed_dhan_chain_fetch, timeout=_CHAIN_LIVE_TIMEOUT_CLOSED_S
+                    _closed_dhan_chain_fetch, timeout=_closed_to
                 )
                 if closed_chain and int(closed_chain.get("total_contracts") or 0) > 0:
                     # Dhan still returns last quotes after hours — show as snapshot, not live.
@@ -5175,7 +5180,11 @@ async def index_chain_micro_loop():
         idx += 1
         open_now = bool(_market_open_from_state())
         try:
-            result = await _get_chain_uncached(sym)
+            # After hours: allow longer Dhan OC fetch so BANKNIFTY/MIDCPNIFTY can warm
+            # (UI /api/chain still uses short outer timeout + cache fallback).
+            result = await _get_chain_uncached(
+                sym, closed_timeout_s=22.0 if not open_now else None
+            )
             if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
                 payload = dict(result)
                 payload["stream_mode"] = "index_chain_micro"
@@ -5802,17 +5811,119 @@ async def predict_performance():
 
 @app.get("/api/alerts/recent")
 async def get_recent_alerts(limit: int = 50):
-    """Get recent alerts"""
+    """Get recent alerts + synthesize operational degradations when file is empty."""
     try:
-        if not ALERTS_AVAILABLE:
-            return {"status": "ERROR", "message": "Alerts system not available", "alerts": []}
+        alerts: list = []
+        if ALERTS_AVAILABLE:
+            try:
+                alerts_system = get_alerts_system()
+                alerts = list(alerts_system.get_recent_alerts(limit) or [])
+            except Exception as exc:
+                print(f"[alerts] file read failed: {exc}")
 
-        alerts_system = get_alerts_system()
-        alerts = alerts_system.get_recent_alerts(limit)
-
-        return {"status": "ok", "alerts": alerts, "count": len(alerts)}
+        ops = await _synthesize_operational_alerts()
+        # Prefer file alerts; append ops that are not already present by title.
+        seen = {str(a.get("title") or a.get("id") or "") for a in alerts}
+        for a in ops:
+            title = str(a.get("title") or "")
+            if title and title not in seen:
+                alerts.append(a)
+                seen.add(title)
+        alerts = alerts[-max(1, int(limit or 50)) :]
+        return {"status": "ok", "alerts": alerts, "count": len(alerts), "ops_injected": len(ops)}
     except Exception as e:
         return {"status": "ERROR", "message": str(e), "alerts": []}
+
+
+async def _synthesize_operational_alerts() -> list:
+    """Build operator-visible alerts from live runtime state (not silent empty)."""
+    from datetime import datetime as _dt
+
+    now = _dt.now(IST).isoformat()
+    out: list = []
+
+    def _add(code: str, severity: str, title: str, message: str, data: dict | None = None):
+        out.append(
+            {
+                "id": f"OPS_{code}",
+                "type": "system_alert",
+                "severity": severity,
+                "title": title,
+                "message": message,
+                "data": data or {},
+                "timestamp": now,
+                "persistent": False,
+                "read": False,
+                "source": "operational_synth",
+            }
+        )
+
+    try:
+        # Moneycontrol scrape (reference only — Dhan is trading truth)
+        mc = _cache_get("moneycontrol_gainers:25", 600.0)
+        if isinstance(mc, dict) and str(mc.get("status") or "").upper() in {
+            "SCRAPE_FAILED",
+            "PARSE_FAILED",
+            "ERROR",
+        }:
+            _add(
+                "MC_SCRAPE",
+                "warning",
+                "Moneycontrol gainers scrape failed",
+                f"Reference scrape blocked ({mc.get('error') or mc.get('status')}). "
+                "Trading truth remains Dhan Market Top / option chain.",
+                {"status": mc.get("status"), "error": mc.get("error")},
+            )
+
+        # Chain warm gaps (after-hours BANKNIFTY/MIDCPNIFTY often cold)
+        cold = []
+        for sym in _INDEX_STREAM_SYMBOLS:
+            pushed = _PUSHED_CHAIN_CACHE.get(sym) or {}
+            data = pushed.get("data") if isinstance(pushed, dict) else None
+            if not isinstance(data, dict) or float(data.get("spot") or 0) <= 0:
+                ttl = _cache_get(f"chain_{sym}", 300.0)
+                if not isinstance(ttl, dict) or float(ttl.get("spot") or 0) <= 0:
+                    cold.append(sym)
+        if cold:
+            _add(
+                "CHAIN_COLD",
+                "warning",
+                "Index option-chain cache incomplete",
+                f"No verified Dhan snapshot yet for: {', '.join(cold)}. "
+                "TopBar may show blank spots until micro-loop warms cache.",
+                {"symbols": cold},
+            )
+
+        # Live gate blockers (informational — must stay blocked)
+        try:
+            gate = await get_live_trading_gate()
+        except Exception:
+            gate = None
+        if isinstance(gate, dict) and not gate.get("gate_open", True):
+            failing = [
+                g
+                for g in (gate.get("gates") or [])
+                if isinstance(g, dict) and not g.get("passed")
+            ]
+            if failing:
+                detail = "; ".join(
+                    f"{g.get('gate')}={g.get('detail')}" for g in failing[:4]
+                )
+                _add(
+                    "LIVE_GATE",
+                    "info",
+                    "Live trading correctly BLOCKED",
+                    detail[:400],
+                    {"failing_gates": [g.get("gate") for g in failing]},
+                )
+    except Exception as exc:
+        _add(
+            "SYNTH_ERROR",
+            "warning",
+            "Operational alert synthesis error",
+            str(exc)[:200],
+        )
+    return out
 
 
 @app.get("/api/alerts/unread")
@@ -6380,6 +6491,8 @@ async def get_backtest_results():
             costed = json.loads(costed_path.read_text(encoding="utf-8"))
     except Exception as exc:
         costed = {"error": str(exc)[:160]}
+    # Operator view: never dump repo file-path "candidates_sample" as trade evidence.
+    summary = _sanitize_backtest_operator_summary(summary)
     return {
         "status": "ok",
         "summary": summary,
@@ -6387,6 +6500,41 @@ async def get_backtest_results():
         "source_dir": str(base),
         "live_trading_enabled": False,
     }
+
+
+def _sanitize_backtest_operator_summary(summary: Any) -> Any:
+    if not isinstance(summary, dict):
+        return summary
+    out = dict(summary)
+    ev = out.get("evidence")
+    if isinstance(ev, dict):
+        ev2 = {k: v for k, v in ev.items() if k != "candidates_sample"}
+        sample = ev.get("candidates_sample")
+        if isinstance(sample, list):
+            # Keep only dict-like trade rows; drop .py/.md path strings.
+            trade_like = [x for x in sample if isinstance(x, dict)]
+            path_like = [
+                x
+                for x in sample
+                if isinstance(x, str)
+                and (
+                    "/" in x
+                    or "\\" in x
+                    or x.endswith((".py", ".md", ".json", ".tsx", ".ts"))
+                )
+            ]
+            ev2["trade_candidates_sample"] = trade_like[:40]
+            ev2["code_path_scan_count"] = len(path_like)
+            ev2["code_path_scan_note"] = (
+                "Orchestrator file-scan paths are not trade candidates; "
+                "hidden from Performance tab. See costed_walkforward for PnL proof."
+            )
+            if "candidate_count" in ev2 and path_like and not trade_like:
+                ev2["candidate_count_note"] = (
+                    f"candidate_count={ev2.get('candidate_count')} counts code/docs hits, not trades"
+                )
+        out["evidence"] = ev2
+    return out
 
 
 @app.get("/api/backtests/latest")
@@ -6920,16 +7068,23 @@ async def get_agent_memory():
 
 @app.get("/api/agent/issues")
 async def get_agent_issues():
-    """Get detected issues - returns immediately with empty array"""
+    """Return real operational issues (not a permanent empty stub)."""
     try:
-        if not UPGRADE_AGENT_AVAILABLE:
-            return {"status": "ok", "message": "Upgrade agent not available", "issues": []}
-
-        # Return immediately - issue detection is handled by other systems
-        # This endpoint is kept for API compatibility but returns instantly
-        return {"status": "ok", "issues": []}
+        ops = await _synthesize_operational_alerts()
+        issues = [
+            {
+                "id": a.get("id"),
+                "severity": a.get("severity"),
+                "title": a.get("title"),
+                "message": a.get("message"),
+                "data": a.get("data") or {},
+                "timestamp": a.get("timestamp"),
+            }
+            for a in ops
+            if str(a.get("severity") or "") in {"warning", "error", "critical"}
+        ]
+        return {"status": "ok", "issues": issues, "count": len(issues)}
     except Exception as e:
-        # Return empty array on any error to prevent blocking
         return {"status": "ok", "message": str(e), "issues": []}
 
 
