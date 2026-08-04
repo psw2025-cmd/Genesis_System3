@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-22:20:16 IST
+23:00:18 IST
 NIFTY
 24,615
 SNAP
@@ -16,7 +16,7 @@ FINNIFTY
 SNAP
 TICK 1s
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -27,11 +27,11 @@ OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
-ML 0/5d
+ML 1/5d
 PAPER
-EXP —
+EXP -196.14
 UI
 LIVE
 COMMAND
@@ -63,7 +63,7 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/4/2026, 4:50:12 PM
+Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/4/2026, 5:30:14 PM
 Dhan production tokens have no paper sandbox — fills are local sim; LTP/PnL from live Dhan option chain. LIVE orders stay OFF.
 Refresh
 Force Paper Tick
@@ -71,17 +71,17 @@ Mode Safety
 PAPER SAFE
 Live trading: OFF
 Market Data (Dhan)
-CHAIN LIVE
+CONNECTED
 Mark-to-market: DHAN_LIVE_MARK_TO_MARKET
 Today Paper Entries
 0
 Open positions: 0
 Today Paper Exits
 0
-Realized: ₹0.00
+Realized: ₹-1806.07
 Paper Truth Provenance
 Ledger / source
-/app/src/outputs/positions_live.json
+/app/outputs/positions_live.json
 Displayed rows
 0
 Fake/fixture rejected
@@ -99,11 +99,11 @@ No open paper positions
 Use Force Paper Tick during market hours to open a Dhan-chain-backed paper fill, or wait for the cloud paper loop.
 PnL Summary (Dhan-style)
 Total PnL
-₹0.00
+₹-1806.07
 Unrealized (open)
 ₹0.00
 Realized (booked)
-₹0.00
+₹-1806.07
 Open Positions
 0 / 3
 Today Entries / Exits

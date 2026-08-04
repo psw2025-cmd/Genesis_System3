@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-22:20:00 IST
+23:00:03 IST
 NIFTY
 24,615
 SNAP
@@ -16,7 +16,7 @@ FINNIFTY
 SNAP
 TICK 1s
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -27,11 +27,11 @@ OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
-ML 0/5d
+ML 1/5d
 PAPER
-EXP —
+EXP -196.14
 UI
 LIVE
 COMMAND
@@ -83,7 +83,7 @@ CONTRACTS
 +/-10 ATM
 +/-15 ATM
 +/-20 ATM
-AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=5s fetched=2026-08-04T16:23:31.320802+00:00 - Market closed — last verified Dhan snapshot (2026-08-04 21:53 IST)
+AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=177.8s fetched=2026-08-04T17:14:52.347795+00:00 - Market closed — last verified Dhan snapshot (2026-08-04 22:44 IST)
 OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
 
 583K

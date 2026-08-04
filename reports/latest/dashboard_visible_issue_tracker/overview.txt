@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-22:19:50 IST
+22:59:52 IST
 NIFTY
 24,615
 SNAP
@@ -14,9 +14,9 @@ SNAP
 FINNIFTY
 26,845
 SNAP
-TICK 0s
+TICK 1s
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -27,11 +27,11 @@ OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
-ML 0/5d
+ML 1/5d
 PAPER
-EXP —
+EXP -196.14
 UI
 LIVE
 COMMAND
@@ -67,10 +67,10 @@ PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
-₹0
+₹-1,806
 Cloud sim
 OPEN POSITIONS
 0
@@ -88,16 +88,15 @@ State API
 Market closed: After hours (closed at 15:30)
 LOADED
 Broker Status API
-ERROR
+LOADED
 Funds API
-Invalid Token
 LOADED
 Holdings API
 LOADED
 Positions API
 LOADED
 P&L API
-pnl=0
+pnl=-1806.07
 LOADED
 Gain Rank / Scanner
 2026-08-04
@@ -109,21 +108,21 @@ Alerts
 0 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-04 21:53 IST)
+Market closed — last verified Dhan snapshot (2026-08-04 22:44 IST)
 Gate Matrix
 2/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
-0/5 days · ρ=None · need ≥0.7
+1/5 days · ρ=0.2 · need ≥0.7
 PEND
 Profit / Expectancy
-expectancy=None · win_rate=None
+expectancy=-196.14 · win_rate=0.3333
 PEND
 Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=12.79s refresh=60s
+tick_age=30.73s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -137,7 +136,7 @@ System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+PASS
 Data Source
 live
 Market

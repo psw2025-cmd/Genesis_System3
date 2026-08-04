@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-22:20:52 IST
+23:00:54 IST
 NIFTY
 24,615
 SNAP
@@ -16,7 +16,7 @@ FINNIFTY
 SNAP
 TICK 1s
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -27,11 +27,11 @@ OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
-ML 0/5d
+ML 1/5d
 PAPER
-EXP —
+EXP -196.14
 UI
 LIVE
 COMMAND
@@ -82,10 +82,10 @@ human_approved
 NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json
 ❌
 validation_days
-0 validation days (need ≥10)
+1 validation days (need ≥10)
 ❌
 ml_accuracy_rho
-Avg Spearman ρ=0.000 (need ≥0.70)
+Avg Spearman ρ=0.200 (need ≥0.70)
 ✅
 max_loss_configured
 Max daily loss = ₹5000 hardcoded in kill_switch.json
