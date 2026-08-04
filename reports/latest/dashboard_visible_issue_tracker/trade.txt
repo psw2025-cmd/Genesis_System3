@@ -3,17 +3,18 @@ AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
-805_gcp_not_render
-00:56:25 IST
+roker_status_cache
+01:18:38 IST
 NIFTY
---
+24,615
+SNAP
 BNFTY
 --
 FINNIFTY
 --
-TICK 2s
+TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN DEGRADED
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
@@ -60,13 +61,13 @@ System
 Live Gate
 LOCK
 ALL-INDIA TOP OPTION GAINERS
-Loading… · 0 rows · Reference board (LIVE_SCRAPED) · not used for live orders
+Refreshed 2026-08-05 01:17:06 · SCRAPE_FAILED · 0 rows · Reference board (LIVE_SCRAPED) · not used for live orders
 MONEYCONTROL
 DHAN LIVE
-HTTP POLL
+WS STREAM
 LIVE OFF
-Loading market top…
-Waiting for Moneycontrol All Options Top Gainers…
+No gainer rows yet
+HTTP Error 403: Forbidden
 OPTION CHAIN
 NIFTY
 BANKNIFTY
@@ -78,16 +79,196 @@ HDFCBANK
 TCS
 INFY
 ICICIBANK
-OPTION CHAIN - NIFTY
-No chain rows yet (market closed — last snapshot not loaded).
-Status: NO_DHAN_DATA
-Market: CLOSED · NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-Next open: --
-Source: dhan / blocked_until_real_dhan_stream
-Backend: NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+SESSION SNAPSHOT
+SPOT
+24,615
+PCR
+0.97
+CONTRACTS
+160
++/-5 ATM
++/-10 ATM
++/-15 ATM
++/-20 ATM
+AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=53.8s fetched=2026-08-04T19:38:17.748380+00:00 - Market closed — last verified Dhan snapshot (2026-08-05 01:08 IST)
+OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
+
+583K
+	--	1384K	0.0%	514.30	514.4	24,100	0.1	0.05	27.6%	142516K	--	
+4.2M
+
+
+206K
+	--	1041K	0.0%	465.55	464.3	24,150	0.1	0.05	25.1%	89353K	--	
+2.3M
+
+
+919K
+	--	8304K	0.0%	414.45	414.4	24,200	0.1	0.05	22.6%	341619K	--	
+6.0M
+
+
+323K
+	--	6812K	0.0%	365.00	364.5	24,250	0.1	0.05	20.1%	377991K	--	
+3.5M
+
+
+974K
+	--	36964K	0.0%	314.40	314.4	24,300	0.1	0.05	17.5%	608278K	--	
+4.5M
+
+
+545K
+	--	61803K	0.0%	264.35	264.4	24,350	0.1	0.05	15.0%	733556K	--	
+3.8M
+
+
+2.4M
+	--	263507K	0.0%	215.00	214.7	24,400	0.1	0.05	12.4%	1320146K	--	
+8.1M
+
+
+4.0M
+	--	574138K	0.0%	164.85	164.6	24,450	0.1	0.10	10.5%	1533825K	--	
+12.3M
+
+
+7.3M
+	--	1351548K	0.0%	114.70	114.7	24,500	0.1	0.05	7.1%	1708725K	--	
+8.3M
+
+
+5.5M
+	--	1177290K	0.0%	64.80	64.8	24,550	0.1	0.10	4.7%	1077446K	--	
+7.5M
+
+
+10.7M
+	--	1688456K	0.0%	14.90	14.9	24,600ATM	0.1	0.05	1.3%	1135296K	--	
+14.8M
+
+
+11.0M
+	--	1107324K	2.3%	0.05	--	24,650	35.2	35.00	4.4%	355154K	--	
+1.7M
+
+
+8.5M
+	--	866824K	5.2%	0.05	--	24,700	85.0	85.00	8.8%	197655K	--	
+1.1M
+
+
+4.0M
+	--	447668K	8.0%	0.05	--	24,750	135.2	134.15	10.9%	52974K	--	
+231K
+
+
+7.2M
+	--	446917K	10.6%	0.05	--	24,800	185.0	184.70	15.8%	31963K	--	
+295K
+
+
+3.9M
+	--	208974K	13.2%	0.05	--	24,850	235.4	234.80	19.6%	4287K	--	
+66K
+
+
+4.4M
+	--	185243K	15.7%	0.05	--	24,900	285.5	284.75	22.9%	3917K	--	
+81K
+
+
+1.6M
+	--	73593K	18.2%	0.05	--	24,950	335.6	334.65	25.9%	678K	--	
+50K
+
+
+9.0M
+	--	198165K	20.6%	0.05	--	25,000	385.0	384.60	29.0%	2271K	--	
+97K
+
+
+2.9M
+	--	65482K	23.0%	0.05	--	25,050	435.7	434.55	31.9%	142K	--	
+29K
+
+
+4.8M
+	--	112809K	25.4%	0.05	--	25,100	485.7	484.50	34.8%	226K	--	
+40K
 INDEX / RANK FEED
-No rankings available
-Network/DNS could not reach Cloud Run backend for /api/batch/market-data. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
+1
+NIFTY
+CE
+GAIN %
+63.3%
+ELIGIBLE
+2
+FINNIFTY
+PE
+GAIN %
+26.2%
+ELIGIBLE
+3
+FINNIFTY
+PE
+GAIN %
+22.6%
+ELIGIBLE
+4
+FINNIFTY
+PE
+GAIN %
+21.7%
+ELIGIBLE
+5
+FINNIFTY
+PE
+GAIN %
+20.6%
+ELIGIBLE
+6
+FINNIFTY
+PE
+GAIN %
+19.0%
+ELIGIBLE
+7
+MIDCPNIFTY
+PE
+GAIN %
+18.4%
+ELIGIBLE
+8
+FINNIFTY
+PE
+GAIN %
+17.9%
+ELIGIBLE
+9
+FINNIFTY
+PE
+GAIN %
+17.7%
+ELIGIBLE
+10
+FINNIFTY
+PE
+GAIN %
+17.2%
+ELIGIBLE
+11
+FINNIFTY
+PE
+GAIN %
+15.9%
+ELIGIBLE
+12
+FINNIFTY
+PE
+GAIN %
+15.2%
+ELIGIBLE
 EQUITY OPTIONS
 EOD/live
 No equity option rows
