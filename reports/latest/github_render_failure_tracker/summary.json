@@ -5,6 +5,16 @@
   "failed_workflows": [
     {
       "branch": "main",
+      "commit": "9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30867012854",
+      "run_id": 30867012854,
+      "status": "completed",
+      "updated_at": "2026-08-04T00:58:51Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
       "commit": "2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864904430",
@@ -22,16 +32,6 @@
       "status": "completed",
       "updated_at": "2026-08-04T00:11:31Z",
       "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342485",
-      "run_id": 30864342485,
-      "status": "completed",
-      "updated_at": "2026-08-04T00:09:36Z",
-      "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
@@ -64,7 +64,7 @@
       "workflow": "System3 Broker Chain Semantic Gate"
     }
   ],
-  "generated_utc": "2026-08-04T00:31:52.985496Z",
+  "generated_utc": "2026-08-04T01:34:21.612913Z",
   "github_failed_count": 6,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -77,22 +77,49 @@
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
-  "render_failed_count": 0,
-  "render_failures": [],
+  "render_failed_count": 2,
+  "render_failures": [
+    {
+      "classification": {
+        "mentions_auth_error": true,
+        "mentions_commit_or_sha": false,
+        "mentions_server_error": false
+      },
+      "endpoint": "/api/broker/diagnose",
+      "error_type": null,
+      "reason": "authentication error classification detected",
+      "status_code": 200,
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/diagnose"
+    },
+    {
+      "classification": {
+        "mentions_auth_error": true,
+        "mentions_commit_or_sha": false,
+        "mentions_server_error": false
+      },
+      "endpoint": "/api/broker/funds",
+      "error_type": null,
+      "reason": "authentication error classification detected",
+      "status_code": 200,
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds"
+    }
+  ],
   "report_only_no_self_failure_storm": true,
   "repository": "psw2025-cmd/Genesis_System3",
   "response_bodies_persisted": false,
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30867012854 conclusion=failure commit=9d28ba295cde",
     "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30864904430 conclusion=failure commit=2f8fa0dc30f7",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30864342476 conclusion=failure commit=310b976c6ea9",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30864342485 conclusion=failure commit=310b976c6ea9",
     "Fix latest GitHub workflow 'Dashboard Visual Contract Check' run=30864342499 conclusion=failure commit=310b976c6ea9",
     "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=30863100178 conclusion=failure commit=7fe876a1469b",
-    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30863100107 conclusion=failure commit=7fe876a1469b"
+    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30863100107 conclusion=failure commit=7fe876a1469b",
+    "Fix Render endpoint /api/broker/diagnose: authentication error classification detected status=200",
+    "Fix Render endpoint /api/broker/funds: authentication error classification detected status=200"
   ],
-  "todo_count": 6,
+  "todo_count": 8,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
