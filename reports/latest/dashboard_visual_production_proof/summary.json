@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T19:25:53.369Z",
+  "generated_at": "2026-08-04T19:51:43.245Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -16,7 +16,6 @@
     "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
   ],
   "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
@@ -26,14 +25,13 @@
     "TAB_COVERAGE:0/16",
     "SHELL_PROOF_NOT_TIME_ALIGNED",
     "VISIBLE_TRACKER_STATUS:BLOCKED",
-    "VISIBLE_TRACKER_BAD_TABS:16",
-    "VISIBLE_TRACKER_NOT_TIME_ALIGNED"
+    "VISIBLE_TRACKER_BAD_TABS:16"
   ],
   "corroborating_evidence": {
     "shell_generated_at": "2026-07-27T23:56:42.530Z",
     "shell_status": "BLOCKED",
     "shell_tab_coverage": "0/16",
-    "visible_tracker_generated_at": "2026-08-04T18:54:28.916Z",
+    "visible_tracker_generated_at": "2026-08-04T19:47:45.173Z",
     "visible_tracker_status": "BLOCKED",
     "visible_tracker_bad_tab_count": 16
   },
@@ -41,67 +39,67 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 160255
+      "size_bytes": 166847
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 253569
+      "size_bytes": 254773
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 155505
+      "size_bytes": 162734
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 127579
+      "size_bytes": 129825
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 93215
+      "size_bytes": 195120
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 67533
+      "size_bytes": 143420
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 74651
+      "size_bytes": 161231
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 79803
+      "size_bytes": 82803
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 116157
+      "size_bytes": 112848
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 136938
+      "size_bytes": 135513
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 103531
+      "size_bytes": 134157
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 116953
+      "size_bytes": 118375
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 84628
+      "size_bytes": 80731
     }
   ],
   "safety": {
