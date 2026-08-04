@@ -3,21 +3,22 @@
   "broker": {
     "connected": false,
     "http": 200,
-    "reason": "BROKER_NOT_CONNECTED"
+    "reason": "TOKEN_EXPIRED_OR_INVALID"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
     "http": 200,
-    "reason": null,
-    "semantic_ok": true
+    "reason": "TOKEN_EXPIRED_OR_INVALID",
+    "semantic_ok": false
   },
-  "generated_utc": "2026-08-04T05:35:34.308075Z",
+  "generated_utc": "2026-08-04T06:31:29.754844Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "BROKER:BROKER_NOT_CONNECTED",
+    "BROKER:TOKEN_EXPIRED_OR_INVALID",
+    "FUNDS:TOKEN_EXPIRED_OR_INVALID",
     "CHAIN:NIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
     "CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
     "CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
