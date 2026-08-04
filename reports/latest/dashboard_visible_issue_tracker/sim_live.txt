@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:12:27 IST
+20:53:59 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
-TICK 2s
+TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -70,7 +70,6 @@ This tab consumes backend API route /api/simulation/live/state like a live feed.
 ✓ SIMULATION ONLY
 ✓ NO REAL ORDERS
 ✓ LIVE OFF
-Backend simulation API not available yet: backend simulation API failed: 401. After Render deploy, this should come from /api/simulation/live/state.
 BACKEND SIM MODE
 STREAMING
 VIRTUAL P&L
@@ -78,7 +77,7 @@ VIRTUAL P&L
 REAL LIVE STATUS
 OFF / LOCKED
 SOURCE
-WAITING
+ok
 Pause backend stream
 Refresh backend tick #2
 TREND
@@ -87,4 +86,18 @@ VOLATILE
 Backend virtual paper order tape
 ID	Symbol	Side	Strike	Expiry	LTP	P&L	Status	Source
 Backend virtual checklist
-Simulation green checks must never be counted as real production readiness.
+ML SPEARMAN RHO GTE 0 70 OVER 5 DAYS
+SIM ONLY
+POSITIVE NET EXPECTANCY AFTER COSTS
+SIM ONLY
+REAL PAPER LIFECYCLE MARKET DAY PROOF
+SIM ONLY
+WEBSOCKET TICK HEALTH PROVEN
+SIM ONLY
+MODEL ACCURACY REPORT PRESENT
+✓ SIM OK
+OPTION STRIKE VISIBILITY PROVEN
+SIM ONLY
+EQUITY FO ELIGIBILITY PROVEN
+✓ SIM OK
+SIMULATION ONLY — no broker order APIs, live trading remains OFF

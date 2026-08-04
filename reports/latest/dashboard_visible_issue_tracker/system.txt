@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:13:19 IST
+20:54:51 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
 TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -64,7 +64,7 @@ Live Gate
 LOCK
 Connection Status
 Broker (Dhan)
-CONNECTED
+DISCONNECTED
 WebSocket
 LIVE
 Live Trading
@@ -76,19 +76,16 @@ live
 Market State
 CLOSED / OFFLINE
 API Status
-API_AUTH_REQUIRED
+OK / WAITING
 Performance
 Cycle Count
 0
 Cycle Duration
 0.00s
 SLA Pass
-true
+false
 QC Status
-PASS
-READ-ONLY BROKER UNLOCK
-Broker funds, holdings, and positions require dashboard API auth.
-Unlock
+NOT_READY
 Safety
 LIVE_TRADING_ENABLED
 0 (hardcoded)
@@ -97,6 +94,6 @@ ACTIVE
 Live Allowed
 false
 Broker Data Visibility
-AUTH REQUIRED
+READ-ONLY WHEN API RESPONDS
 Blocker 1
-Live trading permanently disabled in analyzer mode
+Broker not connected - real data unavailable

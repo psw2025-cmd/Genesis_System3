@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:13:04 IST
+20:54:36 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
 TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -64,16 +64,17 @@ Live Gate
 LOCK
 ML Model Truth
 This tab is proof-only. It does not train inline and does not invent metrics.
-MODEL_NOT_PROVEN
-No matured ML training/performance artifact is available. This means model is not proven trained/ready yet.
+MODEL_PROOF_LOADED_BUT_BLOCKED
+Loaded 1 blocked accuracy artifact(s). Model not proven — missing matured prediction history / post-market validation. Blocker: model_accuracy_report:NO_PREDICTION_SOURCE_FOUND
 Required proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.
 Active model
 NOT_PROVEN
 Fallback used
-UNKNOWN
+NO
 Proof records
-0 proven / 0 blocked
+0 proven / 1 blocked
 Training status
 BLOCKED
-Training proof missing.
-Next real fix is scheduler/model pipeline proof, not UI decoration.
+Model Performance Records
+MODEL	STATUS	PREDICTIONS	AVG ACCURACY	PROOF PASS / BLOCKED	BLOCKER	GENERATED
+model_accuracy_report	BLOCKED	0	N/A	0 / 1	NO_PREDICTION_SOURCE_FOUND	2026-08-04T15:09:37.656411+00:00

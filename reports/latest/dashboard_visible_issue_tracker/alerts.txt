@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:13:14 IST
+20:54:46 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
 TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -64,5 +64,3 @@ Live Gate
 LOCK
 
 No alerts
-
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds. Retrying slowly; last good truth remains visible where available.

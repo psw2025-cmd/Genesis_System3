@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:13:09 IST
+20:54:41 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
 TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -62,39 +62,36 @@ Alerts
 System
 Live Gate
 LOCK
-READ-ONLY BROKER UNLOCK
-Broker funds, holdings, and positions require dashboard API auth.
-Unlock
 BROKER CONNECTION - DHAN
 Status
-CONNECTED
+BLOCKED / TOKEN ERROR
 Truth
-READ-ONLY BROKER PROOF OK
+BROKER AUTH BLOCKED - NOT READY
 Mode
 READ-ONLY BROKER PROOF
 Client ID
 NOT PROVIDED BY BROKER API
 Token Status
-API_AUTH_REQUIRED
+ERROR / INVALID OR EXPIRED
 Holdings API
-ERROR/BLOCKED
+RESPONDED
 Funds API
 ERROR/BLOCKED
 Broker Blocker
-NONE - MARKET CLOSED IS OK
+DH-906 - Order_Error - Invalid Token
 Market State
 MARKET CLOSED / READ-ONLY OK
 Data Visibility
-LOCKED UNTIL API KEY IS CONFIGURED
+BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID
 Live Trading
 BLOCKED BY BACKEND FLAG
 ACCOUNT FUNDS
-Failed to load funds: 401 - API_AUTH_REQUIRED - Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
+Failed to load funds: DH-906 - Order_Error - Invalid Token
 Market close is not the blocker. Check Dhan token/API response.
 EQUITY HOLDINGS (0)
 
-Failed to load holdings: Holdings: Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
+No valid broker holdings truth available.
 
 DHAN LIVE POSITIONS (0)
 
-Failed to load positions: Positions: Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
+No valid broker positions truth available.

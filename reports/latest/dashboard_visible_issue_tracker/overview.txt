@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:12:22 IST
+20:53:54 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
-TICK 4s
+TICK 1s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -66,10 +66,6 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
-API status: API_AUTH_REQUIRED - Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds. Retrying slowly; last good truth remains visible where available.
-READ-ONLY BROKER UNLOCK
-Broker funds, holdings, and positions require dashboard API auth.
-Unlock
 BROKER
 API RESPONDED
 Dhan read-only
@@ -87,45 +83,61 @@ market closed must not hide read-only data
 LOADED
 Health API
 live
-WAITING
+LOADED
 State API
-ERROR
+Market closed: After hours (closed at 15:30)
+LOADED
 Broker Status API
-API_AUTH_REQUIRED
 ERROR
 Funds API
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
-ERROR
+Invalid Token
+LOADED
 Holdings API
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
-ERROR
+LOADED
 Positions API
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
 LOADED
 P&L API
 pnl=0
 LOADED
 Gain Rank / Scanner
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
+2026-08-04
 LOADED
 Auto Gates
-1 gates
+7 gates
 LOADED
 Alerts
 0 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan option-chain snapshot (2026-08-04 05:10 IST)
+Market closed — last verified Dhan snapshot (2026-08-04 20:15 IST)
 Gate Matrix
-0/1 PASS
-FAIL
-Dashboard API Access
-Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.
+2/7 PASS
+PEND
+ML Accuracy (Spearman ρ)
+0/5 days · ρ=None · need ≥0.7
+PEND
+Profit / Expectancy
+expectancy=None · win_rate=None
+PEND
+Paper Lifecycle
+market-session proof pending
+PEND
+Tick / Data Freshness
+tick_age=60.11s refresh=60s
+PASS
+Model Accuracy Report
+Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
+PEND
+Option Strike Visibility
+Run scripts/system3_option_visibility_audit.py
+PASS
+Equity F&O Eligibility
+Wire is_tradeable_fo_symbol() in ranking/paper trade path
 System Health
 Mode
 PAPER
 QC Status
-PASS
+NOT_READY
 Data Source
 live
 Market

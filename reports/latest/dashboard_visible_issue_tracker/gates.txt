@@ -4,19 +4,19 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-05:13:24 IST
+20:54:56 IST
 NIFTY
-24,774
+24,615
 SNAP
 BNFTY
-58,248
+57,907
 SNAP
 FINNIFTY
-26,984
+26,845
 SNAP
 TICK 0s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,7 +27,7 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
@@ -64,11 +64,31 @@ Live Gate
 LOCK
 Live Trading Gate
 
-—
+3/6 gates passed
 
-CHECKING
+LIVE_TRADING_BLOCKED
+
+Live trading blocked — see failed gates above
 
 GATE CHECKLIST
+✅
+env_live_disabled
+LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)
+✅
+kill_switch_off
+Kill switch not activated
+❌
+human_approved
+NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json
+❌
+validation_days
+0 validation days (need ≥10)
+❌
+ml_accuracy_rho
+Avg Spearman ρ=0.000 (need ≥0.70)
+✅
+max_loss_configured
+Max daily loss = ₹5000 hardcoded in kill_switch.json
 
 ⚠️ Gates not yet passed
 
