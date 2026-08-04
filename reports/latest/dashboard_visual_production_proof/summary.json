@@ -27,63 +27,63 @@
   "screenshots": [
     {
       "file": "truth.png",
-      "ok": true,
-      "size_bytes": 162962
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "genesis.png",
-      "ok": true,
-      "size_bytes": 253293
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "e2e_proof.png",
-      "ok": true,
-      "size_bytes": 159736
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "overview.png",
-      "ok": true,
-      "size_bytes": 128085
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "chain.png",
-      "ok": true,
-      "size_bytes": 89020
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "signals.png",
-      "ok": true,
-      "size_bytes": 152279
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "paper.png",
-      "ok": true,
-      "size_bytes": 159288
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "positions.png",
-      "ok": true,
-      "size_bytes": 85457
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "broker.png",
-      "ok": true,
-      "size_bytes": 116302
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "performance.png",
-      "ok": true,
-      "size_bytes": 81339
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "ml.png",
-      "ok": true,
-      "size_bytes": 102077
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "gates.png",
-      "ok": true,
-      "size_bytes": 78137
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "mobile_390x844.png",
