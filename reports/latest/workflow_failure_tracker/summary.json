@@ -1,6 +1,16 @@
 {
-  "failed_count": 14,
+  "failed_count": 8,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "a5c84d510501a92015eea475d88f00681638394a",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T01:55:03Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30870199180",
+      "run_id": 30870199180,
+      "updated_at": "2026-08-04T02:00:33Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
@@ -70,96 +80,20 @@
       "run_id": 30864678877,
       "updated_at": "2026-08-04T00:10:02Z",
       "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:48Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864354599",
-      "run_id": 30864354599,
-      "updated_at": "2026-08-04T00:07:52Z",
-      "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:45Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864351639",
-      "run_id": 30864351639,
-      "updated_at": "2026-08-04T00:11:12Z",
-      "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342499",
-      "run_id": 30864342499,
-      "updated_at": "2026-08-04T00:04:00Z",
-      "workflow": "Dashboard Visual Contract Check"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T00:03:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342489",
-      "run_id": 30864342489,
-      "updated_at": "2026-08-04T00:11:20Z",
-      "workflow": "Cloud Runtime Check"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342485",
-      "run_id": 30864342485,
-      "updated_at": "2026-08-04T00:09:36Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342476",
-      "run_id": 30864342476,
-      "updated_at": "2026-08-04T00:11:31Z",
-      "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:03:35Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342460",
-      "run_id": 30864342460,
-      "updated_at": "2026-08-04T00:10:59Z",
-      "workflow": "Dashboard Live UI Proof"
     }
   ],
-  "generated_utc": "2026-08-04T01:35:21.376494+00:00",
+  "generated_utc": "2026-08-04T02:00:43.443040+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30870199180 conclusion=failure commit=a5c84d510501a92015eea475d88f00681638394a",
     "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864904430 conclusion=failure commit=2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
     "Fix workflow 'Cloud Runtime Check' run 30864754665 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30864754654 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
     "Fix workflow 'Genesis System3 Global Safety CI' run 30864754653 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864753955 conclusion=failure commit=1a4edbae05b184c25323030ad7644439d991c491",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30864678877 conclusion=cancelled commit=2f2bc7c4b268b2bf2b366b59c3f945f96c388024",
-    "Fix workflow 'Dashboard Visible Proof Warmed' run 30864354599 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Dashboard Live UI Proof' run 30864351639 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Dashboard Visual Contract Check' run 30864342499 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Cloud Runtime Check' run 30864342489 conclusion=cancelled commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30864342485 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'System3 Latest Truth Publish' run 30864342476 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Dashboard Live UI Proof' run 30864342460 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09"
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30864678877 conclusion=cancelled commit=2f2bc7c4b268b2bf2b366b59c3f945f96c388024"
   ]
 }
