@@ -5,12 +5,12 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "3f774498d758ca95cb5a526d936f16d63a9ccfc1",
+      "commit": "9b33126aa169af66f52ffda91d4ed6fea690d651",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30911281107",
-      "run_id": 30911281107,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30916229129",
+      "run_id": 30916229129,
       "status": "completed",
-      "updated_at": "2026-08-04T13:00:14Z",
+      "updated_at": "2026-08-04T13:58:41Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -54,7 +54,7 @@
       "workflow": "System3 Latest Truth Publish"
     }
   ],
-  "generated_utc": "2026-08-04T13:35:07.910942Z",
+  "generated_utc": "2026-08-04T14:50:25.545544Z",
   "github_failed_count": 5,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -75,7 +75,7 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30911281107 conclusion=failure commit=3f774498d758",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30916229129 conclusion=failure commit=9b33126aa169",
     "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30905081102 conclusion=failure commit=8f0b8d586b8a",
     "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30904363455 conclusion=failure commit=8f0b8d586b8a",
     "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30902811579 conclusion=failure commit=cea6caaf0b7f",
