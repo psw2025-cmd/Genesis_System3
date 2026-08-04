@@ -105,7 +105,11 @@ def _load_env() -> dict:
 
 
 def _write_token(new_token: str) -> None:
-    """Write refreshed token to .secrets/dhan.env (Codespace) or env only (cloud)."""
+    """Write refreshed token to .secrets/dhan.env (Codespace) or env only (cloud).
+
+    On Cloud Run, also best-effort persist to Secret Manager so new revisions /
+    cold starts keep the fresh token without a manual remount.
+    """
     os.environ["DHAN_ACCESS_TOKEN"] = new_token
 
     if ENV_FILE.exists():
@@ -127,12 +131,56 @@ def _write_token(new_token: str) -> None:
     else:
         logger.info("DHAN_ACCESS_TOKEN set in os.environ (cloud mode — no local env file)")
 
+    _persist_token_to_secret_manager(new_token)
+
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
     try:
         with open(LOG_FILE, "a") as f:
             f.write(f"{datetime.now().isoformat()} | token refreshed | len={len(new_token)}\n")
     except OSError:
         pass
+
+
+def _persist_token_to_secret_manager(new_token: str) -> None:
+    """Persist refreshed token to GCP Secret Manager when running on Cloud Run.
+
+    This makes auto-heal durable across cold starts. Failures are non-fatal.
+    """
+    on_cloud = bool(
+        os.environ.get("K_SERVICE")
+        or os.environ.get("CLOUD_MODE")
+        or os.environ.get("SYSTEM3_DEPLOY_TARGET") == "gcp-cloud-run"
+    )
+    if not on_cloud:
+        return
+    if os.environ.get("DHAN_PERSIST_TOKEN_TO_SM", "1").strip().lower() in ("0", "false", "no", "off"):
+        return
+    try:
+        from google.cloud import secretmanager
+    except Exception as exc:
+        logger.warning("Secret Manager client unavailable for token persist: %s", type(exc).__name__)
+        return
+
+    project = (
+        os.environ.get("GOOGLE_CLOUD_PROJECT")
+        or os.environ.get("GCP_PROJECT")
+        or os.environ.get("SYSTEM3_FIRESTORE_PROJECT")
+        or "system3-openalgo-safe"
+    )
+    client = secretmanager.SecretManagerServiceClient()
+    for secret_id in ("dhan-access-token", "system3-dhan-access-token"):
+        parent = f"projects/{project}/secrets/{secret_id}"
+        try:
+            client.add_secret_version(
+                request={"parent": parent, "payload": {"data": new_token.encode("utf-8")}}
+            )
+            logger.info("DHAN_ACCESS_TOKEN persisted to Secret Manager secret=%s", secret_id)
+        except Exception as exc:
+            logger.warning(
+                "Could not persist token to secret=%s (%s) — in-process env still updated",
+                secret_id,
+                type(exc).__name__,
+            )
 
 
 def _token_expiry(token: str) -> datetime | None:

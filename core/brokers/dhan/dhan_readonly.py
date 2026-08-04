@@ -70,7 +70,7 @@ _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 # Broker status endpoint is polled every 10s by the dashboard.  Auto-refresh
 # must therefore be rate-limited so an expired/missing token does not trigger
 # repeated login attempts or TOTP churn on every UI poll.
-_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "300") or "300")
+_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "90") or "90")
 _LAST_STATUS_REFRESH_ATTEMPT_AT = 0.0
 
 logger = logging.getLogger("dhan_readonly")
@@ -242,7 +242,24 @@ def get_profile() -> dict:
         return {"success": True, "source": "rest", "data": _safe_profile(data)}
     except Exception as exc:
         err = str(exc)
-        if "401" in err or "Unauthorized" in err.lower():
+        body = ""
+        resp = getattr(exc, "response", None)
+        if resp is not None:
+            try:
+                body = (getattr(resp, "text", None) or "")[:300]
+            except Exception:
+                body = ""
+            status_code = getattr(resp, "status_code", None)
+            if status_code in (400, 401) or "DH-906" in body or "Invalid Token" in body:
+                return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
+            if status_code == 403 or "Forbidden" in err.lower():
+                return {"success": False, "error": "ACCESS_FORBIDDEN", "data": None}
+            return {
+                "success": False,
+                "error": f"HTTP_{status_code}: {body[:120] or type(exc).__name__}",
+                "data": None,
+            }
+        if "401" in err or "Unauthorized" in err.lower() or "DH-906" in err or "Invalid Token" in err:
             return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
         if "403" in err or "Forbidden" in err.lower():
             return {"success": False, "error": "ACCESS_FORBIDDEN", "data": None}
@@ -398,8 +415,30 @@ def get_status() -> dict:
     connected = profile_result.get("success", False)
     error = None if connected else profile_result.get("error", "UNKNOWN")
 
-    if not connected and error == "TOKEN_EXPIRED_OR_INVALID":
-        refresh_meta = _safe_refresh_token_for_status(error)
+    # Auto-heal on expired/invalid token AND on ambiguous HTTP failures that
+    # commonly wrap DH-906 Invalid Token when the deployed classifier is older.
+    should_refresh = (not connected) and (
+        error
+        in (
+            "TOKEN_EXPIRED_OR_INVALID",
+            "CONFIG_MISSING",
+        )
+        or (
+            isinstance(error, str)
+            and (
+                error.startswith("HTTP_400")
+                or error.startswith("NETWORK_ERROR")
+                or "DH-906" in error
+                or "Invalid Token" in error
+            )
+        )
+    )
+    if should_refresh:
+        refresh_meta = _safe_refresh_token_for_status(
+            "TOKEN_EXPIRED_OR_INVALID"
+            if error != "CONFIG_MISSING"
+            else "CONFIG_MISSING"
+        )
         if refresh_meta.get("success"):
             t0 = time.time()
             profile_result = get_profile()
