@@ -1,5 +1,5 @@
 {
-  "failed_count": 24,
+  "failed_count": 23,
   "failed_runs": [
     {
       "branch": "main",
@@ -230,19 +230,9 @@
       "run_id": 30949281039,
       "updated_at": "2026-08-04T20:51:05Z",
       "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "copilot/implement-p0-stabilization-patch",
-      "commit": "75285578c87ed39200e2b6ebd592efbaf1e42b62",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T20:40:36Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30948942230",
-      "run_id": 30948942230,
-      "updated_at": "2026-08-04T20:47:50Z",
-      "workflow": "Running Copilot cloud agent"
     }
   ],
-  "generated_utc": "2026-08-04T21:57:21.406254+00:00",
+  "generated_utc": "2026-08-04T22:28:43.885475+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
@@ -269,7 +259,6 @@
     "Fix workflow 'Genesis System3 Global Safety CI' run 30949398752 conclusion=action_required commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2",
     "Fix workflow 'GCP Stage 2 Safety Checks' run 30949398608 conclusion=action_required commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949395197 conclusion=failure commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30949281039 conclusion=failure commit=e7f2cf20ec132c3b290415f1e069821a67d3a700",
-    "Fix workflow 'Running Copilot cloud agent' run 30948942230 conclusion=failure commit=75285578c87ed39200e2b6ebd592efbaf1e42b62"
+    "Fix workflow 'Dashboard Visual Production Proof' run 30949281039 conclusion=failure commit=e7f2cf20ec132c3b290415f1e069821a67d3a700"
   ]
 }

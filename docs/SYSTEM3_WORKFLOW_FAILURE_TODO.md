@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-04T21:57:21.406254+00:00`
+Generated UTC: `2026-08-04T22:28:43.885475+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `24`
+Failed workflow count: `23`
 
 ## Rule
 
@@ -35,7 +35,6 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'GCP Stage 2 Safety Checks' run 30949398608 conclusion=action_required commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949395197 conclusion=failure commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30949281039 conclusion=failure commit=e7f2cf20ec132c3b290415f1e069821a67d3a700
-- [ ] Fix workflow 'Running Copilot cloud agent' run 30948942230 conclusion=failure commit=75285578c87ed39200e2b6ebd592efbaf1e42b62
 
 ## Failed run details
 
@@ -64,4 +63,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | GCP Stage 2 Safety Checks | 30949398608 | action_required | `b842a3ea8b08` | 2026-08-04T20:46:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949398608 |
 | .github/workflows/options-ml-training-proof.yml | 30949395197 | failure | `b842a3ea8b08` | 2026-08-04T20:46:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949395197 |
 | Dashboard Visual Production Proof | 30949281039 | failure | `e7f2cf20ec13` | 2026-08-04T20:51:05Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949281039 |
-| Running Copilot cloud agent | 30948942230 | failure | `75285578c87e` | 2026-08-04T20:47:50Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30948942230 |
