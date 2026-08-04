@@ -45,10 +45,11 @@ SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 WEIGHT_GRID = {
     "oi_change_pct": [0.10, 0.15, 0.20, 0.25, 0.30],
     "iv_percentile": [0.05, 0.10, 0.15, 0.20],
-    "volume_surge": [0.10, 0.15, 0.20],
+    "volume_surge": [0.08, 0.10, 0.13, 0.15, 0.20],
     "pcr_divergence": [0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50],
     "atm_premium_ratio": [0.05, 0.10, 0.15],
-    "momentum_score": [0.03, 0.05, 0.08],
+    "momentum_score": [0.02, 0.03, 0.05],
+    # gamma_exposure fixed at 0.07 until bhavcopy-based GEX extraction is added
     # ml_confidence fixed at 0.0 — signal CSV not yet available
 }
 
@@ -353,7 +354,8 @@ def patch_engine_weights(new_weights: dict) -> bool:
         f'    "pcr_divergence":     {new_weights["pcr_divergence"]},',
         f'    "atm_premium_ratio":  {new_weights["atm_premium_ratio"]},',
         f'    "momentum_score":     {new_weights["momentum_score"]},',
-        f'    "ml_confidence":      {new_weights.get("ml_confidence", 0.20)},',
+        f'    "ml_confidence":      {new_weights.get("ml_confidence", 0.13)},',
+        f'    "gamma_exposure":     {new_weights.get("gamma_exposure", 0.07)},',
         "}",
     ]
     new_block = "\n".join(lines)
@@ -479,9 +481,10 @@ def main():
         print(f"DECISION: AUTO-UPDATE gain_rank_engine.py (confidence={confidence}, n_days={n_days})")
 
     if should_write and not args.dry_run:
-        # Add ml_confidence back at 0.20, renormalise
+        # Add ml_confidence back at 0.13, gamma_exposure at 0.07, renormalise
         weights_with_ml = dict(best_weights)
-        weights_with_ml["ml_confidence"] = 0.20
+        weights_with_ml["ml_confidence"] = 0.13
+        weights_with_ml["gamma_exposure"] = 0.07
         weights_with_ml = _normalise_weights(weights_with_ml)
         ok = patch_engine_weights(weights_with_ml)
         if ok:

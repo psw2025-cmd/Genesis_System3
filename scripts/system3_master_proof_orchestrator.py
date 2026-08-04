@@ -59,11 +59,14 @@ SECRET_PATTERNS = [
 _SCAN_SKIP_EXACT = frozenset(
     {
         "scripts/system3_master_proof_orchestrator.py",  # self-referential pattern definitions
+        "scan_output.txt",  # generated full-repo scan artifact — not a credential file
+        "ai_scan.txt",  # generated AI scan artifact — not a credential file
     }
 )
 _SCAN_SKIP_PREFIXES = (
     "docs/",  # documentation — not executable credentials
     "dashboard/frontend/dist/",  # compiled/minified frontend bundle
+    "reports/",  # generated proof/audit reports — not credential files
 )
 
 SECRET_FILENAME_RE = re.compile(

@@ -25,7 +25,6 @@
       "analyzer_paper_lifecycle_proof:lifecycle_proof_broker_not_connected"
     ],
     "MANUAL_SECRET_REQUIRED": [
-      "safety_and_secrets:possible_secret_like_content_in_tracked_text",
       "fresh_data_automation_proof:dhan_broker_secrets_not_available_to_ci_data_live_probe_skipped"
     ],
     "MARKET_CLOSED_OR_HOLIDAY": [],
@@ -38,7 +37,7 @@
       "repo_authority_and_duplicate_control:duplicate_basename_candidates_need_runtime_classification"
     ]
   },
-  "generated_utc": "2026-07-24T04:10:25.445827+00:00",
+  "generated_utc": "2026-08-04T21:00:42.970708+00:00",
   "trade_ready": false,
-  "verdict": "TRADE_READY_BLOCKED"
+  "verdict": "ANALYZER_READY_PROOF_INCOMPLETE"
 }

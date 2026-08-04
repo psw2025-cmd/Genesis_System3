@@ -1,8 +1,8 @@
 # System3 Master Control Plane
 
-Generated UTC: 2026-07-24T04:10:25.421774+00:00
+Generated UTC: 2026-08-04T21:00:42.968169+00:00
 
-- Verdict: `TRADE_READY_BLOCKED`
+- Verdict: `ANALYZER_READY_PROOF_INCOMPLETE`
 - Trade ready: `False`
 - Live trading enabled: `False`
 - Mode: `Analyzer/Paper only`
@@ -11,7 +11,7 @@ Generated UTC: 2026-07-24T04:10:25.421774+00:00
 
 | Gate | Status | Pass | Blockers | Warnings |
 |---|---|---:|---:|---:|
-| `safety_and_secrets` | `FAIL` | `False` | `1` | `0` |
+| `safety_and_secrets` | `PASS` | `True` | `0` | `0` |
 | `repo_authority_and_duplicate_control` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
 | `deployment_and_endpoint_proof` | `PASS` | `True` | `0` | `0` |
 | `fresh_data_automation_proof` | `PASS_WITH_WARNINGS` | `True` | `0` | `1` |
@@ -22,7 +22,7 @@ Generated UTC: 2026-07-24T04:10:25.421774+00:00
 
 ## Active blockers
 
-- `safety_and_secrets:possible_secret_like_content_in_tracked_text`
+- None
 
 ## Manual-only items
 

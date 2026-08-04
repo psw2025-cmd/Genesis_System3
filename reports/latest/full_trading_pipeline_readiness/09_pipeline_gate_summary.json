@@ -3,10 +3,10 @@
     "live_market_analyzer_paper_trade_not_proven"
   ],
   "dhanhq_dependency_present": true,
-  "generated_utc": "2026-07-24T04:10:25.441827+00:00",
+  "generated_utc": "2026-08-04T21:00:42.970219+00:00",
   "logzero_dependency_present": true,
   "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
-  "master_control_plane_verdict": "TRADE_READY_BLOCKED",
+  "master_control_plane_verdict": "ANALYZER_READY_PROOF_INCOMPLETE",
   "proven_backtest_recent": true,
   "proven_dashboard_full_ui_live": true,
   "proven_live_market_paper_trade_today": false,
