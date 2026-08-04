@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-22:59:52 IST
+23:58:42 IST
 NIFTY
 24,615
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,845
 SNAP
-TICK 1s
+TICK 0s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -29,9 +29,9 @@ PAPER
 DATA
 DHAN
 ML
-ML 1/5d
+ML 0/5d
 PAPER
-EXP -196.14
+EXP —
 UI
 LIVE
 COMMAND
@@ -67,7 +67,7 @@ PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 BROKER
-CONNECTED
+API RESPONDED
 Dhan read-only
 PAPER P&L
 ₹-1,806
@@ -88,11 +88,11 @@ State API
 Market closed: After hours (closed at 15:30)
 LOADED
 Broker Status API
-LOADED
+ERROR
 Funds API
-LOADED
+ERROR
 Holdings API
-LOADED
+ERROR
 Positions API
 LOADED
 P&L API
@@ -108,7 +108,7 @@ Alerts
 0 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-04 22:44 IST)
+Market closed — last verified Dhan snapshot (2026-08-04 23:42 IST)
 Gate Matrix
 2/7 PASS
 PEND
@@ -122,7 +122,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=30.73s refresh=60s
+tick_age=60.09s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD

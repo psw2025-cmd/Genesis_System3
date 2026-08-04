@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-23:00:08 IST
+23:58:58 IST
 NIFTY
 24,615
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,845
 SNAP
-TICK 1s
+TICK 0s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -29,9 +29,9 @@ PAPER
 DATA
 DHAN
 ML
-ML 1/5d
+ML 0/5d
 PAPER
-EXP -196.14
+EXP —
 UI
 LIVE
 COMMAND
@@ -90,7 +90,7 @@ Rs 2.40
 Target
 Rs 3.90
 ALL-INDIA TOP OPTION GAINERS
-Refreshed 2026-08-04 22:59:00 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
+Refreshed 2026-08-04 23:54:46 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
 MONEYCONTROL
 DHAN LIVE
 WS STREAM
@@ -130,5 +130,5 @@ Contract
 DIVISLAB25AUG266300PE
 What Blocked Trading?
 Scanner Segments
-2/4
+4/4
 Download Signal Snapshot (JSON)

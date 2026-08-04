@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-23:00:13 IST
+23:59:03 IST
 NIFTY
 24,615
 SNAP
@@ -29,9 +29,9 @@ PAPER
 DATA
 DHAN
 ML
-ML 1/5d
+ML 0/5d
 PAPER
-EXP -196.14
+EXP —
 UI
 LIVE
 COMMAND
@@ -63,7 +63,7 @@ System
 Live Gate
 LOCK
 ALL-INDIA TOP OPTION GAINERS
-Refreshed 2026-08-04 22:59:00 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
+Refreshed 2026-08-04 23:54:46 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
 MONEYCONTROL
 DHAN LIVE
 WS STREAM
@@ -116,7 +116,7 @@ CONTRACTS
 +/-10 ATM
 +/-15 ATM
 +/-20 ATM
-AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=4.2s fetched=2026-08-04T17:14:52.347795+00:00 - Market closed — last verified Dhan snapshot (2026-08-04 22:44 IST)
+AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=35.7s fetched=2026-08-04T18:12:43.682845+00:00 - Market closed — last verified Dhan snapshot (2026-08-04 23:42 IST)
 OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
 
 583K
