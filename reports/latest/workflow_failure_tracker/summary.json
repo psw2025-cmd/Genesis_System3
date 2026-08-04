@@ -3,6 +3,16 @@
   "failed_runs": [
     {
       "branch": "main",
+      "commit": "0a81b6e5840d053cd49ee41c0d685e6f4e9c3e48",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-04T23:41:59Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30960862172",
+      "run_id": 30960862172,
+      "updated_at": "2026-08-04T23:42:19Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
       "commit": "abad4bca4f15198eb54650c51e773003275ec61b",
       "conclusion": "failure",
       "created_at": "2026-08-04T23:35:47Z",
@@ -120,23 +130,14 @@
       "run_id": 30952405454,
       "updated_at": "2026-08-04T21:27:53Z",
       "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "copilot/research-frozen-backtest-issues",
-      "commit": "bb130c342c5f306548ef4efc09c7fc0a62662678",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T21:24:17Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30952187505",
-      "run_id": 30952187505,
-      "updated_at": "2026-08-04T21:35:06Z",
-      "workflow": "Running Copilot cloud agent"
     }
   ],
-  "generated_utc": "2026-08-04T23:42:07.952010+00:00",
+  "generated_utc": "2026-08-04T23:49:20.147002+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30960862172 conclusion=cancelled commit=0a81b6e5840d053cd49ee41c0d685e6f4e9c3e48",
     "Fix workflow 'Dashboard Visual Production Proof' run 30960520818 conclusion=failure commit=abad4bca4f15198eb54650c51e773003275ec61b",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30959827039 conclusion=cancelled commit=f97daec0b8a8c7500a7d7aebd5cf7f3e6d40840e",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30957564613 conclusion=cancelled commit=d1ce816c0022ee5475ff272eb69f36e8cf11ea45",
@@ -148,7 +149,6 @@
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953197691 conclusion=failure commit=4f7d877d4335fcbe75c3a0c2d860420e6698c504",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953103270 conclusion=failure commit=57bc685c65c35902acc242f12b79e1f707da1c79",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30952847037 conclusion=failure commit=bc5ba5a465260d8cec7a7db0cc8463b934f9d025",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30952405454 conclusion=cancelled commit=82fd6400d7fc5929871e7db2f2f575735a96a2a4",
-    "Fix workflow 'Running Copilot cloud agent' run 30952187505 conclusion=failure commit=bb130c342c5f306548ef4efc09c7fc0a62662678"
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30952405454 conclusion=cancelled commit=82fd6400d7fc5929871e7db2f2f575735a96a2a4"
   ]
 }
