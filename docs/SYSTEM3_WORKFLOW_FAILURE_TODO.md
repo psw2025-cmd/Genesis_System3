@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-04T00:59:07.148506+00:00`
+Generated UTC: `2026-08-04T01:35:21.376494+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `17`
+Failed workflow count: `14`
 
 ## Rule
 
@@ -26,9 +26,6 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30864342485 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30864342476 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 30864342460 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
-- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 30864342457 conclusion=cancelled commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
-- [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 30864342453 conclusion=cancelled commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864341924 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09
 
 ## Failed run details
 
@@ -48,6 +45,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Dashboard Visual Production Proof | 30864342485 | failure | `310b976c6ea9` | 2026-08-04T00:09:36Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342485 |
 | System3 Latest Truth Publish | 30864342476 | failure | `310b976c6ea9` | 2026-08-04T00:11:31Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342476 |
 | Dashboard Live UI Proof | 30864342460 | failure | `310b976c6ea9` | 2026-08-04T00:10:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342460 |
-| Genesis System3 Global Safety CI | 30864342457 | cancelled | `310b976c6ea9` | 2026-08-04T00:11:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342457 |
-| Dashboard Visible Proof Warmed | 30864342453 | cancelled | `310b976c6ea9` | 2026-08-04T00:03:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864342453 |
-| .github/workflows/options-ml-training-proof.yml | 30864341924 | failure | `310b976c6ea9` | 2026-08-04T00:03:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864341924 |
