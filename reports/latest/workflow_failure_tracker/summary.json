@@ -1,6 +1,16 @@
 {
-  "failed_count": 20,
+  "failed_count": 17,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T00:53:41Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30867012854",
+      "run_id": 30867012854,
+      "updated_at": "2026-08-04T00:58:51Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
@@ -160,53 +170,14 @@
       "run_id": 30864341924,
       "updated_at": "2026-08-04T00:03:35Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
-      "commit": "0341e0b43c3665feb7d2299550b93293cd6272df",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-03T23:55:16Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30863884372",
-      "run_id": 30863884372,
-      "updated_at": "2026-08-04T00:04:03Z",
-      "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "main",
-      "commit": "0341e0b43c3665feb7d2299550b93293cd6272df",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T23:55:13Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30863881155",
-      "run_id": 30863881155,
-      "updated_at": "2026-08-03T23:56:25Z",
-      "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "0341e0b43c3665feb7d2299550b93293cd6272df",
-      "conclusion": "failure",
-      "created_at": "2026-08-03T23:55:10Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30863878969",
-      "run_id": 30863878969,
-      "updated_at": "2026-08-03T23:55:47Z",
-      "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "0341e0b43c3665feb7d2299550b93293cd6272df",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-03T23:55:08Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30863876275",
-      "run_id": 30863876275,
-      "updated_at": "2026-08-04T00:00:20Z",
-      "workflow": "Genesis System3 Global Safety CI"
     }
   ],
-  "generated_utc": "2026-08-04T00:34:04.819601+00:00",
+  "generated_utc": "2026-08-04T00:59:07.148506+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864904430 conclusion=failure commit=2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
     "Fix workflow 'Cloud Runtime Check' run 30864754665 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30864754654 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
@@ -222,10 +193,6 @@
     "Fix workflow 'Dashboard Live UI Proof' run 30864342460 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
     "Fix workflow 'Genesis System3 Global Safety CI' run 30864342457 conclusion=cancelled commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 30864342453 conclusion=cancelled commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864341924 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 30863884372 conclusion=cancelled commit=0341e0b43c3665feb7d2299550b93293cd6272df",
-    "Fix workflow 'Dashboard Visible Proof Warmed' run 30863881155 conclusion=failure commit=0341e0b43c3665feb7d2299550b93293cd6272df",
-    "Fix workflow 'Dashboard Live UI Proof' run 30863878969 conclusion=failure commit=0341e0b43c3665feb7d2299550b93293cd6272df",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 30863876275 conclusion=cancelled commit=0341e0b43c3665feb7d2299550b93293cd6272df"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864341924 conclusion=failure commit=310b976c6ea9624b9e74bf0e5cdfceb7f3718d09"
   ]
 }
