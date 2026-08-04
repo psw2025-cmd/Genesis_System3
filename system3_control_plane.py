@@ -62,6 +62,7 @@ KEEP_EXACT = {
     ".github/workflows/ci.yml",
     ".github/scripts/root_architecture_gate.py",
     ".gitignore",
+    "config/cloud_runtime.json",
     "render.yaml",
     "dashboard/backend/app.py",
     "dashboard/backend/Dockerfile",

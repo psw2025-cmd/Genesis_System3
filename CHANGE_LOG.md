@@ -1239,3 +1239,9 @@ Verification with local `REQUIRE_API_KEY=true`:
 - Re-ran `scan_secrets()` from `scripts/system3_master_proof_orchestrator.py`: now returns `[]` for tracked files.
 - Remaining gate blocker from targeted check is separate: `render_yaml_missing` in current worktree, not tracked secret content.
 - Live trading remains disabled; analyzer/paper mode unchanged.
+
+**[2026-08-04 21:41 UTC] [Codex]** DEPLOYMENT PROOF ALIGNMENT: Updated proof/control-plane logic to treat `/home/runner/work/Genesis_System3/Genesis_System3/config/cloud_runtime.json` as the canonical deployment config for Google Cloud Run, with `render.yaml` now optional legacy evidence.
+- `scripts/system3_master_proof_orchestrator.py`: safety and repo-authority checks no longer fail just because `render.yaml` is absent when Cloud Run config exists.
+- `system3_control_plane.py`: added `config/cloud_runtime.json` to authoritative keep-list.
+- Targeted validation: `gate_safety_and_secrets` => PASS, `gate_repo_authority` => PASS_WITH_WARNINGS.
+- Live trading remains disabled; analyzer/paper mode unchanged.
