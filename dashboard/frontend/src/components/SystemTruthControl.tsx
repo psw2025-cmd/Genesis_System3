@@ -137,7 +137,12 @@ export function SystemTruthControl() {
       { layer: 'Paper/analyzer lifecycle', status: data.trades?.ok ? (tradeCount > 0 ? 'PASS' : 'PARTIAL') : 'BLOCKED', evidence: `today_trade_rows=${tradeCount}, endpoint=${data.trades?.status || 0}`, requiredForMoney: false },
       { layer: 'Risk gates and automation status', status: gateOk ? 'PASS' : 'BLOCKED', evidence: `auto_gates_http=${data.gates?.status || 0}, status=${gates.status || '-'}`, requiredForMoney: true },
       { layer: 'Live-money safety lock', status: liveFlag === true || orderAllowed === true ? 'BLOCKED' : 'PASS', evidence: `live_flag=${String(liveFlag)}, order_allowed=${String(orderAllowed)}`, requiredForMoney: true },
-      { layer: 'Dashboard operator truth', status: 'PASS', evidence: 'Generated from live endpoints. SENSEX is optional until official Dhan rows are proven; enabled universe remains no-fallback.', requiredForMoney: true },
+      {
+        layer: 'Dashboard operator truth',
+        status: (data.health?.ok && data.broker?.ok && data.gates?.ok && requiredOk === REQUIRED_CHAIN_SYMBOLS.length) ? 'PASS' : 'BLOCKED',
+        evidence: `health_ok=${Boolean(data.health?.ok)}, broker_ok=${Boolean(data.broker?.ok)}, gates_ok=${Boolean(data.gates?.ok)}, enabled_chains_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length} (runtime API probes; not hard-coded)`,
+        requiredForMoney: true,
+      },
     ]
   }, [data])
 

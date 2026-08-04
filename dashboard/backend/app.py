@@ -7179,7 +7179,14 @@ def _compat_signal_from_chain(symbol: str, chain: Dict[str, Any]) -> Dict[str, A
             pe_vol += vol
     total = ce_oi + pe_oi
     if total <= 0:
-        return {"symbol": symbol.upper(), "signal": "HOLD", "confidence_pct": 0.0, "reason": "no_option_chain_oi"}
+        return {
+            "symbol": symbol.upper(),
+            "signal": "HOLD",
+            "confidence_pct": 0.0,
+            "reason": "no_option_chain_oi",
+            "source": "chain_oi_fallback",
+            "ml_signal": False,
+        }
     pcr = pe_oi / max(ce_oi, 1.0)
     vol_bias = (pe_vol - ce_vol) / max(pe_vol + ce_vol, 1.0)
     score = max(-1.0, min(1.0, (pcr - 1.0) * 0.7 + vol_bias * 0.3))
@@ -7192,7 +7199,99 @@ def _compat_signal_from_chain(symbol: str, chain: Dict[str, Any]) -> Dict[str, A
         "ce_oi": ce_oi,
         "pe_oi": pe_oi,
         "contracts": len(rows),
+        "source": "chain_oi_fallback",
+        "ml_signal": False,
+        "reason": "ml_unavailable_using_chain_oi_heuristic",
     }
+
+
+def _compat_map_recommendation_to_signal(rec: Any, score: float = 0.0) -> str:
+    text = str(rec or "").upper()
+    if any(k in text for k in ("BUY", "LONG", "CE", "CALL")):
+        return "BUY"
+    if any(k in text for k in ("SELL", "SHORT", "PE", "PUT")):
+        return "SELL"
+    if score > 0.12:
+        return "BUY"
+    if score < -0.12:
+        return "SELL"
+    return "HOLD"
+
+
+def _get_runtime_state() -> Dict[str, Any]:
+    """Safe runtime/SSOT snapshot used by ML and performance routes."""
+    if SSOT_AVAILABLE and state_store is not None:
+        try:
+            state = state_store.get_state()
+            if isinstance(state, dict):
+                return state
+        except Exception:
+            pass
+    try:
+        path = OUTPUTS_DIR / "runtime_state.json"
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return data
+    except Exception:
+        pass
+    return {}
+
+
+def _compat_ml_signal_for_symbol(symbol: str) -> Optional[Dict[str, Any]]:
+    """Build a real ML/ranker signal for a symbol (no hard-coded BUY/SELL)."""
+    sym = symbol.upper().strip()
+    state = _get_runtime_state()
+    for pred in state.get("ml_predictions") or []:
+        if not isinstance(pred, dict):
+            continue
+        pred_sym = str(pred.get("symbol") or pred.get("underlying") or pred.get("ticker") or "").upper()
+        if pred_sym != sym:
+            continue
+        score = float(pred.get("score") or pred.get("gain_score") or pred.get("confidence") or 0)
+        signal = _compat_map_recommendation_to_signal(
+            pred.get("signal") or pred.get("recommendation") or pred.get("action"),
+            score,
+        )
+        conf = pred.get("confidence_pct")
+        if conf is None:
+            conf = abs(score) * 100.0 if abs(score) <= 1 else abs(score)
+        return {
+            "symbol": sym,
+            "signal": signal,
+            "confidence_pct": round(float(min(99.0, float(conf))), 2),
+            "score": score,
+            "recommendation": pred.get("recommendation") or pred.get("action") or signal,
+            "source": "runtime_ml_predictions",
+            "ml_signal": True,
+            "raw": pred,
+        }
+
+    scan = _compat_run_scanner()
+    rows = list(scan.get("full_ranking") or []) + list(scan.get("top_predictions") or [])
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        row_sym = str(row.get("underlying") or row.get("symbol") or "").upper()
+        if row_sym != sym:
+            continue
+        score = float(row.get("gain_score") or row.get("expected_move_pct") or row.get("score") or 0)
+        signal = _compat_map_recommendation_to_signal(row.get("recommendation"), score)
+        conf = min(99.0, abs(score) * 10.0 if abs(score) <= 10 else abs(score))
+        return {
+            "symbol": sym,
+            "signal": signal,
+            "confidence_pct": round(float(conf), 2),
+            "score": score,
+            "expected_move_pct": row.get("expected_move_pct"),
+            "recommendation": row.get("recommendation") or signal,
+            "rank": row.get("rank"),
+            "source": "daily_gain_scanner",
+            "ml_signal": True,
+            "scan_status": scan.get("status"),
+            "raw": row,
+        }
+    return None
 
 
 def _compat_read_json(path: Path, default: Any):
@@ -7423,21 +7522,25 @@ async def compat_chart(symbol: str, timeframe: str = "1m"):
 
 @app.get("/prediction/all")
 async def compat_prediction_all():
-    scan = (await compat_profit_scan()).get("data", {})
     preds = []
-    for row in scan.get("items", [])[:10]:
-        sym = row.get("underlying") or row.get("symbol")
-        if sym:
-            pred = await compat_prediction(str(sym))
-            preds.append(pred.get("data", {}))
-    return _compat_ok({"predictions": preds})
+    for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"):
+        pred = await compat_prediction(sym)
+        data = pred.get("data", {}) if isinstance(pred, dict) else {}
+        if data:
+            preds.append(data)
+    return _compat_ok({"predictions": preds, "count": len(preds), "source": "ml_or_ranker"})
 
 
 @app.get("/prediction/{symbol}")
 async def compat_prediction(symbol: str):
+    """Return real ML/ranker signal for symbol; chain OI only as explicit fallback."""
+    ml = await _run_blocking(_compat_ml_signal_for_symbol, symbol, timeout=30.0)
+    if isinstance(ml, dict) and ml.get("ml_signal"):
+        return _compat_ok(ml)
     chain_resp = await compat_chain(symbol)
-    chain = chain_resp.get("data", {})
-    return _compat_ok(_compat_signal_from_chain(symbol, chain))
+    chain = chain_resp.get("data", {}) if isinstance(chain_resp, dict) else {}
+    fallback = _compat_signal_from_chain(symbol, chain if isinstance(chain, dict) else {})
+    return _compat_ok(fallback)
 
 
 @app.get("/positions")
@@ -8040,9 +8143,31 @@ async def get_performance_metrics():
 async def get_ml_predictions():
     try:
         state = _get_runtime_state()
-        predictions = state.get("ml_predictions", []) or []
-        return {"predictions": predictions[:5], "count": len(predictions), "status": "ok"}
-    except: return {"predictions": [], "status": "error"}
+        predictions = list(state.get("ml_predictions", []) or [])
+        if not predictions:
+            scan = await _run_blocking(_compat_run_scanner, timeout=30.0)
+            for row in (scan.get("full_ranking") or scan.get("top_predictions") or [])[:10]:
+                if not isinstance(row, dict):
+                    continue
+                score = float(row.get("gain_score") or row.get("expected_move_pct") or 0)
+                predictions.append(
+                    {
+                        "symbol": row.get("underlying") or row.get("symbol"),
+                        "signal": _compat_map_recommendation_to_signal(row.get("recommendation"), score),
+                        "confidence_pct": round(min(99.0, abs(score) * 10.0 if abs(score) <= 10 else abs(score)), 2),
+                        "recommendation": row.get("recommendation"),
+                        "score": score,
+                        "source": "daily_gain_scanner",
+                    }
+                )
+        return {
+            "predictions": predictions[:10],
+            "count": len(predictions),
+            "status": "ok",
+            "live_trading_enabled": False,
+        }
+    except Exception as exc:
+        return {"predictions": [], "status": "error", "error": str(exc)[:200]}
 
 # SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES
 @app.get("/api/simulation/live/state")

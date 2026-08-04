@@ -92,23 +92,58 @@ export function Overview() {
   ]
 
   const proofGates = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
+  const liveAllowed = Boolean(health?.live_allowed ?? state?.live_trading_enabled ?? state?.live_allowed)
+  const mode = String(health?.mode ?? state?.mode ?? '').toUpperCase()
+  const qc = String(health?.qc_status ?? '').toUpperCase()
+  const gatesPassing = Number(autoGates?.gates_passing ?? 0)
+  const gatesTotal = Number(autoGates?.gates_total ?? proofGates.length ?? 0)
 
-  const staticGates = [
-    { label: 'ML Accuracy (Spearman rho)', status: 'PEND', note: 'Accumulating - need 10 trading days' },
-    { label: 'Paper Lifecycle Proof', status: 'PEND', note: 'Market session required' },
-    { label: 'Tick / Data Freshness', status: health?.data_source ? 'PASS' : 'PEND', note: `source: ${health?.data_source ?? 'checking...'}` },
-    { label: 'Broker Connection', status: brokerConn ? 'PASS' : 'FAIL', note: brokerConn ? 'Dhan connected' : 'Dhan disconnected' },
-    { label: 'Live Trading Gate', status: 'FAIL', note: 'OFF - hardcoded safety' },
-    { label: 'Paper Mode Active', status: 'PASS', note: 'CLOUD_PAPER_ENGINE=0, analyzer mode' },
+  // Runtime-only fallback when /api/auto_gates has not returned proof_gates yet.
+  // No hard-coded PASS badges — every status comes from live health/broker/state APIs.
+  const runtimeGates = [
+    {
+      label: 'Broker Connection',
+      status: brokerConn ? 'PASS' : (brokerStatus ? 'FAIL' : 'PEND'),
+      note: brokerStatus?.status ?? brokerStatus?.error ?? (brokerConn ? 'Dhan connected' : 'awaiting /api/broker status'),
+    },
+    {
+      label: 'Tick / Data Freshness',
+      status: health?.data_source ? 'PASS' : (health ? 'FAIL' : 'PEND'),
+      note: health?.data_source ? `source: ${health.data_source}` : 'awaiting /api/health',
+    },
+    {
+      label: 'QC Gate',
+      status: qc === 'PASS' ? 'PASS' : (qc ? (qc === 'NOT_READY' ? 'PEND' : 'FAIL') : 'PEND'),
+      note: health?.qc_status ?? 'awaiting /api/health.qc_status',
+    },
+    {
+      label: 'Auto Gates Matrix',
+      status: autoGates
+        ? (gatesTotal > 0 && gatesPassing >= gatesTotal ? 'PASS' : (gatesPassing > 0 ? 'PEND' : 'FAIL'))
+        : 'PEND',
+      note: autoGates ? `${gatesPassing}/${gatesTotal || '?'} from /api/auto_gates` : 'awaiting /api/auto_gates',
+    },
+    {
+      label: 'Paper / Analyzer Mode',
+      status: mode === 'PAPER' || mode === 'ANALYZER' ? 'PASS' : (mode ? 'FAIL' : 'PEND'),
+      note: mode || 'awaiting /api/health.mode',
+    },
+    {
+      label: 'Live Trading Gate',
+      status: liveAllowed ? 'FAIL' : (health || state ? 'PASS' : 'PEND'),
+      note: liveAllowed
+        ? 'LIVE FLAG DETECTED — must remain OFF'
+        : 'OFF (confirmed via /api/health|/api/state)',
+    },
   ]
 
   const displayGates = proofGates.length > 0
     ? proofGates.map((g: any) => ({
         label: typeof g?.name === 'string' ? g.name : String(g?.gate_id ?? 'Gate'),
         status: typeof g?.status === 'string' ? g.status : (g?.pass ? 'PASS' : 'PEND'),
-        note: typeof g?.note === 'string' ? g.note : undefined,
+        note: typeof g?.note === 'string' ? g.note : (typeof g?.evidence === 'string' ? g.evidence : undefined),
       }))
-    : staticGates
+    : runtimeGates
 
   const passCount = displayGates.filter(g =>
     g.status === 'PASS' || g.status === 'pass').length

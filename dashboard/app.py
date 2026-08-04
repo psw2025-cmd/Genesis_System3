@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 System3 Genesis Streamlit Dashboard
 Autonomous analyzer/paper operator console. Real-money execution stays gated.
@@ -5,6 +6,7 @@ Autonomous analyzer/paper operator console. Real-money execution stays gated.
 
 from __future__ import annotations
 
+import sys
 from datetime import date, timedelta
 from typing import Any, Dict, Optional
 
@@ -14,9 +16,19 @@ import requests
 import streamlit as st
 import streamlit.components.v1 as components
 
+# Use Unicode escape so Windows/latin-1 consoles never mojibake ₹ as "â¹".
+INR_SYMBOL = "\u20b9"
+
 BACKEND_URL = "http://127.0.0.1:8000"
 VERSION = "System3 Genesis v2026.07.07"
 SYMBOLS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+
+# Force UTF-8 stdout/stderr when the host supports it (fixes Streamlit ₹ display).
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 st.set_page_config(page_title="System3 Genesis", page_icon="System3", layout="wide", initial_sidebar_state="expanded")
 st.markdown(
@@ -40,9 +52,9 @@ st.markdown(
 
 def money(value: Any) -> str:
     try:
-        return f"₹{float(value):,.2f}"
+        return f"{INR_SYMBOL}{float(value):,.2f}"
     except Exception:
-        return "₹0.00"
+        return f"{INR_SYMBOL}0.00"
 
 
 def pct(value: Any) -> str:
