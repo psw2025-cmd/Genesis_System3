@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 const base = (process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
-const key = process.env.DASHBOARD_API_KEY || ''
+const key = String(process.env.DASHBOARD_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const outDir = path.join('reports', 'latest', 'dashboard_live_ui_proof')
 fs.mkdirSync(outDir, { recursive: true })
 
