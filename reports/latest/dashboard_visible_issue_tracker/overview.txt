@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:53:54 IST
+22:19:50 IST
 NIFTY
 24,615
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,845
 SNAP
-TICK 1s
+TICK 0s
 MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
@@ -109,7 +109,7 @@ Alerts
 0 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-04 20:15 IST)
+Market closed — last verified Dhan snapshot (2026-08-04 21:53 IST)
 Gate Matrix
 2/7 PASS
 PEND
@@ -123,7 +123,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=60.11s refresh=60s
+tick_age=12.79s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD

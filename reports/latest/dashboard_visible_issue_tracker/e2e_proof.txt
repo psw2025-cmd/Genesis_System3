@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:53:49 IST
+22:19:45 IST
 NIFTY
 24,615
 SNAP
@@ -75,7 +75,7 @@ BLOCKED · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 8/4/2026, 3:23:46 PM · This panel is proof-only; it does not enable live orders.
+Last run: 8/4/2026, 4:49:43 PM · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
 Dhan broker connection	BLOCKED	200

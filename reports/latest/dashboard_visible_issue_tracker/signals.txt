@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:54:10 IST
+22:20:06 IST
 NIFTY
 24,615
 SNAP
@@ -90,7 +90,7 @@ Rs 2.40
 Target
 Rs 3.90
 ALL-INDIA TOP OPTION GAINERS
-Refreshed 2026-08-04 20:53:07 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
+Refreshed 2026-08-04 22:18:42 · ok · 25 rows · Reference board (LIVE_SCRAPED) · not used for live orders
 MONEYCONTROL
 DHAN LIVE
 WS STREAM

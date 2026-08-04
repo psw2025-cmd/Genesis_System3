@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:53:39 IST
+22:19:35 IST
 NIFTY
 24,615
 SNAP
@@ -70,7 +70,7 @@ Infrastructure / broker read path
 BLOCKED
 Money readiness
 Last run
-8/4/2026, 3:23:35 PM
+8/4/2026, 4:49:31 PM
 MONEY_READY_BLOCKED
 At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
 LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE

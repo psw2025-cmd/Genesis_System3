@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:54:30 IST
+22:20:26 IST
 NIFTY
 24,615
 SNAP
@@ -63,7 +63,7 @@ System
 Live Gate
 LOCK
 Performance
-last checked 20:54:26 IST
+last checked 22:20:22 IST
 TOTAL P&L
 ₹0
 Realized + Unrealized

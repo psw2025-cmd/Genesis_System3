@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 _e2e_full_cloud_40
-20:54:20 IST
+22:20:16 IST
 NIFTY
 24,615
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,845
 SNAP
-TICK 0s
+TICK 1s
 MARKET CLOSED / DATA POLLING
 DHAN API ERR
 PAPER
@@ -63,7 +63,7 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/4/2026, 3:24:16 PM
+Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/4/2026, 4:50:12 PM
 Dhan production tokens have no paper sandbox — fills are local sim; LTP/PnL from live Dhan option chain. LIVE orders stay OFF.
 Refresh
 Force Paper Tick
