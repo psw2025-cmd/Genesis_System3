@@ -12,6 +12,11 @@ Push to `main` that touches runtime paths (`dashboard/`, `core/`, etc.) triggers
 1. Cloud Build → immutable image tagged with the full commit SHA
 2. Cloud Run image patch (secret mounts preserved; live trading forced OFF)
 
+Canonical production URL (not Render):
+`https://genesis-system3-web-doq2wplepa-el.a.run.app`
+
+Source of truth: `config/cloud_runtime.json`
+
 Manual `gcloud` / `ALLOW_GCP_DEPLOY` scripts below remain for emergency/break-glass
 only. Preferred path is the GitHub Action.
 

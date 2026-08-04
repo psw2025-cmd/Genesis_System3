@@ -89,7 +89,7 @@ export function TopBar() {
   const streamLive = marketOpen && wsStatus === 'live'
 
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'RENDER_UNAVAILABLE'
+  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'CLOUD_UNAVAILABLE' || apiStatus?.status === 'RENDER_UNAVAILABLE'
   const authLocked = apiStatus?.status === 'API_AUTH_REQUIRED'
   const brokerHasError = authLocked
     || hasBrokerApiError(brokerStatus)

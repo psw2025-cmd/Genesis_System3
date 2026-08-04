@@ -37,6 +37,14 @@ SAFE_ENV = (
     ("DHAN_PERSIST_TOKEN_TO_SM", "1"),
     ("CLOUD_MODE", "1"),
     ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),
+    (
+        "SYSTEM3_PUBLIC_BACKEND_URL",
+        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    ),
+    (
+        "SYSTEM3_API_BASE",
+        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    ),
 )
 
 

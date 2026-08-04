@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Genesis System3 — Cloud Verify + Issue Finder
-Runs in GitHub Actions (can reach Render).
+Runs in GitHub Actions against Google Cloud Run (or localhost via DASHBOARD_URL).
 Fetches every API, detects every issue, writes full report.
 Claude reads report → fixes code → CI runs again → repeat.
 """
@@ -10,7 +10,16 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 IST  = timezone(timedelta(hours=5, minutes=30))
-BASE = os.environ.get("DASHBOARD_URL", "http://127.0.0.1:8000")
+BASE = os.environ.get(
+    "DASHBOARD_URL",
+    os.environ.get(
+        "DASHBOARD_BASE_URL",
+        os.environ.get(
+            "SYSTEM3_PUBLIC_BACKEND_URL",
+            "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+        ),
+    ),
+).rstrip("/")
 OUT  = Path("reports/latest/dashboard_ui_proof")
 OUT.mkdir(parents=True, exist_ok=True)
 

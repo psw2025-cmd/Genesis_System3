@@ -4,7 +4,7 @@ import { API_BASE, API_HEADERS } from '../config'
 
 const BASE = API_BASE || window.location.origin
 
-// Render/dashboard can return 429/5xx during bursts. These are transient; keep last
+// Cloud Run / dashboard can return 429/5xx during bursts. These are transient; keep last
 // good values instead of flashing the whole UI red.
 const TRANSIENT_STATUS = new Set([0, 429, 502, 503, 504, 520, 521, 522, 523, 524])
 const isTransient = (status?: number) => TRANSIENT_STATUS.has(Number(status ?? -1))
@@ -56,7 +56,7 @@ async function fetchJSON(path: string, timeoutMs = 20000) {
 }
 
 const authStatus = (path: string, status: number) => ({
-  status: status === 401 ? 'API_AUTH_REQUIRED' : isTransient(status) ? (status === 0 ? 'NETWORK_ERROR' : status === 429 ? 'RATE_LIMITED' : 'RENDER_UNAVAILABLE') : 'API_ERROR',
+  status: status === 401 ? 'API_AUTH_REQUIRED' : isTransient(status) ? (status === 0 ? 'NETWORK_ERROR' : status === 429 ? 'RATE_LIMITED' : 'CLOUD_UNAVAILABLE') : 'API_ERROR',
   code: status,
   path,
   severity: status === 401 ? 'locked' : isTransient(status) ? 'transient' : 'error',
@@ -64,10 +64,10 @@ const authStatus = (path: string, status: number) => ({
     ? 'Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.'
     : isTransient(status)
       ? status === 0
-        ? `Network/DNS could not reach Render for ${path}. Keeping last good data where available.`
+        ? `Network/DNS could not reach Cloud Run backend for ${path}. Keeping last good data where available.`
         : status === 429
           ? `Backend rate-limited ${path}. Keeping last good data and using slower polling.`
-          : `Render/backend returned ${status} for ${path}. Keeping last good data where available.`
+          : `Cloud Run/backend returned ${status} for ${path}. Keeping last good data where available.`
       : `Backend API returned ${status}`,
 })
 

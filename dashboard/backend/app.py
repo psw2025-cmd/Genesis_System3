@@ -827,7 +827,7 @@ async def get_broker_funds():
 
 @app.get("/api/broker/diagnose")
 async def get_broker_diagnose():
-    """Diagnose exactly WHY broker is disconnected. Key for Render setup."""
+    """Diagnose exactly WHY broker is disconnected. Key for Cloud Run / Secret Manager setup."""
     import os as _os
 
     issues = []
@@ -840,8 +840,8 @@ async def get_broker_diagnose():
     }
     for key, val in env_checks.items():
         if not val:
-            issues.append(f"MISSING: {key} env var not set in Render")
-            hints.append(f"Set {key} in Render → Environment → Add Env Var")
+            issues.append(f"MISSING: {key} env var not set in Cloud Run / Secret Manager")
+            hints.append(f"Set {key} via GCP Secret Manager mount on genesis-system3-web")
 
     # Check token validity
     token = env_checks["DHAN_ACCESS_TOKEN"]
@@ -887,9 +887,9 @@ async def get_broker_diagnose():
         "hints": hints,
         "api_probe": api_test,
         "fix_action": (
-            "Update DHAN_ACCESS_TOKEN in Render Environment Variables. "
-            "Get fresh token from https://login.dhan.co → Profile → API. "
-            "Token expires daily — use DHAN_PIN + DHAN_TOTP_SECRET for auto-refresh."
+            "Update DHAN_ACCESS_TOKEN in GCP Secret Manager (dhan-access-token) and "
+            "let Cloud Run remount latest. Prefer PIN+TOTP auto-heal on genesis-system3-web. "
+            "Token expires daily — DHAN_PIN + DHAN_TOTP_SECRET enable auto-refresh."
             if issues
             else "No issues found"
         ),
@@ -1659,18 +1659,54 @@ async def push_chain_snapshots(payload: Dict[str, Any], request: Request):
 
 @app.get("/api/deploy/info")
 async def get_deploy_info():
+    """Expose deployed commit / host facts for Cloud Run (GCP) proofs.
+
+    Prefers Cloud Run env (DEPLOY_GIT_SHA, K_SERVICE, SYSTEM3_DEPLOY_TARGET).
+    Falls back to legacy RENDER_* vars only if present on old hosts.
     """
-    Exposes the deployed commit SHA so external proof scripts (e.g.
-    scripts/paper_day_proof_pack.py) can verify Render is actually
-    running the expected commit, without needing a Render API key.
-    Render auto-injects RENDER_GIT_COMMIT on every deploy — this just
-    surfaces it. No secrets involved.
-    """
+    cfg: Dict[str, Any] = {}
+    try:
+        cfg_path = ROOT_DIR / "config" / "cloud_runtime.json"
+        if cfg_path.exists():
+            loaded = json.loads(cfg_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                cfg = loaded
+    except Exception:
+        cfg = {}
+
+    git_sha = (
+        os.environ.get("DEPLOY_GIT_SHA")
+        or os.environ.get("RENDER_GIT_COMMIT")
+        or ""
+    ).strip()
+    service_name = (
+        os.environ.get("K_SERVICE")
+        or os.environ.get("RENDER_SERVICE_NAME")
+        or str(cfg.get("service_name") or "genesis-system3-web")
+    )
+    target = (
+        os.environ.get("SYSTEM3_DEPLOY_TARGET")
+        or str(cfg.get("deploy_target") or "gcp-cloud-run")
+    ).strip()
+    base = (
+        os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
+        or os.environ.get("SYSTEM3_API_BASE")
+        or str(cfg.get("public_base_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app")
+    ).rstrip("/")
     return {
-        "git_sha": os.environ.get("RENDER_GIT_COMMIT", ""),
-        "git_branch": os.environ.get("RENDER_GIT_BRANCH", ""),
-        "service_name": os.environ.get("RENDER_SERVICE_NAME", ""),
-        "deployed_at_known": bool(os.environ.get("RENDER_GIT_COMMIT")),
+        "git_sha": git_sha,
+        "git_branch": os.environ.get("RENDER_GIT_BRANCH") or os.environ.get("GITHUB_REF_NAME") or "",
+        "service_name": service_name,
+        "deploy_target": target,
+        "cloud_provider": "google_cloud" if ("gcp" in target or "cloud-run" in target) else "unknown",
+        "public_base_url": base,
+        "ui_url": f"{base}{cfg.get('ui_path') or '/ui'}",
+        "region": os.environ.get("GCP_REGION") or cfg.get("region") or "",
+        "project_id": os.environ.get("GOOGLE_CLOUD_PROJECT") or cfg.get("project_id") or "",
+        "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
+        "live_trading_enabled": False,
+        "deployed_at_known": bool(git_sha),
+        "render_git_commit_legacy": os.environ.get("RENDER_GIT_COMMIT", ""),
     }
 
 
@@ -1801,10 +1837,10 @@ async def approve_live_trading(payload: Dict[str, Any]):
         return {
             "approved": True,
             "message": "Approval recorded. IMPORTANT: You must STILL manually set "
-            "LIVE_TRADING_ENABLED=1 on Render dashboard to actually enable live trading. "
-            "This approval alone does NOT enable live trading.",
-            "next_step": "Render dashboard → genesis-system3-backend → Environment → "
-            "LIVE_TRADING_ENABLED → change to 1 → Save",
+            "LIVE_TRADING_ENABLED=1 on Cloud Run (GCP) to actually enable live trading. "
+            "This approval alone does NOT enable live trading. Default remains OFF.",
+            "next_step": "Cloud Run → genesis-system3-web → Variables & Secrets → "
+            "LIVE_TRADING_ENABLED → change to 1 → Deploy (owner-only; keep OFF unless explicit)",
         }
     except Exception as e:
         return {"approved": False, "message": f"Failed to save approval: {e}"}

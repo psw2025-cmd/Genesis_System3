@@ -137,7 +137,7 @@ export function LiveTradingGate() {
           <p style={{ fontSize: ".75rem", color: "var(--text-mut)", marginBottom: "12px" }}>
             Type the exact approval phrase to record your consent. This does NOT
             enable live trading automatically — you must also change
-            LIVE_TRADING_ENABLED=1 manually on Render dashboard.
+            LIVE_TRADING_ENABLED=1 manually on Cloud Run (keep OFF unless explicit).
           </p>
           <input
             value={phrase}

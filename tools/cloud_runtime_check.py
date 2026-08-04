@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cloud runtime check for Genesis System3 Render deployment.
+Cloud runtime check for Genesis System3 Google Cloud Run deployment.
 
 Purpose:
 - Collect the exact live facts usually requested manually in chat.
@@ -24,7 +24,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
-DEFAULT_BASE_URL = "http://127.0.0.1:8000"
+DEFAULT_BASE_URL = os.environ.get(
+    "DASHBOARD_BASE_URL",
+    os.environ.get(
+        "SYSTEM3_PUBLIC_BACKEND_URL",
+        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    ),
+).rstrip("/")
 REPORT_DIR = Path("reports/latest/cloud_runtime_check")
 
 SECRET_KEY_RE = re.compile(

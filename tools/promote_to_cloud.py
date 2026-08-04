@@ -107,8 +107,8 @@ def main() -> int:
         print("git push failed — check network/auth")
         return 1
 
-    print("\nPushed to origin — Render will auto-deploy (genesis-system3-backend + worker).")
-    print("Verify: python tools/production_daily_cycle.py --deploy-check")
+    print("\nPushed to origin — Cloud Run auto-deploys via GitHub Actions (genesis-system3-web).")
+    print("Verify: python tools/cloud_runtime_check.py --base-url https://genesis-system3-web-doq2wplepa-el.a.run.app")
     return 0
 
 

@@ -1,12 +1,22 @@
 import axios from 'axios'
 
+// Production UI is served same-origin from Google Cloud Run
+// (https://genesis-system3-web-doq2wplepa-el.a.run.app). Leave VITE_API_BASE_URL
+// empty in Cloud builds so API calls stay on the Cloud Run host — never Render.
+
 const normalizeApiBase = (value: string): string => value.replace(/\/+$/, '')
 
 const getApiBase = (): string => {
   const configuredBase = import.meta.env.VITE_API_BASE_URL
 
   if (configuredBase && configuredBase.trim()) {
-    return normalizeApiBase(configuredBase.trim())
+    const base = normalizeApiBase(configuredBase.trim())
+    // Hard-block legacy Render hosts so DNS failures cannot return.
+    if (/onrender\.com/i.test(base)) {
+      console.warn('Ignoring legacy Render VITE_API_BASE_URL; using same-origin Cloud Run host')
+      return ''
+    }
+    return base
   }
 
   if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {

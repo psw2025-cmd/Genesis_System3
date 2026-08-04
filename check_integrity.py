@@ -19,15 +19,19 @@ if os.path.exists(workflow_path):
     with open(workflow_path, "r", encoding="utf-8") as f:
         content = f.read()
     
-    # Replace render URL with localhost if present
-    if "https://genesis-system3-backend.onrender.com" in content:
-        content = content.replace("https://genesis-system3-backend.onrender.com", "http://127.0.0.1:8000")
+    # Replace legacy Render URL with Cloud Run (or localhost for local workflows)
+    cloud = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+    legacy = "https://genesis-system3-backend.onrender.com"
+    if legacy in content:
+        content = content.replace(legacy, cloud)
         with open(workflow_path, "w", encoding="utf-8") as f:
             f.write(content)
         audit_report["workflow_fixes_applied"].append(workflow_path)
-        print(" [FIXED] Updated DASHBOARD_BASE_URL to localhost inside workflow file.")
+        print(" [FIXED] Replaced legacy Render DASHBOARD_BASE_URL with Cloud Run URL.")
+    elif cloud in content or "127.0.0.1:8000" in content or "a.run.app" in content:
+        print(" [PASS] Workflow DASHBOARD_BASE_URL is Cloud Run or localhost aligned.")
     else:
-        print(" [PASS] Workflow DASHBOARD_BASE_URL is already locally aligned.")
+        print(" [WARN] Workflow DASHBOARD_BASE_URL host not recognized.")
 
 # 2. Inspect latest auto recovery & blocker reports for micro details
 blocker_file = "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json"
