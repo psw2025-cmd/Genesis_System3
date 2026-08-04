@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T20:46:55.582Z",
+  "generated_at": "2026-08-04T21:43:09.459Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -15,10 +15,7 @@
     "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
     "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
   ],
-  "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ],
+  "trade_readiness_blockers": [],
   "consistency_blockers": [
     "SHELL_STATUS:BLOCKED",
     "TAB_COVERAGE:0/16",
@@ -39,62 +36,62 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 167917
+      "size_bytes": 166735
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 255134
+      "size_bytes": 255046
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 163744
+      "size_bytes": 163256
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 132455
+      "size_bytes": 123752
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 195820
+      "size_bytes": 195725
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 154109
+      "size_bytes": 153345
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 162736
+      "size_bytes": 162896
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 81251
+      "size_bytes": 80997
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 113450
+      "size_bytes": 113167
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 124176
+      "size_bytes": 124349
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 134891
+      "size_bytes": 135072
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 118682
+      "size_bytes": 118772
     },
     {
       "file": "mobile_390x844.png",
