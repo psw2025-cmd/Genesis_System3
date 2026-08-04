@@ -1,6 +1,16 @@
 {
-  "failed_count": 23,
+  "failed_count": 24,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "0abe011164cf7f3eeb6a7d84b10b30f14e2cda1b",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-04T21:45:53Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30953706157",
+      "run_id": 30953706157,
+      "updated_at": "2026-08-04T21:46:21Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "dcf3958896f70a65de50fad38718139bc15be544",
@@ -232,11 +242,12 @@
       "workflow": "Running Copilot cloud agent"
     }
   ],
-  "generated_utc": "2026-08-04T21:46:08.252271+00:00",
+  "generated_utc": "2026-08-04T21:57:21.406254+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30953706157 conclusion=cancelled commit=0abe011164cf7f3eeb6a7d84b10b30f14e2cda1b",
     "Fix workflow 'Dashboard Visual Production Proof' run 30953462367 conclusion=failure commit=dcf3958896f70a65de50fad38718139bc15be544",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953443498 conclusion=failure commit=1e22833f14b3a05b418d64bdb5005f690de45a45",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953429373 conclusion=failure commit=74b4520f0bc8af83618e10596c2bca8482abc961",
