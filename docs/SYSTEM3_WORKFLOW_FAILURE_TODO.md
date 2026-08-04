@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-04T20:54:50.457455+00:00`
+Generated UTC: `2026-08-04T21:27:40.474412+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `20`
+Failed workflow count: `22`
 
 ## Rule
 
@@ -12,11 +12,16 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 30950537666 conclusion=action_required commit=1e7c03be4f6ca80b47c80da5929393edd3898378
+- [ ] Fix workflow 'GCP Stage 2 Safety Checks' run 30950536980 conclusion=action_required commit=1e7c03be4f6ca80b47c80da5929393edd3898378
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30950526886 conclusion=failure commit=1e7c03be4f6ca80b47c80da5929393edd3898378
 - [ ] Fix workflow 'Genesis System3 Global Safety CI' run 30949882511 conclusion=action_required commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7
 - [ ] Fix workflow 'GCP Stage 2 Safety Checks' run 30949882404 conclusion=action_required commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949876973 conclusion=failure commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30949765891 conclusion=cancelled commit=2ae3795207e237c6af2d2f4fc989e6d5faa63482
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30949736687 conclusion=cancelled commit=d5c5bd08e520d54dbf97a8281c3c611244db2eb8
 - [ ] Fix workflow 'Actions Truth Autopsy' run 30949730459 conclusion=action_required commit=d5c5bd08e520d54dbf97a8281c3c611244db2eb8
+- [ ] Fix workflow 'Running Copilot cloud agent' run 30949541922 conclusion=failure commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
 - [ ] Fix workflow 'Genesis System3 Global Safety CI' run 30949398752 conclusion=action_required commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
 - [ ] Fix workflow 'GCP Stage 2 Safety Checks' run 30949398608 conclusion=action_required commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949395197 conclusion=failure commit=b842a3ea8b08b86944bc6b0496d85853b9dd61b2
@@ -29,19 +34,21 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Genesis System3 Global Safety CI' run 30947514852 conclusion=failure commit=0afce386fe11056892c22fdb14336ab8d6c8eb9f
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30947514717 conclusion=failure commit=0afce386fe11056892c22fdb14336ab8d6c8eb9f
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30947514689 conclusion=failure commit=0afce386fe11056892c22fdb14336ab8d6c8eb9f
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30947513277 conclusion=failure commit=0afce386fe11056892c22fdb14336ab8d6c8eb9f
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30947283644 conclusion=cancelled commit=df6ca108d4042599dab72df04e0f16e455f6fb13
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30946963997 conclusion=cancelled commit=6e133df8e549014abc6153241eaf3d6a3201d79b
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Genesis System3 Global Safety CI | 30950537666 | action_required | `1e7c03be4f6c` | 2026-08-04T21:01:33Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30950537666 |
+| GCP Stage 2 Safety Checks | 30950536980 | action_required | `1e7c03be4f6c` | 2026-08-04T21:01:32Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30950536980 |
+| .github/workflows/options-ml-training-proof.yml | 30950526886 | failure | `1e7c03be4f6c` | 2026-08-04T21:01:25Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30950526886 |
 | Genesis System3 Global Safety CI | 30949882511 | action_required | `d980ca7649a2` | 2026-08-04T20:53:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949882511 |
 | GCP Stage 2 Safety Checks | 30949882404 | action_required | `d980ca7649a2` | 2026-08-04T20:53:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949882404 |
 | .github/workflows/options-ml-training-proof.yml | 30949876973 | failure | `d980ca7649a2` | 2026-08-04T20:52:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949876973 |
+| System3 1000 Point TODO Status Updater | 30949765891 | cancelled | `2ae3795207e2` | 2026-08-04T20:55:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949765891 |
 | System3 1000 Point TODO Status Updater | 30949736687 | cancelled | `d5c5bd08e520` | 2026-08-04T20:51:36Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949736687 |
 | Actions Truth Autopsy | 30949730459 | action_required | `d5c5bd08e520` | 2026-08-04T20:51:02Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949730459 |
+| Running Copilot cloud agent | 30949541922 | failure | `b842a3ea8b08` | 2026-08-04T21:02:47Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949541922 |
 | Genesis System3 Global Safety CI | 30949398752 | action_required | `b842a3ea8b08` | 2026-08-04T20:46:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949398752 |
 | GCP Stage 2 Safety Checks | 30949398608 | action_required | `b842a3ea8b08` | 2026-08-04T20:46:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949398608 |
 | .github/workflows/options-ml-training-proof.yml | 30949395197 | failure | `b842a3ea8b08` | 2026-08-04T20:46:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949395197 |
@@ -54,6 +61,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Genesis System3 Global Safety CI | 30947514852 | failure | `0afce386fe11` | 2026-08-04T20:26:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514852 |
 | Dashboard Visual Production Proof | 30947514717 | failure | `0afce386fe11` | 2026-08-04T20:25:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514717 |
 | System3 Latest Truth Publish | 30947514689 | failure | `0afce386fe11` | 2026-08-04T20:31:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514689 |
-| .github/workflows/options-ml-training-proof.yml | 30947513277 | failure | `0afce386fe11` | 2026-08-04T20:21:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947513277 |
-| System3 1000 Point TODO Status Updater | 30947283644 | cancelled | `df6ca108d404` | 2026-08-04T20:19:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947283644 |
-| System3 1000 Point TODO Status Updater | 30946963997 | cancelled | `6e133df8e549` | 2026-08-04T20:15:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30946963997 |
