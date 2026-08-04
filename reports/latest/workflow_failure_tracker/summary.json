@@ -1,6 +1,16 @@
 {
-  "failed_count": 8,
+  "failed_count": 5,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "9b136f91ba16debf5db52d2336d302fc4cc15eea",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T03:22:42Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30874577485",
+      "run_id": 30874577485,
+      "updated_at": "2026-08-04T03:28:05Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "9ae1b2dee298f53a06542fc8aea44246e4ff9a0c",
@@ -40,60 +50,17 @@
       "run_id": 30864904430,
       "updated_at": "2026-08-04T00:13:47Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
-      "commit": "1a4edbae05b184c25323030ad7644439d991c491",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T00:11:01Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864754665",
-      "run_id": 30864754665,
-      "updated_at": "2026-08-04T00:14:06Z",
-      "workflow": "Cloud Runtime Check"
-    },
-    {
-      "branch": "main",
-      "commit": "1a4edbae05b184c25323030ad7644439d991c491",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T00:11:01Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864754654",
-      "run_id": 30864754654,
-      "updated_at": "2026-08-04T00:11:06Z",
-      "workflow": "Dashboard Visible Proof Warmed"
-    },
-    {
-      "branch": "main",
-      "commit": "1a4edbae05b184c25323030ad7644439d991c491",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T00:11:01Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864754653",
-      "run_id": 30864754653,
-      "updated_at": "2026-08-04T00:14:18Z",
-      "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "main",
-      "commit": "1a4edbae05b184c25323030ad7644439d991c491",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:11:00Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864753955",
-      "run_id": 30864753955,
-      "updated_at": "2026-08-04T00:11:00Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-04T03:04:28.413449+00:00",
+  "generated_utc": "2026-08-04T03:28:13.228165+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30874577485 conclusion=failure commit=9b136f91ba16debf5db52d2336d302fc4cc15eea",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30870485830 conclusion=cancelled commit=9ae1b2dee298f53a06542fc8aea44246e4ff9a0c",
     "Fix workflow 'Dashboard Visual Production Proof' run 30870199180 conclusion=failure commit=a5c84d510501a92015eea475d88f00681638394a",
     "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864904430 conclusion=failure commit=2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
-    "Fix workflow 'Cloud Runtime Check' run 30864754665 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
-    "Fix workflow 'Dashboard Visible Proof Warmed' run 30864754654 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 30864754653 conclusion=cancelled commit=1a4edbae05b184c25323030ad7644439d991c491",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864753955 conclusion=failure commit=1a4edbae05b184c25323030ad7644439d991c491"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864904430 conclusion=failure commit=2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb"
   ]
 }
