@@ -1,6 +1,16 @@
 {
-  "failed_count": 9,
+  "failed_count": 8,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "ca15ba9e59319d6a50e4aa35d5d987f36e7ce658",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T15:05:57Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30922382124",
+      "run_id": 30922382124,
+      "updated_at": "2026-08-04T15:11:20Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "86bc080fb9768e83c5a2ae819f329bfce0285aea",
@@ -70,41 +80,20 @@
       "run_id": 30905081102,
       "updated_at": "2026-08-04T11:30:56Z",
       "workflow": "System3 Broker Chain Semantic Gate"
-    },
-    {
-      "branch": "main",
-      "commit": "8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T11:19:51Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30904363455",
-      "run_id": 30904363455,
-      "updated_at": "2026-08-04T11:26:52Z",
-      "workflow": "System3 Full Auto Truth"
-    },
-    {
-      "branch": "main",
-      "commit": "6b7f2ca2f2dbe28675198196b46137b1aab623e0",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T11:11:22Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30903773507",
-      "run_id": 30903773507,
-      "updated_at": "2026-08-04T11:11:43Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-08-04T14:16:16.434715+00:00",
+  "generated_utc": "2026-08-04T15:11:30.845241+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30922382124 conclusion=failure commit=ca15ba9e59319d6a50e4aa35d5d987f36e7ce658",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30916532297 conclusion=cancelled commit=86bc080fb9768e83c5a2ae819f329bfce0285aea",
     "Fix workflow 'Dashboard Visual Production Proof' run 30916229129 conclusion=failure commit=9b33126aa169af66f52ffda91d4ed6fea690d651",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30911688071 conclusion=cancelled commit=173f5e9eafdf20cf6e2d6d56b77bdfa2c9d04f68",
     "Fix workflow 'Dashboard Visual Production Proof' run 30911281107 conclusion=failure commit=3f774498d758ca95cb5a526d936f16d63a9ccfc1",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30907250785 conclusion=cancelled commit=949f8f719ea1390a1298de0961861ce7ec13c1e4",
     "Fix workflow 'Dashboard Visual Production Proof' run 30906871800 conclusion=failure commit=be4652b9cdd6aa51eb67815c810ca06f72eaff74",
-    "Fix workflow 'System3 Broker Chain Semantic Gate' run 30905081102 conclusion=failure commit=8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8",
-    "Fix workflow 'System3 Full Auto Truth' run 30904363455 conclusion=failure commit=8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30903773507 conclusion=cancelled commit=6b7f2ca2f2dbe28675198196b46137b1aab623e0"
+    "Fix workflow 'System3 Broker Chain Semantic Gate' run 30905081102 conclusion=failure commit=8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8"
   ]
 }
