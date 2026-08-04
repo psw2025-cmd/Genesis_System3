@@ -1,6 +1,46 @@
 {
-  "failed_count": 8,
+  "failed_count": 11,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "e205e884b932c96cb272f0979431d425a5358d14",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T05:21:51Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30880454597",
+      "run_id": 30880454597,
+      "updated_at": "2026-08-04T05:29:01Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "e205e884b932c96cb272f0979431d425a5358d14",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T05:20:21Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30880379233",
+      "run_id": 30880379233,
+      "updated_at": "2026-08-04T05:24:44Z",
+      "workflow": "System3 Market Session Proof Runner"
+    },
+    {
+      "branch": "main",
+      "commit": "44a0832b4b8c394ce7215eaf48b8f34e3ffc59d3",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T04:50:30Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30878847972",
+      "run_id": 30878847972,
+      "updated_at": "2026-08-04T04:54:09Z",
+      "workflow": "System3 Market Session Proof Runner"
+    },
+    {
+      "branch": "main",
+      "commit": "1c1e167acbabaff304cde38aefdf7fdf291fbbfb",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T04:33:35Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30878032560",
+      "run_id": 30878032560,
+      "updated_at": "2026-08-04T04:34:48Z",
+      "workflow": "System3 Windows Self-Hosted Workflow Migration"
+    },
     {
       "branch": "main",
       "commit": "6b4b1e5674f7b902043bda8a37455e588cf291f8",
@@ -70,30 +110,23 @@
       "run_id": 30870199180,
       "updated_at": "2026-08-04T02:00:33Z",
       "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:53:41Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30867012854",
-      "run_id": 30867012854,
-      "updated_at": "2026-08-04T00:58:51Z",
-      "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-04T04:34:17.339174+00:00",
+  "generated_utc": "2026-08-04T05:29:10.103920+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30880454597 conclusion=failure commit=e205e884b932c96cb272f0979431d425a5358d14",
+    "Fix workflow 'System3 Market Session Proof Runner' run 30880379233 conclusion=failure commit=e205e884b932c96cb272f0979431d425a5358d14",
+    "Fix workflow 'System3 Market Session Proof Runner' run 30878847972 conclusion=failure commit=44a0832b4b8c394ce7215eaf48b8f34e3ffc59d3",
+    "Fix workflow 'System3 Windows Self-Hosted Workflow Migration' run 30878032560 conclusion=failure commit=1c1e167acbabaff304cde38aefdf7fdf291fbbfb",
     "Fix workflow 'System3 Broker Chain Semantic Gate' run 30877188043 conclusion=failure commit=6b4b1e5674f7b902043bda8a37455e588cf291f8",
     "Fix workflow 'System3 Full Auto Truth' run 30876635099 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633",
     "Fix workflow 'Dashboard Live UI Proof' run 30876524506 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30874834600 conclusion=cancelled commit=34a6040ef1a53a254cf08b1dfe304f28d1344eef",
     "Fix workflow 'Dashboard Visual Production Proof' run 30874577485 conclusion=failure commit=9b136f91ba16debf5db52d2336d302fc4cc15eea",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30870485830 conclusion=cancelled commit=9ae1b2dee298f53a06542fc8aea44246e4ff9a0c",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30870199180 conclusion=failure commit=a5c84d510501a92015eea475d88f00681638394a",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8"
+    "Fix workflow 'Dashboard Visual Production Proof' run 30870199180 conclusion=failure commit=a5c84d510501a92015eea475d88f00681638394a"
   ]
 }
