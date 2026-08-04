@@ -1,6 +1,46 @@
 {
-  "failed_count": 5,
+  "failed_count": 8,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "6b4b1e5674f7b902043bda8a37455e588cf291f8",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T04:16:23Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30877188043",
+      "run_id": 30877188043,
+      "updated_at": "2026-08-04T04:17:00Z",
+      "workflow": "System3 Broker Chain Semantic Gate"
+    },
+    {
+      "branch": "main",
+      "commit": "f4ff64368d0f5e6247022844533b0e41a7544633",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T04:05:44Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30876635099",
+      "run_id": 30876635099,
+      "updated_at": "2026-08-04T04:24:12Z",
+      "workflow": "System3 Full Auto Truth"
+    },
+    {
+      "branch": "main",
+      "commit": "f4ff64368d0f5e6247022844533b0e41a7544633",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T04:03:35Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30876524506",
+      "run_id": 30876524506,
+      "updated_at": "2026-08-04T04:13:57Z",
+      "workflow": "Dashboard Live UI Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "34a6040ef1a53a254cf08b1dfe304f28d1344eef",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-04T03:28:06Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30874834600",
+      "run_id": 30874834600,
+      "updated_at": "2026-08-04T03:28:22Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "9b136f91ba16debf5db52d2336d302fc4cc15eea",
@@ -40,27 +80,20 @@
       "run_id": 30867012854,
       "updated_at": "2026-08-04T00:58:51Z",
       "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T00:13:47Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30864904430",
-      "run_id": 30864904430,
-      "updated_at": "2026-08-04T00:13:47Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-04T03:28:13.228165+00:00",
+  "generated_utc": "2026-08-04T04:34:17.339174+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 Broker Chain Semantic Gate' run 30877188043 conclusion=failure commit=6b4b1e5674f7b902043bda8a37455e588cf291f8",
+    "Fix workflow 'System3 Full Auto Truth' run 30876635099 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633",
+    "Fix workflow 'Dashboard Live UI Proof' run 30876524506 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30874834600 conclusion=cancelled commit=34a6040ef1a53a254cf08b1dfe304f28d1344eef",
     "Fix workflow 'Dashboard Visual Production Proof' run 30874577485 conclusion=failure commit=9b136f91ba16debf5db52d2336d302fc4cc15eea",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30870485830 conclusion=cancelled commit=9ae1b2dee298f53a06542fc8aea44246e4ff9a0c",
     "Fix workflow 'Dashboard Visual Production Proof' run 30870199180 conclusion=failure commit=a5c84d510501a92015eea475d88f00681638394a",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30864904430 conclusion=failure commit=2f8fa0dc30f76b1a2cc9311443c9fbf10adcf2bb"
+    "Fix workflow 'Dashboard Visual Production Proof' run 30867012854 conclusion=failure commit=9d28ba295cdea3a208790a6fe45a34a91f8cefe8"
   ]
 }
