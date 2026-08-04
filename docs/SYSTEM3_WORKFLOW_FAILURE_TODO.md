@@ -1,6 +1,6 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-04T11:17:46.080479+00:00`
+Generated UTC: `2026-08-04T12:01:13.690475+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
 Failed workflow count: `11`
@@ -12,6 +12,9 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30906871800 conclusion=failure commit=be4652b9cdd6aa51eb67815c810ca06f72eaff74
+- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30905081102 conclusion=failure commit=8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8
+- [ ] Fix workflow 'System3 Full Auto Truth' run 30904363455 conclusion=failure commit=8f0b8d586b8a20f6ebde2d796cdd47b2f68cfaa8
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30903773507 conclusion=cancelled commit=6b7f2ca2f2dbe28675198196b46137b1aab623e0
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30903537193 conclusion=failure commit=a18fdf34e9c4d4785faf0fe0d1e0e0a64d97a532
 - [ ] Fix workflow 'System3 Market Session Proof Runner' run 30902811579 conclusion=failure commit=cea6caaf0b7f8b6898e35bc311765ea73300eaba
@@ -20,14 +23,14 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30900102172 conclusion=cancelled commit=87f96151147e4daa23324b4179fa4bc839188864
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 30899735551 conclusion=failure commit=e44b3d70df2ba1cd5b4ff056588481dad9ef30c6
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 30898392810 conclusion=failure commit=6f095845e3a5888461c9c94f64a4d4c93e1df087
-- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30896874259 conclusion=failure commit=b50f73db64c5bf9eefab1b1948d32d3d31ce8613
-- [ ] Fix workflow 'System3 Full Auto Truth' run 30896384842 conclusion=failure commit=b50f73db64c5bf9eefab1b1948d32d3d31ce8613
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30896001162 conclusion=cancelled commit=2565119b3bbd515ea8580b6b8e24f746d87aa304
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Visual Production Proof | 30906871800 | failure | `be4652b9cdd6` | 2026-08-04T12:01:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30906871800 |
+| System3 Broker Chain Semantic Gate | 30905081102 | failure | `8f0b8d586b8a` | 2026-08-04T11:30:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30905081102 |
+| System3 Full Auto Truth | 30904363455 | failure | `8f0b8d586b8a` | 2026-08-04T11:26:52Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30904363455 |
 | System3 1000 Point TODO Status Updater | 30903773507 | cancelled | `6b7f2ca2f2db` | 2026-08-04T11:11:43Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30903773507 |
 | Dashboard Visual Production Proof | 30903537193 | failure | `a18fdf34e9c4` | 2026-08-04T11:11:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30903537193 |
 | System3 Market Session Proof Runner | 30902811579 | failure | `cea6caaf0b7f` | 2026-08-04T11:01:51Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30902811579 |
@@ -36,6 +39,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 30900102172 | cancelled | `87f96151147e` | 2026-08-04T10:19:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30900102172 |
 | Dashboard Visual Production Proof | 30899735551 | failure | `e44b3d70df2b` | 2026-08-04T10:18:42Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30899735551 |
 | System3 Latest Truth Publish | 30898392810 | failure | `6f095845e3a5` | 2026-08-04T10:02:51Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30898392810 |
-| System3 Broker Chain Semantic Gate | 30896874259 | failure | `b50f73db64c5` | 2026-08-04T09:37:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30896874259 |
-| System3 Full Auto Truth | 30896384842 | failure | `b50f73db64c5` | 2026-08-04T09:34:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30896384842 |
-| System3 1000 Point TODO Status Updater | 30896001162 | cancelled | `2565119b3bbd` | 2026-08-04T09:22:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30896001162 |
