@@ -1,0 +1,85 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+01:52:51 IST
+NIFTY
+24,615
+SNAP
+BNFTY
+--
+FINNIFTY
+--
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+POLL
+Signals
+POLL
+TRADING
+Trade
+POLL
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+System Truth Control
+Full upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.
+Recheck All Layers
+PASS
+Infrastructure / broker read path
+BLOCKED
+Money readiness
+Last run
+8/4/2026, 8:22:46 PM
+MONEY_READY_BLOCKED
+At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
+LAYER	STATUS	REQUIRED FOR MONEY	EVIDENCE
+Backend/API route health	PASS	YES	health=200, state=200
+Broker read-only connection	PASS	YES	connected=true, broker=dhan, order_allowed=false
+Funds / margin truth	PASS	YES	available=13916.97, used=-, source=-
+Holdings and live positions read path	PASS	YES	holdings=11, positions=1
+Dhan option-chain availability	BLOCKED	YES	enabled_ready=1/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1
+Universe / ranking candidates	PASS	YES	candidate_rows=30, gain=30, scanner=0
+CE / PE decision evidence	PASS	YES	CE/PE field found in ranker/scanner payload
+Paper/analyzer lifecycle	PASS	NO	today_trade_rows=1, endpoint=200
+Risk gates and automation status	PASS	YES	auto_gates_http=200, status=ok
+Live-money safety lock	PASS	YES	live_flag=false, order_allowed=false
+Dashboard operator truth	BLOCKED	YES	health_ok=true, broker_ok=true, gates_ok=true, enabled_chains_ready=1/4 (runtime API probes; not hard-coded)

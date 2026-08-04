@@ -1,0 +1,122 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+01:53:43 IST
+NIFTY
+24,615
+SNAP
+BNFTY
+--
+FINNIFTY
+--
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+POLL
+Signals
+POLL
+TRADING
+Trade
+POLL
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Performance
+last checked 01:53:38 IST
+TOTAL P&L
+₹-1,806
+Realized + Unrealized
+WIN RATE
+0.3%
+TOTAL TRADES
+9
+3W / 6L
+OPEN PAPER
+0
+Cloud paper engine
+BACKTEST / WALK-FORWARD PROOF
+{
+  "proof_id": "WALKFORWARD_20260614_151049",
+  "started": "2026-06-14T15:10:49.111203+00:00",
+  "completed": "2026-06-14T15:10:52.694857+00:00",
+  "pass": true,
+  "status": "PASS",
+  "recent_costed_walkforward_proven": true,
+  "costs_slippage_included_proven": true,
+  "walk_pairs": 8,
+  "trade_count": 8,
+  "win_trades": 4,
+  "loss_trades": 4,
+  "win_rate_pct": 50,
+  "total_gross_pnl": -101258.25,
+  "total_costs": 1378.1,
+  "total_net_pnl": -102636.35,
+  "avg_net_pnl_per_trade": -12829.54,
+  "bhavcopy_days_used": [
+    "20260608",
+    "20260609",
+    "20260610",
+    "20260611",
+    "20260612"
+  ],
+  "cost_model": {
+    "brokerage_per_side": 20,
+    "stt_rate": 0.000625,
+    "exchange_txn_charge": 0.0005,
+    "slippage_pct": 0.001,
+    "description": "Dhan flat-fee plan: ₹20/side + STT + exc charge + 18% GST + SEBI"
+  },
+  "symbols_tested": [
+    "NIFTY",
+    "BANKNIFTY"
+  ],
+  "strategy": "OI-change-ranked ATM CE next-day exit — walk-forward proof only, not trading signal",
+  "live_trading_enabled": false,
+  "note": "Walk-forward proof validates cost model and pipeline correctness. Not a performance claim.",
+  "trades": [
+    {
+      "symbol": "NIFTY",
+      "strike": 23200,
+     
+ML ACCURACY (SPEARMAN Ρ) — 0 DAY HISTORY
+
+No ρ history recorded yet

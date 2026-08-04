@@ -1,0 +1,78 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+01:53:48 IST
+NIFTY
+24,615
+SNAP
+BNFTY
+--
+FINNIFTY
+--
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+LIVE
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+POLL
+Signals
+POLL
+TRADING
+Trade
+POLL
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+ML Model Truth
+This tab is proof-only. It does not train inline and does not invent metrics.
+MODEL_PROOF_LOADED_BUT_BLOCKED
+Loaded 1 blocked accuracy artifact(s). Model not proven — missing matured prediction history / post-market validation. Blocker: model_accuracy_report:NO_PREDICTION_SOURCE_FOUND
+Required proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.
+Active model
+NOT_PROVEN
+Fallback used
+NO
+Proof records
+0 proven / 1 blocked
+Training status
+BLOCKED
+Model Performance Records
+MODEL	STATUS	PREDICTIONS	AVG ACCURACY	PROOF PASS / BLOCKED	BLOCKER	GENERATED
+model_accuracy_report	BLOCKED	0	N/A	0 / 1	NO_PREDICTION_SOURCE_FOUND	2026-07-24T03:53:31.406031+00:00
