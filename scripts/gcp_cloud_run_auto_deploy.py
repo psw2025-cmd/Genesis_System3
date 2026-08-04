@@ -137,8 +137,17 @@ def _build_image(session: AuthorizedSession, bucket: str, object_name: str, imag
         print(f"build_wait[{i}] {status}")
         if status == "SUCCESS":
             return
-        if status in {"FAILURE", "CANCELLED", "EXPIRED", "TIMEOUT"}:
-            raise SystemExit(f"Build {status}: {b.get('logUrl')} {b.get('failureInfo')}")
+        if status in {
+            "FAILURE",
+            "CANCELLED",
+            "EXPIRED",
+            "TIMEOUT",
+            "INTERNAL_ERROR",
+        }:
+            raise SystemExit(
+                f"Build {status}: {b.get('logUrl')} "
+                f"{b.get('failureInfo') or b.get('statusDetail')}"
+            )
         time.sleep(15)
     raise SystemExit("Build timed out waiting for SUCCESS")
 
