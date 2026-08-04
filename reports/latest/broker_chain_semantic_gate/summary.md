@@ -1,9 +1,9 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-08-03T23:41:43.232576Z`
+- Generated UTC: `2026-08-04T04:16:56.298957Z`
 - Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (HTTP_401)
-- Funds semantic proof: `False`
+- Broker connected: `False` (BROKER_NOT_CONNECTED)
+- Funds semantic proof: `True`
 - Mandatory chains ready: `0/4`
 - Analyzer mode: `ON`
 - Live trading: `OFF`
@@ -11,15 +11,14 @@
 - Secrets written: `false`
 
 ## Mandatory chains
-- NIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
-- BANKNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
-- FINNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
-- MIDCPNIFTY: BLOCKED http=401 source=None status=None contracts=0 stale=False
+- NIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
+- BANKNIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
+- FINNIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
+- MIDCPNIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
 
 ## Blockers
-- BROKER:HTTP_401
-- FUNDS:HTTP_401
-- CHAIN:NIFTY:HTTP_401
-- CHAIN:BANKNIFTY:HTTP_401
-- CHAIN:FINNIFTY:HTTP_401
-- CHAIN:MIDCPNIFTY:HTTP_401
+- BROKER:BROKER_NOT_CONNECTED
+- CHAIN:NIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
+- CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
+- CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
+- CHAIN:MIDCPNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
