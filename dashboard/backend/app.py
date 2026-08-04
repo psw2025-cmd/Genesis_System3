@@ -2492,16 +2492,22 @@ async def get_health():
                 if SSOT_AVAILABLE and state_store is not None:
                     cached_broker = state_store.get_state().get("broker") or {}
                     broker_connected = bool(cached_broker.get("connected"))
-                    broker_status_str = cached_broker.get("status") or (
-                        "connected" if broker_connected else "disconnected"
+                    # Never report status=connected when connected is false (stale SSOT).
+                    broker_status_str = (
+                        "connected"
+                        if broker_connected
+                        else str(cached_broker.get("status") or "disconnected")
                     )
+                    if not broker_connected and broker_status_str.lower() == "connected":
+                        broker_status_str = "disconnected"
                     broker_name = cached_broker.get("name") or "dhan"
                 else:
                     health_file = OUTPUTS_DIR / "health.json"
                     if health_file.exists():
                         health_cached = json.loads(health_file.read_text())
                         broker_connected = bool(
-                            health_cached.get("is_connected") or health_cached.get("broker_status") == "connected"
+                            health_cached.get("is_connected")
+                            or health_cached.get("broker_status") == "connected"
                         )
                         broker_status_str = "connected" if broker_connected else "disconnected"
                         broker_name = "dhan"
@@ -4993,6 +4999,8 @@ async def startup():
 
     # Start background data refresh
     asyncio.create_task(background_data_refresh())
+    asyncio.create_task(broker_self_heal_loop())
+    print('[self-heal] scheduled')
 
     # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
     # Default ON for Cloud so Paper/Performance tabs are not permanently zero.
@@ -7274,6 +7282,45 @@ async def compat_http_exception_handler(request: Request, exc: StarletteHTTPExce
 @app.exception_handler(Exception)
 async def compat_500_handler(request: Request, exc: Exception):
     return JSONResponse(status_code=500, content=_compat_ok({"error": "server_error", "message": str(exc)}))
+
+
+_BROKER_FAIL_COUNT = 0
+_BROKER_LAST_ALERT_TS = 0.0
+_BROKER_HEAL_IN_PROGRESS = False
+
+async def broker_self_heal_loop():
+    import time as _t
+    global _BROKER_FAIL_COUNT, _BROKER_LAST_ALERT_TS, _BROKER_HEAL_IN_PROGRESS
+    print("[self-heal] watchdog started")
+    await asyncio.sleep(30)
+    while True:
+        try:
+            if DHAN_AVAILABLE:
+                from core.brokers.dhan.dhan_readonly import get_status
+                s = await asyncio.wait_for(asyncio.to_thread(get_status), timeout=10.0)
+                if s.get("connected"):
+                    if _BROKER_FAIL_COUNT > 0:
+                        print(f"[self-heal] reconnected after {_BROKER_FAIL_COUNT} fails")
+                        _BROKER_FAIL_COUNT = 0
+                        _BROKER_HEAL_IN_PROGRESS = False
+                else:
+                    _BROKER_FAIL_COUNT += 1
+                    if _t.time() - _BROKER_LAST_ALERT_TS > 300:
+                        _BROKER_LAST_ALERT_TS = _t.time()
+                        print(f"[self-heal] broker down fail={_BROKER_FAIL_COUNT} err={s.get(chr(101)+chr(114)+chr(114)+chr(111)+chr(114))}")
+                    if _BROKER_FAIL_COUNT >= 3 and not _BROKER_HEAL_IN_PROGRESS:
+                        _BROKER_HEAL_IN_PROGRESS = True
+                        try:
+                            await asyncio.wait_for(asyncio.to_thread(_run_startup_token_refresh_blocking), timeout=60.0)
+                            print("[self-heal] token refreshed ok")
+                            _BROKER_FAIL_COUNT = 0
+                            _BROKER_HEAL_IN_PROGRESS = False
+                        except Exception as e:
+                            print(f"[self-heal] refresh failed: {e}")
+                            _BROKER_HEAL_IN_PROGRESS = False
+        except Exception as e:
+            print(f"[self-heal] error: {e}")
+        await asyncio.sleep(60 if _BROKER_FAIL_COUNT == 0 else 30)
 
 @app.on_event("startup")
 async def compat_background_schedulers():
