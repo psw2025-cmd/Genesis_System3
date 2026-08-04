@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-04T05:58:51.181289+00:00`
+Generated UTC: `2026-08-04T07:03:25.964502+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `15`
+Failed workflow count: `16`
 
 ## Rule
 
@@ -12,6 +12,9 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'Dashboard Live UI Proof' run 30885769366 conclusion=failure commit=ed029e39a6263841759bf16bee737091907e4f36
+- [ ] Fix workflow 'System3 Latest Truth Publish' run 30885429205 conclusion=failure commit=a6cdb4bf8a127b698f52b8c8c5005c3785008bfe
+- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30884273294 conclusion=failure commit=033bc303c6ec0e6bbe7d50fa3626b11e4429095d
 - [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 30881139797 conclusion=failure commit=764bc2f04682b76b0b67b13b7163f5ace58ffe1d
 - [ ] Fix workflow 'System3 Full Auto Truth' run 30880990985 conclusion=failure commit=764bc2f04682b76b0b67b13b7163f5ace58ffe1d
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 30880937571 conclusion=failure commit=764bc2f04682b76b0b67b13b7163f5ace58ffe1d
@@ -25,13 +28,14 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 Full Auto Truth' run 30876635099 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633
 - [ ] Fix workflow 'Dashboard Live UI Proof' run 30876524506 conclusion=failure commit=f4ff64368d0f5e6247022844533b0e41a7544633
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30874834600 conclusion=cancelled commit=34a6040ef1a53a254cf08b1dfe304f28d1344eef
-- [ ] Fix workflow 'Dashboard Visual Production Proof' run 30874577485 conclusion=failure commit=9b136f91ba16debf5db52d2336d302fc4cc15eea
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 30870485830 conclusion=cancelled commit=9ae1b2dee298f53a06542fc8aea44246e4ff9a0c
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Live UI Proof | 30885769366 | failure | `ed029e39a626` | 2026-08-04T07:02:50Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30885769366 |
+| System3 Latest Truth Publish | 30885429205 | failure | `a6cdb4bf8a12` | 2026-08-04T07:02:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30885429205 |
+| System3 Broker Chain Semantic Gate | 30884273294 | failure | `033bc303c6ec` | 2026-08-04T06:31:34Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30884273294 |
 | System3 Broker Chain Semantic Gate | 30881139797 | failure | `764bc2f04682` | 2026-08-04T05:35:38Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30881139797 |
 | System3 Full Auto Truth | 30880990985 | failure | `764bc2f04682` | 2026-08-04T05:47:09Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30880990985 |
 | Dashboard Live UI Proof | 30880937571 | failure | `764bc2f04682` | 2026-08-04T05:39:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30880937571 |
@@ -45,5 +49,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 Full Auto Truth | 30876635099 | failure | `f4ff64368d0f` | 2026-08-04T04:24:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30876635099 |
 | Dashboard Live UI Proof | 30876524506 | failure | `f4ff64368d0f` | 2026-08-04T04:13:57Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30876524506 |
 | System3 1000 Point TODO Status Updater | 30874834600 | cancelled | `34a6040ef1a5` | 2026-08-04T03:28:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30874834600 |
-| Dashboard Visual Production Proof | 30874577485 | failure | `9b136f91ba16` | 2026-08-04T03:28:05Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30874577485 |
-| System3 1000 Point TODO Status Updater | 30870485830 | cancelled | `9ae1b2dee298` | 2026-08-04T02:00:56Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30870485830 |
