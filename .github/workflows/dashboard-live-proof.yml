@@ -58,10 +58,13 @@ jobs:
         run: node tools/frontend_no_fake_guard.mjs
 
       - name: Capture live dashboard proof
+        id: live
+        continue-on-error: true
         run: node tools/dashboard_live_ui_proof.mjs
 
       - name: Permanent live log watch
         if: always()
+        continue-on-error: true
         run: node tools/permanent_live_log_watch.mjs
 
       - name: Upload dashboard proof artifact
@@ -73,3 +76,21 @@ jobs:
             reports/latest/dashboard_live_ui_proof/
             reports/latest/permanent_live_log_watch/
           retention-days: 14
+
+      - name: Enforce auth/session when API key is configured
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          key = (os.environ.get('DASHBOARD_API_KEY') or '').strip()
+          p = Path('reports/latest/dashboard_live_ui_proof/summary.json')
+          if not p.exists():
+              raise SystemExit('live UI proof summary missing')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          auth = data.get('auth') or {}
+          if key and auth.get('ok') is not True:
+              raise SystemExit(f"auth failed: {auth}")
+          print({'auth_ok': bool(auth.get('ok')), 'infra': data.get('infra_blockers'), 'visual': data.get('visual_blockers')})
+          PY
