@@ -1,11 +1,21 @@
-# Google Cloud Run deployment (guarded)
+# Google Cloud Run deployment
 
 Target project: `system3-openalgo-safe`
 Target region: `asia-south1` (Mumbai)
 
-This directory contains configuration only. Nothing here deploys automatically.
-Both deployment scripts refuse to run unless `ALLOW_GCP_DEPLOY=YES` is supplied
-after explicit approval.
+## Automatic deploy (default)
+
+Push to `main` that touches runtime paths (`dashboard/`, `core/`, etc.) triggers
+`.github/workflows/cloud-run-auto-deploy.yml`, which runs
+`scripts/gcp_cloud_run_auto_deploy.py`:
+
+1. Cloud Build → immutable image tagged with the full commit SHA
+2. Cloud Run image patch (secret mounts preserved; live trading forced OFF)
+
+Manual `gcloud` / `ALLOW_GCP_DEPLOY` scripts below remain for emergency/break-glass
+only. Preferred path is the GitHub Action.
+
+Required GitHub secret: `GCP_SA_KEY` (JSON for `github-actions-deploy@…`).
 
 ## Safety invariants
 

@@ -1,0 +1,100 @@
+name: Cloud Run Auto Deploy
+
+# Push to main (runtime paths) → build + roll Cloud Run. No manual gcloud.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - "core/**"
+      - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/sync_dhan_instruments_master.py"
+      - "src/**"
+      - "config/**"
+      - "deploy/gcp/**"
+      - ".github/workflows/cloud-run-auto-deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: cloud-run-auto-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
+      GCP_REGION: asia-south1
+      GCP_CLOUD_RUN_SERVICE: genesis-system3-web
+      CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deploy deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "google-auth>=2.28.0" "requests>=2.31.0"
+
+      - name: Deploy to Cloud Run
+        run: python scripts/gcp_cloud_run_auto_deploy.py
+
+      - name: Prove live trading stays OFF
+        run: |
+          gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
+            --project="${GOOGLE_CLOUD_PROJECT}" \
+            --region="${GCP_REGION}" \
+            --format=json > /tmp/svc.json
+          python - <<'PY'
+          import json, sys
+          svc = json.load(open("/tmp/svc.json"))
+          env = {}
+          # gcloud describe JSON (v1)
+          for c in (
+              ((svc.get("spec") or {}).get("template") or {}).get("spec") or {}
+          ).get("containers") or []:
+              for e in c.get("env") or []:
+                  if e.get("name") and "value" in e:
+                      env[e["name"]] = e["value"]
+          # Run API v2 shape (if present)
+          for c in (svc.get("template") or {}).get("containers") or []:
+              for e in c.get("env") or []:
+                  if e.get("name") and "value" in e:
+                      env[e["name"]] = e["value"]
+          bad = []
+          for k in ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED", "AUTO_EXECUTE_TRADES"):
+              if env.get(k) not in (None, "0", "false", "False"):
+                  bad.append(f"{k}={env.get(k)!r}")
+          if bad:
+              print("LIVE FLAGS NOT OFF:", bad)
+              sys.exit(2)
+          print(
+              "LIVE_OFF_OK",
+              {
+                  k: env.get(k)
+                  for k in (
+                      "LIVE_TRADING_ENABLED",
+                      "SYSTEM3_LIVE_TRADING_ALLOWED",
+                      "AUTO_EXECUTE_TRADES",
+                      "DEPLOY_GIT_SHA",
+                  )
+              },
+          )
+          PY
