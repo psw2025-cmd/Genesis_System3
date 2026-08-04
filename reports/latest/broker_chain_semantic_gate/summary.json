@@ -1,22 +1,25 @@
 {
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
-    "connected": true,
+    "connected": false,
     "http": 200,
-    "reason": "CONNECTED"
+    "reason": "BROKER_NOT_CONNECTED"
   },
-  "final_verdict": "PASS",
+  "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
     "http": 200,
-    "reason": null,
-    "semantic_ok": true
+    "reason": "TOKEN_EXPIRED_OR_INVALID",
+    "semantic_ok": false
   },
-  "generated_utc": "2026-08-04T10:33:26.184485Z",
+  "generated_utc": "2026-08-04T11:30:51.011162Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
-  "readiness_blockers": [],
+  "readiness_blockers": [
+    "BROKER:BROKER_NOT_CONNECTED",
+    "FUNDS:TOKEN_EXPIRED_OR_INVALID"
+  ],
   "required_chain_ready_count": 4,
   "required_chain_total": 4,
   "required_chains": [
