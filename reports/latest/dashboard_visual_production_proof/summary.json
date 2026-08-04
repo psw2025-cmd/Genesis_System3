@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T18:09:09.819Z",
+  "generated_at": "2026-08-04T18:27:58.559Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -15,12 +15,7 @@
     "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
     "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
   ],
-  "trade_readiness_blockers": [
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  ],
+  "trade_readiness_blockers": [],
   "consistency_blockers": [
     "SHELL_STATUS:BLOCKED",
     "TAB_COVERAGE:0/16",
@@ -41,67 +36,67 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 161521
+      "size_bytes": 161974
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 255363
+      "size_bytes": 254934
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 156383
+      "size_bytes": 156939
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 133195
+      "size_bytes": 123513
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 195191
+      "size_bytes": 195245
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 68585
+      "size_bytes": 68937
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 75512
+      "size_bytes": 76283
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 80738
+      "size_bytes": 81142
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 113921
+      "size_bytes": 113232
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 137981
+      "size_bytes": 138160
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 104917
+      "size_bytes": 104908
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 118106
+      "size_bytes": 118567
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 80344
+      "size_bytes": 83978
     }
   ],
   "safety": {
