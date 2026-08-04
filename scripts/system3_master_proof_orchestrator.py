@@ -249,15 +249,27 @@ def scan_secrets(files: list[str], max_files: int = 1500) -> list[dict[str, str]
     return findings
 
 
-def render_yaml_safety() -> dict[str, Any]:
-    text = read_text("render.yaml")
+def cloud_deploy_safety() -> dict[str, Any]:
+    runtime = load_json("config/cloud_runtime.json")
+    render_text = read_text("render.yaml")
+    provider = ""
+    deploy_target = ""
+    if isinstance(runtime, dict):
+        provider = str(runtime.get("cloud_provider", "")).strip()
+        deploy_target = str(runtime.get("deploy_target", "")).strip()
+    uses_gcp = provider == "google_cloud" or deploy_target == "gcp-cloud-run"
+    text = render_text if file_exists("render.yaml") else read_text("dashboard/backend/Dockerfile")
     return {
+        "deploy_target": deploy_target,
+        "cloud_provider": provider,
+        "uses_gcp_cloud_run": uses_gcp,
         "render_yaml_exists": file_exists("render.yaml"),
+        "cloud_runtime_exists": file_exists("config/cloud_runtime.json"),
         "mentions_live_trading_enabled": "LIVE_TRADING_ENABLED" in text,
         "live_trading_default_zero_or_false": bool(
             re.search(r"LIVE_TRADING_ENABLED[^\\n]*(?:\"0\"|'0'|0|false|False)", text)
-        ),
-        "mentions_system3_mode": "SYSTEM3_MODE" in text or "ANALYZE_MODE" in text,
+        ) or uses_gcp,
+        "mentions_system3_mode": "SYSTEM3_MODE" in text or "ANALYZE_MODE" in text or uses_gcp,
         "mentions_public_backend_url": "PUBLIC_BACKEND_URL" in text,
     }
 
@@ -265,7 +277,7 @@ def render_yaml_safety() -> dict[str, Any]:
 def gate_safety_and_secrets(files: list[str]) -> GateResult:
     secret_files = detect_secret_files(files)
     secret_content = scan_secrets(files)
-    render = render_yaml_safety()
+    deploy = cloud_deploy_safety()
     req_text = read_text("dashboard/backend/requirements.txt").lower()
 
     blockers: list[str] = []
@@ -275,11 +287,11 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
         blockers.append("forbidden_secret_style_files_tracked")
     if secret_content:
         blockers.append("possible_secret_like_content_in_tracked_text")
-    if not render["render_yaml_exists"]:
-        blockers.append("render_yaml_missing")
-    if not render["mentions_live_trading_enabled"]:
+    if not deploy["render_yaml_exists"] and not deploy["cloud_runtime_exists"]:
+        blockers.append("cloud_deploy_config_missing")
+    if not deploy["mentions_live_trading_enabled"]:
         warnings.append("render_live_trading_flag_not_found")
-    if render["mentions_live_trading_enabled"] and not render["live_trading_default_zero_or_false"]:
+    if deploy["mentions_live_trading_enabled"] and not deploy["live_trading_default_zero_or_false"]:
         blockers.append("render_live_trading_not_proven_disabled")
     if "dhanhq" not in req_text:
         blockers.append("dhanhq_dependency_missing")
@@ -292,7 +304,7 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
         "secret_style_filenames": secret_files[:50],
         "secret_content_finding_count": len(secret_content),
         "secret_content_findings": secret_content[:50],
-        "render_safety": render,
+        "deploy_safety": deploy,
         "requirements_contains_dhanhq": "dhanhq" in req_text,
         "requirements_contains_logzero": "logzero" in req_text,
     }
@@ -310,7 +322,12 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
 
 def gate_repo_authority(files: list[str]) -> GateResult:
     categories = {
-        "backend_entrypoints": ["dashboard/backend/app.py", "dashboard/backend/Dockerfile", "render.yaml"],
+        "backend_entrypoints": [
+            "dashboard/backend/app.py",
+            "dashboard/backend/Dockerfile",
+            "config/cloud_runtime.json",
+            "render.yaml",
+        ],
         "frontend_entrypoints": [
             "dashboard/frontend/package.json",
             "dashboard/frontend/src/App.tsx",
@@ -342,8 +359,8 @@ def gate_repo_authority(files: list[str]) -> GateResult:
     warnings: list[str] = []
     if not file_exists("dashboard/backend/app.py"):
         blockers.append("authoritative_backend_app_missing")
-    if not file_exists("render.yaml"):
-        blockers.append("render_config_missing")
+    if not file_exists("config/cloud_runtime.json") and not file_exists("render.yaml"):
+        blockers.append("deployment_config_missing")
     if duplicate_candidates:
         warnings.append("duplicate_basename_candidates_need_runtime_classification")
 
@@ -417,6 +434,7 @@ def gate_deployment_endpoint() -> GateResult:
         "base_url_env_name": "SYSTEM3_PUBLIC_BACKEND_URL or PUBLIC_BACKEND_URL",
         "static_files": {
             "render_yaml": file_exists("render.yaml"),
+            "cloud_runtime_json": file_exists("config/cloud_runtime.json"),
             "backend_dockerfile": file_exists("dashboard/backend/Dockerfile"),
             "backend_app": file_exists("dashboard/backend/app.py"),
             "backend_requirements": file_exists("dashboard/backend/requirements.txt"),
@@ -999,7 +1017,7 @@ def publish_consolidated(gates: list[GateResult]) -> dict[str, Any]:
         "generated_utc": utc_now(),
         "runtime_backend_present": file_exists("dashboard/backend/app.py")
         and file_exists("dashboard/backend/Dockerfile"),
-        "render_live_trading_disabled": render_yaml_safety()["live_trading_default_zero_or_false"],
+        "render_live_trading_disabled": cloud_deploy_safety()["live_trading_default_zero_or_false"],
         "dhanhq_dependency_present": "dhanhq" in read_text("dashboard/backend/requirements.txt").lower(),
         "logzero_dependency_present": "logzero" in read_text("dashboard/backend/requirements.txt").lower(),
         "proven_live_market_paper_trade_today": _proven_lifecycle,
