@@ -5,7 +5,7 @@ WORKDIR /app/dashboard/frontend
 # Increment only when production proof shows Render serving a stale frontend
 # despite newer reviewed source. This is a non-secret cache epoch; changing it
 # forces the frontend-builder layer to rebuild without altering runtime logic.
-ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260805_broker_disconnect_core
+ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260805_broker_status_cache
 ENV SYSTEM3_FRONTEND_BUILD_EPOCH=${SYSTEM3_FRONTEND_BUILD_EPOCH}
 
 COPY dashboard/frontend/package*.json ./

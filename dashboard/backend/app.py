@@ -696,6 +696,18 @@ async def get_broker_status():
     except Exception as _e:
         # Keep last SSOT truth on timeout/transient errors so /api/health does not
         # flap the UI to DISCONNECTED every few seconds.
+        cached = None
+        if SSOT_AVAILABLE and state_store is not None:
+            try:
+                cached = (state_store.get_state().get("broker") or {})
+            except Exception:
+                cached = None
+        if isinstance(cached, dict) and cached.get("connected") is True:
+            out = dict(cached)
+            out["transient"] = True
+            out["error"] = out.get("error") or f"status_probe_timeout:{str(_e)[:80]}"
+            out["stale"] = True
+            return out
         return {
             "connected": False,
             "name": "dhan",
@@ -705,6 +717,7 @@ async def get_broker_status():
             "latency_ms": None,
             "last_ok": None,
             "transient": True,
+            "credentials_present": True,
         }
 
 
@@ -734,13 +747,25 @@ async def get_dhan_broker_status():
             "error": f"MODULE_NOT_AVAILABLE: {str(exc)[:200]}",
         }
     except Exception as exc:
+        cached = None
+        if SSOT_AVAILABLE and state_store is not None:
+            try:
+                cached = state_store.get_state().get("broker") or {}
+            except Exception:
+                cached = None
+        if isinstance(cached, dict) and cached.get("connected") is True:
+            out = dict(cached)
+            out["transient"] = True
+            out["stale"] = True
+            out["error"] = out.get("error") or f"status_probe_timeout:{str(exc)[:80]}"
+            return out
         return {
             "broker": "dhan",
             "mode": "ANALYZER",
             "connected": False,
             "live_trading_enabled": False,
             "order_placement_allowed": False,
-            "credentials_present": False,
+            "credentials_present": True,
             "error": str(exc)[:200],
             "transient": True,
         }

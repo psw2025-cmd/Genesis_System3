@@ -66,14 +66,44 @@ export function BrokerPanel() {
   // Do not paint TOKEN ERROR when broker truth is already connected (rate-limit false fails).
   const brokerTokenBad = (!brokerTruthConnected) && (fundsFailure.bad || statusFailure.bad)
   const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'BLOCKED / TOKEN ERROR' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
-  const fundsError = Boolean(brokerFunds && (brokerFunds.success === false || brokerFunds.blocked === true || fundsFailure.bad))
+  const fundsError = Boolean(
+    brokerFunds
+    && (
+      brokerFunds.blocked === true
+      || fundsFailure.bad
+      || (
+        brokerFunds.success === false
+        && Boolean(brokerFunds.error || brokerFunds.message)
+      )
+    )
+  )
   const fundsLoading = brokerFunds == null
 
   const holdings = pickArray(brokerHoldings, 'rows', 'holdings', 'data')
   const positions = pickArray(brokerPositions, 'rows', 'positions', 'data')
 
-  const holdingsError = Boolean(brokerHoldings && (brokerHoldings.success === false || brokerHoldings.blocked === true || holdingsFailure.bad))
-  const positionsError = Boolean(brokerPositions && (brokerPositions.success === false || brokerPositions.blocked === true || positionsFailure.bad))
+  const holdingsError = Boolean(
+    brokerHoldings
+    && (
+      brokerHoldings.blocked === true
+      || holdingsFailure.bad
+      || (
+        brokerHoldings.success === false
+        && Boolean(brokerHoldings.error || brokerHoldings.message)
+      )
+    )
+  )
+  const positionsError = Boolean(
+    brokerPositions
+    && (
+      brokerPositions.blocked === true
+      || positionsFailure.bad
+      || (
+        brokerPositions.success === false
+        && Boolean(brokerPositions.error || brokerPositions.message)
+      )
+    )
+  )
 
   const availBal = funds?.available_balance ?? funds?.availableBalance ?? null
   const usedMargin = funds?.utilized_amount ?? funds?.utilizedAmount ?? null

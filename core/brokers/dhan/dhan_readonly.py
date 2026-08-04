@@ -72,6 +72,9 @@ _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 # repeated login attempts or TOTP churn on every UI poll.
 _STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "130") or "130")
 _LAST_STATUS_REFRESH_ATTEMPT_AT = 0.0
+_STATUS_RESULT_CACHE: dict | None = None
+_STATUS_RESULT_CACHE_AT = 0.0
+_STATUS_RESULT_TTL_S = float(os.getenv("DHAN_STATUS_CACHE_TTL_S", "25") or "25")
 
 logger = logging.getLogger("dhan_readonly")
 
@@ -370,6 +373,21 @@ def get_status() -> dict:
     Full broker status check. Safe for API responses.
     Never includes raw access token.
     """
+    global _STATUS_RESULT_CACHE, _STATUS_RESULT_CACHE_AT
+
+    # Serve recent connected truth fast — prevents UI flap when dashboard polls
+    # health/batch/broker in parallel and Dhan profile latency spikes past timeout.
+    now = time.time()
+    if (
+        _STATUS_RESULT_CACHE
+        and (now - _STATUS_RESULT_CACHE_AT) < _STATUS_RESULT_TTL_S
+        and _STATUS_RESULT_CACHE.get("connected") is True
+    ):
+        out = dict(_STATUS_RESULT_CACHE)
+        out["cache_hit"] = True
+        out["cache_age_s"] = round(now - _STATUS_RESULT_CACHE_AT, 1)
+        return out
+
     refresh_meta = {"attempted": False, "success": False}
     masked = get_dhan_credentials_masked()
 
@@ -446,7 +464,7 @@ def get_status() -> dict:
             connected = profile_result.get("success", False)
             error = None if connected else profile_result.get("error", "UNKNOWN")
 
-    return {
+    result = {
         "broker": "dhan",
         "mode": "ANALYZER",
         "connected": connected,
@@ -460,7 +478,12 @@ def get_status() -> dict:
         "auto_refresh": refresh_meta,
         "sdk_available": _DHAN_SDK_OK,
         "env_source": _ENV_LOADED_VIA,
+        "cache_hit": False,
     }
+    if connected:
+        _STATUS_RESULT_CACHE = dict(result)
+        _STATUS_RESULT_CACHE_AT = time.time()
+    return result
 
 
 # ── BLOCKED ORDER METHODS ──────────────────────────────────────────────────────
