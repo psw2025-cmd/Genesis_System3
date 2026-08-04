@@ -218,57 +218,64 @@ export function useData() {
   }, [])
 
   const pollBroker = useCallback(async () => {
-    const [status, holdings, funds, positions] = await Promise.allSettled([
-      fetchJSON('/api/broker/dhan/status'),
-      fetchJSON('/api/broker/holdings'),
-      fetchJSON('/api/broker/funds'),
-      fetchJSON('/api/broker/positions/live'),
-    ])
-
-    const statusErr = apiError(status, '/api/broker/dhan/status')
-    const holdingsErr = apiError(holdings, '/api/broker/holdings')
-    const fundsErr = apiError(funds, '/api/broker/funds')
-    const positionsErr = apiError(positions, '/api/broker/positions/live')
-    const err = statusErr || holdingsErr || fundsErr || positionsErr
-    const prev = useStore.getState()
-    const retainTransient = err && isTransient(err.code)
-    if (err) markFailure('broker', err)
-    else markSuccess('broker')
-
-    setBrokerStatus(status.status === 'fulfilled' ? status.value : retainTransient ? (keepLastGood(prev.brokerStatus, err, 'Broker status') || blockedBrokerStatus(statusErr || err)) : blockedBrokerStatus(statusErr || err))
-    setBrokerHoldings(holdings.status === 'fulfilled' ? holdings.value : retainTransient ? (keepLastGood(prev.brokerHoldings, err, 'Holdings') || blockedRows(holdingsErr || err, 'Holdings')) : blockedRows(holdingsErr || err, 'Holdings'))
-    setBrokerFunds(funds.status === 'fulfilled' ? funds.value : retainTransient ? (keepLastGood(prev.brokerFunds, err, 'Funds') || blockedFunds(fundsErr || err)) : blockedFunds(fundsErr || err))
-    setBrokerPositions(positions.status === 'fulfilled' ? positions.value : retainTransient ? (keepLastGood(prev.brokerPositions, err, 'Positions') || blockedRows(positionsErr || err, 'Positions')) : blockedRows(positionsErr || err, 'Positions'))
+    try {
+      const batch = await fetchJSON('/api/batch/positions-holdings')
+      markSuccess('broker')
+      setBrokerStatus(batch?.broker_status || blockedBrokerStatus({ message: 'batch missing broker_status' }))
+      setBrokerHoldings(batch?.holdings || blockedRows({ message: 'batch missing holdings' }, 'Holdings'))
+      setBrokerFunds(batch?.funds || blockedFunds({ message: 'batch missing funds' }))
+      setBrokerPositions(batch?.positions || blockedRows({ message: 'batch missing positions' }, 'Positions'))
+    } catch (err: any) {
+      const apiStatus = err instanceof ApiRequestError
+        ? authStatus('/api/batch/positions-holdings', err.status)
+        : { status: 'API_ERROR', code: 0, path: '/api/batch/positions-holdings', message: String(err?.message || err) }
+      const prev = useStore.getState()
+      const retainTransient = isTransient(apiStatus.code)
+      markFailure('broker', apiStatus)
+      if (retainTransient) {
+        setBrokerStatus(keepLastGood(prev.brokerStatus, apiStatus, 'Broker status') || blockedBrokerStatus(apiStatus))
+        setBrokerHoldings(keepLastGood(prev.brokerHoldings, apiStatus, 'Holdings') || blockedRows(apiStatus, 'Holdings'))
+        setBrokerFunds(keepLastGood(prev.brokerFunds, apiStatus, 'Funds') || blockedFunds(apiStatus))
+        setBrokerPositions(keepLastGood(prev.brokerPositions, apiStatus, 'Positions') || blockedRows(apiStatus, 'Positions'))
+      } else {
+        setBrokerStatus(blockedBrokerStatus(apiStatus))
+        setBrokerHoldings(blockedRows(apiStatus, 'Holdings'))
+        setBrokerFunds(blockedFunds(apiStatus))
+        setBrokerPositions(blockedRows(apiStatus, 'Positions'))
+      }
+    }
   }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, markFailure, markSuccess])
 
   const poll = useCallback(async () => {
-    const [health, state, paper, gainRank, pnl] = await Promise.allSettled([
-      fetchJSON('/api/health'),
-      fetchJSON('/api/state'),
-      fetchJSON('/api/paper'),
-      fetchJSON('/api/gain_rank'),
-      fetchJSON('/api/pnl'),
-    ])
-
-    const err = apiError(health, '/api/health') || apiError(state, '/api/state') || apiError(paper, '/api/paper') || apiError(gainRank, '/api/gain_rank') || apiError(pnl, '/api/pnl')
-    const prev = useStore.getState()
-    const retainTransient = err && isTransient(err.code)
-    if (err) markFailure('core', err)
-    else markSuccess('core')
-
-    if (health.status === 'fulfilled') setHealth(health.value)
-    else if (!retainTransient || !prev.health) setHealth(fallbackHealth(err))
-
-    if (state.status === 'fulfilled') setState(state.value)
-    if (paper.status === 'fulfilled') setPaper(paper.value)
-    else if (!retainTransient || !prev.paper) setPaper(blockedPaper(err))
-
-    if (gainRank.status === 'fulfilled') setGainRank(gainRank.value)
-    else if (!retainTransient || !prev.gainRank) setGainRank(blockedGainRank(err))
-
-    if (pnl.status === 'fulfilled') setPnl(pnl.value)
-    else if (!retainTransient || !prev.pnl) setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: err?.status, message: err?.message, blocked: true })
-  }, [setHealth, setState, setPaper, setGainRank, setPnl, markFailure, markSuccess])
+    try {
+      const batch = await fetchJSON('/api/batch/market-data')
+      markSuccess('core')
+      if (batch?.health) setHealth(batch.health)
+      if (batch?.state) setState(batch.state)
+      if (batch?.paper) setPaper(batch.paper)
+      else setPaper(blockedPaper({ message: 'batch missing paper' }))
+      if (batch?.gain_rank) setGainRank(batch.gain_rank)
+      else setGainRank(blockedGainRank({ message: 'batch missing gain_rank' }))
+      if (batch?.pnl) setPnl(batch.pnl)
+      else setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: 'NO_DATA', blocked: true })
+      // Secondary alerts/gates also arrive in market-data batch (one round-trip).
+      if (Array.isArray(batch?.alerts?.alerts)) setAlerts(batch.alerts.alerts)
+      if (batch?.auto_gates) setAutoGates(batch.auto_gates)
+    } catch (err: any) {
+      const apiStatus = err instanceof ApiRequestError
+        ? authStatus('/api/batch/market-data', err.status)
+        : { status: 'API_ERROR', code: 0, path: '/api/batch/market-data', message: String(err?.message || err) }
+      const prev = useStore.getState()
+      const retainTransient = isTransient(apiStatus.code)
+      markFailure('core', apiStatus)
+      if (!retainTransient || !prev.health) setHealth(fallbackHealth(apiStatus))
+      if (!retainTransient || !prev.paper) setPaper(blockedPaper(apiStatus))
+      if (!retainTransient || !prev.gainRank) setGainRank(blockedGainRank(apiStatus))
+      if (!retainTransient || !prev.pnl) {
+        setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: apiStatus.status, message: apiStatus.message, blocked: true })
+      }
+    }
+  }, [setHealth, setState, setPaper, setGainRank, setPnl, setAlerts, setAutoGates, markFailure, markSuccess])
 
   const pollChain = useCallback(async (sym: string) => {
     try {
@@ -469,9 +476,8 @@ export function useData() {
 
   useEffect(() => {
     unmountedRef.current = false
-    poll()
-    setTimeout(() => { if (!unmountedRef.current) pollBroker() }, STAGGER_MS)
-    setTimeout(() => { if (!unmountedRef.current) pollSecondary() }, STAGGER_MS * 2)
+    // Boot with 2 parallel batch calls (market-data + positions-holdings).
+    void Promise.all([poll(), pollBroker()])
     wsConnect()
 
     let coreTimer: ReturnType<typeof setInterval> | null = null
@@ -485,6 +491,7 @@ export function useData() {
       const open = useStore.getState().marketOpen
       coreTimer = setInterval(poll, open ? CORE_POLL_MS_OPEN : CORE_POLL_MS_CLOSED)
       brokerTimer = setInterval(pollBroker, BROKER_POLL_MS)
+      // alerts/gates already included in market-data batch; keep rare secondary refresh as safety net
       secTimer = setInterval(pollSecondary, SECONDARY_POLL_MS)
     }
     armTimers()

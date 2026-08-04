@@ -2395,6 +2395,333 @@ _TTL_PERF = 120  # performance data
 _TTL_PORTFOLIO = 30  # portfolio/unified
 _TTL_AUTO_GATES = 60  # auto gates — reads several files
 _TTL_BROKER_TRUTH = 30  # broker truth validator
+_TTL_BATCH = 8.0  # dashboard batch endpoints — 5–10s window
+
+
+def _slim_health(h: Any) -> Dict[str, Any]:
+    if not isinstance(h, dict):
+        return {"status": "error"}
+    broker = h.get("broker") if isinstance(h.get("broker"), dict) else {}
+    market = h.get("market") if isinstance(h.get("market"), dict) else {}
+    return {
+        "status": h.get("status"),
+        "mode": h.get("mode"),
+        "qc_status": h.get("qc_status"),
+        "data_source": h.get("data_source"),
+        "live_allowed": h.get("live_allowed"),
+        "broker_status": h.get("broker_status"),
+        "message": h.get("message"),
+        "broker": {
+            "connected": broker.get("connected"),
+            "status": broker.get("status"),
+            "name": broker.get("name"),
+            "error": broker.get("error"),
+        },
+        "market": {"is_open": market.get("is_open"), "reason": market.get("reason")},
+        "cycle_count": h.get("cycle_count"),
+        "last_fetch": h.get("last_fetch"),
+    }
+
+
+def _slim_paper(p: Any) -> Dict[str, Any]:
+    if not isinstance(p, dict):
+        return {"status": "error", "positions": {"open_count": 0}, "pnl": {"summary": {}}}
+    positions = p.get("positions") if isinstance(p.get("positions"), dict) else {}
+    pnl = p.get("pnl") if isinstance(p.get("pnl"), dict) else {}
+    summary = pnl.get("summary") if isinstance(pnl.get("summary"), dict) else pnl
+    open_positions = positions.get("open_positions") or positions.get("positions") or []
+    slim_pos = []
+    if isinstance(open_positions, list):
+        for row in open_positions[:40]:
+            if not isinstance(row, dict):
+                continue
+            slim_pos.append(
+                {
+                    "symbol": row.get("symbol") or row.get("trading_symbol"),
+                    "qty": row.get("qty") or row.get("quantity") or row.get("netQty"),
+                    "pnl": row.get("pnl") or row.get("unrealized_pnl") or row.get("unrealizedProfit"),
+                    "side": row.get("side") or row.get("option_type"),
+                    "strike": row.get("strike"),
+                    "ltp": row.get("ltp") or row.get("last_price"),
+                }
+            )
+    return {
+        "status": p.get("status", "ok"),
+        "mode": p.get("mode", "PAPER"),
+        "live_trading_enabled": False,
+        "positions": {
+            "open_count": positions.get("open_count", len(slim_pos)),
+            "open_positions": slim_pos,
+        },
+        "pnl": {
+            "summary": {
+                "total_pnl": summary.get("total_pnl", 0),
+                "daily_pnl": summary.get("daily_pnl", 0),
+                "win_rate": summary.get("win_rate", 0),
+                "total_trades": summary.get("total_trades", 0),
+            }
+        },
+    }
+
+
+def _slim_gain_rank(g: Any) -> Dict[str, Any]:
+    if not isinstance(g, dict):
+        return {"status": "error", "rankings": []}
+    rankings = g.get("rankings") or (g.get("latest") or {}).get("predictions") or []
+    slim = []
+    if isinstance(rankings, list):
+        for row in rankings[:15]:
+            if not isinstance(row, dict):
+                continue
+            slim.append(
+                {
+                    "rank": row.get("rank"),
+                    "underlying": row.get("underlying") or row.get("symbol"),
+                    "option_type": row.get("option_type") or row.get("side"),
+                    "strike": row.get("strike"),
+                    "gain_pct": row.get("gain_pct") or row.get("gain_rank") or row.get("gain_score"),
+                    "ltp": row.get("ltp"),
+                    "recommendation": row.get("recommendation"),
+                }
+            )
+    return {
+        "status": g.get("status", "ok"),
+        "stale": g.get("stale"),
+        "latest_date": g.get("latest_date") or (g.get("latest") or {}).get("date"),
+        "rankings": slim,
+        "latest": {"predictions": slim, "date": g.get("latest_date")},
+    }
+
+
+def _slim_pnl(p: Any) -> Dict[str, Any]:
+    if not isinstance(p, dict):
+        return {"summary": {"total_pnl": 0}, "history": []}
+    summary = p.get("summary") if isinstance(p.get("summary"), dict) else p
+    return {
+        "status": p.get("status", "ok"),
+        "summary": {
+            "total_pnl": summary.get("total_pnl", 0),
+            "daily_pnl": summary.get("daily_pnl", 0),
+            "total_trades": summary.get("total_trades", 0),
+            "win_rate": summary.get("win_rate", 0),
+        },
+        "history": (p.get("history") or [])[-20:] if isinstance(p.get("history"), list) else [],
+    }
+
+
+def _slim_gates(g: Any) -> Dict[str, Any]:
+    if not isinstance(g, dict):
+        return {"proof_gates": [], "gates_passing": 0, "gates_total": 0}
+    gates = g.get("proof_gates") or []
+    slim_gates = []
+    if isinstance(gates, list):
+        for row in gates[:20]:
+            if not isinstance(row, dict):
+                continue
+            slim_gates.append(
+                {
+                    "gate_id": row.get("gate_id") or row.get("id"),
+                    "name": row.get("name"),
+                    "status": row.get("status"),
+                    "pass": row.get("pass"),
+                    "note": row.get("note") or row.get("evidence"),
+                }
+            )
+    return {
+        "status": g.get("status", "ok"),
+        "proof_gates": slim_gates,
+        "gates_passing": g.get("gates_passing", sum(1 for x in slim_gates if x.get("pass") or str(x.get("status")).upper() == "PASS")),
+        "gates_total": g.get("gates_total", len(slim_gates)),
+        "live_trading_enabled": False,
+    }
+
+
+def _slim_broker_status(s: Any) -> Dict[str, Any]:
+    if not isinstance(s, dict):
+        return {"connected": False}
+    return {
+        "broker": s.get("broker", "dhan"),
+        "connected": s.get("connected"),
+        "status": s.get("status"),
+        "error": s.get("error"),
+        "credentials_present": s.get("credentials_present"),
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "latency_ms": s.get("latency_ms"),
+        "mode": s.get("mode"),
+    }
+
+
+def _slim_rows_payload(payload: Any, keys: Tuple[str, ...]) -> Dict[str, Any]:
+    if not isinstance(payload, dict):
+        return {"success": False, "rows": [], "count": 0}
+    rows = payload.get("rows") or payload.get("holdings") or payload.get("positions") or payload.get("data") or []
+    slim = []
+    if isinstance(rows, list):
+        for row in rows[:80]:
+            if not isinstance(row, dict):
+                continue
+            slim.append({k: row.get(k) for k in keys})
+    out = {
+        "success": payload.get("success", True),
+        "rows": slim,
+        "count": payload.get("count", len(slim)),
+        "status": payload.get("status"),
+        "message": payload.get("message"),
+        "error": payload.get("error"),
+    }
+    if "normalized" in payload and isinstance(payload.get("normalized"), dict):
+        n = payload["normalized"]
+        out["normalized"] = {
+            "available_balance": n.get("available_balance"),
+            "utilized_amount": n.get("utilized_amount"),
+            "total_limit": n.get("total_limit"),
+        }
+    for k in ("available_balance", "utilized_amount", "availabelBalance", "utilizedAmount"):
+        if k in payload:
+            out[k] = payload.get(k)
+    return out
+
+
+@app.get("/api/batch/market-data")
+async def batch_market_data():
+    """Dashboard boot batch #1 — slim health/state/paper/rank/pnl/gates/alerts (8s TTL)."""
+    hit = _cache_get("batch_market_data_v1", _TTL_BATCH)
+    if hit is not None:
+        out = dict(hit)
+        out["cache_hit"] = True
+        return out
+
+    results = await asyncio.gather(
+        get_health(),
+        get_state(),
+        get_paper(),
+        get_gain_rank(),
+        get_pnl(),
+        get_recent_alerts(limit=20),
+        get_auto_gates(),
+        return_exceptions=True,
+    )
+
+    def _ok(val: Any, fallback: Dict[str, Any]) -> Dict[str, Any]:
+        if isinstance(val, Exception):
+            return {**fallback, "error": str(val)[:160]}
+        return val if isinstance(val, dict) else fallback
+
+    health = _ok(results[0], {"status": "error"})
+    state = _ok(results[1], {})
+    paper = _ok(results[2], {})
+    gain = _ok(results[3], {})
+    pnl = _ok(results[4], {})
+    alerts = _ok(results[5], {"alerts": []})
+    gates = _ok(results[6], {"proof_gates": []})
+
+    # Keep state compact: drop bulky nested blobs
+    slim_state = {
+        "status": state.get("status"),
+        "mode": state.get("mode"),
+        "live_trading_enabled": state.get("live_trading_enabled", False),
+        "live_allowed": state.get("live_allowed", False),
+        "broker": state.get("broker") if isinstance(state.get("broker"), dict) else {},
+        "market": state.get("market") if isinstance(state.get("market"), dict) else {},
+        "timestamp": state.get("timestamp") or state.get("updated_at"),
+    }
+
+    payload = {
+        "cache_hit": False,
+        "generated_at": datetime.now(IST).isoformat(),
+        "ttl_s": _TTL_BATCH,
+        "live_trading_enabled": False,
+        "health": _slim_health(health),
+        "state": slim_state,
+        "paper": _slim_paper(paper),
+        "gain_rank": _slim_gain_rank(gain),
+        "pnl": _slim_pnl(pnl),
+        "alerts": {
+            "alerts": (alerts.get("alerts") or [])[:20] if isinstance(alerts.get("alerts"), list) else [],
+            "count": alerts.get("count", 0),
+        },
+        "auto_gates": _slim_gates(gates),
+    }
+    return _cache_set("batch_market_data_v1", payload)
+
+
+@app.get("/api/batch/positions-holdings")
+async def batch_positions_holdings():
+    """Dashboard boot batch #2 — slim broker status/funds/holdings/positions (8s TTL)."""
+    hit = _cache_get("batch_positions_holdings_v1", _TTL_BATCH)
+    if hit is not None:
+        out = dict(hit)
+        out["cache_hit"] = True
+        return out
+
+    results = await asyncio.gather(
+        get_dhan_broker_status(),
+        get_broker_funds(),
+        get_broker_holdings(),
+        get_broker_positions_live(),
+        return_exceptions=True,
+    )
+
+    def _ok(val: Any, fallback: Dict[str, Any]) -> Dict[str, Any]:
+        if isinstance(val, Exception):
+            return {**fallback, "error": str(val)[:160], "success": False}
+        return val if isinstance(val, dict) else fallback
+
+    status = _ok(results[0], {"connected": False})
+    funds = _ok(results[1], {"success": False})
+    holdings = _ok(results[2], {"rows": []})
+    positions = _ok(results[3], {"rows": []})
+
+    payload = {
+        "cache_hit": False,
+        "generated_at": datetime.now(IST).isoformat(),
+        "ttl_s": _TTL_BATCH,
+        "live_trading_enabled": False,
+        "broker_status": _slim_broker_status(status),
+        "funds": _slim_rows_payload(
+            funds,
+            ("available_balance", "utilized_amount", "total_limit", "availabelBalance", "utilizedAmount"),
+        ),
+        "holdings": _slim_rows_payload(
+            holdings,
+            (
+                "tradingSymbol",
+                "symbol",
+                "totalQty",
+                "quantity",
+                "avgCostPrice",
+                "averagePrice",
+                "lastTradedPrice",
+                "ltp",
+            ),
+        ),
+        "positions": _slim_rows_payload(
+            positions,
+            (
+                "tradingSymbol",
+                "symbol",
+                "positionType",
+                "netQty",
+                "quantity",
+                "buyAvg",
+                "unrealizedProfit",
+                "realizedProfit",
+                "drvOptionType",
+                "drvStrikePrice",
+                "drvExpiryDate",
+            ),
+        ),
+    }
+    # Preserve funds normalized fields used by Overview
+    if isinstance(funds.get("normalized"), dict):
+        payload["funds"]["normalized"] = {
+            "available_balance": funds["normalized"].get("available_balance"),
+            "utilized_amount": funds["normalized"].get("utilized_amount"),
+            "total_limit": funds["normalized"].get("total_limit"),
+        }
+        payload["funds"]["success"] = funds.get("success", True)
+    return _cache_set("batch_positions_holdings_v1", payload)
 
 
 # API Endpoints
