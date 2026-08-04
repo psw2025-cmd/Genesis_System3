@@ -1,6 +1,16 @@
 {
-  "failed_count": 13,
+  "failed_count": 10,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "6c5730a909f8048d3b5c3f5892f02148b62319ba",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T18:08:17Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30937192877",
+      "run_id": 30937192877,
+      "updated_at": "2026-08-04T18:08:17Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
     {
       "branch": "main",
       "commit": "ca4afe9ed4c5f18ba96e93f17abd5949e0524bf5",
@@ -90,53 +100,14 @@
       "run_id": 30933916949,
       "updated_at": "2026-08-04T17:37:25Z",
       "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T17:26:31Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30933913100",
-      "run_id": 30933913100,
-      "updated_at": "2026-08-04T17:34:13Z",
-      "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "main",
-      "commit": "5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T17:26:31Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30933913051",
-      "run_id": 30933913051,
-      "updated_at": "2026-08-04T17:31:03Z",
-      "workflow": "Dashboard Visible Proof Isolated"
-    },
-    {
-      "branch": "main",
-      "commit": "5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T17:26:31Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30933913038",
-      "run_id": 30933913038,
-      "updated_at": "2026-08-04T17:42:36Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T17:26:27Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30933907901",
-      "run_id": 30933907901,
-      "updated_at": "2026-08-04T17:26:27Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-04T18:06:53.863396+00:00",
+  "generated_utc": "2026-08-04T18:09:42.138955+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30937192877 conclusion=failure commit=6c5730a909f8048d3b5c3f5892f02148b62319ba",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30936301499 conclusion=cancelled commit=ca4afe9ed4c5f18ba96e93f17abd5949e0524bf5",
     "Fix workflow 'Dashboard Visual Production Proof' run 30935964413 conclusion=failure commit=dc2680e50c86ef33182cfc09f20bf24512ea0c21",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30935938903 conclusion=cancelled commit=dc2680e50c86ef33182cfc09f20bf24512ea0c21",
@@ -145,10 +116,6 @@
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30935231733 conclusion=failure commit=de4ebf9be6345504947b917f77effe80df75500b",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30935162940 conclusion=cancelled commit=ccc998613a3e31db2b1d2a9913aba112db383600",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30933983882 conclusion=cancelled commit=42bc7fbe44f991808be71fa18bb0dcc95486edc8",
-    "Fix workflow 'System3 Latest Truth Publish' run 30933916949 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 30933913100 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-    "Fix workflow 'Dashboard Visible Proof Isolated' run 30933913051 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30933913038 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30933907901 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa"
+    "Fix workflow 'System3 Latest Truth Publish' run 30933916949 conclusion=failure commit=5a6ba9e2d866a3d1293d4175a87cc85bddb5f1fa"
   ]
 }
