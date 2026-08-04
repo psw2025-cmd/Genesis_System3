@@ -1631,8 +1631,11 @@ _PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = (
 # too early is what collapses market-hours streaming under Dhan's ~1 req/3s limit.
 _PUSHED_CHAIN_FRESH_S = 45
 _PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) before live fetch
-_PUSHED_CHAIN_FRESH_S_CLOSED = 600  # worker/micro-loop off-hours window
+_PUSHED_CHAIN_STALE_SERVE_S_CLOSED = 86400  # after hours: never block UI waiting on Dhan OC
+_PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
 _INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
+_CHAIN_LIVE_TIMEOUT_OPEN_S = 12.0
+_CHAIN_LIVE_TIMEOUT_CLOSED_S = 4.0
 
 
 @app.post("/api/chain/push")
@@ -3366,6 +3369,9 @@ def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
     age_s = _time_module.time() - float(pushed.get("received_at") or 0)
     market_open = bool(pushed.get("market_open", True))
     fresh_window = _PUSHED_CHAIN_FRESH_S if market_open else _PUSHED_CHAIN_FRESH_S_CLOSED
+    stale_serve = (
+        _PUSHED_CHAIN_STALE_SERVE_S if market_open else _PUSHED_CHAIN_STALE_SERVE_S_CLOSED
+    )
     data = dict(pushed["data"] or {})
     if not data:
         return None
@@ -3377,7 +3383,7 @@ def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
         data["stale"] = False
         data["live"] = bool(market_open)
         return data
-    if age_s < _PUSHED_CHAIN_STALE_SERVE_S:
+    if age_s < stale_serve:
         # Prefer last good rows over a rate-limit empty response during market hours.
         data["stale"] = True
         data["live"] = False
@@ -3386,6 +3392,53 @@ def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
         )
         return data
     return None
+
+
+@app.get("/api/batch/chains")
+async def batch_chains():
+    """Index chains for TopBar/Overview — cache/push only, never blocks on Dhan OC."""
+    hit = _cache_get("batch_chains_v1", _TTL_BATCH)
+    if hit is not None:
+        out = dict(hit)
+        out["cache_hit"] = True
+        return out
+
+    chains: Dict[str, Any] = {}
+    for sym in _INDEX_STREAM_SYMBOLS:
+        pushed = _chain_from_push_cache(sym)
+        if pushed is not None:
+            chains[sym] = pushed
+            continue
+        ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
+        if isinstance(ttl_hit, dict) and (
+            float(ttl_hit.get("spot") or 0) > 0
+            or int(ttl_hit.get("total_contracts") or 0) > 0
+        ):
+            chains[sym] = ttl_hit
+            continue
+        chains[sym] = {
+            "underlying": sym,
+            "contracts": [],
+            "spot": 0,
+            "pcr": 1.0,
+            "total_contracts": 0,
+            "data_source": "dhan",
+            "status": "CHAIN_CACHE_WARMING",
+            "live": False,
+            "snapshot": True,
+            "stale": True,
+            "message": "Index chain warming from micro-loop — UI must not wait on live Dhan OC",
+        }
+
+    payload = {
+        "cache_hit": False,
+        "generated_at": datetime.now(IST).isoformat(),
+        "ttl_s": _TTL_BATCH,
+        "live_trading_enabled": False,
+        "symbols": list(_INDEX_STREAM_SYMBOLS),
+        "chains": chains,
+    }
+    return _cache_set("batch_chains_v1", payload)
 
 
 @app.get("/api/chain/{underlying}")
@@ -3401,15 +3454,36 @@ async def get_chain(underlying: str):
         return pushed
 
     cache_key = f"chain_{sym}"
-    _hit = _cache_get(cache_key, _TTL_CHAIN)
+    open_now = bool(_market_open_from_state())
+    chain_ttl = _TTL_CHAIN if open_now else max(_TTL_CHAIN, 300.0)
+    _hit = _cache_get(cache_key, chain_ttl)
     if _hit is not None:
         return _hit
-    result = await _get_chain_uncached(underlying)
+
+    # After hours: never hold the request path for a full Dhan OC round-trip.
+    # Micro-loop / snapshots refill cache; UI keeps last good via stale serve.
+    live_timeout = _CHAIN_LIVE_TIMEOUT_OPEN_S if open_now else _CHAIN_LIVE_TIMEOUT_CLOSED_S
+    try:
+        result = await asyncio.wait_for(_get_chain_uncached(underlying), timeout=live_timeout)
+    except asyncio.TimeoutError:
+        result = {
+            "underlying": sym,
+            "contracts": [],
+            "spot": 0,
+            "pcr": 1.0,
+            "total_contracts": 0,
+            "data_source": "dhan",
+            "status": "CHAIN_FETCH_TIMEOUT",
+            "live": False,
+            "snapshot": True,
+            "stale": True,
+            "message": f"Option chain fetch timed out after {live_timeout:.0f}s — keeping UI responsive",
+        }
     if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
         _PUSHED_CHAIN_CACHE[sym] = {
             "data": result,
             "received_at": _time_module.time(),
-            "market_open": bool(result.get("live", _market_open_from_state())),
+            "market_open": bool(result.get("live", open_now)),
         }
     return _cache_set(cache_key, result)
 
@@ -3551,7 +3625,9 @@ async def _get_chain_uncached(underlying: str):
 
                     return fetch_chain_for_api(DataSourceManager(), underlying.upper())
 
-                closed_chain = await _run_blocking(_closed_dhan_chain_fetch, timeout=45.0)
+                closed_chain = await _run_blocking(
+                    _closed_dhan_chain_fetch, timeout=_CHAIN_LIVE_TIMEOUT_CLOSED_S
+                )
                 if closed_chain and int(closed_chain.get("total_contracts") or 0) > 0:
                     # Dhan still returns last quotes after hours — show as snapshot, not live.
                     closed_chain["data_source"] = "dhan"

@@ -23,7 +23,6 @@ const ACTIVE_CHAIN_POLL_MS_OPEN = 30000
 const ACTIVE_CHAIN_POLL_MS_CLOSED = 60000
 const TOPBAR_CHAIN_POLL_MS_OPEN = 60000
 const TOPBAR_CHAIN_POLL_MS_CLOSED = 180000
-const STAGGER_MS = 2000
 
 class ApiRequestError extends Error {
   status: number
@@ -37,14 +36,22 @@ class ApiRequestError extends Error {
   }
 }
 
-async function fetchJSON(path: string) {
+async function fetchJSON(path: string, timeoutMs = 20000) {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
   try {
-    const r = await fetch(BASE + path, { credentials: 'include', headers: { Accept: 'application/json', ...API_HEADERS } })
+    const r = await fetch(BASE + path, {
+      credentials: 'include',
+      headers: { Accept: 'application/json', ...API_HEADERS },
+      signal: ctrl.signal,
+    })
     if (!r.ok) throw new ApiRequestError(path, r.status)
     return r.json()
   } catch (err: any) {
     if (err instanceof ApiRequestError) throw err
     throw new ApiRequestError(path, 0)
+  } finally {
+    clearTimeout(timer)
   }
 }
 
@@ -277,40 +284,44 @@ export function useData() {
     }
   }, [setHealth, setState, setPaper, setGainRank, setPnl, setAlerts, setAutoGates, markFailure, markSuccess])
 
-  const pollChain = useCallback(async (sym: string) => {
-    try {
-      const data = await fetchJSON(`/api/chain/${sym}`)
-      if (!isRealDhanChainPayload(data)) {
-        const prev = useStore.getState().chain?.[sym]
-        // Never wipe a previously good chain for empty/rate-limited/closed payloads.
-        if (prev && (isRealDhanChainPayload(prev) || (Array.isArray(prev.contracts) && prev.contracts.length > 0 && Number(prev.spot || 0) > 0))) {
-          setChain(sym, {
-            ...prev,
-            snapshot: true,
-            live: false,
-            verified_live_dhan: false,
-            stale: true,
-            status: prev.status || 'DHAN_LAST_GOOD',
-            message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh unavailable)',
-          })
-          return
-        }
-        const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
-        if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/chain/${sym}`, message: blocked.blocked_reason })
-        setChain(sym, blocked)
+  const applyChainPayload = useCallback((sym: string, data: any) => {
+    if (!isRealDhanChainPayload(data)) {
+      const prev = useStore.getState().chain?.[sym]
+      // Never wipe a previously good chain for empty/rate-limited/closed payloads.
+      if (prev && (isRealDhanChainPayload(prev) || (Array.isArray(prev.contracts) && prev.contracts.length > 0 && Number(prev.spot || 0) > 0))) {
+        setChain(sym, {
+          ...prev,
+          snapshot: true,
+          live: false,
+          verified_live_dhan: false,
+          stale: true,
+          status: prev.status || 'DHAN_LAST_GOOD',
+          message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh unavailable)',
+        })
         return
       }
-      markSuccess(`chain_${sym}`)
-      const isSnapshot = data?.snapshot === true || data?.live === false || /MARKET_CLOSED/i.test(String(data?.status || ''))
-      setChain(sym, {
-        ...data,
-        stale: Boolean(isSnapshot || data?.stale),
-        blocked: false,
-        verified_live_dhan: !isSnapshot,
-        verified_dhan_snapshot: Boolean(isSnapshot),
-        optional: isOptionalChain(sym),
-        stream_tick_at: new Date().toISOString(),
-      })
+      const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
+      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/chain/${sym}`, message: blocked.blocked_reason })
+      setChain(sym, blocked)
+      return
+    }
+    markSuccess(`chain_${sym}`)
+    const isSnapshot = data?.snapshot === true || data?.live === false || /MARKET_CLOSED/i.test(String(data?.status || ''))
+    setChain(sym, {
+      ...data,
+      stale: Boolean(isSnapshot || data?.stale),
+      blocked: false,
+      verified_live_dhan: !isSnapshot,
+      verified_dhan_snapshot: Boolean(isSnapshot),
+      optional: isOptionalChain(sym),
+      stream_tick_at: new Date().toISOString(),
+    })
+  }, [setChain, markFailure, markSuccess])
+
+  const pollChain = useCallback(async (sym: string) => {
+    try {
+      const data = await fetchJSON(`/api/chain/${sym}`, 8000)
+      applyChainPayload(sym, data)
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       const prev = useStore.getState().chain?.[sym]
@@ -319,7 +330,27 @@ export function useData() {
       if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
       else setChain(sym, blockedChain(sym, apiStatus))
     }
-  }, [setChain, markFailure, markSuccess])
+  }, [applyChainPayload, setChain, markFailure])
+
+  const pollAllChains = useCallback(async () => {
+    try {
+      const batch = await fetchJSON('/api/batch/chains', 8000)
+      const chains = batch?.chains && typeof batch.chains === 'object' ? batch.chains : {}
+      ENABLED_CHAIN_SYMBOLS.forEach((sym) => {
+        if (chains[sym]) applyChainPayload(sym, chains[sym])
+      })
+      markSuccess('chains_batch')
+    } catch (err: any) {
+      const apiStatus = err instanceof ApiRequestError
+        ? authStatus('/api/batch/chains', err.status)
+        : { status: 'API_ERROR', code: 0, path: '/api/batch/chains', message: String(err?.message || err) }
+      markFailure('chains_batch', apiStatus)
+      // Soft fallback: stagger individual chain polls with short timeout (never stampede for 45s).
+      ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
+        setTimeout(() => { if (!unmountedRef.current) void pollChain(sym) }, 250 * (idx + 1))
+      })
+    }
+  }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
   const pollSecondary = useCallback(async () => {
     const [alerts, gates] = await Promise.allSettled([
@@ -510,7 +541,9 @@ export function useData() {
 
   useEffect(() => {
     const active = String(chainSymbol || 'NIFTY').toUpperCase()
-    pollChain(active)
+    // One cache-only batch for all index chains (TopBar) + short active-chain refresh.
+    void pollAllChains()
+    void pollChain(active)
 
     let activeTimer: ReturnType<typeof setInterval> | null = null
     let topBarTimer: ReturnType<typeof setInterval> | null = null
@@ -520,16 +553,9 @@ export function useData() {
       if (topBarTimer) clearInterval(topBarTimer)
       const open = useStore.getState().marketOpen
       activeTimer = setInterval(() => pollChain(active), open ? ACTIVE_CHAIN_POLL_MS_OPEN : ACTIVE_CHAIN_POLL_MS_CLOSED)
-      topBarTimer = setInterval(() => {
-        ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
-          if (sym !== active) setTimeout(() => { if (!unmountedRef.current) pollChain(sym) }, STAGGER_MS * (idx + 1))
-        })
-      }, open ? TOPBAR_CHAIN_POLL_MS_OPEN : TOPBAR_CHAIN_POLL_MS_CLOSED)
+      topBarTimer = setInterval(() => { void pollAllChains() }, open ? TOPBAR_CHAIN_POLL_MS_OPEN : TOPBAR_CHAIN_POLL_MS_CLOSED)
     }
 
-    ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
-      if (sym !== active) setTimeout(() => { if (!unmountedRef.current) pollChain(sym) }, STAGGER_MS * (idx + 1))
-    })
     armChainTimers()
     const modeTimer = setInterval(armChainTimers, 30000)
 
@@ -538,5 +564,5 @@ export function useData() {
       if (topBarTimer) clearInterval(topBarTimer)
       clearInterval(modeTimer)
     }
-  }, [chainSymbol, pollChain])
+  }, [chainSymbol, pollChain, pollAllChains])
 }
