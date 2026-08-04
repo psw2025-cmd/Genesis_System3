@@ -3,18 +3,17 @@ AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
-4_chain_batch_fast
-00:25:16 IST
+805_gcp_not_render
+00:56:20 IST
 NIFTY
-24,615
-SNAP
+--
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 4s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -60,49 +59,4 @@ Alerts
 System
 Live Gate
 LOCK
-Signals & Recommendations
-REAL CANDIDATE EVIDENCE
-TRADE_CANDIDATE_ONLY
-Read-only scanner/ranker evidence found.
-This is not a broker order. Live trading remains disabled until paper/risk gates prove readiness.
-What Blocked Trading?
-Candidate only: paper/risk/live gates still decide whether trade is allowed
-Underlying
-DIVISLAB
-Strategy
-scanner_top_contract_gainers: PE candidate evidence
-Confidence
-100.0%
-Side
-PE
-Strike
-6300
-Expiry
-2026-08-25
-Gain %
-200.00%
-Entry Mid
-Rs 3.00
-Stop Loss
-Rs 2.40
-Target
-Rs 3.90
-ALL-INDIA TOP OPTION GAINERS
-Refreshed 2026-08-05 00:24:04 · SCRAPE_FAILED · 0 rows · Reference board (LIVE_SCRAPED) · not used for live orders
-MONEYCONTROL
-DHAN LIVE
-WS STREAM
-LIVE OFF
-No gainer rows yet
-HTTP Error 403: Forbidden
-Explainability
-Reason
-Candidate evidence exists, but broker order remains blocked until risk/paper lifecycle gates pass.
-Source
-scanner_top_contract_gainers
-Contract
-DIVISLAB25AUG266300PE
-What Blocked Trading?
-Scanner Segments
-4/4
-Download Signal Snapshot (JSON)
+Loading signals...
