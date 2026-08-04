@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: genesis-system3
+    env: python
+    buildCommand: pip install -r dashboard/backend/requirements.txt
+    startCommand: uvicorn dashboard.backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: LIVE_TRADING_ENABLED
+        value: "0"
+      - key: SYSTEM3_LIVE_TRADING_ALLOWED
+        value: "0"
+      - key: SYSTEM3_MODE
+        value: PAPER
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: REQUIRE_API_KEY
+        value: "true"
+    autoDeploy: true

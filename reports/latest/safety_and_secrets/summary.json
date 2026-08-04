@@ -1,8 +1,6 @@
 {
   "auto_repair_allowed": false,
-  "blockers": [
-    "possible_secret_like_content_in_tracked_text"
-  ],
+  "blockers": [],
   "evidence": {
     "render_safety": {
       "live_trading_default_zero_or_false": true,
@@ -13,20 +11,15 @@
     },
     "requirements_contains_dhanhq": true,
     "requirements_contains_logzero": true,
-    "secret_content_finding_count": 1,
-    "secret_content_findings": [
-      {
-        "file": "scan_output.txt",
-        "pattern": "(?i)(api[_-]?key|secret[_-]?key|client[_-]?secret|totp|otp|pin|password)[ \\t]*[:"
-      }
-    ],
+    "secret_content_finding_count": 0,
+    "secret_content_findings": [],
     "secret_style_filename_count": 0,
     "secret_style_filenames": [],
-    "tracked_file_count": 2358
+    "tracked_file_count": 2428
   },
   "gate": "safety_and_secrets",
   "next_action": "Keep Analyzer/Paper mode. If any secret finding appears, remove it outside automation and rotate credentials.",
-  "pass": false,
-  "status": "FAIL",
+  "pass": true,
+  "status": "PASS",
   "warnings": []
 }

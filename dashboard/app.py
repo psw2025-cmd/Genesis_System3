@@ -334,5 +334,5 @@ if selected_page == "Truth & Control":
 
 st.divider()
 st.caption(f"{VERSION} | Backend: {BACKEND_URL} | Analyzer/Paper first | Currency: INR | Percent format: 2 decimals")
-print("DEPLOY READY: git push && render deploy")
+print("DEPLOY READY: git push && gcloud run deploy")
 

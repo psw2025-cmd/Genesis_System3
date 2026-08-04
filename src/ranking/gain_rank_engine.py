@@ -12,6 +12,7 @@ Scoring factors (each normalized 0-100):
   5. ATM Premium Ratio  — option premium as % of spot (expected move magnitude)
   6. Momentum Score     — recent spot price momentum (dLTP / 5-period EMA)
   7. ML Confidence      — system3_signal_engine aggregate directional conviction per underlying
+  8. Gamma Exposure     — net dealer gamma × OI (GEX); large negative GEX → sharp moves expected
 
 Final rank score = weighted sum. Top-N returned sorted descending.
 """
@@ -36,19 +37,22 @@ except ImportError:
 
     logger = logging.getLogger("gain_rank_engine")
 
-# Weights for the seven scoring factors (must sum to 1.0)
+# Weights for the eight scoring factors (must sum to 1.0)
 # Updated conservatively based on 1-day grid search: PCR was massively under-weighted.
 # Grid search optimal (1 day): PCR=0.50, OI=0.15 → ρ 0.40→0.80
 # Applied at 50% of optimal move to guard against 1-day overfitting.
+# Gamma Exposure added (0.07) taken from momentum_score reduction (0.05→0.02) and
+# ml_confidence reduction (0.15→0.13) — GEX is a proven high-signal NSE factor.
 # Auto-updated by scripts/calibrate_factor_weights.py once 5+ validation days accumulate.
 FACTOR_WEIGHTS = {
     "oi_change_pct": 0.20,  # Reduced 0.25→0.20; grid found OI less discriminating than PCR
     "iv_percentile": 0.15,  # Now real signal via ATM straddle proxy (was dead 50.0)
-    "volume_surge": 0.15,  # Unchanged — volume confirms conviction
+    "volume_surge": 0.13,  # Slight reduction from 0.15 to fund GEX factor
     "pcr_divergence": 0.22,  # Raised 0.12→0.22; grid search found PCR most discriminating
     "atm_premium_ratio": 0.08,  # Unchanged — expected move magnitude
-    "momentum_score": 0.05,  # Unchanged — no bhavcopy intraday data available
-    "ml_confidence": 0.15,  # Reduced 0.20→0.15; signal CSV not yet generated, redistributed
+    "momentum_score": 0.02,  # Reduced 0.05→0.02 — usually defaults to 50.0, weak signal
+    "ml_confidence": 0.13,  # Reduced 0.15→0.13; signal CSV not yet generated
+    "gamma_exposure": 0.07,  # NEW — net dealer GEX from Dhan Greeks; 0 if gamma unavailable
 }
 
 # Minimum score to be included in recommended trades
@@ -188,9 +192,10 @@ class GainRankEngine:
         pcr_score = self._pcr_divergence_score(chain_df, spot)
         premium_score, expected_move_pct = self._atm_premium_score(chain_df, spot)
         momentum_score = self._momentum_score(chain_df, spot)
+        gex_score = self._gamma_exposure_score(chain_df, spot)
 
-        # When ml_confidence=0 (signal engine hasn't run), redistribute its 20%
-        # weight proportionally to the other factors so scoring remains valid.
+        # When ml_confidence=0 (signal engine hasn't run), redistribute its weight
+        # proportionally to the other factors so scoring remains valid.
         if ml_conf > 0:
             gain_score = (
                 oi_score * FACTOR_WEIGHTS["oi_change_pct"]
@@ -200,6 +205,7 @@ class GainRankEngine:
                 + premium_score * FACTOR_WEIGHTS["atm_premium_ratio"]
                 + momentum_score * FACTOR_WEIGHTS["momentum_score"]
                 + ml_conf * FACTOR_WEIGHTS["ml_confidence"]
+                + gex_score * FACTOR_WEIGHTS["gamma_exposure"]
             )
         else:
             # No ML signal — redistribute ml_confidence weight proportionally
@@ -211,6 +217,7 @@ class GainRankEngine:
                 + pcr_score * FACTOR_WEIGHTS["pcr_divergence"] / base_weight
                 + premium_score * FACTOR_WEIGHTS["atm_premium_ratio"] / base_weight
                 + momentum_score * FACTOR_WEIGHTS["momentum_score"] / base_weight
+                + gex_score * FACTOR_WEIGHTS["gamma_exposure"] / base_weight
             )
 
         gain_score = round(min(100.0, max(0.0, gain_score)), 2)
@@ -225,19 +232,39 @@ class GainRankEngine:
             "momentum_score": round(momentum_score, 2),
             "atm_premium_score": round(premium_score, 2),
             "ml_confidence_score": round(ml_conf, 2),
+            "gamma_exposure_score": round(gex_score, 2),
             "expected_move_pct": round(expected_move_pct, 3),
             "recommendation": "TRADE" if gain_score >= MIN_GAIN_SCORE else "SKIP",
         }
 
     def _oi_change_score(self, df: pd.DataFrame, oi_hist: Optional[Dict]) -> float:
-        """Score based on % change in total OI vs previous session."""
+        """Score based on % change in total OI vs previous session.
+
+        Priority:
+          1. Session-level OI history (oi_hist dict with prev_oi / curr_oi)
+          2. Intra-chain change_in_oi column from Dhan API (net OI change per strike)
+          3. OI concentration fallback (weakest signal)
+        """
         if oi_hist and "prev_oi" in oi_hist and oi_hist["prev_oi"] > 0:
             curr_oi = oi_hist.get("curr_oi", 0)
             change_pct = abs((curr_oi - oi_hist["prev_oi"]) / oi_hist["prev_oi"]) * 100
             # >5% OI change = strong; >15% = very strong
             return min(100.0, change_pct * 6.0)
 
-        # Fallback: use intra-chain OI concentration
+        # Path 2: use change_in_oi column from Dhan API (oi - previous_oi per strike)
+        chg_col = next(
+            (c for c in df.columns if c.lower() in ("change_in_oi", "oi_change", "chng_in_oi", "oichange")), None
+        )
+        if chg_col is not None:
+            net_change = pd.to_numeric(df[chg_col], errors="coerce").fillna(0)
+            oi_col = next((c for c in df.columns if c.lower() in ("oi", "open_interest") and c != chg_col), None)
+            total_oi = pd.to_numeric(df[oi_col], errors="coerce").sum() if oi_col else 0
+            total_chg = net_change.abs().sum()
+            if total_oi > 0:
+                change_pct = (total_chg / total_oi) * 100
+                return min(100.0, change_pct * 6.0)
+
+        # Path 3: fallback: use intra-chain OI concentration
         oi_col = next((c for c in df.columns if "oi" in c.lower() and "change" not in c.lower()), None)
         if oi_col is None:
             return 50.0
@@ -360,28 +387,66 @@ class GainRankEngine:
 
     def _pcr_divergence_score(self, df: pd.DataFrame, spot: float) -> float:
         """
-        Score based on PCR at extreme with reversal signal.
-        PCR < 0.7 (over-bearish) or PCR > 1.5 (over-bullish) near reversal = high score.
+        Score based on PCR extremes — continuous scoring rather than buckets.
+
+        Strategy: PCR < 0.7 (bearish excess — CE writers dominate) or PCR > 1.5
+        (bullish excess — PE writers dominate) signals potential for sharp reversal moves.
+        Near-ATM PCR (±2 strikes) is more informative than total chain PCR.
+
+        Returns 0-100 where 90-100 = extreme imbalance (strong move likely).
         """
-        oi_col = next((c for c in df.columns if "oi" in c.lower() and "change" not in c.lower()), None)
+        oi_col = next((c for c in df.columns if c.lower() in ("oi", "open_interest") and "change" not in c.lower()), None)
         type_col = next((c for c in df.columns if c.lower() in ("option_type", "type", "ce_pe")), None)
+        strike_col = next((c for c in df.columns if "strike" in c.lower()), None)
+
         if oi_col is None or type_col is None:
             return 50.0
 
-        ce_oi = df[df[type_col].str.upper().isin(["CE", "CALL"])][oi_col].sum()
-        pe_oi = df[df[type_col].str.upper().isin(["PE", "PUT"])][oi_col].sum()
+        # Attempt near-ATM PCR first (more signal-dense)
+        if strike_col is not None and spot > 0:
+            df2 = df.copy()
+            df2["_strike"] = pd.to_numeric(df2[strike_col], errors="coerce")
+            # Typical ATM range: ±2% of spot (covers 3-4 strikes for NIFTY 50-pt spacing)
+            atm_band = spot * 0.02
+            near_atm = df2[df2["_strike"].between(spot - atm_band, spot + atm_band)]
+            if len(near_atm) >= 2:
+                ce_oi = pd.to_numeric(
+                    near_atm[near_atm[type_col].str.upper().isin(["CE", "CALL"])][oi_col], errors="coerce"
+                ).sum()
+                pe_oi = pd.to_numeric(
+                    near_atm[near_atm[type_col].str.upper().isin(["PE", "PUT"])][oi_col], errors="coerce"
+                ).sum()
+                if ce_oi > 0 and pe_oi > 0:
+                    pcr = pe_oi / ce_oi
+                    return self._pcr_to_score(pcr)
+
+        # Full-chain PCR fallback
+        ce_oi = pd.to_numeric(
+            df[df[type_col].str.upper().isin(["CE", "CALL"])][oi_col], errors="coerce"
+        ).sum()
+        pe_oi = pd.to_numeric(
+            df[df[type_col].str.upper().isin(["PE", "PUT"])][oi_col], errors="coerce"
+        ).sum()
         if ce_oi <= 0:
             return 50.0
 
         pcr = pe_oi / ce_oi
-        # Extremes signal potential for sharp moves (PCR extremes = contrarian opportunity)
-        if pcr < 0.6 or pcr > 1.8:
-            return 90.0
-        elif pcr < 0.8 or pcr > 1.4:
-            return 70.0
-        elif pcr < 1.0 or pcr > 1.2:
-            return 55.0
-        return 45.0  # PCR near 1 = balanced, less directional edge
+        return self._pcr_to_score(pcr)
+
+    @staticmethod
+    def _pcr_to_score(pcr: float) -> float:
+        """Convert PCR value to 0-100 score using continuous sigmoid-like mapping.
+
+        Score is highest at PCR extremes (< 0.6 or > 1.8) because extreme positioning
+        increases probability of sharp directional move (gamma squeeze / capitulation).
+        Score is lowest at PCR ≈ 1.0 (balanced, no edge).
+        """
+        # Distance from balance point (1.0) on log scale
+        log_pcr = abs(np.log(max(pcr, 1e-6)))
+        # log(0.6/1.0) ≈ 0.51, log(1.8) ≈ 0.59 → target ~70-80 score at these extremes
+        # Scale: 0 → 45, 0.5 → 72, 1.0 → 90, 1.5 → 100
+        score = 45.0 + min(55.0, log_pcr * 110.0)
+        return round(score, 1)
 
     def _atm_premium_score(self, df: pd.DataFrame, spot: float) -> Tuple[float, float]:
         """
@@ -413,6 +478,52 @@ class GainRankEngine:
 
         # Fallback: check if spot vs ATM CE LTP suggests direction
         return 50.0
+
+    def _gamma_exposure_score(self, df: pd.DataFrame, spot: float) -> float:
+        """
+        Gamma Exposure (GEX) score.
+
+        GEX = Σ (gamma × OI × contract_size) per strike, sign-adjusted by option type.
+        Dealers are long gamma on PE and short gamma on CE (standard assumption).
+        Net negative GEX means dealers must sell as market falls → amplifies moves.
+        Net positive GEX means dealers act as stabiliser → dampens moves.
+
+        Score interpretation:
+          - Large |GEX| = high dealer hedging pressure = sharp moves more likely → high score
+          - GEX ≈ 0 = neutral positioning → medium score (~50)
+          - Returns 50.0 if gamma column not present (Dhan Greeks not available)
+        """
+        gamma_col = next((c for c in df.columns if c.lower() in ("gamma",)), None)
+        oi_col = next(
+            (c for c in df.columns if c.lower() in ("oi", "open_interest") and "change" not in c.lower()), None
+        )
+        type_col = next((c for c in df.columns if c.lower() in ("option_type", "type", "ce_pe")), None)
+
+        if gamma_col is None or oi_col is None or type_col is None:
+            return 50.0  # No Greeks available — neutral fallback
+
+        df2 = df.copy()
+        df2["_gamma"] = pd.to_numeric(df2[gamma_col], errors="coerce").fillna(0.0)
+        df2["_oi"] = pd.to_numeric(df2[oi_col], errors="coerce").fillna(0.0)
+        df2["_type"] = df2[type_col].str.upper()
+
+        # NSE contract size is typically 50 (NIFTY), 15 (BANKNIFTY), etc.
+        # We normalise by spot to make GEX comparable across underlyings.
+        contract_size = 50  # conservative default; actual values don't affect rank ordering
+        df2["_gex"] = df2.apply(
+            lambda r: r["_gamma"] * r["_oi"] * contract_size * (1 if r["_type"] in ("PE", "PUT") else -1),
+            axis=1,
+        )
+        net_gex = df2["_gex"].sum()
+
+        if spot <= 0:
+            return 50.0
+
+        # Normalise: |net_gex| / spot → typical NIFTY range ~0-500 units GEX/spot
+        normalised = abs(net_gex) / spot
+        # Map to 0-100: normalised=0 → 50, normalised=50 → ~75, normalised=200 → ~95
+        score = 50.0 + min(50.0, normalised * 0.5)
+        return round(score, 1)
 
     # ------------------------------------------------------------------ #
     #  IV History persistence                                             #

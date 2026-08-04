@@ -4,7 +4,7 @@
   "evidence": {
     "binance_crypto_candidate_count": 0,
     "binance_crypto_candidates_sample": [],
-    "data_candidate_count": 189,
+    "data_candidate_count": 194,
     "data_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       ".github/workflows/options-ml-training-proof.yml",
@@ -68,6 +68,7 @@
       "core/validation/option_chain_validator.py",
       "dashboard/backend/chain_adapter.py",
       "dashboard/backend/equity_option_scanner.py",
+      "dashboard/backend/moneycontrol_option_gainers.py",
       "dashboard/backend/routers/chain.py",
       "dashboard/backend/synthetic_data_generator.py",
       "dashboard/frontend/src/components/ChainAnalytics.tsx",
@@ -121,13 +122,12 @@
       "reports/latest/broker_chain_semantic_gate/summary.md",
       "reports/latest/dashboard_auto_snap/latest_chain_nifty.json",
       "reports/latest/dashboard_auto_snap/latest_ui_response.json",
-      "reports/latest/dhan_advance_platform_verification/claim_verification_matrix.csv",
-      "reports/latest/dhan_advance_platform_verification/system3_mapping_matrix.csv",
-      "reports/latest/dhan_option_chain_schema_audit/summary.json",
-      "reports/latest/dhan_option_chain_schema_audit/summary.md",
-      "reports/latest/external_data_yahoo/yahoo_data_summary.json"
+      "reports/latest/dashboard_visible_issue_tracker/chain.png",
+      "reports/latest/dashboard_visible_issue_tracker/chain.txt",
+      "reports/latest/dashboard_visual_production_proof/screenshots/chain.png",
+      "reports/latest/dhan_advance_platform_verification/claim_verification_matrix.csv"
     ],
-    "dhan_india_candidate_count": 72,
+    "dhan_india_candidate_count": 74,
     "dhan_india_candidates_sample": [
       "\"docs/Phases 311\\342\\200\\223330 = Integrity + Anti-corruption + Observability layer for System3.md\"",
       ".github/workflows/options-ml-training-proof.yml",
@@ -159,6 +159,7 @@
       "core/utils/option_chain_calculations.py",
       "core/validation/option_chain_validator.py",
       "dashboard/backend/equity_option_scanner.py",
+      "dashboard/backend/moneycontrol_option_gainers.py",
       "dashboard/frontend/src/components/OptionChain.tsx",
       "docs/ALL_INDICES_OPTION_CHAIN_FETCH.md",
       "docs/OPTION_CHAIN_COMPREHENSIVE_COLUMNS.md",
@@ -180,6 +181,7 @@
       "reports/latest/dashboard_auto_snap/latest_ui_response.json",
       "reports/latest/dhan_option_chain_schema_audit/summary.json",
       "reports/latest/dhan_option_chain_schema_audit/summary.md",
+      "reports/latest/inspector_audit_response/README.md",
       "reports/latest/option_strike_visibility.json",
       "reports/latest/option_strike_visibility.md",
       "scripts/analyze_optionchain_master.py",
