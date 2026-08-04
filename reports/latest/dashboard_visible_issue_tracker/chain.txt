@@ -3,18 +3,16 @@ AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
-_e2e_full_cloud_40
-23:58:52 IST
+4_chain_batch_fast
+00:25:11 IST
 NIFTY
 24,615
 SNAP
 BNFTY
-57,907
-SNAP
+--
 FINNIFTY
-26,845
-SNAP
-TICK 0s
+--
+TICK 1s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -83,7 +81,7 @@ CONTRACTS
 +/-10 ATM
 +/-15 ATM
 +/-20 ATM
-AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=35.7s fetched=2026-08-04T18:12:43.682845+00:00 - Market closed — last verified Dhan snapshot (2026-08-04 23:42 IST)
+AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=20.3s fetched=2026-08-04T18:43:57.294409+00:00 - Market closed — last verified Dhan snapshot (2026-08-05 00:13 IST)
 OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
 
 583K

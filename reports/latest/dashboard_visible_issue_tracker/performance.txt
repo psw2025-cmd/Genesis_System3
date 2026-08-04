@@ -3,17 +3,15 @@ AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
-_e2e_full_cloud_40
-23:59:18 IST
+4_chain_batch_fast
+00:25:36 IST
 NIFTY
 24,615
 SNAP
 BNFTY
-57,907
-SNAP
+--
 FINNIFTY
-26,845
-SNAP
+--
 TICK 0s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
@@ -63,7 +61,7 @@ System
 Live Gate
 LOCK
 Performance
-last checked 23:59:14 IST
+last checked 00:25:32 IST
 TOTAL P&L
 ₹-1,806
 Realized + Unrealized

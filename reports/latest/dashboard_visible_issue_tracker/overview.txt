@@ -3,18 +3,16 @@ AI OPTIONS CONTROL
 OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
-_e2e_full_cloud_40
-23:58:42 IST
+4_chain_batch_fast
+00:25:00 IST
 NIFTY
 24,615
 SNAP
 BNFTY
-57,907
-SNAP
+--
 FINNIFTY
-26,845
-SNAP
-TICK 0s
+--
+TICK 1s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -66,8 +64,9 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
+API status: NO_DHAN_DATA - Index chain warming from micro-loop — UI must not wait on live Dhan OC Retrying slowly; last good truth remains visible where available.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹-1,806
@@ -85,14 +84,14 @@ Health API
 live
 LOADED
 State API
-Market closed: After hours (closed at 15:30)
+Market closed: Before pre-market (opens at 09:15)
 LOADED
 Broker Status API
-ERROR
+LOADED
 Funds API
-ERROR
+LOADED
 Holdings API
-ERROR
+LOADED
 Positions API
 LOADED
 P&L API
@@ -108,7 +107,7 @@ Alerts
 0 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-04 23:42 IST)
+Market closed — last verified Dhan snapshot (2026-08-05 00:13 IST)
 Gate Matrix
 2/7 PASS
 PEND
@@ -122,7 +121,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=60.09s refresh=60s
+tick_age=23.45s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
