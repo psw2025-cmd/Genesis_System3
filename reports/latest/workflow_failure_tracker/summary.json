@@ -1,6 +1,16 @@
 {
-  "failed_count": 13,
+  "failed_count": 14,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "2565119b3bbd515ea8580b6b8e24f746d87aa304",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-04T09:22:03Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30896001162",
+      "run_id": 30896001162,
+      "updated_at": "2026-08-04T09:22:21Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "eaf3adf4f9716ca981c21d9be53a2b696c56500d",
@@ -132,11 +142,12 @@
       "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-04T09:22:10.265945+00:00",
+  "generated_utc": "2026-08-04T09:26:00.138569+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30896001162 conclusion=cancelled commit=2565119b3bbd515ea8580b6b8e24f746d87aa304",
     "Fix workflow 'Dashboard Visual Production Proof' run 30895422411 conclusion=failure commit=eaf3adf4f9716ca981c21d9be53a2b696c56500d",
     "Fix workflow 'Dashboard Live UI Proof' run 30894319252 conclusion=failure commit=eaf3adf4f9716ca981c21d9be53a2b696c56500d",
     "Fix workflow 'System3 Latest Truth Publish' run 30894061045 conclusion=failure commit=ab98f84e1d62511384d9dffa8297afd2a0b5d822",
