@@ -1,5 +1,5 @@
 {
-  "failed_count": 19,
+  "failed_count": 17,
   "failed_runs": [
     {
       "branch": "main",
@@ -170,29 +170,9 @@
       "run_id": 30949876973,
       "updated_at": "2026-08-04T20:52:58Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
-      "commit": "2ae3795207e237c6af2d2f4fc989e6d5faa63482",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T20:51:31Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949765891",
-      "run_id": 30949765891,
-      "updated_at": "2026-08-04T20:55:03Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "d5c5bd08e520d54dbf97a8281c3c611244db2eb8",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T20:51:07Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30949736687",
-      "run_id": 30949736687,
-      "updated_at": "2026-08-04T20:51:36Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-08-04T22:53:15.479743+00:00",
+  "generated_utc": "2026-08-04T23:23:21.299110+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
@@ -213,8 +193,6 @@
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30950526886 conclusion=failure commit=1e7c03be4f6ca80b47c80da5929393edd3898378",
     "Fix workflow 'Genesis System3 Global Safety CI' run 30949882511 conclusion=action_required commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7",
     "Fix workflow 'GCP Stage 2 Safety Checks' run 30949882404 conclusion=action_required commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949876973 conclusion=failure commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30949765891 conclusion=cancelled commit=2ae3795207e237c6af2d2f4fc989e6d5faa63482",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30949736687 conclusion=cancelled commit=d5c5bd08e520d54dbf97a8281c3c611244db2eb8"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30949876973 conclusion=failure commit=d980ca7649a2ca648b07c47c73a2e8554d5e11d7"
   ]
 }
