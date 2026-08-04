@@ -1471,6 +1471,9 @@ async def get_moneycontrol_option_gainers(top_n: int = 25, refresh: bool = False
         if isinstance(report, dict):
             report["ready_for_live"] = False
             report["live_trading_enabled"] = False
+            # Keep a shared :25 cache key so Alerts synth sees scrape failures
+            # even when UI requested a smaller top_n.
+            _cache_set("moneycontrol_gainers:25", report)
             return _cache_set(cache_key, report)
         return {"status": "error", "market_top_table": [], "ready_for_live": False}
     except Exception as e:
@@ -5860,7 +5863,23 @@ async def _synthesize_operational_alerts() -> list:
 
     try:
         # Moneycontrol scrape (reference only — Dhan is trading truth)
-        mc = _cache_get("moneycontrol_gainers:25", 600.0)
+        mc = None
+        for _mc_key in (
+            "moneycontrol_gainers:25",
+            "moneycontrol_gainers:5",
+            "moneycontrol_gainers:3",
+        ):
+            hit = _cache_get(_mc_key, 600.0)
+            if isinstance(hit, dict):
+                mc = hit
+                break
+        if not isinstance(mc, dict):
+            disk = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
+            if disk.exists():
+                try:
+                    mc = json.loads(disk.read_text(encoding="utf-8"))
+                except Exception:
+                    mc = None
         if isinstance(mc, dict) and str(mc.get("status") or "").upper() in {
             "SCRAPE_FAILED",
             "PARSE_FAILED",
