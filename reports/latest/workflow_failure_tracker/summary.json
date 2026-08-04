@@ -1,6 +1,16 @@
 {
-  "failed_count": 13,
+  "failed_count": 12,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "2102febf9955976b0e3ecd6670f0fe78edc11230",
+      "conclusion": "failure",
+      "created_at": "2026-08-04T16:48:34Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30930912000",
+      "run_id": 30930912000,
+      "updated_at": "2026-08-04T16:48:34Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
     {
       "branch": "main",
       "commit": "7b940a08d386cf54e350969fe78d446954e33ff0",
@@ -110,33 +120,14 @@
       "run_id": 30922852870,
       "updated_at": "2026-08-04T15:11:43Z",
       "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "ca15ba9e59319d6a50e4aa35d5d987f36e7ce658",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T15:05:57Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30922382124",
-      "run_id": 30922382124,
-      "updated_at": "2026-08-04T15:11:20Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "86bc080fb9768e83c5a2ae819f329bfce0285aea",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-04T13:58:44Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30916532297",
-      "run_id": 30916532297,
-      "updated_at": "2026-08-04T13:59:09Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     }
   ],
-  "generated_utc": "2026-08-04T16:15:31.033841+00:00",
+  "generated_utc": "2026-08-04T16:49:25.745028+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30930912000 conclusion=failure commit=2102febf9955976b0e3ecd6670f0fe78edc11230",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30927586369 conclusion=cancelled commit=7b940a08d386cf54e350969fe78d446954e33ff0",
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 30927147229 conclusion=cancelled commit=04c91af3b341c1a401260c7819b30d43ce734c74",
     "Fix workflow 'Dashboard Visual Production Proof' run 30927074068 conclusion=failure commit=04c91af3b341c1a401260c7819b30d43ce734c74",
@@ -147,8 +138,6 @@
     "Fix workflow 'Dashboard Visible Proof Isolated' run 30923839574 conclusion=failure commit=b6790b9208ab4eae4e7cc420e40a9e80cde9ecdb",
     "Fix workflow 'Dashboard Visual Production Proof' run 30923839288 conclusion=failure commit=b6790b9208ab4eae4e7cc420e40a9e80cde9ecdb",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30923835078 conclusion=failure commit=b6790b9208ab4eae4e7cc420e40a9e80cde9ecdb",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30922852870 conclusion=cancelled commit=ff50a1eb9ab28f513fef344b48d06025c068b191",
-    "Fix workflow 'Dashboard Visual Production Proof' run 30922382124 conclusion=failure commit=ca15ba9e59319d6a50e4aa35d5d987f36e7ce658",
-    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30916532297 conclusion=cancelled commit=86bc080fb9768e83c5a2ae819f329bfce0285aea"
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 30922852870 conclusion=cancelled commit=ff50a1eb9ab28f513fef344b48d06025c068b191"
   ]
 }
