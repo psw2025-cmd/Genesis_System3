@@ -5,7 +5,7 @@
 
 ## Findings
 - Public truth index exists.
-- Public truth commit: eea81b4479b355d99b7262d1f36bc840a9963955
+- Public truth commit: f4ff64368d0f5e6247022844533b0e41a7544633
 
 ## Blockers
 - Public truth final verdict is FAIL.
