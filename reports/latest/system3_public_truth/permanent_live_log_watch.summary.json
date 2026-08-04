@@ -1,15 +1,23 @@
 {
-  "base": "http://127.0.0.1:8000",
+  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "blockers": [
-    "TOP_LEVEL_EXCEPTION:Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/api/auth/status\nCall log:\n  - navigating to \"http://127.0.0.1:8000/api/auth/status\", waiting until \"networkidle\"\n",
-    "REQUEST_FAILED:http://127.0.0.1:8000/api/auth/status:net::ERR_CONNECTION_REFUSED"
+    "TOP_LEVEL_EXCEPTION:TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/\", waiting until \"networkidle\"\n",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED"
   ],
   "chain_truth": [],
   "final_verdict": "FAIL",
-  "generated_at": "2026-08-03T05:54:43.435Z",
+  "generated_at": "2026-08-04T04:09:32.398Z",
   "infra_blockers": [
-    "TOP_LEVEL_EXCEPTION:Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:8000/api/auth/status\nCall log:\n  - navigating to \"http://127.0.0.1:8000/api/auth/status\", waiting until \"networkidle\"\n",
-    "REQUEST_FAILED:http://127.0.0.1:8000/api/auth/status:net::ERR_CONNECTION_REFUSED"
+    "TOP_LEVEL_EXCEPTION:TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/\", waiting until \"networkidle\"\n",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED"
   ],
   "trade_readiness_blockers": []
 }
