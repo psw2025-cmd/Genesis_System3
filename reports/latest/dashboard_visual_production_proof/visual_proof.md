@@ -1,40 +1,46 @@
 # Dashboard Visual Production Proof
 
-Generated: None
-Base: None
+Generated: 2026-08-04T16:02:16.308Z
+Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **MISSING**
-Auth OK: **False**
-Screenshot gate: **False**
+Source verdict: **FAIL**
+Auth OK: **True**
+Screenshot gate: **True**
 
 ## Blockers
+- UI_FAIL:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
+- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
 - SHELL_STATUS:BLOCKED
 - TAB_COVERAGE:0/16
+- SHELL_PROOF_NOT_TIME_ALIGNED
 - VISIBLE_TRACKER_STATUS:BLOCKED
+- VISIBLE_TRACKER_BAD_TABS:16
+- VISIBLE_TRACKER_NOT_TIME_ALIGNED
 
 ## Corroborating evidence
 - `shell_generated_at`: `2026-07-27T23:56:42.530Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-08-04T07:57:30.685Z`
+- `visible_tracker_generated_at`: `2026-08-04T15:23:22.840Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `0`
+- `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`166285`
-- PASS `genesis.png` size=`254662`
-- PASS `e2e_proof.png` size=`164423`
-- PASS `overview.png` size=`124359`
-- PASS `chain.png` size=`195980`
-- PASS `signals.png` size=`156568`
-- PASS `paper.png` size=`162371`
-- PASS `positions.png` size=`80369`
-- PASS `broker.png` size=`122391`
-- PASS `performance.png` size=`77596`
-- PASS `ml.png` size=`105372`
-- PASS `gates.png` size=`81391`
-- MISSING `mobile_390x844.png` size=`0`
+- PASS `truth.png` size=`162576`
+- PASS `genesis.png` size=`254423`
+- PASS `e2e_proof.png` size=`157283`
+- PASS `overview.png` size=`124365`
+- PASS `chain.png` size=`195051`
+- PASS `signals.png` size=`156458`
+- PASS `paper.png` size=`162421`
+- PASS `positions.png` size=`80482`
+- PASS `broker.png` size=`122319`
+- PASS `performance.png` size=`136639`
+- PASS `ml.png` size=`135129`
+- PASS `gates.png` size=`118802`
+- PASS `mobile_390x844.png` size=`74742`
 
 ## truth.png
 
@@ -83,3 +89,7 @@ Screenshot gate: **False**
 ## gates.png
 
 ![gates.png](screenshots/gates.png)
+
+## mobile_390x844.png
+
+![mobile_390x844.png](screenshots/mobile_390x844.png)
