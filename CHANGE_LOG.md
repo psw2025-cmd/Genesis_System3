@@ -1233,3 +1233,9 @@ Verification with local `REQUIRE_API_KEY=true`:
 
 
 
+
+**[2026-08-04 21:36 UTC] [Codex]** SECURITY FIX: Removed stale secret-bearing excerpts from tracked `scan_output.txt` that were keeping `safety_and_secrets` blocked.
+- Deleted embedded token/env dump lines copied from prior scans (`API_KEY`, `WORKER_PUSH_TOKEN`, Dhan secret workflow env excerpts, stale safety report excerpt).
+- Re-ran `scan_secrets()` from `scripts/system3_master_proof_orchestrator.py`: now returns `[]` for tracked files.
+- Remaining gate blocker from targeted check is separate: `render_yaml_missing` in current worktree, not tracked secret content.
+- Live trading remains disabled; analyzer/paper mode unchanged.
