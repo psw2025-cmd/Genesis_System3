@@ -683,11 +683,19 @@ async def get_broker_status():
     try:
         from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
 
-        status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=5)
-        if SSOT_AVAILABLE and state_store is not None:
-            state_store.update_state({"broker": status})
+        status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=12)
+        # Only persist definitive results to SSOT — never write timeout/error noise.
+        if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
+            if status.get("connected") is True or status.get("error") in (
+                "TOKEN_EXPIRED_OR_INVALID",
+                "CONFIG_MISSING",
+                "ACCESS_FORBIDDEN",
+            ):
+                state_store.update_state({"broker": status})
         return status
     except Exception as _e:
+        # Keep last SSOT truth on timeout/transient errors so /api/health does not
+        # flap the UI to DISCONNECTED every few seconds.
         return {
             "connected": False,
             "name": "dhan",
@@ -696,6 +704,7 @@ async def get_broker_status():
             "error_type": "DHAN_STATUS_ERROR",
             "latency_ms": None,
             "last_ok": None,
+            "transient": True,
         }
 
 
@@ -705,9 +714,14 @@ async def get_dhan_broker_status():
     try:
         from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
 
-        status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=5)
-        if SSOT_AVAILABLE and state_store is not None:
-            state_store.update_state({"broker": status})
+        status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=12)
+        if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
+            if status.get("connected") is True or status.get("error") in (
+                "TOKEN_EXPIRED_OR_INVALID",
+                "CONFIG_MISSING",
+                "ACCESS_FORBIDDEN",
+            ):
+                state_store.update_state({"broker": status})
         return status
     except ImportError as exc:
         return {
@@ -728,6 +742,7 @@ async def get_dhan_broker_status():
             "order_placement_allowed": False,
             "credentials_present": False,
             "error": str(exc)[:200],
+            "transient": True,
         }
 
 
@@ -7788,7 +7803,20 @@ async def compat_rate_limit_and_timing(request: Request, call_next):
     host = request.client.host if request.client else "unknown"
     api_key_hdr = (request.headers.get("x-api-key") or "").strip()
     # Authenticated dashboard sessions get a higher ceiling; anonymous stays stricter.
-    limit = 600 if api_key_hdr or request.cookies.get("system3_dashboard_session") else 180
+    # Broker + batch paths must never 429 the UI into false DISCONNECTED/TOKEN ERROR.
+    _broker_paths = (
+        "/api/broker",
+        "/api/batch/",
+        "/api/health",
+        "/api/deploy/info",
+    )
+    if any(path.startswith(p) for p in _broker_paths) and (api_key_hdr or request.cookies.get("system3_dashboard_session")):
+        response = await call_next(request)
+        elapsed_ms = round((time.time() - start) * 1000, 2)
+        response.headers["X-Response-Time-ms"] = str(elapsed_ms)
+        return response
+
+    limit = 1200 if api_key_hdr or request.cookies.get("system3_dashboard_session") else 180
     bucket_key = f"{host}:auth" if limit >= 600 else host
     bucket = _COMPAT_REQ_BUCKET[bucket_key]
     now = time.time()
@@ -7849,9 +7877,24 @@ async def broker_self_heal_loop():
                     if _BROKER_FAIL_COUNT >= 3 and not _BROKER_HEAL_IN_PROGRESS:
                         _BROKER_HEAL_IN_PROGRESS = True
                         try:
-                            await asyncio.wait_for(asyncio.to_thread(_run_startup_token_refresh_blocking), timeout=60.0)
-                            print("[self-heal] token refreshed ok")
-                            _BROKER_FAIL_COUNT = 0
+                            from core.brokers.dhan.token_manager import refresh_token
+
+                            result = await asyncio.wait_for(
+                                asyncio.to_thread(refresh_token, True),
+                                timeout=60.0,
+                            )
+                            if result.get("success") and result.get("strategy") not in (
+                                "cooldown_skip",
+                                "cooldown_wait",
+                                "cooldown_lock",
+                            ):
+                                print(f"[self-heal] token refreshed ok via {result.get('strategy')}")
+                                _BROKER_FAIL_COUNT = 0
+                            else:
+                                print(
+                                    f"[self-heal] refresh deferred/failed: "
+                                    f"{result.get('strategy')} {result.get('message')}"
+                                )
                             _BROKER_HEAL_IN_PROGRESS = False
                         except Exception as e:
                             print(f"[self-heal] refresh failed: {e}")

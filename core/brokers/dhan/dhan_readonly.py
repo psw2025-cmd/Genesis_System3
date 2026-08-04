@@ -70,7 +70,7 @@ _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 # Broker status endpoint is polled every 10s by the dashboard.  Auto-refresh
 # must therefore be rate-limited so an expired/missing token does not trigger
 # repeated login attempts or TOTP churn on every UI poll.
-_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "90") or "90")
+_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "130") or "130")
 _LAST_STATUS_REFRESH_ATTEMPT_AT = 0.0
 
 logger = logging.getLogger("dhan_readonly")

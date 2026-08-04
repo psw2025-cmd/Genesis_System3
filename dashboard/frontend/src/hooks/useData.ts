@@ -240,10 +240,10 @@ export function useData() {
       const retainTransient = isTransient(apiStatus.code)
       markFailure('broker', apiStatus)
       if (retainTransient) {
-        setBrokerStatus(keepLastGood(prev.brokerStatus, apiStatus, 'Broker status') || blockedBrokerStatus(apiStatus))
-        setBrokerHoldings(keepLastGood(prev.brokerHoldings, apiStatus, 'Holdings') || blockedRows(apiStatus, 'Holdings'))
-        setBrokerFunds(keepLastGood(prev.brokerFunds, apiStatus, 'Funds') || blockedFunds(apiStatus))
-        setBrokerPositions(keepLastGood(prev.brokerPositions, apiStatus, 'Positions') || blockedRows(apiStatus, 'Positions'))
+        if (prev.brokerStatus) setBrokerStatus(keepLastGood(prev.brokerStatus, apiStatus, 'Broker status') || prev.brokerStatus)
+        if (prev.brokerHoldings) setBrokerHoldings(keepLastGood(prev.brokerHoldings, apiStatus, 'Holdings') || prev.brokerHoldings)
+        if (prev.brokerFunds) setBrokerFunds(keepLastGood(prev.brokerFunds, apiStatus, 'Funds') || prev.brokerFunds)
+        if (prev.brokerPositions) setBrokerPositions(keepLastGood(prev.brokerPositions, apiStatus, 'Positions') || prev.brokerPositions)
       } else {
         setBrokerStatus(blockedBrokerStatus(apiStatus))
         setBrokerHoldings(blockedRows(apiStatus, 'Holdings'))

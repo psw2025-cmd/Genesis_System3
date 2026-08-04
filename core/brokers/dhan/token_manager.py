@@ -411,10 +411,27 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
             if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
                 remaining = int(_TOKEN_COOLDOWN_S - elapsed)
                 logger.info(f"Token refresh cooldown: {remaining}s remaining — using existing token")
+                # Never claim success when caller needs a real refresh and we skipped.
+                # Returning success:True here made self-heal think token was fixed while
+                # DH-906 still left the broker disconnected for minutes.
+                cur = (os.environ.get("DHAN_ACCESS_TOKEN") or "").strip()
+                if not cur:
+                    try:
+                        cur = (_load_env().get("DHAN_ACCESS_TOKEN") or "").strip()
+                    except Exception:
+                        cur = ""
+                exp = _token_expiry(cur) if cur else None
+                expired = bool(exp and exp < datetime.now())
                 return {
-                    "success": True,
+                    "success": (not expired) and bool(cur),
                     "strategy": "cooldown_skip",
-                    "message": f"Cooldown active ({remaining}s left) — token already fresh, no call needed",
+                    "message": (
+                        f"Cooldown active ({remaining}s left) — token still expired; wait for next generate window"
+                        if expired or not cur
+                        else f"Cooldown active ({remaining}s left) — token already fresh, no call needed"
+                    ),
+                    "cooldown_remaining_s": remaining,
+                    "token_expired": expired,
                 }
             # Mark refresh timestamp BEFORE the API call, still under the
             # lock, to prevent race
@@ -422,7 +439,26 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         finally:
             _TOKEN_REFRESH_LOCK.release()
     else:
-        _TOKEN_LAST_REFRESH_TS = _time_mod.time()
+        # force_generate still must respect Dhan's hard 2-minute generate limit.
+        if not _TOKEN_REFRESH_LOCK.acquire(timeout=5):
+            return {
+                "success": False,
+                "strategy": "cooldown_lock",
+                "message": "Token refresh already in progress (concurrent call blocked)",
+            }
+        try:
+            elapsed = _time_mod.time() - _TOKEN_LAST_REFRESH_TS
+            if elapsed < _TOKEN_COOLDOWN_S and _TOKEN_LAST_REFRESH_TS > 0:
+                remaining = int(_TOKEN_COOLDOWN_S - elapsed)
+                return {
+                    "success": False,
+                    "strategy": "cooldown_wait",
+                    "message": f"Dhan generate_token rate-limit window: wait {remaining}s",
+                    "cooldown_remaining_s": remaining,
+                }
+            _TOKEN_LAST_REFRESH_TS = _time_mod.time()
+        finally:
+            _TOKEN_REFRESH_LOCK.release()
     env = _load_env()
     client_id = env.get("DHAN_CLIENT_ID", "").strip()
     cur_token = env.get("DHAN_ACCESS_TOKEN", "").strip()

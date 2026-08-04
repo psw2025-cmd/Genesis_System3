@@ -74,11 +74,21 @@ export const useStore = create<DashboardState>((set) => ({
   chainSymbol: 'NIFTY',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
-  setHealth: (health) => set({
-    health,
-    brokerConnected: health?.broker?.connected ?? false,
-    marketOpen: Boolean(health?.market?.is_open ?? health?.market_status === 'open'),
-    lastSync: new Date().toISOString(),
+  setHealth: (health) => set((s) => {
+    // CRITICAL: health uses cached SSOT and must NOT clobber a live broker_status=true.
+    // This race was the long-standing "broker disconnect flicker" on the TopBar/Sidebar.
+    const healthConnected = health?.broker?.connected
+    const statusConnected = s.brokerStatus?.connected
+    let brokerConnected = s.brokerConnected
+    if (healthConnected === true) brokerConnected = true
+    else if (healthConnected === false && statusConnected !== true) brokerConnected = false
+    // if health says false/missing but brokerStatus says true → keep true
+    return {
+      health,
+      brokerConnected,
+      marketOpen: Boolean(health?.market?.is_open ?? health?.market_status === 'open'),
+      lastSync: new Date().toISOString(),
+    }
   }),
   setState: (state) => set((s) => ({
     state,
@@ -95,7 +105,16 @@ export const useStore = create<DashboardState>((set) => ({
   setAutoGates: (autoGates) => set({ autoGates }),
   setPnl: (pnl) => set({ pnl }),
   setApiStatus: (apiStatus) => set({ apiStatus }),
-  setBrokerStatus: (brokerStatus) => set({ brokerStatus, brokerConnected: brokerStatus?.connected ?? false }),
+  setBrokerStatus: (brokerStatus) => set((s) => {
+    // Authoritative broker truth wins; never force false on undefined.
+    const next =
+      brokerStatus?.connected === true
+        ? true
+        : brokerStatus?.connected === false
+          ? false
+          : s.brokerConnected
+    return { brokerStatus, brokerConnected: next }
+  }),
   setBrokerHoldings: (brokerHoldings) => set({ brokerHoldings }),
   setBrokerFunds: (brokerFunds) => set({ brokerFunds }),
   setBrokerPositions: (brokerPositions) => set({ brokerPositions }),
