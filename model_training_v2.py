@@ -79,11 +79,15 @@ def load_balanced_dataset(path: str) -> pd.DataFrame:
     """
     Load balanced dataset from Phase 390.
 
+    Enforces temporal ordering: rows are sorted by timestamp (ts, date, or index)
+    before any downstream train/test splitting. This prevents look-ahead leakage
+    where future rows could contaminate training-set rolling features.
+
     Args:
         path: Path to CSV file (e.g., 'storage/datasets/phase_390_balanced_features.csv')
 
     Returns:
-        pd.DataFrame with columns including 'signal' and 'underlying'
+        pd.DataFrame sorted chronologically with columns including 'signal' and 'underlying'
 
     Raises:
         FileNotFoundError: If CSV not found
@@ -102,6 +106,22 @@ def load_balanced_dataset(path: str) -> pd.DataFrame:
     missing = [c for c in required_cols if c not in df.columns]
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
+
+    # --- Temporal sort (critical: prevents look-ahead leakage in rolling features) ---
+    ts_candidates = [c for c in df.columns if c.lower() in ("ts", "timestamp", "date", "datetime", "time")]
+    if ts_candidates:
+        ts_col = ts_candidates[0]
+        try:
+            df[ts_col] = pd.to_datetime(df[ts_col], errors="coerce")
+            df = df.sort_values(ts_col, ascending=True, na_position="first").reset_index(drop=True)
+            logger.info(f"✓ Dataset sorted chronologically by '{ts_col}'")
+        except Exception as e:
+            logger.warning(f"Could not sort by '{ts_col}': {e} — using row order as-is")
+    else:
+        logger.warning(
+            "No timestamp column found (expected: ts/timestamp/date). "
+            "Row order is assumed to be chronological. Add a timestamp column to guarantee leakage-free splits."
+        )
 
     logger.info(f"✓ Dataset validation passed")
     return df
@@ -241,9 +261,12 @@ def train_models_per_underlying(df: pd.DataFrame, config: TrainingConfig) -> Dic
 
             logger.info(f"  Feature matrix shape: {X.shape}")
 
-            # Train/test split (stratified)
+            # --- Temporal train/test split (no shuffle — prevents look-ahead leakage) ---
+            # shuffle=False preserves chronological order so the test set is always
+            # strictly after the training set in time. stratify is incompatible with
+            # shuffle=False and is intentionally omitted.
             X_train, X_test, y_train, y_test = train_test_split(
-                X, y_encoded, test_size=config.test_size, random_state=config.random_state, stratify=y_encoded
+                X, y_encoded, test_size=config.test_size, random_state=None, shuffle=False
             )
 
             logger.info(f"  Train/Test split: {len(X_train)}/{len(X_test)}")

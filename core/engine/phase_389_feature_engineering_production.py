@@ -644,6 +644,27 @@ def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
 
         original_cols = len(df.columns)
 
+        # --- Temporal sort BEFORE feature engineering (prevents look-ahead leakage) ---
+        # Rolling-window features (MA, momentum, diffs) computed via groupby().transform()
+        # are correct only if rows within each group are in chronological order. If rows
+        # are mixed across time, a training row's rolling feature will look into future
+        # test-set rows, causing leakage and artificially perfect test accuracy.
+        logger.info("\n[Step 1b] Sorting chronologically to prevent rolling-feature look-ahead leakage...")
+        ts_cols = [c for c in df.columns if c.lower() in ("ts", "timestamp", "date", "datetime", "time")]
+        if ts_cols:
+            ts_col = ts_cols[0]
+            try:
+                df[ts_col] = pd.to_datetime(df[ts_col], errors="coerce")
+                sort_keys = ["underlying", ts_col] if "underlying" in df.columns else [ts_col]
+                df = df.sort_values(sort_keys, ascending=True, na_position="first").reset_index(drop=True)
+                logger.info(f"  ✓ Sorted by {sort_keys}")
+            except Exception as sort_err:
+                logger.warning(f"  Could not sort by '{ts_col}': {sort_err} — row order assumed chronological")
+        else:
+            logger.warning(
+                "  No timestamp column found. Add 'ts' column to guarantee leakage-free rolling features."
+            )
+
         # Step 2: Apply feature engineering
         logger.info("\n[Step 2] Applying feature engineering (6 categories, 40+ features)...")
 

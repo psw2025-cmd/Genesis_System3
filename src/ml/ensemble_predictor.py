@@ -202,6 +202,13 @@ class EnsemblePredictor:
         # Use global weight tracker
         self.weight_tracker = _weight_tracker
 
+        # Regression head: predicts expected % gain from option chain features.
+        # Loaded from state/models/gain_regressor_{underlying}.pkl when available.
+        # Falls back to heuristic when model file is absent.
+        self._regressor_cache: Dict[str, Any] = {}
+        # Traverse up to repo root (src/ml/ → src/ → repo_root/)
+        self._regressor_dir = ROOT_DIR.parent / "state" / "models"
+
     def load_ultra_model(self, underlying: str) -> Optional[Any]:
         """Load Ultra model for underlying."""
         model_path = self.ultra_model_dir / f"{underlying}_ultra_model.pkl"
@@ -529,12 +536,15 @@ class EnsemblePredictor:
         # Calculate overall confidence
         overall_confidence = np.mean(list(confidences.values())) if confidences else 0.0
 
-        # Regression head: expected % gain for this underlying.
-        # Heuristic until real regression training data is available:
-        #   |mean_signal| * confidence * 2.5%  (index options rarely exceed 2.5% intraday)
-        # Once real training data exists, replace with a trained regressor output here.
-        mean_signal = float(np.mean(final_pred)) if len(final_pred) > 0 else 0.0
-        expected_gain_pct = round(abs(mean_signal) * float(overall_confidence) * 2.5, 4)
+        # --- Regression head: expected % gain ---
+        # Loads a trained Ridge/XGBRegressor from state/models/gain_regressor_{underlying}.pkl.
+        # The regressor is trained by scripts/train_gain_regressor.py on historical
+        # target_forward_return values from options_ce_pe_history_pipeline.py.
+        # Falls back to calibrated heuristic when no trained regressor exists yet.
+        underlying_key = getattr(df, "_underlying", None) or "UNKNOWN"
+        expected_gain_pct = self._predict_expected_gain(
+            df, underlying_key, float(np.mean(final_pred)) if len(final_pred) > 0 else 0.0, float(overall_confidence)
+        )
 
         return {
             "prediction": final_pred,
@@ -669,6 +679,60 @@ class EnsemblePredictor:
             confidences.append(float(confidence))
 
         return {"predictions": predictions, "confidences": confidences, "model_name": "baseline_sim", "models_used": []}
+
+    def _predict_expected_gain(
+        self, df: pd.DataFrame, underlying: str, mean_signal: float, confidence: float
+    ) -> float:
+        """
+        Predict expected % gain for the underlying using a trained regression model.
+
+        Attempts to load state/models/gain_regressor_{underlying}.pkl (trained by
+        scripts/train_gain_regressor.py on real historical target_forward_return data).
+
+        Falls back to a calibrated heuristic when no regressor is trained yet:
+            |mean_signal| * confidence * 2.5%
+        (index options rarely move more than 2.5% intraday; the heuristic is a
+        conservative lower bound until real regression data accumulates).
+
+        The regressor is automatically retrained by auto_retrain.py when
+        state/retrain_signal.json is present (triggered by MarketResultValidator
+        when Spearman ρ < 0.40 for 3 consecutive days).
+        """
+        cache_key = f"regressor_{underlying}"
+        reg = self._regressor_cache.get(cache_key)
+
+        if reg is None:
+            # Try to load from disk
+            reg_path = self._regressor_dir / f"gain_regressor_{underlying}.pkl"
+            if reg_path.exists():
+                try:
+                    with open(reg_path, "rb") as fh:
+                        reg = pickle.load(fh)
+                    self._regressor_cache[cache_key] = reg
+                    logger.info(f"Loaded gain regressor for {underlying}")
+                except Exception as exc:
+                    logger.warning(f"Could not load gain regressor for {underlying}: {exc}")
+                    reg = None
+
+        if reg is not None:
+            # Build a one-row feature vector for the regressor
+            # Expected features: mean_signal, confidence, atm_iv, pcr, oi_change_pct
+            try:
+                atm_iv = float(df["iv"].median()) if "iv" in df.columns else 0.20
+                pcr = float((df[df["option_type"] == "PE"]["oi"].sum() /
+                              max(df[df["option_type"] == "CE"]["oi"].sum(), 1))
+                             if "option_type" in df.columns and "oi" in df.columns else 1.0)
+                oi_chg = float(df["oi_change"].sum()) if "oi_change" in df.columns else 0.0
+                X_reg = np.array([[mean_signal, confidence, atm_iv, pcr, oi_chg]])
+                pred = float(reg.predict(X_reg)[0])
+                return round(max(0.0, pred), 4)
+            except Exception as exc:
+                logger.warning(f"Gain regressor prediction failed for {underlying}: {exc}")
+
+        # --- Calibrated heuristic fallback ---
+        # |mean_signal| ∈ [0,1], confidence ∈ [0,1]
+        # Product gives max ~2.5% which is realistic for single-day index option moves.
+        return round(abs(mean_signal) * confidence * 2.5, 4)
 
     def update_model_accuracy(self, model_name: str, accuracy: float):
         """

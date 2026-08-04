@@ -145,6 +145,24 @@ def run_retrain(dry_run: bool = False) -> dict:
         _clear_signal()
         summary = f"RETRAIN SUCCESS in {elapsed:.0f}s: {trained} OK, {failed} failed"
         _log_to_change_log(summary)
+
+        # --- Self-learning: also retrain the gain regressor (expected-% gain head) ---
+        print("\n  Retraining gain regressor (expected-% gain head)...")
+        try:
+            import importlib.util
+            reg_script = os.path.join(ROOT_DIR, "scripts", "train_gain_regressor.py")
+            spec = importlib.util.spec_from_file_location("train_gain_regressor", reg_script)
+            mod = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+            reg_result = mod.run(dry_run=False)
+            reg_status = reg_result.get("status", "UNKNOWN")
+            reg_trained = reg_result.get("underlyings_trained", [])
+            print(f"  Gain regressor: {reg_status} | trained={reg_trained}")
+            _log_to_change_log(f"GAIN_REGRESSOR {reg_status}: {reg_trained}")
+        except Exception as reg_exc:
+            print(f"  WARNING: gain regressor retraining failed: {reg_exc}")
+            _log_to_change_log(f"GAIN_REGRESSOR SKIPPED: {reg_exc}")
+
         return {"status": "SUCCESS", "trained": trained, "failed": failed, "elapsed_s": elapsed}
 
     else:
