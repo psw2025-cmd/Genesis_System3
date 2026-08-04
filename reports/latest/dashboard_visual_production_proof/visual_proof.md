@@ -1,6 +1,6 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-08-04T20:22:46.192Z
+Generated: 2026-08-04T20:46:55.582Z
 Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
@@ -12,36 +12,37 @@ Screenshot gate: **True**
 - UI_FAIL:Paper Trades
 - PAPER_TRUTH_NOT_VISIBLE:Paper Trades
 - PAPER_TRUTH_NOT_VISIBLE:GLOBAL
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - SHELL_STATUS:BLOCKED
 - TAB_COVERAGE:0/16
 - SHELL_PROOF_NOT_TIME_ALIGNED
 - VISIBLE_TRACKER_STATUS:BLOCKED
+- VISIBLE_TRACKER_BAD_TABS:16
+- VISIBLE_TRACKER_NOT_TIME_ALIGNED
 
 ## Corroborating evidence
 - `shell_generated_at`: `2026-07-27T23:56:42.530Z`
 - `shell_status`: `BLOCKED`
 - `shell_tab_coverage`: `0/16`
-- `visible_tracker_generated_at`: `2026-08-04T20:14:07.611Z`
+- `visible_tracker_generated_at`: `2026-08-04T20:22:34.364Z`
 - `visible_tracker_status`: `BLOCKED`
-- `visible_tracker_bad_tab_count`: `0`
+- `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`167160`
-- PASS `genesis.png` size=`254756`
-- PASS `e2e_proof.png` size=`162669`
-- PASS `overview.png` size=`131730`
-- PASS `chain.png` size=`194952`
-- PASS `signals.png` size=`154810`
-- PASS `paper.png` size=`162174`
-- PASS `positions.png` size=`80439`
-- PASS `broker.png` size=`112644`
-- PASS `performance.png` size=`123555`
-- PASS `ml.png` size=`134004`
-- PASS `gates.png` size=`118245`
-- PASS `mobile_390x844.png` size=`81140`
+- PASS `truth.png` size=`167917`
+- PASS `genesis.png` size=`255134`
+- PASS `e2e_proof.png` size=`163744`
+- PASS `overview.png` size=`132455`
+- PASS `chain.png` size=`195820`
+- PASS `signals.png` size=`154109`
+- PASS `paper.png` size=`162736`
+- PASS `positions.png` size=`81251`
+- PASS `broker.png` size=`113450`
+- PASS `performance.png` size=`124176`
+- PASS `ml.png` size=`134891`
+- PASS `gates.png` size=`118682`
+- PASS `mobile_390x844.png` size=`75500`
 
 ## truth.png
 
