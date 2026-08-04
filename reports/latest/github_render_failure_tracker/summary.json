@@ -5,86 +5,75 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
+      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943167915",
-      "run_id": 30943167915,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514689",
+      "run_id": 30947514689,
       "status": "completed",
-      "updated_at": "2026-08-04T19:32:53Z",
+      "updated_at": "2026-08-04T20:31:56Z",
+      "workflow": "System3 Latest Truth Publish"
+    },
+    {
+      "branch": "main",
+      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514852",
+      "run_id": 30947514852,
+      "status": "completed",
+      "updated_at": "2026-08-04T20:26:24Z",
       "workflow": "Genesis System3 Global Safety CI"
     },
     {
       "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
+      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943168583",
-      "run_id": 30943168583,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514717",
+      "run_id": 30947514717,
       "status": "completed",
-      "updated_at": "2026-08-04T19:27:11Z",
+      "updated_at": "2026-08-04T20:25:21Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947515181",
+      "run_id": 30947515181,
+      "status": "completed",
+      "updated_at": "2026-08-04T20:24:17Z",
       "workflow": "Dashboard Visible Proof Isolated"
     },
     {
       "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
+      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943166207",
-      "run_id": 30943166207,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947513277",
+      "run_id": 30947513277,
       "status": "completed",
-      "updated_at": "2026-08-04T19:24:55Z",
+      "updated_at": "2026-08-04T20:21:54Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "509022c9cf04c28b64b69ce36786d2dbd22d69d9",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30945188947",
+      "run_id": 30945188947,
+      "status": "completed",
+      "updated_at": "2026-08-04T19:59:38Z",
+      "workflow": "Dashboard Deploy Provenance Gate"
     }
   ],
-  "generated_utc": "2026-08-04T19:33:43.550046Z",
-  "github_failed_count": 3,
-  "github_pending_count": 4,
+  "generated_utc": "2026-08-04T20:33:10.056660Z",
+  "github_failed_count": 6,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [
-    {
-      "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943167941",
-      "run_id": 30943167941,
-      "status": "in_progress",
-      "updated_at": "2026-08-04T19:25:05Z",
-      "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943168454",
-      "run_id": 30943168454,
-      "status": "in_progress",
-      "updated_at": "2026-08-04T19:25:01Z",
-      "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943168334",
-      "run_id": 30943168334,
-      "status": "in_progress",
-      "updated_at": "2026-08-04T19:25:01Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "62369b05f1535c8aa64bc73253a8a73a880367e5",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30943168314",
-      "run_id": 30943168314,
-      "status": "in_progress",
-      "updated_at": "2026-08-04T19:25:00Z",
-      "workflow": "Cloud Runtime Check"
-    }
-  ],
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
@@ -121,13 +110,16 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30943167915 conclusion=failure commit=62369b05f153",
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=30943168583 conclusion=failure commit=62369b05f153",
-    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30943166207 conclusion=failure commit=62369b05f153",
+    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30947514689 conclusion=failure commit=0afce386fe11",
+    "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30947514852 conclusion=failure commit=0afce386fe11",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30947514717 conclusion=failure commit=0afce386fe11",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=30947515181 conclusion=failure commit=0afce386fe11",
+    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30947513277 conclusion=failure commit=0afce386fe11",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=30945188947 conclusion=cancelled commit=509022c9cf04",
     "Fix Render endpoint /api/state: HTTP status 0 status=0",
     "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0"
   ],
-  "todo_count": 5,
+  "todo_count": 8,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
