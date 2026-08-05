@@ -11,17 +11,32 @@
     "reason": null,
     "semantic_ok": true
   },
-  "generated_utc": "2026-08-05T05:37:51.961466Z",
+  "generated_utc": "2026-08-05T06:33:49.879912Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "CHAIN:NIFTY:TIMEOUTERROR"
+    "CHAIN:BANKNIFTY:TIMEOUTERROR",
+    "CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN"
   ],
-  "required_chain_ready_count": 3,
+  "required_chain_ready_count": 2,
   "required_chain_total": 4,
   "required_chains": [
+    {
+      "contracts": 160,
+      "error": null,
+      "http": 200,
+      "priority": "dhan_p0_live",
+      "ready": true,
+      "reason": null,
+      "source": "dhan",
+      "spot_present": true,
+      "stale": false,
+      "status": "MARKET_OPEN",
+      "symbol": "NIFTY",
+      "transport_ok": true
+    },
     {
       "contracts": 0,
       "error": "TIMEOUTERROR",
@@ -33,34 +48,20 @@
       "spot_present": false,
       "stale": false,
       "status": null,
-      "symbol": "NIFTY",
+      "symbol": "BANKNIFTY",
       "transport_ok": false
     },
     {
-      "contracts": 160,
+      "contracts": 0,
       "error": null,
       "http": 200,
-      "priority": "dhan_p0_live",
-      "ready": true,
-      "reason": null,
+      "priority": "dhan_only_no_rows",
+      "ready": false,
+      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
       "source": "dhan",
-      "spot_present": true,
+      "spot_present": false,
       "stale": false,
-      "status": "MARKET_OPEN",
-      "symbol": "BANKNIFTY",
-      "transport_ok": true
-    },
-    {
-      "contracts": 160,
-      "error": null,
-      "http": 200,
-      "priority": "dhan_p0_live",
-      "ready": true,
-      "reason": null,
-      "source": "dhan",
-      "spot_present": true,
-      "stale": false,
-      "status": "MARKET_OPEN",
+      "status": "NO_DHAN_DATA",
       "symbol": "FINNIFTY",
       "transport_ok": true
     },
@@ -82,6 +83,6 @@
   "secrets_written": false,
   "system3_live_trading_allowed": false,
   "transport_failures": [
-    "CHAIN_NIFTY_HTTP_0"
+    "CHAIN_BANKNIFTY_HTTP_0"
   ]
 }
