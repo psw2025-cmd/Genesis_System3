@@ -1,24 +1,20 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-08-05T04:17:10.390938Z`
+- Generated UTC: `2026-08-05T05:37:51.961466Z`
 - Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (TOKEN_EXPIRED_OR_INVALID)
-- Funds semantic proof: `False`
-- Mandatory chains ready: `1/4`
+- Broker connected: `True` (CONNECTED)
+- Funds semantic proof: `True`
+- Mandatory chains ready: `3/4`
 - Analyzer mode: `ON`
 - Live trading: `OFF`
 - Order endpoints called: `false`
 - Secrets written: `false`
 
 ## Mandatory chains
-- NIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
-- BANKNIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
-- FINNIFTY: BLOCKED http=200 source=dhan status=NO_DHAN_DATA contracts=0 stale=False
+- NIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
+- BANKNIFTY: PASS http=200 source=dhan status=MARKET_OPEN contracts=160 stale=False
+- FINNIFTY: PASS http=200 source=dhan status=MARKET_OPEN contracts=160 stale=False
 - MIDCPNIFTY: PASS http=200 source=dhan status=MARKET_OPEN contracts=160 stale=False
 
 ## Blockers
-- BROKER:TOKEN_EXPIRED_OR_INVALID
-- FUNDS:TOKEN_EXPIRED_OR_INVALID
-- CHAIN:NIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
-- CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
-- CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN
+- CHAIN:NIFTY:TIMEOUTERROR
