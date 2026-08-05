@@ -1,6 +1,16 @@
 {
-  "failed_count": 12,
+  "failed_count": 9,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "bc792246d19b95c67bc903a6d096d49174d7eeba",
+      "conclusion": "failure",
+      "created_at": "2026-08-05T00:48:37Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30964472270",
+      "run_id": 30964472270,
+      "updated_at": "2026-08-05T00:54:03Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
     {
       "branch": "main",
       "commit": "0a81b6e5840d053cd49ee41c0d685e6f4e9c3e48",
@@ -80,53 +90,14 @@
       "run_id": 30953443498,
       "updated_at": "2026-08-04T21:42:09Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "copilot/research-frozen-backtest-issues",
-      "commit": "74b4520f0bc8af83618e10596c2bca8482abc961",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T21:41:58Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30953429373",
-      "run_id": 30953429373,
-      "updated_at": "2026-08-04T21:41:58Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "copilot/research-frozen-backtest-issues",
-      "commit": "4f7d877d4335fcbe75c3a0c2d860420e6698c504",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T21:38:39Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30953197691",
-      "run_id": 30953197691,
-      "updated_at": "2026-08-04T21:38:39Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "copilot/research-frozen-backtest-issues",
-      "commit": "57bc685c65c35902acc242f12b79e1f707da1c79",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T21:37:17Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30953103270",
-      "run_id": 30953103270,
-      "updated_at": "2026-08-04T21:37:17Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "copilot/research-frozen-backtest-issues",
-      "commit": "bc5ba5a465260d8cec7a7db0cc8463b934f9d025",
-      "conclusion": "failure",
-      "created_at": "2026-08-04T21:33:39Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30952847037",
-      "run_id": 30952847037,
-      "updated_at": "2026-08-04T21:33:39Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-05T00:32:16.810234+00:00",
+  "generated_utc": "2026-08-05T00:54:10.770064+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 30964472270 conclusion=failure commit=bc792246d19b95c67bc903a6d096d49174d7eeba",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30960862172 conclusion=cancelled commit=0a81b6e5840d053cd49ee41c0d685e6f4e9c3e48",
     "Fix workflow 'Dashboard Visual Production Proof' run 30960520818 conclusion=failure commit=abad4bca4f15198eb54650c51e773003275ec61b",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30959827039 conclusion=cancelled commit=f97daec0b8a8c7500a7d7aebd5cf7f3e6d40840e",
@@ -134,10 +105,6 @@
     "Fix workflow 'Dashboard Visual Production Proof' run 30957096350 conclusion=failure commit=36a9d28c2334b95f31ee2531d08cb36ddb1e7842",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 30953706157 conclusion=cancelled commit=0abe011164cf7f3eeb6a7d84b10b30f14e2cda1b",
     "Fix workflow 'Dashboard Visual Production Proof' run 30953462367 conclusion=failure commit=dcf3958896f70a65de50fad38718139bc15be544",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953443498 conclusion=failure commit=1e22833f14b3a05b418d64bdb5005f690de45a45",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953429373 conclusion=failure commit=74b4520f0bc8af83618e10596c2bca8482abc961",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953197691 conclusion=failure commit=4f7d877d4335fcbe75c3a0c2d860420e6698c504",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953103270 conclusion=failure commit=57bc685c65c35902acc242f12b79e1f707da1c79",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30952847037 conclusion=failure commit=bc5ba5a465260d8cec7a7db0cc8463b934f9d025"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 30953443498 conclusion=failure commit=1e22833f14b3a05b418d64bdb5005f690de45a45"
   ]
 }
