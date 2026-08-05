@@ -1,22 +1,16 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-08-05T08:06:19.037Z
-Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
+Generated: None
+Base: None
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **FAIL**
-Auth OK: **True**
-Screenshot gate: **True**
+Source verdict: **MISSING**
+Auth OK: **False**
+Screenshot gate: **False**
 
 ## Blockers
-- UI_FAIL:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
-- CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - SHELL_STATUS:BLOCKED
 - TAB_COVERAGE:0/16
-- SHELL_PROOF_NOT_TIME_ALIGNED
 - VISIBLE_TRACKER_STATUS:BLOCKED
 
 ## Corroborating evidence
@@ -28,19 +22,19 @@ Screenshot gate: **True**
 - `visible_tracker_bad_tab_count`: `0`
 
 ## Screenshots
-- PASS `truth.png` size=`159911`
-- PASS `genesis.png` size=`67133`
-- PASS `e2e_proof.png` size=`154969`
-- PASS `overview.png` size=`118061`
-- PASS `chain.png` size=`194358`
-- PASS `signals.png` size=`66764`
-- PASS `paper.png` size=`74128`
-- PASS `positions.png` size=`81748`
-- PASS `broker.png` size=`107166`
-- PASS `performance.png` size=`82393`
-- PASS `ml.png` size=`103211`
-- PASS `gates.png` size=`79434`
-- PASS `mobile_390x844.png` size=`79745`
+- PASS `truth.png` size=`163299`
+- PASS `genesis.png` size=`256529`
+- PASS `e2e_proof.png` size=`154733`
+- PASS `overview.png` size=`126879`
+- PASS `chain.png` size=`197834`
+- PASS `signals.png` size=`66846`
+- PASS `paper.png` size=`74201`
+- PASS `positions.png` size=`81402`
+- PASS `broker.png` size=`113926`
+- PASS `performance.png` size=`82034`
+- PASS `ml.png` size=`102993`
+- PASS `gates.png` size=`116480`
+- MISSING `mobile_390x844.png` size=`0`
 
 ## truth.png
 
@@ -89,7 +83,3 @@ Screenshot gate: **True**
 ## gates.png
 
 ![gates.png](screenshots/gates.png)
-
-## mobile_390x844.png
-
-![mobile_390x844.png](screenshots/mobile_390x844.png)
