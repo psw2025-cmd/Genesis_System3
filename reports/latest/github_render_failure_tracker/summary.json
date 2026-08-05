@@ -5,12 +5,12 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "bc792246d19b95c67bc903a6d096d49174d7eeba",
+      "commit": "f852e099bfeed70f7a64882553c1c62e847687c3",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30964472270",
-      "run_id": 30964472270,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30967807320",
+      "run_id": 30967807320,
       "status": "completed",
-      "updated_at": "2026-08-05T00:54:03Z",
+      "updated_at": "2026-08-05T02:00:35Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -54,7 +54,7 @@
       "workflow": "Actions Truth Autopsy"
     }
   ],
-  "generated_utc": "2026-08-05T01:34:12.428620Z",
+  "generated_utc": "2026-08-05T03:03:20.577216Z",
   "github_failed_count": 5,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -75,7 +75,7 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30964472270 conclusion=failure commit=bc792246d19b",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30967807320 conclusion=failure commit=f852e099bfee",
     "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30953443498 conclusion=failure commit=1e22833f14b3",
     "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30950537666 conclusion=action_required commit=1e7c03be4f6c",
     "Fix latest GitHub workflow 'GCP Stage 2 Safety Checks' run=30950536980 conclusion=action_required commit=1e7c03be4f6c",
