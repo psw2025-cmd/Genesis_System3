@@ -5,17 +5,27 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "3bb44aba3c8f53235114e8d2cae8bab5c56b410a",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31036413466",
-      "run_id": 31036413466,
+      "commit": "ed56ece71a4c93f88f476d99883bf4eef38a8057",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31042289422",
+      "run_id": 31042289422,
       "status": "completed",
-      "updated_at": "2026-08-05T18:54:19Z",
+      "updated_at": "2026-08-05T20:13:39Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
+      "commit": "c24efe04b128f01226a9bd8f63e095f758e8a67e",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31041222028",
+      "run_id": 31041222028,
+      "status": "completed",
+      "updated_at": "2026-08-05T19:55:12Z",
       "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-05T19:31:14.499124Z",
-  "github_failed_count": 1,
+  "generated_utc": "2026-08-05T20:31:10.143531Z",
+  "github_failed_count": 2,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
@@ -35,9 +45,10 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31036413466 conclusion=failure commit=3bb44aba3c8f"
+    "Fix latest GitHub workflow 'System3 1000 Point TODO Status Updater' run=31042289422 conclusion=cancelled commit=ed56ece71a4c",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31041222028 conclusion=failure commit=c24efe04b128"
   ],
-  "todo_count": 1,
+  "todo_count": 2,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
