@@ -5,12 +5,22 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "469f0beaf427d3bb9d1d87a10927c7a7744c4f6c",
+      "commit": "336a94ffba91cfb84a06d2b959f6e0d2d3bd96f5",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31012542784",
-      "run_id": 31012542784,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31019403314",
+      "run_id": 31019403314,
       "status": "completed",
-      "updated_at": "2026-08-05T14:00:38Z",
+      "updated_at": "2026-08-05T15:16:50Z",
+      "workflow": "System3 Workflow Failure Tracker"
+    },
+    {
+      "branch": "main",
+      "commit": "a9075de630136d4baff312ac6ae8aeb5fc5a3a39",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31018153692",
+      "run_id": 31018153692,
+      "status": "completed",
+      "updated_at": "2026-08-05T15:15:47Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -54,8 +64,8 @@
       "workflow": "System3 Market Session Proof Runner"
     }
   ],
-  "generated_utc": "2026-08-05T14:48:24.740469Z",
-  "github_failed_count": 5,
+  "generated_utc": "2026-08-05T15:44:42.231179Z",
+  "github_failed_count": 6,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
@@ -75,13 +85,14 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31012542784 conclusion=failure commit=469f0beaf427",
+    "Fix latest GitHub workflow 'System3 Workflow Failure Tracker' run=31019403314 conclusion=failure commit=336a94ffba91",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31018153692 conclusion=failure commit=a9075de63013",
     "Fix latest GitHub workflow 'System3 Full Auto Truth' run=31000971397 conclusion=failure commit=6e7761b28bab",
     "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31001493053 conclusion=failure commit=6e7761b28bab",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31000772263 conclusion=failure commit=168ccf9d8045",
     "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30999357152 conclusion=failure commit=eef21896bf35"
   ],
-  "todo_count": 5,
+  "todo_count": 6,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
