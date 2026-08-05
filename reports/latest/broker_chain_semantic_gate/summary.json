@@ -1,96 +1,83 @@
 {
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
-    "connected": false,
-    "http": 0,
-    "reason": "TIMEOUTERROR"
+    "connected": true,
+    "http": 200,
+    "reason": "CONNECTED"
   },
-  "final_verdict": "BLOCKED_NOT_TRADE_READY",
+  "final_verdict": "PASS",
   "funds": {
-    "http": 0,
-    "reason": "TIMEOUTERROR",
-    "semantic_ok": false
+    "http": 200,
+    "reason": null,
+    "semantic_ok": true
   },
-  "generated_utc": "2026-08-05T09:37:49.423619Z",
+  "generated_utc": "2026-08-05T10:32:48.999319Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
-  "readiness_blockers": [
-    "BROKER:TIMEOUTERROR",
-    "FUNDS:TIMEOUTERROR",
-    "CHAIN:NIFTY:TIMEOUTERROR",
-    "CHAIN:BANKNIFTY:TIMEOUTERROR",
-    "CHAIN:FINNIFTY:TIMEOUTERROR",
-    "CHAIN:MIDCPNIFTY:TIMEOUTERROR"
-  ],
-  "required_chain_ready_count": 0,
+  "readiness_blockers": [],
+  "required_chain_ready_count": 4,
   "required_chain_total": 4,
   "required_chains": [
     {
-      "contracts": 0,
-      "error": "TIMEOUTERROR",
-      "http": 0,
-      "priority": null,
-      "ready": false,
-      "reason": "TIMEOUTERROR",
-      "source": null,
-      "spot_present": false,
+      "contracts": 160,
+      "error": null,
+      "http": 200,
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
+      "source": "dhan",
+      "spot_present": true,
       "stale": false,
-      "status": null,
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "NIFTY",
-      "transport_ok": false
+      "transport_ok": true
     },
     {
-      "contracts": 0,
-      "error": "TIMEOUTERROR",
-      "http": 0,
-      "priority": null,
-      "ready": false,
-      "reason": "TIMEOUTERROR",
-      "source": null,
-      "spot_present": false,
+      "contracts": 160,
+      "error": null,
+      "http": 200,
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
+      "source": "dhan",
+      "spot_present": true,
       "stale": false,
-      "status": null,
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "BANKNIFTY",
-      "transport_ok": false
+      "transport_ok": true
     },
     {
-      "contracts": 0,
-      "error": "TIMEOUTERROR",
-      "http": 0,
-      "priority": null,
-      "ready": false,
-      "reason": "TIMEOUTERROR",
-      "source": null,
-      "spot_present": false,
+      "contracts": 160,
+      "error": null,
+      "http": 200,
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
+      "source": "dhan",
+      "spot_present": true,
       "stale": false,
-      "status": null,
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "FINNIFTY",
-      "transport_ok": false
+      "transport_ok": true
     },
     {
-      "contracts": 0,
-      "error": "TIMEOUTERROR",
-      "http": 0,
-      "priority": null,
-      "ready": false,
-      "reason": "TIMEOUTERROR",
-      "source": null,
-      "spot_present": false,
+      "contracts": 160,
+      "error": null,
+      "http": 200,
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
+      "source": "dhan",
+      "spot_present": true,
       "stale": false,
-      "status": null,
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "MIDCPNIFTY",
-      "transport_ok": false
+      "transport_ok": true
     }
   ],
   "secrets_written": false,
   "system3_live_trading_allowed": false,
-  "transport_failures": [
-    "BROKER_STATUS_HTTP_0",
-    "CHAIN_NIFTY_HTTP_0",
-    "CHAIN_BANKNIFTY_HTTP_0",
-    "CHAIN_FINNIFTY_HTTP_0",
-    "CHAIN_MIDCPNIFTY_HTTP_0"
-  ]
+  "transport_failures": []
 }

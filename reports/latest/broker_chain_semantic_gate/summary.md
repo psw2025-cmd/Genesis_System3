@@ -1,25 +1,20 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-08-05T09:37:49.423619Z`
-- Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (TIMEOUTERROR)
-- Funds semantic proof: `False`
-- Mandatory chains ready: `0/4`
+- Generated UTC: `2026-08-05T10:32:48.999319Z`
+- Final verdict: **PASS**
+- Broker connected: `True` (CONNECTED)
+- Funds semantic proof: `True`
+- Mandatory chains ready: `4/4`
 - Analyzer mode: `ON`
 - Live trading: `OFF`
 - Order endpoints called: `false`
 - Secrets written: `false`
 
 ## Mandatory chains
-- NIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- BANKNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- FINNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
-- MIDCPNIFTY: BLOCKED http=0 source=None status=None contracts=0 stale=False
+- NIFTY: PASS http=200 source=dhan status=MARKET_CLOSED_DHAN_SNAPSHOT contracts=160 stale=False
+- BANKNIFTY: PASS http=200 source=dhan status=MARKET_CLOSED_DHAN_SNAPSHOT contracts=160 stale=False
+- FINNIFTY: PASS http=200 source=dhan status=MARKET_CLOSED_DHAN_SNAPSHOT contracts=160 stale=False
+- MIDCPNIFTY: PASS http=200 source=dhan status=MARKET_CLOSED_DHAN_SNAPSHOT contracts=160 stale=False
 
 ## Blockers
-- BROKER:TIMEOUTERROR
-- FUNDS:TIMEOUTERROR
-- CHAIN:NIFTY:TIMEOUTERROR
-- CHAIN:BANKNIFTY:TIMEOUTERROR
-- CHAIN:FINNIFTY:TIMEOUTERROR
-- CHAIN:MIDCPNIFTY:TIMEOUTERROR
+- none
