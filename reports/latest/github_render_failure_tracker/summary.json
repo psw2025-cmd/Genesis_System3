@@ -5,33 +5,43 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "abb67e4660ad6a1b0af8e636768b2d64a08d39ad",
+      "commit": "9394792e893c874801eafca3c30bb192793ed92e",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30981649158",
-      "run_id": 30981649158,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30984828519",
+      "run_id": 30984828519,
       "status": "completed",
-      "updated_at": "2026-08-05T06:33:54Z",
+      "updated_at": "2026-08-05T07:36:05Z",
+      "workflow": "System3 Latest Truth Publish"
+    },
+    {
+      "branch": "main",
+      "commit": "9394792e893c874801eafca3c30bb192793ed92e",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30985502041",
+      "run_id": 30985502041,
+      "status": "completed",
+      "updated_at": "2026-08-05T07:34:19Z",
       "workflow": "System3 Broker Chain Semantic Gate"
     },
     {
       "branch": "main",
-      "commit": "bb8e6733b2a56666efe9795748cc81b2f2ec562f",
+      "commit": "8262ef37f0c907c42092003ab063612c4660bfc6",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30978378566",
-      "run_id": 30978378566,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30983968945",
+      "run_id": 30983968945,
       "status": "completed",
-      "updated_at": "2026-08-05T05:56:23Z",
-      "workflow": "System3 Full Auto Truth"
+      "updated_at": "2026-08-05T07:20:47Z",
+      "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
-      "commit": "7a037cdf3917f88094f8a5bb4746e73da5fcf85e",
+      "commit": "8262ef37f0c907c42092003ab063612c4660bfc6",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30977879324",
-      "run_id": 30977879324,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30983489689",
+      "run_id": 30983489689,
       "status": "completed",
-      "updated_at": "2026-08-05T05:37:30Z",
-      "workflow": "Dashboard Visual Production Proof"
+      "updated_at": "2026-08-05T07:07:55Z",
+      "workflow": "System3 Full Auto Truth"
     },
     {
       "branch": "main",
@@ -54,80 +64,21 @@
       "workflow": "System3 Windows Self-Hosted Workflow Migration"
     }
   ],
-  "generated_utc": "2026-08-05T06:58:50.135781Z",
-  "github_failed_count": 5,
-  "github_pending_count": 1,
+  "generated_utc": "2026-08-05T07:54:19.713848Z",
+  "github_failed_count": 6,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [
-    {
-      "branch": "main",
-      "commit": "c9653f2e86bdb78d16aacf0e0b83733b4c4a24a9",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30983156657",
-      "run_id": 30983156657,
-      "status": "in_progress",
-      "updated_at": "2026-08-05T06:57:23Z",
-      "workflow": "Dashboard Live UI Proof"
-    }
-  ],
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
-  "render_failed_count": 6,
+  "render_failed_count": 1,
   "render_failures": [
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/deploy/info",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/funds",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/holdings",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/holdings"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/positions/live",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/positions/live"
-    },
     {
       "classification": {
         "mentions_auth_error": false,
@@ -139,18 +90,6 @@
       "reason": "HTTP status 0",
       "status_code": 0,
       "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/paper",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper"
     }
   ],
   "report_only_no_self_failure_storm": true,
@@ -159,19 +98,15 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30981649158 conclusion=failure commit=abb67e4660ad",
-    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30978378566 conclusion=failure commit=bb8e6733b2a5",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30977879324 conclusion=failure commit=7a037cdf3917",
+    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30984828519 conclusion=failure commit=9394792e893c",
+    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30985502041 conclusion=failure commit=9394792e893c",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30983968945 conclusion=failure commit=8262ef37f0c9",
+    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30983489689 conclusion=failure commit=8262ef37f0c9",
     "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30977802143 conclusion=failure commit=7a037cdf3917",
     "Fix latest GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30975436979 conclusion=failure commit=8e8d5146dbcb",
-    "Fix Render endpoint /api/deploy/info: HTTP status 0 status=0",
-    "Fix Render endpoint /api/broker/funds: HTTP status 0 status=0",
-    "Fix Render endpoint /api/broker/holdings: HTTP status 0 status=0",
-    "Fix Render endpoint /api/broker/positions/live: HTTP status 0 status=0",
-    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0",
-    "Fix Render endpoint /api/paper: HTTP status 0 status=0"
+    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0"
   ],
-  "todo_count": 11,
+  "todo_count": 7,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
