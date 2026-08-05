@@ -5,22 +5,22 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "336a94ffba91cfb84a06d2b959f6e0d2d3bd96f5",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31019403314",
-      "run_id": 31019403314,
+      "commit": "6d8b68a9d4d42c106343d3d6bdf0bb0af90b0764",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31022836607",
+      "run_id": 31022836607,
       "status": "completed",
-      "updated_at": "2026-08-05T15:16:50Z",
-      "workflow": "System3 Workflow Failure Tracker"
+      "updated_at": "2026-08-05T16:04:45Z",
+      "workflow": "Dashboard Deploy Provenance Gate"
     },
     {
       "branch": "main",
-      "commit": "a9075de630136d4baff312ac6ae8aeb5fc5a3a39",
+      "commit": "6d8b68a9d4d42c106343d3d6bdf0bb0af90b0764",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31018153692",
-      "run_id": 31018153692,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31022747331",
+      "run_id": 31022747331,
       "status": "completed",
-      "updated_at": "2026-08-05T15:15:47Z",
+      "updated_at": "2026-08-05T16:00:51Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -64,7 +64,7 @@
       "workflow": "System3 Market Session Proof Runner"
     }
   ],
-  "generated_utc": "2026-08-05T15:44:42.231179Z",
+  "generated_utc": "2026-08-05T16:33:32.284338Z",
   "github_failed_count": 6,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -85,8 +85,8 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'System3 Workflow Failure Tracker' run=31019403314 conclusion=failure commit=336a94ffba91",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31018153692 conclusion=failure commit=a9075de63013",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=31022836607 conclusion=cancelled commit=6d8b68a9d4d4",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31022747331 conclusion=failure commit=6d8b68a9d4d4",
     "Fix latest GitHub workflow 'System3 Full Auto Truth' run=31000971397 conclusion=failure commit=6e7761b28bab",
     "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31001493053 conclusion=failure commit=6e7761b28bab",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31000772263 conclusion=failure commit=168ccf9d8045",
