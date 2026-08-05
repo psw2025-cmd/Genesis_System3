@@ -5,47 +5,17 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "7dba9140efab05366f269dbdeb4b79ad6a824a76",
+      "commit": "3bb44aba3c8f53235114e8d2cae8bab5c56b410a",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31031890468",
-      "run_id": 31031890468,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31036413466",
+      "run_id": 31036413466,
       "status": "completed",
-      "updated_at": "2026-08-05T17:55:55Z",
+      "updated_at": "2026-08-05T18:54:19Z",
       "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "6e7761b28bab1a798743038291fae59abd44bf37",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31000971397",
-      "run_id": 31000971397,
-      "status": "completed",
-      "updated_at": "2026-08-05T11:28:16Z",
-      "workflow": "System3 Full Auto Truth"
-    },
-    {
-      "branch": "main",
-      "commit": "6e7761b28bab1a798743038291fae59abd44bf37",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31001493053",
-      "run_id": 31001493053,
-      "status": "completed",
-      "updated_at": "2026-08-05T11:27:41Z",
-      "workflow": "System3 Broker Chain Semantic Gate"
-    },
-    {
-      "branch": "main",
-      "commit": "168ccf9d8045d7c9f48a7992f729b7afda4ead4d",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31000772263",
-      "run_id": 31000772263,
-      "status": "completed",
-      "updated_at": "2026-08-05T11:22:11Z",
-      "workflow": "System3 Latest Truth Publish"
     }
   ],
-  "generated_utc": "2026-08-05T18:33:30.309601Z",
-  "github_failed_count": 4,
+  "generated_utc": "2026-08-05T19:31:14.499124Z",
+  "github_failed_count": 1,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
@@ -65,12 +35,9 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31031890468 conclusion=failure commit=7dba9140efab",
-    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=31000971397 conclusion=failure commit=6e7761b28bab",
-    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31001493053 conclusion=failure commit=6e7761b28bab",
-    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31000772263 conclusion=failure commit=168ccf9d8045"
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31036413466 conclusion=failure commit=3bb44aba3c8f"
   ],
-  "todo_count": 4,
+  "todo_count": 1,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
