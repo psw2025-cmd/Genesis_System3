@@ -1,9 +1,9 @@
 # Broker and Chain Semantic Gate
 
-- Generated UTC: `2026-08-05T07:34:15.119928Z`
-- Final verdict: **BLOCKED_NOT_TRADE_READY**
-- Broker connected: `False` (TOKEN_EXPIRED_OR_INVALID)
-- Funds semantic proof: `False`
+- Generated UTC: `2026-08-05T08:34:30.381622Z`
+- Final verdict: **PASS**
+- Broker connected: `True` (CONNECTED)
+- Funds semantic proof: `True`
 - Mandatory chains ready: `4/4`
 - Analyzer mode: `ON`
 - Live trading: `OFF`
@@ -17,5 +17,4 @@
 - MIDCPNIFTY: PASS http=200 source=dhan status=MARKET_OPEN contracts=160 stale=False
 
 ## Blockers
-- BROKER:TOKEN_EXPIRED_OR_INVALID
-- FUNDS:TOKEN_EXPIRED_OR_INVALID
+- none
