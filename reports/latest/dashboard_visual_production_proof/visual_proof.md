@@ -1,6 +1,6 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-08-05T12:57:31.421Z
+Generated: 2026-08-05T13:56:10.249Z
 Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
@@ -27,18 +27,18 @@ Screenshot gate: **True**
 - `visible_tracker_bad_tab_count`: `0`
 
 ## Screenshots
-- PASS `truth.png` size=`167312`
-- PASS `genesis.png` size=`255281`
-- PASS `e2e_proof.png` size=`163964`
-- PASS `overview.png` size=`124114`
-- PASS `chain.png` size=`201383`
-- PASS `signals.png` size=`157335`
-- PASS `paper.png` size=`162503`
-- PASS `positions.png` size=`81341`
-- PASS `broker.png` size=`114016`
-- PASS `performance.png` size=`124367`
-- PASS `ml.png` size=`134718`
-- PASS `gates.png` size=`118658`
+- PASS `truth.png` size=`167154`
+- PASS `genesis.png` size=`255255`
+- PASS `e2e_proof.png` size=`163912`
+- PASS `overview.png` size=`124108`
+- PASS `chain.png` size=`201283`
+- PASS `signals.png` size=`157045`
+- PASS `paper.png` size=`163132`
+- PASS `positions.png` size=`81445`
+- PASS `broker.png` size=`113904`
+- PASS `performance.png` size=`124255`
+- PASS `ml.png` size=`134624`
+- PASS `gates.png` size=`118870`
 - PASS `mobile_390x844.png` size=`75527`
 
 ## truth.png
