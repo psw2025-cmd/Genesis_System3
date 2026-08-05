@@ -5,21 +5,23 @@
   "failed_workflows": [
     {
       "branch": "main",
+      "commit": "e7af8bdab7192da3401783cddf90e82e91cbf670",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30976302634",
+      "run_id": 30976302634,
+      "status": "completed",
+      "updated_at": "2026-08-05T04:56:05Z",
+      "workflow": "System3 Market Session Proof Runner"
+    },
+    {
+      "branch": "main",
       "commit": "8e8d5146dbcbd3140c212023e2ad178cd880d1a2",
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30975436979",
       "run_id": 30975436979,
+      "status": "completed",
       "updated_at": "2026-08-05T04:33:21Z",
       "workflow": "System3 Windows Self-Hosted Workflow Migration"
-    },
-    {
-      "branch": "main",
-      "commit": "872ab7a222f03db005f27bc5ea338611935ab8e1",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30974642043",
-      "run_id": 30974642043,
-      "updated_at": "2026-08-05T04:17:13Z",
-      "workflow": "System3 Broker Chain Semantic Gate"
     },
     {
       "branch": "main",
@@ -27,8 +29,19 @@
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30974115094",
       "run_id": 30974115094,
+      "status": "completed",
       "updated_at": "2026-08-05T04:24:49Z",
       "workflow": "System3 Full Auto Truth"
+    },
+    {
+      "branch": "main",
+      "commit": "872ab7a222f03db005f27bc5ea338611935ab8e1",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30974642043",
+      "run_id": 30974642043,
+      "status": "completed",
+      "updated_at": "2026-08-05T04:17:13Z",
+      "workflow": "System3 Broker Chain Semantic Gate"
     },
     {
       "branch": "main",
@@ -36,17 +49,9 @@
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30973994003",
       "run_id": 30973994003,
+      "status": "completed",
       "updated_at": "2026-08-05T04:11:31Z",
       "workflow": "Dashboard Live UI Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "91eadda9480ac32954d55195ed69ac512e2a8b8b",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30972333072",
-      "run_id": 30972333072,
-      "updated_at": "2026-08-05T03:28:22Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
     },
     {
       "branch": "main",
@@ -54,64 +59,35 @@
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30972069843",
       "run_id": 30972069843,
+      "status": "completed",
       "updated_at": "2026-08-05T03:27:59Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
-      "branch": "main",
-      "commit": "17286eb9475bc44e065731f9fb88008e492a7d50",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30968082251",
-      "run_id": 30968082251,
-      "updated_at": "2026-08-05T02:00:58Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "f852e099bfeed70f7a64882553c1c62e847687c3",
+      "branch": "copilot/research-frozen-backtest-issues",
+      "commit": "1e22833f14b3a05b418d64bdb5005f690de45a45",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30967807320",
-      "run_id": 30967807320,
-      "updated_at": "2026-08-05T02:00:35Z",
-      "workflow": "Dashboard Visual Production Proof"
-    },
-    {
-      "branch": "main",
-      "commit": "d5f35234956a371cf8f1f9fdc25a5141850b3ff5",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30966772969",
-      "run_id": 30966772969,
-      "updated_at": "2026-08-05T01:34:44Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "e630506395255c0f5fec545e0e1899f540661d41",
-      "conclusion": "cancelled",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30964756403",
-      "run_id": 30964756403,
-      "updated_at": "2026-08-05T00:54:22Z",
-      "workflow": "System3 1000 Point TODO Status Updater"
-    },
-    {
-      "branch": "main",
-      "commit": "bc792246d19b95c67bc903a6d096d49174d7eeba",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30964472270",
-      "run_id": 30964472270,
-      "updated_at": "2026-08-05T00:54:03Z",
-      "workflow": "Dashboard Visual Production Proof"
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30953443498",
+      "run_id": 30953443498,
+      "status": "completed",
+      "updated_at": "2026-08-04T21:42:09Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-05T04:56:01.798681Z",
-  "github_failed_count": 11,
+  "generated_utc": "2026-08-05T05:08:05.045568Z",
+  "github_failed_count": 7,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
+  "historical_duplicate_failures_removed": true,
+  "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
+  "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
-  "render_base": "http://127.0.0.1:8000",
-  "render_endpoint_timeout_s": 12.0,
-  "render_failed_count": 12,
+  "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "render_endpoint_timeout_s": 30.0,
+  "render_failed_count": 6,
   "render_failures": [
     {
       "classification": {
@@ -119,83 +95,11 @@
         "mentions_commit_or_sha": false,
         "mentions_server_error": false
       },
-      "endpoint": "/",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/ui/",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/ui/"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/health",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/health"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/state",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/state"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/deploy/info",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/deploy/info"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/diagnose",
-      "error_type": "URLError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/broker/diagnose"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
       "endpoint": "/api/broker/funds",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/broker/funds"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds"
     },
     {
       "classification": {
@@ -204,10 +108,10 @@
         "mentions_server_error": false
       },
       "endpoint": "/api/broker/holdings",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/broker/holdings"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/holdings"
     },
     {
       "classification": {
@@ -216,10 +120,10 @@
         "mentions_server_error": false
       },
       "endpoint": "/api/broker/positions/live",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/broker/positions/live"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/positions/live"
     },
     {
       "classification": {
@@ -228,10 +132,10 @@
         "mentions_server_error": false
       },
       "endpoint": "/api/scanner/top_contract_gainers",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/scanner/top_contract_gainers"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers"
     },
     {
       "classification": {
@@ -240,10 +144,10 @@
         "mentions_server_error": false
       },
       "endpoint": "/api/paper",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/paper"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper"
     },
     {
       "classification": {
@@ -252,10 +156,10 @@
         "mentions_server_error": false
       },
       "endpoint": "/api/ml/performance",
-      "error_type": "URLError",
+      "error_type": "TimeoutError",
       "reason": "HTTP status 0",
       "status_code": 0,
-      "url": "http://127.0.0.1:8000/api/ml/performance"
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/ml/performance"
     }
   ],
   "report_only_no_self_failure_storm": true,
@@ -264,23 +168,13 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30975436979 conclusion=failure commit=8e8d5146dbcb",
-    "Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30974642043 conclusion=failure commit=872ab7a222f0",
-    "Fix GitHub workflow 'System3 Full Auto Truth' run=30974115094 conclusion=failure commit=49bae332ff50",
-    "Fix GitHub workflow 'Dashboard Live UI Proof' run=30973994003 conclusion=failure commit=49bae332ff50",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30972333072 conclusion=cancelled commit=91eadda9480a",
-    "Fix GitHub workflow 'Dashboard Visual Production Proof' run=30972069843 conclusion=failure commit=5c3e20aec98d",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30968082251 conclusion=cancelled commit=17286eb9475b",
-    "Fix GitHub workflow 'Dashboard Visual Production Proof' run=30967807320 conclusion=failure commit=f852e099bfee",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30966772969 conclusion=cancelled commit=d5f35234956a",
-    "Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30964756403 conclusion=cancelled commit=e63050639525",
-    "Fix GitHub workflow 'Dashboard Visual Production Proof' run=30964472270 conclusion=failure commit=bc792246d19b",
-    "Fix Render endpoint /: HTTP status 0 status=0",
-    "Fix Render endpoint /ui/: HTTP status 0 status=0",
-    "Fix Render endpoint /api/health: HTTP status 0 status=0",
-    "Fix Render endpoint /api/state: HTTP status 0 status=0",
-    "Fix Render endpoint /api/deploy/info: HTTP status 0 status=0",
-    "Fix Render endpoint /api/broker/diagnose: HTTP status 0 status=0",
+    "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30976302634 conclusion=failure commit=e7af8bdab719",
+    "Fix latest GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30975436979 conclusion=failure commit=8e8d5146dbcb",
+    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=30974115094 conclusion=failure commit=49bae332ff50",
+    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=30974642043 conclusion=failure commit=872ab7a222f0",
+    "Fix latest GitHub workflow 'Dashboard Live UI Proof' run=30973994003 conclusion=failure commit=49bae332ff50",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30972069843 conclusion=failure commit=5c3e20aec98d",
+    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30953443498 conclusion=failure commit=1e22833f14b3",
     "Fix Render endpoint /api/broker/funds: HTTP status 0 status=0",
     "Fix Render endpoint /api/broker/holdings: HTTP status 0 status=0",
     "Fix Render endpoint /api/broker/positions/live: HTTP status 0 status=0",
@@ -288,6 +182,7 @@
     "Fix Render endpoint /api/paper: HTTP status 0 status=0",
     "Fix Render endpoint /api/ml/performance: HTTP status 0 status=0"
   ],
-  "todo_count": 23,
-  "tracker_internal_status": "PASS"
+  "todo_count": 13,
+  "tracker_internal_status": "PASS",
+  "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
