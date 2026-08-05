@@ -5,36 +5,25 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "2c1c1eb9f8eebb2429c7a0c40ab616a37dc40dee",
+      "commit": "4bf41896992ad904cb3b7f3498adcf368f2a0c8c",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31045269537",
-      "run_id": 31045269537,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31049659608",
+      "run_id": 31049659608,
       "status": "completed",
-      "updated_at": "2026-08-05T20:53:27Z",
+      "updated_at": "2026-08-05T21:46:14Z",
       "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-05T21:26:41.448392Z",
+  "generated_utc": "2026-08-05T22:24:28.572091Z",
   "github_failed_count": 1,
-  "github_pending_count": 1,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [
-    {
-      "branch": "main",
-      "commit": "fe47a26636e983db440d3510ed725ccfacb64897",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31048646185",
-      "run_id": 31048646185,
-      "status": "queued",
-      "updated_at": "2026-08-05T21:26:34Z",
-      "workflow": "System3 Workflow Failure Tracker"
-    }
-  ],
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
@@ -46,7 +35,7 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31045269537 conclusion=failure commit=2c1c1eb9f8ee"
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31049659608 conclusion=failure commit=4bf41896992a"
   ],
   "todo_count": 1,
   "tracker_internal_status": "PASS",
