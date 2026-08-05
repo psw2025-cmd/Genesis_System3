@@ -2,32 +2,32 @@
 
 ## screenshots/truth.png
 
-MISSING
+![screenshots/truth.png](screenshots/truth.png)
 
 ## screenshots/signals.png
 
-MISSING
+![screenshots/signals.png](screenshots/signals.png)
 
 ## screenshots/paper.png
 
-MISSING
+![screenshots/paper.png](screenshots/paper.png)
 
 ## screenshots/broker.png
 
-MISSING
+![screenshots/broker.png](screenshots/broker.png)
 
 ## screenshots/ml.png
 
-MISSING
+![screenshots/ml.png](screenshots/ml.png)
 
 ## screenshots/gates.png
 
-MISSING
+![screenshots/gates.png](screenshots/gates.png)
 
 ## screenshots/overview.png
 
-MISSING
+![screenshots/overview.png](screenshots/overview.png)
 
 ## screenshots/mobile_390x844.png
 
-MISSING
+![screenshots/mobile_390x844.png](screenshots/mobile_390x844.png)

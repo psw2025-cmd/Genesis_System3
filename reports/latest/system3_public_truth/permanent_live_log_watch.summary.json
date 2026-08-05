@@ -5,19 +5,31 @@
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED"
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/BANKNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/FINNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/MIDCPNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings:net::ERR_ABORTED"
   ],
   "chain_truth": [],
   "final_verdict": "FAIL",
-  "generated_at": "2026-08-04T04:09:32.398Z",
+  "generated_at": "2026-08-05T04:05:33.026Z",
   "infra_blockers": [
     "TOP_LEVEL_EXCEPTION:TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/\", waiting until \"networkidle\"\n",
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
     "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-    "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED"
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/BANKNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/FINNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/MIDCPNIFTY:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+    "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings:net::ERR_ABORTED"
   ],
   "trade_readiness_blockers": []
 }

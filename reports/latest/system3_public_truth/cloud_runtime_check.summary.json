@@ -1,61 +1,71 @@
 {
   "alerts": [],
-  "deployed_commit": "",
-  "expected_commit": "f4ff64368d0f5e6247022844533b0e41a7544633",
-  "generated_utc": "2026-08-04T04:02:20.514691Z",
+  "deployed_commit": "[REDACTED]",
+  "expected_commit": "49bae332ff5072aa50b0c38f307b1306834e233a",
+  "generated_utc": "2026-08-05T04:01:28.702676Z",
   "key_facts": {
     "broker_connected": false,
     "chain_nifty_contracts": 0,
-    "portfolio_details_mode": "skipped_for_render_memory",
+    "portfolio_details_mode": null,
     "scheduler_healthy": false,
     "scheduler_received": false
   },
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 98.3,
+      "pct_used": 291.4,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": 8.0,
+        "headroom_mb": -918.8,
         "limit_mb": 480,
-        "pct_used": 98.3,
-        "rss_mb": 472.0,
+        "pct_used": 291.4,
+        "rss_mb": 1398.8,
         "status": "HIGH"
       },
-      "rss_mb": 472.0,
+      "rss_mb": 1398.8,
       "status": "HIGH"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 98.3,
+      "pct_used": 291.4,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": 8.0,
+        "headroom_mb": -918.8,
         "limit_mb": 480,
-        "pct_used": 98.3,
-        "rss_mb": 472.0,
+        "pct_used": 291.4,
+        "rss_mb": 1398.8,
         "status": "HIGH"
       },
-      "rss_mb": 472.0,
+      "rss_mb": 1398.8,
       "status": "HIGH"
     },
     "before": {
       "available": true,
-      "pct_used": 98.3,
+      "pct_used": 291.4,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": 8.0,
+        "headroom_mb": -918.8,
         "limit_mb": 480,
-        "pct_used": 98.3,
-        "rss_mb": 472.0,
+        "pct_used": 291.4,
+        "rss_mb": 1398.8,
         "status": "HIGH"
       },
-      "rss_mb": 472.0,
+      "rss_mb": 1398.8,
       "status": "HIGH"
     }
   },
   "verdict": "WARN",
   "warnings": [
+    {
+      "key": "endpoint_portfolio_unified",
+      "level": "WARNING",
+      "message": "portfolio_unified failed: 500 HTTPError: 500 attempts=1"
+    },
+    {
+      "key": "deploy_commit_mismatch",
+      "level": "WARNING",
+      "message": "Render git_sha=[REDACTED] expected=49bae332ff50"
+    },
     {
       "key": "broker_not_connected",
       "level": "WARNING",
@@ -74,17 +84,17 @@
     {
       "key": "memory_before",
       "level": "WARNING",
-      "message": "RSS high: 472.0MB"
+      "message": "RSS high: 1398.8MB"
     },
     {
       "key": "memory_after_portfolio",
       "level": "WARNING",
-      "message": "RSS high: 472.0MB"
+      "message": "RSS high: 1398.8MB"
     },
     {
       "key": "memory_after_chain",
       "level": "WARNING",
-      "message": "RSS high: 472.0MB"
+      "message": "RSS high: 1398.8MB"
     }
   ]
 }
