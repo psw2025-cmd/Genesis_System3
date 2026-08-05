@@ -131,8 +131,8 @@
   "blockers": [
     "UI_FAIL:Paper Trades",
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
     "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
     "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
   ],
@@ -151,17 +151,17 @@
       "total_contracts": 0
     },
     {
-      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "blocker": null,
       "endpoint": "/api/chain/BANKNIFTY",
-      "ok": false,
+      "ok": true,
       "optional": false,
-      "safe_blocked": true,
+      "safe_blocked": false,
       "source": "dhan",
-      "source_priority": "dhan_only_no_rows",
-      "spot": 0,
+      "source_priority": "dhan_p0_live",
+      "spot": 57641.6,
       "stale": false,
-      "status": "NO_DHAN_DATA",
-      "total_contracts": 0
+      "status": "MARKET_OPEN",
+      "total_contracts": 160
     },
     {
       "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -177,17 +177,17 @@
       "total_contracts": 0
     },
     {
-      "blocker": null,
+      "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
       "endpoint": "/api/chain/MIDCPNIFTY",
-      "ok": true,
+      "ok": false,
       "optional": false,
-      "safe_blocked": false,
+      "safe_blocked": true,
       "source": "dhan",
-      "source_priority": "dhan_p0_live",
-      "spot": 14902.75,
+      "source_priority": "dhan_only_no_rows",
+      "spot": 0,
       "stale": false,
-      "status": "MARKET_OPEN",
-      "total_contracts": 160
+      "status": "NO_DHAN_DATA",
+      "total_contracts": 0
     },
     {
       "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -204,14 +204,14 @@
     }
   ],
   "final_verdict": "FAIL",
-  "generated_at": "2026-08-05T04:03:01.861Z",
+  "generated_at": "2026-08-05T06:25:23.449Z",
   "infra_blockers": [
     "UI_FAIL:Paper Trades"
   ],
   "trade_readiness_blockers": [
     "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
   ],
   "ui": [
     {

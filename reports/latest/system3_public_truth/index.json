@@ -1,7 +1,7 @@
 {
-  "commit": "49bae332ff5072aa50b0c38f307b1306834e233a",
+  "commit": "abb67e4660ad6a1b0af8e636768b2d64a08d39ad",
   "final_verdict": "FAIL",
-  "generated_utc": "2026-08-05T04:07:07.967249Z",
+  "generated_utc": "2026-08-05T06:33:01.203935Z",
   "how_to_read": "Fetch reports/latest/system3_public_truth/index.json or index.md from the repo.",
   "how_to_trigger": "Update .github/triggers/system3_truth_trigger.txt or run workflow_dispatch.",
   "safety": {
@@ -17,11 +17,11 @@
       "summary_json": {
         "alerts": [],
         "deployed_commit": "[REDACTED]",
-        "expected_commit": "49bae332ff5072aa50b0c38f307b1306834e233a",
-        "generated_utc": "2026-08-05T04:01:28.702676Z",
+        "expected_commit": "abb67e4660ad6a1b0af8e636768b2d64a08d39ad",
+        "generated_utc": "2026-08-05T06:24:05.655413Z",
         "key_facts": {
           "broker_connected": false,
-          "chain_nifty_contracts": 0,
+          "chain_nifty_contracts": 160,
           "portfolio_details_mode": null,
           "scheduler_healthy": false,
           "scheduler_received": false
@@ -29,44 +29,44 @@
         "memory": {
           "after_chain": {
             "available": true,
-            "pct_used": 291.4,
+            "pct_used": 293.6,
             "raw": {
               "gc_triggered": true,
-              "headroom_mb": -918.8,
+              "headroom_mb": -929.5,
               "limit_mb": 480,
-              "pct_used": 291.4,
-              "rss_mb": 1398.8,
+              "pct_used": 293.6,
+              "rss_mb": 1409.5,
               "status": "HIGH"
             },
-            "rss_mb": 1398.8,
+            "rss_mb": 1409.5,
             "status": "HIGH"
           },
           "after_portfolio": {
             "available": true,
-            "pct_used": 291.4,
+            "pct_used": 293.6,
             "raw": {
               "gc_triggered": true,
-              "headroom_mb": -918.8,
+              "headroom_mb": -929.5,
               "limit_mb": 480,
-              "pct_used": 291.4,
-              "rss_mb": 1398.8,
+              "pct_used": 293.6,
+              "rss_mb": 1409.5,
               "status": "HIGH"
             },
-            "rss_mb": 1398.8,
+            "rss_mb": 1409.5,
             "status": "HIGH"
           },
           "before": {
             "available": true,
-            "pct_used": 291.4,
+            "pct_used": 293.6,
             "raw": {
               "gc_triggered": true,
-              "headroom_mb": -918.8,
+              "headroom_mb": -929.5,
               "limit_mb": 480,
-              "pct_used": 291.4,
-              "rss_mb": 1398.8,
+              "pct_used": 293.6,
+              "rss_mb": 1409.5,
               "status": "HIGH"
             },
-            "rss_mb": 1398.8,
+            "rss_mb": 1409.5,
             "status": "HIGH"
           }
         },
@@ -80,7 +80,7 @@
           {
             "key": "deploy_commit_mismatch",
             "level": "WARNING",
-            "message": "Render git_sha=[REDACTED] expected=49bae332ff50"
+            "message": "Render git_sha=[REDACTED] expected=abb67e4660ad"
           },
           {
             "key": "broker_not_connected",
@@ -93,24 +93,19 @@
             "message": "worker scheduler health has not been received"
           },
           {
-            "key": "chain_nifty_empty",
-            "level": "WARNING",
-            "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
-          },
-          {
             "key": "memory_before",
             "level": "WARNING",
-            "message": "RSS high: 1398.8MB"
+            "message": "RSS high: 1409.5MB"
           },
           {
             "key": "memory_after_portfolio",
             "level": "WARNING",
-            "message": "RSS high: 1398.8MB"
+            "message": "RSS high: 1409.5MB"
           },
           {
             "key": "memory_after_chain",
             "level": "WARNING",
-            "message": "RSS high: 1398.8MB"
+            "message": "RSS high: 1409.5MB"
           }
         ]
       },
@@ -252,8 +247,8 @@
         "blockers": [
           "UI_FAIL:Paper Trades",
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
           "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
           "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
           "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
         ],
@@ -272,17 +267,17 @@
             "total_contracts": 0
           },
           {
-            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+            "blocker": null,
             "endpoint": "/api/chain/BANKNIFTY",
-            "ok": false,
+            "ok": true,
             "optional": false,
-            "safe_blocked": true,
+            "safe_blocked": false,
             "source": "dhan",
-            "source_priority": "dhan_only_no_rows",
-            "spot": 0,
+            "source_priority": "dhan_p0_live",
+            "spot": 57641.6,
             "stale": false,
-            "status": "NO_DHAN_DATA",
-            "total_contracts": 0
+            "status": "MARKET_OPEN",
+            "total_contracts": 160
           },
           {
             "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -298,17 +293,17 @@
             "total_contracts": 0
           },
           {
-            "blocker": null,
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
             "endpoint": "/api/chain/MIDCPNIFTY",
-            "ok": true,
+            "ok": false,
             "optional": false,
-            "safe_blocked": false,
+            "safe_blocked": true,
             "source": "dhan",
-            "source_priority": "dhan_p0_live",
-            "spot": 14902.75,
+            "source_priority": "dhan_only_no_rows",
+            "spot": 0,
             "stale": false,
-            "status": "MARKET_OPEN",
-            "total_contracts": 160
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
           },
           {
             "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
@@ -325,14 +320,14 @@
           }
         ],
         "final_verdict": "FAIL",
-        "generated_at": "2026-08-05T04:03:01.861Z",
+        "generated_at": "2026-08-05T06:25:23.449Z",
         "infra_blockers": [
           "UI_FAIL:Paper Trades"
         ],
         "trade_readiness_blockers": [
           "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+          "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
         ],
         "ui": [
           {
@@ -501,37 +496,151 @@
       "summary_json": {
         "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
         "blockers": [
-          "TOP_LEVEL_EXCEPTION:TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/\", waiting until \"networkidle\"\n",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains:net::ERR_ABORTED",
-          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/trades/today:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/dhan/status:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers?top_n=5:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/genesis-production-brief:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/autonomous-brain:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/hidden-secrets-lab:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/never-die-monitor:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/hunger-meter:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/data-truth-score:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/system_health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/final-message:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/holdings:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/positions/live:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/auto_gates:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/BANKNIFTY:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/FINNIFTY:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/MIDCPNIFTY:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/SENSEX:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/pnl:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/trades/today:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
-          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings:net::ERR_ABORTED"
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
         ],
-        "chain_truth": [],
+        "chain_truth": [
+          {
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+            "endpoint": "/api/chain/NIFTY",
+            "ok": false,
+            "optional": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
+            "source": "dhan",
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
+          },
+          {
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+            "endpoint": "/api/chain/BANKNIFTY",
+            "ok": false,
+            "optional": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
+            "source": "dhan",
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
+          },
+          {
+            "blocker": null,
+            "endpoint": "/api/chain/FINNIFTY",
+            "ok": true,
+            "optional": false,
+            "priority": "dhan_p0_live",
+            "safe_blocked": false,
+            "source": "dhan",
+            "spot": 26760.3,
+            "status": "MARKET_OPEN",
+            "total_contracts": 160
+          },
+          {
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+            "endpoint": "/api/chain/MIDCPNIFTY",
+            "ok": false,
+            "optional": false,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
+            "source": "dhan",
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
+          },
+          {
+            "blocker": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+            "endpoint": "/api/chain/SENSEX",
+            "ok": false,
+            "optional": true,
+            "priority": "dhan_only_no_rows",
+            "safe_blocked": true,
+            "source": "dhan",
+            "spot": 0,
+            "status": "NO_DHAN_DATA",
+            "total_contracts": 0
+          }
+        ],
         "final_verdict": "FAIL",
-        "generated_at": "2026-08-05T04:05:33.026Z",
+        "generated_at": "2026-08-05T06:28:06.935Z",
         "infra_blockers": [
-          "TOP_LEVEL_EXCEPTION:TimeoutError: page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/\", waiting until \"networkidle\"\n",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
-          "BROWSER_CONSOLE:error Failed to load resource: net::ERR_FAILED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains:net::ERR_ABORTED",
-          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/trades/today:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/dhan/status:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers?top_n=5:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/genesis-production-brief:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/autonomous-brain:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/hidden-secrets-lab:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/never-die-monitor:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/hunger-meter:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/data-truth-score:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/system_health:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/final-message:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/holdings:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/positions/live:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/auto_gates:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/BANKNIFTY:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/FINNIFTY:net::ERR_ABORTED",
           "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/MIDCPNIFTY:net::ERR_ABORTED",
-          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED",
-          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings:net::ERR_ABORTED"
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/SENSEX:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/pnl:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/trades/today:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper:net::ERR_ABORTED",
+          "REQUEST_FAILED:https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data:net::ERR_ABORTED"
         ],
-        "trade_readiness_blockers": []
+        "trade_readiness_blockers": [
+          "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+          "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+        ]
       },
       "summary_md": "permanent_live_log_watch.summary.md",
       "verdict": "FAIL"
@@ -541,42 +650,42 @@
     {
       "file": "screenshots/truth.png",
       "ok": true,
-      "size_bytes": 163164
+      "size_bytes": 162743
     },
     {
       "file": "screenshots/signals.png",
       "ok": true,
-      "size_bytes": 153384
+      "size_bytes": 154312
     },
     {
       "file": "screenshots/paper.png",
       "ok": true,
-      "size_bytes": 160468
+      "size_bytes": 159824
     },
     {
       "file": "screenshots/broker.png",
       "ok": true,
-      "size_bytes": 119590
+      "size_bytes": 118574
     },
     {
       "file": "screenshots/ml.png",
       "ok": true,
-      "size_bytes": 132168
+      "size_bytes": 131822
     },
     {
       "file": "screenshots/gates.png",
       "ok": true,
-      "size_bytes": 116571
+      "size_bytes": 115869
     },
     {
       "file": "screenshots/overview.png",
       "ok": true,
-      "size_bytes": 119460
+      "size_bytes": 128364
     },
     {
       "file": "screenshots/mobile_390x844.png",
       "ok": true,
-      "size_bytes": 79202
+      "size_bytes": 79254
     }
   ],
   "workflow": "System3 Latest Truth Publish"

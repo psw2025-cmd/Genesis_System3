@@ -1,11 +1,11 @@
 {
   "alerts": [],
   "deployed_commit": "[REDACTED]",
-  "expected_commit": "49bae332ff5072aa50b0c38f307b1306834e233a",
-  "generated_utc": "2026-08-05T04:01:28.702676Z",
+  "expected_commit": "abb67e4660ad6a1b0af8e636768b2d64a08d39ad",
+  "generated_utc": "2026-08-05T06:24:05.655413Z",
   "key_facts": {
     "broker_connected": false,
-    "chain_nifty_contracts": 0,
+    "chain_nifty_contracts": 160,
     "portfolio_details_mode": null,
     "scheduler_healthy": false,
     "scheduler_received": false
@@ -13,44 +13,44 @@
   "memory": {
     "after_chain": {
       "available": true,
-      "pct_used": 291.4,
+      "pct_used": 293.6,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": -918.8,
+        "headroom_mb": -929.5,
         "limit_mb": 480,
-        "pct_used": 291.4,
-        "rss_mb": 1398.8,
+        "pct_used": 293.6,
+        "rss_mb": 1409.5,
         "status": "HIGH"
       },
-      "rss_mb": 1398.8,
+      "rss_mb": 1409.5,
       "status": "HIGH"
     },
     "after_portfolio": {
       "available": true,
-      "pct_used": 291.4,
+      "pct_used": 293.6,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": -918.8,
+        "headroom_mb": -929.5,
         "limit_mb": 480,
-        "pct_used": 291.4,
-        "rss_mb": 1398.8,
+        "pct_used": 293.6,
+        "rss_mb": 1409.5,
         "status": "HIGH"
       },
-      "rss_mb": 1398.8,
+      "rss_mb": 1409.5,
       "status": "HIGH"
     },
     "before": {
       "available": true,
-      "pct_used": 291.4,
+      "pct_used": 293.6,
       "raw": {
         "gc_triggered": true,
-        "headroom_mb": -918.8,
+        "headroom_mb": -929.5,
         "limit_mb": 480,
-        "pct_used": 291.4,
-        "rss_mb": 1398.8,
+        "pct_used": 293.6,
+        "rss_mb": 1409.5,
         "status": "HIGH"
       },
-      "rss_mb": 1398.8,
+      "rss_mb": 1409.5,
       "status": "HIGH"
     }
   },
@@ -64,7 +64,7 @@
     {
       "key": "deploy_commit_mismatch",
       "level": "WARNING",
-      "message": "Render git_sha=[REDACTED] expected=49bae332ff50"
+      "message": "Render git_sha=[REDACTED] expected=abb67e4660ad"
     },
     {
       "key": "broker_not_connected",
@@ -77,24 +77,19 @@
       "message": "worker scheduler health has not been received"
     },
     {
-      "key": "chain_nifty_empty",
-      "level": "WARNING",
-      "message": "NIFTY chain empty/status=NO_DHAN_DATA source=dhan"
-    },
-    {
       "key": "memory_before",
       "level": "WARNING",
-      "message": "RSS high: 1398.8MB"
+      "message": "RSS high: 1409.5MB"
     },
     {
       "key": "memory_after_portfolio",
       "level": "WARNING",
-      "message": "RSS high: 1398.8MB"
+      "message": "RSS high: 1409.5MB"
     },
     {
       "key": "memory_after_chain",
       "level": "WARNING",
-      "message": "RSS high: 1398.8MB"
+      "message": "RSS high: 1409.5MB"
     }
   ]
 }

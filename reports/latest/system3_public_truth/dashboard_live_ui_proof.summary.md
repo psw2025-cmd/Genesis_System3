@@ -1,6 +1,6 @@
 # Dashboard Live UI Proof
 
-Generated: 2026-08-05T04:03:01.861Z
+Generated: 2026-08-05T06:25:23.449Z
 Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Required symbols: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY
 Optional symbols: SENSEX
@@ -22,9 +22,9 @@ Truth control visible: **true**
 
 ## Chain Truth
 - BLOCKED (required) /api/chain/NIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- BLOCKED (required) /api/chain/BANKNIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+- PASS (required) /api/chain/BANKNIFTY source=dhan priority=dhan_p0_live status=MARKET_OPEN spot=57641.6 contracts=160 blocker=-
 - BLOCKED (required) /api/chain/FINNIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- PASS (required) /api/chain/MIDCPNIFTY source=dhan priority=dhan_p0_live status=MARKET_OPEN spot=14902.75 contracts=160 blocker=-
+- BLOCKED (required) /api/chain/MIDCPNIFTY source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - BLOCKED (optional) /api/chain/SENSEX source=dhan priority=dhan_only_no_rows status=NO_DHAN_DATA spot=0 contracts=0 blocker=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 
 ## API
@@ -73,8 +73,8 @@ Truth control visible: **true**
 
 ## Trading Readiness Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
+- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
 
 ## Optional Data Blockers
 - CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS
@@ -82,7 +82,7 @@ Truth control visible: **true**
 ## Required Solutions
 - UI_FAIL:Paper Trades: Fix UI route, tab rendering, loading state, or browser exception; rerun visual proof.
 - CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
 - CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
+- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS: Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.
 - PAPER_TRUTH_NOT_VISIBLE:Paper Trades: Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.
 - PAPER_TRUTH_NOT_VISIBLE:GLOBAL: Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.
