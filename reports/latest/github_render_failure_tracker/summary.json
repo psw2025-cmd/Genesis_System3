@@ -5,12 +5,12 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "abad4bca4f15198eb54650c51e773003275ec61b",
+      "commit": "bc792246d19b95c67bc903a6d096d49174d7eeba",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30960520818",
-      "run_id": 30960520818,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30964472270",
+      "run_id": 30964472270,
       "status": "completed",
-      "updated_at": "2026-08-04T23:41:57Z",
+      "updated_at": "2026-08-05T00:54:03Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
@@ -52,30 +52,10 @@
       "status": "completed",
       "updated_at": "2026-08-04T20:51:02Z",
       "workflow": "Actions Truth Autopsy"
-    },
-    {
-      "branch": "main",
-      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947514689",
-      "run_id": 30947514689,
-      "status": "completed",
-      "updated_at": "2026-08-04T20:31:56Z",
-      "workflow": "System3 Latest Truth Publish"
-    },
-    {
-      "branch": "main",
-      "commit": "0afce386fe11056892c22fdb14336ab8d6c8eb9f",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30947515181",
-      "run_id": 30947515181,
-      "status": "completed",
-      "updated_at": "2026-08-04T20:24:17Z",
-      "workflow": "Dashboard Visible Proof Isolated"
     }
   ],
-  "generated_utc": "2026-08-05T00:30:45.092826Z",
-  "github_failed_count": 7,
+  "generated_utc": "2026-08-05T01:34:12.428620Z",
+  "github_failed_count": 5,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
@@ -95,15 +75,13 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30960520818 conclusion=failure commit=abad4bca4f15",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=30964472270 conclusion=failure commit=bc792246d19b",
     "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=30953443498 conclusion=failure commit=1e22833f14b3",
     "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30950537666 conclusion=action_required commit=1e7c03be4f6c",
     "Fix latest GitHub workflow 'GCP Stage 2 Safety Checks' run=30950536980 conclusion=action_required commit=1e7c03be4f6c",
-    "Fix latest GitHub workflow 'Actions Truth Autopsy' run=30949730459 conclusion=action_required commit=d5c5bd08e520",
-    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=30947514689 conclusion=failure commit=0afce386fe11",
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=30947515181 conclusion=failure commit=0afce386fe11"
+    "Fix latest GitHub workflow 'Actions Truth Autopsy' run=30949730459 conclusion=action_required commit=d5c5bd08e520"
   ],
-  "todo_count": 7,
+  "todo_count": 5,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
