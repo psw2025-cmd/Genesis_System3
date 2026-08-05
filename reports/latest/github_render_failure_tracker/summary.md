@@ -1,6 +1,6 @@
 # System3 GitHub + Render Failure TODO
 
-Generated UTC: `2026-08-05T11:41:31.674877Z`
+Generated UTC: `2026-08-05T12:37:13.598548Z`
 Status: **BLOCKED**
 Tracker internal status: **PASS**
 Repository: `psw2025-cmd/Genesis_System3`
@@ -16,10 +16,10 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 ## TODO
 
+- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31003378392 conclusion=failure commit=a4ed72f43c12
 - [ ] Fix latest GitHub workflow 'System3 Full Auto Truth' run=31000971397 conclusion=failure commit=6e7761b28bab
 - [ ] Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31001493053 conclusion=failure commit=6e7761b28bab
 - [ ] Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31000772263 conclusion=failure commit=168ccf9d8045
-- [ ] Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31000004163 conclusion=failure commit=4661e6f79180
 - [ ] Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=30999357152 conclusion=failure commit=eef21896bf35
 - [ ] Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=30992339504 conclusion=action_required commit=71572eee7c17
 
@@ -27,10 +27,10 @@ Only a workflow's newest observed run can remain an active failure. A newer succ
 
 | Workflow | Run | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| Dashboard Visual Production Proof | 31003378392 | failure | `a4ed72f43c12` | 2026-08-05T12:00:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31003378392 |
 | System3 Full Auto Truth | 31000971397 | failure | `6e7761b28bab` | 2026-08-05T11:28:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31000971397 |
 | System3 Broker Chain Semantic Gate | 31001493053 | failure | `6e7761b28bab` | 2026-08-05T11:27:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31001493053 |
 | System3 Latest Truth Publish | 31000772263 | failure | `168ccf9d8045` | 2026-08-05T11:22:11Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31000772263 |
-| Dashboard Visual Production Proof | 31000004163 | failure | `4661e6f79180` | 2026-08-05T11:10:01Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31000004163 |
 | System3 Market Session Proof Runner | 30999357152 | failure | `eef21896bf35` | 2026-08-05T10:58:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30999357152 |
 | Genesis System3 Global Safety CI | 30992339504 | action_required | `71572eee7c17` | 2026-08-05T09:13:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30992339504 |
 
