@@ -1,9 +1,9 @@
 # System3 Autopilot Latest Status
 
-Generated UTC: `2026-08-05T04:54:44.441870+00:00`
+Generated UTC: `2026-08-05T07:59:13.619605+00:00`
 Owner/operator: **PRITAM S. WARGHADE**
 Status: **BLOCKED**
-Blockers: `92`
+Blockers: `91`
 
 ## Non-negotiable rules
 
@@ -31,9 +31,9 @@ Blockers: `92`
 |---|---|---|---:|---:|
 | secure_install_credential_audit | BLOCKED | BLOCKED | 6 | 6 |
 | dashboard_visible_issue_tracker | BLOCKED | BLOCKED | 1 | 1 |
-| github_render_failure_tracker | BLOCKED | BLOCKED | 49 | 49 |
+| github_render_failure_tracker | BLOCKED | BLOCKED | 47 | 47 |
 | parallel_root_cause_audit | BLOCKED | BLOCKED | 14 | 14 |
-| workflow_failure_tracker | BLOCKED | BLOCKED | 12 | 12 |
+| workflow_failure_tracker | BLOCKED | BLOCKED | 13 | 13 |
 | todo_status_update | BLOCKED | BLOCKED | 0 | 0 |
 | dashboard_visual_production_proof | UNKNOWN | BLOCKED | 0 | 0 |
 | system3_public_truth | FAIL | BLOCKED | 0 | 0 |
@@ -49,55 +49,53 @@ Blockers: `92`
 - [ ] dashboard_visible_issue_tracker: Playwright/browser launch failed: Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1148/chrome-linux/headless_shell
 ╔═════════════════════════════════════════════════════════════════════════╗
 ║ Looks like Playwright Test or Playwright w
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Windows Self-Hosted Workflow Migration' run=30975436979 conclusion=failure commit=8e8d5146dbcb
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30974642043 conclusion=failure commit=872ab7a222f0
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30974115094 conclusion=failure commit=49bae332ff50
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Live UI Proof' run=30973994003 conclusion=failure commit=49bae332ff50
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30972333072 conclusion=cancelled commit=91eadda9480a
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30972069843 conclusion=failure commit=5c3e20aec98d
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30968082251 conclusion=cancelled commit=17286eb9475b
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30967807320 conclusion=failure commit=f852e099bfee
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30966772969 conclusion=cancelled commit=d5f35234956a
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30964756403 conclusion=cancelled commit=e63050639525
-- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30964472270 conclusion=failure commit=bc792246d19b
-- [ ] github_render_failure_tracker: Fix Render endpoint /: HTTP status 0 status=0
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30985502041 conclusion=failure commit=9394792e893c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Latest Truth Publish' run=30984828519 conclusion=failure commit=9394792e893c
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30984661000 conclusion=cancelled commit=d7d2a3286e99
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30983968945 conclusion=failure commit=8262ef37f0c9
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30983489689 conclusion=failure commit=8262ef37f0c9
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30981649158 conclusion=failure commit=abb67e4660ad
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 1000 Point TODO Status Updater' run=30978681834 conclusion=cancelled commit=f3e1691619ce
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Broker Chain Semantic Gate' run=30978521783 conclusion=failure commit=bb8e6733b2a5
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Full Auto Truth' run=30978378566 conclusion=failure commit=bb8e6733b2a5
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Latest Truth Publish' run=30978284089 conclusion=failure commit=bb8e6733b2a5
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'Dashboard Visual Production Proof' run=30977879324 conclusion=failure commit=7a037cdf3917
+- [ ] github_render_failure_tracker: Fix GitHub workflow 'System3 Market Session Proof Runner' run=30977802143 conclusion=failure commit=7a037cdf3917
 - [ ] github_render_failure_tracker: Fix Render endpoint /ui/: HTTP status 0 status=0
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/health: HTTP status 0 status=0
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/state: HTTP status 0 status=0
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/deploy/info: HTTP status 0 status=0
+- [ ] github_render_failure_tracker: Fix Render endpoint /api/deploy/info: HTTP status 401 status=401
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/diagnose: HTTP status 0 status=0
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/funds: HTTP status 401 status=401
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/holdings: HTTP status 0 status=0
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 0 status=0
+- [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/holdings: HTTP status 401 status=401
+- [ ] github_render_failure_tracker: Fix Render endpoint /api/broker/positions/live: HTTP status 0 status=0
+- [ ] github_render_failure_tracker: Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401
 - [ ] github_render_failure_tracker: Fix Render endpoint /api/paper: HTTP status 401 status=401
-- [ ] github_render_failure_tracker: Fix Render endpoint /api/ml/performance: HTTP status 0 status=0
-- [ ] github_render_failure_tracker: endpoint=/ reason=HTTP status 0 status=0
+- [ ] github_render_failure_tracker: Fix Render endpoint /api/ml/performance: HTTP status 401 status=401
 - [ ] github_render_failure_tracker: endpoint=/ui/ reason=HTTP status 0 status=0
-- [ ] github_render_failure_tracker: endpoint=/api/health reason=HTTP status 0 status=0
 - [ ] github_render_failure_tracker: endpoint=/api/state reason=HTTP status 0 status=0
-- [ ] github_render_failure_tracker: endpoint=/api/deploy/info reason=HTTP status 0 status=0
+- [ ] github_render_failure_tracker: endpoint=/api/deploy/info reason=HTTP status 401 status=401
 - [ ] github_render_failure_tracker: endpoint=/api/broker/diagnose reason=HTTP status 0 status=0
 - [ ] github_render_failure_tracker: endpoint=/api/broker/funds reason=HTTP status 401 status=401
-- [ ] github_render_failure_tracker: endpoint=/api/broker/holdings reason=HTTP status 0 status=0
-- [ ] github_render_failure_tracker: endpoint=/api/broker/positions/live reason=HTTP status 401 status=401
-- [ ] github_render_failure_tracker: endpoint=/api/scanner/top_contract_gainers reason=HTTP status 0 status=0
+- [ ] github_render_failure_tracker: endpoint=/api/broker/holdings reason=HTTP status 401 status=401
+- [ ] github_render_failure_tracker: endpoint=/api/broker/positions/live reason=HTTP status 0 status=0
+- [ ] github_render_failure_tracker: endpoint=/api/scanner/top_contract_gainers reason=HTTP status 401 status=401
 - [ ] github_render_failure_tracker: endpoint=/api/paper reason=HTTP status 401 status=401
-- [ ] github_render_failure_tracker: endpoint=/api/ml/performance reason=HTTP status 0 status=0
-- [ ] github_render_failure_tracker: workflow=System3 Windows Self-Hosted Workflow Migration conclusion=failure run=30975436979
-- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30974642043
-- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30974115094
-- [ ] github_render_failure_tracker: workflow=Dashboard Live UI Proof conclusion=failure run=30973994003
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30972333072
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30972069843
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30968082251
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30967807320
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30966772969
-- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30964756403
-- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30964472270
-- [ ] github_render_failure_tracker: github_failed_count=11
-- [ ] github_render_failure_tracker: render_failed_count=12
-- [ ] github_render_failure_tracker: todo_count=23
+- [ ] github_render_failure_tracker: endpoint=/api/ml/performance reason=HTTP status 401 status=401
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30985502041
+- [ ] github_render_failure_tracker: workflow=System3 Latest Truth Publish conclusion=failure run=30984828519
+- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30984661000
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30983968945
+- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30983489689
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30981649158
+- [ ] github_render_failure_tracker: workflow=System3 1000 Point TODO Status Updater conclusion=cancelled run=30978681834
+- [ ] github_render_failure_tracker: workflow=System3 Broker Chain Semantic Gate conclusion=failure run=30978521783
+- [ ] github_render_failure_tracker: workflow=System3 Full Auto Truth conclusion=failure run=30978378566
+- [ ] github_render_failure_tracker: workflow=System3 Latest Truth Publish conclusion=failure run=30978284089
+- [ ] github_render_failure_tracker: workflow=Dashboard Visual Production Proof conclusion=failure run=30977879324
+- [ ] github_render_failure_tracker: workflow=System3 Market Session Proof Runner conclusion=failure run=30977802143
+- [ ] github_render_failure_tracker: github_failed_count=12
+- [ ] github_render_failure_tracker: render_failed_count=10
+- [ ] github_render_failure_tracker: todo_count=22
 - [ ] parallel_root_cause_audit: Modular routers are imported but disabled; fixes in dashboard/backend/routers may not affect production routes.
 - [ ] parallel_root_cause_audit: Synthetic data generator import still exists in backend; verify REAL_ONLY blocks it from displayed trading truth.
 - [ ] parallel_root_cause_audit: Public truth final verdict is FAIL.
@@ -112,18 +110,19 @@ Blockers: `92`
 - [ ] parallel_root_cause_audit: Need fresh screenshot after latest commits; older screenshots do not prove current UI.
 - [ ] parallel_root_cause_audit: Final public truth is FAIL.
 - [ ] parallel_root_cause_audit: Final truth must aggregate latest Render, integration, visual, broker, chain, scanner, paper, ML proof.
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30983968945 conclusion=failure commit=8262ef37f0c907c42092003ab063612c4660bfc6
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Full Auto Truth' run 30983489689 conclusion=failure commit=8262ef37f0c907c42092003ab063612c4660bfc6
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30981649158 conclusion=failure commit=abb67e4660ad6a1b0af8e636768b2d64a08d39ad
+- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30978681834 conclusion=cancelled commit=f3e1691619ced3518b8ad2846def31beaf3b8ebd
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30978521783 conclusion=failure commit=bb8e6733b2a56666efe9795748cc81b2f2ec562f
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Full Auto Truth' run 30978378566 conclusion=failure commit=bb8e6733b2a56666efe9795748cc81b2f2ec562f
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Latest Truth Publish' run 30978284089 conclusion=failure commit=bb8e6733b2a56666efe9795748cc81b2f2ec562f
+- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30977879324 conclusion=failure commit=7a037cdf3917f88094f8a5bb4746e73da5fcf85e
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Market Session Proof Runner' run 30977802143 conclusion=failure commit=7a037cdf3917f88094f8a5bb4746e73da5fcf85e
+- [ ] workflow_failure_tracker: Fix workflow 'System3 Market Session Proof Runner' run 30976302634 conclusion=failure commit=e7af8bdab7192da3401783cddf90e82e91cbf670
 - [ ] workflow_failure_tracker: Fix workflow 'System3 Windows Self-Hosted Workflow Migration' run 30975436979 conclusion=failure commit=8e8d5146dbcbd3140c212023e2ad178cd880d1a2
 - [ ] workflow_failure_tracker: Fix workflow 'System3 Broker Chain Semantic Gate' run 30974642043 conclusion=failure commit=872ab7a222f03db005f27bc5ea338611935ab8e1
-- [ ] workflow_failure_tracker: Fix workflow 'System3 Full Auto Truth' run 30974115094 conclusion=failure commit=49bae332ff5072aa50b0c38f307b1306834e233a
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Live UI Proof' run 30973994003 conclusion=failure commit=49bae332ff5072aa50b0c38f307b1306834e233a
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30972333072 conclusion=cancelled commit=91eadda9480ac32954d55195ed69ac512e2a8b8b
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30972069843 conclusion=failure commit=5c3e20aec98d660601f58b8843116a04dffd75c3
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30968082251 conclusion=cancelled commit=17286eb9475bc44e065731f9fb88008e492a7d50
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30967807320 conclusion=failure commit=f852e099bfeed70f7a64882553c1c62e847687c3
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30966772969 conclusion=cancelled commit=d5f35234956a371cf8f1f9fdc25a5141850b3ff5
-- [ ] workflow_failure_tracker: Fix workflow 'System3 1000 Point TODO Status Updater' run 30964756403 conclusion=cancelled commit=e630506395255c0f5fec545e0e1899f540661d41
-- [ ] workflow_failure_tracker: Fix workflow 'Dashboard Visual Production Proof' run 30964472270 conclusion=failure commit=bc792246d19b95c67bc903a6d096d49174d7eeba
-- [ ] workflow_failure_tracker: failed_count=11
+- [ ] workflow_failure_tracker: failed_count=12
 - [ ] todo_status_update: status=BLOCKED
 - [ ] dashboard_visual_production_proof: status=UNKNOWN
 - [ ] system3_public_truth: status=FAIL
