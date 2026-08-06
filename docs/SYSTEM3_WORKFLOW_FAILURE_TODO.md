@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-06T12:12:36.826141+00:00`
+Generated UTC: `2026-08-06T12:50:18.531486+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `26`
+Failed workflow count: `18`
 
 ## Rule
 
@@ -12,60 +12,44 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31100253573 conclusion=failure commit=a961c80b99290c25d90a94aa15ff01d80c5a87ae
-- [ ] Fix workflow 'Deploy Genesis System3 to Cloud Run' run 31100205424 conclusion=failure commit=fd21dd354963f235e4bec8301e0f951a63fd9e0a
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31100204686 conclusion=failure commit=fd21dd354963f235e4bec8301e0f951a63fd9e0a
-- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 31099946813 conclusion=failure commit=ddda839f12401a643faa8c18363ac6bc6e426c7d
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099940104 conclusion=failure commit=ddda839f12401a643faa8c18363ac6bc6e426c7d
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31099903998 conclusion=cancelled commit=0cb33f696768a21f0eb8daeee037ad4e5866608b
-- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31099867716 conclusion=failure commit=3a8470a32c4d2221757d3c7b07bc6c032448aba4
-- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 31099867674 conclusion=cancelled commit=3a8470a32c4d2221757d3c7b07bc6c032448aba4
-- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31099822407 conclusion=failure commit=3a8470a32c4d2221757d3c7b07bc6c032448aba4
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099817353 conclusion=failure commit=3a8470a32c4d2221757d3c7b07bc6c032448aba4
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099794121 conclusion=failure commit=b4b214bbec2477b17658c0fc64efee32b9086589
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099764394 conclusion=failure commit=69b7084f28d3b223581cf20f1a4c0ff4d4011a4d
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099753092 conclusion=failure commit=7ffd09fdc9b763bb8fc06e42b4a61baab29eeba3
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099727087 conclusion=failure commit=bf3c65d663cf778fbf05e3c74171ec5a76b37e0b
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099648762 conclusion=failure commit=e4068f3bd5bc11cac024493675501e4152ce8bfc
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099613486 conclusion=failure commit=8b8d81ef4a76aeb7dd156cc1daec1a9294d80f7b
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099565736 conclusion=failure commit=0e3601dea8fc71711df24292f232c4ba04e33f9a
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099534241 conclusion=failure commit=5dd0b8813727050243dc94b5ee4551ffea438bc6
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099525520 conclusion=failure commit=8085804ba23afb8ceb2b7bac5fe0324daf59f5f8
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099503952 conclusion=failure commit=b53b822c72560a266df2f1d54401a3123216dba6
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099468857 conclusion=failure commit=c3fd5be21f18ed073d956f74bd41182f68aa60fa
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099453913 conclusion=failure commit=97b5b3f885fdf059ec7a0afd9cb10949d20ce898
-- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31099421039 conclusion=failure commit=9d635989c04eb88ec1cdcf5d2002b01afe8152db
-- [ ] Fix workflow 'Dashboard Visual Production Proof' run 31099269757 conclusion=failure commit=b0976a6d40ab4206f957771d0ed88c4137fe2571
-- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 31097469275 conclusion=failure commit=2098328f11825d2e3ee82582f060c496283889e7
-- [ ] Fix workflow 'System3 Full Auto Truth' run 31096824653 conclusion=failure commit=2098328f11825d2e3ee82582f060c496283889e7
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103061503 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102566377 conclusion=failure commit=6e59b9ec5714d6026e30e68698f9f55e63d27008
+- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 31102331948 conclusion=cancelled commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102328423 conclusion=failure commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72
+- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 31102296205 conclusion=cancelled commit=4b0442430855c1202fbbbe27f0403aeacd492dbd
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102258798 conclusion=failure commit=4b0442430855c1202fbbbe27f0403aeacd492dbd
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102212864 conclusion=failure commit=5f6a5cb50e80f21b464cbfb72a3db3788d6e44b4
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102189804 conclusion=failure commit=8676f3388e8631ecd73629831cdcd562dbd5e4ba
+- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31102151102 conclusion=failure commit=c8fb37d107f7e21976e983ef4ecff6ddc9d000e8
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102150251 conclusion=failure commit=c8fb37d107f7e21976e983ef4ecff6ddc9d000e8
+- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31102100092 conclusion=failure commit=72eed261a25e61e695697a96c16d9f91934ec506
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102099070 conclusion=failure commit=72eed261a25e61e695697a96c16d9f91934ec506
+- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31102064517 conclusion=failure commit=f0b4e1e1565a2195481acd34b827ce088c68c6c1
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102062976 conclusion=failure commit=f0b4e1e1565a2195481acd34b827ce088c68c6c1
+- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31102035164 conclusion=failure commit=dfb815fc3b1f425bb9a1f9d6ae4609c050db717f
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102033705 conclusion=failure commit=dfb815fc3b1f425bb9a1f9d6ae4609c050db717f
+- [ ] Fix workflow 'GCP Dhan Token Fix CI' run 31102021770 conclusion=failure commit=053a618102beb4b4371224f9dadd93c70a311fac
+- [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102020557 conclusion=failure commit=053a618102beb4b4371224f9dadd93c70a311fac
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
-| .github/workflows/options-ml-training-proof.yml | 31100253573 | failure | `a961c80b9929` | 2026-08-06T12:10:07Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31100253573 |
-| Deploy Genesis System3 to Cloud Run | 31100205424 | failure | `fd21dd354963` | 2026-08-06T12:09:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31100205424 |
-| .github/workflows/options-ml-training-proof.yml | 31100204686 | failure | `fd21dd354963` | 2026-08-06T12:09:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31100204686 |
-| Genesis System3 Global Safety CI | 31099946813 | failure | `ddda839f1240` | 2026-08-06T12:11:06Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099946813 |
-| .github/workflows/options-ml-training-proof.yml | 31099940104 | failure | `ddda839f1240` | 2026-08-06T12:05:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099940104 |
-| System3 1000 Point TODO Status Updater | 31099903998 | cancelled | `0cb33f696768` | 2026-08-06T12:05:22Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099903998 |
-| GCP Dhan Token Fix CI | 31099867716 | failure | `3a8470a32c4d` | 2026-08-06T12:04:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099867716 |
-| Genesis System3 Global Safety CI | 31099867674 | cancelled | `3a8470a32c4d` | 2026-08-06T12:06:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099867674 |
-| GCP Dhan Token Fix CI | 31099822407 | failure | `3a8470a32c4d` | 2026-08-06T12:04:03Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099822407 |
-| .github/workflows/options-ml-training-proof.yml | 31099817353 | failure | `3a8470a32c4d` | 2026-08-06T12:03:49Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099817353 |
-| .github/workflows/options-ml-training-proof.yml | 31099794121 | failure | `b4b214bbec24` | 2026-08-06T12:03:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099794121 |
-| .github/workflows/options-ml-training-proof.yml | 31099764394 | failure | `69b7084f28d3` | 2026-08-06T12:03:04Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099764394 |
-| .github/workflows/options-ml-training-proof.yml | 31099753092 | failure | `7ffd09fdc9b7` | 2026-08-06T12:02:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099753092 |
-| .github/workflows/options-ml-training-proof.yml | 31099727087 | failure | `bf3c65d663cf` | 2026-08-06T12:02:31Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099727087 |
-| .github/workflows/options-ml-training-proof.yml | 31099648762 | failure | `e4068f3bd5bc` | 2026-08-06T12:01:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099648762 |
-| .github/workflows/options-ml-training-proof.yml | 31099613486 | failure | `8b8d81ef4a76` | 2026-08-06T12:00:53Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099613486 |
-| .github/workflows/options-ml-training-proof.yml | 31099565736 | failure | `0e3601dea8fc` | 2026-08-06T12:00:16Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099565736 |
-| .github/workflows/options-ml-training-proof.yml | 31099534241 | failure | `5dd0b8813727` | 2026-08-06T11:59:51Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099534241 |
-| .github/workflows/options-ml-training-proof.yml | 31099525520 | failure | `8085804ba23a` | 2026-08-06T11:59:43Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099525520 |
-| .github/workflows/options-ml-training-proof.yml | 31099503952 | failure | `b53b822c7256` | 2026-08-06T11:59:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099503952 |
-| .github/workflows/options-ml-training-proof.yml | 31099468857 | failure | `c3fd5be21f18` | 2026-08-06T11:58:52Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099468857 |
-| .github/workflows/options-ml-training-proof.yml | 31099453913 | failure | `97b5b3f885fd` | 2026-08-06T11:58:39Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099453913 |
-| .github/workflows/options-ml-training-proof.yml | 31099421039 | failure | `9d635989c04e` | 2026-08-06T11:58:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099421039 |
-| Dashboard Visual Production Proof | 31099269757 | failure | `b0976a6d40ab` | 2026-08-06T12:04:58Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31099269757 |
-| System3 Broker Chain Semantic Gate | 31097469275 | failure | `2098328f1182` | 2026-08-06T11:30:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31097469275 |
-| System3 Full Auto Truth | 31096824653 | failure | `2098328f1182` | 2026-08-06T11:27:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31096824653 |
+| .github/workflows/options-ml-training-proof.yml | 31103061503 | failure | `2639a405679d` | 2026-08-06T12:49:19Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103061503 |
+| .github/workflows/options-ml-training-proof.yml | 31102566377 | failure | `6e59b9ec5714` | 2026-08-06T12:42:41Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102566377 |
+| Genesis System3 Global Safety CI | 31102331948 | cancelled | `f38d190f45b4` | 2026-08-06T12:42:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102331948 |
+| .github/workflows/options-ml-training-proof.yml | 31102328423 | failure | `f38d190f45b4` | 2026-08-06T12:39:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102328423 |
+| Genesis System3 Global Safety CI | 31102296205 | cancelled | `4b0442430855` | 2026-08-06T12:39:27Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102296205 |
+| .github/workflows/options-ml-training-proof.yml | 31102258798 | failure | `4b0442430855` | 2026-08-06T12:38:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102258798 |
+| .github/workflows/options-ml-training-proof.yml | 31102212864 | failure | `5f6a5cb50e80` | 2026-08-06T12:37:45Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102212864 |
+| .github/workflows/options-ml-training-proof.yml | 31102189804 | failure | `8676f3388e86` | 2026-08-06T12:37:26Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102189804 |
+| GCP Dhan Token Fix CI | 31102151102 | failure | `c8fb37d107f7` | 2026-08-06T12:37:14Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102151102 |
+| .github/workflows/options-ml-training-proof.yml | 31102150251 | failure | `c8fb37d107f7` | 2026-08-06T12:36:52Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102150251 |
+| GCP Dhan Token Fix CI | 31102100092 | failure | `72eed261a25e` | 2026-08-06T12:36:21Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102100092 |
+| .github/workflows/options-ml-training-proof.yml | 31102099070 | failure | `72eed261a25e` | 2026-08-06T12:36:10Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102099070 |
+| GCP Dhan Token Fix CI | 31102064517 | failure | `f0b4e1e1565a` | 2026-08-06T12:35:51Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102064517 |
+| .github/workflows/options-ml-training-proof.yml | 31102062976 | failure | `f0b4e1e1565a` | 2026-08-06T12:35:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102062976 |
+| GCP Dhan Token Fix CI | 31102035164 | failure | `dfb815fc3b1f` | 2026-08-06T12:35:28Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102035164 |
+| .github/workflows/options-ml-training-proof.yml | 31102033705 | failure | `dfb815fc3b1f` | 2026-08-06T12:35:15Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102033705 |
+| GCP Dhan Token Fix CI | 31102021770 | failure | `053a618102be` | 2026-08-06T12:35:18Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102021770 |
+| .github/workflows/options-ml-training-proof.yml | 31102020557 | failure | `053a618102be` | 2026-08-06T12:35:05Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102020557 |
