@@ -165,6 +165,15 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     svc = session.get(svc_url, timeout=60).json()
     c0 = dict((svc.get("template", {}).get("containers") or [{}])[0])
     c0["image"] = image
+    # MemGuard showed ~408/480MB on 512Mi — leave headroom for Dhan OC + pandas.
+    c0["resources"] = {
+        **(c0.get("resources") or {}),
+        "limits": {
+            **((c0.get("resources") or {}).get("limits") or {}),
+            "memory": "1Gi",
+            "cpu": ((c0.get("resources") or {}).get("limits") or {}).get("cpu") or "1",
+        },
+    }
     env_map = {e["name"]: e for e in c0.get("env", []) if "name" in e}
     for k, v in SAFE_ENV:
         env_map[k] = {"name": k, "value": v}
