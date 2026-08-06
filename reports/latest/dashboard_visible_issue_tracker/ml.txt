@@ -4,14 +4,14 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:56:32 IST
+12:22:08 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 3s
+TICK 1s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -58,16 +58,17 @@ Live Gate
 LOCK
 ML Model Truth
 This tab is proof-only. It does not train inline and does not invent metrics.
-CHECKING
-Checking model artifacts...
+MODEL_PROOF_LOADED_BUT_BLOCKED
+Loaded 1 blocked accuracy artifact(s). Model not proven — missing matured prediction history / post-market validation. Blocker: model_accuracy_report:NO_PREDICTION_SOURCE_FOUND
 Required proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.
 Active model
 NOT_PROVEN
 Fallback used
-UNKNOWN
+NO
 Proof records
-0 proven / 0 blocked
+0 proven / 1 blocked
 Training status
 BLOCKED
-Training proof missing.
-Next real fix is scheduler/model pipeline proof, not UI decoration.
+Model Performance Records
+MODEL	STATUS	PREDICTIONS	AVG ACCURACY	PROOF PASS / BLOCKED	BLOCKER	GENERATED
+model_accuracy_report	BLOCKED	0	N/A	0 / 1	NO_PREDICTION_SOURCE_FOUND	2026-08-06T06:45:45.123467+00:00

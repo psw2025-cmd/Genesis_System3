@@ -4,14 +4,14 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:55:51 IST
+12:21:27 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 0s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -64,10 +64,10 @@ BROKER
 CONNECTED
 Dhan read-only
 PAPER P&L
-₹-1,806
+₹-71
 Cloud sim
 OPEN POSITIONS
-0
+2
 Paper only
 CYCLES
 0
@@ -79,21 +79,21 @@ Health API
 live
 LOADED
 State API
+Market open
 LOADED
 Broker Status API
-connected
-ERROR
+LOADED
 Funds API
-ERROR
+LOADED
 Holdings API
-ERROR
+LOADED
 Positions API
 LOADED
 P&L API
-pnl=-1806.07
-STALE
+pnl=-70.59
+LOADED
 Gain Rank / Scanner
-2026-06-13
+2026-08-06
 LOADED
 Auto Gates
 7 gates
@@ -116,7 +116,7 @@ Paper Lifecycle
 proven
 PEND
 Tick / Data Freshness
-tick_age=18.29s refresh=60s
+tick_age=3.91s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
