@@ -3603,7 +3603,9 @@ async def get_chain(underlying: str):
             "received_at": _time_module.time(),
             "market_open": bool(result.get("live", open_now)),
         }
-    return _cache_set(cache_key, result)
+        return _cache_set(cache_key, result)
+    # Never cache empty/failed OC — that poisons /api/chain for the TTL window.
+    return result
 
 
 async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = None):
@@ -8155,7 +8157,9 @@ async def broker_self_heal_loop():
                             from core.brokers.dhan.token_manager import refresh_token
 
                             result = await asyncio.wait_for(
-                                asyncio.to_thread(refresh_token, True),
+                                # Never force-generate here — that invalidates the live
+                                # Cloud Run secret token (DH-906) and kills option-chain.
+                                asyncio.to_thread(refresh_token, False),
                                 timeout=60.0,
                             )
                             if result.get("success") and result.get("strategy") not in (
