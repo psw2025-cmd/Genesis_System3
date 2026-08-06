@@ -1,0 +1,8 @@
+PASS i=1 /ui ms=139 status=200 html_ok
+PASS i=1 /api/health ms=323 status=200 {"status":"not_ready","mode":"PAPER","broker_status":"discon
+PASS i=2 /ui ms=84 status=200 html_ok
+PASS i=2 /api/health ms=99 status=200 {"status":"not_ready","mode":"PAPER","broker_status":"discon
+PASS i=3 /ui ms=62 status=200 html_ok
+PASS i=3 /api/health ms=82 status=200 {"status":"not_ready","mode":"PAPER","broker_status":"discon
+PASS i=4 /ui ms=88 status=200 html_ok
+PASS i=4 /api/health ms=88 status=200 {"status":"not_ready","mode":"PAPER","broker_status":"discon

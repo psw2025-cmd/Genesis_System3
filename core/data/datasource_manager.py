@@ -73,8 +73,8 @@ class DataSourceManager:
                 from dhanhq import dhanhq
                 from dhanhq.dhan_context import DhanContext
 
-                client_id = os.environ.get("DHAN_CLIENT_ID", "")
-                token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+                client_id = os.environ.get("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff")
+                token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
                 if client_id and token:
                     ctx = DhanContext(client_id, token)
                     self._client = dhanhq(ctx)

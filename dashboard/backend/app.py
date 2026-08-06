@@ -3816,30 +3816,25 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     "message": "BROKER_NOT_READY - Real chain data unavailable",
                 }
 
-        # Market closed — prefer Dhan snapshot, never label MARKET_OPEN
-        if not market_is_open:
-            try:
-                from core.data.datasource_manager import DataSourceManager
-                from dashboard.backend.chain_adapter import fetch_chain_for_api
-
-                _dsm = DataSourceManager()
-                _closed = fetch_chain_for_api(_dsm, underlying.upper())
-                if _closed and _closed.get("contracts"):
-                    _closed["status"] = "MARKET_CLOSED"
-                    _closed["message"] = "Market closed — last available chain snapshot"
-                    return _closed
-            except Exception:
-                pass
-
         # ALWAYS try Dhan P0 first when market is open (or as fallback)
         # chain_raw_live.csv on Render is from repo clone — may be months old
         # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
+        # CRITICAL: fetch_chain_for_api is sync HTTP — must run off the event loop
+        # or /ui and /api/health starve (Cloud Run "upstream request timeout").
         try:
-            from core.data.datasource_manager import DataSourceManager
-            from dashboard.backend.chain_adapter import fetch_chain_for_api
 
-            _dsm = DataSourceManager()
-            _live = fetch_chain_for_api(_dsm, underlying.upper())
+            def _open_dhan_chain_fetch():
+                from core.data.datasource_manager import DataSourceManager
+                from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                return fetch_chain_for_api(DataSourceManager(), underlying.upper())
+
+            open_to = (
+                float(closed_timeout_s)
+                if closed_timeout_s is not None
+                else _CHAIN_LIVE_TIMEOUT_OPEN_S
+            )
+            _live = await _run_blocking(_open_dhan_chain_fetch, timeout=max(open_to, 8.0))
             if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
                 _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
                 _live["source_priority"] = "dhan_p0_live"
@@ -3859,19 +3854,26 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 print(
                     f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback"
                 )
+        except asyncio.TimeoutError:
+            print(f"[chain/{underlying}] DSM timed out — using CSV fallback")
         except Exception as _dsm_err:
             print(f"[chain/{underlying}] DSM failed: {_dsm_err} — using CSV fallback")
 
         # CSV fallback (only reached if Dhan P0 fails)
         chain_file = OUTPUTS_DIR / "chain_raw_live.csv"
         if not chain_file.exists():
-            # Try Dhan Data API directly
+            # Try Dhan Data API directly (still off the event loop)
             try:
-                from core.data.datasource_manager import DataSourceManager
-                from dashboard.backend.chain_adapter import fetch_chain_for_api
 
-                _dsm = DataSourceManager()
-                _chain_result = fetch_chain_for_api(_dsm, underlying.upper())
+                def _fallback_dhan_chain_fetch():
+                    from core.data.datasource_manager import DataSourceManager
+                    from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+                    return fetch_chain_for_api(DataSourceManager(), underlying.upper())
+
+                _chain_result = await _run_blocking(
+                    _fallback_dhan_chain_fetch, timeout=_CHAIN_LIVE_TIMEOUT_OPEN_S
+                )
                 if _chain_result and _chain_result.get("contracts"):
                     return _chain_result
             except Exception:
@@ -5247,8 +5249,8 @@ async def index_chain_micro_loop():
                 )
         except Exception as exc:
             print(f"[index-chain-micro] {sym} failed: {exc}")
-        # DSM already enforces ~3.4s OC gap; small yield between symbols.
-        await asyncio.sleep(0.4 if open_now else 20.0)
+        # DSM already enforces ~3.4s OC gap; leave event-loop headroom for /ui.
+        await asyncio.sleep(2.0 if open_now else 20.0)
 
 
 async def market_top_micro_loop():
@@ -5401,7 +5403,7 @@ async def cloud_paper_trading_loop():
                 # (still PAPER ONLY — never places broker orders).
                 market_top_rows: list = []
                 try:
-                    mt = _cache_get("scanner_gainers:5:25:1")
+                    mt = _cache_get("scanner_gainers:5:25:1", 300.0)
                     if mt is None and _MARKET_TOP_STATE_FILE.exists():
                         mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
                     market_top_rows = list((mt or {}).get("market_top_table") or [])
@@ -5417,12 +5419,16 @@ async def cloud_paper_trading_loop():
                             seed_syms.append(sym)
                         if len(seed_syms) >= 4:
                             break
+                    # Cache/push only — never force live OC fan-out that starves /ui.
                     for sym in seed_syms:
                         try:
-                            ch = await get_chain(sym)
+                            ch = _chain_from_push_cache(sym)
+                            if ch is None:
+                                ch = _cache_get(f"chain_{sym}", 120.0)
                             if ch and ch.get("contracts"):
-                                ch["paper_seed"] = "market_top_high_rise"
-                                chains.append(ch)
+                                seeded = dict(ch)
+                                seeded["paper_seed"] = "market_top_high_rise"
+                                chains.append(seeded)
                         except Exception:
                             continue
                     if seed_syms:

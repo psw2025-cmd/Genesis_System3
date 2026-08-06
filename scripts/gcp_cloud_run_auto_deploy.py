@@ -217,7 +217,10 @@ def main() -> int:
         os.environ["SYSTEM3_DEPLOY_INCLUDE_WORKTREE"] = "1"
 
     sha = _git_sha()
-    image = f"{REPO}:{sha}"
+    # Unique tag so Cloud Run always creates a new revision (same git SHA
+    # retag alone does not force a pull when the URI string is unchanged).
+    deploy_stamp = int(time.time())
+    image = f"{REPO}:{sha[:12]}-{deploy_stamp}"
     print("SHA", sha)
     print("IMAGE", image)
     print("SERVICE", SERVICE)

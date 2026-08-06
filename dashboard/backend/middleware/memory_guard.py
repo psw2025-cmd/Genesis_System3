@@ -31,9 +31,18 @@ except ImportError:
         return 0.0
 
 
-MEM_WARN_MB = int(os.environ.get("MEM_WARN_MB", "700"))
-MEM_GC_MB = int(os.environ.get("MEM_GC_MB", "850"))
-MEM_LIMIT_MB = int(os.environ.get("MEM_LIMIT_MB", "960"))
+def _env_int(name: str, default: int) -> int:
+    """Parse int env safely (gcloud mangling can join values into one string)."""
+    raw = str(os.environ.get(name, default) or default).strip().split()[0]
+    try:
+        return int(float(raw))
+    except (TypeError, ValueError):
+        return default
+
+
+MEM_WARN_MB = _env_int("MEM_WARN_MB", 700)
+MEM_GC_MB = _env_int("MEM_GC_MB", 850)
+MEM_LIMIT_MB = _env_int("MEM_LIMIT_MB", 960)
 
 _FAST_PATHS = {"/", "/api/health", "/api/state", "/static", "/ui", "/favicon.ico"}
 

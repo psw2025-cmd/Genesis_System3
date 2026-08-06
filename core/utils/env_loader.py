@@ -24,6 +24,6 @@ def get_dhan_credentials():
     Never logs or returns the raw token in user-facing output.
     """
     return {
-        "client_id": os.getenv("DHAN_CLIENT_ID", "").strip(),
-        "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip(),
+        "client_id": os.getenv("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff"),
+        "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff"),
     }
