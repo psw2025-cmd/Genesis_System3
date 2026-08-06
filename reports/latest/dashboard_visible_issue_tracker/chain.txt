@@ -4,19 +4,16 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-16:00:43 IST
+18:22:34 IST
 NIFTY
-24,636
-SNAP
+--
 BNFTY
-58,064
-SNAP
+--
 FINNIFTY
-26,864
-SNAP
-TICK 2s
+--
+TICK 3s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN API ERR
 PAPER
 LIVE OFF
 WS
@@ -27,13 +24,13 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-LIVE
+CHECK
 COMMAND
 Truth Control
 TRUTH
@@ -72,120 +69,10 @@ HDFCBANK
 TCS
 INFY
 ICICIBANK
-SESSION SNAPSHOT
-SPOT
-24,636
-PCR
-0.85
-CONTRACTS
-160
-+/-5 ATM
-+/-10 ATM
-+/-15 ATM
-+/-20 ATM
-AFTER HOURS SNAPSHOT - NIFTY source=dhan priority=dhan_last_verified_snapshot age=175.5s fetched=2026-08-06T10:24:53.579194+00:00 - Market closed — last verified Dhan snapshot (2026-08-06 15:54 IST)
-OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
-
-68K
-	--	103K	14.6%	543.55	541.7	24,150	9.6	9.05	11.6%	16591K	--	
-1.5M
-
-
-1.1M
-	--	935K	14.3%	498.00	495.9	24,200	12.0	11.95	11.4%	38842K	--	
-5.8M
-
-
-180K
-	--	344K	13.8%	452.00	447.6	24,250	15.7	14.95	11.1%	23167K	--	
-2.2M
-
-
-961K
-	--	2149K	13.0%	404.05	404.1	24,300	20.1	19.50	10.9%	49832K	--	
-5.6M
-
-
-279K
-	--	1547K	12.9%	362.10	357.5	24,350	25.5	24.60	10.6%	27809K	--	
-2.2M
-
-
-1.4M
-	--	7169K	12.7%	322.00	318.1	24,400	33.4	33.45	10.7%	62558K	--	
-5.3M
-
-
-396K
-	--	4711K	12.5%	282.45	275.2	24,450	42.8	41.90	10.4%	37255K	--	
-2.2M
-
-
-2.8M
-	--	32383K	11.8%	240.05	240.0	24,500	54.5	53.10	10.2%	91556K	--	
-5.9M
-
-
-1.1M
-	--	27737K	11.7%	206.60	204.2	24,550	68.7	67.55	10.1%	65499K	--	
-2.5M
-
-
-5.6M
-	--	140176K	11.4%	172.10	172.1	24,600	85.9	84.00	9.9%	201522K	--	
-8.6M
-
-
-4.4M
-	--	148993K	11.2%	142.40	143.4	24,650ATM	107.3	107.45	10.0%	149581K	--	
-3.8M
-
-
-8.4M
-	--	153334K	11.2%	118.00	117.1	24,700	130.0	130.00	9.8%	105252K	--	
-4.5M
-
-
-3.1M
-	--	69499K	11.2%	95.85	94.3	24,750	157.7	156.70	9.6%	26324K	--	
-808K
-
-
-6.7M
-	--	96086K	11.1%	76.35	75.6	24,800	188.4	188.00	9.5%	28250K	--	
-1.1M
-
-
-2.2M
-	--	43774K	10.9%	58.20	58.1	24,850	222.6	220.80	9.2%	5516K	--	
-270K
-
-
-5.9M
-	--	62698K	10.9%	45.95	44.3	24,900	258.0	255.00	8.7%	6084K	--	
-363K
-
-
-1.7M
-	--	30132K	10.9%	35.00	34.1	24,950	297.6	297.55	8.8%	1621K	--	
-80K
-
-
-8.8M
-	--	80222K	10.9%	26.00	25.1	25,000	338.0	335.90	7.7%	3490K	--	
-717K
-
-
-1.8M
-	--	26073K	10.8%	19.00	18.6	25,050	386.0	384.20	8.1%	377K	--	
-42K
-
-
-6.4M
-	--	40647K	10.8%	13.70	13.3	25,100	431.5	426.45	0.0%	413K	--	
-79K
-
-
-1.7M
-	--	18000K	10.9%	10.20	9.7	25,150	476.0	470.65	0.0%	198K	--	
-12K
+OPTION CHAIN - NIFTY
+No chain rows yet (market closed — last snapshot not loaded).
+Status: NO_DHAN_DATA
+Market: CLOSED · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
+Next open: --
+Source: dhan / --
+Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
