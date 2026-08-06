@@ -482,26 +482,33 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
             "message": "OAuth manual required — not auto-triggered in cloud mode",
         }
 
-    # Strategy 1: generate_token via PIN + TOTP (primary — fastest, fully automated)
-    if not force_generate or (pin and totp_secret):
-        if pin and totp_secret:
-            logger.info("Trying Strategy 1: generate_token(pin, totp)")
-            new_token = _try_generate(client_id, pin, totp_secret)
-            if new_token:
-                _write_token(new_token)
-                exp = _token_expiry(new_token)
-                return {
-                    "success": True,
-                    "strategy": "generate_token",
-                    "message": "Token generated via PIN + TOTP (fully automated)",
-                    "token_preview": f"...{new_token[-8:]}",
-                    "token_length": len(new_token),
-                    "expires_at": exp.isoformat() if exp else "unknown",
-                }
-            logger.info("generate_token failed — falling back")
+    # Strategy 1: generate_token via PIN + TOTP
+    # ONLY when forced, or when there is no current token to renew.
+    # Previous condition `if not force_generate or (pin and totp_secret)` was always
+    # true when PIN/TOTP exist, so every self-heal/startup call minted a NEW token
+    # and immediately invalidated the Cloud Run secret mount (DH-906).
+    if pin and totp_secret and (force_generate or not cur_token):
+        logger.info(
+            "Trying Strategy 1: generate_token(pin, totp) force=%s has_token=%s",
+            force_generate,
+            bool(cur_token),
+        )
+        new_token = _try_generate(client_id, pin, totp_secret)
+        if new_token:
+            _write_token(new_token)
+            exp = _token_expiry(new_token)
+            return {
+                "success": True,
+                "strategy": "generate_token",
+                "message": "Token generated via PIN + TOTP (fully automated)",
+                "token_preview": f"...{new_token[-8:]}",
+                "token_length": len(new_token),
+                "expires_at": exp.isoformat() if exp else "unknown",
+            }
+        logger.info("generate_token failed — falling back")
 
-    # Strategy 2: renew existing token
-    if not force_generate and cur_token:
+    # Strategy 2: renew existing token (preferred for cloud remounts)
+    if cur_token and not force_generate:
         logger.info("Trying Strategy 2: renew_token(current_token)")
         new_token = _try_renew(client_id, cur_token)
         if new_token:
@@ -516,6 +523,20 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
                 "expires_at": exp.isoformat() if exp else "unknown",
             }
         logger.info("renew_token failed — falling back to OAuth manual")
+    elif force_generate and cur_token and not (pin and totp_secret):
+        logger.info("force_generate requested but PIN/TOTP missing — trying renew")
+        new_token = _try_renew(client_id, cur_token)
+        if new_token:
+            _write_token(new_token)
+            exp = _token_expiry(new_token)
+            return {
+                "success": True,
+                "strategy": "renew_token",
+                "message": "Token renewed (PIN/TOTP unavailable)",
+                "token_preview": f"...{new_token[-8:]}",
+                "token_length": len(new_token),
+                "expires_at": exp.isoformat() if exp else "unknown",
+            }
 
     # Strategy 3: OAuth manual flow (requires browser action)
     logger.warning("Automated strategies failed — initiating OAuth manual flow")

@@ -5558,11 +5558,18 @@ async def startup():
     # auth call cannot delay or block the server from accepting requests.
     _pin = os.environ.get("DHAN_PIN", "").strip()
     _totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
-    if _pin and _totp:
+    _startup_refresh = os.environ.get("SYSTEM3_STARTUP_TOKEN_REFRESH", "1") not in (
+        "0",
+        "false",
+        "False",
+    )
+    if _pin and _totp and _startup_refresh:
         asyncio.create_task(_startup_token_refresh_task())
     else:
         if not os.environ.get("DHAN_ACCESS_TOKEN"):
             print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set — token refresh skipped")
+        elif not _startup_refresh:
+            print("[startup] token refresh disabled via SYSTEM3_STARTUP_TOKEN_REFRESH=0")
 
     # Start background data refresh
     asyncio.create_task(background_data_refresh())
@@ -8150,6 +8157,17 @@ async def broker_self_heal_loop():
                         _BROKER_LAST_ALERT_TS = _t.time()
                         print(f"[self-heal] broker down fail={_BROKER_FAIL_COUNT} err={s.get(chr(101)+chr(114)+chr(114)+chr(111)+chr(114))}")
                     if _BROKER_FAIL_COUNT >= 3 and not _BROKER_HEAL_IN_PROGRESS:
+                        if os.environ.get("BROKER_SELF_HEAL_TOKEN_REFRESH", "1") in (
+                            "0",
+                            "false",
+                            "False",
+                        ):
+                            print(
+                                "[self-heal] token refresh disabled via "
+                                "BROKER_SELF_HEAL_TOKEN_REFRESH=0 — keeping mounted secret"
+                            )
+                            _BROKER_HEAL_IN_PROGRESS = False
+                            continue
                         _BROKER_HEAL_IN_PROGRESS = True
                         try:
                             from core.brokers.dhan.token_manager import refresh_token
