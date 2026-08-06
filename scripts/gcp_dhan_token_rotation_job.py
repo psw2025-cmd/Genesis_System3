@@ -77,8 +77,7 @@ def main() -> int:
     from core.brokers.dhan.token_manager import refresh_token, verify_token
 
     started = datetime.now(timezone.utc)
-    before_raw = verify_token()
-    before = _safe_verify(before_raw)
+    before = _safe_verify(verify_token())
     before_secret = _latest_version_proof()
     remaining = before.get("hours_remaining")
 
@@ -107,15 +106,16 @@ def main() -> int:
         return 0
 
     result = refresh_token(force_generate=True)
-    after_raw = verify_token()
-    after = _safe_verify(after_raw)
+    after = _safe_verify(verify_token())
     after_secret = _latest_version_proof()
+    before_version = before_secret.get("version")
+    after_version = after_secret.get("version")
     version_advanced = bool(
-        before_secret.get("version")
-        and after_secret.get("version")
-        and before_secret.get("version") != after_secret.get("version")
+        before_version and after_version and before_version != after_version
     )
-    persisted = version_advanced or before_secret.get("version") is None
+    persisted = bool(after_version) and (
+        version_advanced or before_version is None
+    )
     success = bool(result.get("success") and after["valid"] and persisted)
 
     proof = {
@@ -129,6 +129,7 @@ def main() -> int:
         "secret_before": before_secret,
         "secret_after": after_secret,
         "secret_version_advanced": version_advanced,
+        "secret_persisted": persisted,
         "rotation_threshold_hours": MIN_HOURS,
         "live_trading_enabled": False,
         "order_endpoints_called": False,
