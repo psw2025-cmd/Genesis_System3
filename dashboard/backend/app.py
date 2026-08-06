@@ -5246,8 +5246,8 @@ async def index_chain_micro_loop():
                 )
         except Exception as exc:
             print(f"[index-chain-micro] {sym} failed: {exc}")
-        # DSM already enforces ~3.4s OC gap; leave event-loop headroom for /ui.
-        await asyncio.sleep(2.0 if open_now else 20.0)
+        # DSM enforces ~3.4s OC gap; pace above that so UI requests keep headroom.
+        await asyncio.sleep(3.5 if open_now else 20.0)
 
 
 async def market_top_micro_loop():

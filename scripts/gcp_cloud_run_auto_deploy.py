@@ -65,8 +65,17 @@ def _git_sha() -> str:
 
 def _archive_tarball(sha: str) -> Path:
     """Archive committed tree (CI) or worktree overlay for local emergency deploys."""
-    out = ROOT / ".secrets" / f"deploy_{sha[:12]}.tgz"
-    out.parent.mkdir(parents=True, exist_ok=True)
+    # Prefer non-C: scratch when available — local C: fills up from repeated ~20MB archives.
+    scratch_root = Path(os.environ.get("SYSTEM3_DEPLOY_SCRATCH", r"E:\System3_deploy_scratch"))
+    try:
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        out = scratch_root / f"deploy_{sha[:12]}.tgz"
+        # Probe writability
+        (scratch_root / ".write_test").write_text("ok", encoding="utf-8")
+        (scratch_root / ".write_test").unlink(missing_ok=True)
+    except Exception:
+        out = ROOT / ".secrets" / f"deploy_{sha[:12]}.tgz"
+        out.parent.mkdir(parents=True, exist_ok=True)
     include_worktree = os.environ.get("SYSTEM3_DEPLOY_INCLUDE_WORKTREE", "").strip() in {
         "1",
         "true",
