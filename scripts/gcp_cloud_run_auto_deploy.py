@@ -195,6 +195,9 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     for k, v in SAFE_ENV:
         env_map[k] = {"name": k, "value": v}
     env_map["DEPLOY_GIT_SHA"] = {"name": "DEPLOY_GIT_SHA", "value": sha}
+    # Never keep PIN/TOTP on Cloud Run — minting there invalidates SM-mounted tokens.
+    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP"):
+        env_map.pop(drop, None)
     c0["env"] = list(env_map.values())
     patch = session.patch(
         svc_url,
