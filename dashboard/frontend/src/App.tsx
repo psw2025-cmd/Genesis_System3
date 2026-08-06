@@ -9,7 +9,7 @@ import { Sidebar }   from './components/Sidebar'
 import { Overview }      from './components/Overview'
 import { TradeTab }      from './components/TradeTab'
 import { Positions }     from './components/Positions'
-import { BrokerPanel }   from './components/BrokerPanel'
+import { BrokerProofPanel } from './components/BrokerProofPanel'
 import { OptionChain }   from './components/OptionChain'
 import { AlertsTab }     from './components/AlertsTab'
 import { SystemTab }     from './components/SystemTab'
@@ -41,14 +41,14 @@ function ProductionProofBar() {
   const paperLabel = paperOk
     ? 'PAPER OK'
     : (profitOk ? 'PROVENANCE' : `EXP ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? '—'}`)
-  const renderOk = Boolean(brokerConnected || health?.broker_status === 'connected')
+  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
   const proofItems: Array<[string, string, boolean]> = [
     ['LIVE', 'OFF', true],
     ['MODE', 'PAPER', true],
     ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
     ['ML', mlLabel, mlOk],
     ['PAPER', paperLabel, paperOk],
-    ['UI', renderOk ? 'LIVE' : 'CHECK', renderOk],
+    ['UI', cloudUiOk ? 'LIVE' : 'CHECK', cloudUiOk],
   ]
 
   return (
@@ -123,7 +123,7 @@ function Content() {
     case 'ml':           return <MLPerformance />
     case 'genesis':      return <GenesisTab />
     case 'e2e-proof':    return <EndToEndProof />
-    case 'broker':       return <BrokerPanel />
+    case 'broker':       return <BrokerProofPanel />
     case 'alerts':       return <AlertsTab />
     case 'system':       return <SystemTab />
     case 'gates':        return <LiveTradingGate />
