@@ -1,0 +1,62 @@
+name: Deploy Genesis System3 to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: system3-openalgo-safe
+  REGION: asia-south1
+  SERVICE: genesis-system3-web
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+        
+    - name: Build and Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ env.SERVICE }} \
+          --region ${{ env.REGION }} \
+          --project ${{ env.PROJECT_ID }} \
+          --source . \
+          --allow-unauthenticated \
+          --set-secrets DHAN_CLIENT_ID=system3-dhan-client-id:latest \
+          --set-secrets DHAN_ACCESS_TOKEN=dhan-access-token:latest \
+          --set-secrets DHAN_APP_ID=dhan-app-id:latest \
+          --set-secrets DHAN_APP_SECRET=dhan-app-secret:latest
+          
+    - name: Verify Deployment
+      run: |
+        echo "Checking service health..."
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} \
+          --region ${{ env.REGION }} \
+          --format='value(status.url)')
+        echo "Service URL: $SERVICE_URL"
+        
+        # Wait for service to be ready
+        sleep 10
+        
+        # Check health endpoint
+        curl -f "$SERVICE_URL/health" || exit 1
+        echo "✅ Service deployed and healthy"
+        
+    - name: Post Deployment Report
+      if: always()
+      run: |
+        echo "✅ Deployment completed successfully"
+        gcloud run services describe ${{ env.SERVICE }} \
+          --region ${{ env.REGION }} \
+          --format='table(metadata.name, status.latestReadyRevision, status.url)'
