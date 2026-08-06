@@ -1,88 +1,96 @@
 {
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
-    "connected": true,
-    "http": 200,
-    "reason": "CONNECTED"
+    "connected": false,
+    "http": 0,
+    "reason": "TIMEOUTERROR"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
-    "http": 200,
-    "reason": null,
-    "semantic_ok": true
+    "http": 0,
+    "reason": "TIMEOUTERROR",
+    "semantic_ok": false
   },
-  "generated_utc": "2026-08-05T11:27:38.011855Z",
+  "generated_utc": "2026-08-06T04:20:42.644328Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "CHAIN:NIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
-    "CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
-    "CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
-    "CHAIN:MIDCPNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN"
+    "BROKER:TIMEOUTERROR",
+    "FUNDS:TIMEOUTERROR",
+    "CHAIN:NIFTY:HTTP_503",
+    "CHAIN:BANKNIFTY:TIMEOUTERROR",
+    "CHAIN:FINNIFTY:TIMEOUTERROR",
+    "CHAIN:MIDCPNIFTY:TIMEOUTERROR"
   ],
   "required_chain_ready_count": 0,
   "required_chain_total": 4,
   "required_chains": [
     {
       "contracts": 0,
-      "error": null,
-      "http": 200,
-      "priority": "dhan_only_no_rows",
+      "error": "HTTP_503",
+      "http": 503,
+      "priority": null,
       "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
-      "source": "dhan",
+      "reason": "HTTP_503",
+      "source": null,
       "spot_present": false,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": null,
       "symbol": "NIFTY",
-      "transport_ok": true
+      "transport_ok": false
     },
     {
       "contracts": 0,
-      "error": null,
-      "http": 200,
-      "priority": "dhan_only_no_rows",
+      "error": "TIMEOUTERROR",
+      "http": 0,
+      "priority": null,
       "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
-      "source": "dhan",
+      "reason": "TIMEOUTERROR",
+      "source": null,
       "spot_present": false,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": null,
       "symbol": "BANKNIFTY",
-      "transport_ok": true
+      "transport_ok": false
     },
     {
       "contracts": 0,
-      "error": null,
-      "http": 200,
-      "priority": "dhan_only_no_rows",
+      "error": "TIMEOUTERROR",
+      "http": 0,
+      "priority": null,
       "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
-      "source": "dhan",
+      "reason": "TIMEOUTERROR",
+      "source": null,
       "spot_present": false,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": null,
       "symbol": "FINNIFTY",
-      "transport_ok": true
+      "transport_ok": false
     },
     {
       "contracts": 0,
-      "error": null,
-      "http": 200,
-      "priority": "dhan_only_no_rows",
+      "error": "TIMEOUTERROR",
+      "http": 0,
+      "priority": null,
       "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
-      "source": "dhan",
+      "reason": "TIMEOUTERROR",
+      "source": null,
       "spot_present": false,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": null,
       "symbol": "MIDCPNIFTY",
-      "transport_ok": true
+      "transport_ok": false
     }
   ],
   "secrets_written": false,
   "system3_live_trading_allowed": false,
-  "transport_failures": []
+  "transport_failures": [
+    "BROKER_STATUS_HTTP_0",
+    "CHAIN_NIFTY_HTTP_503",
+    "CHAIN_BANKNIFTY_HTTP_0",
+    "CHAIN_FINNIFTY_HTTP_0",
+    "CHAIN_MIDCPNIFTY_HTTP_0"
+  ]
 }
