@@ -1,6 +1,36 @@
 {
-  "failed_count": 18,
+  "failed_count": 12,
   "failed_runs": [
+    {
+      "branch": "fix/gcp-deploy-preenabled-apis-20260806",
+      "commit": "bdc9287ebec747c1e0e49b22395eeb98d42462d8",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T12:56:56Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103638275",
+      "run_id": 31103638275,
+      "updated_at": "2026-08-06T12:56:56Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "6975eb50fdf78408e5438e4c68dd3bbefd294e2c",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T12:54:13Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103436556",
+      "run_id": 31103436556,
+      "updated_at": "2026-08-06T13:02:42Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "7ac4b8a679da31c298d003ce7e20cea88b1d7bf8",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-06T12:51:59Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103265539",
+      "run_id": 31103265539,
+      "updated_at": "2026-08-06T12:52:20Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
     {
       "branch": "main",
       "commit": "91ddf9839c7eaa515fea6af8938588d6ba4917f8",
@@ -20,6 +50,16 @@
       "run_id": 31103064375,
       "updated_at": "2026-08-06T12:51:53Z",
       "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "main",
+      "commit": "2639a405679d37c46ce72896362f395880fd2762",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T12:49:21Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103064163",
+      "run_id": 31103064163,
+      "updated_at": "2026-08-06T12:53:33Z",
+      "workflow": "Dashboard Visible Proof Isolated"
     },
     {
       "branch": "main",
@@ -80,130 +120,24 @@
       "run_id": 31102296205,
       "updated_at": "2026-08-06T12:39:27Z",
       "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "4b0442430855c1202fbbbe27f0403aeacd492dbd",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:38:24Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102258798",
-      "run_id": 31102258798,
-      "updated_at": "2026-08-06T12:38:24Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "5f6a5cb50e80f21b464cbfb72a3db3788d6e44b4",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:37:45Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102212864",
-      "run_id": 31102212864,
-      "updated_at": "2026-08-06T12:37:45Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "8676f3388e8631ecd73629831cdcd562dbd5e4ba",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:37:26Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102189804",
-      "run_id": 31102189804,
-      "updated_at": "2026-08-06T12:37:26Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "c8fb37d107f7e21976e983ef4ecff6ddc9d000e8",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:36:53Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102151102",
-      "run_id": 31102151102,
-      "updated_at": "2026-08-06T12:37:14Z",
-      "workflow": "GCP Dhan Token Fix CI"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "c8fb37d107f7e21976e983ef4ecff6ddc9d000e8",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:36:52Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102150251",
-      "run_id": 31102150251,
-      "updated_at": "2026-08-06T12:36:52Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "72eed261a25e61e695697a96c16d9f91934ec506",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:36:11Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102100092",
-      "run_id": 31102100092,
-      "updated_at": "2026-08-06T12:36:21Z",
-      "workflow": "GCP Dhan Token Fix CI"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "72eed261a25e61e695697a96c16d9f91934ec506",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:36:10Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102099070",
-      "run_id": 31102099070,
-      "updated_at": "2026-08-06T12:36:10Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "f0b4e1e1565a2195481acd34b827ce088c68c6c1",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:35:41Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102064517",
-      "run_id": 31102064517,
-      "updated_at": "2026-08-06T12:35:51Z",
-      "workflow": "GCP Dhan Token Fix CI"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "f0b4e1e1565a2195481acd34b827ce088c68c6c1",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:35:40Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102062976",
-      "run_id": 31102062976,
-      "updated_at": "2026-08-06T12:35:40Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "dfb815fc3b1f425bb9a1f9d6ae4609c050db717f",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:35:16Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102035164",
-      "run_id": 31102035164,
-      "updated_at": "2026-08-06T12:35:28Z",
-      "workflow": "GCP Dhan Token Fix CI"
     }
   ],
-  "generated_utc": "2026-08-06T12:52:06.760978+00:00",
+  "generated_utc": "2026-08-06T13:02:53.890968+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103638275 conclusion=failure commit=bdc9287ebec747c1e0e49b22395eeb98d42462d8",
+    "Fix workflow 'Dashboard Visual Production Proof' run 31103436556 conclusion=failure commit=6975eb50fdf78408e5438e4c68dd3bbefd294e2c",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 31103265539 conclusion=cancelled commit=7ac4b8a679da31c298d003ce7e20cea88b1d7bf8",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 31103117844 conclusion=cancelled commit=91ddf9839c7eaa515fea6af8938588d6ba4917f8",
     "Fix workflow 'Dashboard Visual Production Proof' run 31103064375 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
+    "Fix workflow 'Dashboard Visible Proof Isolated' run 31103064163 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow 'Cloud Run Auto Deploy' run 31103063820 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103061503 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102566377 conclusion=failure commit=6e59b9ec5714d6026e30e68698f9f55e63d27008",
     "Fix workflow 'Genesis System3 Global Safety CI' run 31102331948 conclusion=cancelled commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102328423 conclusion=failure commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 31102296205 conclusion=cancelled commit=4b0442430855c1202fbbbe27f0403aeacd492dbd",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102258798 conclusion=failure commit=4b0442430855c1202fbbbe27f0403aeacd492dbd",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102212864 conclusion=failure commit=5f6a5cb50e80f21b464cbfb72a3db3788d6e44b4",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102189804 conclusion=failure commit=8676f3388e8631ecd73629831cdcd562dbd5e4ba",
-    "Fix workflow 'GCP Dhan Token Fix CI' run 31102151102 conclusion=failure commit=c8fb37d107f7e21976e983ef4ecff6ddc9d000e8",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102150251 conclusion=failure commit=c8fb37d107f7e21976e983ef4ecff6ddc9d000e8",
-    "Fix workflow 'GCP Dhan Token Fix CI' run 31102100092 conclusion=failure commit=72eed261a25e61e695697a96c16d9f91934ec506",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102099070 conclusion=failure commit=72eed261a25e61e695697a96c16d9f91934ec506",
-    "Fix workflow 'GCP Dhan Token Fix CI' run 31102064517 conclusion=failure commit=f0b4e1e1565a2195481acd34b827ce088c68c6c1",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102062976 conclusion=failure commit=f0b4e1e1565a2195481acd34b827ce088c68c6c1",
-    "Fix workflow 'GCP Dhan Token Fix CI' run 31102035164 conclusion=failure commit=dfb815fc3b1f425bb9a1f9d6ae4609c050db717f"
+    "Fix workflow 'Genesis System3 Global Safety CI' run 31102296205 conclusion=cancelled commit=4b0442430855c1202fbbbe27f0403aeacd492dbd"
   ]
 }
