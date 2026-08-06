@@ -9,7 +9,7 @@
     "Backend has broker diagnose endpoint for env/token probe.",
     "Backend checks Dhan env presence in diagnose route."
   ],
-  "generated_utc": "2026-08-06T12:49:27.350114+00:00",
+  "generated_utc": "2026-08-06T17:53:36.377767+00:00",
   "live_trading_enabled": false,
   "production_grade_claim_allowed": false,
   "required_fixes": [
