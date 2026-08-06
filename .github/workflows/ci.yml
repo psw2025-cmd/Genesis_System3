@@ -1,6 +1,6 @@
 name: Genesis System3 Global Safety CI
 
-# Self-hosted Windows runner CI.
+# GitHub-hosted cloud CI only.
 # Analyzer/Paper only. No live trading. No repo write-back from CI.
 
 on:
@@ -31,7 +31,7 @@ env:
 jobs:
   workflow-policy-guard:
     name: BLOCKING - workflow policy and trading safety guard
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout repository
@@ -56,7 +56,8 @@ jobs:
 
           if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
             mapfile -t workflows < <(
-              git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" --                 '.github/workflows/*.yml' '.github/workflows/*.yaml' | sort
+              git diff --name-only --diff-filter=ACMR "$BASE_SHA" "$HEAD_SHA" -- \
+                '.github/workflows/*.yml' '.github/workflows/*.yaml' | sort
             )
           else
             echo "No usable base SHA; validating the authoritative CI workflow."
@@ -83,6 +84,18 @@ jobs:
             exit 1
           fi
 
+          echo "Checking CI uses GitHub-hosted cloud runners only..."
+          if grep -nE "runs-on:[[:space:]]*self-hosted|runs-on:[[:space:]]*\[[^]]*self-hosted" .github/workflows/ci.yml; then
+            echo "FAIL: self-hosted runner found. Global safety CI must not execute on a laptop/local runner."
+            exit 1
+          fi
+          expected_hosted_jobs=5
+          actual_hosted_jobs=$(grep -cE "runs-on:[[:space:]]*ubuntu-latest" .github/workflows/ci.yml)
+          test "$actual_hosted_jobs" -eq "$expected_hosted_jobs" || {
+            echo "FAIL: expected ${expected_hosted_jobs} ubuntu-latest jobs, found ${actual_hosted_jobs}"
+            exit 1
+          }
+
           echo "Checking forbidden auto-write/deploy commands..."
           if grep -nE "git[[:space:]]+p[u]sh|gh[[:space:]]+pr[[:space:]]+m[e]rge|gh[[:space:]]+r[e]lease|create-pull-r[e]quest|peter-evans/create-pull-r[e]quest|--auto-f[i]x|auto_f[i]x|autof[i]x" "${workflows[@]}"; then
             echo "FAIL: auto-fix/write-back behavior found in workflow."
@@ -104,11 +117,12 @@ jobs:
           grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED: "0"' .github/workflows/ci.yml || { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml"; exit 1; }
 
           echo "policy_guard=PASS"
+          echo "cloud_runner_policy=PASS"
           echo "trading_safety=PASS"
 
   architecture-trading-safety:
     name: BLOCKING - architecture and trading safety gate
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: workflow-policy-guard
     steps:
@@ -128,7 +142,7 @@ jobs:
 
   python-compile-proof:
     name: BLOCKING - Python compile proof
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: workflow-policy-guard
     steps:
@@ -147,7 +161,7 @@ jobs:
 
   full-proof-pack-validation:
     name: BLOCKING - full proof pack validation
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: workflow-policy-guard
     env:
@@ -163,6 +177,11 @@ jobs:
         with:
           fetch-depth: 0
           clean: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Install CI and backend dependencies
         shell: bash
@@ -265,7 +284,7 @@ jobs:
 
   frontend-build:
     name: BLOCKING - frontend production build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: workflow-policy-guard
     defaults:
