@@ -1,6 +1,6 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-06T07:11:36.760199+00:00`
+Generated UTC: `2026-08-06T07:17:41.490698+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
 Failed workflow count: `14`
@@ -12,6 +12,8 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31079967363 conclusion=cancelled commit=cda4bebde868aa28f57b91e9906a569bc101f92c
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 31079922084 conclusion=failure commit=f92f49f9097df05c1c2ff0bf717eb7aa98d5e6e3
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31079517786 conclusion=cancelled commit=c1e109050c526992ea78d224252d868f5dd06947
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 31079471388 conclusion=failure commit=30a8d4c332f1126f27ca0e955171df5ecaa563cc
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31079465567 conclusion=failure commit=30a8d4c332f1126f27ca0e955171df5ecaa563cc
@@ -24,13 +26,13 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 31078655242 conclusion=failure commit=c7ca78a2515645b612b02b14a1e6fac61b8f876c
 - [ ] Fix workflow 'Dashboard Visible Proof Isolated' run 31078655092 conclusion=failure commit=c7ca78a2515645b612b02b14a1e6fac61b8f876c
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31078653667 conclusion=failure commit=c7ca78a2515645b612b02b14a1e6fac61b8f876c
-- [ ] Fix workflow 'System3 Broker Chain Semantic Gate' run 31077677668 conclusion=failure commit=c6d896aabe693db5ea893307b03454e57d303b4f
-- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31077568204 conclusion=cancelled commit=0c386dede1bd5125b5ec87cf9d172625d0b8efb7
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 1000 Point TODO Status Updater | 31079967363 | cancelled | `cda4bebde868` | 2026-08-06T07:11:54Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31079967363 |
+| Dashboard Visual Production Proof | 31079922084 | failure | `f92f49f9097d` | 2026-08-06T07:17:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31079922084 |
 | System3 1000 Point TODO Status Updater | 31079517786 | cancelled | `c1e109050c52` | 2026-08-06T07:04:42Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31079517786 |
 | Dashboard Visual Production Proof | 31079471388 | failure | `30a8d4c332f1` | 2026-08-06T07:11:20Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31079471388 |
 | .github/workflows/options-ml-training-proof.yml | 31079465567 | failure | `30a8d4c332f1` | 2026-08-06T07:03:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31079465567 |
@@ -43,5 +45,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 Latest Truth Publish | 31078655242 | failure | `c7ca78a25156` | 2026-08-06T07:03:18Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31078655242 |
 | Dashboard Visible Proof Isolated | 31078655092 | failure | `c7ca78a25156` | 2026-08-06T06:52:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31078655092 |
 | .github/workflows/options-ml-training-proof.yml | 31078653667 | failure | `c7ca78a25156` | 2026-08-06T06:50:17Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31078653667 |
-| System3 Broker Chain Semantic Gate | 31077677668 | failure | `c6d896aabe69` | 2026-08-06T06:35:11Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31077677668 |
-| System3 1000 Point TODO Status Updater | 31077568204 | cancelled | `0c386dede1bd` | 2026-08-06T06:31:44Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31077568204 |
