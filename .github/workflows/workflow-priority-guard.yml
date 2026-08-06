@@ -1,0 +1,43 @@
+name: Workflow Priority Guard
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/scripts/workflow_priority_guard.py"
+      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/scripts/workflow_priority_guard.py"
+      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: workflow-priority-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SYSTEM3_MODE: analyze
+  ANALYZE_MODE: "1"
+  LIVE_TRADING_ENABLED: "0"
+  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+  AUTO_EXECUTE_TRADES: "0"
+
+jobs:
+  enforce-priority-only:
+    name: BLOCKING - priority workflows only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enforce permanent workflow allow-list
+        run: python .github/scripts/workflow_priority_guard.py
