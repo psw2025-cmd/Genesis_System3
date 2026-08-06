@@ -1,0 +1,57 @@
+name: GCP Dhan Token Fix CI
+
+on:
+  push:
+    branches:
+      - "fix/gcp-dhan-token-rotation-ui-proof-*"
+  pull_request:
+    paths:
+      - "core/brokers/dhan/**"
+      - "core/utils/env_loader.py"
+      - "scripts/start_cloud_run.py"
+      - "scripts/gcp_dhan_token_rotation_job.py"
+      - "dashboard/backend/**"
+      - "dashboard/frontend/**"
+      - "tests/test_gcp_dhan_token_rotation_contract.py"
+      - ".github/workflows/cloud-run-auto-deploy.yml"
+      - ".github/workflows/gcp-dhan-token-rotation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python compile and unit contracts
+        run: |
+          python -m compileall -q core dashboard scripts tests
+          python -m unittest -v tests.test_gcp_dhan_token_rotation_contract
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: dashboard/frontend/package-lock.json
+
+      - name: Frontend production build
+        working-directory: dashboard/frontend
+        run: |
+          npm ci --legacy-peer-deps
+          npm run build
+          grep -R -q "TOKEN ROTATION PROOF" dist/assets
+
+      - name: Analyzer-only safety grep
+        run: |
+          ! grep -R -nE "LIVE_TRADING_ENABLED.?=.?1|SYSTEM3_LIVE_TRADING_ALLOWED.?=.?1|AUTO_EXECUTE_TRADES.?=.?1" \
+            core/brokers/dhan/cloud_token_provider.py \
+            core/brokers/dhan/cloud_runtime_patch.py \
+            scripts/start_cloud_run.py \
+            scripts/gcp_dhan_token_rotation_job.py
