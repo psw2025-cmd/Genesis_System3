@@ -1,9 +1,9 @@
 {
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
-    "connected": false,
+    "connected": true,
     "http": 200,
-    "reason": "BROKER_NOT_CONNECTED"
+    "reason": "CONNECTED"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
@@ -11,32 +11,30 @@
     "reason": null,
     "semantic_ok": true
   },
-  "generated_utc": "2026-08-06T09:35:03.491232Z",
+  "generated_utc": "2026-08-06T10:33:57.782358Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "BROKER:BROKER_NOT_CONNECTED",
-    "CHAIN:NIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
     "CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
     "CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
     "CHAIN:MIDCPNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN"
   ],
-  "required_chain_ready_count": 0,
+  "required_chain_ready_count": 1,
   "required_chain_total": 4,
   "required_chains": [
     {
-      "contracts": 0,
+      "contracts": 160,
       "error": null,
       "http": 200,
-      "priority": "dhan_only_no_rows",
-      "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
       "source": "dhan",
-      "spot_present": false,
+      "spot_present": true,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "NIFTY",
       "transport_ok": true
     },
