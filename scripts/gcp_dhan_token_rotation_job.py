@@ -23,36 +23,26 @@ MIN_HOURS = float(os.getenv("DHAN_ROTATE_WHEN_HOURS_LEFT", "6"))
 
 
 def _latest_version_proof() -> dict:
+    """Return the concrete version backing `latest`, without exposing its value."""
     try:
         from google.cloud import secretmanager
 
         client = secretmanager.SecretManagerServiceClient()
-        parent = f"projects/{PROJECT}/secrets/{SECRET_ID}"
-        versions = list(
-            client.list_secret_versions(
-                request={"parent": parent, "filter": "state:ENABLED"}
-            )
-        )
-        if not versions:
-            return {"secret_id": SECRET_ID, "version": None, "created_at_utc": None}
-        latest = max(versions, key=lambda item: int(item.name.rsplit("/", 1)[-1]))
-        created = getattr(latest, "create_time", None)
-        if hasattr(created, "ToDatetime"):
-            created = created.ToDatetime()
-        if isinstance(created, datetime):
-            if created.tzinfo is None:
-                created = created.replace(tzinfo=timezone.utc)
-            created = created.astimezone(timezone.utc).isoformat()
+        resource = f"projects/{PROJECT}/secrets/{SECRET_ID}/versions/latest"
+        response = client.access_secret_version(request={"name": resource})
+        version_name = str(getattr(response, "name", "") or "")
         return {
             "secret_id": SECRET_ID,
-            "version": latest.name.rsplit("/", 1)[-1],
-            "created_at_utc": str(created) if created else None,
+            "version": version_name.rsplit("/", 1)[-1] if version_name else None,
+            "token_present": bool(getattr(getattr(response, "payload", None), "data", b"")),
+            "raw_token_exposed": False,
         }
     except Exception as exc:
         return {
             "secret_id": SECRET_ID,
             "version": None,
-            "created_at_utc": None,
+            "token_present": False,
+            "raw_token_exposed": False,
             "metadata_error_type": type(exc).__name__,
         }
 
@@ -69,6 +59,7 @@ def _safe_verify(raw: dict) -> dict:
 
 def main() -> int:
     os.environ["CLOUD_MODE"] = "1"
+    os.environ["CLOUD_WORKER"] = "1"
     os.environ["DHAN_PERSIST_TOKEN_TO_SM"] = "1"
     os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
     os.environ["LIVE_TRADING_ENABLED"] = "0"
