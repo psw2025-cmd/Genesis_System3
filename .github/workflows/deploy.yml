@@ -36,7 +36,8 @@ jobs:
           --set-secrets DHAN_CLIENT_ID=system3-dhan-client-id:latest \
           --set-secrets DHAN_ACCESS_TOKEN=dhan-access-token:latest \
           --set-secrets DHAN_APP_ID=dhan-app-id:latest \
-          --set-secrets DHAN_APP_SECRET=dhan-app-secret:latest
+          --set-secrets DHAN_APP_SECRET=dhan-app-secret:latest \
+          --set-env-vars REQUIRE_API_KEY=false,API_KEY=""
           
     - name: Verify Deployment
       run: |
