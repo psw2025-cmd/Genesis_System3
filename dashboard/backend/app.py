@@ -1692,8 +1692,8 @@ _PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) be
 _PUSHED_CHAIN_STALE_SERVE_S_CLOSED = 86400  # after hours: never block UI waiting on Dhan OC
 _PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
 _INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
-_CHAIN_LIVE_TIMEOUT_OPEN_S = 12.0
-_CHAIN_LIVE_TIMEOUT_CLOSED_S = 4.0
+_CHAIN_LIVE_TIMEOUT_OPEN_S = 25.0
+_CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 
 
 @app.post("/api/chain/push")
@@ -5224,11 +5224,8 @@ async def index_chain_micro_loop():
         idx += 1
         open_now = bool(_market_open_from_state())
         try:
-            # After hours: allow longer Dhan OC fetch so BANKNIFTY/MIDCPNIFTY can warm
-            # (UI /api/chain still uses short outer timeout + cache fallback).
-            result = await _get_chain_uncached(
-                sym, closed_timeout_s=22.0 if not open_now else None
-            )
+            # Generous timeout both open/closed — DSM OC often needs >12s under load.
+            result = await _get_chain_uncached(sym, closed_timeout_s=28.0)
             if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
                 payload = dict(result)
                 payload["stream_mode"] = "index_chain_micro"
