@@ -4,14 +4,14 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-13:46:33 IST
+15:07:05 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 4s
 MARKET OPEN
 DHAN API OK
 PAPER
@@ -103,7 +103,7 @@ WAITING
 Option Chain
 No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 Gate Matrix
-3/7 PASS
+2/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
 1/5 days · ρ=0.2 · need ≥0.7
@@ -115,11 +115,11 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=60.15s refresh=60s
+tick_age=46.68s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
-PASS
+PEND
 Option Strike Visibility
 Run scripts/system3_option_visibility_audit.py
 PASS

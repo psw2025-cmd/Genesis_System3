@@ -4,14 +4,14 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-13:47:30 IST
+15:08:02 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 2s
+TICK 0s
 MARKET OPEN
 DHAN API OK
 PAPER
@@ -89,3 +89,5 @@ Live Allowed
 false
 Broker Data Visibility
 READ-ONLY WHEN API RESPONDS
+Blocker 1
+Broker not connected - real data unavailable
