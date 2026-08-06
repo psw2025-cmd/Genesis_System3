@@ -168,7 +168,7 @@ jobs:
               --http-method=POST \
               --oauth-service-account-email="${RUNTIME_SA}" \
               --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" \
-              --headers="Content-Type=application/json" \
+              --update-headers="Content-Type=application/json" \
               --message-body='{}'
           else
             gcloud scheduler jobs create http "${DHAN_ROTATION_SCHEDULER}" \
