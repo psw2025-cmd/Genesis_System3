@@ -1,6 +1,36 @@
 {
-  "failed_count": 12,
+  "failed_count": 13,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "b329a040606bdee429771b06876a80fc38876e38",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T13:24:24Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31105759417",
+      "run_id": 31105759417,
+      "updated_at": "2026-08-06T13:30:31Z",
+      "workflow": "Dashboard Visual Production Proof"
+    },
+    {
+      "branch": "fix/options-ml-workflow-yaml-20260806",
+      "commit": "9504db4d6ce403bb19f84e9248c942d178fef4e1",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T13:16:57Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31105186998",
+      "run_id": 31105186998,
+      "updated_at": "2026-08-06T13:17:34Z",
+      "workflow": "Genesis System3 Global Safety CI"
+    },
+    {
+      "branch": "main",
+      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T13:03:45Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104163503",
+      "run_id": 31104163503,
+      "updated_at": "2026-08-06T13:08:06Z",
+      "workflow": "Cloud Run Auto Deploy"
+    },
     {
       "branch": "main",
       "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
@@ -95,38 +125,21 @@
       "branch": "main",
       "commit": "2639a405679d37c46ce72896362f395880fd2762",
       "conclusion": "failure",
-      "created_at": "2026-08-06T12:49:19Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103061503",
-      "run_id": 31103061503,
-      "updated_at": "2026-08-06T12:49:19Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "6e59b9ec5714d6026e30e68698f9f55e63d27008",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:42:41Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102566377",
-      "run_id": 31102566377,
-      "updated_at": "2026-08-06T12:42:41Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "f38d190f45b4c890c80eecfe54ec8c6c24690e72",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-06T12:39:26Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102331948",
-      "run_id": 31102331948,
-      "updated_at": "2026-08-06T12:42:55Z",
-      "workflow": "Genesis System3 Global Safety CI"
+      "created_at": "2026-08-06T12:49:20Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103063730",
+      "run_id": 31103063730,
+      "updated_at": "2026-08-06T13:08:02Z",
+      "workflow": "System3 Latest Truth Publish"
     }
   ],
-  "generated_utc": "2026-08-06T13:05:11.835047+00:00",
+  "generated_utc": "2026-08-06T13:30:45.631723+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'Dashboard Visual Production Proof' run 31105759417 conclusion=failure commit=b329a040606bdee429771b06876a80fc38876e38",
+    "Fix workflow 'Genesis System3 Global Safety CI' run 31105186998 conclusion=failure commit=9504db4d6ce403bb19f84e9248c942d178fef4e1",
+    "Fix workflow 'Cloud Run Auto Deploy' run 31104163503 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31104160286 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 31104088319 conclusion=cancelled commit=0b333291945bb1cefc6df270b8cb6dabe8a697e5",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103638275 conclusion=failure commit=bdc9287ebec747c1e0e49b22395eeb98d42462d8",
@@ -136,8 +149,6 @@
     "Fix workflow 'Dashboard Visual Production Proof' run 31103064375 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow 'Dashboard Visible Proof Isolated' run 31103064163 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow 'Cloud Run Auto Deploy' run 31103063820 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103061503 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102566377 conclusion=failure commit=6e59b9ec5714d6026e30e68698f9f55e63d27008",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 31102331948 conclusion=cancelled commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72"
+    "Fix workflow 'System3 Latest Truth Publish' run 31103063730 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762"
   ]
 }
