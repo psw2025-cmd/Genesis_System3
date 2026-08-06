@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source:
-        description: Data source: dhan or csv
+        description: "Data source: dhan or csv"
         required: true
         default: dhan
       lookback_days:
