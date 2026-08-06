@@ -5,16 +5,16 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "98086ea6912361a64b0360ebf7642ba9f6596a0e",
+      "commit": "b83a1daa9489e6da9b3d8b5b5545adc4d5e1f595",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31056812892",
-      "run_id": 31056812892,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31060773245",
+      "run_id": 31060773245,
       "status": "completed",
-      "updated_at": "2026-08-05T23:39:19Z",
+      "updated_at": "2026-08-06T00:52:11Z",
       "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-06T00:27:19.675513Z",
+  "generated_utc": "2026-08-06T01:34:18.628301Z",
   "github_failed_count": 1,
   "github_pending_count": 0,
   "github_timeout_s": 12.0,
@@ -35,7 +35,7 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31056812892 conclusion=failure commit=98086ea69123"
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31060773245 conclusion=failure commit=b83a1daa9489"
   ],
   "todo_count": 1,
   "tracker_internal_status": "PASS",
