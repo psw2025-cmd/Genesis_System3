@@ -2,8 +2,9 @@
 """Auto-deploy Genesis System3 web service to Cloud Run (image update only).
 
 Builds an immutable image tagged with the full git SHA, then patches the Cloud
-Run service container image + safe env vars. Secret mounts and other env are
-preserved (never use bare --set-env-vars).
+Run service container image + safe env vars. Broker secret mounts and other env
+are preserved, while the dashboard API-key lock is deliberately removed during
+the analyzer/paper phase.
 
 Live trading flags are always forced OFF.
 """
@@ -32,6 +33,7 @@ SAFE_ENV = (
     ("LIVE_TRADING_ENABLED", "0"),
     ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
     ("AUTO_EXECUTE_TRADES", "0"),
+    ("REQUIRE_API_KEY", "false"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
@@ -195,8 +197,9 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     for k, v in SAFE_ENV:
         env_map[k] = {"name": k, "value": v}
     env_map["DEPLOY_GIT_SHA"] = {"name": "DEPLOY_GIT_SHA", "value": sha}
-    # Never keep PIN/TOTP on Cloud Run — minting there invalidates SM-mounted tokens.
-    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP"):
+    # Never keep PIN/TOTP on Cloud Run. Dashboard API_KEY also stays absent
+    # until a separately reviewed live-readiness security implementation.
+    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP", "API_KEY"):
         env_map.pop(drop, None)
     c0["env"] = list(env_map.values())
     patch = session.patch(
@@ -242,6 +245,7 @@ def main() -> int:
     print("IMAGE", image)
     print("SERVICE", SERVICE)
     print("LIVE_OFF enforced")
+    print("DASHBOARD_API_LOCK disabled")
 
     session = _session()
     tgz = _archive_tarball(sha)
