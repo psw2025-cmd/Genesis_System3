@@ -40,6 +40,7 @@ export function SystemTab() {
       </div>
 
       {apiStatus?.status === 'API_AUTH_REQUIRED' && <AuthUnlock />}
+      {/auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || '')) && apiStatus?.status !== 'API_AUTH_REQUIRED' && <AuthUnlock />}
 
       <div className="card p-5">
         <h3 className="text-sm font-semibold text-text-primary mb-3">Safety</h3>

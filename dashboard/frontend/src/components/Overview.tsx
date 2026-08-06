@@ -167,7 +167,9 @@ export function Overview() {
           </div>
         )}
       </div>
-      {apiStatus?.status === 'API_AUTH_REQUIRED' && <AuthUnlock />}
+      { (apiStatus?.status === 'API_AUTH_REQUIRED'
+        || /auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || ''))
+      ) && <AuthUnlock /> }
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI label="Broker"         value={brokerConn ? 'CONNECTED' : brokerStatus || brokerFunds || brokerHoldings || brokerPositions ? 'API RESPONDED' : 'OFFLINE'}

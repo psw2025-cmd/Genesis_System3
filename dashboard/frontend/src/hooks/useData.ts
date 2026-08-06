@@ -167,6 +167,12 @@ function isRealDhanChainPayload(data: any) {
   return dhanish && spot > 0 && contracts > 0
 }
 
+function isChainWarmingPayload(data: any) {
+  if (!data || typeof data !== 'object') return false
+  const status = String(data.status || '').toUpperCase()
+  return status === 'CHAIN_CACHE_WARMING' || status === 'NO_DHAN_DATA'
+}
+
 function keepLastGood(previous: any, apiStatus: any, label: string) {
   if (!previous) return null
   return {
@@ -304,8 +310,27 @@ export function useData() {
         })
         return
       }
+      // After-hours / cold-cache warm is expected — never paint sticky NETWORK_ERROR.
+      if (isChainWarmingPayload(data)) {
+        setChain(sym, {
+          underlying: sym,
+          contracts: [],
+          spot: 0,
+          pcr: 1,
+          total_contracts: 0,
+          data_source: 'dhan',
+          status: String(data.status || 'CHAIN_CACHE_WARMING'),
+          stale: true,
+          snapshot: true,
+          live: false,
+          blocked: false,
+          optional: isOptionalChain(sym),
+          message: data.message || 'Index chain warming from Dhan cache',
+        })
+        return
+      }
       const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
-      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/chain/${sym}`, message: blocked.blocked_reason })
+      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/batch/chains`, message: blocked.blocked_reason })
       setChain(sym, blocked)
       return
     }
@@ -324,35 +349,52 @@ export function useData() {
 
   const pollChain = useCallback(async (sym: string) => {
     try {
-      const data = await fetchJSON(`/api/chain/${sym}`, 8000)
+      const data = await fetchJSON(`/api/chain/${sym}`, 12000)
       applyChainPayload(sym, data)
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       const prev = useStore.getState().chain?.[sym]
       const retain = isTransient(apiStatus.code) || apiStatus.status === 'API_AUTH_REQUIRED' || Boolean(prev?.contracts?.length)
-      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, apiStatus)
+      // Soft-fail individual chain: do not overwrite Overview with NETWORK_ERROR when
+      // batch path is the primary source of truth (especially after hours).
+      if (!isOptionalChain(sym) && apiStatus.status === 'API_AUTH_REQUIRED') markFailure(`chain_${sym}`, apiStatus)
       if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
-      else setChain(sym, blockedChain(sym, apiStatus))
+      else setChain(sym, {
+        ...blockedChain(sym, apiStatus),
+        status: 'CHAIN_CACHE_WARMING',
+        blocked: false,
+        message: apiStatus.message || 'Waiting for Dhan chain cache',
+      })
     }
   }, [applyChainPayload, setChain, markFailure])
 
   const pollAllChains = useCallback(async () => {
     try {
-      const batch = await fetchJSON('/api/batch/chains', 8000)
+      const batch = await fetchJSON('/api/batch/chains', 15000)
       const chains = batch?.chains && typeof batch.chains === 'object' ? batch.chains : {}
       ENABLED_CHAIN_SYMBOLS.forEach((sym) => {
         if (chains[sym]) applyChainPayload(sym, chains[sym])
+        else applyChainPayload(sym, { status: 'CHAIN_CACHE_WARMING', data_source: 'dhan', message: 'Missing from batch chains' })
       })
+      // Batch OK clears sticky chain_* NETWORK_ERROR leftovers.
+      ENABLED_CHAIN_SYMBOLS.forEach((sym) => { failureCountRef.current[`chain_${sym}`] = 0 })
       markSuccess('chains_batch')
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
         ? authStatus('/api/batch/chains', err.status)
         : { status: 'API_ERROR', code: 0, path: '/api/batch/chains', message: String(err?.message || err) }
       markFailure('chains_batch', apiStatus)
-      // Soft fallback: stagger individual chain polls with short timeout (never stampede for 45s).
-      ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
-        setTimeout(() => { if (!unmountedRef.current) void pollChain(sym) }, 250 * (idx + 1))
-      })
+      // Soft fallback only when market likely open; after-hours keep warming placeholders.
+      const marketOpen = Boolean(useStore.getState().marketOpen)
+      if (marketOpen) {
+        ENABLED_CHAIN_SYMBOLS.forEach((sym, idx) => {
+          setTimeout(() => { if (!unmountedRef.current) void pollChain(sym) }, 250 * (idx + 1))
+        })
+      } else {
+        ENABLED_CHAIN_SYMBOLS.forEach((sym) => {
+          applyChainPayload(sym, { status: 'CHAIN_CACHE_WARMING', data_source: 'dhan', message: 'Batch chains timeout — waiting for cache warm' })
+        })
+      }
     }
   }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
