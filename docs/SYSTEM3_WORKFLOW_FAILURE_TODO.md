@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-06T06:24:59.943974+00:00`
+Generated UTC: `2026-08-06T06:25:32.062058+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `14`
+Failed workflow count: `13`
 
 ## Rule
 
@@ -12,6 +12,8 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31077214632 conclusion=cancelled commit=a80a24641603c6fb383aac98a39a9118750ca752
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31077197792 conclusion=cancelled commit=a7bf39779e64525cd551cec7a6f5fe0072c7758c
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31077188768 conclusion=failure commit=dca2d5a2b9756443af465e3df8d6b2711caf9711
 - [ ] Fix workflow 'Cloud Runtime Check' run 31076916242 conclusion=cancelled commit=614f1061634465e1d7fa474bad4d163e42c2303f
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31076790540 conclusion=cancelled commit=86c6837ff85748308d6d07e8347b251437a278d7
@@ -23,14 +25,13 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31076436759 conclusion=cancelled commit=aff792bbda6cbf9579b953505df5a693362818e3
 - [ ] Fix workflow 'System3 Latest Truth Publish' run 31076389432 conclusion=failure commit=095966a03dc54f8f20030c4862d979057c5d9685
 - [ ] Fix workflow 'Dashboard Visual Production Proof' run 31076389416 conclusion=failure commit=095966a03dc54f8f20030c4862d979057c5d9685
-- [ ] Fix workflow 'Genesis System3 Global Safety CI' run 31076389406 conclusion=cancelled commit=095966a03dc54f8f20030c4862d979057c5d9685
-- [ ] Fix workflow 'Cloud Runtime Check' run 31076389396 conclusion=cancelled commit=095966a03dc54f8f20030c4862d979057c5d9685
-- [ ] Fix workflow 'Dashboard Visible Proof Isolated' run 31076389390 conclusion=failure commit=095966a03dc54f8f20030c4862d979057c5d9685
 
 ## Failed run details
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 1000 Point TODO Status Updater | 31077214632 | cancelled | `a80a24641603` | 2026-08-06T06:25:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31077214632 |
+| System3 1000 Point TODO Status Updater | 31077197792 | cancelled | `a7bf39779e64` | 2026-08-06T06:25:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31077197792 |
 | .github/workflows/options-ml-training-proof.yml | 31077188768 | failure | `dca2d5a2b975` | 2026-08-06T06:24:40Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31077188768 |
 | Cloud Runtime Check | 31076916242 | cancelled | `614f10616344` | 2026-08-06T06:24:59Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076916242 |
 | System3 1000 Point TODO Status Updater | 31076790540 | cancelled | `86c6837ff857` | 2026-08-06T06:17:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076790540 |
@@ -42,6 +43,3 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | System3 1000 Point TODO Status Updater | 31076436759 | cancelled | `aff792bbda6c` | 2026-08-06T06:11:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076436759 |
 | System3 Latest Truth Publish | 31076389432 | failure | `095966a03dc5` | 2026-08-06T06:24:35Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076389432 |
 | Dashboard Visual Production Proof | 31076389416 | failure | `095966a03dc5` | 2026-08-06T06:16:12Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076389416 |
-| Genesis System3 Global Safety CI | 31076389406 | cancelled | `095966a03dc5` | 2026-08-06T06:17:09Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076389406 |
-| Cloud Runtime Check | 31076389396 | cancelled | `095966a03dc5` | 2026-08-06T06:17:06Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076389396 |
-| Dashboard Visible Proof Isolated | 31076389390 | failure | `095966a03dc5` | 2026-08-06T06:12:29Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31076389390 |
