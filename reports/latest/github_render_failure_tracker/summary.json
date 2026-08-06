@@ -5,23 +5,53 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "b329a040606bdee429771b06876a80fc38876e38",
+      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31105759417",
-      "run_id": 31105759417,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31112503652",
+      "run_id": 31112503652,
       "status": "completed",
-      "updated_at": "2026-08-06T13:30:31Z",
+      "updated_at": "2026-08-06T14:46:23Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "9384df8dadbec73d267fcba555985801e5d5abb1",
+      "conclusion": "cancelled",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31109982199",
+      "run_id": 31109982199,
+      "status": "completed",
+      "updated_at": "2026-08-06T14:26:29Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
+      "commit": "c64f2f6ad50b845a0d6f2402b9f834a068bc7570",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31108818095",
+      "run_id": 31108818095,
+      "status": "completed",
+      "updated_at": "2026-08-06T14:03:17Z",
+      "workflow": "Dashboard Visible Proof Warmed"
+    },
+    {
+      "branch": "main",
+      "commit": "22f63ca93073649250f4b1923e5580d1aaadb80a",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31108182775",
+      "run_id": 31108182775,
+      "status": "completed",
+      "updated_at": "2026-08-06T14:00:52Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
-      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
+      "commit": "22f63ca93073649250f4b1923e5580d1aaadb80a",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104163503",
-      "run_id": 31104163503,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31108274718",
+      "run_id": 31108274718,
       "status": "completed",
-      "updated_at": "2026-08-06T13:08:06Z",
-      "workflow": "Cloud Run Auto Deploy"
+      "updated_at": "2026-08-06T13:56:11Z",
+      "workflow": "Dashboard Deploy Provenance Gate"
     },
     {
       "branch": "main",
@@ -35,16 +65,6 @@
     },
     {
       "branch": "main",
-      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104160286",
-      "run_id": 31104160286,
-      "status": "completed",
-      "updated_at": "2026-08-06T13:03:42Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
       "commit": "2639a405679d37c46ce72896362f395880fd2762",
       "conclusion": "failure",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31103064163",
@@ -54,16 +74,27 @@
       "workflow": "Dashboard Visible Proof Isolated"
     }
   ],
-  "generated_utc": "2026-08-06T13:34:06.547021Z",
-  "github_failed_count": 5,
-  "github_pending_count": 0,
+  "generated_utc": "2026-08-06T14:47:36.732066Z",
+  "github_failed_count": 7,
+  "github_pending_count": 1,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [],
+  "pending_workflows": [
+    {
+      "branch": "main",
+      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
+      "conclusion": null,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104163503",
+      "run_id": 31104163503,
+      "status": "in_progress",
+      "updated_at": "2026-08-06T14:46:34Z",
+      "workflow": "Cloud Run Auto Deploy"
+    }
+  ],
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
@@ -184,10 +215,12 @@
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31105759417 conclusion=failure commit=b329a040606b",
-    "Fix latest GitHub workflow 'Cloud Run Auto Deploy' run=31104163503 conclusion=failure commit=a03198dde8bf",
+    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=31112503652 conclusion=failure commit=a03198dde8bf",
+    "Fix latest GitHub workflow 'System3 1000 Point TODO Status Updater' run=31109982199 conclusion=cancelled commit=9384df8dadbe",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Warmed' run=31108818095 conclusion=failure commit=c64f2f6ad50b",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31108182775 conclusion=failure commit=22f63ca93073",
+    "Fix latest GitHub workflow 'Dashboard Deploy Provenance Gate' run=31108274718 conclusion=failure commit=22f63ca93073",
     "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31103063730 conclusion=failure commit=2639a405679d",
-    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=31104160286 conclusion=failure commit=a03198dde8bf",
     "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=31103064163 conclusion=failure commit=2639a405679d",
     "Fix Render endpoint /api/state: HTTP status 401 status=401",
     "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
@@ -199,7 +232,7 @@
     "Fix Render endpoint /api/paper: HTTP status 401 status=401",
     "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401"
   ],
-  "todo_count": 14,
+  "todo_count": 16,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
