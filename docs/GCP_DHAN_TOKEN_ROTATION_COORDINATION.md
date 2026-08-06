@@ -2,7 +2,8 @@
 
 **Authoritative implementation:** PR #85  
 **Target runtime:** Google Cloud Run, Google Secret Manager and Google Cloud Scheduler only  
-**Safety mode:** analyzer/read-only; live trading and order routing remain disabled
+**Safety mode:** analyzer/read-only; live trading and order routing remain disabled  
+**Integration status:** final branch is rebased on Claude commit `e330c1d`; full validation is required before merge
 
 ## Reserved scope
 
