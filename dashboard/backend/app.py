@@ -1701,20 +1701,20 @@ _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 # before the HTTP request even started (NO_DHAN_DATA / DSM timed out).
 _DHAN_OC_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="dhan-oc")
 _DHAN_OC_LOCK = asyncio.Lock()
-_DHAN_OC_THREAD_LOCK = threading.Lock()
 
 
 async def _run_dhan_oc(fn, *args, timeout: float = 25.0, **kwargs):
-    """Run one Dhan OC fetch at a time on a dedicated worker thread."""
+    """Run one Dhan OC fetch at a time on a dedicated worker thread.
 
-    def _locked_call():
-        with _DHAN_OC_THREAD_LOCK:
-            return fn(*args, **kwargs)
+    DSM already serializes with its own threading lock — do not add a second
+    app-level thread lock here (that deadlocked against market-top and timed out
+    /api/chain at exactly 25s).
+    """
 
     async with _DHAN_OC_LOCK:
         loop = asyncio.get_running_loop()
         return await asyncio.wait_for(
-            loop.run_in_executor(_DHAN_OC_EXECUTOR, _locked_call),
+            loop.run_in_executor(_DHAN_OC_EXECUTOR, lambda: fn(*args, **kwargs)),
             timeout=timeout,
         )
 
@@ -5300,28 +5300,26 @@ async def market_top_micro_loop():
                     except Exception:
                         prior = {}
 
-                # Serialize against index-chain micro Dhan OC lane.
-                with _DHAN_OC_THREAD_LOCK:
-                    report = build_top_contract_gainers_report(
-                        top_n=5,
-                        market_top_n=25,
-                        include_equity=False,
-                    )
-                    # Index micro-loop owns the single Dhan OC lane during market hours.
-                    # Equity fan-out previously hogged the shared executor and timed out index OC.
-                    if os.environ.get("MARKET_TOP_EQUITY_ENRICH", "0") in ("1", "true", "True"):
-                        try:
-                            with_eq = build_top_contract_gainers_report(
-                                top_n=5,
-                                market_top_n=40,
-                                include_equity=True,
-                                equity_limit=8,
-                                overall_timeout_s=95.0,
-                                rotate_equity=True,
-                            )
-                            report = merge_market_top_reports(report, with_eq, market_top_n=25)
-                        except Exception as eq_exc:
-                            report["equity_enrich_error"] = str(eq_exc)[:200]
+                # Fast index board only — DSM serializes OC internally.
+                report = build_top_contract_gainers_report(
+                    top_n=5,
+                    market_top_n=25,
+                    include_equity=False,
+                )
+                # Equity enrich off by default so index micro keeps OC budget.
+                if os.environ.get("MARKET_TOP_EQUITY_ENRICH", "0") in ("1", "true", "True"):
+                    try:
+                        with_eq = build_top_contract_gainers_report(
+                            top_n=5,
+                            market_top_n=40,
+                            include_equity=True,
+                            equity_limit=8,
+                            overall_timeout_s=95.0,
+                            rotate_equity=True,
+                        )
+                        report = merge_market_top_reports(report, with_eq, market_top_n=25)
+                    except Exception as eq_exc:
+                        report["equity_enrich_error"] = str(eq_exc)[:200]
                 if prior and int(prior.get("contracts_scored_total") or 0) > 0:
                     report = merge_market_top_reports(prior, report, market_top_n=25)
                 scored = int(report.get("contracts_scored_total") or 0)
