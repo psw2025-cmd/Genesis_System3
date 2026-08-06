@@ -15,7 +15,7 @@ on:
     - cron: '30 11 * * 1-5'
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   ANALYZE_MODE: '1'
@@ -47,15 +47,6 @@ jobs:
           SRC="${{ github.event.inputs.source || 'dhan' }}"
           DAYS="${{ github.event.inputs.lookback_days || '45' }}"
           python scripts/options_ce_pe_history_pipeline.py --mode full --source "$SRC" --lookback-days "$DAYS"
-      - name: Commit CE/PE ML proof summary
-        if: always()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/latest/options_contract_builder/ reports/latest/options_ml_training/ state/options_history/contracts.csv state/options_history/dataset/ce_pe_dataset.csv state/models/options_ce_pe_model.joblib 2>/dev/null || true
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "ci(ml): publish CE PE options training proof [skip ci]"
-          bash tools/ci_git_push_with_rebase.sh main origin
       - name: Upload CE/PE ML artifacts
         uses: actions/upload-artifact@v4
         if: always()
