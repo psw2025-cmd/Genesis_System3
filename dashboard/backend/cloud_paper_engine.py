@@ -42,8 +42,11 @@ SLIPPAGE_PCT = 0.001
 # Paper SL/TP (matches Phase C protection settings)
 SL_PCT = 12.0
 TARGET_PCT = 18.0
-NEAR_ATM_PCT = 3.0
+NEAR_ATM_PCT = 5.0
 HIGH_RISE_NEAR_ATM_PCT = 8.0
+# Paper must chase live Dhan % gainers, not OI-flow noise.
+MIN_GAIN_PCT_TO_OPEN = 3.0
+MIN_LTP_TO_OPEN = 8.0
 
 
 def _now_ist() -> datetime:
@@ -141,40 +144,45 @@ class CloudPaperEngine:
             self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Pick one near-ATM contract.
+        """Pick one tradeable contract by pure Dhan LTP % gain (highest first).
 
-        Default: highest OI change. High-rise seeded chains prefer LTP % gain
-        (today's Moneycontrol-like movers) while remaining PAPER-only.
+        Near-ATM filter keeps risk bounded. OI is only a tiny tie-break — never
+        the primary ranker (OI_FLOW caused wrong PE while CE was the real gainer).
         """
         contracts = chain.get("contracts", [])
         spot = float(chain.get("spot", 0) or chain.get("spot_price", 0) or 0)
-        underlying = chain.get("underlying", "NIFTY")
+        underlying = str(chain.get("underlying") or "NIFTY").upper()
         high_rise = str(chain.get("paper_seed") or "") == "market_top_high_rise"
         atm_cap = HIGH_RISE_NEAR_ATM_PCT if high_rise else NEAR_ATM_PCT
         if spot <= 0 or not contracts:
             return None
-        cands = []
+        cands: List[Dict[str, Any]] = []
         for c in contracts:
             strike = float(c.get("strike", 0) or 0)
             ot = str(c.get("option_type", "") or "").strip().upper()
             if ot not in ("CE", "PE"):
                 continue
             ltp = float(c.get("ltp", 0) or c.get("mid_price", 0) or 0)
-            if ltp < (5 if high_rise else 10):
+            if ltp < MIN_LTP_TO_OPEN:
                 continue
             if _is_phantom(ltp, strike, spot, ot):
                 continue
             mny = abs(spot - strike) / spot * 100.0
             if mny > atm_cap:
                 continue
+            prev = float(
+                c.get("previous_close_price")
+                or c.get("previous_close")
+                or c.get("prev_close")
+                or 0
+            )
+            gain_pct = ((ltp - prev) / prev * 100.0) if prev > 0 else float(c.get("gain_pct") or 0)
+            if gain_pct < MIN_GAIN_PCT_TO_OPEN:
+                continue
             oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
             vol = abs(float(c.get("volume", 0) or 0))
-            prev = float(c.get("previous_close_price") or c.get("previous_close") or c.get("prev_close") or 0)
-            gain_pct = ((ltp - prev) / prev * 100.0) if prev > 0 else 0.0
-            if high_rise:
-                score = gain_pct * 1000.0 + vol
-            else:
-                score = oi_chg * 10.0 + vol
+            # Pure gain first; volume/OI only break ties.
+            score = gain_pct * 10000.0 + vol * 0.01 + oi_chg * 0.001
             cands.append(
                 {
                     "underlying": underlying,
@@ -185,9 +193,11 @@ class CloudPaperEngine:
                     "volume": vol,
                     "gain_pct": round(gain_pct, 4),
                     "score": score,
+                    "moneyness_pct": round(mny, 4),
                     "expiry_date": c.get("expiry_date") or c.get("expiry") or chain.get("expiry_date"),
                     "security_id": c.get("security_id"),
-                    "strategy": "HIGH_RISE_PAPER" if high_rise else "OI_FLOW_PAPER",
+                    "strategy": "MARKET_TOP_GAIN_PCT",
+                    "selection_reason": "highest_dhan_gain_pct_near_atm",
                 }
             )
         if not cands:
@@ -195,10 +205,86 @@ class CloudPaperEngine:
         cands.sort(key=lambda x: x["score"], reverse=True)
         return cands[0]
 
-    def step(self, chains: List[Dict[str, Any]], max_open: int = 3):
+    def _pick_from_market_top(
+        self,
+        market_top: List[Dict[str, Any]],
+        chains: List[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        """Map Dhan Market Top gainer rows onto live chain contracts (exact strike/side)."""
+        if not market_top or not chains:
+            return None
+        chain_map = {
+            str(ch.get("underlying") or "").upper(): ch
+            for ch in chains
+            if isinstance(ch, dict) and ch.get("contracts")
+        }
+        ranked = sorted(
+            [r for r in market_top if isinstance(r, dict)],
+            key=lambda r: float(r.get("gain_pct") or 0),
+            reverse=True,
+        )
+        for row in ranked[:25]:
+            underlying = str(row.get("underlying") or row.get("symbol") or "").upper()
+            ot = str(row.get("option_type") or row.get("side") or "").upper()
+            if ot in ("CALL", "C"):
+                ot = "CE"
+            if ot in ("PUT", "P"):
+                ot = "PE"
+            strike = float(row.get("strike") or 0)
+            gain_pct = float(row.get("gain_pct") or 0)
+            if not underlying or ot not in ("CE", "PE") or strike <= 0 or gain_pct < MIN_GAIN_PCT_TO_OPEN:
+                continue
+            ch = chain_map.get(underlying)
+            if not ch:
+                continue
+            spot = float(ch.get("spot") or ch.get("spot_price") or 0)
+            match = None
+            for c in ch.get("contracts") or []:
+                if float(c.get("strike") or 0) != strike:
+                    continue
+                if str(c.get("option_type") or "").upper() != ot:
+                    continue
+                ltp = float(c.get("ltp") or c.get("mid_price") or row.get("ltp") or 0)
+                if ltp < MIN_LTP_TO_OPEN:
+                    continue
+                if spot > 0 and _is_phantom(ltp, strike, spot, ot):
+                    continue
+                match = c
+                break
+            if not match:
+                continue
+            ltp = float(match.get("ltp") or match.get("mid_price") or row.get("ltp") or 0)
+            return {
+                "underlying": underlying,
+                "strike": strike,
+                "option_type": ot,
+                "ltp": ltp,
+                "oi_chg": abs(float(match.get("dOI") or match.get("oi_change") or 0)),
+                "volume": abs(float(match.get("volume") or row.get("volume") or 0)),
+                "gain_pct": round(gain_pct, 4),
+                "score": gain_pct * 10000.0 + 5000.0,  # prefer scanner-confirmed rows
+                "moneyness_pct": round(abs(spot - strike) / spot * 100.0, 4) if spot > 0 else None,
+                "expiry_date": match.get("expiry_date")
+                or match.get("expiry")
+                or row.get("expiry_date")
+                or ch.get("expiry_date"),
+                "security_id": match.get("security_id") or row.get("security_id"),
+                "strategy": "MARKET_TOP_GAIN_PCT",
+                "selection_reason": f"dhan_market_top_rank_gain_pct={gain_pct:.2f}",
+                "market_match_note": row.get("market_match_note"),
+            }
+        return None
+
+    def step(
+        self,
+        chains: List[Dict[str, Any]],
+        max_open: int = 3,
+        market_top: Optional[List[Dict[str, Any]]] = None,
+    ):
         """One engine tick: update open positions, maybe open a new one."""
         self._reset_if_new_day()
         now = _now_ist()
+        market_top = market_top or []
 
         # 1. Update open positions — check SL/TP using current chain LTP
         chain_by_key = {}
@@ -209,6 +295,14 @@ class CloudPaperEngine:
                 ltp = float(c.get("ltp", 0) or c.get("mid_price", 0) or 0)
                 if ot in ("CE", "PE") and ltp > 0:
                     chain_by_key[(ch.get("underlying"), strike, ot)] = ltp
+
+        # Prefer current market-top gainer for rotation out of legacy OI_FLOW picks.
+        preferred = self._pick_from_market_top(market_top, chains)
+        if preferred is None:
+            for ch in chains:
+                sig = self._pick_signal(ch)
+                if sig and (preferred is None or sig["score"] > preferred["score"]):
+                    preferred = sig
 
         still_open = []
         for pos in self.open_positions:
@@ -223,6 +317,19 @@ class CloudPaperEngine:
                 exit_reason = "TARGET"
             elif now.strftime("%H:%M") >= "15:15":
                 exit_reason = "EOD_SQUAREOFF"
+            elif (
+                preferred
+                and str(pos.get("strategy") or "") in {"OI_FLOW_PAPER", "BUY_CE", "BUY_PE"}
+                and (
+                    pos.get("underlying") != preferred["underlying"]
+                    or float(pos.get("strike") or 0) != float(preferred["strike"])
+                    or pos.get("option_type") != preferred["option_type"]
+                )
+                and float(preferred.get("gain_pct") or 0) >= 10.0
+                and chg_pct > -5.0
+            ):
+                # Exit wrong OI-flow pick so next tick can open the true Dhan gainer.
+                exit_reason = "ROTATE_TO_MARKET_TOP_GAINER"
             if exit_reason:
                 net = _compute_net_pnl(entry, cur, pos["underlying"])
                 closed = {
@@ -255,71 +362,68 @@ class CloudPaperEngine:
         self.open_positions = still_open
 
         # 2. Maybe open a new position (one per tick, respect max_open)
-        if len(self.open_positions) < max_open:
-            best = None
-            for ch in chains:
-                sig = self._pick_signal(ch)
-                if sig and (best is None or sig.get("score", sig.get("oi_chg", 0)) > best.get("score", best.get("oi_chg", 0))):
-                    best = sig
-            if best:
-                # Avoid duplicate open on same contract
-                dup = any(
-                    p["underlying"] == best["underlying"]
-                    and p["strike"] == best["strike"]
-                    and p["option_type"] == best["option_type"]
-                    for p in self.open_positions
+        if len(self.open_positions) < max_open and preferred:
+            best = preferred
+            dup = any(
+                p["underlying"] == best["underlying"]
+                and p["strike"] == best["strike"]
+                and p["option_type"] == best["option_type"]
+                for p in self.open_positions
+            )
+            if not dup:
+                self.seq += 1
+                entry = round(best["ltp"], 2)
+                expiry = str(best.get("expiry_date") or best.get("expiry") or "")
+                trading_symbol = (
+                    f"{best['underlying']}{expiry.replace('-', '') if expiry else ''}"
+                    f"{int(best['strike'])}{best['option_type']}"
                 )
-                if not dup:
-                    self.seq += 1
-                    entry = round(best["ltp"], 2)
-                    expiry = str(best.get("expiry_date") or best.get("expiry") or "")
-                    trading_symbol = (
-                        f"{best['underlying']}{expiry.replace('-', '') if expiry else ''}"
-                        f"{int(best['strike'])}{best['option_type']}"
-                    )
-                    pos = {
-                        "position_id": f"POS_{self.seq:04d}",
-                        "action": "OPEN",
-                        "status": "OPEN",
-                        "underlying": best["underlying"],
-                        "symbol": best["underlying"],
-                        "trading_symbol": trading_symbol,
-                        "security_id": best.get("security_id"),
-                        "strike": best["strike"],
-                        "option_type": best["option_type"],
-                        "drvOptionType": "CALL" if best["option_type"] == "CE" else "PUT",
-                        "drvStrikePrice": best["strike"],
-                        "drvExpiryDate": expiry or None,
-                        "expiry_date": expiry or None,
-                        "positionType": "LONG",
-                        "productType": "INTRADAY",
-                        "exchangeSegment": "NSE_FNO",
-                        "buyAvg": entry,
-                        "costPrice": entry,
-                        "entry_price": entry,
-                        "current_price": entry,
-                        "ltp": entry,
-                        "netQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
-                        "qty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
-                        "buyQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
-                        "sellQty": 0,
-                        "strategy": best.get("strategy") or f"BUY_{best['option_type']}",
-                        "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
-                        "target": round(entry * (1.0 + TARGET_PCT / 100.0), 2),
-                        "unrealized_pnl": 0.0,
-                        "realizedProfit": 0.0,
-                        "unrealizedProfit": 0.0,
-                        "data_source": "dhan_option_chain_live",
-                        "market_data_source": "DHAN_LIVE",
-                        "quote_source": "DHAN_OPTION_CHAIN",
-                        "provenance": "PAPER_CLOUD_SIM",
-                        "broker_order_endpoints_called": False,
-                        "timestamp": now.isoformat(),
-                        "entry_time": now.isoformat(),
-                        "time_ist": _ist_str(now),
-                    }
-                    self.open_positions.append(pos)
-                    self._append_trade_csv(pos, "OPEN")
+                pos = {
+                    "position_id": f"POS_{self.seq:04d}",
+                    "action": "OPEN",
+                    "status": "OPEN",
+                    "underlying": best["underlying"],
+                    "symbol": best["underlying"],
+                    "trading_symbol": trading_symbol,
+                    "security_id": best.get("security_id"),
+                    "strike": best["strike"],
+                    "option_type": best["option_type"],
+                    "drvOptionType": "CALL" if best["option_type"] == "CE" else "PUT",
+                    "drvStrikePrice": best["strike"],
+                    "drvExpiryDate": expiry or None,
+                    "expiry_date": expiry or None,
+                    "positionType": "LONG",
+                    "productType": "INTRADAY",
+                    "exchangeSegment": "NSE_FNO",
+                    "buyAvg": entry,
+                    "costPrice": entry,
+                    "entry_price": entry,
+                    "current_price": entry,
+                    "ltp": entry,
+                    "netQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                    "qty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                    "buyQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                    "sellQty": 0,
+                    "strategy": best.get("strategy") or "MARKET_TOP_GAIN_PCT",
+                    "selection_reason": best.get("selection_reason"),
+                    "gain_pct_at_entry": best.get("gain_pct"),
+                    "market_match_note": best.get("market_match_note"),
+                    "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
+                    "target": round(entry * (1.0 + TARGET_PCT / 100.0), 2),
+                    "unrealized_pnl": 0.0,
+                    "realizedProfit": 0.0,
+                    "unrealizedProfit": 0.0,
+                    "data_source": "dhan_option_chain_live",
+                    "market_data_source": "DHAN_LIVE",
+                    "quote_source": "DHAN_OPTION_CHAIN",
+                    "provenance": "PAPER_CLOUD_SIM",
+                    "broker_order_endpoints_called": False,
+                    "timestamp": now.isoformat(),
+                    "entry_time": now.isoformat(),
+                    "time_ist": _ist_str(now),
+                }
+                self.open_positions.append(pos)
+                self._append_trade_csv(pos, "OPEN")
 
         self._write_outputs()
         self._save_state()

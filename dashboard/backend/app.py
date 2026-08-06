@@ -4662,14 +4662,36 @@ async def paper_engine_tick(max_open: int = 3):
     if not chains:
         return {"status": "NO_CHAIN", "message": "No live Dhan chains available for paper tick", "open_count": 0}
 
+    market_top_rows: list = []
+    try:
+        mt = await get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False)
+        if isinstance(mt, dict):
+            market_top_rows = list(mt.get("market_top_table") or [])
+            if not market_top_rows:
+                mw = mt.get("market_wide") or {}
+                market_top_rows = list(mw.get("top_combined_list") or [])
+    except Exception as mt_exc:
+        print(f"[paper-tick] market top fetch skipped: {mt_exc}")
+
     engine = get_paper_engine(OUTPUTS_DIR)
-    engine.step(chains, max_open=min(max(max_open, 1), 5))
+    engine.step(chains, max_open=min(max(max_open, 1), 5), market_top=market_top_rows)
     _API_CACHE.pop("paper", None)
+    top = (engine.open_positions or [None])[-1] if engine.open_positions else None
     return {
         "status": "ok",
         "open_count": len(engine.open_positions),
         "closed_count": len(engine.closed_positions),
         "open_positions": engine.open_positions[:10],
+        "selection_mode": "MARKET_TOP_GAIN_PCT",
+        "market_top_rows_used": len(market_top_rows),
+        "latest_open": {
+            "trading_symbol": (top or {}).get("trading_symbol"),
+            "strategy": (top or {}).get("strategy"),
+            "selection_reason": (top or {}).get("selection_reason"),
+            "gain_pct_at_entry": (top or {}).get("gain_pct_at_entry"),
+        }
+        if top
+        else None,
         "mode": "PAPER_CLOUD_SIM",
         "live_trading_enabled": False,
     }
@@ -5374,14 +5396,19 @@ async def cloud_paper_trading_loop():
                     except Exception:
                         continue
 
-                # Prefer today's Dhan Market Top equity high-risers for paper discovery
+                # Prefer today's Dhan Market Top for paper discovery
                 # (still PAPER ONLY — never places broker orders).
+                market_top_rows: list = []
                 try:
                     mt = _cache_get("scanner_gainers:5:25:1")
                     if mt is None and _MARKET_TOP_STATE_FILE.exists():
                         mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+                    market_top_rows = list((mt or {}).get("market_top_table") or [])
+                    if not market_top_rows:
+                        mw = (mt or {}).get("market_wide") or {}
+                        market_top_rows = list(mw.get("top_combined_list") or [])
                     seed_syms = []
-                    for row in (mt or {}).get("market_top_table") or []:
+                    for row in market_top_rows:
                         sym = str(row.get("underlying") or row.get("symbol") or "").upper()
                         if not sym or sym in {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"}:
                             continue
@@ -5403,9 +5430,11 @@ async def cloud_paper_trading_loop():
                     print(f"[paper-loop] high-rise seed skipped: {seed_exc}")
 
                 if chains:
-                    engine.step(chains, max_open=3)
+                    engine.step(chains, max_open=3, market_top=market_top_rows)
                     print(
-                        f"[paper-loop] tick: {len(engine.open_positions)} open, {len(engine.closed_positions)} closed"
+                        f"[paper-loop] tick: {len(engine.open_positions)} open, "
+                        f"{len(engine.closed_positions)} closed, "
+                        f"market_top_rows={len(market_top_rows)}"
                     )
 
             await _asyncio.sleep(60)  # tick every 60s
