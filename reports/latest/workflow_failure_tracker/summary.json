@@ -1,6 +1,26 @@
 {
-  "failed_count": 13,
+  "failed_count": 14,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "8b1d828ec5b975d5934131c61d16d9fb06233983",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-06T08:16:05Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31084199198",
+      "run_id": 31084199198,
+      "updated_at": "2026-08-06T08:16:29Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
+      "commit": "b8bb380c0e11fbda69f8a9e024b38f12ced9369e",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T08:15:24Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31084151901",
+      "run_id": 31084151901,
+      "updated_at": "2026-08-06T08:17:41Z",
+      "workflow": "Dashboard Visible Proof Isolated"
+    },
     {
       "branch": "main",
       "commit": "b8bb380c0e11fbda69f8a9e024b38f12ced9369e",
@@ -120,23 +140,15 @@
       "run_id": 31082439841,
       "updated_at": "2026-08-06T07:50:04Z",
       "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "main",
-      "commit": "ecad60632373e691db51fe8a4cf3b7052d3adf42",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T07:33:42Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31081394855",
-      "run_id": 31081394855,
-      "updated_at": "2026-08-06T07:34:13Z",
-      "workflow": "System3 Broker Chain Semantic Gate"
     }
   ],
-  "generated_utc": "2026-08-06T08:16:14.228168+00:00",
+  "generated_utc": "2026-08-06T08:18:04.052086+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 31084199198 conclusion=cancelled commit=8b1d828ec5b975d5934131c61d16d9fb06233983",
+    "Fix workflow 'Dashboard Visible Proof Isolated' run 31084151901 conclusion=failure commit=b8bb380c0e11fbda69f8a9e024b38f12ced9369e",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31084148213 conclusion=failure commit=b8bb380c0e11fbda69f8a9e024b38f12ced9369e",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 31083977470 conclusion=cancelled commit=c446463e823d719791126ae6d3a335c4253aff2e",
     "Fix workflow 'Dashboard Visual Production Proof' run 31083410667 conclusion=failure commit=4ac7fb9a85ddb3ffd81c909f9d3e2c4ad37e73d0",
@@ -148,7 +160,6 @@
     "Fix workflow 'Genesis System3 Global Safety CI' run 31082441001 conclusion=failure commit=9a3bf413994c3d3561adedb0a6b268ef1ca57bc3",
     "Fix workflow 'Dashboard Visual Production Proof' run 31082440955 conclusion=failure commit=9a3bf413994c3d3561adedb0a6b268ef1ca57bc3",
     "Fix workflow 'Dashboard Visible Proof Isolated' run 31082440921 conclusion=failure commit=9a3bf413994c3d3561adedb0a6b268ef1ca57bc3",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31082439841 conclusion=failure commit=9a3bf413994c3d3561adedb0a6b268ef1ca57bc3",
-    "Fix workflow 'System3 Broker Chain Semantic Gate' run 31081394855 conclusion=failure commit=ecad60632373e691db51fe8a4cf3b7052d3adf42"
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31082439841 conclusion=failure commit=9a3bf413994c3d3561adedb0a6b268ef1ca57bc3"
   ]
 }
