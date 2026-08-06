@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T08:07:46.276Z",
+  "generated_at": "2026-08-06T08:16:15.958Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -26,7 +26,8 @@
     "TAB_COVERAGE:0/16",
     "SHELL_PROOF_NOT_TIME_ALIGNED",
     "VISIBLE_TRACKER_STATUS:BLOCKED",
-    "VISIBLE_TRACKER_BAD_TABS:16"
+    "VISIBLE_TRACKER_BAD_TABS:16",
+    "VISIBLE_TRACKER_NOT_TIME_ALIGNED"
   ],
   "corroborating_evidence": {
     "shell_generated_at": "2026-07-27T23:56:42.530Z",
@@ -40,67 +41,67 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 157398
+      "size_bytes": 157927
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 254427
+      "size_bytes": 255090
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 153013
+      "size_bytes": 153289
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 116482
+      "size_bytes": 117990
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 93983
+      "size_bytes": 90875
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 64815
+      "size_bytes": 65255
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 72222
+      "size_bytes": 72626
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 77125
+      "size_bytes": 77544
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 114586
+      "size_bytes": 117927
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 119955
+      "size_bytes": 120679
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 100884
+      "size_bytes": 101471
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 114385
+      "size_bytes": 114965
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 74331
+      "size_bytes": 74447
     }
   ],
   "safety": {
