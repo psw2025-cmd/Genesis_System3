@@ -4,33 +4,36 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-15:07:05 IST
+15:36:04 IST
 NIFTY
---
+24,636
+SNAP
 BNFTY
---
+58,064
+SNAP
 FINNIFTY
---
-TICK 4s
-MARKET OPEN
-DHAN API OK
+26,864
+SNAP
+TICK 0s
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 PROOF
 LIVE
 OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-CHECK
+LIVE
 COMMAND
 Truth Control
 TRUTH
@@ -42,9 +45,12 @@ Sim Live
 SIM
 MARKET DATA
 Option Chain
+POLL
 Signals
+POLL
 TRADING
 Trade
+POLL
 Paper Trades
 Positions
 ANALYSIS
@@ -61,7 +67,7 @@ PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹-1,806
@@ -79,43 +85,44 @@ Health API
 live
 LOADED
 State API
+Market closed: After hours (closed at 15:30)
 LOADED
 Broker Status API
-ERROR
+LOADED
 Funds API
-ERROR
+LOADED
 Holdings API
-ERROR
+LOADED
 Positions API
 LOADED
 P&L API
 pnl=-1806.07
-STALE
+LOADED
 Gain Rank / Scanner
-2026-06-13
+2026-08-06
 LOADED
 Auto Gates
 7 gates
 LOADED
 Alerts
 2 recent
-WAITING
+LOADED
 Option Chain
-No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
+Market closed — last verified Dhan snapshot (2026-08-06 15:32 IST)
 Gate Matrix
-2/7 PASS
+3/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
 1/5 days · ρ=0.2 · need ≥0.7
 PEND
 Profit / Expectancy
 expectancy=-196.14 · win_rate=0.3333
-PEND
+PASS
 Paper Lifecycle
-market-session proof pending
+proven
 PEND
 Tick / Data Freshness
-tick_age=46.68s refresh=60s
+tick_age=13.63s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -129,11 +136,11 @@ System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+PASS
 Data Source
 live
 Market
-OPEN
+CLOSED / DATA POLLING
 Live Allowed
 false
 Last Sync

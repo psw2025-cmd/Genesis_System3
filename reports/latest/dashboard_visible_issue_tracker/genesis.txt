@@ -4,33 +4,35 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-15:06:55 IST
+15:35:54 IST
 NIFTY
---
+24,636
+SNAP
 BNFTY
---
+58,064
+SNAP
 FINNIFTY
 --
 TICK 2s
-MARKET OPEN
-DHAN API OK
+MARKET CLOSED / DATA POLLING
+DHAN CONNECTED
 PAPER
 LIVE OFF
 WS
-OFF
+LIVE
 PROOF
 LIVE
 OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-CHECK
+LIVE
 COMMAND
 Truth Control
 TRUTH
@@ -42,9 +44,12 @@ Sim Live
 SIM
 MARKET DATA
 Option Chain
+POLL
 Signals
+POLL
 TRADING
 Trade
+POLL
 Paper Trades
 Positions
 ANALYSIS
@@ -62,34 +67,34 @@ One official UI for broker status, prediction quality, gain ranking, risk gates,
 Refresh
 Voice Alert
 OPERATING MODE
-MARKET_OPEN_OPERATOR
+OFF_MARKET_RESEARCH_AND_VALIDATION
 BROKER
-disconnected
+connected
 TRUTH SCORE
 62.5%
 MEMORY EVENTS
 0
 LIVE TRADING
 BLOCKED
-MARKET OPEN: TRADER MUST SEE
+OFF-MARKET: TRADER MUST SEE
 ✓
-broker connected/read-only latency
+last scanner snapshot and staleness
 ✓
-live option chain contracts by symbol
+prediction-vs-actual accuracy trend
 ✓
-PCR, max pain, IV, OI buildup
+Spearman rho and top-N hit rate
 ✓
-top gain-ranked symbols
+loss learning notes
 ✓
-prediction BUY/SELL/HOLD confidence
+strategy research queue
 ✓
-spread/liquidity risk
+backtest/walk-forward status
 ✓
-open positions and P&L
+broker token health
 ✓
-kill switch and daily-loss gate
+next market open checklist
 ✓
-data truth score from at least two sources
+deployment and self-heal status
 PREDICTION ACCURACY & GAIN RANK REQUIREMENTS
 ACCURACY GOAL
 90%
