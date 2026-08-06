@@ -920,10 +920,24 @@ async def get_broker_diagnose():
             from core.brokers.dhan.dhan_readonly import get_funds
 
             result = get_funds()
-            api_test = {"success": result.get("success"), "data": result.get("data")}
-            if result.get("success"):
+            data = result.get("data")
+            ok = bool(result.get("success"))
+            # Guard against older get_funds that returned success with DH-906 body
+            if isinstance(data, dict):
+                remarks = data.get("remarks") if isinstance(data.get("remarks"), dict) else {}
+                code = str(remarks.get("error_code") or data.get("errorCode") or "")
+                if code == "DH-906" or "Invalid Token" in str(data):
+                    ok = False
+                    result = dict(result)
+                    result["success"] = False
+                    result["error"] = "TOKEN_EXPIRED_OR_INVALID"
+            api_test = {"success": ok, "data": data, "error": result.get("error")}
+            if ok:
                 issues.clear()
                 hints = ["Token valid and working!"]
+            else:
+                issues.append("Dhan rejected access token (DH-906 / invalid)")
+                hints.append("Mint token once locally, push to Secret Manager, remount; keep Cloud PIN/TOTP unmounted")
         except Exception as e:
             api_test = {"success": False, "error": str(e)[:100]}
             issues.append(f"Dhan API call failed: {str(e)[:80]}")

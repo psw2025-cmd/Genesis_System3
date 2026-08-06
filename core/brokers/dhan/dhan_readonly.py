@@ -96,10 +96,16 @@ def _env_falsey(name: str, default: str = "0") -> bool:
 
 def _status_auto_refresh_enabled() -> bool:
     """
-    Safe default: enabled only for read-only broker status checks.
-    Disable with DHAN_STATUS_AUTO_REFRESH=0 if needed.
+    Safe default: OFF on Cloud Run (mounted SM token must not be invalidated).
+    Local/dev can enable with DHAN_STATUS_AUTO_REFRESH=1.
     """
-    if not _env_truthy("DHAN_STATUS_AUTO_REFRESH", "1"):
+    cloud = bool(
+        os.getenv("K_SERVICE")
+        or os.getenv("CLOUD_MODE")
+        or os.getenv("SYSTEM3_DEPLOY_TARGET") == "gcp-cloud-run"
+    )
+    default = "0" if cloud else "1"
+    if not _env_truthy("DHAN_STATUS_AUTO_REFRESH", default):
         return False
 
     # Never allow this read-only adapter to be used as a live-trading bypass.
@@ -144,10 +150,9 @@ def _safe_refresh_token_for_status(reason: str) -> dict:
     try:
         from core.brokers.dhan.token_manager import refresh_token
 
-        # Expired/missing dashboard token needs a fresh generate attempt first.
-        # renew_token can fail once the token is already fully expired.
-        force_generate = reason in ("CONFIG_MISSING", "TOKEN_EXPIRED_OR_INVALID")
-        result = refresh_token(force_generate=force_generate)
+        # Never force-generate here. Minting a new token invalidates the Cloud Run
+        # Secret Manager mount (DH-906 churn). Renew-only; controlled mint stays local.
+        result = refresh_token(force_generate=False)
         meta["success"] = bool(result.get("success"))
         meta["strategy"] = result.get("strategy")
         meta["message"] = str(result.get("message", ""))[:160]
@@ -280,6 +285,23 @@ def _safe_profile(raw: dict) -> dict:
     return {k: v for k, v in raw.items() if k in safe_keys}
 
 
+
+def _auth_failure_payload(data) -> bool:
+    """True when Dhan returned an Invalid Token / DH-906 style payload."""
+    if not isinstance(data, dict):
+        return False
+    remarks = data.get("remarks") if isinstance(data.get("remarks"), dict) else {}
+    err = str(remarks.get("error_code") or data.get("errorCode") or "")
+    msg = str(remarks.get("error_message") or data.get("errorMessage") or "")
+    status = str(data.get("status") or "").lower()
+    blob = f"{err} {msg} {status}"
+    return (
+        "DH-906" in blob
+        or "invalid token" in blob.lower()
+        or (status == "failure" and ("token" in blob.lower() or err.startswith("DH-")))
+    )
+
+
 def get_funds() -> dict:
     """Fetch fund limits (read-only)."""
     creds = get_dhan_credentials()
@@ -291,15 +313,23 @@ def get_funds() -> dict:
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_fund_limits"):
         try:
-            return {"success": True, "source": "sdk", "data": client.get_fund_limits()}
+            data = client.get_fund_limits()
+            if _auth_failure_payload(data):
+                return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": data, "source": "sdk"}
+            return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
 
     try:
         data = _rest_get(_DHAN_FUNDS_URL, access_token, client_id)
+        if _auth_failure_payload(data):
+            return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": data, "source": "rest"}
         return {"success": True, "source": "rest", "data": data}
     except Exception as exc:
-        return {"success": False, "error": str(exc)[:200], "data": None}
+        err = str(exc)
+        if "DH-906" in err or "Invalid Token" in err or "401" in err:
+            return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
+        return {"success": False, "error": err[:200], "data": None}
 
 
 def get_positions() -> dict:
