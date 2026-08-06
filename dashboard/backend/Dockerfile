@@ -1,36 +1,22 @@
-# ── Stage 1: Build React frontend (Node.js only needed here) ──────────
 FROM node:20-slim AS frontend-builder
 WORKDIR /app/dashboard/frontend
 
-# Increment only when production proof shows Render serving a stale frontend
-# despite newer reviewed source. This is a non-secret cache epoch; changing it
-# forces the frontend-builder layer to rebuild without altering runtime logic.
-ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260805_broker_status_cache
+ARG SYSTEM3_FRONTEND_BUILD_EPOCH=20260806_gcp_token_rotation_proof
 ENV SYSTEM3_FRONTEND_BUILD_EPOCH=${SYSTEM3_FRONTEND_BUILD_EPOCH}
 
 COPY dashboard/frontend/package*.json ./
-# Use the committed lockfile so Render cannot resolve a different dependency
-# graph from the one reviewed in the repository.
 RUN npm ci --legacy-peer-deps
 COPY dashboard/frontend/ ./
-# Fail the image build if the current React source cannot compile or if the
-# analyzer-only Sim Live control is absent from the generated bundle. This
-# prevents stale/incomplete frontend assets from being published as healthy.
-# A deterministic, non-secret source fingerprint is published inside the
-# Vite assets directory. Unlike an arbitrary SPA-root path, /ui/assets/* must
-# resolve to a real static file and cannot be silently replaced by index.html.
 RUN printf '%s\n' "$SYSTEM3_FRONTEND_BUILD_EPOCH" > .system3-frontend-build-epoch \
     && npm run build \
     && test -f dist/index.html \
     && grep -R -q --include='*.js' 'Sim Live' dist/assets \
     && grep -R -q --include='*.js' 'CLOUD BUILD' dist/assets \
     && grep -R -q --include='*.js' 'SESSION SNAPSHOT' dist/assets \
+    && grep -R -q --include='*.js' 'TOKEN ROTATION PROOF' dist/assets \
     && sidebar_sha="$(sha256sum src/components/Sidebar.tsx | awk '{print $1}')" \
-    && printf '{"schema":1,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false,"cloud_build_badge":true,"session_snapshot_ui":true,"build_epoch":"%s"}\n' "$sidebar_sha" "$SYSTEM3_FRONTEND_BUILD_EPOCH" > dist/assets/deploy-provenance.json
+    && printf '{"schema":2,"sidebar_sha256":"%s","sim_live_required":true,"live_trading_enabled":false,"cloud_build_badge":true,"session_snapshot_ui":true,"token_rotation_proof_ui":true,"build_epoch":"%s"}\n' "$sidebar_sha" "$SYSTEM3_FRONTEND_BUILD_EPOCH" > dist/assets/deploy-provenance.json
 
-# ── Stage 2: Runtime (Python only, no Node.js) ────────────────────────
-# Node.js removed from runtime image — saves ~200MB RAM on free tier.
-# React dist is copied from stage 1, so /ui still serves correctly.
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -39,20 +25,17 @@ ENV PYTHONPATH=/app
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /app/
 
-# Copy only the frontend produced by this image build. The builder stage is
-# authoritative; a failed or missing build cannot silently fall back to a
-# repository-carried dist directory.
 RUN rm -rf /app/dashboard/frontend/dist
 COPY --from=frontend-builder /app/dashboard/frontend/dist /app/dashboard/frontend/dist
 RUN test -f /app/dashboard/frontend/dist/index.html \
     && test -f /app/dashboard/frontend/dist/assets/deploy-provenance.json \
-    && grep -R -q --include='*.js' 'Sim Live' /app/dashboard/frontend/dist/assets
+    && grep -R -q --include='*.js' 'Sim Live' /app/dashboard/frontend/dist/assets \
+    && grep -R -q --include='*.js' 'TOKEN ROTATION PROOF' /app/dashboard/frontend/dist/assets
 
 RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
       python -m pip install --upgrade pip && \
@@ -64,20 +47,13 @@ RUN if [ -f /app/dashboard/backend/requirements.txt ]; then \
 RUN python scripts/sync_dhan_instruments_master.py --force || \
     python -c "print('[build] instrument sync skipped — will retry at startup')"
 
-WORKDIR /app
-
 RUN useradd --create-home --shell /bin/false appuser \
   && chown -R appuser:appuser /app
 
 USER appuser
 EXPOSE 8080
 
-# Cloud Run injects PORT (typically 8080). Do not hardcode 8000.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -fsS "http://localhost:${PORT:-8080}/api/health" || exit 1
 
-# Memory-safe uvicorn config:
-# --limit-max-requests 1000: restart after 1000 requests (prevents leaks)
-# --timeout-keep-alive 20: faster connection cleanup
-# --limit-concurrency 50: allow dashboard burst polling without uvicorn 503s
-CMD ["sh", "-c", "exec uvicorn dashboard.backend.app:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1 --timeout-keep-alive 20 --limit-max-requests 1000 --limit-concurrency 50"]
+CMD ["python", "scripts/start_cloud_run.py"]
