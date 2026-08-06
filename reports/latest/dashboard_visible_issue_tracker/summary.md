@@ -1,10 +1,10 @@
 # Dashboard Visible Issue Tracker
-Generated: 2026-08-06T06:10:49.503Z
+Generated: 2026-08-06T06:17:23.868Z
 Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Status: **BLOCKED**
 Expected tab count: `16`
 Scanned tab count: `16`
-Visible blocker count: `69`
+Visible blocker count: `63`
 Info line count: `70`
 Screenshot missing count: `0`
 Unsettled tab count: `16`
@@ -14,7 +14,7 @@ Production-grade claim allowed: `false`
 ## Rule
 Every live sidebar tab must be scanned and its asynchronous content must settle before PASS. A timed-out tab is still captured but is recorded as ASYNC_CONTENT_NOT_SETTLED. Visible UI blockers remain TODO until automated UI proof shows they are gone. Informational NO TRADE / MARKET CLOSED / LIVE OFF lines are recorded separately and do not count as blocker unless paired with ERROR/FAIL/PENDING/MISSING/STALE/AUTH/0/4.
 ## TODO
-- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...
+- [ ] Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...
 - [ ] Fix visible UI blocker on Truth Control: BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED
 - [ ] Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -28,10 +28,10 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - [ ] Fix visible UI blocker on Truth Control: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
 - [ ] Fix visible UI blocker on Truth Control: Dashboard operator truth	BLOCKED	YES	health_ok=false, broker_ok=false, gates_ok=false, enabled_chains_ready=0/4 (runtime API probes; not hard-coded)
-- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5016ms
+- [ ] Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5017ms
 - [ ] Fix visible UI blocker on Genesis Brain: BLOCKED
 - [ ] Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
-- [ ] Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- [ ] Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5015ms
 - [ ] Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · FULL E2E
 - [ ] Fix visible UI blocker on E2E Proof: BLOCKED · API
@@ -49,24 +49,19 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint	BLOCKED	-
 - [ ] Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible	BLOCKED	-
 - [ ] Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof	PASS	blocked
-- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - [ ] Fix visible UI blocker on Overview: ERROR
 - [ ] Fix visible UI blocker on Overview: STALE
-- [ ] Fix visible UI blocker on Overview: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 - [ ] Fix visible UI blocker on Overview: PEND
 - [ ] Fix visible UI blocker on Overview: market-session proof pending
-- [ ] Fix visible UI blocker on Sim Live: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- [ ] Fix visible UI blocker on Option Chain: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- [ ] Fix visible UI blocker on Option Chain: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- [ ] Fix visible UI blocker on Trade: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- [ ] Fix visible UI blocker on Trade: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- [ ] Fix visible UI blocker on Sim Live: ASYNC_CONTENT_NOT_SETTLED after 5016ms
+- [ ] Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- [ ] Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5013ms
+- [ ] Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- [ ] Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- [ ] Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5010ms
 - [ ] Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING MODEL ARTIFACTS...
+- [ ] Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...
 - [ ] Fix visible UI blocker on ML Model: 0 proven / 0 blocked
 - [ ] Fix visible UI blocker on ML Model: BLOCKED
 - [ ] Fix visible UI blocker on ML Model: Training proof missing.
@@ -76,34 +71,33 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - [ ] Fix visible UI blocker on Broker: Failed to load funds: unknown error
 - [ ] Fix visible UI blocker on Broker: Failed to load holdings: unknown error
 - [ ] Fix visible UI blocker on Broker: Failed to load positions: unknown error
-- [ ] Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- [ ] Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- [ ] Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5016ms
 - [ ] Fix visible UI blocker on System: ERROR
-- [ ] Fix visible UI blocker on System: Broker not connected - real data unavailable
 - [ ] Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - [ ] Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED
 - [ ] Fix visible UI blocker on Live Gate: Live trading blocked — see failed gates above
 ## Tab results
 | Tab | Status | Screenshot | Settled | Settle ms | Blockers | Info | Exceptions | Text file |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| Truth Control | BLOCKED | OK | NO | 5016 | 14 | 3 | 0 | truth.txt |
-| Genesis Brain | BLOCKED | OK | NO | 5016 | 3 | 5 | 0 | genesis.txt |
-| E2E Proof | BLOCKED | OK | NO | 5014 | 18 | 3 | 0 | e2e_proof.txt |
-| Overview | BLOCKED | OK | NO | 5010 | 6 | 10 | 0 | overview.txt |
-| Sim Live | BLOCKED | OK | NO | 5011 | 1 | 6 | 0 | sim_live.txt |
-| Option Chain | BLOCKED | OK | NO | 5011 | 3 | 3 | 0 | chain.txt |
-| Signals | BLOCKED | OK | NO | 5011 | 1 | 3 | 0 | signals.txt |
-| Trade | BLOCKED | OK | NO | 5012 | 3 | 4 | 0 | trade.txt |
-| Paper Trades | BLOCKED | OK | NO | 5011 | 1 | 5 | 0 | paper.txt |
-| Positions | BLOCKED | OK | NO | 5011 | 1 | 5 | 0 | positions.txt |
+| Truth Control | BLOCKED | OK | NO | 5018 | 14 | 3 | 0 | truth.txt |
+| Genesis Brain | BLOCKED | OK | NO | 5017 | 3 | 5 | 0 | genesis.txt |
+| E2E Proof | BLOCKED | OK | NO | 5015 | 18 | 3 | 0 | e2e_proof.txt |
+| Overview | BLOCKED | OK | NO | 5012 | 5 | 10 | 0 | overview.txt |
+| Sim Live | BLOCKED | OK | NO | 5016 | 1 | 7 | 0 | sim_live.txt |
+| Option Chain | BLOCKED | OK | NO | 5018 | 1 | 3 | 0 | chain.txt |
+| Signals | BLOCKED | OK | NO | 5013 | 1 | 3 | 0 | signals.txt |
+| Trade | BLOCKED | OK | NO | 5018 | 1 | 4 | 0 | trade.txt |
+| Paper Trades | BLOCKED | OK | NO | 5010 | 1 | 5 | 0 | paper.txt |
+| Positions | BLOCKED | OK | NO | 5010 | 1 | 4 | 0 | positions.txt |
 | Performance | BLOCKED | OK | NO | 5014 | 1 | 5 | 0 | performance.txt |
-| ML Model | BLOCKED | OK | NO | 5014 | 4 | 3 | 0 | ml.txt |
+| ML Model | BLOCKED | OK | NO | 5011 | 4 | 3 | 0 | ml.txt |
 | Broker | BLOCKED | OK | NO | 5012 | 6 | 3 | 0 | broker.txt |
-| Alerts | BLOCKED | OK | NO | 5013 | 1 | 3 | 0 | alerts.txt |
-| System | BLOCKED | OK | NO | 5012 | 3 | 4 | 0 | system.txt |
+| Alerts | BLOCKED | OK | NO | 5014 | 1 | 3 | 0 | alerts.txt |
+| System | BLOCKED | OK | NO | 5016 | 2 | 4 | 0 | system.txt |
 | Live Gate | BLOCKED | OK | NO | 5012 | 3 | 5 | 0 | gates.txt |
 ## Visible blockers
-- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...
+- **Truth Control**: ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...
 - **Truth Control**: BLOCKED
 - **Truth Control**: MONEY_READY_BLOCKED
 - **Truth Control**: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.
@@ -117,10 +111,10 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Truth Control**: Paper/analyzer lifecycle	BLOCKED	NO	today_trade_rows=0, endpoint=0
 - **Truth Control**: Risk gates and automation status	BLOCKED	YES	auto_gates_http=0, status=-
 - **Truth Control**: Dashboard operator truth	BLOCKED	YES	health_ok=false, broker_ok=false, gates_ok=false, enabled_chains_ready=0/4 (runtime API probes; not hard-coded)
-- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5016ms
+- **Genesis Brain**: ASYNC_CONTENT_NOT_SETTLED after 5017ms
 - **Genesis Brain**: BLOCKED
 - **Genesis Brain**: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.
-- **E2E Proof**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- **E2E Proof**: ASYNC_CONTENT_NOT_SETTLED after 5015ms
 - **E2E Proof**: Real broker/data truth only. Live money remains blocked until every row below passes.
 - **E2E Proof**: BLOCKED · FULL E2E
 - **E2E Proof**: BLOCKED · API
@@ -138,24 +132,19 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **E2E Proof**: Today paper lifecycle endpoint	BLOCKED	-
 - **E2E Proof**: Gate/risk endpoint visible	BLOCKED	-
 - **E2E Proof**: Live-money switch blocked until separate proof	PASS	blocked
-- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **Overview**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - **Overview**: ERROR
 - **Overview**: STALE
-- **Overview**: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 - **Overview**: PEND
 - **Overview**: market-session proof pending
-- **Sim Live**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- **Option Chain**: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- **Option Chain**: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
-- **Trade**: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- **Trade**: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
-- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5011ms
+- **Sim Live**: ASYNC_CONTENT_NOT_SETTLED after 5016ms
+- **Option Chain**: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- **Signals**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
+- **Trade**: ASYNC_CONTENT_NOT_SETTLED after 5018ms
+- **Paper Trades**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
+- **Positions**: ASYNC_CONTENT_NOT_SETTLED after 5010ms
 - **Performance**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
-- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING MODEL ARTIFACTS...
+- **ML Model**: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...
 - **ML Model**: 0 proven / 0 blocked
 - **ML Model**: BLOCKED
 - **ML Model**: Training proof missing.
@@ -165,10 +154,9 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Broker**: Failed to load funds: unknown error
 - **Broker**: Failed to load holdings: unknown error
 - **Broker**: Failed to load positions: unknown error
-- **Alerts**: ASYNC_CONTENT_NOT_SETTLED after 5013ms
-- **System**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
+- **Alerts**: ASYNC_CONTENT_NOT_SETTLED after 5014ms
+- **System**: ASYNC_CONTENT_NOT_SETTLED after 5016ms
 - **System**: ERROR
-- **System**: Broker not connected - real data unavailable
 - **Live Gate**: ASYNC_CONTENT_NOT_SETTLED after 5012ms
 - **Live Gate**: LIVE_TRADING_BLOCKED
 - **Live Gate**: Live trading blocked — see failed gates above
@@ -199,6 +187,7 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Sim Live**: Paper Trades
 - **Sim Live**: ✓ LIVE OFF
 - **Sim Live**: Backend virtual paper order tape
+- **Sim Live**: POS_0001	NIFTY	CE	24700		116.5	₹0.00	OPEN	paper_simulation
 - **Sim Live**: REAL PAPER LIFECYCLE MARKET DAY PROOF
 - **Option Chain**: PAPER
 - **Option Chain**: LIVE OFF
@@ -219,7 +208,6 @@ Every live sidebar tab must be scanned and its asynchronous content must settle 
 - **Positions**: LIVE OFF
 - **Positions**: Paper Trades
 - **Positions**: PAPER ONLY — NO REAL MONEY
-- **Positions**: Paper engine generates positions during market hours
 - **Performance**: PAPER
 - **Performance**: LIVE OFF
 - **Performance**: Paper Trades

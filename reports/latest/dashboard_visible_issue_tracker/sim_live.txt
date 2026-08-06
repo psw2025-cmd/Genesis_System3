@@ -4,14 +4,15 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:41:25 IST
+11:48:03 IST
 NIFTY
---
+24,628
+SNAP
 BNFTY
 --
 FINNIFTY
 --
-TICK 3s
+TICK 0s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -67,7 +68,7 @@ This tab consumes backend API route /api/simulation/live/state like a live feed.
 BACKEND SIM MODE
 STREAMING
 VIRTUAL P&L
-₹-1806.07
+₹0.00
 REAL LIVE STATUS
 OFF / LOCKED
 SOURCE
@@ -79,6 +80,7 @@ RANGE
 VOLATILE
 Backend virtual paper order tape
 ID	Symbol	Side	Strike	Expiry	LTP	P&L	Status	Source
+POS_0001	NIFTY	CE	24700		116.5	₹0.00	OPEN	paper_simulation
 Backend virtual checklist
 ML SPEARMAN RHO GTE 0 70 OVER 5 DAYS
 SIM ONLY

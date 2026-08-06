@@ -4,14 +4,15 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:41:20 IST
+11:47:58 IST
 NIFTY
---
+24,628
+SNAP
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 0s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -64,10 +65,10 @@ BROKER
 CONNECTED
 Dhan read-only
 PAPER P&L
-₹-1,806
+₹0
 Cloud sim
 OPEN POSITIONS
-0
+1
 Paper only
 CYCLES
 0
@@ -90,7 +91,7 @@ ERROR
 Positions API
 LOADED
 P&L API
-pnl=-1806.07
+pnl=0
 STALE
 Gain Rank / Scanner
 2026-06-13
@@ -100,9 +101,9 @@ Auto Gates
 LOADED
 Alerts
 2 recent
-WAITING
+LOADED
 Option Chain
-No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
+Serving last good Dhan chain (139s old) while paced refresh catches up
 Gate Matrix
 2/7 PASS
 PEND
@@ -116,7 +117,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=60.12s refresh=60s
+tick_age=4.79s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -130,7 +131,7 @@ System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+PASS
 Data Source
 live
 Market

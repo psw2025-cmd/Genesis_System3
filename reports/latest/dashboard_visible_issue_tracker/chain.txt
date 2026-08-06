@@ -4,14 +4,15 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:41:31 IST
+11:48:09 IST
 NIFTY
---
+24,628
+SNAP
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 0s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -66,10 +67,120 @@ HDFCBANK
 TCS
 INFY
 ICICIBANK
-OPTION CHAIN - NIFTY
-Waiting for live Dhan option-chain stream…
-Status: NO_DHAN_DATA
-Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
-Next open: --
-Source: dhan / --
-Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
+POLLING
+SPOT
+24,628
+PCR
+0.90
+CONTRACTS
+160
++/-5 ATM
++/-10 ATM
++/-15 ATM
++/-20 ATM
+MARKET OPEN / CATCHING UP - NIFTY source=dhan priority=dhan_option_chain_live age=148.5s fetched=2026-08-06T06:15:39.392712+00:00 - Serving last good Dhan chain (149s old) while paced refresh catches up
+OI	CHGOI	VOL	IV	LTP	BID	STRIKE	ASK	LTP	IV	VOL	CHGOI	OI
+
+72K
+	--	42K	10.9%	526.00	519.7	24,150	17.0	16.85	13.1%	6389K	--	
+1.5M
+
+
+1.2M
+	--	447K	11.0%	475.65	475.0	24,200	20.9	20.90	12.9%	16101K	--	
+5.8M
+
+
+190K
+	--	168K	11.2%	430.90	429.7	24,250	26.0	25.95	12.7%	10157K	--	
+2.6M
+
+
+1.0M
+	--	1155K	11.1%	386.50	386.1	24,300	32.7	32.65	12.6%	20002K	--	
+5.5M
+
+
+284K
+	--	563K	11.3%	346.25	344.7	24,350	40.6	40.55	12.4%	11314K	--	
+2.3M
+
+
+1.5M
+	--	3827K	11.1%	304.00	304.5	24,400	50.1	50.00	12.3%	26257K	--	
+7.2M
+
+
+516K
+	--	2553K	11.2%	266.75	266.4	24,450	62.4	62.10	12.2%	15975K	--	
+2.9M
+
+
+3.2M
+	--	18104K	11.3%	231.70	231.3	24,500	77.0	76.70	12.1%	39767K	--	
+7.0M
+
+
+1.4M
+	--	15754K	11.3%	198.95	198.5	24,550	93.8	93.50	12.0%	28881K	--	
+3.6M
+
+
+6.7M
+	--	73557K	11.2%	168.15	168.2	24,600	113.2	113.00	12.0%	90371K	--	
+10.8M
+
+
+5.1M
+	--	73086K	11.2%	140.70	140.4	24,650ATM	136.1	136.00	12.0%	67372K	--	
+6.6M
+
+
+9.1M
+	--	73290K	11.2%	116.50	116.3	24,700	160.9	160.95	11.9%	46302K	--	
+5.4M
+
+
+3.1M
+	--	32448K	11.1%	94.60	94.6	24,750	189.5	189.45	12.0%	11953K	--	
+1.2M
+
+
+7.3M
+	--	43110K	11.1%	75.60	75.7	24,800	221.2	220.65	11.9%	13126K	--	
+1.5M
+
+
+2.6M
+	--	20708K	11.1%	59.85	59.8	24,850	255.2	254.65	11.9%	2534K	--	
+434K
+
+
+6.7M
+	--	27866K	11.0%	46.85	46.8	24,900	291.7	292.00	12.1%	2833K	--	
+474K
+
+
+1.8M
+	--	14877K	11.1%	36.30	36.3	24,950	330.9	330.00	12.0%	579K	--	
+82K
+
+
+8.0M
+	--	37785K	11.1%	27.85	27.8	25,000	372.8	370.10	12.1%	1633K	--	
+704K
+
+
+2.1M
+	--	12648K	11.2%	21.20	21.1	25,050	416.8	413.90	12.4%	149K	--	
+59K
+
+
+6.3M
+	--	20205K	11.2%	16.05	16.1	25,100	461.0	459.95	13.0%	155K	--	
+71K
+
+
+1.7M
+	--	9597K	11.4%	12.45	12.4	25,150	508.5	503.70	13.5%	41K	--	
+11K

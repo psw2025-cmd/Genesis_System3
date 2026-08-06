@@ -4,9 +4,10 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:42:17 IST
+11:48:55 IST
 NIFTY
---
+24,628
+SNAP
 BNFTY
 --
 FINNIFTY
@@ -77,9 +78,9 @@ Cycle Count
 Cycle Duration
 0.00s
 SLA Pass
-false
+true
 QC Status
-NOT_READY
+PASS
 Safety
 LIVE_TRADING_ENABLED
 0 (hardcoded)
@@ -90,4 +91,4 @@ false
 Broker Data Visibility
 READ-ONLY WHEN API RESPONDS
 Blocker 1
-Broker not connected - real data unavailable
+Live trading permanently disabled in analyzer mode

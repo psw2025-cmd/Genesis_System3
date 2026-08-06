@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T06:10:49.503Z",
+  "generated_at": "2026-08-06T06:17:23.868Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "status": "BLOCKED",
   "auth": {
@@ -15,12 +15,12 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5016,
+      "settle_elapsed_ms": 5018,
       "settle_remaining_markers": [
         "CHECKING..."
       ],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...",
+        "ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...",
         "BLOCKED",
         "MONEY_READY_BLOCKED",
         "At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
@@ -42,7 +42,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:05 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSystem Truth Control\nFull upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.\nChecking...\nBLOCKED\nInfrastructure / broker read path\nBLOCKED\nMoney readiness\nLast run\n-\nMONEY_READY_BLOCKED\nAt least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.\nLAYER\tSTATUS\tREQUIRED FOR MONEY\tEVIDENCE\nBackend/API route health\tBLOCKED\tYES\thealth=0, state=0\nBroker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false\nFunds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-\nHoldings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0\nDhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\nUniverse / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0\nCE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload\nPaper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0\nRisk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-\nLive-money safety lock\tPASS\tYES\tlive_flag=false, order_allowed=false\nDashboard operator truth\tBLOCKED\tYES\thealth_ok=false, broker_ok=false, gates_ok=false, enabled_chains_ready=0/4 (runtime API probes; not hard-coded)"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:47:43 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSystem Truth Control\nFull upstream/downstream trading chain. Enabled universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. Optional watchlist: SENSEX.\nChecking...\nBLOCKED\nInfrastructure / broker read path\nBLOCKED\nMoney readiness\nLast run\n-\nMONEY_READY_BLOCKED\nAt least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.\nLAYER\tSTATUS\tREQUIRED FOR MONEY\tEVIDENCE\nBackend/API route health\tBLOCKED\tYES\thealth=0, state=0\nBroker read-only connection\tBLOCKED\tYES\tconnected=false, broker=dhan, order_allowed=false\nFunds / margin truth\tBLOCKED\tYES\tavailable=-, used=-, source=-\nHoldings and live positions read path\tBLOCKED\tYES\tholdings=0, positions=0\nDhan option-chain availability\tBLOCKED\tYES\tenabled_ready=0/4, enabled_safe_no_trade=0/4, optional_ready=0/1, optional_safe_no_trade=0/1\nUniverse / ranking candidates\tBLOCKED\tYES\tcandidate_rows=0, gain=0, scanner=0\nCE / PE decision evidence\tBLOCKED\tYES\tNo CE/PE side found in model/ranker/scanner payload\nPaper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0\nRisk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-\nLive-money safety lock\tPASS\tYES\tlive_flag=false, order_allowed=false\nDashboard operator truth\tBLOCKED\tYES\thealth_ok=false, broker_ok=false, gates_ok=false, enabled_chains_ready=0/4 (runtime API probes; not hard-coded)"
     },
     {
       "id": "genesis",
@@ -52,10 +52,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5016,
+      "settle_elapsed_ms": 5017,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+        "ASYNC_CONTENT_NOT_SETTLED after 5017ms",
         "BLOCKED",
         "Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports."
       ],
@@ -68,7 +68,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:10 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 2s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nGENESIS PRODUCTION COMMAND CENTER\nAI Options Automation Dashboard\nOne official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.\nRefresh\nVoice Alert\nOPERATING MODE\nMARKET_OPEN_OPERATOR\nBROKER\ndisconnected\nTRUTH SCORE\n62.5%\nMEMORY EVENTS\n0\nLIVE TRADING\nBLOCKED\nMARKET OPEN: TRADER MUST SEE\n✓\nbroker connected/read-only latency\n✓\nlive option chain contracts by symbol\n✓\nPCR, max pain, IV, OI buildup\n✓\ntop gain-ranked symbols\n✓\nprediction BUY/SELL/HOLD confidence\n✓\nspread/liquidity risk\n✓\nopen positions and P&L\n✓\nkill switch and daily-loss gate\n✓\ndata truth score from at least two sources\nPREDICTION ACCURACY & GAIN RANK REQUIREMENTS\nACCURACY GOAL\n90%\nVisible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.\nCurrent blocker: Accumulate multi-day real prediction-vs-actual proof and improve IV/OI filters.\nGLOBAL RESEARCH SOURCES INTEGRATED\nZerodha Varsity - Options Theory\nGreeks, volatility, moneyness, pricing education\nZerodha Varsity - Option Strategies\nSpreads, straddle, strangle, max pain, PCR, iron condor\nCboe Options Institute\nGlobal options education, risk management, strategy playbooks\nNSE India Option Chain\nIndian option-chain truth: OI, volume, strike/expiry surface\nDhanHQ API v2\nBroker API, option chain, market feed, historical data, orders when gates pass\nHIDDEN SECRETS LAB\nHigh IV favors defined-risk premium structures only after spread/liquidity checks.\nVerified: true | Impact: unproven_until_backtested\nOI concentration near a strike can create expiry pin risk; max pain is advisory, not a signal alone.\nVerified: true | Impact: risk_filter\nVolume plus OI change is stronger than volume alone for buildup classification.\nVerified: true | Impact: signal_quality_filter\nINTEGRATION MAP\nBroker\nCurrent: Dhan read-only + gated order endpoint\nNext: keep real-money disabled until proof gates pass\nMarket data\nCurrent: Dhan/NSE/cache chain endpoints\nNext: add 2-source truth comparison per symbol\nPrediction\nCurrent: gain rank + signal confidence APIs\nNext: show multi-day rho/top-N trend on Genesis tab\nRisk\nCurrent: 2% trade risk, 5% daily loss policy displayed\nNext: enforce position sizing in paper lifecycle\nLearning\nCurrent: memory JSONL + research log\nNext: promote only after walk-forward improvement\nNEVER DIE MONITOR\nUPTIME SECONDS\n0\nLAST SELF-HEAL\nstartup_guard_checked\nISSUES FIXED\n0\nTRUTH, COMPLIANCE, AND CONTROL\nKill switch visible: live trading remains disabled until all proof gates pass.\nLet Agent Take Full Control\n{\n  \"message\": \"I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS.\"\n}"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:47:48 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nGENESIS PRODUCTION COMMAND CENTER\nAI Options Automation Dashboard\nOne official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.\nRefresh\nVoice Alert\nOPERATING MODE\nMARKET_OPEN_OPERATOR\nBROKER\nconnected\nTRUTH SCORE\n62.5%\nMEMORY EVENTS\n0\nLIVE TRADING\nBLOCKED\nMARKET OPEN: TRADER MUST SEE\n✓\nbroker connected/read-only latency\n✓\nlive option chain contracts by symbol\n✓\nPCR, max pain, IV, OI buildup\n✓\ntop gain-ranked symbols\n✓\nprediction BUY/SELL/HOLD confidence\n✓\nspread/liquidity risk\n✓\nopen positions and P&L\n✓\nkill switch and daily-loss gate\n✓\ndata truth score from at least two sources\nPREDICTION ACCURACY & GAIN RANK REQUIREMENTS\nACCURACY GOAL\n90%\nVisible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.\nCurrent blocker: Accumulate multi-day real prediction-vs-actual proof and improve IV/OI filters.\nGLOBAL RESEARCH SOURCES INTEGRATED\nZerodha Varsity - Options Theory\nGreeks, volatility, moneyness, pricing education\nZerodha Varsity - Option Strategies\nSpreads, straddle, strangle, max pain, PCR, iron condor\nCboe Options Institute\nGlobal options education, risk management, strategy playbooks\nNSE India Option Chain\nIndian option-chain truth: OI, volume, strike/expiry surface\nDhanHQ API v2\nBroker API, option chain, market feed, historical data, orders when gates pass\nHIDDEN SECRETS LAB\nHigh IV favors defined-risk premium structures only after spread/liquidity checks.\nVerified: true | Impact: unproven_until_backtested\nOI concentration near a strike can create expiry pin risk; max pain is advisory, not a signal alone.\nVerified: true | Impact: risk_filter\nVolume plus OI change is stronger than volume alone for buildup classification.\nVerified: true | Impact: signal_quality_filter\nINTEGRATION MAP\nBroker\nCurrent: Dhan read-only + gated order endpoint\nNext: keep real-money disabled until proof gates pass\nMarket data\nCurrent: Dhan/NSE/cache chain endpoints\nNext: add 2-source truth comparison per symbol\nPrediction\nCurrent: gain rank + signal confidence APIs\nNext: show multi-day rho/top-N trend on Genesis tab\nRisk\nCurrent: 2% trade risk, 5% daily loss policy displayed\nNext: enforce position sizing in paper lifecycle\nLearning\nCurrent: memory JSONL + research log\nNext: promote only after walk-forward improvement\nNEVER DIE MONITOR\nUPTIME SECONDS\n0\nLAST SELF-HEAL\nstartup_guard_checked\nISSUES FIXED\n0\nTRUTH, COMPLIANCE, AND CONTROL\nKill switch visible: live trading remains disabled until all proof gates pass.\nLet Agent Take Full Control\n{\n  \"message\": \"I AM ALIVE. I AM LEARNING. ANALYZER MODE IS RUNNING. REAL EARNING IS NOT CLAIMED UNTIL PAPER AND LIVE PROOF PASS.\"\n}"
     },
     {
       "id": "e2e_proof",
@@ -78,10 +78,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5014,
+      "settle_elapsed_ms": 5015,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5014ms",
+        "ASYNC_CONTENT_NOT_SETTLED after 5015ms",
         "Real broker/data truth only. Live money remains blocked until every row below passes.",
         "BLOCKED · FULL E2E",
         "BLOCKED · API",
@@ -107,7 +107,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:15 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 3s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nChecking read-only endpoints…\nBLOCKED · FULL E2E\nOverall visual proof\nBLOCKED · API\nCore endpoints\nBLOCKED · DHAN CHAIN\nReal Dhan option chain\nPASS · NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED · TRADER READY\nHuman readiness checklist\nLast run: not yet · This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t-\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tBLOCKED\t-\nReal broker holdings response\tBLOCKED\t-\nReal broker positions response\tBLOCKED\t-\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tPASS\tclean\nPaper/analyzer P&L endpoint\tBLOCKED\t-\nToday paper lifecycle endpoint\tBLOCKED\t-\nGate/risk endpoint visible\tBLOCKED\t-\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:47:53 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Visual Truth Proof\nReal broker/data truth only. Live money remains blocked until every row below passes.\nChecking read-only endpoints…\nBLOCKED · FULL E2E\nOverall visual proof\nBLOCKED · API\nCore endpoints\nBLOCKED · DHAN CHAIN\nReal Dhan option chain\nPASS · NO BAD SOURCE\nNo non-Dhan/stale/fallback\nBLOCKED · TRADER READY\nHuman readiness checklist\nLast run: not yet · This panel is proof-only; it does not enable live orders.\nTrader Readiness Truth Checklist\nREQUIRED FOR REAL-MONEY TRADING\tSTATUS\tEVIDENCE VISIBLE TO USER\nDhan broker connection\tBLOCKED\t-\nDhan access token/session\tBLOCKED\t-\nReal broker funds/margin\tBLOCKED\t-\nReal broker holdings response\tBLOCKED\t-\nReal broker positions response\tBLOCKED\t-\nReal Dhan option chain for all watched symbols\tBLOCKED\t0/5\nNo non-Dhan/stale/fallback markers in chain\tPASS\tclean\nPaper/analyzer P&L endpoint\tBLOCKED\t-\nToday paper lifecycle endpoint\tBLOCKED\t-\nGate/risk endpoint visible\tBLOCKED\t-\nLive-money switch blocked until separate proof\tPASS\tblocked\nDhan Option Chain Proof\nSYMBOL\tVISUAL STATUS\tSOURCE\tPRIORITY\tSTATUS\tSPOT\tCONTRACTS\tREASON\nCore API / Dashboard Data Proof\nENDPOINT\tHTTP\tVISUAL STATUS\tIMPORTANT STATUS"
     },
     {
       "id": "overview",
@@ -117,13 +117,12 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5010,
+      "settle_elapsed_ms": 5012,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
         "ERROR",
         "STALE",
-        "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
         "PEND",
         "market-session proof pending"
       ],
@@ -147,12 +146,6 @@
           "backgroundColor": "rgba(245, 158, 11, 0.1)"
         },
         {
-          "text": "WAITING",
-          "className": "pill text-[10px] w-32 justify-center bg-amber/10 text-amber border border-amber/20",
-          "color": "rgb(245, 158, 11)",
-          "backgroundColor": "rgba(245, 158, 11, 0.1)"
-        },
-        {
           "text": "PEND",
           "className": "pill text-[10px] w-14 justify-center bg-amber/10 text-amber border border-amber/20",
           "color": "rgb(245, 158, 11)",
@@ -184,7 +177,7 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:20 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nBROKER\nCONNECTED\nDhan read-only\nPAPER P&L\n₹-1,806\nCloud sim\nOPEN POSITIONS\n0\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nlive\nLOADED\nState API\nLOADED\nBroker Status API\nconnected\nERROR\nFunds API\nERROR\nHoldings API\nERROR\nPositions API\nLOADED\nP&L API\npnl=-1806.07\nSTALE\nGain Rank / Scanner\n2026-06-13\nLOADED\nAuto Gates\n7 gates\nLOADED\nAlerts\n2 recent\nWAITING\nOption Chain\nNo current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.\nGate Matrix\n2/7 PASS\nPEND\nML Accuracy (Spearman ρ)\n1/5 days · ρ=0.2 · need ≥0.7\nPEND\nProfit / Expectancy\nexpectancy=-196.14 · win_rate=0.3333\nPEND\nPaper Lifecycle\nmarket-session proof pending\nPEND\nTick / Data Freshness\ntick_age=60.12s refresh=60s\nPASS\nModel Accuracy Report\nRun scripts/system3_model_accuracy_tracker.py --api-base $CLOUD\nPEND\nOption Strike Visibility\nRun scripts/system3_option_visibility_audit.py\nPASS\nEquity F&O Eligibility\nWire is_tradeable_fo_symbol() in ranking/paper trade path\nSystem Health\nMode\nPAPER\nQC Status\nNOT_READY\nData Source\nlive\nMarket\nOPEN\nLive Allowed\nfalse\nLast Sync\n--"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:47:58 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nANALYZER / PAPER COMMAND CENTER\nPAPER MODE ACTIVE - LIVE TRADING DISABLED\nLIVE OFF\nMarket closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.\nBROKER\nCONNECTED\nDhan read-only\nPAPER P&L\n₹0\nCloud sim\nOPEN POSITIONS\n1\nPaper only\nCYCLES\n0\nEngine ticks\nLive Data Coverage\nmarket closed must not hide read-only data\nLOADED\nHealth API\nlive\nLOADED\nState API\nLOADED\nBroker Status API\nconnected\nERROR\nFunds API\nERROR\nHoldings API\nERROR\nPositions API\nLOADED\nP&L API\npnl=0\nSTALE\nGain Rank / Scanner\n2026-06-13\nLOADED\nAuto Gates\n7 gates\nLOADED\nAlerts\n2 recent\nLOADED\nOption Chain\nServing last good Dhan chain (139s old) while paced refresh catches up\nGate Matrix\n2/7 PASS\nPEND\nML Accuracy (Spearman ρ)\n1/5 days · ρ=0.2 · need ≥0.7\nPEND\nProfit / Expectancy\nexpectancy=-196.14 · win_rate=0.3333\nPEND\nPaper Lifecycle\nmarket-session proof pending\nPEND\nTick / Data Freshness\ntick_age=4.79s refresh=60s\nPASS\nModel Accuracy Report\nRun scripts/system3_model_accuracy_tracker.py --api-base $CLOUD\nPEND\nOption Strike Visibility\nRun scripts/system3_option_visibility_audit.py\nPASS\nEquity F&O Eligibility\nWire is_tradeable_fo_symbol() in ranking/paper trade path\nSystem Health\nMode\nPAPER\nQC Status\nPASS\nData Source\nlive\nMarket\nOPEN\nLive Allowed\nfalse\nLast Sync\n--"
     },
     {
       "id": "sim_live",
@@ -194,10 +187,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5011,
+      "settle_elapsed_ms": 5016,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+        "ASYNC_CONTENT_NOT_SETTLED after 5016ms"
       ],
       "info_lines": [
         "PAPER",
@@ -205,11 +198,12 @@
         "Paper Trades",
         "✓ LIVE OFF",
         "Backend virtual paper order tape",
+        "POS_0001\tNIFTY\tCE\t24700\t\t116.5\t₹0.00\tOPEN\tpaper_simulation",
         "REAL PAPER LIFECYCLE MARKET DAY PROOF"
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:25 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 3s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBackend Virtual Live Trading Simulation\n\nThis tab consumes backend API route /api/simulation/live/state like a live feed. It is simulation only: no broker order APIs, no real live gate credit, no live trading enablement.\n\n✓ BACKEND FEED\n✓ SIMULATION ONLY\n✓ NO REAL ORDERS\n✓ LIVE OFF\nBACKEND SIM MODE\nSTREAMING\nVIRTUAL P&L\n₹-1806.07\nREAL LIVE STATUS\nOFF / LOCKED\nSOURCE\nok\nPause backend stream\nRefresh backend tick #2\nTREND\nRANGE\nVOLATILE\nBackend virtual paper order tape\nID\tSymbol\tSide\tStrike\tExpiry\tLTP\tP&L\tStatus\tSource\nBackend virtual checklist\nML SPEARMAN RHO GTE 0 70 OVER 5 DAYS\nSIM ONLY\nPOSITIVE NET EXPECTANCY AFTER COSTS\nSIM ONLY\nREAL PAPER LIFECYCLE MARKET DAY PROOF\nSIM ONLY\nWEBSOCKET TICK HEALTH PROVEN\nSIM ONLY\nMODEL ACCURACY REPORT PRESENT\n✓ SIM OK\nOPTION STRIKE VISIBILITY PROVEN\nSIM ONLY\nEQUITY FO ELIGIBILITY PROVEN\n✓ SIM OK\nSIMULATION ONLY — no broker order APIs, live trading remains OFF"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:03 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBackend Virtual Live Trading Simulation\n\nThis tab consumes backend API route /api/simulation/live/state like a live feed. It is simulation only: no broker order APIs, no real live gate credit, no live trading enablement.\n\n✓ BACKEND FEED\n✓ SIMULATION ONLY\n✓ NO REAL ORDERS\n✓ LIVE OFF\nBACKEND SIM MODE\nSTREAMING\nVIRTUAL P&L\n₹0.00\nREAL LIVE STATUS\nOFF / LOCKED\nSOURCE\nok\nPause backend stream\nRefresh backend tick #2\nTREND\nRANGE\nVOLATILE\nBackend virtual paper order tape\nID\tSymbol\tSide\tStrike\tExpiry\tLTP\tP&L\tStatus\tSource\nPOS_0001\tNIFTY\tCE\t24700\t\t116.5\t₹0.00\tOPEN\tpaper_simulation\nBackend virtual checklist\nML SPEARMAN RHO GTE 0 70 OVER 5 DAYS\nSIM ONLY\nPOSITIVE NET EXPECTANCY AFTER COSTS\nSIM ONLY\nREAL PAPER LIFECYCLE MARKET DAY PROOF\nSIM ONLY\nWEBSOCKET TICK HEALTH PROVEN\nSIM ONLY\nMODEL ACCURACY REPORT PRESENT\n✓ SIM OK\nOPTION STRIKE VISIBILITY PROVEN\nSIM ONLY\nEQUITY FO ELIGIBILITY PROVEN\n✓ SIM OK\nSIMULATION ONLY — no broker order APIs, live trading remains OFF"
     },
     {
       "id": "chain",
@@ -219,12 +213,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5011,
+      "settle_elapsed_ms": 5018,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms",
-        "Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-        "Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+        "ASYNC_CONTENT_NOT_SETTLED after 5018ms"
       ],
       "info_lines": [
         "PAPER",
@@ -233,14 +225,272 @@
       ],
       "red_elements": [
         {
-          "text": "Waiting for live Dhan option-chain stream…",
-          "className": "text-sm text-amber font-semibold mt-1",
+          "text": "POLLING",
+          "className": "pill text-[10px] border bg-amber/10 text-amber border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(245, 158, 11, 0.1)"
+        },
+        {
+          "text": "MARKET OPEN / CATCHING UP - NIFTY source=dhan priority=dhan_option_chain_live age=148.5s fetched=2026-08-06T06:15:39.392712+00:00 - Serving last good Dhan chain (149s old) while paced refresh catches up",
+          "className": "px-4 py-2 border-b border-border text-xs font-mono text-amber bg-amber/5",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(245, 158, 11, 0.05)"
+        },
+        {
+          "text": "10.9%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.0%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.7%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.6%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.4%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.3%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.2%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.0%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.4%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.4%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.5%",
+          "className": "tcell text-left text-amber",
           "color": "rgb(245, 158, 11)",
           "backgroundColor": "rgba(0, 0, 0, 0)"
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:31 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nRELIANCE\nHDFCBANK\nTCS\nINFY\nICICIBANK\nOPTION CHAIN - NIFTY\nWaiting for live Dhan option-chain stream…\nStatus: NO_DHAN_DATA\nMarket: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.\nNext open: --\nSource: dhan / --\nBackend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:09 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nRELIANCE\nHDFCBANK\nTCS\nINFY\nICICIBANK\nPOLLING\nSPOT\n24,628\nPCR\n0.90\nCONTRACTS\n160\n+/-5 ATM\n+/-10 ATM\n+/-15 ATM\n+/-20 ATM\nMARKET OPEN / CATCHING UP - NIFTY source=dhan priority=dhan_option_chain_live age=148.5s fetched=2026-08-06T06:15:39.392712+00:00 - Serving last good Dhan chain (149s old) while paced refresh catches up\nOI\tCHGOI\tVOL\tIV\tLTP\tBID\tSTRIKE\tASK\tLTP\tIV\tVOL\tCHGOI\tOI\n\n72K\n\t--\t42K\t10.9%\t526.00\t519.7\t24,150\t17.0\t16.85\t13.1%\t6389K\t--\t\n1.5M\n\n\n1.2M\n\t--\t447K\t11.0%\t475.65\t475.0\t24,200\t20.9\t20.90\t12.9%\t16101K\t--\t\n5.8M\n\n\n190K\n\t--\t168K\t11.2%\t430.90\t429.7\t24,250\t26.0\t25.95\t12.7%\t10157K\t--\t\n2.6M\n\n\n1.0M\n\t--\t1155K\t11.1%\t386.50\t386.1\t24,300\t32.7\t32.65\t12.6%\t20002K\t--\t\n5.5M\n\n\n284K\n\t--\t563K\t11.3%\t346.25\t344.7\t24,350\t40.6\t40.55\t12.4%\t11314K\t--\t\n2.3M\n\n\n1.5M\n\t--\t3827K\t11.1%\t304.00\t304.5\t24,400\t50.1\t50.00\t12.3%\t26257K\t--\t\n7.2M\n\n\n516K\n\t--\t2553K\t11.2%\t266.75\t266.4\t24,450\t62.4\t62.10\t12.2%\t15975K\t--\t\n2.9M\n\n\n3.2M\n\t--\t18104K\t11.3%\t231.70\t231.3\t24,500\t77.0\t76.70\t12.1%\t39767K\t--\t\n7.0M\n\n\n1.4M\n\t--\t15754K\t11.3%\t198.95\t198.5\t24,550\t93.8\t93.50\t12.0%\t28881K\t--\t\n3.6M\n\n\n6.7M\n\t--\t73557K\t11.2%\t168.15\t168.2\t24,600\t113.2\t113.00\t12.0%\t90371K\t--\t\n10.8M\n\n\n5.1M\n\t--\t73086K\t11.2%\t140.70\t140.4\t24,650ATM\t136.1\t136.00\t12.0%\t67372K\t--\t\n6.6M\n\n\n9.1M\n\t--\t73290K\t11.2%\t116.50\t116.3\t24,700\t160.9\t160.95\t11.9%\t46302K\t--\t\n5.4M\n\n\n3.1M\n\t--\t32448K\t11.1%\t94.60\t94.6\t24,750\t189.5\t189.45\t12.0%\t11953K\t--\t\n1.2M\n\n\n7.3M\n\t--\t43110K\t11.1%\t75.60\t75.7\t24,800\t221.2\t220.65\t11.9%\t13126K\t--\t\n1.5M\n\n\n2.6M\n\t--\t20708K\t11.1%\t59.85\t59.8\t24,850\t255.2\t254.65\t11.9%\t2534K\t--\t\n434K\n\n\n6.7M\n\t--\t27866K\t11.0%\t46.85\t46.8\t24,900\t291.7\t292.00\t12.1%\t2833K\t--\t\n474K\n\n\n1.8M\n\t--\t14877K\t11.1%\t36.30\t36.3\t24,950\t330.9\t330.00\t12.0%\t579K\t--\t\n82K\n\n\n8.0M\n\t--\t37785K\t11.1%\t27.85\t27.8\t25,000\t372.8\t370.10\t12.1%\t1633K\t--\t\n704K\n\n\n2.1M\n\t--\t12648K\t11.2%\t21.20\t21.1\t25,050\t416.8\t413.90\t12.4%\t149K\t--\t\n59K\n\n\n6.3M\n\t--\t20205K\t11.2%\t16.05\t16.1\t25,100\t461.0\t459.95\t13.0%\t155K\t--\t\n71K\n\n\n1.7M\n\t--\t9597K\t11.4%\t12.45\t12.4\t25,150\t508.5\t503.70\t13.5%\t41K\t--\t\n11K"
     },
     {
       "id": "signals",
@@ -250,10 +500,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5011,
+      "settle_elapsed_ms": 5013,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+        "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
       ],
       "info_lines": [
         "PAPER",
@@ -262,7 +512,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:36 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 2s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLoading signals..."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:14 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLoading signals..."
     },
     {
       "id": "trade",
@@ -272,12 +522,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5012,
+      "settle_elapsed_ms": 5018,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
-        "Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-        "Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+        "ASYNC_CONTENT_NOT_SETTLED after 5018ms"
       ],
       "info_lines": [
         "PAPER",
@@ -287,8 +535,266 @@
       ],
       "red_elements": [
         {
-          "text": "Waiting for live Dhan option-chain stream…",
-          "className": "text-sm text-amber font-semibold mt-1",
+          "text": "POLLING",
+          "className": "pill text-[10px] border bg-amber/10 text-amber border-amber/20",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(245, 158, 11, 0.1)"
+        },
+        {
+          "text": "MARKET OPEN / CATCHING UP - NIFTY source=dhan priority=dhan_option_chain_live age=157.6s fetched=2026-08-06T06:15:39.392712+00:00 - Serving last good Dhan chain (158s old) while paced refresh catches up",
+          "className": "px-4 py-2 border-b border-border text-xs font-mono text-amber bg-amber/5",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(245, 158, 11, 0.05)"
+        },
+        {
+          "text": "10.9%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.0%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.7%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.6%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.4%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.3%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.2%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.3%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.9%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.0%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.1%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.1%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "12.4%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.2%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.0%",
+          "className": "tcell text-left text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "11.4%",
+          "className": "tcell text-right text-amber",
+          "color": "rgb(245, 158, 11)",
+          "backgroundColor": "rgba(0, 0, 0, 0)"
+        },
+        {
+          "text": "13.5%",
+          "className": "tcell text-left text-amber",
           "color": "rgb(245, 158, 11)",
           "backgroundColor": "rgba(0, 0, 0, 0)"
         },
@@ -318,7 +824,7 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:41 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nMARKET TOP CE / PE\nLoading… · 0 rows · Dhan live · trading truth for paper MTM\nMONEYCONTROL\nDHAN LIVE\nHTTP POLL\nLIVE OFF\nLoading market top…\nWaiting for Dhan option-chain gainers…\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nRELIANCE\nHDFCBANK\nTCS\nINFY\nICICIBANK\nOPTION CHAIN - NIFTY\nWaiting for live Dhan option-chain stream…\nStatus: NO_DHAN_DATA\nMarket: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.\nNext open: --\nSource: dhan / --\nBackend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.\nINDEX / RANK FEED\n1\nNIFTY\nGAIN %\n76.9%\nWATCH\n2\nBANKNIFTY\nGAIN %\n66.0%\nWATCH\n3\nMIDCPNIFTY\nGAIN %\n61.7%\nWATCH\n4\nFINNIFTY\nGAIN %\n34.6%\nWATCH\nEQUITY OPTIONS\nEOD/live\nNo equity option rows\nWaiting for Dhan equity option chain snapshot."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:19 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nMARKET TOP CE / PE\nLoading… · 0 rows · Dhan live · trading truth for paper MTM\nMONEYCONTROL\nDHAN LIVE\nHTTP POLL\nLIVE OFF\nLoading market top…\nWaiting for Dhan option-chain gainers…\nOPTION CHAIN\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nRELIANCE\nHDFCBANK\nTCS\nINFY\nICICIBANK\nPOLLING\nSPOT\n24,628\nPCR\n0.90\nCONTRACTS\n160\n+/-5 ATM\n+/-10 ATM\n+/-15 ATM\n+/-20 ATM\nMARKET OPEN / CATCHING UP - NIFTY source=dhan priority=dhan_option_chain_live age=157.6s fetched=2026-08-06T06:15:39.392712+00:00 - Serving last good Dhan chain (158s old) while paced refresh catches up\nOI\tCHGOI\tVOL\tIV\tLTP\tBID\tSTRIKE\tASK\tLTP\tIV\tVOL\tCHGOI\tOI\n\n72K\n\t--\t42K\t10.9%\t526.00\t519.7\t24,150\t17.0\t16.85\t13.1%\t6389K\t--\t\n1.5M\n\n\n1.2M\n\t--\t447K\t11.0%\t475.65\t475.0\t24,200\t20.9\t20.90\t12.9%\t16101K\t--\t\n5.8M\n\n\n190K\n\t--\t168K\t11.2%\t430.90\t429.7\t24,250\t26.0\t25.95\t12.7%\t10157K\t--\t\n2.6M\n\n\n1.0M\n\t--\t1155K\t11.1%\t386.50\t386.1\t24,300\t32.7\t32.65\t12.6%\t20002K\t--\t\n5.5M\n\n\n284K\n\t--\t563K\t11.3%\t346.25\t344.7\t24,350\t40.6\t40.55\t12.4%\t11314K\t--\t\n2.3M\n\n\n1.5M\n\t--\t3827K\t11.1%\t304.00\t304.5\t24,400\t50.1\t50.00\t12.3%\t26257K\t--\t\n7.2M\n\n\n516K\n\t--\t2553K\t11.2%\t266.75\t266.4\t24,450\t62.4\t62.10\t12.2%\t15975K\t--\t\n2.9M\n\n\n3.2M\n\t--\t18104K\t11.3%\t231.70\t231.3\t24,500\t77.0\t76.70\t12.1%\t39767K\t--\t\n7.0M\n\n\n1.4M\n\t--\t15754K\t11.3%\t198.95\t198.5\t24,550\t93.8\t93.50\t12.0%\t28881K\t--\t\n3.6M\n\n\n6.7M\n\t--\t73557K\t11.2%\t168.15\t168.2\t24,600\t113.2\t113.00\t12.0%\t90371K\t--\t\n10.8M\n\n\n5.1M\n\t--\t73086K\t11.2%\t140.70\t140.4\t24,650ATM\t136.1\t136.00\t12.0%\t67372K\t--\t\n6.6M\n\n\n9.1M\n\t--\t73290K\t11.2%\t116.50\t116.3\t24,700\t160.9\t160.95\t11.9%\t46302K\t--\t\n5.4M\n\n\n3.1M\n\t--\t32448K\t11.1%\t94.60\t94.6\t24,750\t189.5\t189.45\t12.0%\t11953K\t--\t\n1.2M\n\n\n7.3M\n\t--\t43110K\t11.1%\t75.60\t75.7\t24,800\t221.2\t220.65\t11.9%\t13126K\t--\t\n1.5M\n\n\n2.6M\n\t--\t20708K\t11.1%\t59.85\t59.8\t24,850\t255.2\t254.65\t11.9%\t2534K\t--\t\n434K\n\n\n6.7M\n\t--\t27866K\t11.0%\t46.85\t46.8\t24,900\t291.7\t292.00\t12.1%\t2833K\t--\t\n474K\n\n\n1.8M\n\t--\t14877K\t11.1%\t36.30\t36.3\t24,950\t330.9\t330.00\t12.0%\t579K\t--\t\n82K\n\n\n8.0M\n\t--\t37785K\t11.1%\t27.85\t27.8\t25,000\t372.8\t370.10\t12.1%\t1633K\t--\t\n704K\n\n\n2.1M\n\t--\t12648K\t11.2%\t21.20\t21.1\t25,050\t416.8\t413.90\t12.4%\t149K\t--\t\n59K\n\n\n6.3M\n\t--\t20205K\t11.2%\t16.05\t16.1\t25,100\t461.0\t459.95\t13.0%\t155K\t--\t\n71K\n\n\n1.7M\n\t--\t9597K\t11.4%\t12.45\t12.4\t25,150\t508.5\t503.70\t13.5%\t41K\t--\t\n11K\nINDEX / RANK FEED\n1\nNIFTY\nGAIN %\n76.9%\nWATCH\n2\nBANKNIFTY\nGAIN %\n66.0%\nWATCH\n3\nMIDCPNIFTY\nGAIN %\n61.7%\nWATCH\n4\nFINNIFTY\nGAIN %\n34.6%\nWATCH\nEQUITY OPTIONS\nEOD/live\nNo equity option rows\nWaiting for Dhan equity option chain snapshot."
     },
     {
       "id": "paper",
@@ -328,10 +834,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5011,
+      "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+        "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
       ],
       "info_lines": [
         "PAPER",
@@ -342,7 +848,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:46 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 2s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nLoading paper positions + Dhan mark-to-market…"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:24 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nLoading paper positions + Dhan mark-to-market…"
     },
     {
       "id": "positions",
@@ -352,21 +858,20 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5011,
+      "settle_elapsed_ms": 5010,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+        "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
       ],
       "info_lines": [
         "PAPER",
         "LIVE OFF",
         "Paper Trades",
-        "PAPER ONLY — NO REAL MONEY",
-        "Paper engine generates positions during market hours"
+        "PAPER ONLY — NO REAL MONEY"
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:51 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 3s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n₹-1,806\nWIN RATE\n0.3%\nTRADES\n9\nOPEN\n0\nPAPER ONLY — NO REAL MONEY\nOPEN POSITIONS (0)\n\nNo open positions\n\nPaper engine generates positions during market hours"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:29 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNET P&L\n₹0\nWIN RATE\n0.0%\nTRADES\n0\nOPEN\n1\nPAPER ONLY — NO REAL MONEY\nOPEN POSITIONS (1)\nSYMBOL\tTYPE\tENTRY\tLTP\tP&L\tP&L%\tQTY\tREASON\nNIFTY\tCE\t116.50\t116.50\t₹0\t₹0\t75\tMARKET_TOP_GAIN_PCT"
     },
     {
       "id": "performance",
@@ -390,14 +895,14 @@
       ],
       "red_elements": [
         {
-          "text": "0.3%",
+          "text": "0.0%",
           "className": "num tx-down",
           "color": "rgb(255, 77, 106)",
           "backgroundColor": "rgba(0, 0, 0, 0)"
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:41:56 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 11:41:53 IST\nTOTAL P&L\n₹-1,806\nRealized + Unrealized\nWIN RATE\n0.3%\nTOTAL TRADES\n9\n3W / 6L\nOPEN PAPER\n0\nCloud paper engine\nBACKTEST / WALK-FORWARD PROOF\n{\n  \"proof_id\": \"WALKFORWARD_20260614_151049\",\n  \"started\": \"2026-06-14T15:10:49.111203+00:00\",\n  \"completed\": \"2026-06-14T15:10:52.694857+00:00\",\n  \"pass\": true,\n  \"status\": \"PASS\",\n  \"recent_costed_walkforward_proven\": true,\n  \"costs_slippage_included_proven\": true,\n  \"walk_pairs\": 8,\n  \"trade_count\": 8,\n  \"win_trades\": 4,\n  \"loss_trades\": 4,\n  \"win_rate_pct\": 50,\n  \"total_gross_pnl\": -101258.25,\n  \"total_costs\": 1378.1,\n  \"total_net_pnl\": -102636.35,\n  \"avg_net_pnl_per_trade\": -12829.54,\n  \"bhavcopy_days_used\": [\n    \"20260608\",\n    \"20260609\",\n    \"20260610\",\n    \"20260611\",\n    \"20260612\"\n  ],\n  \"cost_model\": {\n    \"brokerage_per_side\": 20,\n    \"stt_rate\": 0.000625,\n    \"exchange_txn_charge\": 0.0005,\n    \"slippage_pct\": 0.001,\n    \"description\": \"Dhan flat-fee plan: ₹20/side + STT + exc charge + 18% GST + SEBI\"\n  },\n  \"symbols_tested\": [\n    \"NIFTY\",\n    \"BANKNIFTY\"\n  ],\n  \"strategy\": \"OI-change-ranked ATM CE next-day exit — walk-forward proof only, not trading signal\",\n  \"live_trading_enabled\": false,\n  \"note\": \"Walk-forward proof validates cost model and pipeline correctness. Not a performance claim.\",\n  \"trades\": [\n    {\n      \"symbol\": \"NIFTY\",\n      \"strike\": 23200,\n     \nML ACCURACY (SPEARMAN Ρ) — 0 DAY HISTORY\n\nNo ρ history recorded yet"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:34 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 11:48:30 IST\nTOTAL P&L\n₹0\nRealized + Unrealized\nWIN RATE\n0.0%\nTOTAL TRADES\n0\n0W / 0L\nOPEN PAPER\n1\nCloud paper engine\nBACKTEST / WALK-FORWARD PROOF\n{\n  \"proof_id\": \"WALKFORWARD_20260614_151049\",\n  \"started\": \"2026-06-14T15:10:49.111203+00:00\",\n  \"completed\": \"2026-06-14T15:10:52.694857+00:00\",\n  \"pass\": true,\n  \"status\": \"PASS\",\n  \"recent_costed_walkforward_proven\": true,\n  \"costs_slippage_included_proven\": true,\n  \"walk_pairs\": 8,\n  \"trade_count\": 8,\n  \"win_trades\": 4,\n  \"loss_trades\": 4,\n  \"win_rate_pct\": 50,\n  \"total_gross_pnl\": -101258.25,\n  \"total_costs\": 1378.1,\n  \"total_net_pnl\": -102636.35,\n  \"avg_net_pnl_per_trade\": -12829.54,\n  \"bhavcopy_days_used\": [\n    \"20260608\",\n    \"20260609\",\n    \"20260610\",\n    \"20260611\",\n    \"20260612\"\n  ],\n  \"cost_model\": {\n    \"brokerage_per_side\": 20,\n    \"stt_rate\": 0.000625,\n    \"exchange_txn_charge\": 0.0005,\n    \"slippage_pct\": 0.001,\n    \"description\": \"Dhan flat-fee plan: ₹20/side + STT + exc charge + 18% GST + SEBI\"\n  },\n  \"symbols_tested\": [\n    \"NIFTY\",\n    \"BANKNIFTY\"\n  ],\n  \"strategy\": \"OI-change-ranked ATM CE next-day exit — walk-forward proof only, not trading signal\",\n  \"live_trading_enabled\": false,\n  \"note\": \"Walk-forward proof validates cost model and pipeline correctness. Not a performance claim.\",\n  \"trades\": [\n    {\n      \"symbol\": \"NIFTY\",\n      \"strike\": 23200,\n     \nML ACCURACY (SPEARMAN Ρ) — 0 DAY HISTORY\n\nNo ρ history recorded yet"
     },
     {
       "id": "ml",
@@ -407,12 +912,12 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5014,
+      "settle_elapsed_ms": 5011,
       "settle_remaining_markers": [
         "CHECKING MODEL ARTIFACTS..."
       ],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING MODEL ARTIFACTS...",
+        "ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...",
         "0 proven / 0 blocked",
         "BLOCKED",
         "Training proof missing."
@@ -424,7 +929,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:42:01 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 2s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nCHECKING\nChecking model artifacts...\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nUNKNOWN\nProof records\n0 proven / 0 blocked\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:40 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nCHECKING\nChecking model artifacts...\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nUNKNOWN\nProof records\n0 proven / 0 blocked\nTraining status\nBLOCKED\nTraining proof missing.\nNext real fix is scheduler/model pipeline proof, not UI decoration."
     },
     {
       "id": "broker",
@@ -476,7 +981,7 @@
         }
       ],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:42:07 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nCONNECTED\nTruth\nREAD-ONLY BROKER PROOF OK\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nVALID\nHoldings API\nERROR/BLOCKED\nFunds API\nERROR/BLOCKED\nBroker Blocker\nNONE\nMarket State\nMARKET OPEN\nData Visibility\nVISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nFailed to load funds: unknown error\nMarket close is not the blocker. Check Dhan token/API response.\nEQUITY HOLDINGS (0)\n\nFailed to load holdings: unknown error\n\nDHAN LIVE POSITIONS (0)\n\nFailed to load positions: unknown error"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:45 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBROKER CONNECTION - DHAN\nStatus\nCONNECTED\nTruth\nREAD-ONLY BROKER PROOF OK\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nVALID\nHoldings API\nERROR/BLOCKED\nFunds API\nERROR/BLOCKED\nBroker Blocker\nNONE\nMarket State\nMARKET OPEN\nData Visibility\nVISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS\nLive Trading\nBLOCKED BY BACKEND FLAG\nACCOUNT FUNDS\nFailed to load funds: unknown error\nMarket close is not the blocker. Check Dhan token/API response.\nEQUITY HOLDINGS (0)\n\nFailed to load holdings: unknown error\n\nDHAN LIVE POSITIONS (0)\n\nFailed to load positions: unknown error"
     },
     {
       "id": "alerts",
@@ -486,10 +991,10 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5013,
+      "settle_elapsed_ms": 5014,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
+        "ASYNC_CONTENT_NOT_SETTLED after 5014ms"
       ],
       "info_lines": [
         "PAPER",
@@ -498,7 +1003,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:42:12 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 1s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n2 ALERTS\nNo verified Dhan snapshot yet for: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. TopBar may show blank spots until micro-loop warms cache.\n2026-08-06T11:41:46.158596+05:30\nhuman_approved=NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json; validation_days=1 validation days (need ≥10); ml_accuracy_rho=Avg Spearman ρ=0.200 (need ≥0.70)\n2026-08-06T11:41:46.158596+05:30"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:50 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\n2 ALERTS\nNo verified Dhan snapshot yet for: BANKNIFTY, FINNIFTY, MIDCPNIFTY. TopBar may show blank spots until micro-loop warms cache.\n2026-08-06T11:48:12.568180+05:30\nhuman_approved=NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json; validation_days=1 validation days (need ≥10); ml_accuracy_rho=Avg Spearman ρ=0.200 (need ≥0.70)\n2026-08-06T11:48:12.568180+05:30"
     },
     {
       "id": "system",
@@ -508,12 +1013,11 @@
       "screenshot_ok": true,
       "navigation_method_index": 0,
       "async_content_settled": false,
-      "settle_elapsed_ms": 5012,
+      "settle_elapsed_ms": 5016,
       "settle_remaining_markers": [],
       "blocker_lines": [
-        "ASYNC_CONTENT_NOT_SETTLED after 5012ms",
-        "ERROR",
-        "Broker not connected - real data unavailable"
+        "ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+        "ERROR"
       ],
       "info_lines": [
         "PAPER",
@@ -523,7 +1027,7 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:42:17 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nCONNECTED\nWebSocket\nERROR\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nlive\nMarket State\nOPEN\nAPI Status\nOK / WAITING\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\nfalse\nQC Status\nNOT_READY\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nBroker not connected - real data unavailable"
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:48:55 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Status\nBroker (Dhan)\nCONNECTED\nWebSocket\nERROR\nLive Trading\nDISABLED (hardcoded)\nMode\nPAPER\nData Source\nlive\nMarket State\nOPEN\nAPI Status\nOK / WAITING\nPerformance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Pass\ntrue\nQC Status\nPASS\nSafety\nLIVE_TRADING_ENABLED\n0 (hardcoded)\nPaper Mode\nACTIVE\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY WHEN API RESPONDS\nBlocker 1\nLive trading permanently disabled in analyzer mode"
     },
     {
       "id": "gates",
@@ -549,11 +1053,11 @@
       ],
       "red_elements": [],
       "ui_exceptions": [],
-      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:42:22 IST\nNIFTY\n--\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked — see failed gates above\n\nGATE CHECKLIST\n✅\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n✅\nkill_switch_off\nKill switch not activated\n❌\nhuman_approved\nNOT APPROVED — owner must set live_trading_approved=true in kill_switch.json\n❌\nvalidation_days\n1 validation days (need ≥10)\n❌\nml_accuracy_rho\nAvg Spearman ρ=0.200 (need ≥0.70)\n✅\nmax_loss_configured\nMax daily loss = ₹5000 hardcoded in kill_switch.json\n\n⚠️ Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: ₹5,000. System halts automatically when limit is hit."
+      "body_text_sample": "SYSTEM3\nAI OPTIONS CONTROL\nOWNER\nPRITAM S. WARGHADE\nCLOUD BUILD\nroker_status_cache\n11:49:00 IST\nNIFTY\n24,628\nSNAP\nBNFTY\n--\nFINNIFTY\n--\nTICK 0s\nMARKET OPEN\nDHAN CONNECTED\nPAPER\nLIVE OFF\nWS\nOFF\nPROOF\nLIVE\nOFF\nMODE\nPAPER\nDATA\nDHAN\nML\nML 0/5d\nPAPER\nEXP —\nUI\nLIVE\nCOMMAND\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOption Chain\nSignals\nTRADING\nTrade\nPaper Trades\nPositions\nANALYSIS\nPerformance\nML Model\nSYSTEM\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked — see failed gates above\n\nGATE CHECKLIST\n✅\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n✅\nkill_switch_off\nKill switch not activated\n❌\nhuman_approved\nNOT APPROVED — owner must set live_trading_approved=true in kill_switch.json\n❌\nvalidation_days\n1 validation days (need ≥10)\n❌\nml_accuracy_rho\nAvg Spearman ρ=0.200 (need ≥0.70)\n✅\nmax_loss_configured\nMax daily loss = ₹5000 hardcoded in kill_switch.json\n\n⚠️ Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 on Render. Max daily loss: ₹5,000. System halts automatically when limit is hit."
     }
   ],
   "expected_tab_count": 16,
-  "visible_issue_count": 69,
+  "visible_issue_count": 63,
   "info_line_count": 70,
   "screenshot_missing_count": 0,
   "unsettled_tab_count": 16,
@@ -562,7 +1066,7 @@
   "visible_issues": [
     {
       "tab": "Truth Control",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING..."
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING..."
     },
     {
       "tab": "Truth Control",
@@ -618,7 +1122,7 @@
     },
     {
       "tab": "Genesis Brain",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5017ms"
     },
     {
       "tab": "Genesis Brain",
@@ -630,7 +1134,7 @@
     },
     {
       "tab": "E2E Proof",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5015ms"
     },
     {
       "tab": "E2E Proof",
@@ -702,7 +1206,7 @@
     },
     {
       "tab": "Overview",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
     },
     {
       "tab": "Overview",
@@ -714,10 +1218,6 @@
     },
     {
       "tab": "Overview",
-      "text": "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
-    },
-    {
-      "tab": "Overview",
       "text": "PEND"
     },
     {
@@ -726,43 +1226,27 @@
     },
     {
       "tab": "Sim Live",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms"
     },
     {
       "tab": "Option Chain",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
-    },
-    {
-      "tab": "Option Chain",
-      "text": "Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
-    },
-    {
-      "tab": "Option Chain",
-      "text": "Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5018ms"
     },
     {
       "tab": "Signals",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
     },
     {
       "tab": "Trade",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
-    },
-    {
-      "tab": "Trade",
-      "text": "Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
-    },
-    {
-      "tab": "Trade",
-      "text": "Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5018ms"
     },
     {
       "tab": "Paper Trades",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
     },
     {
       "tab": "Positions",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5010ms"
     },
     {
       "tab": "Performance",
@@ -770,7 +1254,7 @@
     },
     {
       "tab": "ML Model",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING MODEL ARTIFACTS..."
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS..."
     },
     {
       "tab": "ML Model",
@@ -810,19 +1294,15 @@
     },
     {
       "tab": "Alerts",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5013ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5014ms"
     },
     {
       "tab": "System",
-      "text": "ASYNC_CONTENT_NOT_SETTLED after 5012ms"
+      "text": "ASYNC_CONTENT_NOT_SETTLED after 5016ms"
     },
     {
       "tab": "System",
       "text": "ERROR"
-    },
-    {
-      "tab": "System",
-      "text": "Broker not connected - real data unavailable"
     },
     {
       "tab": "Live Gate",
@@ -944,6 +1424,10 @@
     },
     {
       "tab": "Sim Live",
+      "text": "POS_0001\tNIFTY\tCE\t24700\t\t116.5\t₹0.00\tOPEN\tpaper_simulation"
+    },
+    {
+      "tab": "Sim Live",
       "text": "REAL PAPER LIFECYCLE MARKET DAY PROOF"
     },
     {
@@ -1021,10 +1505,6 @@
     {
       "tab": "Positions",
       "text": "PAPER ONLY — NO REAL MONEY"
-    },
-    {
-      "tab": "Positions",
-      "text": "Paper engine generates positions during market hours"
     },
     {
       "tab": "Performance",
@@ -1120,7 +1600,7 @@
     }
   ],
   "todo": [
-    "Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5016ms markers=CHECKING...",
+    "Fix visible UI blocker on Truth Control: ASYNC_CONTENT_NOT_SETTLED after 5018ms markers=CHECKING...",
     "Fix visible UI blocker on Truth Control: BLOCKED",
     "Fix visible UI blocker on Truth Control: MONEY_READY_BLOCKED",
     "Fix visible UI blocker on Truth Control: At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.",
@@ -1134,10 +1614,10 @@
     "Fix visible UI blocker on Truth Control: Paper/analyzer lifecycle\tBLOCKED\tNO\ttoday_trade_rows=0, endpoint=0",
     "Fix visible UI blocker on Truth Control: Risk gates and automation status\tBLOCKED\tYES\tauto_gates_http=0, status=-",
     "Fix visible UI blocker on Truth Control: Dashboard operator truth\tBLOCKED\tYES\thealth_ok=false, broker_ok=false, gates_ok=false, enabled_chains_ready=0/4 (runtime API probes; not hard-coded)",
-    "Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+    "Fix visible UI blocker on Genesis Brain: ASYNC_CONTENT_NOT_SETTLED after 5017ms",
     "Fix visible UI blocker on Genesis Brain: BLOCKED",
     "Fix visible UI blocker on Genesis Brain: Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.",
-    "Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5014ms",
+    "Fix visible UI blocker on E2E Proof: ASYNC_CONTENT_NOT_SETTLED after 5015ms",
     "Fix visible UI blocker on E2E Proof: Real broker/data truth only. Live money remains blocked until every row below passes.",
     "Fix visible UI blocker on E2E Proof: BLOCKED · FULL E2E",
     "Fix visible UI blocker on E2E Proof: BLOCKED · API",
@@ -1155,24 +1635,19 @@
     "Fix visible UI blocker on E2E Proof: Today paper lifecycle endpoint\tBLOCKED\t-",
     "Fix visible UI blocker on E2E Proof: Gate/risk endpoint visible\tBLOCKED\t-",
     "Fix visible UI blocker on E2E Proof: Live-money switch blocked until separate proof\tPASS\tblocked",
-    "Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+    "Fix visible UI blocker on Overview: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
     "Fix visible UI blocker on Overview: ERROR",
     "Fix visible UI blocker on Overview: STALE",
-    "Fix visible UI blocker on Overview: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
     "Fix visible UI blocker on Overview: PEND",
     "Fix visible UI blocker on Overview: market-session proof pending",
-    "Fix visible UI blocker on Sim Live: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
-    "Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
-    "Fix visible UI blocker on Option Chain: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-    "Fix visible UI blocker on Option Chain: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-    "Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
-    "Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
-    "Fix visible UI blocker on Trade: Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-    "Fix visible UI blocker on Trade: Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.",
-    "Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
-    "Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5011ms",
+    "Fix visible UI blocker on Sim Live: ASYNC_CONTENT_NOT_SETTLED after 5016ms",
+    "Fix visible UI blocker on Option Chain: ASYNC_CONTENT_NOT_SETTLED after 5018ms",
+    "Fix visible UI blocker on Signals: ASYNC_CONTENT_NOT_SETTLED after 5013ms",
+    "Fix visible UI blocker on Trade: ASYNC_CONTENT_NOT_SETTLED after 5018ms",
+    "Fix visible UI blocker on Paper Trades: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
+    "Fix visible UI blocker on Positions: ASYNC_CONTENT_NOT_SETTLED after 5010ms",
     "Fix visible UI blocker on Performance: ASYNC_CONTENT_NOT_SETTLED after 5014ms",
-    "Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5014ms markers=CHECKING MODEL ARTIFACTS...",
+    "Fix visible UI blocker on ML Model: ASYNC_CONTENT_NOT_SETTLED after 5011ms markers=CHECKING MODEL ARTIFACTS...",
     "Fix visible UI blocker on ML Model: 0 proven / 0 blocked",
     "Fix visible UI blocker on ML Model: BLOCKED",
     "Fix visible UI blocker on ML Model: Training proof missing.",
@@ -1182,10 +1657,9 @@
     "Fix visible UI blocker on Broker: Failed to load funds: unknown error",
     "Fix visible UI blocker on Broker: Failed to load holdings: unknown error",
     "Fix visible UI blocker on Broker: Failed to load positions: unknown error",
-    "Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5013ms",
-    "Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
+    "Fix visible UI blocker on Alerts: ASYNC_CONTENT_NOT_SETTLED after 5014ms",
+    "Fix visible UI blocker on System: ASYNC_CONTENT_NOT_SETTLED after 5016ms",
     "Fix visible UI blocker on System: ERROR",
-    "Fix visible UI blocker on System: Broker not connected - real data unavailable",
     "Fix visible UI blocker on Live Gate: ASYNC_CONTENT_NOT_SETTLED after 5012ms",
     "Fix visible UI blocker on Live Gate: LIVE_TRADING_BLOCKED",
     "Fix visible UI blocker on Live Gate: Live trading blocked — see failed gates above"

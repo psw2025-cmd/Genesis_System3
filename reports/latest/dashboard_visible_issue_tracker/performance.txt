@@ -4,14 +4,15 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:41:56 IST
+11:48:34 IST
 NIFTY
---
+24,628
+SNAP
 BNFTY
 --
 FINNIFTY
 --
-TICK 1s
+TICK 0s
 MARKET OPEN
 DHAN CONNECTED
 PAPER
@@ -57,17 +58,17 @@ System
 Live Gate
 LOCK
 Performance
-last checked 11:41:53 IST
+last checked 11:48:30 IST
 TOTAL P&L
-₹-1,806
+₹0
 Realized + Unrealized
 WIN RATE
-0.3%
+0.0%
 TOTAL TRADES
-9
-3W / 6L
-OPEN PAPER
 0
+0W / 0L
+OPEN PAPER
+1
 Cloud paper engine
 BACKTEST / WALK-FORWARD PROOF
 {
