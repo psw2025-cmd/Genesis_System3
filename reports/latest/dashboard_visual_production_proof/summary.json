@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T08:16:15.958Z",
+  "generated_at": "2026-08-06T09:14:20.765Z",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
@@ -33,7 +33,7 @@
     "shell_generated_at": "2026-07-27T23:56:42.530Z",
     "shell_status": "BLOCKED",
     "shell_tab_coverage": "0/16",
-    "visible_tracker_generated_at": "2026-08-06T07:50:38.254Z",
+    "visible_tracker_generated_at": "2026-08-06T08:16:01.939Z",
     "visible_tracker_status": "BLOCKED",
     "visible_tracker_bad_tab_count": 16
   },
@@ -41,67 +41,67 @@
     {
       "file": "truth.png",
       "ok": true,
-      "size_bytes": 157927
+      "size_bytes": 157941
     },
     {
       "file": "genesis.png",
       "ok": true,
-      "size_bytes": 255090
+      "size_bytes": 254598
     },
     {
       "file": "e2e_proof.png",
       "ok": true,
-      "size_bytes": 153289
+      "size_bytes": 153020
     },
     {
       "file": "overview.png",
       "ok": true,
-      "size_bytes": 117990
+      "size_bytes": 116490
     },
     {
       "file": "chain.png",
       "ok": true,
-      "size_bytes": 90875
+      "size_bytes": 94273
     },
     {
       "file": "signals.png",
       "ok": true,
-      "size_bytes": 65255
+      "size_bytes": 64790
     },
     {
       "file": "paper.png",
       "ok": true,
-      "size_bytes": 72626
+      "size_bytes": 72300
     },
     {
       "file": "positions.png",
       "ok": true,
-      "size_bytes": 77544
+      "size_bytes": 77394
     },
     {
       "file": "broker.png",
       "ok": true,
-      "size_bytes": 117927
+      "size_bytes": 115344
     },
     {
       "file": "performance.png",
       "ok": true,
-      "size_bytes": 120679
+      "size_bytes": 120442
     },
     {
       "file": "ml.png",
       "ok": true,
-      "size_bytes": 101471
+      "size_bytes": 101328
     },
     {
       "file": "gates.png",
       "ok": true,
-      "size_bytes": 114965
+      "size_bytes": 114834
     },
     {
       "file": "mobile_390x844.png",
       "ok": true,
-      "size_bytes": 74447
+      "size_bytes": 74331
     }
   ],
   "safety": {
