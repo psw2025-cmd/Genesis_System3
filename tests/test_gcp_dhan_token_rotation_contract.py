@@ -110,15 +110,26 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
         self.assertIn('--schedule="30 7 * * *"', deploy)
 
-    def test_cloud_run_uses_same_dashboard_secret_as_authenticated_proof(self):
-        deploy = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-        backend = Path("dashboard/backend/app.py").read_text(encoding="utf-8")
-        self.assertIn('--update-secrets="API_KEY=system3-dashboard-api-key:latest"', deploy)
-        self.assertIn("REQUIRE_API_KEY=true", deploy)
-        self.assertIn('os.environ.get("API_KEY", "").strip()', backend)
-        self.assertIn('request.headers.get("X-API-Key", "")', backend)
-        self.assertIn('--secret=system3-dashboard-api-key', deploy)
-        self.assertIn('-H "X-API-Key: ${API_KEY_TMP}"', deploy)
+    def test_dashboard_api_lock_stays_disabled_across_gcp_deploy_paths(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        deploy_script = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
+
+        self.assertIn("REQUIRE_API_KEY=false", workflow)
+        self.assertIn('--remove-secrets="API_KEY"', workflow)
+        self.assertNotIn("system3-dashboard-api-key", workflow)
+        self.assertNotIn('X-API-Key: ${API_KEY_TMP}', workflow)
+        self.assertIn('.required == false', workflow)
+        self.assertIn('.configured == false', workflow)
+        self.assertIn('.mode == "auth_disabled"', workflow)
+
+        self.assertIn('("REQUIRE_API_KEY", "false")', deploy_script)
+        self.assertIn('"API_KEY")', deploy_script)
+        self.assertIn("DASHBOARD_API_LOCK disabled", deploy_script)
+
+        self.assertIn("--allow-unauthenticated", manual_script)
+        self.assertNotIn("--no-allow-unauthenticated", manual_script)
+        self.assertIn("REQUIRE_API_KEY=false", manual_script)
 
 
 if __name__ == "__main__":

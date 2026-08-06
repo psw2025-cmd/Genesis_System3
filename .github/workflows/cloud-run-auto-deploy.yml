@@ -104,8 +104,8 @@ jobs:
             --region="${GCP_REGION}" \
             --min-instances=0 \
             --max-instances=1 \
-            --update-env-vars="DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,REQUIRE_API_KEY=true,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
-            --update-secrets="API_KEY=system3-dashboard-api-key:latest"
+            --update-env-vars="DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,REQUIRE_API_KEY=false,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
+            --remove-secrets="API_KEY"
 
       - name: Configure rotator IAM, Cloud Run Job and Cloud Scheduler
         run: |
@@ -207,8 +207,11 @@ jobs:
           svc = json.load(open("/tmp/svc.json"))
           scheduler = json.load(open("/tmp/scheduler.json"))
           env = {}
+          env_names = set()
           for c in ((((svc.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or []):
               for e in c.get("env") or []:
+                  if e.get("name"):
+                      env_names.add(e["name"])
                   if e.get("name") and "value" in e:
                       env[e["name"]] = e["value"]
           bad = []
@@ -221,15 +224,19 @@ jobs:
           if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic":
               print("DYNAMIC_TOKEN_SOURCE_MISSING", env.get("DHAN_TOKEN_SOURCE"))
               sys.exit(3)
-          if env.get("REQUIRE_API_KEY") != "true":
-              print("DASHBOARD_AUTH_NOT_REQUIRED", env.get("REQUIRE_API_KEY"))
+          if env.get("REQUIRE_API_KEY") not in ("0", "false", "False"):
+              print("DASHBOARD_API_LOCK_NOT_DISABLED", env.get("REQUIRE_API_KEY"))
               sys.exit(4)
+          if "API_KEY" in env_names:
+              print("DASHBOARD_API_KEY_STILL_MOUNTED")
+              sys.exit(5)
           if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata":
               print("SCHEDULER_CONFIG_INVALID", scheduler.get("schedule"), scheduler.get("timeZone"))
-              sys.exit(5)
+              sys.exit(6)
           print("CLOUD_RUNTIME_SAFETY_OK", {
               "token_source": env.get("DHAN_TOKEN_SOURCE"),
-              "dashboard_auth_required": env.get("REQUIRE_API_KEY"),
+              "dashboard_api_lock": "disabled",
+              "dashboard_api_key_mounted": False,
               "live_trading": env.get("LIVE_TRADING_ENABLED"),
               "scheduler": scheduler.get("name"),
               "schedule": scheduler.get("schedule"),
@@ -237,32 +244,26 @@ jobs:
           })
           PY
 
-      - name: Authenticated UI broker proof
+      - name: Public UI broker proof
         run: |
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --format='value(status.url)')
-          API_KEY_TMP=$(gcloud secrets versions access latest \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --secret=system3-dashboard-api-key)
 
           curl -fsS --max-time 30 \
-            -H "X-API-Key: ${API_KEY_TMP}" \
             "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
           jq '{required,configured,authenticated,mode}' /tmp/auth.json
-          jq -e '.required == true and .configured == true and .authenticated == true' /tmp/auth.json >/dev/null
+          jq -e '.required == false and .configured == false and .authenticated == true and .mode == "auth_disabled"' /tmp/auth.json >/dev/null
 
           for ATTEMPT in 1 2 3 4 5 6; do
             curl -fsS --max-time 30 \
-              -H "X-API-Key: ${API_KEY_TMP}" \
               "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
             if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then
               break
             fi
             sleep 10
           done
-          unset API_KEY_TMP
 
           jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
           jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null
