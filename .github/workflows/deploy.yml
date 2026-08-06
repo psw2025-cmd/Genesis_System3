@@ -1,4 +1,4 @@
-name: Deploy Genesis System3 to Cloud Run
+name: Deploy Genesis System3 to Cloud Run (Unified)
 
 on:
   push:
@@ -37,7 +37,24 @@ jobs:
           --set-secrets DHAN_ACCESS_TOKEN=dhan-access-token:latest \
           --set-secrets DHAN_APP_ID=dhan-app-id:latest \
           --set-secrets DHAN_APP_SECRET=dhan-app-secret:latest \
-          --set-env-vars REQUIRE_API_KEY=false,API_KEY=""
+          --set-env-vars REQUIRE_API_KEY=false,API_KEY="",DHAN_TOKEN_REFRESH_ENABLED=true
+          
+    - name: Initialize Token Refresh Daemon
+      run: |
+        echo "Initializing Dhan token refresh..."
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} \
+          --region ${{ env.REGION }} \
+          --format='value(status.url)')
+        
+        # Wait for service to be ready
+        for i in {1..30}; do
+          if curl -f "$SERVICE_URL/health" 2>/dev/null | grep -q "success"; then
+            echo "✅ Service ready - Token refresh initialized"
+            break
+          fi
+          echo "Waiting for service... ($i/30)"
+          sleep 2
+        done
           
     - name: Verify Deployment
       run: |
@@ -48,7 +65,7 @@ jobs:
         echo "Service URL: $SERVICE_URL"
         
         # Wait for service to be ready
-        sleep 10
+        sleep 5
         
         # Check health endpoint
         curl -f "$SERVICE_URL/health" || exit 1
