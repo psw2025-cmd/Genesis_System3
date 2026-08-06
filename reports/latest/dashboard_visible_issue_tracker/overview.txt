@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-11:10:37 IST
+11:41:20 IST
 NIFTY
 --
 BNFTY
@@ -102,7 +102,7 @@ Alerts
 2 recent
 WAITING
 Option Chain
-Index chain warming from micro-loop — UI must not wait on live Dhan OC
+No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 Gate Matrix
 2/7 PASS
 PEND
@@ -116,7 +116,7 @@ Paper Lifecycle
 market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=60.1s refresh=60s
+tick_age=60.12s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
@@ -130,7 +130,7 @@ System Health
 Mode
 PAPER
 QC Status
-PASS
+NOT_READY
 Data Source
 live
 Market
