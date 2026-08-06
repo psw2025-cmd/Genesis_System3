@@ -1,48 +1,18 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-08-06T15:13:22.547Z
-Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
+Generated: None
+Base: None
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
-Source verdict: **FAIL**
+Source verdict: **MISSING**
 Auth OK: **False**
-Screenshot gate: **True**
+Screenshot gate: **False**
 
 ## Blockers
-- AUTH_FAIL:503
-- API_FAIL:/api/deploy/info:401
-- API_FAIL:/api/state:401
-- API_FAIL:/api/broker/dhan/status:401
-- API_FAIL:/api/broker/funds:401
-- API_FAIL:/api/broker/holdings:401
-- API_FAIL:/api/broker/positions/live:401
-- CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/NIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/BANKNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/FINNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/MIDCPNIFTY:401
-- CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN
-- API_FAIL:/api/chain/SENSEX:401
-- API_FAIL:/api/gain_rank:401
-- API_FAIL:/api/scanner/top_contract_gainers?top_n=5:401
-- API_FAIL:/api/pnl:401
-- API_FAIL:/api/trades/today:401
-- API_FAIL:/api/auto_gates:401
-- API_FAIL:/api/ml/performance:401
-- API_FAIL:/api/ml/compare:401
-- API_FAIL:/api/paper:401
-- UI_FAIL:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:Paper Trades
-- PAPER_TRUTH_NOT_VISIBLE:GLOBAL
 - SHELL_STATUS:BLOCKED
 - TAB_COVERAGE:0/16
-- SHELL_PROOF_NOT_TIME_ALIGNED
 - VISIBLE_TRACKER_STATUS:BLOCKED
 - VISIBLE_TRACKER_BAD_TABS:16
-- VISIBLE_TRACKER_NOT_TIME_ALIGNED
 
 ## Corroborating evidence
 - `shell_generated_at`: `2026-07-27T23:56:42.530Z`
@@ -53,68 +23,16 @@ Screenshot gate: **True**
 - `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`166567`
-- PASS `genesis.png` size=`255334`
-- PASS `e2e_proof.png` size=`159871`
-- PASS `overview.png` size=`137041`
-- PASS `chain.png` size=`203052`
-- PASS `signals.png` size=`111706`
-- PASS `paper.png` size=`83176`
-- PASS `positions.png` size=`81408`
-- PASS `broker.png` size=`139395`
-- PASS `performance.png` size=`91155`
-- PASS `ml.png` size=`112284`
-- PASS `gates.png` size=`90973`
-- PASS `mobile_390x844.png` size=`84747`
-
-## truth.png
-
-![truth.png](screenshots/truth.png)
-
-## genesis.png
-
-![genesis.png](screenshots/genesis.png)
-
-## e2e_proof.png
-
-![e2e_proof.png](screenshots/e2e_proof.png)
-
-## overview.png
-
-![overview.png](screenshots/overview.png)
-
-## chain.png
-
-![chain.png](screenshots/chain.png)
-
-## signals.png
-
-![signals.png](screenshots/signals.png)
-
-## paper.png
-
-![paper.png](screenshots/paper.png)
-
-## positions.png
-
-![positions.png](screenshots/positions.png)
-
-## broker.png
-
-![broker.png](screenshots/broker.png)
-
-## performance.png
-
-![performance.png](screenshots/performance.png)
-
-## ml.png
-
-![ml.png](screenshots/ml.png)
-
-## gates.png
-
-![gates.png](screenshots/gates.png)
-
-## mobile_390x844.png
-
-![mobile_390x844.png](screenshots/mobile_390x844.png)
+- MISSING `truth.png` size=`0`
+- MISSING `genesis.png` size=`0`
+- MISSING `e2e_proof.png` size=`0`
+- MISSING `overview.png` size=`0`
+- MISSING `chain.png` size=`0`
+- MISSING `signals.png` size=`0`
+- MISSING `paper.png` size=`0`
+- MISSING `positions.png` size=`0`
+- MISSING `broker.png` size=`0`
+- MISSING `performance.png` size=`0`
+- MISSING `ml.png` size=`0`
+- MISSING `gates.png` size=`0`
+- MISSING `mobile_390x844.png` size=`0`

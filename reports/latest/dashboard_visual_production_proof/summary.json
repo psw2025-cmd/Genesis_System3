@@ -1,53 +1,21 @@
 {
-  "generated_at": "2026-08-06T15:13:22.547Z",
-  "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "generated_at": null,
+  "base": null,
   "visual_gate_pass": false,
   "production_grade_claim_allowed": false,
-  "source_summary_ok": true,
-  "source_summary_error": null,
-  "source_final_verdict": "FAIL",
+  "source_summary_ok": false,
+  "source_summary_error": "FileNotFoundError: [Errno 2] No such file or directory: 'reports/latest/dashboard_live_ui_proof/summary.json'",
+  "source_final_verdict": "MISSING",
   "auth_ok": false,
-  "screenshot_gate_pass": true,
-  "infra_blockers": [
-    "AUTH_FAIL:503",
-    "API_FAIL:/api/deploy/info:401",
-    "API_FAIL:/api/state:401",
-    "API_FAIL:/api/broker/dhan/status:401",
-    "API_FAIL:/api/broker/funds:401",
-    "API_FAIL:/api/broker/holdings:401",
-    "API_FAIL:/api/broker/positions/live:401",
-    "CHAIN_NOT_TRADE_READY:/api/chain/NIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/NIFTY:401",
-    "CHAIN_NOT_TRADE_READY:/api/chain/BANKNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/BANKNIFTY:401",
-    "CHAIN_NOT_TRADE_READY:/api/chain/FINNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/FINNIFTY:401",
-    "CHAIN_NOT_TRADE_READY:/api/chain/MIDCPNIFTY:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/MIDCPNIFTY:401",
-    "CHAIN_NOT_TRADE_READY:/api/chain/SENSEX:NOT_REAL_DHAN_CHAIN",
-    "API_FAIL:/api/chain/SENSEX:401",
-    "API_FAIL:/api/gain_rank:401",
-    "API_FAIL:/api/scanner/top_contract_gainers?top_n=5:401",
-    "API_FAIL:/api/pnl:401",
-    "API_FAIL:/api/trades/today:401",
-    "API_FAIL:/api/auto_gates:401",
-    "API_FAIL:/api/ml/performance:401",
-    "API_FAIL:/api/ml/compare:401",
-    "API_FAIL:/api/paper:401",
-    "UI_FAIL:Paper Trades"
-  ],
-  "visual_blockers": [
-    "PAPER_TRUTH_NOT_VISIBLE:Paper Trades",
-    "PAPER_TRUTH_NOT_VISIBLE:GLOBAL"
-  ],
+  "screenshot_gate_pass": false,
+  "infra_blockers": [],
+  "visual_blockers": [],
   "trade_readiness_blockers": [],
   "consistency_blockers": [
     "SHELL_STATUS:BLOCKED",
     "TAB_COVERAGE:0/16",
-    "SHELL_PROOF_NOT_TIME_ALIGNED",
     "VISIBLE_TRACKER_STATUS:BLOCKED",
-    "VISIBLE_TRACKER_BAD_TABS:16",
-    "VISIBLE_TRACKER_NOT_TIME_ALIGNED"
+    "VISIBLE_TRACKER_BAD_TABS:16"
   ],
   "corroborating_evidence": {
     "shell_generated_at": "2026-07-27T23:56:42.530Z",
@@ -60,68 +28,68 @@
   "screenshots": [
     {
       "file": "truth.png",
-      "ok": true,
-      "size_bytes": 166567
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "genesis.png",
-      "ok": true,
-      "size_bytes": 255334
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "e2e_proof.png",
-      "ok": true,
-      "size_bytes": 159871
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "overview.png",
-      "ok": true,
-      "size_bytes": 137041
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "chain.png",
-      "ok": true,
-      "size_bytes": 203052
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "signals.png",
-      "ok": true,
-      "size_bytes": 111706
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "paper.png",
-      "ok": true,
-      "size_bytes": 83176
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "positions.png",
-      "ok": true,
-      "size_bytes": 81408
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "broker.png",
-      "ok": true,
-      "size_bytes": 139395
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "performance.png",
-      "ok": true,
-      "size_bytes": 91155
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "ml.png",
-      "ok": true,
-      "size_bytes": 112284
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "gates.png",
-      "ok": true,
-      "size_bytes": 90973
+      "ok": false,
+      "size_bytes": 0
     },
     {
       "file": "mobile_390x844.png",
-      "ok": true,
-      "size_bytes": 84747
+      "ok": false,
+      "size_bytes": 0
     }
   ],
   "safety": {
