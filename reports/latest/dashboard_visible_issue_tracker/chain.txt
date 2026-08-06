@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-12:21:37 IST
+13:21:20 IST
 NIFTY
 --
 BNFTY
@@ -69,7 +69,7 @@ ICICIBANK
 OPTION CHAIN - NIFTY
 Waiting for live Dhan option-chain stream…
 Status: CHAIN_CACHE_WARMING
-Market: OPEN · Market open
-Next open: 2026-08-06 09:15:00 IST
+Market: OPEN · Index chain warming from micro-loop — UI must not wait on live Dhan OC
+Next open: --
 Source: dhan / --
 Backend: Index chain warming from micro-loop — UI must not wait on live Dhan OC

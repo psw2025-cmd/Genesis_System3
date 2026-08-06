@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-12:21:53 IST
+13:21:35 IST
 NIFTY
 --
 BNFTY
@@ -57,70 +57,4 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/6/2026, 6:51:48 AM
-Dhan production tokens have no paper sandbox — fills are local sim; LTP/PnL from live Dhan option chain. LIVE orders stay OFF.
-Refresh
-Force Paper Tick
-Mode Safety
-PAPER SAFE
-Live trading: OFF
-Market Data (Dhan)
-CONNECTED
-Mark-to-market: DHAN_LIVE_MARK_TO_MARKET
-Today Paper Entries
-2
-Open positions: 2
-Today Paper Exits
-0
-Realized: ₹0.00
-Paper Truth Provenance
-Ledger / source
-/app/outputs/positions_live.json
-Displayed rows
-2
-Fake/fixture rejected
-0
-Dhan /orders API
-INTENTIONALLY NOT CALLED
-Correct for paper — broker orders must stay off
-Sources checked: DhanHQ Portfolio/Positions docs · Dhan Sandbox (separate tokens) · OpenAlgo Dhan notes · industry paper dashboards (entry, LTP, unrealized/realized PnL, SL/TP, order book empty in paper).
-PAPER TRADING MODE (NO REAL ORDERS)
-Fills are simulated locally. Dhan /orders APIs are intentionally not called. Mark-to-market uses live Dhan option-chain LTP.
-Mode: PAPER | Data Source: DHAN_LIVE_MARK_TO_MARKET | Broker: Connected
-Open Paper Positions (2)
-Columns map to DhanHQ v2 Positions: tradingSymbol, positionType, productType, buyAvg, netQty, unrealizedProfit, drvOptionType, drvStrikePrice, drvExpiryDate + paper SL/Target.
-Pos ID	Trading Symbol	Side	CE/PE	Strike	Expiry	Qty	Buy Avg	LTP	Unrealized	SL	Target	Product	Provenance
-POS_0001	NIFTY2026081124800CE	LONG	CE	24800	2026-08-11	75	₹81.95	₹81.95	₹-70.59	₹72.12	₹96.70	INTRADAY
-NSE_FNO	PAPER_CLOUD_SIM
-DHAN_LIVE
-2026-08-06 12:17:01 IST
-POS_0002	BANKNIFTY2026082559200CE	LONG	CE	59200	2026-08-25	30	₹243.50	₹243.50	₹0.00	₹214.28	₹287.33	INTRADAY
-NSE_FNO	PAPER_CLOUD_SIM
-DHAN_LIVE
-2026-08-06 12:19:41 IST
-PnL Summary (Dhan-style)
-Total PnL
-₹-70.59
-Unrealized (open)
-₹-70.59
-Realized (booked)
-₹0.00
-Open Positions
-2 / 3
-Today Entries / Exits
-2 / 0
-Paper Exposure
-₹13451.25
-Order Book (Paper)
-Broker order book stays empty in paper mode.
-POST /v2/orders → NOT CALLED
-GET /v2/orders → N/A (paper ledger only)
-GET /v2/positions → Live broker positions separate (Broker tab)
-Paper fills → PAPER_CLOUD_SIM + Dhan LTP MTM
-LIVE Order Safety: BLOCKED · AUTO_EXECUTE_TRADES=0
-Today Paper Trade Proof
-Entries (2)
-POS_0001 · NIFTY CE 24800.0 @ 81.95 · 2026-08-06 12:17:01 IST
-POS_0002 · BANKNIFTY CE 59200.0 @ 243.5 · 2026-08-06 12:19:41 IST
-Exits (0)
-No exits yet (SL/Target/EOD not hit).
+Loading paper positions + Dhan mark-to-market…
