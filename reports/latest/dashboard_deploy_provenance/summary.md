@@ -1,13 +1,13 @@
 # Dashboard Deploy Provenance
 
-Generated: 2026-08-06T08:06:53.501800+00:00
+Generated: 2026-08-06T09:14:35.280960+00:00
 
 Status: **PASS**
 
 - Manifest path: `/ui/assets/deploy-provenance.json`
 - HTTP: `200`
-- Attempts: `2`
-- Recovered after transient failure: `True`
+- Attempts: `1`
+- Recovered after transient failure: `False`
 - Content type: `application/json`
 - Source fingerprint match: `True`
 - Blocker: `none`
