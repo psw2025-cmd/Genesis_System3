@@ -4,15 +4,17 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-01:53:32 IST
+09:05:13 IST
 NIFTY
-24,615
+24,625
 SNAP
 BNFTY
---
+57,740
+SNAP
 FINNIFTY
---
-TICK 0s
+26,844
+SNAP
+TICK 1s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -61,7 +63,7 @@ System
 Live Gate
 LOCK
 Paper Trading Console
-Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/4/2026, 8:23:28 PM
+Aligned to DhanHQ v2 Positions fields · Source: PAPER_CLOUD_SIM · Refresh: 8/6/2026, 3:35:09 AM
 Dhan production tokens have no paper sandbox — fills are local sim; LTP/PnL from live Dhan option chain. LIVE orders stay OFF.
 Refresh
 Force Paper Tick
@@ -72,7 +74,7 @@ Market Data (Dhan)
 CONNECTED
 Mark-to-market: DHAN_LIVE_MARK_TO_MARKET
 Today Paper Entries
-1
+0
 Open positions: 0
 Today Paper Exits
 0
@@ -105,7 +107,7 @@ Realized (booked)
 Open Positions
 0 / 3
 Today Entries / Exits
-1 / 0
+0 / 0
 Paper Exposure
 ₹0.00
 Order Book (Paper)
@@ -116,7 +118,7 @@ GET /v2/positions → Live broker positions separate (Broker tab)
 Paper fills → PAPER_CLOUD_SIM + Dhan LTP MTM
 LIVE Order Safety: BLOCKED · AUTO_EXECUTE_TRADES=0
 Today Paper Trade Proof
-Entries (1)
-POS_0001 · NIFTY CE 24600 @ 14.9 · 2026-08-05 01:19:39 IST
+Entries (0)
+No entries yet today.
 Exits (0)
 No exits yet (SL/Target/EOD not hit).
