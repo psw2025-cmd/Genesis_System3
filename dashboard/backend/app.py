@@ -295,6 +295,9 @@ from routers import broker as broker_router
 from routers import chain as chain_router
 from routers import ml as ml_router
 
+from fo_eligibility_filter import get_fo_eligibility_filter
+from option_strike_visibility_audit import OptionVisibilityAuditor, generate_sample_audit_report
+
 # ── Memory guard middleware ────────────────────────────────────────────────
 from middleware.memory_guard import memory_guard_middleware, get_memory_stats
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -1225,6 +1228,29 @@ async def get_instruments_health():
         return {"status": "error", "error": str(e)[:200]}
 
 
+
+def _filter_rows_fo(rows):
+    """BLK-004: drop non-F&O underlyings from ranking/signal payloads."""
+    fo = get_fo_eligibility_filter()
+    kept = []
+    rejected = []
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        sym = str(row.get("underlying") or row.get("symbol") or "").strip().upper()
+        if not sym:
+            rejected.append({"underlying": sym, "reason": "MISSING_SYMBOL"})
+            continue
+        ok, reason = fo.is_eligible(sym)
+        if ok:
+            out = dict(row)
+            out["fo_check"] = {"eligible": True, "reason": reason}
+            kept.append(out)
+        else:
+            rejected.append({"underlying": sym, "reason": reason})
+    return kept, rejected
+
+
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
     """Latest gain rank predictions — file history, or live scanner fallback."""
@@ -1319,10 +1345,22 @@ async def get_gain_rank(refresh: bool = False):
         if latest is None:
             return {"status": "no_data", "latest": None, "history": history[-14:], "is_today": False, "stale": True}
 
+        latest = dict(latest)
+        raw_rows = (latest.get("rankings") or latest.get("predictions") or [])
+        kept, rejected = _filter_rows_fo(raw_rows if isinstance(raw_rows, list) else [])
+        latest["rankings"] = kept
+        latest["predictions"] = kept
+        latest["fo_filtered_out"] = rejected
+        latest["fo_filter"] = {
+            "eligible_count": len(kept),
+            "rejected_count": len(rejected),
+            "universe_size": len(get_fo_eligibility_filter().get_current_universe()),
+        }
         return {
             "status": "ok",
             "latest": latest,
-            "rankings": (latest or {}).get("rankings") or (latest or {}).get("predictions") or [],
+            "rankings": kept,
+            "fo_rejected": rejected,
             "history": history[-14:],
             "total_days": len(history),
             "is_today": (latest or {}).get("date") == today,
@@ -1332,6 +1370,63 @@ async def get_gain_rank(refresh: bool = False):
         }
     except Exception as e:
         return {"status": "error", "error": str(e), "latest": None, "history": [], "is_today": False, "stale": True}
+
+
+
+
+@app.get("/api/audit/option-visibility")
+async def get_option_visibility_audit(sample: bool = False):
+    """BLK-003: prove signal underlyings map to visible PE/CE contracts."""
+    try:
+        if sample:
+            report = generate_sample_audit_report()
+            report["mode"] = "sample"
+            return report
+
+        history = []
+        if GAIN_RANK_FILE.exists():
+            raw = json.loads(GAIN_RANK_FILE.read_text(encoding="utf-8", errors="replace"))
+            if isinstance(raw, list):
+                history = raw
+        preds = []
+        if history:
+            latest = history[-1] if isinstance(history[-1], dict) else {}
+            raw_preds = latest.get("predictions") or latest.get("rankings") or []
+            if isinstance(raw_preds, list):
+                preds = [p for p in raw_preds if isinstance(p, dict)]
+
+        chain_candidates = [
+            ROOT_DIR / "state" / "option_chain_cache.json",
+            ROOT_DIR / "storage" / "live" / "option_chain_cache.json",
+            ROOT_DIR / "reports" / "latest" / "option_strike_visibility.json",
+        ]
+        chain_file = next((p for p in chain_candidates if p.exists()), None)
+        auditor = OptionVisibilityAuditor(chain_file)
+        now = datetime.now(IST)
+        if not preds:
+            for i, sym in enumerate(["NIFTY", "BANKNIFTY", "RELIANCE", "SBIN", "INFY"]):
+                auditor.audit_signal(f"SEED-{i+1}", sym, "LONG", 0.5, now)
+            report = auditor.generate_report()
+            report["mode"] = "seed_no_predictions"
+            report["chain_file"] = str(chain_file) if chain_file else None
+            return report
+
+        for i, row in enumerate(preds[:25]):
+            sym = str(row.get("underlying") or row.get("symbol") or "NIFTY")
+            score = float(row.get("gain_score") or row.get("gain_pct") or 0)
+            direction = "LONG" if score >= 0 else "SHORT"
+            conf = min(abs(score) / 100.0, 1.0) if score else 0.5
+            auditor.audit_signal(str(row.get("id") or f"SIG-{i+1}"), sym, direction, conf, now)
+        report = auditor.generate_report()
+        report["mode"] = "live_history"
+        report["chain_file"] = str(chain_file) if chain_file else None
+        report["note"] = (
+            "Coverage uses local chain cache when present; "
+            "otherwise symbols are marked missing until Dhan OC is cached."
+        )
+        return report
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:300], "proof_gate": False}
 
 
 @app.get("/api/scanner/top_contract_gainers")
@@ -4247,6 +4342,14 @@ async def get_top_signal():
 
         data = json.loads(signal_file.read_text())
         data["data_source"] = "real"
+        und = str(data.get("underlying") or data.get("symbol") or "").strip().upper()
+        if und:
+            ok, reason = get_fo_eligibility_filter().is_eligible(und)
+            data["fo_check"] = {"eligible": ok, "reason": reason}
+            if not ok:
+                data["action"] = "NO_TRADE"
+                data["reason"] = f"NOT_IN_NSE_FO_UNIVERSE ({und})"
+                data["status"] = "FO_FILTERED"
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

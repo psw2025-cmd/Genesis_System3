@@ -6,18 +6,36 @@ Ensures SSOT stays up-to-date with the trading system
 import asyncio
 import json
 import os
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pytz
 
+from broker_alert_deduplicator import process_broker_alert
+
 IST = pytz.timezone("Asia/Kolkata")
 
 # These will be set by the importing module
 MARKET_DETECTION_AVAILABLE = False
 ADVANCED_FEATURES_AVAILABLE = False
+
+
+
+class _BrokerAlertLog:
+    """Adapter so process_broker_alert can log via print."""
+
+    @staticmethod
+    def info(msg):
+        print(msg)
+
+    @staticmethod
+    def warning(msg):
+        print(msg)
+
+    @staticmethod
+    def debug(msg):
+        return
 
 
 class StateSyncService:
@@ -267,20 +285,12 @@ class StateSyncService:
             else:
                 self.state_store.resolve_alert("QC_FAIL")
 
-            # Broker alert — use MERGED state with 3-consecutive-failures threshold
+            # Broker alert — deduplicated (BLK-001): threshold + state tracking
             if updates.get("broker") is not None:
-                is_connected = updates["broker"].get("connected", False)
-                if is_connected:
-                    self._consecutive_failures = 0
-                    self.state_store.resolve_alert("BROKER_DISCONNECTED")
-                else:
-                    self._consecutive_failures += 1
-                    if self._consecutive_failures >= 3:
-                        self.state_store.upsert_alert("WARN", "BROKER_DISCONNECTED", "Broker connection lost")
+                is_connected = bool(updates["broker"].get("connected", False))
+                process_broker_alert(is_connected, self.state_store, logger=_BrokerAlertLog)
             elif broker_actually_connected:
-                # Clear false alert when broker is connected
-                self._consecutive_failures = 0
-                self.state_store.resolve_alert("BROKER_DISCONNECTED")
+                process_broker_alert(True, self.state_store, logger=_BrokerAlertLog)
 
             # Synthetic mode alert — only when market open + broker unavailable
             if updates.get("data_source") == "SYNTHETIC" and updates.get("market", {}).get("is_open", False):

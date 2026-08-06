@@ -7,9 +7,12 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter
+
+from fo_eligibility_filter import get_fo_eligibility_filter
+from option_strike_visibility_audit import OptionVisibilityAuditor, generate_sample_audit_report
 
 router = APIRouter(tags=["ml"])
 
@@ -108,6 +111,30 @@ def _validation_metrics() -> Dict:
     }
 
 
+
+def _filter_predictions_fo(preds: List[Dict]) -> tuple[List[Dict], List[Dict[str, Any]]]:
+    """Keep only F&O-eligible underlyings; return (kept, rejected)."""
+    fo = get_fo_eligibility_filter()
+    kept: List[Dict] = []
+    rejected: List[Dict[str, Any]] = []
+    for row in preds or []:
+        if not isinstance(row, dict):
+            continue
+        sym = str(row.get("underlying") or row.get("symbol") or "").strip().upper()
+        if not sym:
+            rejected.append({"underlying": sym, "reason": "MISSING_SYMBOL"})
+            continue
+        ok, reason = fo.is_eligible(sym)
+        if ok:
+            out = dict(row)
+            out["fo_check"] = {"eligible": True, "reason": reason}
+            kept.append(out)
+        else:
+            rejected.append({"underlying": sym, "reason": reason})
+    return kept, rejected
+
+
+
 @router.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
     history = _load_history()
@@ -115,9 +142,18 @@ async def get_gain_rank(refresh: bool = False):
         return {"status": "no_data", "latest": None, "history": [], "stale": True, "source_file": str(GAIN_RANK_FILE)}
     today = datetime.now().strftime("%Y-%m-%d")
     today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
-    latest = today_entry or history[-1]
+    latest = dict(today_entry or history[-1])
     stale = latest.get("date") != today
-    return {"status": "ok", "latest": latest, "history": history[-14:], "is_today": not stale, "stale": stale, "source_file": str(GAIN_RANK_FILE), "note": "Rankings computed by worker at 09:15 IST — no inline ML in web process"}
+    preds = latest.get("predictions") if isinstance(latest.get("predictions"), list) else []
+    kept, rejected = _filter_predictions_fo(preds)
+    latest["predictions"] = kept
+    latest["fo_filtered_out"] = rejected
+    latest["fo_filter"] = {
+        "eligible_count": len(kept),
+        "rejected_count": len(rejected),
+        "universe_size": len(get_fo_eligibility_filter().get_current_universe()),
+    }
+    return {"status": "ok", "latest": latest, "history": history[-14:], "is_today": not stale, "stale": stale, "source_file": str(GAIN_RANK_FILE), "note": "Rankings computed by worker at 09:15 IST — FO eligibility filter applied on read (BLK-004)", "fo_rejected": rejected}
 
 
 @router.get("/api/accuracy_trend")
@@ -181,5 +217,54 @@ async def get_top_signal():
     preds = latest.get("predictions", [])
     if not preds:
         return {"signal": None, "status": "no_predictions", "source_file": str(GAIN_RANK_FILE)}
-    top = max(preds, key=lambda x: x.get("gain_score", 0))
-    return {"signal": {"underlying": top.get("underlying", "NIFTY"), "score": top.get("gain_score", 0), "direction": "BUY" if top.get("gain_score", 0) > 0 else "SELL", "confidence": min(abs(top.get("gain_score", 0)) / 100, 1.0), "date": latest.get("date")}, "status": "ok", "source_file": str(GAIN_RANK_FILE)}
+    kept, rejected = _filter_predictions_fo(preds)
+    if not kept:
+        return {"signal": None, "status": "no_fo_eligible_predictions", "fo_rejected": rejected, "source_file": str(GAIN_RANK_FILE)}
+    top = max(kept, key=lambda x: x.get("gain_score", 0))
+    return {"signal": {"underlying": top.get("underlying", "NIFTY"), "score": top.get("gain_score", 0), "direction": "BUY" if top.get("gain_score", 0) > 0 else "SELL", "confidence": min(abs(top.get("gain_score", 0)) / 100, 1.0), "date": latest.get("date"), "fo_check": top.get("fo_check")}, "status": "ok", "fo_rejected_count": len(rejected), "source_file": str(GAIN_RANK_FILE)}
+
+
+@router.get("/api/audit/option-visibility")
+async def get_option_visibility_audit(sample: bool = False):
+    """BLK-003: prove signal underlyings map to visible PE/CE contracts."""
+    if sample:
+        report = generate_sample_audit_report()
+        report["mode"] = "sample"
+        return report
+
+    history = _load_history()
+    preds: List[Dict] = []
+    if history:
+        latest = history[-1]
+        raw = latest.get("predictions") if isinstance(latest.get("predictions"), list) else []
+        preds = [p for p in raw if isinstance(p, dict)]
+
+    chain_candidates = [
+        ROOT / "state" / "option_chain_cache.json",
+        ROOT / "storage" / "live" / "option_chain_cache.json",
+        ROOT / "reports" / "latest" / "option_strike_visibility.json",
+    ]
+    chain_file: Optional[Path] = next((p for p in chain_candidates if p.exists()), None)
+    auditor = OptionVisibilityAuditor(chain_file)
+    now = datetime.now()
+    if not preds:
+        # Fall back to priority FO names so endpoint always returns structure
+        for i, sym in enumerate(["NIFTY", "BANKNIFTY", "RELIANCE", "SBIN", "INFY"]):
+            auditor.audit_signal(f"SEED-{i+1}", sym, "LONG", 0.5, now)
+        report = auditor.generate_report()
+        report["mode"] = "seed_no_predictions"
+        report["chain_file"] = str(chain_file) if chain_file else None
+        return report
+
+    for i, row in enumerate(preds[:25]):
+        sym = str(row.get("underlying") or row.get("symbol") or "NIFTY")
+        score = float(row.get("gain_score") or 0)
+        direction = "LONG" if score >= 0 else "SHORT"
+        conf = min(abs(score) / 100.0, 1.0)
+        auditor.audit_signal(str(row.get("id") or f"SIG-{i+1}"), sym, direction, conf, now)
+    report = auditor.generate_report()
+    report["mode"] = "live_history"
+    report["chain_file"] = str(chain_file) if chain_file else None
+    report["note"] = "Coverage uses local chain cache when present; otherwise symbols are marked missing until Dhan OC is cached."
+    return report
+
