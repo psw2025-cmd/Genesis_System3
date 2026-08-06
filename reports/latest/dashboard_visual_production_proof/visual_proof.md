@@ -1,6 +1,6 @@
 # Dashboard Visual Production Proof
 
-Generated: 2026-08-06T10:17:27.007Z
+Generated: 2026-08-06T10:29:13.088Z
 Base: https://genesis-system3-web-doq2wplepa-el.a.run.app
 Visual gate pass: **False**
 Production-grade claim allowed: **False**
@@ -17,6 +17,7 @@ Screenshot gate: **True**
 - SHELL_PROOF_NOT_TIME_ALIGNED
 - VISIBLE_TRACKER_STATUS:BLOCKED
 - VISIBLE_TRACKER_BAD_TABS:16
+- VISIBLE_TRACKER_NOT_TIME_ALIGNED
 
 ## Corroborating evidence
 - `shell_generated_at`: `2026-07-27T23:56:42.530Z`
@@ -27,19 +28,19 @@ Screenshot gate: **True**
 - `visible_tracker_bad_tab_count`: `16`
 
 ## Screenshots
-- PASS `truth.png` size=`166409`
-- PASS `genesis.png` size=`256286`
-- PASS `e2e_proof.png` size=`165148`
-- PASS `overview.png` size=`127552`
-- PASS `chain.png` size=`202913`
-- PASS `signals.png` size=`141467`
-- PASS `paper.png` size=`163302`
-- PASS `positions.png` size=`81662`
-- PASS `broker.png` size=`121814`
-- PASS `performance.png` size=`124623`
-- PASS `ml.png` size=`134686`
-- PASS `gates.png` size=`119017`
-- PASS `mobile_390x844.png` size=`75368`
+- PASS `truth.png` size=`161603`
+- PASS `genesis.png` size=`254780`
+- PASS `e2e_proof.png` size=`156428`
+- PASS `overview.png` size=`120131`
+- PASS `chain.png` size=`202474`
+- PASS `signals.png` size=`68768`
+- PASS `paper.png` size=`76008`
+- PASS `positions.png` size=`80518`
+- PASS `broker.png` size=`117176`
+- PASS `performance.png` size=`123975`
+- PASS `ml.png` size=`104869`
+- PASS `gates.png` size=`118312`
+- PASS `mobile_390x844.png` size=`75527`
 
 ## truth.png
 
