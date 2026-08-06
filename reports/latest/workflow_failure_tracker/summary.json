@@ -1,5 +1,5 @@
 {
-  "failed_count": 15,
+  "failed_count": 16,
   "failed_runs": [
     {
       "branch": "main",
@@ -30,6 +30,16 @@
       "run_id": 31113750244,
       "updated_at": "2026-08-06T15:09:13Z",
       "workflow": "Dashboard Deploy Provenance Gate"
+    },
+    {
+      "branch": "main",
+      "commit": "9d9e378aaccfbb34dc50dcff0de2fa19fde2724d",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T15:00:14Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31113698906",
+      "run_id": 31113698906,
+      "updated_at": "2026-08-06T15:18:37Z",
+      "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
@@ -152,7 +162,7 @@
       "workflow": "Genesis System3 Global Safety CI"
     }
   ],
-  "generated_utc": "2026-08-06T15:16:40.698336+00:00",
+  "generated_utc": "2026-08-06T15:18:51.352825+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
@@ -160,6 +170,7 @@
     "Fix workflow 'Cloud Run Auto Deploy' run 31114519634 conclusion=failure commit=57ba44594ec791ecb706c3aa3b5268f499eda3c6",
     "Fix workflow 'Dashboard Visible Proof Warmed' run 31114025880 conclusion=failure commit=df4a13400152c9c5c0f783d98ae77920cf472cc3",
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 31113750244 conclusion=cancelled commit=9d9e378aaccfbb34dc50dcff0de2fa19fde2724d",
+    "Fix workflow 'Dashboard Visual Production Proof' run 31113698906 conclusion=failure commit=9d9e378aaccfbb34dc50dcff0de2fa19fde2724d",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31113264837 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31112503652 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31111755770 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",

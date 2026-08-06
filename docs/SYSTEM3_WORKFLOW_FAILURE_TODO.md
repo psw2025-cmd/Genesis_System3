@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-06T15:16:40.698336+00:00`
+Generated UTC: `2026-08-06T15:18:51.352825+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `15`
+Failed workflow count: `16`
 
 ## Rule
 
@@ -15,6 +15,7 @@ Do not claim resolved unless workflow status, Render verification, integration v
 - [ ] Fix workflow 'Cloud Run Auto Deploy' run 31114519634 conclusion=failure commit=57ba44594ec791ecb706c3aa3b5268f499eda3c6
 - [ ] Fix workflow 'Dashboard Visible Proof Warmed' run 31114025880 conclusion=failure commit=df4a13400152c9c5c0f783d98ae77920cf472cc3
 - [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 31113750244 conclusion=cancelled commit=9d9e378aaccfbb34dc50dcff0de2fa19fde2724d
+- [ ] Fix workflow 'Dashboard Visual Production Proof' run 31113698906 conclusion=failure commit=9d9e378aaccfbb34dc50dcff0de2fa19fde2724d
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31113264837 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31112503652 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31111755770 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c
@@ -35,6 +36,7 @@ Do not claim resolved unless workflow status, Render verification, integration v
 | Cloud Run Auto Deploy | 31114519634 | failure | `57ba44594ec7` | 2026-08-06T15:16:31Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31114519634 |
 | Dashboard Visible Proof Warmed | 31114025880 | failure | `df4a13400152` | 2026-08-06T15:04:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31114025880 |
 | Dashboard Deploy Provenance Gate | 31113750244 | cancelled | `9d9e378aaccf` | 2026-08-06T15:09:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31113750244 |
+| Dashboard Visual Production Proof | 31113698906 | failure | `9d9e378aaccf` | 2026-08-06T15:18:37Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31113698906 |
 | .github/workflows/options-ml-training-proof.yml | 31113264837 | failure | `a03198dde8bf` | 2026-08-06T14:55:13Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31113264837 |
 | .github/workflows/options-ml-training-proof.yml | 31112503652 | failure | `a03198dde8bf` | 2026-08-06T14:46:23Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31112503652 |
 | .github/workflows/options-ml-training-proof.yml | 31111755770 | failure | `a03198dde8bf` | 2026-08-06T14:37:30Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31111755770 |
