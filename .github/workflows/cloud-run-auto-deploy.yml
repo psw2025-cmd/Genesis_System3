@@ -83,13 +83,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "google-auth>=2.28.0" "requests>=2.31.0"
 
-      - name: Enable required Google Cloud APIs
+      # APIs are pre-enabled in project system3-openalgo-safe. The deploy
+      # identity intentionally does not receive project-level Service Usage
+      # Admin merely to repeat an idempotent enable command on every release.
+      - name: Verify required Google Cloud APIs are available
         run: |
-          gcloud services enable \
-            run.googleapis.com \
-            secretmanager.googleapis.com \
-            cloudscheduler.googleapis.com \
-            --project="${GOOGLE_CLOUD_PROJECT}"
+          gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
+            --project="${GOOGLE_CLOUD_PROJECT}" \
+            --region="${GCP_REGION}" \
+            --format='value(metadata.name,status.url)' >/tmp/preflight-service.txt
+          test -s /tmp/preflight-service.txt
 
       - name: Deploy guarded Cloud Run service
         run: python scripts/gcp_cloud_run_auto_deploy.py
@@ -259,8 +262,8 @@ jobs:
           gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
-            --format='table(metadata.name,status.latestReadyRevisionName,status.url)'
+            --format='table(metadata.name,status.latestReadyRevisionName,status.url)' || true
           gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --location="${GCP_REGION}" \
-            --format='table(name,schedule,timeZone,state)'
+            --format='table(name,schedule,timeZone,state)' || true
