@@ -4,19 +4,16 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-09:04:47 IST
+09:14:57 IST
 NIFTY
-24,625
-SNAP
+--
 BNFTY
-57,740
-SNAP
+--
 FINNIFTY
-26,844
-SNAP
-TICK 0s
+--
+TICK 4s
 MARKET CLOSED / DATA POLLING
-DHAN API ERR
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -27,13 +24,13 @@ OFF
 MODE
 PAPER
 DATA
-DHAN REQ
+DHAN
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-CHECK
+LIVE
 COMMAND
 Truth Control
 TRUTH
@@ -66,8 +63,9 @@ ANALYZER / PAPER COMMAND CENTER
 PAPER MODE ACTIVE - LIVE TRADING DISABLED
 LIVE OFF
 Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
+API status: NETWORK_ERROR - Network/DNS could not reach Cloud Run backend for /api/batch/market-data. Keeping last good data where available. Retrying slowly; last good truth remains visible where available.
 BROKER
-API RESPONDED
+CONNECTED
 Dhan read-only
 PAPER P&L
 ₹-1,806
@@ -83,60 +81,56 @@ market closed must not hide read-only data
 LOADED
 Health API
 live
-LOADED
+WAITING
 State API
-Pre-market window (9:00-9:15 AM) - Market not open
-ERROR
+LOADED
 Broker Status API
-LOADED
+connected
+ERROR
 Funds API
-LOADED
+ERROR
 Holdings API
-LOADED
+ERROR
 Positions API
 LOADED
 P&L API
 pnl=-1806.07
 LOADED
 Gain Rank / Scanner
-2026-08-06
-LOADED
+Network/DNS could not reach Cloud Run backend for /api/batch/market-data. Keeping last good data where available.
+WAITING
 Auto Gates
-7 gates
 LOADED
 Alerts
-1 recent
-LOADED
+0 recent
+MARKET_SESSION_ONLY
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-06 08:42 IST)
+No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 Gate Matrix
-2/7 PASS
-PEND
-ML Accuracy (Spearman ρ)
-1/5 days · ρ=0.2 · need ≥0.7
-PEND
-Profit / Expectancy
-expectancy=-196.14 · win_rate=0.3333
-PEND
-Paper Lifecycle
-market-session proof pending
-PEND
+5/6 PASS
+PASS
+Broker Connection
+connected
+PASS
 Tick / Data Freshness
-tick_age=60.11s refresh=60s
+source: live
 PASS
-Model Accuracy Report
-Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD
+QC Gate
+PASS
 PEND
-Option Strike Visibility
-Run scripts/system3_option_visibility_audit.py
+Auto Gates Matrix
+awaiting /api/auto_gates
 PASS
-Equity F&O Eligibility
-Wire is_tradeable_fo_symbol() in ranking/paper trade path
+Paper / Analyzer Mode
+PAPER
+PASS
+Live Trading Gate
+OFF (confirmed via /api/health|/api/state)
 System Health
 Mode
 PAPER
 QC Status
-NOT_READY
+PASS
 Data Source
 live
 Market

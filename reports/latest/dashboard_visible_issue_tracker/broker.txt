@@ -4,19 +4,16 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-09:05:34 IST
+09:15:44 IST
 NIFTY
-24,625
-SNAP
+--
 BNFTY
-57,740
-SNAP
+--
 FINNIFTY
-26,844
-SNAP
-TICK 1s
+--
+TICK 41s
 MARKET CLOSED / DATA POLLING
-DHAN CONNECTED
+DHAN DEGRADED
 PAPER
 LIVE OFF
 WS
@@ -74,9 +71,9 @@ NOT PROVIDED BY BROKER API
 Token Status
 VALID
 Holdings API
-RESPONDED
+ERROR/BLOCKED
 Funds API
-RESPONDED
+ERROR/BLOCKED
 Broker Blocker
 NONE - MARKET CLOSED IS OK
 Market State
@@ -86,12 +83,12 @@ VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS
 Live Trading
 BLOCKED BY BACKEND FLAG
 ACCOUNT FUNDS
-Funds API responded but no balance field found in response
-Read-only funds must come from current Dhan broker API response. No cached/hardcoded balance is displayed.
+Failed to load funds: unknown error
+Market close is not the blocker. Check Dhan token/API response.
 EQUITY HOLDINGS (0)
 
-No equity holdings found in Dhan broker response
+Failed to load holdings: unknown error
 
 DHAN LIVE POSITIONS (0)
 
-No open positions in Dhan account read-only response
+Failed to load positions: unknown error
