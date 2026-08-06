@@ -894,6 +894,9 @@ async def get_broker_diagnose():
         "DHAN_TOTP_SECRET": _os.environ.get("DHAN_TOTP_SECRET", "").strip(),
     }
     for key, val in env_checks.items():
+        # PIN/TOTP are intentionally NOT mounted on Cloud Run (prevents DH-906 churn).
+        if key in ("DHAN_PIN", "DHAN_TOTP_SECRET"):
+            continue
         if not val:
             issues.append(f"MISSING: {key} env var not set in Cloud Run / Secret Manager")
             hints.append(f"Set {key} via GCP Secret Manager mount on genesis-system3-web")
