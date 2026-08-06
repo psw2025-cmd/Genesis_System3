@@ -1,9 +1,9 @@
 # System3 Workflow Failure TODO
 
-Generated UTC: `2026-08-06T03:34:25.198936+00:00`
+Generated UTC: `2026-08-06T03:38:34.456061+00:00`
 Repository: `psw2025-cmd/Genesis_System3`
 Status: **BLOCKED**
-Failed workflow count: `8`
+Failed workflow count: `10`
 
 ## Rule
 
@@ -12,6 +12,8 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 ## Failed workflow TODO list
 
+- [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31068800474 conclusion=cancelled commit=8d751dd016ce0d22388941e6894f3b9ab2c35533
+- [ ] Fix workflow 'Dashboard Visible Proof Isolated' run 31068776991 conclusion=failure commit=8c0d5f00bcc9c60af70c657c5a6a051c7e736a93
 - [ ] Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31068776414 conclusion=failure commit=8c0d5f00bcc9c60af70c657c5a6a051c7e736a93
 - [ ] Fix workflow 'System3 1000 Point TODO Status Updater' run 31068511093 conclusion=cancelled commit=86ae3c414a0615ae6cb166628c19ee3275ede1a4
 - [ ] Fix workflow 'Dashboard Deploy Provenance Gate' run 31068310271 conclusion=failure commit=1c6e5af05ceae736b92c4ce35975f4edbdff3a6d
@@ -25,6 +27,8 @@ Do not claim resolved unless workflow status, Render verification, integration v
 
 | Workflow | Run ID | Conclusion | Commit | Updated | Link |
 |---|---:|---|---|---|---|
+| System3 1000 Point TODO Status Updater | 31068800474 | cancelled | `8d751dd016ce` | 2026-08-06T03:34:36Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068800474 |
+| Dashboard Visible Proof Isolated | 31068776991 | failure | `8c0d5f00bcc9` | 2026-08-06T03:35:55Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068776991 |
 | .github/workflows/options-ml-training-proof.yml | 31068776414 | failure | `8c0d5f00bcc9` | 2026-08-06T03:33:42Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068776414 |
 | System3 1000 Point TODO Status Updater | 31068511093 | cancelled | `86ae3c414a06` | 2026-08-06T03:28:26Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068511093 |
 | Dashboard Deploy Provenance Gate | 31068310271 | failure | `1c6e5af05cea` | 2026-08-06T03:25:24Z | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068310271 |

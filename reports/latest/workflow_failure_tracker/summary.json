@@ -1,6 +1,26 @@
 {
-  "failed_count": 8,
+  "failed_count": 10,
   "failed_runs": [
+    {
+      "branch": "main",
+      "commit": "8d751dd016ce0d22388941e6894f3b9ab2c35533",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-06T03:34:12Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068800474",
+      "run_id": 31068800474,
+      "updated_at": "2026-08-06T03:34:36Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
+      "branch": "main",
+      "commit": "8c0d5f00bcc9c60af70c657c5a6a051c7e736a93",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T03:33:42Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31068776991",
+      "run_id": 31068776991,
+      "updated_at": "2026-08-06T03:35:55Z",
+      "workflow": "Dashboard Visible Proof Isolated"
+    },
     {
       "branch": "main",
       "commit": "8c0d5f00bcc9c60af70c657c5a6a051c7e736a93",
@@ -82,11 +102,13 @@
       "workflow": "Dashboard Visual Production Proof"
     }
   ],
-  "generated_utc": "2026-08-06T03:34:25.198936+00:00",
+  "generated_utc": "2026-08-06T03:38:34.456061+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 31068800474 conclusion=cancelled commit=8d751dd016ce0d22388941e6894f3b9ab2c35533",
+    "Fix workflow 'Dashboard Visible Proof Isolated' run 31068776991 conclusion=failure commit=8c0d5f00bcc9c60af70c657c5a6a051c7e736a93",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31068776414 conclusion=failure commit=8c0d5f00bcc9c60af70c657c5a6a051c7e736a93",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 31068511093 conclusion=cancelled commit=86ae3c414a0615ae6cb166628c19ee3275ede1a4",
     "Fix workflow 'Dashboard Deploy Provenance Gate' run 31068310271 conclusion=failure commit=1c6e5af05ceae736b92c4ce35975f4edbdff3a6d",
