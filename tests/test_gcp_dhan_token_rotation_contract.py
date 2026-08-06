@@ -110,6 +110,16 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
         self.assertIn('--schedule="30 7 * * *"', deploy)
 
+    def test_cloud_run_uses_same_dashboard_secret_as_authenticated_proof(self):
+        deploy = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        backend = Path("dashboard/backend/app.py").read_text(encoding="utf-8")
+        self.assertIn('--update-secrets="API_KEY=system3-dashboard-api-key:latest"', deploy)
+        self.assertIn("REQUIRE_API_KEY=true", deploy)
+        self.assertIn('os.environ.get("API_KEY", "").strip()', backend)
+        self.assertIn('request.headers.get("X-API-Key", "")', backend)
+        self.assertIn('--secret=system3-dashboard-api-key', deploy)
+        self.assertIn('-H "X-API-Key: ${API_KEY_TMP}"', deploy)
+
 
 if __name__ == "__main__":
     unittest.main()
