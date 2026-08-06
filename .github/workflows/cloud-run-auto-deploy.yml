@@ -10,6 +10,7 @@ on:
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/gcp_runtime_evidence.py"
       - "scripts/sync_dhan_instruments_master.py"
       - "src/**"
       - "config/**"
@@ -24,6 +25,7 @@ concurrency:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -40,13 +42,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: Authenticate to Google Cloud with keyless WIF
+        if: ${{ vars.GCP_WIF_PROVIDER != '' && vars.GCP_DEPLOY_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Temporary legacy-key authentication fallback
+        if: ${{ vars.GCP_WIF_PROVIDER == '' || vars.GCP_DEPLOY_SERVICE_ACCOUNT == '' }}
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -62,6 +73,7 @@ jobs:
               "core/brokers/dhan/cloud_token_provider.py": "GCP_SECRET_MANAGER_DYNAMIC",
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
+              "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
               "dashboard/frontend/src/components/BrokerProofPanel.tsx": "TOKEN ROTATION PROOF",
           }
           for path, marker in required.items():
@@ -83,9 +95,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "google-auth>=2.28.0" "requests>=2.31.0"
 
-      # APIs are pre-enabled in project system3-openalgo-safe. The deploy
-      # identity intentionally does not receive project-level Service Usage
-      # Admin merely to repeat an idempotent enable command on every release.
       - name: Verify required Google Cloud APIs are available
         run: |
           gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
@@ -267,6 +276,66 @@ jobs:
 
           jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
           jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null
+
+      - name: Re-authenticate as read-only evidence identity
+        if: ${{ always() && vars.GCP_WIF_PROVIDER != '' && vars.GCP_EVIDENCE_SERVICE_ACCOUNT != '' }}
+        continue-on-error: true
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_EVIDENCE_SERVICE_ACCOUNT }}
+
+      - name: Generate sanitized GCP runtime evidence
+        if: always()
+        run: python scripts/gcp_runtime_evidence.py
+
+      - name: Upload GCP runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system3-gcp-runtime-evidence-${{ github.run_number }}
+          path: reports/latest/gcp_runtime_lock/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce deployment provenance and safety lock
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("reports/latest/gcp_runtime_lock/gcp_runtime_lock.json")
+          if not path.is_file():
+              raise SystemExit("GCP_RUNTIME_EVIDENCE_MISSING")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          safety = report.get("safety") or {}
+          failures = []
+          if not report.get("source_matches_deployment"):
+              failures.append("source_matches_deployment=false")
+          if not safety.get("analyze_mode"):
+              failures.append("analyze_mode=false")
+          for key in (
+              "live_trading_enabled",
+              "system3_live_trading_allowed",
+              "auto_execute_trades",
+              "api_key_required",
+              "api_key_mounted",
+              "secret_payloads_exposed",
+          ):
+              if safety.get(key):
+                  failures.append(f"{key}=true")
+          if report.get("secret_values_exposed"):
+              failures.append("secret_values_exposed=true")
+          print("GCP_RUNTIME_LOCK", {
+              "lock_result": report.get("lock_result"),
+              "source_matches_deployment": report.get("source_matches_deployment"),
+              "operational_blockers": report.get("blockers"),
+              "production_grade_claim_allowed": report.get("production_grade_claim_allowed"),
+          })
+          if failures:
+              raise SystemExit(f"GCP_RUNTIME_SAFETY_OR_PROVENANCE_FAIL {failures}")
+          PY
 
       - name: Post deployment report
         if: always()
