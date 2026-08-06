@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T07:12:24.129270+00:00",
+  "generated_at": "2026-08-06T08:06:53.501800+00:00",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "manifest_path": "/ui/assets/deploy-provenance.json",
   "status": "PASS",
@@ -9,12 +9,18 @@
   "attempts": [
     {
       "attempt": 1,
+      "http_status": 0,
+      "content_type": "",
+      "error_type": "NETWORK_OR_TIMEOUT"
+    },
+    {
+      "attempt": 2,
       "http_status": 200,
       "content_type": "application/json",
       "error_type": ""
     }
   ],
-  "recovered_after_transient_failure": false,
+  "recovered_after_transient_failure": true,
   "local_sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
   "deployed_sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
   "source_match": true,
