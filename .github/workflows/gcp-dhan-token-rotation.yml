@@ -1,0 +1,63 @@
+name: GCP Dhan Token Rotation Manual Recovery
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: gcp-dhan-token-rotation-manual
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  rotate-and-prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PROJECT_ID: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      JOB: genesis-system3-dhan-token-rotate
+      CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Execute single-flight rotation job
+        run: |
+          gcloud run jobs execute "${JOB}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --wait
+
+      - name: Prove dynamic reload in live UI backend
+        run: |
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(status.url)')
+          API_KEY_TMP=$(gcloud secrets versions access latest \
+            --project="${PROJECT_ID}" \
+            --secret=system3-dashboard-api-key)
+
+          PASS=0
+          for ATTEMPT in 1 2 3 4 5 6; do
+            curl -fsS --max-time 30 \
+              -H "X-API-Key: ${API_KEY_TMP}" \
+              "${URL}/api/broker/status" > /tmp/broker.json || true
+            if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then
+              PASS=1
+              break
+            fi
+            sleep 10
+          done
+          unset API_KEY_TMP
+
+          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
+          test "${PASS}" = "1"
