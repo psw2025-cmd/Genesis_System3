@@ -5,43 +5,73 @@
   "failed_workflows": [
     {
       "branch": "main",
-      "commit": "ebbad34c555c9a3d525ce12a41925e2d609b9486",
+      "commit": "2098328f11825d2e3ee82582f060c496283889e7",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31093382909",
-      "run_id": 31093382909,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31097469275",
+      "run_id": 31097469275,
       "status": "completed",
-      "updated_at": "2026-08-06T10:39:02Z",
-      "workflow": "Genesis System3 Global Safety CI"
+      "updated_at": "2026-08-06T11:30:17Z",
+      "workflow": "System3 Broker Chain Semantic Gate"
     },
     {
       "branch": "main",
-      "commit": "52563f981a4ccbf7c1059440d1cdad1171fc8c28",
+      "commit": "2098328f11825d2e3ee82582f060c496283889e7",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31093185936",
-      "run_id": 31093185936,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31096824653",
+      "run_id": 31096824653,
       "status": "completed",
-      "updated_at": "2026-08-06T10:38:00Z",
+      "updated_at": "2026-08-06T11:27:55Z",
       "workflow": "System3 Full Auto Truth"
     },
     {
       "branch": "main",
-      "commit": "ebbad34c555c9a3d525ce12a41925e2d609b9486",
+      "commit": "2098328f11825d2e3ee82582f060c496283889e7",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31093382271",
-      "run_id": 31093382271,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31096814519",
+      "run_id": 31096814519,
       "status": "completed",
-      "updated_at": "2026-08-06T10:36:00Z",
+      "updated_at": "2026-08-06T11:20:15Z",
+      "workflow": "Deploy Genesis System3 to Cloud Run"
+    },
+    {
+      "branch": "main",
+      "commit": "2098328f11825d2e3ee82582f060c496283889e7",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31096813667",
+      "run_id": 31096813667,
+      "status": "completed",
+      "updated_at": "2026-08-06T11:19:44Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "e172993a52862fa11dc289b9bbe3fa527f3027ec",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31095890016",
+      "run_id": 31095890016,
+      "status": "completed",
+      "updated_at": "2026-08-06T11:09:30Z",
       "workflow": "Dashboard Visual Production Proof"
     },
     {
       "branch": "main",
-      "commit": "c86522f76a5f7b07d621f30d007f4ea9d8507621",
+      "commit": "50fcc3712cf2a7efd2fc828351b9639473377c3a",
       "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31093704198",
-      "run_id": 31093704198,
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31095251949",
+      "run_id": 31095251949,
       "status": "completed",
-      "updated_at": "2026-08-06T10:34:02Z",
-      "workflow": "System3 Broker Chain Semantic Gate"
+      "updated_at": "2026-08-06T11:01:34Z",
+      "workflow": "System3 Market Session Proof Runner"
+    },
+    {
+      "branch": "main",
+      "commit": "50fcc3712cf2a7efd2fc828351b9639473377c3a",
+      "conclusion": "failure",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31094922215",
+      "run_id": 31094922215,
+      "status": "completed",
+      "updated_at": "2026-08-06T11:01:17Z",
+      "workflow": "System3 Latest Truth Publish"
     },
     {
       "branch": "main",
@@ -52,199 +82,39 @@
       "status": "completed",
       "updated_at": "2026-08-06T10:31:40Z",
       "workflow": "Dashboard Visible Proof Isolated"
-    },
-    {
-      "branch": "main",
-      "commit": "ebbad34c555c9a3d525ce12a41925e2d609b9486",
-      "conclusion": "failure",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31093380978",
-      "run_id": 31093380978,
-      "status": "completed",
-      "updated_at": "2026-08-06T10:28:21Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
     }
   ],
-  "generated_utc": "2026-08-06T10:56:59.031086Z",
-  "github_failed_count": 6,
-  "github_pending_count": 2,
+  "generated_utc": "2026-08-06T11:45:46.549947Z",
+  "github_failed_count": 8,
+  "github_pending_count": 0,
   "github_timeout_s": 12.0,
   "historical_duplicate_failures_removed": true,
   "latest_state_reconcile_error_type": null,
   "live_trading_enabled": false,
   "newer_success_supersedes_older_failure": true,
   "order_routes_called": false,
-  "pending_workflows": [
-    {
-      "branch": "main",
-      "commit": "50fcc3712cf2a7efd2fc828351b9639473377c3a",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31095251949",
-      "run_id": 31095251949,
-      "status": "in_progress",
-      "updated_at": "2026-08-06T10:56:38Z",
-      "workflow": "System3 Market Session Proof Runner"
-    },
-    {
-      "branch": "main",
-      "commit": "50fcc3712cf2a7efd2fc828351b9639473377c3a",
-      "conclusion": null,
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31094922215",
-      "run_id": 31094922215,
-      "status": "in_progress",
-      "updated_at": "2026-08-06T10:51:45Z",
-      "workflow": "System3 Latest Truth Publish"
-    }
-  ],
+  "pending_workflows": [],
   "production_grade_claim_allowed": false,
   "render_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "render_endpoint_timeout_s": 30.0,
-  "render_failed_count": 10,
-  "render_failures": [
-    {
-      "classification": {
-        "mentions_auth_error": false,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/",
-      "error_type": "TimeoutError",
-      "reason": "HTTP status 0",
-      "status_code": 0,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/state",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/deploy/info",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/diagnose",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/diagnose"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/funds",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/funds"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/holdings",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/holdings"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/broker/positions/live",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/positions/live"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/scanner/top_contract_gainers",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/paper",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper"
-    },
-    {
-      "classification": {
-        "mentions_auth_error": true,
-        "mentions_commit_or_sha": false,
-        "mentions_server_error": false
-      },
-      "endpoint": "/api/ml/performance",
-      "error_type": null,
-      "reason": "HTTP status 401",
-      "status_code": 401,
-      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/ml/performance"
-    }
-  ],
+  "render_failed_count": 0,
+  "render_failures": [],
   "report_only_no_self_failure_storm": true,
   "repository": "psw2025-cmd/Genesis_System3",
   "response_bodies_persisted": false,
   "secrets_printed": false,
   "status": "BLOCKED",
   "todo": [
-    "Fix latest GitHub workflow 'Genesis System3 Global Safety CI' run=31093382909 conclusion=failure commit=ebbad34c555c",
-    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=31093185936 conclusion=failure commit=52563f981a4c",
-    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31093382271 conclusion=failure commit=ebbad34c555c",
-    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31093704198 conclusion=failure commit=c86522f76a5f",
-    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=31093382964 conclusion=failure commit=ebbad34c555c",
-    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=31093380978 conclusion=failure commit=ebbad34c555c",
-    "Fix Render endpoint /: HTTP status 0 status=0",
-    "Fix Render endpoint /api/state: HTTP status 401 status=401",
-    "Fix Render endpoint /api/deploy/info: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/diagnose: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/funds: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/holdings: HTTP status 401 status=401",
-    "Fix Render endpoint /api/broker/positions/live: HTTP status 401 status=401",
-    "Fix Render endpoint /api/scanner/top_contract_gainers: HTTP status 401 status=401",
-    "Fix Render endpoint /api/paper: HTTP status 401 status=401",
-    "Fix Render endpoint /api/ml/performance: HTTP status 401 status=401"
+    "Fix latest GitHub workflow 'System3 Broker Chain Semantic Gate' run=31097469275 conclusion=failure commit=2098328f1182",
+    "Fix latest GitHub workflow 'System3 Full Auto Truth' run=31096824653 conclusion=failure commit=2098328f1182",
+    "Fix latest GitHub workflow 'Deploy Genesis System3 to Cloud Run' run=31096814519 conclusion=failure commit=2098328f1182",
+    "Fix latest GitHub workflow '.github/workflows/options-ml-training-proof.yml' run=31096813667 conclusion=failure commit=2098328f1182",
+    "Fix latest GitHub workflow 'Dashboard Visual Production Proof' run=31095890016 conclusion=failure commit=e172993a5286",
+    "Fix latest GitHub workflow 'System3 Market Session Proof Runner' run=31095251949 conclusion=failure commit=50fcc3712cf2",
+    "Fix latest GitHub workflow 'System3 Latest Truth Publish' run=31094922215 conclusion=failure commit=50fcc3712cf2",
+    "Fix latest GitHub workflow 'Dashboard Visible Proof Isolated' run=31093382964 conclusion=failure commit=ebbad34c555c"
   ],
-  "todo_count": 16,
+  "todo_count": 8,
   "tracker_internal_status": "PASS",
   "workflow_failure_count_semantics": "latest_observed_run_state_per_workflow"
 }
