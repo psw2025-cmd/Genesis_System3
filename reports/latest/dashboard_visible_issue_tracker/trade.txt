@@ -4,16 +4,16 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-13:21:30 IST
+13:46:54 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 3s
+TICK 2s
 MARKET OPEN
-DHAN CONNECTED
+DHAN API OK
 PAPER
 LIVE OFF
 WS
@@ -24,13 +24,13 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-LIVE
+CHECK
 COMMAND
 Truth Control
 TRUTH
@@ -77,11 +77,11 @@ INFY
 ICICIBANK
 OPTION CHAIN - NIFTY
 Waiting for live Dhan option-chain stream…
-Status: CHAIN_CACHE_WARMING
-Market: OPEN · Index chain warming from micro-loop — UI must not wait on live Dhan OC
+Status: NO_DHAN_DATA
+Market: OPEN · No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 Next open: --
 Source: dhan / --
-Backend: Index chain warming from micro-loop — UI must not wait on live Dhan OC
+Backend: No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard.
 INDEX / RANK FEED
 1
 NIFTY

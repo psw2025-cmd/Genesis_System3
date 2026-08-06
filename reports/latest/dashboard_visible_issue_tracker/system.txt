@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-13:22:06 IST
+13:47:30 IST
 NIFTY
 --
 BNFTY
@@ -13,7 +13,7 @@ FINNIFTY
 --
 TICK 2s
 MARKET OPEN
-DHAN CONNECTED
+DHAN API OK
 PAPER
 LIVE OFF
 WS
@@ -24,13 +24,13 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-LIVE
+CHECK
 COMMAND
 Truth Control
 TRUTH
@@ -58,7 +58,7 @@ Live Gate
 LOCK
 Connection Status
 Broker (Dhan)
-CONNECTED
+DISCONNECTED
 WebSocket
 ERROR
 Live Trading
@@ -79,7 +79,7 @@ Cycle Duration
 SLA Pass
 false
 QC Status
-PASS
+NOT_READY
 Safety
 LIVE_TRADING_ENABLED
 0 (hardcoded)

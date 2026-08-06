@@ -4,16 +4,16 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-13:22:01 IST
+13:47:24 IST
 NIFTY
 --
 BNFTY
 --
 FINNIFTY
 --
-TICK 3s
+TICK 2s
 MARKET OPEN
-DHAN CONNECTED
+DHAN API OK
 PAPER
 LIVE OFF
 WS
@@ -24,13 +24,13 @@ OFF
 MODE
 PAPER
 DATA
-DHAN
+DHAN REQ
 ML
 ML 0/5d
 PAPER
 EXP —
 UI
-LIVE
+CHECK
 COMMAND
 Truth Control
 TRUTH
@@ -57,7 +57,7 @@ System
 Live Gate
 LOCK
 2 ALERTS
-No verified Dhan snapshot yet for: BANKNIFTY. TopBar may show blank spots until micro-loop warms cache.
-2026-08-06T13:21:26.991396+05:30
+No verified Dhan snapshot yet for: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY. TopBar may show blank spots until micro-loop warms cache.
+2026-08-06T13:46:50.543036+05:30
 human_approved=NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json; validation_days=1 validation days (need ≥10); ml_accuracy_rho=Avg Spearman ρ=0.200 (need ≥0.70)
-2026-08-06T13:21:26.991396+05:30
+2026-08-06T13:46:50.543036+05:30
