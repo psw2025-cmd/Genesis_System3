@@ -11,7 +11,7 @@
     "reason": "TOKEN_EXPIRED_OR_INVALID",
     "semantic_ok": false
   },
-  "generated_utc": "2026-08-06T07:34:08.680027Z",
+  "generated_utc": "2026-08-06T08:34:19.496414Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
