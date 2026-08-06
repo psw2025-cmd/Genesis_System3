@@ -1,25 +1,37 @@
 {
-  "generated_at": "2026-08-06T03:25:19.950533+00:00",
+  "generated_at": "2026-08-06T05:25:28.410718+00:00",
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "manifest_path": "/ui/assets/deploy-provenance.json",
-  "status": "PASS",
-  "http_status": 200,
-  "content_type": "application/json",
-  "error_type": "",
+  "status": "BLOCKED",
+  "http_status": 0,
+  "content_type": "",
+  "error_type": "NETWORK_OR_TIMEOUT",
   "attempts": [
     {
       "attempt": 1,
-      "http_status": 200,
-      "content_type": "application/json",
-      "error_type": ""
+      "http_status": 0,
+      "content_type": "",
+      "error_type": "NETWORK_OR_TIMEOUT"
+    },
+    {
+      "attempt": 2,
+      "http_status": 0,
+      "content_type": "",
+      "error_type": "NETWORK_OR_TIMEOUT"
+    },
+    {
+      "attempt": 3,
+      "http_status": 0,
+      "content_type": "",
+      "error_type": "NETWORK_OR_TIMEOUT"
     }
   ],
   "recovered_after_transient_failure": false,
   "local_sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
-  "deployed_sidebar_sha256": "5e2aafa9c916e29125690ab09c5bbe68cbc1c7115cfeb220d9c689b251806dd3",
-  "source_match": true,
-  "sim_live_required": true,
-  "blocker": "",
+  "deployed_sidebar_sha256": "",
+  "source_match": false,
+  "sim_live_required": false,
+  "blocker": "DEPLOY_PROVENANCE_TRANSIENT_FAILURE_AFTER_RETRIES",
   "analyzer_mode": true,
   "live_trading_enabled": false,
   "order_routes_called": false,
