@@ -635,7 +635,18 @@ async def get_state():
     if not SSOT_AVAILABLE or state_store is None:
         raise HTTPException(status_code=503, detail="State store not available")
 
-    state = await asyncio.to_thread(state_store.get_state)
+    try:
+        state = await asyncio.wait_for(asyncio.to_thread(state_store.get_state), timeout=5.0)
+    except asyncio.TimeoutError:
+        return {
+            "status": "timeout",
+            "mode": "PAPER",
+            "live_trading_enabled": False,
+            "live_allowed": False,
+            "broker": {"connected": False},
+            "market": {"is_open": False},
+            "message": "SSOT get_state timed out — returning safe PAPER stub",
+        }
     # Gate: if broker not connected or data not real, force mode to PAPER for UI consistency
     broker_connected = state.get("broker", {}).get("connected", False)
     ds = (state.get("data_source") or "").upper()
@@ -1229,9 +1240,13 @@ async def get_gain_rank(refresh: bool = False):
 
         # Live fallback: build today's rankings from contract-gain scanner so
         # Signals/Trade tabs are not permanently empty when history file is missing.
+        # Bound tightly — never block /api/batch/market-data for 60s+ on equity fan-out.
         if stale or latest is None:
             try:
-                scan = await get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=True)
+                scan = await asyncio.wait_for(
+                    get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False),
+                    timeout=8.0,
+                )
                 rankings = []
                 table = (scan or {}).get("market_top_table") or []
                 if not table:
@@ -2674,29 +2689,30 @@ async def batch_market_data():
         out["cache_hit"] = True
         return out
 
+    async def _bounded(coro, timeout_s: float, fallback: Dict[str, Any]):
+        try:
+            val = await asyncio.wait_for(coro, timeout=timeout_s)
+            return val if isinstance(val, dict) else fallback
+        except Exception as exc:
+            return {**fallback, "error": str(exc)[:160]}
+
     results = await asyncio.gather(
-        get_health(),
-        get_state(),
-        get_paper(),
-        get_gain_rank(),
-        get_pnl(),
-        get_recent_alerts(limit=20),
-        get_auto_gates(),
-        return_exceptions=True,
+        _bounded(get_health(), 4.0, {"status": "error"}),
+        _bounded(get_state(), 5.0, {"mode": "PAPER", "live_trading_enabled": False}),
+        _bounded(get_paper(), 4.0, {}),
+        _bounded(get_gain_rank(), 9.0, {}),
+        _bounded(get_pnl(), 4.0, {}),
+        _bounded(get_recent_alerts(limit=20), 4.0, {"alerts": []}),
+        _bounded(get_auto_gates(), 5.0, {"proof_gates": []}),
     )
 
-    def _ok(val: Any, fallback: Dict[str, Any]) -> Dict[str, Any]:
-        if isinstance(val, Exception):
-            return {**fallback, "error": str(val)[:160]}
-        return val if isinstance(val, dict) else fallback
-
-    health = _ok(results[0], {"status": "error"})
-    state = _ok(results[1], {})
-    paper = _ok(results[2], {})
-    gain = _ok(results[3], {})
-    pnl = _ok(results[4], {})
-    alerts = _ok(results[5], {"alerts": []})
-    gates = _ok(results[6], {"proof_gates": []})
+    health = results[0] if isinstance(results[0], dict) else {"status": "error"}
+    state = results[1] if isinstance(results[1], dict) else {}
+    paper = results[2] if isinstance(results[2], dict) else {}
+    gain = results[3] if isinstance(results[3], dict) else {}
+    pnl = results[4] if isinstance(results[4], dict) else {}
+    alerts = results[5] if isinstance(results[5], dict) else {"alerts": []}
+    gates = results[6] if isinstance(results[6], dict) else {"proof_gates": []}
 
     # Keep state compact: drop bulky nested blobs
     slim_state = {

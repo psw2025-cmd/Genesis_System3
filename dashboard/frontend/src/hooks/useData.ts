@@ -265,7 +265,7 @@ export function useData() {
 
   const poll = useCallback(async () => {
     try {
-      const batch = await fetchJSON('/api/batch/market-data')
+      const batch = await fetchJSON('/api/batch/market-data', 25000)
       markSuccess('core')
       if (batch?.health) setHealth(batch.health)
       if (batch?.state) setState(batch.state)
