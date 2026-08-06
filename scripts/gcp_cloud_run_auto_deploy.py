@@ -40,6 +40,9 @@ SAFE_ENV = (
     ("MEM_LIMIT_MB", "960"),
     ("MEM_WARN_MB", "700"),
     ("MEM_GC_MB", "850"),
+    ("MARKET_TOP_MICRO_STREAM", "0"),
+    ("DHAN_STATUS_AUTO_REFRESH", "0"),
+    ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     (
         "SYSTEM3_PUBLIC_BACKEND_URL",
         "https://genesis-system3-web-doq2wplepa-el.a.run.app",
