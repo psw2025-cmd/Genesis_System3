@@ -1,27 +1,26 @@
 {
   "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "broker": {
-    "connected": true,
+    "connected": false,
     "http": 200,
-    "reason": "CONNECTED"
+    "reason": "TOKEN_EXPIRED_OR_INVALID"
   },
   "final_verdict": "BLOCKED_NOT_TRADE_READY",
   "funds": {
     "http": 200,
-    "reason": null,
-    "semantic_ok": true
+    "reason": "TOKEN_EXPIRED_OR_INVALID",
+    "semantic_ok": false
   },
-  "generated_utc": "2026-08-06T10:33:57.782358Z",
+  "generated_utc": "2026-08-06T11:30:13.140192Z",
   "live_trading_enabled": false,
   "mode": "ANALYZER_ONLY",
   "order_endpoints_called": false,
   "production_grade_claim_allowed": false,
   "readiness_blockers": [
-    "CHAIN:BANKNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
-    "CHAIN:FINNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN",
-    "CHAIN:MIDCPNIFTY:NO_CURRENT_VERIFIED_DHAN_CHAIN"
+    "BROKER:TOKEN_EXPIRED_OR_INVALID",
+    "FUNDS:TOKEN_EXPIRED_OR_INVALID"
   ],
-  "required_chain_ready_count": 1,
+  "required_chain_ready_count": 4,
   "required_chain_total": 4,
   "required_chains": [
     {
@@ -39,44 +38,44 @@
       "transport_ok": true
     },
     {
-      "contracts": 0,
+      "contracts": 160,
       "error": null,
       "http": 200,
-      "priority": "dhan_only_no_rows",
-      "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
       "source": "dhan",
-      "spot_present": false,
+      "spot_present": true,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "BANKNIFTY",
       "transport_ok": true
     },
     {
-      "contracts": 0,
+      "contracts": 160,
       "error": null,
       "http": 200,
-      "priority": "dhan_only_no_rows",
-      "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
       "source": "dhan",
-      "spot_present": false,
+      "spot_present": true,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "FINNIFTY",
       "transport_ok": true
     },
     {
-      "contracts": 0,
+      "contracts": 160,
       "error": null,
       "http": 200,
-      "priority": "dhan_only_no_rows",
-      "ready": false,
-      "reason": "NO_CURRENT_VERIFIED_DHAN_CHAIN",
+      "priority": "dhan_last_verified_snapshot",
+      "ready": true,
+      "reason": null,
       "source": "dhan",
-      "spot_present": false,
+      "spot_present": true,
       "stale": false,
-      "status": "NO_DHAN_DATA",
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
       "symbol": "MIDCPNIFTY",
       "transport_ok": true
     }
