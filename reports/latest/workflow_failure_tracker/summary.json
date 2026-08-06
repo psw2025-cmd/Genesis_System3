@@ -2,6 +2,26 @@
   "failed_count": 12,
   "failed_runs": [
     {
+      "branch": "main",
+      "commit": "a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
+      "conclusion": "failure",
+      "created_at": "2026-08-06T13:03:42Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104160286",
+      "run_id": 31104160286,
+      "updated_at": "2026-08-06T13:03:42Z",
+      "workflow": ".github/workflows/options-ml-training-proof.yml"
+    },
+    {
+      "branch": "main",
+      "commit": "0b333291945bb1cefc6df270b8cb6dabe8a697e5",
+      "conclusion": "cancelled",
+      "created_at": "2026-08-06T13:02:46Z",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31104088319",
+      "run_id": 31104088319,
+      "updated_at": "2026-08-06T13:03:05Z",
+      "workflow": "System3 1000 Point TODO Status Updater"
+    },
+    {
       "branch": "fix/gcp-deploy-preenabled-apis-20260806",
       "commit": "bdc9287ebec747c1e0e49b22395eeb98d42462d8",
       "conclusion": "failure",
@@ -100,33 +120,15 @@
       "run_id": 31102331948,
       "updated_at": "2026-08-06T12:42:55Z",
       "workflow": "Genesis System3 Global Safety CI"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "f38d190f45b4c890c80eecfe54ec8c6c24690e72",
-      "conclusion": "failure",
-      "created_at": "2026-08-06T12:39:23Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102328423",
-      "run_id": 31102328423,
-      "updated_at": "2026-08-06T12:39:23Z",
-      "workflow": ".github/workflows/options-ml-training-proof.yml"
-    },
-    {
-      "branch": "fix/gcp-dhan-token-rotation-ui-proof-20260806",
-      "commit": "4b0442430855c1202fbbbe27f0403aeacd492dbd",
-      "conclusion": "cancelled",
-      "created_at": "2026-08-06T12:38:56Z",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31102296205",
-      "run_id": 31102296205,
-      "updated_at": "2026-08-06T12:39:27Z",
-      "workflow": "Genesis System3 Global Safety CI"
     }
   ],
-  "generated_utc": "2026-08-06T13:02:53.890968+00:00",
+  "generated_utc": "2026-08-06T13:05:11.835047+00:00",
   "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
   "repository": "psw2025-cmd/Genesis_System3",
   "status": "BLOCKED",
   "todo": [
+    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31104160286 conclusion=failure commit=a03198dde8bfa4b5c83a5ad035bbb51fafd4f22c",
+    "Fix workflow 'System3 1000 Point TODO Status Updater' run 31104088319 conclusion=cancelled commit=0b333291945bb1cefc6df270b8cb6dabe8a697e5",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103638275 conclusion=failure commit=bdc9287ebec747c1e0e49b22395eeb98d42462d8",
     "Fix workflow 'Dashboard Visual Production Proof' run 31103436556 conclusion=failure commit=6975eb50fdf78408e5438e4c68dd3bbefd294e2c",
     "Fix workflow 'System3 1000 Point TODO Status Updater' run 31103265539 conclusion=cancelled commit=7ac4b8a679da31c298d003ce7e20cea88b1d7bf8",
@@ -136,8 +138,6 @@
     "Fix workflow 'Cloud Run Auto Deploy' run 31103063820 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31103061503 conclusion=failure commit=2639a405679d37c46ce72896362f395880fd2762",
     "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102566377 conclusion=failure commit=6e59b9ec5714d6026e30e68698f9f55e63d27008",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 31102331948 conclusion=cancelled commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72",
-    "Fix workflow '.github/workflows/options-ml-training-proof.yml' run 31102328423 conclusion=failure commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72",
-    "Fix workflow 'Genesis System3 Global Safety CI' run 31102296205 conclusion=cancelled commit=4b0442430855c1202fbbbe27f0403aeacd492dbd"
+    "Fix workflow 'Genesis System3 Global Safety CI' run 31102331948 conclusion=cancelled commit=f38d190f45b4c890c80eecfe54ec8c6c24690e72"
   ]
 }
