@@ -1,0 +1,75 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+11:10:47 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+TICK 3s
+MARKET OPEN
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+OFF
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+NIFTY
+BANKNIFTY
+FINNIFTY
+MIDCPNIFTY
+SENSEX
+RELIANCE
+HDFCBANK
+TCS
+INFY
+ICICIBANK
+OPTION CHAIN - NIFTY
+Waiting for live Dhan option-chain stream…
+Status: CHAIN_CACHE_WARMING
+Market: OPEN · Index chain warming from micro-loop — UI must not wait on live Dhan OC
+Next open: --
+Source: dhan / --
+Backend: Index chain warming from micro-loop — UI must not wait on live Dhan OC

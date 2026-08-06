@@ -1,0 +1,93 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+11:11:34 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+TICK 3s
+MARKET OPEN
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+OFF
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Connection Status
+Broker (Dhan)
+CONNECTED
+WebSocket
+ERROR
+Live Trading
+DISABLED (hardcoded)
+Mode
+PAPER
+Data Source
+live
+Market State
+OPEN
+API Status
+OK / WAITING
+Performance
+Cycle Count
+0
+Cycle Duration
+0.00s
+SLA Pass
+true
+QC Status
+PASS
+Safety
+LIVE_TRADING_ENABLED
+0 (hardcoded)
+Paper Mode
+ACTIVE
+Live Allowed
+false
+Broker Data Visibility
+READ-ONLY WHEN API RESPONDS
+Blocker 1
+Live trading permanently disabled in analyzer mode

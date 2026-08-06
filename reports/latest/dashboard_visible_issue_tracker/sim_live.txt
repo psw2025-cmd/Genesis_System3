@@ -1,0 +1,97 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+11:10:42 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+TICK 2s
+MARKET OPEN
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+OFF
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+Backend Virtual Live Trading Simulation
+
+This tab consumes backend API route /api/simulation/live/state like a live feed. It is simulation only: no broker order APIs, no real live gate credit, no live trading enablement.
+
+✓ BACKEND FEED
+✓ SIMULATION ONLY
+✓ NO REAL ORDERS
+✓ LIVE OFF
+BACKEND SIM MODE
+STREAMING
+VIRTUAL P&L
+₹-1806.07
+REAL LIVE STATUS
+OFF / LOCKED
+SOURCE
+ok
+Pause backend stream
+Refresh backend tick #2
+TREND
+RANGE
+VOLATILE
+Backend virtual paper order tape
+ID	Symbol	Side	Strike	Expiry	LTP	P&L	Status	Source
+Backend virtual checklist
+ML SPEARMAN RHO GTE 0 70 OVER 5 DAYS
+SIM ONLY
+POSITIVE NET EXPECTANCY AFTER COSTS
+SIM ONLY
+REAL PAPER LIFECYCLE MARKET DAY PROOF
+SIM ONLY
+WEBSOCKET TICK HEALTH PROVEN
+SIM ONLY
+MODEL ACCURACY REPORT PRESENT
+✓ SIM OK
+OPTION STRIKE VISIBILITY PROVEN
+SIM ONLY
+EQUITY FO ELIGIBILITY PROVEN
+✓ SIM OK
+SIMULATION ONLY — no broker order APIs, live trading remains OFF

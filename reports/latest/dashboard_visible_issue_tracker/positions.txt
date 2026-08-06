@@ -1,0 +1,72 @@
+SYSTEM3
+AI OPTIONS CONTROL
+OWNER
+PRITAM S. WARGHADE
+CLOUD BUILD
+roker_status_cache
+11:11:08 IST
+NIFTY
+--
+BNFTY
+--
+FINNIFTY
+--
+TICK 4s
+MARKET OPEN
+DHAN CONNECTED
+PAPER
+LIVE OFF
+WS
+OFF
+PROOF
+LIVE
+OFF
+MODE
+PAPER
+DATA
+DHAN
+ML
+ML 0/5d
+PAPER
+EXP —
+UI
+LIVE
+COMMAND
+Truth Control
+TRUTH
+Genesis Brain
+E2E Proof
+PROOF
+Overview
+Sim Live
+SIM
+MARKET DATA
+Option Chain
+Signals
+TRADING
+Trade
+Paper Trades
+Positions
+ANALYSIS
+Performance
+ML Model
+SYSTEM
+Broker
+Alerts
+System
+Live Gate
+LOCK
+NET P&L
+₹-1,806
+WIN RATE
+0.3%
+TRADES
+9
+OPEN
+0
+PAPER ONLY — NO REAL MONEY
+OPEN POSITIONS (0)
+
+No open positions
+
+Paper engine generates positions during market hours
