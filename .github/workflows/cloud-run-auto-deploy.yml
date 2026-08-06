@@ -104,7 +104,8 @@ jobs:
             --region="${GCP_REGION}" \
             --min-instances=0 \
             --max-instances=1 \
-            --update-env-vars="DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER"
+            --update-env-vars="DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,REQUIRE_API_KEY=true,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
+            --update-secrets="API_KEY=system3-dashboard-api-key:latest"
 
       - name: Configure rotator IAM, Cloud Run Job and Cloud Scheduler
         run: |
@@ -220,11 +221,15 @@ jobs:
           if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic":
               print("DYNAMIC_TOKEN_SOURCE_MISSING", env.get("DHAN_TOKEN_SOURCE"))
               sys.exit(3)
+          if env.get("REQUIRE_API_KEY") != "true":
+              print("DASHBOARD_AUTH_NOT_REQUIRED", env.get("REQUIRE_API_KEY"))
+              sys.exit(4)
           if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata":
               print("SCHEDULER_CONFIG_INVALID", scheduler.get("schedule"), scheduler.get("timeZone"))
-              sys.exit(4)
+              sys.exit(5)
           print("CLOUD_RUNTIME_SAFETY_OK", {
               "token_source": env.get("DHAN_TOKEN_SOURCE"),
+              "dashboard_auth_required": env.get("REQUIRE_API_KEY"),
               "live_trading": env.get("LIVE_TRADING_ENABLED"),
               "scheduler": scheduler.get("name"),
               "schedule": scheduler.get("schedule"),
@@ -241,6 +246,12 @@ jobs:
           API_KEY_TMP=$(gcloud secrets versions access latest \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --secret=system3-dashboard-api-key)
+
+          curl -fsS --max-time 30 \
+            -H "X-API-Key: ${API_KEY_TMP}" \
+            "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
+          jq '{required,configured,authenticated,mode}' /tmp/auth.json
+          jq -e '.required == true and .configured == true and .authenticated == true' /tmp/auth.json >/dev/null
 
           for ATTEMPT in 1 2 3 4 5 6; do
             curl -fsS --max-time 30 \
