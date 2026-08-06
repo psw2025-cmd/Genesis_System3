@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-15:35:59 IST
+16:00:27 IST
 NIFTY
 24,636
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,864
 SNAP
-TICK 0s
+TICK 3s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -75,7 +75,7 @@ BLOCKED · NO BAD SOURCE
 No non-Dhan/stale/fallback
 BLOCKED · TRADER READY
 Human readiness checklist
-Last run: 8/6/2026, 10:05:59 AM · This panel is proof-only; it does not enable live orders.
+Last run: 8/6/2026, 10:30:27 AM · This panel is proof-only; it does not enable live orders.
 Trader Readiness Truth Checklist
 REQUIRED FOR REAL-MONEY TRADING	STATUS	EVIDENCE VISIBLE TO USER
 Dhan broker connection	PASS	200
@@ -86,7 +86,7 @@ Real broker positions response	PASS	rows visible or empty broker response
 Real Dhan option chain for all watched symbols	PASS	5/5
 No non-Dhan/stale/fallback markers in chain	BLOCKED	blocked marker found
 Paper/analyzer P&L endpoint	PASS	200
-Today paper lifecycle endpoint	PASS	count=1
+Today paper lifecycle endpoint	PASS	count=0
 Gate/risk endpoint visible	PASS	ok
 Live-money switch blocked until separate proof	PASS	blocked
 Dhan Option Chain Proof

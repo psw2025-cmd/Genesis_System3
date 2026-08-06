@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-15:36:04 IST
+16:00:32 IST
 NIFTY
 24,636
 SNAP
@@ -105,24 +105,24 @@ Auto Gates
 7 gates
 LOADED
 Alerts
-2 recent
+1 recent
 LOADED
 Option Chain
-Market closed — last verified Dhan snapshot (2026-08-06 15:32 IST)
+Market closed — last verified Dhan snapshot (2026-08-06 15:54 IST)
 Gate Matrix
-3/7 PASS
+2/7 PASS
 PEND
 ML Accuracy (Spearman ρ)
 1/5 days · ρ=0.2 · need ≥0.7
 PEND
 Profit / Expectancy
 expectancy=-196.14 · win_rate=0.3333
-PASS
+PEND
 Paper Lifecycle
-proven
+market-session proof pending
 PEND
 Tick / Data Freshness
-tick_age=13.63s refresh=60s
+tick_age=26.08s refresh=60s
 PASS
 Model Accuracy Report
 Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD

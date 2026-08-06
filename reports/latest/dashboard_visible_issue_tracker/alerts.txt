@@ -4,7 +4,7 @@ OWNER
 PRITAM S. WARGHADE
 CLOUD BUILD
 roker_status_cache
-15:36:56 IST
+16:01:24 IST
 NIFTY
 24,636
 SNAP
@@ -14,7 +14,7 @@ SNAP
 FINNIFTY
 26,864
 SNAP
-TICK 3s
+TICK 1s
 MARKET CLOSED / DATA POLLING
 DHAN CONNECTED
 PAPER
@@ -62,8 +62,6 @@ Alerts
 System
 Live Gate
 LOCK
-2 ALERTS
-No verified Dhan snapshot yet for: FINNIFTY. TopBar may show blank spots until micro-loop warms cache.
-2026-08-06T15:35:34.701267+05:30
+1 ALERT
 human_approved=NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json; validation_days=1 validation days (need ≥10); ml_accuracy_rho=Avg Spearman ρ=0.200 (need ≥0.70)
-2026-08-06T15:35:34.701267+05:30
+2026-08-06T16:00:02.091775+05:30
