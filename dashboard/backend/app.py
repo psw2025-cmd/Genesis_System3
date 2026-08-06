@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
@@ -1694,6 +1695,28 @@ _PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
 _INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
 _CHAIN_LIVE_TIMEOUT_OPEN_S = 25.0
 _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
+
+# Single-flight Dhan option-chain executor — Cloud Run 1 vCPU cannot run many
+# concurrent sync OC HTTP calls; queued to_thread work was burning the timeout
+# before the HTTP request even started (NO_DHAN_DATA / DSM timed out).
+_DHAN_OC_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="dhan-oc")
+_DHAN_OC_LOCK = asyncio.Lock()
+_DHAN_OC_THREAD_LOCK = threading.Lock()
+
+
+async def _run_dhan_oc(fn, *args, timeout: float = 25.0, **kwargs):
+    """Run one Dhan OC fetch at a time on a dedicated worker thread."""
+
+    def _locked_call():
+        with _DHAN_OC_THREAD_LOCK:
+            return fn(*args, **kwargs)
+
+    async with _DHAN_OC_LOCK:
+        loop = asyncio.get_running_loop()
+        return await asyncio.wait_for(
+            loop.run_in_executor(_DHAN_OC_EXECUTOR, _locked_call),
+            timeout=timeout,
+        )
 
 
 @app.post("/api/chain/push")
@@ -3725,7 +3748,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     if closed_timeout_s is not None
                     else _CHAIN_LIVE_TIMEOUT_CLOSED_S
                 )
-                closed_chain = await _run_blocking(
+                closed_chain = await _run_dhan_oc(
                     _closed_dhan_chain_fetch, timeout=_closed_to
                 )
                 if closed_chain and int(closed_chain.get("total_contracts") or 0) > 0:
@@ -3834,7 +3857,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 if closed_timeout_s is not None
                 else _CHAIN_LIVE_TIMEOUT_OPEN_S
             )
-            _live = await _run_blocking(_open_dhan_chain_fetch, timeout=max(open_to, 8.0))
+            _live = await _run_dhan_oc(_open_dhan_chain_fetch, timeout=max(open_to, 8.0))
             if _live and _live.get("contracts") and len(_live["contracts"]) >= 5:
                 _live["status"] = "MARKET_OPEN" if market_is_open else "MARKET_CLOSED"
                 _live["source_priority"] = "dhan_p0_live"
@@ -3871,7 +3894,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
 
                     return fetch_chain_for_api(DataSourceManager(), underlying.upper())
 
-                _chain_result = await _run_blocking(
+                _chain_result = await _run_dhan_oc(
                     _fallback_dhan_chain_fetch, timeout=_CHAIN_LIVE_TIMEOUT_OPEN_S
                 )
                 if _chain_result and _chain_result.get("contracts"):
@@ -5275,24 +5298,28 @@ async def market_top_micro_loop():
                     except Exception:
                         prior = {}
 
-                # Fast index board first so UI/WS never wait on equity fan-out.
-                report = build_top_contract_gainers_report(
-                    top_n=5,
-                    market_top_n=25,
-                    include_equity=False,
-                )
-                try:
-                    with_eq = build_top_contract_gainers_report(
+                # Serialize against index-chain micro Dhan OC lane.
+                with _DHAN_OC_THREAD_LOCK:
+                    report = build_top_contract_gainers_report(
                         top_n=5,
-                        market_top_n=40,
-                        include_equity=True,
-                        equity_limit=8,
-                        overall_timeout_s=95.0,
-                        rotate_equity=True,
+                        market_top_n=25,
+                        include_equity=False,
                     )
-                    report = merge_market_top_reports(report, with_eq, market_top_n=25)
-                except Exception as eq_exc:
-                    report["equity_enrich_error"] = str(eq_exc)[:200]
+                    # Index micro-loop owns the single Dhan OC lane during market hours.
+                    # Equity fan-out previously hogged the shared executor and timed out index OC.
+                    if os.environ.get("MARKET_TOP_EQUITY_ENRICH", "0") in ("1", "true", "True"):
+                        try:
+                            with_eq = build_top_contract_gainers_report(
+                                top_n=5,
+                                market_top_n=40,
+                                include_equity=True,
+                                equity_limit=8,
+                                overall_timeout_s=95.0,
+                                rotate_equity=True,
+                            )
+                            report = merge_market_top_reports(report, with_eq, market_top_n=25)
+                        except Exception as eq_exc:
+                            report["equity_enrich_error"] = str(eq_exc)[:200]
                 if prior and int(prior.get("contracts_scored_total") or 0) > 0:
                     report = merge_market_top_reports(prior, report, market_top_n=25)
                 scored = int(report.get("contracts_scored_total") or 0)
