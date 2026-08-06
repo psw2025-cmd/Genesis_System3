@@ -4644,54 +4644,55 @@ async def get_paper():
 
 
 @app.post("/api/paper/tick")
-async def paper_engine_tick(max_open: int = 3):
-    """Force one cloud paper-engine tick from live Dhan chains (PAPER ONLY)."""
+async def paper_engine_tick(background_tasks: BackgroundTasks, max_open: int = 3):
+    """Force one cloud paper-engine tick from live Dhan chains (PAPER ONLY).
+
+    Heavy chain/scanner work runs in a background task so /ui never hits
+    Cloud Run 'upstream request timeout' while a tick is in flight.
+    """
     try:
         from dashboard.backend.cloud_paper_engine import get_paper_engine
     except ImportError:
         from cloud_paper_engine import get_paper_engine
 
-    chains = []
-    for sym in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]:
-        try:
-            ch = await get_chain(sym)
-            if ch and ch.get("contracts"):
-                chains.append(ch)
-        except Exception:
-            continue
-    if not chains:
-        return {"status": "NO_CHAIN", "message": "No live Dhan chains available for paper tick", "open_count": 0}
-
-    market_top_rows: list = []
-    try:
-        mt = await get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False)
-        if isinstance(mt, dict):
-            market_top_rows = list(mt.get("market_top_table") or [])
-            if not market_top_rows:
-                mw = mt.get("market_wide") or {}
-                market_top_rows = list(mw.get("top_combined_list") or [])
-    except Exception as mt_exc:
-        print(f"[paper-tick] market top fetch skipped: {mt_exc}")
-
     engine = get_paper_engine(OUTPUTS_DIR)
-    engine.step(chains, max_open=min(max(max_open, 1), 5), market_top=market_top_rows)
-    _API_CACHE.pop("paper", None)
-    top = (engine.open_positions or [None])[-1] if engine.open_positions else None
+    open_before = len(engine.open_positions)
+
+    async def _run_tick() -> None:
+        chains = []
+        for sym in ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]:
+            try:
+                ch = await get_chain(sym)
+                if ch and ch.get("contracts"):
+                    chains.append(ch)
+            except Exception:
+                continue
+        if not chains:
+            print("[paper-tick] NO_CHAIN")
+            return
+        market_top_rows: list = []
+        try:
+            mt = await get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False)
+            if isinstance(mt, dict):
+                market_top_rows = list(mt.get("market_top_table") or [])
+                if not market_top_rows:
+                    mw = mt.get("market_wide") or {}
+                    market_top_rows = list(mw.get("top_combined_list") or [])
+        except Exception as mt_exc:
+            print(f"[paper-tick] market top fetch skipped: {mt_exc}")
+        engine.step(chains, max_open=min(max(max_open, 1), 5), market_top=market_top_rows)
+        _API_CACHE.pop("paper", None)
+        print(
+            f"[paper-tick] done open={len(engine.open_positions)} "
+            f"closed={len(engine.closed_positions)} market_top={len(market_top_rows)}"
+        )
+
+    background_tasks.add_task(_run_tick)
     return {
-        "status": "ok",
-        "open_count": len(engine.open_positions),
-        "closed_count": len(engine.closed_positions),
-        "open_positions": engine.open_positions[:10],
+        "status": "accepted",
+        "message": "Paper tick scheduled in background (PAPER ONLY)",
+        "open_count_before": open_before,
         "selection_mode": "MARKET_TOP_GAIN_PCT",
-        "market_top_rows_used": len(market_top_rows),
-        "latest_open": {
-            "trading_symbol": (top or {}).get("trading_symbol"),
-            "strategy": (top or {}).get("strategy"),
-            "selection_reason": (top or {}).get("selection_reason"),
-            "gain_pct_at_entry": (top or {}).get("gain_pct_at_entry"),
-        }
-        if top
-        else None,
         "mode": "PAPER_CLOUD_SIM",
         "live_trading_enabled": False,
     }

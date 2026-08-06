@@ -37,6 +37,9 @@ SAFE_ENV = (
     ("DHAN_PERSIST_TOKEN_TO_SM", "1"),
     ("CLOUD_MODE", "1"),
     ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),
+    ("MEM_LIMIT_MB", "960"),
+    ("MEM_WARN_MB", "700"),
+    ("MEM_GC_MB", "850"),
     (
         "SYSTEM3_PUBLIC_BACKEND_URL",
         "https://genesis-system3-web-doq2wplepa-el.a.run.app",
@@ -181,8 +184,13 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     c0["env"] = list(env_map.values())
     patch = session.patch(
         svc_url,
-        params={"updateMask": "template.containers"},
-        json={"template": {"containers": [c0]}},
+        params={"updateMask": "template.containers,template.scaling"},
+        json={
+            "template": {
+                "containers": [c0],
+                "scaling": {"minInstanceCount": 1, "maxInstanceCount": 10},
+            }
+        },
         timeout=120,
     )
     if patch.status_code not in (200, 201):

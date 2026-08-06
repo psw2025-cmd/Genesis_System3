@@ -31,11 +31,11 @@ except ImportError:
         return 0.0
 
 
-MEM_WARN_MB = int(os.environ.get("MEM_WARN_MB", "380"))
-MEM_GC_MB = int(os.environ.get("MEM_GC_MB", "420"))
-MEM_LIMIT_MB = int(os.environ.get("MEM_LIMIT_MB", "480"))
+MEM_WARN_MB = int(os.environ.get("MEM_WARN_MB", "700"))
+MEM_GC_MB = int(os.environ.get("MEM_GC_MB", "850"))
+MEM_LIMIT_MB = int(os.environ.get("MEM_LIMIT_MB", "960"))
 
-_FAST_PATHS = {"/", "/api/health", "/api/state", "/static"}
+_FAST_PATHS = {"/", "/api/health", "/api/state", "/static", "/ui", "/favicon.ico"}
 
 _last_gc_time = 0.0
 GC_COOLDOWN_S = 30.0
@@ -193,7 +193,9 @@ async def memory_guard_middleware(request, call_next: Callable):
     global _last_gc_time
 
     path = request.url.path
-    if path in _FAST_PATHS:
+    # Never run MemGuard GC / chain rewrite on SPA shell — upstream LB times out
+    # if the event loop is busy when /ui is served.
+    if path in _FAST_PATHS or path.startswith("/ui/") or path.startswith("/assets"):
         return await call_next(request)
 
     rss_before = _rss_mb()
