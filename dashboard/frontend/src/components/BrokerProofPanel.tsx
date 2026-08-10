@@ -30,7 +30,7 @@ function fmtTime(value: any) {
 }
 
 function responded(obj: any) {
-  return Boolean(obj && obj.blocked !== true && obj.error == null && obj.success !== false)
+  return Boolean(obj && obj.pendingProof !== true && obj.error == null && obj.success !== false)
 }
 
 export function BrokerProofPanel() {

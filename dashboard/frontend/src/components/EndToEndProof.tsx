@@ -54,7 +54,7 @@ function isDhanChain(json: any) {
 
 function proofReason(json: any) {
   if (!json || typeof json !== 'object') return 'NO_RESPONSE'
-  return json.blocked_reason || json.message || json.status || json.error || 'UNKNOWN'
+  return json.proof_reason || json.message || json.status || json.error || 'UNKNOWN'
 }
 
 function endpoint(probes: Probe[], name: string) {
@@ -76,7 +76,7 @@ function isBrokerConnected(json: any) {
   return json.connected === true || json.success === true || String(json.status || '').toLowerCase().includes('connected')
 }
 
-function isLiveTradingBlocked(stateJson: any, brokerJson: any) {
+function isLiveTradingPending(stateJson: any, brokerJson: any) {
   const raw = stateJson?.live_trading_enabled ?? stateJson?.liveTradingEnabled ?? stateJson?.live_allowed ?? brokerJson?.live_trading_enabled ?? brokerJson?.liveTradingEnabled ?? brokerJson?.live_allowed ?? '0'
   return !(raw === true || String(raw) === '1')
 }
@@ -172,7 +172,7 @@ export function EndToEndProof() {
   const readiness = [
     { item: 'Dhan broker connection', ok: Boolean(broker?.ok && isBrokerConnected(broker.json)), evidence: broker?.json?.status || broker?.json?.token_status || broker?.status || '-' },
     { item: 'Dhan access token/session', ok: Boolean(broker?.ok && !/invalid|expired|unauthorized|token error/i.test(JSON.stringify(broker.json || {}))), evidence: broker?.json?.token_status || broker?.json?.status || '-' },
-    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.blocked && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || funds?.error || '-' },
+    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.pendingProof && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || funds?.error || '-' },
     { item: 'Real broker holdings response', ok: Boolean(holdings?.ok && holdings.json && holdings.json.success !== false), evidence: hasRows(holdings?.json, 'rows', 'holdings', 'data') ? 'rows visible or empty broker response' : (holdings?.json?.message || holdings?.status || holdings?.error || '-') },
     { item: 'Real broker positions response', ok: Boolean(positions?.ok && positions.json && positions.json.success !== false), evidence: hasRows(positions?.json, 'rows', 'positions', 'data') ? 'rows visible or empty broker response' : (positions?.json?.message || positions?.status || positions?.error || '-') },
     { item: 'Real Dhan option chain for all watched symbols', ok: chainPass, evidence: `${chains.filter(p => p.ok && isDhanChain(p.json)).length}/${CHAIN_SYMBOLS.length}` },
@@ -180,7 +180,7 @@ export function EndToEndProof() {
     { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || pnl?.error || '-' },
     { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || trades?.error || '-') },
     { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || gates?.error || '-' },
-    { item: 'Live-money switch pending separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'pending safety lock' : 'enabled flag detected' },
+    { item: 'Live-money switch pending separate proof', ok: isLiveTradingPending(state?.json, broker?.json), evidence: isLiveTradingPending(state?.json, broker?.json) ? 'pending safety lock' : 'enabled flag detected' },
   ]
   const readinessPass = readiness.every(r => r.ok)
   const overall = corePass && chainPass && noBadSource && readinessPass

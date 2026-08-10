@@ -97,49 +97,49 @@ const fallbackHealth = (apiStatus: any) => ({
   live_blockers: [apiStatus?.message || 'API temporarily offline'],
 })
 
-const blockedPaper = (apiStatus: any) => ({
+const pendingPaper = (apiStatus: any) => ({
   positions: { open_count: 0, open_positions: [] },
   pnl: { summary: { total_pnl: 0, win_rate: 0, total_trades: 0, closed_positions: [] } },
   status: apiStatus?.status || 'NO_REAL_PAPER_DATA',
-  blocked: true,
+  pendingProof: true,
   blocked_reason: apiStatus?.message || 'Paper data pending',
 })
 
-const blockedGainRank = (apiStatus: any) => ({
+const pendingGainRank = (apiStatus: any) => ({
   rankings: [],
   latest: { predictions: [] },
   status: apiStatus?.status || 'NO_REAL_RANK_DATA',
-  blocked: true,
+  pendingProof: true,
   stale: false,
   message: apiStatus?.message || 'API temporarily offline',
 })
 
-const blockedGates = (apiStatus: any) => ({
+const pendingGates = (apiStatus: any) => ({
   proof_gates: [
     { gate_id: 'api_access', name: 'Dashboard API Access', status: 'FAIL', note: apiStatus?.message || 'API temporarily offline' },
   ],
 })
 
-const blockedBrokerStatus = (apiStatus: any) => ({
+const pendingBrokerStatus = (apiStatus: any) => ({
   success: false,
   connected: false,
   status: apiStatus?.status || 'API_LOCKED',
   token_status: apiStatus?.status || 'API_LOCKED',
-  message: apiStatus?.message || 'Broker API unavailable',
-  error: apiStatus?.message || 'Broker API unavailable',
+  message: apiStatus?.message || 'Broker API pending',
+  error: apiStatus?.message || 'Broker API pending',
 })
 
-const blockedRows = (apiStatus: any, label: string) => ({
+const pendingRows = (apiStatus: any, label: string) => ({
   success: false,
   rows: [],
   count: 0,
   status: apiStatus?.status || 'API_LOCKED',
-  blocked: true,
-  message: `${label}: ${apiStatus?.message || 'API unavailable'}`,
-  error: apiStatus?.message || 'API unavailable',
+  pendingProof: true,
+  message: `${label}: ${apiStatus?.message || 'API pending'}`,
+  error: apiStatus?.message || 'API pending',
 })
 
-const blockedFunds = (apiStatus: any) => ({
+const pendingFunds = (apiStatus: any) => ({
   success: false,
   normalized: {
     available_balance: null,
@@ -151,13 +151,13 @@ const blockedFunds = (apiStatus: any) => ({
   error: apiStatus?.message || 'Funds data pending',
 })
 
-const blockedChain = (sym: string, apiStatus: any) => ({
+const pendingChain = (sym: string, apiStatus: any) => ({
   underlying: sym,
   contracts: [],
   spot: 0,
   pcr: '--',
   status: 'NO_DHAN_DATA',
-  blocked: true,
+  pendingProof: true,
   blocked_reason: apiStatus?.message || 'Option chain pending',
   data_source: 'dhan',
   source_priority: isOptionalChain(sym) ? 'optional_symbol_pending' : 'pending_real_dhan_stream',
@@ -254,10 +254,10 @@ export function useData() {
     try {
       const batch = await fetchJSON('/api/batch/positions-holdings')
       markSuccess('broker')
-      setBrokerStatus(batch?.broker_status || blockedBrokerStatus({ message: 'batch missing broker_status' }))
-      setBrokerHoldings(batch?.holdings || blockedRows({ message: 'batch missing holdings' }, 'Holdings'))
-      setBrokerFunds(batch?.funds || blockedFunds({ message: 'batch missing funds' }))
-      setBrokerPositions(batch?.positions || blockedRows({ message: 'batch missing positions' }, 'Positions'))
+      setBrokerStatus(batch?.broker_status || pendingBrokerStatus({ message: 'batch missing broker_status' }))
+      setBrokerHoldings(batch?.holdings || pendingRows({ message: 'batch missing holdings' }, 'Holdings'))
+      setBrokerFunds(batch?.funds || pendingFunds({ message: 'batch missing funds' }))
+      setBrokerPositions(batch?.positions || pendingRows({ message: 'batch missing positions' }, 'Positions'))
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
         ? authStatus('/api/batch/positions-holdings', err.status, err.kind)
@@ -271,10 +271,10 @@ export function useData() {
         if (prev.brokerFunds) setBrokerFunds(keepLastGood(prev.brokerFunds, apiStatus, 'Funds') || prev.brokerFunds)
         if (prev.brokerPositions) setBrokerPositions(keepLastGood(prev.brokerPositions, apiStatus, 'Positions') || prev.brokerPositions)
       } else {
-        setBrokerStatus(blockedBrokerStatus(apiStatus))
-        setBrokerHoldings(blockedRows(apiStatus, 'Holdings'))
-        setBrokerFunds(blockedFunds(apiStatus))
-        setBrokerPositions(blockedRows(apiStatus, 'Positions'))
+        setBrokerStatus(pendingBrokerStatus(apiStatus))
+        setBrokerHoldings(pendingRows(apiStatus, 'Holdings'))
+        setBrokerFunds(pendingFunds(apiStatus))
+        setBrokerPositions(pendingRows(apiStatus, 'Positions'))
       }
     }
   }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, markFailure, markSuccess])
@@ -286,11 +286,11 @@ export function useData() {
       if (batch?.health) setHealth(batch.health)
       if (batch?.state) setState(batch.state)
       if (batch?.paper) setPaper(batch.paper)
-      else setPaper(blockedPaper({ message: 'batch missing paper' }))
+      else setPaper(pendingPaper({ message: 'batch missing paper' }))
       if (batch?.gain_rank) setGainRank(batch.gain_rank)
-      else setGainRank(blockedGainRank({ message: 'batch missing gain_rank' }))
+      else setGainRank(pendingGainRank({ message: 'batch missing gain_rank' }))
       if (batch?.pnl) setPnl(batch.pnl)
-      else setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: 'NO_DATA', blocked: true })
+      else setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: 'NO_DATA', pendingProof: true })
       // Secondary alerts/gates also arrive in market-data batch (one round-trip).
       if (Array.isArray(batch?.alerts?.alerts)) setAlerts(batch.alerts.alerts)
       if (batch?.auto_gates) setAutoGates(batch.auto_gates)
@@ -302,10 +302,10 @@ export function useData() {
       const retainTransient = isTransient(apiStatus.code)
       markFailure('core', apiStatus)
       if (!retainTransient || !prev.health) setHealth(fallbackHealth(apiStatus))
-      if (!retainTransient || !prev.paper) setPaper(blockedPaper(apiStatus))
-      if (!retainTransient || !prev.gainRank) setGainRank(blockedGainRank(apiStatus))
+      if (!retainTransient || !prev.paper) setPaper(pendingPaper(apiStatus))
+      if (!retainTransient || !prev.gainRank) setGainRank(pendingGainRank(apiStatus))
       if (!retainTransient || !prev.pnl) {
-        setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: apiStatus.status, message: apiStatus.message, blocked: true })
+        setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: apiStatus.status, message: apiStatus.message, pendingProof: true })
       }
     }
   }, [setHealth, setState, setPaper, setGainRank, setPnl, setAlerts, setAutoGates, markFailure, markSuccess])
@@ -322,7 +322,7 @@ export function useData() {
           verified_live_dhan: false,
           stale: true,
           status: prev.status || 'DHAN_LAST_GOOD',
-          message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh unavailable)',
+          message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh pending)',
         })
         return
       }
@@ -339,13 +339,13 @@ export function useData() {
           stale: true,
           snapshot: true,
           live: false,
-          blocked: false,
+          pendingProof: false,
           optional: isOptionalChain(sym),
           message: data.message || 'Index chain warming from Dhan cache',
         })
         return
       }
-      const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
+      const blocked = pendingChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
       if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/batch/chains`, message: blocked.blocked_reason })
       setChain(sym, blocked)
       return
@@ -355,7 +355,7 @@ export function useData() {
     setChain(sym, {
       ...data,
       stale: Boolean(isSnapshot || data?.stale),
-      blocked: false,
+      pendingProof: false,
       verified_live_dhan: !isSnapshot,
       verified_dhan_snapshot: Boolean(isSnapshot),
       optional: isOptionalChain(sym),
@@ -374,11 +374,11 @@ export function useData() {
       // Soft-fail individual chain: do not overwrite Overview with NETWORK_ERROR when
       // batch path is the primary source of truth (especially after hours).
       if (!isOptionalChain(sym) && apiStatus.status === 'API_AUTH_REQUIRED') markFailure(`chain_${sym}`, apiStatus)
-      if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
+      if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || pendingChain(sym, apiStatus))
       else setChain(sym, {
-        ...blockedChain(sym, apiStatus),
+        ...pendingChain(sym, apiStatus),
         status: 'CHAIN_CACHE_WARMING',
-        blocked: false,
+        pendingProof: false,
         message: apiStatus.message || 'Waiting for Dhan chain cache',
       })
     }
@@ -430,7 +430,7 @@ export function useData() {
     else if (!retainTransient || !prev.alerts?.length) setAlerts([])
 
     if (gates.status === 'fulfilled') setAutoGates(gates.value)
-    else if (!retainTransient || !prev.autoGates) setAutoGates(blockedGates(err))
+    else if (!retainTransient || !prev.autoGates) setAutoGates(pendingGates(err))
   }, [setAlerts, setAutoGates, markFailure, markSuccess])
 
   const wsConnect = useCallback(() => {
@@ -505,7 +505,7 @@ export function useData() {
             setChain(sym, {
               ...m.data,
               stale: Boolean(isSnapshot || m.data?.stale),
-              blocked: false,
+              pendingProof: false,
               verified_live_dhan: !isSnapshot,
               verified_dhan_snapshot: Boolean(isSnapshot),
               optional: isOptionalChain(sym),

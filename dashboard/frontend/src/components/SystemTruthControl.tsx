@@ -78,7 +78,7 @@ function chainPass(x: any): boolean {
   const status = String(x.status || '').toUpperCase()
   const contracts = Number(x.total_contracts || (Array.isArray(x.contracts) ? x.contracts.length : 0))
   const spot = Number(x.spot || 0)
-  if (source !== 'dhan' || x.blocked || spot <= 0 || contracts <= 0) return false
+  if (source !== 'dhan' || x.pendingProof || spot <= 0 || contracts <= 0) return false
   // After-hours Dhan snapshots are valid proof (stale=true is expected when market closed).
   if (['MARKET_CLOSED_DHAN_SNAPSHOT', 'EOD_SNAPSHOT', 'MARKET_CLOSED'].includes(status)) return true
   if (['OK', 'MARKET_OPEN'].includes(status) && x.stale !== true) return true

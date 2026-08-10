@@ -39,7 +39,7 @@ export default function Backtest() {
         setSummary(response.data?.summary || response.data)
       } catch (err: any) {
         setSummary(null)
-        setError(err?.message || 'Backtest endpoint unavailable')
+        setError(err?.message || 'Backtest data pending')
       } finally {
         setLoading(false)
       }
