@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
 
-type LoadState = 'loading' | 'ready' | 'not_ready' | 'not_ready' | 'error'
+type LoadState = 'loading' | 'ready' | 'not_ready' | 'error'
 
 type ModelRec = {
   status?: string
@@ -11,7 +11,7 @@ type ModelRec = {
   avg_accuracy?: number | null
   avg_confidence?: number | null
   proof_pass_count?: number
-  validation pending_count?: number
+  validation_pending_count?: number
   blocker_reason?: string
   message?: string
   generated_at_utc?: string
@@ -111,14 +111,14 @@ export default function MLPerformance() {
   const models = mergeModels(performance, comparison)
   const modelNames = Object.keys(models)
   const provenCount = modelNames.filter((n) => models[n]?.model_proof_ready === true).length
-  const validation pendingCount = modelNames.length - provenCount
+  const validationPendingCount = modelNames.length - provenCount
   const ready = status === 'ready'
   const badgeLabel = ready
     ? 'MODEL_PROOF_READY'
     : status === 'loading'
       ? 'CHECKING'
       : status === 'not_ready'
-        ? 'MODEL_PROOF_LOADED_BUT_BLOCKED'
+        ? 'MODEL_PROOF_VALIDATION_PENDING'
         : 'MODEL_NOT_PROVEN'
   const badgeColor = ready ? 'var(--up)' : status === 'loading' ? '#f59e0b' : 'var(--down)'
   const badgeBorder = ready ? 'rgba(16,185,129,.45)' : status === 'loading' ? 'rgba(245,158,11,.45)' : 'rgba(239,68,68,.45)'
@@ -151,9 +151,9 @@ export default function MLPerformance() {
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Fallback used</div><div style={{ fontWeight: 900 }}>{model.fallback_used === true ? 'YES' : model.fallback_used === false ? 'NO' : 'UNKNOWN'}</div></div>
         <div className="card">
           <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Proof records</div>
-          <div style={{ fontWeight: 900 }}>{provenCount} proven / {validation pendingCount} validation pending</div>
+          <div style={{ fontWeight: 900 }}>{provenCount} proven / {validationPendingCount} validation pending</div>
         </div>
-        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'PROVEN' : 'BLOCKED'}</div></div>
+        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'READY' : 'BLOCKED'}</div></div>
       </div>
 
       {ready && comparison?.best_model && (
@@ -186,11 +186,11 @@ export default function MLPerformance() {
                 <tr key={name}>
                   <td className="tcell"><b>{name}</b></td>
                   <td className="tcell" style={{ color: rowReady ? 'var(--up)' : 'var(--down)', fontWeight: 700 }}>
-                    {metrics.status || (rowReady ? 'PROVEN' : 'BLOCKED')}
+                    {metrics.status || (rowReady ? 'READY' : 'VALIDATION_PENDING')}
                   </td>
                   <td className="tcell">{metrics.total_predictions ?? 0}</td>
                   <td className="tcell">{fmtPct(metrics.avg_accuracy)}</td>
-                  <td className="tcell">{`${metrics.proof_pass_count ?? 0} / ${metrics.validation pending_count ?? 0}`}</td>
+                  <td className="tcell">{`${metrics.proof_pass_count ?? 0} / ${metrics.validation_pending_count ?? 0}`}</td>
                   <td className="tcell">{metrics.blocker_reason || metrics.message || (rowReady ? '—' : 'NOT_PROVEN')}</td>
                   <td className="tcell">{metrics.generated_at_utc || '—'}</td>
                 </tr>
