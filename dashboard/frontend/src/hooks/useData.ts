@@ -24,15 +24,19 @@ const ACTIVE_CHAIN_POLL_MS_CLOSED = 60000
 const TOPBAR_CHAIN_POLL_MS_OPEN = 60000
 const TOPBAR_CHAIN_POLL_MS_CLOSED = 180000
 
+type ApiErrorKind = 'http' | 'timeout' | 'network'
+
 class ApiRequestError extends Error {
   status: number
   path: string
+  kind: ApiErrorKind
 
-  constructor(path: string, status: number) {
-    super(`${status}`)
+  constructor(path: string, status: number, kind: ApiErrorKind = 'http') {
+    super(`${kind}:${status}`)
     this.name = 'ApiRequestError'
     this.path = path
     this.status = status
+    this.kind = kind
   }
 }
 
@@ -49,26 +53,38 @@ async function fetchJSON(path: string, timeoutMs = 20000) {
     return r.json()
   } catch (err: any) {
     if (err instanceof ApiRequestError) throw err
-    throw new ApiRequestError(path, 0)
+    if (err?.name === 'AbortError') throw new ApiRequestError(path, 0, 'timeout')
+    throw new ApiRequestError(path, 0, 'network')
   } finally {
     clearTimeout(timer)
   }
 }
 
-const authStatus = (path: string, status: number) => ({
-  status: status === 401 ? 'API_AUTH_REQUIRED' : isTransient(status) ? (status === 0 ? 'NETWORK_ERROR' : status === 429 ? 'RATE_LIMITED' : 'CLOUD_UNAVAILABLE') : 'API_ERROR',
+const authStatus = (path: string, status: number, kind: ApiErrorKind = 'http') => ({
+  status: status === 401
+    ? 'API_AUTH_REQUIRED'
+    : kind === 'timeout'
+      ? 'REQUEST_TIMEOUT'
+      : kind === 'network'
+        ? 'NETWORK_ERROR'
+        : isTransient(status)
+          ? (status === 429 ? 'RATE_LIMITED' : 'CLOUD_UNAVAILABLE')
+          : 'API_ERROR',
   code: status,
   path,
+  error_kind: kind,
   severity: status === 401 ? 'locked' : isTransient(status) ? 'transient' : 'error',
   message: status === 401
-    ? 'Dashboard API auth required. Read-only data is locked until API key/session unlock succeeds.'
-    : isTransient(status)
-      ? status === 0
-        ? `Network/DNS could not reach Cloud Run backend for ${path}. Keeping last good data where available.`
+    ? 'Dashboard authentication is required. Read-only data remains locked until a valid session is established.'
+    : kind === 'timeout'
+      ? `Request to ${path} timed out. Keeping last good data while the backend or cache recovers.`
+      : kind === 'network'
+        ? `The browser could not reach ${path}. Check connectivity or service availability; keeping last good data.`
         : status === 429
           ? `Backend rate-limited ${path}. Keeping last good data and using slower polling.`
-          : `Cloud Run/backend returned ${status} for ${path}. Keeping last good data where available.`
-      : `Backend API returned ${status}`,
+          : isTransient(status)
+            ? `Cloud Run/backend returned ${status} for ${path}. Keeping last good data where available.`
+            : `Backend API returned ${status}`,
 })
 
 const fallbackHealth = (apiStatus: any) => ({
@@ -195,7 +211,7 @@ function withFailureCount(apiStatus: any, group: string, count: number) {
 }
 
 function apiError(result: PromiseSettledResult<any>, path: string) {
-  if (result.status === 'rejected' && result.reason instanceof ApiRequestError) return authStatus(path, result.reason.status)
+  if (result.status === 'rejected' && result.reason instanceof ApiRequestError) return authStatus(path, result.reason.status, result.reason.kind)
   if (result.status === 'rejected') return { status: 'API_ERROR', code: 0, path, message: String(result.reason?.message || result.reason) }
   return null
 }
@@ -244,7 +260,7 @@ export function useData() {
       setBrokerPositions(batch?.positions || blockedRows({ message: 'batch missing positions' }, 'Positions'))
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
-        ? authStatus('/api/batch/positions-holdings', err.status)
+        ? authStatus('/api/batch/positions-holdings', err.status, err.kind)
         : { status: 'API_ERROR', code: 0, path: '/api/batch/positions-holdings', message: String(err?.message || err) }
       const prev = useStore.getState()
       const retainTransient = isTransient(apiStatus.code)
@@ -280,7 +296,7 @@ export function useData() {
       if (batch?.auto_gates) setAutoGates(batch.auto_gates)
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
-        ? authStatus('/api/batch/market-data', err.status)
+        ? authStatus('/api/batch/market-data', err.status, err.kind)
         : { status: 'API_ERROR', code: 0, path: '/api/batch/market-data', message: String(err?.message || err) }
       const prev = useStore.getState()
       const retainTransient = isTransient(apiStatus.code)
@@ -352,7 +368,7 @@ export function useData() {
       const data = await fetchJSON(`/api/chain/${sym}`, 12000)
       applyChainPayload(sym, data)
     } catch (err: any) {
-      const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
+      const apiStatus = err instanceof ApiRequestError ? authStatus(`/api/chain/${sym}`, err.status, err.kind) : { status: 'API_ERROR', code: 0, path: `/api/chain/${sym}`, message: String(err?.message || err) }
       const prev = useStore.getState().chain?.[sym]
       const retain = isTransient(apiStatus.code) || apiStatus.status === 'API_AUTH_REQUIRED' || Boolean(prev?.contracts?.length)
       // Soft-fail individual chain: do not overwrite Overview with NETWORK_ERROR when
@@ -381,7 +397,7 @@ export function useData() {
       markSuccess('chains_batch')
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
-        ? authStatus('/api/batch/chains', err.status)
+        ? authStatus('/api/batch/chains', err.status, err.kind)
         : { status: 'API_ERROR', code: 0, path: '/api/batch/chains', message: String(err?.message || err) }
       markFailure('chains_batch', apiStatus)
       // Soft fallback only when market likely open; after-hours keep warming placeholders.

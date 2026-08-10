@@ -35,7 +35,7 @@ export default function Backtest() {
       setLoading(true)
       setError(null)
       try {
-        const response = await axios.get(`${API_BASE}/api/backtest`, { timeout: 7000 })
+        const response = await axios.get(`${API_BASE}/api/backtest/results`, { timeout: 12000 })
         setSummary(response.data?.summary || response.data)
       } catch (err: any) {
         setSummary(null)
@@ -68,7 +68,7 @@ export default function Backtest() {
           <h3 className="text-xl font-bold mb-2">Backtest endpoint not proven</h3>
           <p className="text-yellow-200">{error}</p>
           <p className="text-sm text-yellow-100 mt-3">
-            Dashboard route exists, but production readiness requires backend /api/backtest proof.
+            Production readiness requires recent evidence from /api/backtest/results.
           </p>
         </div>
       )}

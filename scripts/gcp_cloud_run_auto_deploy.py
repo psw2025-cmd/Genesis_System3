@@ -2,9 +2,9 @@
 """Auto-deploy Genesis System3 web service to Cloud Run (image update only).
 
 Builds an immutable image tagged with the full git SHA, then patches the Cloud
-Run service container image + safe env vars. Broker secret mounts and other env
-are preserved, while the dashboard API-key lock is deliberately removed during
-the analyzer/paper phase.
+Run service container image + safe env vars. The dashboard API-key lock is
+always enforced: API_KEY and WORKER_PUSH_TOKEN are mounted from Secret
+Manager. Deployment fails closed if those secrets are missing.
 
 Live trading flags are always forced OFF.
 """
@@ -29,11 +29,19 @@ SERVICE = os.environ.get("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
 REPO = f"{REGION}-docker.pkg.dev/{PROJECT}/system3-containers/genesis-system3"
 BUILDER_SA = f"projects/{PROJECT}/serviceAccounts/system3-builder@{PROJECT}.iam.gserviceaccount.com"
 
+# Secret Manager secret IDs holding the dashboard's API key and worker-push
+# token. Configurable via env vars so different environments can use
+# different secrets, but always default to a named, reviewable secret.
+API_KEY_SECRET_ID = os.environ.get("API_KEY_SECRET_ID", "system3-dashboard-api-key")
+WORKER_PUSH_TOKEN_SECRET_ID = os.environ.get(
+    "WORKER_PUSH_TOKEN_SECRET_ID", "system3-dashboard-worker-push-token"
+)
+
 SAFE_ENV = (
     ("LIVE_TRADING_ENABLED", "0"),
     ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
     ("AUTO_EXECUTE_TRADES", "0"),
-    ("REQUIRE_API_KEY", "false"),
+    ("REQUIRE_API_KEY", "true"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
@@ -61,6 +69,19 @@ SAFE_ENV = (
 def _session() -> AuthorizedSession:
     creds, _ = google_auth_default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
     return AuthorizedSession(creds)
+
+
+def _require_secret_exists(session: AuthorizedSession, secret_id: str) -> None:
+    """Fail closed if a required Secret Manager secret is missing or inaccessible."""
+    url = f"https://secretmanager.googleapis.com/v1/projects/{PROJECT}/secrets/{secret_id}"
+    resp = session.get(url, timeout=30)
+    if resp.status_code != 200:
+        raise SystemExit(
+            f"Required Secret Manager secret '{secret_id}' is missing or inaccessible "
+            f"(status {resp.status_code}). Create it and grant the runtime service "
+            "account roles/secretmanager.secretAccessor before deploying. See "
+            "docs/security/SECURE_DEPLOYMENT_PREREQUISITES.md."
+        )
 
 
 def _git_sha() -> str:
@@ -197,9 +218,20 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     for k, v in SAFE_ENV:
         env_map[k] = {"name": k, "value": v}
     env_map["DEPLOY_GIT_SHA"] = {"name": "DEPLOY_GIT_SHA", "value": sha}
-    # Never keep PIN/TOTP on Cloud Run. Dashboard API_KEY also stays absent
-    # until a separately reviewed live-readiness security implementation.
-    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP", "API_KEY"):
+    # Dashboard API_KEY and WORKER_PUSH_TOKEN are always mounted from Secret
+    # Manager (never as plain env values, never logged).
+    env_map["API_KEY"] = {
+        "name": "API_KEY",
+        "valueSource": {"secretKeyRef": {"secret": API_KEY_SECRET_ID, "version": "latest"}},
+    }
+    env_map["WORKER_PUSH_TOKEN"] = {
+        "name": "WORKER_PUSH_TOKEN",
+        "valueSource": {
+            "secretKeyRef": {"secret": WORKER_PUSH_TOKEN_SECRET_ID, "version": "latest"}
+        },
+    }
+    # Never keep PIN/TOTP on Cloud Run.
+    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP"):
         env_map.pop(drop, None)
     c0["env"] = list(env_map.values())
     patch = session.patch(
@@ -245,9 +277,12 @@ def main() -> int:
     print("IMAGE", image)
     print("SERVICE", SERVICE)
     print("LIVE_OFF enforced")
-    print("DASHBOARD_API_LOCK disabled")
+    print("DASHBOARD_API_LOCK enforced (REQUIRE_API_KEY=true)")
 
     session = _session()
+    _require_secret_exists(session, API_KEY_SECRET_ID)
+    _require_secret_exists(session, WORKER_PUSH_TOKEN_SECRET_ID)
+    print("SECRET_MANAGER_PREREQUISITES_OK", API_KEY_SECRET_ID, WORKER_PUSH_TOKEN_SECRET_ID)
     tgz = _archive_tarball(sha)
     print("ARCHIVE_BYTES", tgz.stat().st_size)
     bucket, object_name = _upload_source(session, tgz, sha)

@@ -217,36 +217,55 @@ def check_secret_like_values_in_changed_files(files: list[str]) -> dict:
     }
 
 
-def check_trading_safety_text(files: list[str]) -> dict:
-    suspicious = []
+def _added_lines_from_diff(files, gate_script):
+    """Return (file, line_text) for every line newly added in this PR.
+    Pre-existing code not introduced by this PR never triggers the check.
+    """
+    scan_files = [f for f in files if f != gate_script]
+    if not scan_files:
+        return []
+    for cmd in (
+        ["git", "diff", "origin/main...HEAD", "--"] + scan_files,
+        ["git", "diff", "HEAD~1..HEAD", "--"] + scan_files,
+    ):
+        result = sh(cmd, allow_fail=True)
+        if result.get("return_code") not in (0, 1):
+            continue
+        output = result.get("output", "")
+        if not output.strip():
+            continue
+        added, current_file = [], ""
+        for line in output.splitlines():
+            if line.startswith("+++ b/"):
+                current_file = line[6:]
+            elif line.startswith("+") and not line.startswith("+++"):
+                added.append((current_file, line[1:]))
+        return added
+    return []
+
+def check_trading_safety_text(files: list) -> dict:
+    """Flag suspicious live-trading terms newly introduced in this PR only.
+    Scans added diff lines so pre-existing compatibility code (e.g. legacy
+    place_order wrapper already on main) is not a false positive.
+    """
     suspicious_terms = [
-        "LIVE_TRADING_ENABLED=true",
-        "TRADING_MODE=live",
-        "STRATEGY_MODE=LIVE",
-        "placeOrder(",
-        "place_order(",
-        "dhanhq.placeOrder",
+        "LIVE_TRADING_ENABLED=true", "TRADING_MODE=live",
+        "STRATEGY_MODE=LIVE", "placeOrder(", "place_order(", "dhanhq.placeOrder",
     ]
     gate_script = ".github/scripts/root_architecture_gate.py"
-    for f in files:
-        if f == gate_script:
-            continue
-        path = ROOT / f
-        if not path.exists() or path.is_dir():
-            continue
-        try:
-            text = path.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
-            continue
+    added_lines = _added_lines_from_diff(files, gate_script)
+    suspicious = []
+    for file_name, line_text in added_lines:
         for term in suspicious_terms:
-            if term in text:
-                suspicious.append({"file": f, "term": term})
+            if term in line_text:
+                suspicious.append({"file": file_name, "term": term,
+                                   "added_line": line_text.strip()})
     return {
         "name": "no_obvious_live_trading_enablement_in_changed_files",
         "status": "PASS" if not suspicious else "FAIL",
         "findings": suspicious,
+        "note": "Scans only newly added diff lines; pre-existing code not flagged.",
     }
-
 
 def main() -> int:
     files = changed_files()

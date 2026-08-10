@@ -384,67 +384,44 @@ _default_allowed_origins = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "null",  # Electron file:// pages send Origin: null
 ]
 _env_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "")
 _allowed_origins = [o.strip() for o in _env_allowed_origins.split(",") if o.strip()] or _default_allowed_origins
 
+if any(origin in {"*", "null"} for origin in _allowed_origins):
+    raise RuntimeError(
+        "ALLOWED_ORIGINS must contain explicit http(s) origins; wildcard/null are forbidden"
+    )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Accept",
+        "Authorization",
+        "Content-Type",
+        "Idempotency-Key",
+        "X-API-Key",
+        "X-Request-ID",
+        "X-Worker-Token",
+    ],
 )
 
-# API-key auth, OFF by default. Every route is currently reachable by
-# anyone who finds this URL - that's a real gap - but flipping this on
-# unconditionally would lock out the live frontend the instant it
-# deploys, since the frontend has no way to send a key until it is
-# rebuilt with a matching VITE_API_KEY baked in. Enable deliberately:
-#   1. Set API_KEY=<random-secret> and REQUIRE_API_KEY=true on the
-#      backend (Render dashboard env vars).
-#   2. Set the same value as VITE_API_KEY in the frontend's build env
-#      and rebuild/redeploy the frontend.
-#   3. Only then does this actually enforce - until both sides are
-#      updated, requests proceed exactly as before (fail open, with a
-#      one-time startup warning so the gap is visible in logs).
+# Dashboard authentication. Read-only routes may remain available during
+# public analyzer mode, but mutations always fail closed when authentication
+# is disabled or unconfigured. Browser authentication uses an HttpOnly session
+# cookie created by /api/auth/session. Never compile API_KEY into JavaScript.
 _REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
 _API_KEY = os.environ.get("API_KEY", "").strip()
 _DASHBOARD_SESSION_COOKIE = "system3_dashboard_session"
 _DASHBOARD_SESSION_MAX_AGE = int(os.environ.get("DASHBOARD_SESSION_MAX_AGE", "43200"))
-_API_KEY_EXEMPT_PREFIXES = ("/ui", "/docs", "/openapi.json", "/redoc", "/ws")
-_API_KEY_EXEMPT_EXACT = (
-    "/",
-    "/api/health",
-    "/health",
-    "/healthz",
-    "/api/system_health",
-    "/genesis-production-brief",
-    "/autonomous-brain",
-    "/hidden-secrets-lab",
-    "/never-die-monitor",
-    "/hunger-meter",
-    "/data-truth-score",
-    "/cost-roi",
-    "/compliance-check",
-    "/final-message",
-    "/agent-full-control",
-    "/api/auth/session",
-    "/api/auth/status",
-    "/api/auth/logout",
-    "/favicon.ico",
-        # NEW ENDPOINTS - 7-ISSUE FIX
-            "/api/broker/positions",
-                "/api/market/top-gainers",
-                    "/api/market/top-losers",
-                        "/api/performance",
-                            "/api/ml/predictions",
-                            
-    "/metrics",
-    "/api/scheduler/health/push",
-    "/api/chain/push",
-)
+try:
+    from dashboard.backend.security_policy import evaluate_request
+except ImportError:
+    from security_policy import evaluate_request
+
 
 if _REQUIRE_API_KEY and not _API_KEY:
     print("[security] REQUIRE_API_KEY=true but API_KEY is unset - auth will reject all requests")
@@ -459,9 +436,7 @@ def _dashboard_session_token() -> str:
 
 
 def _has_dashboard_api_access(request: Request) -> bool:
-    if not _REQUIRE_API_KEY:
-        return True
-    if not _API_KEY:
+    if not _REQUIRE_API_KEY or not _API_KEY:
         return False
     header_key = request.headers.get("X-API-Key", "")
     if header_key and hmac.compare_digest(header_key, _API_KEY):
@@ -478,7 +453,10 @@ class DashboardAuthRequest(BaseModel):
 @app.post("/api/auth/session")
 async def create_dashboard_session(payload: DashboardAuthRequest, request: Request):
     if not _REQUIRE_API_KEY:
-        return {"ok": True, "authenticated": True, "mode": "auth_disabled"}
+        raise HTTPException(
+            status_code=503,
+            detail="Dashboard authentication is disabled; sessions cannot be created",
+        )
     if not _API_KEY:
         raise HTTPException(status_code=503, detail="Dashboard API auth is required but API_KEY is not configured")
     if not hmac.compare_digest((payload.api_key or "").strip(), _API_KEY):
@@ -515,13 +493,49 @@ async def dashboard_auth_logout(request: Request):
 
 @app.middleware("http")
 async def _enforce_api_key(request: Request, call_next):
-    if not _REQUIRE_API_KEY:
-        return await call_next(request)
     path = request.url.path
-    if path in _API_KEY_EXEMPT_EXACT or path.startswith(_API_KEY_EXEMPT_PREFIXES):
-        return await call_next(request)
-    if not _has_dashboard_api_access(request):
-        return JSONResponse(status_code=401, content={"detail": "Missing or invalid dashboard API session"})
+    method = request.method.upper()
+
+    worker_token = globals().get("_WORKER_PUSH_TOKEN", "")
+    sent_worker_token = request.headers.get("X-Worker-Token", "")
+    worker_token_valid = bool(
+        worker_token
+        and sent_worker_token
+        and hmac.compare_digest(sent_worker_token, worker_token)
+    )
+
+    forwarded_scheme = request.headers.get(
+        "X-Forwarded-Proto", request.url.scheme
+    ).split(",")[0].strip()
+    host = request.headers.get("Host", "")
+    same_origin = f"{forwarded_scheme}://{host}" if host else ""
+
+    decision = evaluate_request(
+        method=method,
+        path=path,
+        require_api_key=_REQUIRE_API_KEY,
+        api_key_configured=bool(_API_KEY),
+        dashboard_access=_has_dashboard_api_access(request),
+        worker_token_configured=bool(worker_token),
+        worker_token_valid=worker_token_valid,
+        header_api_key_present=bool(request.headers.get("X-API-Key")),
+        origin=request.headers.get("Origin", ""),
+        same_origin=same_origin,
+        allowed_origins=_allowed_origins,
+        idempotency_key_present=bool(
+            request.headers.get("Idempotency-Key")
+        ),
+    )
+
+    if not decision.allowed:
+        content = {"detail": decision.detail}
+        if decision.code:
+            content["code"] = decision.code
+        return JSONResponse(
+            status_code=decision.status_code,
+            content=content,
+        )
+
     return await call_next(request)
 
 

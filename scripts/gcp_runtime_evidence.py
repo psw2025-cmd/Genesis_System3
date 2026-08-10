@@ -33,6 +33,9 @@ SAFE_ENV = {
     "SYSTEM3_DEPLOY_TARGET", "MEM_WARN_MB", "MEM_GC_MB", "MEM_LIMIT_MB",
 }
 SECRETS = ("system3-dhan-client-id", "dhan-access-token", "dhan-pin", "dhan-totp-secret")
+# Env var names that must only ever arrive via Secret Manager (valueFrom). If one of
+# these shows up with a plain `value` instead, that is a plaintext-secret leak.
+SECRET_BACKED_ENV_NAMES = {"API_KEY", "WORKER_PUSH_TOKEN"}
 REDACT = re.compile(
     r"(?i)(bearer\s+[a-z0-9._~+\-/]+=*|authorization\s*[:=]\s*\S+|"
     r"(?:token|secret|password|pin|totp|api[_-]?key)\s*[:=]\s*[^\s,;]+)"
@@ -68,9 +71,10 @@ def container(service: dict[str, Any]) -> dict[str, Any]:
     return rows[0] if rows else {}
 
 
-def safe_env(service: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+def safe_env(service: dict[str, Any]) -> tuple[dict[str, Any], list[str], list[str]]:
     env: dict[str, Any] = {}
     secret_refs: list[str] = []
+    plaintext_secret_names: list[str] = []
     for row in container(service).get("env") or []:
         name = str(row.get("name") or "")
         if not name:
@@ -79,7 +83,11 @@ def safe_env(service: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
             secret_refs.append(name)
         elif name in SAFE_ENV:
             env[name] = row.get("value")
-    return env, sorted(secret_refs)
+        elif name in SECRET_BACKED_ENV_NAMES:
+            # Present with a plain value instead of a Secret Manager valueFrom
+            # reference: the value itself is never captured, only the fact of the leak.
+            plaintext_secret_names.append(name)
+    return env, sorted(secret_refs), sorted(plaintext_secret_names)
 
 
 def is_off(value: Any) -> bool:
@@ -88,6 +96,45 @@ def is_off(value: Any) -> bool:
 
 def is_on(value: Any) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def evaluate_safety(env: dict[str, Any], secret_refs: list[str],
+                     plaintext_secret_names: list[str]) -> dict[str, Any]:
+    # api_key_required / api_key_mounted TRUE is the secure state: dashboard auth is
+    # enforced and the key comes from Secret Manager (valueFrom), not a plain env value.
+    return {"analyze_mode": is_on(env.get("ANALYZE_MODE")),
+            "live_trading_enabled": not is_off(env.get("LIVE_TRADING_ENABLED")),
+            "system3_live_trading_allowed": not is_off(env.get("SYSTEM3_LIVE_TRADING_ALLOWED")),
+            "auto_execute_trades": not is_off(env.get("AUTO_EXECUTE_TRADES")),
+            "api_key_required": not is_off(env.get("REQUIRE_API_KEY")),
+            "api_key_mounted": "API_KEY" in secret_refs,
+            "api_key_plaintext_exposed": "API_KEY" in plaintext_secret_names,
+            "secret_payloads_exposed": False}
+
+
+def safety_passes(safety: dict[str, Any]) -> bool:
+    return (safety["analyze_mode"]
+            and not safety["live_trading_enabled"]
+            and not safety["system3_live_trading_allowed"]
+            and not safety["auto_execute_trades"]
+            and safety["api_key_required"]
+            and safety["api_key_mounted"]
+            and not safety["api_key_plaintext_exposed"])
+
+
+def safety_blockers(safety: dict[str, Any]) -> list[str]:
+    blockers = []
+    if not safety["analyze_mode"]:
+        blockers.append("Analyzer mode is not enabled.")
+    if any(safety[k] for k in ("live_trading_enabled", "system3_live_trading_allowed", "auto_execute_trades")):
+        blockers.append("Live-trading-off invariants are not proven.")
+    if not safety["api_key_required"]:
+        blockers.append("Dashboard API key authentication is missing or disabled (REQUIRE_API_KEY is not enforced).")
+    if not safety["api_key_mounted"]:
+        blockers.append("Dashboard API key is not mounted from Secret Manager.")
+    if safety["api_key_plaintext_exposed"]:
+        blockers.append("Dashboard API key is present as a plaintext environment value instead of a Secret Manager reference.")
+    return blockers
 
 
 def quantile(values: list[float], q: float) -> float | None:
@@ -322,7 +369,7 @@ def collect() -> dict[str, Any]:
     service, commands["service"] = run_json(["gcloud", "run", "services", "describe", SERVICE,
                                                f"--project={PROJECT}", f"--region={REGION}", "--format=json"])
     service = service if isinstance(service, dict) else {}
-    env, secret_refs = safe_env(service); c0 = container(service)
+    env, secret_refs, plaintext_secret_names = safe_env(service); c0 = container(service)
     revision = str(((service.get("status") or {}).get("latestReadyRevisionName"))
                    or service.get("latestReadyRevision") or "").rsplit("/", 1)[-1]
     url = ((service.get("status") or {}).get("url")) or service.get("uri") or ""
@@ -348,15 +395,8 @@ def collect() -> dict[str, Any]:
               ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")}
     deployed_sha = str(env.get("DEPLOY_GIT_SHA") or "")
     source_match = bool(EXPECTED_SHA and deployed_sha and EXPECTED_SHA == deployed_sha)
-    safety = {"analyze_mode": is_on(env.get("ANALYZE_MODE")),
-              "live_trading_enabled": not is_off(env.get("LIVE_TRADING_ENABLED")),
-              "system3_live_trading_allowed": not is_off(env.get("SYSTEM3_LIVE_TRADING_ALLOWED")),
-              "auto_execute_trades": not is_off(env.get("AUTO_EXECUTE_TRADES")),
-              "api_key_required": not is_off(env.get("REQUIRE_API_KEY")),
-              "api_key_mounted": "API_KEY" in secret_refs, "secret_payloads_exposed": False}
-    safety_pass = safety["analyze_mode"] and not any(safety[k] for k in
-        ("live_trading_enabled", "system3_live_trading_allowed", "auto_execute_trades",
-         "api_key_required", "api_key_mounted"))
+    safety = evaluate_safety(env, secret_refs, plaintext_secret_names)
+    safety_pass = safety_passes(safety)
     broker = endpoints.get("/api/broker/status", {}).get("summary", {})
     broker_ready = bool(broker.get("connected") and broker.get("token_source") == "GCP_SECRET_MANAGER_DYNAMIC"
                         and broker.get("token_value_exposed") is False
@@ -369,7 +409,7 @@ def collect() -> dict[str, Any]:
     if not commands["service"]["ok"]: blockers.append("Cloud Run service could not be read.")
     if not revision: blockers.append("Latest ready Cloud Run revision is unavailable.")
     if not source_match: blockers.append("GitHub SHA and deployed DEPLOY_GIT_SHA are missing or different.")
-    if not safety_pass: blockers.append("Analyzer/live-off/API-key-disabled invariants are not proven.")
+    blockers += safety_blockers(safety)
     if not health_ok: blockers.append("Public /api/health proof failed.")
     if not broker_ready: blockers.append("Dhan read-only broker proof is not ready.")
     if not chains_ready: blockers.append("All four required option chains are not fresh and populated.")
@@ -387,7 +427,8 @@ def collect() -> dict[str, Any]:
                           "image": c0.get("image"), "service_account": service_account,
                           "resources": c0.get("resources") or {}, "scaling": template.get("scaling") or {},
                           "public_invoker": public, "safe_environment": env,
-                          "mounted_secret_environment_names": secret_refs},
+                          "mounted_secret_environment_names": secret_refs,
+                          "plaintext_secret_environment_names_detected": plaintext_secret_names},
             "safety": safety,
             "scheduler": {"name": (scheduler or {}).get("name") if isinstance(scheduler, dict) else None,
                           "state": (scheduler or {}).get("state") if isinstance(scheduler, dict) else None,

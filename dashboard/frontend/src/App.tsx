@@ -19,6 +19,14 @@ import { EndToEndProof }   from './components/EndToEndProof'
 import { SystemTruthControl } from './components/SystemTruthControl'
 import { LiveSimulation } from './components/LiveSimulation'
 
+// ── V5 Workspaces ─────────────────────────────────────────────────────
+import { DecisionIntelligence } from './components/workspaces/DecisionIntelligence'
+import { OptionsIntelligence }  from './components/workspaces/OptionsIntelligence'
+import { MultibaggerResearch }  from './components/workspaces/MultibaggerResearch'
+import { RiskAndScenarios }     from './components/workspaces/RiskAndScenarios'
+import { DataIntegrity }        from './components/workspaces/DataIntegrity'
+import { PredictionAudit }      from './components/workspaces/PredictionAudit'
+
 // ── Tier B: Axios-based tabs (need axios dep, call backend directly) ───
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
@@ -112,6 +120,12 @@ function ProductionProofBar() {
 function Content() {
   const { activeTab } = useStore()
   switch (activeTab) {
+    case 'decision-intel': return <DecisionIntelligence />
+    case 'options-intel':  return <OptionsIntelligence />
+    case 'multibagger':    return <MultibaggerResearch />
+    case 'risk-scenarios': return <RiskAndScenarios />
+    case 'data-integrity': return <DataIntegrity />
+    case 'prediction-audit': return <PredictionAudit />
     case 'truth':        return <SystemTruthControl />
     case 'overview':     return <Overview />
     case 'trade':        return <TradeTab />
@@ -128,7 +142,7 @@ function Content() {
     case 'system':       return <SystemTab />
     case 'gates':        return <LiveTradingGate />
     case 'sim-live':     return <LiveSimulation />
-    default:             return <SystemTruthControl />
+    default:             return <DecisionIntelligence />
   }
 }
 

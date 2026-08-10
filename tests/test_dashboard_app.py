@@ -77,6 +77,15 @@ def call(app, method, path, **kwargs):
     return asyncio.run(_call(app, method, path, **kwargs))
 
 
+def route_endpoint(app, method: str, path: str):
+    """Return an exact FastAPI route endpoint for direct inner-gate tests."""
+    for route in app.routes:
+        methods = getattr(route, "methods", set()) or set()
+        if route.path == path and method.upper() in methods:
+            return route.endpoint
+    raise AssertionError(f"Route not found: {method} {path}")
+
+
 def test_health_endpoint_returns_200(app):
     status, _, body = call(app, "GET", "/api/health")
     assert status == 200
@@ -128,16 +137,21 @@ def test_order_create_rejected_when_approval_not_signed_off(app, monkeypatch):
         lambda: {"human_approval": False, "note": "test override"},
     )
 
-    status, _, body = call(
-        app,
-        "POST",
-        "/api/orders/create",
-        json_body={"symbol": "NIFTY", "order_type": "MARKET", "quantity": 1},
+    endpoint = route_endpoint(app, "POST", "/api/orders/create")
+    data = asyncio.run(
+        endpoint(
+            {
+                "symbol": "NIFTY",
+                "order_type": "MARKET",
+                "quantity": 1,
+            }
+        )
     )
-    assert status == 200  # endpoint returns 200 with an ERROR status body, not an HTTP error
-    data = json.loads(body)
     assert data["status"] == "ERROR"
-    assert "approval" in data["message"].lower() or "approval" in str(data.get("approval", "")).lower()
+    assert (
+        "approval" in data["message"].lower()
+        or "approval" in str(data.get("approval", "")).lower()
+    )
 
 
 def test_order_create_rejected_when_kill_switch_active(app, monkeypatch, tmp_path):
@@ -151,13 +165,15 @@ def test_order_create_rejected_when_kill_switch_active(app, monkeypatch, tmp_pat
 
     monkeypatch.setattr(ks_mod, "KILL_SWITCH_JSON", kill_file)
 
-    status, _, body = call(
-        app,
-        "POST",
-        "/api/orders/create",
-        json_body={"symbol": "NIFTY", "order_type": "MARKET", "quantity": 1},
+    endpoint = route_endpoint(app, "POST", "/api/orders/create")
+    data = asyncio.run(
+        endpoint(
+            {
+                "symbol": "NIFTY",
+                "order_type": "MARKET",
+                "quantity": 1,
+            }
+        )
     )
-    assert status == 200
-    data = json.loads(body)
     assert data["status"] == "ERROR"
     assert "kill switch" in data["message"].lower()
