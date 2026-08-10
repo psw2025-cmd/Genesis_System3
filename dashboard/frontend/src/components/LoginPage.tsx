@@ -18,7 +18,7 @@ export function LoginPage({ onLogin }: Props) {
       if (r.ok && d.authenticated) {
         sessionStorage.setItem('s3_api_key', key.trim()); onLogin()
       } else {
-        setError(d.detail || d.message || 'Invalid API key — check and retry.')
+        setError(typeof d.detail === 'string' ? d.detail : (typeof d.message === 'string' ? d.message : (Array.isArray(d.detail) ? d.detail.map((x)=>x.msg||JSON.stringify(x)).join(', ') : 'Invalid API key — check and retry.')))
       }
     } catch { setError('Connection failed.') }
     finally { setLoading(false) }
