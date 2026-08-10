@@ -1,3 +1,5 @@
+import { useAuth } from './hooks/useAuth'
+import { LoginPage } from './components/LoginPage'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
@@ -146,6 +148,18 @@ function Content() {
   }
 }
 
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { checked, authenticated, login } = useAuth()
+  if (!checked) return (
+    <div style={{minHeight:'100vh',background:'#070b14',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{color:'#3b82f6',fontFamily:'monospace',letterSpacing:4,fontSize:13}}>SYSTEM3 LOADING…</div>
+    </div>
+  )
+  if (!authenticated) return <LoginPage onLogin={login} />
+  return <>{children}</>
+}
+
 export default function App() {
   useData()
   return (
@@ -160,5 +174,6 @@ export default function App() {
         </main>
       </div>
     </div>
+    </AuthGate>
   )
 }
