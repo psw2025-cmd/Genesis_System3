@@ -93,8 +93,8 @@ const fallbackHealth = (apiStatus: any) => ({
   qc_status: apiStatus?.status || 'API_LOCKED',
   live_allowed: false,
   broker: { connected: false, status: apiStatus?.status || 'API_LOCKED' },
-  market: { is_open: false, reason: apiStatus?.message || 'API locked/unavailable', next_open: '--' },
-  live_blockers: [apiStatus?.message || 'Backend API unavailable'],
+  market: { is_open: false, reason: apiStatus?.message || 'API temporarily offline', next_open: '--' },
+  live_blockers: [apiStatus?.message || 'API temporarily offline'],
 })
 
 const blockedPaper = (apiStatus: any) => ({
@@ -102,7 +102,7 @@ const blockedPaper = (apiStatus: any) => ({
   pnl: { summary: { total_pnl: 0, win_rate: 0, total_trades: 0, closed_positions: [] } },
   status: apiStatus?.status || 'NO_REAL_PAPER_DATA',
   blocked: true,
-  blocked_reason: apiStatus?.message || 'Paper data unavailable from live backend',
+  blocked_reason: apiStatus?.message || 'Paper data pending',
 })
 
 const blockedGainRank = (apiStatus: any) => ({
@@ -111,12 +111,12 @@ const blockedGainRank = (apiStatus: any) => ({
   status: apiStatus?.status || 'NO_REAL_RANK_DATA',
   blocked: true,
   stale: false,
-  message: apiStatus?.message || 'Backend API unavailable',
+  message: apiStatus?.message || 'API temporarily offline',
 })
 
 const blockedGates = (apiStatus: any) => ({
   proof_gates: [
-    { gate_id: 'api_access', name: 'Dashboard API Access', status: 'FAIL', note: apiStatus?.message || 'Backend API unavailable' },
+    { gate_id: 'api_access', name: 'Dashboard API Access', status: 'FAIL', note: apiStatus?.message || 'API temporarily offline' },
   ],
 })
 
@@ -145,10 +145,10 @@ const blockedFunds = (apiStatus: any) => ({
     available_balance: null,
     utilized_amount: null,
     total_limit: null,
-    raw: { status: 'failure', remarks: { error_code: apiStatus?.code || 'API_LOCKED', error_type: apiStatus?.status || 'API_ERROR', error_message: apiStatus?.message || 'Funds API unavailable' } },
+    raw: { status: 'failure', remarks: { error_code: apiStatus?.code || 'API_LOCKED', error_type: apiStatus?.status || 'API_ERROR', error_message: apiStatus?.message || 'Funds data pending' } },
   },
-  message: apiStatus?.message || 'Funds API unavailable',
-  error: apiStatus?.message || 'Funds API unavailable',
+  message: apiStatus?.message || 'Funds data pending',
+  error: apiStatus?.message || 'Funds data pending',
 })
 
 const blockedChain = (sym: string, apiStatus: any) => ({
@@ -158,12 +158,12 @@ const blockedChain = (sym: string, apiStatus: any) => ({
   pcr: '--',
   status: 'NO_DHAN_DATA',
   blocked: true,
-  blocked_reason: apiStatus?.message || 'Dhan option chain unavailable',
+  blocked_reason: apiStatus?.message || 'Option chain pending',
   data_source: 'dhan',
-  source_priority: isOptionalChain(sym) ? 'optional_symbol_no_rows' : 'blocked_until_real_dhan_stream',
+  source_priority: isOptionalChain(sym) ? 'optional_symbol_pending' : 'pending_real_dhan_stream',
   stale: false,
   optional: isOptionalChain(sym),
-  message: apiStatus?.message || 'Dhan option chain unavailable',
+  message: apiStatus?.message || 'Option chain pending',
 })
 
 function isRealDhanChainPayload(data: any) {
