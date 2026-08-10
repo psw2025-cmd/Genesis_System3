@@ -48,7 +48,26 @@ User also accidentally overwrote GCP secret `dhan-pin` with the literal string "
 7. **Doc cleanup**: README.md rewritten for GCP Cloud Run reality (Render/Windows refs removed);
    SYSTEM_STATE.md updated earlier.
 
-## Backlog
-- P2 SYS3-BLK-004: Equity F&O eligibility not proven before trade readiness (fo_eligibility_filter.py exists — wire into readiness gate).
-- P3 SYS3-BLK-006: remaining markdown doc sprawl (other stale .md files beyond README/SYSTEM_STATE).
-- P3: Frontend card consuming /api/broker/token-health (dashboard UI, dashboard/frontend Vite app).
+## Implemented round 3 (2026-08-11) — "make everything real" (all tested: TestClient + UI screenshots)
+8. **Multibagger Equity tab made REAL** (was 100% placeholder): new `dashboard/backend/multibagger_engine.py`
+   — screens NSE F&O equity universe (211 real symbols) using Dhan /v2/charts/historical daily candles
+   (~400 sessions). Real metrics: 1Y/6M/3M returns, 52w-high distance, volume expansion, 200DMA, max
+   drawdown → composite score 0-100. 6h cache + state persistence. Endpoint `GET /api/equity/multibagger`.
+   `MultibaggerResearch.tsx` fully rewritten: ranked table, refresh, honest NOT_READY state (never fake data).
+9. **SYS3-BLK-004**: `GET /api/equity/fo-eligibility?symbols=A,B` — FOEligibilityFilter singleton
+   bootstrapped from Dhan security master OPTSTK (222 symbols); fo_eligible flag also on every multibagger row.
+10. **Daily Health Digest**: `GET /api/health/digest` — broker stability, token status, active alerts,
+    screen freshness, F&O universe size. Real data only.
+11. **Token Health Card UI**: new `TokenHealthCard.tsx` in System tab — consumes /api/broker/token-health,
+    60s auto-refresh.
+12. **Auth UX bug fixed**: /api/auth/status now returns authenticated:true when REQUIRE_API_KEY=false
+    (prod unaffected — key still required there).
+13. **Hardened prod real-only**: deploy script now forces SYSTEM3_REAL_ONLY=1 (synthetic data generators
+    can never activate in production).
+14. Frontend rebuilt (`dashboard/frontend/dist` updated — deploy image serves new bundle).
+
+## Real-money trading status (honest)
+- Order placement remains BLOCKED by design (dhan_readonly blocks orders; deploy script forces
+  LIVE_TRADING_ENABLED=0). Real money flow requires the proof gates (/api/auto_gates: ML Spearman ≥0.70
+  over 5 days, positive net expectancy, paper lifecycle proof) plus explicit user-enabled live flags.
+  Do NOT silently enable. All data paths are now real (no synthetic in prod).

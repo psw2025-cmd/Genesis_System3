@@ -47,6 +47,7 @@ SAFE_ENV = (
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
     ("SYSTEM3_STARTUP_TOKEN_REFRESH", "0"),
     ("BROKER_SELF_HEAL_TOKEN_REFRESH", "0"),
+    ("SYSTEM3_REAL_ONLY", "1"),
     ("CLOUD_MODE", "1"),
     ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),
     ("MEM_LIMIT_MB", "960"),

@@ -479,7 +479,8 @@ async def dashboard_auth_status(request: Request):
     return {
         "required": _REQUIRE_API_KEY,
         "configured": bool(_API_KEY),
-        "authenticated": _has_dashboard_api_access(request),
+        # When auth is disabled, the UI must not demand a key.
+        "authenticated": (not _REQUIRE_API_KEY) or _has_dashboard_api_access(request),
         "mode": "session_cookie_or_header" if _REQUIRE_API_KEY else "auth_disabled",
     }
 
@@ -800,6 +801,121 @@ async def get_broker_token_health():
     else:
         out["health"] = "UNKNOWN"
     return out
+
+
+@app.get("/api/equity/multibagger")
+async def get_multibagger_screen(scan_limit: int = 60, top: int = 25, refresh: bool = False):
+    """Multibagger equity screener — REAL Dhan historical data only, never synthetic."""
+    try:
+        try:
+            from multibagger_engine import run_screen
+        except ImportError:
+            from dashboard.backend.multibagger_engine import run_screen
+
+        return await asyncio.wait_for(
+            asyncio.to_thread(run_screen, int(scan_limit), int(top), bool(refresh)),
+            timeout=110.0,
+        )
+    except asyncio.TimeoutError:
+        return {"status": "TIMEOUT", "reason": "screen exceeded 110s — retry (results cache after first run)", "rows": []}
+    except Exception as exc:
+        return {"status": "ERROR", "reason": str(exc)[:300], "rows": []}
+
+
+_FO_FILTER_SINGLETON = None
+
+
+def _get_fo_filter():
+    global _FO_FILTER_SINGLETON
+    if _FO_FILTER_SINGLETON is None:
+        try:
+            from fo_eligibility_filter import FOEligibilityFilter
+        except ImportError:
+            from dashboard.backend.fo_eligibility_filter import FOEligibilityFilter
+        f = FOEligibilityFilter()
+        try:
+            f.bootstrap_universe()
+        except Exception as exc:
+            print(f"[fo-eligibility] bootstrap warning: {exc}")
+        _FO_FILTER_SINGLETON = f
+    return _FO_FILTER_SINGLETON
+
+
+@app.get("/api/equity/fo-eligibility")
+async def get_fo_eligibility(symbols: str = ""):
+    """SYS3-BLK-004: prove F&O tradability for symbols BEFORE trade readiness."""
+    filt = await asyncio.to_thread(_get_fo_filter)
+    requested = [s.strip().upper() for s in symbols.split(",") if s.strip()]
+    results = {}
+    for sym in requested[:50]:
+        ok, reason = filt.is_eligible(sym)
+        results[sym] = {"eligible": ok, "reason": reason}
+    return {
+        "universe_size": len(filt.fo_eligible_equities),
+        "results": results,
+        "gate": "FO_ELIGIBILITY_REQUIRED_BEFORE_TRADE_READY",
+        "source": "dhan_security_master_optstk + config/nse_fo_universe.json",
+    }
+
+
+@app.get("/api/health/digest")
+async def get_health_digest():
+    """Daily health digest — broker uptime, token rotation, screen freshness. Real data only."""
+    from datetime import timezone as _tz
+
+    digest: Dict[str, Any] = {
+        "generated_utc": datetime.now(_tz.utc).isoformat(),
+        "live_trading_enabled": False,
+    }
+    try:
+        from connection_stability import get_connection_tracker
+
+        digest["broker_stability"] = get_connection_tracker().snapshot()
+    except Exception:
+        digest["broker_stability"] = None
+    try:
+        from core.brokers.dhan.cloud_token_provider import token_metadata
+
+        tok = token_metadata()
+        digest["token"] = {
+            "present": tok.get("token_present"),
+            "hours_remaining": tok.get("hours_remaining"),
+            "expired": tok.get("expired"),
+            "secret_version": tok.get("secret_version"),
+            "reload_count": tok.get("reload_count"),
+        }
+    except Exception:
+        digest["token"] = None
+    try:
+        alerts = []
+        if SSOT_AVAILABLE and state_store is not None:
+            alerts = (state_store.get_state().get("alerts") or [])
+        digest["active_alerts"] = [
+            {"code": a.get("code"), "level": a.get("level")}
+            for a in alerts
+            if isinstance(a, dict) and not a.get("resolved")
+        ][:20]
+    except Exception:
+        digest["active_alerts"] = []
+    try:
+        mb_file = ROOT_DIR / "state" / "multibagger_screen.json"
+        if mb_file.exists():
+            mb = json.loads(mb_file.read_text())
+            digest["multibagger_screen"] = {
+                "generated_at_utc": mb.get("generated_at_utc"),
+                "succeeded": mb.get("succeeded"),
+                "top_symbol": (mb.get("rows") or [{}])[0].get("symbol"),
+            }
+        else:
+            digest["multibagger_screen"] = None
+    except Exception:
+        digest["multibagger_screen"] = None
+    try:
+        filt = _get_fo_filter()
+        digest["fo_universe_size"] = len(filt.fo_eligible_equities)
+    except Exception:
+        digest["fo_universe_size"] = None
+    return digest
 
 
 @app.get("/api/broker/dhan/status")

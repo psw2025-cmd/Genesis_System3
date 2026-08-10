@@ -1,7 +1,7 @@
 {
-  "generated_utc": "2026-07-24T03:53:41.956656Z",
+  "generated_utc": "2026-08-10T21:09:06.578371Z",
   "pass": false,
-  "source": "tests\\fixtures\\paper_closed_trades_feb2026.json",
+  "source": "tests/fixtures/paper_closed_trades_feb2026.json",
   "evidence": {
     "trade_count": 9,
     "wins": 3,

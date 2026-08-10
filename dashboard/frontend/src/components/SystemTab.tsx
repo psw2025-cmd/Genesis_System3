@@ -1,6 +1,7 @@
 import { useStore } from '../store'
 import { cn } from '../lib/utils'
 import { AuthUnlock } from './AuthUnlock'
+import { TokenHealthCard } from './TokenHealthCard'
 
 function Row({ label, value, ok }: { label: string; value: string; ok?: boolean }) {
   return (
@@ -41,6 +42,8 @@ export function SystemTab() {
 
       {apiStatus?.status === 'API_AUTH_REQUIRED' && <AuthUnlock />}
       {/auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || '')) && apiStatus?.status !== 'API_AUTH_REQUIRED' && <AuthUnlock />}
+
+      <TokenHealthCard />
 
       <div className="card p-5">
         <h3 className="text-sm font-semibold text-text-primary mb-3">Safety</h3>
