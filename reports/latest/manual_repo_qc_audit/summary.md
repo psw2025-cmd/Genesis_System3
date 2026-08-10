@@ -1,18 +1,18 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 03:50 IST`
+Updated: `2026-08-11 04:51 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `50d89073f9c554a7884ff10a031041e65d6b52c5`.
-- Latest application/source HEAD remains: `b70af343340a73ed27ca548820d5893c779ab5bd` (`fix(ui): final cleanup - remove all blocked/unavailable terminology`).
-- Commits after `b70af343...` are audit-report-only in the current evidence set.
-- Latest merged application/UI PR remains PR #96. Recent merged PRs #92-#96 were rechecked; no newer application PR was found in this run.
-- Combined status checks for current audit-report HEAD returned no statuses; workflow-run lookup for application HEAD `b70af343...` returned no runs through the connector. This is not failure proof, but it is also not same-revision CI/runtime readiness proof.
-- Deployment target: Google Cloud Run / Google Cloud services. Render is migration debt only.
-- Audit posture: ANALYZER/PAPER. Live-money routing stays OFF. No audit action may enable, place, modify, cancel or route a live order.
+- Repository HEAD observed at start of this iteration: `b9a10ce5aa23284bbf5dd02d45667659b7125784`.
+- Latest application/source HEAD remains `b70af343340a73ed27ca548820d5893c779ab5bd` (`fix(ui): final cleanup - remove all blocked/unavailable terminology`).
+- Commits after `b70af343...` remain audit-report-only in the current evidence set.
+- Recent PRs rechecked: PR #96 remains the newest merged application/UI PR; #92-#96 remain relevant to V5 UI/auth behavior. No newer application PR was found in this iteration.
+- Workflow-run lookup for application HEAD `b70af343...` returned no runs through the connector. This is neither CI-failure proof nor exact-revision CI/runtime readiness proof.
+- Deployment target: Google Cloud Run / Google Cloud services. Render references are migration debt only.
+- Audit posture: ANALYZER/PAPER. Live-money routing remains OFF. No audit action may place, modify, cancel or route a live order.
 - This Markdown is the single continuously maintained audit/remediation authority.
 
 ## 1. Executive verdict
@@ -20,25 +20,25 @@ Updated: `2026-08-11 03:50 IST`
 | Area | Verdict | Solution state |
 |---|---|---|
 | Exact application HEAD CI/runtime proof | **NOT PROVEN** | exact-revision proof required |
-| Dashboard login contract | **FAIL / P0** | **READY TO PATCH** |
+| Dashboard auth/session | **FAIL / P0-P1** | **READY TO PATCH** |
 | Global safety/mode truth | **FAIL / P0** | **READY TO PATCH** via `SafetyTruth` |
+| WebSocket/REST stream truth | **FAIL / P0-P1** | **READY TO PATCH** via `StreamTruth` + event ordering |
 | Data/source/staleness truth | **FAIL / P0-P1** | **READY TO PATCH** via typed envelopes |
-| Option chain / Greeks | **INCOMPLETE / P0-P1** | warming fix ready; full provenance contract required |
-| Paper UI mutation control | **FAIL / P0-P1** | **READY TO PATCH** — dead/unproven route must not render |
-| Paper execution lifecycle | **FAIL / P0** | **READY TO PATCH** canonical mutation service |
-| Paper restart/idempotency safety | **FAIL / P0-P1** | **READY TO PATCH** immutable IDs + durable ledger |
-| Paper P&L/reconciliation | **NOT PROVEN / P0-P1** | canonical lifecycle/reconciliation required |
-| Pre-trade risk authority | **FAIL / P0** | server-owned `RiskPolicy` + mandatory `PreTradeRiskService` |
+| Option chain / Greeks | **INCOMPLETE / P0-P1** | warming fix ready; provenance contract required |
+| Paper UI mutation control | **FAIL / P0-P1** | **READY TO PATCH** capability-driven |
+| Paper execution lifecycle | **FAIL / P0** | **READY TO PATCH** immutable lifecycle |
+| Paper restart/idempotency safety | **FAIL / P0-P1** | **READY TO PATCH** durable ledger |
+| Paper P&L/reconciliation | **NOT PROVEN / P0-P1** | after-cost reconciliation required |
+| Pre-trade risk authority | **FAIL / P0** | server-owned policy + mandatory risk service |
 | Execution guardrail | **FAIL / P0** | fail-closed patch required |
-| Legacy mutation UI residue | **FIX-REQUIRED / P0-P1** | quarantine/remove from deployment surface |
 | Google Cloud provenance | **NOT PROVEN / P1** | exact revision/image/runtime evidence required |
 | Real-money trade ready | **NO** | locked |
 
 ## 2. Mandatory solution-driven audit rule
 
-Every finding must map to a canonical remediation containing root cause, exact files/routes, target behavior, minimal implementation, ordered patch steps, schema/API changes, compatibility notes, safety constraints, regression risks, exact tests, PASS criteria, rollback/fail-safe behavior and implementation status `NOT STARTED | READY TO PATCH | PATCHED | VERIFIED`.
+Every finding must include severity, exact proof, symptom, root cause, real-money impact, exact files/routes, target behavior, minimal safe implementation, ordered implementation steps, schema/API changes, compatibility/migration notes, safety constraints, regression risks, exact tests, PASS criteria, rollback/fail-safe behavior, and implementation status `NOT STARTED | READY TO PATCH | PATCHED | VERIFIED`.
 
-Missing, stale, parse-failed or unproven evidence must never become green, PASS, zero-risk, zero-P&L, PAPER SAFE, live data or trade-ready through frontend/backend defaults.
+Missing, stale, parse-failed, unauthenticated or unproven evidence must never become green, PASS, zero-risk, zero-P&L, PAPER SAFE, LIVE, fresh-market-data, broker-connected or trade-ready through frontend/backend defaults.
 
 ## 3. Retained verified findings
 
@@ -60,10 +60,10 @@ Missing, stale, parse-failed or unproven evidence must never become green, PASS,
 - **UI-007 / P1:** shared market-data truth envelope is missing.
 - **UI-009 / P0:** PAPER/LIVE/LOCKED is not driven by one authoritative runtime safety object.
 - **UI-010 / P1:** immutable production prediction ledger remains unproven.
-- **UI-011 / P1:** full enforceable portfolio/factor/scenario risk remains unproven.
+- **UI-011 / P1:** complete enforceable portfolio/factor/scenario risk remains unproven.
 - **UI-012/UI-013/UI-014 / P2:** workspace rationalization, responsive/mobile and keyboard/focus behavior remain incomplete/unproven.
 - **UI-018 / P1:** source/build labels are not deployment compatibility proof.
-- **UI-019 / P1:** broker health needs a typed state machine.
+- **UI-019 / P1:** broker health requires a typed state machine.
 
 ### Option chain / Greeks
 
@@ -77,30 +77,38 @@ Missing, stale, parse-failed or unproven evidence must never become green, PASS,
 
 - **READY-001 / P0:** missing live/order evidence can default safe.
 - **READY-002 / P0:** money-ready calculation excludes required paper lifecycle proof.
-- **READY-003 / P0-P1:** gates can pass from object presence/structural shape rather than all semantic checks.
+- **READY-003 / P0-P1:** gates can pass from object presence/shape instead of semantic checks.
 - **READY-004 / P1:** funds/holdings/positions success semantics are too weak.
 - **READY-005 / P0:** trader-ready can pass transport checks without lifecycle/expectancy proof.
 - **READY-006 / P1:** core E2E PASS is transport-level only.
-- **READY-007 / P1:** E2E Dhan proof lacks full freshness/schema envelope.
-- **READY-008 / P1:** active Live Gate still contains Render-era instructions.
+- **READY-007 / P1:** Dhan proof lacks full freshness/schema envelope.
+- **READY-008 / P1:** active Live Gate contains Render-era instructions.
 - **READY-009 / P1:** human approval lacks exact evidence revision/time provenance.
 
-### Paper / Trade / Positions retained
+### Paper / Trade / Positions
 
 - **PAPER-001 / P0:** missing safety fields can yield `PAPER SAFE`.
 - **PAPER-002 / P0:** missing market source can yield live-looking Dhan state.
 - **PAPER-003 / P1:** missing monetary fields can render `₹0.00`.
-- **PAPER-004 / P1:** missing provenance can display `INTRADAY`, `NSE_FNO`, `PAPER_CLOUD_SIM`, `DHAN_LIVE` defaults.
+- **PAPER-004 / P1:** missing provenance can display plausible `INTRADAY/NSE_FNO/PAPER_CLOUD_SIM/DHAN_LIVE` defaults.
 - **PAPER-005 / P1:** paper-safe proof relies heavily on negative evidence rather than simulator/ledger proof.
 - **PAPER-006 / P1:** position performance defaults to zero.
 - **PAPER-007 / P1:** empty positions lack explicit truth state.
-- **PAPER-008 / P1:** Force Paper Tick lacks visible idempotency/correlation proof.
+- **PAPER-008 / P1:** Force Paper Tick lacks idempotency/correlation proof.
 - **PAPER-009 / P1:** immutable lifecycle event chain is not exposed.
+- **PAPER-010 / P0-P1:** Force Paper Tick calls an unproven `/api/paper/tick` capability.
+- **PAPER-011 / P0:** direct `run_live_chain.py -> PaperExecutor.execute_trade()` bypasses canonical pre-trade risk authority.
+- **PAPER-012 / P0-P1:** process-local executor IDs/state are restart-unsafe.
+- **PAPER-013 / P1:** missing contract update can reuse last price for MTM/exit logic without explicit stale quality.
+- **PAPER-014 / P1:** realized P&L is not proven after-cost/reconciled.
+- **PAPER-015 / P1:** paper read APIs can collapse load/parse errors into empty/zero-looking truth.
+- **PAPER-016 / P0-P1:** `paper_truth` statically declares safety instead of measured authority.
 - **TRADE-001 / P1-P2:** current Trade tab is scanner/chain context, not a controlled paper-order/risk workstation.
-- **TRADE-002 / P0-P1:** `gain_rank` can be rendered as `GAIN %`.
+- **TRADE-002 / P0-P1:** `gain_rank` can render as `GAIN %`.
 - **TRADE-003 / P1:** `EOD/live` does not prove freshness.
+- **LEGACY-001 / P0-P1:** legacy Streamlit UI retains mutation-oriented controls; deployment exposure remains UNPROVEN.
 
-### Risk retained
+### Risk
 
 - **RISK-001 / P0:** browser supplies risk limits instead of selecting server-owned policy.
 - **RISK-002 / P0:** missing risk policy can use permissive defaults.
@@ -108,139 +116,129 @@ Missing, stale, parse-failed or unproven evidence must never become green, PASS,
 - **RISK-004 / P1:** existing VaR is not a reproducible institutional portfolio VaR contract.
 - **RISK-005 / P0:** execution guardrail fails open on missing market/instrument/trade-count evidence.
 - **RISK-006 / P0:** canonical risk guardrail wiring into execution path is unproven.
-- **RISK-007 / P1:** Risk & Scenarios uses a non-contract `autoGates.active` proxy.
+- **RISK-007 / P1:** Risk & Scenarios uses a non-contract gate proxy.
 - **RISK-008 / P0-P1:** lifecycle gate can promote from position shape instead of immutable lifecycle proof.
-- **RISK-009 / P1:** auto-gate refresh/evaluation errors can be swallowed and old artifacts retained.
+- **RISK-009 / P1:** auto-gate refresh/evaluation errors can retain old artifacts.
 
-## 4. New deep-slice findings — paper mutation, persistence and execution ownership
+## 4. New deep-slice findings — WebSocket, polling, freshness and ordering
 
-### PAPER-010 / P0-P1 — `Force Paper Tick` is an unproven/dead product control
+### WS-001 / P1 — transport OPEN is immediately labeled `live` before data freshness is proven
 
-`dashboard/frontend/src/components/PaperTrading.tsx` renders `Force Paper Tick` and calls `POST /api/paper/tick`. Repository-wide exact searches for `/api/paper/tick` and `paper_tick` found no backend implementation. The current `dashboard/backend/routers/trading.py` exposes `/api/paper`, `/api/pnl`, `/api/positions`, `/api/trades`, `/api/trades/today`, `/api/pnl/today` and other read endpoints, but no paper-tick mutation route.
+In `dashboard/frontend/src/hooks/useData.ts`, `ws.onopen` resets reconnect attempts and executes `setWsStatus('live')`. No heartbeat, market-data event, schema validation or event-age threshold is required before the product declares the WebSocket live.
 
-**Symptom:** the UI advertises a mutation capability whose backend contract is not present in the audited route owner.
+**Root cause:** transport connectivity and data-stream health are represented by one string.
 
-**Real-money/paper impact:** dead controls destroy operator trust; if later patched ad hoc, the mutation could bypass the canonical risk/idempotency/ledger design.
+**Impact:** an idle, stalled or semantically broken socket can look healthy to the operator.
 
-**Canonical solution:** capability-driven UI. Backend exposes a read-only `paper_mutation_capability` contract. The button is hidden/disabled unless the exact route, auth policy, `PreTradeRiskService`, idempotency store and lifecycle ledger are all available on the same runtime revision.
+**Solution:** create `StreamTruth` with separate `transport_state`, `heartbeat_state`, `event_flow_state`, `last_event_at`, `age_ms`, `freshness_threshold_ms`, `schema_state`, `source_state`, `sequence_state`. `onopen` may set only `TRANSPORT_CONNECTED`; `STREAM_HEALTHY` requires fresh valid heartbeat plus fresh domain events.
 
-**Files:** `PaperTrading.tsx`, `dashboard/backend/routers/trading.py` or a new dedicated `paper_mutations.py`, API capability schema/tests.
+**Files:** `dashboard/frontend/src/hooks/useData.ts`, store schema, TopBar/Data Integrity/Broker panels; backend stream envelope/heartbeat owner.
 
-**Closure tests:** route inventory test; browser test proving no dead control; negative route test; capability mismatch test; mutation unavailable => no button; no live-order APIs called.
-
-**Status:** `READY TO PATCH`.
-
-### PAPER-011 / P0 — actual paper position creation bypasses canonical pre-trade risk authority
-
-`scripts/run_live_chain.py::run_cycle()` directly calls `self.paper_executor.execute_trade(...)` when QC passes and signal action is `TRADE`. It then persists an OPEN trade with `TradeHistoryStore`. No `risk_decision_id`, server-owned policy version, portfolio snapshot ID, market truth ID or idempotency key is required before position creation.
-
-**Root cause:** signal/QC and execution are directly coupled; risk is not a mandatory independent authority.
-
-**Solution:** replace direct executor invocation with `PaperMutationService.create_order(candidate_id, market_truth_id, ...)`. That service must call `PreTradeRiskService.evaluate()` and require a fresh explicit PASS before any fill/position event. `PaperExecutor` becomes a simulator behind the service, never a public mutation authority.
-
-**Regression risk:** existing simulations that omit risk evidence will stop creating entries. This is desired fail-closed behavior; tests must add explicit policy/market/portfolio fixtures rather than restoring defaults.
+**Tests:** open socket with zero events => not LIVE; stale heartbeat => STALE; malformed message => SCHEMA_ERROR; valid heartbeat + fresh event => HEALTHY.
 
 **Status:** `READY TO PATCH`.
 
-### PAPER-012 / P0-P1 — paper executor identity/state is process-local and restart-unsafe
+### WS-002 / P0-P1 — heartbeat logic can false-green `live`
 
-`PaperExecutor.__init__()` initializes `self.positions = {}`, `self.trade_history = []`, and `self.next_position_id = 1`. Position IDs are generated as `POS_0001`, `POS_0002`, etc. The executor does not restore sequence/state from a durable ledger before new creation.
+Current heartbeat handling sets error only when `m.market_open && m.stream_ok === false`; every other heartbeat executes `setWsStatus('live')`. Therefore `stream_ok` missing/undefined, market closed, or structurally incomplete heartbeat can still paint LIVE.
 
-**Impact:** restart can lose in-memory lifecycle context and can reuse position IDs unless another layer prevents it. Exactly-once mutation and reconciliation are therefore not proven.
+**Root cause:** boolean negative check instead of an explicit heartbeat contract.
 
-**Solution:** durable append-only lifecycle ledger owns IDs. Use UUID/ULID or database-generated immutable IDs plus `correlation_id`, `candidate_id`, `paper_order_id`, `fill_event_id`, `position_id`, `idempotency_key`. Rebuild materialized open positions from ledger on startup and verify ledger ↔ projection reconciliation before accepting new mutations.
-
-**Status:** `READY TO PATCH`.
-
-### PAPER-013 / P1 — stale/absent contract updates silently reuse the last price
-
-`PaperExecutor.update_positions()` uses the position's last `current_price/current_mid` when the contract is missing from the current data. It then continues P&L calculation and stop/target evaluation without an explicit stale-quality state.
-
-**Impact:** an operator can see apparently current MTM and lifecycle logic while the underlying contract quote is unavailable.
-
-**Solution:** every MTM event requires `DataTruthEnvelope`. Missing contract => `price_quality=STALE_OR_MISSING`; preserve last-good price only for display with watermark and age, but do not trigger fresh-price SL/target logic after freshness TTL. Policy decides bounded stale behavior; default is no new lifecycle trigger.
+**Solution:** heartbeat schema must require `stream_ok`, `market_state`, `source`, `server_time`, `last_source_event_time`, `sequence`, `schema_version`, `runtime_revision`. Missing required fields => `UNKNOWN/SCHEMA_ERROR`, never LIVE. Market closed becomes `MARKET_CLOSED`, not LIVE.
 
 **Status:** `READY TO PATCH`.
 
-### PAPER-014 / P1 — realized P&L is gross and lifecycle costs/reconciliation are incomplete
+### WS-003 / P1 — REST polling and WS writes have no monotonic ordering guard
 
-On close, `PaperExecutor` records realized P&L from entry/current price × quantity. The audited path does not require exit slippage, fees/taxes, fill-quality evidence or an explicit `RECONCILED` terminal event before performance is consumed.
+`useData()` keeps REST core polling active every 20s/60s while the WebSocket simultaneously writes health, paper, P&L, chain, scanner/ranker and market state. State updates do not compare source event time, sequence number, revision or receive time before overwriting each other.
 
-**Impact:** gross simulated P&L can overstate strategy economics and cannot support positive after-cost expectancy claims.
+**Impact:** an older REST response can overwrite a newer WS event, or vice versa, producing time-travel/contradictory UI state.
 
-**Solution:** simulator versioned fill model on entry and exit, configurable slippage, fees/taxes, `gross_pnl`, `costs`, `net_pnl`, reconciliation status and immutable source event times. Performance/readiness consumes only reconciled after-cost outcomes.
+**Solution:** every domain update carries `{event_id, sequence, source_event_time, backend_received_time, snapshot_revision}`. Store reducers accept an update only if it is newer according to domain ordering rules. REST is fallback/snapshot truth, not an unversioned competing writer.
 
-**Status:** `READY TO DESIGN/PATCH`.
-
-### PAPER-015 / P1 — paper read APIs swallow file/JSON errors into empty/zero-looking truth
-
-`dashboard/backend/routers/trading.py::_load_json()` catches all exceptions and returns defaults. `/api/paper` and `/api/pnl` then construct zero/empty summaries when files are absent or invalid.
-
-**Impact:** missing/corrupt state can look like valid zero P&L / zero trades / no positions.
-
-**Solution:** `_load_json` returns a typed load result `{quality_state, error_code, source_file, mtime, parsed_value}`. Parse/file errors propagate as `ERROR/NO_DATA`; only an explicitly valid empty ledger can be `PROVEN_EMPTY`.
+**Regression risk:** previously accepted out-of-order updates will be rejected; diagnostics must expose rejected-old-event counts.
 
 **Status:** `READY TO PATCH`.
 
-### PAPER-016 / P0-P1 — `paper_truth` hard-codes negative safety claims instead of reporting measured authority
+### WS-004 / P1 — chain spot WS update can retain an old spot and still mark it live
 
-`dashboard/backend/routers/trading.py::_truth()` always returns `paper_order_mode="ANALYZER_PAPER_ONLY"`, `live_trading_allowed=False` and `broker_order_endpoints_called=False`. Those fields are static declarations, not execution telemetry tied to router state, safety revision or audited calls.
+`chain_spots_update` computes `spot: Number(info.spot || prev.spot || 0)`, falls back source to `'dhan'`, stamps a new `stream_tick_at`, and sets `live` from the UI market-open flag. If the incoming event lacks spot/source, an old spot can be retained while the new envelope appears current/live.
 
-**Impact:** UI can treat declarations as proof and display green `PAPER SAFE` even when authoritative runtime safety is unavailable.
-
-**Solution:** remove safety authority from `_truth()`. `paper_truth` contains ledger provenance only; global `SafetyTruth` owns mode/router/kill-switch. Broker-order call evidence, if required, comes from immutable router audit telemetry with revision/time/evidence ID.
+**Solution:** do not stamp freshness when the field was not supplied by the event. Track field-level provenance or reject incomplete chain-spot events. `live=true` requires fresh source event time and validated Dhan provenance, not merely market-open state.
 
 **Status:** `READY TO PATCH`.
 
-### LEGACY-001 / P0-P1 — legacy Streamlit UI still contains mutation-oriented controls
+### WS-005 / P1 — market-top WS events become `status:'ok'` without freshness/schema proof
 
-`dashboard/app.py` contains `Submit gated order`, `Square off all`, and `Cancel` controls wired to `/place-order`, `/emergency-exit` and order-delete calls. This run did not prove that this Streamlit surface is deployed, so runtime exposure is **UNPROVEN**, not asserted. Nevertheless it is dangerous deployment residue because it conflicts with the analyzer/paper/live-off product architecture.
+`market_top_update` builds rankings and stores `status:'ok'`, source `ws_market_top_micro`, and recommendation `WATCH` without validating event age, sequence, schema version or provenance completeness.
 
-**Solution:** classify `dashboard/app.py` as legacy/non-deployable or remove mutation controls entirely. CI/deployment guard must assert the production entrypoint does not include legacy mutation UI. Server mutation routes remain independently fail-closed even if a legacy client is accidentally deployed.
+**Solution:** validate `MarketTopEnvelope`; ranking remains `UNKNOWN/STALE` when provenance/freshness is incomplete. Scanner rank stays distinct from prediction probability and realized gain.
 
-**Closure:** deployment-entrypoint test, route/control inventory, grep/AST guard for forbidden production mutation controls, Cloud Run exact revision proof, browser navigation proof showing only V5 product shell.
+**Status:** `READY TO PATCH`.
 
-**Status:** `READY TO PATCH` for quarantine/guard; deployment exposure remains `UNPROVEN`.
+### WS-006 / P1 — malformed WebSocket payloads are silently ignored
 
-## 5. Verification counters
+The WS message handler catches JSON/processing failures and performs no alert/status transition.
 
-Independent paths only; repeated reading of the same artifact does not increment.
+**Impact:** schema drift or corrupted events can silently stop updating some panels while transport remains green.
 
-| Finding | Counter | State |
-|---|---:|---|
-| AUTH-001 | `3/20` | OPEN |
-| AUTH-002 | `2/20` | OPEN |
-| AUTH-003 | `2/20` | OPEN |
-| UI-001 | `9/20` | OPEN — paper read-file fallback + stale MTM paths added |
-| UI-002 | `3/20` | OPEN |
-| UI-003 | `3/20` | OPEN |
-| UI-005 | `8/20` | OPEN — paper router defaults added |
-| UI-006 | `5/20` | OPEN — corrupt/missing ledger vs true empty added |
-| UI-007 | `3/20` | OPEN — MTM data truth requirement added |
-| UI-009 | `6/20` | OPEN — static `_truth()` safety declaration added |
-| UI-011 | `3/20` | OPEN — execution insertion point mapped |
-| UI-016 | `4/20` | OPEN |
-| CHAIN-001 | `1/20` | OPEN |
-| CHAIN-002 | `2/20` | OPEN |
-| CHAIN-003 | `1/20` | OPEN |
-| CHAIN-004 | `1/20` | OPEN |
-| CHAIN-005 | `1/20` | OPEN |
-| READY-001 | `4/20` | OPEN — static paper safety truth path added |
-| READY-003 | `2/20` | OPEN |
-| PAPER-001 | `2/20` | OPEN — backend `_truth()` independent path |
-| PAPER-003 | `2/20` | OPEN — read API zero fallback independent path |
-| PAPER-005 | `2/20` | OPEN — `_truth()` negative-evidence declaration path |
-| PAPER-008 | `2/20` | OPEN — route capability absent/unproven |
-| PAPER-009 | `2/20` | OPEN — executor/persistence path has no immutable event chain |
-| PAPER-010..016 | `1/20` each | OPEN |
-| RISK-001..009 | `1/20` each | OPEN |
-| LEGACY-001 | `1/20` | OPEN / deployment exposure UNPROVEN |
+**Solution:** increment typed parse/schema error counters, preserve redacted sample metadata, set affected domain to `SCHEMA_ERROR`, surface alert/observability entry, and trip stream health after a bounded threshold.
 
-No finding is `LOCKED-20X`.
+**Status:** `READY TO PATCH`.
 
-## 6. Canonical truth contracts
+### WS-007 / P1 — last-good retention preserves the previous status label
 
-### 6.1 `SafetyTruth`
+`keepLastGood()` sets `stale:true` but retains `status: previous.status || 'TRANSIENT_CACHE'`. A previously `ok/live` status can therefore coexist with stale data if downstream components key on status rather than the stale flag.
+
+**Solution:** stale wrapper has authoritative quality state `STALE_LAST_GOOD`; original status is moved to `last_good_status` for diagnostics only. Rendering must use quality state first.
+
+**Status:** `READY TO PATCH`.
+
+### WS-008 / P1 — standalone `useWebSocket.ts` duplicates connection/fallback policy and appears unused
+
+The repository contains a second WebSocket hook with different reconnect cadence, market-hours behavior and polling fallback. Repository search found its definition but no independent consumer in the current V5 frontend evidence set.
+
+**Impact:** duplicate connection policies create drift/dead-code risk and make future use likely to reintroduce inconsistent stream semantics.
+
+**Solution:** remove/quarantine the unused hook or make a single `StreamTransportService` the only transport owner. CI should reject a second direct `new WebSocket(...)` owner outside approved transport modules.
+
+**Status:** `READY TO PATCH` after import/build proof confirms no consumer.
+
+### WS-009 / P0-P1 — WebSocket health proof does not actually prove a WebSocket connection
+
+`scripts/websocket_tick_health_proof.py` fetches `/api/state`, reads `last_tick_age_sec`, broker state and refresh interval, and can PASS using REST polling. It defines `/ws/stream` only as a string and never opens a WebSocket. The script note explicitly allows REST SSOT polling for analyzer PASS.
+
+**Impact:** a proof named WebSocket Tick Health can pass without WebSocket transport/e2e event evidence; this cannot support institutional streaming-readiness claims.
+
+**Solution:** split proof into `REST_SSOT_FRESHNESS` and `WEBSOCKET_STREAM_HEALTH`. WS proof must authenticate, connect, receive server hello/heartbeat plus at least one valid event during market conditions or a deterministic test fixture, verify sequence/time/schema/source, calculate event age and reconnect behavior, then store exact runtime revision evidence.
+
+**Status:** `READY TO PATCH`.
+
+### WS-010 / P0-P1 — backend `last_tick_age_sec` is artificially capped and parse failures can appear bounded
+
+`dashboard/backend/state_sync_service.py` derives age from state timestamps, but on parse failure substitutes `_sync_interval`, then publishes `last_tick_age_sec = min(age_sec, _sync_interval * 2)`. An arbitrarily old source can therefore never report older than twice the sync interval through this metric.
+
+**Impact:** stale state can look bounded/fresh enough for downstream proofs; current `websocket_tick_health_proof.py` consumes this field.
+
+**Solution:** never cap source age. Publish separate `source_event_age_sec`, `state_sync_age_sec`, `last_successful_source_event_at`, `last_successful_sync_at`; parse error => `age=null`, `quality=SCHEMA_ERROR`. Proofs must use uncapped source-event age.
+
+**Status:** `READY TO PATCH`.
+
+### WS-011 / P1 — `/ws/stream` backend capability is not proven by current repository search
+
+Frontend code and reports refer to `/ws/stream`, but this iteration's repository searches did not locate a concrete FastAPI WebSocket route implementation. This is recorded as **UNPROVEN**, not asserted absent, because search indexing can miss route construction/import indirection.
+
+**Solution:** route inventory must enumerate WebSocket routes from the actual ASGI app at test/runtime, record owning module, auth policy and message schema. UI connection controls depend on this capability result.
+
+**Status:** `UNPROVEN / READY TO VERIFY`.
+
+### Existing runtime artifact regression check
+
+`reports/latest/websocket_tick_health/summary.md` at application HEAD reports `Pass: False` and tick age `5.03`. This confirms the repository's latest stored WebSocket-health artifact is not a PASS; it does not establish current runtime state.
+
+## 5. Canonical truth contracts
+
+### 5.1 `SafetyTruth`
 
 ```text
 mode: ANALYZER | PAPER | LIVE | UNKNOWN
@@ -257,7 +255,7 @@ age_ms
 proof_status: PROVEN | STALE | UNKNOWN | ERROR
 ```
 
-### 6.2 `DataTruthEnvelope`
+### 5.2 `DataTruthEnvelope`
 
 ```text
 source
@@ -278,277 +276,177 @@ source_revision
 runtime_revision
 ```
 
-### 6.3 `PaperLifecycleTruth`
+### 5.3 `StreamTruth` — NEW
 
 ```text
-correlation_id
-candidate_id
-prediction_evidence_id
-paper_order_id
-idempotency_key
-simulator_id
-simulator_version
-fill_event_id
-requested_price
-fill_price
-entry_slippage
-exit_slippage
-fees_taxes
-market_truth_id
-market_event_time
-risk_decision_id
-position_id
-exit_trigger_id
-exit_event_id
-gross_pnl
-net_pnl
-reconciliation_status
-ledger_revision
-source_revision
+transport_state: DISCONNECTED | CONNECTING | CONNECTED | ERROR
+stream_state: HEALTHY | STALE | MARKET_CLOSED | DEGRADED | UNKNOWN | SCHEMA_ERROR
+heartbeat_state: FRESH | STALE | MISSING | INVALID
+last_heartbeat_at
+last_source_event_at
+last_backend_receive_at
+last_frontend_receive_at
+event_age_ms
+freshness_threshold_ms
+last_sequence
+rejected_old_events
+parse_error_count
+schema_version
+source
+provider_session
+rest_fallback_state
+rest_snapshot_revision
 runtime_revision
-```
-
-### 6.4 `GateTruth`
-
-```text
-gate_id
-status: PASS | FAIL | PENDING | STALE | ERROR | UNKNOWN
-threshold
-observed_value
-evidence_id
-source_revision
-runtime_revision
-verified_at
-age_ms
-policy_version
-reason
-```
-
-### 6.5 `RiskPolicy` — server-owned only
-
-```text
-policy_id
-policy_version
-policy_hash
-environment
-account_scope
-strategy_scope
-max_positions
-max_gross_exposure
-max_net_exposure
-max_daily_loss
-max_drawdown
-max_concentration_pct
-max_delta
-max_gamma
-max_vega
-min_liquidity
-max_spread_pct
-max_data_age_ms
-allowed_instruments
-valid_from
-valid_until
 source_revision
 ```
 
-### 6.6 `PreTradeRiskTruth`
+### 5.4 `PaperLifecycleTruth`
 
-```text
-risk_decision_id
-candidate_id
-policy_id
-policy_version
-portfolio_snapshot_id
-market_truth_id
-evaluated_at
-expires_at
-enforcement_state: PASS | FAIL | UNKNOWN | ERROR
-checks[]: {check_id,status,observed,threshold,evidence_id,reason}
-source_revision
-runtime_revision
-```
+`correlation_id`, candidate/prediction IDs, paper order/fill/position/exit IDs, idempotency key, simulator version, market truth ID/time, risk decision ID, entry/exit slippage, fees/taxes, gross/net P&L, reconciliation state, ledger/runtime/source revisions.
 
-### 6.7 `PaperMutationCapability`
+### 5.5 `GateTruth`, `RiskPolicy`, `PreTradeRiskTruth`, `PaperMutationCapability`
 
-```text
-mutation_available: boolean
-route_version
-auth_policy_version
-risk_service_version
-ledger_version
-idempotency_store_state
-simulator_version
-runtime_revision
-proof_status: PROVEN | STALE | UNKNOWN | ERROR
-reason
-```
+Retain the existing fail-closed contracts: semantic gate status with evidence/revision/age; server-owned immutable risk policy; fresh pre-trade risk decision; capability-driven paper mutation only when exact-revision proof is `PROVEN`.
 
-The frontend renders an actionable paper mutation control only when this capability is exact-revision `PROVEN` and live router remains disabled.
+## 6. Canonical remediation roadmap
 
-## 7. Canonical remediation roadmap
+- **SOL-01 Auth/session — READY TO PATCH:** correct login body, cookie-only browser auth, remove raw API key storage, gate all polling/WS startup behind auth, add TTL/revocation tests.
+- **SOL-02 SafetyTruth — READY TO PATCH:** one backend safety authority for TopBar/Truth/E2E/Paper/Live Gate; missing/stale => UNKNOWN.
+- **SOL-03 DataTruthEnvelope — READY TO PATCH:** remove production `||0`/plausible defaults; explicit provenance/time/age/schema/quality; only valid empty ledger/account result becomes `PROVEN_EMPTY`.
+- **SOL-04 Semantic readiness — READY TO PATCH:** HTTP 200/object presence never equals PASS; lifecycle, reconciliation, enforceable risk and positive after-cost expectancy remain mandatory.
+- **SOL-05 Options/Greeks — READY TO DESIGN/PATCH:** complete row schema, explicit IV units/model assumptions, full Greeks and portfolio aggregation.
+- **SOL-06 Immutable paper lifecycle — READY TO PATCH:** canonical paper mutation service, durable IDs/idempotency/event ledger, restart replay/reconciliation, costed P&L, stale MTM inhibition.
+- **SOL-07 Scanner contract — READY TO PATCH:** nullable distinct rank/score/probability/forecast/realized fields; no rank→percent fallback.
+- **SOL-08 GCP provenance — READY TO PATCH/DESIGN:** remove Render instructions; exact frontend/backend commit, Cloud Run revision, image digest, deploy time, policy/entrypoint proof.
+- **SOL-09 PreTradeRiskService — READY TO PATCH:** server-owned policy and mandatory fresh PASS before every paper mutation; UNKNOWN/ERROR denies.
+- **SOL-10 Legacy UI quarantine — READY TO PATCH:** production entrypoint guard; no legacy mutation controls in deployed navigation/runtime.
+- **SOL-11 StreamTruth + ordered state merge — NEW / READY TO PATCH:** consolidate WebSocket transport ownership; separate transport from stream health; validate heartbeat/event schemas; monotonic per-domain merge; uncapped event age; typed REST fallback; stale watermark; observability counters.
 
-### SOL-01 — dashboard auth/session
+### SOL-11 ordered implementation
 
-Fix login body; cookie-only browser auth; remove raw-key `sessionStorage`; auth-gate all polling; add TTL/revocation/replay tests.
+1. Define backend `StreamEventEnvelope` and frontend `StreamTruth` types.
+2. Require event ID/sequence/source event time/backend receive time/schema/source/runtime revision on WS domain events.
+3. Change WS `onopen` to `TRANSPORT_CONNECTED`, never `live`.
+4. Validate heartbeat schema; missing fields => UNKNOWN/SCHEMA_ERROR.
+5. Add domain reducers with monotonic sequence/time/revision checks so REST cannot overwrite newer WS data.
+6. Replace `keepLastGood` status preservation with `STALE_LAST_GOOD` quality state.
+7. Reject/inhibit incomplete `chain_spots_update`; never refresh timestamp using retained old spot.
+8. Validate market-top envelope before `status=ok`.
+9. Surface parse/schema errors; no silent catch.
+10. Remove/quarantine unused duplicate `useWebSocket.ts` or make it the sole approved transport service.
+11. Replace capped backend tick age with uncapped source-event age + independent sync age.
+12. Split REST freshness proof from true WS proof and add ASGI WebSocket route-inventory test.
+13. UI Data/Broker Health screen displays transport, heartbeat, event age, sequence, source, REST fallback and rejected-old-event counts separately.
 
-**Status:** `READY TO PATCH`.
+**SOL-11 PASS criteria:** connected socket with no data is not LIVE; incomplete heartbeat never green; source-event age is uncapped; malformed events surface error; stale last-good is visibly stale; older REST/WS update cannot overwrite newer domain state; no duplicate WebSocket transport owner; WS proof actually opens the socket; exact route/auth/schema owner is proven; live router stays locked.
 
-### SOL-02 — authoritative safety truth
+**Rollback/fail-safe:** if envelope/schema/order capability is absent, keep read-only last-good data visibly STALE and inhibit any mutation. Never fall back to an unversioned live label.
 
-One backend `SafetyTruth` feeds TopBar, proof bar, Truth Control, E2E, Paper Trading and Live Gate. Missing/stale => UNKNOWN; UI never derives live/order safety.
+## 7. Verification counters
 
-**Status:** `READY TO PATCH`.
+Independent paths only; rereading the same artifact does not increment.
 
-### SOL-03 — typed data/null semantics
+| Finding | Counter | State |
+|---|---:|---|
+| AUTH-001 | `3/20` | OPEN |
+| AUTH-002 | `2/20` | OPEN |
+| AUTH-003 | `2/20` | OPEN |
+| UI-001 | `11/20` | OPEN — WS stale-retention + capped-age paths added |
+| UI-002 | `3/20` | OPEN |
+| UI-003 | `4/20` | OPEN — chain spot WS fallback source path added |
+| UI-005 | `9/20` | OPEN — WS live/default semantics added |
+| UI-006 | `5/20` | OPEN |
+| UI-007 | `6/20` | OPEN — WS/REST ordering and freshness paths added |
+| UI-009 | `6/20` | OPEN |
+| UI-011 | `3/20` | OPEN |
+| UI-016 | `5/20` | OPEN — transport vs source/feed truth added |
+| CHAIN-001 | `1/20` | OPEN |
+| CHAIN-002 | `3/20` | OPEN — WS chain spot provenance gap added |
+| CHAIN-003..005 | `1/20` each | OPEN |
+| READY-001 | `4/20` | OPEN |
+| READY-003 | `2/20` | OPEN |
+| PAPER-001 | `2/20` | OPEN |
+| PAPER-003 | `2/20` | OPEN |
+| PAPER-005 | `2/20` | OPEN |
+| PAPER-008 | `2/20` | OPEN |
+| PAPER-009 | `2/20` | OPEN |
+| PAPER-010..016 | `1/20` each | OPEN |
+| RISK-001..009 | `1/20` each | OPEN |
+| LEGACY-001 | `1/20` | OPEN / exposure UNPROVEN |
+| WS-001..010 | `1/20` each | OPEN |
+| WS-011 | `1/20` | UNPROVEN / verify route inventory |
 
-Remove `||0`/plausible production defaults; add provenance/event time/receive time/age/schema/quality; only valid empty data becomes `PROVEN_EMPTY`.
-
-**Status:** `READY TO PATCH` frontend/read APIs; backend envelope implementation required.
-
-### SOL-04 — semantic readiness
-
-HTTP 200/object presence never equals PASS. Paper lifecycle, reconciliation, risk and positive after-cost expectancy remain required; stale/error propagates.
-
-**Status:** `READY TO PATCH`.
-
-### SOL-05 — Option Chain + Greeks
-
-Versioned chain row schema with bid/ask/LTP/OI/ΔOI/volume/IV/Delta/Gamma/Theta/Vega/Rho, explicit IV units and Greeks model/source assumptions; aggregate portfolio Greeks.
-
-**Status:** warming/PCR `READY TO PATCH`; complete provenance contract `READY TO DESIGN/PATCH`.
-
-### SOL-06 — immutable paper lifecycle and reconciliation
-
-This run upgrades SOL-06 from design-only to an implementation-ready architecture.
-
-**Exact ownership changes:**
-
-- `dashboard/frontend/src/components/PaperTrading.tsx`: capability-driven mutation button; no direct optimistic assumptions.
-- new `dashboard/backend/routers/paper_mutations.py` or equivalent dedicated mutation owner: authenticated paper-only mutation endpoint.
-- new `dashboard/backend/paper_mutation_service.py`: orchestration authority.
-- `src/trading/paper_executor.py`: simulator only; no direct identity authority; no process-local sequencing as canonical ID source.
-- `scripts/run_live_chain.py`: call mutation service instead of direct `execute_trade()`.
-- `src/storage/trade_history.py` or new durable ledger store: append-only lifecycle/idempotency ledger.
-- `dashboard/backend/routers/trading.py`: read projections return typed ledger/data quality; no static safety authority.
-- tests: route inventory, lifecycle, restart/replay, idempotency, stale quote, reconciliation, costed P&L.
-
-**Ordered implementation:**
-
-1. Introduce durable lifecycle schema and immutable IDs.
-2. Add idempotency store and unique constraint on mutation key/candidate intent.
-3. Add `PaperMutationCapability` endpoint.
-4. Implement `PaperMutationService.create_order()`.
-5. Require `PreTradeRiskTruth=PASS`, current `DataTruthEnvelope`, candidate/evidence IDs.
-6. Call versioned simulator for fill; append `PAPER_ORDER_CREATED` then `SIM_FILL` then `POSITION_OPEN` atomically/transactionally where supported.
-7. Replace direct `run_live_chain.py -> PaperExecutor.execute_trade` path.
-8. Rebuild materialized positions from ledger on startup; reconcile before accepting new mutations.
-9. MTM events carry source/time/age; stale/missing quote cannot trigger fresh-price SL/target logic.
-10. Exit path records exit slippage/fees/taxes and `gross_pnl/net_pnl`; final state requires `RECONCILED`.
-11. React Force Paper Tick renders only from proven capability; otherwise hidden/disabled with exact reason.
-12. Remove safety declarations from `paper_truth`; consume global `SafetyTruth`.
-
-**PASS criteria:** no paper position can exist without candidate ID, fresh risk PASS, market truth ID, idempotency key, order/fill events and durable ledger entry; restart cannot duplicate/reuse IDs; same idempotency key returns same result; stale quote cannot create a fresh exit; missing/corrupt ledger returns ERROR not zero/empty; after-cost P&L reconciles to events; live order endpoints remain uncalled.
-
-**Rollback/fail-safe:** if ledger/risk/data capability is unavailable, inhibit new paper mutation and keep read-only last-good data explicitly stale; never fall back to direct executor creation.
-
-**Status:** `READY TO PATCH`.
-
-### SOL-07 — scanner metric contract
-
-Distinct nullable rank/score/forecast/realized/probability fields; no rank→percent fallback; validated predictions require ledger evidence ID.
-
-**Status:** `READY TO PATCH`.
-
-### SOL-08 — Google Cloud provenance
-
-Remove active Render instructions; expose backend/frontend commits, Cloud Run revision, image digest, deploy time and policy version; verify production entrypoint excludes legacy Streamlit mutation UI.
-
-**Status:** wording/quarantine guard `READY TO PATCH`; runtime metadata proof required.
-
-### SOL-09 — canonical pre-trade risk authority
-
-Server-owned immutable `RiskPolicy`; `PreTradeRiskService.evaluate()` is mandatory before every paper mutation and any future live router. Missing policy/data/instrument/ledger state => UNKNOWN/ERROR and deny. Persist fresh `risk_decision_id` into lifecycle.
-
-**Status:** `READY TO PATCH`; exact insertion point is now mapped to the replacement of direct `run_live_chain.py -> PaperExecutor.execute_trade()`.
-
-### SOL-10 — legacy UI quarantine
-
-Mark `dashboard/app.py` non-production/legacy, remove mutation controls or isolate behind non-deployable development packaging. Add CI guard that the Cloud Run entrypoint is the V5 FastAPI/React product and legacy Streamlit mutation controls are absent from deployed navigation/runtime.
-
-**Status:** `READY TO PATCH`; actual runtime exposure remains `UNPROVEN` until Cloud Run revision/entrypoint proof is collected.
+No finding is `LOCKED-20X`.
 
 ## 8. Prioritized implementation order
 
-### P0 Wave 1 — false-green/fail-open elimination
+### P0 Wave 1 — eliminate false-green/fail-open behavior
 
-1. SOL-01 auth body + auth-gated polling.
+1. SOL-01 auth body + auth-gated polling/stream startup.
 2. SOL-02 authoritative `SafetyTruth`.
-3. SOL-09 server-owned risk + mandatory pre-trade authority.
-4. SOL-06 lifecycle IDs/idempotency/ledger + remove direct executor mutation path.
-5. PAPER-010 capability-driven removal of dead Force Paper Tick control.
-6. SOL-04 semantic readiness/lifecycle gate repair.
-7. SOL-03 remove zero/live/PCR/safety defaults.
-8. SOL-10 legacy mutation UI quarantine.
-9. SOL-07 rank-as-percent repair.
+3. SOL-11 transport/stream separation, heartbeat schema, uncapped age and ordered merge.
+4. SOL-09 server-owned risk + mandatory pre-trade authority.
+5. SOL-06 durable lifecycle/idempotency/ledger and remove direct executor mutation path.
+6. capability-driven removal of dead/unproven Paper Tick control.
+7. SOL-04 semantic readiness repair.
+8. SOL-03 remove zero/live/PCR/safety defaults.
+9. SOL-10 legacy mutation UI quarantine.
+10. SOL-07 rank-as-percent repair.
 
-**Wave-1 success criterion:** no missing field/file/route/policy/quote, parse error, HTTP success, object existence, stale last-good value or browser default can create green safety/readiness/risk/P&L/mutation truth.
+**Wave-1 success:** no missing field/file/route/policy/quote, parse error, HTTP success, object existence, socket OPEN, incomplete heartbeat, stale last-good value, out-of-order REST response or browser default can create green safety/readiness/risk/P&L/stream/mutation truth.
 
-### P1 Wave 2 — prove paper/market/account economics
+### P1 Wave 2 — prove market/account/paper economics
 
-1. complete `DataTruthEnvelope`;
-2. lifecycle restart/replay/reconciliation;
-3. costed fills/P&L;
-4. Option Chain + complete Greeks provenance;
-5. portfolio/scenario risk;
-6. exact Cloud Run runtime/source/entrypoint provenance.
+Complete market/broker provenance; restart-safe lifecycle reconciliation; costed fills/P&L; Options + full Greeks provenance; portfolio/scenario risk; exact Cloud Run runtime/source/entrypoint provenance; true WebSocket runtime proof.
 
 ### P2 Wave 3 — institutional operator quality
 
-Responsive tablet/mobile, accessibility, command palette/search, drilldowns, observability/SLO/incidents, security/session settings and audit export.
+Responsive tablet/mobile, accessibility, keyboard/focus, command palette/search, drilldowns, observability/SLO/incidents, security/session settings and audit export.
 
 ## 9. Product information architecture target
 
 1. **Command Center** — Overview + Decision Intel + authoritative truth strip.
 2. **Market / Scanner** — watch, scanner, ranker, signals.
-3. **Options & Greeks** — full chain, IV/OI/liquidity, complete Greeks.
+3. **Options & Greeks** — full chain, IV/OI/liquidity, Greeks.
 4. **AI Decision Audit** — Genesis Brain + Prediction Audit + calibration/evidence.
-5. **Paper / Trade Lifecycle** — capability-driven paper ticket/tick, immutable events, fills, positions, P&L, reconciliation.
-6. **Portfolio & Risk** — server-owned policy, current risk decision, exposure, aggregate Greeks, scenarios.
-7. **Data & Broker Health** — provenance/freshness/auth/read/feed truth.
-8. **Readiness / Proof** — semantic gates, E2E proof, Live Gate.
-9. **Observability** — alerts, logs, errors, latency, deployment/runtime truth.
-10. **Security / Settings** — sessions, policy versions, permissions, audit export, non-authoritative UI preferences.
+5. **Paper / Trade Lifecycle** — capability-driven ticket, immutable orders/fills/positions/P&L/reconciliation.
+6. **Portfolio & Risk** — server-owned policy, exposure, aggregate Greeks, scenarios.
+7. **Data & Broker Health** — transport/heartbeat/source/freshness/auth/account reads and fallback truth.
+8. **Readiness / Proof** — semantic E2E gates + Live Gate.
+9. **Observability** — alerts, logs, schema/parse errors, latency, stream reconnects and deployment truth.
+10. **Security / Settings** — sessions, policy versions, permissions, audit export and non-authoritative UI preferences.
 
-Current repo tabs remain represented through this rationalized hierarchy; no conceptual rename implies that backend capability already exists.
+Current repository tabs remain represented through this rationalized hierarchy; a conceptual rename never implies implemented backend capability.
 
-## 10. Product UI visual evolution — V7
+## 10. Product UI visual evolution — V8
 
-New concept: **Paper Execution Control V7**.
+New concept: **Data Stream & Broker Health V8**.
 
-Changes from V5 paper lifecycle concept:
+Changes driven by this slice:
 
-- Force Paper Tick is no longer assumed to exist; it is hidden until backend capability is exact-revision proven.
-- Mutation starts from candidate/evidence/risk/market/idempotency IDs, not direct position creation.
-- Server validation pipeline visibly separates auth, mutation policy, market truth, pre-trade risk, duplicate protection, simulator and ledger append.
-- Lifecycle is represented as immutable event stream rather than only a positions table.
-- Restart reconciliation and duplicate-idempotency checks are first-class operator truth.
-- Live order control is permanently locked.
-- Missing route/risk/ledger capability is shown as PENDING/UNKNOWN, never a clickable dead button.
+- separates WebSocket transport connected from data stream healthy;
+- exposes heartbeat, last source event, event age and freshness TTL;
+- separates Dhan REST auth, feed/session, option cache, account reads and market state;
+- makes REST fallback visible instead of silently competing with WS;
+- adds event sequence/schema/source/quality columns;
+- stale data is watermarked and cannot refresh itself by reusing old values;
+- malformed payload becomes SCHEMA_ERROR/alert instead of silent ignore;
+- execution eligibility is INHIBITED when stream truth is unknown/stale;
+- live router remains locked.
 
-Visual artifact generated for this iteration: `Genesis_System3_Paper_Execution_Control_Target_V7.png`.
+Visual artifact: `Genesis_System3_Data_Stream_Broker_Health_Target_V8.png`.
 
 ## 11. Positive foundations to preserve
 
-- shared UI design tokens/numeric styling and reduced-motion direction;
-- semantic sidebar/ARIA foundations;
+- WS reconnect uses exponential backoff + jitter in the main V5 data hook;
+- REST polling intervals are already reduced relative to earlier Dhan-stampede behavior;
+- shared UI tokens/numeric styling and reduced-motion direction;
 - visible pending states in unfinished workspaces;
 - scanner-vs-prediction distinction direction;
-- wrong-symbol option-chain suppression;
+- wrong-symbol chain suppression;
 - source/snapshot/stale messaging foundation;
-- bid/ask <=0 rendered missing rather than fake;
 - Live Gate approval does not automatically enable live trading;
-- Paper Trading states that Dhan production is not a paper sandbox and local fills are simulated;
-- `PaperExecutor` max-position guard remains useful as defense-in-depth after canonical risk enforcement.
+- Paper Trading states Dhan production is not a paper sandbox and local fills are simulated.
 
 These are foundations, not readiness proof.
 
@@ -562,21 +460,22 @@ Remain open until exact-revision proof closes them:
 - `MULTI_DAY_STABILITY_NOT_PROVEN`
 - `POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN`
 - `REAL_PAPER_LIFECYCLE_NOT_PROVEN`
+- `WEBSOCKET_STREAM_HEALTH_NOT_PROVEN`
 
 `LIVE_TRADING_DISABLED_BY_DESIGN` remains required audit posture, not a defect.
 
 ## 13. Closure standard
 
-A finding becomes `CLOSED` only when evidence is tied to the exact changed revision: source fix inspected; positive/negative tests; build/static/type checks; unit/integration/browser tests; route inventory; network/console proof; frontend/backend schema reconciliation; restart/idempotency/reconciliation tests; runtime/deployment proof where required; analyzer/live-off unchanged; no contradictory independent evidence.
+A finding becomes `CLOSED` only when evidence is tied to the exact changed revision: source fix inspected; positive/negative tests; static/type/build checks; unit/integration/browser tests; route inventory; console/network proof; schema reconciliation; ordering/reconnect/staleness tests where applicable; restart/idempotency/reconciliation tests; runtime/deployment proof where required; analyzer/live-off unchanged; no contradictory independent evidence.
 
 ## 14. Next audit / solution slices
 
-1. **WebSocket/polling truth** — reconnect/backoff, heartbeat, stale retention, ordering, duplicate subscriptions, event timestamps and browser polling interaction.
-2. **Option-chain backend normalization** — exact Dhan normalizer, IV/Greeks owner, timestamp/schema path.
-3. **Observability / Cloud Run provenance** — source/runtime revision, image digest, production entrypoint, latency/errors/browser failures/dependency truth.
-4. **DB/state-store consistency** — `TradeHistoryStore`, JSON state files, SQLite/other stores, locking/concurrency, atomicity and duplicate state authorities.
-5. **Responsive/accessibility** — desktop/tablet/mobile, keyboard/focus/live regions/dense-table behavior.
+1. **Option-chain backend normalization** — exact Dhan normalizer, timestamps, cache ownership, IV/Greeks computation and schema.
+2. **Observability / Cloud Run provenance** — source/runtime revision, image digest, production entrypoint, browser/runtime errors and dependencies.
+3. **DB/state-store consistency** — TradeHistoryStore, JSON/state store, locking/concurrency, atomicity and duplicate authorities.
+4. **Responsive/accessibility** — desktop/tablet/mobile, keyboard/focus/live regions/dense tables.
+5. **AI/ML/prediction ledger** — calibration, frozen cutoff, model/hash, drift and realized after-cost outcomes.
 
 ## 15. Hard safety rule
 
-A green UI, successful build, endpoint HTTP 200, zero-valued risk/P&L, static `PAPER SAFE`, human approval, absent route error, missing market data or a process-local simulator never substitutes for source/freshness/lifecycle/enforceable risk/reconciliation/positive after-cost expectancy/exact runtime proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
+A green UI, successful build, endpoint HTTP 200, socket OPEN, heartbeat object existence, zero-valued risk/P&L, static `PAPER SAFE`, human approval, stale last-good value, capped age metric, missing market data or a process-local simulator never substitutes for authoritative source/freshness/ordering/lifecycle/enforceable risk/reconciliation/positive after-cost expectancy/exact runtime proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
