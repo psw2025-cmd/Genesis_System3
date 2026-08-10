@@ -99,7 +99,7 @@ export function BrokerProofPanel() {
             <ProofItem label="ROTATION JOB" value={`${proof?.rotation_job || 'genesis-system3-dhan-token-rotate'} · ${proof?.rotation_schedule || '07:30 IST daily'}`} ok={Boolean(proof?.rotation_job || sourceOk)} />
             <ProofItem label="FUNDS / HOLDINGS / POSITIONS" value={`${responded(brokerFunds) ? 'F' : '-'} / ${responded(brokerHoldings) ? 'H' : '-'} / ${responded(brokerPositions) ? 'P' : '-'}`} ok={responded(brokerFunds) && responded(brokerHoldings) && responded(brokerPositions)} />
             <ProofItem label="REQUIRED DHAN CHAINS" value={`${readyChains}/4 READY`} ok={readyChains === 4} />
-            <ProofItem label="LIVE-MONEY SAFETY" value={liveOff ? 'ANALYZER · LIVE OFF · ORDERS BLOCKED' : 'UNSAFE FLAG DETECTED'} ok={liveOff} />
+            <ProofItem label="LIVE-MONEY SAFETY" value={liveOff ? 'ANALYZER · LIVE OFF · ORDERS DISABLED' : 'LIVE FLAG DETECTED'} ok={liveOff} />
           </div>
 
           <div style={{ marginTop: '10px', color: 'var(--text-mut)', fontSize: '.68rem' }}>

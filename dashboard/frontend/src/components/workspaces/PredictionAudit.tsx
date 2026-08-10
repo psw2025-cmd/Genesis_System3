@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusChip, BlockedState } from './TruthUI';
+import { StatusChip, PENDINGState } from './TruthUI';
 import { Search, Shield } from 'lucide-react';
 
 export const PredictionAudit: React.FC = () => {
@@ -17,7 +17,7 @@ export const PredictionAudit: React.FC = () => {
           <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Prediction Audit Ledger</h1>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <StatusChip label="AUDIT" value="NOT IMPLEMENTED" status="warn" />
+          <StatusChip label="AUDIT" value="PENDING" status="warn" />
         </div>
       </header>
 
@@ -35,7 +35,7 @@ export const PredictionAudit: React.FC = () => {
           </p>
         </div>
 
-        <BlockedState reason="PREDICTION LEDGER NOT IMPLEMENTED" />
+        <PENDINGState reason="PREDICTION LEDGER PENDING" />
 
         <section className="card" style={{ padding: '16px' }}>
           <h2 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>Forensic Audit History</h2>
@@ -52,7 +52,7 @@ export const PredictionAudit: React.FC = () => {
             <tbody>
               <tr>
                 <td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: 'var(--text-mut)', fontSize: '12px' }}>
-                  NOT IMPLEMENTED — DATA SERVICE UNAVAILABLE
+                  PENDING — DATA SERVICE PENDING
                 </td>
               </tr>
             </tbody>

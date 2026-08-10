@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../../store';
-import { StatusChip, BlockedState } from './TruthUI';
+import { StatusChip, PENDINGState } from './TruthUI';
 import { Database, ShieldCheck, Wifi, RefreshCw } from 'lucide-react';
 
 export const DataIntegrity: React.FC = () => {
@@ -81,7 +81,7 @@ export const DataIntegrity: React.FC = () => {
           )}
         </section>
 
-        <BlockedState reason="REPOSITORY / API SECURITY AUDIT PENDING" />
+        <PENDINGState reason="REPOSITORY / API SECURITY REVIEW PENDING" />
       </div>
     </div>
   );

@@ -48,7 +48,7 @@ function brokerClientId(status: any, funds?: any) {
 
 function liveTradingState(state: any, brokerStatus: any) {
   const raw = state?.live_trading_enabled ?? state?.liveTradingEnabled ?? brokerStatus?.live_trading_enabled ?? brokerStatus?.liveTradingEnabled ?? brokerStatus?.live_allowed ?? '0'
-  return String(raw) === '1' || raw === true ? 'ENABLED BY BACKEND FLAG' : 'BLOCKED BY BACKEND FLAG'
+  return String(raw) === '1' || raw === true ? 'ENABLED BY BACKEND FLAG' : 'DISABLED BY BACKEND FLAG'
 }
 
 export function BrokerPanel() {
@@ -65,7 +65,7 @@ export function BrokerPanel() {
   const brokerTruthConnected = Boolean(brokerConnected === true || brokerStatus?.connected === true)
   // Do not paint TOKEN ERROR when broker truth is already connected (rate-limit false fails).
   const brokerTokenBad = (!brokerTruthConnected) && (fundsFailure.bad || statusFailure.bad)
-  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'BLOCKED / TOKEN ERROR' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
+  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'AUTH OR TOKEN ISSUE' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
   const fundsError = Boolean(
     brokerFunds
     && (
@@ -121,15 +121,15 @@ export function BrokerPanel() {
           Broker Connection - Dhan
         </h3>
         <Row label="Status" value={brokerTruthConnected ? 'CONNECTED' : dataState} color={brokerTruthConnected ? 'tx-up' : brokerApiResponded && !brokerTokenBad ? 'tx-amber' : 'tx-down'} />
-        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH BLOCKED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
+        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH REQUIRED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
         <Row label="Mode" value="READ-ONLY BROKER PROOF" />
         <Row label="Client ID" value={brokerClientId(brokerStatus, brokerFunds)} color={brokerClientId(brokerStatus, brokerFunds).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
         <Row label="Token Status" value={brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
-        <Row label="Holdings API" value={holdingsError ? 'ERROR/BLOCKED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
-        <Row label="Funds API" value={fundsError ? 'ERROR/BLOCKED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
+        <Row label="Holdings API" value={holdingsError ? 'ERROR/AUTH REQUIRED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
+        <Row label="Funds API" value={fundsError ? 'ERROR/AUTH REQUIRED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
         <Row label="Broker Blocker" value={brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={brokerTokenBad ? 'tx-down' : 'tx-up'} />
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
-        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
+        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
       </div>
 
@@ -146,7 +146,7 @@ export function BrokerPanel() {
           <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker funds API...</p>
         ) : availBal == null ? (
           <div style={{ color: 'var(--text-mut)', fontSize: '.8rem', lineHeight: 1.6 }}>
-            <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds unavailable: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
+            <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds data pending: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
             <div>Read-only funds must come from current Dhan broker API response. No cached/hardcoded balance is displayed.</div>
           </div>
         ) : (
@@ -170,7 +170,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker holdings API...</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
+            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings data pending: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -212,7 +212,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker positions API...</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
+            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions data pending: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

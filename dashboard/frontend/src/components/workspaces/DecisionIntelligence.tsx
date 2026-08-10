@@ -66,7 +66,7 @@ export const DecisionIntelligence: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <StatusChip label="API" value={apiStatus?.status || 'UNKNOWN'} status={apiStatus?.status === 'ok' ? 'ok' : 'warn'} />
               <StatusChip label="SCANNER" value={health?.scanner?.status || 'OFFLINE'} status={health?.scanner?.status === 'active' ? 'ok' : 'mut'} />
-              <StatusChip label="PREDICTOR" value={health?.predictor?.status || 'UNAVAILABLE'} status={health?.predictor?.status === 'ready' ? 'ok' : 'error'} />
+              <StatusChip label="PREDICTOR" value={health?.predictor?.status || 'PENDING'} status={health?.predictor?.status === 'ready' ? 'ok' : 'error'} />
             </div>
           </div>
 

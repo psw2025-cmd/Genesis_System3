@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusChip, BlockedState } from './TruthUI';
+import { StatusChip, PENDINGState } from './TruthUI';
 import { Sparkles, BarChart, Zap, Search } from 'lucide-react';
 
 export const MultibaggerResearch: React.FC = () => {
@@ -35,7 +35,7 @@ export const MultibaggerResearch: React.FC = () => {
               <BarChart size={16} color="var(--text-sec)" />
               <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Horizon Forecast Matrix</h3>
             </div>
-            <BlockedState reason="FORECAST SERVICE NOT IMPLEMENTED" />
+            <PENDINGState reason="FORECAST SERVICE PENDING" />
           </section>
 
           <section className="card" style={{ padding: '16px' }}>
@@ -50,7 +50,7 @@ export const MultibaggerResearch: React.FC = () => {
                   <div className="progress-bar" style={{ flex: 1 }}>
                     <div className="progress-fill" style={{ width: '0%', background: 'var(--accent)' }} />
                   </div>
-                  <div style={{ width: '50px', fontSize: '10px', color: 'var(--text-mut)', textAlign: 'right' }}>BLOCKED</div>
+                  <div style={{ width: '50px', fontSize: '10px', color: 'var(--text-mut)', textAlign: 'right' }}>PENDING</div>
                 </div>
               ))}
             </div>
@@ -60,15 +60,15 @@ export const MultibaggerResearch: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
           <section className="card" style={{ padding: '12px' }}>
             <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', marginBottom: '8px', textTransform: 'uppercase' }}>Fundamentals</h4>
-            <BlockedState reason="DATA SERVICE NOT IMPLEMENTED" />
+            <PENDINGState reason="DATA SERVICE PENDING" />
           </section>
           <section className="card" style={{ padding: '12px' }}>
             <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', marginBottom: '8px', textTransform: 'uppercase' }}>Governance</h4>
-            <BlockedState reason="DATA SERVICE NOT IMPLEMENTED" />
+            <PENDINGState reason="DATA SERVICE PENDING" />
           </section>
           <section className="card" style={{ padding: '12px' }}>
             <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', marginBottom: '8px', textTransform: 'uppercase' }}>Ownership / Flows</h4>
-            <BlockedState reason="DATA SERVICE NOT IMPLEMENTED" />
+            <PENDINGState reason="DATA SERVICE PENDING" />
           </section>
         </div>
 

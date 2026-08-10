@@ -1,0 +1,75 @@
+dashboard/frontend/src/components/BrokerPanel.tsx:117:      {authBlocked && <AuthUnlock />}
+dashboard/frontend/src/components/BrokerPanel.tsx:128:        <Row label="Holdings API" value={holdingsError ? 'ERROR/AUTH REQUIRED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
+dashboard/frontend/src/components/BrokerPanel.tsx:129:        <Row label="Funds API" value={fundsError ? 'ERROR/AUTH REQUIRED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
+dashboard/frontend/src/components/BrokerPanel.tsx:132:        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
+dashboard/frontend/src/components/BrokerPanel.tsx:149:            <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds data pending: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
+dashboard/frontend/src/components/BrokerPanel.tsx:173:            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings data pending: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
+dashboard/frontend/src/components/BrokerPanel.tsx:215:            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions data pending: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
+dashboard/frontend/src/components/BrokerPanel.tsx:37:  const bad = obj?.success === false || obj?.blocked === true || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized') || detail.includes('dh-901')
+dashboard/frontend/src/components/BrokerPanel.tsx:58:  const authBlocked = apiStatus?.status === 'API_AUTH_REQUIRED'
+dashboard/frontend/src/components/BrokerPanel.tsx:59:  const brokerBlocked = authBlocked || apiStatus?.status === 'API_ERROR'
+dashboard/frontend/src/components/BrokerPanel.tsx:68:  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'AUTH OR TOKEN ISSUE' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
+dashboard/frontend/src/components/BrokerPanel.tsx:72:      brokerFunds.blocked === true
+dashboard/frontend/src/components/BrokerPanel.tsx:88:      brokerHoldings.blocked === true
+dashboard/frontend/src/components/BrokerPanel.tsx:99:      brokerPositions.blocked === true
+dashboard/frontend/src/components/BrokerProofPanel.tsx:33:  return Boolean(obj && obj.blocked !== true && obj.error == null && obj.success !== false)
+dashboard/frontend/src/components/ControlPlane.tsx:325:            alert('Proof pack generation not implemented in UI - use scripts/verify_dashboard.ps1')
+dashboard/frontend/src/components/EndToEndProof.tsx:175:    { item: 'Real broker funds/margin', ok: Boolean(funds?.ok && funds.json && !funds.json.blocked && funds.json.success !== false), evidence: funds?.json?.status || funds?.json?.message || funds?.status || funds?.error || '-' },
+dashboard/frontend/src/components/EndToEndProof.tsx:183:    { item: 'Live-money switch pending separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
+dashboard/frontend/src/components/EndToEndProof.tsx:244:              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_VISIBLE' : (p.error || blockedReason(p.json))}</td>
+dashboard/frontend/src/components/EndToEndProof.tsx:55:function blockedReason(json: any) {
+dashboard/frontend/src/components/EndToEndProof.tsx:57:  return json.blocked_reason || json.message || json.status || json.error || 'UNKNOWN'
+dashboard/frontend/src/components/EndToEndProof.tsx:79:function isLiveTradingBlocked(stateJson: any, brokerJson: any) {
+dashboard/frontend/src/components/ErrorBanner.test.tsx:13:    render(<ErrorBanner endpoint="/api/state" status={503} message="Service unavailable" />)
+dashboard/frontend/src/components/GenesisTab.tsx:142:        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'BLOCKED'} tone="down" />
+dashboard/frontend/src/components/MarketTopCePeTable.tsx:168:          ? 'Moneycontrol blocked (403) — use Dhan board for trading truth'
+dashboard/frontend/src/components/MLPerformance.tsx:105:      setMessage(`ML proof endpoints unavailable: ${err?.message || String(err)}`)
+dashboard/frontend/src/components/MLPerformance.tsx:156:        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'READY' : 'BLOCKED'}</div></div>
+dashboard/frontend/src/components/PaperTrading.tsx:329:          <div className="text-xs text-gray-500 mt-3">LIVE Order Safety: BLOCKED · AUTO_EXECUTE_TRADES=0</div>
+dashboard/frontend/src/components/SystemTruthControl.tsx:81:  if (source !== 'dhan' || x.blocked || spot <= 0 || contracts <= 0) return false
+dashboard/frontend/src/components/TopBar.tsx:92:  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'CLOUD_UNAVAILABLE' || apiStatus?.status === 'RENDER_UNAVAILABLE'
+dashboard/frontend/src/hooks/useData.ts:100:const blockedPaper = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:104:  blocked: true,
+dashboard/frontend/src/hooks/useData.ts:105:  blocked_reason: apiStatus?.message || 'Paper data pending',
+dashboard/frontend/src/hooks/useData.ts:108:const blockedGainRank = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:112:  blocked: true,
+dashboard/frontend/src/hooks/useData.ts:117:const blockedGates = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:123:const blockedBrokerStatus = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:128:  message: apiStatus?.message || 'Broker API unavailable',
+dashboard/frontend/src/hooks/useData.ts:129:  error: apiStatus?.message || 'Broker API unavailable',
+dashboard/frontend/src/hooks/useData.ts:132:const blockedRows = (apiStatus: any, label: string) => ({
+dashboard/frontend/src/hooks/useData.ts:137:  blocked: true,
+dashboard/frontend/src/hooks/useData.ts:138:  message: `${label}: ${apiStatus?.message || 'API unavailable'}`,
+dashboard/frontend/src/hooks/useData.ts:139:  error: apiStatus?.message || 'API unavailable',
+dashboard/frontend/src/hooks/useData.ts:142:const blockedFunds = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:154:const blockedChain = (sym: string, apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:160:  blocked: true,
+dashboard/frontend/src/hooks/useData.ts:161:  blocked_reason: apiStatus?.message || 'Option chain pending',
+dashboard/frontend/src/hooks/useData.ts:247:    // Clear sticky NETWORK_ERROR / CLOUD_UNAVAILABLE once a group recovers,
+dashboard/frontend/src/hooks/useData.ts:257:      setBrokerStatus(batch?.broker_status || blockedBrokerStatus({ message: 'batch missing broker_status' }))
+dashboard/frontend/src/hooks/useData.ts:258:      setBrokerHoldings(batch?.holdings || blockedRows({ message: 'batch missing holdings' }, 'Holdings'))
+dashboard/frontend/src/hooks/useData.ts:259:      setBrokerFunds(batch?.funds || blockedFunds({ message: 'batch missing funds' }))
+dashboard/frontend/src/hooks/useData.ts:260:      setBrokerPositions(batch?.positions || blockedRows({ message: 'batch missing positions' }, 'Positions'))
+dashboard/frontend/src/hooks/useData.ts:274:        setBrokerStatus(blockedBrokerStatus(apiStatus))
+dashboard/frontend/src/hooks/useData.ts:275:        setBrokerHoldings(blockedRows(apiStatus, 'Holdings'))
+dashboard/frontend/src/hooks/useData.ts:276:        setBrokerFunds(blockedFunds(apiStatus))
+dashboard/frontend/src/hooks/useData.ts:277:        setBrokerPositions(blockedRows(apiStatus, 'Positions'))
+dashboard/frontend/src/hooks/useData.ts:289:      else setPaper(blockedPaper({ message: 'batch missing paper' }))
+dashboard/frontend/src/hooks/useData.ts:291:      else setGainRank(blockedGainRank({ message: 'batch missing gain_rank' }))
+dashboard/frontend/src/hooks/useData.ts:293:      else setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: 'NO_DATA', blocked: true })
+dashboard/frontend/src/hooks/useData.ts:305:      if (!retainTransient || !prev.paper) setPaper(blockedPaper(apiStatus))
+dashboard/frontend/src/hooks/useData.ts:306:      if (!retainTransient || !prev.gainRank) setGainRank(blockedGainRank(apiStatus))
+dashboard/frontend/src/hooks/useData.ts:308:        setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: apiStatus.status, message: apiStatus.message, blocked: true })
+dashboard/frontend/src/hooks/useData.ts:325:          message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh unavailable)',
+dashboard/frontend/src/hooks/useData.ts:342:          blocked: false,
+dashboard/frontend/src/hooks/useData.ts:348:      const blocked = blockedChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
+dashboard/frontend/src/hooks/useData.ts:349:      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/batch/chains`, message: blocked.blocked_reason })
+dashboard/frontend/src/hooks/useData.ts:350:      setChain(sym, blocked)
+dashboard/frontend/src/hooks/useData.ts:358:      blocked: false,
+dashboard/frontend/src/hooks/useData.ts:377:      if (retain && prev) setChain(sym, keepLastGood(prev, apiStatus, `${sym} chain`) || blockedChain(sym, apiStatus))
+dashboard/frontend/src/hooks/useData.ts:379:        ...blockedChain(sym, apiStatus),
+dashboard/frontend/src/hooks/useData.ts:381:        blocked: false,
+dashboard/frontend/src/hooks/useData.ts:433:    else if (!retainTransient || !prev.autoGates) setAutoGates(blockedGates(err))
+dashboard/frontend/src/hooks/useData.ts:508:              blocked: false,
+dashboard/frontend/src/hooks/useData.ts:71:          ? (status === 429 ? 'RATE_LIMITED' : 'CLOUD_UNAVAILABLE')
+dashboard/frontend/src/hooks/useWebSocket.ts:3: * Falls back to polling if WebSocket is unavailable

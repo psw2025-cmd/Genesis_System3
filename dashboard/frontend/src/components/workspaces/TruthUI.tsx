@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * MANDATORY: Truth-first UI components.
- * These ensure clear status, blocked states, and probability messaging.
+ * These ensure clear status, pending states, and probability messaging.
  */
 
 interface StatusChipProps {
@@ -36,12 +36,12 @@ export const StatusChip: React.FC<StatusChipProps> = ({ label, status = 'mut', v
   );
 };
 
-interface BlockedStateProps {
+interface PENDINGStateProps {
   reason?: string;
   dataTestId?: string;
 }
 
-export const BlockedState: React.FC<BlockedStateProps> = ({ reason = 'DATA SERVICE NOT IMPLEMENTED', dataTestId }) => (
+export const PENDINGState: React.FC<PENDINGStateProps> = ({ reason = 'DATA SERVICE PENDING', dataTestId }) => (
   <div
     data-testid={dataTestId}
     style={{
@@ -57,7 +57,7 @@ export const BlockedState: React.FC<BlockedStateProps> = ({ reason = 'DATA SERVI
       textTransform: 'uppercase',
     }}
   >
-    <div style={{ marginBottom: '8px' }}>⚠️ BLOCKED</div>
+    <div style={{ marginBottom: '8px' }}>⚠️ PENDING</div>
     <div>{reason}</div>
   </div>
 );

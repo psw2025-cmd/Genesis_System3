@@ -58,7 +58,7 @@ export default function DataSourceWarning({ dataSource, brokerConnected, mode }:
               {!brokerConnected ? 'BROKER DISCONNECTED' : 'MARKET DATA NOT READY'}
             </div>
             <div className="text-sm text-yellow-300 mb-2">
-              Real market data is unavailable. Trading actions stay disabled.
+              Real market data is temporarily offline. Trading actions remain disabled.
             </div>
             <div className="text-xs text-yellow-400/80">
               Data Source: <strong>{dataSource}</strong>

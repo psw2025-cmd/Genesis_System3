@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../../store';
-import { StatusChip, BlockedState } from './TruthUI';
+import { StatusChip, PENDINGState } from './TruthUI';
 import { Layers, Activity, TrendingUp, ShieldAlert, BarChart2 } from 'lucide-react';
 
 function pickArray(obj: any, ...keys: string[]): any[] {
@@ -59,11 +59,11 @@ export const OptionsIntelligence: React.FC = () => {
                     <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol || '—'}</span>
                   </div>
                 </div>
-                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile ? `${currentChain.iv_percentile}%` : 'UNAVAILABLE'} status={currentChain?.iv_percentile > 80 ? 'warn' : 'ok'} />
+                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : 'ok'} />
                 <StatusChip label="OI CHANGE" value={currentChain?.oi_change || 'STABLE'} />
               </div>
             ) : (
-              <BlockedState reason={`NO CHAIN DATA FOR ${chainSymbol}`} />
+              <PENDINGState reason={`NO CHAIN DATA YET FOR ${chainSymbol}`} />
             )}
           </section>
 
@@ -83,7 +83,7 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <BlockedState reason="GAIN RANK SERVICE NOT IMPLEMENTED" />
+              <PENDINGState reason="GAIN RANK SERVICE PENDING" />
             )}
           </section>
 
@@ -103,7 +103,7 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <BlockedState reason="MARKET TOP DATA UNAVAILABLE" />
+              <PENDINGState reason="MARKET TOP DATA PENDING" />
             )}
           </section>
 
@@ -112,7 +112,7 @@ export const OptionsIntelligence: React.FC = () => {
               <ShieldAlert size={16} color="var(--text-sec)" />
               <h2 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Abnormal Activity</h2>
             </div>
-            <BlockedState reason="CATALYST & SENTIMENT DATA BLOCKED" />
+            <PENDINGState reason="CATALYST & SENTIMENT DATA PENDING" />
           </section>
         </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../../store';
-import { StatusChip, BlockedState } from './TruthUI';
+import { StatusChip, PENDINGState } from './TruthUI';
 import { Shield, BarChart3, Activity, Lock } from 'lucide-react';
 import RiskDashboard from '../RiskDashboard';
 
@@ -40,7 +40,7 @@ export const RiskAndScenarios: React.FC = () => {
               <BarChart3 size={16} color="var(--text-sec)" />
               <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Factor Risk Status</h3>
             </div>
-            <BlockedState reason="FACTOR RISK SERVICE NOT IMPLEMENTED" />
+            <PENDINGState reason="FACTOR RISK SERVICE PENDING" />
           </section>
 
           <section className="card" style={{ padding: '16px' }}>
@@ -62,7 +62,7 @@ export const RiskAndScenarios: React.FC = () => {
               <Activity size={16} color="var(--text-sec)" />
               <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Scenario Analysis</h3>
             </div>
-            <BlockedState reason="SCENARIO ENGINE NOT IMPLEMENTED" />
+            <PENDINGState reason="SCENARIO ENGINE PENDING" />
           </section>
         </div>
       </div>

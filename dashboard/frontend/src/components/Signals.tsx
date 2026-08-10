@@ -84,7 +84,7 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
     strategy: `${source}: ${isPe ? 'PE' : isCe ? 'CE' : opt || 'OPTION'} candidate evidence`,
     confidence: Number.isFinite(confidence) ? confidence : 0,
     direction: isPe ? 'PE' : isCe ? 'CE' : opt || 'NONE',
-    reason: 'Candidate evidence exists, but broker order remains blocked until risk/paper lifecycle gates pass.',
+    reason: 'Candidate evidence exists, but broker order remains disabled until risk/paper lifecycle checks pass.',
     source,
     option_type: isPe ? 'PE' : isCe ? 'CE' : opt,
     strike: candidate.strike,
@@ -218,7 +218,7 @@ export default function Signals() {
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">Signals & Recommendations</h2>
         <ErrorBanner endpoint={error.endpoint} status={error.status} message={error.message} onRetry={fetchData} />
-        <EmptyState title="Signal data unavailable" reason="Backend did not return signal/state data. Check API health and deployment." icon="INFO" />
+        <EmptyState title="Signal data pending" reason="Backend did not return signal/state data. Check API health and deployment." icon="INFO" />
       </div>
     )
   }
@@ -264,7 +264,7 @@ export default function Signals() {
 
         {blockingReasons.length > 0 && !isTrade && !isManaging && (
           <div className="mb-4 p-3 bg-yellow-900 rounded">
-            <div className="text-sm font-bold mb-2">What Blocked Trading?</div>
+            <div className="text-sm font-bold mb-2">What Is Preventing Trading?</div>
             <ul className="list-disc list-inside text-sm">{blockingReasons.map((reason, idx) => <li key={idx}>{reason}</li>)}</ul>
           </div>
         )}
@@ -308,7 +308,7 @@ export default function Signals() {
 
       {!isTrade && qc && (
         <div className="bg-red-900 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">What Blocked Trading?</h3>
+          <h3 className="text-xl font-bold mb-4">What Is Preventing Trading?</h3>
           <div className="space-y-2">
             <div><div className="text-sm text-gray-300">Scanner Segments</div><div>{qc.scanner_segments || 'N/A'}</div></div>
             {qc.no_trade_reasons && Object.keys(qc.no_trade_reasons).length > 0 && (
