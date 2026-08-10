@@ -163,17 +163,18 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 export default function App() {
   useData()
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
-                  background: 'var(--surface)', overflow: 'hidden' }}>
-      <TopBar />
-      <ProductionProofBar />
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <Sidebar />
-        <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
-          <Content />
-        </main>
+    <AuthGate>
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
+                    background: 'var(--surface)', overflow: 'hidden' }}>
+        <TopBar />
+        <ProductionProofBar />
+        <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <Sidebar />
+          <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+            <Content />
+          </main>
+        </div>
       </div>
-    </div>
     </AuthGate>
   )
 }
