@@ -1,0 +1,64 @@
+dashboard/frontend/src/components/ErrorBoundary.tsx:5:  fallback?: ReactNode
+dashboard/frontend/src/components/ErrorBoundary.tsx:42:      if (this.props.fallback) {
+dashboard/frontend/src/components/ErrorBoundary.tsx:43:        return this.props.fallback
+dashboard/frontend/src/components/GenesisTab.tsx:153:            <div style={small}>Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.</div>
+dashboard/frontend/src/components/SystemTruthControl.tsx:82:  // After-hours Dhan snapshots are valid proof (stale=true is expected when market closed).
+dashboard/frontend/src/components/SystemTruthControl.tsx:84:  if (['OK', 'MARKET_OPEN'].includes(status) && x.stale !== true) return true
+dashboard/frontend/src/components/EndToEndProof.tsx:48:  if (json.stale === true) return false
+dashboard/frontend/src/components/EndToEndProof.tsx:49:  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(combined)) return false
+dashboard/frontend/src/components/EndToEndProof.tsx:162:  const noBadSource = chains.every(p => !/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock|stale)/i.test(JSON.stringify(p.json || {})))
+dashboard/frontend/src/components/EndToEndProof.tsx:179:    { item: 'No non-Dhan/stale/fallback markers in chain', ok: noBadSource, evidence: noBadSource ? 'clean' : 'pending verification marker found' },
+dashboard/frontend/src/components/EndToEndProof.tsx:207:        <div className="card">{badge(noBadSource, 'NO BAD SOURCE')}<div style={{ marginTop: 8, fontSize: 12 }}>No non-Dhan/stale/fallback</div></div>
+dashboard/frontend/src/components/MLPerformance.tsx:151:        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Fallback used</div><div style={{ fontWeight: 900 }}>{model.fallback_used === true ? 'YES' : model.fallback_used === false ? 'NO' : 'UNKNOWN'}</div></div>
+dashboard/frontend/src/components/PaperTrading.tsx:223:            <div className="text-gray-400">Fake/fixture rejected</div>
+dashboard/frontend/src/components/PaperTrading.tsx:224:            <div className="text-2xl font-bold text-green-300">{Number(paperTruth.fake_fixture_rows_rejected || 0)}</div>
+dashboard/frontend/src/components/RiskDashboard.tsx:39:        // Fallback to old endpoints
+dashboard/frontend/src/components/RiskDashboard.tsx:52:        } catch (fallbackError) {
+dashboard/frontend/src/components/RiskDashboard.tsx:53:          console.error('Fallback also failed:', fallbackError)
+dashboard/frontend/src/components/OptionChain.tsx:81:  const stale = Boolean(data?.stale) || String(status).toUpperCase().includes('STALE') || String(sourcePriority).toLowerCase().includes('csv')
+dashboard/frontend/src/components/OptionChain.tsx:144:  const streamLive = Boolean(marketOpen && (data?.verified_live_dhan || data?.live === true) && !stale)
+dashboard/frontend/src/components/OptionChain.tsx:194:      {(stale || data?.message || sourcePriority !== '--' || !streamLive) && (
+dashboard/frontend/src/components/OptionChain.tsx:195:        <div className={cn('px-4 py-2 border-b border-border text-xs font-mono', stale || !streamLive ? 'text-amber bg-amber/5' : 'text-text-muted')}>
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:19:  it('renders the default fallback UI when a child throws', () => {
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:21:    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:29:    consoleError.mockRestore()
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:32:  it('renders a custom fallback when provided', () => {
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:33:    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:35:      <ErrorBoundary fallback={<div>custom fallback</div>}>
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:39:    expect(screen.getByText('custom fallback')).toBeInTheDocument()
+dashboard/frontend/src/components/ErrorBoundary.test.tsx:41:    consoleError.mockRestore()
+dashboard/frontend/src/components/ModelBehavior.tsx:70:            <div className="text-lg">Ensemble / Fallback</div>
+dashboard/frontend/src/components/ModelBehavior.tsx:74:            <div className="text-sm text-gray-400">Fallback Counters</div>
+dashboard/frontend/src/components/Alerts.tsx:19:          // Fallback to alerts endpoints
+dashboard/frontend/src/components/Alerts.tsx:29:        // Fallback to alerts endpoints
+dashboard/frontend/src/components/Alerts.tsx:37:        } catch (fallbackError) {
+dashboard/frontend/src/components/Alerts.tsx:38:          console.error('Fallback also failed:', fallbackError)
+dashboard/frontend/src/components/DataSourceWarning.tsx:39:                : ' Waiting for Dhan market data — paper MTM may be stale until chain reconnects.'}
+dashboard/frontend/src/components/workspaces/DecisionIntelligence.tsx:80:              <StatusChip label="NSE" value={health?.nse?.status || 'FALLBACK'} status={health?.nse?.status === 'ok' ? 'ok' : 'warn'} />
+dashboard/frontend/src/components/AgentConsole.tsx:23:function safeText(value: any, fallback = 'N/A'): string {
+dashboard/frontend/src/components/AgentConsole.tsx:24:  if (value === null || value === undefined || value === '') return fallback
+dashboard/frontend/src/components/AgentConsole.tsx:203:          Agent API warning: {lastError}. Showing safe fallback values.
+dashboard/frontend/src/components/Overview.tsx:39:  const warn = s === 'STALE' || s === 'MARKET_CLOSED' || s === 'WAITING'
+dashboard/frontend/src/components/Overview.tsx:88:    { label: 'Gain Rank / Scanner', status: gainRank?.stale ? 'STALE' : gainRank ? 'LOADED' : 'WAITING', note: gainRank?.latest_date ?? gainRank?.latest?.date ?? gainRank?.message },
+dashboard/frontend/src/components/Overview.tsx:101:  // Runtime-only fallback when /api/auto_gates has not returned proof_gates yet.
+dashboard/frontend/src/hooks/useData.ts:90:const fallbackHealth = (apiStatus: any) => ({
+dashboard/frontend/src/hooks/useData.ts:113:  stale: false,
+dashboard/frontend/src/hooks/useData.ts:164:  stale: false,
+dashboard/frontend/src/hooks/useData.ts:175:  // Reject fake/non-Dhan sources. Allow market-closed verified Dhan snapshots.
+dashboard/frontend/src/hooks/useData.ts:176:  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock)/i.test(combined)) return false
+dashboard/frontend/src/hooks/useData.ts:177:  if (data.stale === true && !/MARKET_CLOSED|SNAPSHOT/i.test(status) && data.snapshot !== true && data.live !== false) {
+dashboard/frontend/src/hooks/useData.ts:196:    stale: true,
+dashboard/frontend/src/hooks/useData.ts:304:      if (!retainTransient || !prev.health) setHealth(fallbackHealth(apiStatus))
+dashboard/frontend/src/hooks/useData.ts:323:          stale: true,
+dashboard/frontend/src/hooks/useData.ts:339:          stale: true,
+dashboard/frontend/src/hooks/useData.ts:357:      stale: Boolean(isSnapshot || data?.stale),
+dashboard/frontend/src/hooks/useData.ts:403:      // Soft fallback only when market likely open; after-hours keep warming placeholders.
+dashboard/frontend/src/hooks/useData.ts:507:              stale: Boolean(isSnapshot || m.data?.stale),
+dashboard/frontend/src/hooks/useData.ts:557:          // Only flag stream failure during market hours when chain cache is empty/stale.
+dashboard/frontend/src/hooks/useWebSocket.ts:22:  fallbackPollInterval?: number // Polling interval if WebSocket fails (ms)
+dashboard/frontend/src/hooks/useWebSocket.ts:32:    fallbackPollInterval = 3000,
+dashboard/frontend/src/hooks/useWebSocket.ts:86:        // Clear any polling fallback
+dashboard/frontend/src/hooks/useWebSocket.ts:206:  // Polling fallback
+dashboard/frontend/src/hooks/useWebSocket.ts:208:    if (usePolling && fallbackPollInterval > 0 && callbacksRef.current.onMessage) {
+dashboard/frontend/src/hooks/useWebSocket.ts:217:      pollIntervalRef.current = setInterval(poll, fallbackPollInterval)
+dashboard/frontend/src/hooks/useWebSocket.ts:225:  }, [usePolling, fallbackPollInterval]) // Removed onMessage dependency
