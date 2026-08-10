@@ -68,7 +68,7 @@ const authStatus = (path: string, status: number, kind: ApiErrorKind = 'http') =
       : kind === 'network'
         ? 'NETWORK_ERROR'
         : isTransient(status)
-          ? (status === 429 ? 'RATE_LIMITED' : 'CLOUD_UNAVAILABLE')
+          ? (status === 429 ? 'RATE_LIMITED' : 'CLOUD_DEGRADED')
           : 'API_ERROR',
   code: status,
   path,
@@ -102,7 +102,7 @@ const pendingPaper = (apiStatus: any) => ({
   pnl: { summary: { total_pnl: 0, win_rate: 0, total_trades: 0, closed_positions: [] } },
   status: apiStatus?.status || 'NO_REAL_PAPER_DATA',
   pendingProof: true,
-  blocked_reason: apiStatus?.message || 'Paper data pending',
+  pending_reason: apiStatus?.message || 'Paper data pending',
 })
 
 const pendingGainRank = (apiStatus: any) => ({
@@ -158,7 +158,7 @@ const pendingChain = (sym: string, apiStatus: any) => ({
   pcr: '--',
   status: 'NO_DHAN_DATA',
   pendingProof: true,
-  blocked_reason: apiStatus?.message || 'Option chain pending',
+  pending_reason: apiStatus?.message || 'Option chain pending',
   data_source: 'dhan',
   source_priority: isOptionalChain(sym) ? 'optional_symbol_pending' : 'pending_real_dhan_stream',
   stale: false,
@@ -244,7 +244,7 @@ export function useData() {
 
   const markSuccess = useCallback((group: string) => {
     failureCountRef.current[group] = 0
-    // Clear sticky NETWORK_ERROR / CLOUD_UNAVAILABLE once a group recovers,
+    // Clear sticky NETWORK_ERROR / CLOUD_DEGRADED once a group recovers,
     // otherwise TopBar stays DHAN DEGRADED forever after one failed poll.
     const remaining = Object.values(failureCountRef.current).some((n) => Number(n) > 0)
     if (!remaining) setApiStatus(null as any)
@@ -322,7 +322,7 @@ export function useData() {
           verified_live_dhan: false,
           stale: true,
           status: prev.status || 'DHAN_LAST_GOOD',
-          message: data?.message || data?.blocked_reason || 'Keeping last good Dhan chain (live refresh pending)',
+          message: data?.message || data?.pending_reason || 'Keeping last good Dhan chain (live refresh pending)',
         })
         return
       }
@@ -345,9 +345,9 @@ export function useData() {
         })
         return
       }
-      const blocked = pendingChain(sym, { message: data?.blocked_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
-      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/batch/chains`, message: blocked.blocked_reason })
-      setChain(sym, blocked)
+      const pendingItem = pendingChain(sym, { message: data?.pending_reason || data?.message || data?.status || 'Option chain response is not proven Dhan data' })
+      if (!isOptionalChain(sym)) markFailure(`chain_${sym}`, { status: 'NO_DHAN_DATA', code: 200, path: `/api/batch/chains`, message: pendingItem.pending_reason })
+      setChain(sym, pendingItem)
       return
     }
     markSuccess(`chain_${sym}`)
