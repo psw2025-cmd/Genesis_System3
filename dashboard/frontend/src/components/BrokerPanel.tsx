@@ -129,7 +129,7 @@ export function BrokerPanel() {
         <Row label="Funds API" value={fundsError ? 'ERROR/AUTH REQUIRED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
         <Row label="Broker Blocker" value={brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={brokerTokenBad ? 'tx-down' : 'tx-up'} />
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
-        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
+        <Row label="Data Visibility" value={authBlocked ? 'VISIBLE AFTER API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
       </div>
 
@@ -170,7 +170,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker holdings API...</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings data pending: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
+            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings data pending: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No broker holdings proof visible yet.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -212,7 +212,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker positions API...</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions data pending: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
+            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions data pending: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No broker positions proof visible yet.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

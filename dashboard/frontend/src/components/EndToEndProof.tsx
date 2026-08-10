@@ -52,7 +52,7 @@ function isDhanChain(json: any) {
   return source === 'dhan' && contracts > 0 && spot > 0
 }
 
-function blockedReason(json: any) {
+function proofReason(json: any) {
   if (!json || typeof json !== 'object') return 'NO_RESPONSE'
   return json.blocked_reason || json.message || json.status || json.error || 'UNKNOWN'
 }
@@ -241,7 +241,7 @@ export function EndToEndProof() {
               <td className="tcell">{String(p.json?.status || p.status)}</td>
               <td className="tcell">{String(p.json?.spot ?? '-')}</td>
               <td className="tcell">{String(p.json?.total_contracts ?? (Array.isArray(p.json?.contracts) ? p.json.contracts.length : '-'))}</td>
-              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_CONFIRMED' : (p.error || blockedReason(p.json))}</td>
+              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_CONFIRMED' : (p.error || proofReason(p.json))}</td>
             </tr>
           })}
         </tbody>

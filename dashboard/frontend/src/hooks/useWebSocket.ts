@@ -1,6 +1,6 @@
 /**
  * WebSocket Hook for Real-time Updates
- * Falls back to polling if WebSocket is unavailable
+ * Falls back to polling if WebSocket is offline
  * Only activates during market hours (Monday-Friday, 9:15 AM - 3:30 PM IST)
  */
 import { useEffect, useRef, useState, useCallback } from 'react'

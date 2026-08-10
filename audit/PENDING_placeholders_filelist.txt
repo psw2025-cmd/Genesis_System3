@@ -3,6 +3,4 @@ dashboard/frontend/src/components/BrokerProofPanel.tsx
 dashboard/frontend/src/components/EndToEndProof.tsx
 dashboard/frontend/src/components/ErrorBanner.test.tsx
 dashboard/frontend/src/components/SystemTruthControl.tsx
-dashboard/frontend/src/components/TopBar.tsx
 dashboard/frontend/src/hooks/useData.ts
-dashboard/frontend/src/hooks/useWebSocket.ts
