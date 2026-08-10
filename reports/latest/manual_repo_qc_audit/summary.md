@@ -1,327 +1,226 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-10 22:39 IST`
+Updated: `2026-08-10 22:49–23:05 IST`
 
 ## 0. Scope lock and evidence baseline
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Latest repository HEAD observed this iteration: `b6ce4a1654deea38a8f767d7c9fbaaa2f12789e4`.
-- Latest application/source HEAD: `b70af343340a73ed27ca548820d5893c779ab5bd`.
-- `b6ce4a...` changes this audit report only; application conclusions below are tied to `b70af343...` unless a later application commit is named.
-- Deployment target: Google Cloud Run / Google Cloud services. Render is migration debt, not a target.
-- Safety posture during audit: ANALYZER/PAPER, live-money routing OFF. No audit step may enable/place/modify/cancel a live order.
-- End-state objective: architecture and UI must be capable of safe real-money trading, but readiness may only be declared from same-revision reproducible proof.
-- This is the single master audit Markdown. Findings are refined/merged here instead of spawning parallel summary files.
+- Repository HEAD observed before this report update: `9eb6d150fa4ed35b8b6ac3164f9283a7fcf4aad9`.
+- Latest application/source HEAD remains: `b70af343340a73ed27ca548820d5893c779ab5bd`.
+- `9eb6d150...` is an audit-document-only change; application conclusions remain tied to `b70af343...` unless a later application commit is named.
+- Deployment target: Google Cloud Run / Google Cloud services. Render is migration debt, not an accepted target.
+- Audit safety posture: ANALYZER/PAPER, live-money routing OFF. No audit action may enable/place/modify/cancel a live order.
+- End-state objective: architecture and UI must eventually be capable of safe real-money trading, but readiness may only be declared from reproducible, same-revision evidence.
+- This is the single continuously refined master audit Markdown. Duplicate findings are merged here rather than creating parallel audit summaries.
 
-## 1. Current executive verdict
+## 1. Executive verdict
 
 | Area | Verdict | Evidence status |
 |---|---|---|
-| Current application HEAD CI proof | **NOT PROVEN** | No combined status contexts returned for `b70af343...`; PR #96 green CI is an earlier checkpoint |
-| Dashboard login HTTP contract | **FAIL / P0** | Frontend omits required JSON body |
-| Pre-auth data polling | **FAIL / P1** | `useData()` executes outside/above the auth decision |
-| Browser API-key exposure | **NEEDS HARDENING / P1** | raw key stored in `sessionStorage` and globally reinjected |
-| Session expiry semantics | **PARTIAL / P1** | cookie Max-Age exists, server token is deterministic with no server-checked issuance expiry |
-| UI truthfulness | **FAIL / P0-P1** | multiple absence-as-success and unsupported semantic labels found |
-| Options Intelligence | **INCOMPLETE / P1** | truth/staleness checks missing; validated-forecast contradiction; Greeks not present in this workspace |
-| Prediction audit | **PENDING / REQUIRED** | UI explicitly says production prediction ledger not wired |
-| Factor/scenario risk | **PENDING / REQUIRED** | UI explicitly shows both services pending |
-| Responsive/mobile UI | **NOT PROVEN / P2** | fixed sidebar and no viewport responsive breakpoint found in current frontend CSS |
-| Accessibility focus proof | **NOT PROVEN / P2** | reduced-motion support exists; explicit focus-visible treatment not found |
-| Dhan endpoint truth in UI | **INCORRECT / P1** | UI says `web.dhan.co`; official Dhan REST base is `api.dhan.co`, market feed is `api-feed.dhan.co` |
-| Audit artifact freshness | **FAIL / P1** | generated audit text still contains old terminology not matching current source |
-| Cloud Run analyzer/live-off deployment flags | **PASS IN WORKFLOW SOURCE** | live flags remain 0 and analyzer mode remains 1 |
-| Real-market paper lifecycle | **NOT PROVEN** | historical blocker still open |
+| Current application HEAD CI proof | **NOT PROVEN** | No combined status contexts returned for current application HEAD |
+| Dashboard login HTTP contract | **FAIL / P0** | LoginPage omits required JSON `api_key` body |
+| Pre-auth data polling | **FAIL / P1** | `useData()` executes before AuthGate establishes authentication |
+| Browser API-key exposure | **FIX-REQUIRED / P1** | raw dashboard key stored in `sessionStorage` and reinjected into requests |
+| Server-side session expiry | **PARTIAL / P1** | cookie Max-Age exists, but server token lacks independent issuance/expiry enforcement |
+| Global UI mode truth | **FAIL / P0** | PAPER/LIVE-OFF states are hard-coded in global chrome rather than sourced from runtime safety authority |
+| Global proof bar truth | **FAIL / P0-P1** | UI “LIVE” can be derived from broker connectivity; proof labels conflate different safety domains |
+| UI truthfulness generally | **FAIL / P0-P1** | multiple absence-as-success, unsafe fallback and semantic-overclaim patterns remain |
+| Options Intelligence | **INCOMPLETE / P1** | source/freshness envelope missing; ranking mislabeled as forecast; Greeks workspace not proven complete |
+| Prediction audit | **PENDING / REQUIRED** | production prediction ledger is explicitly not wired |
+| Factor/scenario risk | **PENDING / REQUIRED** | factor-risk and scenario services explicitly pending |
+| Responsive/mobile UI | **NOT PROVEN / P2** | fixed sidebar and no proven application-shell breakpoint behavior |
+| Accessibility focus proof | **NOT PROVEN / P2** | reduced-motion exists; complete keyboard focus-visible behavior not proven |
+| Dhan endpoint truth in UI | **INCORRECT / P1** | Data Integrity uses misleading `web.dhan.co` operational API label |
+| Audit artifact freshness | **FAIL / P1** | historical/generated trackers can diverge from current source and must not be treated as runtime truth |
+| Cloud Run analyzer/live-off workflow flags | **PASS IN SOURCE ONLY** | deployment workflow keeps live flags disabled and analyzer mode enabled |
+| Real-market paper lifecycle | **NOT PROVEN** | historical blocker remains open |
 | Multi-day positive costed expectancy | **NOT PROVEN** | no same-revision reproducible proof |
-| Real-money trade ready | **NO** | P0/P1 blockers and missing runtime/profitability proof |
+| Real-money trade ready | **NO** | P0/P1 blockers plus missing runtime, lifecycle, risk and expectancy proof |
 
-## 2. Iteration delta — what changed from the previous report
+## 2. Iteration delta — newest refinements
 
-### New verified findings
+### Newly verified this iteration
 
-1. **P0 UI false-reassurance pattern:** `DecisionIntelligence` shows `✓ NO SYSTEM BLOCKERS` when `health.blockers` is absent as well as when it is a proven empty array.
-2. **P0/P1 contradictory forecast semantics:** `OptionsIntelligence` calls gain-rank rows `System3 Top Forecasts`, while `PredictionAudit` explicitly states the scanner gain-rank list is **not a validated forecast**.
-3. **P1 Dhan endpoint label error:** `DataIntegrity` hard-codes `web.dhan.co` as `API ENDPOINT`; official Dhan v2 REST examples use `https://api.dhan.co/v2/...` and live market feed uses `wss://api-feed.dhan.co`.
-4. **P1 broker-auth/security conflation:** `DataIntegrity` renders `Session is active and secure` solely from `brokerConnected`.
-5. **P1 freshness false-green risk:** any truthy `chain_age` or `top_age` is marked OK; no threshold or age unit contract is applied.
-6. **P1 options truth defects:** zero-valued PCR/IV can render as missing because `||` is used; missing OI change is rendered as `STABLE` without evidence.
-7. **P1 positions absence-vs-zero ambiguity:** `OptionsIntelligence` shows `NO ACTIVE DHAN POSITIONS` whenever parsed rows are empty, without proving broker/auth/API success.
-8. **P1 mode truth defect:** `DecisionIntelligence` hard-codes `PAPER` / `LIVE OFF` instead of deriving the display from an authoritative runtime safety state.
-9. **P2 responsive gap:** primary sidebar is fixed at `190px`; current `index.css` contains reduced-motion media handling but no viewport breakpoint for the application shell/sidebar.
-10. **P2 accessibility gap:** no repository match for `focus-visible`; WCAG 2.2 focus appearance therefore remains unproven.
-11. **P1/P2 information-architecture overload:** 22 sidebar destinations expose several overlapping truth/system/market workflows without progressive disclosure.
+1. **UI-015 / P0 — ProductionProofBar hard-codes safety state.** `dashboard/frontend/src/App.tsx` constructs `['LIVE','OFF',true]` and `['MODE','PAPER',true]`; both are permanently rendered as safe/green regardless of runtime configuration.
+2. **UI-016 / P0-P1 — Proof-bar UI readiness is conflated with broker connectivity.** `cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')`, then `UI` becomes `LIVE` and green. Broker connectivity does not prove frontend deployment integrity, browser health, UI revision provenance, authenticated session quality, data freshness, or trade-safety state.
+3. **UI-017 / P1 — TopBar independently hard-codes `PAPER` and `LIVE OFF`.** This confirms global mode truth is duplicated across presentation components rather than coming from one authoritative safety contract.
+4. **UI-018 / P1 — Cloud build badge can imply healthy/proven deployment from existence of a build epoch only.** `CloudBuildBadge` turns green whenever `build_epoch` exists; it does not verify commit SHA, Cloud Run revision, image digest, age/freshness, backend compatibility or same-revision health.
+5. **UI-019 / P1 — Broker badge can become green from “API responded” rather than a fully proven connected/authenticated state.** In `TopBar`, `brokerGood = brokerConnected || (brokerApiResponded && !brokerHasError)`. A non-error response is useful evidence but is not equivalent to authenticated broker readiness, feed health or trading permission.
+6. **Repository/document freshness:** newest repository commit before this update was `9eb6d150...`; current application code remains `b70af343...`. CI status contexts for the audit-only head are empty and therefore do not provide application readiness proof.
 
-### Refined previous findings
+### Revalidated without counter inflation
 
-- Auth findings remain open and are now explicitly separated into HTTP-contract, pre-auth polling, browser-key exposure and server-expiry semantics.
-- UI terminology cleanup is no longer treated as evidence of readiness; truth semantics are audited independently from wording.
-- “World-class UI” target is now defined as an institutional task workflow with an always-visible truth strip, not a larger collection of tabs.
+The following still reproduce, but rereading unchanged evidence is not counted as an independent verification:
+
+- LoginPage still omits the required JSON body and persists the raw API key in browser storage.
+- `App()` still calls `useData()` before AuthGate returns authenticated content.
+- current application HEAD remains later than the last historically proven PR checkpoint.
 
 ## 3. Verification counters
 
-Independent verification means a different evidence path or contradiction test; rereading the same unchanged artifact does not increment the count.
+A counter increases only when a materially independent evidence path reproduces the same conclusion. Reading the same unchanged artifact twice does not count.
 
-| Finding ID | Conclusion | Counter | Lock state |
+| Finding | Conclusion | Counter | State |
 |---|---|---:|---|
 | AUTH-001 | LoginPage/backend session payload mismatch | `3/20` | OPEN |
-| AUTH-002 | `useData()` starts before authentication is established | `2/20` | OPEN |
-| AUTH-003 | raw dashboard key persists in browser JS-accessible storage | `2/20` | OPEN |
-| UI-001 | missing data can be presented as “no blockers” | `2/20` | OPEN |
-| UI-002 | gain-rank is mislabeled as validated forecast in one workspace | `2/20` | OPEN |
-| UI-003 | Dhan endpoint shown in Data Integrity is operationally misleading | `2/20` | OPEN |
-| UI-004 | broker connectivity is incorrectly used as secure-session proof | `1/20` | OPEN |
-| UI-005 | options fallback/default expressions can misstate zero/missing values | `1/20` | OPEN |
-| UI-006 | empty positions rows are not distinguished from unproven broker response | `1/20` | OPEN |
-| UI-007 | current shell lacks proven responsive navigation behavior | `2/20` | OPEN |
+| AUTH-002 | protected data hooks start before authentication | `2/20` | OPEN |
+| AUTH-003 | raw dashboard key remains JS-accessible | `2/20` | OPEN |
+| UI-001 | missing telemetry can be presented as “no blockers” | `2/20` | OPEN |
+| UI-002 | gain-rank is mislabeled as validated forecast | `2/20` | OPEN |
+| UI-003 | Dhan endpoint display is operationally misleading | `2/20` | OPEN |
+| UI-004 | broker connectivity is conflated with secure dashboard session | `1/20` | OPEN |
+| UI-005 | unsafe option-value fallback/default semantics | `1/20` | OPEN |
+| UI-006 | empty positions are not distinguished from unproven response | `1/20` | OPEN |
+| UI-007 | responsive navigation behavior is not proven | `2/20` | OPEN |
 | UI-008 | explicit keyboard focus appearance is not proven | `2/20` | OPEN |
-| UI-009 | factor/scenario risk services are pending | `1/20` | OPEN |
+| UI-009 | authoritative PAPER/LIVE mode truth is missing | `3/20` | OPEN — independently reproduced in DecisionIntelligence, ProductionProofBar and TopBar |
 | UI-010 | immutable production prediction ledger is pending | `2/20` | OPEN |
+| UI-011 | factor/scenario risk services are pending | `1/20` | OPEN |
+| UI-016 | global UI/proof readiness is incorrectly derived from broker connection | `2/20` | OPEN — Data Integrity + ProductionProofBar |
 
-No item has reached `LOCKED-20X` yet.
+No finding has reached `LOCKED-20X`.
 
 ## 4. Critical authentication/security findings
 
-### AUTH-001 — P0 — LoginPage HTTP request does not satisfy backend contract
-
-**Status:** FIX-REQUIRED, verified.
-
-**Frontend:** `dashboard/frontend/src/components/LoginPage.tsx:8-22`
-
-```ts
-fetch('/api/auth/session', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', 'X-API-Key': key.trim() },
-  credentials: 'include',
-})
-```
-
-No body is sent.
-
-**Backend:** `dashboard/backend/app.py:430-485`
-
-```py
-class DashboardAuthRequest(BaseModel):
-    api_key: str
-```
-
-The endpoint reads `payload.api_key`. A real HTTP request without the body can fail Pydantic validation before key comparison.
-
-**Independent cross-check:** `dashboard/frontend/src/components/AuthUnlock.tsx` already contains the correct pattern: `body: JSON.stringify({ api_key: apiKey.trim() })`.
-
-**Why this matters for real money:** a broken login flow can cause operator lockout, unauthenticated polling noise, false broker-disconnected states and emergency-access failure during live operation.
-
-**World-class fix:** use one typed auth API client; send the key once in a JSON body over HTTPS; establish cookie session; do not duplicate auth request construction across components.
-
-**Closure proof:** browser integration test against FastAPI: valid body -> 200 + HttpOnly cookie; invalid key -> 401; missing body -> 422; refresh -> `/api/auth/status authenticated=true`; no key logged.
-
-### AUTH-002 — P1 — Data polling begins before AuthGate decision
+### AUTH-001 — P0 — Login request does not satisfy backend contract
 
 **Status:** FIX-REQUIRED.
 
-**Source:** `dashboard/frontend/src/App.tsx:145-185`.
+Frontend `dashboard/frontend/src/components/LoginPage.tsx` POSTs `/api/auth/session` with headers and credentials but no JSON body. Backend `dashboard/backend/app.py` requires a Pydantic payload containing `api_key`.
 
-`App()` executes `useData()` and only then returns `<AuthGate>...`. Hooks run when `App` renders, so protected data polling can begin while the login page is being shown.
+**Why it matters:** operator lockout and auth-noise during a real-money incident are unacceptable.
 
-**Why it matters:** unnecessary 401/403 calls can contaminate broker/UI state, increase noise and mask genuine authentication/broker failures.
+**World-class solution:** one typed authentication client; send the bootstrap API key exactly once in the JSON body over HTTPS; establish an HttpOnly cookie session; remove duplicated request-construction paths.
 
-**World-class fix:** move data subscriptions into an authenticated `DashboardRuntime` child or make `useData({enabled: authenticated})` fail closed.
+**Closure proof:** browser integration test: valid key -> 200 + authenticated cookie; invalid -> 401; missing body -> 422; refresh -> authenticated; no raw key logged.
 
-**Closure proof:** Playwright/network test: before auth, only static/auth-status/session traffic; zero protected broker/chain/paper endpoints. After auth, subscriptions start once.
+### AUTH-002 — P1 — Protected polling begins before authentication
 
-### AUTH-003 — P1 — Raw API key retained in `sessionStorage`
+`App()` invokes `useData()` before the AuthGate decides whether to show LoginPage.
 
-**Status:** FIX-REQUIRED.
+**World-class solution:** authenticated runtime child (`<DashboardRuntime/>`) owns all protected subscriptions, or every protected data hook receives a fail-closed `enabled=authenticated` control.
 
-**Source:** `LoginPage.tsx` stores `s3_api_key`; `useAuth.ts` reads it and patches global axios/fetch to add `X-API-Key`.
+**Closure proof:** browser network capture before login shows zero protected broker/chain/paper requests; subscriptions start once only after successful auth.
 
-**Why it matters:** an XSS in any same-origin UI code can read the raw API key. A global fetch monkey-patch also broadens where credentials may be attached.
+### AUTH-003 — P1 — Raw API key stored in `sessionStorage`
 
-**World-class fix:** key is one-time bootstrap credential only; remove it from JS-accessible storage after session creation; use HttpOnly, Secure, SameSite cookie; use a scoped API client instead of patching `window.fetch` globally.
+LoginPage stores `s3_api_key`; auth utilities read and reinject it into requests.
 
-**Closure proof:** browser storage inspection shows no raw API key; protected API works through cookie; CSP/XSS tests; logout invalidates session.
+**World-class solution:** bootstrap credential is not persisted in JS-accessible storage. Use HttpOnly/Secure/SameSite cookie plus a scoped API client; avoid global `window.fetch` monkey-patching.
 
-### AUTH-004 — P1 — “12-hour” session is not independently server-expiring
+**Closure proof:** browser storage contains no raw key; protected requests work through session cookie; CSP/XSS checks; logout invalidates session.
 
-**Status:** FIX-REQUIRED / design hardening.
+### AUTH-004 — P1 — Session token lacks independent server expiry
 
-**Source:** `dashboard/backend/app.py:430-485` derives the cookie token deterministically from `_API_KEY`; server compares token equality but does not encode/check issued-at or expiry.
+Server token equality is deterministic from the API key and does not itself encode/check issue time or expiry.
 
-Browser Max-Age limits normal cookie sending, but a copied token is not rejected based on age by server logic.
+**World-class solution:** random opaque server-side session with TTL or signed expiring token with rotation/revocation.
 
-**World-class fix:** random opaque server-side session with TTL, or signed expiring token containing issued-at/expiry plus rotation/revocation support.
+**Closure proof:** replay after server TTL returns 401; key/session rotation invalidates old sessions.
 
-**Closure proof:** replay a captured expired session token after server TTL and prove 401; rotation invalidates older session.
+## 5. Dashboard/UI truth findings
 
-## 5. Dashboard/UI truth findings — deep slice 1
+### UI-001 — P0 — Absence of blocker/error telemetry can render as success
 
-### UI-001 — P0 — Absence of blocker data is displayed as success
+`DecisionIntelligence` and `DataIntegrity` contain conditional branches where missing arrays can collapse into “NO ... BLOCKERS”.
 
-**Status:** FIX-REQUIRED.
+**World-class rule:** every operational state is three-valued or richer: `PASS`, `FAIL`, `UNKNOWN/NO-PROOF`, plus `STALE` when applicable. Absence is never green.
 
-**Source A:** `DecisionIntelligence.tsx:30-115`:
+### UI-002 — P0/P1 — Scanner rank is presented as “Top Forecasts”
 
-```tsx
-health?.blockers?.length > 0 ? ... : <div>✓ NO SYSTEM BLOCKERS</div>
-```
+`OptionsIntelligence` labels gain-rank rows as forecasts while `PredictionAudit` explicitly says gain-rank is not a validated forecast.
 
-If `health` or `blockers` is absent, the branch renders the same green success as a proven empty array.
+**Fix:** call it `Scanner / Gain Rank` until immutable prediction records exist with model version, data cutoff, probability/confidence, uncertainty, calibration and realized outcome.
 
-**Source B:** `DataIntegrity.tsx:20-110` uses the same pattern for `health.errors`: missing error telemetry renders `✓ NO ACTIVE DATA BLOCKERS`.
+### UI-003 — P1 — Dhan endpoint label is misleading
 
-**Real-money impact:** false-green is more dangerous than an explicit failure; an operator can trade while telemetry itself is missing.
+Data Integrity hard-codes `web.dhan.co` as API endpoint. Runtime operator health should instead show sanitized configured REST/feed hosts separately and derive them from backend connection metadata.
 
-**World-class solution:** three-state semantics everywhere: `PASS`, `FAIL`, `UNKNOWN/NO PROOF`. Success requires explicit schema-valid data plus fresh timestamp; absence must never equal success.
+### UI-004 / UI-016 — P1/P0 — Broker truth is overloaded into unrelated security/UI truth
 
-**Closure proof:** component tests for undefined, null, stale, empty-proven, non-empty-failure; only explicit fresh empty result may be green.
+Current UI uses broker connectivity to support phrases such as secure session or UI-live/proven state.
 
-### UI-002 — P0/P1 — Gain-rank is labeled as “Top Forecasts” despite audit contract saying it is not a validated forecast
+**Required split:**
 
-**Status:** FIX-REQUIRED.
+- Dashboard authentication
+- Dhan REST authentication
+- Market-data feed
+- Data freshness
+- Broker account read health
+- Trading permission/order-router state
+- Frontend revision/provenance
+- Backend revision/provenance
 
-**Source A:** `OptionsIntelligence.tsx:30-175` renders `System3 Top Forecasts vs Market Leaders` for `gainRank.rankings`.
+No badge may infer another domain.
 
-**Source B:** `PredictionAudit.tsx` explicitly states: `the scanner's gain-rank list is not a validated forecast`.
+### UI-005 — P1 — Freshness can become green from truthiness rather than threshold
 
-**Real-money impact:** converts a ranking/scanner output into an apparently predictive claim. This can materially bias order decisions.
+Age/freshness fields need normalized units and explicit market-state-aware thresholds.
 
-**World-class solution:** rename to `Scanner / Gain Rank` until a validated prediction artifact exists. A forecast badge may only appear when a prediction record has model version, frozen input cutoff, probability/confidence, uncertainty, calibration status and immutable ledger ID.
+**Required display:** source event time, received time, age, allowed threshold, market open/closed, live/snapshot, clock-skew state.
 
-**Closure proof:** cross-workspace semantic contract test prevents `forecast/prediction` labels for unvalidated gain-rank payloads.
+### UI-006 — P1 — Unsafe numeric fallbacks can alter meaning
 
-### UI-003 — P1 — Data Integrity shows wrong operational Dhan API endpoint
+Examples retained from audit: `pcr_oi || '—'`, `pcr_vol || '—'`, falsy IV percentile, and missing OI change becoming `STABLE`.
 
-**Status:** FIX-REQUIRED.
+**Fix:** schema validation + nullish handling; missing data renders `UNKNOWN/NO DATA`, never a directional market conclusion.
 
-**Source:** `DataIntegrity.tsx:20-110` hard-codes `API ENDPOINT = web.dhan.co`.
+### UI-007 — P1 — Options analytics are not gated by a shared data-truth envelope
 
-**Primary-source cross-check:** official Dhan v2 REST examples use `https://api.dhan.co/v2/...`; official live feed uses `wss://api-feed.dhan.co`.
+A valid-looking chain object can render analytics without locally requiring authoritative source/freshness/schema quality.
 
-`web.dhan.co` is used for the Dhan web login/user flow, not as the runtime REST trading API base shown by official v2 API examples.
-
-**World-class solution:** show separate, runtime-derived endpoints:
-
-- REST: `api.dhan.co` (sanitized host only)
-- Market feed: `api-feed.dhan.co`
-- connection mode/version
-- last successful request/tick
-- latency and auth status
-
-Never hard-code operator health truth in presentation code.
-
-**Closure proof:** UI value comes from backend connection metadata and matches actual configured host; integration test compares sanitized runtime host to displayed host.
-
-### UI-004 — P1 — Broker connection is presented as secure dashboard session proof
-
-**Status:** FIX-REQUIRED.
-
-**Source:** `DataIntegrity.tsx:20-110`:
-
-```tsx
-{brokerConnected ? 'Session is active and secure.' : ...}
-```
-
-`brokerConnected` is a broker state; it does not prove dashboard-session security, cookie flags, session age, API-key protection, user identity or authorization.
-
-**World-class solution:** split four states: `Dashboard Auth`, `Dhan Auth`, `Market Data Feed`, `Trading Permission`. Never derive one from another.
-
-**Closure proof:** each badge uses a separate backend field with schema test and independent negative tests.
-
-### UI-005 — P1 — Data freshness is marked OK from truthiness, not an SLA/age threshold
-
-**Status:** FIX-REQUIRED.
-
-**Source:** `DataIntegrity.tsx:20-110`:
-
-```tsx
-status={health?.data?.chain_age ? 'ok' : 'mut'}
-status={health?.data?.top_age ? 'ok' : 'mut'}
-```
-
-Any truthy string/value can become green, even an old value.
-
-**World-class solution:** normalize age to milliseconds/seconds and apply explicit market-state-aware thresholds. Show absolute event timestamp + age + source + allowed threshold. Market-closed snapshots need a separate semantic state, not live-green.
-
-**Closure proof:** threshold boundary tests, market-open vs closed tests, stale feed test, clock-skew test.
-
-### UI-006 — P1 — Options values use unsafe fallbacks that can fabricate semantics
-
-**Status:** FIX-REQUIRED.
-
-**Source:** `OptionsIntelligence.tsx:30-175`.
-
-- `pcr_oi || '—'` hides a legitimate numeric zero.
-- `pcr_vol || '—'` hides a legitimate numeric zero.
-- `iv_percentile ? ... : 'PENDING'` turns zero into pending.
-- `oi_change || 'STABLE'` fabricates `STABLE` when the field is absent.
-
-**World-class solution:** use explicit nullish checks (`??`) plus schema validation. Never substitute directional/market semantics such as `STABLE` for missing data.
-
-**Closure proof:** unit tests for `0`, `null`, `undefined`, `NaN`, valid positive/negative values; missing value must render `UNKNOWN/NO DATA` not a market conclusion.
-
-### UI-007 — P1 — Option intelligence does not prove chain source/freshness before rendering analytics
-
-**Status:** FIX-REQUIRED.
-
-The workspace checks only whether `currentChain` is truthy before showing PCR/IV/OI. It does not locally require Dhan source, valid spot/contracts, non-stale/live-or-approved-snapshot semantics before displaying analytics.
-
-**World-class solution:** one shared `DataTruthEnvelope` required by every analytic component: source, event timestamp, received timestamp, age, market state, snapshot/live, quality status, schema version. Render analytics only when envelope policy passes; otherwise show last-good snapshot with explicit age or no-proof state.
-
-**Closure proof:** stale/fallback/mock payload cannot produce a normal analytics card.
+**Required `DataTruthEnvelope`:** source, symbol, event timestamp, received timestamp, age, live/snapshot, market state, schema version, quality state and last-good provenance.
 
 ### UI-008 — P1 — Empty positions can be confused with proven zero positions
 
-**Status:** FIX-REQUIRED.
+Required states: `LOADING`, `AUTH_REQUIRED`, `API_ERROR`, `SCHEMA_ERROR`, `PROVEN_EMPTY`, `ROWS_PRESENT`, `STALE_LAST_GOOD`.
 
-**Source:** `OptionsIntelligence.tsx:30-175` parses rows; if zero rows, it always renders `NO ACTIVE DHAN POSITIONS`.
+### UI-009 / UI-015 / UI-017 — P0 — Global mode safety is hard-coded in three presentation surfaces
 
-A zero-row result may be a real empty account, but can also occur if response shape changes, auth is pending, API failed, or the store holds a pending fallback object.
+Independent code paths currently present PAPER/LIVE-OFF as static truth:
 
-**World-class solution:** distinguish `LOADING`, `AUTH_REQUIRED`, `API_ERROR`, `SCHEMA_ERROR`, `PROVEN_EMPTY`, `ROWS_PRESENT`, `STALE_LAST_GOOD`.
+1. Decision Intelligence
+2. ProductionProofBar
+3. TopBar
 
-**Closure proof:** broker response metadata must explicitly prove a successful current read before `NO ACTIVE POSITIONS` is allowed.
+ProductionProofBar additionally marks the two static values as safe/green (`true`).
 
-### UI-009 — P1 — PAPER/LIVE state is hard-coded in Decision Intelligence
+**Real-money impact:** if configuration or routing state ever drifts, the dashboard can keep showing “LIVE OFF” while actual runtime permission differs. This is a catastrophic operator-trust failure mode.
 
-**Status:** FIX-REQUIRED despite current live-off safety intent.
+**World-class solution — authoritative `SafetyTruth` backend contract:**
 
-**Source:** `DecisionIntelligence.tsx:30-115` hard-codes `MODE=PAPER`, `LIVE=OFF` and prose stating trading is inhibited.
+```text
+mode: ANALYZER | PAPER | LIVE | UNKNOWN
+live_trading_enabled: boolean | null
+auto_execute_enabled: boolean | null
+order_router_state: DISABLED | ARMED | ENABLED | UNKNOWN
+kill_switch_state: ...
+source_revision: commit SHA
+cloud_run_revision: revision
+verified_at: RFC3339
+age_ms: integer
+policy_version: string
+proof_status: PROVEN | STALE | UNKNOWN
+```
 
-**Why this matters:** if deployment/runtime configuration ever drifts, the UI could continue saying `LIVE OFF`. For real-money trading, safety state must be runtime truth, not static copy.
+Frontend must fail closed: unavailable/stale safety truth => `UNKNOWN — DO NOT TRADE`, never static green.
 
-**World-class solution:** authoritative backend safety object with redundant fields (`mode`, `live_enabled`, `auto_execute`, `order_router_state`, `last_verified_at`, revision). UI fails closed to `UNKNOWN / DO NOT TRADE` if unavailable.
+### UI-010 — P1 — Prediction ledger is an explicit required placeholder
 
-**Closure proof:** controlled test payloads verify display changes; unknown backend state never shows live-off certainty or trade-ready success.
+This is acceptable as transparent unfinished functionality but blocks AI-driven live-money readiness.
 
-### UI-010 — P1 — Prediction Audit is an explicit required placeholder
+**Required ledger:** append-only prediction ID, symbol/contract, horizon, model/version/hash, frozen input cutoff, probability, uncertainty, evidence/counter-evidence, decision, realized outcome, costs/slippage, calibration bucket and integrity chain/hash.
 
-**Status:** FIX-REQUIRED before predictive real-money use.
+### UI-011 — P1 — Factor/scenario risk is explicitly pending
 
-**Source:** `PredictionAudit.tsx` says no production prediction ledger is wired and renders `PREDICTION LEDGER PENDING` / `DATA SERVICE PENDING`.
+Before any live-money assessment, portfolio view must prove net/gross exposure, concentration, expiry buckets, aggregate Greeks, stress/gap scenarios, margin utilization, drawdown headroom and enforceable pre-trade limits.
 
-**Required institutional target:** append-only prediction record including target, horizon, model/version/hash, probability, uncertainty, evidence/counter-evidence, data cutoff, feature schema, decision, realized outcome, fees/slippage, calibration bucket and tamper-evident audit ID.
+### UI-012 — P2 — Navigation is task-fragmented
 
-**Closure proof:** immutable write/read path, hash/sequence integrity check, prediction-to-outcome reconciliation, model-version lineage, retention/export test.
+Current sidebar exposes roughly twenty-plus destinations with overlapping truth/system/market workflows.
 
-### UI-011 — P1 — Factor risk and scenario engine are explicit required placeholders
-
-**Status:** FIX-REQUIRED for real-money readiness.
-
-**Source:** `RiskAndScenarios.tsx` displays `FACTOR RISK SERVICE PENDING` and `SCENARIO ENGINE PENDING`.
-
-**Required target:** for options/futures, minimum risk view should include net/gross exposure, concentration, underlying/expiry buckets, portfolio Greeks, gap/stress scenarios, max-loss/defined-risk truth where applicable, margin utilization, drawdown limits and pre-trade limit headroom.
-
-**Closure proof:** deterministic scenario fixtures, Greek aggregation reconciliation, margin/risk endpoint integration, stale-price rejection, boundary/limit tests.
-
-### UI-012 — P2 — Navigation is dense and task-fragmented
-
-**Status:** RECOMMENDED redesign; not by itself a trading blocker.
-
-**Source:** `Sidebar.tsx` exposes 22 destinations across Command, Market Data, Trading, Analysis and System. Several workflows overlap: `Decision Intel/Overview`, `Truth/E2E/Data Integrity/Broker/System`, `Options Intel/Option Chain`, `Performance/ML/Prediction Audit`.
-
-**World-class target:** primary task navigation of ~8-10 workspaces, with sub-tabs/drilldowns inside each workspace. Preserve all proven capabilities; consolidate surfaces, not data.
-
-Recommended primary IA:
+**Target primary IA (8–10 workspaces):**
 
 1. Command Center
 2. Market / Scanner
@@ -334,263 +233,261 @@ Recommended primary IA:
 9. Observability
 10. Security / Settings
 
-### UI-013 — P2 — Responsive/mobile behavior is not proven
+Capabilities should be consolidated, not deleted.
 
-**Status:** FIX/PROOF REQUIRED.
+### UI-013 — P2 — Responsive/mobile behavior not proven
 
-**Source A:** `Sidebar.tsx` uses fixed `width: 190px`.
+Desktop workstation is primary. Tablet gets collapsible rail. Mobile should initially be high-priority read-only operational view; mobile live order entry is OPTIONAL and should not be introduced before desktop truth/safety is fully proven.
 
-**Source B:** `index.css` includes `@media (prefers-reduced-motion: reduce)` but no viewport-width responsive shell/sidebar rule was found.
+### UI-014 — P2 — Keyboard focus appearance not proven
 
-**World-class solution:** desktop multi-pane workstation + tablet collapsible rail + mobile read-only priority view. Order-capable controls, if ever introduced, require intentional mobile-safe flows rather than desktop controls compressed onto a phone.
+Required: consistent `:focus-visible`, logical tab order, skip-to-content, table/grid keyboard strategy, aria-live for critical status updates, high-contrast non-color-only status indicators.
 
-**Closure proof:** Playwright viewport matrix (desktop 1920/1440, laptop 1366, tablet, mobile); zero inaccessible essential controls, zero uncontrolled horizontal shell overflow, screenshot diffs.
+### UI-018 — P1 — “CLOUD BUILD” green does not prove deployment compatibility
 
-### UI-014 — P2 — Keyboard focus appearance is not proven
+`CloudBuildBadge` becomes green when a build epoch exists.
 
-**Status:** FIX/PROOF REQUIRED.
+**World-class provenance badge must prove together:** frontend commit, backend commit, Cloud Run revision, image digest, build time, deploy time, health-check time, compatibility/schema version and freshness. Any mismatch is amber/red/unknown, not green.
 
-Repository search found no `focus-visible`. `select:focus` changes border, but there is no demonstrated consistent high-visibility keyboard focus treatment for all interactive controls.
+### UI-019 — P1 — Broker “good” state can come from response existence
 
-WCAG 2.2 includes stronger focus appearance expectations and keyboard-visible focus is especially important in a dense operational dashboard.
+`TopBar` considers broker good when any broker API object has responded and no obvious error string is detected.
 
-**World-class solution:** global `:focus-visible` token with high-contrast outline, no focus suppression, logical tab order, skip-to-content, table/grid keyboard strategy, aria-live for status changes where appropriate.
+**World-class broker state machine:** `UNKNOWN`, `AUTH_REQUIRED`, `AUTHENTICATED_READ_OK`, `FEED_OK`, `DEGRADED`, `STALE`, `API_ERROR`, `SCHEMA_ERROR`. Trading permission remains a separate field.
 
-**Closure proof:** automated accessibility scan plus manual keyboard-only walkthrough of every primary workflow.
+## 6. Positive UI foundations to preserve
 
-## 6. Positive UI evidence retained
+- shared design tokens and tabular numeric behavior exist;
+- reduced-motion preference is respected;
+- sidebar uses semantic navigation/ARIA attributes;
+- several unfinished workspaces explicitly show pending state instead of fabricating results;
+- Prediction Audit correctly warns that scanner gain-rank is not validated prediction proof;
+- analyzer/live-off intent is highly visible;
+- TopBar does attempt to expose market, broker, websocket and tick-age context.
 
-These are useful foundations and should be preserved:
+These are foundations only, not readiness proof.
 
-- `index.css` defines consistent design tokens and tabular numeric font behavior.
-- reduced-motion preference is explicitly respected.
-- `Sidebar` uses semantic `<nav>`, `aria-label`, button labels and `aria-current`.
-- workspaces use explicit PENDING states rather than fabricated data in several unfinished services.
-- Prediction Audit correctly warns that gain-rank is not a validated forecast.
-- Risk workspace states there are no executable controls in that workspace.
-- analyzer/live-off intent is visible throughout the UI.
+## 7. World-class institutional target UI — design baseline V2
 
-Positive evidence is not promoted to readiness until runtime truth and integration tests prove it.
+### 7.1 Always-visible authoritative truth strip — REQUIRED
 
-## 7. World-class target UI architecture — design baseline V1
+Every screen must show compact, source-backed status for:
 
-### 7.1 Always-visible truth strip — REQUIRED
-
-Every screen should display, from authoritative runtime data:
-
-- mode: Analyzer / Paper / Live
-- live-order router: disabled/enabled/unknown
-- Dhan REST auth status + token expiry
-- market feed status + source
+- operational mode
+- order-router permission
+- dashboard auth
+- Dhan REST auth
+- market-feed connection
 - market open/closed
-- last tick/event timestamp + age
-- Cloud Run revision + application commit
-- risk gate state
+- source + last event timestamp + age
+- frontend commit
+- backend commit
+- Cloud Run revision/image digest
+- risk gate
 - reconciliation state
-- open critical incidents/blockers
+- critical incident count
 
-Unknown must be visibly different from pass/fail.
+The visual language must distinguish `PROVEN`, `DEGRADED`, `FAIL`, `STALE`, `UNKNOWN`, and `NOT IMPLEMENTED`.
 
 ### 7.2 Command Center — REQUIRED
 
-One-screen operational answer to:
+One screen must answer:
 
-- Is the system safe to use?
-- Is data live, fresh and Dhan-sourced?
-- What is the strongest current scanner/AI evidence?
-- What positions/paper positions exist?
-- What is portfolio risk?
-- Which gate prevents real-money execution?
-- What changed recently?
+- Is the system safe to use now?
+- Is data authoritative, fresh and Dhan-sourced?
+- Which scanner candidates exist and what evidence supports them?
+- Which outputs are validated predictions vs rankings only?
+- What paper positions exist?
+- What portfolio/risk headroom exists?
+- Which exact gate prevents real-money activation?
+- What changed in the last session/hour?
 
 ### 7.3 Market / Scanner — REQUIRED
 
-- configurable watchlists
-- real-time quotes/volume and market status
-- scanner ranking with source, timestamp, model/rule origin
-- market-leader comparison clearly separated from forecasts
-- filtering/sorting/search with saved views
-- drilldown to symbol workspace
-
-Primary reference cross-check: TradingView Trading Platform documents watchlists, details widgets, news, account manager and event/subscription based UI composition. These are design-pattern references only; they are not claims that System3 has these capabilities.
+- watchlists and saved views
+- source/freshness next to every quote
+- ranker/scanner origin and rule/model version
+- filtering/sorting/search
+- market-leader comparison separated from model predictions
+- symbol drilldown
+- explicit stale/snapshot behavior
 
 ### 7.4 Options & Greeks — REQUIRED
 
 - expiry selector and strike ladder
 - bid/ask/LTP/spread/volume/OI/OI change/IV
-- Delta/Gamma/Theta/Vega and portfolio aggregate Greeks
-- PCR, IV percentile only when validated
+- Delta/Gamma/Theta/Vega per contract
+- portfolio aggregate Greeks
+- PCR/IV percentile only when validated
 - ATM/ITM/OTM visual hierarchy
-- source + freshness per chain
-- snapshot/live distinction
-- scanner context and position overlay
-- scenario P&L / Greek shift view
+- chain source/freshness/live-vs-snapshot
+- position overlay
+- scenario P&L and Greek shifts
+- schema/quality warning when contract data are incomplete
 
 ### 7.5 AI Decision Audit — REQUIRED before AI-driven live money
 
-- candidate vs validated prediction distinction
-- probability/confidence and uncertainty
-- evidence + counter-evidence
+- scanner candidate versus validated prediction distinction
+- probability/confidence + uncertainty
+- evidence and counter-evidence
 - model version/hash
 - frozen data cutoff
 - calibration metrics
-- prediction ledger ID
+- immutable ledger ID
 - realized outcome and after-cost result
-- explanation must never replace quantitative evidence
+- model drift and feature-quality state
 
-### 7.6 Portfolio / Risk — REQUIRED
+### 7.6 Paper / Trade Lifecycle — REQUIRED
 
-- funds, margin, exposure, realized/unrealized P&L
-- positions with broker timestamp
+- intent -> validation -> risk decision -> paper order -> fill simulation -> position -> exit -> realized P&L -> reconciliation
+- timestamps and correlation IDs through every stage
+- rejected/failed transitions visible
+- no “zero trades” success state unless the lifecycle API is proven healthy
+
+### 7.7 Portfolio & Risk — REQUIRED
+
+- funds/margin
+- realized/unrealized P&L
+- positions with broker timestamp/source
 - concentration and expiry exposure
 - aggregate Greeks
-- max daily loss/drawdown headroom
+- daily loss/drawdown headroom
 - stress scenarios
-- reconciliation state
-- kill-switch status as display only until a separately audited execution-control program exists
+- reconciliation status
+- risk-limit headroom
+- kill-switch status displayed from authority, not as a cosmetic control
 
-### 7.7 Observability — REQUIRED
+### 7.8 Data & Broker Health — REQUIRED
 
-Google Cloud guidance supports dashboards that combine service health/SLO status, alerts and logs. System3 should surface operator-level versions of:
+- Dhan REST host/auth/read health
+- Dhan feed host/connection/reconnect state
+- per-stream last event time and latency
+- schema/normalization health
+- rate-limit state
+- last successful funds/positions/holdings read
+- source provenance and fallback status
+
+### 7.9 Readiness / Proof — REQUIRED
+
+Every gate links to evidence, revision and timestamp. No generic green check without proof object. Gate states: `PASS`, `FAIL`, `BLOCKED`, `STALE`, `UNKNOWN`, `NOT RUN`.
+
+### 7.10 Observability — REQUIRED
 
 - API availability SLI/SLO
-- broker read success ratio
+- broker-read success ratio
 - market-feed freshness SLI
 - p50/p95/p99 endpoint latency
 - websocket reconnect/disconnect counts
-- event-loop lag / memory / CPU
+- worker/event-loop lag
+- memory/CPU
 - Cloud Run revision/image/commit provenance
-- recent incidents and error-budget burn
+- incident timeline and error-budget burn
+- frontend browser errors and failed API calls
 
-### 7.8 Accessibility / operator ergonomics — REQUIRED
+### 7.11 Security / Settings — REQUIRED
 
-- WCAG 2.2-aligned keyboard/focus behavior
-- color is never the sole status signal
-- tabular numerics
-- UTC/IST policy explicit; market timestamps consistently labeled
-- dangerous controls separated from informational controls
-- no animation required to understand state
-- high-density mode plus comfortable mode
-- saved layout preferences
+- session age/expiry
+- auth method and security posture without exposing secrets
+- role/permission model when multi-user is introduced
+- audit-log export
+- safety configuration shown read-only unless separately authorized
+- no secret values in browser storage or UI
 
 ## 8. Feature priority matrix
 
-### REQUIRED before live-money readiness can even be assessed
+### REQUIRED before live-money readiness can be assessed
 
-- truthful authentication and session state
-- authoritative live/paper mode indicator
-- Dhan REST/feed health and freshness
-- no absence-as-success UI states
-- validated option-chain + Greeks display
-- proven positions/funds/margin truth
-- paper lifecycle + reconciliation
-- factor/portfolio/scenario risk
-- prediction ledger for AI-driven decisions
-- immutable auditability
-- pre-trade risk gates
+- correct auth/session contract
+- no browser-persisted raw API key
+- authoritative runtime safety/mode contract
+- no absence-as-success states
+- Dhan REST/feed truth and freshness
+- validated option-chain + Greeks
+- proven funds/positions/margin
+- end-to-end paper lifecycle and reconciliation
+- portfolio/factor/scenario risk
+- enforceable pre-trade risk gates
+- immutable prediction ledger for AI-driven decisions
+- deployment/source provenance
 - latency/freshness observability
-- incident/error display
-- responsive safe operator layout
+- incident/error visibility
+- responsive operator-safe layout
 - keyboard/accessibility baseline
-- same-revision deployment provenance
 
 ### RECOMMENDED
 
-- consolidated task-based navigation
+- task-based consolidated navigation
 - multi-monitor layout presets
 - saved watchlists/workspaces
+- linked underlying/options views
 - advanced chart annotations
-- crosshair-linked option/underlying views
-- custom alerts and incident timeline
-- comparison of scanner signal vs market leaders
-- configurable data-density modes
+- configurable density
+- incident timeline and custom alerts
 
-### OPTIONAL until core truth/safety is proven
+### OPTIONAL until core safety/truth is proven
 
-- news/sentiment enrichment
-- catalyst enrichment
-- social sentiment
-- cosmetic themes beyond accessible dark/light
-- extensive drawing-tool ecosystem
-- advanced multi-chart layouts
-- mobile order entry
+- social/news sentiment enrichment
+- cosmetic theme breadth
+- large drawing-tool ecosystem
+- extensive multi-chart mosaics
+- mobile live order entry
 
-Optional breadth must never delay or obscure required truth/safety work.
+Optional breadth must never delay core truth, risk, lifecycle or security work.
 
-## 9. Historical verified checkpoints retained
+## 9. Historical proof retained with strict scope
 
-### V5 consolidation snapshot
-
-`docs/audit/V5_CONSOLIDATION_VALIDATION.md` recorded:
-
-- direct backend routes `183 -> 183`, removed `0`
-- navigation tabs `16 -> 22`
-- frontend production build PASS
-- dashboard tests `7/7 PASS`
-- security/deployment contract tests `24/24 PASS`
-- syntax checks PASS
-- production npm vulnerabilities `0`
-- embedded reusable frontend API key removed
-- live trading disabled
-
-This is historical evidence only; later code changed.
-
-### PR checkpoints
-
-- PR #93 login/session feature: configured blocking CI passed, but integration coverage did not catch the actual LoginPage HTTP-body mismatch.
-- PR #95 broker-status CI auth: CI-only auth proof change.
-- PR #96 UI status cleanup: workflows passed at that checkpoint.
-- application HEAD `b70af343...` is later than PR #96 merge and is not marked current-HEAD CI-proven by this audit.
+Earlier V5 validation recorded successful builds/tests and security/deployment checks at specific historical revisions. PR #93/#95/#96 checkpoints also had green workflows at their respective heads. These are valuable regression references only; they do not prove application HEAD `b70af343...` because later code changed and current same-revision CI/runtime proof is incomplete.
 
 ## 10. Google Cloud / deployment findings retained
 
-- Cloud Run workflow is the deployment source of truth.
-- root `render.yaml` absent.
-- residual Render terminology remains in frontend/backend comments/status handling.
-- Cloud Run deploy env string contains duplicate `REQUIRE_API_KEY=true` entry.
-- workflow source preserves: `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`, `ANALYZE_MODE=1`, `SYSTEM3_MODE=ANALYZER`.
-- production runtime still requires exact-revision proof: revision, image digest, commit, health, authenticated broker status, funds/positions/holdings, required chains, browser proof and safety flags.
+- Google Cloud Run is the target deployment authority.
+- root `render.yaml` is absent.
+- residual Render-era terminology remains migration debt.
+- Cloud Run workflow source keeps live trading disabled and analyzer mode enabled.
+- a production runtime claim still requires exact-revision proof: frontend/backend commit, Cloud Run revision, image digest, authenticated health, Dhan status, required chains, funds/positions/holdings, browser proof and all safety flags.
 
-## 11. Historical open trading gates
+## 11. Historical open real-money gates
 
-Carry forward until new proof closes them:
+Carry forward until same-revision evidence closes them:
 
-- `real_market_analyzer_paper_lifecycle_not_proven`
-- `nse_comparison_proof_missing`
+- `REAL_MARKET_ANALYZER_PAPER_LIFECYCLE_NOT_PROVEN`
+- `NSE_COMPARISON_PROOF_MISSING`
 - `TRADE_READY_FALSE`
 - `MULTI_DAY_STABILITY_NOT_PROVEN`
 - `POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN`
 - `REAL_PAPER_LIFECYCLE_NOT_PROVEN`
 
-`LIVE_TRADING_DISABLED_BY_DESIGN` is a required safety state during this audit, not a defect.
+`LIVE_TRADING_DISABLED_BY_DESIGN` is the required safety posture during this audit, not a defect.
 
 ## 12. Closure standard for every finding
 
-A finding may be `CLOSED` only when all relevant evidence is tied to the exact changed commit:
+A finding may be marked `CLOSED` only when all applicable evidence is tied to the exact changed revision:
 
-1. code/config fix inspected;
-2. negative and positive tests added;
+1. source/config fix inspected;
+2. positive and negative tests added;
 3. build/compile/type/static checks pass;
-4. applicable unit/integration/browser tests pass;
-5. deployment proof for the same revision when runtime-dependent;
-6. no safety regression in analyzer/live-off flags;
-7. stale/old audit trackers regenerated;
-8. screenshot/browser proof for UI findings;
-9. cross-contract verification for frontend/backend fields;
-10. no contradictory evidence from another independent path.
+4. unit/integration/browser tests pass;
+5. deployment proof exists for runtime-dependent findings;
+6. analyzer/live-off safety has no regression;
+7. stale trackers regenerated;
+8. browser screenshot/network/console proof exists for UI findings;
+9. frontend/backend contract fields reconcile;
+10. no contradictory independent evidence remains.
 
 ## 13. Next audit slices
 
-Priority sequence for subsequent iterations:
+1. **Option Chain + Greeks end-to-end field truth** — frontend table, backend routes, Dhan normalization, calculator provenance, units and stale handling.
+2. **System Truth / End-to-End Proof / LiveTradingGate** — locate additional global false-green or duplicated safety semantics.
+3. **Paper Trading + Trade + Positions** — lifecycle transitions, reconciliation, P&L truth, zero-vs-error semantics.
+4. **Risk + auto-gates** — determine which displayed limits are actually enforced before an order route.
+5. **WebSocket/polling** — reconnect, backoff, stale cache, out-of-order data, heartbeat and event timestamp semantics.
+6. **Observability/Cloud Run provenance** — source revision, SLO, logs, latency, runtime health.
+7. **Responsive/accessibility browser matrix** — desktop/tablet/mobile, keyboard, focus and status announcement proof.
 
-1. **Option Chain + Greeks implementation and field truth** — compare `OptionChain`, backend chain routes, greeks calculators and Dhan payload normalization.
-2. **TopBar / ProductionProofBar / Truth Control / E2E Proof** — hunt contradictory global states and false-green readiness.
-3. **Paper Trading + Trade + Positions** — lifecycle, reconciliation, P&L truth, zero-vs-error semantics.
-4. **RiskDashboard + Auto Gates** — map risk limits to actual enforceable backend gates.
-5. **WebSocket/polling architecture** — reconnect, stale cache, out-of-order messages, timestamps and heartbeat semantics.
-6. **Observability / Cloud Run provenance** — SLO, logs, metrics, error budgets, revision truth.
-7. **Responsive/accessibility browser proof** — viewport matrix, keyboard, focus, screen-reader/status semantics.
+## 14. Visual-design iteration rule
 
-## 14. Hard safety rule
+Each subsequent audit iteration should improve or rotate the target UI visual without pretending conceptual elements are implemented. Every unproven value in design concepts must be marked `CONCEPT`, `TARGET`, `PENDING`, `UNKNOWN` or `NOT PROVEN`. No fabricated P&L, profitability, broker-ready, trade-ready or PASS metrics are permitted.
 
-UI wording, design quality, green badges or successful builds can never substitute for broker/data/risk/runtime proof. Any future live-order capability must be separately designed, independently audited, gated, staged and proven before activation. During this audit, live order placement/modification/cancellation/routing remains prohibited.
+## 15. Hard safety rule
+
+UI quality, green badges, successful builds or attractive design can never substitute for broker/data/risk/runtime proof. Any future live-order capability must be separately designed, independently audited, staged and proven before activation. During this audit, live order placement/modification/cancellation/routing remains prohibited.
