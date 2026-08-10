@@ -70,7 +70,7 @@ export const useStore = create<DashboardState>((set) => ({
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
-  activeTab: 'overview',
+  activeTab: 'decision-intel',
   chainSymbol: 'NIFTY',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),

@@ -1,27 +1,34 @@
 import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
-  Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical
+  Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
+  Search, Zap
 } from 'lucide-react'
 import { useStore } from '../store'
 
 const TABS = [
-  { id: 'truth',       label: 'Truth Control', Icon: Shield,            group: 'main' },
-  { id: 'genesis',     label: 'Genesis Brain', Icon: Sparkles,         group: 'main' },
-  { id: 'e2e-proof',   label: 'E2E Proof',     Icon: CheckCircle,      group: 'main' },
-  { id: 'overview',    label: 'Overview',      Icon: LayoutDashboard,  group: 'main' },
-  { id: 'sim-live',    label: 'Sim Live',      Icon: FlaskConical,     group: 'main' },
-  { id: 'chain',       label: 'Option Chain',  Icon: Layers,           group: 'market' },
-  { id: 'signals',     label: 'Signals',       Icon: TrendingUp,       group: 'market' },
-  { id: 'trade',       label: 'Trade',         Icon: FileText,         group: 'trading' },
-  { id: 'paper',       label: 'Paper Trades',  Icon: BookOpen,         group: 'trading' },
-  { id: 'positions',   label: 'Positions',     Icon: Database,         group: 'trading' },
-  { id: 'performance', label: 'Performance',   Icon: BarChart3,        group: 'analysis' },
-  { id: 'ml',          label: 'ML Model',      Icon: Brain,            group: 'analysis' },
-  { id: 'broker',      label: 'Broker',        Icon: Database,         group: 'system' },
-  { id: 'alerts',      label: 'Alerts',        Icon: Bell,             group: 'system' },
-  { id: 'system',      label: 'System',        Icon: Activity,         group: 'system' },
-  { id: 'gates',       label: 'Live Gate',     Icon: Shield,           group: 'system' },
+  { id: 'decision-intel', label: 'Decision Intel', Icon: Zap, group: 'main' },
+  { id: 'truth',          label: 'Truth Control',  Icon: Shield,          group: 'main' },
+  { id: 'genesis',        label: 'Genesis Brain',  Icon: Sparkles,        group: 'main' },
+  { id: 'e2e-proof',      label: 'E2E Proof',      Icon: CheckCircle,     group: 'main' },
+  { id: 'overview',       label: 'Overview',       Icon: LayoutDashboard, group: 'main' },
+  { id: 'sim-live',       label: 'Sim Live',       Icon: FlaskConical,    group: 'main' },
+  { id: 'options-intel',  label: 'Options Intel',  Icon: Layers,          group: 'market' },
+  { id: 'chain',          label: 'Option Chain',   Icon: Layers,          group: 'market' },
+  { id: 'signals',        label: 'Signals',        Icon: TrendingUp,      group: 'market' },
+  { id: 'trade',          label: 'Trade',          Icon: FileText,        group: 'trading' },
+  { id: 'paper',          label: 'Paper Trades',   Icon: BookOpen,        group: 'trading' },
+  { id: 'positions',      label: 'Positions',      Icon: Database,        group: 'trading' },
+  { id: 'risk-scenarios', label: 'Risk & Scenarios', Icon: Shield,        group: 'analysis' },
+  { id: 'multibagger',    label: 'Multibagger V4', Icon: Sparkles,        group: 'analysis' },
+  { id: 'prediction-audit', label: 'Prediction Audit', Icon: Search,       group: 'analysis' },
+  { id: 'performance',    label: 'Performance',    Icon: BarChart3,       group: 'analysis' },
+  { id: 'ml',             label: 'ML Model',       Icon: Brain,           group: 'analysis' },
+  { id: 'data-integrity', label: 'Data Integrity', Icon: Database,        group: 'system' },
+  { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
+  { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
+  { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
+  { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ]
 
 const GROUP_LABELS: Record<string, string> = {
