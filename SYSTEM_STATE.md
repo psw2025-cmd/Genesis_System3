@@ -1,6 +1,8 @@
 # SYSTEM_STATE.md — Single Source of Truth
 > **ALL AGENTS MUST READ THIS FILE FIRST before making any changes.**
-> Last updated: 2026-06-14 20:30 IST | Updated by: Claude (controller)
+> Last updated: 2026-08-11 IST | Updated by: E1 agent (SYS3-BLK-011 fix)
+> **DEPLOYMENT REALITY: Google Cloud Run (project `system3-openalgo-safe`, region `asia-south1`). NOT Render. NOT local Windows.**
+> Web service: `genesis-system3-web` | Token rotation: Cloud Run Job `genesis-system3-dhan-token-rotate`
 
 ---
 
@@ -17,10 +19,10 @@
 - **ACTIVE:** DhanHQ ONLY
 - **Client ID:** ...3741
 - **SDK:** dhanhq 2.2.0
-- **Status (Codespace):** Token expired — TOTP strategy giving "Invalid TOTP" (2026-06-14). User must complete OAuth flow.
-- **Status (Render cloud):** TOKEN_EXPIRED_OR_INVALID — user must set fresh `DHAN_ACCESS_TOKEN` in Render dashboard.
-- **Balance:** ₹17.53 (last verified 2026-06-12)
-- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=first-insights-1`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
+- **Status (GCP Cloud Run):** CONNECTED ✅ (verified 2026-08-11, token secret version 35, /fundlimit HTTP 200)
+- **Balance:** ₹2,291.94 available (verified 2026-08-11)
+- **Token source:** GCP Secret Manager secret `dhan-access-token` (dynamic reload, 30s TTL)
+- **CRITICAL RULE (SYS3-BLK-011):** Dhan invalidates ALL prior access tokens the moment a new PIN+TOTP login happens. Therefore ONLY the rotation job may generate tokens. The web service must NEVER call generate_token (BROKER_SELF_HEAL_TOKEN_REFRESH=0).
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)
 | API Category | Status | Notes |
@@ -45,15 +47,13 @@
 
 ---
 
-## TOKEN MANAGEMENT
-- **Strategy:** generate_token(PIN + TOTP) — pure API, fully automated (Codespace)
-- **Cloud strategy:** `cloud_worker.py` runs token-daemon thread; web service refreshes on startup if DHAN_PIN+DHAN_TOTP_SECRET set in Render env
-- **Daemon:** Start with `scripts/dhan_token_auto_refresh.py` (daily 08:30, or `--now` for manual refresh)
-- **Watchdog:** `scripts/dhan_watchdog_runner.py` (every 30 min)
-- **Startup check:** Runs on every terminal login via ~/.bashrc
-- **Credentials (Codespace):** DHAN_PIN ✅, DHAN_TOTP_SECRET ✅, DHAN_APP_ID ✅, DHAN_APP_SECRET ✅ — BUT TOTP returns "Invalid TOTP" as of 2026-06-14 (token expired 2026-06-13 ~19:00)
-- **Credentials (Render):** DHAN_* must be set in Render dashboard (sync: false). Token currently expired.
-- **Current token:** EXPIRED — requires OAuth flow to renew
+## TOKEN MANAGEMENT (GCP — updated 2026-08-11, SYS3-BLK-011 fix)
+- **Single writer:** Cloud Run Job `genesis-system3-dhan-token-rotate` (scripts/gcp_dhan_token_rotation_job.py) is the ONLY component allowed to generate tokens. Scheduled daily 07:30 IST via Cloud Scheduler.
+- **Live validation gate:** token_manager.py validates every new token against `https://api.dhan.co/v2/fundlimit` BEFORE persisting to Secret Manager. Invalid tokens are never saved.
+- **Web service:** read-only consumer via cloud_token_provider.py (30s cache TTL, force-reload throttled to 1 per 30s to prevent Secret Manager hammering).
+- **Self-heal:** BROKER_SELF_HEAL_TOKEN_REFRESH defaults to 0 (OFF). Web service never mints tokens.
+- **Credentials (GCP Secret Manager):** dhan-pin ✅ (v10), dhan-totp-secret ✅, system3-dhan-client-id ✅, dhan-access-token ✅ (rotated)
+- **Manual rotation:** `gcloud run jobs execute genesis-system3-dhan-token-rotate --region=asia-south1 --wait`
 
 ---
 
@@ -88,8 +88,7 @@
 ---
 
 ## PENDING TASKS (priority order)
-1. **[USER ACTION — BLOCKER]** Renew Dhan access token via OAuth flow → `connected=true` on `/api/broker/status`. Until done, broker is disconnected in both Codespace and Render cloud.
-   - Step: `https://auth.dhan.co/login/consentApp-login?consentAppId=first-insights-1` → copy tokenId → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>` → set in Render dashboard
+1. ~~**[USER ACTION — BLOCKER]** Renew Dhan access token~~ ✅ RESOLVED 2026-08-11 — broker `connected=true` on GCP; SYS3-BLK-011 permanent fix applied (validate-before-persist + reload throttle + self-heal off). Redeploy web service to activate code fixes.
 2. **[MARKET DAY — 2026-06-16]** Run paper lifecycle proof at 09:30 IST (auto-scheduled or `python scripts/paper_lifecycle_proof.py`)
 3. ~~**[USER ACTION]** Subscribe to Dhan Data APIs~~ ✅ DONE 2026-06-23 — All data unlocked
 2. ~~**[CODE]** Wire system3_signal_engine to generate signal CSV (activate dead 15% ml_confidence weight)~~ ✅ DONE (session 6: bhavcopy runner + prob_BUY_CE fix + staleness fix)

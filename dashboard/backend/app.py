@@ -8291,7 +8291,11 @@ async def broker_self_heal_loop():
                         _BROKER_LAST_ALERT_TS = _t.time()
                         print(f"[self-heal] broker down fail={_BROKER_FAIL_COUNT} err={s.get(chr(101)+chr(114)+chr(114)+chr(111)+chr(114))}")
                     if _BROKER_FAIL_COUNT >= 3 and not _BROKER_HEAL_IN_PROGRESS:
-                        if os.environ.get("BROKER_SELF_HEAL_TOKEN_REFRESH", "1") in (
+                        # Default OFF (SYS3-BLK-011): the web service must never mint
+                        # tokens — Dhan invalidates all prior sessions on new login,
+                        # which cascades into the token-paradox churn loop. Rotation
+                        # is exclusively the Cloud Run job's duty (07:30 IST daily).
+                        if os.environ.get("BROKER_SELF_HEAL_TOKEN_REFRESH", "0") in (
                             "0",
                             "false",
                             "False",
@@ -8301,6 +8305,7 @@ async def broker_self_heal_loop():
                                 "BROKER_SELF_HEAL_TOKEN_REFRESH=0 — keeping mounted secret"
                             )
                             _BROKER_HEAL_IN_PROGRESS = False
+                            await asyncio.sleep(60)
                             continue
                         _BROKER_HEAL_IN_PROGRESS = True
                         try:

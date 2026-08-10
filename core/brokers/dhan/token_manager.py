@@ -200,6 +200,47 @@ def _token_expiry(token: str) -> datetime | None:
         return None
 
 
+def _validate_token_live(client_id: str, token: str) -> bool:
+    """Prove a token works against Dhan /fundlimit BEFORE persisting it.
+
+    SYS3-BLK-011 root cause: an unvalidated (or instantly-invalidated) token
+    written to Secret Manager sent every consumer into a DH-906 churn loop.
+    """
+    try:
+        import requests
+
+        resp = requests.get(
+            "https://api.dhan.co/v2/fundlimit",
+            headers={
+                "access-token": token,
+                "client-id": client_id,
+                "Content-Type": "application/json",
+            },
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            logger.info("Token live-validation PASSED (fundlimit HTTP 200)")
+            return True
+        logger.error(
+            "Token live-validation FAILED: HTTP %s %s",
+            resp.status_code,
+            resp.text[:200],
+        )
+        return False
+    except Exception as e:
+        logger.error(f"Token live-validation error: {e}")
+        return False
+
+
+def _validated_persist(client_id: str, new_token: str) -> bool:
+    """Validate then persist. Returns False (and does NOT persist) if invalid."""
+    if not _validate_token_live(client_id, new_token):
+        logger.error("REFUSING to persist unvalidated token to Secret Manager")
+        return False
+    _write_token(new_token)
+    return True
+
+
 # ------------------------------------------------------------------ #
 #  Strategy 1 (primary): generate_token via PIN + TOTP               #
 # ------------------------------------------------------------------ #
@@ -495,15 +536,21 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         )
         new_token = _try_generate(client_id, pin, totp_secret)
         if new_token:
-            _write_token(new_token)
+            if not _validated_persist(client_id, new_token):
+                return {
+                    "success": False,
+                    "strategy": "generate_token",
+                    "message": "Token generated but FAILED live validation — NOT persisted to Secret Manager",
+                }
             exp = _token_expiry(new_token)
             return {
                 "success": True,
                 "strategy": "generate_token",
-                "message": "Token generated via PIN + TOTP (fully automated)",
+                "message": "Token generated via PIN + TOTP and live-validated against /fundlimit",
                 "token_preview": f"...{new_token[-8:]}",
                 "token_length": len(new_token),
                 "expires_at": exp.isoformat() if exp else "unknown",
+                "live_validated": True,
             }
         logger.info("generate_token failed — falling back")
 
@@ -512,12 +559,17 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         logger.info("Trying Strategy 2: renew_token(current_token)")
         new_token = _try_renew(client_id, cur_token)
         if new_token:
-            _write_token(new_token)
+            if not _validated_persist(client_id, new_token):
+                return {
+                    "success": False,
+                    "strategy": "renew_token",
+                    "message": "Renewed token FAILED live validation — NOT persisted",
+                }
             exp = _token_expiry(new_token)
             return {
                 "success": True,
                 "strategy": "renew_token",
-                "message": "Token renewed (extended from current token)",
+                "message": "Token renewed and live-validated against /fundlimit",
                 "token_preview": f"...{new_token[-8:]}",
                 "token_length": len(new_token),
                 "expires_at": exp.isoformat() if exp else "unknown",
@@ -527,7 +579,12 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
         logger.info("force_generate requested but PIN/TOTP missing — trying renew")
         new_token = _try_renew(client_id, cur_token)
         if new_token:
-            _write_token(new_token)
+            if not _validated_persist(client_id, new_token):
+                return {
+                    "success": False,
+                    "strategy": "renew_token",
+                    "message": "Renewed token FAILED live validation — NOT persisted",
+                }
             exp = _token_expiry(new_token)
             return {
                 "success": True,

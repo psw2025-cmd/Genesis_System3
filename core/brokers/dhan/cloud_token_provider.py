@@ -141,8 +141,24 @@ def get_access_token(*, force_refresh: bool = False, reason: str = "credential_r
             return cached or os.getenv("DHAN_ACCESS_TOKEN", "").strip()
 
 
+_FORCE_RELOAD_MIN_INTERVAL_S = 30.0
+_LAST_FORCE_RELOAD_EPOCH = 0.0
+
+
 def force_reload(reason: str = "auth_failure") -> bool:
+    """Force-fetch the latest secret version, rate-limited to stop SM hammering.
+
+    SYS3-BLK-011: during a bad-token loop every read call triggered a forced
+    Secret Manager access (~4/sec, reload_count 25k+). A 30s floor bounds
+    worst-case SM traffic to 2 reads/min while still healing promptly.
+    """
+    global _LAST_FORCE_RELOAD_EPOCH
     with _LOCK:
+        now = time.time()
+        if now - _LAST_FORCE_RELOAD_EPOCH < _FORCE_RELOAD_MIN_INTERVAL_S:
+            _CACHE["last_reload_reason"] = f"{reason}_throttled"
+            return False
+        _LAST_FORCE_RELOAD_EPOCH = now
         before_token = str(_CACHE.get("token") or os.getenv("DHAN_ACCESS_TOKEN", "").strip())
         before_version = str(_CACHE.get("version") or "")
     token = get_access_token(force_refresh=True, reason=reason)
