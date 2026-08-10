@@ -1,0 +1,111 @@
+{
+  "theme_name": "Neo-Brutalist Soft / Earthy Swiss",
+  "theme_strategy": "Light-theme preferred for editorial feel. Raw, high-contrast, functional layouts. Stark backgrounds, bold type, simple geometry, limited color. No gradients. No purple/violet magic tropes. The app should feel like a premium physical notebook meets a high-end developer tool.",
+  "typography": {
+    "fonts": {
+      "headings": "Bricolage Grotesque",
+      "body": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    },
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter font-medium text-stone-900",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-medium text-stone-800",
+      "h3": "text-xl sm:text-2xl font-medium tracking-tight text-stone-800",
+      "body": "text-base leading-relaxed text-stone-700",
+      "labels_and_mono": "text-xs tracking-[0.1em] uppercase font-mono text-stone-500"
+    },
+    "pairing_rules": "Use Bricolage Grotesque for titles and big headers. Use IBM Plex Sans for all note body content for maximum readability. Use JetBrains Mono strictly for tags, timestamps, AI suggestions, and UI metadata."
+  },
+  "colors": {
+    "archetype": "Organic & Earthy + Swiss Contrast",
+    "palette": {
+      "background_app": "#F5F5F0",
+      "background_editor": "#FFFFFF",
+      "text_primary": "#1A1A1A",
+      "text_secondary": "#5C5C54",
+      "border_color": "#E0E0D8",
+      "accent_primary": "#1A1A1A",
+      "accent_ai": "#D95236",
+      "accent_ai_bg": "#FDF0ED",
+      "hover_bg": "#EAEAE3"
+    },
+    "tailwind_mapping": {
+      "bg-app": "bg-[#F5F5F0]",
+      "bg-editor": "bg-white",
+      "text-main": "text-[#1A1A1A]",
+      "border-light": "border-[#E0E0D8]",
+      "ai-text": "text-[#D95236]",
+      "ai-bg": "bg-[#FDF0ED]"
+    },
+    "rules": "Never use pure #000000 or #808080. AI actions must be highlighted in Terracotta (#D95236) to ground the AI conceptually, avoiding all glowing purple/blue gradients."
+  },
+  "layouts": {
+    "overall": "Three-pane layout: Collapsible left sidebar (Navigation + Tags), middle column (Notes List), right massive pane (Main Editor + Activity Sidebar progressive disclosure).",
+    "editor_container": "Single-focus writing area. max-w-3xl mx-auto, w-full. Massive padding: py-12 md:py-24 px-8 md:px-16.",
+    "spacing": "Use p-6 or p-8 inside cards. Use gap-8 or gap-12 between major sections.",
+    "grid": "Bento-style for recent activity and tag stats. grid-cols-1 md:grid-cols-4 tight gaps (gap-4)."
+  },
+  "components": {
+    "buttons": "Flat, pill-shaped or sharp rectangular. 1px solid border. Hover state drops a 2px hard shadow or translates -y-1. AI buttons use the Terracotta accent.",
+    "cards": "Cardless approach preferred. Use 1px solid borders (border-stone-200) on pure white backgrounds. No soft blurry shadows. If shadow is needed, use a hard offset shadow (e.g., shadow-[4px_4px_0_0_rgba(26,26,26,1)]).",
+    "header_and_nav": "Solid background (bg-[#F5F5F0]) with a hard 1px bottom border. DO NOT use fully transparent backgrounds for headers.",
+    "inputs": "Flat, border-stone-300, focus:border-stone-900 focus:ring-0. High contrast.",
+    "tags": "Pill shaped, font-mono text-xs, bg-stone-100 border border-stone-200 text-stone-700."
+  },
+  "motion": {
+    "interactions": "Crisp and immediate. transition-transform duration-200 ease-out. No 'transition-all'. hover:-translate-y-[1px].",
+    "page_transitions": "Fade in with a slight upward translation (translate-y-2 to 0, opacity 0 to 1) for lists and editor content."
+  },
+  "visual_enhancers": {
+    "textures": "Subtle paper texture or grain overlay on the app background (#F5F5F0) to break digital flatness.",
+    "icons": "iconoir-react for a sharp, non-corporate technical look. Ensure stroke-width is consistent.",
+    "ai_cues": "Instead of sparkles, use a distinct geometric shape (like a sharp asterisk or an organic solid dot) next to AI actions. 'AI Summarize' should look like an editorial tool."
+  },
+  "media": {
+    "image_urls": {
+      "user_avatar": {
+        "url": "https://images.unsplash.com/photo-1506863530036-1efeddceb993?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHwyfHxwb3J0cmFpdCUyMHBlcnNvbiUyMG1pbmltYWxpc3R8ZW58MHx8fHwxNzg2Mzg2ODY3fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Minimalist grayscale portrait of a woman, for the user profile avatar."
+      },
+      "texture_bg": {
+        "url": "https://images.unsplash.com/photo-1637325258040-d2f09636ecf6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDJ8MHwxfHNlYXJjaHwyfHxzdWJ0bGUlMjBwYXBlciUyMHRleHR1cmUlMjB3aGl0ZXxlbnwwfHx8fDE3ODYzODY4Njd8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Subtle white paper texture. Use as a fixed background overlay with opacity-30 and mix-blend-multiply on the app wrapper to give a tactical feel."
+      }
+    }
+  },
+  "GENERAL_UI_UX_DESIGN_GUIDELINES": [
+    "All interactive and key informational elements MUST include a `data-testid` attribute to facilitate robust automated testing. (e.g., data-testid='note-title-input', data-testid='ai-summarize-btn').",
+    "DO NOT use complete `transparent` background in header, overlays, or any surface that has content scrolling under it.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Ensure minimum 4.5:1 text contrast for readability. High contrast hover states are mandatory.",
+    "Provide a visible navigation structure on desktop, no hamburger-only menus.",
+    "Prioritize progressive disclosure: hide advanced tools until the user needs them.",
+    "Use Shadcn calendar for date pickers, Shadcn dropdown for selects, Sonner for toasts."
+  ],
+  "instructions_to_main_agent": [
+    "Read and apply all typography rules. Use next/font or standard imports to load Bricolage Grotesque, IBM Plex Sans, and JetBrains Mono.",
+    "Avoid using Shadcn Card component if it forces soft shadows; strip the shadow and apply a 1px border instead.",
+    "Build the Editor pane to be a quiet canvas. The title field should be an unstyled input (text-5xl) with tracking-tight.",
+    "Implement a command palette or floating pill at the bottom center of the editor for AI actions like 'Summarize' and 'Suggest Title'.",
+    "Install and use `iconoir-react` for icons.",
+    "Install and use `sonner` for toast notifications.",
+    "Ensure all components use .js extensions as specified. Do not create .tsx files.",
+    "Always apply hover, focus, and active states. Do not use 'transition-all'.",
+    "Do not add '.App { text-align: center; }' or generic centering.",
+    "Integrate the subtle paper texture URL into a global fixed background div with pointer-events-none and low opacity."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy and 1px borders, not just shadows.",
+    "You MUST NOT apply universal transition (e.g., transition: all). Add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container. This disrupts natural reading flow.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc. for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, custom selection states, and loading animations separate good from extraordinary.",
+    "Main agent relies on provided image URLs. NEVER use placeholder text/URLs."
+  ]
+}

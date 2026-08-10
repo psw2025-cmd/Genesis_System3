@@ -20,7 +20,7 @@
 - **Status (Codespace):** Token expired — TOTP strategy giving "Invalid TOTP" (2026-06-14). User must complete OAuth flow.
 - **Status (Render cloud):** TOKEN_EXPIRED_OR_INVALID — user must set fresh `DHAN_ACCESS_TOKEN` in Render dashboard.
 - **Balance:** ₹17.53 (last verified 2026-06-12)
-- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
+- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=first-insights-1`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)
 | API Category | Status | Notes |
@@ -89,7 +89,7 @@
 
 ## PENDING TASKS (priority order)
 1. **[USER ACTION — BLOCKER]** Renew Dhan access token via OAuth flow → `connected=true` on `/api/broker/status`. Until done, broker is disconnected in both Codespace and Render cloud.
-   - Step: `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88` → copy tokenId → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>` → set in Render dashboard
+   - Step: `https://auth.dhan.co/login/consentApp-login?consentAppId=first-insights-1` → copy tokenId → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>` → set in Render dashboard
 2. **[MARKET DAY — 2026-06-16]** Run paper lifecycle proof at 09:30 IST (auto-scheduled or `python scripts/paper_lifecycle_proof.py`)
 3. ~~**[USER ACTION]** Subscribe to Dhan Data APIs~~ ✅ DONE 2026-06-23 — All data unlocked
 2. ~~**[CODE]** Wire system3_signal_engine to generate signal CSV (activate dead 15% ml_confidence weight)~~ ✅ DONE (session 6: bhavcopy runner + prob_BUY_CE fix + staleness fix)

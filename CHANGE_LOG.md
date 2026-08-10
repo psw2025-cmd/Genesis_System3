@@ -597,7 +597,7 @@ path, no Dhan API subscription required). Git state synced: local main = remote 
 ### Pending (requires user action):
 
 1. **Dhan OAuth flow** — `DHAN_ACCESS_TOKEN` expired (TOKEN_EXPIRED_OR_INVALID)
-   - Visit: `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`
+   - Visit: `https://auth.dhan.co/login/consentApp-login?consentAppId=first-insights-1`
    - Copy tokenId from redirect URL → `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`
    - Set `DHAN_ACCESS_TOKEN` in Render dashboard (both web + worker)
    - Set `DHAN_PIN` + `DHAN_TOTP_SECRET` in Render for daily auto-refresh
