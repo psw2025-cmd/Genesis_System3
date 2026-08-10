@@ -10,7 +10,7 @@ describe('ErrorBanner', () => {
   })
 
   it('shows HTTP status when provided', () => {
-    render(<ErrorBanner endpoint="/api/state" status={503} message="Service unavailable" />)
+    render(<ErrorBanner endpoint="/api/state" status={503} message="Service offline" />)
     expect(screen.getByText('503')).toBeInTheDocument()
   })
 
