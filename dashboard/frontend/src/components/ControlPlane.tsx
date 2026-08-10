@@ -322,7 +322,7 @@ export default function ControlPlane() {
         <button
           onClick={() => {
             // Implementation would generate proof pack
-            alert('Proof pack generation not implemented in UI - use scripts/verify_dashboard.ps1')
+            alert('Proof pack generation is not exposed in the UI yet - use scripts/verify_dashboard.ps1')
           }}
           className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
         >

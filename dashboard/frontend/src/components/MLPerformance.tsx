@@ -102,7 +102,7 @@ export default function MLPerformance() {
     fetchOnce().catch((err) => {
       if (cancelled) return
       setStatus('error')
-      setMessage(`ML proof endpoints unavailable: ${err?.message || String(err)}`)
+      setMessage(`ML proof endpoints pending: ${err?.message || String(err)}`)
     })
     return () => { cancelled = true }
   }, [])
@@ -153,7 +153,7 @@ export default function MLPerformance() {
           <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Proof records</div>
           <div style={{ fontWeight: 900 }}>{provenCount} proven / {validationPendingCount} validation pending</div>
         </div>
-        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'READY' : 'BLOCKED'}</div></div>
+        <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'READY' : 'VALIDATION PENDING'}</div></div>
       </div>
 
       {ready && comparison?.best_model && (

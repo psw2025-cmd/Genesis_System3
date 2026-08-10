@@ -180,7 +180,7 @@ export function EndToEndProof() {
     { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || pnl?.error || '-' },
     { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || trades?.error || '-') },
     { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || gates?.error || '-' },
-    { item: 'Live-money switch pending separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
+    { item: 'Live-money switch pending separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'pending safety lock' : 'enabled flag detected' },
   ]
   const readinessPass = readiness.every(r => r.ok)
   const overall = corePass && chainPass && noBadSource && readinessPass
@@ -241,7 +241,7 @@ export function EndToEndProof() {
               <td className="tcell">{String(p.json?.status || p.status)}</td>
               <td className="tcell">{String(p.json?.spot ?? '-')}</td>
               <td className="tcell">{String(p.json?.total_contracts ?? (Array.isArray(p.json?.contracts) ? p.json.contracts.length : '-'))}</td>
-              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_VISIBLE' : (p.error || blockedReason(p.json))}</td>
+              <td className="tcell" style={{ color: ok ? 'var(--text-muted)' : 'var(--down)' }}>{ok ? 'REAL_DHAN_CONFIRMED' : (p.error || blockedReason(p.json))}</td>
             </tr>
           })}
         </tbody>

@@ -165,7 +165,7 @@ export function MarketTopCePeTable({ onSelectUnderlying, compact = false, pollMs
     ? (
         String(mcMeta.status || '').toUpperCase().includes('FAIL')
         || String(mcMeta.error || '').includes('403')
-          ? 'Moneycontrol blocked (403) — use Dhan board for trading truth'
+          ? 'Moneycontrol restricted (403) — use Dhan board for trading truth'
           : (mcMeta.error || mcMeta.note || 'Moneycontrol is reference-only; Dhan remains order/paper truth')
       )
     : (err || pollMeta.error || pollMeta.note || marketTop?.message || 'Waiting for Dhan option-chain gainers…')

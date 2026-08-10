@@ -326,7 +326,7 @@ export default function PaperTrading() {
             <div>GET /v2/positions → <span className="text-gray-400">Live broker positions separate (Broker tab)</span></div>
             <div>Paper fills → <span className="text-green-400">PAPER_CLOUD_SIM + Dhan LTP MTM</span></div>
           </div>
-          <div className="text-xs text-gray-500 mt-3">LIVE Order Safety: BLOCKED · AUTO_EXECUTE_TRADES=0</div>
+          <div className="text-xs text-gray-500 mt-3">LIVE Order Safety: DISABLED · AUTO_EXECUTE_TRADES=0</div>
         </div>
       </div>
 

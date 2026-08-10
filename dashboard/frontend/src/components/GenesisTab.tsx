@@ -139,7 +139,7 @@ export function GenesisTab() {
         <Metric label="Broker" value={state.health?.broker_status || '--'} tone={state.health?.broker_status === 'connected' ? 'up' : 'warn'} />
         <Metric label="Truth Score" value={`${state.truth?.truth_score ?? 0}%`} tone="warn" />
         <Metric label="Memory Events" value={state.brain?.memory_events ?? 0} tone="up" />
-        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'BLOCKED'} tone="down" />
+        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'DISABLED'} tone="down" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 18 }}>
