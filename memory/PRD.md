@@ -33,9 +33,22 @@ User also accidentally overwrote GCP secret `dhan-pin` with the literal string "
 - Redeploy web service to activate code fixes.
 - SECURITY: user posted Dhan PIN (197819) in chat — must change PIN on Dhan platform.
 
+## Implemented round 2 (2026-08-11) — all locally tested (endpoint smoke tests via TestClient, 200 OK)
+4. **SYS3-BLK-001 fixed**: new `dashboard/backend/connection_stability.py` — shared tracker with
+   3-consecutive-failure confirmation + 120s DEGRADED grace window + flap/uptime stats. Wired into
+   `/api/broker/status` (adds `stability` block) and `broker_truth_validator.py` (single transient
+   failure now reports DEGRADED_TRANSIENT instead of BROKER_OFFLINE). Alert dedup (threshold=3)
+   already existed in broker_alert_deduplicator.py and is used by state_sync_service.
+5. **Rotation Health Card API**: new `GET /api/broker/token-health` — token metadata (no raw token),
+   connection stability snapshot, policy block (single-writer, validate-before-persist), health verdict.
+6. **SYS3-BLK-003 upgraded**: `/api/audit/option-visibility` now fetches LIVE Dhan option chains
+   (via DataSourceManager + chain_adapter.fetch_chain_for_api, 45s cap, ≤8 underlyings) when no local
+   cache exists — proves real PE/CE strikes + security tokens on Cloud Run. Response includes
+   `chain_source` and `live_chain_symbols`.
+7. **Doc cleanup**: README.md rewritten for GCP Cloud Run reality (Render/Windows refs removed);
+   SYSTEM_STATE.md updated earlier.
+
 ## Backlog
-- P1 SYS3-BLK-001: false BROKER_DISCONNECTED alert loop — enforce 3-consecutive-failure threshold in
-  `dashboard/backend/broker_alert_deduplicator.py` / `broker_truth_validator.py`.
-- P2 SYS3-BLK-003: PE/CE strike/token visibility missing.
-- P2 SYS3-BLK-004: Equity F&O eligibility not proven before trade readiness.
-- P3 SYS3-BLK-006: Markdown doc sprawl cleanup (README.md still mentions Render).
+- P2 SYS3-BLK-004: Equity F&O eligibility not proven before trade readiness (fo_eligibility_filter.py exists — wire into readiness gate).
+- P3 SYS3-BLK-006: remaining markdown doc sprawl (other stale .md files beyond README/SYSTEM_STATE).
+- P3: Frontend card consuming /api/broker/token-health (dashboard UI, dashboard/frontend Vite app).

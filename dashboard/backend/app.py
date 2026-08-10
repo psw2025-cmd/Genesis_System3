@@ -713,6 +713,15 @@ async def get_broker_status():
         from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
 
         status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=12)
+        if isinstance(status, dict):
+            try:
+                from connection_stability import get_connection_tracker
+
+                status["stability"] = get_connection_tracker().record(
+                    bool(status.get("connected")), status.get("error")
+                )
+            except Exception:
+                pass
         # Only persist definitive results to SSOT — never write timeout/error noise.
         if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
             if status.get("connected") is True or status.get("error") in (
@@ -748,6 +757,49 @@ async def get_broker_status():
             "transient": True,
             "credentials_present": True,
         }
+
+
+@app.get("/api/broker/token-health")
+async def get_broker_token_health():
+    """SYS3-BLK-011 rotation health card. Never exposes the raw token."""
+    from datetime import timezone as _tz
+
+    out: Dict[str, Any] = {
+        "generated_utc": datetime.now(_tz.utc).isoformat(),
+        "live_trading_enabled": False,
+        "raw_token_exposed": False,
+    }
+    try:
+        from core.brokers.dhan.cloud_token_provider import token_metadata
+
+        out["token"] = token_metadata()
+    except Exception as exc:
+        out["token"] = {"error": type(exc).__name__}
+    try:
+        from connection_stability import get_connection_tracker
+
+        out["connection_stability"] = get_connection_tracker().snapshot()
+    except Exception:
+        out["connection_stability"] = None
+    out["policy"] = {
+        "single_writer": "genesis-system3-dhan-token-rotate (Cloud Run Job)",
+        "web_service_token_minting": "DISABLED (BROKER_SELF_HEAL_TOKEN_REFRESH=0)",
+        "validate_before_persist": True,
+        "validation_endpoint": "https://api.dhan.co/v2/fundlimit",
+        "force_reload_throttle_s": 30,
+        "rotation_schedule": os.environ.get("DHAN_TOKEN_ROTATION_SCHEDULE", "07:30 IST daily"),
+    }
+    tok = out.get("token") or {}
+    hours = tok.get("hours_remaining")
+    if tok.get("expired"):
+        out["health"] = "EXPIRED"
+    elif hours is not None and hours < 3:
+        out["health"] = "EXPIRING_SOON"
+    elif tok.get("token_present"):
+        out["health"] = "HEALTHY"
+    else:
+        out["health"] = "UNKNOWN"
+    return out
 
 
 @app.get("/api/broker/dhan/status")
@@ -1434,12 +1486,65 @@ async def get_option_visibility_audit(sample: bool = False):
         chain_file = next((p for p in chain_candidates if p.exists()), None)
         auditor = OptionVisibilityAuditor(chain_file)
         now = datetime.now(IST)
+
+        # SYS3-BLK-003: no local cache on Cloud Run — pull live Dhan chains so
+        # PE/CE strike+token visibility is proven with real contracts.
+        live_chain_symbols: list = []
+        if not auditor.chain_data:
+            symbols = [
+                str(r.get("underlying") or r.get("symbol") or "").upper()
+                for r in preds[:25]
+            ] if preds else []
+            if not symbols:
+                symbols = ["NIFTY", "BANKNIFTY", "RELIANCE", "SBIN", "INFY"]
+            symbols = list(dict.fromkeys(s for s in symbols if s))[:8]
+
+            def _load_live_chains() -> dict:
+                from core.data.datasource_manager import DataSourceManager
+                from chain_adapter import fetch_chain_for_api
+
+                dsm = DataSourceManager()
+                loaded: dict = {}
+                for sym in symbols:
+                    try:
+                        payload = fetch_chain_for_api(dsm, sym)
+                    except Exception:
+                        payload = None
+                    rows = (payload or {}).get("contracts") or []
+                    mapped = [
+                        {
+                            "expiry": c.get("expiry_date"),
+                            "strike": c.get("strike"),
+                            "option_type": c.get("option_type"),
+                            "token": c.get("security_id"),
+                            "trading_symbol": c.get("trading_symbol"),
+                            "bid_price": c.get("top_bid_price"),
+                            "ask_price": c.get("top_ask_price"),
+                            "oi": c.get("oi"),
+                        }
+                        for c in rows
+                        if c.get("security_id") and c.get("strike")
+                    ]
+                    if mapped:
+                        loaded[sym] = mapped
+                return loaded
+
+            try:
+                live = await asyncio.wait_for(asyncio.to_thread(_load_live_chains), timeout=45)
+                if live:
+                    auditor.chain_data.update(live)
+                    live_chain_symbols = sorted(live.keys())
+            except Exception as _lc_err:
+                print(f"[option-visibility] live chain fallback failed: {_lc_err}")
+
         if not preds:
             for i, sym in enumerate(["NIFTY", "BANKNIFTY", "RELIANCE", "SBIN", "INFY"]):
                 auditor.audit_signal(f"SEED-{i+1}", sym, "LONG", 0.5, now)
             report = auditor.generate_report()
             report["mode"] = "seed_no_predictions"
             report["chain_file"] = str(chain_file) if chain_file else None
+            report["live_chain_symbols"] = live_chain_symbols
+            report["chain_source"] = "dhan_live" if live_chain_symbols else ("cache" if chain_file else "none")
             return report
 
         for i, row in enumerate(preds[:25]):
@@ -1451,9 +1556,11 @@ async def get_option_visibility_audit(sample: bool = False):
         report = auditor.generate_report()
         report["mode"] = "live_history"
         report["chain_file"] = str(chain_file) if chain_file else None
+        report["live_chain_symbols"] = live_chain_symbols
+        report["chain_source"] = "dhan_live" if live_chain_symbols else ("cache" if chain_file else "none")
         report["note"] = (
-            "Coverage uses local chain cache when present; "
-            "otherwise symbols are marked missing until Dhan OC is cached."
+            "Coverage uses local chain cache when present; otherwise live Dhan "
+            "option chains are fetched per audited underlying (SYS3-BLK-003)."
         )
         return report
     except Exception as e:

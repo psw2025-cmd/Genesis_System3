@@ -63,6 +63,15 @@ def build_broker_truth_report() -> Dict[str, Any]:
 
     status = get_status()
     broker_connected = bool(status.get("connected"))
+    stability = None
+    try:
+        try:
+            from connection_stability import get_connection_tracker
+        except ImportError:
+            from dashboard.backend.connection_stability import get_connection_tracker
+        stability = get_connection_tracker().record(broker_connected, status.get("error"))
+    except Exception:
+        stability = None
     holdings_resp = get_holdings()
     positions_resp = get_positions()
     funds_resp = get_funds()
@@ -167,7 +176,11 @@ def build_broker_truth_report() -> Dict[str, Any]:
     )
 
     if not broker_connected:
-        overall = "BROKER_OFFLINE"
+        # SYS3-BLK-001: single failed probe within grace window = DEGRADED, not OFFLINE.
+        if stability and stability.get("grace_active"):
+            overall = "DEGRADED_TRANSIENT"
+        else:
+            overall = "BROKER_OFFLINE"
         pct = 0
     elif all_apis_ok and valid_count == total_count:
         overall = "VALID"
@@ -185,6 +198,7 @@ def build_broker_truth_report() -> Dict[str, Any]:
         "order_placement_allowed": False,
         "broker": status,
         "broker_connected": broker_connected,
+        "connection_stability": stability,
         "validation": {
             "overall": overall,
             "valid_pct": pct,
