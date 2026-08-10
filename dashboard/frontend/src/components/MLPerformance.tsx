@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
 
-type LoadState = 'loading' | 'ready' | 'blocked' | 'not_ready' | 'error'
+type LoadState = 'loading' | 'ready' | 'not_ready' | 'not_ready' | 'error'
 
 type ModelRec = {
   status?: string
@@ -11,7 +11,7 @@ type ModelRec = {
   avg_accuracy?: number | null
   avg_confidence?: number | null
   proof_pass_count?: number
-  blocked_count?: number
+  validation pending_count?: number
   blocker_reason?: string
   message?: string
   generated_at_utc?: string
@@ -86,10 +86,10 @@ export default function MLPerformance() {
         setStatus('ready')
         setMessage(apiMessage || `Loaded ${proven.length} proven model performance record(s).`)
       } else if (names.length > 0) {
-        setStatus('blocked')
+        setStatus('not_ready')
         setMessage(
           apiMessage
-          || `Loaded ${names.length} blocked accuracy artifact(s). Model not proven — missing matured prediction history / post-market validation.`,
+          || `Loaded ${names.length} validation-pending artifact(s). Model not proven — missing matured prediction history / post-market validation.`,
         )
       } else {
         setStatus('not_ready')
@@ -111,13 +111,13 @@ export default function MLPerformance() {
   const models = mergeModels(performance, comparison)
   const modelNames = Object.keys(models)
   const provenCount = modelNames.filter((n) => models[n]?.model_proof_ready === true).length
-  const blockedCount = modelNames.length - provenCount
+  const validation pendingCount = modelNames.length - provenCount
   const ready = status === 'ready'
   const badgeLabel = ready
     ? 'MODEL_PROOF_READY'
     : status === 'loading'
       ? 'CHECKING'
-      : status === 'blocked'
+      : status === 'not_ready'
         ? 'MODEL_PROOF_LOADED_BUT_BLOCKED'
         : 'MODEL_NOT_PROVEN'
   const badgeColor = ready ? 'var(--up)' : status === 'loading' ? '#f59e0b' : 'var(--down)'
@@ -151,7 +151,7 @@ export default function MLPerformance() {
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Fallback used</div><div style={{ fontWeight: 900 }}>{model.fallback_used === true ? 'YES' : model.fallback_used === false ? 'NO' : 'UNKNOWN'}</div></div>
         <div className="card">
           <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Proof records</div>
-          <div style={{ fontWeight: 900 }}>{provenCount} proven / {blockedCount} blocked</div>
+          <div style={{ fontWeight: 900 }}>{provenCount} proven / {validation pendingCount} validation pending</div>
         </div>
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>Training status</div><div style={{ fontWeight: 900 }}>{ready ? 'PROVEN' : 'BLOCKED'}</div></div>
       </div>
@@ -174,7 +174,7 @@ export default function MLPerformance() {
                 <th className="thead">Status</th>
                 <th className="thead">Predictions</th>
                 <th className="thead">Avg accuracy</th>
-                <th className="thead">Proof pass / blocked</th>
+                <th className="thead">Proof pass / validation pending</th>
                 <th className="thead">Blocker</th>
                 <th className="thead">Generated</th>
               </tr>
@@ -190,7 +190,7 @@ export default function MLPerformance() {
                   </td>
                   <td className="tcell">{metrics.total_predictions ?? 0}</td>
                   <td className="tcell">{fmtPct(metrics.avg_accuracy)}</td>
-                  <td className="tcell">{`${metrics.proof_pass_count ?? 0} / ${metrics.blocked_count ?? 0}`}</td>
+                  <td className="tcell">{`${metrics.proof_pass_count ?? 0} / ${metrics.validation pending_count ?? 0}`}</td>
                   <td className="tcell">{metrics.blocker_reason || metrics.message || (rowReady ? '—' : 'NOT_PROVEN')}</td>
                   <td className="tcell">{metrics.generated_at_utc || '—'}</td>
                 </tr>

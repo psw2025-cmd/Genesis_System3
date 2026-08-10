@@ -35,7 +35,7 @@ function badge(ok: boolean, label?: string) {
       background: ok ? 'rgba(16,185,129,.14)' : 'rgba(239,68,68,.14)',
       color: ok ? 'var(--up)' : 'var(--down)',
       border: `1px solid ${ok ? 'rgba(16,185,129,.35)' : 'rgba(239,68,68,.35)'}`,
-    }}>{ok ? 'PASS' : 'BLOCKED'}{label ? ` · ${label}` : ''}</span>
+    }}>{ok ? 'PASS' : 'WAITING'}{label ? ` · ${label}` : ''}</span>
   )
 }
 
@@ -176,11 +176,11 @@ export function EndToEndProof() {
     { item: 'Real broker holdings response', ok: Boolean(holdings?.ok && holdings.json && holdings.json.success !== false), evidence: hasRows(holdings?.json, 'rows', 'holdings', 'data') ? 'rows visible or empty broker response' : (holdings?.json?.message || holdings?.status || holdings?.error || '-') },
     { item: 'Real broker positions response', ok: Boolean(positions?.ok && positions.json && positions.json.success !== false), evidence: hasRows(positions?.json, 'rows', 'positions', 'data') ? 'rows visible or empty broker response' : (positions?.json?.message || positions?.status || positions?.error || '-') },
     { item: 'Real Dhan option chain for all watched symbols', ok: chainPass, evidence: `${chains.filter(p => p.ok && isDhanChain(p.json)).length}/${CHAIN_SYMBOLS.length}` },
-    { item: 'No non-Dhan/stale/fallback markers in chain', ok: noBadSource, evidence: noBadSource ? 'clean' : 'blocked marker found' },
+    { item: 'No non-Dhan/stale/fallback markers in chain', ok: noBadSource, evidence: noBadSource ? 'clean' : 'pending verification marker found' },
     { item: 'Paper/analyzer P&L endpoint', ok: Boolean(pnl?.ok), evidence: pnl?.json?.status || pnl?.status || pnl?.error || '-' },
     { item: 'Today paper lifecycle endpoint', ok: Boolean(trades?.ok), evidence: trades?.json?.count != null ? `count=${trades.json.count}` : String(trades?.status || trades?.error || '-') },
     { item: 'Gate/risk endpoint visible', ok: Boolean(gates?.ok), evidence: gates?.json?.status || gates?.status || gates?.error || '-' },
-    { item: 'Live-money switch blocked until separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
+    { item: 'Live-money switch pending separate proof', ok: isLiveTradingBlocked(state?.json, broker?.json), evidence: isLiveTradingBlocked(state?.json, broker?.json) ? 'blocked' : 'enabled flag detected' },
   ]
   const readinessPass = readiness.every(r => r.ok)
   const overall = corePass && chainPass && noBadSource && readinessPass
@@ -191,7 +191,7 @@ export function EndToEndProof() {
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>End-to-End Visual Truth Proof</h2>
           <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>
-            Real broker/data truth only. Live money remains blocked until every row below passes.
+            Real broker/data truth only. Live money remains pending until every row below passes.
           </div>
         </div>
         <button onClick={runProof} disabled={loading} style={{

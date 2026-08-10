@@ -22,7 +22,7 @@ function ProofItem({ label, value, ok }: { label: string; value: string; ok: boo
 }
 
 function fmtTime(value: any) {
-  if (!value) return 'NOT PROVEN'
+  if (!value) return 'PENDING PROOF'
   const d = new Date(value)
   return Number.isNaN(d.getTime())
     ? String(value)
@@ -76,7 +76,7 @@ export function BrokerProofPanel() {
               </div>
             </div>
             <div style={{ color: brokerConnected ? 'var(--up)' : 'var(--down)', fontWeight: 800, fontSize: '.8rem' }}>
-              {brokerConnected ? 'BROKER CONNECTED' : `BROKER BLOCKED: ${brokerStatus?.error || 'NOT PROVEN'}`}
+              {brokerConnected ? 'BROKER CONNECTED' : `BROKER PENDING: ${brokerStatus?.error || 'PENDING PROOF'}`}
             </div>
           </div>
 
@@ -88,14 +88,14 @@ export function BrokerProofPanel() {
               gap: '8px',
             }}
           >
-            <ProofItem label="BROKER PROFILE" value={brokerConnected ? `PASS · ${brokerStatus?.latency_ms ?? '-'} ms` : String(brokerStatus?.error || 'FAIL')} ok={brokerConnected} />
-            <ProofItem label="TOKEN SOURCE" value={proof?.source || 'NOT PROVEN'} ok={sourceOk} />
-            <ProofItem label="SECRET VERSION" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'NOT PROVEN'} ok={Boolean(proof?.secret_version)} />
+            <ProofItem label="BROKER PROFILE" value={brokerConnected ? `PASS · ${brokerStatus?.latency_ms ?? '-'} ms` : String(brokerStatus?.error || 'PENDING')} ok={brokerConnected} />
+            <ProofItem label="TOKEN SOURCE" value={proof?.source || 'PENDING PROOF'} ok={sourceOk} />
+            <ProofItem label="SECRET VERSION" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'PENDING PROOF'} ok={Boolean(proof?.secret_version)} />
             <ProofItem label="TOKEN LOADED (IST)" value={fmtTime(proof?.loaded_at_utc)} ok={Boolean(proof?.loaded_at_utc)} />
             <ProofItem label="TOKEN EXPIRY (IST)" value={fmtTime(proof?.expires_at_utc)} ok={tokenHealthy} />
-            <ProofItem label="TOKEN TIME LEFT" value={hours == null ? 'NOT PROVEN' : `${Number(hours).toFixed(2)} HOURS`} ok={tokenHealthy} />
+            <ProofItem label="TOKEN TIME LEFT" value={hours == null ? 'PENDING PROOF' : `${Number(hours).toFixed(2)} HOURS`} ok={tokenHealthy} />
             <ProofItem label="LAST RELOAD REASON" value={String(proof?.last_reload_reason || 'NOT YET RELOADED')} ok={!proof?.last_error_type} />
-            <ProofItem label="AUTH-FAIL RETRY" value={reload?.attempted ? (reload?.success ? 'RELOADED + RETRIED' : 'RELOAD FAILED') : 'NOT REQUIRED'} ok={!reload?.attempted || Boolean(reload?.success)} />
+            <ProofItem label="AUTH-PENDING RETRY" value={reload?.attempted ? (reload?.success ? 'RELOADED + RETRIED' : 'RELOAD PENDINGED') : 'NOT REQUIRED'} ok={!reload?.attempted || Boolean(reload?.success)} />
             <ProofItem label="ROTATION JOB" value={`${proof?.rotation_job || 'genesis-system3-dhan-token-rotate'} · ${proof?.rotation_schedule || '07:30 IST daily'}`} ok={Boolean(proof?.rotation_job || sourceOk)} />
             <ProofItem label="FUNDS / HOLDINGS / POSITIONS" value={`${responded(brokerFunds) ? 'F' : '-'} / ${responded(brokerHoldings) ? 'H' : '-'} / ${responded(brokerPositions) ? 'P' : '-'}`} ok={responded(brokerFunds) && responded(brokerHoldings) && responded(brokerPositions)} />
             <ProofItem label="REQUIRED DHAN CHAINS" value={`${readyChains}/4 READY`} ok={readyChains === 4} />

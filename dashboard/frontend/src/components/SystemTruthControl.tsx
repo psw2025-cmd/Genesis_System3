@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 
-type Status = 'PASS' | 'BLOCKED' | 'PARTIAL'
+type Status = 'PASS' | 'WAITING' | 'PARTIAL'
 type LayerRow = { layer: string; status: Status; evidence: string; requiredForMoney: boolean }
 
 // Enabled universe must match the scanner/paper path. SENSEX remains optional until
@@ -178,19 +178,19 @@ export function SystemTruthControl() {
     const gainCount = gainRows.length + scannerRows.length, tradeCount = countList(trades)
     const gateOk = Boolean(data.gates?.ok), cePeOk = hasCePe(gain) || hasCePe(scanner)
     return [
-      { layer: 'Backend/API route health', status: data.health?.ok && data.state?.ok ? 'PASS' : 'BLOCKED', evidence: `health=${data.health?.status || 0}, state=${data.state?.status || 0}`, requiredForMoney: true },
-      { layer: 'Broker read-only connection', status: broker.connected === true ? 'PASS' : 'BLOCKED', evidence: `connected=${broker.connected === true}, broker=${broker.broker || 'dhan'}, order_allowed=${broker.order_placement_allowed === true}`, requiredForMoney: true },
-      { layer: 'Funds / margin truth', status: data.funds?.ok && !funds.error ? 'PASS' : 'BLOCKED', evidence: `available=${funds.available_balance ?? funds.normalized?.available_balance ?? '-'}, used=${funds.used_margin ?? funds.normalized?.used_margin ?? '-'}, source=${funds.source || '-'}`, requiredForMoney: true },
-      { layer: 'Holdings and live positions read path', status: data.holdings?.ok && data.positions?.ok ? 'PASS' : 'BLOCKED', evidence: `holdings=${countList(data.holdings?.data)}, positions=${countList(data.positions?.data)}`, requiredForMoney: true },
-      { layer: 'Dhan option-chain availability', status: requiredOk === REQUIRED_CHAIN_SYMBOLS.length ? 'PASS' : requiredSafeBlocks > 0 ? 'PARTIAL' : 'BLOCKED', evidence: `enabled_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length}, enabled_safe_no_trade=${requiredSafeBlocks}/${REQUIRED_CHAIN_SYMBOLS.length}, optional_ready=${optionalOk}/${OPTIONAL_CHAIN_SYMBOLS.length}, optional_safe_no_trade=${optionalSafeBlocks}/${OPTIONAL_CHAIN_SYMBOLS.length}`, requiredForMoney: true },
-      { layer: 'Universe / ranking candidates', status: gainCount > 0 ? 'PASS' : 'BLOCKED', evidence: `candidate_rows=${gainCount}, gain=${gainRows.length}, scanner=${scannerRows.length}`, requiredForMoney: true },
-      { layer: 'CE / PE decision evidence', status: cePeOk ? 'PASS' : 'BLOCKED', evidence: cePeOk ? 'CE/PE field found in ranker/scanner payload' : 'No CE/PE side found in model/ranker/scanner payload', requiredForMoney: true },
-      { layer: 'Paper/analyzer lifecycle', status: data.trades?.ok ? (tradeCount > 0 ? 'PASS' : 'PARTIAL') : 'BLOCKED', evidence: `today_trade_rows=${tradeCount}, endpoint=${data.trades?.status || 0}`, requiredForMoney: false },
-      { layer: 'Risk gates and automation status', status: gateOk ? 'PASS' : 'BLOCKED', evidence: `auto_gates_http=${data.gates?.status || 0}, status=${gates.status || '-'}`, requiredForMoney: true },
-      { layer: 'Live-money safety lock', status: liveFlag === true || orderAllowed === true ? 'BLOCKED' : 'PASS', evidence: `live_flag=${String(liveFlag)}, order_allowed=${String(orderAllowed)}`, requiredForMoney: true },
+      { layer: 'Backend/API route health', status: data.health?.ok && data.state?.ok ? 'PASS' : 'WAITING', evidence: `health=${data.health?.status || 0}, state=${data.state?.status || 0}`, requiredForMoney: true },
+      { layer: 'Broker read-only connection', status: broker.connected === true ? 'PASS' : 'WAITING', evidence: `connected=${broker.connected === true}, broker=${broker.broker || 'dhan'}, order_allowed=${broker.order_placement_allowed === true}`, requiredForMoney: true },
+      { layer: 'Funds / margin truth', status: data.funds?.ok && !funds.error ? 'PASS' : 'WAITING', evidence: `available=${funds.available_balance ?? funds.normalized?.available_balance ?? '-'}, used=${funds.used_margin ?? funds.normalized?.used_margin ?? '-'}, source=${funds.source || '-'}`, requiredForMoney: true },
+      { layer: 'Holdings and live positions read path', status: data.holdings?.ok && data.positions?.ok ? 'PASS' : 'WAITING', evidence: `holdings=${countList(data.holdings?.data)}, positions=${countList(data.positions?.data)}`, requiredForMoney: true },
+      { layer: 'Dhan option-chain availability', status: requiredOk === REQUIRED_CHAIN_SYMBOLS.length ? 'PASS' : requiredSafeBlocks > 0 ? 'PARTIAL' : 'WAITING', evidence: `enabled_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length}, enabled_safe_no_trade=${requiredSafeBlocks}/${REQUIRED_CHAIN_SYMBOLS.length}, optional_ready=${optionalOk}/${OPTIONAL_CHAIN_SYMBOLS.length}, optional_safe_no_trade=${optionalSafeBlocks}/${OPTIONAL_CHAIN_SYMBOLS.length}`, requiredForMoney: true },
+      { layer: 'Universe / ranking candidates', status: gainCount > 0 ? 'PASS' : 'WAITING', evidence: `candidate_rows=${gainCount}, gain=${gainRows.length}, scanner=${scannerRows.length}`, requiredForMoney: true },
+      { layer: 'CE / PE decision evidence', status: cePeOk ? 'PASS' : 'WAITING', evidence: cePeOk ? 'CE/PE field found in ranker/scanner payload' : 'No CE/PE side found in model/ranker/scanner payload', requiredForMoney: true },
+      { layer: 'Paper/analyzer lifecycle', status: data.trades?.ok ? (tradeCount > 0 ? 'PASS' : 'PARTIAL') : 'WAITING', evidence: `today_trade_rows=${tradeCount}, endpoint=${data.trades?.status || 0}`, requiredForMoney: false },
+      { layer: 'Risk gates and automation status', status: gateOk ? 'PASS' : 'WAITING', evidence: `auto_gates_http=${data.gates?.status || 0}, status=${gates.status || '-'}`, requiredForMoney: true },
+      { layer: 'Live-money safety lock', status: liveFlag === true || orderAllowed === true ? 'WAITING' : 'PASS', evidence: `live_flag=${String(liveFlag)}, order_allowed=${String(orderAllowed)}`, requiredForMoney: true },
       {
         layer: 'Dashboard operator truth',
-        status: (data.health?.ok && data.broker?.ok && data.gates?.ok && requiredOk === REQUIRED_CHAIN_SYMBOLS.length) ? 'PASS' : 'BLOCKED',
+        status: (data.health?.ok && data.broker?.ok && data.gates?.ok && requiredOk === REQUIRED_CHAIN_SYMBOLS.length) ? 'PASS' : 'WAITING',
         evidence: `health_ok=${Boolean(data.health?.ok)}, broker_ok=${Boolean(data.broker?.ok)}, gates_ok=${Boolean(data.gates?.ok)}, enabled_chains_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length} (runtime API probes; not hard-coded)`,
         requiredForMoney: true,
       },
@@ -209,12 +209,12 @@ export function SystemTruthControl() {
       </div>
       {error && <div style={{ border: '1px solid rgba(239,68,68,.4)', color: 'var(--down)', padding: 10, borderRadius: 8, marginBottom: 12 }}>{error}</div>}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
-        <div className="card">{badge(infraOk ? 'PASS' : 'BLOCKED')}<div style={{ marginTop: 8, fontSize: 12 }}>Infrastructure / broker read path</div></div>
-        <div className="card">{badge(moneyReady ? 'PASS' : 'BLOCKED')}<div style={{ marginTop: 8, fontSize: 12 }}>Money readiness</div></div>
+        <div className="card">{badge(infraOk ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Infrastructure / broker read status</div></div>
+        <div className="card">{badge(moneyReady ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Money readiness pending</div></div>
         <div className="card"><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Last run</div><div style={{ fontWeight: 800, marginTop: 6 }}>{lastRun || '-'}</div></div>
       </div>
       <div style={{ border: `1px solid ${moneyReady ? 'rgba(16,185,129,.45)' : 'rgba(239,68,68,.45)'}`, background: moneyReady ? 'rgba(16,185,129,.08)' : 'rgba(239,68,68,.08)', padding: 14, borderRadius: 10, marginBottom: 16 }}>
-        <div style={{ fontWeight: 900, fontSize: 16 }}>{moneyReady ? 'MONEY_READY_PROOF_GREEN' : 'MONEY_READY_BLOCKED'}</div>
+        <div style={{ fontWeight: 900, fontSize: 16 }}>{moneyReady ? 'MONEY_READY_PROOF_GREEN' : 'MONEY_READY_PENDING'}</div>
         <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>{moneyReady ? 'All required enabled-universe layers are passing. A separate manual live gate is still required before broker order execution.' : 'At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.'}</div>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>

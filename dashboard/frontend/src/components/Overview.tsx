@@ -36,7 +36,7 @@ function GateRow({ label, status, note }: { label: string; status: string; note?
 function DataRow({ label, status, note }: { label: string; status: string; note?: any }) {
   const s = String(status || 'WAITING')
   const good = s === 'LOADED' || s === 'PASS'
-  const warn = s === 'STALE' || s === 'MARKET_SESSION_ONLY' || s === 'WAITING'
+  const warn = s === 'STALE' || s === 'MARKET_CLOSED' || s === 'WAITING'
   return (
     <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
       <span className={cn(
@@ -88,7 +88,7 @@ export function Overview() {
     { label: 'Gain Rank / Scanner', status: gainRank?.stale ? 'STALE' : gainRank ? 'LOADED' : 'WAITING', note: gainRank?.latest_date ?? gainRank?.latest?.date ?? gainRank?.message },
     { label: 'Auto Gates', status: autoGates ? 'LOADED' : 'WAITING', note: Array.isArray(autoGates?.proof_gates) ? `${autoGates.proof_gates.length} gates` : undefined },
     { label: 'Alerts', status: Array.isArray(alerts) ? 'LOADED' : 'WAITING', note: Array.isArray(alerts) ? `${alerts.length} recent` : undefined },
-    { label: 'Option Chain', status: chainData?.contracts?.length ? 'LOADED' : marketOpen ? 'WAITING' : 'MARKET_SESSION_ONLY', note: chainData?.message ?? (marketOpen ? 'waiting for rows' : 'live rows unavailable outside session') },
+    { label: 'Option Chain', status: chainData?.contracts?.length ? 'LOADED' : marketOpen ? 'WAITING' : 'MARKET_CLOSED', note: chainData?.message ?? (marketOpen ? 'waiting for rows' : 'live rows pending outside market hours') },
   ]
 
   const proofGates = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
