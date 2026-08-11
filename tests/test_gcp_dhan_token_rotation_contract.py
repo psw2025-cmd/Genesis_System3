@@ -88,6 +88,7 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"', text)
         self.assertIn('"order_endpoints_called": False', text)
         self.assertIn("secret_version_advanced", text)
+        self.assertIn("refresh_token(force_generate=True)", text)
         forbidden_calls = [
             "place" + "_order(",
             "modify" + "_order(",
@@ -110,14 +111,47 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
         self.assertIn('--schedule="30 7 * * *"', deploy)
 
+    def test_legacy_token_writers_are_permanently_non_mutating(self):
+        codespace = Path("scripts/codespace_startup.sh").read_text(encoding="utf-8")
+        daemon = Path("scripts/dhan_token_auto_refresh.py").read_text(encoding="utf-8")
+        startup = Path("scripts/dhan_startup_check.py").read_text(encoding="utf-8")
+        watchdog = Path("core/brokers/dhan/token_watchdog.py").read_text(encoding="utf-8")
+        runner = Path("scripts/dhan_watchdog_runner.py").read_text(encoding="utf-8")
+        setup = Path("scripts/setup_dhan_automation.py").read_text(encoding="utf-8")
+        legacy_worker = Path("scripts/cloud_worker.py").read_text(encoding="utf-8")
+
+        self.assertIn('pkill -f "dhan_token_auto_refresh.py"', codespace)
+        self.assertNotIn('nohup "$PY" -u "$PROJ/scripts/dhan_token_auto_refresh.py"', codespace)
+        self.assertNotIn('"$PY" "$PROJ/scripts/dhan_startup_check.py"', codespace)
+
+        for text in (daemon, startup, watchdog, runner, setup, legacy_worker):
+            self.assertNotIn("refresh_token(", text)
+            self.assertNotIn("generate_token(", text)
+            self.assertNotIn("renew_token(", text)
+
+        self.assertIn('"status": "RETIRED"', legacy_worker)
+        self.assertNotIn("run_watchdog_loop", legacy_worker)
+        self.assertNotIn("run_daemon()", legacy_worker)
+
+    def test_cloud_runtime_escalates_only_to_canonical_rotation_job(self):
+        patch = Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
+        self.assertIn("_invoke_canonical_rotation", patch)
+        self.assertIn("jobs/{job}:run", patch)
+        self.assertIn("metadata.google.internal", patch)
+        self.assertIn("SecretVersionDidNotAdvance", patch)
+        self.assertIn("_live_is_locked", patch)
+        self.assertIn("SINGLE_FLIGHT_BUSY", patch)
+        self.assertIn("COOLDOWN", patch)
+        self.assertNotIn("refresh_token(", patch)
+        for marker in ("place_order(", "modify_order(", "cancel_order("):
+            self.assertNotIn(marker, patch)
+
     def test_public_paper_dashboard_contract_across_gcp_deploy_paths(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
         deploy_script = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
         manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
-        # PAPER/ANALYZER dashboard reads are public and the reusable dashboard
-        # API key must not be mounted or reintroduced by any GCP deploy path.
         self.assertIn("REQUIRE_API_KEY=false", workflow)
         self.assertIn("--remove-secrets=API_KEY", workflow)
         self.assertNotIn("API_KEY_SECRET_ID", workflow)
@@ -125,13 +159,11 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
 
-        # Post-deploy read proof must explicitly require auth-disabled mode.
         self.assertIn('.required == false', workflow)
         self.assertIn('.mode == "auth_disabled"', workflow)
         self.assertIn('"API_KEY" in secret_env_names', workflow)
         self.assertIn('"WORKER_PUSH_TOKEN" not in secret_env_names', workflow)
 
-        # Live-trading flags stay off regardless of public dashboard visibility.
         self.assertIn("LIVE_TRADING_ENABLED=0", workflow)
         self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", workflow)
         self.assertIn("AUTO_EXECUTE_TRADES=0", workflow)
@@ -148,16 +180,12 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertNotIn("API_KEY_SECRET_ID", manual_script)
         self.assertIn("WORKER_PUSH_TOKEN", manual_script)
 
-        # Manual Dhan recovery proves broker status through anonymous read-only
-        # GET and must never read/send the dashboard key.
         self.assertNotIn("system3-dashboard-api-key", recovery)
         self.assertNotIn("X-API-Key", recovery)
         self.assertIn('/api/broker/status', recovery)
 
     def test_runtime_evidence_lock_requires_public_dashboard_and_no_api_key_mount(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-        # In public PAPER mode, api_key_required/api_key_mounted being true is a
-        # deployment failure; worker auth remains separate.
         self.assertIn('"api_key_required",', workflow)
         self.assertIn('"api_key_mounted",', workflow)
         self.assertIn("if safety.get(key):", workflow)
