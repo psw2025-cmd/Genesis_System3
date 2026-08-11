@@ -3,9 +3,9 @@
 
 Cloud Run startup invariant: the HTTP ingress must be allowed to bind to the
 injected PORT without waiting for broker/Secret Manager/network initialization.
-The Dhan runtime patch therefore installs in a daemon thread after process
-startup has begun. Any bootstrap failure is logged and the API remains up so
-health/status endpoints can report the dependency failure explicitly.
+The Dhan runtime patch therefore imports and installs inside a daemon thread.
+Any bootstrap failure is logged and the API remains up so health/status
+endpoints can report the dependency failure explicitly.
 """
 from __future__ import annotations
 
@@ -15,11 +15,12 @@ import threading
 
 import uvicorn
 
-from core.brokers.dhan.cloud_runtime_patch import install
-
 
 def _install_runtime_patch() -> None:
     try:
+        # Keep even the broker module import out of the launcher pre-bind path.
+        from core.brokers.dhan.cloud_runtime_patch import install
+
         proof = install()
         print("[cloud-bootstrap] " + json.dumps(proof, sort_keys=True), flush=True)
     except Exception as exc:
