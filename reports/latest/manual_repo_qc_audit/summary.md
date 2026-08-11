@@ -1,606 +1,337 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 16:58 IST`
+Updated: `2026-08-11 17:50 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `5c0b43eb9ddd30dbe6014c8472fee2cbfceb585f`.
-- Latest application/source HEAD remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
-- Compare `b70af343... -> 5c0b43eb...`: 21 commits ahead, 0 behind, and only `reports/latest/manual_repo_qc_audit/summary.md` changed. Therefore no newer application implementation is promoted into this evidence baseline.
-- PR #98 is OPEN at `74f5b68509b5af7ec94466831c2dd4d57365d868`, base `5c0b43eb...`. It changes `dashboard/style.css` and `core/brokers/dhan/token_manager.py`; it is not implemented on `main`. Its exact head has two observed PR-triggered successful workflows: `Genesis System3 Global Safety CI` run 1234 and `GCP Dhan Token Fix CI` run 55. Those results prove only that PR head checks completed successfully; they do not prove deployment/runtime readiness.
-- PR #97 remains OPEN at `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main`.
-- PR #96 remains the newest merged application/UI PR identified in current evidence.
-- GitHub returned no workflow runs for exact application SHA `b70af343...` and no workflow runs for report-only HEAD `5c0b43eb...`; exact-revision application CI/runtime readiness remains **NOT PROVEN**.
-- Google Cloud is the only accepted deployment target. Render-era operational assumptions are migration debt.
-- Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing remain prohibited.
+- Current `main` HEAD verified this iteration: `6a8f728d58d00cc91381306f8535225b2819777a`.
+- Material application change occurred: PR #99 merged at `6a8f728d...`; therefore the current application/source baseline is now `6a8f728d58d00cc91381306f8535225b2819777a`, replacing the former `b70af343...` baseline.
+- Compare former application baseline `b70af343... -> 6a8f728d...`: 24 commits ahead, 0 behind. Runtime code changed only in `dashboard/backend/app.py` and `dashboard/backend/cloud_paper_engine.py`; the other changed path is this master audit report.
+- PR #99 is MERGED. PR #98 remains OPEN at `74f5b685...`; PR #97 remains OPEN at `29e7b2cf...`.
+- Exact PR #99 head `e5fcfc8259f1d3f20f101e4e53ec369065644cc8` had three observed successful PR-triggered workflows: `Genesis System3 Global Safety CI`, `GCP Stage 2 Safety Checks`, and `GCP Dhan Token Fix CI`.
+- The merge commit `6a8f728d...` has no workflow runs returned by the available commit-workflow connector, so exact merged-revision CI/deployment proof is still **NOT PROVEN**.
+- Google Cloud is the only accepted deployment target. Render-era operational assumptions remain migration debt/non-authority.
+- Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
 - This Markdown is the single continuously maintained audit/remediation authority.
 
 ## 1. Executive verdict
 
 | Area | Verdict | Canonical solution / implementation state |
 |---|---|---|
-| Exact application revision proof | **NOT PROVEN** | `DeploymentTruth` — READY TO PATCH |
+| Exact deployment revision proof | **FAIL / NOT PROVEN** | `DeploymentTruth` — READY TO PATCH |
 | Dashboard auth/session | **FAIL / P0-P1** | `SessionTruth` — READY TO PATCH |
 | Mutation authorization | **FAIL / P0-P1** | `MutationPolicy + CapabilityManifest` — READY TO PATCH |
 | Global mode/order safety | **FAIL / P0** | `SafetyTruth + ExecutionEligibility` — READY TO PATCH |
-| Broker/account truth | **FAIL / P0-P1** | `SOL-21 AccountTruth + AccountSnapshotCoordinator` — READY TO PATCH |
+| Broker/account truth | **FAIL / P0-P1** | `AccountTruth + AccountSnapshotCoordinator` — READY TO PATCH |
 | DB/shared state | **FAIL / P0-P1** | `StateTruth + domain CAS` — READY TO PATCH |
 | WebSocket/REST truth | **FAIL / P0-P1** | `StreamTruth` — READY TO PATCH |
 | Option chain/Greeks | **FAIL / P0-P1** | `OptionChainTruth` — READY TO PATCH |
 | Scanner/ranker | **FAIL / P0-P1** | `ScannerTruth` — READY TO PATCH |
 | Performance/concurrency | **FAIL / P0-P1** | `WorkCoordinator + SnapshotScheduler` — READY TO PATCH |
-| Paper lifecycle/reconciliation | **FAIL / P0** | `SOL-20 PaperLedger + ReconciliationService` — READY TO PATCH |
+| Paper lifecycle/reconciliation | **PARTIAL PATCH / STILL FAIL P0** | `PaperLedger + ReconciliationService` — READY TO PATCH |
 | Pre-trade risk authority | **FAIL / P0** | `PreTradeRiskService` — READY TO PATCH |
 | AI/prediction provenance | **MISSING / P0-P1** | `PredictionTruth + ModelArtifactManifest` — READY TO PATCH/DESIGN |
 | Accessibility/responsive browser proof | **FAIL / P1** | `AccessibleWorkstationShell` — READY TO PATCH |
 | Real-money readiness | **NO** | LIVE stays OFF/LOCKED |
 
-## 2. System-wide audit invariant
+## 2. System-wide invariant
 
 Missing, stale, parse-failed, timed-out, unauthenticated, overloaded, contradictory, corrupt or unproven evidence must never become PASS, LIVE, safe, fresh, zero-risk, zero-P&L, zero-Greek, calibrated confidence, broker-connected, account-empty, deployed-current or trade-ready through defaults.
 
-A successful profile/connectivity request proves connectivity only. It does not prove funds, holdings, positions, orders, margin, portfolio generation or risk-input freshness. Empty, zero, error and unknown are different states.
+HTTP success, GitHub workflow green, Cloud Run READY, profile connectivity and image tag equality are each insufficient on their own. Transaction authority must be server-owned, revision-bound and evidence-backed. UI and JSON/CSV files are projections only.
 
-Files and dashboard DTOs are projections only. They must never be transaction authority. Every paper/live-adjacent state mutation must be backed by immutable server-issued decision/event IDs. UI can display safety truth; it can never be its authority.
+## 3. Retained canonical remediation groups
 
-## 3. Retained findings registry and canonical remediation groups
-
-### AUTH-001..011 — Session/authentication authority
-
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED. `AUTH-001 4/20`, `AUTH-002 3/20`, `AUTH-003 3/20`, `AUTH-004 2/20`; other AUTH findings remain below 20.
-
-**Root causes:** LoginPage/body contract mismatch; raw API-key persistence in browser storage; global key injection; deterministic session token; browser-only expiry; no authoritative server revocation record; incomplete auth throttling/CSRF/idempotency proof.
-
-**Files/functions likely to change:** `dashboard/frontend/src/components/LoginPage.tsx`, `AuthUnlock.tsx`, `hooks/useAuth.ts`, `dashboard/backend/app.py` auth routes/middleware, `security_policy.py`.
-
-**Target:** one `SessionTruth` contract with random opaque session ID, HttpOnly/Secure/SameSite cookie, authoritative `issued_at/expires_at/revoked_at`, principal/scope, policy revision, runtime revision and evidence ID. Browser stores no reusable API key after session creation.
-
-**Implementation:** unify login contract; remove sessionStorage/localStorage API key; remove global request-key injection; add server session registry/revocation/expiry; add auth throttling; test exact cookie attributes behind Cloud Run.
-
-**Migration:** support existing login route temporarily but issue only new-style session; invalidate deterministic legacy cookies.
-
-**Security constraints:** never expose dashboard key, Dhan token, PIN/TOTP or worker token in UI/log/export.
-
-**Regression risks:** existing API client assumes `X-API-Key`; replace with one authenticated client using cookie credentials.
-
-**Tests/PASS:** valid login, invalid login, expiry, revocation, logout, CSRF, cross-origin denial, no browser secret, no API key on subsequent requests. 20 repeated invalid attempts must be rate-limited. PASS only when revoked/expired sessions cannot read protected data or mutate state.
-
-**Rollback:** auth uncertainty => deny protected routes; live remains locked.
-
-**Implementation status:** READY TO PATCH.
+### AUTH-001..011 — SessionTruth
+P0-P1 / FIX-REQUIRED. Login contract mismatch, raw API-key persistence, deterministic session token, browser-only expiry, missing server revocation and incomplete throttling/CSRF/idempotency proof remain open. Target: opaque server session, HttpOnly/Secure/SameSite cookie, authoritative issued/expiry/revocation, no reusable browser API key. Status: READY TO PATCH.
 
 ### MUT-001..008 — MutationPolicy + CapabilityManifest
+P0-P1 / FIX-REQUIRED. Every POST/PUT/PATCH/DELETE must declare a capability and associated auth, CSRF, idempotency, audit and domain gate. Unknown mutation fails closed/CI. LIVE_MUTATION hard denied in analyzer/paper. Status: READY TO PATCH.
 
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED.
+### SAFE-001..008 + RISK-001..009 — SafetyTruth + PreTradeRiskService
+P0 / FIX-REQUIRED. One authoritative SafetyTruth and one immutable ExecutionDecision are required before any paper/live-adjacent mutation. `UNKNOWN|STALE|ERROR` inhibits. Kill-switch OK is necessary but never sufficient. Status: READY TO PATCH.
 
-**Root causes:** mutation routes have inconsistent auth/replay semantics; `/api/live-trading/approve` persists approval; idempotency is path-list based; worker replay protection is incomplete; HTTP auth is not domain eligibility.
-
-**Files:** `dashboard/backend/app.py`, `security_policy.py`, scheduler/worker ingest routes, future `mutation_policy.py`.
-
-**Target:** every POST/PUT/PATCH/DELETE declares one capability such as `SESSION_CREATE`, `SESSION_REVOKE_SELF`, `WORKER_INGEST`, `PREFERENCE_WRITE`, `PAPER_MUTATION`, `RISK_POLICY_WRITE`, `LIVE_APPROVAL`, `LIVE_MUTATION`.
-
-**Implementation:** generate route inventory from `app.routes`; fail CI on unclassified write route; bind auth/CSRF/idempotency/domain-gate/audit rules to capability; forbid GET mutation and query-string secrets.
-
-**Compatibility:** preserve route paths where possible while changing enforcement semantics.
-
-**Safety:** `LIVE_MUTATION` hard denied in analyzer/paper deployments. `LIVE_APPROVAL` is evidence only, never router enablement.
-
-**Tests/PASS:** unclassified writes=0; duplicate route owners=0; GET mutations=0; query-string secrets=0; analyzer/live mutation allowance=0.
-
-**Rollback:** unknown mutation capability => 403/locked.
-
-**Status:** READY TO PATCH.
-
-### SAFE-001..008 + RISK-001..009 — SafetyTruth, ExecutionEligibility, PreTradeRiskService
-
-**Severity/status:** P0, OPEN / FIX-REQUIRED.
-
-**Root causes:** split kill-switch authorities; order creation gated mainly by kill state; risk analytics are not independently proven as mandatory transaction gate; scheduler/live-approval surfaces can create contradictory readiness semantics; browser/default risk values can collapse unknown to safe-looking numbers.
-
-**Files:** `dashboard/backend/order_management.py`, `risk_management.py`, `app.py` safety/live/scheduler routes, kill-switch modules/files, future `safety_truth.py` and `pretrade_risk_service.py`.
-
-**Target:** one server `SafetyTruth`; one immutable `ExecutionDecision` required for every paper/live-adjacent mutation; kill switch OK is necessary but never sufficient.
-
-**Execution chain:** `Intent -> MutationPolicy -> SafetyTruth -> DeploymentTruth -> StateTruth generation -> Stream/OptionChain/AccountTruth -> PreTradeRiskService -> ExecutionDecision -> serialized paper worker`.
-
-**Contract:** `ExecutionDecision {decision_id, intent_id, state: PASS|FAIL|UNKNOWN|ERROR, safety_revision, risk_policy_revision, account_snapshot_id, market_snapshot_ids, expires_at, evidence_ids[]}`.
-
-**Safety:** UNKNOWN/STALE/ERROR always inhibit. UI never overrides backend gate. LIVE router remains independently hard locked.
-
-**Tests/PASS:** no paper position/order/close can be created without current PASS decision; stale account/market/safety/risk input rejects; kill-switch conflict rejects; scheduler cannot bypass.
-
-**Rollback:** decision service unavailable => paper mutation inhibited; read-only UI allowed.
-
-**Status:** READY TO PATCH.
+### ACCOUNT-001..008 — AccountTruth
+P0-P1 / FIX-REQUIRED. Semantic Dhan error bodies, zero/default normalization, mixed account generations, connectivity/account conflation and missing risk binding remain open. Zero account exposure is valid only when `EMPTY_PROVEN`. Status: READY TO PATCH.
 
 ### STATE-001..012 — StateTruth + domain CAS
-
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED.
-
-**Root causes:** local files/shared state/in-memory state can disagree; whole-snapshot writes can overwrite newer domains; local fallback can become authority; startup may promote plausible but stale state.
-
-**Files:** runtime/state store, state sync service, Firestore adapter, app startup, frontend state projections.
-
-**Target:** Firestore/shared state is production authority on GCP; domain revisions for broker/account/market/chain/scanner/risk/paper; every write carries writer ID, runtime revision, event ID and expected revision.
-
-**Implementation:** domain CAS/transactions; startup generation validation; reject stale writer; local files diagnostic/projection only; fail closed if required shared backend unavailable.
-
-**Tests/PASS:** concurrent writers cannot overwrite newer revisions; Firestore outage yields `STATE_AUTHORITY_ERROR` and read-only degraded mode, not local authority.
-
-**Status:** READY TO PATCH.
+P0-P1 / FIX-REQUIRED. Firestore/shared state must be GCP authority; local files become projections. Domain revisions/CAS reject stale writers; shared-state failure becomes read-only degraded state. Status: READY TO PATCH.
 
 ### CHAIN-001..014 — OptionChainTruth
-
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED.
-
-**Root causes:** null-to-zero conversion, incomplete Greeks/quotes, expiry-insensitive or weakly-proven caches, source invention, parser-error collapse and weak runtime provenance.
-
-**Files:** Dhan chain acquisition/normalizer/cache, backend chain endpoints, frontend chain tables/TopBar, Greeks services.
-
-**Target contract:** underlying/security ID/requested+resolved expiry/provider/source event time/receive time/age/TTL/schema+normalizer revision/cache identity/spot+quote quality/row evidence/Greeks provenance.
-
-**Implementation:** null remains null; keyed singleflight per provider/security/expiry; source must be inherited from validated acquisition truth; complete Delta/Gamma/Theta/Vega/Rho/IV with units/method evidence.
-
-**Tests/PASS:** stale/parse/error never appears live/zero; expiry collision impossible; one cold fetch per key; missing Greek is UNKNOWN not zero.
-
-**Status:** READY TO PATCH.
+P0-P1 / FIX-REQUIRED. Null-to-zero, weak expiry/cache identity, source invention, parser collapse and incomplete Greeks remain open. Every row must carry provider/event/receive/age/TTL/schema/normalizer/evidence truth. Status: READY TO PATCH.
 
 ### WS-001..011 — StreamTruth
-
-**Severity/status:** P0-P1, OPEN/UNPROVEN.
-
-**Root causes:** socket-open is treated too close to stream health; heartbeat/freshness/order validation weak; competing REST/WS writers can regress state; malformed events can fail silently.
-
-**Target:** transport state separated from market-data state. Every event carries event time, backend receive time, frontend receive time, sequence, schema version, source revision and TTL. Older revisions cannot overwrite newer.
-
-**Tests/PASS:** out-of-order/replayed/malformed/stale events rejected and counted; reconnect does not restamp old payload fresh.
-
-**Status:** READY TO PATCH.
+P0-P1 / FIX-REQUIRED. Socket-open is not market-stream health. Add heartbeat, sequence, schema, event/receive times and stale/out-of-order rejection; older REST cannot overwrite newer WS. Status: READY TO PATCH.
 
 ### SCAN-001..010 — ScannerTruth
+P0-P1 / FIX-REQUIRED. Remove high-watermark rank carryover/restamping and auto-eligibility. Latest observation always replaces old even when gain falls; stale rows evict. Status: READY TO PATCH.
 
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED.
+### PERF-001..009 — WorkCoordinator
+P0-P1 / FIX-REQUIRED. Bounded domain workers, singleflight, serialized paper worker, completion-driven polling, event-loop and queue observability required. `PERF-004` remains open despite new manual-close lock because `/api/paper/tick` command idempotency/serialization is not fully solved. Status: READY TO PATCH.
 
-**Root causes:** same-day rank accepted as current; high-watermark carryover can retain prior larger gain; old rows can be restamped; REST/WS writers compete; WATCH can be treated too close to eligibility; source/freshness can be manufactured by ranking layer.
+### ML-001..014 — PredictionTruth
+P0-P1 / FIX-REQUIRED. Immutable prediction/model artifact evidence, temporal validation, calibration and reconciled after-cost outcome linkage remain missing. Status: READY TO PATCH/DESIGN.
 
-**Target:** immutable scanner snapshot/cycle/session/universe generation; latest observation always replaces older even when gain falls; rank, gain and eligibility separate; stale rows evicted.
+### UI/A11Y
+P1 / FIX-REQUIRED. `UI-001` remains `LOCKED-20X / FIX-REQUIRED`. All Tier-0 badges must consume typed backend truth; responsive/accessibility/browser-console proof remains required. Status: READY TO PATCH.
 
-**Tests/PASS:** 40% -> 12% becomes 12%; absent/stale row evicts; older REST snapshot cannot overwrite newer WS; no risk PASS => not eligible.
+## 4. Regression verification — PR #99 paper manual-close patch
 
-**Status:** READY TO PATCH.
+### PAPER-017 — direct projection-file mutation
 
-### PERF-001..009 — WorkCoordinator + SnapshotScheduler
+**Previous proof:** `/api/positions/{position_id}/close` directly edited `positions_live.json`.
 
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED. `PERF-004 2/20`.
+**New code proof:** PR #99 changes the route to obtain `CloudPaperEngine` and call `engine.close_position_by_id(position_id)`. The direct JSON file-surgery block was removed.
 
-**Root causes:** timeout waiter does not cancel OS thread; overlapping polls; chain stampede; overlapping paper ticks; false current-RSS telemetry; response buffering; event-loop blocking sync; cold batch fan-out; unbounded log-tail reads.
+**Assessment:** the specific direct-file-authority defect is **PATCHED in source**, not yet fully VERIFIED. The route no longer directly writes `positions_live.json`.
 
-**Target:** bounded domain workers; singleflight; one serialized paper mutation worker; completion-driven browser polling; queue/event-loop/current+peak RSS observability; overload => `DEGRADED_READ_ONLY`.
+**Remaining closure conditions:** exact merged-revision tests must prove manual close + concurrent tick + restart cannot resurrect the position; persistence failures must fail closed; duplicate close idempotency and immutable event evidence are still absent.
 
-**Tests/PASS:** 20 duplicate paper ticks yield one logical command; no overlapping cold chain fetch for same key; event loop remains responsive under injected slow provider; stale late result rejected.
+**Status:** `PATCHED / UNPROVEN` (not CLOSED).
 
-**Status:** READY TO PATCH.
+### PAPER-018 — competing manual-close vs engine in-memory authority
 
-### ML-001..014 — PredictionTruth + ModelArtifactManifest
+**New code proof:** `CloudPaperEngine` now owns `close_position_by_id()` and uses the same `open_positions/closed_positions` state that produces projections. A `threading.Lock` serializes `step()` and manual close within one engine instance.
 
-**Severity/status:** P0-P1, OPEN / FIX-REQUIRED.
+**Assessment:** the concrete same-process dual-authority/race identified earlier is materially reduced. However this remains an in-memory/file-state design, not an append-only event ledger; no cross-process/distributed lock, command idempotency, position revision or reconciliation checkpoint is present.
 
-**Root causes:** immutable prediction ledger absent; score/confidence semantics conflated; maturity stages weak; temporal leakage/calibration proof incomplete; prediction outcomes not linked to reconciled after-cost paper lifecycle.
+**Status:** `PATCHED / PARTIAL / UNPROVEN`.
 
-**Target:** prediction ID, model/artifact hash, dataset hash, feature schema hash, source SHA, train/data cutoff, calibration revision, uncertainty, maturity state and later realized outcome linkage.
+### New regression concern from PR #99
 
-**Tests/PASS:** prediction is immutable; no future data leakage; calibrated probability separately proven; only reconciled after-cost outcomes enter forward-performance evidence.
+`close_position_by_id()` closes using the stored `current_price` (falling back to `entry_price`) and immediately persists the result. It does not require a current quote snapshot ID, quote freshness, ExecutionDecision, PreTradeRisk/SafetyTruth, idempotency key or position revision. Therefore PR #99 fixes the concrete resurrection path but does not satisfy the target institutional close lifecycle.
 
-**Status:** READY TO PATCH/DESIGN.
+**Required next step:** convert manual close to `ClosePositionIntent` through MutationPolicy -> SafetyTruth -> fresh market truth -> PreTradeRisk/ExecutionDecision -> serialized PaperMutationWorker -> immutable close/fill/position event -> reconciliation.
 
-### A11Y-001..012 + UI-001..019 — Accessible workstation and UI truth
+## 5. Latest deep slice — Google Cloud deployment/runtime provenance
 
-**Severity/status:** P1, OPEN. `UI-001` is `LOCKED-20X / FIX-REQUIRED`; `UI-005 17/20`, `UI-007 13/20`, `UI-016 14/20`.
+### GCP-012 / P0 — deployment proof uses image tag, not immutable Artifact Registry digest
 
-**Root causes:** hard-coded/default-valid UI states; zero/empty ambiguity; weak provenance/freshness; fixed/clipped layouts; keyboard/focus/live-region gaps; no exact revision browser proof.
+**Exact proof:** `scripts/gcp_cloud_run_auto_deploy.py` builds an image with a unique tag containing a short SHA plus timestamp and patches Cloud Run with that tag. `scripts/gcp_runtime_evidence.py` records `container.image`, revision and `DEPLOY_GIT_SHA`, but does not resolve/store the immutable image `sha256:` digest as the primary deployment identity.
 
-**Target workspaces:** Command Center; Market/Scanner; Options & Greeks; AI Decision Audit; Paper Lifecycle; Portfolio & Risk; Data & Broker; Readiness/Proof; Observability; Security/Settings.
+**Root cause:** source identity and runtime artifact identity are linked by mutable metadata/tag rather than a cryptographic artifact digest chain.
 
-**Implementation:** all status badges consume typed backend truth; desktop/tablet/mobile shell; command palette; focus-visible; keyboard navigation; aria-live critical changes; responsive tables/cards; no Tier-0 safety truth clipped.
+**Impact:** tag/SHA agreement cannot independently prove which image bytes a revision executed; rollback and exact-revision incident forensics are weaker.
 
-**Tests/PASS:** Playwright + axe + console-error tests across all workspaces, desktop/tablet/mobile, 200% zoom, auth/error/loading/market-open/closed/stale states.
+**Files:** `scripts/gcp_cloud_run_auto_deploy.py`, `scripts/gcp_runtime_evidence.py`, `.github/workflows/cloud-run-auto-deploy.yml`, Readiness/Proof UI.
 
-**Status:** READY TO PATCH.
+**Target:** `DeploymentTruth {source_sha, cloud_build_id, artifact_uri, image_digest, cloud_run_revision, traffic_percent, runtime_reported_sha, deployment_policy_revision, evidence_id}`.
 
-## 4. Paper lifecycle deep slice — PAPER-017..024
+**Implementation:** after Cloud Build SUCCESS, query Artifact Registry/build results for digest; deploy by digest (`image@sha256:...`) or record resolved digest and verify Cloud Run revision digest; runtime evidence must compare source SHA + build ID + digest + revision.
 
-### PAPER-017/018 — direct manual close + competing paper authorities
+**Migration:** retain human-readable tags as aliases only; never use tag match as closure proof.
 
-**Severity/status:** P0, READY TO PATCH / FIX-REQUIRED, 1/20 each.
+**Security/safety:** deployment proof collector is read-only and must not read secret payloads.
 
-**Proof/root cause:** `dashboard/backend/app.py::close_position(position_id)` edits `positions_live.json` directly, while `CloudPaperEngine` owns separate `self.open_positions`/`paper_engine_state.json` and later rewrites the projection. A manual close can therefore be overwritten/resurrected.
+**Tests/PASS:** altered tag pointing to different digest is rejected; only exact digest+SHA+revision chain passes; rollback names exact prior digest/revision.
 
-**Target:** `ClosePositionIntent` through MutationPolicy/SafetyTruth/fresh quote/risk/idempotent serialized paper worker, producing immutable close/fill/position events. Projection files become read-only outputs.
-
-**Tests/PASS:** 20 duplicate closes -> one close; stale revision rejects; restart/tick cannot reopen closed lifecycle; no route directly writes positions projection.
-
-**Rollback:** disable manual mutation, retain read-only positions.
-
-### PAPER-019 — persistence failure silently becomes empty state
-
-**Severity/status:** P0-P1, READY TO PATCH / FIX-REQUIRED, 1/20.
-
-**Proof/root cause:** broad exception handling in paper state load/save/output paths can initialize/retain empty arrays/zero sequence rather than expose ledger failure.
-
-**Target:** typed `LEDGER_ERROR`; event commit before projection acknowledgement; checksummed/versioned checkpoints; persistence failure inhibits paper mutations.
-
-**Tests/PASS:** malformed state, permission denied, disk-full/mock write failure and interrupted snapshot never yield proven zero/empty portfolio.
-
-### PAPER-020 — destructive day rollover and repeatable IDs
-
-**Severity/status:** P1, READY TO PATCH, 1/20.
-
-**Target:** global UUID/ULID event/position IDs; session boundary events; unresolved overnight position => `RECONCILE_REQUIRED`, never silent reset.
-
-**Tests/PASS:** IDs never repeat across 20 simulated sessions; unresolved position survives as reconciliation blocker.
-
-### PAPER-021/022/023 — explicit fill/cost/quantity provenance
-
-**Severity/status:** P1, READY TO PATCH, 1/20 each.
-
-**Root causes:** LTP used directly as simulated fill; no immutable order/fill/quote chain; hard-coded cost constants return opaque net; quantity can be recomputed with a different fallback multiplier.
-
-**Target:** `PAPER_ORDER_ACCEPTED -> PAPER_FILL -> POSITION_*`; fill stores actual signed quantity, quote snapshot, fill-model revision and `CostPolicy` revision. Gross, brokerage, fees/taxes, slippage, total cost and net are individually persisted.
-
-**Tests/PASS:** exactly one opening and closing fill per lifecycle; stored quantity drives P&L; gross-cost=net; policy change never rewrites old event values; unsupported instrument metadata inhibits fill.
-
-### PAPER-024 — no authoritative reconciliation chain
-
-**Severity/status:** P1, READY TO PATCH, 1/20.
-
-**Root cause:** engine state, positions JSON, P&L JSON/summary and CSV history lack one common immutable generation/event sequence.
-
-**Target contract:** `ReconciliationTruth {state: RECONCILED|DRIFT|ERROR|UNKNOWN, ledger_seq, projection_generations, orphan_ids, duplicate_ids, evidence_id, checked_at}`.
-
-**Tests/PASS:** projection deletion/edit/truncation deterministically rebuilds from ledger; mismatch => DRIFT, never PASS.
-
-## 5. Canonical solution — SOL-20 PaperLedger + ReconciliationService
-
-**Status:** READY TO PATCH.
-
-### Authoritative lifecycle
-
-`PaperCommand / ClosePositionIntent -> MutationPolicy -> SafetyTruth -> DeploymentTruth + StateTruth generation -> StreamTruth / OptionChainTruth / AccountTruth -> PreTradeRiskService -> immutable ExecutionDecision -> serialized/idempotent PaperMutationWorker -> PAPER_ORDER_ACCEPTED -> PAPER_FILL -> POSITION_OPENED/UPDATED/CLOSED -> P&L valuation event -> RECONCILIATION_CHECKPOINT`.
-
-Projection files such as `positions_live.json`, `pnl_live.json`, `paper_pnl_summary.json` and CSV exports are projections only.
-
-### Core contracts
-
-- `PaperCommand {command_id, correlation_id, intent_id, decision_id, idempotency_key, capability, expected_generation, created_at}`
-- `PaperOrderEvent {order_event_id, command_id, instrument_id, side, qty, order_type, quote_snapshot_id, state}`
-- `PaperFill {fill_id, order_event_id, qty, fill_price, quote_snapshot_id, fill_model_revision, cost_policy_revision, filled_at}`
-- `PositionEvent {position_id, position_revision, parent_fill_id, state, event_id, event_time}`
-- `CostBreakdown {gross, brokerage, taxes_fees, slippage, total_cost, net, policy_revision}`
-- `ReconciliationTruth {state, ledger_seq, projection_generations, orphan_ids, duplicate_ids, evidence_id, checked_at}`
-
-### Ordered implementation
-
-1. Add durable append-only event store and global IDs.
-2. Add one serialized mutation worker with idempotency.
-3. Convert `/api/paper/tick` to command enqueue.
-4. Convert manual close to ClosePositionIntent.
-5. Add explicit order/fill/position events bound to quote/risk evidence.
-6. Store actual fill quantity/instrument metadata.
-7. Add versioned CostPolicy and component P&L.
-8. Replace destructive date reset with session/EOD events.
-9. Make persistence errors fatal to mutation authority.
-10. Build all UI/JSON/CSV projections from reducers.
-11. Reconcile on startup, after command, before readiness statistics.
-12. Surface lifecycle/cost/reconciliation evidence in Paper workspace.
-
-**PASS:** every Paper position/P&L/history row is reconstructible from immutable events and a RECONCILED checkpoint.
-
-## 6. Latest deep slice — Dhan broker/account truth, funds, holdings, positions and portfolio consistency
-
-### ACCOUNT-001 / P0-P1 — positions/holdings can return success=true for Dhan failure payloads
-
-**Exact proof:** `core/brokers/dhan/dhan_readonly.py::get_funds()` explicitly checks `_auth_failure_payload(data)` for SDK and REST responses. `get_positions()` and `get_holdings()` do not perform the same payload-level failure check; an SDK/REST JSON body that represents broker failure but arrives without transport exception can be wrapped as `{success: True, source: ..., data: ...}`.
-
-**Symptom/root cause:** transport success is conflated with semantic broker success for positions/holdings.
-
-**Real-money/readiness impact:** downstream normalizers can turn a broker failure payload into an empty list and the system can then treat zero positions/holdings as valid account truth. Pre-trade exposure/margin decisions could be materially wrong.
-
-**Files/functions:** `core/brokers/dhan/dhan_readonly.py::get_positions/get_holdings/get_funds/get_orders_readonly`, Dhan semantic classifier, broker/account service.
-
-**World-class target:** every broker read uses one semantic response validator returning `PASS|EMPTY|ERROR|AUTH_ERROR|RATE_LIMITED|STALE|UNKNOWN`, provider request ID/status, account identity hash, event/receive times and evidence ID.
-
-**Minimal safe implementation:** centralize `_classify_dhan_response`; require expected payload schema before `success=true`; apply consistently to profile/funds/holdings/positions/orders; never normalize failure payload as empty account.
-
-**Contract change:** replace loose `{success,data,error}` with `BrokerReadResult<T> {state, data, empty_proven, source, provider_status, provider_request_id, account_id_hash, event_time, received_at, age_ms, schema_revision, evidence_id, error}`.
-
-**Migration:** compatibility serializers may expose legacy fields but must preserve `state` and never map ERROR/UNKNOWN to success/empty.
-
-**Safety:** AccountTruth ERROR/UNKNOWN inhibits PreTradeRiskService and paper/live-adjacent mutations.
-
-**Regression risks:** UI currently interprets lists/counts directly; update frontend together with contract.
-
-**Tests/PASS:** inject HTTP-200 failure payload, DH-906 payload, malformed payload, true empty positions, true one-position payload; only true empty can yield `EMPTY` with count 0. Failure never yields proven zero exposure.
-
-**Rollback:** account semantic validator unavailable => AccountTruth UNKNOWN and risk inhibited.
+**Rollback:** inability to resolve digest => `DEPLOYMENT_NOT_PROVEN`; no readiness promotion.
 
 **Status:** READY TO PATCH / FIX-REQUIRED.
 
-### ACCOUNT-002 / P0-P1 — Dhan normalizer converts missing/malformed holdings values to numeric zero
+### GCP-013 / P0-P1 — web runtime identity is also Dhan rotator and scheduler identity
 
-**Exact proof:** `dhan_payload_normalizer.py::normalize_holding_row()` uses `... or 0` for quantity/average/LTP and on any conversion exception sets all three to `0.0`. It then computes current value/P&L from those zeros. `normalize_position_row()` similarly defaults quantity/LTP/P&L fields to zero and uses direct `float(...)` conversions for several fields.
+**Exact proof:** `cloud-run-auto-deploy.yml` reads the Cloud Run runtime service account into `RUNTIME_SA`, grants it Secret Manager access to client ID, Dhan access token, PIN, TOTP, dashboard API key and worker token, grants token-version-adder, deploys the Dhan rotation job using the same account, grants the same account Run Job invoker and configures Cloud Scheduler OAuth using the same account.
 
-**Root cause:** parser convenience defaults are being used as financial truth.
+**Root cause:** web serving, privileged credential rotation and scheduled invocation are not separated by least privilege.
 
-**Impact:** unavailable or malformed broker market/account data can become apparently valid ₹0 / zero exposure / zero P&L rows.
+**Impact:** compromise of the web runtime identity expands blast radius to PIN/TOTP and token-write/rotation permissions.
 
-**Files:** `core/brokers/dhan/dhan_payload_normalizer.py`, BrokerPanel, broker truth validator.
+**Files:** `.github/workflows/cloud-run-auto-deploy.yml`, WIF/bootstrap/IAM docs/scripts, Cloud Run/Job/Scheduler deployment config.
 
-**Target:** nullable typed fields plus per-field quality: `VALID|MISSING|INVALID|STALE`; financial zero is accepted only when explicitly present and schema-valid.
+**Target identities:** `system3-web` (read-only runtime secrets only), `system3-dhan-rotator` (Dhan PIN/TOTP/token write only), `system3-scheduler-invoker` (Run Job invoke only), `system3-deployer`, `system3-evidence-reader`.
 
-**Implementation:** parse each field independently; preserve raw value; null on missing/invalid; add `field_errors`; calculate derived current value/P&L only when all required inputs valid.
+**Implementation:** pre-provision identities/IAM; stop granting privileged secret roles to web SA; job uses rotator SA; scheduler uses invoker SA; evidence artifact records identities and effective capabilities.
 
-**Tests/PASS:** malformed one field does not zero unrelated fields; missing LTP => P&L UNKNOWN, not zero; explicit broker zero remains valid zero.
+**Migration:** prove current runtime first, then dual-stage cutover; revoke web PIN/TOTP/token-write roles only after rotator/scheduler tests pass.
 
-**Rollback:** parser uncertainty => row quality ERROR/UNKNOWN.
+**Tests/PASS:** web SA denied PIN/TOTP access and secret version add; rotator denied web/API unrelated secrets; scheduler can invoke only named job; evidence reader cannot mutate.
 
-**Status:** READY TO PATCH / FIX-REQUIRED.
-
-### ACCOUNT-003 / P0 — broker truth validator can certify empty/zero account fields as VALID after semantic parsing loss
-
-**Exact proof:** `broker_truth_validator.py::_field_status()` allows zero by default and treats an empty list as valid for required list type. `build_broker_truth_report()` derives holdings/positions counts from normalized lists and uses 0 for holdings value and position P&L when API response reports success. If semantic failure/malformed shape has already been wrapped as success, the validator can count those zeros as valid and potentially reach `VALID`/`PASS_WITH_WARNINGS`.
-
-**Root cause:** validator trusts upstream boolean success and validates plausible numeric shape rather than provenance/semantic completeness.
-
-**Impact:** false-green account/risk evidence.
-
-**Files:** `broker_truth_validator.py`, `dhan_readonly.py`, normalizer, readiness/risk consumers.
-
-**Target:** validator consumes typed BrokerReadResult and AccountSnapshot; EMPTY is only valid if `empty_proven=true` from correct broker schema. Aggregates require one account generation and domain evidence IDs.
-
-**Implementation:** remove validity derived solely from zero/count; require semantic state + schema proof; overall `PASS` only when mandatory domains are PASS/EMPTY_PROVEN and same generation.
-
-**Tests/PASS:** HTTP-200 error body, malformed body and wrong schema must produce NOT_VALID/ERROR; only broker-defined empty schema can produce zero counts as valid.
-
-**Rollback:** ambiguity => AccountTruth UNKNOWN.
+**Rollback:** if split fails, disable scheduled rotation and keep read-only web runtime; do not broaden web SA again automatically.
 
 **Status:** READY TO PATCH / FIX-REQUIRED.
 
-### ACCOUNT-004 / P1 — funds/holdings/positions lack event time, receive time, TTL and common account generation
+### GCP-014 / P1 — long-lived `GCP_SA_KEY` fallback remains active
 
-**Exact proof:** read-only adapter returns source/data/error without authoritative event/receive timestamps; `broker_truth_validator` adds only report `generated_utc`; modular `/api/broker/truth` creates a response timestamp after sequentially calling status/funds/holdings/positions. There is no per-domain source age, snapshot revision or account generation.
+**Exact proof:** deploy workflow prefers WIF only when variables are present; otherwise it authenticates with `${{ secrets.GCP_SA_KEY }}`. The WIF setup document explicitly calls this a temporary fallback and instructs deletion only after WIF-only proof.
 
-**Root cause:** retrieval time is being used as a loose proxy for source consistency.
+**Root cause:** migration fallback can silently preserve long-lived deploy credentials indefinitely.
 
-**Impact:** risk/portfolio views can combine funds from one moment, positions from another and profile connectivity from another while appearing as one current account.
+**Impact:** key exfiltration/reuse risk and weaker auditable identity provenance.
 
-**Files:** Dhan adapter, account coordinator, broker API DTOs, frontend store/BrokerPanel, PreTradeRiskService.
+**Target:** WIF mandatory for automatic deploy; legacy key path disabled after one independently proven WIF migration artifact.
 
-**Target:** `AccountSnapshot {snapshot_id, account_id_hash, token_generation, started_at, completed_at, domains{profile,funds,holdings,positions,orders}, consistency_state, evidence_id}`; each domain has event/receive time, age, TTL, provider request ID and schema revision.
+**Implementation:** add explicit migration deadline/state; after proof remove legacy auth step and secret; CI fails if WIF variables missing.
 
-**Implementation:** coordinate bounded reads; stamp backend receive time immediately; derive account snapshot generation; enforce maximum skew; publish `CONSISTENT|PARTIAL|STALE|ERROR|UNKNOWN`.
-
-**Tests/PASS:** deliberately delay one domain beyond skew/TTL and verify risk inhibited; mixed token generation rejected; all domains trace to snapshot ID.
+**Tests/PASS:** WIF-only deployment succeeds twice; legacy key disabled/deleted; workflow without WIF fails closed before deployment.
 
 **Status:** READY TO PATCH.
 
-### ACCOUNT-005 / P1 — profile CONNECTED can remain green while account domains fail or are stale
+### GCP-015 / P1 — deployment is not one atomic canonical Cloud Run spec
 
-**Exact proof:** `get_status()` caches only a connected profile result for `_STATUS_RESULT_TTL_S`. `BrokerPanel` derives `brokerTruthConnected` from broker/profile connected state and can display `READ-ONLY BROKER PROOF OK` even though holdings/positions are independently fetched and may be in error. The panel's `Broker Blocker` row is driven mainly by token/broker connectivity, not one authoritative account consistency verdict.
+**Exact proof:** `gcp_cloud_run_auto_deploy.py::_patch_service()` sets scaling `minInstanceCount=1,maxInstanceCount=10`, while the workflow later executes `gcloud run services update --min-instances=0 --max-instances=1`. `deploy/gcp/README.md` describes zero minimum/one maximum as the safety invariant. If the workflow fails between these stages, an intermediate revision/service configuration differs from the documented target.
 
-**Root cause:** connectivity proof and account-data proof are conflated in UI hierarchy.
+**Root cause:** deployment desired state is spread across multiple mutation steps and scripts.
 
-**Impact:** operator may infer usable account/risk state from a green broker connection while funds/positions are stale/failed.
+**Impact:** configuration drift, transient unintended scaling/cost/concurrency and harder rollback/provenance.
 
-**Files:** `dhan_readonly.py::get_status`, frontend `BrokerPanel.tsx`, store/useData, future AccountTruth endpoint.
+**Target:** one reviewed canonical Cloud Run service specification applied once; all safety env/scaling/service-account/secret bindings are part of the same desired-state change.
 
-**Target UI:** separate `DHAN PROFILE CONNECTIVITY` from `ACCOUNT SNAPSHOT`. Connected profile may be green while AccountTruth is PARTIAL/STALE/ERROR; risk remains inhibited.
+**Implementation:** central deployment manifest/config builder; remove conflicting later update; post-deploy validation reads exact revision and compares to desired spec.
 
-**Tests/PASS:** profile succeeds while positions fails => header shows connectivity OK but account snapshot ERROR/PARTIAL and no risk eligibility.
+**Tests/PASS:** injected failure after deploy cannot leave noncanonical scaling; desired-vs-actual diff = 0 for safety fields.
 
-**Status:** READY TO PATCH.
-
-### ACCOUNT-006 / P1/UI — BrokerPanel still renders financial unknowns as zero-derived values
-
-**Exact proof:** `BrokerPanel.tsx` helper functions default average/entry to 0, holdings LTP/quantity to 0, compute P&L from those values, and position LTP/P&L fallback to 0. It also considers Holdings API `RESPONDED` whenever a holdings object exists and no interpreted error is present, including zero rows.
-
-**Root cause:** frontend presentation layer contains independent financial fallback logic instead of rendering typed backend field truth.
-
-**Impact:** unknown/missing market/account values can look like real zeros; browser-derived P&L can disagree with backend/account truth.
-
-**Files:** `BrokerPanel.tsx`, `useData.ts`, store types, reusable money/quality cells.
-
-**Target:** backend owns normalized financial fields and quality; UI renders `— / UNKNOWN / STALE / ERROR` and evidence/age. No browser P&L reconstruction for authoritative broker rows.
-
-**Tests/PASS:** null/missing values never render `₹0.00`, `0.00%` or green success; explicit broker zero does. Browser and API P&L must match exact evidence ID.
+**Rollback:** redeploy previous canonical digest+spec, not partial `gcloud update` mutations.
 
 **Status:** READY TO PATCH.
 
-### ACCOUNT-007 / P1 — disabled modular broker router contains false-zero compatibility behavior and is a future reactivation hazard
+### GCP-016 / P1 — deployment workflow mutates IAM and operational scheduler topology on every deploy
 
-**Exact proof:** `dashboard/backend/routers/broker.py` is currently disabled in `app.py` because modular routers duplicate active rich endpoints. Its funds route defaults missing balances to 0 and exceptions to all-zero balances; holdings/positions exceptions return empty lists/count 0. `/api/broker/truth` sequentially combines those responses.
+**Exact proof:** every auto-deploy adds Secret Manager IAM bindings, adds Run Job invoker, deploys/reconfigures the rotation job and creates/updates Cloud Scheduler.
 
-**Root cause:** duplicate broker API contracts remain in the source tree with weaker truth semantics.
+**Root cause:** application deployment and infrastructure/IAM administration are coupled.
 
-**Impact:** future modularization/re-enable could silently reintroduce zero/empty-on-error behavior and conflicting route ownership.
+**Impact:** a source-code deploy principal has broad operational mutation scope; IAM drift can be hidden inside normal app deployment; failure modes are harder to isolate.
 
-**Files:** `dashboard/backend/routers/broker.py`, `dashboard/backend/app.py`, route-inventory tests.
+**Target:** infrastructure/IAM provisioned separately (Terraform/gcloud bootstrap with review); app deployment only builds image and updates the approved Cloud Run revision. Scheduler/rotator changes require their own controlled pipeline.
 
-**Target:** one canonical broker/account service and route owner. Delete or refactor legacy duplicate router before re-enabling; no separate normalization/default logic.
-
-**Tests/PASS:** unique `(method,path)` owner; same AccountTruth schema from every public account endpoint; error cannot become zero/empty.
-
-**Status:** READY TO PATCH / FIX-REQUIRED before router re-enable.
-
-### ACCOUNT-008 / P1 — account truth is not yet bound into canonical PreTradeRiskService
-
-**Exact proof:** current broker/account validator is primarily reporting/validation logic; prior risk audit already proved no independently authoritative PreTradeRiskService is wired to every mutation. No immutable `account_snapshot_id` is required before paper tick/close/order intent.
-
-**Root cause:** account display truth and execution eligibility are separate concerns without a mandatory join.
-
-**Impact:** even a future correct account panel would not by itself stop stale/partial account data from being used by transaction logic.
-
-**Files:** future `account_truth_service.py`, `pretrade_risk_service.py`, PaperMutationWorker, risk UI.
-
-**Target:** every ExecutionDecision records one current AccountTruth snapshot ID; required domains and TTL are policy-defined. Missing/partial/stale account truth => risk state UNKNOWN/FAIL.
-
-**Tests/PASS:** mutate account generation after risk evaluation => decision expires/rejects; missing positions/funds => no paper mutation; explicit proven-empty account can pass only if policy permits.
+**Tests/PASS:** standard app deploy makes zero IAM policy changes and zero scheduler topology changes; infra drift is reported, not silently repaired by app deployment.
 
 **Status:** READY TO PATCH.
 
-## 7. Canonical solution — SOL-21 AccountTruth + AccountSnapshotCoordinator
+### GCP-017 / P1 — auto-deploy executes privileged Dhan token rotation immediately
+
+**Exact proof:** deploy workflow runs `gcloud run jobs execute genesis-system3-dhan-token-rotate --wait` after configuring the job.
+
+**Root cause:** application deployment is coupled to credential rotation side effects.
+
+**Impact:** deploy rollback/retry can trigger repeated credential rotation independent of schedule; credential lifecycle evidence becomes coupled to code deployment.
+
+**Target:** deployment validates job configuration/IAM but does not rotate broker credentials. Rotation is Scheduler/manual break-glass with unique rotation event ID and replay control.
+
+**Tests/PASS:** app deploy causes zero token rotations; scheduler execution produces one rotation event; repeated event ID is rejected/no-op.
 
 **Status:** READY TO PATCH.
 
-### Contract
+### GCP-018 / P1 — runtime evidence does not prove traffic ownership of exact revision
 
-`BrokerReadResult<T> {domain, state: PASS|EMPTY_PROVEN|STALE|AUTH_ERROR|RATE_LIMITED|ERROR|UNKNOWN, data, account_id_hash, token_generation, provider, provider_request_id, source_event_at, received_at, age_ms, ttl_ms, schema_revision, evidence_id, field_quality, error}`.
+**Exact proof:** runtime evidence captures `latestReadyRevision` and service URL but does not record the full traffic allocation and require 100% (or explicitly intended split) to the proven revision before declaring deployment lock.
 
-`AccountTruth {snapshot_id, state: CONSISTENT|PARTIAL|STALE|ERROR|UNKNOWN, account_id_hash, token_generation, started_at, completed_at, max_domain_skew_ms, domains, totals, reconciliation, runtime_revision, evidence_id}`.
+**Root cause:** latest ready revision is assumed too close to active serving revision.
 
-### Ordered implementation
+**Impact:** an older revision could still serve some traffic while proof reports the newest ready revision.
 
-1. Build one Dhan semantic response classifier and apply to profile/funds/holdings/positions/orders.
-2. Refactor normalizer to nullable per-field parsing with quality/errors; remove financial `or 0` defaults.
-3. Create `AccountSnapshotCoordinator` with bounded/singleflight account reads and one generation ID.
-4. Stamp receive times, provider request IDs where available, age/TTL and schema/normalizer revisions.
-5. Define broker-proven empty payloads separately from malformed/error payloads.
-6. Rebuild `broker_truth_validator` on AccountTruth; zero counts valid only for EMPTY_PROVEN.
-7. Replace duplicate/disabled broker router semantics with one canonical service before modular router reactivation.
-8. Update frontend store/useData/BrokerPanel to consume AccountTruth only; no browser financial reconstruction.
-9. Bind `account_snapshot_id` to PreTradeRiskService and ExecutionDecision.
-10. Add broker-vs-paper/risk reconciliation view and evidence drilldown.
+**Target:** record all traffic targets/percentages/tags and require policy match; endpoint probes must bind to the serving revision where possible.
 
-### Migration/backward compatibility
+**Tests/PASS:** 90/10 split fails a 100%-current policy; stale tagged revision cannot satisfy deployment proof.
 
-Legacy response fields may remain temporarily, but they must be derived from AccountTruth and carry state/evidence. Never preserve legacy `0` on error semantics.
+**Status:** READY TO PATCH.
 
-### Security/safety
+### GCP-019 / P1-P2 — substantial Render-era operational tooling remains executable
 
-- Read-only Dhan adapter remains the only broker interface for this audit scope.
-- Existing place/modify/cancel blockers remain intact.
-- AccountTruth UNKNOWN/PARTIAL/STALE/ERROR inhibits risk-dependent paper mutations.
-- No raw account credential/token is emitted; use redacted account identity hash.
+**Exact proof:** repository search still returns executable Render-specific tools/scripts and operational docs including `tools/sync_render_secrets.py`, `tools/render_deploy_commit_proof.py`, `tools/render_env_alignment_audit.py`, `scripts/render_worker_mobile_check.sh` and multiple Render runbooks/reports.
 
-### Regression risks
+**Root cause:** migration retained old deployment-operational code without a single archival/non-authoritative boundary.
 
-- Components expecting numeric zeros may need nullable types.
-- Existing tests that assert empty arrays on transport error must be changed to typed ERROR.
-- Read coordination can increase latency; use bounded WorkCoordinator and last-good STALE display, never stale-as-current.
+**Impact:** an agent/operator can select stale Render tooling, creating contradictory deployment authority and wasted/unsafe remediation.
 
-### Exact closure tests
+**Target:** move historical Render material under clearly archived documentation or mark executable entry points hard-disabled with message `GCP is canonical deployment target`; remove Render from current runbooks/automation decisions.
 
-1. HTTP 200 semantic error for holdings/positions => ERROR, not empty.
-2. True broker empty positions => EMPTY_PROVEN/count 0.
-3. Missing/malformed qty/LTP/avg => null + field error, not 0.
-4. Funds PASS + positions timeout => AccountTruth PARTIAL/ERROR and risk inhibited.
-5. Profile connected + holdings auth error => connectivity green only; account snapshot red/amber.
-6. Domain age beyond TTL => STALE and risk inhibited.
-7. Token/account generation changes mid-snapshot => snapshot rejected/retried.
-8. Browser renders missing financial values as `—/UNKNOWN`, never zero.
-9. Broker and Paper P&L remain explicitly separate sources; cross-source comparison never merges them.
-10. 20 repeated identical reads preserve one canonical generation semantics and no false-green zero state.
-11. Mock broker mutation methods remain zero calls.
+**Tests/PASS:** current operational docs/workflows contain zero instructions to deploy/change Render; CI flags new Render runtime authority references outside archive.
 
-**PASS:** every funds/holdings/positions/risk display traces to one AccountTruth snapshot/evidence ID; no broker error, parse loss or stale domain can appear as valid zero/empty current account state.
+**Status:** READY TO PATCH.
 
-**Rollback/fail-safe:** keep last-good account snapshot read-only and mark STALE; PreTradeRisk and paper mutation inhibited; LIVE locked.
+## 6. Canonical solution — DeploymentTruth V2
 
-## 8. Regression checks this iteration
+**Status:** READY TO PATCH.
 
-- Application/source SHA remains `b70af343...`; newest `main` at iteration start is report-only `5c0b43eb...`.
-- PR #98 is open, not main. Its token-manager Cloud Run detection change and v-cloak CSS cannot close any `main` finding yet.
-- PR #97 remains open and does not close synthetic-P&L issues on main.
-- Exact application-head workflow runs remain absent.
-- Modular broker router remains disabled due duplicate route ownership; duplicate weaker broker contract still exists in source.
-- Dhan adapter remains read-only and explicitly blocks place/modify/cancel/super/forever/slice methods — positive safety foundation retained.
-- Funds semantic auth-failure classification exists — positive foundation — but positions/holdings do not yet share the same classifier.
-- `broker_truth_validator` still permits zero values/empty lists as valid based on upstream success.
-- `BrokerPanel` still derives several account financial values/P&L with zero fallbacks.
-- Existing `PERF-004` paper-tick concurrency and SOL-20 lifecycle findings remain unresolved.
-- LIVE remains prohibited; no live order was enabled, placed, modified, cancelled or routed.
+Required chain:
 
-## 9. Findings upgraded/downgraded/closed
+`main source SHA -> Cloud Build ID -> Artifact Registry digest -> Cloud Run revision -> traffic allocation -> runtime reported SHA -> safety/IAM evidence -> immutable evidence ID`.
 
-- `ACCOUNT-001..008`: NEW, `1/20` each, FIX-REQUIRED; ACCOUNT-001/002/003 are P0-P1/P0 because they can understate exposure/account truth.
-- `UI-001`: independently reproduced again through broker/account zero-default behavior; remains `LOCKED-20X / FIX-REQUIRED` (counter stays capped at 20/20).
-- `READY account-success ambiguity`: upgraded in confidence and now concretely owned by `SOL-21 AccountTruth`.
-- `RISK` account-input concern: upgraded in confidence because current account reads lack common generation/TTL.
-- Positive finding: Dhan read-only order methods remain hard blocked; no downgrade of live-off safety posture.
-- `PAPER-010` remains CLOSED/CORRECTED only for the old route-absence claim.
-- No readiness, profitability, deployment, account, paper or risk finding is closed in this iteration.
+Required fields:
 
-## 10. Prioritized remediation roadmap
+`DeploymentTruth {state: PASS|STALE|ERROR|UNKNOWN, source_sha, build_id, artifact_repo, image_digest, revision, traffic[], service_account, runtime_sha, safe_env_revision, secret_binding_metadata, scheduler_identity, rotator_identity, deployed_at, observed_at, evidence_id}`.
+
+Ordered implementation:
+1. Resolve/store image digest after Cloud Build and deploy/verify by digest.
+2. Consolidate Cloud Run desired state into one canonical atomic deployment definition.
+3. Record full traffic allocation and require policy match.
+4. Split web/rotator/scheduler/deployer/evidence identities and least-privilege IAM.
+5. Separate infra/IAM/scheduler provisioning from ordinary app deployment.
+6. Remove auto token rotation from app deployment.
+7. Complete WIF migration; remove `GCP_SA_KEY` fallback.
+8. Add runtime endpoint/evidence showing source SHA, revision and deployment evidence ID without secrets.
+9. Archive/hard-disable Render-era operational tooling.
+10. Add Readiness/Proof UI drilldown for SHA/build/digest/revision/traffic/IAM/safety.
+
+PASS criteria: exact source SHA, build, digest, revision and intended traffic all match; live flags are OFF; secret payload exposure is false; identity split is least privilege; WIF is keyless; no ordinary app deploy mutates IAM/scheduler or rotates Dhan credentials.
+
+Fail-safe: any missing digest/traffic/IAM/runtime proof => DeploymentTruth UNKNOWN/ERROR, readiness blocked, paper/live-adjacent safety decision inhibited where deployment truth is required, LIVE locked.
+
+## 7. Prioritized remediation roadmap
 
 ### P0
-
-1. `SessionTruth`: fix login contract; remove browser reusable API key; authoritative server expiry/revocation.
-2. `MutationPolicy + CapabilityManifest`: classify every write route; CSRF/idempotency/capability enforcement.
-3. `SafetyTruth + ExecutionEligibility + PreTradeRiskService`.
-4. `SOL-21 AccountTruth`: semantic Dhan reads, nullable normalization, one account generation; bind to risk.
-5. `SOL-20 PaperLedger + ReconciliationService`: eliminate direct file mutation/free-form engine state authority.
-6. Remove split kill-switch authority and make missing safety truth fail closed.
-7. `DeploymentTruth` exact SHA -> image digest -> Cloud Run revision.
-8. `StateTruth + domain CAS` shared authority.
-9. Bounded `WorkCoordinator` and serialized paper/account work.
+1. SessionTruth.
+2. MutationPolicy + CapabilityManifest.
+3. SafetyTruth + ExecutionEligibility + mandatory PreTradeRiskService.
+4. AccountTruth + AccountSnapshotCoordinator.
+5. Complete PaperLedger + ReconciliationService; treat PR #99 as partial bridge only.
+6. DeploymentTruth V2: immutable digest/revision/traffic and identity split.
+7. StateTruth + domain CAS.
+8. WorkCoordinator + serialized/idempotent paper mutation worker.
 
 ### P1
-
-1. `OptionChainTruth` + per-symbol/expiry singleflight.
-2. `StreamTruth` event/heartbeat/order/freshness validation.
-3. `ScannerTruth` latest-observation semantics and stale eviction.
-4. Versioned Paper CostPolicy, explicit fills and after-cost P&L.
-5. Replace scheduler URL secret with GCP IAM/OIDC and job capabilities.
-6. `PredictionTruth` linked to reconciled paper outcomes.
-7. Account-vs-paper-vs-risk reconciliation UI and evidence exports.
+1. OptionChainTruth.
+2. StreamTruth.
+3. ScannerTruth.
+4. Versioned fill/cost/P&L provenance.
+5. WIF-only deploy and remove legacy GCP key.
+6. Separate IAM/infra/scheduler/token-rotation pipelines.
+7. PredictionTruth linked to reconciled paper outcomes.
 8. Responsive/accessibility/browser-console proof.
-9. Retire remaining Render-era operational instructions/comments.
+9. Retire Render-era operational authority.
 
 ### P2
+Advanced institutional analytics, scenario controls and tuning only after P0/P1 truth contracts are proven.
 
-Institutional analytics, what-if scenarios, advanced drilldowns and tuning controls only after P0/P1 truth contracts are proven.
+## 8. Counters / status changes
 
-## 11. Independent verification counters
+- `UI-001` remains `LOCKED-20X / FIX-REQUIRED`.
+- `PAPER-017`: source status upgraded from READY TO PATCH to `PATCHED / UNPROVEN`; counter remains below LOCKED-20X because patch closure needs independent runtime/test reproductions.
+- `PAPER-018`: upgraded to `PATCHED / PARTIAL / UNPROVEN`; long-term ledger/reconciliation solution remains required.
+- `PERF-004` remains open; PR #99's instance lock does not provide command idempotency or full paper-worker serialization semantics.
+- `GCP-012..019`: NEW, `1/20` each, FIX-REQUIRED.
+- No new finding reaches LOCKED-20X.
+- No deployment, readiness, profitability or real-money finding is CLOSED.
+- LIVE remains OFF/LOCKED; no live order was enabled, placed, modified, cancelled or routed.
 
-- `AUTH-001 4/20`, `AUTH-002 3/20`, `AUTH-003 3/20`, `AUTH-004 2/20`.
-- `UI-001` remains `LOCKED-20X / FIX-REQUIRED`; reproducibility does not equal closure.
-- `UI-005 17/20`, `UI-007 13/20`, `UI-016 14/20`.
-- `PERF-004 2/20`.
-- `PAPER-017..024 1/20` each.
-- `ACCOUNT-001..008 1/20` each.
-- `PAPER-010 route-absence` remains CLOSED/CORRECTED and cannot be LOCKED.
-- No new finding reaches LOCKED-20X this iteration.
+## 9. Product-design track — Readiness / Deployment Proof V21
 
-## 12. Product-design track — Data & Broker / Account Truth V20
-
-This iteration's required visual is the real `Data & Broker` product workspace, not an audit-status report.
+This iteration's required product UI is the real `Readiness / Proof` workspace.
 
 ### REQUIRED
-
-- Tier-0 market/session, Dhan profile connectivity, account snapshot state, funds/positions age, analyzer/paper state and LIVE LOCKED.
-- Account snapshot ID, redacted account identity, token generation, broker event/receive times, age/TTL, schema revision and evidence ID.
-- Separate domain states for PROFILE/FUNDS/HOLDINGS/POSITIONS/ORDERS READONLY.
-- Funds table that displays unknown/malformed values as `— / UNKNOWN`, never ₹0.
-- Holdings/positions tables with per-row source event, age, quality and evidence.
-- Account-generation consistency state; mixed generation visibly inhibits risk.
-- Broker-vs-paper-vs-risk reconciliation panel; sources must remain separate.
-- Read-only broker adapter and place/modify/cancel prohibition visible as safety truth.
+- Tier-0 source SHA, image digest, Cloud Run revision, traffic ownership, WIF state, IAM split state, SafetyTruth and LIVE LOCKED.
+- Explicit deployment chain: Git SHA -> Cloud Build -> digest -> revision -> traffic -> runtime SHA.
+- Revision/traffic table showing source/digest/mode/safety/evidence per serving revision.
+- Identity panel separating deployer, web runtime, Dhan rotator, Scheduler invoker and evidence reader.
+- Scheduler/token-rotation panel with identity, invoker role, job digest and last evidence; web PIN/TOTP/token-write capability must show NO.
+- Operator proof showing deployment state, revision age, runtime/source match, secret-exposure state, rollback revision and redacted evidence export.
 
 ### RECOMMENDED
-
-- Drilldown from any funds/position row to raw redacted provider response, normalizer revision and field-quality evidence.
-- Account snapshot history/diff with generation changes.
-- Margin/exposure scenario view only from proven AccountTruth.
+- One-click drilldown to sanitized Cloud Run spec/IAM diff and build provenance.
+- Rollback preview to prior known digest/revision with safety policy diff.
+- Deployment history with evidence IDs and revision traffic transitions.
 
 ### OPTIONAL
+- Cost/performance trend by revision after runtime telemetry is authoritative.
 
-- Advanced portfolio attribution and historical account snapshots after durable provenance is proven.
+## 10. Closure discipline
 
-## 13. Closure discipline
+`PATCHED` means source changed. `VERIFIED/CLOSED` requires exact-revision unit/integration/runtime/browser proof, reproducible evidence IDs, safety regression and independent verification. `LOCKED-20X` means repeatedly reproduced, not fixed. Workflow green, HTTP 200, Cloud Run READY, UI labels or image tags alone can never prove deployment/trading readiness.
 
-`LOCKED-20X` means independently reproduced 20 times; it does not mean fixed. CLOSED requires a patch on an exact source revision, exact runtime/deployment proof where applicable, unit/integration/browser/runtime tests, reproducible evidence IDs and independent verification. Trade-readiness, profitability, deployment success, broker truth and live safety may never be inferred from UI labels, workflow green alone or counters.
+## 11. Next deep slice
 
-## 14. Next deep slice
-
-Google Cloud deployment/runtime provenance and operational authority: trace `cloud-run-auto-deploy.yml`, build/image digest/revision/traffic, IAM/service-account separation, Secret Manager use, Scheduler invoker identity, runtime SHA endpoints and remaining Render-era instructions. Regression-check that no deployment path can set live/order flags or present a tag/HTTP-200 as exact-revision proof.
+Inspect the merged PR #99 paper close path and complete Paper mutation authority end-to-end: authentication/capability, idempotency, fresh quote/chain binding, ExecutionDecision, lock scope, persistence failure behavior, restart/replay, duplicate close/tick semantics, fill/cost provenance and reconciliation. In parallel regression-check that GCP deployment remains LIVE OFF and no newly merged route can reach broker place/modify/cancel paths.
