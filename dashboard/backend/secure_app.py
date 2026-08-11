@@ -1,20 +1,16 @@
 """Security boundary wrapper for the System3 FastAPI application.
 
-This module keeps the legacy monolithic application intact while replacing only
-its dashboard authentication authority with SessionTruth.  Cloud Run launches
-this module, so browser cookies are opaque, server-issued, expiring and
-revocable.  Header X-API-Key remains a compatibility path for trusted CI/API
-clients; the browser no longer stores or replays it.
+Cloud Run launches this module. Browser authentication uses an opaque,
+server-issued SessionTruth cookie. In cloud mode SessionTruth is backed by
+Firestore and fails closed if the shared authority is unavailable. Trusted
+CI/API clients retain explicit X-API-Key compatibility; the browser does not
+store or replay that key.
 
-Analyzer/paper safety is unchanged.  This module contains no broker order code.
+Analyzer/paper safety is unchanged. This module contains no broker order code.
 """
 from __future__ import annotations
 
-from collections import defaultdict, deque
 import hmac
-import threading
-import time
-from typing import Deque, Dict
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -25,9 +21,7 @@ from dashboard.backend.session_truth import get_session_truth_store
 
 app = legacy.app
 _SESSION_TRUTH = get_session_truth_store()
-_AUTH_ATTEMPTS: Dict[str, Deque[float]] = defaultdict(deque)
-_AUTH_ATTEMPTS_LOCK = threading.Lock()
-_AUTH_WINDOW_S = 300.0
+_AUTH_WINDOW_S = 300
 _AUTH_MAX_FAILURES = 10
 _AUTH_PATHS = {
     "/api/auth/session",
@@ -43,26 +37,55 @@ def _client_key(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-def _record_or_reject_login_attempt(request: Request) -> None:
-    """Fail closed after repeated failed login attempts from one client."""
-    now = time.monotonic()
-    key = _client_key(request)
-    with _AUTH_ATTEMPTS_LOCK:
-        bucket = _AUTH_ATTEMPTS[key]
-        while bucket and now - bucket[0] > _AUTH_WINDOW_S:
-            bucket.popleft()
-        if len(bucket) >= _AUTH_MAX_FAILURES:
-            raise HTTPException(
-                status_code=429,
-                detail="Too many failed dashboard login attempts; retry later",
-            )
-        bucket.append(now)
+def _enforce_login_throttle(request: Request) -> None:
+    try:
+        allowed, retry_after = _SESSION_TRUTH.login_allowed(
+            _client_key(request),
+            window_seconds=_AUTH_WINDOW_S,
+            max_failures=_AUTH_MAX_FAILURES,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Dashboard session authority unavailable",
+        ) from exc
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many failed dashboard login attempts; retry later",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+
+def _record_failed_login(request: Request) -> None:
+    try:
+        count = _SESSION_TRUTH.record_login_failure(
+            _client_key(request),
+            window_seconds=_AUTH_WINDOW_S,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Dashboard session authority unavailable",
+        ) from exc
+    if count >= _AUTH_MAX_FAILURES:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many failed dashboard login attempts; retry later",
+            headers={"Retry-After": str(_AUTH_WINDOW_S)},
+        )
 
 
 def _clear_login_failures(request: Request) -> None:
-    key = _client_key(request)
-    with _AUTH_ATTEMPTS_LOCK:
-        _AUTH_ATTEMPTS.pop(key, None)
+    try:
+        _SESSION_TRUTH.clear_login_failures(_client_key(request))
+    except Exception as exc:
+        # A successful credential check must not create a session if the shared
+        # throttle authority cannot be cleared consistently.
+        raise HTTPException(
+            status_code=503,
+            detail="Dashboard session authority unavailable",
+        ) from exc
 
 
 def _forwarded_scheme(request: Request) -> str:
@@ -71,21 +94,37 @@ def _forwarded_scheme(request: Request) -> str:
     ).split(",")[0].strip().lower()
 
 
+def _forwarded_host(request: Request) -> str:
+    forwarded = request.headers.get("X-Forwarded-Host", "").split(",")[0].strip()
+    return forwarded or request.headers.get("Host", "")
+
+
 def _same_origin(request: Request) -> str:
-    host = request.headers.get("Host", "")
+    host = _forwarded_host(request)
     return f"{_forwarded_scheme(request)}://{host}" if host else ""
 
 
 def _origin_allowed(request: Request) -> bool:
-    origin = request.headers.get("Origin", "")
+    origin = request.headers.get("Origin", "").rstrip("/")
     if not origin:
         return False
-    return origin == _same_origin(request) or origin in set(legacy._allowed_origins)
+    allowed = {str(value).rstrip("/") for value in legacy._allowed_origins}
+    return origin == _same_origin(request).rstrip("/") or origin in allowed
 
 
-def _session_record(request: Request):
+def _session_record(request: Request, *, surface_backend_error: bool = False):
     token = request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE, "")
-    return _SESSION_TRUTH.validate(token)
+    if not token:
+        return None
+    try:
+        return _SESSION_TRUTH.validate(token)
+    except Exception as exc:
+        if surface_backend_error:
+            raise HTTPException(
+                status_code=503,
+                detail="Dashboard session authority unavailable",
+            ) from exc
+        return None
 
 
 def _has_dashboard_api_access(request: Request) -> bool:
@@ -103,7 +142,7 @@ def _has_dashboard_api_access(request: Request) -> bool:
 legacy._has_dashboard_api_access = _has_dashboard_api_access
 
 # Remove the three legacy deterministic-cookie route objects before registering
-# the authoritative versions below.  All other app routes/startup hooks remain.
+# the authoritative versions below. All other app routes/startup hooks remain.
 app.router.routes = [
     route for route in app.router.routes
     if getattr(route, "path", None) not in _AUTH_PATHS
@@ -122,21 +161,31 @@ async def create_dashboard_session(payload: legacy.DashboardAuthRequest, request
             status_code=503,
             detail="Dashboard API auth is required but API_KEY is not configured",
         )
+
+    _enforce_login_throttle(request)
     supplied = (payload.api_key or "").strip()
     if not hmac.compare_digest(supplied, legacy._API_KEY):
-        _record_or_reject_login_attempt(request)
+        _record_failed_login(request)
         raise HTTPException(status_code=401, detail="Invalid dashboard API key")
 
     _clear_login_failures(request)
-    token, session = _SESSION_TRUTH.issue(
-        max_age_seconds=legacy._DASHBOARD_SESSION_MAX_AGE,
-        principal="dashboard",
-    )
+    try:
+        token, session = _SESSION_TRUTH.issue(
+            max_age_seconds=legacy._DASHBOARD_SESSION_MAX_AGE,
+            principal="dashboard",
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Dashboard session authority unavailable",
+        ) from exc
+
     response = JSONResponse(
         {
             "ok": True,
             "authenticated": True,
             "mode": "opaque_server_session",
+            "session_backend": _SESSION_TRUTH.backend_name,
             "session": session.public_dict(),
         }
     )
@@ -154,7 +203,7 @@ async def create_dashboard_session(payload: legacy.DashboardAuthRequest, request
 
 @app.get("/api/auth/status")
 async def dashboard_auth_status(request: Request):
-    session = _session_record(request)
+    session = _session_record(request, surface_backend_error=True)
     header_key = request.headers.get("X-API-Key", "")
     header_ok = bool(
         legacy._REQUIRE_API_KEY
@@ -175,6 +224,7 @@ async def dashboard_auth_status(request: Request):
             if legacy._REQUIRE_API_KEY
             else "auth_disabled"
         ),
+        "session_backend": _SESSION_TRUTH.backend_name,
         "session": session.public_dict() if session else None,
     }
 
@@ -182,13 +232,27 @@ async def dashboard_auth_status(request: Request):
 @app.post("/api/auth/logout")
 async def dashboard_auth_logout(request: Request):
     # Logout is a cookie-authenticated mutation; validate browser origin even
-    # though the route itself remains publicly callable for expired sessions.
+    # though the route remains callable when no/expired cookie is present.
     if request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE) and not _origin_allowed(request):
         raise HTTPException(status_code=403, detail="Origin validation failed")
     token = request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE, "")
-    revoked = _SESSION_TRUTH.revoke(token) if token else False
+    if token:
+        try:
+            revoked = _SESSION_TRUTH.revoke(token)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=503,
+                detail="Dashboard session authority unavailable",
+            ) from exc
+    else:
+        revoked = False
     response = JSONResponse(
-        {"ok": True, "authenticated": False, "server_revoked": revoked}
+        {
+            "ok": True,
+            "authenticated": False,
+            "server_revoked": revoked,
+            "session_backend": _SESSION_TRUTH.backend_name,
+        }
     )
     response.delete_cookie(
         legacy._DASHBOARD_SESSION_COOKIE,
