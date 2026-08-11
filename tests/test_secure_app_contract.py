@@ -17,6 +17,20 @@ class SecureAppContractTests(unittest.TestCase):
         self.assertIn("_SESSION_TRUTH.revoke", source)
         self.assertIn('secure=_forwarded_scheme(request) == "https"', source)
         self.assertIn("_AUTH_MAX_FAILURES = 10", source)
+        self.assertIn("_SESSION_TRUTH.login_allowed", source)
+        self.assertIn("_SESSION_TRUTH.record_login_failure", source)
+        self.assertIn("_SESSION_TRUTH.clear_login_failures", source)
+        self.assertNotIn("defaultdict", source)
+        self.assertNotIn("_AUTH_ATTEMPTS", source)
+
+    def test_cloud_session_store_is_shared_and_fail_closed(self):
+        source = Path("dashboard/backend/session_truth.py").read_text(encoding="utf-8")
+        self.assertIn('("firestore" if cloud_runtime else "memory")', source)
+        self.assertIn("Cloud Run SessionTruth requires SYSTEM3_SESSION_BACKEND=firestore", source)
+        self.assertIn("system3_dashboard_sessions", source)
+        self.assertIn("system3_dashboard_login_throttle", source)
+        self.assertIn("firestore.Client", source)
+        self.assertIn("self._hash_client_key", source)
 
     def test_no_deterministic_session_derivation_in_secure_boundary(self):
         source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
