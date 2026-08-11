@@ -12,6 +12,7 @@ on:
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/gcp_runtime_iam_preflight.py"
       - "scripts/gcp_failed_revision_forensic.py"
       - "scripts/gcp_runtime_evidence.py"
       - "scripts/gcp_public_dashboard_runtime_proof.py"
@@ -41,6 +42,7 @@ jobs:
       GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
       GCP_REGION: asia-south1
       GCP_CLOUD_RUN_SERVICE: genesis-system3-web
+      GCP_WEB_RUNTIME_SERVICE_ACCOUNT: genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
       GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
@@ -75,6 +77,7 @@ jobs:
               "core/brokers/dhan/cloud_token_provider.py": "GCP_SECRET_MANAGER_DYNAMIC",
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
+              "scripts/gcp_runtime_iam_preflight.py": "FIRESTORE_RUNTIME_IAM_OK",
               "scripts/gcp_failed_revision_forensic.py": "FAILED_REVISION_FORENSIC",
               "scripts/gcp_runtime_evidence.py": "dashboard_public_readonly",
               "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
@@ -91,9 +94,6 @@ jobs:
           assert 'LIVE_TRADING_ENABLED"] = "0"' in Path("scripts/gcp_dhan_token_rotation_job.py").read_text()
 
           workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-          # Build legacy credential markers without embedding the exact forbidden
-          # tokens in this workflow. Raw self-searches previously matched their
-          # own assertions and stopped safe deployments before the real checks.
           legacy_sa_key_name = "GCP_" + "SA_KEY"
           legacy_credentials_field = "credentials_" + "json"
           legacy_auth_hits = [
@@ -104,20 +104,20 @@ jobs:
           ]
           assert not legacy_auth_hits, f"legacy service-account-key auth found: {legacy_auth_hits}"
 
-          # Inspect executable shell lines only. The previous raw-string check
-          # matched its own assertion/comment and caused a false CI failure.
           executable_service_updates = [
               line.strip()
               for line in workflow.splitlines()
               if line.strip().startswith("gcloud run services update ")
           ]
           assert not executable_service_updates, (
-              "workflow must delegate Cloud Run mutation to canonical deployer: "
+              "workflow must delegate Cloud Run service mutation to canonical deployer: "
               f"{executable_service_updates}"
           )
 
           deployer = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
           assert '("REQUIRE_API_KEY", "false")' in deployer
+          assert '("SYSTEM3_STATE_BACKEND", "firestore")' in deployer
+          assert '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")' in deployer
           assert "--remove-secrets=API_KEY" in deployer
           assert "WORKER_PUSH_TOKEN_SECRET_ID" in deployer
           print("STATIC_GATES_OK", sorted(required))
@@ -128,6 +128,9 @@ jobs:
           gcloud secrets describe "${WORKER_PUSH_TOKEN_SECRET_ID}" \
             --project="${GOOGLE_CLOUD_PROJECT}" >/dev/null \
             || { echo "Required worker secret '${WORKER_PUSH_TOKEN_SECRET_ID}' does not exist." >&2; exit 1; }
+
+      - name: Ensure required Firestore IAM for web runtime
+        run: python scripts/gcp_runtime_iam_preflight.py
 
       - name: Build frontend proof
         working-directory: dashboard/frontend
@@ -149,9 +152,6 @@ jobs:
             --format='value(metadata.name,status.url)' >/tmp/preflight-service.txt
           test -s /tmp/preflight-service.txt
 
-      # This is the only web-service deployment authority. It owns the complete
-      # runtime env/secret contract, creates an exact 0%-traffic candidate,
-      # proves the exact revision and tagged endpoints, and only then promotes.
       - name: Deploy guarded public PAPER Cloud Run service
         run: python scripts/gcp_cloud_run_auto_deploy.py
 
@@ -166,9 +166,6 @@ jobs:
         with:
           name: public-paper-dashboard-proof-${{ github.run_number }}
           path: reports/latest/public_dashboard_proof/
-          # Missing proof is already represented by the required proof step.
-          # Do not create a second misleading workflow failure when an earlier
-          # prerequisite caused that step to be skipped.
           if-no-files-found: warn
           retention-days: 14
 
@@ -192,9 +189,7 @@ jobs:
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --format='value(spec.template.spec.serviceAccountName)')
-          if [ -z "${RUNTIME_SA}" ]; then
-            RUNTIME_SA=$(gcloud projects describe "${GOOGLE_CLOUD_PROJECT}" --format='value(projectNumber)')-compute@developer.gserviceaccount.com
-          fi
+          test -n "${RUNTIME_SA}"
           echo "RUNTIME_SERVICE_ACCOUNT=${RUNTIME_SA}" >> "$GITHUB_ENV"
 
           for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret "${WORKER_PUSH_TOKEN_SECRET_ID}"; do
@@ -283,89 +278,41 @@ jobs:
             --format=json > /tmp/scheduler.json
           python - <<'PY'
           import json, sys
-          svc = json.load(open("/tmp/svc.json"))
-          scheduler = json.load(open("/tmp/scheduler.json"))
-          env = {}
-          secret_env_names = set()
-          for c in ((((svc.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or []):
+          svc = json.load(open("/tmp/svc.json")); scheduler = json.load(open("/tmp/scheduler.json"))
+          env = {}; secret_env_names = set()
+          containers = ((((svc.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or [])
+          for c in containers:
               for e in c.get("env") or []:
-                  if e.get("name") and "value" in e:
-                      env[e["name"]] = e["value"]
-                  if e.get("name") and (e.get("valueFrom") or {}).get("secretKeyRef"):
-                      secret_env_names.add(e["name"])
-          bad = []
-          for key in ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED", "AUTO_EXECUTE_TRADES"):
-              if env.get(key) not in (None, "0", "false", "False"):
-                  bad.append(f"{key}={env.get(key)!r}")
-          if bad:
-              print("LIVE_FLAGS_NOT_OFF", bad)
-              sys.exit(2)
-          if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic":
-              print("DYNAMIC_TOKEN_SOURCE_MISSING", env.get("DHAN_TOKEN_SOURCE"))
-              sys.exit(3)
-          if env.get("DEFER_INSTRUMENT_WARMUP") != "1":
-              print("DEFER_INSTRUMENT_WARMUP_MISSING", env.get("DEFER_INSTRUMENT_WARMUP"))
-              sys.exit(3)
-          if str(env.get("REQUIRE_API_KEY") or "").lower() not in ("0", "false", "no", "off"):
-              print("PUBLIC_DASHBOARD_MODE_NOT_ENFORCED", env.get("REQUIRE_API_KEY"))
-              sys.exit(4)
-          if "API_KEY" in secret_env_names:
-              print("DASHBOARD_API_KEY_STILL_MOUNTED")
-              sys.exit(5)
-          if "WORKER_PUSH_TOKEN" not in secret_env_names:
-              print("WORKER_PUSH_TOKEN_SECRET_NOT_MOUNTED")
-              sys.exit(5)
-          if "WORKER_PUSH_TOKEN" in env:
-              print("WORKER_PUSH_TOKEN_LEAKED_AS_PLAIN_VALUE")
-              sys.exit(5)
+                  if e.get("name") and "value" in e: env[e["name"]] = e["value"]
+                  if e.get("name") and (e.get("valueFrom") or {}).get("secretKeyRef"): secret_env_names.add(e["name"])
+          bad = [key for key in ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED", "AUTO_EXECUTE_TRADES") if env.get(key) not in (None,"0","false","False")]
+          if bad: print("LIVE_FLAGS_NOT_OFF", bad); sys.exit(2)
+          if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic": print("DYNAMIC_TOKEN_SOURCE_MISSING"); sys.exit(3)
+          if env.get("DEFER_INSTRUMENT_WARMUP") != "1": print("DEFER_INSTRUMENT_WARMUP_MISSING"); sys.exit(3)
+          if str(env.get("REQUIRE_API_KEY") or "").lower() not in ("0","false","no","off"): print("PUBLIC_DASHBOARD_MODE_NOT_ENFORCED"); sys.exit(4)
+          if "API_KEY" in secret_env_names: print("DASHBOARD_API_KEY_STILL_MOUNTED"); sys.exit(5)
+          if "WORKER_PUSH_TOKEN" not in secret_env_names: print("WORKER_PUSH_TOKEN_SECRET_NOT_MOUNTED"); sys.exit(5)
+          if "WORKER_PUSH_TOKEN" in env: print("WORKER_PUSH_TOKEN_LEAKED_AS_PLAIN_VALUE"); sys.exit(5)
           traffic = {}
           for item in (svc.get("status") or {}).get("traffic") or []:
-              revision = item.get("revisionName")
-              percent = int(item.get("percent") or 0)
-              if revision and percent:
-                  traffic[revision] = traffic.get(revision, 0) + percent
-          if len(traffic) != 1 or list(traffic.values()) != [100]:
-              print("SERVING_TRAFFIC_NOT_SINGLE_EXACT_REVISION", traffic)
-              sys.exit(6)
-          if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata":
-              print("SCHEDULER_CONFIG_INVALID", scheduler.get("schedule"), scheduler.get("timeZone"))
-              sys.exit(7)
-          print("CLOUD_RUNTIME_SAFETY_OK", {
-              "token_source": env.get("DHAN_TOKEN_SOURCE"),
-              "dashboard_access": "public-readonly",
-              "dashboard_api_key_mounted": False,
-              "worker_push_token_mounted_from_secret_manager": True,
-              "defer_instrument_warmup": env.get("DEFER_INSTRUMENT_WARMUP"),
-              "serving_traffic": traffic,
-              "live_trading": env.get("LIVE_TRADING_ENABLED"),
-              "scheduler": scheduler.get("name"),
-              "schedule": scheduler.get("schedule"),
-              "time_zone": scheduler.get("timeZone"),
-          })
+              revision=item.get("revisionName"); percent=int(item.get("percent") or 0)
+              if revision and percent: traffic[revision]=traffic.get(revision,0)+percent
+          if len(traffic)!=1 or list(traffic.values()) != [100]: print("SERVING_TRAFFIC_NOT_SINGLE_EXACT_REVISION", traffic); sys.exit(6)
+          if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata": print("SCHEDULER_CONFIG_INVALID"); sys.exit(7)
+          print("CLOUD_RUNTIME_SAFETY_OK", {"dashboard_access":"public-readonly","dashboard_api_key_mounted":False,"worker_push_token_mounted_from_secret_manager":True,"serving_traffic":traffic})
           PY
 
       - name: Public dashboard and broker proof without API key
         run: |
-          SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --region="${GCP_REGION}" \
-            --format='value(status.url)')
-
+          SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
-          jq '{required,configured,authenticated,mode}' /tmp/auth.json
           jq -e '.required == false and .mode == "auth_disabled"' /tmp/auth.json >/dev/null
-
           curl -fsS --max-time 30 "${SERVICE_URL}/api/state" > /tmp/state.json
-
           for ATTEMPT in 1 2 3 4 5 6; do
             curl -fsS --max-time 30 "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
-            if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then
-              break
-            fi
+            if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then break; fi
             sleep 10
           done
-
-          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
           jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null
 
       - name: Generate sanitized GCP runtime evidence
@@ -387,68 +334,24 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          path = Path("reports/latest/gcp_runtime_lock/gcp_runtime_lock.json")
-          if not path.is_file():
-              raise SystemExit("GCP_RUNTIME_EVIDENCE_MISSING")
-          report = json.loads(path.read_text(encoding="utf-8"))
-          safety = report.get("safety") or {}
-          failures = []
-          if not report.get("source_matches_deployment"):
-              failures.append("source_matches_deployment=false")
-          if not safety.get("analyze_mode"):
-              failures.append("analyze_mode=false")
-          if not safety.get("dashboard_public_readonly"):
-              failures.append("dashboard_public_readonly=false")
-          for key in (
-              "live_trading_enabled",
-              "system3_live_trading_allowed",
-              "auto_execute_trades",
-              "secret_payloads_exposed",
-              "api_key_required",
-              "api_key_mounted",
-              "api_key_plaintext_exposed",
-          ):
-              if safety.get(key):
-                  failures.append(f"{key}=true")
-          if report.get("secret_values_exposed"):
-              failures.append("secret_values_exposed=true")
-          print("GCP_RUNTIME_LOCK", {
-              "lock_result": report.get("lock_result"),
-              "source_matches_deployment": report.get("source_matches_deployment"),
-              "operational_blockers": report.get("blockers"),
-              "production_grade_claim_allowed": report.get("production_grade_claim_allowed"),
-          })
-          if failures:
-              raise SystemExit(f"GCP_RUNTIME_SAFETY_OR_PROVENANCE_FAIL {failures}")
+          path=Path("reports/latest/gcp_runtime_lock/gcp_runtime_lock.json")
+          if not path.is_file(): raise SystemExit("GCP_RUNTIME_EVIDENCE_MISSING")
+          report=json.loads(path.read_text(encoding="utf-8")); safety=report.get("safety") or {}; failures=[]
+          if not report.get("source_matches_deployment"): failures.append("source_matches_deployment=false")
+          if not safety.get("analyze_mode"): failures.append("analyze_mode=false")
+          if not safety.get("dashboard_public_readonly"): failures.append("dashboard_public_readonly=false")
+          for key in ("live_trading_enabled","system3_live_trading_allowed","auto_execute_trades","secret_payloads_exposed","api_key_required","api_key_mounted","api_key_plaintext_exposed"):
+              if safety.get(key): failures.append(f"{key}=true")
+          if report.get("secret_values_exposed"): failures.append("secret_values_exposed=true")
+          print("GCP_RUNTIME_LOCK", {"lock_result":report.get("lock_result"),"source_matches_deployment":report.get("source_matches_deployment"),"operational_blockers":report.get("blockers")})
+          if failures: raise SystemExit(f"GCP_RUNTIME_SAFETY_OR_PROVENANCE_FAIL {failures}")
           PY
 
       - name: Post deployment report
         if: always()
         run: |
-          gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --region="${GCP_REGION}" \
-            --format=json > /tmp/post-service.json || true
-          python - <<'PY'
-          import json
-          try:
-              svc = json.load(open('/tmp/post-service.json'))
-          except Exception:
-              print('POST_DEPLOY_SERVICE_UNAVAILABLE')
-          else:
-              traffic = {}
-              for item in (svc.get('status') or {}).get('traffic') or []:
-                  revision = item.get('revisionName')
-                  percent = int(item.get('percent') or 0)
-                  if revision and percent:
-                      traffic[revision] = traffic.get(revision, 0) + percent
-              print('POST_DEPLOY_SERVING_TRAFFIC', traffic)
-              print('POST_DEPLOY_URL', (svc.get('status') or {}).get('url'))
-          PY
-          gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --location="${GCP_REGION}" \
-            --format='table(name,schedule,timeZone,state)' || true
+          gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(status.traffic.revisionName,status.traffic.percent,status.url)' || true
+          gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='table(name,schedule,timeZone,state)' || true
 
       - name: Publish exact-SHA runtime proof success
         if: ${{ success() }}
@@ -457,30 +360,10 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, urllib.request
-          sha = os.environ["GITHUB_SHA"]
-          repo = os.environ["GITHUB_REPOSITORY"]
-          api = os.environ["GITHUB_API_URL"]
-          target = f'{os.environ["GITHUB_SERVER_URL"]}/{repo}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'
-          body = json.dumps({
-              "state": "success",
-              "context": "cloud-run/runtime-proof",
-              "description": "Cloud Run PAPER dashboard public/read-only proof passed",
-              "target_url": target,
-          }).encode()
-          req = urllib.request.Request(
-              f"{api}/repos/{repo}/statuses/{sha}",
-              data=body,
-              headers={
-                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-                  "Accept": "application/vnd.github+json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "Content-Type": "application/json",
-              },
-              method="POST",
-          )
-          with urllib.request.urlopen(req, timeout=30) as response:
-              if response.status not in (200, 201):
-                  raise SystemExit(f"COMMIT_STATUS_PUBLISH_FAILED {response.status}")
+          sha=os.environ["GITHUB_SHA"]; repo=os.environ["GITHUB_REPOSITORY"]; api=os.environ["GITHUB_API_URL"]
+          body=json.dumps({"state":"success","context":"cloud-run/runtime-proof","description":"Cloud Run PAPER public/read-only runtime proof passed","target_url":f'{os.environ["GITHUB_SERVER_URL"]}/{repo}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'}).encode()
+          req=urllib.request.Request(f"{api}/repos/{repo}/statuses/{sha}",data=body,headers={"Authorization":f"Bearer {os.environ['GITHUB_TOKEN']}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"},method="POST")
+          with urllib.request.urlopen(req,timeout=30) as r: assert r.status in (200,201)
           PY
 
       - name: Publish exact-SHA runtime proof failure
@@ -490,28 +373,8 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, urllib.request
-          sha = os.environ["GITHUB_SHA"]
-          repo = os.environ["GITHUB_REPOSITORY"]
-          api = os.environ["GITHUB_API_URL"]
-          target = f'{os.environ["GITHUB_SERVER_URL"]}/{repo}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'
-          body = json.dumps({
-              "state": "failure",
-              "context": "cloud-run/runtime-proof",
-              "description": "Cloud Run deployment or public PAPER dashboard proof failed",
-              "target_url": target,
-          }).encode()
-          req = urllib.request.Request(
-              f"{api}/repos/{repo}/statuses/{sha}",
-              data=body,
-              headers={
-                  "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-                  "Accept": "application/vnd.github+json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "Content-Type": "application/json",
-              },
-              method="POST",
-          )
-          with urllib.request.urlopen(req, timeout=30) as response:
-              if response.status not in (200, 201):
-                  raise SystemExit(f"COMMIT_STATUS_PUBLISH_FAILED {response.status}")
+          sha=os.environ["GITHUB_SHA"]; repo=os.environ["GITHUB_REPOSITORY"]; api=os.environ["GITHUB_API_URL"]
+          body=json.dumps({"state":"failure","context":"cloud-run/runtime-proof","description":"Cloud Run deployment or PAPER runtime proof failed","target_url":f'{os.environ["GITHUB_SERVER_URL"]}/{repo}/actions/runs/{os.environ["GITHUB_RUN_ID"]}'}).encode()
+          req=urllib.request.Request(f"{api}/repos/{repo}/statuses/{sha}",data=body,headers={"Authorization":f"Bearer {os.environ['GITHUB_TOKEN']}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"},method="POST")
+          with urllib.request.urlopen(req,timeout=30) as r: assert r.status in (200,201)
           PY
