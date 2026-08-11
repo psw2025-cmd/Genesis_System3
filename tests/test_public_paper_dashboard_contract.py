@@ -69,6 +69,9 @@ def test_approved_deploy_workflow_proves_no_key_access_live_off_and_actual_ui_vi
     assert "rendered_product_marker_missing" in proof
     assert "dashboard_login_prompt_still_rendered" in proof
     assert "real_deployed_cloud_run_dashboard_ui" in proof
+    assert '"dashboard_path": dashboard_path' in proof
+    assert '"dashboard_api_key_prompt_rendered": False' in proof
+    assert '"api_key_used": False' in proof
     assert "LIVE_TRADING_ENABLED=0" in workflow
     assert "SYSTEM3_LIVE_TRADING_ALLOWED=0" in workflow
     assert "AUTO_EXECUTE_TRADES=0" in workflow
