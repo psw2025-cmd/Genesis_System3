@@ -14,7 +14,7 @@ def main() -> None:
     proof = install()
     print("[cloud-bootstrap] " + json.dumps(proof, sort_keys=True))
     uvicorn.run(
-        "dashboard.backend.app:app",
+        "dashboard.backend.secure_app:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", "8080")),
         workers=1,
