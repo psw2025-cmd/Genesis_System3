@@ -173,6 +173,7 @@ class RequestIDMiddleware:
         set_trace_id(trace_id)
         set_span_id(span_id)
 
+        runtime = _runtime_metadata()
         start = time.monotonic()
         status_holder = {"status": 0}
         caught_error: Exception | None = None
@@ -183,6 +184,8 @@ class RequestIDMiddleware:
                 message["headers"].append((b"x-request-id", request_id.encode("ascii")))
                 message["headers"].append((b"x-trace-id", trace_id.encode("ascii")))
                 message["headers"].append((b"traceparent", response_traceparent.encode("ascii")))
+                message["headers"].append((b"x-system3-revision", runtime["revision"].encode("ascii", "ignore")))
+                message["headers"].append((b"x-system3-deploy-sha", runtime["deployment_tag"].encode("ascii", "ignore")))
                 status_holder["status"] = int(message.get("status", 0) or 0)
             await send(message)
 
