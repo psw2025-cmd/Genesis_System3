@@ -19,6 +19,11 @@ def test_observability_bootstrap_is_read_only_and_least_privilege():
     assert '--period=1' in text
     assert '"/api/health"' in text
     assert '"/ui"' in text
+    assert "monitoring.googleapis.com/uptime_check/check_passed" in text
+    assert '"duration": "180s"' in text
+    assert '"severity": "p0"' in text
+    assert "gcloud monitoring policies create" in text
+    assert "notification_channels=NOT_CONFIGURED" in text
 
     forbidden = [
         "roles/secretmanager.admin",
