@@ -11,6 +11,10 @@ python-dotenv==1.0.1
 # requests: HTTP API calls for NSE fallback, broker integrations
 requests==2.32.3
 
+# Google Secret Manager is an explicit production dependency for the dynamic
+# Dhan token provider and the canonical Cloud Run rotation job.
+google-cloud-secret-manager>=2.20.0
+
 # dhanhq: DhanHQ broker SDK — REQUIRED for all broker operations
 dhanhq==2.2.0
 

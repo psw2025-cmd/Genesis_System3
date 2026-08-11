@@ -45,11 +45,16 @@ SAFE_ENV = (
     ("DHAN_TOKEN_CACHE_TTL_S", "30"),
     ("DHAN_TOKEN_ROTATION_JOB", os.environ.get("DHAN_ROTATION_JOB", "genesis-system3-dhan-token-rotate")),
     ("DHAN_TOKEN_ROTATION_SCHEDULE", "07:30 IST daily"),
+    # Legacy in-process token generation stays disabled. Invalid-token recovery
+    # is delegated to the single canonical Cloud Run rotation Job instead.
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
     ("SYSTEM3_STARTUP_TOKEN_REFRESH", "0"),
     ("BROKER_SELF_HEAL_TOKEN_REFRESH", "0"),
+    ("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1"),
+    ("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "130"),
+    ("DHAN_CANONICAL_ROTATION_WAIT_S", "120"),
     ("CLOUD_MODE", "1"),
     ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),
     ("MEM_LIMIT_MB", "960"),
