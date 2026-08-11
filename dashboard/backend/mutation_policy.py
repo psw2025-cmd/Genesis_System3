@@ -26,6 +26,7 @@ class Capability(str, Enum):
     PAPER_MUTATION = "PAPER_MUTATION"
     RISK_POLICY_WRITE = "RISK_POLICY_WRITE"
     SAFETY_CONTROL = "SAFETY_CONTROL"
+    SYSTEM_CONTROL = "SYSTEM_CONTROL"
     SCHEDULER_CONTROL = "SCHEDULER_CONTROL"
     PREFERENCE_WRITE = "PREFERENCE_WRITE"
     ANALYZER_COMMAND = "ANALYZER_COMMAND"
@@ -94,8 +95,13 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
     )):
         return Capability.WORKER_INGEST
 
+    # Broker/order-changing surfaces are never downgraded to generic control.
+    # Emergency exit can still submit broker mutations in a live architecture,
+    # therefore it remains behind the same hard LIVE lock while LIVE is disabled.
     if p.startswith("/api/live-trading/approve"):
         return Capability.LIVE_APPROVAL
+    if p == "/emergency-exit" or p.startswith("/order/"):
+        return Capability.LIVE_MUTATION
     if p.startswith((
         "/api/live-trading/",
         "/api/orders/",
@@ -117,9 +123,22 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
     if p.startswith(("/api/scheduler/", "/api/schedules/")):
         return Capability.SCHEDULER_CONTROL
 
-    if p.startswith(("/api/settings/", "/api/preferences/", "/api/alerts/")):
+    # Code/agent/runner control is intentionally distinct from analytical work.
+    # Public PAPER has no SYSTEM_CONTROL authority, so these remain denied even
+    # though the routes are now explicitly owned by the manifest.
+    if p == "/agent-full-control" or p.startswith(("/api/agent/", "/api/runner/")):
+        return Capability.SYSTEM_CONTROL
+
+    if p.startswith((
+        "/api/settings/",
+        "/api/preferences/",
+        "/api/alerts/",
+        "/api/journal/",
+    )):
         return Capability.PREFERENCE_WRITE
 
+    if p in {"/backtest", "/greeks", "/iv"}:
+        return Capability.ANALYZER_COMMAND
     if p.startswith((
         "/api/analyzer/",
         "/api/analysis/",
@@ -130,6 +149,10 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
         "/api/model/",
         "/api/prediction/",
         "/api/retrain/",
+        "/api/filter/",
+        "/api/forensic/",
+        "/api/learning/",
+        "/api/validation/",
     )):
         return Capability.ANALYZER_COMMAND
 
