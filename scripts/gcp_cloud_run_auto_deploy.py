@@ -5,10 +5,12 @@ Deployment contract:
 - build an immutable image for the exact git SHA;
 - force LIVE and automatic order execution OFF;
 - create the new Cloud Run revision with *zero production traffic*;
-- address the candidate through a revision tag and prove HTTP/API startup;
+- address the candidate through a revision tag and prove its exact Ready state;
+- prove the tagged candidate HTTP/API before promotion;
 - promote 100% traffic only to that exact proven revision;
-- on any candidate failure, leave the previously serving revision untouched;
-- never report READY merely because an older revision is still ready.
+- on any candidate failure, preserve/restore the previously serving traffic;
+- capture sanitized failed-revision evidence automatically;
+- never use latestReadyRevisionName as a substitute for serving-traffic proof.
 
 The public ANALYZER/PAPER dashboard remains read-only. Worker ingestion uses its
 separate Secret Manager token. No Dhan PIN/TOTP secret is mounted in the web
@@ -20,8 +22,8 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 import time
-import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -35,12 +37,16 @@ REGION = os.environ.get("GCP_REGION", "asia-south1")
 SERVICE = os.environ.get("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
 REPO = f"{REGION}-docker.pkg.dev/{PROJECT}/system3-containers/genesis-system3"
 BUILDER_SA = f"projects/{PROJECT}/serviceAccounts/system3-builder@{PROJECT}.iam.gserviceaccount.com"
+RUNTIME_SA = f"genesis-system3-web@{PROJECT}.iam.gserviceaccount.com"
 CANDIDATE_TAG = "candidate"
 
 WORKER_PUSH_TOKEN_SECRET_ID = os.environ.get(
     "WORKER_PUSH_TOKEN_SECRET_ID", "system3-dashboard-worker-push-token"
 )
 
+# This is the complete authoritative Cloud Run web-service runtime contract.
+# Startup-critical values are explicit so a clean service recreation cannot
+# silently re-enable eager warm-up or lose analyzer-only state constraints.
 SAFE_ENV = (
     ("LIVE_TRADING_ENABLED", "0"),
     ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
@@ -48,6 +54,14 @@ SAFE_ENV = (
     ("REQUIRE_API_KEY", "false"),
     ("ANALYZE_MODE", "1"),
     ("SYSTEM3_MODE", "ANALYZER"),
+    ("SYSTEM3_REAL_ONLY", "1"),
+    ("CLOUD_PAPER_ENGINE", "0"),
+    ("DEFER_INSTRUMENT_WARMUP", "1"),
+    ("SYSTEM3_STATE_BACKEND", "firestore"),
+    ("SYSTEM3_STATE_BACKEND_REQUIRED", "1"),
+    ("SYSTEM3_FIRESTORE_PROJECT", PROJECT),
+    ("SYSTEM3_STATE_REFRESH_S", "5"),
+    ("SYSTEM3_SYNC_INTERVAL_S", "60"),
     ("DHAN_TOKEN_SOURCE", "gcp-secret-manager-dynamic"),
     ("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token"),
     ("DHAN_TOKEN_CACHE_TTL_S", "30"),
@@ -116,6 +130,103 @@ def _revision_json(revision: str) -> dict[str, Any]:
         capture=True,
     )
     return json.loads(raw)
+
+
+def _traffic_allocations(service: dict[str, Any]) -> dict[str, int]:
+    """Return resolved production traffic by immutable revision name."""
+    allocations: dict[str, int] = {}
+    for item in ((service.get("status") or {}).get("traffic") or []):
+        revision = str(item.get("revisionName") or "")
+        percent = int(item.get("percent") or 0)
+        if revision and percent > 0:
+            allocations[revision] = allocations.get(revision, 0) + percent
+    return dict(sorted(allocations.items()))
+
+
+def _traffic_percent(service: dict[str, Any], revision: str) -> int:
+    return _traffic_allocations(service).get(revision, 0)
+
+
+def _restore_traffic(allocations: dict[str, int]) -> None:
+    if not allocations or sum(allocations.values()) != 100:
+        raise RuntimeError(f"refusing unsafe rollback traffic map: {allocations}")
+    target = ",".join(f"{revision}={percent}" for revision, percent in allocations.items())
+    _run(
+        [
+            "gcloud", "run", "services", "update-traffic", SERVICE,
+            f"--project={PROJECT}", f"--region={REGION}", f"--to-revisions={target}", "--quiet",
+        ],
+        capture=True,
+    )
+    restored = _traffic_allocations(_service_json())
+    if restored != allocations:
+        raise RuntimeError(f"traffic rollback proof failed: expected={allocations} actual={restored}")
+    print("PREVIOUS_TRAFFIC_RESTORED", json.dumps(restored, sort_keys=True))
+
+
+def _ready_condition(revision: dict[str, Any]) -> tuple[str, str, str]:
+    for condition in ((revision.get("status") or {}).get("conditions") or []):
+        if condition.get("type") == "Ready":
+            return (
+                str(condition.get("status") or "Unknown"),
+                str(condition.get("reason") or ""),
+                str(condition.get("message") or "")[:500],
+            )
+    return "Unknown", "", ""
+
+
+def _wait_revision_ready(revision_name: str, timeout_s: int = 180) -> dict[str, Any]:
+    deadline = time.time() + timeout_s
+    last: dict[str, Any] = {}
+    terminal_reasons = {
+        "HealthCheckContainerError",
+        "ContainerMissing",
+        "ContainerPermissionDenied",
+        "RevisionFailed",
+    }
+    while time.time() < deadline:
+        last = _revision_json(revision_name)
+        status, reason, message = _ready_condition(last)
+        print("candidate_ready", revision_name, status, reason)
+        if status == "True":
+            return last
+        if status == "False" and reason in terminal_reasons:
+            raise RuntimeError(
+                f"candidate revision terminal failure: revision={revision_name} reason={reason} message={message}"
+            )
+        time.sleep(5)
+    status, reason, message = _ready_condition(last)
+    raise RuntimeError(
+        f"candidate revision readiness timeout: revision={revision_name} status={status} reason={reason} message={message}"
+    )
+
+
+def _run_failed_revision_forensic(revision_name: str) -> None:
+    script = ROOT / "scripts" / "gcp_failed_revision_forensic.py"
+    if not script.exists() or not revision_name:
+        return
+    env = dict(os.environ)
+    env.update(
+        {
+            "FAILED_REVISION": revision_name,
+            "GOOGLE_CLOUD_PROJECT": PROJECT,
+            "GCP_REGION": REGION,
+            "GCP_CLOUD_RUN_SERVICE": SERVICE,
+        }
+    )
+    proc = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    print("FAILED_REVISION_FORENSIC_RC", proc.returncode)
+    if proc.stdout:
+        print(proc.stdout[-16000:])
+    if proc.stderr:
+        print(proc.stderr[-4000:])
 
 
 def _require_secret_exists(session: AuthorizedSession, secret_id: str) -> None:
@@ -222,15 +333,11 @@ def _env_arg(sha: str) -> str:
     return ",".join(f"{k}={v}" for k, v in pairs)
 
 
-def _candidate_url(service: dict[str, Any]) -> str:
+def _candidate_url(service: dict[str, Any], candidate: str) -> str:
     for item in ((service.get("status") or {}).get("traffic") or []):
-        if item.get("tag") == CANDIDATE_TAG and item.get("url"):
+        if item.get("tag") == CANDIDATE_TAG and item.get("revisionName") == candidate and item.get("url"):
             return str(item["url"]).rstrip("/")
-    # Some gcloud/API versions expose tagged URLs at the top-level traffic list.
-    for item in (service.get("traffic") or []):
-        if item.get("tag") == CANDIDATE_TAG and item.get("url"):
-            return str(item["url"]).rstrip("/")
-    raise RuntimeError("candidate revision tag URL was not published")
+    raise RuntimeError(f"candidate tag URL not published for exact revision {candidate}")
 
 
 def _http_json(url: str, attempts: int = 12) -> dict[str, Any]:
@@ -248,40 +355,12 @@ def _http_json(url: str, attempts: int = 12) -> dict[str, Any]:
     raise RuntimeError(f"candidate HTTP proof failed for {url}: {type(last).__name__ if last else 'unknown'}")
 
 
-def _deploy_candidate(image: str, sha: str) -> tuple[str, str, str]:
-    before = _service_json()
-    previous_ready = str(((before.get("status") or {}).get("latestReadyRevisionName") or ""))
-    if not previous_ready:
-        raise RuntimeError("no previously ready Cloud Run revision to protect")
-    print("PREVIOUS_READY", previous_ready)
-
-    cmd = [
-        "gcloud", "run", "deploy", SERVICE,
-        f"--project={PROJECT}", f"--region={REGION}", f"--image={image}",
-        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=0", "--max=1",
-        "--memory=1Gi", "--cpu=1", f"--update-env-vars={_env_arg(sha)}",
-        "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
-        f"--update-secrets=WORKER_PUSH_TOKEN={WORKER_PUSH_TOKEN_SECRET_ID}:latest",
-        "--quiet",
-    ]
-    try:
-        _run(cmd, capture=True)
-    except subprocess.CalledProcessError:
-        after_fail = _service_json()
-        still_ready = str(((after_fail.get("status") or {}).get("latestReadyRevisionName") or ""))
-        print("CANDIDATE_DEPLOY_FAILED previous_ready=", previous_ready, "still_ready=", still_ready)
-        if still_ready != previous_ready:
-            raise RuntimeError(
-                f"failed candidate changed ready revision: before={previous_ready} after={still_ready}"
-            )
-        raise
-
-    service = _service_json()
+def _candidate_created_after(service: dict[str, Any], before_created: str) -> str:
     candidate = str(((service.get("status") or {}).get("latestCreatedRevisionName") or ""))
-    if not candidate or candidate == previous_ready:
-        raise RuntimeError(f"new candidate revision not identified: candidate={candidate!r} previous={previous_ready!r}")
+    return candidate if candidate and candidate != before_created else ""
 
-    revision = _revision_json(candidate)
+
+def _assert_candidate_image(revision: dict[str, Any], image: str) -> None:
     containers = ((revision.get("spec") or {}).get("containers") or [])
     if not containers:
         containers = ((((revision.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or [])
@@ -289,39 +368,123 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, str]:
     if image not in deployed_image and deployed_image != image:
         raise RuntimeError(f"candidate image mismatch: expected={image} actual={deployed_image}")
 
-    url = _candidate_url(service)
+
+def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
+    before = _service_json()
+    before_created = str(((before.get("status") or {}).get("latestCreatedRevisionName") or ""))
+    previous_traffic = _traffic_allocations(before)
+    if not previous_traffic or sum(previous_traffic.values()) != 100:
+        raise RuntimeError(f"no exact 100% serving traffic map to protect: {previous_traffic}")
+    print("PREVIOUS_TRAFFIC", json.dumps(previous_traffic, sort_keys=True))
+
+    cmd = [
+        "gcloud", "run", "deploy", SERVICE,
+        f"--project={PROJECT}", f"--region={REGION}", f"--image={image}",
+        f"--service-account={RUNTIME_SA}", "--port=8080",
+        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=0", "--max=1",
+        "--memory=1Gi", "--cpu=1", "--concurrency=50", "--timeout=300",
+        "--allow-unauthenticated", f"--update-env-vars={_env_arg(sha)}",
+        "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
+        f"--update-secrets=WORKER_PUSH_TOKEN={WORKER_PUSH_TOKEN_SECRET_ID}:latest",
+        "--quiet",
+    ]
+
+    deploy_error: subprocess.CalledProcessError | None = None
+    try:
+        _run(cmd, capture=True)
+    except subprocess.CalledProcessError as exc:
+        deploy_error = exc
+
+    service = _service_json()
+    candidate = _candidate_created_after(service, before_created)
+    current_traffic = _traffic_allocations(service)
+
+    # --no-traffic is an invariant, not an assumption. If Cloud Run traffic ever
+    # drifts during candidate creation, restore the exact previous allocation.
+    if current_traffic != previous_traffic:
+        print(
+            "CANDIDATE_TRAFFIC_DRIFT",
+            json.dumps({"before": previous_traffic, "after": current_traffic}, sort_keys=True),
+        )
+        _restore_traffic(previous_traffic)
+        current_traffic = _traffic_allocations(_service_json())
+
+    if not candidate:
+        if deploy_error:
+            raise deploy_error
+        raise RuntimeError("new candidate revision was not identified")
+
+    try:
+        revision = _wait_revision_ready(candidate)
+        _assert_candidate_image(revision, image)
+    except Exception:
+        _run_failed_revision_forensic(candidate)
+        if _traffic_allocations(_service_json()) != previous_traffic:
+            _restore_traffic(previous_traffic)
+        raise
+
+    # A nonzero gcloud exit can race with revision reconciliation. The exact
+    # immutable revision Ready condition above is the authority; if it became
+    # Ready and still has 0% traffic, continue to tagged HTTP proof.
+    if deploy_error:
+        print("GCLOUD_DEPLOY_NONZERO_BUT_EXACT_REVISION_READY", candidate)
+
+    service = _service_json()
+    if _traffic_percent(service, candidate) != 0:
+        _restore_traffic(previous_traffic)
+        raise RuntimeError(f"candidate unexpectedly has production traffic before proof: {candidate}")
+
+    url = _candidate_url(service, candidate)
     print("CANDIDATE", candidate)
     print("CANDIDATE_URL", url)
     print("CANDIDATE_TRAFFIC", "0%")
 
-    auth = _http_json(f"{url}/api/auth/status")
-    if auth.get("required") is not False:
-        raise RuntimeError(f"candidate auth/read-only proof failed: {auth}")
-    state = _http_json(f"{url}/api/state")
-    if not isinstance(state, dict):
-        raise RuntimeError("candidate /api/state did not return JSON object")
+    try:
+        health = _http_json(f"{url}/api/health")
+        if not isinstance(health, dict):
+            raise RuntimeError("candidate /api/health did not return JSON object")
+        auth = _http_json(f"{url}/api/auth/status")
+        if auth.get("required") is not False:
+            raise RuntimeError(f"candidate auth/read-only proof failed: {auth}")
+        state = _http_json(f"{url}/api/state")
+        if not isinstance(state, dict):
+            raise RuntimeError("candidate /api/state did not return JSON object")
+        broker = _http_json(f"{url}/api/broker/status")
+        if broker.get("live_trading_enabled") is not False or broker.get("order_placement_allowed") is not False:
+            raise RuntimeError("candidate broker safety proof failed")
+    except Exception:
+        _run_failed_revision_forensic(candidate)
+        if _traffic_allocations(_service_json()) != previous_traffic:
+            _restore_traffic(previous_traffic)
+        raise
+
     print("CANDIDATE_HTTP_PROOF_OK", candidate)
 
-    # Promote the exact tested immutable revision, never the floating LATEST tag.
-    _run([
-        "gcloud", "run", "services", "update-traffic", SERVICE,
-        f"--project={PROJECT}", f"--region={REGION}", f"--to-revisions={candidate}=100", "--quiet",
-    ], capture=True)
+    # Promote the exact tested immutable revision, never a floating latest tag.
+    _run(
+        [
+            "gcloud", "run", "services", "update-traffic", SERVICE,
+            f"--project={PROJECT}", f"--region={REGION}", f"--to-revisions={candidate}=100", "--quiet",
+        ],
+        capture=True,
+    )
 
     promoted = _service_json()
-    ready = str(((promoted.get("status") or {}).get("latestReadyRevisionName") or ""))
-    if ready != candidate:
-        raise RuntimeError(f"promotion proof failed: candidate={candidate} latestReady={ready}")
+    promoted_traffic = _traffic_allocations(promoted)
+    if promoted_traffic != {candidate: 100}:
+        _restore_traffic(previous_traffic)
+        raise RuntimeError(
+            f"candidate traffic proof failed: expected={{{candidate!r}: 100}} actual={promoted_traffic}"
+        )
+    ready_status, ready_reason, ready_message = _ready_condition(_revision_json(candidate))
+    if ready_status != "True":
+        _restore_traffic(previous_traffic)
+        raise RuntimeError(
+            f"promoted revision lost Ready state: {candidate} {ready_status} {ready_reason} {ready_message}"
+        )
 
-    traffic = ((promoted.get("status") or {}).get("traffic") or [])
-    candidate_percent = 0
-    for item in traffic:
-        if item.get("revisionName") == candidate:
-            candidate_percent += int(item.get("percent") or 0)
-    if candidate_percent != 100:
-        raise RuntimeError(f"candidate traffic proof failed: revision={candidate} percent={candidate_percent}")
-
-    return candidate, url, previous_ready
+    print("PROMOTED_TRAFFIC", json.dumps(promoted_traffic, sort_keys=True))
+    return candidate, url, previous_traffic
 
 
 def main() -> int:
@@ -337,7 +500,7 @@ def main() -> int:
     print("SHA", sha)
     print("IMAGE", image)
     print("SERVICE", SERVICE)
-    print("DEPLOYMENT_MODEL candidate-no-traffic-health-proof-explicit-promotion")
+    print("DEPLOYMENT_MODEL candidate-no-traffic-exact-ready-http-proof-explicit-promotion")
     print("LIVE_OFF enforced")
     print("DASHBOARD_PUBLIC_READONLY enforced (REQUIRE_API_KEY=false, API_KEY unmounted)")
 
@@ -350,20 +513,25 @@ def main() -> int:
     print("UPLOAD", bucket, object_name)
     _build_image(session, bucket, object_name, image)
 
-    candidate, candidate_url, previous_ready = _deploy_candidate(image, sha)
+    candidate, candidate_url, previous_traffic = _deploy_candidate(image, sha)
     print("READY", candidate)
-    print("PREVIOUS_READY_RETAINED_FOR_ROLLBACK", previous_ready)
+    print("PREVIOUS_TRAFFIC_RETAINED_FOR_ROLLBACK", json.dumps(previous_traffic, sort_keys=True))
     print("CANDIDATE_URL", candidate_url)
     print("IMAGE", image)
-    print(json.dumps({
-        "ok": True,
-        "revision": candidate,
-        "previous_revision": previous_ready,
-        "image": image,
-        "sha": sha,
-        "traffic_percent": 100,
-        "live_trading_enabled": False,
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "revision": candidate,
+                "previous_traffic": previous_traffic,
+                "image": image,
+                "sha": sha,
+                "traffic_percent": 100,
+                "live_trading_enabled": False,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
