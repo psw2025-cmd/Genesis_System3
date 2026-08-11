@@ -53,12 +53,18 @@ def test_manual_gcp_deploy_removes_dashboard_api_key_secret():
     assert "API_KEY_SECRET_ID" not in deploy
 
 
-def test_post_deploy_proof_checks_no_key_access_and_live_off():
-    workflow = (ROOT / ".github/workflows/public-paper-dashboard-proof.yml").read_text(encoding="utf-8")
+def test_approved_deploy_workflow_proves_no_key_access_live_off_and_visual():
+    workflow = (ROOT / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
     assert "--remove-secrets=API_KEY" in workflow
     assert "REQUIRE_API_KEY=false" in workflow
     assert "dashboard_visible_without_login" in workflow
     assert "public-dashboard/runtime-proof" in workflow
+    assert "google-chrome --headless" in workflow
+    assert "public_dashboard_proof/dashboard.png" in workflow
     assert "LIVE_TRADING_ENABLED=0" in workflow
     assert "SYSTEM3_LIVE_TRADING_ALLOWED=0" in workflow
     assert "AUTO_EXECUTE_TRADES=0" in workflow
+
+
+def test_no_extra_workflow_added_for_dashboard_proof():
+    assert not (ROOT / ".github/workflows/public-paper-dashboard-proof.yml").exists()
