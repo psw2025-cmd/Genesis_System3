@@ -13,9 +13,12 @@ on:
       - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/codespace_startup.sh"
       - "scripts/cloud_worker.py"
+      - "scripts/system3_self_healing_watchdog.py"
+      - "tools/sync_render_secrets.py"
       - "dashboard/backend/**"
       - "dashboard/frontend/**"
       - "tests/test_gcp_dhan_token_rotation_contract.py"
+      - "tests/test_dhan_single_token_authority.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
       - ".github/workflows/gcp-dhan-token-fix-ci.yml"
@@ -42,10 +45,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Python compile and unit contracts
+      - name: Python compile and single-authority contracts
         run: |
           python -m compileall -q core dashboard scripts tests
-          python -m unittest -v tests.test_gcp_dhan_token_rotation_contract
+          python -m unittest -v \
+            tests.test_gcp_dhan_token_rotation_contract \
+            tests.test_dhan_single_token_authority
 
       - uses: actions/setup-node@v4
         with:
