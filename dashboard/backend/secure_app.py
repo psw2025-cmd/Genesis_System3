@@ -1,21 +1,36 @@
 """Security boundary wrapper for the System3 FastAPI application.
 
-Cloud Run launches this module. Browser authentication uses an opaque,
-server-issued SessionTruth cookie. In cloud mode SessionTruth is backed by
-Firestore and fails closed if the shared authority is unavailable. Trusted
-CI/API clients retain explicit X-API-Key compatibility; the browser does not
-store or replay that key.
+Cloud Run launches this module. PAPER/ANALYZER dashboard viewing is public and
+read-only; no dashboard API key is required for reads. SessionTruth routes are
+retained as fail-closed compatibility surfaces but cannot create sessions while
+REQUIRE_API_KEY is disabled.
 
-Analyzer/paper safety is unchanged. This module contains no broker order code.
+This wrapper also installs the authoritative MutationPolicy decision function
+used by the legacy request middleware. Public visibility never becomes mutation
+authority. UNKNOWN writes and all live mutation/approval capabilities are hard
+denied before legacy route logic. Dedicated worker ingestion remains bound to
+its worker token. No broker order implementation exists in this module.
 """
 from __future__ import annotations
 
+from collections import Counter
+import hashlib
 import hmac
+import json
 
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from dashboard.backend import app as legacy
+from dashboard.backend.mutation_policy import (
+    Capability,
+    assert_runtime_manifest,
+    duplicate_write_routes,
+    evaluate_runtime_mutation,
+    inventory_write_routes,
+    unclassified_write_routes,
+)
+from dashboard.backend.security_policy import SecurityDecision
 from dashboard.backend.session_truth import get_session_truth_store
 
 
@@ -28,6 +43,7 @@ _AUTH_PATHS = {
     "/api/auth/status",
     "/api/auth/logout",
 }
+_BASE_EVALUATE_REQUEST = legacy.evaluate_request
 
 
 def _client_key(request: Request) -> str:
@@ -80,8 +96,6 @@ def _clear_login_failures(request: Request) -> None:
     try:
         _SESSION_TRUTH.clear_login_failures(_client_key(request))
     except Exception as exc:
-        # A successful credential check must not create a session if the shared
-        # throttle authority cannot be cleared consistently.
         raise HTTPException(
             status_code=503,
             detail="Dashboard session authority unavailable",
@@ -128,7 +142,7 @@ def _session_record(request: Request, *, surface_backend_error: bool = False):
 
 
 def _has_dashboard_api_access(request: Request) -> bool:
-    """Authoritative access check used by legacy auth middleware at request time."""
+    """Compatibility access check. Public PAPER viewing never calls this authority."""
     if not legacy._REQUIRE_API_KEY or not legacy._API_KEY:
         return False
     header_key = request.headers.get("X-API-Key", "")
@@ -137,9 +151,47 @@ def _has_dashboard_api_access(request: Request) -> bool:
     return _session_record(request) is not None
 
 
-# Existing middleware resolves this global function at request time, so swapping
-# the function changes the auth authority without duplicating the middleware.
+# Existing middleware resolves these globals at request time. Replacing the
+# functions changes authority without duplicating/reordering the legacy
+# RequestID/security middleware stack.
 legacy._has_dashboard_api_access = _has_dashboard_api_access
+
+
+def _capability_aware_request_policy(**kwargs) -> SecurityDecision:
+    """Apply MutationPolicy before the legacy auth/origin policy.
+
+    A separate browser/control mutation authority does not exist in the public
+    PAPER dashboard, so `control_authorized` is deliberately False. This makes
+    the product publicly readable but not publicly writable.
+    """
+    mutation = evaluate_runtime_mutation(
+        kwargs.get("method", ""),
+        kwargs.get("path", ""),
+        worker_token_configured=bool(kwargs.get("worker_token_configured")),
+        worker_token_valid=bool(kwargs.get("worker_token_valid")),
+        control_authorized=False,
+    )
+    if mutation is None:
+        return _BASE_EVALUATE_REQUEST(**kwargs)
+
+    if not mutation.allowed:
+        return SecurityDecision(
+            False,
+            mutation.status_code,
+            mutation.reason,
+            mutation.code,
+        )
+
+    # Worker authority is capability-specific and must not be forced through a
+    # dashboard/session auth path. Handler schema/domain validation still runs.
+    if mutation.capability is Capability.WORKER_INGEST:
+        return SecurityDecision(True)
+
+    # Session compatibility endpoints retain their existing endpoint policy.
+    return _BASE_EVALUATE_REQUEST(**kwargs)
+
+
+legacy.evaluate_request = _capability_aware_request_policy
 
 # Remove the three legacy deterministic-cookie route objects before registering
 # the authoritative versions below. All other app routes/startup hooks remain.
@@ -231,8 +283,6 @@ async def dashboard_auth_status(request: Request):
 
 @app.post("/api/auth/logout")
 async def dashboard_auth_logout(request: Request):
-    # Logout is a cookie-authenticated mutation; validate browser origin even
-    # though the route remains callable when no/expired cookie is present.
     if request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE) and not _origin_allowed(request):
         raise HTTPException(status_code=403, detail="Origin validation failed")
     token = request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE, "")
@@ -262,3 +312,63 @@ async def dashboard_auth_logout(request: Request):
         httponly=True,
     )
     return response
+
+
+def _sentinel_reached(capability: str) -> None:
+    # These handlers have no mutation implementation. Runtime deployment probes
+    # expect security middleware to stop the request before this function runs.
+    raise HTTPException(
+        status_code=500,
+        detail=f"MUTATION_POLICY_BYPASSED_{capability}",
+    )
+
+
+@app.post("/api/security/mutation-policy/probe/paper", include_in_schema=False)
+async def mutation_policy_probe_paper():
+    _sentinel_reached("PAPER_MUTATION")
+
+
+@app.post("/api/security/mutation-policy/probe/live", include_in_schema=False)
+async def mutation_policy_probe_live():
+    _sentinel_reached("LIVE_MUTATION")
+
+
+@app.post("/api/security/mutation-policy/probe/worker", include_in_schema=False)
+async def mutation_policy_probe_worker():
+    _sentinel_reached("WORKER_INGEST")
+
+
+@app.get("/api/security/mutation-policy")
+async def mutation_policy_status():
+    """Non-secret runtime evidence for the active mutation boundary."""
+    rows = inventory_write_routes(app)
+    unknown = unclassified_write_routes(app)
+    duplicates = duplicate_write_routes(app)
+    counts = Counter(row.capability.value for row in rows)
+    manifest_rows = [
+        {"method": row.method, "path": row.path, "capability": row.capability.value}
+        for row in rows
+    ]
+    manifest_hash = hashlib.sha256(
+        json.dumps(manifest_rows, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "state": "ENFORCED" if not unknown and not duplicates else "INVALID",
+        "runtime_mode": "ANALYZER_PAPER",
+        "public_dashboard_read_only": True,
+        "control_authority_configured": False,
+        "live_mutation": "HARD_DENY",
+        "live_approval": "HARD_DENY",
+        "worker_authority": "DEDICATED_WORKER_TOKEN",
+        "write_route_count": len(rows),
+        "unknown_count": len(unknown),
+        "duplicate_count": len(duplicates),
+        "capability_counts": dict(sorted(counts.items())),
+        "manifest_sha256": manifest_hash,
+        "secret_values_exposed": False,
+    }
+
+
+# Import/startup must fail if a newly added write route bypasses classification or
+# duplicates an existing method/path owner. This is runtime authority, not only CI.
+assert_runtime_manifest(app)

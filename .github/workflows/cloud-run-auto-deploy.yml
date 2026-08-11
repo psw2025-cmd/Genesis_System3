@@ -14,6 +14,7 @@ on:
       - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/gcp_runtime_evidence.py"
       - "scripts/gcp_public_dashboard_runtime_proof.py"
+      - "scripts/gcp_mutation_policy_runtime_proof.py"
       - "scripts/sync_dhan_instruments_master.py"
       - "src/**"
       - "config/**"
@@ -81,8 +82,11 @@ jobs:
               "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
               "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
               "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
+              "scripts/gcp_mutation_policy_runtime_proof.py": "MUTATION_POLICY_RUNTIME_PROOF",
               "dashboard/frontend/src/App.tsx": "public/read-only",
               "dashboard/backend/security_policy.py": "AUTH_REQUIRED_FOR_MUTATION",
+              "dashboard/backend/mutation_policy.py": "LIVE_MUTATION_LOCKED",
+              "dashboard/backend/secure_app.py": "control_authorized=False",
           }
           for path, marker in required.items():
               text = Path(path).read_text(encoding="utf-8")
@@ -142,6 +146,20 @@ jobs:
         with:
           name: public-paper-dashboard-proof-${{ github.run_number }}
           path: reports/latest/public_dashboard_proof/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Prove runtime mutation capability matrix
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/gcp_mutation_policy_runtime_proof.py
+
+      - name: Upload mutation policy runtime proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-policy-runtime-proof-${{ github.run_number }}
+          path: reports/latest/mutation_policy_runtime_proof/
           if-no-files-found: error
           retention-days: 14
 
