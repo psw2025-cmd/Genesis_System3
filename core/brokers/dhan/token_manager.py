@@ -485,7 +485,7 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
 
     if force_oauth:
         # Never auto-print OAuth URL in cloud mode (Render logs are public)
-  if not _CLOUD_MODE:
+        if not _CLOUD_MODE:
             _try_oauth_manual(client_id, app_id, app_secret)
         return {
             "success": False,
