@@ -92,7 +92,12 @@ jobs:
           workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
           assert "GCP_SA_KEY" not in workflow
           assert "credentials_json" not in workflow
-          assert 'gcloud run services update "${GCP_CLOUD_RUN_SERVICE}"' not in workflow
+          actual_service_updates = [
+              line.strip()
+              for line in workflow.splitlines()
+              if line.strip().startswith("gcloud run services update ")
+          ]
+          assert actual_service_updates == [], actual_service_updates
           print("STATIC_GATES_OK", sorted(required))
           PY
 
