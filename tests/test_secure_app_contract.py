@@ -37,13 +37,12 @@ class SecureAppContractTests(unittest.TestCase):
         self.assertNotIn("system3-dashboard-session-v1", source)
         self.assertNotIn("hashlib.sha256", source)
 
-    def test_browser_key_replay_remains_removed(self):
-        login = Path("dashboard/frontend/src/components/LoginPage.tsx").read_text(encoding="utf-8")
-        auth = Path("dashboard/frontend/src/hooks/useAuth.ts").read_text(encoding="utf-8")
-        self.assertNotIn("sessionStorage.setItem", login)
-        self.assertNotIn("s3_api_key", login)
-        self.assertNotIn("X-API-Key", auth)
-        self.assertIn("credentials:'include'", auth.replace(' ', ''))
+    def test_obsolete_browser_login_and_session_hook_are_absent(self):
+        # PAPER/ANALYZER viewing is public/read-only. Retaining dead credential
+        # entry/session code creates a regression path where a future UI change
+        # could accidentally restore a dashboard-key prompt.
+        self.assertFalse(Path("dashboard/frontend/src/components/LoginPage.tsx").exists())
+        self.assertFalse(Path("dashboard/frontend/src/hooks/useAuth.ts").exists())
 
 
 if __name__ == "__main__":
