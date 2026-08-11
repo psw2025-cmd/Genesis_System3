@@ -38,6 +38,20 @@ def test_frontend_has_no_dashboard_api_key_gate():
     assert "AuthGate" not in app
 
 
+def test_compatibility_auth_notice_never_collects_or_submits_a_dashboard_key():
+    notice = (ROOT / "dashboard/frontend/src/components/AuthUnlock.tsx").read_text(encoding="utf-8")
+    assert 'type="password"' not in notice
+    assert "/api/auth/session" not in notice
+    assert "JSON.stringify" not in notice
+    assert "apiKey" not in notice
+    assert "do not request or enter credentials" in notice
+    assert "Public read contract error" in notice
+
+
+def test_obsolete_key_session_runtime_proof_is_retired():
+    assert not (ROOT / "scripts/gcp_session_runtime_proof.py").exists()
+
+
 def test_gcp_auto_deploy_is_public_readonly_and_unmounts_api_key():
     deploy = (ROOT / "scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
     assert '("REQUIRE_API_KEY", "false")' in deploy
