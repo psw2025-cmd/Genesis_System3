@@ -20,12 +20,14 @@ class SessionTruthStoreTests(unittest.TestCase):
         self.assertEqual(store.validate(token), record)
         self.assertIsNone(store.validate("not-an-issued-session"))
 
-    def test_logout_revoke_invalidates_server_side(self):
+    def test_logout_revoke_invalidates_server_side_and_keeps_tombstone(self):
         store = SessionTruthStore()
         token, _ = store.issue(max_age_seconds=60)
         self.assertIsNotNone(store.validate(token))
         self.assertTrue(store.revoke(token))
         self.assertIsNone(store.validate(token))
+        self.assertEqual(store.active_count(), 0)
+        self.assertEqual(store.revoked_count(), 1)
         self.assertFalse(store.revoke(token))
 
     def test_expiry_is_enforced_by_server_store(self):
@@ -35,6 +37,7 @@ class SessionTruthStoreTests(unittest.TestCase):
         time.sleep(1.05)
         self.assertIsNone(store.validate(token))
         self.assertEqual(store.active_count(), 0)
+        self.assertEqual(store.revoked_count(), 0)
 
     def test_non_positive_ttl_rejected(self):
         store = SessionTruthStore()
