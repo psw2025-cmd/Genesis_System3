@@ -1,3 +1,9 @@
+/* Hide raw Vue template braces until the app mounts (fix for issue #44: dashboard
+   showed unrendered {{ ... }} tokens when /ui/app.js loaded slowly or failed). */
+[v-cloak] {
+     display: none !important;
+}
+
 /* ═══════════════════════════════════════════════════
    GENESIS SYSTEM3 — Institutional Trading Dashboard
    Production CSS v2.0.0
