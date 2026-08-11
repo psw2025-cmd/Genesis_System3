@@ -33,8 +33,9 @@ SAFE_ENV = {
     "SYSTEM3_DEPLOY_TARGET", "MEM_WARN_MB", "MEM_GC_MB", "MEM_LIMIT_MB",
 }
 SECRETS = ("system3-dhan-client-id", "dhan-access-token", "dhan-pin", "dhan-totp-secret")
-# Env var names that must only ever arrive via Secret Manager (valueFrom). If one of
-# these shows up with a plain `value` instead, that is a plaintext-secret leak.
+# Env var names that must only ever arrive via Secret Manager (valueFrom) when
+# they are intentionally mounted. API_KEY is intentionally NOT mounted in the
+# public read-only PAPER dashboard, while WORKER_PUSH_TOKEN remains secret-backed.
 SECRET_BACKED_ENV_NAMES = {"API_KEY", "WORKER_PUSH_TOKEN"}
 REDACT = re.compile(
     r"(?i)(bearer\s+[a-z0-9._~+\-/]+=*|authorization\s*[:=]\s*\S+|"
@@ -100,15 +101,26 @@ def is_on(value: Any) -> bool:
 
 def evaluate_safety(env: dict[str, Any], secret_refs: list[str],
                      plaintext_secret_names: list[str]) -> dict[str, Any]:
-    # api_key_required / api_key_mounted TRUE is the secure state: dashboard auth is
-    # enforced and the key comes from Secret Manager (valueFrom), not a plain env value.
+    """Evaluate the approved public-read-only PAPER dashboard safety posture.
+
+    Dashboard viewing intentionally requires no API key. Therefore the expected
+    state is REQUIRE_API_KEY=false and no API_KEY Secret Manager mount. Mutation
+    authority remains independently fail-closed in MutationPolicy/security policy,
+    and worker ingestion continues to use its dedicated worker secret.
+    """
+    api_key_required = not is_off(env.get("REQUIRE_API_KEY"))
+    api_key_mounted = "API_KEY" in secret_refs
+    api_key_plaintext_exposed = "API_KEY" in plaintext_secret_names
     return {"analyze_mode": is_on(env.get("ANALYZE_MODE")),
             "live_trading_enabled": not is_off(env.get("LIVE_TRADING_ENABLED")),
             "system3_live_trading_allowed": not is_off(env.get("SYSTEM3_LIVE_TRADING_ALLOWED")),
             "auto_execute_trades": not is_off(env.get("AUTO_EXECUTE_TRADES")),
-            "api_key_required": not is_off(env.get("REQUIRE_API_KEY")),
-            "api_key_mounted": "API_KEY" in secret_refs,
-            "api_key_plaintext_exposed": "API_KEY" in plaintext_secret_names,
+            "api_key_required": api_key_required,
+            "api_key_mounted": api_key_mounted,
+            "api_key_plaintext_exposed": api_key_plaintext_exposed,
+            "dashboard_public_readonly": (not api_key_required
+                                          and not api_key_mounted
+                                          and not api_key_plaintext_exposed),
             "secret_payloads_exposed": False}
 
 
@@ -117,8 +129,7 @@ def safety_passes(safety: dict[str, Any]) -> bool:
             and not safety["live_trading_enabled"]
             and not safety["system3_live_trading_allowed"]
             and not safety["auto_execute_trades"]
-            and safety["api_key_required"]
-            and safety["api_key_mounted"]
+            and safety["dashboard_public_readonly"]
             and not safety["api_key_plaintext_exposed"])
 
 
@@ -128,12 +139,12 @@ def safety_blockers(safety: dict[str, Any]) -> list[str]:
         blockers.append("Analyzer mode is not enabled.")
     if any(safety[k] for k in ("live_trading_enabled", "system3_live_trading_allowed", "auto_execute_trades")):
         blockers.append("Live-trading-off invariants are not proven.")
-    if not safety["api_key_required"]:
-        blockers.append("Dashboard API key authentication is missing or disabled (REQUIRE_API_KEY is not enforced).")
-    if not safety["api_key_mounted"]:
-        blockers.append("Dashboard API key is not mounted from Secret Manager.")
+    if safety["api_key_required"]:
+        blockers.append("Dashboard API key requirement was re-enabled; PAPER dashboard must remain public/read-only.")
+    if safety["api_key_mounted"]:
+        blockers.append("Dashboard API key is unexpectedly mounted; PAPER dashboard must not require or mount API_KEY.")
     if safety["api_key_plaintext_exposed"]:
-        blockers.append("Dashboard API key is present as a plaintext environment value instead of a Secret Manager reference.")
+        blockers.append("Dashboard API key is present as a plaintext environment value.")
     return blockers
 
 
