@@ -59,7 +59,18 @@ logger = logging.getLogger("dhan_token_manager")
 #  Env helpers                                                         #
 # ------------------------------------------------------------------ #
 
-_CLOUD_MODE = bool(os.environ.get("RENDER") or os.environ.get("CLOUD_WORKER"))
+# NOTE: Render is being phased out in favor of Google Cloud (Cloud Run).
+# Detect cloud/production the same way as core/brokers/dhan/cloud_token_provider.py
+# and dhan_readonly.py, so this module suppresses OAuth-URL printing on Cloud Run
+# too, not just legacy Render. Previously this only checked RENDER/CLOUD_WORKER,
+# which left Cloud Run deployments printing the OAuth consent URL in logs.
+_CLOUD_MODE = bool(
+      os.environ.get("RENDER")
+      or os.environ.get("CLOUD_WORKER")
+      or os.environ.get("K_SERVICE")
+      or os.environ.get("CLOUD_MODE")
+      or os.environ.get("SYSTEM3_DEPLOY_TARGET") == "gcp-cloud-run"
+)
 
 _DHAN_KEYS = (
     "DHAN_CLIENT_ID",
@@ -474,7 +485,7 @@ def refresh_token(force_generate: bool = False, force_oauth: bool = False) -> di
 
     if force_oauth:
         # Never auto-print OAuth URL in cloud mode (Render logs are public)
-        if not os.environ.get("RENDER") and not os.environ.get("CLOUD_MODE"):
+  if not _CLOUD_MODE:
             _try_oauth_manual(client_id, app_id, app_secret)
         return {
             "success": False,
