@@ -1,16 +1,6 @@
 'use strict';
 
-/**
- * Genesis System3 public PAPER dashboard synthetic.
- *
- * Safety invariants:
- * - anonymous/read-only only: no login, dashboard API key or broker order call;
- * - trace headers are injected only to the configured System3 origin;
- * - HAR is scrubbed before upload: no bodies, cookies, query values or
- *   sensitive header values are retained;
- * - LIVE/mutation authority is never exercised.
- */
-
+/** Genesis System3 public PAPER dashboard synthetic. Read-only by design. */
 const { chromium } = require('@playwright/test');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -25,6 +15,19 @@ const UPLOAD_REQUIRED = /^(1|true|yes)$/i.test(process.env.OBSERVABILITY_UPLOAD_
 const SUCCESS_SAMPLE_RATE = Math.max(0, Math.min(1, Number(process.env.SUCCESS_SAMPLE_RATE || '0.02')));
 const OUT_ROOT = process.env.SYNTHETIC_OUT_DIR || '/tmp/system3-synthetic';
 const SENSITIVE_HEADER = /authorization|cookie|token|api[-_]?key|password|pin|totp|secret|session/i;
+const SECRET_TEXT_PATTERNS = [
+  /\bBearer\s+[^\s,;]+/gi,
+  /\beyJ[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{8,}\b/g,
+  /((?:api[-_ ]?key|access[-_ ]?token|refresh[-_ ]?token|password|pin|totp|secret|session)\s*[:=]\s*)[^\s,;]+/gi,
+];
+
+function redactText(value, limit = 1000) {
+  let text = String(value || '');
+  for (const pattern of SECRET_TEXT_PATTERNS) {
+    text = text.replace(pattern, (match, prefix) => prefix ? `${prefix}<redacted>` : '<redacted>');
+  }
+  return text.slice(0, limit);
+}
 
 function traceContext() {
   const traceId = crypto.randomBytes(16).toString('hex');
@@ -41,32 +44,34 @@ function safeUrl(raw) {
   }
 }
 
+function sameServiceOrigin(raw) {
+  try { return new URL(raw).origin === SERVICE_ORIGIN; } catch (_) { return false; }
+}
+
 function redactHeaders(headers) {
   const out = {};
   for (const [name, value] of Object.entries(headers || {})) {
-    out[name] = SENSITIVE_HEADER.test(name) ? '<redacted>' : String(value).slice(0, 500);
+    out[name] = SENSITIVE_HEADER.test(name) ? '<redacted>' : redactText(value, 500);
   }
   return out;
 }
 
 function scrubHar(har) {
   const clone = JSON.parse(JSON.stringify(har || {}));
-  const entries = (((clone || {}).log || {}).entries || []);
-  for (const entry of entries) {
+  for (const entry of (((clone || {}).log || {}).entries || [])) {
     const req = entry.request || {};
     const res = entry.response || {};
     req.url = safeUrl(req.url || '');
     req.headers = (req.headers || []).map((h) => ({
       name: h.name,
-      value: SENSITIVE_HEADER.test(h.name || '') ? '<redacted>' : String(h.value || '').slice(0, 500),
+      value: SENSITIVE_HEADER.test(h.name || '') ? '<redacted>' : redactText(h.value, 500),
     }));
     req.cookies = [];
     req.queryString = [];
     delete req.postData;
-
     res.headers = (res.headers || []).map((h) => ({
       name: h.name,
-      value: SENSITIVE_HEADER.test(h.name || '') ? '<redacted>' : String(h.value || '').slice(0, 500),
+      value: SENSITIVE_HEADER.test(h.name || '') ? '<redacted>' : redactText(h.value, 500),
     }));
     res.cookies = [];
     if (res.content) {
@@ -89,20 +94,18 @@ async function metadataAccessToken() {
 }
 
 async function uploadFile(token, localPath, objectName, contentType) {
-  const bytes = fs.readFileSync(localPath);
-  const url = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(BUCKET)}/o?uploadType=media&name=${encodeURIComponent(objectName)}`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': contentType || 'application/octet-stream',
+  const response = await fetch(
+    `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(BUCKET)}/o?uploadType=media&name=${encodeURIComponent(objectName)}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': contentType || 'application/octet-stream' },
+      body: fs.readFileSync(localPath),
     },
-    body: bytes,
-  });
+  );
   if (!response.ok) throw new Error(`gcs_upload_http_${response.status}:${objectName}`);
 }
 
-function utcParts(date = new Date()) {
+function utcParts(date) {
   return {
     yyyy: String(date.getUTCFullYear()),
     mm: String(date.getUTCMonth() + 1).padStart(2, '0'),
@@ -116,8 +119,12 @@ async function run() {
   const outDir = path.join(OUT_ROOT, traceId);
   fs.mkdirSync(outDir, { recursive: true });
   const rawHarPath = path.join(outDir, 'raw.har');
+  const redactedHarPath = path.join(outDir, 'redacted.har.json');
   const tracePath = path.join(outDir, 'trace.zip');
   const screenshotPath = path.join(outDir, 'failure.png');
+  const metaPath = path.join(outDir, 'meta.json');
+  const consolePath = path.join(outDir, 'console.json');
+  const networkPath = path.join(outDir, 'network.json');
   const consoleRows = [];
   const networkRows = [];
   const failures = [];
@@ -137,51 +144,35 @@ async function run() {
 
     await page.route('**/*', async (route) => {
       const req = route.request();
-      let sameOrigin = false;
-      try { sameOrigin = new URL(req.url()).origin === SERVICE_ORIGIN; } catch (_) {}
-      if (!sameOrigin) return route.continue();
-      return route.continue({
-        headers: {
-          ...req.headers(),
-          'x-trace-id': traceId,
-          traceparent,
-        },
-      });
+      if (!sameServiceOrigin(req.url())) return route.continue();
+      return route.continue({ headers: { ...req.headers(), 'x-trace-id': traceId, traceparent } });
     });
 
     page.on('console', (msg) => {
       if (msg.type() === 'error' || msg.type() === 'warning') {
-        consoleRows.push({ type: msg.type(), text: msg.text().slice(0, 1000) });
+        consoleRows.push({ type: msg.type(), text: redactText(msg.text()) });
       }
     });
-    page.on('pageerror', (err) => {
-      consoleRows.push({ type: 'pageerror', text: String(err.message || err).slice(0, 1000) });
-    });
-    page.on('requestfailed', (req) => {
-      networkRows.push({
-        name: safeUrl(req.url()),
-        method: req.method(),
-        status: null,
-        failed: true,
-        failure: String((req.failure() || {}).errorText || 'request_failed').slice(0, 300),
-      });
-    });
+    page.on('pageerror', (err) => consoleRows.push({ type: 'pageerror', text: redactText(err.message || err) }));
+    page.on('requestfailed', (req) => networkRows.push({
+      name: safeUrl(req.url()), method: req.method(), status: null, failed: true,
+      failure: redactText((req.failure() || {}).errorText || 'request_failed', 300),
+    }));
     page.on('response', async (res) => {
       const req = res.request();
-      if (new URL(req.url()).origin !== SERVICE_ORIGIN) return;
+      if (!sameServiceOrigin(req.url())) return;
       const responseHeaders = await res.allHeaders().catch(() => ({}));
       const requestHeaders = await req.allHeaders().catch(() => ({}));
       servingRevision = responseHeaders['x-system3-revision'] || servingRevision;
       deploymentTag = responseHeaders['x-system3-deploy-sha'] || deploymentTag;
-      const timing = req.timing();
+      const timing = req.timing() || {};
+      const elapsed = timing.responseEnd >= 0 && timing.startTime >= 0
+        ? Math.max(0, Math.round(timing.responseEnd - timing.startTime)) : null;
       networkRows.push({
-        name: safeUrl(req.url()),
-        method: req.method(),
-        status: res.status(),
+        name: safeUrl(req.url()), method: req.method(), status: res.status(),
         size: Number(responseHeaders['content-length'] || 0) || null,
-        time_ms: timing && timing.responseEnd >= 0 ? Math.round(timing.responseEnd) : null,
-        request_headers: redactHeaders(requestHeaders),
-        response_headers: redactHeaders(responseHeaders),
+        time_ms: elapsed,
+        request_headers: redactHeaders(requestHeaders), response_headers: redactHeaders(responseHeaders),
       });
     });
 
@@ -195,32 +186,26 @@ async function run() {
     if (/DASHBOARD API KEY/i.test(body)) failures.push('dashboard_api_key_prompt_rendered');
 
     const checks = await page.evaluate(async () => {
-      async function getJson(path) {
-        const response = await fetch(path, { method: 'GET', credentials: 'omit' });
+      async function getJson(url) {
+        const response = await fetch(url, { method: 'GET', credentials: 'omit' });
         let body = {};
         try { body = await response.json(); } catch (_) {}
         return { status: response.status, body };
       }
       return {
-        auth: await getJson('/api/auth/status'),
-        health: await getJson('/api/health'),
-        state: await getJson('/api/state'),
-        mutation: await getJson('/api/security/mutation-policy'),
+        auth: await getJson('/api/auth/status'), health: await getJson('/api/health'),
+        state: await getJson('/api/state'), mutation: await getJson('/api/security/mutation-policy'),
       };
     });
-
-    for (const [name, result] of Object.entries(checks)) {
-      if (result.status !== 200) failures.push(`${name}_http_${result.status}`);
-    }
+    for (const [name, result] of Object.entries(checks)) if (result.status !== 200) failures.push(`${name}_http_${result.status}`);
     if (checks.auth.body.required !== false || checks.auth.body.mode !== 'auth_disabled') failures.push('public_dashboard_auth_contract_failed');
     if (checks.mutation.body.state !== 'ENFORCED') failures.push('mutation_policy_not_enforced');
     if (checks.mutation.body.live_mutation !== 'HARD_DENY') failures.push('live_mutation_not_hard_deny');
     if (checks.mutation.body.public_dashboard_read_only !== true) failures.push('dashboard_not_read_only');
-
     if (consoleRows.some((row) => row.type === 'pageerror')) failures.push('browser_pageerror');
-    if (networkRows.some((row) => row.status >= 500)) failures.push('backend_5xx_observed');
+    if (networkRows.some((row) => Number(row.status || 0) >= 500)) failures.push('backend_5xx_observed');
   } catch (err) {
-    failures.push(`synthetic_exception:${err && err.name ? err.name : 'Error'}:${String(err && err.message ? err.message : err).slice(0, 300)}`);
+    failures.push(`synthetic_exception:${redactText(`${err && err.name ? err.name : 'Error'}:${err && err.message ? err.message : err}`, 300)}`);
   } finally {
     if (context) {
       if (failures.length) {
@@ -230,63 +215,44 @@ async function run() {
       } else {
         await context.tracing.stop().catch(() => {});
       }
-      await context.close().catch(() => {}); // flush HAR
+      await context.close().catch(() => {});
     }
     if (browser) await browser.close().catch(() => {});
   }
 
-  const ended = new Date();
-  const redactedHarPath = path.join(outDir, 'redacted.har.json');
   if (fs.existsSync(rawHarPath)) {
     try {
       const har = JSON.parse(fs.readFileSync(rawHarPath, 'utf8'));
       fs.writeFileSync(redactedHarPath, JSON.stringify(scrubHar(har)));
     } catch (err) {
-      failures.push(`har_redaction_failed:${String(err.message || err).slice(0, 200)}`);
+      failures.push(`har_redaction_failed:${redactText(err.message || err, 200)}`);
     }
     fs.rmSync(rawHarPath, { force: true });
   }
 
   const meta = {
-    schema_version: 1,
-    trace_id: traceId,
-    traceparent,
-    timestamp: started.toISOString(),
-    completed_at: ended.toISOString(),
-    duration_ms: ended.getTime() - started.getTime(),
-    env: ENV,
-    service: SERVICE,
-    service_origin: SERVICE_ORIGIN,
-    deployment_tag: deploymentTag,
-    serving_revision: servingRevision,
-    status: failures.length ? 'FAIL' : 'PASS',
-    failures,
-    console_error_or_warning_count: consoleRows.length,
-    network_request_count: networkRows.length,
-    dashboard_api_key_used: false,
-    broker_order_called: false,
-    live_trading_enabled: false,
-    request_response_bodies_persisted: false,
-    cookies_persisted: false,
-    query_values_persisted: false,
+    schema_version: 1, trace_id: traceId, traceparent, timestamp: started.toISOString(),
+    completed_at: new Date().toISOString(), env: ENV, service: SERVICE, service_origin: SERVICE_ORIGIN,
+    deployment_tag: deploymentTag, serving_revision: servingRevision,
+    failures, console_error_or_warning_count: consoleRows.length, network_request_count: networkRows.length,
+    dashboard_api_key_used: false, broker_order_called: false, live_trading_enabled: false,
+    request_response_bodies_persisted: false, cookies_persisted: false, query_values_persisted: false,
   };
-
-  const metaPath = path.join(outDir, 'meta.json');
-  const consolePath = path.join(outDir, 'console.json');
-  const networkPath = path.join(outDir, 'network.json');
-  fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+  meta.duration_ms = new Date(meta.completed_at).getTime() - started.getTime();
   fs.writeFileSync(consolePath, JSON.stringify(consoleRows, null, 2));
   fs.writeFileSync(networkPath, JSON.stringify(networkRows, null, 2));
 
   const sampledSuccess = !failures.length && Math.random() < SUCCESS_SAMPLE_RATE;
   const shouldUpload = failures.length > 0 || sampledSuccess;
+  let token = null;
+  let prefix = null;
   if (shouldUpload) {
     try {
-      const token = await metadataAccessToken();
+      token = await metadataAccessToken();
       const { yyyy, mm, dd } = utcParts(started);
-      const prefix = `har/${ENV}/${SERVICE}/${yyyy}/${mm}/${dd}/${traceId}`;
+      prefix = `har/${ENV}/${SERVICE}/${yyyy}/${mm}/${dd}/${traceId}`;
+      meta.gcs_prefix = `gs://${BUCKET}/${prefix}/`;
       const files = [
-        [metaPath, `${prefix}/meta.json`, 'application/json'],
         [consolePath, `${prefix}/console.json`, 'application/json'],
         [networkPath, `${prefix}/network.json`, 'application/json'],
       ];
@@ -294,12 +260,26 @@ async function run() {
       if (fs.existsSync(tracePath)) files.push([tracePath, `${prefix}/trace.zip`, 'application/zip']);
       if (fs.existsSync(screenshotPath)) files.push([screenshotPath, `${prefix}/failure.png`, 'image/png']);
       for (const [local, objectName, contentType] of files) await uploadFile(token, local, objectName, contentType);
-      meta.gcs_prefix = `gs://${BUCKET}/${prefix}/`;
-      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
     } catch (err) {
-      meta.upload_error = String(err.message || err).slice(0, 300);
-      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+      meta.upload_error = redactText(err.message || err, 300);
       if (UPLOAD_REQUIRED) failures.push(`artifact_upload_failed:${meta.upload_error}`);
+    }
+  }
+
+  meta.status = failures.length ? 'FAIL' : 'PASS';
+  meta.failures = failures;
+  fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+  if (token && prefix) {
+    try {
+      await uploadFile(token, metaPath, `${prefix}/meta.json`, 'application/json');
+    } catch (err) {
+      meta.upload_error = redactText(err.message || err, 300);
+      if (UPLOAD_REQUIRED && !failures.some((x) => x.startsWith('artifact_upload_failed:'))) {
+        failures.push(`artifact_upload_failed:${meta.upload_error}`);
+      }
+      meta.status = failures.length ? 'FAIL' : 'PASS';
+      meta.failures = failures;
+      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
     }
   }
 
@@ -308,6 +288,6 @@ async function run() {
 }
 
 run().catch((err) => {
-  console.error('SYSTEM3_SYNTHETIC_FATAL', String(err && err.message ? err.message : err).slice(0, 500));
+  console.error('SYSTEM3_SYNTHETIC_FATAL', redactText(err && err.message ? err.message : err, 500));
   process.exitCode = 3;
 });
