@@ -11,12 +11,16 @@ export function LoginPage({ onLogin }: Props) {
     try {
       const r = await fetch('/api/auth/session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': key.trim() },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         credentials: 'include',
+        body: JSON.stringify({ api_key: key.trim() }),
       })
       const d = await r.json().catch(() => ({}))
       if (r.ok && d.authenticated) {
-        sessionStorage.setItem('s3_api_key', key.trim()); onLogin()
+        // The reusable API key is deliberately not persisted in browser storage.
+        // Subsequent requests authenticate only with the server-issued HttpOnly cookie.
+        setKey('')
+        onLogin()
       } else {
         setError(typeof d.detail === 'string' ? d.detail : (typeof d.message === 'string' ? d.message : (Array.isArray(d.detail) ? d.detail.map((x)=>x.msg||JSON.stringify(x)).join(', ') : 'Invalid API key — check and retry.')))
       }
@@ -36,7 +40,7 @@ export function LoginPage({ onLogin }: Props) {
           <div style={{marginBottom:18}}>
             <label style={{display:"block",fontSize:10,color:"#6b7280",letterSpacing:2,marginBottom:8}}>DASHBOARD API KEY</label>
             <input type="password" value={key} onChange={e=>setKey(e.target.value)}
-              placeholder="Enter your 64-character API key" autoFocus
+              placeholder="Enter your 64-character API key" autoFocus autoComplete="current-password"
               style={{width:"100%",padding:"11px 12px",background:"#0a0e1a",border:"1px solid #1e3a5f",borderRadius:6,color:"#e2e8f0",fontSize:13,fontFamily:"inherit",outline:"none",boxSizing:"border-box"}} />
           </div>
           {error && <div style={{background:"#1a0808",border:"1px solid #7f1d1d",borderRadius:6,padding:"9px 12px",color:"#fca5a5",fontSize:11,marginBottom:14}}>{error}</div>}
@@ -46,7 +50,7 @@ export function LoginPage({ onLogin }: Props) {
           </button>
         </form>
         <div style={{marginTop:24,padding:"10px 12px",background:"#070b14",borderRadius:6,fontSize:10,color:"#374151",textAlign:"center",letterSpacing:1}}>
-          PAPER MODE · LIVE TRADING OFF · SESSION 12 HRS
+          SESSION AUTH · LIVE TRADING OFF · SERVER COOKIE
         </div>
       </div>
     </div>
