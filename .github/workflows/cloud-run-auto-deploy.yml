@@ -80,7 +80,7 @@ jobs:
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
               "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
-              "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
+              "scripts/gcp_cloud_run_auto_deploy.py": "CANONICAL_RUNTIME_SPEC",
               "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
               "scripts/gcp_mutation_policy_runtime_proof.py": "MUTATION_POLICY_RUNTIME_PROOF",
               "dashboard/frontend/src/App.tsx": "public/read-only",
@@ -121,19 +121,59 @@ jobs:
             --format='value(metadata.name,status.url)' >/tmp/preflight-service.txt
           test -s /tmp/preflight-service.txt
 
-      - name: Deploy guarded public PAPER Cloud Run service
+      - name: Deploy one canonical guarded public PAPER Cloud Run revision
         run: python scripts/gcp_cloud_run_auto_deploy.py
 
-      - name: Enforce public read-only dashboard and dynamic token runtime
+      - name: Verify canonical runtime spec without creating another revision
         run: |
-          gcloud run services update "${GCP_CLOUD_RUN_SERVICE}" \
+          gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
-            --min-instances=0 \
-            --max-instances=1 \
-            --update-env-vars="REQUIRE_API_KEY=false,DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
-            --remove-secrets=API_KEY \
-            --update-secrets="WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"
+            --format=json > /tmp/canonical-service.json
+          python - <<'PY'
+          import json, os, sys
+          svc = json.load(open('/tmp/canonical-service.json'))
+          env = {}
+          secret_env_names = set()
+          containers = ((((svc.get('spec') or {}).get('template') or {}).get('spec') or {}).get('containers') or [])
+          if not containers:
+              raise SystemExit('CANONICAL_RUNTIME_CONTAINER_MISSING')
+          for row in containers[0].get('env') or []:
+              name = row.get('name')
+              if not name:
+                  continue
+              if 'value' in row:
+                  env[name] = str(row.get('value') or '')
+              if (row.get('valueFrom') or {}).get('secretKeyRef'):
+                  secret_env_names.add(name)
+          failures = []
+          expected = os.environ['GITHUB_SHA']
+          if env.get('DEPLOY_GIT_SHA') != expected:
+              failures.append(f"DEPLOY_GIT_SHA={env.get('DEPLOY_GIT_SHA')!r}")
+          if env.get('REQUIRE_API_KEY', '').lower() not in {'0','false','no','off'}:
+              failures.append(f"REQUIRE_API_KEY={env.get('REQUIRE_API_KEY')!r}")
+          if env.get('DHAN_TOKEN_SOURCE') != 'gcp-secret-manager-dynamic':
+              failures.append(f"DHAN_TOKEN_SOURCE={env.get('DHAN_TOKEN_SOURCE')!r}")
+          if env.get('ANALYZE_MODE') != '1' or env.get('SYSTEM3_MODE', '').upper() != 'ANALYZER':
+              failures.append('ANALYZER_MODE_NOT_ENFORCED')
+          for key in ('LIVE_TRADING_ENABLED','SYSTEM3_LIVE_TRADING_ALLOWED','AUTO_EXECUTE_TRADES'):
+              if env.get(key, '').lower() not in {'0','false','no','off'}:
+                  failures.append(f"{key}={env.get(key)!r}")
+          if 'API_KEY' in secret_env_names:
+              failures.append('API_KEY_STILL_MOUNTED')
+          if 'WORKER_PUSH_TOKEN' not in secret_env_names:
+              failures.append('WORKER_PUSH_TOKEN_NOT_MOUNTED')
+          print('CANONICAL_RUNTIME_SPEC_VERIFY', {
+              'expected_sha': expected,
+              'require_api_key': env.get('REQUIRE_API_KEY'),
+              'dhan_token_source': env.get('DHAN_TOKEN_SOURCE'),
+              'api_key_mounted': 'API_KEY' in secret_env_names,
+              'worker_token_mounted': 'WORKER_PUSH_TOKEN' in secret_env_names,
+              'failures': failures,
+          })
+          if failures:
+              sys.exit(2)
+          PY
 
       - name: Prove and capture public PAPER dashboard without API key
         env:
