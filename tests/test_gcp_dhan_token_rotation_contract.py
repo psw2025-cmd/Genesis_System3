@@ -86,9 +86,15 @@ class StaticSafetyContractTests(unittest.TestCase):
         text = Path("scripts/gcp_dhan_token_rotation_job.py").read_text(encoding="utf-8")
         self.assertIn('os.environ["LIVE_TRADING_ENABLED"] = "0"', text)
         self.assertIn('os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"', text)
+        self.assertIn('os.environ["DHAN_TOKEN_ROTATION_AUTHORITY"] = AUTHORITY', text)
+        self.assertIn('AUTHORITY = "gcp-cloud-run-job"', text)
+        self.assertIn('SECRET_ID = os.getenv("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token")', text)
         self.assertIn('"order_endpoints_called": False', text)
         self.assertIn("secret_version_advanced", text)
-        self.assertIn("refresh_token(force_generate=True)", text)
+        self.assertIn("_persist_authoritative_token", text)
+        self.assertIn("DhanLogin(client_id).generate_token", text)
+        self.assertNotIn("from core.brokers.dhan.token_manager", text)
+        self.assertNotIn("system3-dhan-access-token", text)
         forbidden_calls = [
             "place" + "_order(",
             "modify" + "_order(",
