@@ -55,9 +55,19 @@ def test_manual_gcp_deploy_removes_dashboard_api_key_secret():
 
 def test_approved_deploy_workflow_proves_no_key_access_live_off_and_actual_ui_visual():
     workflow = (ROOT / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+    deploy = (ROOT / "scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
     proof = (ROOT / "scripts/gcp_public_dashboard_runtime_proof.py").read_text(encoding="utf-8")
-    assert "--remove-secrets=API_KEY" in workflow
-    assert "REQUIRE_API_KEY=false" in workflow
+
+    # One canonical service mutation owns final env/scaling/secrets; the
+    # workflow verifies that revision instead of creating a second revision.
+    assert "CANONICAL_RUNTIME_SPEC" in workflow
+    assert "CANONICAL_RUNTIME_SPEC" in deploy
+    assert "gcloud run services update" not in workflow
+    assert '("REQUIRE_API_KEY", "false")' in deploy
+    assert 'env_map.pop("API_KEY", None)' in deploy
+    assert '("DHAN_TOKEN_SOURCE", "gcp-secret-manager-dynamic")' in deploy
+    assert '"scaling": {"minInstanceCount": 0, "maxInstanceCount": 1}' in deploy
+
     assert "scripts/gcp_public_dashboard_runtime_proof.py" in workflow
     assert "public-paper-dashboard-proof-" in workflow
     assert "dashboard_visible_without_login" in proof
@@ -72,9 +82,15 @@ def test_approved_deploy_workflow_proves_no_key_access_live_off_and_actual_ui_vi
     assert '"dashboard_path": dashboard_path' in proof
     assert '"dashboard_api_key_prompt_rendered": False' in proof
     assert '"api_key_used": False' in proof
-    assert "LIVE_TRADING_ENABLED=0" in workflow
-    assert "SYSTEM3_LIVE_TRADING_ALLOWED=0" in workflow
-    assert "AUTO_EXECUTE_TRADES=0" in workflow
+
+    # Final live-off configuration is owned by the canonical deploy script and
+    # rechecked by workflow verification/runtime proof.
+    assert '("LIVE_TRADING_ENABLED", "0")' in deploy
+    assert '("SYSTEM3_LIVE_TRADING_ALLOWED", "0")' in deploy
+    assert '("AUTO_EXECUTE_TRADES", "0")' in deploy
+    assert "LIVE_TRADING_ENABLED" in workflow
+    assert "SYSTEM3_LIVE_TRADING_ALLOWED" in workflow
+    assert "AUTO_EXECUTE_TRADES" in workflow
 
 
 def test_no_extra_workflow_added_for_dashboard_proof():
