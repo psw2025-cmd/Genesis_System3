@@ -85,6 +85,8 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
     if p == "/api/auth/logout":
         return Capability.SESSION_REVOKE_SELF
 
+    if p in {"/api/scheduler/health/push", "/api/chain/push"}:
+        return Capability.WORKER_INGEST
     if p.startswith((
         "/api/worker/",
         "/api/gcp/runtime/",
