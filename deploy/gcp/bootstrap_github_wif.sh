@@ -14,8 +14,8 @@ GITHUB_REPOSITORY_ID="${GITHUB_REPOSITORY_ID:-1168640800}"
 GITHUB_OWNER_ID="${GITHUB_OWNER_ID:-176781239}"
 DEPLOY_SA_NAME="${DEPLOY_SA_NAME:-system3-github-deployer}"
 EVIDENCE_SA_NAME="${EVIDENCE_SA_NAME:-system3-evidence-reader}"
+WEB_RUNTIME_SA_NAME="${WEB_RUNTIME_SA_NAME:-genesis-system3-web}"
 CLOUDBUILD_BUCKET="${CLOUDBUILD_BUCKET:-${PROJECT_ID}_cloudbuild}"
-RUNTIME_SERVICE="${RUNTIME_SERVICE:-genesis-system3-web}"
 BUILDER_SA_NAME="${BUILDER_SA_NAME:-system3-builder}"
 
 say() { printf '\n== %s ==\n' "$*"; }
@@ -31,6 +31,7 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   cloudscheduler.googleapis.com \
   secretmanager.googleapis.com \
+  firestore.googleapis.com \
   logging.googleapis.com \
   monitoring.googleapis.com >/dev/null
 
@@ -40,6 +41,7 @@ PROVIDER_NAME="${POOL_NAME}/providers/${PROVIDER_ID}"
 DEPLOY_SA="${DEPLOY_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 EVIDENCE_SA="${EVIDENCE_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 BUILDER_SA="${BUILDER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+WEB_RUNTIME_SA="${WEB_RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
 say "Create or verify Workload Identity Pool"
 if ! gcloud iam workload-identity-pools describe "$POOL_ID" \
@@ -70,7 +72,7 @@ else
     --attribute-condition="$ATTRIBUTE_CONDITION"
 fi
 
-say "Create deployment and evidence service accounts"
+say "Create deployment, evidence and web runtime service accounts"
 if ! exists_sa "$DEPLOY_SA"; then
   gcloud iam service-accounts create "$DEPLOY_SA_NAME" \
     --project="$PROJECT_ID" --display-name="System3 GitHub deployer"
@@ -78,6 +80,10 @@ fi
 if ! exists_sa "$EVIDENCE_SA"; then
   gcloud iam service-accounts create "$EVIDENCE_SA_NAME" \
     --project="$PROJECT_ID" --display-name="System3 read-only evidence reader"
+fi
+if ! exists_sa "$WEB_RUNTIME_SA"; then
+  gcloud iam service-accounts create "$WEB_RUNTIME_SA_NAME" \
+    --project="$PROJECT_ID" --display-name="Genesis System3 web runtime"
 fi
 
 PRINCIPAL_SET="principalSet://iam.googleapis.com/${POOL_NAME}/attribute.repository_id/${GITHUB_REPOSITORY_ID}"
@@ -113,15 +119,29 @@ if exists_sa "$BUILDER_SA"; then
     --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
     --role="roles/iam.serviceAccountUser" >/dev/null
 fi
-RUNTIME_SA="$(gcloud run services describe "$RUNTIME_SERVICE" \
-  --project="$PROJECT_ID" --region="$REGION" \
-  --format='value(spec.template.spec.serviceAccountName)' 2>/dev/null || true)"
-if [[ -n "$RUNTIME_SA" ]] && exists_sa "$RUNTIME_SA"; then
-  gcloud iam service-accounts add-iam-policy-binding "$RUNTIME_SA" \
-    --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
-    --role="roles/iam.serviceAccountUser" >/dev/null
-fi
 
+gcloud iam service-accounts add-iam-policy-binding "$WEB_RUNTIME_SA" \
+  --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
+  --role="roles/iam.serviceAccountUser" >/dev/null
+
+say "Grant the dedicated web runtime only the shared-state and secret access it needs"
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:${WEB_RUNTIME_SA}" \
+  --role="roles/datastore.user" \
+  --condition=None >/dev/null
+
+for SECRET in system3-dhan-client-id dhan-access-token system3-dashboard-worker-push-token; do
+  if gcloud secrets describe "$SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
+    gcloud secrets add-iam-policy-binding "$SECRET" \
+      --project="$PROJECT_ID" --member="serviceAccount:${WEB_RUNTIME_SA}" \
+      --role="roles/secretmanager.secretAccessor" >/dev/null
+  else
+    echo "WARNING: runtime secret metadata not found: ${SECRET}" >&2
+  fi
+done
+
+# Deployment identity may administer broker rotation secrets, but they are never
+# mounted into the public web runtime merely because deployment needs them.
 for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret; do
   if gcloud secrets describe "$SECRET" --project="$PROJECT_ID" >/dev/null 2>&1; then
     gcloud secrets add-iam-policy-binding "$SECRET" \
@@ -151,8 +171,9 @@ done
 say "Verify no service-account key was created"
 DEPLOY_KEYS="$(gcloud iam service-accounts keys list --iam-account="$DEPLOY_SA" --project="$PROJECT_ID" --managed-by=user --format='value(name)')"
 EVIDENCE_KEYS="$(gcloud iam service-accounts keys list --iam-account="$EVIDENCE_SA" --project="$PROJECT_ID" --managed-by=user --format='value(name)')"
-if [[ -n "$DEPLOY_KEYS" || -n "$EVIDENCE_KEYS" ]]; then
-  echo "ERROR: user-managed key unexpectedly exists on a new WIF service account." >&2
+RUNTIME_KEYS="$(gcloud iam service-accounts keys list --iam-account="$WEB_RUNTIME_SA" --project="$PROJECT_ID" --managed-by=user --format='value(name)')"
+if [[ -n "$DEPLOY_KEYS" || -n "$EVIDENCE_KEYS" || -n "$RUNTIME_KEYS" ]]; then
+  echo "ERROR: user-managed key unexpectedly exists on a keyless System3 service account." >&2
   exit 3
 fi
 
@@ -160,21 +181,19 @@ cat <<EOF
 
 BOOTSTRAP COMPLETE
 
-Add these GitHub repository variables under:
-Settings -> Secrets and variables -> Actions -> Variables
-
+Repository variables:
 GCP_WIF_PROVIDER=${PROVIDER_NAME}
 GCP_DEPLOY_SERVICE_ACCOUNT=${DEPLOY_SA}
 GCP_EVIDENCE_SERVICE_ACCOUNT=${EVIDENCE_SA}
+GCP_WEB_RUNTIME_SERVICE_ACCOUNT=${WEB_RUNTIME_SA}
 
-Then run the Cloud Run Auto Deploy workflow once from main.
-Only after WIF authentication and runtime evidence pass:
-1. Delete GitHub secret GCP_SA_KEY.
-2. Disable/delete the old Google service-account JSON key.
+Runtime shared-state prerequisite:
+${WEB_RUNTIME_SA} -> roles/datastore.user
 
 Safety was not changed:
 - ANALYZE_MODE remains 1.
 - LIVE_TRADING_ENABLED remains 0.
 - SYSTEM3_LIVE_TRADING_ALLOWED remains 0.
 - AUTO_EXECUTE_TRADES remains 0.
+- PAPER dashboard viewing remains public/read-only with no dashboard API key.
 EOF
