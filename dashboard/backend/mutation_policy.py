@@ -1,8 +1,8 @@
-"""Canonical write-route capability classification for Genesis System3.
+"""Canonical write-route capability classification and hard safety policy.
 
-The policy is intentionally fail-closed: every HTTP mutation route must map to
-one capability. UNKNOWN is a CI/runtime blocker. LIVE_MUTATION is denied in the
-current analyzer/paper runtime regardless of UI state.
+Every HTTP mutation route must map to one capability. UNKNOWN is denied.
+LIVE_MUTATION and LIVE_APPROVAL are independently denied in analyzer/paper
+runtime regardless of UI state, environment drift, or legacy route behavior.
 """
 from __future__ import annotations
 
@@ -34,6 +34,15 @@ class MutationRoute:
     method: str
     path: str
     capability: Capability
+
+
+@dataclass(frozen=True)
+class MutationDecision:
+    allowed: bool
+    capability: Capability
+    state: str
+    http_status: int
+    reason: str
 
 
 def classify_mutation(method: str, path: str) -> Optional[Capability]:
@@ -106,3 +115,37 @@ def unclassified_write_routes(app) -> List[MutationRoute]:
 
 def capability_for_request(method: str, path: str) -> Capability:
     return classify_mutation(method, path) or Capability.UNKNOWN
+
+
+def evaluate_runtime_mutation(method: str, path: str) -> Optional[MutationDecision]:
+    """Apply the non-bypassable analyzer/paper mutation boundary.
+
+    Authentication, CSRF, worker identity and idempotency are layered policies;
+    this function owns only route classification plus the absolute live lock.
+    """
+    capability = classify_mutation(method, path)
+    if capability is None:
+        return None
+    if capability is Capability.UNKNOWN:
+        return MutationDecision(
+            allowed=False,
+            capability=capability,
+            state="DENY_UNKNOWN",
+            http_status=403,
+            reason="Write route has no approved capability",
+        )
+    if capability in {Capability.LIVE_MUTATION, Capability.LIVE_APPROVAL}:
+        return MutationDecision(
+            allowed=False,
+            capability=capability,
+            state="LIVE_LOCKED",
+            http_status=423,
+            reason="Live trading and live approval are hard locked in analyzer/paper runtime",
+        )
+    return MutationDecision(
+        allowed=True,
+        capability=capability,
+        state="CAPABILITY_ACCEPTED",
+        http_status=200,
+        reason="Capability accepted; downstream auth/domain policy still required",
+    )
