@@ -1,17 +1,18 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 17:50 IST`
+Updated: `2026-08-11 17:53 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Current `main` HEAD verified this iteration: `6a8f728d58d00cc91381306f8535225b2819777a`.
-- Material application change occurred: PR #99 merged at `6a8f728d...`; therefore the current application/source baseline is now `6a8f728d58d00cc91381306f8535225b2819777a`, replacing the former `b70af343...` baseline.
-- Compare former application baseline `b70af343... -> 6a8f728d...`: 24 commits ahead, 0 behind. Runtime code changed only in `dashboard/backend/app.py` and `dashboard/backend/cloud_paper_engine.py`; the other changed path is this master audit report.
-- PR #99 is MERGED. PR #98 remains OPEN at `74f5b685...`; PR #97 remains OPEN at `29e7b2cf...`.
-- Exact PR #99 head `e5fcfc8259f1d3f20f101e4e53ec369065644cc8` had three observed successful PR-triggered workflows: `Genesis System3 Global Safety CI`, `GCP Stage 2 Safety Checks`, and `GCP Dhan Token Fix CI`.
-- The merge commit `6a8f728d...` has no workflow runs returned by the available commit-workflow connector, so exact merged-revision CI/deployment proof is still **NOT PROVEN**.
+- Repository HEAD observed at start of this resolution cross-check: `4a5ec1ed3b236a86b7909972d4eda1677b192aee` (`docs(audit): add GCP deployment provenance and IAM truth`).
+- Latest application/source HEAD is `6a8f728d58d00cc91381306f8535225b2819777a`, the PR #99 merge. The later `4a5ec1...` commit is report-only and does not change application code.
+- Compare former application baseline `b70af343340a73ed27ca548820d5893c779ab5bd -> 6a8f728d...`: 24 commits ahead, 0 behind. Runtime code changed only in `dashboard/backend/app.py` and `dashboard/backend/cloud_paper_engine.py`; the other changed path is this master audit report.
+- PR #99 is MERGED. Source head `e5fcfc8259f1d3f20f101e4e53ec369065644cc8`; merge commit `6a8f728d58d00cc91381306f8535225b2819777a`.
+- Exact PR #99 head `e5fcfc...` had three observed successful PR-triggered workflows: `Genesis System3 Global Safety CI`, `GCP Stage 2 Safety Checks`, and `GCP Dhan Token Fix CI`.
+- The merge commit `6a8f728d...` has no workflow runs or combined status contexts returned by the available commit connectors, so exact merged-revision CI/deployment/runtime proof is still **NOT PROVEN**.
+- PR #98 remains OPEN at `74f5b68509b5af7ec94466831c2dd4d57365d868`; PR #97 remains OPEN at `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`. Open PRs are proposals only and cannot close `main` findings.
 - Google Cloud is the only accepted deployment target. Render-era operational assumptions remain migration debt/non-authority.
 - Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
 - This Markdown is the single continuously maintained audit/remediation authority.
@@ -29,8 +30,8 @@ Updated: `2026-08-11 17:50 IST`
 | WebSocket/REST truth | **FAIL / P0-P1** | `StreamTruth` — READY TO PATCH |
 | Option chain/Greeks | **FAIL / P0-P1** | `OptionChainTruth` — READY TO PATCH |
 | Scanner/ranker | **FAIL / P0-P1** | `ScannerTruth` — READY TO PATCH |
-| Performance/concurrency | **FAIL / P0-P1** | `WorkCoordinator + SnapshotScheduler` — READY TO PATCH |
-| Paper lifecycle/reconciliation | **PARTIAL PATCH / STILL FAIL P0** | `PaperLedger + ReconciliationService` — READY TO PATCH |
+| Performance/concurrency | **PARTIAL PATCH / STILL FAIL P0-P1** | engine lock merged; `WorkCoordinator + SnapshotScheduler` still required |
+| Paper lifecycle/reconciliation | **PARTIAL PATCH / STILL FAIL P0** | PAPER-017/018 concrete defect patched; `PaperLedger + ReconciliationService` still required |
 | Pre-trade risk authority | **FAIL / P0** | `PreTradeRiskService` — READY TO PATCH |
 | AI/prediction provenance | **MISSING / P0-P1** | `PredictionTruth + ModelArtifactManifest` — READY TO PATCH/DESIGN |
 | Accessibility/responsive browser proof | **FAIL / P1** | `AccessibleWorkstationShell` — READY TO PATCH |
@@ -41,6 +42,15 @@ Updated: `2026-08-11 17:50 IST`
 Missing, stale, parse-failed, timed-out, unauthenticated, overloaded, contradictory, corrupt or unproven evidence must never become PASS, LIVE, safe, fresh, zero-risk, zero-P&L, zero-Greek, calibrated confidence, broker-connected, account-empty, deployed-current or trade-ready through defaults.
 
 HTTP success, GitHub workflow green, Cloud Run READY, profile connectivity and image tag equality are each insufficient on their own. Transaction authority must be server-owned, revision-bound and evidence-backed. UI and JSON/CSV files are projections only.
+
+Resolution terminology:
+- `OPEN/FIX-REQUIRED`: defect still reproduces on current application source.
+- `PATCHED`: source-level root cause changed on `main`.
+- `PARTIAL PATCH`: one failure mode is removed but the canonical solution or related safety failure modes remain.
+- `VERIFIED`: exact-revision closure tests/runtime evidence pass.
+- `CLOSED`: the complete finding-specific PASS criteria are independently satisfied.
+
+A merge or green PR workflow alone is never enough to mark a safety/readiness finding CLOSED.
 
 ## 3. Retained canonical remediation groups
 
@@ -69,7 +79,7 @@ P0-P1 / FIX-REQUIRED. Socket-open is not market-stream health. Add heartbeat, se
 P0-P1 / FIX-REQUIRED. Remove high-watermark rank carryover/restamping and auto-eligibility. Latest observation always replaces old even when gain falls; stale rows evict. Status: READY TO PATCH.
 
 ### PERF-001..009 — WorkCoordinator
-P0-P1 / FIX-REQUIRED. Bounded domain workers, singleflight, serialized paper worker, completion-driven polling, event-loop and queue observability required. `PERF-004` remains open despite new manual-close lock because `/api/paper/tick` command idempotency/serialization is not fully solved. Status: READY TO PATCH.
+P0-P1 / FIX-REQUIRED with **PARTIAL PATCH for PERF-004**. Bounded domain workers, singleflight, serialized/idempotent paper worker, completion-driven polling, event-loop and queue observability remain required. PR #99 adds an engine-instance lock around `step()` and manual close, preventing simultaneous same-engine mutation, but duplicate `/api/paper/tick` requests still have no command/idempotency key and can execute sequentially as multiple logical ticks. Status: PARTIAL PATCH / READY TO PATCH remaining solution.
 
 ### ML-001..014 — PredictionTruth
 P0-P1 / FIX-REQUIRED. Immutable prediction/model artifact evidence, temporal validation, calibration and reconciled after-cost outcome linkage remain missing. Status: READY TO PATCH/DESIGN.
@@ -85,27 +95,63 @@ P1 / FIX-REQUIRED. `UI-001` remains `LOCKED-20X / FIX-REQUIRED`. All Tier-0 badg
 
 **New code proof:** PR #99 changes the route to obtain `CloudPaperEngine` and call `engine.close_position_by_id(position_id)`. The direct JSON file-surgery block was removed.
 
-**Assessment:** the specific direct-file-authority defect is **PATCHED in source**, not yet fully VERIFIED. The route no longer directly writes `positions_live.json`.
+**Assessment:** the specific direct-file-authority defect is **PATCHED in source**, not yet fully VERIFIED. The old direct route-level `positions_live.json` write no longer reproduces in current application source.
 
-**Remaining closure conditions:** exact merged-revision tests must prove manual close + concurrent tick + restart cannot resurrect the position; persistence failures must fail closed; duplicate close idempotency and immutable event evidence are still absent.
+**Remaining closure conditions:** exact merged-revision tests must prove manual close + concurrent tick + restart cannot resurrect the position; persistence failures must fail closed; duplicate close idempotency, expected position revision, fresh quote binding and immutable event evidence are still absent.
 
-**Status:** `PATCHED / UNPROVEN` (not CLOSED).
+**Status:** `PATCHED / STATICALLY VERIFIED / RUNTIME UNPROVEN` — not CLOSED. Historical reproduction counter freezes at `1/20`; fix verification is `1 static / 0 runtime`.
 
 ### PAPER-018 — competing manual-close vs engine in-memory authority
 
-**New code proof:** `CloudPaperEngine` now owns `close_position_by_id()` and uses the same `open_positions/closed_positions` state that produces projections. A `threading.Lock` serializes `step()` and manual close within one engine instance.
+**New code proof:** `CloudPaperEngine` now owns `close_position_by_id()` and uses the same `open_positions/closed_positions` state that produces projections. A `threading.Lock` serializes `step()` and manual close within one engine instance. The close path calls `_save_state()` and `_write_outputs()` after updating engine state.
 
-**Assessment:** the concrete same-process dual-authority/race identified earlier is materially reduced. However this remains an in-memory/file-state design, not an append-only event ledger; no cross-process/distributed lock, command idempotency, position revision or reconciliation checkpoint is present.
+**Assessment:** the concrete same-process dual-authority/resurrection race identified earlier is **PATCHED in source**. However this remains an in-memory/file-state design, not an append-only event ledger; no cross-process/distributed coordination, command idempotency, position revision or reconciliation checkpoint is present.
 
-**Status:** `PATCHED / PARTIAL / UNPROVEN`.
+**Status:** `PATCHED / PARTIAL / STATICALLY VERIFIED / RUNTIME UNPROVEN`. Historical reproduction counter freezes at `1/20`; fix verification is `1 static / 0 runtime`.
+
+### PERF-004 — duplicate/concurrent paper mutation semantics
+
+**Merged improvement:** the new shared engine lock serializes `step()` and manual close and prevents simultaneous mutation of the same engine object.
+
+**Remaining defect:** `/api/paper/tick` still lacks a canonical command ID/idempotency key. Twenty duplicate requests may wait on the lock and then execute as twenty separate logical ticks. Therefore the old simultaneous race is reduced, but exactly-once mutation is not proven.
+
+**Status:** `PARTIAL PATCH / FIX-REQUIRED`. Historical reproduction counter was `2/20` before the patch; exact duplicate-request closure verification remains `0 runtime`.
 
 ### New regression concern from PR #99
 
-`close_position_by_id()` closes using the stored `current_price` (falling back to `entry_price`) and immediately persists the result. It does not require a current quote snapshot ID, quote freshness, ExecutionDecision, PreTradeRisk/SafetyTruth, idempotency key or position revision. Therefore PR #99 fixes the concrete resurrection path but does not satisfy the target institutional close lifecycle.
+`close_position_by_id()` closes using the stored `current_price` (falling back to `entry_price`) and immediately persists the result. It does not require a current quote snapshot ID, quote freshness, ExecutionDecision, PreTradeRisk/SafetyTruth, idempotency key or expected position revision. Therefore PR #99 fixes the concrete resurrection path but does not satisfy the institutional close lifecycle.
 
-**Required next step:** convert manual close to `ClosePositionIntent` through MutationPolicy -> SafetyTruth -> fresh market truth -> PreTradeRisk/ExecutionDecision -> serialized PaperMutationWorker -> immutable close/fill/position event -> reconciliation.
+**Required next step:** convert manual close to `ClosePositionIntent` through MutationPolicy -> SafetyTruth -> fresh market truth -> PreTradeRisk/ExecutionDecision -> serialized/idempotent PaperMutationWorker -> immutable close/fill/position event -> reconciliation.
 
-## 5. Latest deep slice — Google Cloud deployment/runtime provenance
+## 5. Resolution cross-check matrix — current application source `6a8f728d...`
+
+| Finding/group | Resolution state | Current evidence |
+|---|---|---|
+| PAPER-017 direct manual-close projection write | **PATCHED / NOT CLOSED** | route delegates to `CloudPaperEngine.close_position_by_id()`; old direct JSON write removed |
+| PAPER-018 manual-close resurrection from separate engine authority | **PATCHED / PARTIAL / NOT CLOSED** | close updates engine authority and shares lock with `step()`; durable ledger/replay absent |
+| PERF-004 simultaneous paper-engine mutation race | **PARTIAL PATCH** | engine lock serializes mutation; duplicate tick idempotency/exactly-once absent |
+| PAPER-019 persistence error -> empty/unsafe state | **OPEN** | broad load/save/output exception behavior unchanged |
+| PAPER-020 destructive date rollover/repeat IDs | **OPEN** | unchanged by PR #99 |
+| PAPER-021 explicit order/fill lifecycle | **OPEN** | close/open still do not create immutable order/fill evidence |
+| PAPER-022 versioned cost/P&L provenance | **OPEN** | existing `_compute_net_pnl()` behavior retained |
+| PAPER-023 quantity/instrument provenance | **OPEN** | existing quantity/multiplier logic retained |
+| PAPER-024 reconciliation identity | **OPEN** | no immutable ledger sequence/ReconciliationTruth added |
+| AUTH-001..011 | **OPEN** | PR #99 does not modify auth/session architecture |
+| MUT-001..008 | **OPEN** | close/tick still lack canonical capability/idempotency chain |
+| SAFE/RISK groups | **OPEN** | close still does not require SafetyTruth/PreTradeRisk/ExecutionDecision |
+| ACCOUNT-001..008 | **OPEN** | Dhan/account files untouched by PR #99 |
+| STATE-001..012 | **OPEN** | no domain-CAS/shared-state fix in PR #99 |
+| CHAIN-001..014 | **OPEN** | unchanged |
+| WS-001..011 | **OPEN / UNPROVEN** | unchanged |
+| SCAN-001..010 | **OPEN** | unchanged |
+| ML-001..014 | **OPEN** | PR #84 remains unmerged proposal; no main closure |
+| UI/A11Y | **OPEN** | PR #98 remains unmerged; no main closure from that proposal |
+| GCP/DeploymentTruth | **OPEN / NOT PROVEN** | report expanded GCP findings; application merge SHA still lacks exact deployment/digest/revision proof |
+| PAPER-010 old route-absence claim | **CLOSED / CORRECTED** | `/api/paper/tick` is proven to exist |
+
+**Cross-check conclusion:** one concrete P0 paper defect family has moved from unpatched to partially patched (`PAPER-017/018`, with PERF-004 partially improved). No system-wide P0 safety/readiness domain is fully CLOSED.
+
+## 6. Latest deep slice — Google Cloud deployment/runtime provenance
 
 ### GCP-012 / P0 — deployment proof uses image tag, not immutable Artifact Registry digest
 
@@ -243,7 +289,7 @@ P1 / FIX-REQUIRED. `UI-001` remains `LOCKED-20X / FIX-REQUIRED`. All Tier-0 badg
 
 **Status:** READY TO PATCH.
 
-## 6. Canonical solution — DeploymentTruth V2
+## 7. Canonical solution — DeploymentTruth V2
 
 **Status:** READY TO PATCH.
 
@@ -271,14 +317,14 @@ PASS criteria: exact source SHA, build, digest, revision and intended traffic al
 
 Fail-safe: any missing digest/traffic/IAM/runtime proof => DeploymentTruth UNKNOWN/ERROR, readiness blocked, paper/live-adjacent safety decision inhibited where deployment truth is required, LIVE locked.
 
-## 7. Prioritized remediation roadmap
+## 8. Prioritized remediation roadmap
 
 ### P0
 1. SessionTruth.
 2. MutationPolicy + CapabilityManifest.
 3. SafetyTruth + ExecutionEligibility + mandatory PreTradeRiskService.
 4. AccountTruth + AccountSnapshotCoordinator.
-5. Complete PaperLedger + ReconciliationService; treat PR #99 as partial bridge only.
+5. Complete PaperLedger + ReconciliationService from the PR #99 single-engine-authority foundation; keep the merged engine lock as defense-in-depth but add immutable command/order/fill/position events, idempotency, risk/safety decision IDs and reconciliation.
 6. DeploymentTruth V2: immutable digest/revision/traffic and identity split.
 7. StateTruth + domain CAS.
 8. WorkCoordinator + serialized/idempotent paper mutation worker.
@@ -297,20 +343,23 @@ Fail-safe: any missing digest/traffic/IAM/runtime proof => DeploymentTruth UNKNO
 ### P2
 Advanced institutional analytics, scenario controls and tuning only after P0/P1 truth contracts are proven.
 
-## 8. Counters / status changes
+## 9. Counters / status changes
 
 - `UI-001` remains `LOCKED-20X / FIX-REQUIRED`.
-- `PAPER-017`: source status upgraded from READY TO PATCH to `PATCHED / UNPROVEN`; counter remains below LOCKED-20X because patch closure needs independent runtime/test reproductions.
-- `PAPER-018`: upgraded to `PATCHED / PARTIAL / UNPROVEN`; long-term ledger/reconciliation solution remains required.
-- `PERF-004` remains open; PR #99's instance lock does not provide command idempotency or full paper-worker serialization semantics.
-- `GCP-012..019`: NEW, `1/20` each, FIX-REQUIRED.
+- `PAPER-017`: source status upgraded from READY TO PATCH to `PATCHED / STATICALLY VERIFIED / RUNTIME UNPROVEN`; historical reproduction counter freezes at `1/20`; fix verification `1 static / 0 runtime`.
+- `PAPER-018`: upgraded to `PATCHED / PARTIAL / STATICALLY VERIFIED / RUNTIME UNPROVEN`; historical reproduction counter freezes at `1/20`; fix verification `1 static / 0 runtime`.
+- `PERF-004`: upgraded to `PARTIAL PATCH`; historical reproduction counter was `2/20`; duplicate-request exactly-once verification remains `0 runtime`.
+- `PAPER-019..024`: remain OPEN at their prior counters.
+- `ACCOUNT-001..008`: remain `1/20` each, FIX-REQUIRED.
+- `GCP-012..019`: remain `1/20` each, FIX-REQUIRED.
+- `PAPER-010 route-absence`: remains CLOSED/CORRECTED.
 - No new finding reaches LOCKED-20X.
 - No deployment, readiness, profitability or real-money finding is CLOSED.
 - LIVE remains OFF/LOCKED; no live order was enabled, placed, modified, cancelled or routed.
 
-## 9. Product-design track — Readiness / Deployment Proof V21
+## 10. Product-design track — Readiness / Deployment Proof V21
 
-This iteration's required product UI is the real `Readiness / Proof` workspace.
+This iteration's latest product UI requirement remains the real `Readiness / Proof` workspace.
 
 ### REQUIRED
 - Tier-0 source SHA, image digest, Cloud Run revision, traffic ownership, WIF state, IAM split state, SafetyTruth and LIVE LOCKED.
@@ -319,6 +368,7 @@ This iteration's required product UI is the real `Readiness / Proof` workspace.
 - Identity panel separating deployer, web runtime, Dhan rotator, Scheduler invoker and evidence reader.
 - Scheduler/token-rotation panel with identity, invoker role, job digest and last evidence; web PIN/TOTP/token-write capability must show NO.
 - Operator proof showing deployment state, revision age, runtime/source match, secret-exposure state, rollback revision and redacted evidence export.
+- Paper close/readiness drilldown must distinguish `PATCHED`, `VERIFIED`, and `CLOSED`; a merged source patch without runtime proof must never display as completed readiness.
 
 ### RECOMMENDED
 - One-click drilldown to sanitized Cloud Run spec/IAM diff and build provenance.
@@ -328,10 +378,10 @@ This iteration's required product UI is the real `Readiness / Proof` workspace.
 ### OPTIONAL
 - Cost/performance trend by revision after runtime telemetry is authoritative.
 
-## 10. Closure discipline
+## 11. Closure discipline
 
-`PATCHED` means source changed. `VERIFIED/CLOSED` requires exact-revision unit/integration/runtime/browser proof, reproducible evidence IDs, safety regression and independent verification. `LOCKED-20X` means repeatedly reproduced, not fixed. Workflow green, HTTP 200, Cloud Run READY, UI labels or image tags alone can never prove deployment/trading readiness.
+`PATCHED` means source changed. `VERIFIED/CLOSED` requires exact-revision unit/integration/runtime/browser proof, reproducible evidence IDs, safety regression and independent verification. `LOCKED-20X` means repeatedly reproduced, not fixed. Workflow green, HTTP 200, Cloud Run READY, UI labels, image tags, PR descriptions or merge state alone can never prove deployment/trading readiness.
 
-## 11. Next deep slice
+## 12. Next deep slice
 
-Inspect the merged PR #99 paper close path and complete Paper mutation authority end-to-end: authentication/capability, idempotency, fresh quote/chain binding, ExecutionDecision, lock scope, persistence failure behavior, restart/replay, duplicate close/tick semantics, fill/cost provenance and reconciliation. In parallel regression-check that GCP deployment remains LIVE OFF and no newly merged route can reach broker place/modify/cancel paths.
+Complete Paper mutation authority end-to-end on top of merged PR #99: authentication/capability, idempotency, fresh quote/chain binding, ExecutionDecision, lock scope, persistence failure behavior, restart/replay, duplicate close/tick semantics, fill/cost provenance and reconciliation. In parallel regression-check that GCP deployment remains LIVE OFF and no newly merged route can reach broker place/modify/cancel paths.
