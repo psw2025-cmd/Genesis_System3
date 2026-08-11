@@ -1,16 +1,16 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 09:48 IST`
+Updated: `2026-08-11 10:51 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `416cc5db5e4b077fd3b8924a20e58ce7990dff89`.
-- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..416cc5db5e4b077fd3b8924a20e58ce7990dff89` is **14 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
+- Repository HEAD observed at start of this iteration: `c240ff0c6cb5bd0261ab247ecaf173be5c85e6ac`.
+- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..c240ff0c6cb5bd0261ab247ecaf173be5c85e6ac` is **15 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
 - PR #97 remains OPEN at head `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main`. Its synthetic-P&L suppression still substitutes zero for unavailable/rejected P&L, so it does not close null/provenance concerns.
 - PR #96 remains the newest merged application/UI PR in the current evidence set.
-- Exact application-HEAD workflow/runtime proof remains **NOT PROVEN**; the current GitHub connector returned no workflow runs bound to application HEAD `b70af343...`.
+- Exact application-HEAD workflow/runtime proof remains **NOT PROVEN**; the GitHub connector returned no workflow runs and no combined statuses bound to application HEAD `b70af343...` in this iteration.
 - Google Cloud Run / Google Cloud services remain the sole deployment authority. Render-era runtime assumptions are migration debt only.
 - Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
 - This Markdown remains the single continuously maintained audit/remediation authority.
@@ -25,6 +25,7 @@ Updated: `2026-08-11 09:48 IST`
 | DB/state-store authority | **FAIL / P0-P1** | **READY TO PATCH** via `StateTruth` + domain-CAS |
 | WebSocket/REST stream truth | **FAIL / P0-P1** | **READY TO PATCH** via `StreamTruth` |
 | Option-chain normalization/cache | **FAIL / P0-P1** | **READY TO PATCH** via `OptionChainTruth` |
+| Scanner/ranker freshness + stability | **FAIL / P0-P1** | **READY TO PATCH** via `ScannerTruth` |
 | Paper mutation/lifecycle | **FAIL / P0** | **READY TO PATCH** immutable lifecycle |
 | Paper P&L/reconciliation | **NOT PROVEN / P0-P1** | after-cost reconciliation required |
 | Pre-trade risk authority | **FAIL / P0** | server-owned policy + mandatory risk service |
@@ -49,6 +50,7 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 - `AUTH-001..004` OPEN: login contract mismatch, pre-auth polling, raw browser API-key storage, incomplete session expiry/revocation proof.
 - `UI-001..019` OPEN: false-valid defaults, source inference, empty/error ambiguity, missing authoritative mode/provenance, weak responsive/accessibility and deployment/build truth.
 - `CHAIN-001..014` OPEN: warming PCR false-data, weak Dhan proof, incomplete Greeks, null→zero parsing, spread validity, expiry-insensitive cache, weak disk-cache provenance, invented source, generic expiry fallback and parser-error collapse.
+- `SCAN-001..010` OPEN: same-day stale rank acceptance, ignored refresh intent, scanner fallback auto-eligibility, hard-coded live provenance, rotating-shard high-watermark retention, stale-row restamping, disk-cache age/session ambiguity, duplicate REST/WS writers, load-heavy equity rotation and UI freshness/eligibility ambiguity.
 - `READY-001..009` OPEN: missing safety evidence default-safe paths, semantic lifecycle/risk/economic gates incomplete, weak account-success semantics, Render-era Live Gate copy and evidence-poor human approval.
 - `PAPER-001..016`, `TRADE-001..003`, `LEGACY-001` OPEN: default safety/data values, unproven mutation route, direct executor bypass, process-local lifecycle, stale-price handling, incomplete costs/reconciliation and legacy mutation UI residue.
 - `RISK-001..009` OPEN: browser-owned limits, permissive defaults, zero-risk fallbacks, weak VaR contract, fail-open guardrail conditions, unproven canonical wiring and proxy gate semantics.
@@ -56,8 +58,167 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 - `GCP-001..011` OPEN: exact-revision proof missing, immutable digest absent, weak frontend SHA, double service mutation, legacy-key fallback, broad runtime IAM, default service-account fallback, weak typed safety/incident proof and incomplete Render retirement.
 - `STATE-001..012` OPEN: file backend default, optional Firestore fallback, stale whole-snapshot overwrite, missing domain revisions/CAS, startup local-file promotion, plausible green defaults, duplicate SSOT methods, position error→empty collapse, weak identity, mixed-generation file sync and missing multi-writer tests.
 - `ML-001..014` OPEN: missing immutable prediction ledger, overloaded model-proof boolean, dictionary-first model selection, rank→confidence misuse, ambiguous percentage units, unknown→zero metrics, tracker type bug, unsafe accuracy math, non-atomic tracker persistence, non-purged/non-global time split, incomplete artifact identity, selection/evaluation leakage, missing calibration and no prediction→after-cost linkage.
+- `A11Y-001..012` OPEN: fixed shell, clipped truth, inefficient keyboard traversal, non-semantic interactive controls, color-only indicators, weak live-region semantics, very small text, fragile overflow ownership, inconsistent focus, dynamic-state announcement gap, contrast redundancy and missing exact-browser proof.
 
-## 4. New deep slice — responsive, accessibility, keyboard and constrained-layout workstation behavior
+## 4. Latest deep slice — scanner/ranker contracts, freshness, stability and market-open load
+
+### SCAN-001 / P0-P1 — same-day rank history can be treated as current without intraday freshness proof
+
+**Exact proof:** `dashboard/backend/app.py:get_gain_rank()` loads `state/gain_rank_history.json`, selects the newest entry whose `date` equals today and sets `stale` only from date equality. It does not require `generated_utc`, source-event age, scanner cycle ID, market session or TTL before returning `status=ok`.
+
+**Symptom/root cause:** a ranking produced earlier in the same trading day can remain authoritative for hours solely because its calendar date equals today.
+
+**Real-money impact:** stale contracts can be presented as current opportunities even after price, liquidity, IV, expiry relevance or market leadership changed.
+
+**Exact files/routes:** `dashboard/backend/app.py`, `/api/gain_rank`, gain-rank persistence producer, frontend `useData.ts`, `TradeTab.tsx`.
+
+**Target behavior:** every rank payload is one immutable `ScannerSnapshot` with `snapshot_id`, source-event range, generated/received times, market session, age, TTL, universe ID and schema/rank-policy version. A current-day row whose TTL expired is `STALE`, never current.
+
+**Minimal safe implementation:** reject or watermark stored rank history unless snapshot age and session identity validate. Historical rows remain available only through history/audit views.
+
+**API/schema changes:** add `snapshot_id`, `generated_at`, `source_event_max_at`, `age_ms`, `ttl_ms`, `market_session_id`, `quality`, `rank_policy_version` and per-row evidence IDs.
+
+**Regression risks:** dashboards becoming empty when no fresh scan is available; migration of old history records without timestamp metadata.
+
+**Closure tests/PASS:** create a same-date fixture older than TTL and prove `/api/gain_rank` returns `STALE` and zero execution-eligible rows; verify fresh fixture returns current; verify market-session rollover invalidates yesterday/same-date test fixtures where session IDs disagree.
+
+**Rollback/fail-safe:** stale historical data may remain visible with watermark for analysis, but scanner candidate eligibility is inhibited.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-002 / P1 — `/api/gain_rank?refresh=true` declares refresh intent but does not use it
+
+**Exact proof:** `get_gain_rank(refresh: bool=False)` defines the query parameter, but the current function body does not branch on `refresh`; live fallback occurs only when the stored latest entry is stale/missing by the weak date rule.
+
+**Symptom/root cause:** operator/client refresh intent is semantically misleading and may leave a same-day stale ranking unchanged.
+
+**Real-money impact:** a visible refresh control/caller can imply the board was recomputed when no recomputation occurred.
+
+**Solution:** either remove the parameter or make `refresh=true` enqueue/request a server-authoritative scan that returns a new `snapshot_id`; never block the event loop for an uncontrolled full scan. Return `202/PENDING` when a new scan is in progress rather than silently serving old data as refreshed.
+
+**Tests/PASS:** stale same-day snapshot + `refresh=true` must yield a different snapshot ID or explicit `PENDING/FAILED`, never unchanged data labeled current.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-003 / P0-P1 — scanner fallback automatically marks rows option-eligible without liquidity/risk/evidence validation
+
+**Exact proof:** both backend live fallback in `get_gain_rank()` and frontend WebSocket `market_top_update` mapping set `option_eligible: true` and `recommendation: 'WATCH'` for rows derived from top gain percentage. No spread, quote completeness, source age, expiry validity, contract identity, risk decision or prediction evidence is required at this point.
+
+**Symptom/root cause:** ranking and eligibility are conflated. Being in a gainers table is treated as sufficient to mark an option contract eligible.
+
+**Real-money impact:** a high-gain but illiquid, crossed, stale, wrong-expiry or otherwise invalid contract can appear operationally actionable.
+
+**Solution:** `ranked` and `eligible` become independent typed states. Scanner produces `WATCH` candidates only. `eligible=true` may be set only by `CandidateValidationService` after `OptionChainTruth`, liquidity policy, `PredictionTruth` if required, and `PreTradeRiskService` evidence are present.
+
+**Regression risks:** fewer green/eligible rows until validation services are wired; downstream code assuming boolean eligibility.
+
+**Closure tests/PASS:** missing bid/ask, stale event age, unknown expiry, missing risk decision and incomplete quote must each force `WATCH/INELIGIBLE`; only an exact validated candidate may become paper-eligible.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-004 / P1 — contract rows hard-code live Dhan provenance independently of chain truth
+
+**Exact proof:** `contract_gain_scanner.py:_contract_row()` assigns `data_provenance='DHAN_OPTION_CHAIN_LIVE'` and a `LIVE DHAN GAINER` note for every scored row, while source chain quality/status/freshness is handled separately at segment level. `get_gain_rank()` also falls back to `DHAN_OPTION_CHAIN_LIVE` when row provenance is absent.
+
+**Symptom/root cause:** row provenance is manufactured by the ranking layer instead of inherited from a validated acquisition envelope.
+
+**Real-money impact:** cached/EOD/stale or otherwise unproven chain rows can receive live-sounding provenance and appear fresher than the source evidence supports.
+
+**Solution:** scanner rows may only reference a `chain_truth_id`/provider event ID. Provenance, session and freshness are copied from the authoritative `OptionChainTruth`; ranking code cannot invent them.
+
+**Tests/PASS:** stale/EOD/cache chain input must produce corresponding stale/snapshot row quality and can never serialize `DHAN_OPTION_CHAIN_LIVE` unless the input truth was validated live.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-005 / P0-P1 — rotating-shard merge is a high-watermark algorithm that can retain obsolete gains
+
+**Exact proof:** `contract_gain_scanner.py:merge_market_top_reports()` merges old and incoming rows by contract key and keeps the new row only when `incoming.gain_pct >= previous.gain_pct`. If the same contract's gain falls from e.g. 40% to 12%, the older 40% row remains. Contracts absent from the incoming shard are also retained.
+
+**Symptom/root cause:** the board is a historical maximum-gain memory, not a current market snapshot.
+
+**Real-money impact:** old winners can dominate current rankings after their gain collapses, creating false opportunity ordering and contaminating scanner→prediction/paper evidence.
+
+**Solution:** never merge current market rank by historical maximum. Maintain a latest-observation map keyed by canonical contract identity with per-row event time/revision. Replace a contract row whenever a newer valid observation arrives, even if gain is lower; evict rows outside TTL/session/universe generation. Historical maxima belong in a separate analytics view.
+
+**Regression risks:** visible rank volatility will increase because the board becomes truthful instead of sticky; consumers expecting monotonic gains may break.
+
+**Closure tests/PASS:** old 40% row followed by newer 12% row must show 12%; absent rows older than TTL must disappear; out-of-order older observations must be rejected; ties use deterministic policy.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-006 / P0-P1 — merge re-stamps retained stale rows with the incoming refresh time
+
+**Exact proof:** after combining rows, `merge_market_top_reports()` chooses one report-level `refreshed_at` and `_rank_table()` writes that same timestamp onto every row, including rows retained from the older base shard.
+
+**Symptom/root cause:** row event time is discarded and replaced by board-generation time.
+
+**Real-money impact:** an obsolete retained contract can look freshly observed even though it was not present in the newest shard/cycle.
+
+**Solution:** preserve immutable `source_event_at` and `observed_at` per row; add separate `snapshot_generated_at` at board level. UI shows row age, not only board age. Retained rows beyond TTL are evicted instead of restamped.
+
+**Tests/PASS:** merging a 5-minute-old base row with a new shard must keep the old row's original event time or evict it; no operation may advance `source_event_at` without a new provider observation.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-007 / P0-P1 — scanner disk state can be returned without explicit age/session validation
+
+**Exact proof:** `/api/scanner/top_contract_gainers` checks `_MARKET_TOP_STATE_FILE`; if `contracts_scored_total > 0`, it caches and returns the disk object. In the inspected path there is no mandatory validation of source-event age, market session, universe generation, rank policy/schema version or exact application/runtime revision before promotion.
+
+**Symptom/root cause:** persisted scanner state is treated as reusable current data based mainly on being non-empty.
+
+**Real-money impact:** restart/failover can resurrect a prior market snapshot and present it as current.
+
+**Solution:** persist a typed `ScannerSnapshotEnvelope`; startup/read path validates session, TTL, source age, schema/rank-policy versions and revision compatibility. Invalid persisted state becomes `STALE_LAST_GOOD` and cannot populate current opportunity state.
+
+**Tests/PASS:** previous-session disk snapshot, malformed timestamp and incompatible schema must each be rejected from current board.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-008 / P1 — REST polling and WebSocket independently write the same scanner stores without snapshot ordering
+
+**Exact proof:** `useData.ts` receives `gain_rank` through `/api/batch/market-data` and writes `setGainRank()`, while `market_top_update` WebSocket events independently rebuild and overwrite the same rank state. `MarketTopCePeTable.tsx` also polls `/api/scanner/top_contract_gainers` every 15 seconds and writes `setMarketTop()` while WS can write that store concurrently. No snapshot sequence/revision comparison is performed before writes.
+
+**Symptom/root cause:** multiple transport writers race on shared client state.
+
+**Real-money impact:** a slower REST response can overwrite a newer WS snapshot, rank rows can jump backward in time, and source badges can disagree with actual data generation.
+
+**Solution:** one store reducer accepts `ScannerSnapshotEnvelope` and compares `snapshot_revision/source_event_at`. REST becomes fallback only; older/equal snapshots are rejected and counted. MarketTop and GainRank derive from the same canonical snapshot rather than separate writer paths.
+
+**Tests/PASS:** inject WS revision 12 then REST revision 11 and prove revision 11 is rejected; verify duplicate equal revision is idempotent; reconnect fallback cannot decrease revision.
+
+**Status:** `READY TO PATCH`.
+
+### SCAN-009 / P1 — market-open equity rotation is intentionally expensive and can create timeout/thread pressure
+
+**Exact proof:** `fetch_chains_for_market()` scans indices in a `ThreadPoolExecutor`, then serially sleeps ~3.15 seconds between each equity chain because of Dhan rate limiting. Default equity scan limit is 16, so equity enrichment alone can consume roughly 50 seconds before provider/network time. Request path timeouts and background rotations can therefore overlap under load. The app separately documents thread-pileup risk in another background path, confirming thread timeout behavior is already a known system concern.
+
+**Symptom/root cause:** synchronous provider work, sleep-based pacing and request-triggered scanning are mixed with a real-time web API.
+
+**Real-money impact:** scanner latency, Cloud Run concurrency pressure and timed-out background threads can degrade unrelated APIs, making old scanner data remain visible while new work is delayed.
+
+**Solution:** move Dhan scanner acquisition into one bounded scheduler/worker with token-bucket rate limiting, per-symbol deduplication, bounded concurrency and cycle deadlines. HTTP/WS only read validated snapshots; they never start expensive scans. Expose queue depth, active workers, cycle duration, timeout count and last completed cycle ID.
+
+**Regression risks:** worker/scheduler availability becomes explicit dependency; initial snapshot may be unavailable rather than synchronously computed.
+
+**Closure tests/PASS:** load test market-open request rate while scanner worker rotates full target universe; p95 API latency stays within policy, worker count bounded, no unbounded thread growth, every cycle has one ID and deadline, stale snapshot ages visibly instead of being restamped.
+
+**Status:** `READY TO PATCH/DESIGN`.
+
+### SCAN-010 / P1 — product UI presents rank/freshness/eligibility with misleading fallbacks
+
+**Exact proof:** `TradeTab.tsx` labels `GAIN %` using `row.gain_pct ?? row.gain_rank ?? 0`, so a rank-like field can still become percentage display. Missing OI/LTP in equity rows becomes zero. Equity status renders `${liveOk} live` when positive but otherwise the ambiguous `EOD/live`. `MarketTopCePeTable.tsx` describes Dhan HTTP fallback as `Dhan live · trading truth for paper MTM`, defaults missing row provenance to `DHAN_OPTION_CHAIN_LIVE`, and converts missing LTP/gain/volume/OI to numeric zero.
+
+**Symptom/root cause:** the UI tries to remain visually complete even when source/age/numeric evidence is incomplete.
+
+**Real-money impact:** unknown data can look live, eligible and numerically valid; operators cannot distinguish current scanner evidence from fallback/cached/no-data states.
+
+**Solution:** scanner table columns must include `Snapshot`, `Event age`, `Source`, `Quote quality`, `Evidence`, and typed `Eligibility`. Null remains `—/UNKNOWN`; Dhan live label requires validated live source+TTL; EOD is explicitly `EOD SNAPSHOT`; fallback rank never substitutes for gain percent.
+
+**Tests/PASS:** frontend fixtures for null fields, stale rows, EOD rows, REST fallback, WS current, crossed quote and missing evidence; no fixture may render invented zero/live/eligible labels.
+
+**Status:** `READY TO PATCH`.
+
+## 5. Prior deep slice — responsive, accessibility, keyboard and constrained-layout workstation behavior
 
 ### A11Y-001 / P1 — application shell is fixed-height/fixed-sidebar and has no responsive layout authority
 
@@ -209,40 +370,42 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-## 5. Positive foundations in this slice
+## 6. Positive foundations in the recent slices
 
 - Sidebar uses native `<button>` elements for tabs, has `aria-label`, `aria-current`, and a named `<nav>` landmark.
 - `ProductionProofBar` has an accessible label and explicit text values in addition to colors.
 - `index.css` already honors `prefers-reduced-motion: reduce`; preserve this.
 - Login uses a native `<form>`, password input and submit button.
 - App contains a semantic `<main>` element.
+- Scanner request code already caps query sizes, has bounded endpoint timeouts, separates index-first request scanning from slower equity enrichment, and documents provider pacing. These are useful foundations but are not sufficient without snapshot/freshness/order truth.
 
-These are foundations only; they do not prove responsive/accessibility completeness.
+## 7. Canonical truth contracts
 
-## 6. Canonical truth contracts
-
-### 6.1 `SafetyTruth`
+### 7.1 `SafetyTruth`
 Mode, nullable live/auto flags, router/kill-switch state, source/runtime/image/policy revisions, verified time/age, `PROVEN|STALE|UNKNOWN|ERROR`.
 
-### 6.2 `DataTruthEnvelope` / `StreamTruth`
+### 7.2 `DataTruthEnvelope` / `StreamTruth`
 Source/session/instrument, source/backend/frontend timestamps, uncapped age/TTL, schema/normalizer versions, transport vs heartbeat vs stream state, sequence/rejected-old events, quality and evidence.
 
-### 6.3 `OptionChainTruth`
+### 7.3 `OptionChainTruth`
 Underlying/security ID/segment, requested+resolved expiry authority, provider/session, times/age/TTL, expiry-aware cache identity, schema/normalizer versions, nullable quote/Greek fields + field quality, completeness, source/runtime revision and evidence ID.
 
-### 6.4 `DeploymentTruth`
+### 7.4 `DeploymentTruth`
 Exact source/tree SHA, Cloud Build ID, immutable image digest, final Cloud Run revision/traffic, frontend/backend SHA, runtime app/service account, policy/config hash, secret/scheduler provenance, verified time and evidence ID.
 
-### 6.5 `StateTruth`
+### 7.5 `StateTruth`
 Required shared backend, collection/document, shared-state health, runtime/instance ID, last shared read/write, per-domain revision/writer/event/time/schema/quality/evidence. Global version is diagnostic only.
 
-### 6.6 `PredictionTruth`
+### 7.6 `PredictionTruth`
 `prediction_id`, immutable issue time, target/horizon, instrument key, model artifact ID/hash, dataset/feature schema hash, frozen data cutoff, raw score, calibrated probability, uncertainty, evidence/counter-evidence, input truth IDs, runtime/source revision, maturity rule/state, later append-only outcome/calibration links.
 
-### 6.7 `AccessibleWorkstationState` — NEW
+### 7.7 `AccessibleWorkstationState`
 Viewport class, navigation mode, focused workspace/control ID, modal/drawer state, critical-status announcement queue and density preference. This state is **non-authoritative for trading**; it must never affect risk/safety truth or live routing.
 
-## 7. Canonical remediation roadmap
+### 7.8 `ScannerTruth` — NEW
+`snapshot_id`, scanner cycle ID, market session ID, universe/universe-generation ID, source-event min/max times, generated/received times, uncapped age+TTL, schema/rank-policy version, canonical contract identity, per-row event time/revision/source/quote quality, rank score/gain metric with explicit units, stable tie-break rule, row evidence ID, candidate-validation state, dropped-stale/out-of-order counters, worker/load diagnostics and exact runtime/source revision. A row belongs to exactly one current snapshot; old-shard observations are never restamped as fresh.
+
+## 8. Canonical remediation roadmap
 
 - `SOL-01 Auth/session — READY TO PATCH`: correct login body; cookie-only auth; remove raw API key; auth-gate polling/WS; TTL/revocation tests.
 - `SOL-02 SafetyTruth — READY TO PATCH`: one backend authority; missing/stale => UNKNOWN.
@@ -250,7 +413,7 @@ Viewport class, navigation mode, focused workspace/control ID, modal/drawer stat
 - `SOL-04 Semantic readiness — READY TO PATCH`: HTTP/object presence never PASS; lifecycle/reconciliation/risk/economics mandatory.
 - `SOL-05 OptionChainTruth + Greeks — READY TO PATCH`: nullable parser, expiry-aware cache, explicit provenance/IV units/full Greeks.
 - `SOL-06 Immutable paper lifecycle — READY TO PATCH`: durable event ledger, IDs/idempotency, restart replay/reconciliation, costed P&L.
-- `SOL-07 Scanner contract — READY TO PATCH`: rank/score/probability/forecast/realized distinct and nullable.
+- `SOL-07 ScannerTruth — READY TO PATCH`: replace high-watermark shard merge with latest-observation snapshots; per-row event age; current-session TTL; deterministic rank policy; rank/score/probability/forecast distinct; scanner outputs WATCH candidates only; canonical REST/WS ordering.
 - `SOL-08 DeploymentTruth + GCP least privilege — READY TO PATCH`: immutable digest/final revision/source SHA, one service mutation, dedicated identities, WIF-only auth.
 - `SOL-09 PreTradeRiskService — READY TO PATCH`: server-owned policy; fresh PASS required; UNKNOWN/ERROR denies.
 - `SOL-10 Legacy UI quarantine — READY TO PATCH`: production entrypoint guard; no legacy mutation surface.
@@ -259,6 +422,24 @@ Viewport class, navigation mode, focused workspace/control ID, modal/drawer stat
 - `SOL-13 StateTruth + domain-CAS — READY TO PATCH`: Firestore required in GCP; sparse domain writes; no local authority fallback; restart/multi-writer proof.
 - `SOL-14 PredictionTruth + ModelArtifactManifest — READY TO PATCH/DESIGN`: immutable prediction ledger, exact model/data identity, purged walk-forward, untouched holdout, calibrated probability, drift monitoring and after-cost outcome linkage.
 - `SOL-15 AccessibleWorkstationShell — READY TO PATCH`: responsive shell, tiered truth header, drawer/compact navigation, command palette, keyboard model, focus-visible, live regions, table reflow and exact-revision Playwright/axe proof.
+- `SOL-16 Scanner worker/load isolation — READY TO PATCH/DESIGN`: one bounded provider worker, token-bucket Dhan pacing, cycle IDs/deadlines, deduplicated symbol work, no request-triggered full scanner work, bounded thread/concurrency metrics and load proof.
+
+### SOL-07 ordered implementation
+
+1. Introduce `ScannerSnapshotEnvelope` + canonical contract identity.
+2. Preserve provider/source event time on every row; separate snapshot-generation time.
+3. Replace high-watermark merge with newer-observation replacement regardless of gain direction.
+4. Evict TTL-expired, wrong-session, wrong-universe-generation and incompatible-schema rows.
+5. Remove scanner-layer hard-coded live provenance; require `OptionChainTruth` reference.
+6. Make scanner result state `WATCH` by default; separate `CandidateValidationService` owns paper eligibility.
+7. Make `/api/gain_rank` validate snapshot age/session and either remove or correctly implement refresh semantics.
+8. Route REST + WS through one revision-aware frontend reducer; reject older snapshots.
+9. Replace null→zero and rank→gain UI fallbacks with typed unknown states.
+10. Add event-age/source/evidence/eligibility columns and snapshot drilldown.
+11. Add deterministic tie-break policy and rank-movement audit.
+12. Run unit, integration, out-of-order, restart, market-session-rollover and browser tests.
+
+**SOL-07 PASS criteria:** a newer lower gain always replaces an older higher gain for the same contract; expired/absent shard rows are evicted; no row freshness timestamp advances without a new provider observation; stale disk state never becomes current; rank/gain/probability cannot substitute for each other; scanner rows remain WATCH until independent validation; older REST/WS snapshots are rejected; UI displays age/source/evidence without invented zero/live labels.
 
 ### SOL-15 ordered implementation
 
@@ -279,7 +460,7 @@ Viewport class, navigation mode, focused workspace/control ID, modal/drawer stat
 
 **Rollback/fail-safe:** if responsive/accessibility shell fails, render a reduced read-only layout with SafetyTruth/DataTruth visible and all trading mutation/live controls inhibited.
 
-## 8. Verification counters
+## 9. Verification counters
 
 Independent reproduction paths only.
 
@@ -289,16 +470,17 @@ Independent reproduction paths only.
 | AUTH-002 | `2/20` | OPEN |
 | AUTH-003 | `2/20` | OPEN |
 | UI-001 | `16/20` | OPEN |
-| UI-002 | `4/20` | OPEN |
-| UI-003 | `8/20` | OPEN — constrained-layout clipping adds another source/state visibility path |
-| UI-005 | `14/20` | OPEN |
+| UI-002 | `5/20` | OPEN — scanner rank/gain fallback is another metric-semantics path |
+| UI-003 | `8/20` | OPEN |
+| UI-005 | `15/20` | OPEN — scanner live provenance/zero defaults add another false-valid path |
 | UI-006 | `9/20` | OPEN |
-| UI-007 | `9/20` | OPEN — top-level stream/broker state lacks complete accessible transition semantics |
+| UI-007 | `11/20` | OPEN — scanner row age/source and REST/WS ordering add independent staleness paths |
 | UI-009 | `6/20` | OPEN |
 | UI-011 | `4/20` | OPEN |
-| UI-016 | `10/20` | OPEN — fixed shell + hidden overflow independently reproduce responsive incompleteness |
+| UI-016 | `10/20` | OPEN |
 | UI-018 | `2/20` | OPEN |
 | CHAIN-001..014 | retained previous counters | OPEN |
+| SCAN-001..010 | `1/20` each | OPEN |
 | READY-001 | `5/20` | OPEN |
 | READY-003 | `3/20` | OPEN |
 | READY-008 | `2/20` | OPEN |
@@ -313,7 +495,7 @@ Independent reproduction paths only.
 
 No finding is `LOCKED-20X`.
 
-## 9. Prioritized implementation order
+## 10. Prioritized implementation order
 
 ### P0 Wave 1 — eliminate false-green/fail-open authorities
 1. SOL-01 auth contract + auth-gated startup.
@@ -322,27 +504,29 @@ No finding is `LOCKED-20X`.
 4. SOL-13 shared `StateTruth` authority + domain-CAS.
 5. SOL-05 OptionChainTruth null/cache/expiry correction.
 6. SOL-11 StreamTruth and ordered REST/WS merge.
-7. SOL-09 server-owned risk + mandatory pre-trade authority.
-8. SOL-06 durable lifecycle/idempotency/reconciliation.
-9. SOL-14 model maturity split + score/confidence correction + immutable PredictionTruth foundation.
-10. SOL-04 semantic readiness.
-11. SOL-03 remaining zero/live/default-safe fallbacks.
-12. SOL-10 legacy mutation UI quarantine.
+7. **SOL-07 ScannerTruth current-snapshot/high-watermark correction.**
+8. SOL-09 server-owned risk + mandatory pre-trade authority.
+9. SOL-06 durable lifecycle/idempotency/reconciliation.
+10. SOL-14 model maturity split + score/confidence correction + immutable PredictionTruth foundation.
+11. SOL-04 semantic readiness.
+12. SOL-03 remaining zero/live/default-safe fallbacks.
+13. SOL-10 legacy mutation UI quarantine.
 
 ### P1 Wave 2 — operator safety + statistical/economic proof
-1. **SOL-15 responsive/accessibility shell and exact-revision browser proof.**
-2. Purged walk-forward + untouched holdout, calibration, drift, model/data hashes.
-3. Prediction→paper→after-cost outcome linkage.
-4. Full Greeks/model provenance and true WebSocket proof.
-5. GCP IAM split/WIF-only auth and revision-bound runtime incidents.
+1. **SOL-16 scanner worker/load isolation and market-open load proof.**
+2. SOL-15 responsive/accessibility shell and exact-revision browser proof.
+3. Purged walk-forward + untouched holdout, calibration, drift, model/data hashes.
+4. Prediction→paper→after-cost outcome linkage.
+5. Full Greeks/model provenance and true WebSocket proof.
+6. GCP IAM split/WIF-only auth and revision-bound runtime incidents.
 
 ### P2 Wave 3 — institutional operator quality
 Advanced command palette/search, customizable density, saved workspace layouts, richer drilldowns, security/session settings and audit export. These remain secondary to truth/safety.
 
-## 10. Product information architecture target
+## 11. Product information architecture target
 
 1. Command Center — Overview + Decision Intel + authoritative truth strip.
-2. Market / Scanner — watch, scanner, ranker, signals.
+2. Market / Scanner — watch, scanner, ranker, signals, snapshot history/rank movement and candidate drilldown.
 3. Options & Greeks — chain, expiry/cache/provenance, IV/OI/liquidity/full Greeks.
 4. AI Decision Audit — Genesis Brain + Prediction Audit + model provenance + calibration/drift + evidence/outcome linkage.
 5. Paper / Trade Lifecycle — capability-driven ticket, immutable orders/fills/positions/P&L/reconciliation.
@@ -354,23 +538,25 @@ Advanced command palette/search, customizable density, saved workspace layouts, 
 
 Current repo tabs remain represented through this rationalized hierarchy; conceptual renames never imply implemented capability.
 
-## 11. Product UI visual evolution — V13
+## 12. Product UI visual evolution — V14
 
-New concept: **Responsive Command Center V13** — actual System3 Command Center shown in desktop/tablet and mobile/constrained layouts.
+New concept: **Scanner & Ranker Truth V14** — actual System3 `Market / Scanner` product workspace.
 
 Changes driven by this iteration:
-- fixed 190px sidebar evolves into persistent desktop navigation, compact tablet rail and mobile drawer;
-- Tier-0 truth (`MARKET`, `DHAN`, `WS`, `PAPER`, `LIVE LOCK`) is never hidden by header overflow;
-- index watch and secondary telemetry are separately scrollable/overflow-managed;
-- mobile uses priority cards instead of squeezing dense desktop tables;
-- keyboard model is explicit: Tab/Shift+Tab, arrow navigation, Enter drilldown, Escape close, `Ctrl/Cmd+K` command palette;
-- visible focus, 44px touch targets, text+icon status and critical live-region announcements are target requirements;
-- execution remains inhibited when truth is unknown or viewport/shell proof fails;
+- scanner board is explicitly one immutable current snapshot rather than rolling historical maxima;
+- header shows market truth, snapshot ID, event age, universe, valid-row count and rank-policy version;
+- every opportunity exposes event age, source, evidence and eligibility independently from rank;
+- missing age/quote proof yields `STALE/REJECT` or `WATCH`, never paper eligibility;
+- high-watermark carryover is explicitly forbidden;
+- rank changes are tied to a new snapshot revision and deterministic policy;
+- candidate drilldown contains prediction/risk/evidence references before any paper action;
+- load/concurrency panel exposes scanner cycle ID, shard generation, worker count, timeouts and rejected stale writers;
+- null values remain unknown rather than zero;
 - live router remains locked.
 
-Visual artifact: `Genesis_System3_Responsive_Command_Center_Target_V13.png`.
+Visual artifact: `Genesis_System3_Scanner_Ranker_Truth_Target_V14.png`.
 
-## 12. Positive foundations to preserve
+## 13. Positive foundations to preserve
 
 - Native Sidebar buttons, named navigation landmark and `aria-current`.
 - ProductionProofBar accessible label and text status values.
@@ -380,11 +566,12 @@ Visual artifact: `Genesis_System3_Responsive_Command_Center_Target_V13.png`.
 - ML router's `ready_for_live=False` safety intent.
 - Firestore transaction/local temp+replace foundations.
 - Serialized/rate-paced Dhan option-chain traffic and WS reconnect backoff+jitter foundations.
+- Scanner query bounds, index-first request path and explicit Dhan pacing comments.
 - Live Gate approval does not automatically enable live trading.
 
 These are foundations, not readiness/accessibility/profitability proof.
 
-## 13. Historical proof/open-gate interpretation
+## 14. Historical proof/open-gate interpretation
 
 Remain open:
 - `EXACT_REVISION_CI_RUNTIME_NOT_PROVEN`
@@ -392,6 +579,10 @@ Remain open:
 - `SHARED_STATE_AUTHORITY_NOT_PROVEN`
 - `RESTART_CONSISTENCY_NOT_PROVEN`
 - `MULTI_WRITER_LOST_UPDATE_PROTECTION_NOT_PROVEN`
+- `SCANNER_CURRENT_SNAPSHOT_NOT_PROVEN`
+- `SCANNER_ROW_FRESHNESS_NOT_PROVEN`
+- `SCANNER_LOAD_STABILITY_NOT_PROVEN`
+- `SCANNER_CANDIDATE_ELIGIBILITY_NOT_PROVEN`
 - `PREDICTION_LEDGER_NOT_PROVEN`
 - `MODEL_ARTIFACT_IDENTITY_NOT_PROVEN`
 - `PURGED_WALKFORWARD_NOT_PROVEN`
@@ -411,18 +602,18 @@ Remain open:
 
 `LIVE_TRADING_DISABLED_BY_DESIGN` remains required audit posture.
 
-## 14. Closure standard
+## 15. Closure standard
 
-A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; responsive viewport + 200%-zoom + keyboard + axe/console checks; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
+A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; scanner current-snapshot/session/TTL/out-of-order/high-watermark/load tests; responsive viewport + 200%-zoom + keyboard + axe/console checks; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
 
-## 15. Next audit/solution slices
+## 16. Next audit/solution slices
 
-1. Scanner/ranker contracts and performance/memory/concurrency under market-open load.
-2. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
+1. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
+2. Scanner follow-up: locate micro-loop/state-file writer and prove whether overlapping cycles can write out of order under Cloud Run concurrency.
 3. ML follow-up: exact market-validation file semantics and whether gain-rank post-market validation has frozen prediction IDs/cutoffs or look-ahead paths.
 4. DB follow-up: exact paper/event persistence files and any SQLite/JSON/Firestore duplicate authorities not yet mapped.
 5. Browser implementation follow-up once SOL-15 lands: exact Playwright/axe/console proof across every workspace.
 
-## 16. Hard safety rule
+## 17. Hard safety rule
 
-A green UI, endpoint HTTP 200, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval, accessible-looking static markup or process-local simulator never substitutes for authoritative source+event time+domain revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
+A green UI, endpoint HTTP 200, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, scanner rank, high-watermark cached winner, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval, accessible-looking static markup or process-local simulator never substitutes for authoritative source+event time+domain/snapshot revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
