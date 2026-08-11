@@ -1,387 +1,232 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 17:53 IST`
+Updated: `2026-08-11 19:27 IST`
 
-## 0. Scope lock and revision truth
+> This revision supersedes older status text in this file. Historical evidence is retained below only where it remains relevant. `PATCHED` never means `CLOSED`.
 
-- Repository: `psw2025-cmd/Genesis_System3` only.
+## 0. Scope, source revision and safety lock
+
+- Repository authority: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this resolution cross-check: `4a5ec1ed3b236a86b7909972d4eda1677b192aee` (`docs(audit): add GCP deployment provenance and IAM truth`).
-- Latest application/source HEAD is `6a8f728d58d00cc91381306f8535225b2819777a`, the PR #99 merge. The later `4a5ec1...` commit is report-only and does not change application code.
-- Compare former application baseline `b70af343340a73ed27ca548820d5893c779ab5bd -> 6a8f728d...`: 24 commits ahead, 0 behind. Runtime code changed only in `dashboard/backend/app.py` and `dashboard/backend/cloud_paper_engine.py`; the other changed path is this master audit report.
-- PR #99 is MERGED. Source head `e5fcfc8259f1d3f20f101e4e53ec369065644cc8`; merge commit `6a8f728d58d00cc91381306f8535225b2819777a`.
-- Exact PR #99 head `e5fcfc...` had three observed successful PR-triggered workflows: `Genesis System3 Global Safety CI`, `GCP Stage 2 Safety Checks`, and `GCP Dhan Token Fix CI`.
-- The merge commit `6a8f728d...` has no workflow runs or combined status contexts returned by the available commit connectors, so exact merged-revision CI/deployment/runtime proof is still **NOT PROVEN**.
-- PR #98 remains OPEN at `74f5b68509b5af7ec94466831c2dd4d57365d868`; PR #97 remains OPEN at `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`. Open PRs are proposals only and cannot close `main` findings.
-- Google Cloud is the only accepted deployment target. Render-era operational assumptions remain migration debt/non-authority.
-- Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
-- This Markdown is the single continuously maintained audit/remediation authority.
+- Current application/source HEAD after this run: `1d7e06a0f661a873528d96bcc685dc7b0af87f58` (merge of PR #102).
+- Prior application milestones in this cascade:
+  - PR #100 browser reusable-key removal -> merge `e655330559a6d85b42c5cc951308827f6718f41f`.
+  - PR #101 server SessionTruth authority -> merge `5ea9b12e3358876ae900fc07c584b349ef8c2254`.
+  - PR #102 Mutation CapabilityManifest -> merge `1d7e06a0f661a873528d96bcc685dc7b0af87f58`.
+- Google Cloud is the only accepted deployment target. Render-era runtime instructions/tools are non-authoritative migration debt.
+- Runtime posture: ANALYZER/PAPER. LIVE remains OFF/LOCKED. No live order was enabled, placed, modified, cancelled or routed in this run.
+- Exact merge-commit deployment/runtime proof is still NOT PROVEN. PR-head CI is evidence for the tested PR head only.
 
-## 1. Executive verdict
+## 1. Smart-cascade step position
 
-| Area | Verdict | Canonical solution / implementation state |
+Current 1-18 flow state:
+
+`1 VERIFY -> 2 SELECT -> 3 ROOT CAUSE -> 4 DESIGN -> 5 PATCH -> 6 TEST -> 7 PR -> 8 CI -> 9 FIX/RETEST -> 10 MERGE -> 11 POST-MERGE VERIFY -> 12 PREP/CONTINUE -> 13 USER GCP ONLY IF REQUIRED -> 14 DEPLOY VERIFY -> 15 RUNTIME TEST -> 16 USER DHAN AUTH ONLY IF REQUIRED -> 17 FULL EVIDENCE -> 18 CLOSED`
+
+This run completed a full source/CI/merge loop for P0-1 SessionTruth and then immediately completed a source/CI/merge loop for the first P0-2 CapabilityManifest slice. The cascade now continues inside **P0-2 runtime enforcement**; user action is **NOT REQUIRED**.
+
+## 2. Executive verdict
+
+| Area | Current verdict | Implementation state |
 |---|---|---|
-| Exact deployment revision proof | **FAIL / NOT PROVEN** | `DeploymentTruth` — READY TO PATCH |
-| Dashboard auth/session | **FAIL / P0-P1** | `SessionTruth` — READY TO PATCH |
-| Mutation authorization | **FAIL / P0-P1** | `MutationPolicy + CapabilityManifest` — READY TO PATCH |
-| Global mode/order safety | **FAIL / P0** | `SafetyTruth + ExecutionEligibility` — READY TO PATCH |
-| Broker/account truth | **FAIL / P0-P1** | `AccountTruth + AccountSnapshotCoordinator` — READY TO PATCH |
-| DB/shared state | **FAIL / P0-P1** | `StateTruth + domain CAS` — READY TO PATCH |
-| WebSocket/REST truth | **FAIL / P0-P1** | `StreamTruth` — READY TO PATCH |
-| Option chain/Greeks | **FAIL / P0-P1** | `OptionChainTruth` — READY TO PATCH |
-| Scanner/ranker | **FAIL / P0-P1** | `ScannerTruth` — READY TO PATCH |
-| Performance/concurrency | **PARTIAL PATCH / STILL FAIL P0-P1** | engine lock merged; `WorkCoordinator + SnapshotScheduler` still required |
-| Paper lifecycle/reconciliation | **PARTIAL PATCH / STILL FAIL P0** | PAPER-017/018 concrete defect patched; `PaperLedger + ReconciliationService` still required |
-| Pre-trade risk authority | **FAIL / P0** | `PreTradeRiskService` — READY TO PATCH |
-| AI/prediction provenance | **MISSING / P0-P1** | `PredictionTruth + ModelArtifactManifest` — READY TO PATCH/DESIGN |
-| Accessibility/responsive browser proof | **FAIL / P1** | `AccessibleWorkstationShell` — READY TO PATCH |
+| SessionTruth/Auth | **PARTIAL VERIFIED / RUNTIME UNPROVEN** | PR #100 + #101 merged; browser secret replay removed; opaque expiring/revocable server sessions added |
+| MutationPolicy | **PARTIAL PATCH / CI VERIFIED** | PR #102 merged; every current write route classified with zero UNKNOWN in CI; runtime capability enforcement still required |
+| SafetyTruth / execution eligibility | **FAIL / P0** | READY TO PATCH after P0-2 enforcement |
+| PreTradeRiskService | **FAIL / P0** | READY TO PATCH |
+| AccountTruth | **FAIL / P0-P1** | READY TO PATCH |
+| PaperLedger/Reconciliation | **PARTIAL PATCH / FAIL P0** | PR #99 fixed one dual-authority defect; durable event ledger/reconciliation still required |
+| StateTruth / Firestore | **FAIL / P0-P1** | READY TO PATCH |
+| DeploymentTruth / GCP | **FAIL / NOT PROVEN** | READY TO PATCH |
+| WorkCoordinator/idempotency | **FAIL / P0-P1** | READY TO PATCH |
+| OptionChainTruth | **FAIL / P0-P1** | READY TO PATCH |
+| StreamTruth | **FAIL / P0-P1** | READY TO PATCH |
+| ScannerTruth | **FAIL / P0-P1** | READY TO PATCH |
+| PredictionTruth/ML | **MISSING / P0-P1** | READY TO PATCH/DESIGN |
+| Institutional UI/A11Y | **FAIL / P1** | READY TO PATCH |
 | Real-money readiness | **NO** | LIVE stays OFF/LOCKED |
 
-## 2. System-wide invariant
+## 3. P0-1 SessionTruth/Auth — current authoritative status
 
-Missing, stale, parse-failed, timed-out, unauthenticated, overloaded, contradictory, corrupt or unproven evidence must never become PASS, LIVE, safe, fresh, zero-risk, zero-P&L, zero-Greek, calibrated confidence, broker-connected, account-empty, deployed-current or trade-ready through defaults.
+### Resolved source defects
 
-HTTP success, GitHub workflow green, Cloud Run READY, profile connectivity and image tag equality are each insufficient on their own. Transaction authority must be server-owned, revision-bound and evidence-backed. UI and JSON/CSV files are projections only.
+**AUTH browser reusable-secret exposure — PATCHED/CI VERIFIED.** PR #100 removed `sessionStorage` persistence of the reusable dashboard API key and removed global `X-API-Key` replay interceptors. Browser login now exchanges the key once for a cookie session.
 
-Resolution terminology:
-- `OPEN/FIX-REQUIRED`: defect still reproduces on current application source.
-- `PATCHED`: source-level root cause changed on `main`.
-- `PARTIAL PATCH`: one failure mode is removed but the canonical solution or related safety failure modes remain.
-- `VERIFIED`: exact-revision closure tests/runtime evidence pass.
-- `CLOSED`: the complete finding-specific PASS criteria are independently satisfied.
+**AUTH deterministic cookie / browser-only expiry / no server revocation — PATCHED/CI VERIFIED at source level.** PR #101 added `dashboard/backend/session_truth.py` and `dashboard/backend/secure_app.py` and changed the GCP launcher to `dashboard.backend.secure_app:app`.
 
-A merge or green PR workflow alone is never enough to mark a safety/readiness finding CLOSED.
+World-class behavior now implemented in source:
+- cryptographically random opaque session token via `secrets.token_urlsafe(32)`;
+- only SHA-256 token hash stored server-side;
+- authoritative server `issued_at`, `expires_at`, `revoked_at`;
+- revoked session tombstone retained until natural expiry;
+- server-side logout revocation;
+- HttpOnly/SameSite cookie; Secure derives from Cloud Run forwarded HTTPS scheme;
+- login throttling: 10 failures/5 min per client;
+- logout Origin validation when a cookie is present;
+- process restart invalidates sessions fail-closed;
+- trusted `X-API-Key` compatibility retained for CI/API probes, not browser persistence.
 
-## 3. Retained canonical remediation groups
+Exact PR #101 final head: `05099d1122853e26332c84dcac6cd623a7cf1f3a`.
+CI evidence on that exact head:
+- `Genesis System3 Global Safety CI` run `31498213627`: **SUCCESS**; all 5 blocking jobs SUCCESS, including backend pytest/proof pack, frontend build, Python compile, workflow/trading-safety guard and architecture/trading-safety gate.
+- `GCP Stage 2 Safety Checks` run `31498213658`: **SUCCESS**.
+- `GCP Dhan Token Fix CI` run `31498213607`: **SUCCESS**.
+- Merge: PR #101 -> `5ea9b12e3358876ae900fc07c584b349ef8c2254`.
 
-### AUTH-001..011 — SessionTruth
-P0-P1 / FIX-REQUIRED. Login contract mismatch, raw API-key persistence, deterministic session token, browser-only expiry, missing server revocation and incomplete throttling/CSRF/idempotency proof remain open. Target: opaque server session, HttpOnly/Secure/SameSite cookie, authoritative issued/expiry/revocation, no reusable browser API key. Status: READY TO PATCH.
+### Remaining SessionTruth closure gap
 
-### MUT-001..008 — MutationPolicy + CapabilityManifest
-P0-P1 / FIX-REQUIRED. Every POST/PUT/PATCH/DELETE must declare a capability and associated auth, CSRF, idempotency, audit and domain gate. Unknown mutation fails closed/CI. LIVE_MUTATION hard denied in analyzer/paper. Status: READY TO PATCH.
+**RUNTIME UNPROVEN.** Exact deployed Cloud Run cookie attributes, login/expiry/revocation behavior and serving revision have not yet been proven against the merge revision. The SessionTruth store is intentionally process-local and therefore requires the intended single-instance/single-worker Cloud Run constraint until shared state exists. Multi-instance deployment before shared session authority is prohibited.
 
-### SAFE-001..008 + RISK-001..009 — SafetyTruth + PreTradeRiskService
-P0 / FIX-REQUIRED. One authoritative SafetyTruth and one immutable ExecutionDecision are required before any paper/live-adjacent mutation. `UNKNOWN|STALE|ERROR` inhibits. Kill-switch OK is necessary but never sufficient. Status: READY TO PATCH.
+**Closure tests still required:** HTTPS Set-Cookie attributes; invalid-key throttling; successful login; expiry; logout/revocation; replay after logout rejected; process restart invalidation; cross-origin logout rejected; exact serving revision/digest proof. Until those pass: status is `PATCHED / PR-CI VERIFIED / RUNTIME UNPROVEN`, not CLOSED.
 
-### ACCOUNT-001..008 — AccountTruth
-P0-P1 / FIX-REQUIRED. Semantic Dhan error bodies, zero/default normalization, mixed account generations, connectivity/account conflation and missing risk binding remain open. Zero account exposure is valid only when `EMPTY_PROVEN`. Status: READY TO PATCH.
+## 4. P0-2 MutationPolicy + CapabilityManifest
 
-### STATE-001..012 — StateTruth + domain CAS
-P0-P1 / FIX-REQUIRED. Firestore/shared state must be GCP authority; local files become projections. Domain revisions/CAS reject stale writers; shared-state failure becomes read-only degraded state. Status: READY TO PATCH.
+### CapabilityManifest slice — PATCHED/CI VERIFIED
 
-### CHAIN-001..014 — OptionChainTruth
-P0-P1 / FIX-REQUIRED. Null-to-zero, weak expiry/cache identity, source invention, parser collapse and incomplete Greeks remain open. Every row must carry provider/event/receive/age/TTL/schema/normalizer/evidence truth. Status: READY TO PATCH.
+PR #102 introduced `dashboard/backend/mutation_policy.py` with canonical capabilities:
+`SESSION_CREATE`, `SESSION_REVOKE_SELF`, `WORKER_INGEST`, `PAPER_MUTATION`, `RISK_POLICY_WRITE`, `SAFETY_CONTROL`, `SCHEDULER_CONTROL`, `PREFERENCE_WRITE`, `ANALYZER_COMMAND`, `LIVE_APPROVAL`, `LIVE_MUTATION`, `UNKNOWN`.
 
-### WS-001..011 — StreamTruth
-P0-P1 / FIX-REQUIRED. Socket-open is not market-stream health. Add heartbeat, sequence, schema, event/receive times and stale/out-of-order rejection; older REST cannot overwrite newer WS. Status: READY TO PATCH.
+The manifest is generated from the actual FastAPI route table, not a manually counted list. CI requires:
+1. every POST/PUT/PATCH/DELETE route has a non-UNKNOWN capability;
+2. duplicate `(method,path)` write owners = 0;
+3. live order paths classify only as `LIVE_MUTATION`;
+4. paper close remains `PAPER_MUTATION`, never live mutation.
 
-### SCAN-001..010 — ScannerTruth
-P0-P1 / FIX-REQUIRED. Remove high-watermark rank carryover/restamping and auto-eligibility. Latest observation always replaces old even when gain falls; stale rows evict. Status: READY TO PATCH.
+Exact PR #102 head: `c9c20fecd5b9ebfa92af33eaa017f53191c63944`.
+CI evidence on that head:
+- `Genesis System3 Global Safety CI` run `31498678214`: **SUCCESS**, all 5 blocking jobs SUCCESS including backend pytest/proof pack.
+- `GCP Stage 2 Safety Checks` run `31498678244`: **SUCCESS**.
+- `GCP Dhan Token Fix CI` run `31498678234`: **SUCCESS**.
+- Merge: PR #102 -> `1d7e06a0f661a873528d96bcc685dc7b0af87f58`.
 
-### PERF-001..009 — WorkCoordinator
-P0-P1 / FIX-REQUIRED with **PARTIAL PATCH for PERF-004**. Bounded domain workers, singleflight, serialized/idempotent paper worker, completion-driven polling, event-loop and queue observability remain required. PR #99 adds an engine-instance lock around `step()` and manual close, preventing simultaneous same-engine mutation, but duplicate `/api/paper/tick` requests still have no command/idempotency key and can execute sequentially as multiple logical ticks. Status: PARTIAL PATCH / READY TO PATCH remaining solution.
+### Remaining P0-2 root cause
 
-### ML-001..014 — PredictionTruth
-P0-P1 / FIX-REQUIRED. Immutable prediction/model artifact evidence, temporal validation, calibration and reconciled after-cost outcome linkage remain missing. Status: READY TO PATCH/DESIGN.
+Classification is not yet the complete runtime authority. The next patch must install capability-aware middleware/enforcement in the secure app so:
+- `UNKNOWN` is denied at runtime and CI;
+- `LIVE_MUTATION` remains independently hard denied in analyzer/paper regardless of UI labels;
+- `LIVE_APPROVAL` cannot silently become router authority;
+- `PAPER_MUTATION` receives explicit authentication, CSRF and idempotency policy;
+- `WORKER_INGEST` remains bound to worker identity/token and replay evidence;
+- risk/safety/scheduler/preference/analyzer writes each receive exact auth/replay/audit requirements;
+- response/audit evidence records capability + request/evidence ID without secrets.
 
-### UI/A11Y
-P1 / FIX-REQUIRED. `UI-001` remains `LOCKED-20X / FIX-REQUIRED`. All Tier-0 badges must consume typed backend truth; responsive/accessibility/browser-console proof remains required. Status: READY TO PATCH.
+**Status:** `PARTIAL PATCH / CI VERIFIED / READY TO PATCH RUNTIME ENFORCEMENT`.
 
-## 4. Regression verification — PR #99 paper manual-close patch
+## 5. P0-3 SafetyTruth + P0-4 PreTradeRiskService
 
-### PAPER-017 — direct projection-file mutation
+**Severity/status:** P0 / FIX-REQUIRED.
 
-**Previous proof:** `/api/positions/{position_id}/close` directly edited `positions_live.json`.
+Root cause: kill-switch/mode/risk truth remains split; current transaction paths are not yet proven to require one immutable fail-closed `ExecutionDecision` derived from current safety, account and market truth.
 
-**New code proof:** PR #99 changes the route to obtain `CloudPaperEngine` and call `engine.close_position_by_id(position_id)`. The direct JSON file-surgery block was removed.
+Target chain:
+`Intent -> MutationPolicy -> SafetyTruth -> DeploymentTruth -> StateTruth -> Stream/OptionChain/AccountTruth -> PreTradeRiskService -> ExecutionDecision -> serialized PaperMutationWorker`.
 
-**Assessment:** the specific direct-file-authority defect is **PATCHED in source**, not yet fully VERIFIED. The old direct route-level `positions_live.json` write no longer reproduces in current application source.
+`ExecutionDecision {decision_id,intent_id,state:PASS|FAIL|UNKNOWN|ERROR,safety_revision,risk_policy_revision,account_snapshot_id,market_snapshot_ids,expires_at,evidence_ids[]}`.
 
-**Remaining closure conditions:** exact merged-revision tests must prove manual close + concurrent tick + restart cannot resurrect the position; persistence failures must fail closed; duplicate close idempotency, expected position revision, fresh quote binding and immutable event evidence are still absent.
+PASS requires UNKNOWN/STALE/ERROR to inhibit; UI can never override; scheduler cannot bypass; every paper/live-adjacent mutation needs a current decision. LIVE router remains independently locked.
 
-**Status:** `PATCHED / STATICALLY VERIFIED / RUNTIME UNPROVEN` — not CLOSED. Historical reproduction counter freezes at `1/20`; fix verification is `1 static / 0 runtime`.
+## 6. P0-5 AccountTruth
 
-### PAPER-018 — competing manual-close vs engine in-memory authority
+`ACCOUNT-001..008` remain FIX-REQUIRED.
 
-**New code proof:** `CloudPaperEngine` now owns `close_position_by_id()` and uses the same `open_positions/closed_positions` state that produces projections. A `threading.Lock` serializes `step()` and manual close within one engine instance. The close path calls `_save_state()` and `_write_outputs()` after updating engine state.
+Retained root causes:
+- Dhan positions/holdings can conflate transport success with semantic broker success;
+- malformed/missing account numbers can normalize to zero;
+- empty/zero can be certified too easily after upstream semantic loss;
+- profile connectivity is visually too close to account correctness;
+- funds/holdings/positions lack one generation, source event time, receive time, TTL and evidence ID;
+- browser can reconstruct financial zeros/P&L;
+- duplicate disabled broker router contains weaker zero/empty-on-error behavior;
+- AccountTruth not yet mandatory in PreTradeRiskService.
 
-**Assessment:** the concrete same-process dual-authority/resurrection race identified earlier is **PATCHED in source**. However this remains an in-memory/file-state design, not an append-only event ledger; no cross-process/distributed coordination, command idempotency, position revision or reconciliation checkpoint is present.
+Canonical solution: `BrokerReadResult<T>` + `AccountSnapshotCoordinator` + `AccountTruth`, with `PASS|EMPTY_PROVEN|STALE|AUTH_ERROR|RATE_LIMITED|ERROR|UNKNOWN`. Error/unknown can never become zero exposure. `account_snapshot_id` becomes mandatory risk evidence.
 
-**Status:** `PATCHED / PARTIAL / STATICALLY VERIFIED / RUNTIME UNPROVEN`. Historical reproduction counter freezes at `1/20`; fix verification is `1 static / 0 runtime`.
+## 7. P0-6 Paper lifecycle / reconciliation
 
-### PERF-004 — duplicate/concurrent paper mutation semantics
-
-**Merged improvement:** the new shared engine lock serializes `step()` and manual close and prevents simultaneous mutation of the same engine object.
-
-**Remaining defect:** `/api/paper/tick` still lacks a canonical command ID/idempotency key. Twenty duplicate requests may wait on the lock and then execute as twenty separate logical ticks. Therefore the old simultaneous race is reduced, but exactly-once mutation is not proven.
-
-**Status:** `PARTIAL PATCH / FIX-REQUIRED`. Historical reproduction counter was `2/20` before the patch; exact duplicate-request closure verification remains `0 runtime`.
-
-### New regression concern from PR #99
-
-`close_position_by_id()` closes using the stored `current_price` (falling back to `entry_price`) and immediately persists the result. It does not require a current quote snapshot ID, quote freshness, ExecutionDecision, PreTradeRisk/SafetyTruth, idempotency key or expected position revision. Therefore PR #99 fixes the concrete resurrection path but does not satisfy the institutional close lifecycle.
-
-**Required next step:** convert manual close to `ClosePositionIntent` through MutationPolicy -> SafetyTruth -> fresh market truth -> PreTradeRisk/ExecutionDecision -> serialized/idempotent PaperMutationWorker -> immutable close/fill/position event -> reconciliation.
-
-## 5. Resolution cross-check matrix — current application source `6a8f728d...`
-
-| Finding/group | Resolution state | Current evidence |
-|---|---|---|
-| PAPER-017 direct manual-close projection write | **PATCHED / NOT CLOSED** | route delegates to `CloudPaperEngine.close_position_by_id()`; old direct JSON write removed |
-| PAPER-018 manual-close resurrection from separate engine authority | **PATCHED / PARTIAL / NOT CLOSED** | close updates engine authority and shares lock with `step()`; durable ledger/replay absent |
-| PERF-004 simultaneous paper-engine mutation race | **PARTIAL PATCH** | engine lock serializes mutation; duplicate tick idempotency/exactly-once absent |
-| PAPER-019 persistence error -> empty/unsafe state | **OPEN** | broad load/save/output exception behavior unchanged |
-| PAPER-020 destructive date rollover/repeat IDs | **OPEN** | unchanged by PR #99 |
-| PAPER-021 explicit order/fill lifecycle | **OPEN** | close/open still do not create immutable order/fill evidence |
-| PAPER-022 versioned cost/P&L provenance | **OPEN** | existing `_compute_net_pnl()` behavior retained |
-| PAPER-023 quantity/instrument provenance | **OPEN** | existing quantity/multiplier logic retained |
-| PAPER-024 reconciliation identity | **OPEN** | no immutable ledger sequence/ReconciliationTruth added |
-| AUTH-001..011 | **OPEN** | PR #99 does not modify auth/session architecture |
-| MUT-001..008 | **OPEN** | close/tick still lack canonical capability/idempotency chain |
-| SAFE/RISK groups | **OPEN** | close still does not require SafetyTruth/PreTradeRisk/ExecutionDecision |
-| ACCOUNT-001..008 | **OPEN** | Dhan/account files untouched by PR #99 |
-| STATE-001..012 | **OPEN** | no domain-CAS/shared-state fix in PR #99 |
-| CHAIN-001..014 | **OPEN** | unchanged |
-| WS-001..011 | **OPEN / UNPROVEN** | unchanged |
-| SCAN-001..010 | **OPEN** | unchanged |
-| ML-001..014 | **OPEN** | PR #84 remains unmerged proposal; no main closure |
-| UI/A11Y | **OPEN** | PR #98 remains unmerged; no main closure from that proposal |
-| GCP/DeploymentTruth | **OPEN / NOT PROVEN** | report expanded GCP findings; application merge SHA still lacks exact deployment/digest/revision proof |
-| PAPER-010 old route-absence claim | **CLOSED / CORRECTED** | `/api/paper/tick` is proven to exist |
-
-**Cross-check conclusion:** one concrete P0 paper defect family has moved from unpatched to partially patched (`PAPER-017/018`, with PERF-004 partially improved). No system-wide P0 safety/readiness domain is fully CLOSED.
-
-## 6. Latest deep slice — Google Cloud deployment/runtime provenance
-
-### GCP-012 / P0 — deployment proof uses image tag, not immutable Artifact Registry digest
-
-**Exact proof:** `scripts/gcp_cloud_run_auto_deploy.py` builds an image with a unique tag containing a short SHA plus timestamp and patches Cloud Run with that tag. `scripts/gcp_runtime_evidence.py` records `container.image`, revision and `DEPLOY_GIT_SHA`, but does not resolve/store the immutable image `sha256:` digest as the primary deployment identity.
-
-**Root cause:** source identity and runtime artifact identity are linked by mutable metadata/tag rather than a cryptographic artifact digest chain.
-
-**Impact:** tag/SHA agreement cannot independently prove which image bytes a revision executed; rollback and exact-revision incident forensics are weaker.
-
-**Files:** `scripts/gcp_cloud_run_auto_deploy.py`, `scripts/gcp_runtime_evidence.py`, `.github/workflows/cloud-run-auto-deploy.yml`, Readiness/Proof UI.
-
-**Target:** `DeploymentTruth {source_sha, cloud_build_id, artifact_uri, image_digest, cloud_run_revision, traffic_percent, runtime_reported_sha, deployment_policy_revision, evidence_id}`.
-
-**Implementation:** after Cloud Build SUCCESS, query Artifact Registry/build results for digest; deploy by digest (`image@sha256:...`) or record resolved digest and verify Cloud Run revision digest; runtime evidence must compare source SHA + build ID + digest + revision.
-
-**Migration:** retain human-readable tags as aliases only; never use tag match as closure proof.
-
-**Security/safety:** deployment proof collector is read-only and must not read secret payloads.
-
-**Tests/PASS:** altered tag pointing to different digest is rejected; only exact digest+SHA+revision chain passes; rollback names exact prior digest/revision.
-
-**Rollback:** inability to resolve digest => `DEPLOYMENT_NOT_PROVEN`; no readiness promotion.
-
-**Status:** READY TO PATCH / FIX-REQUIRED.
-
-### GCP-013 / P0-P1 — web runtime identity is also Dhan rotator and scheduler identity
-
-**Exact proof:** `cloud-run-auto-deploy.yml` reads the Cloud Run runtime service account into `RUNTIME_SA`, grants it Secret Manager access to client ID, Dhan access token, PIN, TOTP, dashboard API key and worker token, grants token-version-adder, deploys the Dhan rotation job using the same account, grants the same account Run Job invoker and configures Cloud Scheduler OAuth using the same account.
-
-**Root cause:** web serving, privileged credential rotation and scheduled invocation are not separated by least privilege.
-
-**Impact:** compromise of the web runtime identity expands blast radius to PIN/TOTP and token-write/rotation permissions.
-
-**Files:** `.github/workflows/cloud-run-auto-deploy.yml`, WIF/bootstrap/IAM docs/scripts, Cloud Run/Job/Scheduler deployment config.
-
-**Target identities:** `system3-web` (read-only runtime secrets only), `system3-dhan-rotator` (Dhan PIN/TOTP/token write only), `system3-scheduler-invoker` (Run Job invoke only), `system3-deployer`, `system3-evidence-reader`.
-
-**Implementation:** pre-provision identities/IAM; stop granting privileged secret roles to web SA; job uses rotator SA; scheduler uses invoker SA; evidence artifact records identities and effective capabilities.
-
-**Migration:** prove current runtime first, then dual-stage cutover; revoke web PIN/TOTP/token-write roles only after rotator/scheduler tests pass.
-
-**Tests/PASS:** web SA denied PIN/TOTP access and secret version add; rotator denied web/API unrelated secrets; scheduler can invoke only named job; evidence reader cannot mutate.
-
-**Rollback:** if split fails, disable scheduled rotation and keep read-only web runtime; do not broaden web SA again automatically.
-
-**Status:** READY TO PATCH / FIX-REQUIRED.
-
-### GCP-014 / P1 — long-lived `GCP_SA_KEY` fallback remains active
-
-**Exact proof:** deploy workflow prefers WIF only when variables are present; otherwise it authenticates with `${{ secrets.GCP_SA_KEY }}`. The WIF setup document explicitly calls this a temporary fallback and instructs deletion only after WIF-only proof.
-
-**Root cause:** migration fallback can silently preserve long-lived deploy credentials indefinitely.
-
-**Impact:** key exfiltration/reuse risk and weaker auditable identity provenance.
-
-**Target:** WIF mandatory for automatic deploy; legacy key path disabled after one independently proven WIF migration artifact.
-
-**Implementation:** add explicit migration deadline/state; after proof remove legacy auth step and secret; CI fails if WIF variables missing.
-
-**Tests/PASS:** WIF-only deployment succeeds twice; legacy key disabled/deleted; workflow without WIF fails closed before deployment.
-
-**Status:** READY TO PATCH.
-
-### GCP-015 / P1 — deployment is not one atomic canonical Cloud Run spec
-
-**Exact proof:** `gcp_cloud_run_auto_deploy.py::_patch_service()` sets scaling `minInstanceCount=1,maxInstanceCount=10`, while the workflow later executes `gcloud run services update --min-instances=0 --max-instances=1`. `deploy/gcp/README.md` describes zero minimum/one maximum as the safety invariant. If the workflow fails between these stages, an intermediate revision/service configuration differs from the documented target.
-
-**Root cause:** deployment desired state is spread across multiple mutation steps and scripts.
-
-**Impact:** configuration drift, transient unintended scaling/cost/concurrency and harder rollback/provenance.
-
-**Target:** one reviewed canonical Cloud Run service specification applied once; all safety env/scaling/service-account/secret bindings are part of the same desired-state change.
-
-**Implementation:** central deployment manifest/config builder; remove conflicting later update; post-deploy validation reads exact revision and compares to desired spec.
-
-**Tests/PASS:** injected failure after deploy cannot leave noncanonical scaling; desired-vs-actual diff = 0 for safety fields.
-
-**Rollback:** redeploy previous canonical digest+spec, not partial `gcloud update` mutations.
-
-**Status:** READY TO PATCH.
-
-### GCP-016 / P1 — deployment workflow mutates IAM and operational scheduler topology on every deploy
-
-**Exact proof:** every auto-deploy adds Secret Manager IAM bindings, adds Run Job invoker, deploys/reconfigures the rotation job and creates/updates Cloud Scheduler.
-
-**Root cause:** application deployment and infrastructure/IAM administration are coupled.
-
-**Impact:** a source-code deploy principal has broad operational mutation scope; IAM drift can be hidden inside normal app deployment; failure modes are harder to isolate.
-
-**Target:** infrastructure/IAM provisioned separately (Terraform/gcloud bootstrap with review); app deployment only builds image and updates the approved Cloud Run revision. Scheduler/rotator changes require their own controlled pipeline.
-
-**Tests/PASS:** standard app deploy makes zero IAM policy changes and zero scheduler topology changes; infra drift is reported, not silently repaired by app deployment.
-
-**Status:** READY TO PATCH.
-
-### GCP-017 / P1 — auto-deploy executes privileged Dhan token rotation immediately
-
-**Exact proof:** deploy workflow runs `gcloud run jobs execute genesis-system3-dhan-token-rotate --wait` after configuring the job.
-
-**Root cause:** application deployment is coupled to credential rotation side effects.
-
-**Impact:** deploy rollback/retry can trigger repeated credential rotation independent of schedule; credential lifecycle evidence becomes coupled to code deployment.
-
-**Target:** deployment validates job configuration/IAM but does not rotate broker credentials. Rotation is Scheduler/manual break-glass with unique rotation event ID and replay control.
-
-**Tests/PASS:** app deploy causes zero token rotations; scheduler execution produces one rotation event; repeated event ID is rejected/no-op.
-
-**Status:** READY TO PATCH.
-
-### GCP-018 / P1 — runtime evidence does not prove traffic ownership of exact revision
-
-**Exact proof:** runtime evidence captures `latestReadyRevision` and service URL but does not record the full traffic allocation and require 100% (or explicitly intended split) to the proven revision before declaring deployment lock.
-
-**Root cause:** latest ready revision is assumed too close to active serving revision.
-
-**Impact:** an older revision could still serve some traffic while proof reports the newest ready revision.
-
-**Target:** record all traffic targets/percentages/tags and require policy match; endpoint probes must bind to the serving revision where possible.
-
-**Tests/PASS:** 90/10 split fails a 100%-current policy; stale tagged revision cannot satisfy deployment proof.
-
-**Status:** READY TO PATCH.
-
-### GCP-019 / P1-P2 — substantial Render-era operational tooling remains executable
-
-**Exact proof:** repository search still returns executable Render-specific tools/scripts and operational docs including `tools/sync_render_secrets.py`, `tools/render_deploy_commit_proof.py`, `tools/render_env_alignment_audit.py`, `scripts/render_worker_mobile_check.sh` and multiple Render runbooks/reports.
-
-**Root cause:** migration retained old deployment-operational code without a single archival/non-authoritative boundary.
-
-**Impact:** an agent/operator can select stale Render tooling, creating contradictory deployment authority and wasted/unsafe remediation.
-
-**Target:** move historical Render material under clearly archived documentation or mark executable entry points hard-disabled with message `GCP is canonical deployment target`; remove Render from current runbooks/automation decisions.
-
-**Tests/PASS:** current operational docs/workflows contain zero instructions to deploy/change Render; CI flags new Render runtime authority references outside archive.
-
-**Status:** READY TO PATCH.
-
-## 7. Canonical solution — DeploymentTruth V2
-
-**Status:** READY TO PATCH.
-
-Required chain:
-
-`main source SHA -> Cloud Build ID -> Artifact Registry digest -> Cloud Run revision -> traffic allocation -> runtime reported SHA -> safety/IAM evidence -> immutable evidence ID`.
-
-Required fields:
-
-`DeploymentTruth {state: PASS|STALE|ERROR|UNKNOWN, source_sha, build_id, artifact_repo, image_digest, revision, traffic[], service_account, runtime_sha, safe_env_revision, secret_binding_metadata, scheduler_identity, rotator_identity, deployed_at, observed_at, evidence_id}`.
-
-Ordered implementation:
-1. Resolve/store image digest after Cloud Build and deploy/verify by digest.
-2. Consolidate Cloud Run desired state into one canonical atomic deployment definition.
-3. Record full traffic allocation and require policy match.
-4. Split web/rotator/scheduler/deployer/evidence identities and least-privilege IAM.
-5. Separate infra/IAM/scheduler provisioning from ordinary app deployment.
-6. Remove auto token rotation from app deployment.
-7. Complete WIF migration; remove `GCP_SA_KEY` fallback.
-8. Add runtime endpoint/evidence showing source SHA, revision and deployment evidence ID without secrets.
-9. Archive/hard-disable Render-era operational tooling.
-10. Add Readiness/Proof UI drilldown for SHA/build/digest/revision/traffic/IAM/safety.
-
-PASS criteria: exact source SHA, build, digest, revision and intended traffic all match; live flags are OFF; secret payload exposure is false; identity split is least privilege; WIF is keyless; no ordinary app deploy mutates IAM/scheduler or rotates Dhan credentials.
-
-Fail-safe: any missing digest/traffic/IAM/runtime proof => DeploymentTruth UNKNOWN/ERROR, readiness blocked, paper/live-adjacent safety decision inhibited where deployment truth is required, LIVE locked.
-
-## 8. Prioritized remediation roadmap
-
-### P0
-1. SessionTruth.
-2. MutationPolicy + CapabilityManifest.
-3. SafetyTruth + ExecutionEligibility + mandatory PreTradeRiskService.
-4. AccountTruth + AccountSnapshotCoordinator.
-5. Complete PaperLedger + ReconciliationService from the PR #99 single-engine-authority foundation; keep the merged engine lock as defense-in-depth but add immutable command/order/fill/position events, idempotency, risk/safety decision IDs and reconciliation.
-6. DeploymentTruth V2: immutable digest/revision/traffic and identity split.
+PR #99 merge `6a8f728d58d00cc91381306f8535225b2819777a` remains a partial bridge:
+- PAPER-017 direct route-level `positions_live.json` mutation: PATCHED/static verified/runtime unproven.
+- PAPER-018 manual-close vs same-engine authority/race: PATCHED/PARTIAL/static verified/runtime unproven.
+- PERF-004: engine lock reduces simultaneous mutation but duplicate `/api/paper/tick` requests can still execute sequentially without command idempotency.
+
+Still OPEN: persistence failure semantics, destructive day rollover/repeatable IDs, explicit order/fill lifecycle, versioned cost/P&L provenance, quantity/instrument provenance and authoritative reconciliation identity.
+
+Target: append-only `PaperCommand -> PaperOrderEvent -> PaperFill -> PositionEvent -> CostBreakdown -> ReconciliationTruth`, global immutable IDs/correlation IDs, one serialized/idempotent mutation worker, projections rebuilt from ledger, DRIFT/ERROR never PASS.
+
+## 8. P0-7 StateTruth / P0-8 DeploymentTruth / P0-9 WorkCoordinator
+
+### StateTruth
+Shared GCP state must become authority with domain revisions/CAS, writer/runtime/event IDs and fail-closed degradation. Local JSON/files are projections only.
+
+### DeploymentTruth
+Retained GCP blockers:
+- GCP-012: image tag is not immutable digest proof;
+- GCP-013: web runtime/rotator/scheduler identity separation insufficient;
+- GCP-014: long-lived `GCP_SA_KEY` fallback remains migration debt;
+- GCP-015: desired Cloud Run spec is split across conflicting deployment mutations;
+- GCP-016: ordinary app deployment mutates IAM/scheduler topology;
+- GCP-017: ordinary app deployment can execute Dhan token rotation;
+- GCP-018: traffic ownership of exact serving revision not fully proven;
+- GCP-019: executable Render-era operational tooling remains.
+
+Target chain:
+`source SHA -> Cloud Build ID -> Artifact Registry sha256 digest -> Cloud Run revision -> traffic allocation -> runtime SHA -> IAM/safety evidence -> immutable evidence ID`.
+
+### WorkCoordinator
+Bounded domain workers, keyed singleflight, completion-driven polling, queue/event-loop observability, serialized/idempotent paper mutation and rejection of late/stale results remain required.
+
+## 9. P1 data, AI and product UI
+
+- `CHAIN-001..014`: OptionChainTruth; null never becomes zero; expiry/security keyed cache; source/event/receive/age/TTL/evidence; full Greeks provenance.
+- `WS-001..011`: StreamTruth; transport-open != fresh market stream; sequence/heartbeat/schema/event time; reject replay/out-of-order.
+- `SCAN-001..010`: ScannerTruth; latest observation replaces old high watermark; stale rows evict; rank != eligibility.
+- `ML-001..014`: PredictionTruth + ModelArtifactManifest; immutable model/data/features hashes, temporal leakage proof, calibration, outcome linkage to reconciled after-cost paper events.
+- `UI-001` remains `LOCKED-20X / FIX-REQUIRED`: no default-green/zero-safe UI. All Tier-0 status badges must consume typed truth contracts. Browser/mobile/keyboard/axe/console proof still required.
+
+## 10. Closure discipline and counters
+
+- `UI-001`: LOCKED-20X / FIX-REQUIRED; repeated reproduction does not mean fixed.
+- `PAPER-017`: historical reproduction `1/20`; fix static evidence exists, runtime closure pending.
+- `PAPER-018`: historical reproduction `1/20`; partial fix static evidence exists, runtime closure pending.
+- `PERF-004`: historical reproduction `2/20`; exactly-once runtime verification remains 0.
+- `ACCOUNT-001..008`: remain at prior `1/20` each.
+- `GCP-012..019`: remain at prior `1/20` each.
+- `PAPER-010 route-absence`: CLOSED/CORRECTED only for the historical false claim that the route did not exist.
+- PR #100/#101/#102 green CI does not establish deployment, broker truth, trade-readiness or profitability.
+
+Definitions:
+- `OPEN/FIX-REQUIRED`: defect still reproduces/current design incomplete.
+- `READY TO PATCH`: root cause/design/tests sufficiently specified.
+- `PATCHED`: source changed.
+- `PARTIAL`: one failure mode removed; canonical solution incomplete.
+- `VERIFIED`: exact-revision required tests/evidence pass.
+- `CLOSED`: all finding-specific PASS criteria independently satisfied, including runtime/deployment where applicable.
+
+## 11. Prioritized remediation roadmap
+
+### P0 strict order
+1. SessionTruth/Auth — **source PATCHED + PR CI VERIFIED; runtime proof deferred to deployment stage**.
+2. MutationPolicy + CapabilityManifest — **manifest PATCHED + CI VERIFIED; runtime enforcement NEXT**.
+3. SafetyTruth + ExecutionEligibility.
+4. Mandatory PreTradeRiskService.
+5. AccountTruth + AccountSnapshotCoordinator.
+6. Durable PaperLedger + ReconciliationService.
 7. StateTruth + domain CAS.
-8. WorkCoordinator + serialized/idempotent paper mutation worker.
+8. DeploymentTruth V2 / GCP identity and digest chain.
+9. WorkCoordinator/idempotency.
 
 ### P1
-1. OptionChainTruth.
-2. StreamTruth.
-3. ScannerTruth.
-4. Versioned fill/cost/P&L provenance.
-5. WIF-only deploy and remove legacy GCP key.
-6. Separate IAM/infra/scheduler/token-rotation pipelines.
-7. PredictionTruth linked to reconciled paper outcomes.
-8. Responsive/accessibility/browser-console proof.
-9. Retire Render-era operational authority.
+OptionChainTruth -> StreamTruth -> ScannerTruth -> PredictionTruth -> institutional UI/accessibility/observability.
 
-### P2
-Advanced institutional analytics, scenario controls and tuning only after P0/P1 truth contracts are proven.
+## 12. Product-design track
 
-## 9. Counters / status changes
+Current target remains an institutional `Readiness / Proof` + `Security / Settings` experience:
+- command header: source SHA, deployment digest/revision, market/session, analyzer/paper state, LIVE LOCKED;
+- security panel: session mode, issued/expires state, server revocation evidence, browser secret storage = NO, auth throttling state, CSRF/origin state;
+- mutation capability panel: route capability, auth requirement, idempotency requirement, last decision/evidence ID, live mutations visibly HARD DENIED;
+- account/market/paper/risk states remain separate typed truths with age/provenance;
+- no unproven metric, readiness score, broker state or profitability claim may be shown as PASS.
 
-- `UI-001` remains `LOCKED-20X / FIX-REQUIRED`.
-- `PAPER-017`: source status upgraded from READY TO PATCH to `PATCHED / STATICALLY VERIFIED / RUNTIME UNPROVEN`; historical reproduction counter freezes at `1/20`; fix verification `1 static / 0 runtime`.
-- `PAPER-018`: upgraded to `PATCHED / PARTIAL / STATICALLY VERIFIED / RUNTIME UNPROVEN`; historical reproduction counter freezes at `1/20`; fix verification `1 static / 0 runtime`.
-- `PERF-004`: upgraded to `PARTIAL PATCH`; historical reproduction counter was `2/20`; duplicate-request exactly-once verification remains `0 runtime`.
-- `PAPER-019..024`: remain OPEN at their prior counters.
-- `ACCOUNT-001..008`: remain `1/20` each, FIX-REQUIRED.
-- `GCP-012..019`: remain `1/20` each, FIX-REQUIRED.
-- `PAPER-010 route-absence`: remains CLOSED/CORRECTED.
-- No new finding reaches LOCKED-20X.
-- No deployment, readiness, profitability or real-money finding is CLOSED.
-- LIVE remains OFF/LOCKED; no live order was enabled, placed, modified, cancelled or routed.
+## 13. Next immediate cascade slice
 
-## 10. Product-design track — Readiness / Deployment Proof V21
+Continue P0-2 by installing runtime capability enforcement on top of the merged manifest. Prove UNKNOWN and LIVE_MUTATION fail closed, preserve worker-ingest separation, define per-capability authentication/CSRF/idempotency requirements, run exact-head CI, merge only after all blocking jobs pass, then immediately begin P0-3 SafetyTruth.
 
-This iteration's latest product UI requirement remains the real `Readiness / Proof` workspace.
-
-### REQUIRED
-- Tier-0 source SHA, image digest, Cloud Run revision, traffic ownership, WIF state, IAM split state, SafetyTruth and LIVE LOCKED.
-- Explicit deployment chain: Git SHA -> Cloud Build -> digest -> revision -> traffic -> runtime SHA.
-- Revision/traffic table showing source/digest/mode/safety/evidence per serving revision.
-- Identity panel separating deployer, web runtime, Dhan rotator, Scheduler invoker and evidence reader.
-- Scheduler/token-rotation panel with identity, invoker role, job digest and last evidence; web PIN/TOTP/token-write capability must show NO.
-- Operator proof showing deployment state, revision age, runtime/source match, secret-exposure state, rollback revision and redacted evidence export.
-- Paper close/readiness drilldown must distinguish `PATCHED`, `VERIFIED`, and `CLOSED`; a merged source patch without runtime proof must never display as completed readiness.
-
-### RECOMMENDED
-- One-click drilldown to sanitized Cloud Run spec/IAM diff and build provenance.
-- Rollback preview to prior known digest/revision with safety policy diff.
-- Deployment history with evidence IDs and revision traffic transitions.
-
-### OPTIONAL
-- Cost/performance trend by revision after runtime telemetry is authoritative.
-
-## 11. Closure discipline
-
-`PATCHED` means source changed. `VERIFIED/CLOSED` requires exact-revision unit/integration/runtime/browser proof, reproducible evidence IDs, safety regression and independent verification. `LOCKED-20X` means repeatedly reproduced, not fixed. Workflow green, HTTP 200, Cloud Run READY, UI labels, image tags, PR descriptions or merge state alone can never prove deployment/trading readiness.
-
-## 12. Next deep slice
-
-Complete Paper mutation authority end-to-end on top of merged PR #99: authentication/capability, idempotency, fresh quote/chain binding, ExecutionDecision, lock scope, persistence failure behavior, restart/replay, duplicate close/tick semantics, fill/cost provenance and reconciliation. In parallel regression-check that GCP deployment remains LIVE OFF and no newly merged route can reach broker place/modify/cancel paths.
+**USER ACTION REQUIRED: NO.**
