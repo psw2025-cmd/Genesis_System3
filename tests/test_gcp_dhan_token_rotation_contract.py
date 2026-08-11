@@ -159,11 +159,18 @@ class StaticSafetyContractTests(unittest.TestCase):
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
         # The workflow delegates the runtime contract to one canonical deployer;
-        # it must not reintroduce a dashboard-key secret or a second service update.
+        # it must not reintroduce a dashboard-key secret or a second executable
+        # service-update command. Ignore explanatory/assertion text that merely
+        # contains the forbidden command as a string literal.
+        actual_service_updates = [
+            line.strip()
+            for line in workflow.splitlines()
+            if line.strip().startswith("gcloud run services update ")
+        ]
         self.assertIn("scripts/gcp_cloud_run_auto_deploy.py", workflow)
         self.assertNotIn("API_KEY_SECRET_ID", workflow)
         self.assertNotIn("system3-dashboard-api-key", workflow)
-        self.assertNotIn('gcloud run services update "${GCP_CLOUD_RUN_SERVICE}"', workflow)
+        self.assertEqual(actual_service_updates, [])
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
         self.assertIn('.required == false', workflow)
