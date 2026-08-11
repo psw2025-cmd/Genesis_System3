@@ -1,368 +1,282 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 21:08 IST`
+Updated: `2026-08-12 04:22 IST`
 
-> This revision supersedes older status text in this file. Historical evidence is retained below only where it remains relevant. `PATCHED` never means `CLOSED`, and a visually inspected artifact can invalidate an automated visual claim even when CI is green.
+> This file is the single authority for the current Genesis System3 remediation stream. `PATCHED`/`MERGED`/green PR CI never imply `CLOSED`; exact serving-revision runtime proof is required where applicable. Historical milestones are retained below in condensed evidence form.
 
-## 0. Scope, source revision and safety lock
+## 0. Scope, revision truth and safety lock
 
-- Repository authority: `psw2025-cmd/Genesis_System3` only.
-- Branch: `main`.
-- Current application/source HEAD after this run: `7a127f5452d0b337db7d6af294f21d4879dd78a0` (merge of PR #108).
-- Important application milestones in this cascade:
-  - PR #99 manual paper-position close authority bridge -> merge `6a8f728d58d00cc91381306f8535225b2819777a`.
-  - PR #100 browser reusable-key removal -> merge `e655330559a6d85b42c5cc951308827f6718f41f`.
-  - PR #101 server SessionTruth authority -> merge `5ea9b12e3358876ae900fc07c584b349ef8c2254`.
-  - PR #102 Mutation CapabilityManifest -> merge `1d7e06a0f661a873528d96bcc685dc7b0af87f58`.
-  - PR #103 shared Cloud Run SessionTruth authority -> merge `e77a8088409e2b76cb1722416f1ee4faee4ddbf1`.
-  - PR #105 exact-SHA SessionTruth deployment instrumentation -> merge `c50044548c296bdf9562af802d3906a7a27a04cb`.
-  - PR #107 user-directed PAPER/ANALYZER public read-only dashboard, no dashboard API key -> merge `a875876ecf64a44706b3fc57fe0a3f8f00991337`.
-  - PR #108 corrected actual `/ui` browser visual proof -> merge `7a127f5452d0b337db7d6af294f21d4879dd78a0`.
-- PR #106, which would have continued enforcing dashboard API-key sessions, was closed unmerged after the dashboard-access requirement changed.
-- Google Cloud is the only accepted deployment target. Render-era runtime instructions/tools remain non-authoritative migration debt.
-- Runtime posture remains ANALYZER/PAPER. LIVE remains OFF/LOCKED. No live order was enabled, placed, modified, cancelled or routed in this run.
-- The interactive dashboard is intentionally **public/read-only in PAPER/ANALYZER**. Public visibility is not mutation authority.
-- `API_KEY` is not mounted in the serving Cloud Run revision. `WORKER_PUSH_TOKEN` remains separate and Secret-Manager-backed for worker ingestion.
+- Repository authority: **`psw2025-cmd/Genesis_System3` only**.
+- Deployment target: **Google Cloud only**. Render is non-authoritative migration debt.
+- Latest **application/source HEAD** before this report-only update: **`8126f85f531655f0313cc52a74491a9049410269`** (merge PR #119).
+- Runtime posture: **ANALYZER/PAPER**.
+- LIVE: **OFF / LOCKED**.
+- No live broker order was enabled, placed, modified, cancelled or routed by this remediation stream.
+- PAPER dashboard viewing is intentionally **public/read-only**. It must not ask for a dashboard API key.
+- Public visibility is never mutation authority. Worker ingestion retains a separate Secret-Manager-backed token and mutation capabilities remain fail-closed.
 
-## 1. Smart-cascade step position
+## 1. Smart-cascade position
 
-Current 1-18 flow state:
+Mandatory flow:
 
-`1 VERIFY -> 2 SELECT -> 3 ROOT CAUSE -> 4 DESIGN -> 5 PATCH -> 6 TEST -> 7 PR -> 8 CI -> 9 FIX/RETEST -> 10 MERGE -> 11 POST-MERGE VERIFY -> 12 PREP/CONTINUE -> 13 USER GCP ONLY IF REQUIRED -> 14 DEPLOY VERIFY -> 15 RUNTIME TEST -> 16 USER DHAN AUTH ONLY IF REQUIRED -> 17 FULL EVIDENCE -> 18 CLOSED`
+`1 VERIFY -> 2 SELECT -> 3 ROOT CAUSE -> 4 DESIGN -> 5 PATCH -> 6 TEST -> 7 PR -> 8 CI -> 9 FIX/RETEST -> 10 MERGE -> 11 POST-MERGE VERIFY -> 12 PREP -> 13 USER GCP ONLY IF GENUINELY REQUIRED -> 14 DEPLOY VERIFY -> 15 RUNTIME TEST -> 16 USER DHAN AUTH ONLY IF REQUIRED -> 17 FULL EVIDENCE -> 18 CLOSED`
 
-The user-directed PAPER dashboard access change is now complete through source patch, exact-head CI, merge, exact merge-SHA GCP deployment, anonymous HTTP proof, actual `/ui` browser rendering, screenshot artifact, manual visual inspection and full deployment workflow completion.
+### Current position
 
-**P0-1 dashboard-view authentication is therefore superseded by the approved public-read-only PAPER architecture and VERIFIED at runtime.** The cascade now proceeds to **P0-2 MutationPolicy runtime enforcement**, because anonymous viewing makes fail-closed write authority even more important.
+**STEP 13 — genuine Google Cloud IAM human boundary.**
 
-**USER ACTION REQUIRED: NO.**
+All controllable repository work for the current deployment blocker has been taken through source patch, PR CI, merge and exact-main deployment preflight. The remaining failure is not a dashboard-key requirement and not a code/test failure: the GitHub WIF deployment identity lacks project-IAM authority needed to grant the dedicated Cloud Run web runtime its required Firestore data role.
 
-## 2. Executive verdict
+**USER ACTION REQUIRED: YES — one narrow Google Cloud IAM binding only. No secret/token/PIN/TOTP is requested.**
 
-| Area | Current verdict | Implementation state |
+## 2. Current executive verdict
+
+| Area | Verdict | Evidence / next condition |
 |---|---|---|
-| PAPER dashboard view access | **VERIFIED / NO API KEY REQUIRED** | PR #107 + #108 merged; exact merge-SHA Cloud Run + actual `/ui` visual proof PASS |
-| SessionTruth/Auth for dashboard viewing | **SUPERSEDED for PAPER reads** | reusable dashboard-key prompt/session gate intentionally removed from active UI/GCP serving path |
-| MutationPolicy | **PARTIAL PATCH / CI VERIFIED** | PR #102 manifest merged; runtime capability enforcement remains next P0 item |
-| Anonymous mutation safety | **VERIFIED BASELINE / NOT FULL CAPABILITY POLICY** | backend policy allows anonymous reads but returns `AUTH_REQUIRED_FOR_MUTATION` for unauthenticated writes when dashboard auth is disabled |
-| Worker ingestion auth | **RETAINED / SEPARATE** | worker token remains mounted from Secret Manager; dashboard API key is unmounted |
-| SafetyTruth / execution eligibility | **FAIL / P0** | READY TO PATCH after P0-2 enforcement |
-| PreTradeRiskService | **FAIL / P0** | READY TO PATCH |
-| AccountTruth | **FAIL / P0-P1** | READY TO PATCH |
-| PaperLedger/Reconciliation | **PARTIAL PATCH / FAIL P0** | PR #99 fixed one dual-authority defect; durable event ledger/reconciliation still required |
-| StateTruth / Firestore | **FAIL / P0-P1** | READY TO PATCH |
-| DeploymentTruth V2 / GCP | **PARTIAL VERIFIED / STILL INCOMPLETE** | exact SHA/revision/traffic/current runtime gate now PASS; digest, identity split and WIF-only remain open |
-| WorkCoordinator/idempotency | **FAIL / P0-P1** | READY TO PATCH |
-| OptionChainTruth | **FAIL / P0-P1** | READY TO PATCH |
-| StreamTruth | **FAIL / P0-P1** | READY TO PATCH |
-| ScannerTruth | **FAIL / P0-P1** | READY TO PATCH |
-| PredictionTruth/ML | **MISSING / P0-P1** | READY TO PATCH/DESIGN |
-| Institutional UI/A11Y | **FAIL / P1** | actual browser rendering now proven for one desktop viewport; accessibility/responsive coverage still required |
+| PAPER dashboard view without API key | **VERIFIED / CLOSED for stated requirement** | Real `/ui` runtime proof previously passed; key prompt paths now also removed from active frontend source in PR #119 |
+| Dashboard API-key workflow semantics | **PATCHED / CI VERIFIED** | PR #116 + #117 removed obsolete key-absence and self-matching false failures |
+| Active dashboard credential-entry UI | **PATCHED / CI VERIFIED** | PR #119 removed LoginPage/useAuth and converted AuthUnlock to passive public-read contract error |
+| Firestore runtime authority | **BLOCKED — STEP 13** | Dedicated web runtime needs `roles/datastore.user`; automation SA cannot read/set project IAM |
+| Current exact-main deployment | **BLOCKED / NOT DEPLOYED** | Run #61 stops at Firestore IAM preflight before candidate deploy |
+| Serving revision safety | **PROTECTED** | Failed candidates receive 0% traffic; last proven serving revision retained 100% traffic |
+| MutationPolicy | **PARTIAL / CI VERIFIED, runtime proof pending** | Runtime probe is skipped until exact current main can deploy |
+| SafetyTruth / ExecutionEligibility | **OPEN P0** | next after MutationPolicy runtime closure |
+| PreTradeRiskService | **OPEN P0** | next dependency after SafetyTruth |
+| AccountTruth | **OPEN P0-P1** | not yet authoritative for risk decisions |
+| PaperLedger/Reconciliation | **PARTIAL / OPEN P0** | PR #99 fixed one dual-authority route; durable append-only lifecycle remains |
+| StateTruth | **OPEN P0-P1** | Firestore is required; domain CAS/versioned authority still incomplete |
+| DeploymentTruth V2 | **PARTIAL / OPEN P0** | serving-revision binding/digest/IAM identity chain still incomplete |
+| WorkCoordinator/idempotency | **OPEN P0-P1** | pending |
+| OptionChainTruth / StreamTruth / ScannerTruth / PredictionTruth | **OPEN P1** | pending after P0 chain |
+| Institutional UI/A11Y | **OPEN P1** | one real desktop render proven; responsive/keyboard/axe/console proof pending |
 | Real-money readiness | **NO** | LIVE stays OFF/LOCKED |
 
-## 3. P0-1 — public read-only PAPER dashboard, exact runtime closure
+## 3. Dashboard no-key remediation — exact evidence
 
-### 3.1 User-approved architecture
+### Previously runtime-verified product behavior
 
-For ANALYZER/PAPER operation, opening or viewing Genesis System3 must not ask for a dashboard API key.
+PR #107 merged as `a875876ecf64a44706b3fc57fe0a3f8f00991337` and PR #108 merged as `7a127f5452d0b337db7d6af294f21d4879dd78a0`.
 
-Implemented contract:
-- frontend does not render `LoginPage`, `AuthGate` or `useAuth` as the application entry gate;
-- `REQUIRE_API_KEY=false` in active GCP deploy paths;
-- `API_KEY` is removed/unmounted from the serving Cloud Run revision;
-- dashboard `/ui` and read APIs are anonymously readable;
-- no reusable dashboard key/header/cookie is needed for reads;
-- backend mutation policy remains fail-closed for unauthenticated writes;
-- `WORKER_PUSH_TOKEN` remains separate for machine ingestion;
-- `ANALYZE_MODE=1` and `SYSTEM3_MODE=ANALYZER` remain enforced;
-- `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0` remain enforced.
+Exact Cloud Run Auto Deploy run `31507282801` succeeded and published:
+- `public-dashboard/runtime-proof = SUCCESS`;
+- `cloud-run/runtime-proof = SUCCESS`.
 
-### 3.2 Source implementation
-
-PR #107 (`35eddfad46b18dced56d1784973e725c8982ce43` final head) changed the active product/deploy contract and merged as:
-
-`a875876ecf64a44706b3fc57fe0a3f8f00991337`
-
-Key source changes:
-1. `dashboard/frontend/src/App.tsx`: removed the active dashboard API-key/login gate.
-2. `scripts/gcp_cloud_run_auto_deploy.py`: sets `REQUIRE_API_KEY=false`, removes `API_KEY`, preserves worker token and LIVE-OFF flags.
-3. `deploy/gcp/deploy_web.sh`: `--remove-secrets=API_KEY`, public Cloud Run ingress, PAPER/LIVE-OFF contract.
-4. `.github/workflows/cloud-run-auto-deploy.yml`: active deploy no longer requires/mounts dashboard API key and proves anonymous reads.
-5. `.github/workflows/gcp-dhan-token-rotation.yml`: broker-status recovery proof no longer retrieves/sends dashboard API key.
-6. `tests/test_public_paper_dashboard_contract.py` and GCP token-rotation contract tests: lock public-read / mutation-blocked semantics.
-
-PR #107 exact-head CI before merge:
-- Workflow Priority Guard: SUCCESS.
-- GCP Stage 2 Safety Checks: SUCCESS.
-- GCP Dhan Token Fix CI: SUCCESS.
-- Genesis System3 Global Safety CI: SUCCESS; all five blocking jobs passed.
-
-### 3.3 First runtime proof — valid config/HTTP, rejected visual
-
-The first exact merge-SHA runtime proof on `a875876ecf64a44706b3fc57fe0a3f8f00991337` successfully established:
-- exact source SHA deployed;
+Real headless-Chrome `/ui` evidence proved:
+- actual SYSTEM3 product UI rendered;
+- no dashboard API-key prompt rendered;
+- no API key used;
+- PAPER visible;
+- LIVE OFF visible;
+- anonymous `/ui`, `/api/auth/status`, `/api/state` and `/api/health` access succeeded;
 - `REQUIRE_API_KEY=false`;
 - `API_KEY` not mounted;
-- worker token mounted;
-- ANALYZER mode;
-- LIVE flags OFF;
-- anonymous root/auth/status/state/health reads returned success without API key or cookie.
+- worker token remained separate.
 
-However, manual inspection of its screenshot found that the proof captured the backend JSON landing response at `/`, not the product dashboard. That automated visual claim was **rejected**, not hidden or counted as visual closure.
+### PR #116 — remove obsolete key-absence workflow failures
 
-The landing response exposed the actual dashboard relative path `/ui`, causing PR #108.
+PR #116 head `32cfb8fdfc508cd2fb93a245cdb4f2349a196653`, merge **`b7f402ee7ce3fb0f4da682516e38c8c65a82a951`**.
 
-### 3.4 Corrected actual `/ui` visual proof — VERIFIED
-
-PR #108 final head:
-`53c24266182f02ea4bc951a16e242592849b31c9`
-
-Fresh exact-head Global Safety run `31507095529`: **SUCCESS**.
-All five blocking jobs succeeded:
-- workflow/trading-safety guard;
-- architecture/trading-safety gate;
-- Python compile;
-- frontend production build;
-- full backend/proof-pack validation.
-
-PR #108 merged as exact application/source SHA:
-`7a127f5452d0b337db7d6af294f21d4879dd78a0`
-
-Exact post-merge Cloud Run Auto Deploy run:
-`31507282801` -> **SUCCESS**.
-
-Exact commit statuses on `7a127f5452d0b337db7d6af294f21d4879dd78a0`:
-- `public-dashboard/runtime-proof` = **SUCCESS**;
-- `cloud-run/runtime-proof` = **SUCCESS**.
-
-Public dashboard proof artifact:
-- name: `public-paper-dashboard-proof-52`;
-- artifact ID: `9107773505`;
-- artifact ZIP digest: `sha256:b3fd8448a749f1ae56cb03fe89560adf4bb14ec7d7eb9e48af51780aa390059b`.
-
-Exact deployed config proof:
-- `expected_sha = 7a127f5452d0b337db7d6af294f21d4879dd78a0`;
-- `deploy_git_sha = 7a127f5452d0b337db7d6af294f21d4879dd78a0`;
-- latest ready revision at proof point: `genesis-system3-web-00195-bxh`;
-- traffic to latest = 100%;
+Changed the GCP evidence/CI contract so the approved secure PAPER state is:
 - `REQUIRE_API_KEY=false`;
-- `API_KEY mounted=false`;
-- `WORKER_PUSH_TOKEN mounted=true`;
-- `ANALYZE_MODE=1`;
-- `SYSTEM3_MODE=ANALYZER`;
-- `LIVE_TRADING_ENABLED=0`;
-- `SYSTEM3_LIVE_TRADING_ALLOWED=0`;
-- `AUTO_EXECUTE_TRADES=0`.
+- `API_KEY` unmounted;
+- API key plaintext exposure = false;
+- `dashboard_public_readonly=true`;
+- worker secret remains required;
+- LIVE flags remain hard OFF.
 
-Anonymous HTTP proof, with no API key and no cookie sent:
-- `/` = HTTP 200;
-- `/ui` = HTTP 200;
-- `/api/auth/status` = HTTP 200;
-- `/api/state` = HTTP 200;
-- `/api/health` = HTTP 200;
-- auth `required=false`;
-- auth mode = `auth_disabled`;
-- actual `/ui` Vite HTML shell present;
-- `dashboard_visible_without_login=true`.
+A key being **re-enabled, mounted or exposed** is now a violation. A key being absent is **not** a failure.
 
-Actual headless-Chrome `/ui` evidence:
-- rendered `SYSTEM3` product marker = true;
-- `DASHBOARD API KEY` prompt rendered = false;
-- API key used = false;
-- viewport = `1600x1000`;
-- screenshot SHA-256 = `4bdccab88f728bda123e4341940a3308c3073d9aee0598701a3d0630fab1f74e`;
-- source = `real_deployed_cloud_run_dashboard_ui`.
+The same PR fixed secondary artifact-failure behavior so skipped upstream proof does not create misleading duplicate failures.
 
-Manual visual inspection independently confirmed the screenshot is the actual System3 `Decision Intelligence` workstation, not JSON and not a login screen. The visible product shell shows PAPER mode and LIVE OFF.
+All exact-head PR safety/build/proof gates passed before merge.
 
-### 3.5 Full deployment run after visual proof
+### PR #117 — eliminate static-guard self-match
 
-The same exact run `31507282801` subsequently completed **SUCCESS** after the visual proof. Its later gates also passed:
-- Dhan token rotator execution;
-- service and scheduler safety proof;
-- public dashboard and broker proof without API key;
-- sanitized GCP runtime evidence generation/upload;
-- deployment provenance/public-dashboard safety lock;
-- final exact-SHA runtime status publication.
+PR #117 head `b23a4f63a00cb088f9e6f78dc69aff3a906a7927`, merge **`abe1cabfcf276d78af1cd9c461f8de2562d0ee99`**.
 
-Therefore the public/no-key dashboard evidence was not invalidated by a later failing deploy step in this exact run.
+Root cause: static WIF guards embedded the exact forbidden legacy credential marker text and then searched the workflow for that text, so the assertion matched itself.
 
-### 3.6 Closure wording
+Fix: construct legacy markers without embedding the literal forbidden tokens and scan executable/non-comment lines. Real legacy service-account-key use still fails; self-reference no longer does.
 
-**Dashboard viewing in PAPER/ANALYZER: VERIFIED / CLOSED for the stated no-key access requirement.**
+All exact-head PR gates passed.
 
-This does **not** close mutation authorization, live-trading readiness, financial correctness, broker/account truth, model correctness or institutional deployment hardening.
+### PR #119 — remove remaining frontend key-prompt paths
 
-## 4. P0-2 MutationPolicy + CapabilityManifest
+PR #119 head `b89ad1e3bd221e63b8fa8977bd5858f162fc8ac3`, merge **`8126f85f531655f0313cc52a74491a9049410269`**.
 
-### CapabilityManifest slice — PATCHED/CI VERIFIED
+Changes:
+- `AuthUnlock.tsx` is now a passive **Public read contract error** notice; it has no password field, key state, submit action or `/api/auth/session` call;
+- deleted obsolete `LoginPage.tsx`;
+- deleted obsolete `useAuth.ts`;
+- deleted obsolete `scripts/gcp_session_runtime_proof.py` that enforced the superseded key/session design;
+- added regression tests preventing those credential-entry paths from returning.
 
-PR #102 introduced `dashboard/backend/mutation_policy.py` with canonical capabilities:
-`SESSION_CREATE`, `SESSION_REVOKE_SELF`, `WORKER_INGEST`, `PAPER_MUTATION`, `RISK_POLICY_WRITE`, `SAFETY_CONTROL`, `SCHEDULER_CONTROL`, `PREFERENCE_WRITE`, `ANALYZER_COMMAND`, `LIVE_APPROVAL`, `LIVE_MUTATION`, `UNKNOWN`.
+PR #119 Global Safety CI passed all blocking jobs, including frontend production build and full backend/proof-pack validation. GCP Dhan/WIF safety CI also passed.
 
-The manifest is generated from the actual FastAPI route table, not a manually counted list. CI requires:
-1. every POST/PUT/PATCH/DELETE route has a non-UNKNOWN capability;
-2. duplicate `(method,path)` write owners = 0;
-3. live order paths classify only as `LIVE_MUTATION`;
-4. paper close remains `PAPER_MUTATION`, never live mutation.
+**Conclusion:** no dashboard API key is required for PAPER dashboard viewing, and active frontend key-entry paths are removed. Do not restore them.
 
-PR #102 merge:
-`1d7e06a0f661a873528d96bcc685dc7b0af87f58`.
+## 4. Genuine current deployment blocker — Firestore IAM
 
-### Remaining P0-2 root cause — NEXT ACTIVE SLICE
+### Exact failed candidate forensic proof
 
-Classification is not yet complete runtime authority. With dashboard reads now intentionally public, runtime write enforcement is the next mandatory safety boundary.
+After the false key/static gates were removed, exact source `abe1cabfcf276d78af1cd9c461f8de2562d0ee99` reached the real Cloud Run candidate deployment in run `31542005028`.
 
-The next patch must install capability-aware middleware/enforcement so:
-- `UNKNOWN` is denied at runtime and CI;
-- `LIVE_MUTATION` remains independently hard denied in ANALYZER/PAPER regardless of browser/UI state;
-- `LIVE_APPROVAL` cannot silently become router authority;
-- `PAPER_MUTATION` receives explicit authorization, CSRF/replay and idempotency policy appropriate for the chosen trusted control channel;
-- `WORKER_INGEST` remains bound only to worker identity/token and replay evidence;
-- risk/safety/scheduler/preference/analyzer writes each receive exact capability-specific authority;
-- public dashboard read access never grants mutation capability;
-- response/audit evidence records capability + request/evidence ID without secrets.
+Cloud Build completed. Candidate revision:
+`genesis-system3-web-00210-huf`.
 
-**Status:** `PARTIAL PATCH / CI VERIFIED / READY TO PATCH RUNTIME ENFORCEMENT`.
+The candidate bound `0.0.0.0:8080` and then failed required state startup with Firestore:
+`PermissionDenied: 403 Missing or insufficient permissions`.
 
-## 5. P0-3 SafetyTruth + P0-4 PreTradeRiskService
+The state backend deliberately failed closed because `SYSTEM3_STATE_BACKEND=firestore` and `SYSTEM3_STATE_BACKEND_REQUIRED=1`. This is correct safety behavior; local-file fallback was not enabled.
 
-**Severity/status:** P0 / FIX-REQUIRED.
+The failed candidate received **0% traffic**. Previous serving revision `genesis-system3-web-00199-tq5` remained at **100% traffic**.
 
-Root cause: kill-switch/mode/risk truth remains split; current transaction paths are not yet proven to require one immutable fail-closed `ExecutionDecision` derived from current safety, account and market truth.
+### PR #118 — repo-side permanent IAM prerequisite
 
-Target chain:
-`Intent -> MutationPolicy -> SafetyTruth -> DeploymentTruth -> StateTruth -> Stream/OptionChain/AccountTruth -> PreTradeRiskService -> ExecutionDecision -> serialized PaperMutationWorker`.
+PR #118 head `fa905fa8428b61ac8b54980e145ae09f0b62853f`, merge **`776eab796a31d081e2f8932ad2e90d4a03983731`**.
 
-`ExecutionDecision {decision_id,intent_id,state:PASS|FAIL|UNKNOWN|ERROR,safety_revision,risk_policy_revision,account_snapshot_id,market_snapshot_ids,expires_at,evidence_ids[]}`.
+Implemented:
+- `scripts/gcp_runtime_iam_preflight.py`;
+- dedicated web runtime identity check;
+- required predefined Firestore role `roles/datastore.user`;
+- WIF/bootstrap provisioning contract for the dedicated web runtime;
+- Firestore remains required/fail-closed;
+- public no-key dashboard and LIVE-OFF invariants retained;
+- exact contract tests added.
 
-PASS requires UNKNOWN/STALE/ERROR to inhibit; UI can never override; scheduler cannot bypass; every paper/live-adjacent mutation needs a current decision. LIVE router remains independently locked.
+All four exact-head PR #118 suites passed before merge.
 
-## 6. P0-5 AccountTruth
+### Exact Step-13 proof
 
-`ACCOUNT-001..008` remain FIX-REQUIRED.
+Post-merge run `31543355143` failed at `Ensure required Firestore IAM for web runtime` **before candidate creation**.
 
-Retained root causes:
-- Dhan positions/holdings can conflate transport success with semantic broker success;
-- malformed/missing account numbers can normalize to zero;
-- empty/zero can be certified too easily after upstream semantic loss;
-- profile connectivity is visually too close to account correctness;
-- funds/holdings/positions lack one generation, source event time, receive time, TTL and evidence ID;
-- browser can reconstruct financial zeros/P&L;
-- duplicate disabled broker router contains weaker zero/empty-on-error behavior;
-- AccountTruth not yet mandatory in PreTradeRiskService.
+The workflow authenticates as:
+`genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com`.
 
-Canonical solution: `BrokerReadResult<T>` + `AccountSnapshotCoordinator` + `AccountTruth`, with `PASS|EMPTY_PROVEN|STALE|AUTH_ERROR|RATE_LIMITED|ERROR|UNKNOWN`. Error/unknown can never become zero exposure. `account_snapshot_id` becomes mandatory risk evidence.
+That identity cannot read project IAM policy (`projects.getIamPolicy` denied), therefore it cannot prove or add `roles/datastore.user` to:
+`genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`.
 
-## 7. P0-6 Paper lifecycle / reconciliation
+Current main/source `8126f85f531655f0313cc52a74491a9049410269` triggered run **`31544001655` (Cloud Run Auto Deploy #61)** and reproduced the same boundary:
+- WIF authentication: PASS;
+- static safety/syntax: PASS;
+- worker Secret Manager prerequisite: PASS;
+- Firestore IAM preflight: **FAIL**;
+- candidate deploy: skipped;
+- dashboard-key requirement: **not a blocker**;
+- LIVE remains OFF/LOCKED.
 
-PR #99 merge `6a8f728d58d00cc91381306f8535225b2819777a` remains a partial bridge:
-- PAPER-017 direct route-level `positions_live.json` mutation: PATCHED/static verified/runtime closure pending.
-- PAPER-018 manual-close vs same-engine authority/race: PATCHED/PARTIAL/static verified/runtime closure pending.
-- PERF-004: engine lock reduces simultaneous mutation but duplicate `/api/paper/tick` requests can still execute sequentially without command idempotency.
+This is the first genuine human-only Step-13 dependency.
 
-Still OPEN: persistence failure semantics, destructive day rollover/repeatable IDs, explicit order/fill lifecycle, versioned cost/P&L provenance, quantity/instrument provenance and authoritative reconciliation identity.
+## 5. Step-13 required Google Cloud action
 
-Target: append-only `PaperCommand -> PaperOrderEvent -> PaperFill -> PositionEvent -> CostBreakdown -> ReconciliationTruth`, global immutable IDs/correlation IDs, one serialized/idempotent mutation worker, projections rebuilt from ledger, DRIFT/ERROR never PASS.
+Grant only the required predefined Firestore data role to the dedicated web runtime service account:
 
-## 8. P0-7 StateTruth / P0-8 DeploymentTruth / P0-9 WorkCoordinator
+```bash
+gcloud projects add-iam-policy-binding system3-openalgo-safe \
+  --member="serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com" \
+  --role="roles/datastore.user" \
+  --condition=None
+```
 
-### StateTruth
-Shared GCP state must become authority with domain revisions/CAS, writer/runtime/event IDs and fail-closed degradation. Local JSON/files are projections only.
+Optional read-back proof:
 
-### DeploymentTruth
-Improvement proven at `7a127f5452d0b337db7d6af294f21d4879dd78a0`:
-- exact source SHA == runtime `DEPLOY_GIT_SHA`;
-- latest ready Cloud Run revision observed and 100% traffic proven at dashboard proof point;
-- full exact-SHA deployment run completed successfully;
-- LIVE-OFF invariants proven;
-- dashboard API key absence and worker-secret separation proven for serving config;
-- `cloud-run/runtime-proof=success` published on the exact merge SHA.
+```bash
+gcloud projects get-iam-policy system3-openalgo-safe \
+  --flatten="bindings[].members" \
+  --filter="bindings.role:roles/datastore.user AND bindings.members:serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com" \
+  --format="table(bindings.role,bindings.members)"
+```
 
-Retained GCP hardening gaps:
-- GCP-012: current canonical proof still needs immutable Artifact Registry image **digest** as primary identity, not only tag/SHA linkage;
-- GCP-013: web runtime/rotator/scheduler identity separation remains insufficient;
-- GCP-014: this exact deployment used the temporary legacy `GCP_SA_KEY` authentication fallback because WIF was skipped; WIF-only remains required;
-- GCP-015: desired Cloud Run spec is still assembled by multiple mutations in the workflow;
-- GCP-016: ordinary app deployment still mutates IAM/scheduler topology;
-- GCP-017: ordinary app deployment still executes Dhan token rotation;
-- GCP-018: traffic proof exists for this exact run, but canonical immutable DeploymentTruth persistence across deploys remains incomplete;
-- GCP-019: executable Render-era operational tooling remains migration debt.
+Do **not** send any GCP credential, service-account key, broker PIN, TOTP or token into chat.
 
-Target chain:
-`source SHA -> Cloud Build ID -> Artifact Registry sha256 digest -> Cloud Run revision -> traffic allocation -> runtime SHA -> IAM/safety evidence -> immutable evidence ID`.
+After this one binding is confirmed, the assistant-owned cascade resumes automatically:
+1. rerun current exact-main deployment;
+2. Firestore preflight must PASS;
+3. create 0%-traffic candidate;
+4. exact candidate must become Ready;
+5. prove `/ui` opens without API key and capture real screenshot;
+6. prove MutationPolicy runtime allow/deny matrix without any broker-order action;
+7. promote only the exact proven revision to 100% traffic;
+8. verify current serving SHA/revision/traffic/safety evidence;
+9. fix any further failure and repeat;
+10. only then advance to the next P0 dependency.
 
-### WorkCoordinator
-Bounded domain workers, keyed singleflight, completion-driven polling, queue/event-loop observability, serialized/idempotent paper mutation and rejection of late/stale results remain required.
+## 6. P0-2 MutationPolicy status
 
-## 9. P1 data, AI and product UI
+Merged foundations:
+- PR #102 CapabilityManifest (`1d7e06a0f661a873528d96bcc685dc7b0af87f58`);
+- `secure_app.py` capability-aware runtime policy;
+- UNKNOWN/live mutation/live approval fail-closed;
+- public reads do not create mutation authority;
+- worker ingestion uses separate worker authority.
 
-- `CHAIN-001..014`: OptionChainTruth; null never becomes zero; expiry/security keyed cache; source/event/receive/age/TTL/evidence; full Greeks provenance.
-- `WS-001..011`: StreamTruth; transport-open != fresh market stream; sequence/heartbeat/schema/event time; reject replay/out-of-order.
-- `SCAN-001..010`: ScannerTruth; latest observation replaces old high watermark; stale rows evict; rank != eligibility.
-- `ML-001..014`: PredictionTruth + ModelArtifactManifest; immutable model/data/features hashes, temporal leakage proof, calibration, outcome linkage to reconciled after-cost paper events.
-- `UI-001` remains `LOCKED-20X / FIX-REQUIRED`: no default-green/zero-safe UI. One real desktop `/ui` render is now proven, but mobile/responsive, keyboard, axe/accessibility, console/runtime-error and state-transition evidence remain required.
+**Current status: PARTIAL / CI VERIFIED / RUNTIME PROOF BLOCKED BY STEP 13.**
 
-## 10. Closure discipline and counters
+The deploy workflow already contains safe mutation-policy runtime sentinels. They are currently skipped only because the exact current application cannot start with required Firestore state until the IAM binding above exists.
 
-- PAPER dashboard no-key access requirement: **VERIFIED/CLOSED** on exact source `7a127f...`, exact GCP run `31507282801`, actual `/ui` screenshot manually inspected.
-- First PR #107 screenshot: **REJECTED as visual closure** because it showed API landing JSON; retained as evidence of proof correction discipline.
-- `UI-001`: LOCKED-20X / FIX-REQUIRED; the no-key dashboard fix does not close broader UI truth/accessibility defects.
-- `PAPER-017`: historical reproduction `1/20`; fix static evidence exists, full runtime lifecycle closure pending.
-- `PAPER-018`: historical reproduction `1/20`; partial fix static evidence exists, full runtime lifecycle closure pending.
-- `PERF-004`: historical reproduction `2/20`; exactly-once runtime verification remains 0.
-- `ACCOUNT-001..008`: remain at prior `1/20` each.
-- `GCP-012..019`: remain open as institutional hardening findings even though one exact current deployment passed its existing runtime gate.
-- `PAPER-010 route-absence`: CLOSED/CORRECTED only for the historical false claim that the route did not exist.
+## 7. DeploymentTruth correction still open
 
-Definitions:
-- `OPEN/FIX-REQUIRED`: defect still reproduces/current design incomplete.
-- `READY TO PATCH`: root cause/design/tests sufficiently specified.
-- `PATCHED`: source changed.
-- `PARTIAL`: one failure mode removed; canonical solution incomplete.
-- `VERIFIED`: exact-revision required tests/evidence pass.
-- `CLOSED`: all finding-specific PASS criteria independently satisfied, including runtime/deployment where applicable.
+A separate evidence defect remains: `scripts/gcp_runtime_evidence.py` can derive environment/SHA from service template/latest candidate metadata even while 100% traffic remains on an older serving revision. Therefore `source_matches_deployment=true` is not sufficient by itself.
 
-## 11. Prioritized remediation roadmap
+Required correction before DeploymentTruth V2 can close:
+- choose the actual `status.traffic` revision carrying 100% serving traffic;
+- describe that exact revision;
+- read image, service account, safe environment and `DEPLOY_GIT_SHA` from that revision;
+- report 0%-traffic candidate separately;
+- compare GitHub SHA only to the actual serving revision;
+- require immutable image digest in the final chain.
 
-### P0 strict order
-1. PAPER dashboard view access without API key — **VERIFIED/CLOSED for stated requirement**; public read-only architecture retained while LIVE is OFF.
-2. MutationPolicy + CapabilityManifest — **manifest PATCHED + CI VERIFIED; runtime enforcement NEXT**.
+**Status: OPEN / READY TO PATCH after Step-13 deployment resumes.**
+
+## 8. Remaining P0 order
+
+1. Public PAPER dashboard/no-key — **VERIFIED/CLOSED for viewing requirement**.
+2. MutationPolicy runtime enforcement — **runtime proof pending Step 13**.
 3. SafetyTruth + ExecutionEligibility.
-4. Mandatory PreTradeRiskService.
+4. PreTradeRiskService.
 5. AccountTruth + AccountSnapshotCoordinator.
 6. Durable PaperLedger + ReconciliationService.
 7. StateTruth + domain CAS.
-8. DeploymentTruth V2 / GCP identity and digest chain.
+8. DeploymentTruth V2 / immutable digest + serving-revision authority + identity separation.
 9. WorkCoordinator/idempotency.
 
-### P1
+Then P1:
 OptionChainTruth -> StreamTruth -> ScannerTruth -> PredictionTruth -> institutional UI/accessibility/observability.
 
-## 12. Product-design track
+## 9. Parallel `conflict_120826_0310` salvage lane
 
-Current actual product shell is accessible publicly in PAPER/ANALYZER mode and must remain explicit about safety:
-- command header: source/deployment evidence, market/session, ANALYZER/PAPER state, LIVE OFF/LOCKED;
-- no dashboard API-key prompt for PAPER viewing;
-- no public-read badge/control may imply write authority;
-- mutation capability panel: route capability, authority requirement, idempotency requirement, last decision/evidence ID, live mutations visibly HARD DENIED;
-- account/market/paper/risk states remain separate typed truths with age/provenance;
-- no unproven metric, readiness score, broker state or profitability claim may be shown as PASS;
-- responsive/mobile/accessibility/browser-console proof remains a separate P1 closure stream.
+Branch remains untrusted/stale intake and must never be merged wholesale.
 
-## 13. Next immediate cascade slice
+Last verified divergence: heavily behind current main; re-check before every salvage action.
 
-Proceed immediately to **P0-2 MutationPolicy runtime enforcement** on top of the merged CapabilityManifest and public-read-only PAPER shell.
+Security quarantine:
+- branch contains a committed plaintext broker credential file;
+- never quote the credential value;
+- never merge that file;
+- affected credential remains classified exposed until independent rotation is proven;
+- do not force-rewrite shared history without explicit authorization.
 
-Mandatory P0-2 proof targets:
-1. every runtime write resolves to a known capability;
-2. `UNKNOWN` is hard denied;
-3. `LIVE_MUTATION` is hard denied in ANALYZER/PAPER independent of UI;
-4. public dashboard reads cannot acquire/write capability;
-5. worker ingestion requires only its dedicated worker authority and replay controls;
-6. paper/risk/safety/scheduler/preference/analyzer writes use explicit capability-specific authority;
-7. required idempotency/replay controls are fail-closed;
-8. every denial/allow decision has non-secret request/evidence ID;
-9. exact-head tests/CI pass before merge;
-10. exact merge-SHA runtime mutation probes prove allowed/denied matrix without placing, modifying, cancelling or routing live orders.
+Current salvage classifications:
+- `connection_stability.py`: **ADAPT**;
+- broker token-health read model/UI: **ADAPT**;
+- real-data multibagger engine/UI: **ADAPT / RECOMMENDED after P0**;
+- F&O eligibility / health digest: **ADAPT after truth-contract review**;
+- branch token mint/persist writer: **REJECT**;
+- AuthGate/LoginPage restore: **REJECT**;
+- `.emergent` webhook cron as runtime authority: **REJECT**;
+- stale generated reports/dist as source authority: **REJECT**;
+- unrelated note/editor `design_guidelines.json`: **REJECT**.
 
-**USER ACTION REQUIRED: NO.**
+Primary P0 remediation continues independently; salvage work must never weaken current safety/deployment authority.
+
+## 10. Closure discipline
+
+- Merge != closure.
+- PR-head green != merged-revision runtime proof.
+- 0%-traffic failed candidate != serving deployment.
+- `latestReadyRevisionName`/service template != serving traffic authority.
+- UNKNOWN/STALE/ERROR remain fail-closed.
+- No profitability or real-money readiness claim is permitted without reproducible lifecycle/risk/model evidence.
+- LIVE stays OFF/LOCKED.
+
+**CURRENT USER ACTION REQUIRED: YES — Step 13, the single narrow Firestore IAM binding in Section 5.**
