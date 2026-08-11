@@ -2,9 +2,10 @@
 """Auto-deploy Genesis System3 web service to Cloud Run (image update only).
 
 Builds an immutable image tagged with the full git SHA, then patches the Cloud
-Run service container image + safe env vars. The dashboard API-key lock is
-always enforced: API_KEY and WORKER_PUSH_TOKEN are mounted from Secret
-Manager. Deployment fails closed if those secrets are missing.
+Run service container image + safe env vars. In ANALYZER/PAPER mode the
+interactive dashboard is intentionally public/read-only: REQUIRE_API_KEY=false
+and API_KEY is not mounted into the serving revision. Worker ingestion keeps its
+separate Secret Manager token.
 
 Live trading flags are always forced OFF.
 """
@@ -14,7 +15,6 @@ import argparse
 import json
 import os
 import subprocess
-import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -29,10 +29,6 @@ SERVICE = os.environ.get("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
 REPO = f"{REGION}-docker.pkg.dev/{PROJECT}/system3-containers/genesis-system3"
 BUILDER_SA = f"projects/{PROJECT}/serviceAccounts/system3-builder@{PROJECT}.iam.gserviceaccount.com"
 
-# Secret Manager secret IDs holding the dashboard's API key and worker-push
-# token. Configurable via env vars so different environments can use
-# different secrets, but always default to a named, reviewable secret.
-API_KEY_SECRET_ID = os.environ.get("API_KEY_SECRET_ID", "system3-dashboard-api-key")
 WORKER_PUSH_TOKEN_SECRET_ID = os.environ.get(
     "WORKER_PUSH_TOKEN_SECRET_ID", "system3-dashboard-worker-push-token"
 )
@@ -41,7 +37,9 @@ SAFE_ENV = (
     ("LIVE_TRADING_ENABLED", "0"),
     ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
     ("AUTO_EXECUTE_TRADES", "0"),
-    ("REQUIRE_API_KEY", "true"),
+    ("REQUIRE_API_KEY", "false"),
+    ("ANALYZE_MODE", "1"),
+    ("SYSTEM3_MODE", "ANALYZER"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
@@ -53,8 +51,6 @@ SAFE_ENV = (
     ("MEM_WARN_MB", "700"),
     ("MEM_GC_MB", "850"),
     ("MARKET_TOP_MICRO_STREAM", "0"),
-    ("DHAN_STATUS_AUTO_REFRESH", "0"),
-    ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     (
         "SYSTEM3_PUBLIC_BACKEND_URL",
         "https://genesis-system3-web-doq2wplepa-el.a.run.app",
@@ -78,9 +74,7 @@ def _require_secret_exists(session: AuthorizedSession, secret_id: str) -> None:
     if resp.status_code != 200:
         raise SystemExit(
             f"Required Secret Manager secret '{secret_id}' is missing or inaccessible "
-            f"(status {resp.status_code}). Create it and grant the runtime service "
-            "account roles/secretmanager.secretAccessor before deploying. See "
-            "docs/security/SECURE_DEPLOYMENT_PREREQUISITES.md."
+            f"(status {resp.status_code})."
         )
 
 
@@ -93,12 +87,10 @@ def _git_sha() -> str:
 
 def _archive_tarball(sha: str) -> Path:
     """Archive committed tree (CI) or worktree overlay for local emergency deploys."""
-    # Prefer non-C: scratch when available — local C: fills up from repeated ~20MB archives.
     scratch_root = Path(os.environ.get("SYSTEM3_DEPLOY_SCRATCH", r"E:\System3_deploy_scratch"))
     try:
         scratch_root.mkdir(parents=True, exist_ok=True)
         out = scratch_root / f"deploy_{sha[:12]}.tgz"
-        # Probe writability
         (scratch_root / ".write_test").write_text("ok", encoding="utf-8")
         (scratch_root / ".write_test").unlink(missing_ok=True)
     except Exception:
@@ -185,13 +177,7 @@ def _build_image(session: AuthorizedSession, bucket: str, object_name: str, imag
         print(f"build_wait[{i}] {status}")
         if status == "SUCCESS":
             return
-        if status in {
-            "FAILURE",
-            "CANCELLED",
-            "EXPIRED",
-            "TIMEOUT",
-            "INTERNAL_ERROR",
-        }:
+        if status in {"FAILURE", "CANCELLED", "EXPIRED", "TIMEOUT", "INTERNAL_ERROR"}:
             raise SystemExit(
                 f"Build {status}: {b.get('logUrl')} "
                 f"{b.get('failureInfo') or b.get('statusDetail')}"
@@ -205,7 +191,6 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     svc = session.get(svc_url, timeout=60).json()
     c0 = dict((svc.get("template", {}).get("containers") or [{}])[0])
     c0["image"] = image
-    # MemGuard showed ~408/480MB on 512Mi — leave headroom for Dhan OC + pandas.
     c0["resources"] = {
         **(c0.get("resources") or {}),
         "limits": {
@@ -218,19 +203,16 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
     for k, v in SAFE_ENV:
         env_map[k] = {"name": k, "value": v}
     env_map["DEPLOY_GIT_SHA"] = {"name": "DEPLOY_GIT_SHA", "value": sha}
-    # Dashboard API_KEY and WORKER_PUSH_TOKEN are always mounted from Secret
-    # Manager (never as plain env values, never logged).
-    env_map["API_KEY"] = {
-        "name": "API_KEY",
-        "valueSource": {"secretKeyRef": {"secret": API_KEY_SECRET_ID, "version": "latest"}},
-    }
+
+    # Public PAPER/ANALYZER dashboard: no reusable dashboard API key in the
+    # serving revision. Worker ingestion keeps its separate secret.
+    env_map.pop("API_KEY", None)
     env_map["WORKER_PUSH_TOKEN"] = {
         "name": "WORKER_PUSH_TOKEN",
         "valueSource": {
             "secretKeyRef": {"secret": WORKER_PUSH_TOKEN_SECRET_ID, "version": "latest"}
         },
     }
-    # Never keep PIN/TOTP on Cloud Run.
     for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP"):
         env_map.pop(drop, None)
     c0["env"] = list(env_map.values())
@@ -269,20 +251,17 @@ def main() -> int:
         os.environ["SYSTEM3_DEPLOY_INCLUDE_WORKTREE"] = "1"
 
     sha = _git_sha()
-    # Unique tag so Cloud Run always creates a new revision (same git SHA
-    # retag alone does not force a pull when the URI string is unchanged).
     deploy_stamp = int(time.time())
     image = f"{REPO}:{sha[:12]}-{deploy_stamp}"
     print("SHA", sha)
     print("IMAGE", image)
     print("SERVICE", SERVICE)
     print("LIVE_OFF enforced")
-    print("DASHBOARD_API_LOCK enforced (REQUIRE_API_KEY=true)")
+    print("DASHBOARD_PUBLIC_READONLY enforced (REQUIRE_API_KEY=false, API_KEY unmounted)")
 
     session = _session()
-    _require_secret_exists(session, API_KEY_SECRET_ID)
     _require_secret_exists(session, WORKER_PUSH_TOKEN_SECRET_ID)
-    print("SECRET_MANAGER_PREREQUISITES_OK", API_KEY_SECRET_ID, WORKER_PUSH_TOKEN_SECRET_ID)
+    print("WORKER_SECRET_PREREQUISITE_OK", WORKER_PUSH_TOKEN_SECRET_ID)
     tgz = _archive_tarball(sha)
     print("ARCHIVE_BYTES", tgz.stat().st_size)
     bucket, object_name = _upload_source(session, tgz, sha)

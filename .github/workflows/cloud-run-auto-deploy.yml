@@ -1,6 +1,8 @@
 name: Cloud Run Auto Deploy
 
 # GitHub is the code source; Google Cloud is the runtime and scheduler.
+# PAPER/ANALYZER dashboard reads are public. LIVE remains locked OFF and
+# unauthenticated mutation requests remain fail-closed in backend policy.
 on:
   push:
     branches: [main]
@@ -11,7 +13,7 @@ on:
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/gcp_runtime_evidence.py"
-      - "scripts/gcp_session_runtime_proof.py"
+      - "scripts/gcp_public_dashboard_runtime_proof.py"
       - "scripts/sync_dhan_instruments_master.py"
       - "src/**"
       - "config/**"
@@ -40,7 +42,6 @@ jobs:
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
       CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
-      API_KEY_SECRET_ID: ${{ vars.API_KEY_SECRET_ID || 'system3-dashboard-api-key' }}
       WORKER_PUSH_TOKEN_SECRET_ID: ${{ vars.WORKER_PUSH_TOKEN_SECRET_ID || 'system3-dashboard-worker-push-token' }}
     steps:
       - name: Checkout
@@ -78,8 +79,9 @@ jobs:
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
               "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
-              "scripts/gcp_session_runtime_proof.py": "SESSIONTRUTH_RUNTIME_PROOF",
-              "dashboard/frontend/src/components/BrokerProofPanel.tsx": "TOKEN ROTATION PROOF",
+              "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
+              "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
+              "dashboard/frontend/src/App.tsx": "public/read-only",
               "dashboard/backend/security_policy.py": "AUTH_REQUIRED_FOR_MUTATION",
           }
           for path, marker in required.items():
@@ -89,19 +91,18 @@ jobs:
           print("STATIC_GATES_OK", sorted(required))
           PY
 
-      - name: Verify required Secret Manager secrets exist (fail closed)
+      - name: Verify worker Secret Manager secret exists
         run: |
-          for SECRET in "${API_KEY_SECRET_ID}" "${WORKER_PUSH_TOKEN_SECRET_ID}"; do
-            gcloud secrets describe "${SECRET}" --project="${GOOGLE_CLOUD_PROJECT}" >/dev/null \
-              || { echo "Required secret '${SECRET}' does not exist in Secret Manager. Create it before deploying (see docs/security/SECURE_DEPLOYMENT_PREREQUISITES.md)." >&2; exit 1; }
-          done
+          gcloud secrets describe "${WORKER_PUSH_TOKEN_SECRET_ID}" \
+            --project="${GOOGLE_CLOUD_PROJECT}" >/dev/null \
+            || { echo "Required worker secret '${WORKER_PUSH_TOKEN_SECRET_ID}' does not exist." >&2; exit 1; }
 
       - name: Build frontend proof
         working-directory: dashboard/frontend
         run: |
           npm ci --legacy-peer-deps
           npm run build
-          grep -R -q "TOKEN ROTATION PROOF" dist/assets
+          grep -R -q "SYSTEM3" dist/assets
 
       - name: Install deploy dependencies
         run: |
@@ -116,18 +117,33 @@ jobs:
             --format='value(metadata.name,status.url)' >/tmp/preflight-service.txt
           test -s /tmp/preflight-service.txt
 
-      - name: Deploy guarded Cloud Run service
+      - name: Deploy guarded public PAPER Cloud Run service
         run: python scripts/gcp_cloud_run_auto_deploy.py
 
-      - name: Enforce dynamic token runtime and single active instance
+      - name: Enforce public read-only dashboard and dynamic token runtime
         run: |
           gcloud run services update "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --min-instances=0 \
             --max-instances=1 \
-            --update-env-vars="REQUIRE_API_KEY=true,DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
-            --update-secrets="API_KEY=${API_KEY_SECRET_ID}:latest,WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"
+            --update-env-vars="REQUIRE_API_KEY=false,DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
+            --remove-secrets=API_KEY \
+            --update-secrets="WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"
+
+      - name: Prove and capture public PAPER dashboard without API key
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/gcp_public_dashboard_runtime_proof.py
+
+      - name: Upload public dashboard visual proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-paper-dashboard-proof-${{ github.run_number }}
+          path: reports/latest/public_dashboard_proof/
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Configure rotator IAM, Cloud Run Job and Cloud Scheduler
         run: |
@@ -140,7 +156,7 @@ jobs:
           fi
           echo "RUNTIME_SERVICE_ACCOUNT=${RUNTIME_SA}" >> "$GITHUB_ENV"
 
-          for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret "${API_KEY_SECRET_ID}" "${WORKER_PUSH_TOKEN_SECRET_ID}"; do
+          for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret "${WORKER_PUSH_TOKEN_SECRET_ID}"; do
             gcloud secrets add-iam-policy-binding "${SECRET}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
               --member="serviceAccount:${RUNTIME_SA}" \
@@ -246,25 +262,25 @@ jobs:
           if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic":
               print("DYNAMIC_TOKEN_SOURCE_MISSING", env.get("DHAN_TOKEN_SOURCE"))
               sys.exit(3)
-          if env.get("REQUIRE_API_KEY") not in ("true", "True"):
-              print("DASHBOARD_API_LOCK_NOT_ENFORCED", env.get("REQUIRE_API_KEY"))
+          if str(env.get("REQUIRE_API_KEY") or "").lower() not in ("0", "false", "no", "off"):
+              print("PUBLIC_DASHBOARD_MODE_NOT_ENFORCED", env.get("REQUIRE_API_KEY"))
               sys.exit(4)
-          if "API_KEY" not in secret_env_names:
-              print("DASHBOARD_API_KEY_SECRET_NOT_MOUNTED")
+          if "API_KEY" in secret_env_names:
+              print("DASHBOARD_API_KEY_STILL_MOUNTED")
               sys.exit(5)
           if "WORKER_PUSH_TOKEN" not in secret_env_names:
               print("WORKER_PUSH_TOKEN_SECRET_NOT_MOUNTED")
               sys.exit(5)
-          if "API_KEY" in env or "WORKER_PUSH_TOKEN" in env:
-              print("DASHBOARD_SECRET_LEAKED_AS_PLAIN_VALUE")
+          if "WORKER_PUSH_TOKEN" in env:
+              print("WORKER_PUSH_TOKEN_LEAKED_AS_PLAIN_VALUE")
               sys.exit(5)
           if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata":
               print("SCHEDULER_CONFIG_INVALID", scheduler.get("schedule"), scheduler.get("timeZone"))
               sys.exit(6)
           print("CLOUD_RUNTIME_SAFETY_OK", {
               "token_source": env.get("DHAN_TOKEN_SOURCE"),
-              "dashboard_api_lock": "enforced",
-              "dashboard_api_key_mounted_from_secret_manager": True,
+              "dashboard_access": "public-readonly",
+              "dashboard_api_key_mounted": False,
               "worker_push_token_mounted_from_secret_manager": True,
               "live_trading": env.get("LIVE_TRADING_ENABLED"),
               "scheduler": scheduler.get("name"),
@@ -273,36 +289,21 @@ jobs:
           })
           PY
 
-      - name: Prove deployed SessionTruth lifecycle
-        run: python scripts/gcp_session_runtime_proof.py
-
-      - name: Public UI broker proof
+      - name: Public dashboard and broker proof without API key
         run: |
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --format='value(status.url)')
 
-          curl -fsS --max-time 30 \
-            "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
-          jq '{required,configured,authenticated,mode,session_backend}' /tmp/auth.json
-          jq -e '.required == true and .configured == true and .authenticated == false and .mode == "session_cookie_or_header" and .session_backend == "firestore"' /tmp/auth.json >/dev/null
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
+          jq '{required,configured,authenticated,mode}' /tmp/auth.json
+          jq -e '.required == false and .mode == "auth_disabled"' /tmp/auth.json >/dev/null
 
-          # Verify anonymous session creation and protected mutation routes fail closed.
-          # Only an intentionally-invalid probe key is used; the real secret is never read or logged.
-          SESSION_STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
-            -X POST "${SERVICE_URL}/api/auth/session" \
-            -H 'Content-Type: application/json' \
-            -d '{"api_key":"deploy-ci-invalid-probe-second"}')
-          echo "ANON_SESSION_WITH_INVALID_KEY_STATUS ${SESSION_STATUS}"
-          [ "${SESSION_STATUS}" = "401" ] || { echo "Expected 401 for invalid dashboard API key probe, got ${SESSION_STATUS}"; exit 1; }
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/state" > /tmp/state.json
 
           for ATTEMPT in 1 2 3 4 5 6; do
-            DASHBOARD_API_KEY=$(gcloud secrets versions access latest --secret="${API_KEY_SECRET_ID}" --project="${GOOGLE_CLOUD_PROJECT}")
-            curl -fsS --max-time 30 \
-                -H "X-API-Key: ${DASHBOARD_API_KEY}" \
-              "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
-            unset DASHBOARD_API_KEY
+            curl -fsS --max-time 30 "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
             if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then
               break
             fi
@@ -334,7 +335,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Enforce deployment provenance and safety lock
+      - name: Enforce deployment provenance and public-dashboard safety lock
         if: always()
         run: |
           python - <<'PY'
@@ -355,12 +356,11 @@ jobs:
               "system3_live_trading_allowed",
               "auto_execute_trades",
               "secret_payloads_exposed",
+              "api_key_required",
+              "api_key_mounted",
           ):
               if safety.get(key):
                   failures.append(f"{key}=true")
-          for key in ("api_key_required", "api_key_mounted"):
-              if not safety.get(key):
-                  failures.append(f"{key}=false")
           if report.get("secret_values_exposed"):
               failures.append("secret_values_exposed=true")
           print("GCP_RUNTIME_LOCK", {
@@ -399,7 +399,7 @@ jobs:
           body = json.dumps({
               "state": "success",
               "context": "cloud-run/runtime-proof",
-              "description": "Cloud Run revision and SessionTruth runtime proof passed",
+              "description": "Cloud Run PAPER dashboard public/read-only proof passed",
               "target_url": target,
           }).encode()
           req = urllib.request.Request(
@@ -416,7 +416,6 @@ jobs:
           with urllib.request.urlopen(req, timeout=30) as response:
               if response.status not in (200, 201):
                   raise SystemExit(f"COMMIT_STATUS_PUBLISH_FAILED {response.status}")
-          print("COMMIT_STATUS_PUBLISHED", sha, "cloud-run/runtime-proof", "success")
           PY
 
       - name: Publish exact-SHA runtime proof failure
@@ -433,7 +432,7 @@ jobs:
           body = json.dumps({
               "state": "failure",
               "context": "cloud-run/runtime-proof",
-              "description": "Cloud Run deployment or SessionTruth runtime proof failed",
+              "description": "Cloud Run deployment or public PAPER dashboard proof failed",
               "target_url": target,
           }).encode()
           req = urllib.request.Request(
@@ -450,5 +449,4 @@ jobs:
           with urllib.request.urlopen(req, timeout=30) as response:
               if response.status not in (200, 201):
                   raise SystemExit(f"COMMIT_STATUS_PUBLISH_FAILED {response.status}")
-          print("COMMIT_STATUS_PUBLISHED", sha, "cloud-run/runtime-proof", "failure")
           PY

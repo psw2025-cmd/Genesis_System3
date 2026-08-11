@@ -1,5 +1,3 @@
-import { useAuth } from './hooks/useAuth'
-import { LoginPage } from './components/LoginPage'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
@@ -148,33 +146,22 @@ function Content() {
   }
 }
 
-
-function AuthGate({ children }: { children: React.ReactNode }) {
-  const { checked, authenticated, login } = useAuth()
-  if (!checked) return (
-    <div style={{minHeight:'100vh',background:'#070b14',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{color:'#3b82f6',fontFamily:'monospace',letterSpacing:4,fontSize:13}}>SYSTEM3 LOADING…</div>
-    </div>
-  )
-  if (!authenticated) return <LoginPage onLogin={login} />
-  return <>{children}</>
-}
-
 export default function App() {
+  // The deployed dashboard is intentionally public/read-only while System3 is
+  // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
+  // mutation requests; public visibility does not grant execution authority.
   useData()
   return (
-    <AuthGate>
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
-                    background: 'var(--surface)', overflow: 'hidden' }}>
-        <TopBar />
-        <ProductionProofBar />
-        <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <Sidebar />
-          <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
-            <Content />
-          </main>
-        </div>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
+                  background: 'var(--surface)', overflow: 'hidden' }}>
+      <TopBar />
+      <ProductionProofBar />
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <Sidebar />
+        <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+          <Content />
+        </main>
       </div>
-    </AuthGate>
+    </div>
   )
 }

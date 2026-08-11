@@ -110,69 +110,58 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
         self.assertIn('--schedule="30 7 * * *"', deploy)
 
-    def test_dashboard_api_lock_stays_enforced_across_gcp_deploy_paths(self):
+    def test_public_paper_dashboard_contract_across_gcp_deploy_paths(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
         deploy_script = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
         manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
+        recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
-        # Deployment must never force auth off or strip the API key.
-        self.assertNotIn("REQUIRE_API_KEY=false", workflow)
-        self.assertNotIn('--remove-secrets="API_KEY"', workflow)
-        self.assertIn("REQUIRE_API_KEY=true", workflow)
-
-        # Secret Manager references for both secrets, with configurable IDs
-        # and secure named defaults, fail-closed prerequisite check, and IAM.
-        self.assertIn("API_KEY_SECRET_ID", workflow)
-        self.assertIn("system3-dashboard-api-key", workflow)
+        # PAPER/ANALYZER dashboard reads are public and the reusable dashboard
+        # API key must not be mounted or reintroduced by any GCP deploy path.
+        self.assertIn("REQUIRE_API_KEY=false", workflow)
+        self.assertIn("--remove-secrets=API_KEY", workflow)
+        self.assertNotIn("API_KEY_SECRET_ID", workflow)
+        self.assertNotIn("system3-dashboard-api-key", workflow)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
-        self.assertIn('--update-secrets="API_KEY=${API_KEY_SECRET_ID}:latest,WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"', workflow)
-        self.assertIn("Verify required Secret Manager secrets exist (fail closed)", workflow)
-        self.assertIn('gcloud secrets describe "${SECRET}"', workflow)
 
-        # Post-deploy checks assert auth is required, configured, and that
-        # anonymous requests are not authenticated.
-        self.assertIn('.required == true', workflow)
-        self.assertIn('.configured == true', workflow)
-        self.assertIn('.authenticated == false', workflow)
-        self.assertNotIn('.mode == "auth_disabled"', workflow)
-        self.assertIn('"API_KEY" not in secret_env_names', workflow)
+        # Post-deploy read proof must explicitly require auth-disabled mode.
+        self.assertIn('.required == false', workflow)
+        self.assertIn('.mode == "auth_disabled"', workflow)
+        self.assertIn('"API_KEY" in secret_env_names', workflow)
         self.assertIn('"WORKER_PUSH_TOKEN" not in secret_env_names', workflow)
 
-        # No secret values are ever printed to logs.
-        self.assertNotIn("cat /tmp/auth.json", workflow)
-
-        # Live-trading flags stay off regardless of the auth hardening.
+        # Live-trading flags stay off regardless of public dashboard visibility.
         self.assertIn("LIVE_TRADING_ENABLED=0", workflow)
         self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", workflow)
         self.assertIn("AUTO_EXECUTE_TRADES=0", workflow)
 
-        self.assertIn('("REQUIRE_API_KEY", "true")', deploy_script)
-        self.assertIn("API_KEY_SECRET_ID", deploy_script)
+        self.assertIn('("REQUIRE_API_KEY", "false")', deploy_script)
+        self.assertNotIn("API_KEY_SECRET_ID", deploy_script)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", deploy_script)
-        self.assertIn("_require_secret_exists", deploy_script)
-        self.assertIn('"secretKeyRef"', deploy_script)
-        self.assertIn("DASHBOARD_API_LOCK enforced", deploy_script)
-        self.assertNotIn('for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP", "API_KEY")', deploy_script)
+        self.assertIn('env_map.pop("API_KEY", None)', deploy_script)
+        self.assertIn("DASHBOARD_PUBLIC_READONLY enforced", deploy_script)
 
-        # Cloud Run ingress stays public for the login/session flow; the app
-        # layer protects the APIs. Manual script still fails closed on
-        # missing secrets and never forces auth off.
         self.assertIn("--allow-unauthenticated", manual_script)
-        self.assertNotIn("--no-allow-unauthenticated", manual_script)
-        self.assertNotIn("REQUIRE_API_KEY=false", manual_script)
-        self.assertIn("REQUIRE_API_KEY=true", manual_script)
-        self.assertIn('--set-secrets="API_KEY=${API_KEY_SECRET_ID}:latest,WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"', manual_script)
-        self.assertIn("gcloud secrets describe", manual_script)
+        self.assertIn("REQUIRE_API_KEY=false", manual_script)
+        self.assertIn("--remove-secrets=API_KEY", manual_script)
+        self.assertNotIn("API_KEY_SECRET_ID", manual_script)
+        self.assertIn("WORKER_PUSH_TOKEN", manual_script)
 
-    def test_runtime_evidence_lock_requires_auth_enabled_not_disabled(self):
-        # The provenance/safety-lock step must require api_key_required and
-        # api_key_mounted to be true (inverse of the old analyzer-phase gate,
-        # which treated dashboard auth being on as a failure).
+        # Manual Dhan recovery proves broker status through anonymous read-only
+        # GET and must never read/send the dashboard key.
+        self.assertNotIn("system3-dashboard-api-key", recovery)
+        self.assertNotIn("X-API-Key", recovery)
+        self.assertIn('/api/broker/status', recovery)
+
+    def test_runtime_evidence_lock_requires_public_dashboard_and_no_api_key_mount(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-        self.assertIn('for key in ("api_key_required", "api_key_mounted"):', workflow)
-        self.assertIn("if not safety.get(key):", workflow)
-        self.assertNotIn('"api_key_required",\n              "api_key_mounted",', workflow)
+        # In public PAPER mode, api_key_required/api_key_mounted being true is a
+        # deployment failure; worker auth remains separate.
+        self.assertIn('"api_key_required",', workflow)
+        self.assertIn('"api_key_mounted",', workflow)
+        self.assertIn("if safety.get(key):", workflow)
+        self.assertNotIn('for key in ("api_key_required", "api_key_mounted"):', workflow)
 
 
 if __name__ == "__main__":
