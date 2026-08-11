@@ -178,11 +178,13 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("--update-secrets=WORKER_PUSH_TOKEN=", deploy_script)
         self.assertIn("DASHBOARD_PUBLIC_READONLY enforced", deploy_script)
 
-        self.assertIn("--allow-unauthenticated", manual_script)
-        self.assertIn("REQUIRE_API_KEY=false", manual_script)
-        self.assertIn("--remove-secrets=API_KEY", manual_script)
-        self.assertNotIn("API_KEY_SECRET_ID", manual_script)
-        self.assertIn("WORKER_PUSH_TOKEN", manual_script)
+        # Manual deployment is now a compatibility wrapper only. It must never
+        # contain an independent production-traffic `gcloud run deploy` path.
+        self.assertIn("scripts/gcp_cloud_run_auto_deploy.py", manual_script)
+        self.assertNotIn("gcloud run deploy genesis-system3-web", manual_script)
+        self.assertIn("LIVE_TRADING_ENABLED=0", manual_script)
+        self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", manual_script)
+        self.assertIn("AUTO_EXECUTE_TRADES=0", manual_script)
 
         self.assertNotIn("system3-dashboard-api-key", recovery)
         self.assertNotIn("X-API-Key", recovery)
