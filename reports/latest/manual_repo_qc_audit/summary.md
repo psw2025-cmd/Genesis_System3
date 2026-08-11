@@ -1,26 +1,27 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 10:51 IST`
+Updated: `2026-08-11 11:49 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `c240ff0c6cb5bd0261ab247ecaf173be5c85e6ac`.
-- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..c240ff0c6cb5bd0261ab247ecaf173be5c85e6ac` is **15 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
-- PR #97 remains OPEN at head `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main`. Its synthetic-P&L suppression still substitutes zero for unavailable/rejected P&L, so it does not close null/provenance concerns.
+- Repository HEAD observed at start of this iteration: `e38ebf93b1c401b70eba2ea5d346d3bf09e5003c`.
+- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..e38ebf93b1c401b70eba2ea5d346d3bf09e5003c` is **16 commits ahead**, **0 behind**, and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
+- PR #97 remains OPEN at `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main` and its synthetic-P&L guard still substitutes numeric zero for rejected/unavailable P&L rather than nullable typed truth.
 - PR #96 remains the newest merged application/UI PR in the current evidence set.
-- Exact application-HEAD workflow/runtime proof remains **NOT PROVEN**; the GitHub connector returned no workflow runs and no combined statuses bound to application HEAD `b70af343...` in this iteration.
+- Exact application-HEAD CI proof remains **NOT PROVEN**: GitHub returned no workflow runs and no combined status checks for application HEAD `b70af343...` in this iteration.
 - Google Cloud Run / Google Cloud services remain the sole deployment authority. Render-era runtime assumptions are migration debt only.
 - Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
-- This Markdown remains the single continuously maintained audit/remediation authority.
+- This Markdown is the single continuously maintained audit/remediation authority.
 
 ## 1. Executive verdict
 
 | Area | Verdict | Solution state |
 |---|---|---|
 | Exact application HEAD CI/runtime proof | **NOT PROVEN** | exact-revision provenance gate required |
-| Dashboard auth/session | **FAIL / P0-P1** | **READY TO PATCH** |
+| Dashboard auth/session | **FAIL / P0-P1** | **READY TO PATCH via SessionTruth** |
+| Mutation authorization / CSRF / idempotency | **INCOMPLETE / P0-P1** | **READY TO PATCH** |
 | Global safety/mode truth | **FAIL / P0** | **READY TO PATCH** via `SafetyTruth` |
 | DB/state-store authority | **FAIL / P0-P1** | **READY TO PATCH** via `StateTruth` + domain-CAS |
 | WebSocket/REST stream truth | **FAIL / P0-P1** | **READY TO PATCH** via `StreamTruth` |
@@ -33,8 +34,8 @@ Updated: `2026-08-11 10:51 IST`
 | AI prediction ledger | **MISSING / P0-P1** | **READY TO PATCH/DESIGN** via `PredictionTruth` |
 | Model provenance / leakage control | **INCOMPLETE / P0-P1** | **READY TO PATCH** |
 | Probability calibration / drift | **NOT PROVEN / P1** | **READY TO PATCH/DESIGN** |
-| Responsive/mobile workstation | **FAIL / P1** | **READY TO PATCH** via responsive shell |
-| Accessibility/keyboard/focus/live-state semantics | **FAIL / P1** | **READY TO PATCH** via `AccessibleWorkstationShell` |
+| Responsive/mobile workstation | **FAIL / P1** | **READY TO PATCH** |
+| Accessibility/keyboard/focus/live-state semantics | **FAIL / P1** | **READY TO PATCH** |
 | Google Cloud deployment provenance | **FAIL / P0-P1** | **READY TO PATCH** via `DeploymentTruth` |
 | Observability/runtime error truth | **INCOMPLETE / P1** | **READY TO PATCH/DESIGN** |
 | Real-money trade ready | **NO** | locked |
@@ -47,7 +48,7 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 
 ## 3. Retained findings registry
 
-- `AUTH-001..004` OPEN: login contract mismatch, pre-auth polling, raw browser API-key storage, incomplete session expiry/revocation proof.
+- `AUTH-001..011` OPEN: login contract mismatch, pre-auth startup exposure, raw browser API-key storage, non-expiring deterministic server token, logout without server revocation, no proven auth-attempt throttling, cross-origin-capable global header injection, cookie security/runtime uncertainty and incomplete mutation idempotency coverage.
 - `UI-001..019` OPEN: false-valid defaults, source inference, empty/error ambiguity, missing authoritative mode/provenance, weak responsive/accessibility and deployment/build truth.
 - `CHAIN-001..014` OPEN: warming PCR false-data, weak Dhan proof, incomplete Greeks, null→zero parsing, spread validity, expiry-insensitive cache, weak disk-cache provenance, invented source, generic expiry fallback and parser-error collapse.
 - `SCAN-001..010` OPEN: same-day stale rank acceptance, ignored refresh intent, scanner fallback auto-eligibility, hard-coded live provenance, rotating-shard high-watermark retention, stale-row restamping, disk-cache age/session ambiguity, duplicate REST/WS writers, load-heavy equity rotation and UI freshness/eligibility ambiguity.
@@ -60,424 +61,278 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 - `ML-001..014` OPEN: missing immutable prediction ledger, overloaded model-proof boolean, dictionary-first model selection, rank→confidence misuse, ambiguous percentage units, unknown→zero metrics, tracker type bug, unsafe accuracy math, non-atomic tracker persistence, non-purged/non-global time split, incomplete artifact identity, selection/evaluation leakage, missing calibration and no prediction→after-cost linkage.
 - `A11Y-001..012` OPEN: fixed shell, clipped truth, inefficient keyboard traversal, non-semantic interactive controls, color-only indicators, weak live-region semantics, very small text, fragile overflow ownership, inconsistent focus, dynamic-state announcement gap, contrast redundancy and missing exact-browser proof.
 
-## 4. Latest deep slice — scanner/ranker contracts, freshness, stability and market-open load
+## 4. Latest deep slice — authentication, session lifetime, CSRF and mutation authorization
 
-### SCAN-001 / P0-P1 — same-day rank history can be treated as current without intraday freshness proof
+### AUTH-001 / P0 — primary login contract is broken while secondary unlock uses the correct contract
 
-**Exact proof:** `dashboard/backend/app.py:get_gain_rank()` loads `state/gain_rank_history.json`, selects the newest entry whose `date` equals today and sets `stale` only from date equality. It does not require `generated_utc`, source-event age, scanner cycle ID, market session or TTL before returning `status=ok`.
+**Exact proof:** backend `DashboardAuthRequest` requires JSON field `api_key`. `create_dashboard_session()` validates `payload.api_key`. `LoginPage.tsx` POSTs `/api/auth/session` with `Content-Type` and `X-API-Key` headers but **no request body**. `AuthUnlock.tsx` separately POSTs `body: JSON.stringify({ api_key: apiKey.trim() })` and therefore matches the backend model.
 
-**Symptom/root cause:** a ranking produced earlier in the same trading day can remain authoritative for hours solely because its calendar date equals today.
+**Symptom/root cause:** two frontend authentication surfaces implement different contracts; the main AuthGate login can receive FastAPI validation failure while the in-dashboard unlock can succeed.
 
-**Real-money impact:** stale contracts can be presented as current opportunities even after price, liquidity, IV, expiry relevance or market leadership changed.
+**Real-money impact:** operators can be locked out of protected truth, while UI may surface auth failures as broker/data problems; future mutation authorization cannot rely on a login flow that is not contract-consistent.
 
-**Exact files/routes:** `dashboard/backend/app.py`, `/api/gain_rank`, gain-rank persistence producer, frontend `useData.ts`, `TradeTab.tsx`.
+**Exact files/routes:** `dashboard/frontend/src/components/LoginPage.tsx`, `dashboard/frontend/src/components/AuthUnlock.tsx`, `dashboard/backend/app.py:/api/auth/session`.
 
-**Target behavior:** every rank payload is one immutable `ScannerSnapshot` with `snapshot_id`, source-event range, generated/received times, market session, age, TTL, universe ID and schema/rank-policy version. A current-day row whose TTL expired is `STALE`, never current.
+**Target behavior:** one shared `AuthClient.createSession(apiKey)` contract, used by every login/unlock surface; the API key is submitted once over TLS and never retained by the browser after cookie creation.
 
-**Minimal safe implementation:** reject or watermark stored rank history unless snapshot age and session identity validate. Historical rows remain available only through history/audit views.
+**Minimal safe implementation:** remove the `X-API-Key` login header and send only `{api_key}` to `/api/auth/session`; on success clear the component key state and rely exclusively on the HttpOnly cookie.
 
-**API/schema changes:** add `snapshot_id`, `generated_at`, `source_event_max_at`, `age_ms`, `ttl_ms`, `market_session_id`, `quality`, `rank_policy_version` and per-row evidence IDs.
+**API/schema changes:** keep current request body shape for compatibility; return a typed `SessionTruth` response containing session ID, issued/expiry times, auth method and policy revision, but never secret material.
 
-**Regression risks:** dashboards becoming empty when no fresh scan is available; migration of old history records without timestamp metadata.
+**Regression risks:** tooling that currently authenticates only by header must remain supported for non-browser automation through a separate documented header-auth mode.
 
-**Closure tests/PASS:** create a same-date fixture older than TTL and prove `/api/gain_rank` returns `STALE` and zero execution-eligible rows; verify fresh fixture returns current; verify market-session rollover invalidates yesterday/same-date test fixtures where session IDs disagree.
+**Closure tests/PASS:** LoginPage and AuthUnlock both authenticate against the same test server; malformed/missing body returns controlled error; valid key establishes cookie; no browser storage contains the raw key afterward.
 
-**Rollback/fail-safe:** stale historical data may remain visible with watermark for analysis, but scanner candidate eligibility is inhibited.
-
-**Status:** `READY TO PATCH`.
-
-### SCAN-002 / P1 — `/api/gain_rank?refresh=true` declares refresh intent but does not use it
-
-**Exact proof:** `get_gain_rank(refresh: bool=False)` defines the query parameter, but the current function body does not branch on `refresh`; live fallback occurs only when the stored latest entry is stale/missing by the weak date rule.
-
-**Symptom/root cause:** operator/client refresh intent is semantically misleading and may leave a same-day stale ranking unchanged.
-
-**Real-money impact:** a visible refresh control/caller can imply the board was recomputed when no recomputation occurred.
-
-**Solution:** either remove the parameter or make `refresh=true` enqueue/request a server-authoritative scan that returns a new `snapshot_id`; never block the event loop for an uncontrolled full scan. Return `202/PENDING` when a new scan is in progress rather than silently serving old data as refreshed.
-
-**Tests/PASS:** stale same-day snapshot + `refresh=true` must yield a different snapshot ID or explicit `PENDING/FAILED`, never unchanged data labeled current.
+**Rollback/fail-safe:** auth failure keeps protected data and all mutations locked.
 
 **Status:** `READY TO PATCH`.
 
-### SCAN-003 / P0-P1 — scanner fallback automatically marks rows option-eligible without liquidity/risk/evidence validation
+### AUTH-002 / P0-P1 — raw API key is persisted in `sessionStorage` and globally attached to requests
 
-**Exact proof:** both backend live fallback in `get_gain_rank()` and frontend WebSocket `market_top_update` mapping set `option_eligible: true` and `recommendation: 'WATCH'` for rows derived from top gain percentage. No spread, quote completeness, source age, expiry validity, contract identity, risk decision or prediction evidence is required at this point.
+**Exact proof:** `LoginPage.tsx` writes `sessionStorage.setItem('s3_api_key', key.trim())`. `useAuth.ts` reads that value in a global axios interceptor and a global replacement of `window.fetch`, attaching `X-API-Key` whenever the key exists.
 
-**Symptom/root cause:** ranking and eligibility are conflated. Being in a gainers table is treated as sufficient to mark an option contract eligible.
+**Symptom/root cause:** a long-lived reusable secret is kept in JavaScript-readable storage even though an HttpOnly cookie already exists.
 
-**Real-money impact:** a high-gain but illiquid, crossed, stale, wrong-expiry or otherwise invalid contract can appear operationally actionable.
+**Real-money impact:** any successful XSS or compromised third-party script can read/exfiltrate the dashboard API key and then authenticate independently of the browser session.
 
-**Solution:** `ranked` and `eligible` become independent typed states. Scanner produces `WATCH` candidates only. `eligible=true` may be set only by `CandidateValidationService` after `OptionChainTruth`, liquidity policy, `PredictionTruth` if required, and `PreTradeRiskService` evidence are present.
+**Solution:** cookie-only browser authentication. Remove `s3_api_key`, remove the axios/fetch API-key injection patches, and keep `credentials:'include'` only for same-origin System3 API calls.
 
-**Regression risks:** fewer green/eligible rows until validation services are wired; downstream code assuming boolean eligibility.
+**Security constraint:** no localStorage/sessionStorage/IndexedDB/raw JS variable persists reusable authentication material after session establishment.
 
-**Closure tests/PASS:** missing bid/ask, stale event age, unknown expiry, missing risk decision and incomplete quote must each force `WATCH/INELIGIBLE`; only an exact validated candidate may become paper-eligible.
-
-**Status:** `READY TO PATCH`.
-
-### SCAN-004 / P1 — contract rows hard-code live Dhan provenance independently of chain truth
-
-**Exact proof:** `contract_gain_scanner.py:_contract_row()` assigns `data_provenance='DHAN_OPTION_CHAIN_LIVE'` and a `LIVE DHAN GAINER` note for every scored row, while source chain quality/status/freshness is handled separately at segment level. `get_gain_rank()` also falls back to `DHAN_OPTION_CHAIN_LIVE` when row provenance is absent.
-
-**Symptom/root cause:** row provenance is manufactured by the ranking layer instead of inherited from a validated acquisition envelope.
-
-**Real-money impact:** cached/EOD/stale or otherwise unproven chain rows can receive live-sounding provenance and appear fresher than the source evidence supports.
-
-**Solution:** scanner rows may only reference a `chain_truth_id`/provider event ID. Provenance, session and freshness are copied from the authoritative `OptionChainTruth`; ranking code cannot invent them.
-
-**Tests/PASS:** stale/EOD/cache chain input must produce corresponding stale/snapshot row quality and can never serialize `DHAN_OPTION_CHAIN_LIVE` unless the input truth was validated live.
+**Tests/PASS:** browser storage scan after login shows no API key; protected API calls succeed via HttpOnly cookie; XSS simulation cannot read session credential through JavaScript.
 
 **Status:** `READY TO PATCH`.
 
-### SCAN-005 / P0-P1 — rotating-shard merge is a high-watermark algorithm that can retain obsolete gains
+### AUTH-003 / P0-P1 — global fetch/axios patch can attach the API key outside the System3 origin
 
-**Exact proof:** `contract_gain_scanner.py:merge_market_top_reports()` merges old and incoming rows by contract key and keeps the new row only when `incoming.gain_pct >= previous.gain_pct`. If the same contract's gain falls from e.g. 40% to 12%, the older 40% row remains. Contracts absent from the incoming shard are also retained.
+**Exact proof:** `useAuth.ts` replaces `window.fetch` globally and does not inspect the request URL/origin before adding `X-API-Key`; the axios interceptor similarly does not restrict `cfg.url` to the System3 API origin.
 
-**Symptom/root cause:** the board is a historical maximum-gain memory, not a current market snapshot.
+**Symptom/root cause:** authentication is implemented as a global browser networking side effect rather than a scoped API client.
 
-**Real-money impact:** old winners can dominate current rankings after their gain collapses, creating false opportunity ordering and contaminating scanner→prediction/paper evidence.
+**Real-money impact:** a future external fetch/axios call to analytics, documentation, sentiment/news, or another origin can transmit/preflight the dashboard key to that origin if browser CORS policy permits the request.
 
-**Solution:** never merge current market rank by historical maximum. Maintain a latest-observation map keyed by canonical contract identity with per-row event time/revision. Replace a contract row whenever a newer valid observation arrives, even if gain is lower; evict rows outside TTL/session/universe generation. Historical maxima belong in a separate analytics view.
+**Solution:** delete global secret injection entirely. Introduce a scoped same-origin `system3Api` client that sends cookies; explicitly reject absolute cross-origin URLs in the authenticated client.
 
-**Regression risks:** visible rank volatility will increase because the board becomes truthful instead of sticky; consumers expecting monotonic gains may break.
-
-**Closure tests/PASS:** old 40% row followed by newer 12% row must show 12%; absent rows older than TTL must disappear; out-of-order older observations must be rejected; ties use deterministic policy.
+**Tests/PASS:** instrument browser networking and prove no `X-API-Key` leaves the application origin; external fetch fixture never contains credentials beyond browser-standard policy.
 
 **Status:** `READY TO PATCH`.
 
-### SCAN-006 / P0-P1 — merge re-stamps retained stale rows with the incoming refresh time
+### AUTH-004 / P0-P1 — the advertised 12-hour session has no server-enforced issuance/expiry state
 
-**Exact proof:** after combining rows, `merge_market_top_reports()` chooses one report-level `refreshed_at` and `_rank_table()` writes that same timestamp onto every row, including rows retained from the older base shard.
+**Exact proof:** `_dashboard_session_token()` is `sha256("system3-dashboard-session-v1:" + API_KEY)`. `_has_dashboard_api_access()` compares the cookie directly to that deterministic value. `DASHBOARD_SESSION_MAX_AGE=43200` is used only as cookie `max_age`; there is no server-side issued-at/expiry check, session record, nonce or expiry embedded in the token.
 
-**Symptom/root cause:** row event time is discarded and replaced by board-generation time.
+**Symptom/root cause:** browser cookie expiry is treated as session expiry, while the server accepts the same token indefinitely as long as `API_KEY` remains unchanged.
 
-**Real-money impact:** an obsolete retained contract can look freshly observed even though it was not present in the newest shard/cycle.
+**Real-money impact:** a copied/stolen session cookie can remain reusable after the original browser's 12-hour cookie disappears, until API key rotation invalidates it.
 
-**Solution:** preserve immutable `source_event_at` and `observed_at` per row; add separate `snapshot_generated_at` at board level. UI shows row age, not only board age. Retained rows beyond TTL are evicted instead of restamped.
+**Solution:** cryptographically random opaque session IDs stored server-side, or a signed token carrying `iat`, `exp`, `jti`, policy version and key/session epoch with server-side revocation support. Prefer opaque sessions in Firestore/Redis-equivalent shared store for Cloud Run multi-instance behavior.
 
-**Tests/PASS:** merging a 5-minute-old base row with a new shard must keep the old row's original event time or evict it; no operation may advance `source_event_at` without a new provider observation.
+**API/schema changes:** `SessionTruth {session_id_hash, issued_at, expires_at, last_seen_at, auth_method, policy_revision, revoked, runtime_revision}`; never return the raw session token.
 
-**Status:** `READY TO PATCH`.
-
-### SCAN-007 / P0-P1 — scanner disk state can be returned without explicit age/session validation
-
-**Exact proof:** `/api/scanner/top_contract_gainers` checks `_MARKET_TOP_STATE_FILE`; if `contracts_scored_total > 0`, it caches and returns the disk object. In the inspected path there is no mandatory validation of source-event age, market session, universe generation, rank policy/schema version or exact application/runtime revision before promotion.
-
-**Symptom/root cause:** persisted scanner state is treated as reusable current data based mainly on being non-empty.
-
-**Real-money impact:** restart/failover can resurrect a prior market snapshot and present it as current.
-
-**Solution:** persist a typed `ScannerSnapshotEnvelope`; startup/read path validates session, TTL, source age, schema/rank-policy versions and revision compatibility. Invalid persisted state becomes `STALE_LAST_GOOD` and cannot populate current opportunity state.
-
-**Tests/PASS:** previous-session disk snapshot, malformed timestamp and incompatible schema must each be rejected from current board.
+**Tests/PASS:** copied cookie is rejected after expiry even if browser max-age is bypassed; clock-boundary tests; multi-instance expiry consistency; key rotation invalidates prior session epoch.
 
 **Status:** `READY TO PATCH`.
 
-### SCAN-008 / P1 — REST polling and WebSocket independently write the same scanner stores without snapshot ordering
+### AUTH-005 / P0-P1 — logout deletes the browser cookie but does not revoke the server credential
 
-**Exact proof:** `useData.ts` receives `gain_rank` through `/api/batch/market-data` and writes `setGainRank()`, while `market_top_update` WebSocket events independently rebuild and overwrite the same rank state. `MarketTopCePeTable.tsx` also polls `/api/scanner/top_contract_gainers` every 15 seconds and writes `setMarketTop()` while WS can write that store concurrently. No snapshot sequence/revision comparison is performed before writes.
+**Exact proof:** `/api/auth/logout` only calls `response.delete_cookie(...)`; there is no session registry/revocation list because the token is deterministic from the API key.
 
-**Symptom/root cause:** multiple transport writers race on shared client state.
+**Symptom/root cause:** logout is client-side credential disposal, not server-side session invalidation.
 
-**Real-money impact:** a slower REST response can overwrite a newer WS snapshot, rank rows can jump backward in time, and source badges can disagree with actual data generation.
+**Real-money impact:** a previously copied cookie remains accepted after user logout.
 
-**Solution:** one store reducer accepts `ScannerSnapshotEnvelope` and compares `snapshot_revision/source_event_at`. REST becomes fallback only; older/equal snapshots are rejected and counted. MarketTop and GainRank derive from the same canonical snapshot rather than separate writer paths.
+**Solution:** server session registry with `revoked_at/reason`; logout transaction revokes session ID before deleting cookie. Add `logout_all`/key-epoch rotation for emergency response.
 
-**Tests/PASS:** inject WS revision 12 then REST revision 11 and prove revision 11 is rejected; verify duplicate equal revision is idempotent; reconnect fallback cannot decrease revision.
+**Tests/PASS:** clone cookie into a second client, log out first client, second client must receive 401 immediately; revocation must work across Cloud Run instances.
 
 **Status:** `READY TO PATCH`.
 
-### SCAN-009 / P1 — market-open equity rotation is intentionally expensive and can create timeout/thread pressure
+### AUTH-006 / P1 — authentication endpoint has no proven brute-force/rate-limit policy
 
-**Exact proof:** `fetch_chains_for_market()` scans indices in a `ThreadPoolExecutor`, then serially sleeps ~3.15 seconds between each equity chain because of Dhan rate limiting. Default equity scan limit is 16, so equity enrichment alone can consume roughly 50 seconds before provider/network time. Request path timeouts and background rotations can therefore overlap under load. The app separately documents thread-pileup risk in another background path, confirming thread timeout behavior is already a known system concern.
+**Exact proof:** application rate-limit middleware only adds delay to `/api/broker` and `/api/chain` prefixes. `/api/auth/session` is PUBLIC by security policy and the inspected code has no attempt counter, backoff or temporary lockout.
 
-**Symptom/root cause:** synchronous provider work, sleep-based pacing and request-triggered scanning are mixed with a real-time web API.
+**Symptom/root cause:** the one secret protecting the dashboard can be attempted repeatedly without an application-level auth-specific rate policy.
 
-**Real-money impact:** scanner latency, Cloud Run concurrency pressure and timed-out background threads can degrade unrelated APIs, making old scanner data remain visible while new work is delayed.
+**Real-money impact:** increases online guessing/credential-stuffing exposure, especially if Cloud Run ingress is public.
 
-**Solution:** move Dhan scanner acquisition into one bounded scheduler/worker with token-bucket rate limiting, per-symbol deduplication, bounded concurrency and cycle deadlines. HTTP/WS only read validated snapshots; they never start expensive scans. Expose queue depth, active workers, cycle duration, timeout count and last completed cycle ID.
+**Solution:** auth-specific rate limiting keyed by source + normalized account/system scope, exponential backoff, bounded failure counters, structured security events and alert threshold. Do not leak whether API key format/length is correct.
 
-**Regression risks:** worker/scheduler availability becomes explicit dependency; initial snapshot may be unavailable rather than synchronously computed.
+**Compatibility:** automation/header API auth should have separate service identity/rate policy rather than sharing human login throttles.
 
-**Closure tests/PASS:** load test market-open request rate while scanner worker rotates full target universe; p95 API latency stays within policy, worker count bounded, no unbounded thread growth, every cycle has one ID and deadline, stale snapshot ages visibly instead of being restamped.
+**Tests/PASS:** repeated invalid attempts trigger 429/backoff; valid session cannot bypass rate accounting through alternate login surface; secrets never enter logs.
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-### SCAN-010 / P1 — product UI presents rank/freshness/eligibility with misleading fallbacks
+### AUTH-007 / P1 — cookie `Secure` depends on request scheme and exact production proxy behavior is not proven
 
-**Exact proof:** `TradeTab.tsx` labels `GAIN %` using `row.gain_pct ?? row.gain_rank ?? 0`, so a rank-like field can still become percentage display. Missing OI/LTP in equity rows becomes zero. Equity status renders `${liveOk} live` when positive but otherwise the ambiguous `EOD/live`. `MarketTopCePeTable.tsx` describes Dhan HTTP fallback as `Dhan live · trading truth for paper MTM`, defaults missing row provenance to `DHAN_OPTION_CHAIN_LIVE`, and converts missing LTP/gain/volume/OI to numeric zero.
+**Exact proof:** `response.set_cookie(... secure=request.url.scheme == "https", samesite="lax")`. Cloud Run normally terminates TLS upstream; correctness therefore depends on the ASGI server/proxy-header configuration presenting the external scheme as HTTPS.
 
-**Symptom/root cause:** the UI tries to remain visually complete even when source/age/numeric evidence is incomplete.
+**Symptom/root cause:** a security attribute is runtime-derived rather than explicitly production-enforced.
 
-**Real-money impact:** unknown data can look live, eligible and numerically valid; operators cannot distinguish current scanner evidence from fallback/cached/no-data states.
+**Impact:** if proxy scheme handling is ever misconfigured, the browser session cookie can be issued without `Secure`.
 
-**Solution:** scanner table columns must include `Snapshot`, `Event age`, `Source`, `Quote quality`, `Evidence`, and typed `Eligibility`. Null remains `—/UNKNOWN`; Dhan live label requires validated live source+TTL; EOD is explicitly `EOD SNAPSHOT`; fallback rank never substitutes for gain percent.
+**Solution:** production configuration must set `SESSION_COOKIE_SECURE=1` and fail startup if deployed environment would issue an insecure auth cookie. Local development may explicitly opt out.
 
-**Tests/PASS:** frontend fixtures for null fields, stale rows, EOD rows, REST fallback, WS current, crossed quote and missing evidence; no fixture may render invented zero/live/eligible labels.
+**Tests/PASS:** exact Cloud Run browser response must contain `Secure; HttpOnly`; deployment proof records cookie-policy hash without cookie value.
 
-**Status:** `READY TO PATCH`.
+**Status:** `READY TO PATCH/VERIFY`.
 
-## 5. Prior deep slice — responsive, accessibility, keyboard and constrained-layout workstation behavior
+### AUTH-008 / P1 — CSRF policy has a useful fail-closed base but needs typed session-bound mutation authority
 
-### A11Y-001 / P1 — application shell is fixed-height/fixed-sidebar and has no responsive layout authority
+**Positive proof:** `security_policy.evaluate_request()` rejects mutation routes when auth is disabled; when cookie auth is used without API-key header it validates Origin against same-origin/allowed origins. Worker push routes have separate worker-token checks.
 
-**Exact proof:** `dashboard/frontend/src/App.tsx` uses a `100vh` flex column, a permanently rendered `Sidebar`, and a main region with `overflow:'hidden'`. `Sidebar.tsx` fixes navigation width to `190px` with 22 tab buttons. There is no breakpoint/drawer logic in these files.
+**Residual issue:** policy receives only booleans (`dashboard_access`, `header_api_key_present`) and does not bind a mutation to a session ID, session age, authorization scope, policy revision or CSRF nonce. Browser and service auth are still represented as one coarse access boolean.
 
-**Symptom/root cause:** the desktop shell is treated as universal. A small viewport must fit a fixed sidebar plus workstation content instead of intentionally switching information architecture.
+**Solution:** `MutationAuthContext` contains principal/session ID, auth method, issue/expiry/revocation state, origin result, CSRF result, permission scopes, policy revision and request/evidence ID. Cookie-authenticated unsafe methods require same-origin plus CSRF token bound to the session (or a rigorously verified same-site/origin-only policy with explicit proof).
 
-**Real-money impact:** critical status, risk, broker/data and order-safety controls can be clipped or forced below usable widths; an operator on tablet/mobile can miss authoritative warnings or select the wrong workspace.
-
-**Exact files:** `dashboard/frontend/src/App.tsx`, `dashboard/frontend/src/components/Sidebar.tsx`, new responsive shell/layout primitives, relevant workspace tables.
-
-**Target behavior:** desktop ≥1280px uses persistent navigation; tablet uses compact rail; mobile uses modal/drawer navigation and bottom quick-actions. Critical truth strip remains visible; secondary telemetry moves into drilldowns.
-
-**Minimal safe implementation:** introduce `useViewportClass()` + CSS container/breakpoint tokens and a single `WorkstationShell`. Sidebar becomes `desktop | compact | drawer`; content regions receive explicit scroll ownership.
-
-**Regression risks:** hiding controls at breakpoints, trapping focus in drawer, duplicate navigation state, content remount/data refetch.
-
-**Closure tests/PASS:** Playwright viewport matrix 360×800, 390×844, 768×1024, 1024×768, 1366×768, 1920×1080; no clipped safety controls; all tabs reachable; no horizontal page scroll except deliberate data-table scrollers; active workspace survives orientation/layout change.
-
-**Fail-safe:** when viewport rules fail, show a safe reduced control surface with live router still locked and truth/status visible.
+**Tests/PASS:** missing/forged Origin, cross-site form, stale session, revoked session and wrong CSRF token all fail; valid same-origin session succeeds only for allowed scope.
 
 **Status:** `READY TO PATCH`.
 
-### A11Y-002 / P1 — TopBar hides overflow instead of prioritizing/reflowing critical controls
+### AUTH-009 / P1 — idempotency enforcement covers only two hard-coded paths
 
-**Proof:** `TopBar.tsx` header sets `overflow:'hidden'`; index chips occupy a flex region also with `overflow:'hidden'`; owner identity, Cloud Build badge, clock, NIFTY/BANKNIFTY/FINNIFTY, sync age, market, Dhan, PAPER, LIVE OFF, WS and rho all compete for one fixed 56px row.
+**Exact proof:** `IDEMPOTENCY_REQUIRED_PATHS = {"/api/orders/create", "/place-order"}`. Other mutation routes are subject to auth/origin checks but not this policy's idempotency requirement.
 
-**Impact:** constrained width can silently remove market/broker/live/WS truth from view.
+**Symptom/root cause:** replay protection is path allow-list based instead of mutation-capability based.
 
-**Solution:** priority-tier header: Tier 0 always-visible safety (`MODE`, `LIVE LOCK`, market/session, broker/data age); Tier 1 index watch becomes horizontally scrollable; Tier 2 owner/build/rho moves to overflow/command panel. Never clip Tier 0.
+**Real-money impact:** future paper/risk/settings/scheduler or order-adjacent mutations can be introduced without automatically receiving idempotency/replay protection.
 
-**Tests:** screenshot/assert visibility at all supported widths; no Tier-0 element may have zero intersection with viewport.
+**Solution:** classify every route by capability metadata (`READ`, `PREFERENCE_WRITE`, `PAPER_MUTATION`, `RISK_POLICY_WRITE`, `WORKER_INGEST`, `LIVE_MUTATION`) and require idempotency for all financially/state-significant mutations. Unknown new mutation category fails CI/security-policy tests.
 
-**Status:** `READY TO PATCH`.
-
-### A11Y-003 / P1 — navigation is technically button-based but not optimized for 22-tab keyboard operation
-
-**Proof:** `Sidebar.tsx` renders every tab as a normal button, so keyboard users must traverse the entire 22-item sequence. There is no roving focus, group-level arrow navigation, workspace search or command palette.
-
-**Impact:** slow navigation under incident/market pressure increases operator error and makes the workstation inefficient for keyboard-first use.
-
-**Solution:** keep native buttons, add roving `tabIndex` within grouped navigation, Up/Down/Home/End movement, Left/Right group movement where appropriate, `Ctrl/Cmd+K` workspace command palette, and skip-to-content link. Preserve `aria-current=page`.
-
-**Tests:** keyboard-only traversal of every workspace, focus order snapshot, no keyboard trap, command palette searchable by current and rationalized tab names.
+**Tests/PASS:** route inventory test enumerates every POST/PUT/PATCH/DELETE and asserts explicit capability/auth/idempotency policy; no unclassified mutation is deployable.
 
 **Status:** `READY TO PATCH`.
 
-### A11Y-004 / P1 — broker TopBar navigation control is a clickable `span`, not an accessible control
+### AUTH-010 / P1 — browser auth UX advertises “SESSION 12 HRS” without authoritative server expiry evidence
 
-**Proof:** `TopBar.tsx` uses `<span onClick={() => setActiveTab('broker')}>` with `cursor:'pointer'` for the Dhan broker status chip; it has no button role, no tab focus, and no Enter/Space behavior.
+**Exact proof:** `LoginPage.tsx` renders `SESSION 12 HRS`, while current server token has no verifiable issued/expiry fields and `/api/auth/status` returns only required/configured/authenticated/mode.
 
-**Impact:** keyboard and assistive-technology operators cannot reliably activate a critical broker-health drilldown.
+**Impact:** UI communicates stronger session-lifetime assurance than the backend proves.
 
-**Solution:** replace with native `<button type="button">`; preserve visual styling, add descriptive accessible name including broker quality, and maintain visible focus.
-
-**Tests:** Tab reaches broker chip; Enter and Space open Broker workspace; axe has no interactive-role violation.
+**Solution:** Security / Settings screen consumes `SessionTruth.expires_at` and renders countdown/expiry source; until implemented display `SESSION EXPIRY: NOT PROVEN`, never a fixed 12-hour guarantee.
 
 **Status:** `READY TO PATCH`.
 
-### A11Y-005 / P1 — broker status in Sidebar has a color-only indicator
+### AUTH-011 / P1 — security/session observability and audit-export contract is incomplete
 
-**Proof:** the Broker navigation item adds an unlabeled 7px colored dot based on `brokerConnected`; the button's text remains only `Broker`.
+**Exact proof:** current auth status response does not provide session ID hash, issued/expiry, revocation, auth method detail, principal/scope, policy revision or security-event correlation ID.
 
-**Impact:** color-vision deficiency or screen-reader users do not receive the broker state represented by the dot.
+**Impact:** operators cannot distinguish fresh session, nearly expired session, revoked/invalid session, header-service auth or policy mismatch from a single authenticated boolean.
 
-**Solution:** decorative dot gets `aria-hidden=true`; accessible button name/description includes typed state (`Broker — connected`, `Broker — unknown`, etc.) sourced from broker truth, and visible text/badge uses words/icons as well as color.
+**Solution:** expose sanitized `SessionTruth`, security event timeline and audit export containing only hashes/IDs/status, never API key, cookie, Dhan token/PIN/TOTP or worker token.
 
-**Status:** `READY TO PATCH`.
-
-### A11Y-006 / P1 — login error/loading/status feedback lacks live-region semantics
-
-**Proof:** `LoginPage.tsx` renders errors in a plain `<div>` with no `role="alert"`/`aria-live`; `AuthGate` loading text similarly has no status role. The login label has no `htmlFor`/input `id` relationship.
-
-**Impact:** assistive technology may not announce authentication failure or loading changes; the field label association is weaker than required for a professional security surface.
-
-**Solution:** `role="status" aria-live="polite"` for loading; `role="alert" aria-live="assertive"` for auth failures; explicit `label htmlFor`, input `id/name`, `aria-describedby`; use appropriate autocomplete policy and never expose the raw key after authentication.
-
-**Security constraint:** this accessibility patch must align with `SOL-01`; the raw API key must be removed from `sessionStorage`, not made easier to persist.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-007 / P1-P2 — critical telemetry uses very small text sizes
-
-**Proof:** `TopBar.tsx` and `Sidebar.tsx` use repeated `.45rem`, `.5rem`, `.52rem`, `.55rem`, `.6rem`, `9px`, and `10px` text for build identity, labels and status badges.
-
-**Impact:** dense workstation information can become unreadable on high-DPI laptops/tablets and for low-vision users; status interpretation slows under pressure.
-
-**Solution:** define minimum semantic type tokens: critical status ≥12px equivalent, secondary telemetry ≥11px, interactive labels ≥12px; support browser zoom 200% without loss of controls; use truncation only with accessible full text.
-
-**Tests:** WCAG reflow at 200% zoom and 320 CSS px equivalent; no safety label clipped or hidden.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-008 / P1 — scroll ownership is fragile because body and main are both overflow-hidden
-
-**Proof:** `index.css` sets `html, body { overflow:hidden }`; `App.tsx` also sets main `overflow:'hidden'`. Therefore every workspace must independently implement scrolling correctly or content becomes unreachable.
-
-**Impact:** long tables, dialogs or error panels can become inaccessible, especially after zoom or on short-height screens.
-
-**Solution:** one explicit shell scroll contract: app body stays fixed only if the active workspace root has guaranteed `overflow:auto`; use reusable `WorkspaceViewport` and `DataScroller`. Dialogs portal to body with their own scroll/focus lock.
-
-**Tests:** automated content-height stress tests, 200% zoom, 600px viewport height and long-table fixtures; last interactive row/control remains reachable.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-009 / P1 — no consistent visible-focus design for workstation controls
-
-**Proof:** `index.css` defines a custom focus border only for `select`; navigation and inline-styled critical controls do not use a shared `:focus-visible` token. Browser defaults may remain, but there is no product-level proof of consistent high-contrast focus.
-
-**Impact:** keyboard operators can lose track of active control in a dense dark UI.
-
-**Solution:** global `:focus-visible` ring token with ≥2px visible contrast, offset and no color-only ambiguity; native semantics first; modal focus trap/restoration standardized.
-
-**Tests:** automated focus-outline snapshots across every interactive component and theme; no element with `outline:none` unless replaced by equal/stronger focus indicator.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-010 / P1 — dynamic market/broker/WS safety-state changes are not exposed through controlled live regions
-
-**Proof:** TopBar updates market status, broker state, WS state and tick age visually but does not expose an accessibility announcement channel. ProductionProofBar has an `aria-label` but no `aria-live` state-change strategy.
-
-**Impact:** a screen-reader user can remain unaware that market/data/broker state degraded or live-lock/readiness changed.
-
-**Solution:** create a deduplicated `CriticalStatusAnnouncer` that announces only meaningful transitions (`HEALTHY→STALE`, `CONNECTED→ERROR`, `PAPER→UNKNOWN`, risk inhibit), not every market tick. Use `aria-live=polite`, escalating safety failures to assertive only when operator action is required.
-
-**Tests:** transition-driven screen-reader DOM assertions; no announcement spam from per-second clock/tick updates.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-011 / P1 — status color semantics need text/icon redundancy and contrast proof
-
-**Proof:** green/amber/red are heavily used for market, broker, WS, proof and sidebar states. Some controls contain text, but several micro-indicators and small labels rely strongly on hue.
-
-**Solution:** every safety/data state includes icon + explicit word (`HEALTHY`, `STALE`, `UNKNOWN`, `ERROR`, `LOCKED`) and meets contrast targets. Do not encode direction/safety solely by red/green.
-
-**Tests:** axe contrast checks plus monochrome/color-blind visual regression snapshots.
-
-**Status:** `READY TO PATCH`.
-
-### A11Y-012 / P1 — actual browser accessibility/runtime proof is absent
-
-**Proof:** this iteration could statically inspect source but no exact-application-head browser/Playwright/axe workflow run exists in the current evidence set.
-
-**Impact:** keyboard/focus/reflow/ARIA claims cannot be closed from code inspection alone.
-
-**Solution:** add exact-revision `ui-accessibility-proof` workflow: build frontend, launch analyzer/paper backend with non-live fixtures, run Playwright + axe on every workspace at desktop/tablet/mobile/200%-zoom, capture console errors/screenshots/accessibility violations and bind artifact to source SHA.
-
-**PASS criteria:** zero critical/serious axe violations; zero console runtime errors; all required workspaces keyboard reachable; no critical status clipped; modal focus restore works; live router remains locked.
+**Tests/PASS:** export redaction test, session lifecycle event tests, exact-revision evidence linkage and browser UI redaction proof.
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-## 6. Positive foundations in the recent slices
+## 5. Positive security foundations to preserve
 
-- Sidebar uses native `<button>` elements for tabs, has `aria-label`, `aria-current`, and a named `<nav>` landmark.
-- `ProductionProofBar` has an accessible label and explicit text values in addition to colors.
-- `index.css` already honors `prefers-reduced-motion: reduce`; preserve this.
-- Login uses a native `<form>`, password input and submit button.
-- App contains a semantic `<main>` element.
-- Scanner request code already caps query sizes, has bounded endpoint timeouts, separates index-first request scanning from slower equity enrichment, and documents provider pacing. These are useful foundations but are not sufficient without snapshot/freshness/order truth.
+- Explicit CORS allow-list; wildcard and `null` origins are rejected at startup.
+- Browser session cookie is `HttpOnly` and uses `SameSite=Lax`.
+- `hmac.compare_digest` is used for API-key/cookie/worker-token comparisons.
+- Mutations fail closed when dashboard authentication is disabled/unconfigured.
+- Worker push paths use a distinct `X-Worker-Token` policy.
+- Origin validation exists for cookie-authenticated mutations.
+- Selected order paths already require `Idempotency-Key`.
+- Auth smoke test verifies missing auth fails, header auth works, wrong key returns 401 and HttpOnly cookie auth works.
 
-## 7. Canonical truth contracts
+These are foundations, not proof of session expiry, revocation, browser-secret safety or complete mutation authorization.
 
-### 7.1 `SafetyTruth`
+## 6. Canonical truth contracts
+
+### 6.1 `SafetyTruth`
 Mode, nullable live/auto flags, router/kill-switch state, source/runtime/image/policy revisions, verified time/age, `PROVEN|STALE|UNKNOWN|ERROR`.
 
-### 7.2 `DataTruthEnvelope` / `StreamTruth`
+### 6.2 `SessionTruth` — NEW
+`session_id_hash`, issued/expiry/last-seen times, auth method (`COOKIE|SERVICE_HEADER`), principal/scope, session epoch, policy revision, revoked state/time/reason, secure-cookie policy, origin/CSRF policy version, runtime/source revision and evidence ID. Raw tokens/secrets are never exposed.
+
+### 6.3 `MutationAuthContext` — NEW
+Request/evidence ID, session/principal, capability class, origin result, CSRF result, idempotency key/hash, permission decision, policy revision and fail-closed reason. Unknown capability or unknown session truth denies mutation.
+
+### 6.4 `DataTruthEnvelope` / `StreamTruth`
 Source/session/instrument, source/backend/frontend timestamps, uncapped age/TTL, schema/normalizer versions, transport vs heartbeat vs stream state, sequence/rejected-old events, quality and evidence.
 
-### 7.3 `OptionChainTruth`
+### 6.5 `OptionChainTruth`
 Underlying/security ID/segment, requested+resolved expiry authority, provider/session, times/age/TTL, expiry-aware cache identity, schema/normalizer versions, nullable quote/Greek fields + field quality, completeness, source/runtime revision and evidence ID.
 
-### 7.4 `DeploymentTruth`
+### 6.6 `ScannerTruth`
+Snapshot/cycle/session/universe IDs, per-row event time/revision/source/quote quality, age/TTL, rank policy/units, validation state, worker/load diagnostics and exact runtime/source revision. Old observations are never restamped fresh.
+
+### 6.7 `DeploymentTruth`
 Exact source/tree SHA, Cloud Build ID, immutable image digest, final Cloud Run revision/traffic, frontend/backend SHA, runtime app/service account, policy/config hash, secret/scheduler provenance, verified time and evidence ID.
 
-### 7.5 `StateTruth`
-Required shared backend, collection/document, shared-state health, runtime/instance ID, last shared read/write, per-domain revision/writer/event/time/schema/quality/evidence. Global version is diagnostic only.
+### 6.8 `StateTruth`
+Required shared backend, shared-state health, runtime/instance ID, last shared read/write, per-domain revision/writer/event/time/schema/quality/evidence. Global version is diagnostic only.
 
-### 7.6 `PredictionTruth`
-`prediction_id`, immutable issue time, target/horizon, instrument key, model artifact ID/hash, dataset/feature schema hash, frozen data cutoff, raw score, calibrated probability, uncertainty, evidence/counter-evidence, input truth IDs, runtime/source revision, maturity rule/state, later append-only outcome/calibration links.
+### 6.9 `PredictionTruth`
+Immutable prediction ID/time, target/horizon/instrument, model/data/feature hashes, frozen cutoff, raw score/calibrated probability/uncertainty, input truth IDs, runtime/source revision, maturity state and append-only after-cost outcome links.
 
-### 7.7 `AccessibleWorkstationState`
-Viewport class, navigation mode, focused workspace/control ID, modal/drawer state, critical-status announcement queue and density preference. This state is **non-authoritative for trading**; it must never affect risk/safety truth or live routing.
+## 7. Canonical remediation roadmap
 
-### 7.8 `ScannerTruth` — NEW
-`snapshot_id`, scanner cycle ID, market session ID, universe/universe-generation ID, source-event min/max times, generated/received times, uncapped age+TTL, schema/rank-policy version, canonical contract identity, per-row event time/revision/source/quote quality, rank score/gain metric with explicit units, stable tie-break rule, row evidence ID, candidate-validation state, dropped-stale/out-of-order counters, worker/load diagnostics and exact runtime/source revision. A row belongs to exactly one current snapshot; old-shard observations are never restamped as fresh.
-
-## 8. Canonical remediation roadmap
-
-- `SOL-01 Auth/session — READY TO PATCH`: correct login body; cookie-only auth; remove raw API key; auth-gate polling/WS; TTL/revocation tests.
+- `SOL-01 Auth/session + SessionTruth — READY TO PATCH`: unify login contract; cookie-only browser auth; remove browser API-key storage/global header patch; server-enforced expiry/revocation; auth throttling; secure-cookie proof; mutation capability inventory; CSRF/idempotency tests.
 - `SOL-02 SafetyTruth — READY TO PATCH`: one backend authority; missing/stale => UNKNOWN.
 - `SOL-03 DataTruthEnvelope — READY TO PATCH`: remove production zero/plausible defaults.
 - `SOL-04 Semantic readiness — READY TO PATCH`: HTTP/object presence never PASS; lifecycle/reconciliation/risk/economics mandatory.
 - `SOL-05 OptionChainTruth + Greeks — READY TO PATCH`: nullable parser, expiry-aware cache, explicit provenance/IV units/full Greeks.
 - `SOL-06 Immutable paper lifecycle — READY TO PATCH`: durable event ledger, IDs/idempotency, restart replay/reconciliation, costed P&L.
-- `SOL-07 ScannerTruth — READY TO PATCH`: replace high-watermark shard merge with latest-observation snapshots; per-row event age; current-session TTL; deterministic rank policy; rank/score/probability/forecast distinct; scanner outputs WATCH candidates only; canonical REST/WS ordering.
+- `SOL-07 ScannerTruth — READY TO PATCH`: latest-observation snapshots, per-row age, session TTL, rank/score/probability separation, independent candidate validation, ordered REST/WS merge.
 - `SOL-08 DeploymentTruth + GCP least privilege — READY TO PATCH`: immutable digest/final revision/source SHA, one service mutation, dedicated identities, WIF-only auth.
 - `SOL-09 PreTradeRiskService — READY TO PATCH`: server-owned policy; fresh PASS required; UNKNOWN/ERROR denies.
 - `SOL-10 Legacy UI quarantine — READY TO PATCH`: production entrypoint guard; no legacy mutation surface.
 - `SOL-11 StreamTruth — READY TO PATCH`: transport != healthy stream; heartbeat schema; ordered REST/WS merge; uncapped age; true WS proof.
 - `SOL-12 RuntimeEventEnvelope — READY TO PATCH/DESIGN`: incidents/logs bound to source SHA + digest + Cloud Run revision.
 - `SOL-13 StateTruth + domain-CAS — READY TO PATCH`: Firestore required in GCP; sparse domain writes; no local authority fallback; restart/multi-writer proof.
-- `SOL-14 PredictionTruth + ModelArtifactManifest — READY TO PATCH/DESIGN`: immutable prediction ledger, exact model/data identity, purged walk-forward, untouched holdout, calibrated probability, drift monitoring and after-cost outcome linkage.
-- `SOL-15 AccessibleWorkstationShell — READY TO PATCH`: responsive shell, tiered truth header, drawer/compact navigation, command palette, keyboard model, focus-visible, live regions, table reflow and exact-revision Playwright/axe proof.
-- `SOL-16 Scanner worker/load isolation — READY TO PATCH/DESIGN`: one bounded provider worker, token-bucket Dhan pacing, cycle IDs/deadlines, deduplicated symbol work, no request-triggered full scanner work, bounded thread/concurrency metrics and load proof.
+- `SOL-14 PredictionTruth + ModelArtifactManifest — READY TO PATCH/DESIGN`: immutable prediction ledger, exact model/data identity, purged walk-forward, untouched holdout, calibrated probability, drift and after-cost outcome linkage.
+- `SOL-15 AccessibleWorkstationShell — READY TO PATCH`: responsive shell, tiered truth header, drawer/compact navigation, command palette, keyboard/focus/live regions, exact-revision Playwright/axe proof.
+- `SOL-16 Scanner worker/load isolation — READY TO PATCH/DESIGN`: bounded provider worker, token-bucket pacing, cycle IDs/deadlines and load proof.
 
-### SOL-07 ordered implementation
+### SOL-01 ordered implementation
 
-1. Introduce `ScannerSnapshotEnvelope` + canonical contract identity.
-2. Preserve provider/source event time on every row; separate snapshot-generation time.
-3. Replace high-watermark merge with newer-observation replacement regardless of gain direction.
-4. Evict TTL-expired, wrong-session, wrong-universe-generation and incompatible-schema rows.
-5. Remove scanner-layer hard-coded live provenance; require `OptionChainTruth` reference.
-6. Make scanner result state `WATCH` by default; separate `CandidateValidationService` owns paper eligibility.
-7. Make `/api/gain_rank` validate snapshot age/session and either remove or correctly implement refresh semantics.
-8. Route REST + WS through one revision-aware frontend reducer; reject older snapshots.
-9. Replace null→zero and rank→gain UI fallbacks with typed unknown states.
-10. Add event-age/source/evidence/eligibility columns and snapshot drilldown.
-11. Add deterministic tie-break policy and rank-movement audit.
-12. Run unit, integration, out-of-order, restart, market-session-rollover and browser tests.
+1. Create one shared frontend `AuthClient`; both LoginPage and AuthUnlock use it.
+2. Fix `/api/auth/session` request to JSON body only; remove redundant API-key header from browser login.
+3. Remove `sessionStorage` API key and global axios/window.fetch credential patches.
+4. Add scoped same-origin API client with cookie credentials only.
+5. Replace deterministic cookie token with random opaque server session ID or signed expiring token + revocation epoch.
+6. Persist session records in shared GCP-safe store; include expiry/revocation/policy revision.
+7. Make logout revoke server session before deleting cookie; add emergency revoke-all/session-epoch operation.
+8. Add auth-attempt throttling/backoff and sanitized security events.
+9. Enforce production `Secure; HttpOnly; SameSite` cookie policy independent of proxy ambiguity.
+10. Introduce `MutationAuthContext` and capability metadata for every unsafe route.
+11. Require session-bound CSRF/origin policy and idempotency for financially/state-significant mutation capabilities.
+12. Extend `/api/auth/status` into sanitized `SessionTruth`; UI shows actual expiry/policy, not hard-coded 12 hours.
+13. Add security/settings session list, revoke control and redacted audit export.
+14. Run unit/integration/browser/security tests on exact application revision.
 
-**SOL-07 PASS criteria:** a newer lower gain always replaces an older higher gain for the same contract; expired/absent shard rows are evicted; no row freshness timestamp advances without a new provider observation; stale disk state never becomes current; rank/gain/probability cannot substitute for each other; scanner rows remain WATCH until independent validation; older REST/WS snapshots are rejected; UI displays age/source/evidence without invented zero/live labels.
+**SOL-01 PASS criteria:** primary login and unlock share one contract; no reusable API key exists in browser storage; no authenticated secret header can leave System3 origin; copied cookie expires server-side and is rejected after logout/revocation; exact Cloud Run response proves Secure+HttpOnly cookie; auth brute-force throttle works; every unsafe route has explicit capability/auth/CSRF/idempotency policy; no raw auth/broker secret appears in logs/UI/export; analyzer/paper/live-off remains unchanged.
 
-### SOL-15 ordered implementation
+**Rollback/fail-safe:** any session-store, policy, CSRF, cookie or authorization uncertainty sets auth state `UNKNOWN/ERROR`, hides protected truth, inhibits paper mutations and leaves live routing locked.
 
-1. Add viewport/layout tokens and `WorkstationShell` with explicit desktop/tablet/mobile modes.
-2. Refactor Sidebar to persistent/compact/drawer modes with one source of active-tab truth.
-3. Refactor TopBar into Tier-0 safety truth, Tier-1 market watch and Tier-2 overflow telemetry; never hide Tier-0.
-4. Replace clickable non-semantic spans with native controls.
-5. Add skip link, roving navigation keys and `Ctrl/Cmd+K` command palette.
-6. Add shared `:focus-visible` design token and modal/drawer focus trap + restore.
-7. Add `CriticalStatusAnnouncer` with transition deduplication; never announce per-tick noise.
-8. Raise minimum type/touch-target sizing and preserve reduced-motion support.
-9. Add reusable `WorkspaceViewport`, `DataScroller`, sticky table headers and mobile column-priority/card views.
-10. Add explicit loading/empty/error/auth/market-closed/stale states with semantic roles.
-11. Run Playwright + axe across all existing repo tabs, breakpoints, 200% zoom and keyboard-only scenarios.
-12. Bind proof artifacts to exact source SHA/runtime revision; no PASS from static inspection alone.
-
-**SOL-15 PASS criteria:** all current navigation destinations are reachable by keyboard and mobile; no Tier-0 safety truth is clipped; no dead/non-semantic interactive element remains; visible focus is consistent; critical state transitions are announced without spam; 200% zoom/reflow works; zero critical/serious axe violations and zero browser console runtime errors on the exact revision.
-
-**Rollback/fail-safe:** if responsive/accessibility shell fails, render a reduced read-only layout with SafetyTruth/DataTruth visible and all trading mutation/live controls inhibited.
-
-## 9. Verification counters
+## 8. Verification counters
 
 Independent reproduction paths only.
 
 | Finding | Counter | State |
 |---|---:|---|
-| AUTH-001 | `3/20` | OPEN |
-| AUTH-002 | `2/20` | OPEN |
-| AUTH-003 | `2/20` | OPEN |
-| UI-001 | `16/20` | OPEN |
-| UI-002 | `5/20` | OPEN — scanner rank/gain fallback is another metric-semantics path |
+| AUTH-001 | `4/20` | OPEN — main LoginPage still omits required JSON body |
+| AUTH-002 | `3/20` | OPEN — raw browser API-key storage reproduced |
+| AUTH-003 | `3/20` | OPEN — global axios/fetch injection reproduced |
+| AUTH-004 | `2/20` | OPEN — deterministic non-expiring server token independently inspected |
+| AUTH-005 | `1/20` | OPEN — logout has no server revocation |
+| AUTH-006 | `1/20` | OPEN — no auth-specific throttling in inspected middleware |
+| AUTH-007 | `1/20` | OPEN/VERIFY — Secure depends on runtime scheme handling |
+| AUTH-008 | `1/20` | OPEN — coarse CSRF/mutation context |
+| AUTH-009 | `1/20` | OPEN — idempotency allow-list limited to two paths |
+| AUTH-010 | `1/20` | OPEN — UI fixed 12-hour claim exceeds server proof |
+| AUTH-011 | `1/20` | OPEN — session/security observability incomplete |
+| UI-001 | `17/20` | OPEN |
+| UI-002 | `5/20` | OPEN |
 | UI-003 | `8/20` | OPEN |
-| UI-005 | `15/20` | OPEN — scanner live provenance/zero defaults add another false-valid path |
+| UI-005 | `15/20` | OPEN |
 | UI-006 | `9/20` | OPEN |
-| UI-007 | `11/20` | OPEN — scanner row age/source and REST/WS ordering add independent staleness paths |
+| UI-007 | `11/20` | OPEN |
 | UI-009 | `6/20` | OPEN |
 | UI-011 | `4/20` | OPEN |
-| UI-016 | `10/20` | OPEN |
+| UI-016 | `11/20` | OPEN — session/security product truth remains incomplete |
 | UI-018 | `2/20` | OPEN |
 | CHAIN-001..014 | retained previous counters | OPEN |
 | SCAN-001..010 | `1/20` each | OPEN |
@@ -495,35 +350,36 @@ Independent reproduction paths only.
 
 No finding is `LOCKED-20X`.
 
-## 10. Prioritized implementation order
+## 9. Prioritized implementation order
 
 ### P0 Wave 1 — eliminate false-green/fail-open authorities
-1. SOL-01 auth contract + auth-gated startup.
+1. **SOL-01 auth contract + cookie-only SessionTruth + server expiry/revocation.**
 2. SOL-02 authoritative `SafetyTruth`.
 3. SOL-08 exact `DeploymentTruth` baseline.
 4. SOL-13 shared `StateTruth` authority + domain-CAS.
 5. SOL-05 OptionChainTruth null/cache/expiry correction.
 6. SOL-11 StreamTruth and ordered REST/WS merge.
-7. **SOL-07 ScannerTruth current-snapshot/high-watermark correction.**
+7. SOL-07 ScannerTruth current-snapshot/high-watermark correction.
 8. SOL-09 server-owned risk + mandatory pre-trade authority.
 9. SOL-06 durable lifecycle/idempotency/reconciliation.
-10. SOL-14 model maturity split + score/confidence correction + immutable PredictionTruth foundation.
+10. SOL-14 model maturity split + immutable PredictionTruth foundation.
 11. SOL-04 semantic readiness.
 12. SOL-03 remaining zero/live/default-safe fallbacks.
 13. SOL-10 legacy mutation UI quarantine.
 
 ### P1 Wave 2 — operator safety + statistical/economic proof
-1. **SOL-16 scanner worker/load isolation and market-open load proof.**
-2. SOL-15 responsive/accessibility shell and exact-revision browser proof.
-3. Purged walk-forward + untouched holdout, calibration, drift, model/data hashes.
-4. Prediction→paper→after-cost outcome linkage.
-5. Full Greeks/model provenance and true WebSocket proof.
-6. GCP IAM split/WIF-only auth and revision-bound runtime incidents.
+1. Complete mutation capability/CSRF/idempotency route inventory and exact browser security proof.
+2. SOL-16 scanner worker/load isolation.
+3. SOL-15 responsive/accessibility shell and exact-revision browser proof.
+4. Purged walk-forward + untouched holdout, calibration, drift, model/data hashes.
+5. Prediction→paper→after-cost outcome linkage.
+6. Full Greeks/model provenance and true WebSocket proof.
+7. GCP IAM split/WIF-only auth and revision-bound runtime incidents.
 
 ### P2 Wave 3 — institutional operator quality
-Advanced command palette/search, customizable density, saved workspace layouts, richer drilldowns, security/session settings and audit export. These remain secondary to truth/safety.
+Advanced command palette/search, customizable density, saved workspace layouts, session/device management, permission drilldowns and redacted audit export. These remain secondary to truth/safety.
 
-## 11. Product information architecture target
+## 10. Product information architecture target
 
 1. Command Center — Overview + Decision Intel + authoritative truth strip.
 2. Market / Scanner — watch, scanner, ranker, signals, snapshot history/rank movement and candidate drilldown.
@@ -534,47 +390,57 @@ Advanced command palette/search, customizable density, saved workspace layouts, 
 7. Data & Broker Health — state authority, domain revisions, transport/heartbeat/source/freshness/account/cache truth.
 8. Readiness / Proof — semantic E2E gates + Live Gate.
 9. Observability — deployment identity, incidents, logs, schema/parse errors, latency/reconnects and revision-bound evidence.
-10. Security / Settings — sessions, IAM/policies, permissions, audit export and non-authoritative preferences.
+10. **Security / Settings — SessionTruth, devices/sessions, expiry/revocation, auth method, mutation policy, CSRF/idempotency status, IAM/policies, audit export and non-authoritative preferences.**
 
 Current repo tabs remain represented through this rationalized hierarchy; conceptual renames never imply implemented capability.
 
-## 12. Product UI visual evolution — V14
+## 11. Product UI visual evolution — V15
 
-New concept: **Scanner & Ranker Truth V14** — actual System3 `Market / Scanner` product workspace.
+New concept: **Security & Session Control V15** — actual System3 `Security / Settings` product workspace.
 
-Changes driven by this iteration:
-- scanner board is explicitly one immutable current snapshot rather than rolling historical maxima;
-- header shows market truth, snapshot ID, event age, universe, valid-row count and rank-policy version;
-- every opportunity exposes event age, source, evidence and eligibility independently from rank;
-- missing age/quote proof yields `STALE/REJECT` or `WATCH`, never paper eligibility;
-- high-watermark carryover is explicitly forbidden;
-- rank changes are tied to a new snapshot revision and deterministic policy;
-- candidate drilldown contains prediction/risk/evidence references before any paper action;
-- load/concurrency panel exposes scanner cycle ID, shard generation, worker count, timeouts and rejected stale writers;
-- null values remain unknown rather than zero;
+Changes required by this iteration:
+- header exposes auth/session state separately from Dhan broker auth;
+- browser API key is never displayed or stored after session creation;
+- session shows issued time, authoritative server expiry, auth method, policy revision and runtime revision;
+- active-session/device table supports server-side revoke and emergency revoke-all;
+- cookie policy shows `Secure`, `HttpOnly`, `SameSite` and exact-revision verification state;
+- mutation authorization matrix shows capability, origin/CSRF, idempotency and backend enforcement state;
+- security-event timeline records login failures, throttling, revoke, expiry and policy-denial events without secrets;
+- redacted audit export explicitly excludes API key, cookie, Dhan token, PIN/TOTP and worker token;
+- session/policy uncertainty sets protected capabilities to `INHIBITED`;
 - live router remains locked.
 
-Visual artifact: `Genesis_System3_Scanner_Ranker_Truth_Target_V14.png`.
+Visual artifact: `Genesis_System3_Security_Session_Control_Target_V15.png`.
 
-## 13. Positive foundations to preserve
+## 12. Positive foundations to preserve
 
+- Explicit CORS allow-list and startup rejection of wildcard/null origins.
+- `HttpOnly` browser cookie and `SameSite=Lax` baseline.
+- `hmac.compare_digest` for secret comparisons.
+- Mutation fail-closed behavior when auth is disabled/unconfigured.
+- Separate worker token for ingestion paths.
+- Existing cookie-auth Origin validation.
+- Existing idempotency requirement on selected order paths.
 - Native Sidebar buttons, named navigation landmark and `aria-current`.
-- ProductionProofBar accessible label and text status values.
-- `prefers-reduced-motion` support in `index.css`.
-- Semantic login form and main landmark.
+- `prefers-reduced-motion` support.
 - Prediction Audit's refusal to present gain-rank as a validated forecast.
-- ML router's `ready_for_live=False` safety intent.
 - Firestore transaction/local temp+replace foundations.
 - Serialized/rate-paced Dhan option-chain traffic and WS reconnect backoff+jitter foundations.
-- Scanner query bounds, index-first request path and explicit Dhan pacing comments.
 - Live Gate approval does not automatically enable live trading.
 
-These are foundations, not readiness/accessibility/profitability proof.
+These are foundations, not readiness/security/profitability proof.
 
-## 14. Historical proof/open-gate interpretation
+## 13. Historical proof/open-gate interpretation
 
 Remain open:
 - `EXACT_REVISION_CI_RUNTIME_NOT_PROVEN`
+- `AUTH_LOGIN_CONTRACT_NOT_PROVEN`
+- `SERVER_SESSION_EXPIRY_NOT_PROVEN`
+- `SESSION_REVOCATION_NOT_PROVEN`
+- `BROWSER_SECRET_ELIMINATION_NOT_PROVEN`
+- `MUTATION_AUTHORIZATION_COVERAGE_NOT_PROVEN`
+- `CSRF_POLICY_RUNTIME_NOT_PROVEN`
+- `IDEMPOTENCY_ROUTE_COVERAGE_NOT_PROVEN`
 - `DEPLOYMENT_TRUTH_NOT_PROVEN`
 - `SHARED_STATE_AUTHORITY_NOT_PROVEN`
 - `RESTART_CONSISTENCY_NOT_PROVEN`
@@ -582,38 +448,34 @@ Remain open:
 - `SCANNER_CURRENT_SNAPSHOT_NOT_PROVEN`
 - `SCANNER_ROW_FRESHNESS_NOT_PROVEN`
 - `SCANNER_LOAD_STABILITY_NOT_PROVEN`
-- `SCANNER_CANDIDATE_ELIGIBILITY_NOT_PROVEN`
 - `PREDICTION_LEDGER_NOT_PROVEN`
 - `MODEL_ARTIFACT_IDENTITY_NOT_PROVEN`
 - `PURGED_WALKFORWARD_NOT_PROVEN`
 - `PROBABILITY_CALIBRATION_NOT_PROVEN`
-- `MODEL_DRIFT_MONITORING_NOT_PROVEN`
 - `PREDICTION_AFTER_COST_LINKAGE_NOT_PROVEN`
 - `RESPONSIVE_WORKSTATION_NOT_PROVEN`
-- `KEYBOARD_NAVIGATION_NOT_PROVEN`
 - `ACCESSIBILITY_AXE_BROWSER_PROOF_NOT_PROVEN`
 - `REAL_MARKET_ANALYZER_PAPER_LIFECYCLE_NOT_PROVEN`
 - `TRADE_READY_FALSE`
 - `MULTI_DAY_STABILITY_NOT_PROVEN`
 - `POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN`
-- `REAL_PAPER_LIFECYCLE_NOT_PROVEN`
 - `WEBSOCKET_STREAM_HEALTH_NOT_PROVEN`
 - `OPTION_CHAIN_RUNTIME_TRUTH_NOT_PROVEN`
 
 `LIVE_TRADING_DISABLED_BY_DESIGN` remains required audit posture.
 
-## 15. Closure standard
+## 14. Closure standard
 
-A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; scanner current-snapshot/session/TTL/out-of-order/high-watermark/load tests; responsive viewport + 200%-zoom + keyboard + axe/console checks; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
+A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; auth/session expiry/revocation and secret-redaction tests; complete mutation capability/CSRF/idempotency inventory; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests; scanner current-snapshot/session/TTL/out-of-order/high-watermark/load tests; responsive viewport + 200%-zoom + keyboard + axe/console checks; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
 
-## 16. Next audit/solution slices
+## 15. Next audit/solution slices
 
-1. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
-2. Scanner follow-up: locate micro-loop/state-file writer and prove whether overlapping cycles can write out of order under Cloud Run concurrency.
-3. ML follow-up: exact market-validation file semantics and whether gain-rank post-market validation has frozen prediction IDs/cutoffs or look-ahead paths.
-4. DB follow-up: exact paper/event persistence files and any SQLite/JSON/Firestore duplicate authorities not yet mapped.
-5. Browser implementation follow-up once SOL-15 lands: exact Playwright/axe/console proof across every workspace.
+1. Exact mutation-route inventory: enumerate every POST/PUT/PATCH/DELETE and map capability, auth, CSRF, idempotency and live/paper enforcement.
+2. Scanner concurrency follow-up: locate micro-loop/state-file writer and prove whether overlapping cycles can write out of order under Cloud Run concurrency.
+3. ML follow-up: exact market-validation file semantics and frozen prediction IDs/cutoffs.
+4. DB follow-up: exact paper/event persistence files and SQLite/JSON/Firestore duplicate authorities.
+5. Browser follow-up once SOL-01/SOL-15 land: exact Playwright/axe/security proof across every workspace.
 
-## 17. Hard safety rule
+## 16. Hard safety rule
 
-A green UI, endpoint HTTP 200, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, scanner rank, high-watermark cached winner, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval, accessible-looking static markup or process-local simulator never substitutes for authoritative source+event time+domain/snapshot revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
+A green UI, endpoint HTTP 200, authenticated boolean, browser cookie presence, client-side cookie max-age, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, scanner rank, high-watermark cached winner, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval, accessible-looking static markup or process-local simulator never substitutes for authoritative session expiry/revocation+permission policy+source/event time+domain/snapshot revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
