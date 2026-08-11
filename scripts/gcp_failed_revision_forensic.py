@@ -36,25 +36,31 @@ def _run(args: list[str]) -> str:
     return proc.stdout
 
 
-def _redact(value: Any) -> str:
+def _redact(value: Any, limit: int = 700) -> str:
     text = str(value or "").replace("\x00", " ")
     for pattern in _SECRET_PATTERNS:
         if pattern.groups:
             text = pattern.sub(r"\1<redacted>", text)
         else:
             text = pattern.sub("<redacted-jwt>", text)
-    # Avoid ever copying arbitrarily long payloads to the proof artifact.
-    return " ".join(text.split())[:700]
+    text = " ".join(text.split())
+    return text[:limit]
 
 
 def _message(entry: dict[str, Any]) -> str:
     if entry.get("textPayload"):
-        return _redact(entry.get("textPayload"))
+        raw = entry.get("textPayload")
+        # Tracebacks need enough sanitized context to retain the terminal
+        # exception line; ordinary messages remain tightly bounded.
+        limit = 5000 if "traceback" in str(raw).lower() else 700
+        return _redact(raw, limit)
     payload = entry.get("jsonPayload") or {}
     if isinstance(payload, dict):
         for key in ("message", "msg", "error", "exception", "detail"):
             if payload.get(key):
-                return _redact(payload.get(key))
+                raw = payload.get(key)
+                limit = 5000 if "traceback" in str(raw).lower() else 700
+                return _redact(raw, limit)
     proto = entry.get("protoPayload") or {}
     if isinstance(proto, dict):
         status = proto.get("status") or {}
