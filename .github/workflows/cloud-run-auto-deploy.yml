@@ -12,6 +12,7 @@ on:
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/gcp_failed_revision_forensic.py"
       - "scripts/gcp_runtime_evidence.py"
       - "scripts/gcp_public_dashboard_runtime_proof.py"
       - "scripts/gcp_mutation_policy_runtime_proof.py"
@@ -42,6 +43,8 @@ jobs:
       GCP_CLOUD_RUN_SERVICE: genesis-system3-web
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
+      GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+      GCP_DEPLOY_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
       CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
       WORKER_PUSH_TOKEN_SECRET_ID: ${{ vars.WORKER_PUSH_TOKEN_SECRET_ID || 'system3-dashboard-worker-push-token' }}
     steps:
@@ -49,18 +52,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud with keyless WIF
-        if: ${{ vars.GCP_WIF_PROVIDER != '' && vars.GCP_DEPLOY_SERVICE_ACCOUNT != '' }}
         uses: google-github-actions/auth@v3
         with:
           project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
-          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
-
-      - name: Temporary legacy-key authentication fallback
-        if: ${{ vars.GCP_WIF_PROVIDER == '' || vars.GCP_DEPLOY_SERVICE_ACCOUNT == '' }}
-        uses: google-github-actions/auth@v3
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOY_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
@@ -79,6 +75,7 @@ jobs:
               "core/brokers/dhan/cloud_token_provider.py": "GCP_SECRET_MANAGER_DYNAMIC",
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
+              "scripts/gcp_failed_revision_forensic.py": "FAILED_REVISION_FORENSIC",
               "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
               "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
               "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
@@ -92,6 +89,10 @@ jobs:
               text = Path(path).read_text(encoding="utf-8")
               assert marker in text, f"missing marker {marker} in {path}"
           assert 'LIVE_TRADING_ENABLED"] = "0"' in Path("scripts/gcp_dhan_token_rotation_job.py").read_text()
+          workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+          assert "GCP_SA_KEY" not in workflow
+          assert "credentials_json" not in workflow
+          assert 'gcloud run services update "${GCP_CLOUD_RUN_SERVICE}"' not in workflow
           print("STATIC_GATES_OK", sorted(required))
           PY
 
@@ -121,19 +122,11 @@ jobs:
             --format='value(metadata.name,status.url)' >/tmp/preflight-service.txt
           test -s /tmp/preflight-service.txt
 
+      # This is the only web-service deployment authority. It owns the complete
+      # runtime env/secret contract, creates an exact 0%-traffic candidate,
+      # proves the exact revision and tagged endpoints, and only then promotes.
       - name: Deploy guarded public PAPER Cloud Run service
         run: python scripts/gcp_cloud_run_auto_deploy.py
-
-      - name: Enforce public read-only dashboard and dynamic token runtime
-        run: |
-          gcloud run services update "${GCP_CLOUD_RUN_SERVICE}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --region="${GCP_REGION}" \
-            --min-instances=0 \
-            --max-instances=1 \
-            --update-env-vars="REQUIRE_API_KEY=false,DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
-            --remove-secrets=API_KEY \
-            --update-secrets="WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"
 
       - name: Prove and capture public PAPER dashboard without API key
         env:
@@ -280,6 +273,9 @@ jobs:
           if env.get("DHAN_TOKEN_SOURCE") != "gcp-secret-manager-dynamic":
               print("DYNAMIC_TOKEN_SOURCE_MISSING", env.get("DHAN_TOKEN_SOURCE"))
               sys.exit(3)
+          if env.get("DEFER_INSTRUMENT_WARMUP") != "1":
+              print("DEFER_INSTRUMENT_WARMUP_MISSING", env.get("DEFER_INSTRUMENT_WARMUP"))
+              sys.exit(3)
           if str(env.get("REQUIRE_API_KEY") or "").lower() not in ("0", "false", "no", "off"):
               print("PUBLIC_DASHBOARD_MODE_NOT_ENFORCED", env.get("REQUIRE_API_KEY"))
               sys.exit(4)
@@ -292,14 +288,25 @@ jobs:
           if "WORKER_PUSH_TOKEN" in env:
               print("WORKER_PUSH_TOKEN_LEAKED_AS_PLAIN_VALUE")
               sys.exit(5)
+          traffic = {}
+          for item in (svc.get("status") or {}).get("traffic") or []:
+              revision = item.get("revisionName")
+              percent = int(item.get("percent") or 0)
+              if revision and percent:
+                  traffic[revision] = traffic.get(revision, 0) + percent
+          if len(traffic) != 1 or list(traffic.values()) != [100]:
+              print("SERVING_TRAFFIC_NOT_SINGLE_EXACT_REVISION", traffic)
+              sys.exit(6)
           if scheduler.get("schedule") != "30 7 * * *" or scheduler.get("timeZone") != "Asia/Kolkata":
               print("SCHEDULER_CONFIG_INVALID", scheduler.get("schedule"), scheduler.get("timeZone"))
-              sys.exit(6)
+              sys.exit(7)
           print("CLOUD_RUNTIME_SAFETY_OK", {
               "token_source": env.get("DHAN_TOKEN_SOURCE"),
               "dashboard_access": "public-readonly",
               "dashboard_api_key_mounted": False,
               "worker_push_token_mounted_from_secret_manager": True,
+              "defer_instrument_warmup": env.get("DEFER_INSTRUMENT_WARMUP"),
+              "serving_traffic": traffic,
               "live_trading": env.get("LIVE_TRADING_ENABLED"),
               "scheduler": scheduler.get("name"),
               "schedule": scheduler.get("schedule"),
@@ -330,15 +337,6 @@ jobs:
 
           jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
           jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null
-
-      - name: Re-authenticate as read-only evidence identity
-        if: ${{ always() && vars.GCP_WIF_PROVIDER != '' && vars.GCP_EVIDENCE_SERVICE_ACCOUNT != '' }}
-        continue-on-error: true
-        uses: google-github-actions/auth@v3
-        with:
-          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
-          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_EVIDENCE_SERVICE_ACCOUNT }}
 
       - name: Generate sanitized GCP runtime evidence
         if: always()
@@ -397,7 +395,23 @@ jobs:
           gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
-            --format='table(metadata.name,status.latestReadyRevisionName,status.url)' || true
+            --format=json > /tmp/post-service.json || true
+          python - <<'PY'
+          import json
+          try:
+              svc = json.load(open('/tmp/post-service.json'))
+          except Exception:
+              print('POST_DEPLOY_SERVICE_UNAVAILABLE')
+          else:
+              traffic = {}
+              for item in (svc.get('status') or {}).get('traffic') or []:
+                  revision = item.get('revisionName')
+                  percent = int(item.get('percent') or 0)
+                  if revision and percent:
+                      traffic[revision] = traffic.get(revision, 0) + percent
+              print('POST_DEPLOY_SERVING_TRAFFIC', traffic)
+              print('POST_DEPLOY_URL', (svc.get('status') or {}).get('url'))
+          PY
           gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --location="${GCP_REGION}" \
