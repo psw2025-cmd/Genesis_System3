@@ -1,12 +1,12 @@
 """Security boundary wrapper for the System3 FastAPI application.
 
 This module keeps the legacy monolithic application intact while replacing only
-its dashboard authentication authority with SessionTruth.  Cloud Run launches
-this module, so browser cookies are opaque, server-issued, expiring and
-revocable.  Header X-API-Key remains a compatibility path for trusted CI/API
-clients; the browser no longer stores or replays it.
+its dashboard authentication authority with SessionTruth and installing the
+non-bypassable MutationPolicy boundary. Cloud Run launches this module.
 
-Analyzer/paper safety is unchanged.  This module contains no broker order code.
+Analyzer/paper safety is authoritative here: UNKNOWN writes and all live
+mutation/approval capabilities are denied before legacy route logic executes.
+This module contains no broker order implementation.
 """
 from __future__ import annotations
 
@@ -20,6 +20,7 @@ from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from dashboard.backend import app as legacy
+from dashboard.backend.mutation_policy import evaluate_runtime_mutation
 from dashboard.backend.session_truth import get_session_truth_store
 
 
@@ -103,11 +104,33 @@ def _has_dashboard_api_access(request: Request) -> bool:
 legacy._has_dashboard_api_access = _has_dashboard_api_access
 
 # Remove the three legacy deterministic-cookie route objects before registering
-# the authoritative versions below.  All other app routes/startup hooks remain.
+# the authoritative versions below. All other app routes/startup hooks remain.
 app.router.routes = [
     route for route in app.router.routes
     if getattr(route, "path", None) not in _AUTH_PATHS
 ]
+
+
+@app.middleware("http")
+async def enforce_mutation_capability(request: Request, call_next):
+    """Deny unknown/live writes before any legacy handler can execute."""
+    decision = evaluate_runtime_mutation(request.method, request.url.path)
+    if decision is not None and not decision.allowed:
+        return JSONResponse(
+            status_code=decision.http_status,
+            content={
+                "ok": False,
+                "state": decision.state,
+                "capability": decision.capability.value,
+                "detail": decision.reason,
+                "live_trading": "LOCKED",
+            },
+            headers={"X-System3-Capability": decision.capability.value},
+        )
+    response = await call_next(request)
+    if decision is not None:
+        response.headers["X-System3-Capability"] = decision.capability.value
+    return response
 
 
 @app.post("/api/auth/session")
@@ -182,7 +205,7 @@ async def dashboard_auth_status(request: Request):
 @app.post("/api/auth/logout")
 async def dashboard_auth_logout(request: Request):
     # Logout is a cookie-authenticated mutation; validate browser origin even
-    # though the route itself remains publicly callable for expired sessions.
+    # though the route itself remains callable for expired sessions.
     if request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE) and not _origin_allowed(request):
         raise HTTPException(status_code=403, detail="Origin validation failed")
     token = request.cookies.get(legacy._DASHBOARD_SESSION_COOKIE, "")
