@@ -87,3 +87,6 @@ reports/latest/manual_*
 
 # Runtime state files
 state/
+*.env
+credentials.json
+.credentials
