@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Auto-deploy Genesis System3 web service to Cloud Run (image update only).
+"""Auto-deploy Genesis System3 web service to Cloud Run.
 
 Builds an immutable image tagged with the full git SHA, then patches the Cloud
-Run service container image + safe env vars. In ANALYZER/PAPER mode the
-interactive dashboard is intentionally public/read-only: REQUIRE_API_KEY=false
-and API_KEY is not mounted into the serving revision. Worker ingestion keeps its
-separate Secret Manager token.
+Run service container image + authoritative safe runtime configuration. In
+ANALYZER/PAPER mode the interactive dashboard is intentionally public/read-only:
+REQUIRE_API_KEY=false and API_KEY is not mounted into the serving revision.
+Worker ingestion keeps its separate Secret Manager token.
 
 Live trading flags are always forced OFF.
 """
@@ -40,6 +40,11 @@ SAFE_ENV = (
     ("REQUIRE_API_KEY", "false"),
     ("ANALYZE_MODE", "1"),
     ("SYSTEM3_MODE", "ANALYZER"),
+    ("DHAN_TOKEN_SOURCE", "gcp-secret-manager-dynamic"),
+    ("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token"),
+    ("DHAN_TOKEN_CACHE_TTL_S", "30"),
+    ("DHAN_TOKEN_ROTATION_JOB", os.environ.get("DHAN_ROTATION_JOB", "genesis-system3-dhan-token-rotate")),
+    ("DHAN_TOKEN_ROTATION_SCHEDULE", "07:30 IST daily"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
@@ -222,7 +227,7 @@ def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str
         json={
             "template": {
                 "containers": [c0],
-                "scaling": {"minInstanceCount": 1, "maxInstanceCount": 10},
+                "scaling": {"minInstanceCount": 0, "maxInstanceCount": 1},
             }
         },
         timeout=120,
