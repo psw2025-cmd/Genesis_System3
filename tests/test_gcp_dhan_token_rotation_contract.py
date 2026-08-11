@@ -95,11 +95,7 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("DhanLogin(client_id).generate_token", text)
         self.assertNotIn("from core.brokers.dhan.token_manager", text)
         self.assertNotIn("system3-dhan-access-token", text)
-        forbidden_calls = [
-            "place" + "_order(",
-            "modify" + "_order(",
-            "cancel" + "_order(",
-        ]
+        forbidden_calls = ["place" + "_order(", "modify" + "_order(", "cancel" + "_order("]
         for marker in forbidden_calls:
             self.assertNotIn(marker, text)
 
@@ -149,11 +145,7 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("SINGLE_FLIGHT_BUSY", patch)
         self.assertIn("COOLDOWN", patch)
         self.assertNotIn("refresh_token(", patch)
-        forbidden_calls = [
-            "place" + "_order(",
-            "modify" + "_order(",
-            "cancel" + "_order(",
-        ]
+        forbidden_calls = ["place" + "_order(", "modify" + "_order(", "cancel" + "_order("]
         for marker in forbidden_calls:
             self.assertNotIn(marker, patch)
 
@@ -182,7 +174,8 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('("REQUIRE_API_KEY", "false")', deploy_script)
         self.assertNotIn("API_KEY_SECRET_ID", deploy_script)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", deploy_script)
-        self.assertIn('env_map.pop("API_KEY", None)', deploy_script)
+        self.assertIn("--remove-secrets=API_KEY", deploy_script)
+        self.assertIn("--update-secrets=WORKER_PUSH_TOKEN=", deploy_script)
         self.assertIn("DASHBOARD_PUBLIC_READONLY enforced", deploy_script)
 
         self.assertIn("--allow-unauthenticated", manual_script)
