@@ -4,6 +4,7 @@ Security goals:
 - session identifiers are cryptographically random and opaque;
 - only SHA-256 token hashes are stored server-side;
 - expiry/revocation are authoritative server decisions, not browser timers;
+- revoked records remain as server tombstones until natural expiry;
 - process restart invalidates all sessions (fail closed);
 - no broker/trading imports or mutation authority live here.
 
@@ -60,7 +61,7 @@ class SessionTruthStore:
         expired = [
             key
             for key, record in self._sessions.items()
-            if record.expires_at <= now or record.revoked_at is not None
+            if record.expires_at <= now
         ]
         for key in expired:
             self._sessions.pop(key, None)
@@ -87,11 +88,9 @@ class SessionTruthStore:
         now = datetime.now(timezone.utc)
         key = self._hash_token(token)
         with self._lock:
+            self._purge_expired_locked(now)
             record = self._sessions.get(key)
-            if record is None:
-                return None
-            if record.revoked_at is not None or record.expires_at <= now:
-                self._sessions.pop(key, None)
+            if record is None or record.revoked_at is not None:
                 return None
             return record
 
@@ -101,25 +100,30 @@ class SessionTruthStore:
         key = self._hash_token(token)
         now = datetime.now(timezone.utc)
         with self._lock:
+            self._purge_expired_locked(now)
             record = self._sessions.get(key)
-            if record is None:
+            if record is None or record.revoked_at is not None:
                 return False
-            revoked = SessionTruth(
+            self._sessions[key] = SessionTruth(
                 session_id_hash=record.session_id_hash,
                 principal=record.principal,
                 issued_at=record.issued_at,
                 expires_at=record.expires_at,
                 revoked_at=now,
             )
-            self._sessions[key] = revoked
-            self._purge_expired_locked(now)
             return True
 
     def active_count(self) -> int:
         now = datetime.now(timezone.utc)
         with self._lock:
             self._purge_expired_locked(now)
-            return len(self._sessions)
+            return sum(1 for record in self._sessions.values() if record.revoked_at is None)
+
+    def revoked_count(self) -> int:
+        now = datetime.now(timezone.utc)
+        with self._lock:
+            self._purge_expired_locked(now)
+            return sum(1 for record in self._sessions.values() if record.revoked_at is not None)
 
 
 _SESSION_TRUTH_STORE = SessionTruthStore()
