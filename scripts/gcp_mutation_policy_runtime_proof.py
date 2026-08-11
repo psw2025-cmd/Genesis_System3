@@ -181,9 +181,13 @@ def main() -> int:
                 expected_status=401,
                 expected_code="WORKER_AUTH_INVALID",
             ),
+            # Deliberately outside every approved capability prefix and with no
+            # registered handler. If runtime classification is bypassed this
+            # would become a normal 404/legacy-auth response, not the expected
+            # MUTATION_CAPABILITY_UNKNOWN denial.
             _probe(
                 base,
-                "/api/security/mutation-policy/probe/unknown",
+                "/__system3_unknown_mutation_probe__",
                 expected_status=403,
                 expected_code="MUTATION_CAPABILITY_UNKNOWN",
             ),
