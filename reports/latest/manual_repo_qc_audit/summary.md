@@ -1,16 +1,16 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 08:51 IST`
+Updated: `2026-08-11 09:48 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `b7bca87904aaae36af7a09b85021ea10ce179f8d`.
-- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..b7bca87904aaae36af7a09b85021ea10ce179f8d` is **13 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
+- Repository HEAD observed at start of this iteration: `416cc5db5e4b077fd3b8924a20e58ce7990dff89`.
+- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..416cc5db5e4b077fd3b8924a20e58ce7990dff89` is **14 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
 - PR #97 remains OPEN at head `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main`. Its synthetic-P&L suppression still substitutes zero for unavailable/rejected P&L, so it does not close null/provenance concerns.
 - PR #96 remains the newest merged application/UI PR in the current evidence set.
-- Exact application-HEAD workflow/runtime proof remains **NOT PROVEN**. Workflow/configuration presence is not deployment evidence.
+- Exact application-HEAD workflow/runtime proof remains **NOT PROVEN**; the current GitHub connector returned no workflow runs bound to application HEAD `b70af343...`.
 - Google Cloud Run / Google Cloud services remain the sole deployment authority. Render-era runtime assumptions are migration debt only.
 - Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
 - This Markdown remains the single continuously maintained audit/remediation authority.
@@ -32,6 +32,8 @@ Updated: `2026-08-11 08:51 IST`
 | AI prediction ledger | **MISSING / P0-P1** | **READY TO PATCH/DESIGN** via `PredictionTruth` |
 | Model provenance / leakage control | **INCOMPLETE / P0-P1** | **READY TO PATCH** |
 | Probability calibration / drift | **NOT PROVEN / P1** | **READY TO PATCH/DESIGN** |
+| Responsive/mobile workstation | **FAIL / P1** | **READY TO PATCH** via responsive shell |
+| Accessibility/keyboard/focus/live-state semantics | **FAIL / P1** | **READY TO PATCH** via `AccessibleWorkstationShell` |
 | Google Cloud deployment provenance | **FAIL / P0-P1** | **READY TO PATCH** via `DeploymentTruth` |
 | Observability/runtime error truth | **INCOMPLETE / P1** | **READY TO PATCH/DESIGN** |
 | Real-money trade ready | **NO** | locked |
@@ -53,206 +55,194 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 - `WS-001..011` OPEN/UNPROVEN: socket-open≠healthy stream, weak heartbeat truth, REST/WS ordering, stale-value re-stamping, malformed-event silence, stale-last-good semantics, duplicate transport policy, fake WebSocket proof, capped age and route-owner uncertainty.
 - `GCP-001..011` OPEN: exact-revision proof missing, immutable digest absent, weak frontend SHA, double service mutation, legacy-key fallback, broad runtime IAM, default service-account fallback, weak typed safety/incident proof and incomplete Render retirement.
 - `STATE-001..012` OPEN: file backend default, optional Firestore fallback, stale whole-snapshot overwrite, missing domain revisions/CAS, startup local-file promotion, plausible green defaults, duplicate SSOT methods, position error→empty collapse, weak identity, mixed-generation file sync and missing multi-writer tests.
+- `ML-001..014` OPEN: missing immutable prediction ledger, overloaded model-proof boolean, dictionary-first model selection, rank→confidence misuse, ambiguous percentage units, unknown→zero metrics, tracker type bug, unsafe accuracy math, non-atomic tracker persistence, non-purged/non-global time split, incomplete artifact identity, selection/evaluation leakage, missing calibration and no prediction→after-cost linkage.
 
-## 4. New deep slice — AI/ML, prediction ledger, model provenance and calibration
+## 4. New deep slice — responsive, accessibility, keyboard and constrained-layout workstation behavior
 
-### ML-001 / P0-P1 — Prediction Audit is a static contract, not a wired prediction ledger
+### A11Y-001 / P1 — application shell is fixed-height/fixed-sidebar and has no responsive layout authority
 
-**Exact proof:** `dashboard/frontend/src/components/workspaces/PredictionAudit.tsx` explicitly states that no production prediction ledger is wired and renders only `PENDING — DATA SERVICE PENDING`.
+**Exact proof:** `dashboard/frontend/src/App.tsx` uses a `100vh` flex column, a permanently rendered `Sidebar`, and a main region with `overflow:'hidden'`. `Sidebar.tsx` fixes navigation width to `190px` with 22 tab buttons. There is no breakpoint/drawer logic in these files.
 
-**Symptom/root cause:** the product has a first-class Prediction Audit tab but no immutable backend ledger/API connecting prediction issuance to later paper outcomes.
+**Symptom/root cause:** the desktop shell is treated as universal. A small viewport must fit a fixed sidebar plus workstation content instead of intentionally switching information architecture.
 
-**Real-money impact:** a displayed AI decision cannot be forensically tied to the exact model, data cutoff, feature values, evidence, subsequent fills or realized outcome. Calibration and model accountability therefore cannot be proven.
+**Real-money impact:** critical status, risk, broker/data and order-safety controls can be clipped or forced below usable widths; an operator on tablet/mobile can miss authoritative warnings or select the wrong workspace.
 
-**Exact files/routes:** `dashboard/frontend/src/components/workspaces/PredictionAudit.tsx`; new backend `prediction_ledger` service/router required; paper lifecycle and scanner/ranker contracts must supply IDs.
+**Exact files:** `dashboard/frontend/src/App.tsx`, `dashboard/frontend/src/components/Sidebar.tsx`, new responsive shell/layout primitives, relevant workspace tables.
 
-**Target behavior:** each prediction gets an immutable `prediction_id` at issuance and is never rewritten. Outcome/calibration records append later using correlation IDs.
+**Target behavior:** desktop ≥1280px uses persistent navigation; tablet uses compact rail; mobile uses modal/drawer navigation and bottom quick-actions. Critical truth strip remains visible; secondary telemetry moves into drilldowns.
 
-**Minimal safe implementation:** introduce `PredictionTruth` + append-only prediction ledger; expose read-only `/api/predictions`, `/api/predictions/{id}`, `/api/predictions/calibration`.
+**Minimal safe implementation:** introduce `useViewportClass()` + CSS container/breakpoint tokens and a single `WorkstationShell`. Sidebar becomes `desktop | compact | drawer`; content regions receive explicit scroll ownership.
 
-**Schema:** prediction ID, issued time, target horizon, instrument/contract key, model artifact ID/hash, feature-schema hash, frozen data cutoff, raw score, calibrated probability, uncertainty, evidence/counter-evidence references, input-source IDs, source/runtime revision, maturity rule and state.
+**Regression risks:** hiding controls at breakpoints, trapping focus in drawer, duplicate navigation state, content remount/data refetch.
 
-**Closure tests:** restart-safe append, duplicate-ID rejection, immutability test, exact model/data hash round-trip, scanner→prediction→paper correlation, matured outcome append without mutating original prediction.
+**Closure tests/PASS:** Playwright viewport matrix 360×800, 390×844, 768×1024, 1024×768, 1366×768, 1920×1080; no clipped safety controls; all tabs reachable; no horizontal page scroll except deliberate data-table scrollers; active workspace survives orientation/layout change.
 
-**Fail-safe:** missing ledger/provenance => AI decision remains advisory and execution-ineligible.
+**Fail-safe:** when viewport rules fail, show a safe reduced control surface with live router still locked and truth/status visible.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-002 / P1 — TopBar hides overflow instead of prioritizing/reflowing critical controls
+
+**Proof:** `TopBar.tsx` header sets `overflow:'hidden'`; index chips occupy a flex region also with `overflow:'hidden'`; owner identity, Cloud Build badge, clock, NIFTY/BANKNIFTY/FINNIFTY, sync age, market, Dhan, PAPER, LIVE OFF, WS and rho all compete for one fixed 56px row.
+
+**Impact:** constrained width can silently remove market/broker/live/WS truth from view.
+
+**Solution:** priority-tier header: Tier 0 always-visible safety (`MODE`, `LIVE LOCK`, market/session, broker/data age); Tier 1 index watch becomes horizontally scrollable; Tier 2 owner/build/rho moves to overflow/command panel. Never clip Tier 0.
+
+**Tests:** screenshot/assert visibility at all supported widths; no Tier-0 element may have zero intersection with viewport.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-003 / P1 — navigation is technically button-based but not optimized for 22-tab keyboard operation
+
+**Proof:** `Sidebar.tsx` renders every tab as a normal button, so keyboard users must traverse the entire 22-item sequence. There is no roving focus, group-level arrow navigation, workspace search or command palette.
+
+**Impact:** slow navigation under incident/market pressure increases operator error and makes the workstation inefficient for keyboard-first use.
+
+**Solution:** keep native buttons, add roving `tabIndex` within grouped navigation, Up/Down/Home/End movement, Left/Right group movement where appropriate, `Ctrl/Cmd+K` workspace command palette, and skip-to-content link. Preserve `aria-current=page`.
+
+**Tests:** keyboard-only traversal of every workspace, focus order snapshot, no keyboard trap, command palette searchable by current and rationalized tab names.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-004 / P1 — broker TopBar navigation control is a clickable `span`, not an accessible control
+
+**Proof:** `TopBar.tsx` uses `<span onClick={() => setActiveTab('broker')}>` with `cursor:'pointer'` for the Dhan broker status chip; it has no button role, no tab focus, and no Enter/Space behavior.
+
+**Impact:** keyboard and assistive-technology operators cannot reliably activate a critical broker-health drilldown.
+
+**Solution:** replace with native `<button type="button">`; preserve visual styling, add descriptive accessible name including broker quality, and maintain visible focus.
+
+**Tests:** Tab reaches broker chip; Enter and Space open Broker workspace; axe has no interactive-role violation.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-005 / P1 — broker status in Sidebar has a color-only indicator
+
+**Proof:** the Broker navigation item adds an unlabeled 7px colored dot based on `brokerConnected`; the button's text remains only `Broker`.
+
+**Impact:** color-vision deficiency or screen-reader users do not receive the broker state represented by the dot.
+
+**Solution:** decorative dot gets `aria-hidden=true`; accessible button name/description includes typed state (`Broker — connected`, `Broker — unknown`, etc.) sourced from broker truth, and visible text/badge uses words/icons as well as color.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-006 / P1 — login error/loading/status feedback lacks live-region semantics
+
+**Proof:** `LoginPage.tsx` renders errors in a plain `<div>` with no `role="alert"`/`aria-live`; `AuthGate` loading text similarly has no status role. The login label has no `htmlFor`/input `id` relationship.
+
+**Impact:** assistive technology may not announce authentication failure or loading changes; the field label association is weaker than required for a professional security surface.
+
+**Solution:** `role="status" aria-live="polite"` for loading; `role="alert" aria-live="assertive"` for auth failures; explicit `label htmlFor`, input `id/name`, `aria-describedby`; use appropriate autocomplete policy and never expose the raw key after authentication.
+
+**Security constraint:** this accessibility patch must align with `SOL-01`; the raw API key must be removed from `sessionStorage`, not made easier to persist.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-007 / P1-P2 — critical telemetry uses very small text sizes
+
+**Proof:** `TopBar.tsx` and `Sidebar.tsx` use repeated `.45rem`, `.5rem`, `.52rem`, `.55rem`, `.6rem`, `9px`, and `10px` text for build identity, labels and status badges.
+
+**Impact:** dense workstation information can become unreadable on high-DPI laptops/tablets and for low-vision users; status interpretation slows under pressure.
+
+**Solution:** define minimum semantic type tokens: critical status ≥12px equivalent, secondary telemetry ≥11px, interactive labels ≥12px; support browser zoom 200% without loss of controls; use truncation only with accessible full text.
+
+**Tests:** WCAG reflow at 200% zoom and 320 CSS px equivalent; no safety label clipped or hidden.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-008 / P1 — scroll ownership is fragile because body and main are both overflow-hidden
+
+**Proof:** `index.css` sets `html, body { overflow:hidden }`; `App.tsx` also sets main `overflow:'hidden'`. Therefore every workspace must independently implement scrolling correctly or content becomes unreachable.
+
+**Impact:** long tables, dialogs or error panels can become inaccessible, especially after zoom or on short-height screens.
+
+**Solution:** one explicit shell scroll contract: app body stays fixed only if the active workspace root has guaranteed `overflow:auto`; use reusable `WorkspaceViewport` and `DataScroller`. Dialogs portal to body with their own scroll/focus lock.
+
+**Tests:** automated content-height stress tests, 200% zoom, 600px viewport height and long-table fixtures; last interactive row/control remains reachable.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-009 / P1 — no consistent visible-focus design for workstation controls
+
+**Proof:** `index.css` defines a custom focus border only for `select`; navigation and inline-styled critical controls do not use a shared `:focus-visible` token. Browser defaults may remain, but there is no product-level proof of consistent high-contrast focus.
+
+**Impact:** keyboard operators can lose track of active control in a dense dark UI.
+
+**Solution:** global `:focus-visible` ring token with ≥2px visible contrast, offset and no color-only ambiguity; native semantics first; modal focus trap/restoration standardized.
+
+**Tests:** automated focus-outline snapshots across every interactive component and theme; no element with `outline:none` unless replaced by equal/stronger focus indicator.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-010 / P1 — dynamic market/broker/WS safety-state changes are not exposed through controlled live regions
+
+**Proof:** TopBar updates market status, broker state, WS state and tick age visually but does not expose an accessibility announcement channel. ProductionProofBar has an `aria-label` but no `aria-live` state-change strategy.
+
+**Impact:** a screen-reader user can remain unaware that market/data/broker state degraded or live-lock/readiness changed.
+
+**Solution:** create a deduplicated `CriticalStatusAnnouncer` that announces only meaningful transitions (`HEALTHY→STALE`, `CONNECTED→ERROR`, `PAPER→UNKNOWN`, risk inhibit), not every market tick. Use `aria-live=polite`, escalating safety failures to assertive only when operator action is required.
+
+**Tests:** transition-driven screen-reader DOM assertions; no announcement spam from per-second clock/tick updates.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-011 / P1 — status color semantics need text/icon redundancy and contrast proof
+
+**Proof:** green/amber/red are heavily used for market, broker, WS, proof and sidebar states. Some controls contain text, but several micro-indicators and small labels rely strongly on hue.
+
+**Solution:** every safety/data state includes icon + explicit word (`HEALTHY`, `STALE`, `UNKNOWN`, `ERROR`, `LOCKED`) and meets contrast targets. Do not encode direction/safety solely by red/green.
+
+**Tests:** axe contrast checks plus monochrome/color-blind visual regression snapshots.
+
+**Status:** `READY TO PATCH`.
+
+### A11Y-012 / P1 — actual browser accessibility/runtime proof is absent
+
+**Proof:** this iteration could statically inspect source but no exact-application-head browser/Playwright/axe workflow run exists in the current evidence set.
+
+**Impact:** keyboard/focus/reflow/ARIA claims cannot be closed from code inspection alone.
+
+**Solution:** add exact-revision `ui-accessibility-proof` workflow: build frontend, launch analyzer/paper backend with non-live fixtures, run Playwright + axe on every workspace at desktop/tablet/mobile/200%-zoom, capture console errors/screenshots/accessibility violations and bind artifact to source SHA.
+
+**PASS criteria:** zero critical/serious axe violations; zero console runtime errors; all required workspaces keyboard reachable; no critical status clipped; modal focus restore works; live router remains locked.
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-### ML-002 / P0-P1 — historical training PASS is promoted to `model_proof_ready=true`
+## 5. Positive foundations in this slice
 
-**Exact proof:** `dashboard/backend/routers/ml.py::_options_model_record()` sets `model_proof_ready=True` solely when `reports/latest/options_ml_training/summary.json` has `status == PASS`, while the same record sets `validation_days=0`, `ready_for_live=False` and says forward paper validation is still required. `get_ml_performance()` then uses `any(model_proof_ready)` to set global model proof, and `MLPerformance.tsx` renders the page `ready` when that API flag is true.
+- Sidebar uses native `<button>` elements for tabs, has `aria-label`, `aria-current`, and a named `<nav>` landmark.
+- `ProductionProofBar` has an accessible label and explicit text values in addition to colors.
+- `index.css` already honors `prefers-reduced-motion: reduce`; preserve this.
+- Login uses a native `<form>`, password input and submit button.
+- App contains a semantic `<main>` element.
 
-**Root cause:** one boolean is overloaded across `TRAINED`, `HISTORICAL_VALIDATED`, `FORWARD_VALIDATED`, `CALIBRATED`, and `MONEY_READY` concepts.
+These are foundations only; they do not prove responsive/accessibility completeness.
 
-**Impact:** the UI can show `MODEL_PROOF_READY` for a model that is only historically trained/evaluated, even with zero forward validation days.
+## 6. Canonical truth contracts
 
-**Canonical solution:** replace boolean readiness with a typed maturity state:
-`NOT_TRAINED | TRAINED | HISTORICAL_VALIDATED | FORWARD_VALIDATING | FORWARD_VALIDATED | CALIBRATED | DRIFTED | RETIRED`.
-Money/readiness gates consume explicit required states and never infer from `status=PASS`.
-
-**Exact files:** `dashboard/backend/routers/ml.py`, `dashboard/frontend/src/components/MLPerformance.tsx`, auto-gate/readiness consumers.
-
-**Tests/PASS:** historical training PASS with zero forward records must render `TRAINED / FORWARD VALIDATION PENDING`, never green model-proof-ready.
-
-**Status:** `READY TO PATCH`.
-
-### ML-003 / P1 — “Best Model” comparison selects first proven record, not best metric
-
-**Proof:** `/api/ml/compare` builds `proven` then uses `next(iter(proven.keys()))` as `best_name`.
-
-**Impact:** model ranking shown to operator can be dictionary-order dependent rather than evidence/metric driven.
-
-**Solution:** require a versioned selection policy with primary metric, tie breakers, minimum sample/maturity, calibration constraint and untouched holdout. Return `selection_policy_id` and per-model comparable metrics. If models are not comparable, `best_model=null`.
-
-**Tests:** reorder input dictionary; selected model must remain identical under deterministic policy.
-
-**Status:** `READY TO PATCH`.
-
-### ML-004 / P0-P1 — gain-rank score is converted into fake “confidence”
-
-**Proof:** `/api/signal/top` returns `confidence = min(abs(gain_score)/100, 1.0)` and direction from score sign. Option-visibility audit similarly derives `conf` from gain score.
-
-**Root cause:** rank/score is treated as though it were a calibrated probability.
-
-**Impact:** operator/AI decision surfaces can present a mathematically uncalibrated ranking score as confidence, which is unsafe for sizing, ranking or readiness logic.
-
-**Solution:** `rank`, `raw_score`, `forecast`, `probability`, `calibrated_probability`, `uncertainty` are separate nullable fields. No confidence field exists unless produced by a named calibration model with evidence.
-
-**Tests:** a gain score of 80 must not produce 0.8 probability/confidence unless an explicit calibrator generated it.
-
-**Status:** `READY TO PATCH`.
-
-### ML-005 / P1 — percentage units are inferred heuristically in the UI
-
-**Proof:** `MLPerformance.tsx::fmtPct()` assumes values `<=1` are fractions and values `>1` are already percentages.
-
-**Impact:** ambiguous API units can silently turn 1.2 into `1.20%` when it may mean 120%, or otherwise hide contract drift.
-
-**Solution:** API carries explicit metric unit/domain (`fraction_0_1`, `percent_0_100`, correlation `-1_1`). Frontend formatting is schema-driven only.
-
-**Status:** `READY TO PATCH`.
-
-### ML-006 / P1 — missing model counts become plausible zeros
-
-**Proof:** ML table renders `total_predictions ?? 0`, `proof_pass_count ?? 0`, `validation_pending_count ?? 0`.
-
-**Impact:** unavailable/malformed evidence can look like a genuine measured zero instead of unknown.
-
-**Solution:** nullable metrics + quality state. Render `— / UNKNOWN` unless backend proves zero.
-
-**Status:** `READY TO PATCH`.
-
-### ML-007 / P0-P1 — `MLPerformanceTracker.record_prediction()` corrupts its own in-memory type contract
-
-**Proof:** a newly created model stores `underlyings` as a `set`; after the first record the method converts it to a `list` for JSON. The next prediction for that same model calls `model_stats["underlyings"].add(underlying)`, which a list does not support.
-
-**Symptom:** second prediction for an existing model can raise `AttributeError`, preventing reliable ledger/performance accumulation.
-
-**Solution:** keep canonical internal structure type-stable (`set` only in memory) and serialize through a copy, or use list + explicit deduplicating append consistently. Add typed dataclass/Pydantic model.
-
-**Tests/PASS:** 100 sequential predictions for same model, restart/load, multiple underlyings and concurrent append; zero exceptions/data loss.
-
-**Status:** `READY TO PATCH`.
-
-### ML-008 / P0-P1 — tracker accuracy math can produce false accuracy and biased averages
-
-**Proof:** when `actual_result == 0`, accuracy is forced to `1.0` regardless of prediction error. `avg_accuracy` divides accumulated accuracy by **total predictions**, including predictions whose actual result/accuracy is still `None`.
-
-**Impact:** accuracy can be materially wrong in both directions and is unsuitable as readiness evidence.
-
-**Solution:** define target-specific metrics. For regression: MAE/RMSE/MAPE only where mathematically valid. For classification: accuracy/precision/recall/F1/AUC plus calibration. Matured sample count is separate from issued count; no immature prediction enters denominator.
-
-**Tests:** actual zero with wrong prediction, immature predictions, class imbalance, all-zero outcome edge case.
-
-**Status:** `READY TO PATCH`.
-
-### ML-009 / P1 — ML tracker corruption silently becomes empty history and writes are non-atomic
-
-**Proof:** `_load_data()` catches all parse/read exceptions and resets to `{models:{}, predictions:[]}`; `_save_data()` writes directly to the JSON file without temp+replace, locking or checksum.
-
-**Impact:** corruption/partial write can erase apparent model history and be mistaken for no predictions; concurrent writers can lose records.
-
-**Solution:** prediction ledger moves to authoritative append-only shared persistence. Until migration: atomic temp+replace, schema/checksum, file lock, corruption quarantine and explicit `LEDGER_ERROR` rather than empty.
-
-**Status:** `READY TO PATCH`.
-
-### ML-010 / P0-P1 — option-model holdout is not a proven market-time/purged split
-
-**Proof:** dataset rows are sorted only **within each contract group**, then groups are appended. Training uses `train_test_split(..., shuffle=False)` on the concatenated dataset. Therefore the final 25% is not guaranteed to be a global chronological holdout across all contracts. Overlapping forward-step labels are also not purged around the split boundary.
-
-**Impact:** train/test leakage or contract-order bias can inflate historical accuracy/AUC and invalidate model-selection evidence.
-
-**Solution:** globally parse/sort timestamps, define immutable data cutoff, use purged walk-forward splits with embargo at least equal to label horizon, group-aware checks for contract/expiry leakage and a final untouched holdout period.
-
-**Tests/PASS:** assert `max(train_event_time) < min(validation_event_time)` after purge for every fold; no overlapping label windows across boundaries; duplicate timestamp/contract leakage report = zero violations.
-
-**Status:** `READY TO PATCH`.
-
-### ML-011 / P1 — trained model artifact lacks full reproducibility identity
-
-**Proof:** saved joblib contains `model`, `best_model`, `results`, `trained_at`; summary records row counts/results but no dataset SHA256, source-file manifest, feature schema hash, cutoff, label horizon, sklearn/python versions, dependency lock hash, git SHA or model artifact hash.
-
-**Impact:** a dashboard metric cannot be proven to correspond to an exact dataset/code/model build.
-
-**Solution:** `ModelArtifactManifest` with `model_id`, model SHA256, source Git SHA/tree, dataset manifest/hash, feature/label schema hash, train cutoff, fold definitions, library/container digest, hyperparameters, selection policy, generated time and evidence ID.
-
-**Status:** `READY TO PATCH`.
-
-### ML-012 / P1 — same test partition is used for model selection and reported performance
-
-**Proof:** both candidate models are evaluated on one `X_test`; the higher AUC/accuracy chooses `best_model`, and the same scores are written as final results.
-
-**Impact:** reported selected-model performance is optimistically biased because the evaluation set participates in model selection.
-
-**Solution:** train → tuning/walk-forward validation → model selection → untouched final holdout. Holdout is evaluated once after policy/model freeze.
-
-**Status:** `READY TO PATCH`.
-
-### ML-013 / P1 — no calibration evidence exists for probability-like output
-
-**Proof:** training reports accuracy and ROC AUC only; no Brier score, log loss, ECE, reliability bins, calibration slope/intercept or calibrated estimator is persisted. Yet product concepts use confidence/probability language.
-
-**Solution:** if probabilistic decisions are needed, fit calibration on a dedicated calibration window or nested fold; persist Brier/ECE/reliability data and calibration-model hash. Calibration drift is monitored separately from discrimination metrics.
-
-**Status:** `READY TO PATCH/DESIGN`.
-
-### ML-014 / P0-P1 — no immutable prediction→after-cost outcome linkage
-
-**Proof:** Prediction Audit admits no production ledger. Existing ML router uses gain-rank history and market-validation files; the inspected contracts do not require paper order/fill IDs, charges, slippage, taxes or reconciled net outcome per prediction.
-
-**Impact:** even a statistically correct model cannot be proven economically useful, and profitability claims cannot be reproduced.
-
-**Solution:** outcome append record references `prediction_id`, paper `correlation_id`, entry/exit fill IDs, maturity time, gross return, fees/slippage/taxes, net after-cost return, MAE/MFE and reconciliation evidence. Calibration metrics use matured outcomes; profitability/readiness uses reconciled net outcomes only.
-
-**Status:** `READY TO PATCH/DESIGN`.
-
-## 5. Canonical truth contracts
-
-### 5.1 `SafetyTruth`
+### 6.1 `SafetyTruth`
 Mode, nullable live/auto flags, router/kill-switch state, source/runtime/image/policy revisions, verified time/age, `PROVEN|STALE|UNKNOWN|ERROR`.
 
-### 5.2 `DataTruthEnvelope` / `StreamTruth`
+### 6.2 `DataTruthEnvelope` / `StreamTruth`
 Source/session/instrument, source/backend/frontend timestamps, uncapped age/TTL, schema/normalizer versions, transport vs heartbeat vs stream state, sequence/rejected-old events, quality and evidence.
 
-### 5.3 `OptionChainTruth`
+### 6.3 `OptionChainTruth`
 Underlying/security ID/segment, requested+resolved expiry authority, provider/session, times/age/TTL, expiry-aware cache identity, schema/normalizer versions, nullable quote/Greek fields + field quality, completeness, source/runtime revision and evidence ID.
 
-### 5.4 `DeploymentTruth`
+### 6.4 `DeploymentTruth`
 Exact source/tree SHA, Cloud Build ID, immutable image digest, final Cloud Run revision/traffic, frontend/backend SHA, runtime app/service account, policy/config hash, secret/scheduler provenance, verified time and evidence ID.
 
-### 5.5 `StateTruth`
+### 6.5 `StateTruth`
 Required shared backend, collection/document, shared-state health, runtime/instance ID, last shared read/write, per-domain revision/writer/event/time/schema/quality/evidence. Global version is diagnostic only.
 
-### 5.6 `PredictionTruth` — NEW
+### 6.6 `PredictionTruth`
 `prediction_id`, immutable issue time, target/horizon, instrument key, model artifact ID/hash, dataset/feature schema hash, frozen data cutoff, raw score, calibrated probability, uncertainty, evidence/counter-evidence, input truth IDs, runtime/source revision, maturity rule/state, later append-only outcome/calibration links.
 
-### 5.7 `ModelArtifactManifest` — NEW
-Model/dataset/code/container hashes, feature+label schema, train cutoff, purged walk-forward folds, calibration/holdout windows, hyperparameters, environment fingerprint, selection policy, metrics/sample counts and evidence ID.
+### 6.7 `AccessibleWorkstationState` — NEW
+Viewport class, navigation mode, focused workspace/control ID, modal/drawer state, critical-status announcement queue and density preference. This state is **non-authoritative for trading**; it must never affect risk/safety truth or live routing.
 
-### 5.8 `PaperLifecycleTruth`, `GateTruth`, `RiskPolicy`, `PreTradeRiskTruth`
-Retain immutable lifecycle, semantic evidence gates, server-owned policy and fail-closed pre-trade decision contracts.
-
-## 6. Canonical remediation roadmap
+## 7. Canonical remediation roadmap
 
 - `SOL-01 Auth/session — READY TO PATCH`: correct login body; cookie-only auth; remove raw API key; auth-gate polling/WS; TTL/revocation tests.
 - `SOL-02 SafetyTruth — READY TO PATCH`: one backend authority; missing/stale => UNKNOWN.
@@ -268,28 +258,28 @@ Retain immutable lifecycle, semantic evidence gates, server-owned policy and fai
 - `SOL-12 RuntimeEventEnvelope — READY TO PATCH/DESIGN`: incidents/logs bound to source SHA + digest + Cloud Run revision.
 - `SOL-13 StateTruth + domain-CAS — READY TO PATCH`: Firestore required in GCP; sparse domain writes; no local authority fallback; restart/multi-writer proof.
 - `SOL-14 PredictionTruth + ModelArtifactManifest — READY TO PATCH/DESIGN`: immutable prediction ledger, exact model/data identity, purged walk-forward, untouched holdout, calibrated probability, drift monitoring and after-cost outcome linkage.
+- `SOL-15 AccessibleWorkstationShell — READY TO PATCH`: responsive shell, tiered truth header, drawer/compact navigation, command palette, keyboard model, focus-visible, live regions, table reflow and exact-revision Playwright/axe proof.
 
-### SOL-14 ordered implementation
+### SOL-15 ordered implementation
 
-1. Define `PredictionTruth`, `PredictionOutcome`, `ModelArtifactManifest`, `CalibrationReport` schemas.
-2. Split existing model state from one boolean into typed maturity stages.
-3. Remove gain-score→confidence derivation; preserve rank/raw score only.
-4. Fix `MLPerformanceTracker` type instability and metric denominators, then deprecate file JSON as authority.
-5. Move prediction issuance to append-only shared persistence with immutable IDs/idempotency.
-6. Produce dataset/source manifests with SHA256 and exact frozen data cutoff.
-7. Rebuild CE/PE evaluation using globally ordered purged walk-forward folds + embargo and an untouched final holdout.
-8. Add model-selection policy ID; do not pick dictionary-first model.
-9. Add probability calibration with Brier/ECE/reliability evidence when probability is exposed.
-10. Add feature/prediction/calibration drift monitoring and explicit `DRIFTED` maturity state.
-11. Wire scanner/candidate → prediction ID → paper lifecycle correlation ID → reconciled after-cost outcome.
-12. Update `PredictionAudit.tsx` and `MLPerformance.tsx` to show provenance, maturity, sample counts, calibration, drift and outcome linkage; unknown remains unknown.
-13. Add replay/restart/concurrency tests and exact-revision runtime evidence.
+1. Add viewport/layout tokens and `WorkstationShell` with explicit desktop/tablet/mobile modes.
+2. Refactor Sidebar to persistent/compact/drawer modes with one source of active-tab truth.
+3. Refactor TopBar into Tier-0 safety truth, Tier-1 market watch and Tier-2 overflow telemetry; never hide Tier-0.
+4. Replace clickable non-semantic spans with native controls.
+5. Add skip link, roving navigation keys and `Ctrl/Cmd+K` command palette.
+6. Add shared `:focus-visible` design token and modal/drawer focus trap + restore.
+7. Add `CriticalStatusAnnouncer` with transition deduplication; never announce per-tick noise.
+8. Raise minimum type/touch-target sizing and preserve reduced-motion support.
+9. Add reusable `WorkspaceViewport`, `DataScroller`, sticky table headers and mobile column-priority/card views.
+10. Add explicit loading/empty/error/auth/market-closed/stale states with semantic roles.
+11. Run Playwright + axe across all existing repo tabs, breakpoints, 200% zoom and keyboard-only scenarios.
+12. Bind proof artifacts to exact source SHA/runtime revision; no PASS from static inspection alone.
 
-**SOL-14 PASS criteria:** every displayed AI decision maps to immutable prediction/model/data evidence; no rank is labeled probability; no historical-training PASS yields model-ready; no training/validation leakage across frozen time boundaries; calibrated probability has calibration evidence; final model performance comes from untouched holdout/forward data; matured predictions link to reconciled after-cost outcomes; exact deployed revision is known.
+**SOL-15 PASS criteria:** all current navigation destinations are reachable by keyboard and mobile; no Tier-0 safety truth is clipped; no dead/non-semantic interactive element remains; visible focus is consistent; critical state transitions are announced without spam; 200% zoom/reflow works; zero critical/serious axe violations and zero browser console runtime errors on the exact revision.
 
-**Rollback/fail-safe:** if model artifact, ledger, calibration, cutoff or outcome evidence is missing/stale, AI remains advisory and all execution/readiness dependencies are inhibited.
+**Rollback/fail-safe:** if responsive/accessibility shell fails, render a reduced read-only layout with SafetyTruth/DataTruth visible and all trading mutation/live controls inhibited.
 
-## 7. Verification counters
+## 8. Verification counters
 
 Independent reproduction paths only.
 
@@ -298,19 +288,19 @@ Independent reproduction paths only.
 | AUTH-001 | `3/20` | OPEN |
 | AUTH-002 | `2/20` | OPEN |
 | AUTH-003 | `2/20` | OPEN |
-| UI-001 | `16/20` | OPEN — ML missing counts add another unknown→zero reproduction |
-| UI-002 | `4/20` | OPEN — score→confidence is another semantic metric mislabel |
-| UI-003 | `7/20` | OPEN |
-| UI-005 | `14/20` | OPEN — ML proof boolean/default semantics independently reproduce |
+| UI-001 | `16/20` | OPEN |
+| UI-002 | `4/20` | OPEN |
+| UI-003 | `8/20` | OPEN — constrained-layout clipping adds another source/state visibility path |
+| UI-005 | `14/20` | OPEN |
 | UI-006 | `9/20` | OPEN |
-| UI-007 | `8/20` | OPEN |
+| UI-007 | `9/20` | OPEN — top-level stream/broker state lacks complete accessible transition semantics |
 | UI-009 | `6/20` | OPEN |
-| UI-011 | `4/20` | OPEN — prediction/model evidence remains incomplete |
-| UI-016 | `8/20` | OPEN |
+| UI-011 | `4/20` | OPEN |
+| UI-016 | `10/20` | OPEN — fixed shell + hidden overflow independently reproduce responsive incompleteness |
 | UI-018 | `2/20` | OPEN |
 | CHAIN-001..014 | retained previous counters | OPEN |
 | READY-001 | `5/20` | OPEN |
-| READY-003 | `3/20` | OPEN — trained-only model proof can influence readiness semantics |
+| READY-003 | `3/20` | OPEN |
 | READY-008 | `2/20` | OPEN |
 | PAPER-001..016 | retained previous counters | OPEN |
 | RISK-001..009 | `1/20` each | OPEN |
@@ -319,10 +309,11 @@ Independent reproduction paths only.
 | GCP-001..011 | `1/20` each | OPEN |
 | STATE-001..012 | `1/20` each | OPEN |
 | ML-001..014 | `1/20` each | OPEN |
+| A11Y-001..012 | `1/20` each | OPEN |
 
 No finding is `LOCKED-20X`.
 
-## 8. Prioritized implementation order
+## 9. Prioritized implementation order
 
 ### P0 Wave 1 — eliminate false-green/fail-open authorities
 1. SOL-01 auth contract + auth-gated startup.
@@ -333,23 +324,27 @@ No finding is `LOCKED-20X`.
 6. SOL-11 StreamTruth and ordered REST/WS merge.
 7. SOL-09 server-owned risk + mandatory pre-trade authority.
 8. SOL-06 durable lifecycle/idempotency/reconciliation.
-9. **SOL-14 model maturity split + score/confidence correction + immutable PredictionTruth foundation.**
+9. SOL-14 model maturity split + score/confidence correction + immutable PredictionTruth foundation.
 10. SOL-04 semantic readiness.
 11. SOL-03 remaining zero/live/default-safe fallbacks.
 12. SOL-10 legacy mutation UI quarantine.
 
-### P1 Wave 2 — statistical/economic proof
-Purged walk-forward + untouched holdout, calibration, drift, model/data hashes, prediction→paper→after-cost outcome linkage, full Greeks/model provenance, true WebSocket proof, GCP IAM split/WIF-only auth and revision-bound runtime incidents.
+### P1 Wave 2 — operator safety + statistical/economic proof
+1. **SOL-15 responsive/accessibility shell and exact-revision browser proof.**
+2. Purged walk-forward + untouched holdout, calibration, drift, model/data hashes.
+3. Prediction→paper→after-cost outcome linkage.
+4. Full Greeks/model provenance and true WebSocket proof.
+5. GCP IAM split/WIF-only auth and revision-bound runtime incidents.
 
 ### P2 Wave 3 — institutional operator quality
-Responsive/mobile, accessibility/keyboard/focus, command palette/search, dense table ergonomics, advanced drilldowns, security/session settings and audit export.
+Advanced command palette/search, customizable density, saved workspace layouts, richer drilldowns, security/session settings and audit export. These remain secondary to truth/safety.
 
-## 9. Product information architecture target
+## 10. Product information architecture target
 
 1. Command Center — Overview + Decision Intel + authoritative truth strip.
 2. Market / Scanner — watch, scanner, ranker, signals.
 3. Options & Greeks — chain, expiry/cache/provenance, IV/OI/liquidity/full Greeks.
-4. **AI Decision Audit — Genesis Brain + Prediction Audit + model provenance + calibration/drift + evidence/outcome linkage.**
+4. AI Decision Audit — Genesis Brain + Prediction Audit + model provenance + calibration/drift + evidence/outcome linkage.
 5. Paper / Trade Lifecycle — capability-driven ticket, immutable orders/fills/positions/P&L/reconciliation.
 6. Portfolio & Risk — server-owned policy, exposure, aggregate Greeks, scenarios.
 7. Data & Broker Health — state authority, domain revisions, transport/heartbeat/source/freshness/account/cache truth.
@@ -359,37 +354,37 @@ Responsive/mobile, accessibility/keyboard/focus, command palette/search, dense t
 
 Current repo tabs remain represented through this rationalized hierarchy; conceptual renames never imply implemented capability.
 
-## 10. Product UI visual evolution — V12
+## 11. Product UI visual evolution — V13
 
-New concept: **AI Decision & Prediction Audit V12** inside the actual `AI Decision Audit` product workspace.
+New concept: **Responsive Command Center V13** — actual System3 Command Center shown in desktop/tablet and mobile/constrained layouts.
 
 Changes driven by this iteration:
-- model maturity is separated from real-money readiness;
-- model SHA256, dataset hash, feature schema and frozen cutoff are first-class operator evidence;
-- rank/raw score is visibly separated from calibrated probability;
-- calibration and drift have dedicated panels;
-- prediction ledger is immutable and prediction-ID based;
-- every prediction can drill into model/data/runtime evidence;
-- paper order/fill correlation and reconciled after-cost outcome are explicit;
-- `TRAINED ≠ PROVEN`, `HIGH AUC ≠ CALIBRATED`, and `GROSS P&L ≠ AFTER-COST` are product rules;
-- missing model/calibration/ledger evidence inhibits execution eligibility;
+- fixed 190px sidebar evolves into persistent desktop navigation, compact tablet rail and mobile drawer;
+- Tier-0 truth (`MARKET`, `DHAN`, `WS`, `PAPER`, `LIVE LOCK`) is never hidden by header overflow;
+- index watch and secondary telemetry are separately scrollable/overflow-managed;
+- mobile uses priority cards instead of squeezing dense desktop tables;
+- keyboard model is explicit: Tab/Shift+Tab, arrow navigation, Enter drilldown, Escape close, `Ctrl/Cmd+K` command palette;
+- visible focus, 44px touch targets, text+icon status and critical live-region announcements are target requirements;
+- execution remains inhibited when truth is unknown or viewport/shell proof fails;
 - live router remains locked.
 
-Visual artifact: `Genesis_System3_AI_Prediction_Audit_Target_V12.png`.
+Visual artifact: `Genesis_System3_Responsive_Command_Center_Target_V13.png`.
 
-## 11. Positive foundations to preserve
+## 12. Positive foundations to preserve
 
-- `PredictionAudit.tsx` correctly refuses to display scanner gain-rank rows as validated forecasts and explicitly states the ledger is not wired.
-- ML router keeps `ready_for_live=False` even where analyzer-only training proof exists; this safety intent should be preserved while fixing overloaded `model_proof_ready` semantics.
-- CE/PE training uses `shuffle=False`, a better starting point than random shuffling, but it must become a globally chronological purged walk-forward design.
-- Historical training pipeline forbids synthetic/fake/mock markers and keeps live trading off.
-- Firestore persistence already uses transactions; local state writes use temp+replace; these are useful foundations but not sufficient multi-writer/state proof.
-- Dhan option-chain traffic remains serialized/rate paced; WS reconnect has backoff+jitter foundations.
+- Native Sidebar buttons, named navigation landmark and `aria-current`.
+- ProductionProofBar accessible label and text status values.
+- `prefers-reduced-motion` support in `index.css`.
+- Semantic login form and main landmark.
+- Prediction Audit's refusal to present gain-rank as a validated forecast.
+- ML router's `ready_for_live=False` safety intent.
+- Firestore transaction/local temp+replace foundations.
+- Serialized/rate-paced Dhan option-chain traffic and WS reconnect backoff+jitter foundations.
 - Live Gate approval does not automatically enable live trading.
 
-These are foundations, not readiness/profitability proof.
+These are foundations, not readiness/accessibility/profitability proof.
 
-## 12. Historical proof/open-gate interpretation
+## 13. Historical proof/open-gate interpretation
 
 Remain open:
 - `EXACT_REVISION_CI_RUNTIME_NOT_PROVEN`
@@ -403,6 +398,9 @@ Remain open:
 - `PROBABILITY_CALIBRATION_NOT_PROVEN`
 - `MODEL_DRIFT_MONITORING_NOT_PROVEN`
 - `PREDICTION_AFTER_COST_LINKAGE_NOT_PROVEN`
+- `RESPONSIVE_WORKSTATION_NOT_PROVEN`
+- `KEYBOARD_NAVIGATION_NOT_PROVEN`
+- `ACCESSIBILITY_AXE_BROWSER_PROOF_NOT_PROVEN`
 - `REAL_MARKET_ANALYZER_PAPER_LIFECYCLE_NOT_PROVEN`
 - `TRADE_READY_FALSE`
 - `MULTI_DAY_STABILITY_NOT_PROVEN`
@@ -413,18 +411,18 @@ Remain open:
 
 `LIVE_TRADING_DISABLED_BY_DESIGN` remains required audit posture.
 
-## 13. Closure standard
+## 14. Closure standard
 
-A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
+A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; model/data hashes and frozen-cutoff proof where applicable; leakage/purged-walk-forward/calibration/drift tests for ML; prediction→paper→after-cost reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; responsive viewport + 200%-zoom + keyboard + axe/console checks; immutable image digest + final Cloud Run revision/runtime proof; analyzer/live-off unchanged; and no contradictory independent evidence.
 
-## 14. Next audit/solution slices
+## 15. Next audit/solution slices
 
-1. Responsive/accessibility: desktop/tablet/mobile, keyboard/focus/live regions/dense tables.
-2. Scanner/ranker contracts and performance/memory/concurrency under market-open load.
-3. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
-4. ML follow-up: exact market-validation file semantics and whether gain-rank post-market validation has frozen prediction IDs/cutoffs or look-ahead paths.
-5. DB follow-up: exact paper/event persistence files and any SQLite/JSON/Firestore duplicate authorities not yet mapped.
+1. Scanner/ranker contracts and performance/memory/concurrency under market-open load.
+2. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
+3. ML follow-up: exact market-validation file semantics and whether gain-rank post-market validation has frozen prediction IDs/cutoffs or look-ahead paths.
+4. DB follow-up: exact paper/event persistence files and any SQLite/JSON/Firestore duplicate authorities not yet mapped.
+5. Browser implementation follow-up once SOL-15 lands: exact Playwright/axe/console proof across every workspace.
 
-## 15. Hard safety rule
+## 16. Hard safety rule
 
-A green UI, endpoint HTTP 200, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval or process-local simulator never substitutes for authoritative source+event time+domain revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
+A green UI, endpoint HTTP 200, socket OPEN, historical parser/training PASS, AUC/accuracy, rank-derived confidence, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval, accessible-looking static markup or process-local simulator never substitutes for authoritative source+event time+domain revision+writer+freshness+schema+ordering+immutable prediction/model/data evidence+calibration+forward validation+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
