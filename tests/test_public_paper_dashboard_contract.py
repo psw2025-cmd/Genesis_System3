@@ -68,6 +68,13 @@ def test_approved_deploy_workflow_proves_no_key_access_live_off_and_actual_ui_vi
     assert '("DHAN_TOKEN_SOURCE", "gcp-secret-manager-dynamic")' in deploy
     assert '"scaling": {"minInstanceCount": 0, "maxInstanceCount": 1}' in deploy
 
+    # The deploy helper cannot return success while an older revision is still
+    # serving or while the desired image differs from the latest ready revision.
+    assert 'cur.get("latestCreatedRevision")' in deploy
+    assert "ready == created" in deploy
+    assert "desired_image == image" in deploy
+    assert "Cloud Run canonical revision did not become latest-ready in time" in deploy
+
     assert "scripts/gcp_public_dashboard_runtime_proof.py" in workflow
     assert "public-paper-dashboard-proof-" in workflow
     assert "dashboard_visible_without_login" in proof
