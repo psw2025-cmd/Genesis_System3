@@ -16,7 +16,9 @@ Do not remove or silently replace existing functionality.
 ## Global truth and safety rules
 
 - PAPER and LIVE OFF must remain globally visible.
-- Authentication-disabled state must be critical and visible.
+- PAPER/ANALYZER dashboard reads are public and must not request a dashboard API key.
+- Any 401/auth-style response from a normal dashboard read endpoint is a backend/deployment contract regression, not a prompt to enter credentials.
+- Public read access never grants mutation authority; worker ingestion and all mutation capabilities keep their separate fail-closed controls.
 - Broker token failures must not appear healthy.
 - Do not invent live prices, positions, model performance or predictions.
 - Illustrative values must say MOCK or FICTIONAL.
@@ -93,7 +95,7 @@ Reuse existing RiskDashboard where possible and expose:
 
 Show:
 
-- Authentication state
+- Public-read contract status and any authentication regression on read endpoints
 - Dhan/broker status
 - Option-chain truth
 - API error kind
@@ -135,5 +137,5 @@ If no ledger exists, display NOT IMPLEMENTED.
 - Create small reusable truth-first components rather than one giant file.
 - New components must compile under existing TypeScript/Vite configuration.
 - Add data-testid attributes for new workspace roots.
-- Do not edit backend, deployment, authentication middleware or tests.
-- Do not modify useData.ts, config.ts or generated dist assets.
+- Do not edit backend, deployment, authentication middleware or tests as part of UI-only consolidation work.
+- Do not modify useData.ts, config.ts or generated dist assets in UI-only consolidation work.
