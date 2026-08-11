@@ -88,6 +88,41 @@ jobs:
           echo "WIF_AUTHENTICATION_OK account=${ACTIVE}"
           cat /tmp/service.txt
 
+      - name: Inventory broker token authorities without secret payloads
+        run: |
+          set -euo pipefail
+          echo "=== CLOUD RUN JOBS ==="
+          gcloud run jobs list \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='table(metadata.name,status.conditions[0].status)' || true
+
+          echo "=== CLOUD SCHEDULERS ==="
+          gcloud scheduler jobs list \
+            --project="${PROJECT_ID}" \
+            --location="${REGION}" \
+            --format='table(name.basename(),schedule,timeZone,state)' || true
+
+          echo "=== DHAN TOKEN SECRET VERSION METADATA ==="
+          gcloud secrets versions list dhan-access-token \
+            --project="${PROJECT_ID}" \
+            --limit=10 \
+            --format='table(name,state,createTime)' || true
+
+          echo "=== ROTATION EXECUTION METADATA ==="
+          gcloud run jobs executions list \
+            --job=genesis-system3-dhan-token-rotate \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --limit=10 \
+            --format='table(metadata.name,metadata.creationTimestamp,status.conditions[0].status,status.conditions[0].message)' || true
+
+          gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format=json > /tmp/service.json
+          jq '{latestReadyRevision:.status.latestReadyRevisionName,serviceAccount:.spec.template.spec.serviceAccountName,safeEnv:[.spec.template.spec.containers[].env[]? | select(.name=="DHAN_TOKEN_SOURCE" or .name=="DHAN_ACCESS_TOKEN_SECRET_ID" or .name=="DHAN_TOKEN_ROTATION_JOB" or .name=="DHAN_TOKEN_ROTATION_SCHEDULE" or .name=="DHAN_STATUS_AUTO_REFRESH" or .name=="SYSTEM3_STARTUP_TOKEN_REFRESH" or .name=="BROKER_SELF_HEAL_TOKEN_REFRESH" or .name=="LIVE_TRADING_ENABLED" or .name=="SYSTEM3_LIVE_TRADING_ALLOWED" or .name=="AUTO_EXECUTE_TRADES") | {name,value}]}' /tmp/service.json
+
       - name: Prove broker read-only safety and LIVE lock
         run: |
           set -euo pipefail
@@ -96,10 +131,10 @@ jobs:
             --region="${REGION}" \
             --format='value(status.url)')
           curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker.json
-          jq -e '.connected == true' /tmp/broker.json >/dev/null
+          jq '{connected,error,latency_ms,auto_refresh,token_reload,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,last_error_type:.token_proof.last_error_type,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker.json
           jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC"' /tmp/broker.json >/dev/null
           jq -e '.token_proof.token_value_exposed == false' /tmp/broker.json >/dev/null
           jq -e '.live_trading_enabled == false' /tmp/broker.json >/dev/null
           jq -e '.order_placement_allowed == false' /tmp/broker.json >/dev/null
-          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker.json
+          jq -e '.connected == true' /tmp/broker.json >/dev/null
           echo "WIF_RUNTIME_SAFETY_OK"
