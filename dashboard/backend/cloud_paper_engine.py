@@ -19,6 +19,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -101,6 +102,7 @@ class CloudPaperEngine:
         self.trades_csv = outputs_dir / "paper_trades_live.csv"
         self.state_file = outputs_dir / "paper_engine_state.json"
         self._load_state()
+        self._lock = threading.Lock()
 
     def _load_state(self):
         if self.state_file.exists():
@@ -276,6 +278,54 @@ class CloudPaperEngine:
         return None
 
     def step(
+        self,
+        chains: List[Dict[str, Any]],
+        max_open: int = 3,
+        market_top: Optional[List[Dict[str, Any]]] = None,
+    ):
+        """One engine tick: update open positions, maybe open a new one.
+
+        Serialized via self._lock so a concurrent manual close
+        (close_position_by_id) cannot race this background tick.
+        """
+        with self._lock:
+            return self._step_locked(chains, max_open=max_open, market_top=market_top)
+
+    def close_position_by_id(self, position_id: str) -> Optional[Dict[str, Any]]:
+        """Manually close one open position through the engine's own authority.
+
+        Single lifecycle path for manual close: mutates self.open_positions /
+        self.closed_positions (the same state paper_engine_state.json and all
+        projection files are derived from) instead of editing
+        positions_live.json directly. Fixes PAPER-017/PAPER-018: removes the
+        dual-authority split between engine state and dashboard file.
+        """
+        with self._lock:
+            for i, pos in enumerate(self.open_positions):
+                if str(pos.get("position_id", "")) == str(position_id):
+                    entry = pos.get("entry_price", 0)
+                    cur = pos.get("current_price", entry)
+                    net = _compute_net_pnl(entry, cur, pos.get("underlying"))
+                    chg_pct = (cur - entry) / entry * 100.0 if entry else 0.0
+                    closed = {
+                        **pos,
+                        "action": "CLOSE",
+                        "status": "CLOSED",
+                        "exit_price": round(cur, 2),
+                        "exit_reason": "MANUAL_CLOSE",
+                        "realized_pnl": net,
+                        "realized_pnl_pct": round(chg_pct, 2),
+                        "time_ist": _ist_str(),
+                    }
+                    del self.open_positions[i]
+                    self.closed_positions.append(closed)
+                    self._append_trade_csv(closed, "CLOSE")
+                    self._save_state()
+                    self._write_outputs()
+                    return closed
+            return None
+
+    def _step_locked(
         self,
         chains: List[Dict[str, Any]],
         max_open: int = 3,

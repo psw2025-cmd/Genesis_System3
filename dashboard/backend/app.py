@@ -4949,38 +4949,27 @@ async def get_simulation_live_state(scenario: str = "paper_analyzer"):
 
 @app.post("/api/positions/{position_id}/close")
 async def close_position(position_id: str):
-    """Manually close a position (for trader control)"""
+    """Manually close a position through the paper engine's own ledger.
+
+    Delegates to CloudPaperEngine.close_position_by_id() so the engine's
+    in-memory/state-file authority stays in sync with positions_live.json.
+    Fixes PAPER-017/PAPER-018: this route used to edit positions_live.json
+    directly, which the engine's own state/tick could silently overwrite
+    ("resurrect") the manually closed position on the next cycle.
+    """
     try:
-        positions_file = OUTPUTS_DIR / "positions_live.json"
-        if not positions_file.exists():
-            raise HTTPException(status_code=404, detail="Positions file not found")
+        try:
+            from dashboard.backend.cloud_paper_engine import get_paper_engine
+        except ImportError:
+            from cloud_paper_engine import get_paper_engine
 
-        data = json.loads(positions_file.read_text())
-        positions = data.get("positions", [])
+        engine = get_paper_engine(OUTPUTS_DIR)
+        closed = engine.close_position_by_id(position_id)
 
-        # Find position
-        position = None
-        for pos in positions:
-            if str(pos.get("position_id", "")) == position_id:
-                position = pos
-                break
-
-        if not position:
+        if closed is None:
             raise HTTPException(status_code=404, detail=f"Position {position_id} not found")
 
-        # Mark as closed (system will handle actual closing in next cycle)
-        position["status"] = "CLOSED"
-        position["exit_reason"] = "MANUAL_CLOSE"
-        position["exit_price"] = position.get("current_price", position.get("entry_price", 0))
-
-        # Save updated positions
-        data["positions"] = [p for p in positions if p.get("status") != "CLOSED"]
-        data["open_count"] = len(data["positions"])
-
-        with open(positions_file, "w") as f:
-            json.dump(data, f, indent=2, default=str)
-
-        return {"status": "success", "message": f"Position {position_id} marked for closure"}
+        return {"status": "success", "message": f"Position {position_id} closed", "position": closed}
     except HTTPException:
         raise
     except Exception as e:
