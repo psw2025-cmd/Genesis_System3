@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Prove the deployed Genesis System3 PAPER dashboard is public/read-only.
+"""Prove the deployed Genesis System3 PAPER dashboard UI is public/read-only.
 
 The proof is deliberately read-only with respect to trading. It verifies the
-exact Cloud Run revision/configuration, performs anonymous GET requests only to
-the dashboard/read APIs, captures a real browser screenshot, and publishes one
-exact-SHA GitHub commit status. No broker order or paper mutation endpoint is
-called.
+exact Cloud Run revision/configuration, performs anonymous GET requests only,
+renders the actual `/ui` product shell in headless Chrome, captures a real
+browser screenshot, and publishes one exact-SHA GitHub commit status. No broker
+order or paper mutation endpoint is called.
 """
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ import sys
 import urllib.request
 from pathlib import Path
 from typing import Any
+from urllib.parse import urljoin
 
 import requests
 
@@ -144,25 +145,32 @@ def _browser_path() -> str:
     raise RuntimeError("headless_chrome_not_found")
 
 
+def _browser_args(url: str) -> list[str]:
+    return [
+        _browser_path(),
+        "--headless",
+        "--disable-gpu",
+        "--no-sandbox",
+        "--hide-scrollbars",
+        "--window-size=1600,1000",
+        "--virtual-time-budget=12000",
+        url,
+    ]
+
+
+def _render_dom(url: str) -> str:
+    args = _browser_args(url)
+    args.insert(-1, "--dump-dom")
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
+    if proc.returncode:
+        raise RuntimeError(f"dashboard_dom_render_failed:{proc.returncode}")
+    return proc.stdout or ""
+
+
 def _capture(url: str, path: Path) -> None:
-    browser = _browser_path()
-    proc = subprocess.run(
-        [
-            browser,
-            "--headless",
-            "--disable-gpu",
-            "--no-sandbox",
-            "--hide-scrollbars",
-            "--window-size=1600,1000",
-            "--virtual-time-budget=12000",
-            f"--screenshot={path}",
-            url,
-        ],
-        text=True,
-        capture_output=True,
-        timeout=60,
-        check=False,
-    )
+    args = _browser_args(url)
+    args.insert(-1, f"--screenshot={path}")
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
     if proc.returncode or not path.is_file() or path.stat().st_size < 1000:
         raise RuntimeError(f"dashboard_screenshot_failed:{proc.returncode}")
 
@@ -252,13 +260,31 @@ def main() -> int:
             raise RuntimeError("public_dashboard_config_proof_failed")
 
         root = requests.get(f"{url}/", timeout=TIMEOUT_S)
+        try:
+            root_payload = root.json() if root.status_code == 200 else {}
+        except Exception:
+            root_payload = {}
+        root_payload = root_payload if isinstance(root_payload, dict) else {}
+        relative = root_payload.get("relative_paths") if isinstance(root_payload.get("relative_paths"), dict) else {}
+        dashboard_path = str(relative.get("dashboard") or "/ui")
+        if not dashboard_path.startswith("/") or dashboard_path.startswith("//"):
+            raise RuntimeError("unsafe_dashboard_relative_path")
+        dashboard_url = urljoin(url + "/", dashboard_path.lstrip("/"))
+        dashboard = requests.get(dashboard_url, timeout=TIMEOUT_S)
+
         auth_status, auth = _get_json(f"{url}/api/auth/status")
         state_status, _ = _get_json(f"{url}/api/state")
         health_status, _ = _get_json(f"{url}/api/health")
 
+        html = dashboard.text if dashboard.status_code == 200 else ""
+        html_shell = '<div id="root"' in html or "<div id='root'" in html
         http_failures: list[str] = []
         if root.status_code != 200:
             http_failures.append(f"root_http_{root.status_code}")
+        if dashboard.status_code != 200:
+            http_failures.append(f"dashboard_ui_http_{dashboard.status_code}")
+        if not html_shell:
+            http_failures.append("dashboard_ui_html_shell_missing")
         if auth_status != 200:
             http_failures.append(f"auth_status_http_{auth_status}")
         if state_status != 200:
@@ -273,7 +299,11 @@ def main() -> int:
         http_proof = {
             "state": "PASS" if not http_failures else "FAIL",
             "service_url": url,
+            "dashboard_path": dashboard_path,
+            "dashboard_url": dashboard_url,
             "root_http_status": root.status_code,
+            "dashboard_ui_http_status": dashboard.status_code,
+            "dashboard_ui_html_shell": html_shell,
             "auth_status_http_status": auth_status,
             "state_http_status": state_status,
             "health_http_status": health_status,
@@ -288,8 +318,15 @@ def main() -> int:
         if http_failures:
             raise RuntimeError("public_dashboard_http_proof_failed")
 
+        dom = _render_dom(dashboard_url)
+        upper_dom = dom.upper()
+        if "SYSTEM3" not in upper_dom:
+            raise RuntimeError("rendered_product_marker_missing")
+        if "DASHBOARD API KEY" in upper_dom:
+            raise RuntimeError("dashboard_login_prompt_still_rendered")
+
         screenshot = OUT / "dashboard.png"
-        _capture(url, screenshot)
+        _capture(dashboard_url, screenshot)
         digest = hashlib.sha256(screenshot.read_bytes()).hexdigest()
         (OUT / "dashboard.sha256").write_text(f"{digest}  dashboard.png\n", encoding="utf-8")
         visual = {
@@ -297,12 +334,15 @@ def main() -> int:
             "sha256": digest,
             "bytes": screenshot.stat().st_size,
             "viewport": "1600x1000",
-            "source": "real_deployed_cloud_run_dashboard",
+            "source": "real_deployed_cloud_run_dashboard_ui",
+            "dashboard_path": dashboard_path,
+            "rendered_system3_marker": True,
+            "dashboard_api_key_prompt_rendered": False,
             "api_key_used": False,
         }
         (OUT / "visual.json").write_text(json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8")
 
-        _publish_status("success", "PAPER dashboard opens without API key; LIVE remains OFF")
+        _publish_status("success", "PAPER dashboard /ui opens without API key; LIVE remains OFF")
         print(
             "PUBLIC_DASHBOARD_RUNTIME_PROOF "
             + json.dumps(
@@ -310,8 +350,10 @@ def main() -> int:
                     "state": "PASS",
                     "sha": EXPECTED_SHA,
                     "revision": latest,
-                    "root_http_status": root.status_code,
+                    "dashboard_path": dashboard_path,
+                    "dashboard_ui_http_status": dashboard.status_code,
                     "api_key_mounted": False,
+                    "api_key_prompt_rendered": False,
                     "screenshot_sha256": digest,
                     "live_trading_enabled": False,
                 },
@@ -320,12 +362,10 @@ def main() -> int:
         )
         return 0
     except Exception as exc:
-        # Ensure sanitized evidence exists without writing response payloads,
-        # cookies, credentials, or Secret Manager values.
         (OUT / "config.json").write_text(json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8")
         (OUT / "http.json").write_text(json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8")
         try:
-            _publish_status("failure", "Public PAPER dashboard no-key proof failed")
+            _publish_status("failure", "Public PAPER dashboard UI no-key proof failed")
         except Exception as status_exc:
             print(f"PUBLIC_DASHBOARD_STATUS_PUBLISH_ERROR {type(status_exc).__name__}", file=sys.stderr)
         print(
