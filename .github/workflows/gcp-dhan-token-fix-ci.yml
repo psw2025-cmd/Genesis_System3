@@ -10,6 +10,7 @@ on:
       - "core/utils/env_loader.py"
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
+      - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/codespace_startup.sh"
       - "scripts/cloud_worker.py"
       - "dashboard/backend/**"
@@ -124,7 +125,18 @@ jobs:
             --project="${PROJECT_ID}" \
             --region="${REGION}" \
             --format=json > /tmp/service.json
-          jq '{latestReadyRevision:.status.latestReadyRevisionName,serviceAccount:.spec.template.spec.serviceAccountName,safeEnv:[.spec.template.spec.containers[].env[]? | select(.name=="DHAN_TOKEN_SOURCE" or .name=="DHAN_ACCESS_TOKEN_SECRET_ID" or .name=="DHAN_TOKEN_ROTATION_JOB" or .name=="DHAN_TOKEN_ROTATION_SCHEDULE" or .name=="DHAN_STATUS_AUTO_REFRESH" or .name=="SYSTEM3_STARTUP_TOKEN_REFRESH" or .name=="BROKER_SELF_HEAL_TOKEN_REFRESH" or .name=="LIVE_TRADING_ENABLED" or .name=="SYSTEM3_LIVE_TRADING_ALLOWED" or .name=="AUTO_EXECUTE_TRADES") | {name,value}]}' /tmp/service.json
+          jq '{latestReadyRevision:.status.latestReadyRevisionName,serviceAccount:.spec.template.spec.serviceAccountName,safeEnv:[.spec.template.spec.containers[].env[]? | select(.name=="DHAN_TOKEN_SOURCE" or .name=="DHAN_ACCESS_TOKEN_SECRET_ID" or .name=="DHAN_TOKEN_ROTATION_JOB" or .name=="DHAN_TOKEN_ROTATION_SCHEDULE" or .name=="DHAN_STATUS_AUTO_REFRESH" or .name=="SYSTEM3_STARTUP_TOKEN_REFRESH" or .name=="BROKER_SELF_HEAL_TOKEN_REFRESH" or .name=="DHAN_CANONICAL_ROTATION_SELF_HEAL" or .name=="DHAN_CANONICAL_ROTATION_COOLDOWN_S" or .name=="LIVE_TRADING_ENABLED" or .name=="SYSTEM3_LIVE_TRADING_ALLOWED" or .name=="AUTO_EXECUTE_TRADES") | {name,value}]}' /tmp/service.json
+
+          RUNTIME_SA=$(jq -r '.spec.template.spec.serviceAccountName // ""' /tmp/service.json)
+          test -n "${RUNTIME_SA}"
+          gcloud run jobs get-iam-policy "${ROTATION_JOB}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format=json > /tmp/rotation-job-iam.json
+          jq -e --arg member "serviceAccount:${RUNTIME_SA}" \
+            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
+            /tmp/rotation-job-iam.json >/dev/null
+          echo "RUNTIME_CAN_INVOKE_CANONICAL_ROTATION_JOB service_account=${RUNTIME_SA}"
 
       - name: Recover broker only through canonical GCP token authority
         run: |
