@@ -116,30 +116,34 @@ class StaticSafetyContractTests(unittest.TestCase):
         manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
-        # PAPER/ANALYZER dashboard reads are public and the reusable dashboard
-        # API key must not be mounted or reintroduced by any GCP deploy path.
-        self.assertIn("REQUIRE_API_KEY=false", workflow)
-        self.assertIn("--remove-secrets=API_KEY", workflow)
+        # Active auto-deploy now owns the final public-readonly/dynamic-token
+        # service template in one revision. Workflow verification must not
+        # create a second Cloud Run revision afterward.
+        self.assertIn("CANONICAL_RUNTIME_SPEC", deploy_script)
+        self.assertIn("CANONICAL_RUNTIME_SPEC", workflow)
+        self.assertNotIn("gcloud run services update", workflow)
         self.assertNotIn("API_KEY_SECRET_ID", workflow)
         self.assertNotIn("system3-dashboard-api-key", workflow)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
 
-        # Post-deploy read proof must explicitly require auth-disabled mode.
+        # Post-deploy read proof still explicitly requires auth-disabled mode.
         self.assertIn('.required == false', workflow)
         self.assertIn('.mode == "auth_disabled"', workflow)
-        self.assertIn('"API_KEY" in secret_env_names', workflow)
-        self.assertIn('"WORKER_PUSH_TOKEN" not in secret_env_names', workflow)
+        self.assertIn("API_KEY_STILL_MOUNTED", workflow)
+        self.assertIn("WORKER_PUSH_TOKEN_NOT_MOUNTED", workflow)
 
         # Live-trading flags stay off regardless of public dashboard visibility.
-        self.assertIn("LIVE_TRADING_ENABLED=0", workflow)
-        self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", workflow)
-        self.assertIn("AUTO_EXECUTE_TRADES=0", workflow)
+        self.assertIn('(\"LIVE_TRADING_ENABLED\", \"0\")', deploy_script)
+        self.assertIn('(\"SYSTEM3_LIVE_TRADING_ALLOWED\", \"0\")', deploy_script)
+        self.assertIn('(\"AUTO_EXECUTE_TRADES\", \"0\")', deploy_script)
 
-        self.assertIn('("REQUIRE_API_KEY", "false")', deploy_script)
+        self.assertIn('(\"REQUIRE_API_KEY\", \"false\")', deploy_script)
+        self.assertIn('(\"DHAN_TOKEN_SOURCE\", \"gcp-secret-manager-dynamic\")', deploy_script)
         self.assertNotIn("API_KEY_SECRET_ID", deploy_script)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", deploy_script)
         self.assertIn('env_map.pop("API_KEY", None)', deploy_script)
+        self.assertIn('"scaling": {"minInstanceCount": 0, "maxInstanceCount": 1}', deploy_script)
         self.assertIn("DASHBOARD_PUBLIC_READONLY enforced", deploy_script)
 
         self.assertIn("--allow-unauthenticated", manual_script)
