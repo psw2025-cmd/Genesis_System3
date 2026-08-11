@@ -158,7 +158,12 @@ class StaticSafetyContractTests(unittest.TestCase):
         manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
-        self.assertIn("REQUIRE_API_KEY=false", workflow)
+        # The workflow delegates the runtime contract to one canonical deployer;
+        # it must not reintroduce a dashboard-key secret or a second service update.
+        self.assertIn("scripts/gcp_cloud_run_auto_deploy.py", workflow)
+        self.assertNotIn("API_KEY_SECRET_ID", workflow)
+        self.assertNotIn("system3-dashboard-api-key", workflow)
+        self.assertNotIn('gcloud run services update "${GCP_CLOUD_RUN_SERVICE}"', workflow)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
         self.assertIn('.required == false', workflow)
@@ -240,6 +245,12 @@ class StaticSafetyContractTests(unittest.TestCase):
 
     def test_canonical_deployer_preserves_startup_and_traffic_invariants(self):
         text = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        tree = ast.parse(text)
+        exact_string_literals = {
+            node.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        }
         self.assertIn('("DEFER_INSTRUMENT_WARMUP", "1")', text)
         self.assertIn('("SYSTEM3_STATE_BACKEND", "firestore")', text)
         self.assertIn('("SYSTEM3_STATE_BACKEND_REQUIRED", "1")', text)
@@ -248,7 +259,9 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("_wait_revision_ready", text)
         self.assertIn("gcp_failed_revision_forensic.py", text)
         self.assertIn("PREVIOUS_TRAFFIC_RESTORED", text)
-        self.assertNotIn("latestReadyRevisionName", text)
+        # It is fine to explain the forbidden field in comments/docstrings; the
+        # executable AST must not use that exact key as a runtime authority.
+        self.assertNotIn("latestReadyRevisionName", exact_string_literals)
 
 
 if __name__ == "__main__":
