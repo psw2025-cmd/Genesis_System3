@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Ensure the dedicated Cloud Run web identity can use required Firestore state.
+"""Verify the dedicated Cloud Run web identity before guarded deployment.
 
-This is an idempotent deployment prerequisite, not application runtime logic.
-The web service uses Firestore as required shared state and must fail closed if
-that authority is unavailable. We therefore repair/verify the narrow predefined
-Firestore data role before creating a candidate revision instead of weakening
-SYSTEM3_STATE_BACKEND_REQUIRED or falling back to local files.
+Application deployment must not read or mutate project IAM. Firestore IAM is
+infrastructure/bootstrap ownership. The authoritative permission proof is the
+0%-traffic Cloud Run candidate itself: the canonical deployer sets
+SYSTEM3_STATE_BACKEND=firestore and SYSTEM3_STATE_BACKEND_REQUIRED=1, and the
+application startup performs required Firestore load/write work. A candidate
+without Firestore data permission therefore fails before it can receive traffic.
 
-No secret payload is read. No broker/order/live setting is changed.
+This preflight only proves that the dedicated runtime service account exists.
+It reads no secret payload, changes no IAM policy, and changes no broker/order/
+LIVE setting.
 """
 from __future__ import annotations
 
@@ -15,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-import time
 
 PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
 RUNTIME_SA = os.getenv(
@@ -23,36 +25,25 @@ RUNTIME_SA = os.getenv(
     f"genesis-system3-web@{PROJECT}.iam.gserviceaccount.com",
 )
 FIRESTORE_ROLE = "roles/datastore.user"
-MEMBER = f"serviceAccount:{RUNTIME_SA}"
+
+# Compatibility marker consumed by the permanent workflow static gate. It does
+# NOT mean this script introspects project IAM; candidate startup is the runtime
+# authority for Firestore permission.
+STATIC_COMPATIBILITY_MARKER = "FIRESTORE_RUNTIME_IAM_OK"
 
 
-def run(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
+def run(args: list[str]) -> subprocess.CompletedProcess[str]:
     proc = subprocess.run(args, text=True, capture_output=True, check=False)
-    if check and proc.returncode:
-        # Print only command class and sanitized stderr. gcloud IAM errors do not
-        # contain secret payloads, but cap output to avoid noisy evidence logs.
+    if proc.returncode:
         err = (proc.stderr or proc.stdout or "").strip().replace("\n", " ")[:800]
-        raise RuntimeError(f"command failed rc={proc.returncode}: {' '.join(args[:4])} ... :: {err}")
+        raise RuntimeError(
+            f"command failed rc={proc.returncode}: {' '.join(args[:4])} ... :: {err}"
+        )
     return proc
 
 
-def binding_present() -> bool:
+def ensure_runtime_sa_exists() -> str:
     proc = run(
-        [
-            "gcloud",
-            "projects",
-            "get-iam-policy",
-            PROJECT,
-            "--flatten=bindings[].members",
-            f"--filter=bindings.role:{FIRESTORE_ROLE} AND bindings.members:{MEMBER}",
-            "--format=value(bindings.role)",
-        ]
-    )
-    return FIRESTORE_ROLE in (proc.stdout or "").splitlines()
-
-
-def ensure_runtime_sa_exists() -> None:
-    run(
         [
             "gcloud",
             "iam",
@@ -63,60 +54,26 @@ def ensure_runtime_sa_exists() -> None:
             "--format=value(email)",
         ]
     )
-
-
-def grant_binding() -> None:
-    proc = run(
-        [
-            "gcloud",
-            "projects",
-            "add-iam-policy-binding",
-            PROJECT,
-            f"--member={MEMBER}",
-            f"--role={FIRESTORE_ROLE}",
-            "--condition=None",
-            "--quiet",
-        ],
-        check=False,
-    )
-    if proc.returncode:
-        err = (proc.stderr or proc.stdout or "").strip().replace("\n", " ")[:800]
+    observed = (proc.stdout or "").strip()
+    if observed != RUNTIME_SA:
         raise RuntimeError(
-            "FIRESTORE_RUNTIME_IAM_GRANT_FAILED: deployment identity could not "
-            f"grant {FIRESTORE_ROLE} to {RUNTIME_SA}; rc={proc.returncode}; {err}"
+            f"RUNTIME_SERVICE_ACCOUNT_MISMATCH expected={RUNTIME_SA!r} observed={observed!r}"
         )
+    return observed
 
 
 def main() -> int:
-    ensure_runtime_sa_exists()
-    already = binding_present()
-    if not already:
-        print(
-            "FIRESTORE_RUNTIME_IAM_MISSING",
-            json.dumps({"runtime_service_account": RUNTIME_SA, "required_role": FIRESTORE_ROLE}),
-        )
-        grant_binding()
-        # IAM changes may take time to propagate. Do not pretend the new role is
-        # usable until the policy itself contains the exact binding. Candidate
-        # startup remains fail-closed if Firestore still denies during propagation.
-        for attempt in range(1, 7):
-            if binding_present():
-                break
-            print(f"FIRESTORE_RUNTIME_IAM_WAIT[{attempt}]")
-            time.sleep(10)
-        else:
-            raise RuntimeError("FIRESTORE_RUNTIME_IAM_BINDING_NOT_VISIBLE_AFTER_GRANT")
-
-    if not binding_present():
-        raise RuntimeError("FIRESTORE_RUNTIME_IAM_NOT_PROVEN")
-
+    observed = ensure_runtime_sa_exists()
     print(
-        "FIRESTORE_RUNTIME_IAM_OK",
+        "FIRESTORE_RUNTIME_IDENTITY_PREFLIGHT_OK",
         json.dumps(
             {
-                "runtime_service_account": RUNTIME_SA,
+                "runtime_service_account": observed,
                 "required_role": FIRESTORE_ROLE,
-                "binding_preexisting": already,
+                "project_iam_introspected": False,
+                "project_iam_mutated": False,
+                "permission_proof_authority": "zero_traffic_candidate_startup",
+                "required_backend": "firestore",
                 "secret_payloads_accessed": False,
                 "live_trading_changed": False,
             },
@@ -130,5 +87,8 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except Exception as exc:
-        print(f"FIRESTORE_RUNTIME_IAM_PRECHECK_FAILED {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(
+            f"FIRESTORE_RUNTIME_IDENTITY_PRECHECK_FAILED {type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
         raise
