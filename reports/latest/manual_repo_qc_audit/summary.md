@@ -1,16 +1,16 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-11 06:49 IST`
+Updated: `2026-08-11 07:50 IST`
 
 ## 0. Scope lock and revision truth
 
 - Repository: `psw2025-cmd/Genesis_System3` only.
 - Branch: `main`.
-- Repository HEAD observed at start of this iteration: `11cfbbc759248a3e8298be9de4f694f9be6d1567`.
-- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..11cfbbc759248a3e8298be9de4f694f9be6d1567` is 11 commits ahead and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
+- Repository HEAD observed at start of this iteration: `220fdcf3fa3c684170889f2045c0e0baedbd1b6d`.
+- Compare proof: `b70af343340a73ed27ca548820d5893c779ab5bd..220fdcf3fa3c684170889f2045c0e0baedbd1b6d` is **12 commits ahead** and changes only `reports/latest/manual_repo_qc_audit/summary.md`; latest application/source HEAD therefore remains `b70af343340a73ed27ca548820d5893c779ab5bd`.
 - PR #97 remains OPEN at head `29e7b2cfc9120976e9c0d33147d92e9dc64f7484`; it is not implemented on `main`.
-- PR #96 remains the newest merged application/UI PR in this evidence set.
-- GitHub connector returned no workflow runs and no combined commit statuses for application HEAD `b70af343340a73ed27ca548820d5893c779ab5bd`; exact-revision CI/runtime readiness is **NOT PROVEN**, not failed.
+- PR #96 remains the newest merged application/UI PR in the current evidence set.
+- GitHub connector returned no workflow runs for repository HEAD `220fdcf3fa3c684170889f2045c0e0baedbd1b6d`; exact-revision CI/runtime readiness remains **NOT PROVEN**, not failed.
 - Google Cloud Run / Google Cloud services remain the sole deployment authority. Render-era runtime assumptions are migration debt only.
 - Audit posture remains ANALYZER/PAPER. Live order placement, modification, cancellation and routing are prohibited.
 - This Markdown remains the single continuously maintained audit/remediation authority.
@@ -22,6 +22,8 @@ Updated: `2026-08-11 06:49 IST`
 | Exact application HEAD CI/runtime proof | **NOT PROVEN** | exact-revision provenance gate required |
 | Dashboard auth/session | **FAIL / P0-P1** | **READY TO PATCH** |
 | Global safety/mode truth | **FAIL / P0** | **READY TO PATCH** via `SafetyTruth` |
+| DB/state-store authority | **FAIL / P0-P1** | **READY TO PATCH** via `StateTruth` + domain-revision store |
+| Restart/concurrency consistency | **FAIL / P0-P1** | shared-cloud authority + idempotent replay required |
 | WebSocket/REST stream truth | **FAIL / P0-P1** | **READY TO PATCH** via `StreamTruth` |
 | Data/source/staleness truth | **FAIL / P0-P1** | **READY TO PATCH** via typed truth envelopes |
 | Option-chain normalization/cache | **FAIL / P0-P1** | **READY TO PATCH** via `OptionChainTruth` |
@@ -43,250 +45,188 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 ## 3. Retained findings registry
 
 ### Auth/session
-- `AUTH-001/P0` login request/backend contract mismatch.
-- `AUTH-002/P1` protected polling before authentication.
-- `AUTH-003/P1` raw dashboard key in browser `sessionStorage`.
-- `AUTH-004/P1` independent session expiry/revocation proof incomplete.
+`AUTH-001..004` remain OPEN: login contract mismatch, pre-auth polling, raw browser key storage, session expiry/revocation proof incomplete.
 
 ### Global UI/data truth
-- `UI-001/P0` absence/error can become plausible valid-looking data.
-- `UI-002/P0-P1` rank/score can be mislabeled as gain/forecast percentage.
-- `UI-003/P1` source identity can be inferred/defaulted rather than proven.
-- `UI-004/UI-016/P0-P1` auth/feed/freshness/account/router/deployment truths are conflated in places.
-- `UI-005/P1` permissive defaults collapse unknown into safe/neutral values.
-- `UI-006/P1` `PROVEN_EMPTY` is not consistently distinguished from error/stale/no-data.
-- `UI-007/P1` shared market-data truth envelope missing.
-- `UI-009/P0` PAPER/LIVE/LOCKED lacks one authoritative runtime safety object.
-- `UI-010/P1` immutable production prediction ledger unproven.
-- `UI-011/P1` enforceable portfolio/factor/scenario risk incomplete.
-- `UI-012/UI-013/UI-014/P2` navigation rationalization, responsive/mobile, keyboard/focus incomplete/unproven.
-- `UI-018/P1` build labels are not deployment compatibility proof.
-- `UI-019/P1` broker health requires typed state machine.
+`UI-001..019` remain OPEN as previously recorded, including false-valid defaults, source inference, `PROVEN_EMPTY` ambiguity, missing authoritative PAPER/LIVE truth, incomplete prediction/risk truth, responsive/accessibility gaps and deployment/build-label ambiguity.
 
 ### Option chain/Greeks
-- `CHAIN-001/P0` warming/no-data chain can produce `PCR=1` instead of unknown.
-- `CHAIN-002/P1` Dhan-looking verification lacks event-time/freshness/schema/normalizer/completeness proof.
-- `CHAIN-003/P1` full Delta/Gamma/Theta/Vega not displayed in Option Chain.
-- `CHAIN-004/P1` Dhan row -> normalized inputs -> Greeks -> UI provenance not proven end to end.
-- `CHAIN-005/P1` IV unit/schema implicit at UI boundary.
-- `CHAIN-006/P0-P1` parser converts missing/invalid quote/Greek fields to numeric zero.
-- `CHAIN-007/P1` incomplete bid/ask can create artificial zero/negative spread.
-- `CHAIN-008/P0-P1` in-memory cache key ignores expiry.
-- `CHAIN-009/P0-P1` disk cache lacks age/provider/schema/expiry validation.
-- `CHAIN-010/P0-P1` serializer can label fallback data `source:dhan` without source proof.
-- `CHAIN-011/P1` generic Monday expiry fallback is not symbol/calendar authoritative.
-- `CHAIN-012/P1` parser exceptions collapse into empty chain + zero spot.
-- `CHAIN-013/P1` historical schema PASS is narrower than runtime chain truth.
-- `CHAIN-014/P2` legacy multi-source fallback residue remains in Dhan-only manager.
+`CHAIN-001..014` remain OPEN: warming PCR false-data, weak Dhan proof, incomplete Greeks display/provenance, implicit IV units, null→zero parsing, spread validity, expiry-insensitive cache, weak disk-cache provenance, invented Dhan source, generic expiry fallback, parser error collapse and legacy multi-source residue.
 
 ### Readiness/gates
-- `READY-001/P0` missing live/order evidence can default safe.
-- `READY-002/P0` money-ready excludes required paper lifecycle proof.
-- `READY-003/P0-P1` gates can pass from object presence instead of semantic checks.
-- `READY-004/P1` funds/holdings/positions success semantics weak.
-- `READY-005/P0` trader-ready can pass transport checks without lifecycle/economic proof.
-- `READY-006/P1` core E2E PASS is transport-level only.
-- `READY-007/P1` Dhan proof lacks full freshness/schema envelope.
-- `READY-008/P1` Live Gate retains Render-era instructions.
-- `READY-009/P1` human approval lacks exact evidence revision/time provenance.
+`READY-001..009` remain OPEN: missing safety evidence can default safe, semantic lifecycle/risk/economic gates incomplete, account success semantics weak, Render-era Live Gate copy and evidence-poor human approval.
 
 ### Paper/trade/positions
-- `PAPER-001/P0` missing safety fields can yield PAPER SAFE.
-- `PAPER-002/P0` missing market source can yield live-looking Dhan state.
-- `PAPER-003/P1` missing monetary fields can render `₹0.00`.
-- `PAPER-004/P1` plausible provenance defaults can be invented.
-- `PAPER-005/P1` paper-safe proof over-relies on negative evidence.
-- `PAPER-006/P1` performance defaults to zero.
-- `PAPER-007/P1` empty positions lack explicit truth state.
-- `PAPER-008/P1` Force Paper Tick lacks idempotency/correlation proof.
-- `PAPER-009/P1` immutable lifecycle event chain not exposed.
-- `PAPER-010/P0-P1` `/api/paper/tick` capability unproven.
-- `PAPER-011/P0` direct executor path bypasses canonical pre-trade authority.
-- `PAPER-012/P0-P1` process-local IDs/state restart-unsafe.
-- `PAPER-013/P1` last price can be reused without explicit stale quality.
-- `PAPER-014/P1` realized P&L not proven after-cost/reconciled.
-- `PAPER-015/P1` paper read errors can collapse to empty/zero truth.
-- `PAPER-016/P0-P1` paper truth statically declares safety.
-- `TRADE-001/P1-P2` Trade tab is not a controlled paper-order/risk workstation.
-- `TRADE-002/P0-P1` `gain_rank` can render as `GAIN %`.
-- `TRADE-003/P1` `EOD/live` does not prove freshness.
-- `LEGACY-001/P0-P1` legacy mutation UI exists; deployment exposure unproven.
+`PAPER-001..016`, `TRADE-001..003`, `LEGACY-001` remain OPEN: static/default safety, missing-data→zero, unproven paper mutation capability, direct executor bypass, process-local lifecycle state, stale-price handling, incomplete cost/reconciliation and legacy mutation UI residue.
 
 ### Risk
-- `RISK-001/P0` browser supplies risk limits.
-- `RISK-002/P0` missing policy can use permissive defaults.
-- `RISK-003/P0-P1` unavailable inputs can become zero risk.
-- `RISK-004/P1` VaR contract not institutional/reproducible.
-- `RISK-005/P0` execution guardrail has fail-open conditions.
-- `RISK-006/P0` canonical guardrail wiring unproven.
-- `RISK-007/P1` risk UI uses non-contract gate proxy.
-- `RISK-008/P0-P1` lifecycle gate can promote from position shape.
-- `RISK-009/P1` refresh/evaluation errors can retain old artifacts.
+`RISK-001..009` remain OPEN: browser-owned limits, permissive defaults, zero-risk fallbacks, weak VaR contract, fail-open guardrail conditions, unproven canonical wiring, UI proxy gate and stale gate artifacts.
 
 ### WebSocket/stream
-- `WS-001/P1` socket OPEN immediately labeled live.
-- `WS-002/P0-P1` incomplete heartbeat can false-green live.
-- `WS-003/P1` REST/WS writes lack monotonic ordering.
-- `WS-004/P1` old spot can be retained and re-stamped current.
-- `WS-005/P1` market-top WS event can become `status:ok` without provenance.
-- `WS-006/P1` malformed WS payload silently ignored.
-- `WS-007/P1` stale last-good can retain prior live/ok status.
-- `WS-008/P1` duplicate/unused WebSocket transport policy risk.
-- `WS-009/P0-P1` WebSocket proof does not actually open a WebSocket.
-- `WS-010/P0-P1` backend tick age capped; parse failure can appear bounded.
-- `WS-011/P1` actual `/ws/stream` route owner remains unproven by current search.
+`WS-001..011` remain OPEN/UNPROVEN: socket-open≠healthy stream, incomplete heartbeat false-green, REST/WS ordering, re-stamped stale values, malformed-event silence, stale-last-good semantics, duplicate transport policy, fake WebSocket proof, capped tick age and route-owner uncertainty.
 
-## 4. New deep slice — Google Cloud deployment provenance, entrypoint and observability
+### Google Cloud/deployment
+`GCP-001..011` remain OPEN: exact-revision proof missing, immutable digest absent, frontend SHA weak, double service mutation, legacy-key fallback, broad runtime IAM, default service-account fallback, typed safety evidence incomplete, cosmetic build markers, weak incident/revision binding and incomplete Render retirement.
 
-### GCP-001 / P0-P1 — exact application SHA has no connector-visible CI/status proof
+### DB/state-store — NEW
+- `STATE-001/P0-P1` Cloud Run deployment does not set `SYSTEM3_STATE_BACKEND=firestore`; runtime-store default is `file`, so cloud shared-state authority is not established by deployed configuration.
+- `STATE-002/P0-P1` Firestore mode is optional by default (`SYSTEM3_STATE_BACKEND_REQUIRED=0`); Firestore initialization/read/write failure can fall back to local files instead of failing closed.
+- `STATE-003/P0-P1` Firestore transaction merges a **whole incoming process snapshot** over remote state. A stale process can overwrite newer domain fields even while global `state_version` remains monotonic.
+- `STATE-004/P1` state version is one global integer; there is no per-domain writer/revision/CAS metadata for broker, market, positions, P&L, risk, chain or worker-owned fields.
+- `STATE-005/P0-P1` startup calls `get_state_store(...)->load_state()` and immediately `sync_from_files()`. Any local output files available to the process can overwrite freshly loaded remote/shared state during startup.
+- `STATE-006/P1` default initialized state contains plausible green/neutral values such as `qc.status=PASS`, `risk.limits.status=PASS`, zero P&L/Greeks/exposure and empty positions before those domains are proven.
+- `STATE-007/P1` duplicated method definitions exist for `_enforce_safety_invariants`, `_save_local_state`, and repeated Firestore-load logic; this increases maintenance/patch divergence risk in the supposed SSOT layer.
+- `STATE-008/P1` broker/internal position readers collapse many import/API/read/parse failures to `[]`; reconciliation can therefore confuse error with proven-empty/no-position state.
+- `STATE-009/P1` reconciliation uses `trading_symbol/symbol` versus internal `position_id` as identity without one canonical instrument/position identity contract; quantity mismatch logic also defaults missing quantities to zero.
+- `STATE-010/P1` state-sync readers parse multiple JSON files independently with no generation/correlation ID, so positions/P&L/signals/QC can come from different cycles and be merged into one dashboard snapshot.
+- `STATE-011/P1` local writes are atomic per file, which is positive, but there is no cross-file transaction across runtime state, positions, P&L, signals and QC artifacts.
+- `STATE-012/P1` Firestore tests verify merge/version behavior and path validation but do not test two stale writers, lost updates, startup replay, backend-required failure, domain revisions or failover semantics.
 
-**Exact proof:** workflow-run lookup and combined-status lookup for application HEAD `b70af343340a73ed27ca548820d5893c779ab5bd` returned no runs/statuses. The deployment workflow is path-filtered, and later audit-only commits do not change application source.
+## 4. New deep slice — DB/state-store consistency, restart and concurrency
 
-**Symptom/root cause:** repository configuration can describe a deployment process, but there is no exact-revision evidence in the available GitHub run/status channel proving that this application SHA passed CI and became the current Cloud Run runtime.
+### STATE-001 / P0-P1 — production deployment does not establish shared-state backend authority
 
-**Real-money impact:** UI/runtime safety claims cannot be tied to the source revision being audited. A green dashboard could belong to a different image/revision.
+**Exact proof:** `RuntimeStateStore` defaults `SYSTEM3_STATE_BACKEND` to `file`; only explicit value `firestore` instantiates `FirestoreStateBackend`. The inspected Cloud Run deploy script/workflow sets analyzer/live-off/auth/token/memory/public URL variables but does not set `SYSTEM3_STATE_BACKEND=firestore` or `SYSTEM3_STATE_BACKEND_REQUIRED=1`.
 
-**Files/dependencies:** `.github/workflows/cloud-run-auto-deploy.yml`, `scripts/gcp_cloud_run_auto_deploy.py`, `scripts/gcp_runtime_evidence.py`, Cloud Run service metadata, Artifact Registry image metadata.
+**Symptom/root cause:** code contains a cloud shared-state implementation, but deployment configuration does not make it authoritative.
 
-**Target behavior:** every deploy emits one immutable `DeploymentTruth` record binding source SHA -> build ID -> image digest -> Cloud Run revision -> runtime service URL -> frontend SHA -> backend SHA -> policy/config hash -> evidence ID.
+**Real-money impact:** process/restart-local state can diverge from worker/job state; dashboard positions/P&L/risk/readiness may depend on whichever instance filesystem currently serves the request.
 
-**Implementation:** add a post-deploy exact-revision gate that reads immutable image digest and the serving Cloud Run revision after all service mutations; compare `DEPLOY_GIT_SHA`, image OCI labels, frontend provenance and runtime endpoint provenance. Store sanitized JSON as workflow artifact and expose read-only subset in Observability UI.
+**Exact files:** `dashboard/backend/runtime_state_store.py`, `dashboard/backend/firestore_state_backend.py`, `scripts/gcp_cloud_run_auto_deploy.py`, `.github/workflows/cloud-run-auto-deploy.yml`.
 
-**Tests/PASS:** exact SHA mismatch, digest mismatch, revision superseded, frontend/backend mismatch, missing evidence, stale evidence all fail; PASS only when all identities agree on the same final serving revision.
+**Target behavior:** in GCP production, state authority is explicit and typed: `backend=FIRESTORE_REQUIRED`, with local disk used only as non-authoritative diagnostics/cache.
 
-**Rollback/fail-safe:** deployment may remain running, but readiness becomes `DEPLOYMENT_TRUTH_UNKNOWN` and all real-money readiness remains inhibited.
+**Minimal safe implementation:** add `SYSTEM3_STATE_BACKEND=firestore`, `SYSTEM3_STATE_BACKEND_REQUIRED=1`, explicit project/collection/document env, startup capability proof and a `/api/state/provenance` read-only contract.
 
-**Status:** `READY TO PATCH`.
+**Ordered steps:** configure Firestore + IAM; make backend required in Cloud Run; start service only after read/write transaction self-test; expose backend/document/revision metadata; mark local mirror `DIAGNOSTIC_ONLY`; block readiness when shared backend unavailable.
 
-### GCP-002 / P1 — deploy path uses mutable tag identity without proving immutable image digest
+**Tests/PASS:** missing Firestore credentials/project/document, permission denied, unavailable backend, restart, and new revision must all produce `STATE_AUTHORITY_ERROR` rather than local-authoritative operation. PASS only when exact serving revision proves shared backend read/write and backend-required=true.
 
-**Exact proof:** `scripts/gcp_cloud_run_auto_deploy.py` builds an image tag `${sha[:12]}-${timestamp}` and prints `IMAGE`, `revision`, and `sha`. In the inspected file, it does not resolve, record, or compare the immutable Artifact Registry digest after build/deploy.
-
-**Root cause:** tag + SHA are used as deployment identity even though a digest is the immutable container identity.
-
-**Impact:** tag/revision evidence is insufficient to prove the exact image bytes serving the product.
-
-**Solution:** after Cloud Build success, resolve `IMAGE@sha256:...`; patch Cloud Run by digest or immediately capture the resolved digest; require service `containerStatuses[].imageDigest` / equivalent final metadata to match; include digest in `DeploymentTruth` and UI.
-
-**Regression risks:** Cloud Run v1/v2 metadata field differences and delayed reconciliation.
-
-**Tests:** digest available, digest mismatch, image tag reused, build succeeded but wrong service image, final revision not ready.
-
-**PASS:** one immutable digest agrees across Artifact Registry, Cloud Run final revision and evidence artifact.
+**Rollback/fail-safe:** analyzer UI may show a read-only degraded page, but paper mutation/readiness are inhibited.
 
 **Status:** `READY TO PATCH`.
 
-### GCP-003 / P1 — frontend deploy provenance does not contain the Git source SHA
+### STATE-002 / P0-P1 — optional Firestore fallback can silently split cloud truth
 
-**Exact proof:** `dashboard/backend/Dockerfile` writes `dist/assets/deploy-provenance.json` containing schema, `sidebar_sha256`, feature booleans and a static/default `SYSTEM3_FRONTEND_BUILD_EPOCH=20260806_gcp_token_rotation_proof`. It does not embed the 40-character source SHA or image digest.
+**Exact proof:** `SYSTEM3_STATE_BACKEND_REQUIRED` defaults false. Firestore constructor/load/save exceptions print warnings and fall back to local files when required=false.
 
-**Impact:** the built browser artifact cannot independently prove it came from the same exact source revision as the backend/runtime.
+**Root cause:** availability fallback is treated as equivalent persistence authority.
 
-**Solution:** Cloud Build passes `SYSTEM3_GIT_SHA` and optional build ID as Docker build args; provenance JSON contains full SHA, frontend tree hash, build ID and schema version. Backend `/api/build/provenance` exposes backend SHA/runtime revision/digest; UI compares both and displays `MATCH / MISMATCH / UNKNOWN`.
+**Impact:** one process can continue on local state while another process/job writes Firestore; both may look internally coherent.
 
-**Tests:** frontend old/backend new, backend old/frontend new, missing provenance file, malformed SHA.
+**Solution:** cloud mode must fail closed on shared-state failure. `StateTruth.quality=ERROR`, no mutations, no readiness, no account/position green state. Local file mirror remains diagnostic and carries `authoritative=false`.
 
-**PASS:** frontend SHA == backend SHA == `DEPLOY_GIT_SHA` == DeploymentTruth source SHA.
-
-**Status:** `READY TO PATCH`.
-
-### GCP-004 / P1 — workflow performs a second service mutation after deploy script's READY revision
-
-**Exact proof:** `gcp_cloud_run_auto_deploy.py` patches scaling to `minInstanceCount=1,maxInstanceCount=10`, waits for a ready revision and prints `READY`. The subsequent `cloud-run-auto-deploy.yml` step executes `gcloud run services update` with `--min-instances=0 --max-instances=1` plus environment/secret updates, which can create/supersede the revision just printed by the deploy script.
-
-**Impact:** the deploy script's reported `READY revision` is not guaranteed to be the final serving revision used by post-deploy proof. Provenance can split across two revisions.
-
-**Canonical solution:** perform exactly one authoritative Cloud Run service mutation per release, containing image digest, scaling, env and secret references. If a second mutation is unavoidable, discard the first revision identity and collect evidence only after the final mutation and traffic convergence.
-
-**Tests:** assert one final revision after deploy; service traffic 100% to expected revision; expected scaling/env/secret refs on that same revision.
-
-**PASS:** no intermediate revision is reported as authoritative.
+**Tests:** Firestore 403/timeout/unavailable/transaction abort => no local-authoritative mutation; UI shows shared-state unavailable; restart cannot promote mirror to authority.
 
 **Status:** `READY TO PATCH`.
 
-### GCP-005 / P1 — WIF still has a legacy long-lived service-account-key fallback
+### STATE-003 / P0-P1 — Firestore transaction is atomic but can still lose domain updates
 
-**Exact proof:** `cloud-run-auto-deploy.yml` uses keyless WIF when variables exist, but falls back to `secrets.GCP_SA_KEY` when WIF configuration is absent.
+**Exact proof:** `FirestoreStateBackend.save(state)` clones the caller's entire state, loads current remote document transactionally, deep-merges **incoming over existing**, then increments the single `state_version`. `RuntimeStateStore._save_state()` passes `self._state`, not a sparse update/expected-domain revision.
 
-**Impact:** long-lived deploy credentials remain a security and provenance risk; an accidental variable regression can silently re-enable key auth.
+**Root cause:** transaction protects write atomicity but not stale-writer semantics.
 
-**Solution:** complete WIF bootstrap, make WIF mandatory, remove `GCP_SA_KEY` fallback and secret, and add workflow guard rejecting `credentials_json` in active deploy workflows.
+**Example failure:** process A reads state version 10; process B updates broker to version 11; process A later submits its full stale snapshot containing old broker plus a new P&L value. Transaction merges A's old broker over B's newer broker, then publishes version 12. Global version increased while broker truth regressed.
 
-**Migration:** first prove one WIF-only deployment plus runtime artifact, then delete/disable old key.
+**Real-money impact:** stale process state can overwrite fresher broker/market/risk/position domains while the monotonic version falsely suggests forward progress.
 
-**Tests:** missing WIF vars fails closed; no `GCP_SA_KEY`/`credentials_json` in active workflows; principal identity recorded as non-secret metadata.
+**Canonical solution:** domain-scoped compare-and-set writes. Every mutable domain carries `domain_revision`, `writer_id`, `event_time`, `updated_at`, `source_revision`, `quality`. Writers send only owned domain patches plus expected revision. Firestore transaction rejects older/equal writer revision or stale event-time where policy requires monotonic events.
 
-**Status:** `READY TO PATCH` after one WIF-only proof.
+**Tests:** two stale writers, concurrent broker+P&L writers, retry after conflict, out-of-order event, Cloud Run revision overlap. PASS only with zero lost updates in deterministic concurrency tests.
 
-### GCP-006 / P0-P1 — runtime IAM grants Secret Manager access broadly to the service runtime identity
+**Status:** `READY TO PATCH`.
 
-**Exact proof:** deployment workflow grants the Cloud Run runtime service account `roles/secretmanager.secretAccessor` on Dhan client ID, access token, PIN, TOTP, dashboard API key and worker push token; it also grants `secretVersionAdder` on the Dhan token. The same runtime identity is then used for the rotation job when no separate identity is resolved.
+### STATE-004 / P1 — one global version cannot prove domain freshness or ownership
 
-**Impact:** the web service identity can inherit credentials needed only by the token rotator, increasing blast radius and violating least privilege.
+**Proof:** state document exposes one `state_version`; no per-domain revision/CAS metadata is required by persistence layer.
 
-**Solution:** split identities: `system3-web-runtime` gets only secrets required for web read/runtime; `system3-dhan-rotator` gets PIN/TOTP/client-id/token write permissions; Scheduler uses a dedicated invoker identity; deploy/evidence identities are separate. Never default to the Compute Engine default service account.
+**Solution:** introduce `DomainEnvelope<T>`: `state`, `domain_revision`, `writer_id`, `event_id`, `source_event_time`, `received_at`, `quality`, `schema_version`, `runtime_revision`, `evidence_id`.
 
-**Tests:** IAM policy matrix denies web runtime access to PIN/TOTP and token-version-add; rotator cannot deploy service; scheduler can invoke only rotation job; evidence identity is read-only.
-
-**PASS:** least-privilege matrix independently verified from IAM policy metadata.
+**UI target:** every Data/Broker/Positions/P&L/Risk panel can drill into writer, revision, event age and state quality; global state version is diagnostic only.
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-### GCP-007 / P1 — fallback to default Compute Engine service account is unsafe authority ambiguity
+### STATE-005 / P0-P1 — startup file sync can overwrite freshly loaded shared state
 
-**Exact proof:** if Cloud Run service account is empty, the workflow constructs `${PROJECT_NUMBER}-compute@developer.gserviceaccount.com` and uses it as `RUNTIME_SA` for secret bindings, job service account and Scheduler OAuth identity.
+**Exact proof:** app startup creates `state_store = get_state_store(OUTPUTS_DIR)`; the singleton calls `load_state()`, then app immediately invokes `state_store.sync_from_files()`. That bridge reads health, positions, P&L and signals from local output files and calls `update_state()`.
 
-**Impact:** deployments can silently attach broad legacy/default IAM authority instead of failing on missing explicit service-account configuration.
+**Impact:** local/migratory artifacts can become newer authoritative cloud state during startup even after a successful remote load.
 
-**Solution:** remove fallback. Missing explicit web runtime/rotator/scheduler identities is a deploy blocker.
+**Solution:** remove unconditional production startup import. Introduce a one-time migration command with explicit `--source`, snapshot ID, age limits, schema validation and human-reviewed evidence. Runtime service must never automatically promote local migration files into shared truth.
 
-**Tests/PASS:** empty serviceAccountName -> deployment fails with typed prerequisite error; no default compute SA accepted by deployment-contract tests.
-
-**Status:** `READY TO PATCH`.
-
-### GCP-008 / P1 — runtime evidence safety booleans can still derive truth from missing env values
-
-**Exact proof:** `scripts/gcp_runtime_evidence.py::evaluate_safety()` calculates `live_trading_enabled = not is_off(env.get(...))`; missing values therefore evaluate as enabled/unsafe, which is fail-closed and should be preserved. However `api_key_required` similarly becomes true for any non-off unknown string and the current structure is boolean rather than typed `PROVEN/UNKNOWN/ERROR` with source/revision metadata.
-
-**Impact:** evidence can state boolean outcomes without explaining whether the underlying env field was present, parsed, stale, or from the final serving revision.
-
-**Solution:** replace boolean-only safety summary with typed field observations: `present`, raw normalized enum, source revision, final revision, evidence time, parse state. `PASS` requires explicit allowed value, not merely truthy/non-off evaluation.
-
-**Tests:** absent, malformed, duplicate env name, secret ref/plain value collision, final revision mismatch.
+**Tests:** remote newer than local; local newer timestamp but wrong revision; malformed local; restart with old local files. All must preserve remote authority.
 
 **Status:** `READY TO PATCH`.
 
-### GCP-009 / P1 — frontend build marker can become cosmetic deployment proof
+### STATE-006 / P1 — initialized SSOT starts with plausible PASS/zero values
 
-**Exact proof:** Docker build checks for literal UI strings (`Sim Live`, `CLOUD BUILD`, `SESSION SNAPSHOT`, `TOKEN ROTATION PROOF`) and stores booleans in deploy provenance. These prove bundle content exists, not that backend contracts, source revision or runtime revision are compatible.
+**Exact proof:** defaults include `qc.status='PASS'`, `risk.limits.status='PASS'`, zero P&L/exposure/Greeks and empty positions before those domains are proven.
 
-**Impact:** visible badges/strings may be over-read as deployment completeness.
+**Impact:** startup/degraded state can look genuinely safe/zero rather than unproven.
 
-**Solution:** retain string checks only as smoke tests; never feed them into readiness. Add route/schema contract hash and frontend/backend SHA compatibility proof.
+**Solution:** initialize every externally meaningful domain as `UNKNOWN` with nullable measurements; only explicit proven-empty may show zero/empty. Safety flags remain independently fail-closed.
+
+**Tests:** fresh boot without files/broker/Firestore must display UNKNOWN/PENDING, never PASS or zero-value performance/risk cards.
 
 **Status:** `READY TO PATCH`.
 
-### GCP-010 / P1 — observability collector summarizes logs but product lacks an exact-revision incident/drilldown contract
+### STATE-007 / P1 — duplicated SSOT methods increase patch divergence risk
 
-**Exact proof:** `gcp_runtime_evidence.py` already categorizes startup, crash/restart, OOM, Dhan auth, option-chain, Firestore, scheduler/worker and unhandled exceptions and derives HTTP/latency summaries. Current product information architecture has no proven exact-revision evidence timeline binding these events to source SHA + image digest + Cloud Run revision.
+**Proof:** `runtime_state_store.py` contains duplicate `_enforce_safety_invariants`, duplicate `_save_local_state`, and duplicated Firestore-load blocks.
 
-**Impact:** operators can see health/performance without knowing whether incidents belong to the exact code revision under review.
+**Impact:** future fixes can land in one copy while runtime dispatch uses the later definition; reviewers can misread which implementation is active.
 
-**Solution:** introduce `RuntimeEventEnvelope` with `event_id`, observed time, domain, severity, Cloud Run revision, image digest, source SHA, route/request correlation ID, redacted summary and evidence link. Observability screen filters by revision and cannot mix revisions by default.
+**Solution:** deduplicate methods; add structural test rejecting duplicate method names in `RuntimeStateStore`; split persistence, safety and migration responsibilities into smaller modules.
 
-**Tests:** multi-revision logs, missing revision label, redaction, correlation IDs, 4xx/5xx separation, OOM/restart event classification.
+**Status:** `READY TO PATCH`.
+
+### STATE-008 / P1 — position errors collapse to empty lists
+
+**Proof:** broker import/API exceptions return `[]`; internal file missing/parse errors also return `[]`. Reconciliation can emit `NO_POSITIONS` from an absence that is not proven-empty.
+
+**Solution:** typed `PositionSourceResult`: `PROVEN`, `PROVEN_EMPTY`, `AUTH_ERROR`, `API_ERROR`, `SCHEMA_ERROR`, `STALE`, `UNKNOWN`; reconciliation may produce `NO_POSITIONS` only from explicit `PROVEN_EMPTY`.
+
+**Status:** `READY TO PATCH`.
+
+### STATE-009 / P1 — position identity/reconciliation contract is weak
+
+**Proof:** broker position ID is derived from `trading_symbol or symbol`; internal identity expects `position_id`; quantity comparison defaults missing values to zero.
+
+**Solution:** canonical immutable instrument key (`exchange_segment + security_id + expiry + strike + option_type`) plus lifecycle position UUID. Symbol is display metadata, not identity. Missing quantity is UNKNOWN/SCHEMA_ERROR.
 
 **Status:** `READY TO PATCH/DESIGN`.
 
-### GCP-011 / P1 — deployment target is GCP but Render retirement is enforced only inside active workflow files
+### STATE-010 / P1 — multi-file snapshots are not cycle-consistent
 
-**Exact proof:** `workflow_priority_guard.py` rejects `render.com`/`api.render.com` references in active `.github/workflows`, but does not prove the rest of the product UI/docs/runtime code is free from operational Render instructions. Existing `READY-008` already found Render-era instructions in Live Gate.
+**Proof:** `state_sync_service.py` reads positions, P&L, signals, health and QC from separate JSON files independently and then merges them into one state update without a shared cycle/generation ID.
 
-**Impact:** an operator can follow a stale deployment instruction despite the workflow control plane being GCP-only.
+**Impact:** UI can show position set from cycle N with P&L from cycle N-1 and QC/signal from another generation.
 
-**Solution:** repository-wide production-path Render retirement test over dashboard/runtime/deploy/docs used by UI help, with explicit allow-list only for archived historical reports. Live Gate copy must reference Google Cloud deployment authority only.
+**Solution:** writers publish one atomic `CycleSnapshot` manifest referencing immutable domain artifacts by checksum/generation; state sync accepts only a complete compatible generation. Longer term, write lifecycle domains directly to the shared store/event ledger instead of filesystem fan-in.
 
-**Status:** `READY TO PATCH`; `READY-008` independently reproduced and moves to `2/20`.
+**Tests:** staggered writes, partial files, old P&L/new positions, interrupted cycle, duplicate generation. No mixed-generation state may be published as PROVEN.
+
+**Status:** `READY TO PATCH`.
+
+### STATE-011 / P1 — atomic file writes do not provide cross-file transactionality
+
+**Positive proof:** `runtime_state_store._atomic_write_json()` uses temp-file + `os.replace`, so one file is protected from partial-write corruption.
+
+**Gap:** positions/P&L/signals/QC/runtime-state files are still independently committed.
+
+**Solution:** preserve atomic single-file helper for diagnostics; authoritative lifecycle/state uses Firestore transaction/event ledger + cycle manifest.
+
+**Status:** `READY TO PATCH/DESIGN`.
+
+### STATE-012 / P1 — Firestore tests miss adversarial multi-writer/restart cases
+
+**Proof:** existing test verifies worker-field merge + monotonic global version and path-injection rejection. It does not model stale full-snapshot writers or backend-required failure.
+
+**Solution tests:** add deterministic stale-writer, same-domain CAS conflict, independent-domain merge, transaction retry, service restart, overlapping revisions, unavailable Firestore, startup migration prevention and proven-empty semantics.
+
+**PASS:** no lost updates, no local-authority fallback, no green defaults, deterministic replay.
+
+**Status:** `READY TO PATCH`.
 
 ## 5. Canonical truth contracts
 
@@ -297,43 +237,43 @@ Missing, stale, parse-failed, unauthenticated or unproven evidence must never be
 `source`, provider session, instrument, source/backend/frontend times, age/TTL, market state, schema/normalizer versions, row count/completeness, quality state, source/runtime revisions.
 
 ### 5.3 `StreamTruth`
-separate transport/stream/heartbeat state, last event times, uncapped event age, TTL, sequence, rejected-old events, parse errors, source/session/schema, REST fallback and revisions.
+Separate transport/stream/heartbeat state, last-event times, uncapped event age, TTL, sequence, rejected-old events, parse errors, source/session/schema, REST fallback and revisions.
 
 ### 5.4 `OptionChainTruth`
-underlying/security id/segment, requested+resolved expiry and authority, provider/session, source/receive times, age/TTL, expiry-aware cache identity, schema/normalizer versions, nullable quote/Greek fields + field quality, completeness, quality state, source/runtime revision and evidence ID.
+Underlying/security id/segment, requested+resolved expiry and authority, provider/session, source/receive times, age/TTL, expiry-aware cache identity, schema/normalizer versions, nullable quote/Greek fields + field quality, completeness, quality state, source/runtime revision and evidence ID.
 
-### 5.5 `DeploymentTruth` — NEW
+### 5.5 `DeploymentTruth`
+Exact source/tree SHA, Cloud Build ID, image tag+digest, final Cloud Run revision/traffic, frontend/backend SHA, runtime app/service account, policy/config hash, secret-reference metadata, scheduler/job provenance, verified time, quality and evidence ID.
+
+### 5.6 `StateTruth` — NEW
 
 ```text
-source_sha
-source_tree_hash
-cloud_build_id
-image_repository
-image_tag
-image_digest
-cloud_run_service
-cloud_run_revision
-traffic_percent
-frontend_source_sha
-frontend_tree_hash
-backend_source_sha
-runtime_entrypoint
-runtime_app
-runtime_service_account
-policy_config_hash
-secret_reference_versions_metadata_only
-scheduler_job
-scheduler_target_revision_or_image_digest
-deployed_at
-verified_at
-age_ms
-quality_state: PROVEN | DRIFT | STALE | ERROR | UNKNOWN
-evidence_id
+backend: FIRESTORE | LOCAL_DIAGNOSTIC
+backend_required: bool
+collection/document
+shared_state_health: PROVEN | DEGRADED | ERROR | UNKNOWN
+global_state_version  # diagnostic only
+runtime_revision
+instance_id
+last_shared_read_at
+last_shared_write_at
+local_mirror_authoritative: false
+domains:
+  broker/market/positions/pnl/risk/chain/signals/qc/...:
+    domain_revision
+    writer_id
+    writer_runtime_revision
+    event_id
+    source_event_time
+    received_at
+    schema_version
+    quality: PROVEN | PROVEN_EMPTY | STALE | ERROR | UNKNOWN
+    evidence_id
 ```
 
-**Invariant:** source tag, UI badge, HTTP 200 or workflow configuration can never substitute for immutable digest + final serving revision + exact source compatibility proof.
+**Invariant:** no whole-process stale snapshot may overwrite a newer domain revision. Cloud shared-state failure never promotes local disk to authority.
 
-### 5.6 `PaperLifecycleTruth`, `GateTruth`, `RiskPolicy`, `PreTradeRiskTruth`
+### 5.7 `PaperLifecycleTruth`, `GateTruth`, `RiskPolicy`, `PreTradeRiskTruth`
 Retain immutable lifecycle, semantic evidence gates, server-owned policy and fail-closed pre-trade decision contracts.
 
 ## 6. Canonical remediation roadmap
@@ -350,28 +290,28 @@ Retain immutable lifecycle, semantic evidence gates, server-owned policy and fai
 - `SOL-10 Legacy UI quarantine — READY TO PATCH`: production entrypoint guard; no legacy mutation surface.
 - `SOL-11 StreamTruth — READY TO PATCH`: transport != healthy stream; heartbeat schema; monotonic REST/WS merge; uncapped age; true WS proof.
 - `SOL-12 RuntimeEventEnvelope — READY TO PATCH/DESIGN`: logs/metrics/incidents bound to source SHA + digest + Cloud Run revision.
+- `SOL-13 StateTruth + domain-CAS store — READY TO PATCH`: Firestore required in GCP; no local-authority fallback; sparse domain patches; per-domain revisions/writers; startup migration removed; cycle-consistent snapshots; proven-empty semantics.
 
-### SOL-08 ordered implementation
+### SOL-13 ordered implementation
 
-1. Add `DeploymentTruth` schema and evidence writer.
-2. Make WIF mandatory; remove `GCP_SA_KEY` fallback after one WIF-only proof.
-3. Split deploy, web-runtime, Dhan-rotator, Scheduler-invoker and read-only-evidence service accounts.
-4. Remove default Compute Engine SA fallback.
-5. Build image with OCI labels for full git SHA, tree hash and build ID.
-6. Resolve immutable Artifact Registry digest after build.
-7. Consolidate image/env/secrets/scaling into one authoritative Cloud Run service mutation or collect truth only after the final mutation.
-8. Verify 100% serving traffic and latest ready revision against the expected digest.
-9. Pass source SHA/build ID into frontend build provenance; expose backend/runtime provenance read-only.
-10. Compare frontend SHA == backend SHA == DEPLOY_GIT_SHA == evidence source SHA.
-11. Record only secret reference metadata/version identifiers, never secret payloads.
-12. Bind Scheduler/rotation job to explicit dedicated identities and expected image digest.
-13. Emit sanitized exact-revision runtime evidence artifact and expose read-only subset in Observability.
-14. Add repository-wide active production-path guard for Render instructions.
-15. Add contract tests for one final serving revision, IAM least privilege, secret refs, live-off flags and provenance drift.
+1. Add `StateTruth`/`DomainEnvelope` schemas and API contract.
+2. Set `SYSTEM3_STATE_BACKEND=firestore` and `SYSTEM3_STATE_BACKEND_REQUIRED=1` in the single final Cloud Run deployment mutation.
+3. Grant only required Firestore permissions to explicit web/worker identities.
+4. Replace whole-state `save(self._state)` with `save_domain_patch(domain, patch, expected_revision, writer_id, event_id)`.
+5. Reject stale/out-of-order same-domain writers transactionally; preserve independent domains.
+6. Remove production local-file fallback; local mirror becomes diagnostics-only and non-authoritative.
+7. Remove unconditional `sync_from_files()` from runtime startup; move migration to explicit one-shot command.
+8. Change fresh defaults from PASS/zero/empty to typed UNKNOWN/null, retaining separate hard live-off invariants.
+9. Introduce canonical position/instrument identity and typed broker/internal source results.
+10. Add cycle/generation IDs or atomic manifests for any remaining filesystem fan-in.
+11. Deduplicate runtime state-store methods/load blocks.
+12. Add adversarial two-writer, restart, overlapping-revision, Firestore-unavailable, stale-file and mixed-generation tests.
+13. Expose read-only state provenance/drilldown in Data & Broker Health / Observability.
+14. Add alert when domain writer revision or event time regresses; execution/readiness remains inhibited.
 
-**SOL-08 PASS criteria:** exact application source SHA, frontend SHA, backend SHA, immutable image digest and final serving Cloud Run revision agree; traffic is on that revision; runtime/live-off/auth policy is read from that same revision; identities are explicit/least-privilege; Scheduler/rotator provenance is known; evidence is current; no active Render operational authority remains.
+**SOL-13 PASS criteria:** exact Cloud Run revision proves Firestore-required authority; two stale writers cannot lose newer domain data; shared backend outage never promotes local disk; restart preserves/replays state deterministically; no mixed-generation snapshot is PROVEN; fresh boot is UNKNOWN not green; position/P&L/risk domains carry writer/revision/evidence metadata.
 
-**Rollback/fail-safe:** on any identity/drift/evidence failure, service may stay available for analyzer viewing but `DeploymentTruth=UNKNOWN|DRIFT`, readiness stays blocked and mutation/live routing remains inhibited.
+**Rollback/fail-safe:** preserve last proven shared state as `STALE_LAST_GOOD` read-only; reject new mutations and readiness until shared authority recovers.
 
 ## 7. Verification counters
 
@@ -382,27 +322,27 @@ Independent reproduction paths only.
 | AUTH-001 | `3/20` | OPEN |
 | AUTH-002 | `2/20` | OPEN |
 | AUTH-003 | `2/20` | OPEN |
-| UI-001 | `13/20` | OPEN |
+| UI-001 | `15/20` | OPEN — state defaults + position empty/error collapse add independent reproductions |
 | UI-002 | `3/20` | OPEN |
-| UI-003 | `6/20` | OPEN |
-| UI-005 | `11/20` | OPEN |
-| UI-006 | `7/20` | OPEN |
-| UI-007 | `7/20` | OPEN |
+| UI-003 | `7/20` | OPEN — state backend/source authority adds independent proof |
+| UI-005 | `13/20` | OPEN — state/risk/QC default semantics independently reproduce |
+| UI-006 | `9/20` | OPEN — reconciliation error/empty collapse independently reproduced |
+| UI-007 | `8/20` | OPEN |
 | UI-009 | `6/20` | OPEN |
 | UI-011 | `3/20` | OPEN |
-| UI-016 | `7/20` | OPEN — deployment truth separation added |
-| UI-018 | `2/20` | OPEN — frontend build-marker vs exact deployment proof independently reproduced |
+| UI-016 | `8/20` | OPEN — state backend authority now separated from UI/runtime claims |
+| UI-018 | `2/20` | OPEN |
 | CHAIN-001 | `1/20` | OPEN |
 | CHAIN-002 | `5/20` | OPEN |
 | CHAIN-003 | `1/20` | OPEN |
 | CHAIN-004 | `2/20` | OPEN |
 | CHAIN-005 | `2/20` | OPEN |
 | CHAIN-006..014 | `1/20` each | OPEN |
-| READY-001 | `4/20` | OPEN |
+| READY-001 | `5/20` | OPEN — fresh state initializes plausible PASS/zero domains |
 | READY-003 | `2/20` | OPEN |
-| READY-008 | `2/20` | OPEN — GCP-only workflow guard does not retire Live Gate Render copy |
+| READY-008 | `2/20` | OPEN |
 | PAPER-001 | `2/20` | OPEN |
-| PAPER-003 | `2/20` | OPEN |
+| PAPER-003 | `3/20` | OPEN — startup/state P&L zero defaults reproduce |
 | PAPER-005 | `2/20` | OPEN |
 | PAPER-008 | `2/20` | OPEN |
 | PAPER-009 | `2/20` | OPEN |
@@ -412,27 +352,29 @@ Independent reproduction paths only.
 | WS-001..010 | `1/20` each | OPEN |
 | WS-011 | `1/20` | UNPROVEN |
 | GCP-001..011 | `1/20` each | OPEN |
+| STATE-001..012 | `1/20` each | OPEN |
 
 No finding is `LOCKED-20X`.
 
 ## 8. Prioritized implementation order
 
-### P0 Wave 1 — false-green/fail-open elimination
+### P0 Wave 1 — false-green/fail-open/state-authority elimination
 1. SOL-01 auth contract + auth-gated startup.
 2. SOL-02 authoritative `SafetyTruth`.
-3. SOL-08 exact `DeploymentTruth` baseline so later fixes can be tied to the serving revision.
-4. SOL-05 parser null-safety + expiry-aware/provenance-aware chain cache.
-5. SOL-11 StreamTruth, uncapped age and ordered REST/WS merge.
-6. SOL-09 server-owned risk + mandatory pre-trade authority.
-7. SOL-06 durable lifecycle/idempotency/reconciliation.
-8. remove dead/unproven paper mutation control.
-9. SOL-04 semantic readiness.
-10. SOL-03 remaining zero/live/default-safe fallbacks.
-11. SOL-10 legacy mutation UI quarantine.
-12. SOL-07 rank-as-percent repair.
+3. SOL-08 exact `DeploymentTruth` baseline.
+4. **SOL-13 shared `StateTruth` authority + domain-CAS store.**
+5. SOL-05 parser null-safety + expiry-aware/provenance-aware chain cache.
+6. SOL-11 StreamTruth, uncapped age and ordered REST/WS merge.
+7. SOL-09 server-owned risk + mandatory pre-trade authority.
+8. SOL-06 durable lifecycle/idempotency/reconciliation.
+9. remove dead/unproven paper mutation control.
+10. SOL-04 semantic readiness.
+11. SOL-03 remaining zero/live/default-safe fallbacks.
+12. SOL-10 legacy mutation UI quarantine.
+13. SOL-07 rank-as-percent repair.
 
 ### P1 Wave 2 — runtime/account/paper economics
-GCP IAM split + WIF-only auth, RuntimeEventEnvelope, full Dhan/account provenance, IV/Greeks model truth, costed fills/P&L, portfolio risk, true WebSocket proof.
+Domain writer observability, GCP IAM split + WIF-only auth, RuntimeEventEnvelope, full Dhan/account provenance, IV/Greeks model truth, costed fills/P&L, portfolio risk, true WebSocket proof.
 
 ### P2 Wave 3 — institutional operator quality
 Responsive/mobile, accessibility/keyboard/focus, command palette/search, deep drilldowns, SLO/incidents, security/session settings and audit export.
@@ -445,56 +387,56 @@ Responsive/mobile, accessibility/keyboard/focus, command palette/search, deep dr
 4. AI Decision Audit — Genesis Brain + Prediction Audit + calibration/evidence.
 5. Paper / Trade Lifecycle — capability-driven ticket, immutable orders/fills/positions/P&L/reconciliation.
 6. Portfolio & Risk — server-owned policy, exposure, aggregate Greeks, scenarios.
-7. Data & Broker Health — transport/heartbeat/source/freshness/auth/account/cache truth.
+7. Data & Broker Health — **shared-state authority, domain writers/revisions**, transport/heartbeat/source/freshness/auth/account/cache truth.
 8. Readiness / Proof — semantic E2E gates + Live Gate.
-9. Observability — deployment identity, alerts, runtime events, logs, schema/parse errors, latency, reconnects and revision-filtered evidence.
+9. Observability — deployment identity, state/store incidents, alerts, runtime events, logs, schema/parse errors, latency, reconnects and revision-filtered evidence.
 10. Security / Settings — sessions, IAM/policy versions, permissions, audit export, non-authoritative preferences.
 
 Current repo tabs remain represented through this rationalized hierarchy; conceptual renames never imply implemented capability.
 
-## 10. Product UI visual evolution — V10
+## 10. Product UI visual evolution — V11
 
-New concept: **Observability & Deployment Truth V10**.
+New concept: **State & Ledger Integrity V11** inside the actual `Data & Broker Health` product workspace.
 
 Changes driven by this iteration:
-- source SHA, immutable image digest and Cloud Run revision are separate first-class fields;
-- frontend and backend build SHA compatibility is visible;
-- entrypoint/runtime app identity is visible;
-- WIF versus legacy-key state is visible without exposing secrets;
-- runtime service account and Scheduler provenance are explicit;
-- live/analyzer/auth states remain UNKNOWN until same-revision evidence exists;
-- SLO/error panels carry source/evidence rather than generic green badges;
-- deployment drift checks compare image/digest/SHA/frontend/backend/route/policy identities;
-- incident timeline is revision-filtered and evidence-linked;
-- Render-era authority is explicitly rejected;
+- shared-state backend authority shown explicitly as FIRESTORE/ERROR/UNKNOWN rather than hidden implementation detail;
+- local mirror visibly marked diagnostic/non-authoritative;
+- every domain displays writer ID, domain revision, event age and evidence quality;
+- no global version is allowed to imply all domains are current;
+- stale-writer/conflict counters and rejected updates are operator-visible;
+- startup/restart recovery and last proven shared revision are explicit;
+- positions/P&L/risk carry generation/correlation IDs so mixed-cycle state is visible;
+- `PROVEN_EMPTY` is distinct from `UNKNOWN/API_ERROR/SCHEMA_ERROR`;
+- state backend outage forces execution/readiness `INHIBITED`;
 - live router remains locked.
 
-Visual artifact: `Genesis_System3_Observability_Deployment_Truth_Target_V10.png`.
+Visual artifact: `Genesis_System3_State_Ledger_Integrity_Target_V11.png`.
 
 ## 11. Positive foundations to preserve
 
-- Cloud Run is explicitly documented as runtime/scheduler authority in active workflow.
-- Active workflow allow-list rejects Render runtime references, self-hosted runners, scheduled GitHub workflows and live-trading enable flags.
-- Deployment forces analyzer/live-off flags and mounts dashboard/worker secrets using Secret Manager references.
-- Build uses a unique SHA-derived image tag.
-- Runtime launcher is explicit: `scripts/start_cloud_run.py` -> `dashboard.backend.app:app`, one Uvicorn worker.
-- Runtime evidence collector already sanitizes/redacts logs and captures useful HTTP/latency/error categories.
-- Docker image runs as a non-root `appuser` and has a healthcheck.
-- Dhan option-chain traffic remains process-serialized and rate paced.
-- WS reconnect has backoff+jitter foundation.
+- `_atomic_write_json()` uses temp-file + `os.replace`, preventing partial single-file writes.
+- Firestore persistence already uses a transaction and keeps a monotonic global state version.
+- state reads return JSON-cloned snapshots instead of mutable references.
+- hard safety invariant forces PAPER/live-off in persisted state and should remain as defense-in-depth.
+- corrupt local runtime state is quarantined rather than silently overwritten.
+- Cloud Run is explicitly documented as runtime/scheduler authority.
+- active workflow allow-list rejects Render runtime references, self-hosted runners, scheduled GitHub workflows and live-trading enable flags.
+- Dhan option-chain traffic remains serialized/rate paced; WS reconnect has backoff+jitter foundation.
 - Live Gate approval does not automatically enable live trading.
 
-These are foundations, not readiness or deployment proof.
+These are foundations, not readiness or consistency proof.
 
 ## 12. Historical proof/open-gate interpretation
 
-PR descriptions, workflow configuration, build strings and historical PASS artifacts remain scoped evidence only. They cannot prove current runtime truth unless tied to exact source SHA + immutable image digest + final serving Cloud Run revision.
+PR descriptions, workflow configuration, unit tests, atomic local writes, Firestore transaction existence, build strings and historical PASS artifacts remain scoped evidence only. They cannot prove current shared-state/runtime truth unless tied to exact source SHA + immutable image digest + final serving Cloud Run revision + domain revision/evidence.
 
 Remain open:
 - `EXACT_REVISION_CI_RUNTIME_NOT_PROVEN`
 - `DEPLOYMENT_TRUTH_NOT_PROVEN`
+- `SHARED_STATE_AUTHORITY_NOT_PROVEN`
+- `RESTART_CONSISTENCY_NOT_PROVEN`
+- `MULTI_WRITER_LOST_UPDATE_PROTECTION_NOT_PROVEN`
 - `REAL_MARKET_ANALYZER_PAPER_LIFECYCLE_NOT_PROVEN`
-- `NSE_COMPARISON_PROOF_MISSING`
 - `TRADE_READY_FALSE`
 - `MULTI_DAY_STABILITY_NOT_PROVEN`
 - `POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN`
@@ -506,16 +448,16 @@ Remain open:
 
 ## 13. Closure standard
 
-A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; expiry/cache/freshness/order/reconnect tests as applicable; restart/idempotency/reconciliation tests; immutable image digest + final Cloud Run revision/runtime proof where required; analyzer/live-off unchanged; and no contradictory independent evidence.
+A finding becomes `CLOSED` only on the exact changed revision with source inspection; positive/negative tests; static/type/build checks; unit/integration/browser tests; route/schema reconciliation; concurrency/CAS/restart/failover tests; expiry/cache/freshness/order/reconnect tests as applicable; restart/idempotency/reconciliation tests; immutable image digest + final Cloud Run revision/runtime proof where required; analyzer/live-off unchanged; and no contradictory independent evidence.
 
 ## 14. Next audit/solution slices
 
-1. DB/state-store consistency: file/JSON/Firestore ownership, locking, atomicity, concurrency, duplicate authorities and restart truth.
-2. AI/ML/prediction ledger: calibration, frozen cutoff, model/hash, drift and realized after-cost outcome.
-3. Responsive/accessibility: desktop/tablet/mobile, keyboard/focus/live regions/dense tables.
-4. Scanner/ranker contracts and performance/memory/concurrency under market-open load.
-5. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
+1. AI/ML/prediction ledger: calibration, frozen cutoff, model/hash, drift and realized after-cost outcome.
+2. Responsive/accessibility: desktop/tablet/mobile, keyboard/focus/live regions/dense tables.
+3. Scanner/ranker contracts and performance/memory/concurrency under market-open load.
+4. Security/session detail: cookie policy, CSRF, session revocation, command/settings permissions and audit export.
+5. DB follow-up: exact paper/event persistence files and any SQLite/JSON/Firestore duplicate authorities not yet mapped.
 
 ## 15. Hard safety rule
 
-A green UI, endpoint HTTP 200, socket OPEN, historical parser PASS, image tag, UI badge, workflow success description, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval or process-local simulator never substitutes for authoritative source+event time+freshness+schema+ordering+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
+A green UI, endpoint HTTP 200, socket OPEN, historical parser PASS, image tag, UI badge, workflow success description, global state version, Firestore transaction, local atomic write, zero-valued quote/Greek/risk/P&L, static PAPER SAFE, stale cache, inferred Dhan source, human approval or process-local simulator never substitutes for authoritative source+event time+domain revision+writer+freshness+schema+ordering+lifecycle+enforceable risk+reconciliation+positive after-cost expectancy+exact source SHA+immutable image digest+final serving runtime revision proof. Live order placement, modification, cancellation and routing remain prohibited during this audit.
