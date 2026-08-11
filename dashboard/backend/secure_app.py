@@ -220,7 +220,7 @@ async def dashboard_auth_status(request: Request):
             if session
             else "api_key_header"
             if header_ok
-            else "auth_required"
+            else "session_cookie_or_header"
             if legacy._REQUIRE_API_KEY
             else "auth_disabled"
         ),
