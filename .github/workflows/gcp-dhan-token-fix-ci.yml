@@ -11,6 +11,7 @@ on:
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/gcp_failed_revision_forensic.py"
       - "scripts/codespace_startup.sh"
       - "scripts/cloud_worker.py"
       - "scripts/system3_self_healing_watchdog.py"
@@ -82,6 +83,12 @@ jobs:
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
+
+      - name: Capture sanitized latest revision startup forensics
+        env:
+          FAILED_REVISION: genesis-system3-web-00209-buz
+        run: |
+          python scripts/gcp_failed_revision_forensic.py
 
       - name: Prove keyless Google identity and Cloud Run read access
         run: |
