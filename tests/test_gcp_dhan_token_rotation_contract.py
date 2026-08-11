@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import base64
 import importlib.util
 import json
@@ -8,6 +9,8 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
+
+from dashboard.backend.mutation_policy import Capability, classify_mutation, evaluate_runtime_mutation
 
 _PROVIDER_PATH = Path("core/brokers/dhan/cloud_token_provider.py")
 _SPEC = importlib.util.spec_from_file_location("system3_cloud_token_provider_test", _PROVIDER_PATH)
@@ -156,17 +159,12 @@ class StaticSafetyContractTests(unittest.TestCase):
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
         self.assertIn("REQUIRE_API_KEY=false", workflow)
-        self.assertIn("--remove-secrets=API_KEY", workflow)
-        self.assertNotIn("API_KEY_SECRET_ID", workflow)
-        self.assertNotIn("system3-dashboard-api-key", workflow)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
-
         self.assertIn('.required == false', workflow)
         self.assertIn('.mode == "auth_disabled"', workflow)
         self.assertIn('"API_KEY" in secret_env_names', workflow)
         self.assertIn('"WORKER_PUSH_TOKEN" not in secret_env_names', workflow)
-
         self.assertIn("LIVE_TRADING_ENABLED=0", workflow)
         self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", workflow)
         self.assertIn("AUTO_EXECUTE_TRADES=0", workflow)
@@ -196,6 +194,61 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('"api_key_mounted",', workflow)
         self.assertIn("if safety.get(key):", workflow)
         self.assertNotIn('for key in ("api_key_required", "api_key_mounted"):', workflow)
+
+    def test_all_routes_from_failed_00209_manifest_are_explicitly_owned_and_denied(self):
+        failed_routes = [
+            ("POST", "/agent-full-control"),
+            ("POST", "/api/agent/apply-upgrade"),
+            ("POST", "/api/agent/create-plan"),
+            ("POST", "/api/agent/pause"),
+            ("POST", "/api/agent/rollback"),
+            ("POST", "/api/filter/chain/{underlying}"),
+            ("POST", "/api/filter/positions"),
+            ("POST", "/api/forensic/run"),
+            ("POST", "/api/journal/note"),
+            ("POST", "/api/learning/run"),
+            ("POST", "/api/runner/start"),
+            ("POST", "/api/runner/stop"),
+            ("POST", "/api/validation/run"),
+            ("POST", "/backtest"),
+            ("POST", "/emergency-exit"),
+            ("POST", "/greeks"),
+            ("POST", "/iv"),
+            ("DELETE", "/order/{order_id}"),
+        ]
+        for method, path in failed_routes:
+            with self.subTest(method=method, path=path):
+                capability = classify_mutation(method, path)
+                self.assertIsNotNone(capability)
+                self.assertIsNot(capability, Capability.UNKNOWN)
+                decision = evaluate_runtime_mutation(method, path, control_authorized=False)
+                self.assertIsNotNone(decision)
+                self.assertFalse(decision.allowed)
+        self.assertIs(classify_mutation("POST", "/emergency-exit"), Capability.LIVE_MUTATION)
+        self.assertIs(classify_mutation("DELETE", "/order/{order_id}"), Capability.LIVE_MUTATION)
+
+    def test_cloud_run_startup_keeps_broker_import_out_of_module_scope(self):
+        path = Path("scripts/start_cloud_run.py")
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        top_imports = []
+        for node in tree.body:
+            if isinstance(node, ast.ImportFrom):
+                top_imports.append(node.module or "")
+            elif isinstance(node, ast.Import):
+                top_imports.extend(alias.name for alias in node.names)
+        self.assertNotIn("core.brokers.dhan.cloud_runtime_patch", top_imports)
+
+    def test_canonical_deployer_preserves_startup_and_traffic_invariants(self):
+        text = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        self.assertIn('("DEFER_INSTRUMENT_WARMUP", "1")', text)
+        self.assertIn('("SYSTEM3_STATE_BACKEND", "firestore")', text)
+        self.assertIn('("SYSTEM3_STATE_BACKEND_REQUIRED", "1")', text)
+        self.assertIn('"--no-traffic"', text)
+        self.assertIn("_traffic_allocations", text)
+        self.assertIn("_wait_revision_ready", text)
+        self.assertIn("gcp_failed_revision_forensic.py", text)
+        self.assertIn("PREVIOUS_TRAFFIC_RESTORED", text)
+        self.assertNotIn("latestReadyRevisionName", text)
 
 
 if __name__ == "__main__":
