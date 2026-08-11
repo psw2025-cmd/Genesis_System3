@@ -15,14 +15,22 @@ on:
       - "tests/test_gcp_dhan_token_rotation_contract.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
+      - ".github/workflows/gcp-dhan-token-fix-ci.yml"
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      PROJECT_ID: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+      DEPLOY_SA: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
     steps:
       - uses: actions/checkout@v4
 
@@ -55,3 +63,43 @@ jobs:
             core/brokers/dhan/cloud_runtime_patch.py \
             scripts/start_cloud_run.py \
             scripts/gcp_dhan_token_rotation_job.py
+
+      - name: Authenticate to Google Cloud with keyless WIF
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Prove keyless Google identity and Cloud Run read access
+        run: |
+          set -euo pipefail
+          ACTIVE=$(gcloud auth list --filter=status:ACTIVE --format='value(account)')
+          test "${ACTIVE}" = "${DEPLOY_SA}"
+          gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(metadata.name,status.latestReadyRevisionName,status.url)' \
+            > /tmp/service.txt
+          test -s /tmp/service.txt
+          echo "WIF_AUTHENTICATION_OK account=${ACTIVE}"
+          cat /tmp/service.txt
+
+      - name: Prove broker read-only safety and LIVE lock
+        run: |
+          set -euo pipefail
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(status.url)')
+          curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker.json
+          jq -e '.connected == true' /tmp/broker.json >/dev/null
+          jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC"' /tmp/broker.json >/dev/null
+          jq -e '.token_proof.token_value_exposed == false' /tmp/broker.json >/dev/null
+          jq -e '.live_trading_enabled == false' /tmp/broker.json >/dev/null
+          jq -e '.order_placement_allowed == false' /tmp/broker.json >/dev/null
+          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker.json
+          echo "WIF_RUNTIME_SAFETY_OK"
