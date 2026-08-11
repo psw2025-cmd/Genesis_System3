@@ -53,7 +53,7 @@ def test_manual_gcp_deploy_removes_dashboard_api_key_secret():
     assert "API_KEY_SECRET_ID" not in deploy
 
 
-def test_approved_deploy_workflow_proves_no_key_access_live_off_and_visual():
+def test_approved_deploy_workflow_proves_no_key_access_live_off_and_actual_ui_visual():
     workflow = (ROOT / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
     proof = (ROOT / "scripts/gcp_public_dashboard_runtime_proof.py").read_text(encoding="utf-8")
     assert "--remove-secrets=API_KEY" in workflow
@@ -64,6 +64,11 @@ def test_approved_deploy_workflow_proves_no_key_access_live_off_and_visual():
     assert "public-dashboard/runtime-proof" in proof
     assert "--headless" in proof
     assert 'OUT / "dashboard.png"' in proof
+    assert 'relative.get("dashboard") or "/ui"' in proof
+    assert "dashboard_ui_http_status" in proof
+    assert "rendered_product_marker_missing" in proof
+    assert "dashboard_login_prompt_still_rendered" in proof
+    assert "real_deployed_cloud_run_dashboard_ui" in proof
     assert "LIVE_TRADING_ENABLED=0" in workflow
     assert "SYSTEM3_LIVE_TRADING_ALLOWED=0" in workflow
     assert "AUTO_EXECUTE_TRADES=0" in workflow
