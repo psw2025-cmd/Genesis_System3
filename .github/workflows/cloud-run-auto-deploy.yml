@@ -13,13 +13,13 @@ on:
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/gcp_runtime_evidence.py"
+      - "scripts/gcp_public_dashboard_runtime_proof.py"
       - "scripts/sync_dhan_instruments_master.py"
       - "src/**"
       - "config/**"
       - "deploy/gcp/**"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
-      - ".github/workflows/public-paper-dashboard-proof.yml"
   workflow_dispatch:
 
 concurrency:
@@ -80,6 +80,7 @@ jobs:
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
               "scripts/gcp_runtime_evidence.py": "secret_values_exposed",
               "scripts/gcp_cloud_run_auto_deploy.py": "DASHBOARD_PUBLIC_READONLY",
+              "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
               "dashboard/frontend/src/App.tsx": "public/read-only",
               "dashboard/backend/security_policy.py": "AUTH_REQUIRED_FOR_MUTATION",
           }
@@ -129,6 +130,20 @@ jobs:
             --update-env-vars="REQUIRE_API_KEY=false,DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_TOKEN_CACHE_TTL_S=30,DHAN_TOKEN_ROTATION_JOB=${DHAN_ROTATION_JOB},DHAN_TOKEN_ROTATION_SCHEDULE=07:30 IST daily,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,SYSTEM3_MODE=ANALYZER" \
             --remove-secrets=API_KEY \
             --update-secrets="WORKER_PUSH_TOKEN=${WORKER_PUSH_TOKEN_SECRET_ID}:latest"
+
+      - name: Prove and capture public PAPER dashboard without API key
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/gcp_public_dashboard_runtime_proof.py
+
+      - name: Upload public dashboard visual proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-paper-dashboard-proof-${{ github.run_number }}
+          path: reports/latest/public_dashboard_proof/
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Configure rotator IAM, Cloud Run Job and Cloud Scheduler
         run: |
