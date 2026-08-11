@@ -1,3 +1,5 @@
+import shutil
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +20,6 @@ def test_observability_bootstrap_is_read_only_and_least_privilege():
     assert '"/api/health"' in text
     assert '"/ui"' in text
 
-    # Do not allow the monitoring identities to become secret/trading authority.
     forbidden = [
         "roles/secretmanager.admin",
         "roles/secretmanager.secretAccessor",
@@ -42,3 +43,24 @@ def test_synthetic_build_uses_dedicated_dockerfile_and_image_substitution():
     assert "observability/Dockerfile.synthetic" in text
     assert "${_IMAGE}" in text
     assert "CLOUD_LOGGING_ONLY" in text
+
+
+def test_observability_bootstrap_has_valid_bash_syntax():
+    subprocess.run(
+        ["bash", "-n", str(ROOT / "deploy/gcp/bootstrap_observability.sh")],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+
+
+def test_synthetic_has_valid_node_syntax_when_node_is_available():
+    node = shutil.which("node")
+    if node is None:
+        return
+    subprocess.run(
+        [node, "--check", str(ROOT / "observability/playbooks/synthetic_smoke.js")],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
