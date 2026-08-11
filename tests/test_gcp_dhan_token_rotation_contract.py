@@ -149,7 +149,12 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("SINGLE_FLIGHT_BUSY", patch)
         self.assertIn("COOLDOWN", patch)
         self.assertNotIn("refresh_token(", patch)
-        for marker in ("place_order(", "modify_order(", "cancel_order("):
+        forbidden_calls = [
+            "place" + "_order(",
+            "modify" + "_order(",
+            "cancel" + "_order(",
+        ]
+        for marker in forbidden_calls:
             self.assertNotIn(marker, patch)
 
     def test_public_paper_dashboard_contract_across_gcp_deploy_paths(self):
