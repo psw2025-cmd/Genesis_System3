@@ -92,17 +92,42 @@ class RuntimeSafetyTests(unittest.TestCase):
             }
         }
 
-    def test_exact_safe_contract_passes(self):
-        result = prove_runtime_safety(
-            _service(),
+    def _prove(self, service: dict) -> dict:
+        return prove_runtime_safety(
+            service,
             self._v1_job(),
             _scheduler(),
             expected_rotator_service_account=ROTATOR_SA,
             expected_scheduler_service_account=SCHEDULER_SA,
         )
+
+    def test_exact_safe_contract_passes(self):
+        result = self._prove(_service())
         self.assertEqual(result["state"], "PASS")
+        self.assertEqual(result["dashboard_credential_surface"], "REMOVED")
+        self.assertEqual(result["retired_dashboard_auth_secret_mounts"], [])
+        self.assertEqual(result["retired_dashboard_auth_plaintext_env"], [])
         self.assertFalse(result["live_trading_enabled"])
         self.assertFalse(result["secret_values_exposed"])
+
+    def test_retired_dashboard_api_key_secret_alias_fails_closed(self):
+        service = _service()
+        service["spec"]["template"]["spec"]["containers"][0]["env"].append(
+            {
+                "name": "DASHBOARD_API_KEY",
+                "valueFrom": {"secretKeyRef": {"name": "legacy-dashboard-key", "key": "latest"}},
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "retired_dashboard_auth_secret_mounted"):
+            self._prove(service)
+
+    def test_retired_dashboard_auth_plaintext_alias_fails_closed(self):
+        service = _service()
+        service["spec"]["template"]["spec"]["containers"][0]["env"].append(
+            {"name": "ENABLE_DASHBOARD_AUTH", "value": "1"}
+        )
+        with self.assertRaisesRegex(ValueError, "retired_dashboard_auth_plaintext_present"):
+            self._prove(service)
 
     def test_wrong_rotator_identity_fails(self):
         with self.assertRaisesRegex(ValueError, "rotator_identity_mismatch"):
@@ -130,13 +155,7 @@ class RuntimeSafetyTests(unittest.TestCase):
         service = _service()
         service["spec"]["template"]["spec"]["containers"][0]["env"][0]["value"] = "1"
         with self.assertRaisesRegex(ValueError, "live_flags_not_off"):
-            prove_runtime_safety(
-                service,
-                self._v1_job(),
-                _scheduler(),
-                expected_rotator_service_account=ROTATOR_SA,
-                expected_scheduler_service_account=SCHEDULER_SA,
-            )
+            self._prove(service)
 
 
 if __name__ == "__main__":
