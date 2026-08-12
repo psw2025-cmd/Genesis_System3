@@ -160,7 +160,9 @@ jobs:
           python -m py_compile scripts/system3_master_proof_orchestrator.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile scripts/quant_alpha_evaluator.py
+          python -m py_compile scripts/quant_factor_decay_monitor.py
           python -m py_compile src/quant/alpha_truth.py
+          python -m py_compile src/quant/factor_decay.py
           echo "compile_proof=PASS"
 
   full-proof-pack-validation:
@@ -224,10 +226,13 @@ jobs:
           python -m py_compile core/engine/system3_phase82_job_scheduler.py
           python -m py_compile scripts/system3_self_healing_watchdog.py
           python -m py_compile scripts/quant_alpha_evaluator.py
+          python -m py_compile scripts/quant_factor_decay_monitor.py
           python -m py_compile src/quant/alpha_truth.py
+          python -m py_compile src/quant/factor_decay.py
           test -f dashboard/frontend/src/components/LiveTradingGate.tsx
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           python -c "import json; json.load(open('config/quant_alpha_targets.json'))" && echo "quant_alpha_targets_json=VALID"
+          python -c "import json; json.load(open('config/quant_decay_policy.json'))" && echo "quant_decay_policy_json=VALID"
           echo "compile_expanded=PASS"
 
       - name: Dashboard backend import smoke
@@ -262,6 +267,7 @@ jobs:
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
             tests/test_quant_alpha_truth.py \
+            tests/test_quant_factor_decay.py \
             -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence
