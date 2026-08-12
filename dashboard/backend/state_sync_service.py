@@ -21,6 +21,20 @@ MARKET_DETECTION_AVAILABLE = False
 ADVANCED_FEATURES_AVAILABLE = False
 
 
+def _health_broker_update_allowed(updates: Dict[str, Any]) -> bool:
+    """Return whether legacy health.json may supply broker truth.
+
+    In the Cloud Run/Firestore runtime, broker truth is produced by the bounded
+    Dhan read-only probe and persisted into the shared SSOT.  ``health.json`` is
+    a derivative/local compatibility artifact and must never overwrite that
+    fresher authoritative observation.  Local/file mode retains the historical
+    health-file fallback, but an in-cycle direct probe still wins.
+    """
+    backend = os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower()
+    if backend == "firestore":
+        return False
+    return "broker" not in updates
+
 
 class _BrokerAlertLog:
     """Adapter so process_broker_alert can log via print."""
@@ -97,6 +111,8 @@ class StateSyncService:
                             "status": "connected",
                             "error": None,
                             "latency_ms": _ds.get("latency_ms"),
+                            "truth_source": "dhan_readonly_probe",
+                            "observed_at_ist": datetime.now(IST).isoformat(),
                         }
                 except Exception:
                     pass
@@ -142,7 +158,8 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing market status: {e}")
 
-        # Sync health data
+        # Sync health data. health.json is a derivative compatibility artifact;
+        # it must not overwrite authoritative Cloud/Firestore broker truth.
         try:
             health_file = self.outputs_dir / "health.json"
             if health_file.exists():
@@ -154,11 +171,14 @@ class StateSyncService:
                     health = json.loads(health_file.read_text())
 
                     updates["mode"] = health.get("mode", "PAPER")
-                    updates["broker"] = {
-                        "connected": health.get("broker_status") == "connected",
-                        "status": health.get("broker_status", "disconnected"),
-                        "name": "dhan",
-                    }
+                    if _health_broker_update_allowed(updates):
+                        updates["broker"] = {
+                            "connected": health.get("broker_status") == "connected",
+                            "status": health.get("broker_status", "disconnected"),
+                            "name": "dhan",
+                            "truth_source": "health_json_legacy",
+                            "observed_at_ist": datetime.now(IST).isoformat(),
+                        }
 
                     # Sync QC
                     qc_status = health.get("qc_status", "PASS")
@@ -344,7 +364,7 @@ _sync_service: Optional[StateSyncService] = None
 
 
 def get_sync_service(state_store, outputs_dir: Path) -> StateSyncService:
-    """Get or create global sync service instance"""
+    """Get or create global state sync service"""
     global _sync_service
     if _sync_service is None:
         _sync_service = StateSyncService(state_store, outputs_dir)
