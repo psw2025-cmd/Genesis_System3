@@ -8,6 +8,7 @@ render/navigation proof from product-review completion.
 """
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
 import os
@@ -27,6 +28,8 @@ EXPECTED_SHA = os.getenv("GITHUB_SHA", "").strip()
 OUT = Path("reports/latest/public_dashboard_proof")
 TABS_OUT = OUT / "tabs"
 TIMEOUT_S = 30
+BROWSER_TIMEOUT_S = 35
+CAPTURE_WORKERS = max(1, min(3, int(os.getenv("SYSTEM3_UI_PROOF_WORKERS", "3"))))
 
 TABS = [
     ("decision-intel", "Decision Intel"),
@@ -93,7 +96,7 @@ def _args(url: str, width: int, height: int, budget_ms: int = 7000) -> list[str]
 def _render_dom(url: str) -> str:
     args = _args(url, 1600, 1000)
     args.insert(-1, "--dump-dom")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=BROWSER_TIMEOUT_S, check=False)
     if proc.returncode:
         raise RuntimeError(f"tab_dom_render_failed:{proc.returncode}")
     return proc.stdout or ""
@@ -102,7 +105,7 @@ def _render_dom(url: str) -> str:
 def _capture(url: str, path: Path, width: int, height: int) -> str:
     args = _args(url, width, height)
     args.insert(-1, f"--screenshot={path}")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=BROWSER_TIMEOUT_S, check=False)
     if proc.returncode or not path.is_file() or path.stat().st_size < 1000:
         raise RuntimeError(f"tab_screenshot_failed:{path.name}:{proc.returncode}")
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -116,6 +119,70 @@ def _active_tab_proven(dom: str, tab_id: str) -> bool:
     return False
 
 
+def _capture_tab(index: int, tab_id: str, label: str, dashboard_url: str) -> tuple[int, dict, list[str]]:
+    url = f"{dashboard_url}?{urlencode({'tab': tab_id})}"
+    row = {
+        "id": tab_id,
+        "label": label,
+        "url": url,
+        "proof_state": "FAIL",
+        "review_state": "PENDING_USER_REVIEW",
+    }
+    failures: list[str] = []
+    try:
+        dom = _render_dom(url)
+        active = _active_tab_proven(dom, tab_id)
+        login_prompt = "DASHBOARD API KEY" in dom.upper()
+        system3_marker = "SYSTEM3" in dom.upper()
+        desktop = TABS_OUT / f"{index:02d}-{tab_id}-desktop.png"
+        mobile = TABS_OUT / f"{index:02d}-{tab_id}-mobile.png"
+        desktop_hash = _capture(url, desktop, 1600, 1000)
+        mobile_hash = _capture(url, mobile, 430, 932)
+        local_failures: list[str] = []
+        if not active:
+            local_failures.append("active_tab_not_proven")
+        if login_prompt:
+            local_failures.append("dashboard_api_key_prompt_rendered")
+        if not system3_marker:
+            local_failures.append("system3_marker_missing")
+        row.update({
+            "proof_state": "PASS" if not local_failures else "FAIL",
+            "active_tab_proven": active,
+            "dashboard_api_key_prompt_rendered": login_prompt,
+            "system3_marker": system3_marker,
+            "desktop_file": str(desktop.relative_to(OUT)),
+            "desktop_sha256": desktop_hash,
+            "mobile_file": str(mobile.relative_to(OUT)),
+            "mobile_sha256": mobile_hash,
+            "failures": local_failures,
+        })
+        failures.extend(f"{tab_id}:{item}" for item in local_failures)
+    except Exception as exc:
+        row["failures"] = [f"{type(exc).__name__}:{str(exc)[:160]}"]
+        failures.append(f"{tab_id}:capture_failed")
+    return index, row, failures
+
+
+def _write_matrix(matrix: dict, rows: dict[int, dict], failures: list[str], *, final: bool) -> None:
+    ordered = [rows[index] for index in sorted(rows)]
+    pass_count = sum(1 for row in ordered if row.get("proof_state") == "PASS")
+    matrix["tabs"] = ordered
+    matrix["completed_count"] = len(ordered)
+    matrix["pass_count"] = pass_count
+    matrix["fail_count"] = len(ordered) - pass_count
+    matrix["failures"] = list(failures)
+    matrix["state"] = (
+        "PASS"
+        if final and not failures and len(ordered) == len(TABS) and pass_count == len(TABS)
+        else "FAIL"
+        if final
+        else "IN_PROGRESS"
+    )
+    (OUT / "tab_visual_matrix.json").write_text(
+        json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8"
+    )
+
+
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     TABS_OUT.mkdir(parents=True, exist_ok=True)
@@ -124,6 +191,8 @@ def main() -> int:
         "source": "real_deployed_cloud_run_ui",
         "expected_sha": EXPECTED_SHA,
         "tab_count": len(TABS),
+        "capture_workers": CAPTURE_WORKERS,
+        "browser_timeout_seconds": BROWSER_TIMEOUT_S,
         "viewports": {"desktop": "1600x1000", "mobile": "430x932"},
         "trading_mutations_called": False,
         "tabs": [],
@@ -136,54 +205,31 @@ def main() -> int:
         if requests.get(dashboard_url, timeout=TIMEOUT_S).status_code != 200:
             raise RuntimeError("dashboard_ui_not_http_200")
 
+        rows: dict[int, dict] = {}
         failures: list[str] = []
-        for index, (tab_id, label) in enumerate(TABS, start=1):
-            url = f"{dashboard_url}?{urlencode({'tab': tab_id})}"
-            row = {
-                "id": tab_id,
-                "label": label,
-                "url": url,
-                "proof_state": "FAIL",
-                "review_state": "PENDING_USER_REVIEW",
-            }
-            try:
-                dom = _render_dom(url)
-                active = _active_tab_proven(dom, tab_id)
-                login_prompt = "DASHBOARD API KEY" in dom.upper()
-                system3_marker = "SYSTEM3" in dom.upper()
-                desktop = TABS_OUT / f"{index:02d}-{tab_id}-desktop.png"
-                mobile = TABS_OUT / f"{index:02d}-{tab_id}-mobile.png"
-                desktop_hash = _capture(url, desktop, 1600, 1000)
-                mobile_hash = _capture(url, mobile, 430, 932)
-                local_failures = []
-                if not active:
-                    local_failures.append("active_tab_not_proven")
-                if login_prompt:
-                    local_failures.append("dashboard_api_key_prompt_rendered")
-                if not system3_marker:
-                    local_failures.append("system3_marker_missing")
-                row.update({
-                    "proof_state": "PASS" if not local_failures else "FAIL",
-                    "active_tab_proven": active,
-                    "dashboard_api_key_prompt_rendered": login_prompt,
-                    "system3_marker": system3_marker,
-                    "desktop_file": str(desktop.relative_to(OUT)),
-                    "desktop_sha256": desktop_hash,
-                    "mobile_file": str(mobile.relative_to(OUT)),
-                    "mobile_sha256": mobile_hash,
-                    "failures": local_failures,
-                })
-                failures.extend(f"{tab_id}:{item}" for item in local_failures)
-            except Exception as exc:
-                row["failures"] = [f"{type(exc).__name__}:{str(exc)[:160]}"]
-                failures.append(f"{tab_id}:capture_failed")
-            matrix["tabs"].append(row)
+        _write_matrix(matrix, rows, failures, final=False)
 
-        matrix["pass_count"] = sum(1 for row in matrix["tabs"] if row.get("proof_state") == "PASS")
-        matrix["fail_count"] = len(matrix["tabs"]) - matrix["pass_count"]
-        matrix["failures"] = failures
-        matrix["state"] = "PASS" if not failures and matrix["pass_count"] == len(TABS) else "FAIL"
-        (OUT / "tab_visual_matrix.json").write_text(json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8")
+        with ThreadPoolExecutor(max_workers=CAPTURE_WORKERS, thread_name_prefix="ui-proof") as executor:
+            futures = {
+                executor.submit(_capture_tab, index, tab_id, label, dashboard_url): index
+                for index, (tab_id, label) in enumerate(TABS, start=1)
+            }
+            for future in as_completed(futures):
+                index, row, row_failures = future.result()
+                rows[index] = row
+                failures.extend(row_failures)
+                _write_matrix(matrix, rows, failures, final=False)
+                print(
+                    "UI_TAB_VISUAL_PROGRESS "
+                    + json.dumps({
+                        "completed": len(rows),
+                        "total": len(TABS),
+                        "pass_count": sum(1 for item in rows.values() if item.get("proof_state") == "PASS"),
+                    }, sort_keys=True),
+                    flush=True,
+                )
+
+        _write_matrix(matrix, rows, failures, final=True)
         print("UI_TAB_VISUAL_PROOF " + json.dumps({
             "state": matrix["state"], "tab_count": len(TABS),
             "pass_count": matrix["pass_count"], "fail_count": matrix["fail_count"],
@@ -192,6 +238,7 @@ def main() -> int:
         return 0 if matrix["state"] == "PASS" else 1
     except Exception as exc:
         matrix["fatal_error"] = f"{type(exc).__name__}:{str(exc)[:180]}"
+        matrix["state"] = "FAIL"
         (OUT / "tab_visual_matrix.json").write_text(json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8")
         print("UI_TAB_VISUAL_PROOF " + json.dumps({"state": "FAIL", "error": matrix["fatal_error"]}), file=sys.stderr)
         return 1
