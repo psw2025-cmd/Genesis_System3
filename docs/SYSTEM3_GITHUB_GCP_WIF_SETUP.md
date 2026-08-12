@@ -2,103 +2,103 @@
 
 ## Purpose
 
-This one-time setup replaces the long-lived `GCP_SA_KEY` GitHub secret with
-short-lived GitHub OIDC credentials through Google Cloud Workload Identity
-Federation. The provider is restricted to:
+GitHub deploys Genesis System3 through short-lived OIDC credentials and Google
+Cloud Workload Identity Federation (WIF). The active deployment workflow has no
+long-lived service-account JSON-key fallback.
 
-- GitHub repository ID `1168640800` (`psw2025-cmd/Genesis_System3`)
-- GitHub owner ID `176781239` (`psw2025-cmd`)
-- branch `refs/heads/main`
+The provider is restricted to repository `psw2025-cmd/Genesis_System3`. No
+trading flag is enabled by this procedure.
 
-No trading flag is enabled by this procedure.
+This identity topic is separate from dashboard visibility: the browser dashboard
+is permanently public/read-only and has no dashboard API-key/session authority.
 
-## What is implemented in the repository
+## Active repository contract
 
-The retained `cloud-run-auto-deploy.yml` supports both modes during migration:
+The retained `.github/workflows/cloud-run-auto-deploy.yml` authenticates with:
 
-1. Workload Identity Federation when the three required GitHub variables exist.
-2. Legacy `GCP_SA_KEY` only as a temporary fallback.
+- Workload Identity provider:
+  `projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github`
+- deploy service account:
+  `genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com`
 
-After deployment it creates a sanitized read-only artifact:
+The workflow creates sanitized runtime evidence under:
 
 - `reports/latest/gcp_runtime_lock/gcp_runtime_lock.json`
 - `reports/latest/gcp_runtime_lock/gcp_runtime_lock.md`
 
-The artifact contains revision, deployed SHA, safe environment values, IAM
-public-access state, scheduler metadata, secret metadata, sanitized log/metric
-summaries, endpoint hashes and lock blockers. It never writes secret payloads.
+Runtime evidence contains serving revision, serving SHA, safe environment names,
+IAM/public-access state, scheduler metadata, Secret Manager metadata, sanitized
+log/metric summaries, endpoint hashes, and blockers. It never reads or persists
+secret payloads.
 
-## One manual Google Cloud step
+## One-time Google Cloud bootstrap
 
-Open Google Cloud Console, select project `system3-openalgo-safe`, then open
-**Cloud Shell**. From a checkout of this repository run:
+Open Cloud Shell in project `system3-openalgo-safe` and run the current bootstrap
+from a trusted checkout only when infrastructure identities must be provisioned:
 
 ```bash
 chmod +x deploy/gcp/bootstrap_github_wif.sh
 ./deploy/gcp/bootstrap_github_wif.sh
 ```
 
-The command must be run by an account allowed to create workload identity
-pools, service accounts and IAM bindings.
+The account running bootstrap must be authorized for the specific IAM resources
+it creates. Ordinary application deployment must not become project-IAM
+administration.
 
-## Add the printed GitHub variables
+Current dedicated identities include:
 
-Open:
+- web runtime: `genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`
+- Dhan rotator: `genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com`
+- scheduler invoker: `gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com`
+- GitHub deployer: `genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com`
 
-`GitHub -> psw2025-cmd/Genesis_System3 -> Settings -> Secrets and variables -> Actions -> Variables`
+## Prove WIF-only deployment
 
-Create exactly the three values printed by the script:
+A valid deployment must prove:
 
-- `GCP_WIF_PROVIDER`
-- `GCP_DEPLOY_SERVICE_ACCOUNT`
-- `GCP_EVIDENCE_SERVICE_ACCOUNT`
-
-These are identifiers, not secrets.
-
-## Prove the migration before deleting the old key
-
-Run **Cloud Run Auto Deploy** from `main`. Confirm:
-
-1. The WIF authentication step ran.
-2. The legacy-key authentication step was skipped.
-3. Deployment completed.
-4. Artifact `system3-gcp-runtime-evidence-<run number>` was uploaded.
-5. `source_matches_deployment=true`.
-6. Analyzer/live-off safety passed.
+1. `google-github-actions/auth` authenticated through the expected WIF provider.
+2. No service-account JSON-key authentication path was used.
+3. The exact source SHA produced the tested immutable image/revision.
+4. The exact tested revision became the single 100%-traffic serving revision.
+5. Runtime evidence binds `DEPLOY_GIT_SHA` to that serving revision.
+6. LIVE/off safety passed.
 7. `secret_values_exposed=false`.
+8. The retired dashboard credential/session surface is absent from the serving
+   revision and `/api/auth/status` reports `credential_surface=REMOVED`.
 
-Only after those checks pass:
+If an old user-managed GCP service-account key still exists from historical
+migration, treat it as independent credential debt: prove WIF-only deployment,
+disable the old key, re-prove WIF, then delete the disabled key. Never add such a
+key back as a workflow fallback.
 
-1. Delete GitHub Actions secret `GCP_SA_KEY`.
-2. Locate the old Google service account associated with that key.
-3. Disable the user-managed key.
-4. Re-run deployment.
-5. Delete the disabled key after the second WIF-only run passes.
+## Permanent dashboard contract
 
-## Intentionally unchanged
-
-During the present analyzer/paper phase:
+The current dashboard state is **not temporary**:
 
 ```text
-REQUIRE_API_KEY=false
-ANALYZE_MODE=1
-LIVE_TRADING_ENABLED=0
-SYSTEM3_LIVE_TRADING_ALLOWED=0
-AUTO_EXECUTE_TRADES=0
+Dashboard visibility = PUBLIC / READ-ONLY
+Dashboard credential authority = REMOVED
+Dashboard session authority = REMOVED
+ANALYZE_MODE = 1
+LIVE_TRADING_ENABLED = 0
+SYSTEM3_LIVE_TRADING_ALLOWED = 0
+AUTO_EXECUTE_TRADES = 0
 ```
 
-The API-key-disabled state is temporary and must be reviewed before funds or
-live order permissions are introduced.
+No future funds/live-order work requires restoration of a dashboard API key.
+Execution safety must be implemented through independent capability, risk,
+approval, state, idempotency, and broker controls rather than browser-view
+credentials.
 
-## Remaining identity hardening
+## Identity separation
 
-The current deployment workflow still uses the Cloud Run runtime identity for
-Dhan token rotation. After WIF evidence is proven, the next controlled change
-is to separate:
+The intended least-privilege model is:
 
-- web runtime identity;
-- Dhan token-rotation identity;
-- scheduler invoker identity.
+- web runtime: runtime reads/state access only;
+- Dhan rotator: PIN/TOTP/token-version authority required for rotation only;
+- scheduler invoker: invoke the rotator job only;
+- GitHub deployer: WIF deployment authority, not long-lived credential storage;
+- worker ingestion: dedicated worker token, separate from dashboard visibility.
 
-Do not perform that split without first capturing the current runtime and
-secret-IAM evidence artifact.
+Any historical excessive Secret Manager or project-level IAM grants must be
+reported and removed only after replacement identities are proven working.
