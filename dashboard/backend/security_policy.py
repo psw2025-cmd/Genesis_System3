@@ -1,7 +1,12 @@
-"""Pure request-authorization policy for the System3 dashboard.
+"""Pure request-authorization policy for the System3 public-readonly dashboard.
 
 This module deliberately has no FastAPI, broker, model or data imports, so its
 security boundary can be tested without loading the large application.
+
+Dashboard API-key/login/session authority is permanently retired. Legacy auth
+arguments remain in the function signature only for compatibility with older
+callers; they cannot grant access. Safe reads are public, dedicated worker
+pushes require the worker token, and every other mutation fails closed.
 """
 from __future__ import annotations
 
@@ -15,19 +20,17 @@ PUBLIC_EXACT = {
     "/api/health",
     "/health",
     "/healthz",
-    "/api/auth/session",
     "/api/auth/status",
-    "/api/auth/logout",
     "/favicon.ico",
+}
+RETIRED_AUTH_PATHS = {
+    "/api/auth/session",
+    "/api/auth/logout",
 }
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 WORKER_PUSH_PATHS = {
     "/api/scheduler/health/push",
     "/api/chain/push",
-}
-IDEMPOTENCY_REQUIRED_PATHS = {
-    "/api/orders/create",
-    "/place-order",
 }
 
 
@@ -61,14 +64,36 @@ def evaluate_request(
     allowed_origins: Iterable[str] = (),
     idempotency_key_present: bool = False,
 ) -> SecurityDecision:
+    """Evaluate one request under the permanent public-readonly contract.
+
+    The legacy dashboard-auth parameters are intentionally ignored. Keeping the
+    signature avoids breaking old internal callers while making it impossible
+    for configuration drift or a supplied API key/session to restore mutation
+    authority.
+    """
+    del (
+        require_api_key,
+        api_key_configured,
+        dashboard_access,
+        header_api_key_present,
+        origin,
+        same_origin,
+        allowed_origins,
+        idempotency_key_present,
+    )
+
     method = method.upper()
 
-    if (
-        method == "OPTIONS"
-        or path in PUBLIC_EXACT
-        or _has_public_prefix(path)
-    ):
+    if method == "OPTIONS":
         return SecurityDecision(True)
+
+    if path in RETIRED_AUTH_PATHS:
+        return SecurityDecision(
+            False,
+            404,
+            "Dashboard login/session authority is permanently retired",
+            "DASHBOARD_AUTH_RETIRED",
+        )
 
     if path in WORKER_PUSH_PATHS:
         if not worker_token_configured:
@@ -87,60 +112,12 @@ def evaluate_request(
             )
         return SecurityDecision(True)
 
-    is_mutation = method not in SAFE_METHODS
-
-    if not require_api_key:
-        if is_mutation:
-            return SecurityDecision(
-                False,
-                503,
-                "Authentication must be enabled before mutation routes can be used",
-                "AUTH_REQUIRED_FOR_MUTATION",
-            )
+    if method in SAFE_METHODS:
         return SecurityDecision(True)
 
-    if not api_key_configured:
-        return SecurityDecision(
-            False,
-            503,
-            "Dashboard authentication is required but API_KEY is not configured",
-            "AUTH_NOT_CONFIGURED",
-        )
-
-    if not dashboard_access:
-        return SecurityDecision(
-            False,
-            401,
-            "Missing or invalid dashboard API session",
-            "AUTH_INVALID",
-        )
-
-    if is_mutation:
-        if not header_api_key_present:
-            allowed = set(allowed_origins)
-            if (
-                not origin
-                or (
-                    origin != same_origin
-                    and origin not in allowed
-                )
-            ):
-                return SecurityDecision(
-                    False,
-                    403,
-                    "Origin validation failed",
-                    "CSRF_ORIGIN_REJECTED",
-                )
-
-        if (
-            path in IDEMPOTENCY_REQUIRED_PATHS
-            and not idempotency_key_present
-        ):
-            return SecurityDecision(
-                False,
-                428,
-                "Idempotency-Key header is required for this operation",
-                "IDEMPOTENCY_KEY_REQUIRED",
-            )
-
-    return SecurityDecision(True)
+    return SecurityDecision(
+        False,
+        403,
+        "Public dashboard is read-only; mutation authority is separate",
+        "PUBLIC_DASHBOARD_READ_ONLY",
+    )
