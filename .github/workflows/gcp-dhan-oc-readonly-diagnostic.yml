@@ -78,7 +78,7 @@ jobs:
             HTTP_STATUS=$(tail -n1 /tmp/scanner.raw | sed 's/^HTTP_STATUS=//')
             head -n -1 /tmp/scanner.raw > /tmp/scanner.json
             echo "SCANNER_HTTP_STATUS=${HTTP_STATUS}"
-            jq -c '{status,source,data_source,source_priority,total_contracts,indices_scanned,contracts_scanned,gainers_count:((.gainers // .contracts // .results // [])|length),error,message,blocked,blocked_reason}' /tmp/scanner.json 2>/dev/null || echo 'SCANNER_JSON_SUMMARY_UNAVAILABLE'
+            jq -c '{status,contracts_scored_total,market_top_count:((.market_top_table // [])|length),segments_implemented,segments_total,underlyings_scanned,all_segments_live,missing_segments,chains_fetched,include_equity,equity_limit,ranking_mode,refreshed_at,generated_utc,error,message}' /tmp/scanner.json 2>/dev/null || echo 'SCANNER_JSON_SUMMARY_UNAVAILABLE'
           else
             echo 'SCANNER_RESULT=TIMEOUT_OR_TRANSPORT_FAILURE'
           fi
