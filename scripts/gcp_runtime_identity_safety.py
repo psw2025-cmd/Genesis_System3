@@ -17,6 +17,12 @@ from typing import Any
 OFF_VALUES = {None, "0", "false", "False"}
 EXPECTED_SCHEDULE = "30 7 * * *"
 EXPECTED_TIME_ZONE = "Asia/Kolkata"
+RETIRED_DASHBOARD_AUTH_ENV_NAMES = {
+    "API_KEY",
+    "DASHBOARD_API_KEY",
+    "ENABLE_DASHBOARD_AUTH",
+    "DASHBOARD_SESSION_MAX_AGE",
+}
 
 
 def _containers(service: dict[str, Any]) -> list[dict[str, Any]]:
@@ -117,8 +123,14 @@ def prove_runtime_safety(
         raise ValueError("defer_instrument_warmup_missing")
     if str(env.get("REQUIRE_API_KEY") or "").lower() not in {"0", "false", "no", "off"}:
         raise ValueError("public_dashboard_mode_not_enforced")
-    if "API_KEY" in secret_env_names:
-        raise ValueError("dashboard_api_key_still_mounted")
+
+    retired_secret_mounts = sorted(RETIRED_DASHBOARD_AUTH_ENV_NAMES & secret_env_names)
+    retired_plaintext_env = sorted(RETIRED_DASHBOARD_AUTH_ENV_NAMES & set(env))
+    if retired_secret_mounts:
+        raise ValueError(f"retired_dashboard_auth_secret_mounted:{retired_secret_mounts}")
+    if retired_plaintext_env:
+        raise ValueError(f"retired_dashboard_auth_plaintext_present:{retired_plaintext_env}")
+
     if "WORKER_PUSH_TOKEN" not in secret_env_names:
         raise ValueError("worker_push_token_secret_not_mounted")
     if "WORKER_PUSH_TOKEN" in env:
@@ -141,6 +153,9 @@ def prove_runtime_safety(
     return {
         "state": "PASS",
         "dashboard_access": "public-readonly",
+        "dashboard_credential_surface": "REMOVED",
+        "retired_dashboard_auth_secret_mounts": [],
+        "retired_dashboard_auth_plaintext_env": [],
         "rotator_service_account": job_sa,
         "scheduler_service_account": scheduler_sa,
         "serving_traffic": traffic,
