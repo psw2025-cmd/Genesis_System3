@@ -18,7 +18,9 @@ on:
       - "tools/sync_render_secrets.py"
       - "dashboard/backend/**"
       - "dashboard/frontend/**"
+      - "deploy/gcp/bootstrap_github_wif.sh"
       - "tests/test_gcp_dhan_token_rotation_contract.py"
+      - "tests/test_gcp_rotator_identity_contract.py"
       - "tests/test_dhan_single_token_authority.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
@@ -51,6 +53,7 @@ jobs:
           python -m compileall -q core dashboard scripts tests
           python -m unittest -v \
             tests.test_gcp_dhan_token_rotation_contract \
+            tests.test_gcp_rotator_identity_contract \
             tests.test_dhan_single_token_authority
 
       - uses: actions/setup-node@v4
@@ -150,7 +153,7 @@ jobs:
             /tmp/rotation-job-iam.json >/dev/null
           echo "RUNTIME_CAN_INVOKE_CANONICAL_ROTATION_JOB service_account=${RUNTIME_SA}"
 
-      - name: Recover broker only through canonical GCP token authority
+      - name: Classify broker runtime truth without production mutation
         run: |
           set -euo pipefail
           URL=$(gcloud run services describe "${SERVICE}" \
@@ -158,35 +161,20 @@ jobs:
             --region="${REGION}" \
             --format='value(status.url)')
 
-          curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker-before.json
-          jq '{connected,error,token_proof:{secret_version:.token_proof.secret_version,hours_remaining:.token_proof.hours_remaining,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker-before.json
-          jq -e '.token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker-before.json >/dev/null
+          curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker-status.json
+          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,last_error_type:.token_proof.last_error_type,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker-status.json
 
-          BEFORE_VERSION=$(jq -r '.token_proof.secret_version // ""' /tmp/broker-before.json)
-          if ! jq -e '.connected == true' /tmp/broker-before.json >/dev/null; then
-            jq -e '.error == "TOKEN_EXPIRED_OR_INVALID"' /tmp/broker-before.json >/dev/null
-            echo "BROKER_DISCONNECTED_INVALID_TOKEN invoking canonical Cloud Run rotation job"
-            gcloud run jobs execute "${ROTATION_JOB}" \
-              --project="${PROJECT_ID}" \
-              --region="${REGION}" \
-              --wait
+          # PR verification is read-only against production. It may classify a
+          # runtime broker/token problem, but it must never rotate a secret or
+          # execute the production rotator merely to make a pull request green.
+          jq -e '.token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker-status.json >/dev/null
+          jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC"' /tmp/broker-status.json >/dev/null
+
+          if jq -e '.connected == true and .error == null' /tmp/broker-status.json >/dev/null; then
+            echo "BROKER_RUNTIME_TRUTH=CONNECTED_READ_ONLY"
+          else
+            ERROR=$(jq -r '.error // "UNKNOWN"' /tmp/broker-status.json)
+            echo "BROKER_RUNTIME_TRUTH=DEGRADED_READ_ONLY error=${ERROR}"
+            echo "BROKER_REMEDIATION_REQUIRED=YES"
+            echo "PR_MUTATION_ATTEMPTED=NO"
           fi
-
-          PASS=0
-          for ATTEMPT in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker-after.json || true
-            if jq -e '.connected == true and .error == null and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker-after.json >/dev/null 2>&1; then
-              PASS=1
-              break
-            fi
-            sleep 5
-          done
-
-          jq '{connected,error,latency_ms,auto_refresh,token_reload,canonical_rotation,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,last_error_type:.token_proof.last_error_type,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker-after.json
-          test "${PASS}" = "1"
-          AFTER_VERSION=$(jq -r '.token_proof.secret_version // ""' /tmp/broker-after.json)
-          if [ -n "${BEFORE_VERSION}" ] && [ "${BEFORE_VERSION}" = "${AFTER_VERSION}" ] && ! jq -e '.connected == true' /tmp/broker-before.json >/dev/null; then
-            echo "Broker recovery did not advance the authoritative secret version" >&2
-            exit 1
-          fi
-          echo "CANONICAL_BROKER_RECOVERY_OK before_version=${BEFORE_VERSION} after_version=${AFTER_VERSION}"
