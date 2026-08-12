@@ -89,7 +89,7 @@ jobs:
               "scripts/gcp_mutation_policy_runtime_proof.py": "MUTATION_POLICY_RUNTIME_PROOF",
               "scripts/gcp_runtime_identity_safety.py": "CLOUD_RUNTIME_SAFETY_OK",
               "dashboard/frontend/src/App.tsx": "public/read-only",
-              "dashboard/backend/security_policy.py": "AUTH_REQUIRED_FOR_MUTATION",
+              "dashboard/backend/security_policy.py": "PUBLIC_DASHBOARD_READ_ONLY",
               "dashboard/backend/mutation_policy.py": "LIVE_MUTATION_LOCKED",
               "dashboard/backend/secure_app.py": "control_authorized=False",
           }
