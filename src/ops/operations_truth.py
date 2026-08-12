@@ -96,6 +96,8 @@ def _contains_forbidden_key(value: Any) -> str | None:
 
 
 def classify_inventory_record(record: Any) -> dict[str, Any]:
+    if record is None:
+        return {"state": "UNKNOWN", "count": None, "reason": "inventory_evidence_missing"}
     if not isinstance(record, Mapping):
         return {"state": "SCHEMA_ERROR", "count": None, "reason": "record_not_mapping"}
 
