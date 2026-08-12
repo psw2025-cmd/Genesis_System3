@@ -137,9 +137,12 @@ def main() -> int:
     require(mutation, "WORKER_AUTH_INVALID", "mutation policy")
 
     require(policy, "PUBLIC_DASHBOARD_READ_ONLY", "security policy")
-    forbid(policy, "AUTH_REQUIRED_FOR_MUTATION", "security policy")
-    forbid(policy, "AUTH_NOT_CONFIGURED", "security policy")
-    forbid(policy, "AUTH_INVALID", "security policy")
+    # Match retired browser-auth codes exactly. Worker-only codes such as
+    # WORKER_AUTH_NOT_CONFIGURED / WORKER_AUTH_INVALID are required and must
+    # remain valid independently of dashboard visibility.
+    forbid(policy, '"AUTH_REQUIRED_FOR_MUTATION"', "security policy")
+    forbid(policy, '"AUTH_NOT_CONFIGURED"', "security policy")
+    forbid(policy, '"AUTH_INVALID"', "security policy")
 
     retired_assignments = (
         "REQUIRE_" + "API_KEY=",
