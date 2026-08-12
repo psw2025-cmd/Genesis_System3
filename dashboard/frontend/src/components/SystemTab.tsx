@@ -1,6 +1,5 @@
 import { useStore } from '../store'
 import { cn } from '../lib/utils'
-import { AuthUnlock } from './AuthUnlock'
 
 function Row({ label, value, ok }: { label: string; value: string; ok?: boolean }) {
   return (
@@ -47,8 +46,8 @@ export function SystemTab() {
       || brokerStatus?.live_trading_enabled
       || brokerStatus?.order_placement_allowed,
   )
-  const authStyleError = apiStatus?.status === 'API_AUTH_REQUIRED'
-    || /auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || ''))
+  const publicReadContractDrift = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || /authentication|required credential|session unlock/i.test(String(apiStatus?.message || ''))
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
@@ -60,10 +59,17 @@ export function SystemTab() {
         <Row label="Mode" value={health?.mode ?? 'PENDING PROOF'} />
         <Row label="Data Source" value={health?.data_source ?? 'PENDING PROOF'} />
         <Row label="Market State" value={marketOpen ? 'OPEN' : 'CLOSED / OFFLINE'} />
-        <Row label="Public Read API" value={authStyleError ? 'CONTRACT ERROR' : (apiStatus?.status ?? 'AVAILABLE / WAITING')} ok={authStyleError ? false : apiStatus ? undefined : true} />
+        <Row label="Public Read API" value={publicReadContractDrift ? 'CONTRACT DRIFT — BLOCK' : (apiStatus?.status ?? 'AVAILABLE / WAITING')} ok={publicReadContractDrift ? false : apiStatus ? undefined : true} />
       </div>
 
-      {authStyleError && <AuthUnlock />}
+      {publicReadContractDrift && (
+        <div className="card p-4 border border-down/30 bg-down/5">
+          <div className="text-xs uppercase tracking-wider text-down font-semibold">Public Read Contract Drift</div>
+          <div className="text-sm text-text-primary mt-1">
+            The dashboard must remain credential-free. This is a backend/runtime configuration defect, not a user login action.
+          </div>
+        </div>
+      )}
 
       <div className="card p-5" data-testid="system-token-truth-card">
         <div className="flex items-start justify-between gap-4 mb-3">
@@ -102,7 +108,7 @@ export function SystemTab() {
         <Row label="System LIVE State" value={liveOff ? 'OFF / LOCKED' : 'LIVE FLAG DETECTED'} ok={liveOff} />
         <Row label="Paper / Analyzer" value={String(health?.mode || '').toLowerCase().includes('analy') || String(health?.mode || '').toLowerCase().includes('paper') ? String(health?.mode).toUpperCase() : 'PENDING PROOF'} />
         <Row label="Live Allowed" value={health?.live_allowed == null ? 'NOT PROVEN' : String(health.live_allowed)} ok={health?.live_allowed == null ? undefined : health.live_allowed === false} />
-        <Row label="Broker Data Visibility" value={authStyleError ? 'PUBLIC-READ CONTRACT ERROR' : 'READ-ONLY'} ok={authStyleError ? false : true} />
+        <Row label="Dashboard Visibility" value={publicReadContractDrift ? 'PUBLIC-READ CONTRACT DRIFT' : 'PUBLIC / READ-ONLY'} ok={publicReadContractDrift ? false : true} />
         {(health?.live_blockers ?? []).map((b: string, i: number) => (
           <Row key={i} label={`Blocker ${i + 1}`} value={b} ok={false} />
         ))}
