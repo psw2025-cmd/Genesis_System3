@@ -27,6 +27,25 @@ class DhanRotatorIdentityContractTests(unittest.TestCase):
         self.assertNotIn("roles/secretmanager.secretAccessor", workflow)
         self.assertNotIn("roles/secretmanager.secretVersionAdder", workflow)
 
+    def test_secret_role_static_guard_cannot_match_its_own_source(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        secret_accessor_marker = "secret" + "Accessor"
+        secret_version_adder_marker = "secretVersion" + "Adder"
+        executable_lines = [
+            line.strip()
+            for line in workflow.splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        hits = [
+            line
+            for line in executable_lines
+            if secret_accessor_marker in line or secret_version_adder_marker in line
+        ]
+        self.assertEqual(hits, [])
+        self.assertIn('secret_accessor_marker = "secret" + "Accessor"', workflow)
+        self.assertIn('secret_version_adder_marker = "secretVersion" + "Adder"', workflow)
+        self.assertIn("secret_role_hits", workflow)
+
     def test_bootstrap_grants_secret_roles_to_correct_identity_only(self):
         bootstrap = Path("deploy/gcp/bootstrap_github_wif.sh").read_text(encoding="utf-8")
         self.assertIn('ROTATOR_SA_NAME="${ROTATOR_SA_NAME:-genesis-system3-dhan-rotator}"', bootstrap)
