@@ -39,20 +39,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v3
 
-      - name: Capture sanitized Dhan option-chain classifications
-        shell: bash
-        run: |
-          set -euo pipefail
-          gcloud logging read \
-            'resource.type="cloud_run_revision" AND resource.labels.service_name="genesis-system3-web" AND textPayload:"[DSM]"' \
-            --project="${PROJECT_ID}" \
-            --freshness=4h \
-            --limit=500 \
-            --order=asc \
-            --format=json > /tmp/dsm-logs.json
-          python scripts/gcp_dhan_oc_log_diagnostic.py /tmp/dsm-logs.json
-
-      - name: Re-probe public read-only chain routes
+      - name: Current runtime read-only probes
         shell: bash
         run: |
           set -euo pipefail
@@ -60,16 +47,48 @@ jobs:
             --project="${PROJECT_ID}" \
             --region="${REGION}" \
             --format='value(status.url)')
+          PROBE_SINCE=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          echo "PROBE_SINCE_UTC=${PROBE_SINCE}"
+
+          echo '--- BROKER THEN STATE (SSOT ORDER PROOF) ---'
+          curl -fsS --max-time 20 "${URL}/api/broker/status" > /tmp/broker.json
+          jq -c '{connected,error,latency_ms,live_trading_enabled,order_placement_allowed,token_source:(.token_proof.source // null),token_value_exposed:(.token_proof.token_value_exposed // null)}' /tmp/broker.json
+          curl -fsS --max-time 20 "${URL}/api/state" > /tmp/state.json
+          jq -c '{broker_connected:(.broker_connected // .broker.connected // null),mode,trade_ready,live_trading_enabled,order_placement_allowed}' /tmp/state.json
+
+          echo '--- REQUIRED INDEX CHAINS ---'
           for sym in NIFTY BANKNIFTY FINNIFTY MIDCPNIFTY; do
+            START_NS=$(date +%s%N)
             curl -fsS --max-time 20 "${URL}/api/chain/${sym}" > "/tmp/${sym}.json"
-            jq -c --arg sym "${sym}" '{symbol:$sym,status,source_priority,data_source,total_contracts,spot_positive:((.spot // 0) > 0),blocked,blocked_reason}' "/tmp/${sym}.json"
+            END_NS=$(date +%s%N)
+            ELAPSED_MS=$(( (END_NS - START_NS) / 1000000 ))
+            jq -c --arg sym "${sym}" --argjson elapsed_ms "${ELAPSED_MS}" '{symbol:$sym,status,source_priority,data_source,total_contracts,spot_positive:((.spot // 0) > 0),blocked,blocked_reason,elapsed_ms:$elapsed_ms}' "/tmp/${sym}.json"
           done
-          echo '--- POST-PROBE DSM CLASSIFICATION ---'
+
+          echo '--- TOP CONTRACT GAINERS SCANNER ---'
+          SCAN_START_NS=$(date +%s%N)
+          set +e
+          curl -sS --max-time 35 -w '\nHTTP_STATUS=%{http_code}\n' "${URL}/api/scanner/top_contract_gainers" > /tmp/scanner.raw
+          SCAN_RC=$?
+          set -e
+          SCAN_END_NS=$(date +%s%N)
+          SCAN_MS=$(( (SCAN_END_NS - SCAN_START_NS) / 1000000 ))
+          echo "SCANNER_CURL_RC=${SCAN_RC} SCANNER_ELAPSED_MS=${SCAN_MS}"
+          if [ "${SCAN_RC}" -eq 0 ]; then
+            HTTP_STATUS=$(tail -n1 /tmp/scanner.raw | sed 's/^HTTP_STATUS=//')
+            head -n -1 /tmp/scanner.raw > /tmp/scanner.json
+            echo "SCANNER_HTTP_STATUS=${HTTP_STATUS}"
+            jq -c '{status,source,data_source,source_priority,total_contracts,indices_scanned,contracts_scanned,gainers_count:((.gainers // .contracts // .results // [])|length),error,message,blocked,blocked_reason}' /tmp/scanner.json 2>/dev/null || echo 'SCANNER_JSON_SUMMARY_UNAVAILABLE'
+          else
+            echo 'SCANNER_RESULT=TIMEOUT_OR_TRANSPORT_FAILURE'
+          fi
+
+          echo '--- EXACT POST-PROBE DSM LOG WINDOW ---'
+          sleep 2
           gcloud logging read \
-            'resource.type="cloud_run_revision" AND resource.labels.service_name="genesis-system3-web" AND textPayload:"[DSM]"' \
+            "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"${SERVICE}\" AND timestamp>=\"${PROBE_SINCE}\" AND textPayload:\"[DSM]\"" \
             --project="${PROJECT_ID}" \
-            --freshness=20m \
-            --limit=200 \
-            --order=asc \
+            --limit=300 \
+            --order=desc \
             --format=json > /tmp/dsm-logs-post.json
           python scripts/gcp_dhan_oc_log_diagnostic.py /tmp/dsm-logs-post.json
