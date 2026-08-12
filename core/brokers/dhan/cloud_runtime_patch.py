@@ -22,6 +22,7 @@ from typing import Any, Callable
 
 import requests
 
+from core.brokers.dhan.cloud_status_probe import get_cloud_status
 from core.brokers.dhan.cloud_token_provider import (
     force_reload,
     get_access_token,
@@ -199,9 +200,6 @@ def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
             proof["error_type"] = "CloudRunJobOperationTimeout"
             return proof
 
-        # Secret Manager is the hand-off boundary. Wait until the canonical job
-        # publishes a different concrete version, then let the existing dynamic
-        # provider update DHAN_ACCESS_TOKEN in-process.
         reload_deadline = time.time() + 45
         after_version = before_version
         while time.time() < reload_deadline:
@@ -256,9 +254,6 @@ def _wrap_read(module: Any, name: str, original: Callable[..., Any]) -> Callable
             if reload_success:
                 result = original(*args, **kwargs)
 
-            # A same-version reload cannot repair a token Dhan has invalidated.
-            # Escalate only to the canonical GCP job; the web process itself
-            # never calls Dhan token-generation APIs.
             if _auth_failed(result):
                 canonical_rotation = _invoke_canonical_rotation(f"{name}_auth_failure")
                 if canonical_rotation.get("success"):
@@ -298,6 +293,12 @@ def install() -> dict[str, Any]:
 
         from core.brokers.dhan import dhan_readonly as module
 
+        # The generic adapter's status path may attempt SDK then REST serially.
+        # That can exceed FastAPI's 12s broker-status deadline. Cloud status uses
+        # one bounded REST profile GET; the wrapper below still owns Secret
+        # Manager reload and canonical token rotation on authentication failure.
+        module.get_status = lambda: get_cloud_status(module)
+
         patched = []
         for name in (
             "get_status",
@@ -319,6 +320,7 @@ def install() -> dict[str, Any]:
             "installed": True,
             "patched": patched,
             "token_source": token_metadata().get("source"),
+            "broker_status_probe": "cloud_rest_profile_bounded",
             "canonical_rotation_authority": "gcp-cloud-run-job",
             "live_trading_enabled": False,
             "order_placement_allowed": False,
