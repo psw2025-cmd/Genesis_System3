@@ -1,0 +1,1 @@
+Generated at deploy time. Evidence includes dashboard.png, tab_visual_matrix.json, and tabs/*-desktop.png / *-mobile.png. These files are runtime proof artifacts only; they are not source-of-truth UI code and are uploaded by the approved Cloud Run workflow.
