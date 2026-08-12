@@ -16,7 +16,8 @@ DEPLOY_SA_NAME="${DEPLOY_SA_NAME:-genesis-system3-automation}"
 EVIDENCE_SA_NAME="${EVIDENCE_SA_NAME:-system3-evidence-reader}"
 WEB_RUNTIME_SA_NAME="${WEB_RUNTIME_SA_NAME:-genesis-system3-web}"
 ROTATOR_SA_NAME="${ROTATOR_SA_NAME:-genesis-system3-dhan-rotator}"
-SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-genesis-system3-scheduler-invoker}"
+# GCP service-account IDs are capped at 30 characters; keep this short.
+SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-gs3-scheduler}"
 CLOUDBUILD_BUCKET="${CLOUDBUILD_BUCKET:-${PROJECT_ID}_cloudbuild}"
 BUILDER_SA_NAME="${BUILDER_SA_NAME:-system3-builder}"
 
