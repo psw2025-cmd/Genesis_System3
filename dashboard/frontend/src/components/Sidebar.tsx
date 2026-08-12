@@ -31,7 +31,7 @@ export const DASHBOARD_TABS = [
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ] as const
 
-export const DASHBOARD_TAB_IDS = new Set(DASHBOARD_TABS.map(tab => tab.id))
+export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map(tab => tab.id))
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',
