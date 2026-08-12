@@ -1,7 +1,6 @@
 import { useStore } from '../store'
 import { fmtCr, signClass } from '../lib/utils'
 import { cn } from '../lib/utils'
-import { AuthUnlock } from './AuthUnlock'
 
 function KPI({ label, value, sub, color }: {
   label: string; value: string | number; sub?: string; color?: string
@@ -76,6 +75,8 @@ export function Overview() {
   const openPos     = paper?.positions?.open_count ?? 0
   const cycleCount  = health?.cycle_count ?? 0
   const chainData   = chain?.[chainSymbol]
+  const publicReadContractDrift = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || /authentication|required credential|session unlock/i.test(String(apiStatus?.message || ''))
 
   const dataCoverage = [
     { label: 'Health API', status: health ? 'LOADED' : 'WAITING', note: health?.last_sync ?? health?.data_source },
@@ -167,9 +168,15 @@ export function Overview() {
           </div>
         )}
       </div>
-      { (apiStatus?.status === 'API_AUTH_REQUIRED'
-        || /auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || ''))
-      ) && <AuthUnlock /> }
+
+      {publicReadContractDrift && (
+        <div className="card p-4 border border-down/30 bg-down/5">
+          <div className="text-xs uppercase tracking-wider text-down font-semibold">Public Read Contract Drift</div>
+          <div className="text-sm text-text-primary mt-1">
+            Dashboard reads must remain credential-free. Correct the backend/runtime contract; do not request a user login credential.
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPI label="Broker"         value={brokerConn ? 'CONNECTED' : brokerStatus || brokerFunds || brokerHoldings || brokerPositions ? 'API RESPONDED' : 'OFFLINE'}
@@ -197,7 +204,7 @@ export function Overview() {
             <span className="num text-xs text-text-muted">{passCount}/{displayGates.length} PASS</span>
             <div className="w-32 h-1.5 bg-surface-3 rounded-full overflow-hidden">
               <div className="h-full bg-up rounded-full"
-                   style={{ width: `${(passCount/displayGates.length)*100}%` }} />
+                   style={{ width: `${displayGates.length ? (passCount/displayGates.length)*100 : 0}%` }} />
             </div>
           </div>
         </div>
@@ -227,4 +234,3 @@ export function Overview() {
     </div>
   )
 }
-
