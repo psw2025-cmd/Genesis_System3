@@ -158,10 +158,6 @@ class StaticSafetyContractTests(unittest.TestCase):
         manual_script = Path("deploy/gcp/deploy_web.sh").read_text(encoding="utf-8")
         recovery = Path(".github/workflows/gcp-dhan-token-rotation.yml").read_text(encoding="utf-8")
 
-        # The workflow delegates the runtime contract to one canonical deployer;
-        # it must not reintroduce a dashboard-key secret or a second executable
-        # service-update command. Ignore explanatory/assertion text that merely
-        # contains the forbidden command as a string literal.
         actual_service_updates = [
             line.strip()
             for line in workflow.splitlines()
@@ -174,22 +170,29 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", workflow)
         self.assertIn("system3-dashboard-worker-push-token", workflow)
         self.assertIn('.required == false', workflow)
-        self.assertIn('.mode == "auth_disabled"', workflow)
-        self.assertIn('"API_KEY" in secret_env_names', workflow)
+        self.assertIn('.configured == false', workflow)
+        self.assertIn('.authenticated == false', workflow)
+        self.assertIn('.mode == "public_readonly"', workflow)
+        self.assertIn('.credential_surface == "REMOVED"', workflow)
+        self.assertIn("RETIRED_DASHBOARD_CREDENTIAL_DRIFT", workflow)
         self.assertIn('"WORKER_PUSH_TOKEN" not in secret_env_names', workflow)
         self.assertIn("LIVE_TRADING_ENABLED=0", workflow)
         self.assertIn("SYSTEM3_LIVE_TRADING_ALLOWED=0", workflow)
         self.assertIn("AUTO_EXECUTE_TRADES=0", workflow)
 
-        self.assertIn('("REQUIRE_API_KEY", "false")', deploy_script)
+        # Canonical deployer must remove the old surface rather than configure a
+        # false dashboard-key switch.
+        self.assertIn("RETIRED_DASHBOARD_ENV", deploy_script)
+        self.assertIn("RETIRED_DASHBOARD_SECRETS", deploy_script)
+        self.assertIn("--remove-env-vars=", deploy_script)
+        self.assertIn("--remove-secrets=", deploy_script)
+        self.assertIn("_assert_candidate_has_no_dashboard_credentials", deploy_script)
+        self.assertNotIn('("REQUIRE_API_KEY", "false")', deploy_script)
         self.assertNotIn("API_KEY_SECRET_ID", deploy_script)
         self.assertIn("WORKER_PUSH_TOKEN_SECRET_ID", deploy_script)
-        self.assertIn("--remove-secrets=API_KEY", deploy_script)
         self.assertIn("--update-secrets=WORKER_PUSH_TOKEN=", deploy_script)
         self.assertIn("DASHBOARD_PUBLIC_READONLY enforced", deploy_script)
 
-        # Manual deployment is now a compatibility wrapper only. It must never
-        # contain an independent production-traffic `gcloud run deploy` path.
         self.assertIn("scripts/gcp_cloud_run_auto_deploy.py", manual_script)
         self.assertNotIn("gcloud run deploy genesis-system3-web", manual_script)
         self.assertIn("LIVE_TRADING_ENABLED=0", manual_script)
@@ -202,10 +205,13 @@ class StaticSafetyContractTests(unittest.TestCase):
 
     def test_runtime_evidence_lock_requires_public_dashboard_and_no_api_key_mount(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        evidence = Path("scripts/gcp_runtime_evidence.py").read_text(encoding="utf-8")
         self.assertIn('"api_key_required",', workflow)
         self.assertIn('"api_key_mounted",', workflow)
         self.assertIn("if safety.get(key):", workflow)
-        self.assertNotIn('for key in ("api_key_required", "api_key_mounted"):', workflow)
+        self.assertIn("dashboard_credential_surface_absent", evidence)
+        self.assertIn("retired_dashboard_env_present", evidence)
+        self.assertIn("retired_dashboard_secret_mounts", evidence)
 
     def test_all_routes_from_failed_00209_manifest_are_explicitly_owned_and_denied(self):
         failed_routes = [
@@ -266,8 +272,6 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("_wait_revision_ready", text)
         self.assertIn("gcp_failed_revision_forensic.py", text)
         self.assertIn("PREVIOUS_TRAFFIC_RESTORED", text)
-        # It is fine to explain the forbidden field in comments/docstrings; the
-        # executable AST must not use that exact key as a runtime authority.
         self.assertNotIn("latestReadyRevisionName", exact_string_literals)
 
 
