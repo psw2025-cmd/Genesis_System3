@@ -12,9 +12,10 @@ Deployment contract:
 - capture sanitized failed-revision evidence automatically;
 - never use latestReadyRevisionName as a substitute for serving-traffic proof.
 
-The public ANALYZER/PAPER dashboard remains read-only. Worker ingestion uses its
-separate Secret Manager token. No Dhan PIN/TOTP secret is mounted in the web
-service.
+The public ANALYZER/PAPER dashboard remains read-only. Retired dashboard
+credential/session configuration is removed from revision metadata. Worker
+ingestion uses its separate Secret Manager token. No Dhan PIN/TOTP secret is
+mounted in the web service.
 """
 from __future__ import annotations
 
@@ -43,6 +44,13 @@ CANDIDATE_TAG = "candidate"
 WORKER_PUSH_TOKEN_SECRET_ID = os.environ.get(
     "WORKER_PUSH_TOKEN_SECRET_ID", "system3-dashboard-worker-push-token"
 )
+
+RETIRED_DASHBOARD_AUTH_ENV_NAMES = {
+    "API_KEY",
+    "DASHBOARD_API_KEY",
+    "ENABLE_DASHBOARD_AUTH",
+    "DASHBOARD_SESSION_MAX_AGE",
+}
 
 # This is the complete authoritative Cloud Run web-service runtime contract.
 # Startup-critical values are explicit so a clean service recreation cannot
@@ -360,6 +368,26 @@ def _candidate_created_after(service: dict[str, Any], before_created: str) -> st
     return candidate if candidate and candidate != before_created else ""
 
 
+def _revision_env_rows(revision: dict[str, Any]) -> list[dict[str, Any]]:
+    containers = ((revision.get("spec") or {}).get("containers") or [])
+    if not containers:
+        containers = ((((revision.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or [])
+    if not containers:
+        return []
+    return [row for row in (containers[0].get("env") or []) if isinstance(row, dict)]
+
+
+def _assert_retired_dashboard_auth_absent(revision: dict[str, Any]) -> None:
+    present = sorted(
+        str(row.get("name"))
+        for row in _revision_env_rows(revision)
+        if row.get("name") in RETIRED_DASHBOARD_AUTH_ENV_NAMES
+    )
+    if present:
+        raise RuntimeError(f"retired dashboard auth environment still present on candidate: {present}")
+    print("CANDIDATE_DASHBOARD_CREDENTIAL_SURFACE_REMOVED")
+
+
 def _assert_candidate_image(revision: dict[str, Any], image: str) -> None:
     containers = ((revision.get("spec") or {}).get("containers") or [])
     if not containers:
@@ -384,7 +412,8 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=0", "--max=1",
         "--memory=1Gi", "--cpu=1", "--concurrency=50", "--timeout=300",
         "--allow-unauthenticated", f"--update-env-vars={_env_arg(sha)}",
-        "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
+        "--remove-env-vars=API_KEY,DASHBOARD_API_KEY,ENABLE_DASHBOARD_AUTH,DASHBOARD_SESSION_MAX_AGE",
+        "--remove-secrets=API_KEY,DASHBOARD_API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
         f"--update-secrets=WORKER_PUSH_TOKEN={WORKER_PUSH_TOKEN_SECRET_ID}:latest",
         "--quiet",
     ]
@@ -416,6 +445,7 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
 
     try:
         revision = _wait_revision_ready(candidate)
+        _assert_retired_dashboard_auth_absent(revision)
         _assert_candidate_image(revision, image)
     except Exception:
         _run_failed_revision_forensic(candidate)
@@ -502,7 +532,7 @@ def main() -> int:
     print("SERVICE", SERVICE)
     print("DEPLOYMENT_MODEL candidate-no-traffic-exact-ready-http-proof-explicit-promotion")
     print("LIVE_OFF enforced")
-    print("DASHBOARD_PUBLIC_READONLY enforced (REQUIRE_API_KEY=false, API_KEY unmounted)")
+    print("DASHBOARD_PUBLIC_READONLY enforced (REQUIRE_API_KEY=false, retired credential env/secrets removed)")
 
     session = _session()
     _require_secret_exists(session, WORKER_PUSH_TOKEN_SECRET_ID)
@@ -528,6 +558,7 @@ def main() -> int:
                 "sha": sha,
                 "traffic_percent": 100,
                 "live_trading_enabled": False,
+                "dashboard_credential_surface": "REMOVED",
             },
             indent=2,
         )
