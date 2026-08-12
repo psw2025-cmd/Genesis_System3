@@ -1,9 +1,10 @@
+import { useEffect } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
-import { Sidebar }   from './components/Sidebar'
+import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -146,6 +147,28 @@ function Content() {
   }
 }
 
+function DashboardTabUrlSync() {
+  const { activeTab, setActiveTab } = useStore()
+
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('tab')
+    if (requested && DASHBOARD_TAB_IDS.has(requested) && requested !== activeTab) {
+      setActiveTab(requested)
+    }
+  }, [activeTab, setActiveTab])
+
+  useEffect(() => {
+    if (!DASHBOARD_TAB_IDS.has(activeTab)) return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('tab') !== activeTab) {
+      url.searchParams.set('tab', activeTab)
+      window.history.replaceState(null, '', url)
+    }
+  }, [activeTab])
+
+  return null
+}
+
 export default function App() {
   // The deployed dashboard is intentionally public/read-only while System3 is
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
@@ -154,6 +177,7 @@ export default function App() {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
                   background: 'var(--surface)', overflow: 'hidden' }}>
+      <DashboardTabUrlSync />
       <TopBar />
       <ProductionProofBar />
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>

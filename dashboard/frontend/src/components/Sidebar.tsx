@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../store'
 
-const TABS = [
+export const DASHBOARD_TABS = [
   { id: 'decision-intel', label: 'Decision Intel', Icon: Zap, group: 'main' },
   { id: 'truth',          label: 'Truth Control',  Icon: Shield,          group: 'main' },
   { id: 'genesis',        label: 'Genesis Brain',  Icon: Sparkles,        group: 'main' },
@@ -29,7 +29,9 @@ const TABS = [
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
-]
+] as const
+
+export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map(tab => tab.id))
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',
@@ -62,7 +64,7 @@ export function Sidebar() {
       }}
     >
       {groups.map(group => {
-        const groupTabs = TABS.filter(t => t.group === group)
+        const groupTabs = DASHBOARD_TABS.filter(t => t.group === group)
         return (
           <div key={group} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <div style={{
