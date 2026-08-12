@@ -1,224 +1,223 @@
 # Genesis System3 Continuous Audit — Single Master Report
 
-Updated: `2026-08-12 09:08 IST`
+Updated: `2026-08-12 09:22 IST`
 
-> Single authority for `psw2025-cmd/Genesis_System3`. Google Cloud is the only runtime/deployment authority. `PATCHED`, `MERGED`, CI green, Cloud Run `Ready`, source-only UI, or concept output never means `CLOSED`. Closure requires exact serving-revision reproducible evidence. LIVE remains OFF/LOCKED. No live order placement/modification/cancellation/routing is permitted.
+> Single authority for `psw2025-cmd/Genesis_System3`. Google Cloud is the only runtime/deployment authority. Source patch, PR merge, CI green, Cloud Run Ready, or a generated UI image never means CLOSED by itself. Closure requires exact 100%-traffic serving-revision evidence. LIVE remains OFF/LOCKED and no live broker order operation is permitted in this remediation stream.
 
-## 0. Exact revision and safety truth
+## 0. Exact source/runtime checkpoint
 
 - Repository: **`psw2025-cmd/Genesis_System3` only**.
-- Current `main` HEAD before this audit-only update: **`6ca4acebd74f8f8aa64420bc2cddd3a3146eecd8`** — documentation-only audit commit.
-- Current application/source authority: **`0acf66ebf45049fbe8c6b1bc6c5912895aceda3e`** — merge PR #128.
-- PR #128 merged the exact 22-tab deployed visual-proof harness; source authority only until exact serving proof exists.
-- Runtime posture: **ANALYZER/PAPER**.
+- Current `main` HEAD: **`36e24d86e1aed1ae5ddbf77055cabf6e125e58cb`** — report-only head based on UI-proof application source.
+- Last merged application/source authority before current security branch: **`0acf66ebf45049fbe8c6b1bc6c5912895aceda3e`** — PR #128, 22-tab/44-image visual-proof harness.
+- Active security branch: **`fix/permanent-public-dashboard-no-key`**, currently ahead of `main` by **28 commits / 27 files** before this report update.
+- Runtime mode requirement: **ANALYZER/PAPER**.
 - LIVE: **OFF / LOCKED**.
-- Real orders attempted by this remediation stream: **0**.
-- Dashboard viewing contract: **public/read-only PAPER**, no dashboard API-key/login UI.
-- Canonical Dhan token authority: **`gcp-secret-manager-dynamic`**; secret payload exposure prohibited.
-- Global Safety CI for audit HEAD `6ca4ace...`: **PASS**, run `31557528488`.
+- Real broker order operations attempted by this remediation stream: **0**.
+- Dashboard visibility requirement: **permanently PUBLIC / READ-ONLY; dashboard credential/session authority REMOVED**.
+- Worker ingestion authority: dedicated worker token only; dashboard viewing is never mutation authority.
 
-## 1. Mandatory control-loop position
+## 1. Primary P0 position and GCP truth
 
-`1 VERIFY -> 2 SELECT -> 3 ROOT CAUSE -> 4 DESIGN -> 5 PATCH -> 6 TEST -> 7 PR -> 8 CI -> 9 FIX/RETEST -> 10 MERGE -> 11 POST-MERGE VERIFY -> 12 PREP -> 13 USER GCP ONLY IF GENUINELY REQUIRED -> 14 DEPLOY VERIFY -> 15 RUNTIME TEST -> 16 USER DHAN/PIN/TOTP/OAuth ONLY IF GENUINELY REQUIRED -> 17 FULL EVIDENCE -> 18 CLOSED`
+The former Firestore Step-13 boundary is now **HUMAN-ACTION COMPLETE / RUNTIME REPROOF PENDING**.
 
-### Current primary P0 position
+Human Cloud Shell proof received:
+- active project `system3-openalgo-safe`;
+- `roles/datastore.user` successfully bound to `genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`;
+- metadata verification returned the exact binding;
+- marker: `FIRESTORE_RUNTIME_IAM_BINDING_COMPLETE`.
 
-**STAY ON STEP 13/14/15 — exact-current candidate startup is blocked by the same PROVEN Firestore IAM denial. No further repository patch or code-only retry is justified before the genuine Step-13 GCP role boundary is satisfied.**
+Previous exact candidate `genesis-system3-web-00214-xot` at source `0acf66...` is still historical failure evidence only:
+- candidate 0% traffic;
+- old production `00199-tq5` retained 100%;
+- container bound `0.0.0.0:8080`;
+- Firestore `batch_get_documents` returned 403;
+- application failed closed with `Required Firestore state load failed`;
+- Cloud Run PORT/startup-probe message was secondary.
 
-Latest exact Cloud Run Auto Deploy run: **`31555951427`**, source **`0acf66ebf45049fbe8c6b1bc6c5912895aceda3e`**.
+Next primary sequence after current no-dashboard-credential PR passes:
+`exact-current deploy -> zero-traffic candidate -> Firestore startup -> exact SHA/digest/revision -> anonymous /ui -> 44 tab screenshots -> MutationPolicy runtime -> broker/rotator/Scheduler proof -> continue P0 chain`.
 
-Proven deployment chain:
-- exact checkout: PASS;
-- keyless WIF: PASS;
-- static syntax/trading safety: PASS;
-- worker-secret existence: PASS;
-- Firestore identity preflight contract: PASS as non-mutating existence/contract check; project IAM was not introspected;
-- frontend production build: PASS, 1,453 modules transformed;
-- required GCP API/service-account existence: PASS, including dedicated rotator and `gs3-scheduler`;
-- Cloud Build: PASS, build ID **`02a1d975-cc7c-40d1-895a-bedb583bc90e`**;
-- exact image tag: `asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:0acf66ebf450-1786500578`;
-- candidate: **`genesis-system3-web-00214-xot`**, 0% traffic;
-- prior production: **`genesis-system3-web-00199-tq5`**, 100% traffic;
-- candidate log: `[cloud-start] binding 0.0.0.0:8080`;
-- candidate bootstrap: canonical Dhan token authority installed, LIVE false, order placement false, raw token not exposed;
-- Firestore `batch_get_documents`: **`403 Missing or insufficient permissions`**;
-- terminal app error: **`RuntimeError: Required Firestore state load failed`**;
-- Cloud Run port/startup-probe message is a secondary consequence, not root cause;
-- exact-current `/ui`: SKIPPED;
-- 22-tab / 44-image proof: SKIPPED;
-- MutationPolicy runtime: SKIPPED;
-- dedicated rotator configuration/execution: SKIPPED;
-- broker recovery: SKIPPED;
-- exact-SHA runtime proof: **FAIL**;
-- production traffic protected: **YES**.
+## 2. Permanent public-dashboard/no-credential forensic program
 
-Two independent candidates (`00213-baq`, `00214-xot`) bound port 8080 and failed at the same required Firestore load. **Repository-controlled startup regression = REJECTED. External Firestore IAM boundary = PROVEN.**
+### Incident / contradiction found
 
-### Genuine Step-13 action
+A manual Cloud Run command reintroduced retired configuration by setting the dashboard-key requirement true and mounting the obsolete dashboard-key secret. The credential value was pasted into terminal/chat output and is therefore classified **EXPOSED + OBSOLETE**; it must never be repeated. Application response still stated dashboard authentication was disabled, proving configuration and application authority had diverged.
 
-Required narrow GCP binding:
+The other agent claim that current CI requires `REQUIRE_API_KEY=true` is **REJECTED**. Prior current-main CI already expected the public PAPER dashboard without a key. The real problem was retained legacy dashboard credential/session capability plus operator/runtime drift.
 
-```bash
-gcloud projects add-iam-policy-binding system3-openalgo-safe \
-  --member="serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com" \
-  --role="roles/datastore.user" \
-  --condition=None
-```
+### Current branch structural changes
 
-Metadata-only verification:
+The target invariant is stronger than `REQUIRE_API_KEY=false`: **the retired credential/session surface must be absent**.
 
-```bash
-gcloud projects get-iam-policy system3-openalgo-safe \
-  --flatten="bindings[].members" \
-  --filter="bindings.role:roles/datastore.user AND bindings.members:serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com" \
-  --format="table(bindings.role,bindings.members)"
-```
+Implemented on `fix/permanent-public-dashboard-no-key`:
 
-After exact proof of this binding, assistant-owned sequence resumes: exact-current deploy -> zero-traffic candidate -> readiness -> exact serving revision/source/digest proof -> public no-key UI -> 44-tab screenshots -> MutationPolicy runtime -> SafetyTruth/ExecutionEligibility -> PreTradeRiskService -> AccountTruth -> durable PaperLedger/Reconciliation -> StateTruth/domain CAS -> DeploymentTruth V2 -> WorkCoordinator/idempotency -> P1 truth chain.
+1. `dashboard/backend/mutation_policy.py`
+   - removed dashboard session-create/session-revoke capabilities;
+   - public UI never becomes control authority;
+   - LIVE mutation/approval remains hard denied;
+   - worker ingestion remains dedicated-token only.
+2. `dashboard/backend/security_policy.py`
+   - public safe reads always allowed;
+   - worker push requires dedicated worker token;
+   - every other public write fails closed with `PUBLIC_DASHBOARD_READ_ONLY`;
+   - obsolete browser credential kwargs are ignored and cannot grant authority.
+3. `dashboard/backend/__init__.py`
+   - new backend package boundary scrubs retired dashboard credential/session env before any backend submodule import.
+4. `dashboard/backend/secure_app.py`
+   - scrubs retired env before legacy app import;
+   - forces legacy key globals inert;
+   - removes live `/api/auth/session` and `/api/auth/logout` routes;
+   - leaves only informational GET `/api/auth/status` with `required=false`, `configured=false`, `authenticated=false`, `mode=public_readonly`, `credential_surface=REMOVED`;
+   - strips retired dashboard key header/session cookie at outer boundary;
+   - preserves independent MutationPolicy and worker authority.
+5. deleted `dashboard/backend/session_truth.py` and its tests.
+6. `.env.example`
+   - no dashboard credential/session environment knob.
+7. canonical `scripts/gcp_cloud_run_auto_deploy.py`
+   - does not configure a dashboard key flag;
+   - removes retired dashboard auth env and both historical dashboard-key secret env names from every candidate;
+   - refuses promotion if any retired credential config remains;
+   - candidate HTTP proof requires `public_readonly / credential_surface=REMOVED`.
+8. `scripts/gcp_runtime_evidence.py` schema v2
+   - binds evidence to the actual single 100%-traffic serving revision, not latest-ready/latest-created/template state;
+   - any retired dashboard env/secret/plaintext presence is a runtime blocker;
+   - compares `GITHUB_SHA` to serving revision `DEPLOY_GIT_SHA`.
+9. `scripts/gcp_public_dashboard_runtime_proof.py`
+   - requires retired credential surface absent before screenshot capture;
+   - requires fixed anonymous public-readonly status contract;
+   - captures real deployed `/ui` then all 22 desktop + 22 mobile visuals.
+10. new `scripts/public_dashboard_no_key_forensic.py`
+   - recursively scans active backend/frontend/scripts/tools/deploy/workflows/config;
+   - rejects new dashboard credential/session semantics outside tightly bounded removal/detection files;
+   - rejects active direct launcher of `dashboard.backend.app:app`;
+   - reports active-files-scanned count and typed proof.
+11. deleted obsolete authenticated/key tools:
+   - `tools/dashboard_auth_smoke.py`;
+   - `tools/dashboard_authenticated_shell_warmup.mjs`;
+   - `tools/dashboard_live_ui_proof.mjs`;
+   - `tools/dashboard_shell_diagnostic.mjs`;
+   - `tools/dashboard_visible_issue_tracker.mjs`;
+   - legacy direct-backend `scripts/verify_dashboard.ps1`.
+12. CI/tests updated with adversarial drift: even if a process starts with retired dashboard auth variables enabled and dummy key values, the real Cloud Run wrapper must scrub them before import; auth session/logout write routes must not exist and mutation manifest must remain valid.
+13. security/WIF docs updated: dashboard credential absence is permanent, WIF is keyless deployment authority, and old dashboard-key/session guidance is retired.
 
-## 2. Dhan broker and identity truth
+### Closure criteria — NOT YET CLOSED
 
-Last authoritative public broker proof:
-- broker: `dhan`;
-- mode: `ANALYZER`;
-- connected: **false**;
-- error: **`TOKEN_EXPIRED_OR_INVALID`**;
-- credentials/client/access-token present: true;
-- token source: `GCP_SECRET_MANAGER_DYNAMIC`;
-- raw token exposed: false;
-- live trading enabled: false;
-- order placement allowed: false.
+Required before marking permanent removal VERIFIED/CLOSED:
+- recursive forensic gate PASS on exact PR head;
+- full Global Safety + GCP Dhan/WIF + priority/workflow gates PASS;
+- PR merged without stale-base conflict;
+- exact merge-SHA Cloud Run deployment succeeds;
+- actual 100%-traffic serving revision has **none** of the retired dashboard credential/session env names or secret mounts;
+- `/api/auth/status` proves `public_readonly / credential_surface=REMOVED`;
+- `/api/auth/session` and `/api/auth/logout` are absent on serving app;
+- `/ui` renders anonymously with no credential prompt;
+- 22 desktop + 22 mobile visual proof passes;
+- MutationPolicy runtime proof passes independently;
+- zero GCP active references to the obsolete dashboard-key secret are proven;
+- only then retire/delete obsolete exposed dashboard-key secret through the appropriate human GCP boundary.
 
-Additional GCP evidence from the human read-only snapshot:
-- canonical `dhan-access-token` reached **version 50** on `2026-08-12T02:00:14Z`;
-- serving runtime later loaded version 50 and Dhan still rejected it as `TOKEN_EXPIRED_OR_INVALID` even though metadata expiry was in the future;
-- therefore version creation alone is **not broker recovery proof**;
-- `genesis-system3-dhan-rotator` exists and has multiple successful executions, but exact current dedicated service-account attachment/runtime validation remains not closed;
-- Scheduler `genesis-system3-dhan-token-rotate-daily` remains ENABLED at `30 7 * * *`, `Asia/Kolkata`, and still uses **`genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`** rather than `gs3-scheduler`;
-- Scheduler identity state: **STALE / NOT YET MIGRATED**;
-- historical web-runtime PIN/TOTP/token-version-add privilege remains a cleanup item only after dedicated rotator recovery proof.
+The phrase “will never affect anything” is implemented as a fail-closed prevention/detection contract: source CI blocks reintroduction, canonical deployment scrubs drift, runtime proof rejects serving drift. No engineering system can prevent a project owner from making a future manual GCP change outside the repository, but that change must be detected and rejected by the canonical proof chain before closure/promotion.
 
-Do not rotate again, alter Scheduler, or remove legacy privilege out of sequence before exact-current web deployment succeeds.
+## 3. Dhan broker and identity truth
 
-## 3. Mandatory UI Proof Matrix
+Current last public runtime broker evidence remains:
+- broker `dhan`;
+- mode `ANALYZER`;
+- connected **false**;
+- error **`TOKEN_EXPIRED_OR_INVALID`**;
+- token source `GCP_SECRET_MANAGER_DYNAMIC`;
+- canonical `dhan-access-token` version reached **50**;
+- version 50 creation alone is not recovery proof because serving broker still rejected it;
+- raw token exposed false;
+- LIVE false;
+- order placement false.
 
-PR #128 is **MERGED** at application/source SHA `0acf66eb...`.
+Identity state:
+- dedicated rotator SA exists;
+- `gs3-scheduler` exists;
+- Scheduler runtime still last proved using old web SA, therefore **STALE / MIGRATION PENDING**;
+- web runtime still has historical excessive PIN/TOTP/token-version-add grants; remove only after dedicated rotator is proven working;
+- canonical vs legacy Dhan token secret authority remains a forensic check after current web deployment succeeds.
 
-Proof contract:
-- canonical sidebar registry: **22 tabs exactly**;
-- safe deterministic `?tab=<id>` links;
-- proof binds to actual single 100%-traffic serving revision and matching `DEPLOY_GIT_SHA`;
-- 22 desktop screenshots at `1600x1000`;
-- 22 mobile screenshots at `430x932`;
-- total **44 screenshots** per exact successful deployment;
-- screenshot SHA-256;
-- active-tab proof;
-- dashboard key/login absence;
+## 4. UI proof/review program
+
+PR #128 source authority provides **22 tabs exactly** and **44 required real deployed screenshots**:
+- 22 desktop `1600x1000`;
+- 22 mobile `430x932`;
+- actual single 100%-traffic serving revision only;
+- exact `DEPLOY_GIT_SHA` binding;
+- active-tab proof, screenshot SHA-256 and no credential/login prompt;
 - no order/paper mutation calls;
-- each tab starts `PENDING_USER_REVIEW`.
+- every tab starts `PENDING_USER_REVIEW`.
 
-Runtime state: **SOURCE MERGED / EXACT-CURRENT DEPLOY FAILED / 44 SCREENSHOTS NOT GENERATED**.
+No tab is FINAL until frontend + backend/data contract + exact deployed desktop/mobile visual + loading/error/stale behavior + user review are complete.
 
-All 22 tabs remain unfinalized until source, data contract, exact-current desktop/mobile visual, functional proof, error/loading/stale behavior, accessibility, and user acceptance are complete.
+Current state: **proof harness merged; exact-current visuals pending successful deployment after this security branch**.
 
-## 4. P0 dependency truth
+## 5. Runtime performance/SRE incident truth
 
-| Dependency | Truth | Next closure condition |
-|---|---|---|
-| public PAPER/no-key viewing | VERIFIED/CLOSED for viewing requirement | preserve contract |
-| Firestore runtime authorization | **FAIL / PROVEN IAM BOUNDARY** | Step-13 `roles/datastore.user` proof |
-| exact current deployment | **FAIL — `00214-xot` Firestore 403** | IAM proof then exact-current redeploy |
-| MutationPolicy | PARTIAL / CI VERIFIED / RUNTIME NOT RUN | exact deployment first |
-| SafetyTruth + ExecutionEligibility | OPEN P0 | MutationPolicy runtime closure |
-| PreTradeRiskService | OPEN P0 | SafetyTruth closure |
-| AccountTruth + AccountSnapshotCoordinator | OPEN P0-P1 | prior P0 gates |
-| durable PaperLedger + Reconciliation | PARTIAL / OPEN P0 | lifecycle/reconciliation authority |
-| StateTruth/domain CAS | OPEN P0-P1 | Firestore + version/CAS authority |
-| DeploymentTruth V2 | PARTIAL / OPEN P0 | source/build/digest/candidate/serving binding |
-| WorkCoordinator/idempotency | OPEN P0-P1 | pending |
-| OptionChainTruth -> StreamTruth -> ScannerTruth -> PredictionTruth | OPEN P1 | after P0 |
-| Institutional UI/A11Y | OPEN | 22-tab functional + visual + user review |
-| Real-money readiness | **NO** | multiple gates open; LIVE locked |
+New independent defects proven from Cloud Run logs and human endpoint profiling:
+- old serving revision exceeded **1024 MiB** memory with observed **1044 MiB**, causing instance termination;
+- `/api/trader/requirements`, `/api/portfolio/unified`, `/api/qc/runtime` exceeded 15s diagnostic cap;
+- several broker endpoints took seconds; `/prediction/all` observed >30s;
+- backend emitted `ValueError: Out of range float values are not JSON compliant` for at least one response path;
+- human manually raised service to `2Gi`, `2 CPU`, concurrency `80` on the old revision.
 
-Important provenance caution: fallback runtime evidence previously reported `source_matches_deployment=true` after the failed candidate, but actual service traffic still proved `00199-tq5` = 100% and `00214-xot` = 0%. Exact-current serving provenance therefore remains **NOT PROVEN**.
+Important: canonical deployer currently still specifies `1Gi / 1 CPU / concurrency 50`; therefore the manual resource increase is **NOT authoritative or durable** and OOM regression remains OPEN. This must be handled as a separate repo-controlled SRE patch after the no-dashboard-credential PR, with evidence rather than permanent manual drift.
 
-## 5. AlphaTruth / quantitative research truth
+OperationsTruth/SRETruth:
+- PR #121 observability: OPEN / must be refreshed against current main before merge;
+- PR #125 OperationsTruth: OPEN / must be refreshed against current main before merge;
+- SLO targets remain goals, not claims;
+- missing monitoring dashboards/alerts/uptime proof must never default green.
 
-Targets remain goals only: OOS directional accuracy >65%, top-decile precision >70%, Sharpe >=2.5, Sortino >=3.5, maximum drawdown <=10%, average-win/average-loss magnitude >2.0, aligned after-cost benchmark outperformance, IS/OOS accuracy gap <=15 percentage points.
+## 6. AlphaTruth
 
-Current authoritative small evidence:
-- 5 days;
-- 8 trades;
-- 4 wins / 4 losses;
-- win rate 50%;
-- gross P&L `-101258.25`;
-- costs `1378.10`;
-- net P&L **`-102636.35`**.
+Targets remain research goals only: OOS directional accuracy >65%, top-decile precision >70%, Sharpe >=2.5, Sortino >=3.5, MDD <=10%, average-win/average-loss magnitude >2.0, aligned after-cost benchmark outperformance and IS/OOS accuracy gap <=15 percentage points.
 
-**AlphaTruth = `INSUFFICIENT_EVIDENCE`.** Mechanics proof is not performance proof. No profitability, live, or model-auto-promotion claim is allowed.
+Current small evidence: 5 days / 8 trades / 4 wins / 4 losses / 50% win rate / net P&L `-102636.35` after costs.
 
-Historical strongest frozen research remains rejected: 489 fills / 492 holdout days; Sharpe `-1.3979`; Sortino `-3.4160`; MDD `52.3395%`; compounded return `-46.7306%`; promotion=false.
+**AlphaTruth = `INSUFFICIENT_EVIDENCE`.** No profitability, automatic model promotion, live, or real-order authority claim is allowed.
 
-Factor/model decay trigger: **NOT_PROVEN / NOT_EVALUABLE**. No `RESEARCH_REQUIRED`; no silent retraining.
+## 7. P0 dependency state
 
-## 6. OperationsTruth / SRETruth
+| Dependency | Current truth |
+|---|---|
+| Permanent public/read-only dashboard credential removal | **PATCHED ON BRANCH / CI+RUNTIME PENDING** |
+| Firestore runtime role | **HUMAN BINDING PROVEN / NEW CANDIDATE REPROOF PENDING** |
+| Exact-current deployment | BLOCKED until current security PR passes/merges |
+| MutationPolicy | source/CI partial; runtime proof pending exact deploy |
+| SafetyTruth + ExecutionEligibility | OPEN P0 |
+| PreTradeRiskService | OPEN P0 |
+| AccountTruth + AccountSnapshotCoordinator | OPEN |
+| durable PaperLedger + Reconciliation | PARTIAL / OPEN |
+| StateTruth/domain CAS | OPEN |
+| DeploymentTruth V2 | PARTIAL; new serving-revision evidence logic patched |
+| WorkCoordinator/idempotency | OPEN |
+| OptionChainTruth -> StreamTruth -> ScannerTruth -> PredictionTruth | OPEN P1 after P0 |
+| Institutional UI/A11Y | OPEN / 22-tab user review pending |
+| Real-money readiness | **NO** |
 
-- PR #121 observability: **OPEN**, not runtime authority.
-- PR #125 OperationsTruth/SRETruth: **OPEN**, not runtime authority.
-- Phase-1 typed GCP inventory: **NOT_PROVEN at runtime** because recent Cloud Shell follow-up lost active gcloud auth and returned `API_ERROR` for later inventory sections; those errors must not be interpreted as empty resources.
-- Earlier successful snapshot proved Artifact Registry and Cloud Build resources; Pub/Sub/monitoring/alert/uptime emptiness is not upgraded to `PROVEN_EMPTY` until an authenticated authoritative query succeeds.
-- SLO scorecard: **NOT_PROVEN**; missing metrics never default green.
-- Targets only: availability >=99.95%, API successful-request P95 <300ms, broker read success >=99.9%, token rotation success 100%, synthetic success >=99.9%, MTTR decreasing, false-alert rate decreasing, automated-recovery rate increasing.
-- Incident class: **infrastructure/IAM — Firestore runtime authorization**.
-- Bounded remediation attempts: two exact-current candidate failures reproduced the same 403 after successful port bind.
-- Further code retry before IAM completion is not justified.
+## 8. Conflict/salvage lane
 
-## 7. `conflict_120826_0310` salvage lane
+`conflict_120826_0310` remains stale/untrusted intake only. Never merge wholesale. ACCEPT/ADAPT only from fresh current main. Reject LoginPage/AuthGate/dashboard-key restoration, legacy token writers, Render/local runtime authority, generated output authority and unsafe cron/webhook authority.
 
-Fresh divergence:
-- `main` is **187 commits ahead** of `conflict_120826_0310`;
-- conflict branch is **6 commits ahead** of `main`;
-- merge base: `5d1ec87a43c5778f6d010b91dc3adcd6a22ae797`;
-- status: **DIVERGED / STALE / UNTRUSTED INTAKE**;
-- wholesale merge/rebase-overwrite remains rejected.
+Committed plaintext credential incident on that branch remains OPEN; never quote/merge the value and treat it exposed until independent rotation proof. No force-rewrite without explicit authorization.
 
-Selective policy:
-- connection-stability concepts: ADAPT;
-- broker token-health UI/read model: ADAPT on current main;
-- real-data Multibagger ideas: ADAPT only after P0/data-contract review;
-- F&O eligibility/health digest: ADAPT after truth review;
-- legacy token writer: REJECT;
-- LoginPage/AuthGate/dashboard-key restoration: REJECT;
-- Emergent webhook/runtime authority: REJECT;
-- Render/local runtime authority: REJECT;
-- generated reports/dist as source authority: REJECT.
+## 9. Current checkpoint
 
-Committed plaintext credential incident remains OPEN. Never quote/merge the value; treat affected credential as exposed until independent rotation proof. No shared-history force rewrite without explicit authorization.
-
-## 8. Current checkpoint
-
-- Current audit `main` before this update: **`6ca4acebd74f8f8aa64420bc2cddd3a3146eecd8`**.
-- Application/source authority: **`0acf66ebf45049fbe8c6b1bc6c5912895aceda3e`**.
-- Audit-head Global Safety CI: **PASS**, run `31557528488`.
-- Primary P0 step: **13/14/15 blocked at genuine Firestore IAM boundary**.
-- Latest exact deployment: `31555951427` = **FAIL**.
-- Serving revision: `genesis-system3-web-00199-tq5` = **100%**.
-- Failed candidate: `genesis-system3-web-00214-xot` = **0%**.
-- Root cause: **PROVEN Firestore `batch_get_documents` 403 after successful port bind**.
-- PR #128: MERGED; 22-tab/44-image harness source-authoritative, runtime proof pending.
-- MutationPolicy: CI/source partial, runtime not run.
-- Dhan: disconnected / `TOKEN_EXPIRED_OR_INVALID`; version 50 creation is not recovery proof.
-- Scheduler: still web-SA runtime identity; migration stale.
-- AlphaTruth: **INSUFFICIENT_EVIDENCE**.
-- OperationsTruth inventory: **NOT_PROVEN runtime**.
-- SLO scorecard: **NOT_PROVEN**.
-- Incident/remediation: external Firestore IAM incident proven; two bounded code/deploy attempts exhausted for this unchanged cause.
-- Factor decay: **NOT_PROVEN / NOT_EVALUABLE**.
-- Observability: PR #121 open.
-- OperationsTruth: PR #125 open.
-- Salvage divergence: `main +187`, conflict `+6`.
-- Real-money readiness: **NO**.
-- LIVE: **OFF / LOCKED**.
-- Real orders attempted: **0**.
-- What remains before assistant-owned work can resume: authoritative proof that `roles/datastore.user` is bound to `genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`.
-- **USER ACTION REQUIRED: YES — only the narrow Firestore role binding and metadata verification in Section 1. No PIN/TOTP/token/API key should be sent to chat.**
+- Main HEAD: `36e24d86e1aed1ae5ddbf77055cabf6e125e58cb`.
+- Last merged application source: `0acf66ebf45049fbe8c6b1bc6c5912895aceda3e`.
+- Current branch: `fix/permanent-public-dashboard-no-key`, ahead by 28 commits / 27 files before this report commit.
+- Firestore role: **BOUND + VERIFIED by human Cloud Shell**.
+- Dashboard-key incident: **EXPOSED/OBSOLETE credential + manual runtime drift; structural retirement patch in progress**.
+- Broker: disconnected / `TOKEN_EXPIRED_OR_INVALID` / version 50 not recovery proof.
+- Scheduler: old web-SA identity last proved; migration pending.
+- UI: 22-tab/44-image runtime proof pending.
+- OOM/latency/NaN JSON defects: OPEN.
+- AlphaTruth: `INSUFFICIENT_EVIDENCE`.
+- SRETruth: OPEN.
+- LIVE: OFF/LOCKED.
+- Real order operations attempted by this remediation stream: 0.
+- **USER ACTION REQUIRED: NO at this checkpoint. Repository/CI work is controllable by assistant. Do not create, rotate, mount, paste, or test any dashboard API key.**
