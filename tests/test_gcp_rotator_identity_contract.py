@@ -28,6 +28,35 @@ class DhanRotatorIdentityContractTests(unittest.TestCase):
         self.assertNotIn("roles/secretmanager.secretAccessor", workflow)
         self.assertNotIn("roles/secretmanager.secretVersionAdder", workflow)
 
+    def test_rotator_runtime_proof_reads_documented_cloud_run_job_schema(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        # Cloud Run v1 Job YAML nests service identity at:
+        # spec.template.spec.template.spec.serviceAccountName.
+        self.assertIn(
+            'execution_template=(((rotator.get("spec") or {}).get("template") or {}).get("spec") or {})',
+            workflow,
+        )
+        self.assertIn(
+            'task_template=((execution_template.get("template") or {}).get("spec") or {})',
+            workflow,
+        )
+        self.assertIn(
+            'job_sa=(task_template.get("serviceAccountName") or task_template.get("serviceAccount"))',
+            workflow,
+        )
+        self.assertIn(
+            "spec.template.spec.template.spec.serviceAccountName",
+            workflow,
+        )
+        self.assertNotIn(
+            'get("template") or {}).get("template") or {}).get("serviceAccountName")',
+            workflow,
+        )
+
+    def test_visual_proof_script_itself_triggers_runtime_reverification(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        self.assertIn('- "scripts/gcp_ui_tab_visual_proof.py"', workflow)
+
     def test_secret_role_static_guard_cannot_match_its_own_source(self):
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
         secret_accessor_marker = "secret" + "Accessor"
