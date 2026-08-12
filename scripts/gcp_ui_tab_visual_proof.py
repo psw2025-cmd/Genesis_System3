@@ -29,6 +29,7 @@ OUT = Path("reports/latest/public_dashboard_proof")
 TABS_OUT = OUT / "tabs"
 TIMEOUT_S = 30
 BROWSER_TIMEOUT_S = 35
+RETRY_BROWSER_TIMEOUT_S = 70
 CAPTURE_WORKERS = max(1, min(3, int(os.getenv("SYSTEM3_UI_PROOF_WORKERS", "3"))))
 
 TABS = [
@@ -93,19 +94,19 @@ def _args(url: str, width: int, height: int, budget_ms: int = 7000) -> list[str]
     ]
 
 
-def _render_dom(url: str) -> str:
+def _render_dom(url: str, *, timeout_s: int = BROWSER_TIMEOUT_S) -> str:
     args = _args(url, 1600, 1000)
     args.insert(-1, "--dump-dom")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=BROWSER_TIMEOUT_S, check=False)
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=timeout_s, check=False)
     if proc.returncode:
         raise RuntimeError(f"tab_dom_render_failed:{proc.returncode}")
     return proc.stdout or ""
 
 
-def _capture(url: str, path: Path, width: int, height: int) -> str:
+def _capture(url: str, path: Path, width: int, height: int, *, timeout_s: int = BROWSER_TIMEOUT_S) -> str:
     args = _args(url, width, height)
     args.insert(-1, f"--screenshot={path}")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=BROWSER_TIMEOUT_S, check=False)
+    proc = subprocess.run(args, text=True, capture_output=True, timeout=timeout_s, check=False)
     if proc.returncode or not path.is_file() or path.stat().st_size < 1000:
         raise RuntimeError(f"tab_screenshot_failed:{path.name}:{proc.returncode}")
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -119,7 +120,15 @@ def _active_tab_proven(dom: str, tab_id: str) -> bool:
     return False
 
 
-def _capture_tab(index: int, tab_id: str, label: str, dashboard_url: str) -> tuple[int, dict, list[str]]:
+def _capture_tab(
+    index: int,
+    tab_id: str,
+    label: str,
+    dashboard_url: str,
+    *,
+    timeout_s: int = BROWSER_TIMEOUT_S,
+    retry: bool = False,
+) -> tuple[int, dict, list[str]]:
     url = f"{dashboard_url}?{urlencode({'tab': tab_id})}"
     row = {
         "id": tab_id,
@@ -127,17 +136,18 @@ def _capture_tab(index: int, tab_id: str, label: str, dashboard_url: str) -> tup
         "url": url,
         "proof_state": "FAIL",
         "review_state": "PENDING_USER_REVIEW",
+        "capture_retry": retry,
     }
     failures: list[str] = []
     try:
-        dom = _render_dom(url)
+        dom = _render_dom(url, timeout_s=timeout_s)
         active = _active_tab_proven(dom, tab_id)
         login_prompt = "DASHBOARD API KEY" in dom.upper()
         system3_marker = "SYSTEM3" in dom.upper()
         desktop = TABS_OUT / f"{index:02d}-{tab_id}-desktop.png"
         mobile = TABS_OUT / f"{index:02d}-{tab_id}-mobile.png"
-        desktop_hash = _capture(url, desktop, 1600, 1000)
-        mobile_hash = _capture(url, mobile, 430, 932)
+        desktop_hash = _capture(url, desktop, 1600, 1000, timeout_s=timeout_s)
+        mobile_hash = _capture(url, mobile, 430, 932, timeout_s=timeout_s)
         local_failures: list[str] = []
         if not active:
             local_failures.append("active_tab_not_proven")
@@ -193,6 +203,8 @@ def main() -> int:
         "tab_count": len(TABS),
         "capture_workers": CAPTURE_WORKERS,
         "browser_timeout_seconds": BROWSER_TIMEOUT_S,
+        "retry_browser_timeout_seconds": RETRY_BROWSER_TIMEOUT_S,
+        "retry_mode": "failed_tabs_serial_once",
         "viewports": {"desktop": "1600x1000", "mobile": "430x932"},
         "trading_mutations_called": False,
         "tabs": [],
@@ -224,6 +236,40 @@ def main() -> int:
                     + json.dumps({
                         "completed": len(rows),
                         "total": len(TABS),
+                        "pass_count": sum(1 for item in rows.values() if item.get("proof_state") == "PASS"),
+                    }, sort_keys=True),
+                    flush=True,
+                )
+
+        retry_indexes = [
+            index for index, row in sorted(rows.items())
+            if row.get("proof_state") != "PASS"
+        ]
+        if retry_indexes:
+            print(
+                "UI_TAB_VISUAL_RETRY "
+                + json.dumps({"indexes": retry_indexes, "mode": "serial", "timeout_s": RETRY_BROWSER_TIMEOUT_S}, sort_keys=True),
+                flush=True,
+            )
+            for index in retry_indexes:
+                tab_id, label = TABS[index - 1]
+                index, row, row_failures = _capture_tab(
+                    index,
+                    tab_id,
+                    label,
+                    dashboard_url,
+                    timeout_s=RETRY_BROWSER_TIMEOUT_S,
+                    retry=True,
+                )
+                rows[index] = row
+                failures = [item for item in failures if not item.startswith(f"{tab_id}:")]
+                failures.extend(row_failures)
+                _write_matrix(matrix, rows, failures, final=False)
+                print(
+                    "UI_TAB_VISUAL_RETRY_PROGRESS "
+                    + json.dumps({
+                        "tab": tab_id,
+                        "proof_state": row.get("proof_state"),
                         "pass_count": sum(1 for item in rows.values() if item.get("proof_state") == "PASS"),
                     }, sort_keys=True),
                     flush=True,
