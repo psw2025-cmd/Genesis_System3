@@ -2,186 +2,205 @@
 
 Updated: `2026-08-12 current control loop`
 
-> Single authority for `psw2025-cmd/Genesis_System3`. Google Cloud is the only runtime/deployment authority. LIVE remains OFF/LOCKED. No live order placement/modification/cancellation/routing is permitted. Secret payloads must never be exposed. Source, CI, Ready, browser visuals, broker reads, state, and quantitative performance are separate evidence domains.
+> Single authority for `psw2025-cmd/Genesis_System3`. Google Cloud is the only runtime/deployment authority. LIVE remains OFF/LOCKED. No live order placement/modification/cancellation/routing is permitted. Secret payloads must never be exposed. Source, CI, Ready, browser visuals, broker reads, state, and quantitative performance remain separate evidence domains.
 
 ## 0. Current source / runtime authority
 
 - Repository: **`psw2025-cmd/Genesis_System3` only**.
-- Current application/source before this report-only update: **`eadd4be87c807ae67ba0d936d8ac50511226138d`** — merge PR #140.
-- PR #140 replaces repeated headless-Chrome CLI launches with one ChromeDriver/WebDriver session for the 22-tab visual proof. Initial proof now expects one navigation per tab, desktop screenshot, same-page mobile resize/screenshot, and one fresh-browser retry only for failed tabs.
-- PR #140 exact-head verification before merge: Genesis Global Safety **5/5 blocking jobs PASS** and GCP Stage 2 Safety **PASS**.
-- Exact post-merge Cloud Run Auto Deploy: **run `31582769776` / run #74**, source `eadd4be8...`, currently IN_PROGRESS.
-- Previous exact runtime source `9e2ce91683f9fc9ac96a85b116451158c89d6159` reached guarded deployment successfully in run #73 and exact sanitized runtime evidence reported `source_matches_deployment=true` / `DEPLOYMENT_LOCKED`.
-- Run #73 latest-ready revision: **`genesis-system3-web-00238-biw`**.
+- Current repository `main`: **`12f72b0460a003093362b90b9a6131e19dc603ff`** — report-only update on top of the application source below.
+- Current deployed/application source: **`eadd4be87c807ae67ba0d936d8ac50511226138d`** — merge PR #140.
+- PR #130 immutable Cloud Run image provenance: **MERGED**, exact head CI green.
+- PR #129 old no-key/auth cleanup: **OPEN, stale/diverged, non-mergeable**; do not wholesale merge.
+- Cloud Run Auto Deploy run **`31582769776` / #74**: **COMPLETED / FAILURE**, but deployment, UI, MutationPolicy, rotator configuration and explicit rotator execution all passed before a verifier-schema failure at step 19.
+- Exact serving/latest-ready revision proven by run #74: **`genesis-system3-web-00240-roh`**, 100% traffic.
+- Candidate `00240-roh` was first created at **0% traffic**, immutable digest proven, HTTP-proved, then explicitly promoted to 100%.
+- Deployed image digest: **`sha256:7051be6c0b40f48d852bbb76fc5a8569fabb7c09c3e017dc38d31e4f5f8d8640`**.
 - Runtime posture: **ANALYZER/PAPER**.
 - LIVE: **OFF / LOCKED**.
 - Real broker orders attempted by this remediation/proof stream: **0**.
-- Dashboard contract: **public/read-only**, no dashboard API-key/login authority.
+- Dashboard contract: **public/read-only**, no dashboard API-key/login/session authority.
 
 ## 1. Current mandatory position
 
-**Stay on STEP 14/15: exact deployment + all-tab browser proof. Do not advance the P0 dependency merely because Cloud Run deployment itself is healthy.**
+**UI browser-proof transport is now closed; stay on runtime identity/broker/StateTruth closure before advancing the next strict P0 dependency.**
 
-Run #73 final truth:
+Run #74 exact gate results:
 - keyless WIF: PASS;
-- Firestore runtime path: PASS;
+- Firestore runtime preflight: PASS;
 - frontend build: PASS;
-- guarded Cloud Run deploy: PASS;
-- exact runtime provenance/safety lock: PASS;
-- public 22-tab visual proof: **FAIL**;
-- MutationPolicy runtime proof: skipped because visual proof failed;
-- dedicated Dhan rotator/Scheduler configuration: skipped;
-- rotator execution: skipped;
-- final broker re-proof step: skipped.
+- guarded 0%-traffic candidate deploy + immutable digest proof: PASS;
+- candidate HTTP proof + explicit 100% promotion: PASS;
+- public no-key dashboard proof: **PASS**;
+- 22-tab WebDriver proof: **PASS 22/22**;
+- desktop/mobile screenshots: **44/44**;
+- screenshot retries: **0**;
+- browser trading mutations: **0**;
+- MutationPolicy runtime proof: **PASS**;
+- dedicated Dhan rotator deploy/configuration: PASS;
+- Cloud Scheduler configuration: PASS;
+- explicit rotator execution `genesis-system3-dhan-token-rotate-xchgb`: **PASS**;
+- service/rotator/Scheduler safety verifier: **FAIL** only because the verifier read the wrong Cloud Run Job JSON field and produced `ROTATOR_IDENTITY_MISMATCH None`;
+- sanitized runtime evidence/provenance lock: PASS for safety/provenance, operational lock remains due option-chain readiness.
 
-**USER ACTION REQUIRED=NO.** Current blocker is repository/proof-runner controlled.
+**USER ACTION REQUIRED=NO.** Current blocker is repository-controlled and is being repaired in PR #141.
 
-## 2. Run #73 visual-proof forensic
+## 2. Run #74 UI / dashboard proof
 
-The serial-timeout change from PR #136 did not close the visual gate.
+Canonical tabs: **22**. Required automated artifact: **22 desktop + 22 mobile = 44 exact-serving screenshots**.
 
-Run #73 artifact `public-paper-dashboard-proof-73` ended with the matrix partially written as `IN_PROGRESS`, with 15 PASS and 7 unresolved when the parent proof terminated.
+Run #74 artifact `public-paper-dashboard-proof-74`:
+- state=`PASS`;
+- tab_count=`22`;
+- pass_count=`22`;
+- fail_count=`0`;
+- browser transport=`webdriver_single_session`;
+- initial_fail_count=`0`;
+- retry_count=`0`;
+- desktop viewport=`1600x1000`;
+- mobile viewport=`430x932`;
+- API-key/login prompt rendered=`false`;
+- mutation/order calls=`false`;
+- exact serving revision=`genesis-system3-web-00240-roh`;
+- exact deployed source=`eadd4be87c807ae67ba0d936d8ac50511226138d`.
 
-Observed retry/failure pattern:
-- Truth Control: timed out after retry;
-- E2E Proof: timed out after retry;
-- Sim Live: timed out after retry;
-- Option Chain: **recovered on retry**;
-- Signals: timed out after retry;
-- Trade: timed out after retry;
-- Risk & Scenarios: timed out after retry;
-- Live Gate: timed out before its retry completed.
+This closes the **automated render/capture gate**, not final product-design acceptance. Every tab artifact still carries `PENDING_USER_REVIEW`.
 
-Root cause is now **PROVEN proof-runner architecture/budget**, not Cloud Run startup:
-- old harness can launch Chrome up to 3 times per tab (DOM, desktop, mobile);
-- slow tab effects repeatedly trigger chain/scanner reads;
-- failed tabs then add serial 70-second retries;
-- parent `gcp_public_dashboard_runtime_proof.py` has a hard **1200-second** subprocess budget;
-- run #73 was terminated before its retry loop could finalize the matrix.
+Known visible product-quality items remain:
+- mobile 430px layout still needs product review; draft PR #139 proposes a compact 58px navigation rail and remains intentionally unmerged;
+- several desktop workspaces remain information-dense and need hierarchy review;
+- Signals/Trade source wording must never regress to credential-request language under the permanent public-readonly architecture;
+- read-heavy tabs remain sensitive to slow backend chain/scanner reads even though the WebDriver proof transport now completes deterministically.
 
-PR #140 fixes the architecture instead of increasing timeouts:
-- uses ChromeDriver already present on GitHub `ubuntu-latest` runners;
-- one WebDriver browser session;
-- `pageLoadStrategy=eager`;
-- one navigation per tab on initial pass;
-- active tab / SYSTEM3 / credential-prompt truth queried in-session;
-- desktop screenshot;
-- resize same loaded page to 430x932;
-- mobile screenshot without reload;
-- failed tabs retry once in a fresh browser session;
-- proof remains fail-closed;
-- zero mutation/order calls.
+Prevention now proven for screenshot transport: one WebDriver session, one navigation per tab, same-page mobile resize, fresh-browser retry only on actual failure, and fixed parent proof budget.
 
-Run #74 is the exact runtime verifier for this contract.
+## 3. Mutation / execution safety
 
-## 3. UI product-quality truth
+Run #74 MutationPolicy runtime proof: **PASS**.
 
-Canonical tabs: **22**. Required final review artifact: **22 desktop + 22 mobile = 44 exact-serving screenshots**.
+- manifest state=`ENFORCED`;
+- write routes=`33`;
+- unknown routes=`0`;
+- duplicate routes=`0`;
+- public dashboard read-only=`true`;
+- control authority configured=`false`;
+- live mutation=`HARD_DENY`;
+- live approval=`HARD_DENY`;
+- worker authority=`DEDICATED_WORKER_TOKEN`;
+- paper probe => 403 `PAPER_MUTATION_AUTHORITY_REQUIRED`;
+- live probe => 423 `LIVE_MUTATION_LOCKED`;
+- invalid worker probe => 401 `WORKER_AUTH_INVALID`;
+- unknown mutation probe => 403 `MUTATION_CAPABILITY_UNKNOWN`;
+- live order endpoints called=`false`;
+- paper mutation handlers called=`false`;
+- secret values exposed=`false`.
 
-Last complete baseline before run #73:
-- run #72: 18/22 tabs passed render/capture proof and produced 36 screenshots;
-- baseline timeout tabs were Truth Control, E2E Proof, Signals and Trade;
-- no API-key/login prompt detected in passing tabs;
-- browser proof called no trading mutations.
+Do not weaken these gates to clear operational blockers.
 
-Screenshot PASS is not UI FINAL.
+## 4. Broker / token / StateTruth — mandatory read-only truth
 
-Current design defects proven by visual review:
-- mobile layout is not acceptable for final product review: the 190px desktop sidebar consumes too much of a 430px viewport;
-- several desktop workspaces are information-dense with inconsistent visual hierarchy;
-- Signals and Trade retain stale auth-era fallback wording in source; public-readonly regressions must be shown as contract errors, never credential requests;
-- Truth/E2E/Signals/Trade and other read-heavy tabs are visibly affected by slow backend data reads;
-- no tab may be marked FINAL until exact-serving desktop/mobile visuals, backend/data truth and user review all pass.
+Fresh run #74 sanitized evidence:
+- `/api/health`: **HTTP 200**, `status=ok`, `mode=PAPER`;
+- `/api/broker/status`: **HTTP 200**, `connected=true`;
+- token source=`GCP_SECRET_MANAGER_DYNAMIC`;
+- broker-loaded Secret Manager token version=`82`;
+- latest enabled access-token secret version observed by metadata=`83`;
+- token value exposed=`false`;
+- LIVE trading enabled=`false`;
+- order placement allowed=`false`;
+- broker probe latency field ~`935 ms`;
+- total broker-status endpoint latency ~`12.35 s`;
+- broker summary `error_present=true`;
+- `/api/state`: **HTTP 200**, `broker_connected=false`.
 
-Draft PR **#139** is CI-green and intentionally unmerged. It converts the mobile sidebar to a 58px accessible icon rail while preserving all 22 navigation targets. Hold until the current visual-baseline lineage finishes, then review its deployed screenshots before merge/finalization.
+Typed broker conclusion: **DIRECT BROKER READ CONNECTED, BUT StateTruth CONTRADICTS IT — NOT CLOSED.** Do not collapse this into a single green broker badge.
 
-## 4. Broker / token / StateTruth
+### Disconnect / recurrence / root cause / remediation / prevention ledger
 
-Run #73 sanitized runtime evidence:
-- `/api/broker/status`: HTTP 200;
-- direct broker probe `connected=true`;
-- token source `GCP_SECRET_MANAGER_DYNAMIC`;
-- Secret Manager access-token version **81**;
-- token value exposed=false;
-- LIVE trading enabled=false;
-- order placement allowed=false;
-- broker latency field ~66 ms;
-- broker status endpoint total latency ~12.4 s;
-- broker summary still reports an error field present;
-- `/api/state`: `broker_connected=false`;
-- `/api/health`: HTTP 200, status=`ok`, mode=`PAPER`.
+1. **StateTruth recurrence:** direct `/api/broker/status connected=true` while `/api/state broker_connected=false` persisted from run #73 into run #74. Root cause is not yet proven. Remediation is to keep both authorities visible and trace state propagation rather than overwrite one with the other. Prevention condition: one typed broker authority or explicit freshness/versioned reconciliation with CAS evidence.
+2. **Token-version recurrence:** broker runtime loaded version 82 while Secret Manager metadata already observed latest enabled version 83. This is compatible with bounded token-cache timing but must remain explicit. Remediation: dynamic source + bounded cache + version metadata. Prevention condition: expose safe loaded/latest version freshness without token payload and re-load only through canonical provider.
+3. **Legacy invocation/identity recurrence:** runtime evidence contains older failed web-runtime/self-heal executions, including a run #74-era web invocation that failed, while the explicit automation execution `xchgb` succeeded under `genesis-system3-dhan-rotator@...`. Remediation: dedicated rotator identity is deployed and Scheduler uses `gs3-scheduler@...`; web runtime has invoke-only authority. Prevention condition: prove current configured Job identity from control-plane JSON, then remove any obsolete web-runtime secret mint/read privileges once no longer required.
+4. **Run #74 verifier false failure:** step 19 returned `ROTATOR_IDENTITY_MISMATCH None` although the explicit rotator execution succeeded with `serviceAccountName=genesis-system3-dhan-rotator@...`. Root cause is a stale JSON path in the workflow verifier: it expected `spec.template.template.serviceAccount*`, while current `gcloud run jobs describe --format=json` uses the nested v1 Job shape. Remediation PR #141 introduces a fail-closed schema-aware parser plus regression tests. Prevention: accept only recognized v1/v2 identity fields, fail on missing/ambiguous/wrong identity, and keep the dedicated expected SA exact-match gate.
+5. **Next latent auth-proof defect found before rerun:** workflow step 20 still expected legacy `.mode == "auth_disabled"` although serving canonical status is `public_readonly`. PR #141 changes the assertion to require **all** canonical fields simultaneously: `required=false`, `configured=false`, `authenticated=false`, `mode=public_readonly`, `credential_surface=REMOVED`, `session=null`. This tightens rather than weakens the no-credential proof.
 
-Therefore current broker truth is **CONTRADICTORY / NOT CLOSED**. A successful direct Dhan read must not be collapsed into a single green broker badge while StateTruth says disconnected.
+## 5. Dhan rotator / Scheduler authority
 
-Run #72 had direct broker connected with token version 76; run #73 observes version 81, proving token versions continue to advance, but dedicated rotator/Scheduler authority is still not runtime-closed.
+Run #74 control-plane truth:
+- Cloud Run Job deployment: PASS;
+- intended Job SA: `genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com`;
+- explicit execution `genesis-system3-dhan-token-rotate-xchgb`: **successful**;
+- successful execution spec records dedicated rotator `serviceAccountName`;
+- Scheduler state=`ENABLED`;
+- schedule=`30 7 * * *`;
+- time zone=`Asia/Kolkata`;
+- Scheduler OAuth identity=`gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com`;
+- Scheduler target is only the canonical Cloud Run Job `:run` endpoint;
+- LIVE/order flags remain off in the Job configuration.
 
-Remaining broker infrastructure proof:
-- Scheduler metadata is still unavailable;
-- dedicated rotator identity has not yet been re-proven by the blocked workflow stages;
-- earlier executions show legacy web-runtime invocation/identity drift;
-- intended identities remain `genesis-system3-dhan-rotator@...` and `gs3-scheduler@...`;
-- once dedicated rotator is proven, remove obsolete web-runtime PIN/TOTP/token-version-add authority and re-prove least privilege.
+PR #141 is the current repair lane for the **proof parser**, not for widening runtime authority.
 
-## 5. Market-data truth
+## 6. Market-data truth
 
 Broker authentication is not market-data readiness.
 
-Run #72/#73 evidence continues to show all four required index option chains not proven fresh/populated:
-- NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY return HTTP 200;
+Fresh run #74 evidence for NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY:
+- HTTP 200;
 - source=`dhan`;
-- source priority indicates Dhan response with no contract rows;
-- spot can be present while contract_count/fetched_at authority is missing;
-- chain requests were about 25 seconds in run #72;
-- scanner top-contract-gainers can approach 30-second timeout;
+- source priority=`dhan_only_no_rows`;
+- spot can be available;
+- `contract_count` authority is missing/null;
+- `fetched_at_utc` authority is missing/null;
+- each request is roughly 25 seconds;
 - `all_required_chains_ready=false`.
 
-Typed conclusion: **OptionChainTruth NOT READY**. Do not treat HTTP 200 or spot availability as a populated chain.
+`/api/scanner/top_contract_gainers` also timed out at ~30 seconds in run #74.
 
-## 6. P0 dependency truth
+Typed conclusion: **OptionChainTruth NOT READY**. Current runtime lock remains `DEPLOYMENT_LOCKED` only because **all four required option chains are not fresh and populated**. HTTP 200 and spot availability are insufficient.
+
+## 7. Current PR / CI lanes
+
+- PR #130: merged; immutable digest resolver/deployer lineage complete and CI-green.
+- PR #129: open, stale/diverged, non-mergeable; Global Safety historically failing. Selective current-main reimplementation only.
+- PR #121 observability: stale/non-mergeable; selectively salvage request IDs, redacted synthetics, uptime/SLO/runbook pieces only after current runtime gate.
+- PR #125 OperationsTruth: stale/non-mergeable; selectively salvage typed OperationsTruth/SLO evidence only after current runtime gate.
+- PR #139 mobile UI compact rail: draft, stale-base relative to current main; refresh/review after runtime-proof lane is green, then deploy screenshots before any merge.
+- **PR #141**: current focused runtime-proof repair. Files: canonical workflow + schema-aware identity verifier + tests + this master report. Merge prohibited until all exact required CI gates are green.
+
+## 8. P0 dependency truth
 
 | Dependency | Current truth | Closure condition |
 |---|---|---|
-| Firestore runtime | VERIFIED current lineage | preserve |
-| Deployment source/digest/provenance | VERIFIED for run #73 source | re-prove current eadd4be8 source |
-| 22-tab exact-serving browser proof | FAIL run #73 / run #74 in progress | 22/22 + 44 screenshots |
-| Public no-key dashboard | architecture VERIFIED | preserve exact-serving proof |
-| MutationPolicy | source/CI partial | runtime capability proof after visual gate |
-| SafetyTruth + ExecutionEligibility | OPEN P0 | MutationPolicy closure |
-| PreTradeRiskService | OPEN P0 | SafetyTruth closure |
-| AccountTruth / SnapshotCoordinator | OPEN P0-P1 | prior gates |
-| PaperLedger / Reconciliation | PARTIAL | durable lifecycle/reconciliation proof |
-| StateTruth/domain CAS | PARTIAL; broker contradiction active | converge authorities + CAS proof |
-| DeploymentTruth V2 | PARTIAL | run #74 complete; permanent trigger coverage |
-| WorkCoordinator/idempotency | OPEN | prior gates |
-| OptionChainTruth -> StreamTruth -> ScannerTruth -> PredictionTruth | OPEN P1 | strict order after P0 |
-| Real-money readiness | **NO** | all above plus live-order safety/reconciliation proof |
+| Firestore runtime | VERIFIED | preserve |
+| Deployment source/digest/provenance | VERIFIED run #74 | preserve |
+| 22-tab exact-serving browser proof | **PASS 22/22** | preserve |
+| Desktop/mobile screenshot artifact | **PASS 44/44** | product review still pending |
+| Public no-key dashboard | VERIFIED exact-serving | preserve strict canonical auth status |
+| MutationPolicy | **VERIFIED runtime PASS** | preserve |
+| Rotator/Scheduler identity | runtime evidence positive; verifier false-failed | PR #141 CI + rerun step 19 |
+| BrokerTruth | direct connected, StateTruth contradiction | reconcile typed authorities |
+| StateTruth/domain CAS | PARTIAL | converge broker state + CAS proof |
+| OptionChainTruth | **NOT READY** | four populated/fresh chains |
+| ScannerTruth | NOT READY | after OptionChainTruth |
+| AlphaTruth | INSUFFICIENT_EVIDENCE | reproducible larger evidence |
+| Real-money readiness | **NO** | all safety/data/reconciliation gates; LIVE stays locked |
 
-## 7. AlphaTruth
+## 9. AlphaTruth
 
 Quantitative performance targets remain goals, not claims.
 
-Current authoritative evidence remains insufficient: 5 days / 8 trades / 50% win rate / net P&L `-102636.35`. **AlphaTruth=`INSUFFICIENT_EVIDENCE`**.
+Current authoritative evidence remains insufficient: 5 days / 8 trades / 50% win rate / net P&L `-102636.35`. **AlphaTruth=`INSUFFICIENT_EVIDENCE`**. Historical larger frozen holdout also failed performance. No model auto-promotion or live risk increase is authorized.
 
-Historical larger frozen holdout also failed performance (negative risk-adjusted return and excessive drawdown). No model auto-promotion or live risk increase is authorized.
+## 10. Current checkpoint
 
-## 8. SRE / observability / salvage
-
-- PR #125 OperationsTruth: historically CI-green but stale; refresh/selectively reimplement on current main, do not wholesale merge.
-- PR #121 observability: historically CI-verified but stale; selectively reimplement trace IDs, redacted synthetic evidence, uptime/SLO/runbook pieces after current runtime gate.
-- SLO targets remain NOT_PROVEN until measured over sufficient windows.
-- Duplicate runtime-trigger PR #137 is closed as superseded.
-- Old auth PRs #129/#131 are stale/diverged; do not wholesale merge.
-- `conflict_120826_0310` remains quarantined selective salvage only; never quote or merge its credential incident.
-
-## 9. Current checkpoint
-
-- Application/source: **`eadd4be87c807ae67ba0d936d8ac50511226138d`**.
-- Exact runtime verifier: **Cloud Run Auto Deploy run `31582769776` / #74 — IN_PROGRESS**.
-- Last finalized exact runtime lock: source `9e2ce916...`, `DEPLOYMENT_LOCKED`, source_matches=true.
-- Run #73 UI: fail due proof-runner total budget; not an app startup failure.
-- Broker: direct Dhan probe connected/token v81, but StateTruth reports disconnected => **CONTRADICTORY**.
+- Repository main: **`12f72b0460a003093362b90b9a6131e19dc603ff`**.
+- Deployed/application source: **`eadd4be87c807ae67ba0d936d8ac50511226138d`**.
+- Serving/latest-ready: **`genesis-system3-web-00240-roh` @ 100%**.
+- Run #74 overall: **FAIL only at stale rotator-identity verifier** after UI/MutationPolicy/rotator execution success.
+- UI automated proof: **22/22 tabs; 44/44 screenshots; zero retries; zero mutations**.
+- Health: **200 / ok / PAPER**.
+- Broker: **200 / direct connected / token v82 / latest secret v83 / LIVE false / orders false**, but `/api/state broker_connected=false` => **CONTRADICTORY / NOT CLOSED**.
+- Scheduler: **ENABLED**, `30 7 * * *`, `Asia/Kolkata`, dedicated scheduler identity.
 - Required option chains: **NOT READY**.
-- Mobile UI: **BLOCKED for final quality**; PR #139 draft/CI-green.
-- AlphaTruth: INSUFFICIENT_EVIDENCE.
-- LIVE/order authority: OFF/FALSE.
-- **USER ACTION REQUIRED=NO.** Continue run #74 -> all-tab proof -> MutationPolicy -> dedicated rotator/Scheduler -> broker/StateTruth re-proof -> next strict P0 dependency.
+- Runtime lock: **DEPLOYMENT_LOCKED** because all four required option chains are not fresh/populated.
+- PR #141: active remediation; merge only after exact CI green, then rerun canonical deploy/runtime proof.
+- LIVE/order authority: **OFF / LOCKED / FALSE**.
+- **USER ACTION REQUIRED=NO.**
