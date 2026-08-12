@@ -12,9 +12,10 @@ class DhanRotatorIdentityContractTests(unittest.TestCase):
             workflow,
         )
         self.assertIn(
-            "DHAN_SCHEDULER_SERVICE_ACCOUNT: genesis-system3-scheduler-invoker@system3-openalgo-safe.iam.gserviceaccount.com",
+            "DHAN_SCHEDULER_SERVICE_ACCOUNT: gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
             workflow,
         )
+        self.assertNotIn("genesis-system3-scheduler-invoker", workflow)
         self.assertIn('--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"', workflow)
         self.assertIn('--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"', workflow)
         self.assertIn('"${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" "${DHAN_SCHEDULER_SERVICE_ACCOUNT}"', workflow)
@@ -49,7 +50,8 @@ class DhanRotatorIdentityContractTests(unittest.TestCase):
     def test_bootstrap_grants_secret_roles_to_correct_identity_only(self):
         bootstrap = Path("deploy/gcp/bootstrap_github_wif.sh").read_text(encoding="utf-8")
         self.assertIn('ROTATOR_SA_NAME="${ROTATOR_SA_NAME:-genesis-system3-dhan-rotator}"', bootstrap)
-        self.assertIn('SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-genesis-system3-scheduler-invoker}"', bootstrap)
+        self.assertIn('SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-gs3-scheduler}"', bootstrap)
+        self.assertNotIn("genesis-system3-scheduler-invoker", bootstrap)
         self.assertIn('member="serviceAccount:${ROTATOR_SA}"', bootstrap)
         self.assertIn('role="roles/secretmanager.secretVersionAdder"', bootstrap)
         self.assertIn('for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret', bootstrap)
