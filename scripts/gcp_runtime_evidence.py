@@ -33,10 +33,16 @@ SAFE_ENV = {
     "SYSTEM3_DEPLOY_TARGET", "MEM_WARN_MB", "MEM_GC_MB", "MEM_LIMIT_MB",
 }
 SECRETS = ("system3-dhan-client-id", "dhan-access-token", "dhan-pin", "dhan-totp-secret")
-# Env var names that must only ever arrive via Secret Manager (valueFrom) when
-# they are intentionally mounted. API_KEY is intentionally NOT mounted in the
-# public read-only PAPER dashboard, while WORKER_PUSH_TOKEN remains secret-backed.
-SECRET_BACKED_ENV_NAMES = {"API_KEY", "WORKER_PUSH_TOKEN"}
+RETIRED_DASHBOARD_AUTH_ENV_NAMES = {
+    "API_KEY",
+    "DASHBOARD_API_KEY",
+    "ENABLE_DASHBOARD_AUTH",
+    "DASHBOARD_SESSION_MAX_AGE",
+}
+# These names must never be present as plain values. WORKER_PUSH_TOKEN is the
+# only dashboard-related secret intentionally mounted; all retired dashboard
+# credential/session names are forbidden whether secret-backed or plaintext.
+SECRET_BACKED_ENV_NAMES = RETIRED_DASHBOARD_AUTH_ENV_NAMES | {"WORKER_PUSH_TOKEN"}
 REDACT = re.compile(
     r"(?i)(bearer\s+[a-z0-9._~+\-/]+=*|authorization\s*[:=]\s*\S+|"
     r"(?:token|secret|password|pin|totp|api[_-]?key)\s*[:=]\s*[^\s,;]+)"
@@ -85,8 +91,8 @@ def safe_env(service: dict[str, Any]) -> tuple[dict[str, Any], list[str], list[s
         elif name in SAFE_ENV:
             env[name] = row.get("value")
         elif name in SECRET_BACKED_ENV_NAMES:
-            # Present with a plain value instead of a Secret Manager valueFrom
-            # reference: the value itself is never captured, only the fact of the leak.
+            # The value itself is never captured, only the fact that a retired
+            # credential/config name or the worker token appeared as plaintext.
             plaintext_secret_names.append(name)
     return env, sorted(secret_refs), sorted(plaintext_secret_names)
 
@@ -101,16 +107,20 @@ def is_on(value: Any) -> bool:
 
 def evaluate_safety(env: dict[str, Any], secret_refs: list[str],
                      plaintext_secret_names: list[str]) -> dict[str, Any]:
-    """Evaluate the approved public-read-only PAPER dashboard safety posture.
+    """Evaluate the approved permanent public-read-only PAPER posture.
 
-    Dashboard viewing intentionally requires no API key. Therefore the expected
-    state is REQUIRE_API_KEY=false and no API_KEY Secret Manager mount. Mutation
-    authority remains independently fail-closed in MutationPolicy/security policy,
-    and worker ingestion continues to use its dedicated worker secret.
+    Dashboard viewing intentionally has no credential/session authority. The
+    legacy REQUIRE_API_KEY=false compatibility flag is harmless and explicit,
+    but retired API-key/auth/session env names must be absent from revision
+    metadata whether secret-backed or plaintext. Worker ingestion remains bound
+    to its separate dedicated worker secret.
     """
     api_key_required = not is_off(env.get("REQUIRE_API_KEY"))
-    api_key_mounted = "API_KEY" in secret_refs
-    api_key_plaintext_exposed = "API_KEY" in plaintext_secret_names
+    retired_secret_mounts = sorted(RETIRED_DASHBOARD_AUTH_ENV_NAMES & set(secret_refs))
+    retired_plaintext = sorted(RETIRED_DASHBOARD_AUTH_ENV_NAMES & set(plaintext_secret_names))
+    api_key_mounted = bool(retired_secret_mounts)
+    api_key_plaintext_exposed = bool(retired_plaintext)
+    credential_surface_removed = not retired_secret_mounts and not retired_plaintext
     return {"analyze_mode": is_on(env.get("ANALYZE_MODE")),
             "live_trading_enabled": not is_off(env.get("LIVE_TRADING_ENABLED")),
             "system3_live_trading_allowed": not is_off(env.get("SYSTEM3_LIVE_TRADING_ALLOWED")),
@@ -118,9 +128,11 @@ def evaluate_safety(env: dict[str, Any], secret_refs: list[str],
             "api_key_required": api_key_required,
             "api_key_mounted": api_key_mounted,
             "api_key_plaintext_exposed": api_key_plaintext_exposed,
+            "retired_dashboard_auth_secret_mounts": retired_secret_mounts,
+            "retired_dashboard_auth_plaintext_env": retired_plaintext,
+            "dashboard_credential_surface_removed": credential_surface_removed,
             "dashboard_public_readonly": (not api_key_required
-                                          and not api_key_mounted
-                                          and not api_key_plaintext_exposed),
+                                          and credential_surface_removed),
             "secret_payloads_exposed": False}
 
 
@@ -130,6 +142,7 @@ def safety_passes(safety: dict[str, Any]) -> bool:
             and not safety["system3_live_trading_allowed"]
             and not safety["auto_execute_trades"]
             and safety["dashboard_public_readonly"]
+            and safety["dashboard_credential_surface_removed"]
             and not safety["api_key_plaintext_exposed"])
 
 
@@ -141,10 +154,16 @@ def safety_blockers(safety: dict[str, Any]) -> list[str]:
         blockers.append("Live-trading-off invariants are not proven.")
     if safety["api_key_required"]:
         blockers.append("Dashboard API key requirement was re-enabled; PAPER dashboard must remain public/read-only.")
-    if safety["api_key_mounted"]:
-        blockers.append("Dashboard API key is unexpectedly mounted; PAPER dashboard must not require or mount API_KEY.")
-    if safety["api_key_plaintext_exposed"]:
-        blockers.append("Dashboard API key is present as a plaintext environment value.")
+    if safety["retired_dashboard_auth_secret_mounts"]:
+        blockers.append(
+            "Retired dashboard credential/session secret env remains mounted: "
+            + ",".join(safety["retired_dashboard_auth_secret_mounts"])
+        )
+    if safety["retired_dashboard_auth_plaintext_env"]:
+        blockers.append(
+            "Retired dashboard credential/session plaintext env remains present: "
+            + ",".join(safety["retired_dashboard_auth_plaintext_env"])
+        )
     return blockers
 
 
@@ -268,7 +287,7 @@ def endpoint_summary(path: str, body: Any) -> dict[str, Any]:
     if not isinstance(body, dict):
         return {"json_object": False}
     if path == "/api/auth/status":
-        return {k: body.get(k) for k in ("required", "configured", "authenticated", "mode")}
+        return {k: body.get(k) for k in ("required", "configured", "authenticated", "mode", "credential_surface")}
     if path == "/api/health":
         return {k: body.get(k) for k in ("status", "service", "mode", "timestamp", "version")}
     if path == "/api/state":
@@ -431,7 +450,7 @@ def collect() -> dict[str, Any]:
     template = (service.get("spec") or {}).get("template") or service.get("template") or {}
     service_account = ((((service.get("spec") or {}).get("template") or {}).get("spec") or {}).get("serviceAccountName")
                        or template.get("serviceAccount"))
-    return {"schema_version": 1, "generated_at_utc": iso(end_dt), "project_id": PROJECT,
+    return {"schema_version": 2, "generated_at_utc": iso(end_dt), "project_id": PROJECT,
             "region": REGION, "service": SERVICE, "repository_commit": EXPECTED_SHA or None,
             "deployed_commit": deployed_sha or None, "source_matches_deployment": source_match,
             "cloud_run": {"latest_ready_revision": revision or None, "service_url": url or None,
