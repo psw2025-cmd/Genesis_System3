@@ -1,87 +1,59 @@
 # start_dashboard_live.ps1
-# Quick launcher to start dashboard for live viewing
+# Local read-only dashboard launcher. Production authority remains Google Cloud.
 
-$ErrorActionPreference = "Continue"
+$ErrorActionPreference = "Stop"
 $ROOT_DIR = Split-Path -Parent $PSScriptRoot
 $VENV_DIR = Join-Path $ROOT_DIR "venv"
-$BACKEND_DIR = Join-Path $ROOT_DIR "dashboard\backend"
 $FRONTEND_DIR = Join-Path $ROOT_DIR "dashboard\frontend"
 
 Write-Host "========================================"
-Write-Host "STARTING DASHBOARD FOR LIVE VIEWING"
+Write-Host "STARTING SYSTEM3 PUBLIC READ-ONLY DASHBOARD"
 Write-Host "========================================"
 
-# Check prerequisites
-Write-Host "`n[1/3] Checking prerequisites..."
-$pythonOk = Get-Command python -ErrorAction SilentlyContinue
+$pythonExe = Join-Path $VENV_DIR "Scripts\python.exe"
+if (-not (Test-Path $pythonExe)) {
+    $pythonExe = (Get-Command python -ErrorAction Stop).Source
+}
 $nodeOk = Get-Command node -ErrorAction SilentlyContinue
-
-if (-not $pythonOk) {
-    Write-Host "  [FAIL] Python not found"
-    exit 1
-}
 if (-not $nodeOk) {
-    Write-Host "  [FAIL] Node.js not found"
+    Write-Host "[FAIL] Node.js not found"
     exit 1
 }
-Write-Host "  [OK] Prerequisites met"
 
-# Start backend
-Write-Host "`n[2/3] Starting backend..."
-Push-Location $BACKEND_DIR
+# Retired dashboard credential variables are deliberately removed. The backend
+# package and secure wrapper enforce the same contract again at import time.
+Remove-Item Env:REQUIRE_API_KEY -ErrorAction SilentlyContinue
+Remove-Item Env:API_KEY -ErrorAction SilentlyContinue
+Remove-Item Env:DASHBOARD_API_KEY -ErrorAction SilentlyContinue
+Remove-Item Env:ENABLE_DASHBOARD_AUTH -ErrorAction SilentlyContinue
+$env:ANALYZE_MODE = "1"
+$env:SYSTEM3_MODE = "ANALYZER"
+$env:LIVE_TRADING_ENABLED = "0"
+$env:SYSTEM3_LIVE_TRADING_ALLOWED = "0"
+$env:AUTO_EXECUTE_TRADES = "0"
 
-# Activate venv and start backend
-$backendScript = @"
-import sys
-import os
-sys.path.insert(0, r'$BACKEND_DIR')
-os.chdir(r'$BACKEND_DIR')
-from app import app
-import uvicorn
-print('Backend starting on http://127.0.0.1:8000')
-print('API docs: http://127.0.0.1:8000/docs')
-uvicorn.run(app, host='127.0.0.1', port=8000, log_level='info')
-"@
-
-$backendScript | Out-File -FilePath "$env:TEMP\dashboard_backend_start.py" -Encoding UTF8
-
-Start-Process -FilePath "$VENV_DIR\Scripts\python.exe" `
-    -ArgumentList "$env:TEMP\dashboard_backend_start.py" `
+Write-Host "`n[1/2] Starting secure backend wrapper..."
+Start-Process -FilePath $pythonExe `
+    -ArgumentList "-m", "uvicorn", "dashboard.backend.secure_app:app", "--host", "127.0.0.1", "--port", "8000", "--log-level", "info" `
+    -WorkingDirectory $ROOT_DIR `
     -WindowStyle Normal `
     -PassThru | Out-Null
+Write-Host "  [OK] Backend starting through dashboard.backend.secure_app"
 
-Pop-Location
-Write-Host "  [OK] Backend starting (check new window)"
-
-# Start frontend
-Write-Host "`n[3/3] Starting frontend..."
+Write-Host "`n[2/2] Starting frontend..."
 Push-Location $FRONTEND_DIR
-
-# Ensure dependencies installed
 if (-not (Test-Path "node_modules")) {
-    Write-Host "  [INFO] Installing frontend dependencies (first time only)..."
     npm install --silent
 }
-
 Start-Process -FilePath "npm" `
     -ArgumentList "run", "dev", "--", "--host", "127.0.0.1", "--port", "3000" `
     -WindowStyle Normal `
     -PassThru | Out-Null
-
 Pop-Location
-Write-Host "  [OK] Frontend starting (check new window)"
 
-# Wait a moment
 Start-Sleep -Seconds 3
-
-Write-Host "`n========================================"
-Write-Host "DASHBOARD STARTED!"
-Write-Host "========================================"
 Write-Host ""
-Write-Host "Open in browser:"
-Write-Host "  Frontend UI: http://localhost:3000"
-Write-Host "  Backend API: http://localhost:8000"
-Write-Host "  API Docs:   http://localhost:8000/docs"
-Write-Host ""
-Write-Host "Press Ctrl+C in the backend/frontend windows to stop"
-Write-Host "========================================"
+Write-Host "Frontend UI: http://localhost:3000"
+Write-Host "Backend API: http://localhost:8000"
+Write-Host "Dashboard visibility: PUBLIC / READ-ONLY"
+Write-Host "LIVE: OFF / LOCKED"
