@@ -23,6 +23,7 @@ env:
   ANALYZE_MODE: "1"
   LIVE_TRADING_ENABLED: "0"
   SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+  AUTO_EXECUTE_TRADES: "0"
   SYSTEM3_REAL_ONLY: "1"
   DEFER_INSTRUMENT_WARMUP: "1"
   PYTHONDONTWRITEBYTECODE: "1"
@@ -115,6 +116,7 @@ jobs:
 
           grep -q 'LIVE_TRADING_ENABLED: "0"' .github/workflows/ci.yml || { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml"; exit 1; }
           grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED: "0"' .github/workflows/ci.yml || { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml"; exit 1; }
+          grep -q 'AUTO_EXECUTE_TRADES: "0"' .github/workflows/ci.yml || { echo "FAIL: AUTO_EXECUTE_TRADES=0 missing from ci.yml"; exit 1; }
 
           echo "policy_guard=PASS"
           echo "cloud_runner_policy=PASS"
@@ -157,6 +159,8 @@ jobs:
           python -m py_compile scripts/system3_full_repo_verification.py
           python -m py_compile scripts/system3_master_proof_orchestrator.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
+          python -m py_compile scripts/quant_alpha_evaluator.py
+          python -m py_compile src/quant/alpha_truth.py
           echo "compile_proof=PASS"
 
   full-proof-pack-validation:
@@ -169,6 +173,7 @@ jobs:
       ANALYZE_MODE: "1"
       LIVE_TRADING_ENABLED: "0"
       SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      AUTO_EXECUTE_TRADES: "0"
       SYSTEM3_REAL_ONLY: "1"
       DEFER_INSTRUMENT_WARMUP: "1"
     steps:
@@ -218,8 +223,11 @@ jobs:
           python -m py_compile scripts/cloud_worker.py
           python -m py_compile core/engine/system3_phase82_job_scheduler.py
           python -m py_compile scripts/system3_self_healing_watchdog.py
+          python -m py_compile scripts/quant_alpha_evaluator.py
+          python -m py_compile src/quant/alpha_truth.py
           test -f dashboard/frontend/src/components/LiveTradingGate.tsx
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
+          python -c "import json; json.load(open('config/quant_alpha_targets.json'))" && echo "quant_alpha_targets_json=VALID"
           echo "compile_expanded=PASS"
 
       - name: Dashboard backend import smoke
@@ -232,12 +240,14 @@ jobs:
           os.environ["ANALYZE_MODE"] = "1"
           os.environ["LIVE_TRADING_ENABLED"] = "0"
           os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+          os.environ["AUTO_EXECUTE_TRADES"] = "0"
           os.environ["SYSTEM3_REAL_ONLY"] = "1"
           os.environ["DEFER_INSTRUMENT_WARMUP"] = "1"
           import dashboard.backend.app as app
           assert getattr(app, "app", None) is not None, "FastAPI app object missing"
           assert os.environ["LIVE_TRADING_ENABLED"] == "0", "LIVE_TRADING_ENABLED safety check failed"
           assert os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] == "0", "SYSTEM3_LIVE_TRADING_ALLOWED safety check failed"
+          assert os.environ["AUTO_EXECUTE_TRADES"] == "0", "AUTO_EXECUTE_TRADES safety check failed"
           print("dashboard_backend_import_smoke=PASS")
           print("live_trading_safety_in_app=PASS")
           PY
@@ -251,7 +261,34 @@ jobs:
             tests/test_qc_validator_dhan_aliases.py \
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
+            tests/test_quant_alpha_truth.py \
             -v --tb=short
+
+      - name: Classify quantitative AlphaTruth evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/quant_alpha_evaluator.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("reports/latest/quant_alpha_evaluator/evaluation.json")
+          report = json.loads(path.read_text(encoding="utf-8"))
+          assert report["live_trading_enabled"] is False
+          assert report["real_orders_attempted"] == 0
+          assert report["model_auto_promotion_allowed"] is False
+          assert report["destructive_git_reset_allowed"] is False
+          assert report["retry_budget"] == 5
+          assert report["state"] in {
+              "PROVEN", "TARGET_FAIL", "INSUFFICIENT_EVIDENCE", "LEAKAGE_BLOCKED", "SCHEMA_ERROR", "DATA_ERROR"
+          }
+          if report["state"] == "PROVEN":
+              assert report["research_candidate_allowed"] is True
+              assert not report.get("blockers")
+          else:
+              assert report["research_candidate_allowed"] is False
+          print("ALPHATRUTH_CI_CONTRACT_OK", report["state"])
+          PY
 
       - name: Run proof batch
         shell: bash
