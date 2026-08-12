@@ -16,10 +16,6 @@ set LIVE_TRADING_ENABLED=0
 set SYSTEM3_LIVE_TRADING_ALLOWED=0
 set AUTO_EXECUTE_TRADES=0
 set SYSTEM3_REAL_ONLY=1
-set REQUIRE_API_KEY=
-set API_KEY=
-set DASHBOARD_API_KEY=
-set ENABLE_DASHBOARD_AUTH=
 
 echo.
 echo ====================================================================
