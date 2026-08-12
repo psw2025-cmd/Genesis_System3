@@ -1,225 +1,208 @@
-# Genesis System3 Continuous Audit — Single Master Report
+# Genesis System3 Manual Repository QC Master Audit
 
-Updated: `2026-08-12 run #78 terminal checkpoint + retired-dashboard-secret remediation branch`
+As of 2026-08-12 21:01 IST. This file remains the single master authority for manual repository/runtime QC evidence. Do not create competing status reports.
 
-> Single authority for `psw2025-cmd/Genesis_System3`. Google Cloud is the only runtime/deployment authority. LIVE remains OFF/LOCKED. No live order placement/modification/cancellation/routing is permitted. Secret payloads must never be exposed. Source, CI, Ready, browser visuals, BrokerTruth, StateTruth, market-data truth and AlphaTruth remain separate evidence domains.
+## Executive state
 
-## 0. Current source / PR / runtime authority
+- Deployed application SHA: `e3b1f3b40fcc65223acb65d5189529dae3af2e90`.
+- Cloud Run Auto Deploy #79 (`31607212444`): **SUCCESS**.
+- Serving / latest-created / latest-ready revision: `genesis-system3-web-00249-22f`.
+- Promotion path: guarded 0%-traffic candidate -> exact runtime/UI proof -> 100% serving traffic.
+- Automated UI proof: **22/22 tabs PASS; desktop 22/22; mobile 22/22; 44/44 screenshots; 0 failures; 0 retries**.
+- Retired dashboard credential mounts: `API_KEY` absent and `DASHBOARD_API_KEY` absent on the exact serving revision.
+- Runtime mode: ANALYZER / PAPER. LIVE remains **OFF / LOCKED**.
+- Real order actions in the canonical proof: **0**.
+- Operational readiness remains **DEPLOYMENT_LOCKED** because broker/state convergence, MIDCPNIFTY OptionChainTruth, and ScannerTruth remain unresolved.
 
-- Repository: **`psw2025-cmd/Genesis_System3` only**.
-- Current `main`: **`e47aa6eb2cf4a33e70bb64c481c9d3d7f445fd49`** — merge PR #145.
-- PR #130 immutable image provenance: **MERGED**, head `56a37ae3841fe5342e5359c03570b9431d52166c`; Global Safety CI PASS; GCP Dhan Token Fix CI PASS; merge commit `e09824188ab7c30f08c0af48cf7e27bb0a22d798`.
-- PR #129 permanent no-key cleanup: **OPEN / stale / non-mergeable**, head `04f27e100b53e464f5d6ba5b407d8faaff74b3ef`; Global Safety CI FAIL while GCP Dhan Token Fix, Stage 2 Safety and Workflow Priority Guard PASS. Never wholesale merge.
-- Current focused remediation branch: `fix/run78-retired-dashboard-secret-scrub`; purpose is only to remove the inert retired `DASHBOARD_API_KEY` secret mount from future Cloud Run candidates and add fail-closed tests. It grants no new authority.
-- Cloud Run Auto Deploy **#78 / `31598580211`**: **COMPLETED / SUCCESS** for exact SHA `e47aa6eb2cf4a33e70bb64c481c9d3d7f445fd49`.
-- Run #78 candidate: **`genesis-system3-web-00246-lix`**, created at **0% traffic**, immutable digest + candidate HTTP proof PASS, then explicitly promoted to **100% traffic**.
-- Serving revision: **`genesis-system3-web-00246-lix` @ 100%**.
-- Latest-created/latest-ready for canonical run #78: **`genesis-system3-web-00246-lix`**.
-- Previous serving rollback authority: `genesis-system3-web-00244-tug`.
-- Deployed image digest: **`sha256:0c9908c94b427d42c784ccd86614e0f5ae4b42c727fa51276d03764a196d3c41`**.
-- Runtime posture: **ANALYZER/PAPER**.
-- LIVE: **OFF / LOCKED**.
-- Real broker order actions by this control loop: **0**.
+## Required PR / CI authority
 
-## 1. Mandatory current position
+### PR #130 — immutable Cloud Run digest provenance
 
-**Deployment/UI/security/identity is fully proven on exact SHA `e47aa6...`. Market-data readiness improved from 0/4 to 3/4 required option chains. The strict remaining OptionChainTruth blocker is MIDCPNIFTY. BrokerTruth vs StateTruth remains contradictory. A retired `DASHBOARD_API_KEY` secret mount is inert but still physically present on the run #78 serving revision and is now under focused removal.**
+- State: **MERGED / CLOSED**.
+- Exact head: `56a37ae3841fe5342e5359c03570b9431d52166c`.
+- Merge commit: `e09824188ab7c30f08c0af48cf7e27bb0a22d798`.
+- Global Safety CI: **PASS**.
+- GCP Dhan Token Fix CI: **PASS**.
+- Digest-resolution/provenance lane remains part of the canonical deployment path.
 
-Run #78 gate results:
-- WIF authentication: PASS;
-- static safety/syntax: PASS;
-- Firestore runtime preflight: PASS;
-- frontend production build: PASS;
-- guarded 0%-traffic candidate + immutable digest proof: PASS;
-- candidate HTTP proof + explicit promotion: PASS;
-- public no-key dashboard proof: PASS;
-- exact 22-tab visual proof: **PASS 22/22**;
-- desktop/mobile exact tab screenshots: **44/44**;
-- visual retries: **0**;
-- browser trading mutations: **0**;
-- MutationPolicy runtime proof: PASS;
-- Dhan rotator configuration + explicit execution: PASS;
-- rotator/Scheduler identity proof: PASS;
-- public broker read proof: PASS;
-- sanitized runtime evidence: PASS;
-- provenance/public-dashboard safety lock step: PASS;
-- workflow conclusion: **SUCCESS**;
-- operational result: **DEPLOYMENT_LOCKED** because all required market-data readiness is not yet true.
+### PR #129 — stale no-key cleanup lane
 
-**USER ACTION REQUIRED=NO.**
+- State: **OPEN / NON-MERGEABLE**.
+- Exact head: `04f27e100b53e464f5d6ba5b407d8faaff74b3ef`.
+- Global Safety CI: **FAIL**.
+- GCP Dhan Token Fix CI: **PASS**.
+- GCP Stage 2 Safety: **PASS**.
+- Workflow Priority Guard: **PASS**.
+- 41 commits / 37 changed files. No wholesale merge or rebase is authorized. Current-main focused fixes only.
 
-## 2. UI / dashboard — top visible priority
+### PR #146 — retired dashboard secret mount removal
 
-Run #78 artifact `public-paper-dashboard-proof-78` is exact-serving evidence for revision `genesis-system3-web-00246-lix` and SHA `e47aa6eb2cf4a33e70bb64c481c9d3d7f445fd49`.
+- State: **MERGED** to deployed application SHA `e3b1f3b40fcc65223acb65d5189529dae3af2e90`.
+- Exact-head required CI: **PASS** before merge.
+- Runtime closure: run #79 proves `DASHBOARD_API_KEY` is physically absent from the exact serving revision while the dedicated worker credential remains separate.
 
-- canonical tabs: `22`;
-- pass: `22/22`;
-- fail: `0`;
-- desktop screenshots: `22/22`;
-- mobile screenshots: `22/22`;
-- exact tab screenshots: **`44/44`**;
-- retry count: `0`;
-- browser transport: `webdriver_single_session`;
-- `/ui` HTTP: `200`;
-- dashboard API-key prompt rendered: `false`;
-- API key used for dashboard reads: `false`;
-- browser mutation/order calls: `false`.
+### Parallel stale lanes
 
-Automated render/capture is closed for this exact deployment. Product-design review is a separate evidence domain; draft PR #139 mobile compact-navigation work remains non-authoritative until refreshed, CI-proven, merged and deployed.
+- PR #121 Observability: open/non-mergeable; selective read-only correlation IDs, redacted synthetics, uptime checks and runbook concepts only.
+- PR #125 OperationsTruth: open/non-mergeable; selective typed inventory/SLO/operations evidence only.
+- Neither lane grants LIVE/order authority and neither is a wholesale merge candidate.
 
-## 3. Mutation / execution safety
+## Cloud Run exact truth — run #79
 
-Run #78 MutationPolicy proof: **PASS**.
+- Workflow: Cloud Run Auto Deploy #79 / run `31607212444` / **SUCCESS**.
+- Application SHA: `e3b1f3b40fcc65223acb65d5189529dae3af2e90`.
+- Candidate revision: `genesis-system3-web-00249-22f`.
+- Initial candidate traffic: **0%**.
+- Exact candidate proof: **PASS**.
+- Final serving traffic: **100%**.
+- Serving revision: `genesis-system3-web-00249-22f`.
+- Latest-created revision: `genesis-system3-web-00249-22f`.
+- Latest-ready revision: `genesis-system3-web-00249-22f`.
+- Source/deployment provenance match: **true**.
+- Public invoker: **true**.
+- `ANALYZE_MODE=1`.
+- `SYSTEM3_MODE=ANALYZER`.
+- `LIVE_TRADING_ENABLED=0`.
+- `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
+- `AUTO_EXECUTE_TRADES=0`.
+- Dashboard credential authority: removed; no `API_KEY` or `DASHBOARD_API_KEY` serving mount.
+- Worker ingestion token remains isolated from public dashboard authority.
 
-- manifest=`ENFORCED`;
-- write routes=`33`;
-- unknown=`0`;
-- duplicate=`0`;
-- public dashboard read-only=`true`;
-- control authority configured=`false`;
-- live mutation=`HARD_DENY`;
-- live approval=`HARD_DENY`;
-- worker authority=`DEDICATED_WORKER_TOKEN`;
-- paper mutation probe => 403 `PAPER_MUTATION_AUTHORITY_REQUIRED`;
-- live mutation probe => 423 `LIVE_MUTATION_LOCKED`;
-- invalid worker probe => 401 `WORKER_AUTH_INVALID`;
-- unknown mutation probe => 403 `MUTATION_CAPABILITY_UNKNOWN`;
-- live order endpoints called=`false`;
-- paper mutation handlers called=`false`;
-- secret values exposed=`false`.
+## UI / dashboard exact-serving proof
 
-Never weaken these gates to clear broker or market-data blockers.
+UI/dashboard remains the top visible priority and is closed at the deterministic automated-proof level for run #79:
 
-## 4. Permanent sentinels / BrokerTruth / StateTruth
+- Canonical tabs: **22**.
+- Tabs PASS: **22/22**.
+- Desktop screenshots: **22/22**.
+- Mobile screenshots: **22/22**.
+- Total exact screenshots: **44/44**.
+- Failed tabs: **0**.
+- Retries: **0**.
+- API-key/login prompt rendered: **false**.
+- API key used for dashboard reads: **false**.
+- Browser mutation activity: **false**.
+- Trading/order mutations: **0**.
+- LIVE remains **OFF / LOCKED**.
 
-Run #78 exact-serving sanitized evidence:
+Automated rendering/capture is therefore PASS. Product-design/UX review remains separate from this deterministic runtime proof.
+
+## Permanent sentinels — exact run #79 evidence
 
 ### `/api/health`
-- HTTP `200`;
-- `status=ok`;
-- `mode=PAPER`;
-- latency ~`316.6 ms`.
 
-### `/api/broker/status`
-- HTTP `200`;
-- `connected=true`;
-- token source=`GCP_SECRET_MANAGER_DYNAMIC`;
-- loaded secret version=`92`;
-- loaded at=`2026-08-12T12:59:32.372663+00:00`;
-- expires at=`2026-08-13T12:35:30+00:00`;
-- hours remaining ~`23.6`;
-- broker probe latency field ~`43 ms`;
-- endpoint total latency ~`12.394 s`;
-- token value exposed=`false`;
-- `live_trading_enabled=false`;
-- `order_placement_allowed=false`;
-- `error_present=true` remains visible.
+- HTTP: **200**.
+- status: **ok**.
+- mode: **PAPER**.
+- observed latency: approximately **306.68 ms**.
 
-### `/api/state`
-- HTTP `200`;
-- `mode=PAPER`;
-- `broker_connected=false`;
-- endpoint latency ~`5.31 s`.
+### `/api/broker/status` — direct BrokerTruth
 
-Typed conclusion: **DIRECT BROKER READ CONNECTED, StateTruth SAYS DISCONNECTED — CONTRADICTION OPEN / NOT CLOSED.**
+- HTTP: **200**.
+- `connected=false`.
+- `error_present=true`.
+- token source: `GCP_SECRET_MANAGER_DYNAMIC`.
+- loaded secret version: **101**.
+- endpoint-reported latest secret version: unavailable/null in this sanitized sample.
+- LIVE trading: **false**.
+- orders allowed: **false**.
+- observed endpoint duration: approximately **12.79 s**.
+- Secret payload value was not exposed or read into this report.
 
-### Disconnect / recurrence / root-cause / remediation / prevention ledger
+### `/api/state` — StateTruth
 
-1. **BrokerTruth vs StateTruth recurrence — ACTIVE.** `/api/broker/status connected=true` while `/api/state broker_connected=false`. Root cause remains unproven. Remediation: preserve both authorities and trace broker-state propagation/version/freshness; never overwrite one with the other. Prevention closure: one canonical broker-state authority or explicit versioned reconciliation/CAS evidence.
-2. **Broker error field recurrence — ACTIVE.** Direct read is connected/read-only yet `error_present=true`. Root cause is not safely classified in current sanitized evidence. Remediation: add/consume a typed non-secret error class/code and freshness timestamp; correlate without exposing broker payload/token. Prevention: fail-closed typed error taxonomy plus StateTruth reconciliation.
-3. **Rotator execution recurrence — RECOVERED BUT REQUIRES HISTORY.** Recent execution `genesis-system3-dhan-token-rotate-sfkx2` failed with exit code 2; a subsequent execution `...-mvs28` succeeded and run #78 explicit execution `...-4vfv9` also succeeded. Current job/Scheduler identity proof is PASS under the dedicated rotator and Scheduler accounts. Root cause of `sfkx2` is not proven by sanitized summary. Remediation: preserve the failed execution in history and correlate safe failure class before declaring recurrence permanently closed. Prevention: exact identity + explicit execution proof every deployment, zero secret payload exposure.
-4. **Legacy/default rotator identity recurrence — CONTROLLED.** Historical executions included default compute identity; current job uses `genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com`. Scheduler uses `gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com`. Prevention: schema-aware exact-SA verification remains mandatory.
-5. **Token-version skew recurrence — CURRENTLY HEALTHY.** Run #78 runtime loaded version is `92`; token is fresh with ~23.6h remaining. Secret payload was not accessed. Continue exposing only safe metadata/version/freshness.
-6. **Retired dashboard-secret mount — ACTIVE CLEANUP GAP.** Run #78 revision metadata still contains secret-backed environment name `DASHBOARD_API_KEY`. Runtime dashboard authority remains absent because serving boundary scrubs retired credential input and `/api/auth/status` proves `public_readonly`; nevertheless physical mount retention violates the permanent credential-surface-removal objective. Root cause: canonical deploy removal list scrubbed `API_KEY` but not `DASHBOARD_API_KEY`. Remediation branch now adds `DASHBOARD_API_KEY` to every candidate `--remove-secrets` command and fails closed if the existing `API_KEY` scrub disappears. Prevention: regression tests for presence, idempotence, and malformed remove-secret contracts; exact next-serving revision must prove the mount absent before closure.
-7. **Runtime lock wording precision defect — ACTIVE REPORTING DEFECT ONLY.** Lock output says “All four required option chains are not fresh and populated,” while run #78 evidence actually proves 3/4 ready and MIDCPNIFTY alone not ready. Do not weaken the lock; improve future blocker detail to enumerate failing symbols only.
+- HTTP: **200**.
+- mode: **PAPER**.
+- `broker_connected=true`.
 
-## 5. Dhan rotator / Scheduler authority
+## Broker disconnect / recurrence / RCA ledger
 
-Run #78 current control-plane proof:
-- rotator Job SA: `genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com`;
-- explicit execution `genesis-system3-dhan-token-rotate-4vfv9`: **SUCCESS**;
-- Scheduler state: **ENABLED**;
-- schedule=`30 7 * * *`;
-- timezone=`Asia/Kolkata`;
-- Scheduler OAuth identity=`gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com`;
-- target: canonical Cloud Run Job `:run` endpoint;
-- LIVE/order flags remain OFF;
-- secret payloads exposed: none.
+### Previous recurrence — run #78
 
-## 6. Market-data truth — strict active blocker
+- Direct `/api/broker/status`: `connected=true`.
+- `/api/state`: `broker_connected=false`.
+- Result: **CONTRADICTION / NOT CLOSED**.
 
-Broker authentication is not market-data readiness.
+### Current recurrence — run #79
 
-Run #78 exact-serving chain evidence:
+- Direct `/api/broker/status`: `connected=false` and `error_present=true`.
+- `/api/state`: `broker_connected=true`.
+- Result: **CONTRADICTION / NOT CLOSED**.
+- The direction of disagreement has flipped relative to run #78.
 
-| Symbol | HTTP | Source priority | Contracts | Fresh timestamp | Stale | Truth |
-|---|---:|---|---:|---|---|---|
-| NIFTY | 200 | `dhan_last_verified_snapshot` | 160 | `2026-08-12T12:56:36.608230+00:00` | false | READY |
-| BANKNIFTY | 200 | `dhan_last_verified_snapshot` | 160 | `2026-08-12T12:57:00.134661+00:00` | false | READY |
-| FINNIFTY | 200 | `dhan_last_verified_snapshot` | 160 | `2026-08-12T12:57:36.848346+00:00` | false | READY |
-| MIDCPNIFTY | 200 | `dhan_only_no_rows` | none | none | not proven | **NOT READY** |
+### Root cause
 
-- readiness: **3/4 required chains**;
-- MIDCPNIFTY spot is present but usable contract rows/fresh timestamp are absent;
-- MIDCPNIFTY request latency ~`8.364 s`;
-- `/api/scanner/top_contract_gainers` still times out at ~`30.078 s`.
+**UNPROVEN from the sanitized evidence currently available.** Do not attribute this to token expiry, cache state, probe timing, Firestore, Dhan, or any other subsystem without exact typed evidence.
 
-Current source RCA boundary:
-- `DataSourceManager` maps MIDCPNIFTY to Dhan security ID `442`, segment `IDX_I`;
-- it prefers Dhan `expiry_list`, then requests option chain, parses usable CE/PE rows, and only then stamps expiry;
-- the emergency calendar fallback still uses an obsolete Monday assumption and requires correction, but the normal path prefers broker expiry-list data, so that fallback is **not yet proven as the run #78 MIDCPNIFTY root cause**;
-- because NIFTY/BANKNIFTY/FINNIFTY are healthy in the same run, the remaining failure is narrowed to MIDCPNIFTY-specific underlying/expiry/API-response/parser/data-availability behavior rather than broad Dhan auth failure.
+### Required remediation
 
-Typed conclusion: **OptionChainTruth = 3/4 READY; MIDCPNIFTY NOT READY; DEPLOYMENT_LOCKED remains correct.**
+- Keep deployment/readiness locked.
+- Require direct BrokerTruth and StateTruth to converge on the same connection state in the same proof window.
+- Capture a typed, sanitized broker error category/phase when `error_present=true`; never expose credentials or broker payload secrets.
+- Do not treat StateTruth alone or direct BrokerTruth alone as sufficient production-readiness authority while the two disagree.
 
-## 7. PR / CI lanes
+### Prevention
 
-- PR #130: MERGED, exact-head required CI PASS; digest resolver/provenance path proven by run #78.
-- PR #129: OPEN/non-mergeable; selective semantics only, no wholesale merge.
-- PR #121 observability: OPEN/non-mergeable; request IDs, redacted synthetics, uptime/SLO/runbook concepts may be selectively salvaged after P0 work.
-- PR #125 OperationsTruth: OPEN/non-mergeable; typed inventory/SLO evidence may be selectively salvaged after P0 work.
-- PR #139 mobile compact navigation: draft/non-authoritative.
-- Current focused branch `fix/run78-retired-dashboard-secret-scrub`: removes only the obsolete dashboard secret mount and adds regression proof; no LIVE/order mutation.
+- Fail closed whenever direct BrokerTruth and StateTruth disagree.
+- Fail closed whenever direct broker `error_present=true`, even if a separate cached/state endpoint reports connected.
+- Re-run the permanent read-only sentinels on every canonical deployment and preserve recurrence/root-cause/remediation/prevention here in this single master file.
 
-## 8. Current dependency matrix
+## OptionChainTruth — run #79
 
-| Dependency | Current truth | Closure condition |
-|---|---|---|
-| Deployment source/digest/provenance | VERIFIED run #78 | preserve |
-| 0%-candidate safety | VERIFIED | preserve |
-| Exact-serving UI tabs | **22/22 PASS** | preserve |
-| Desktop/mobile screenshots | **44/44 PASS** | product review separate |
-| Public no-key dashboard | VERIFIED | remove residual retired secret mount |
-| MutationPolicy | VERIFIED PASS | preserve HARD_DENY |
-| Rotator/Scheduler identity | VERIFIED PASS | classify historical failed execution safely |
-| `/api/health` | **200 / ok / PAPER** | preserve |
-| Broker direct read | **200 / connected / read-only** | reconcile error field + StateTruth |
-| StateTruth broker | **false** | reconcile with BrokerTruth |
-| OptionChainTruth | **3/4 READY** | MIDCPNIFTY populated + fresh |
-| ScannerTruth | NOT READY | resolve MIDCPNIFTY then retest |
-| Retired dashboard secret surface | PARTIAL | next exact-serving revision has no `DASHBOARD_API_KEY` mount |
-| AlphaTruth | INSUFFICIENT_EVIDENCE | reproducible larger evidence |
-| Real-money readiness | **NO** | all safety/data/reconciliation gates; LIVE stays locked |
+- **NIFTY:** 160 contracts — READY.
+- **BANKNIFTY:** 160 contracts — READY.
+- **FINNIFTY:** 160 contracts — READY.
+- **MIDCPNIFTY:** 0 contracts — `NO_DHAN_DATA / dhan_only_no_rows` — NOT READY.
+- Required chains ready: **3/4**.
+- `all_required_chains_ready=false`.
 
-## 9. AlphaTruth
+MIDCPNIFTY remains the sole strict OptionChainTruth blocker. The absence of rows is an observed result, not a proven upstream root cause.
 
-No profitability/readiness claim is authorized. Historical evidence remains insufficient and negative. Model auto-promotion, risk increase and live execution remain forbidden until reproducible quantitative evidence and every safety/data gate pass.
+## ScannerTruth — run #79
 
-## 10. Exact current checkpoint
+- Read-only scanner request timed out at approximately **30 seconds**.
+- Scanner did not call a broker order path.
+- Scanner readiness: **NOT READY / UNCONFIRMED**.
+- Production-grade scanner claims remain disallowed until deterministic read-only proof completes within the accepted contract.
 
-- Repository `main`: **`e47aa6eb2cf4a33e70bb64c481c9d3d7f445fd49`**.
-- Cloud Run run #78: **SUCCESS**.
-- Serving/latest-created/latest-ready: **`genesis-system3-web-00246-lix`**, serving **100%**.
-- Deployed digest: `sha256:0c9908c94b427d42c784ccd86614e0f5ae4b42c727fa51276d03764a196d3c41`.
-- UI: **22/22 tabs; 44/44 screenshots; 0 retries; 0 mutations**.
-- Health: **HTTP 200 / ok / PAPER**.
-- Broker direct: **HTTP 200 / connected=true / token v92 / LIVE=false / orders=false / error_present=true**.
-- StateTruth: **broker_connected=false — CONTRADICTION OPEN**.
-- Rotator/Scheduler: **current proof PASS**, with one recent failed execution retained in recurrence history.
-- OptionChainTruth: **3/4 READY; MIDCPNIFTY NOT READY**.
-- Scanner: **timeout ~30.078 s**.
-- Retired `DASHBOARD_API_KEY` secret mount: **present on run #78 serving revision; focused removal patch in progress**.
-- Runtime lock: **DEPLOYMENT_LOCKED**.
-- Real order actions: **0**.
+## MutationPolicy — run #79
+
+- Runtime manifest: **ENFORCED**.
+- Unknown write routes: **0**.
+- Duplicate write routes: **0**.
+- Public dashboard: **READ-ONLY**.
+- LIVE mutation: **HARD_DENY**.
+- LIVE approval: **HARD_DENY**.
+- Real order calls in proof: **0**.
+- Unsafe mutation calls in proof: **0**.
+- Secret payload exposure: **none**.
+
+## Dhan rotator / Scheduler recurrence ledger
+
+- Scheduler: **ENABLED**.
+- Cadence: `30 7 * * *`.
+- Timezone: `Asia/Kolkata`.
+- Run #79 explicit token-rotator execution: **SUCCESS**.
+- Recent successful executions include `genesis-system3-dhan-token-rotate-zxbmd` and `genesis-system3-dhan-token-rotate-gvxvx`.
+- Historical execution `genesis-system3-dhan-token-rotate-j6jlh` recorded a failure with `failedCount=1` / `ContainerCalledExit` (`container called exit(1)`).
+
+Historical failure root cause is not re-attributed without exact evidence. Prevention remains mandatory identity, cadence and execution exit-state proof on every canonical deployment.
+
+## Current blockers
+
+1. **BrokerTruth:** direct broker is disconnected and reports an error in run #79.
+2. **BrokerTruth vs StateTruth:** direct=false while StateTruth=true; contradiction remains open.
+3. **MIDCPNIFTY OptionChainTruth:** 0 usable contracts / not ready.
+4. **ScannerTruth:** read-only scanner timed out around 30 seconds and is unconfirmed.
+5. **Operational readiness:** remains `DEPLOYMENT_LOCKED`; production-grade/live-readiness claims are prohibited until all strict blockers close with reproducible evidence.
+
+UI/dashboard automated proof is **not** an active blocker: exact run #79 is 22/22 tabs and 44/44 screenshots.
+
+## Safety authority
+
 - LIVE: **OFF / LOCKED**.
-- **USER ACTION REQUIRED=NO.**
+- Real order actions: **0**.
+- Public dashboard: credential-free and read-only.
+- No retired dashboard secret mounted on the exact serving revision.
+- No secret payload values recorded here.
+- No gate has been weakened to obtain a green result.
