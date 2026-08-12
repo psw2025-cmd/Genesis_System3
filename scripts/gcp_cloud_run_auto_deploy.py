@@ -2,10 +2,11 @@
 """Canonical Cloud Run deployment entrypoint with immutable digest proof.
 
 The original deployment state machine is preserved byte-for-byte in
-``gcp_cloud_run_auto_deploy_impl.py``.  This entrypoint verifies that the
+``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
 implementation still contains every critical PAPER/LIVE-OFF/candidate safety
-invariant, then replaces only the image-provenance assertion with the
-fail-closed Artifact Registry repository+digest verifier.
+invariant, replaces only the image-provenance assertion with the fail-closed
+Artifact Registry repository+digest verifier, and removes retired dashboard
+credential secret mounts before any candidate revision can be created.
 """
 from __future__ import annotations
 
@@ -39,12 +40,50 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     'PREVIOUS_TRAFFIC_RESTORED',
 )
 
+_RETIRED_DASHBOARD_SECRET_ENV = "DASHBOARD_API_KEY"
+_ORIGINAL_RUN = deployer._run
+
 
 def _verify_implementation_contract() -> None:
     text = _IMPL.read_text(encoding="utf-8")
     missing = [marker for marker in _REQUIRED_IMPLEMENTATION_MARKERS if marker not in text]
     if missing:
         raise RuntimeError(f"deployment_safety_contract_missing:{missing}")
+
+
+def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
+    """Ensure every Cloud Run candidate explicitly removes retired dashboard auth.
+
+    This is deliberately applied in the canonical wrapper because the preserved
+    implementation is the PR #130 provenance state machine. It changes no LIVE,
+    order, worker-token, or broker authority; it only removes a retired secret
+    mount that must not survive on newly-created revisions.
+    """
+    if args[:3] != ["gcloud", "run", "deploy"]:
+        return list(args)
+
+    result = list(args)
+    indexes = [i for i, arg in enumerate(result) if arg.startswith("--remove-secrets=")]
+    if len(indexes) != 1:
+        raise RuntimeError(f"candidate_remove_secrets_contract_invalid:{len(indexes)}")
+
+    idx = indexes[0]
+    names = [name.strip() for name in result[idx].split("=", 1)[1].split(",") if name.strip()]
+    if "API_KEY" not in names:
+        raise RuntimeError("candidate_api_key_scrub_missing")
+    if _RETIRED_DASHBOARD_SECRET_ENV not in names:
+        names.append(_RETIRED_DASHBOARD_SECRET_ENV)
+    result[idx] = "--remove-secrets=" + ",".join(names)
+    return result
+
+
+def _run_with_retired_dashboard_secret_scrub(
+    args: list[str], *, capture: bool = False
+) -> str:
+    scrubbed = _scrub_retired_dashboard_secret_arg(args)
+    if scrubbed != args:
+        print("RETIRED_DASHBOARD_SECRET_SCRUB enforced")
+    return _ORIGINAL_RUN(scrubbed, capture=capture)
 
 
 def _assert_candidate_image(revision: dict, image: str) -> None:
@@ -61,6 +100,7 @@ def _assert_candidate_image(revision: dict, image: str) -> None:
 def main() -> int:
     _verify_implementation_contract()
     deployer._assert_candidate_image = _assert_candidate_image
+    deployer._run = _run_with_retired_dashboard_secret_scrub
     return deployer.main()
 
 
