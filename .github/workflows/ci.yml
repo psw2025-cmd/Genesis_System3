@@ -48,7 +48,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Legacy workflows remain quarantined; every new or modified workflow must satisfy this policy.
           echo "Scanning new or changed workflow files..."
           workflows=()
           if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]] && ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
@@ -161,6 +160,10 @@ jobs:
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile scripts/quant_alpha_evaluator.py
           python -m py_compile src/quant/alpha_truth.py
+          python -m py_compile dashboard/backend/secure_app.py
+          python -m py_compile scripts/public_dashboard_no_key_forensic.py
+          python -m py_compile scripts/gcp_runtime_evidence.py
+          python -m py_compile scripts/gcp_public_dashboard_runtime_proof.py
           echo "compile_proof=PASS"
 
   full-proof-pack-validation:
@@ -197,6 +200,7 @@ jobs:
           test -f requirements-ci.txt
           test -f dashboard/backend/requirements.txt
           test -f dashboard/backend/app.py
+          test -f dashboard/backend/secure_app.py
           python -m pip install --no-cache-dir -r requirements-ci.txt --quiet
           python -m pip install --no-cache-dir -r dashboard/backend/requirements.txt --quiet
           echo "deps_install=PASS"
@@ -206,6 +210,7 @@ jobs:
         run: |
           set -euo pipefail
           test -f dashboard/backend/app.py || { echo "FATAL: dashboard/backend/app.py missing after checkout"; ls -la dashboard/backend | head -50; exit 1; }
+          test -f dashboard/backend/secure_app.py || { echo "FATAL: secure_app.py missing after checkout"; exit 1; }
           python -m py_compile system3_control_plane.py
           python -m py_compile system3_ultra.py
           python -m py_compile run_system3.py
@@ -215,6 +220,12 @@ jobs:
           python -m py_compile scripts/system3_issue_24_26_27_28_proof_batch.py
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile dashboard/backend/app.py
+          python -m py_compile dashboard/backend/secure_app.py
+          python -m py_compile dashboard/backend/security_policy.py
+          python -m py_compile dashboard/backend/mutation_policy.py
+          python -m py_compile scripts/public_dashboard_no_key_forensic.py
+          python -m py_compile scripts/gcp_runtime_evidence.py
+          python -m py_compile scripts/gcp_public_dashboard_runtime_proof.py
           python -m py_compile scripts/paper_day_proof_pack.py
           python -m py_compile scripts/run_dashboard_browser_proof.py
           python -m py_compile scripts/daily_prediction_benchmark.py
@@ -230,7 +241,14 @@ jobs:
           python -c "import json; json.load(open('config/quant_alpha_targets.json'))" && echo "quant_alpha_targets_json=VALID"
           echo "compile_expanded=PASS"
 
-      - name: Dashboard backend import smoke
+      - name: Permanent public-readonly forensic gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/public_dashboard_no_key_forensic.py
+          echo "public_dashboard_no_key_forensic=PASS"
+
+      - name: Actual Cloud Run serving-wrapper import smoke
         shell: bash
         run: |
           set -euo pipefail
@@ -243,21 +261,43 @@ jobs:
           os.environ["AUTO_EXECUTE_TRADES"] = "0"
           os.environ["SYSTEM3_REAL_ONLY"] = "1"
           os.environ["DEFER_INSTRUMENT_WARMUP"] = "1"
-          import dashboard.backend.app as app
-          assert getattr(app, "app", None) is not None, "FastAPI app object missing"
-          assert os.environ["LIVE_TRADING_ENABLED"] == "0", "LIVE_TRADING_ENABLED safety check failed"
-          assert os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] == "0", "SYSTEM3_LIVE_TRADING_ALLOWED safety check failed"
-          assert os.environ["AUTO_EXECUTE_TRADES"] == "0", "AUTO_EXECUTE_TRADES safety check failed"
-          print("dashboard_backend_import_smoke=PASS")
+          # Adversarial retired drift must be scrubbed before backend import.
+          os.environ["REQUIRE_API_KEY"] = "true"
+          os.environ["API_KEY"] = "dummy-never-authority"
+          os.environ["DASHBOARD_API_KEY"] = "dummy-never-authority"
+          os.environ["ENABLE_DASHBOARD_AUTH"] = "true"
+          from dashboard.backend.secure_app import app
+          assert app is not None, "Secure FastAPI app object missing"
+          for name in ("REQUIRE_API_KEY", "API_KEY", "DASHBOARD_API_KEY", "ENABLE_DASHBOARD_AUTH"):
+              assert name not in os.environ, f"retired dashboard auth drift survived: {name}"
+          assert os.environ["LIVE_TRADING_ENABLED"] == "0"
+          assert os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] == "0"
+          assert os.environ["AUTO_EXECUTE_TRADES"] == "0"
+          route_methods = {
+              (getattr(route, "path", ""), method)
+              for route in app.routes
+              for method in (getattr(route, "methods", set()) or set())
+          }
+          assert ("/api/auth/session", "POST") not in route_methods
+          assert ("/api/auth/logout", "POST") not in route_methods
+          assert ("/api/auth/status", "GET") in route_methods
+          print("secure_serving_wrapper_import_smoke=PASS")
+          print("permanent_public_readonly_contract=PASS")
           print("live_trading_safety_in_app=PASS")
           PY
 
-      - name: Dashboard backend pytest suite
+      - name: Dashboard backend and permanent no-key pytest suite
         shell: bash
         run: |
           set -euo pipefail
           python -m pytest \
             tests/test_dashboard_app.py \
+            tests/test_secure_app_contract.py \
+            tests/test_security_policy.py \
+            tests/test_public_paper_dashboard_contract.py \
+            tests/test_cloud_run_secure_app_import.py \
+            tests/test_public_dashboard_no_key_forensic.py \
+            tests/test_gcp_runtime_evidence_auth_semantics.py \
             tests/test_qc_validator_dhan_aliases.py \
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
