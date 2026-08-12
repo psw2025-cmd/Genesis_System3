@@ -5,9 +5,10 @@ runtime/CI blocker. LIVE_MUTATION and LIVE_APPROVAL are hard denied in the
 current ANALYZER/PAPER runtime regardless of UI state, environment drift or
 legacy route behavior.
 
-The public dashboard is intentionally read-only. Except for self-session routes
-and authenticated worker ingestion, control/paper/risk/scheduler/analyzer writes
-remain denied until a separate mutation control authority is implemented.
+The dashboard is permanently public/read-only. It has no credential/session
+mutation authority. Authenticated worker ingestion remains capability-bound to
+the dedicated worker token; every other write requires a separate control-plane
+authority that is intentionally not configured in this runtime.
 """
 from __future__ import annotations
 
@@ -20,8 +21,6 @@ WRITE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
 
 class Capability(str, Enum):
-    SESSION_CREATE = "SESSION_CREATE"
-    SESSION_REVOKE_SELF = "SESSION_REVOKE_SELF"
     WORKER_INGEST = "WORKER_INGEST"
     PAPER_MUTATION = "PAPER_MUTATION"
     RISK_POLICY_WRITE = "RISK_POLICY_WRITE"
@@ -81,11 +80,6 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
     if p == "/api/security/mutation-policy/probe/paper":
         return Capability.PAPER_MUTATION
 
-    if p == "/api/auth/session":
-        return Capability.SESSION_CREATE
-    if p == "/api/auth/logout":
-        return Capability.SESSION_REVOKE_SELF
-
     if p in {"/api/scheduler/health/push", "/api/chain/push"}:
         return Capability.WORKER_INGEST
     if p.startswith((
@@ -96,8 +90,6 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
         return Capability.WORKER_INGEST
 
     # Broker/order-changing surfaces are never downgraded to generic control.
-    # Emergency exit can still submit broker mutations in a live architecture,
-    # therefore it remains behind the same hard LIVE lock while LIVE is disabled.
     if p.startswith("/api/live-trading/approve"):
         return Capability.LIVE_APPROVAL
     if p == "/emergency-exit" or p.startswith("/order/"):
@@ -123,9 +115,6 @@ def classify_mutation(method: str, path: str) -> Optional[Capability]:
     if p.startswith(("/api/scheduler/", "/api/schedules/")):
         return Capability.SCHEDULER_CONTROL
 
-    # Code/agent/runner control is intentionally distinct from analytical work.
-    # Public PAPER has no SYSTEM_CONTROL authority, so these remain denied even
-    # though the routes are now explicitly owned by the manifest.
     if p == "/agent-full-control" or p.startswith(("/api/agent/", "/api/runner/")):
         return Capability.SYSTEM_CONTROL
 
@@ -189,12 +178,8 @@ def assert_runtime_manifest(app) -> None:
     unknown = unclassified_write_routes(app)
     duplicates = duplicate_write_routes(app)
     if unknown or duplicates:
-        unknown_text = ", ".join(
-            f"{row.method} {row.path}" for row in unknown
-        ) or "none"
-        duplicate_text = ", ".join(
-            f"{method} {path}" for method, path in duplicates
-        ) or "none"
+        unknown_text = ", ".join(f"{row.method} {row.path}" for row in unknown) or "none"
+        duplicate_text = ", ".join(f"{method} {path}" for method, path in duplicates) or "none"
         raise RuntimeError(
             "MUTATION_MANIFEST_INVALID "
             f"unknown=[{unknown_text}] duplicates=[{duplicate_text}]"
@@ -215,9 +200,8 @@ def evaluate_runtime_mutation(
 ) -> Optional[RuntimeMutationDecision]:
     """Return the authoritative runtime mutation decision.
 
-    `control_authorized` is intentionally False in the current public PAPER
-    dashboard. It exists only as an explicit future integration point for a
-    separate control-plane authority; dashboard viewing never sets it True.
+    `control_authorized` is intentionally False in the public PAPER dashboard.
+    Dashboard viewing can never produce mutation authority.
     """
     capability = classify_mutation(method, path)
     if capability is None:
@@ -225,95 +209,48 @@ def evaluate_runtime_mutation(
 
     if capability is Capability.UNKNOWN:
         return RuntimeMutationDecision(
-            False,
-            capability,
-            "DENY",
-            403,
-            "MUTATION_CAPABILITY_UNKNOWN",
-            "Write request has no approved mutation capability",
-            "NONE",
+            False, capability, "DENY", 403, "MUTATION_CAPABILITY_UNKNOWN",
+            "Write request has no approved mutation capability", "NONE",
         )
 
     if capability is Capability.LIVE_MUTATION:
         return RuntimeMutationDecision(
-            False,
-            capability,
-            "DENY",
-            423,
-            "LIVE_MUTATION_LOCKED",
-            "Live mutation is hard locked in ANALYZER/PAPER runtime",
-            "HARD_LIVE_LOCK",
+            False, capability, "DENY", 423, "LIVE_MUTATION_LOCKED",
+            "Live mutation is hard locked in ANALYZER/PAPER runtime", "HARD_LIVE_LOCK",
         )
 
     if capability is Capability.LIVE_APPROVAL:
         return RuntimeMutationDecision(
-            False,
-            capability,
-            "DENY",
-            423,
-            "LIVE_APPROVAL_LOCKED",
-            "Live approval cannot become execution authority in ANALYZER/PAPER",
-            "HARD_LIVE_LOCK",
+            False, capability, "DENY", 423, "LIVE_APPROVAL_LOCKED",
+            "Live approval cannot become execution authority in ANALYZER/PAPER", "HARD_LIVE_LOCK",
         )
 
     if capability is Capability.WORKER_INGEST:
         if not worker_token_configured:
             return RuntimeMutationDecision(
-                False,
-                capability,
-                "DENY",
-                503,
-                "WORKER_AUTH_NOT_CONFIGURED",
-                "Worker ingestion token is not configured",
-                "WORKER_TOKEN",
+                False, capability, "DENY", 503, "WORKER_AUTH_NOT_CONFIGURED",
+                "Worker ingestion token is not configured", "WORKER_TOKEN",
             )
         if not worker_token_valid:
             return RuntimeMutationDecision(
-                False,
-                capability,
-                "DENY",
-                401,
-                "WORKER_AUTH_INVALID",
-                "Worker ingestion requires a valid dedicated worker token",
-                "WORKER_TOKEN",
+                False, capability, "DENY", 401, "WORKER_AUTH_INVALID",
+                "Worker ingestion requires a valid dedicated worker token", "WORKER_TOKEN",
             )
         return RuntimeMutationDecision(
-            True,
-            capability,
-            "ALLOW",
-            200,
-            "WORKER_AUTH_ACCEPTED",
-            "Dedicated worker authority accepted; handler validation still applies",
-            "WORKER_TOKEN",
-        )
-
-    if capability in {Capability.SESSION_CREATE, Capability.SESSION_REVOKE_SELF}:
-        return RuntimeMutationDecision(
-            True,
-            capability,
-            "ALLOW_DOWNSTREAM",
-            200,
-            "SESSION_ROUTE",
-            "Session route may reach its own endpoint-specific policy",
-            "SESSION_ROUTE",
+            True, capability, "ALLOW", 200, "WORKER_AUTH_ACCEPTED",
+            "Dedicated worker authority accepted; handler validation still applies", "WORKER_TOKEN",
         )
 
     if not control_authorized:
         return RuntimeMutationDecision(
-            False,
-            capability,
-            "DENY",
-            403,
+            False, capability, "DENY", 403,
             f"{capability.value}_AUTHORITY_REQUIRED",
             "Public PAPER dashboard is read-only; separate mutation authority is required",
             "CONTROL_PLANE",
         )
 
     return RuntimeMutationDecision(
-        True,
-        capability,
-        "ALLOW_DOWNSTREAM",
-        200,
+        True, capability, "ALLOW_DOWNSTREAM", 200,
         f"{capability.value}_AUTHORITY_ACCEPTED",
         "Mutation control authority accepted; downstream domain/idempotency gates still apply",
         "CONTROL_PLANE",
