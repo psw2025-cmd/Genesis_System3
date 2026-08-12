@@ -26,11 +26,17 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     '("SYSTEM3_LIVE_TRADING_ALLOWED", "0")',
     '("AUTO_EXECUTE_TRADES", "0")',
     '("REQUIRE_API_KEY", "false")',
+    '("DEFER_INSTRUMENT_WARMUP", "1")',
     '("SYSTEM3_STATE_BACKEND", "firestore")',
     '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")',
     '--remove-secrets=API_KEY',
+    '--update-secrets=WORKER_PUSH_TOKEN=',
     'WORKER_PUSH_TOKEN_SECRET_ID',
-    'DASHBOARD_PUBLIC_READONLY',
+    'DASHBOARD_PUBLIC_READONLY enforced',
+    '_traffic_allocations',
+    '_wait_revision_ready',
+    'gcp_failed_revision_forensic.py',
+    'PREVIOUS_TRAFFIC_RESTORED',
 )
 
 
