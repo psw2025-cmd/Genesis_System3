@@ -16,6 +16,7 @@ on:
       - "scripts/gcp_failed_revision_forensic.py"
       - "scripts/gcp_runtime_evidence.py"
       - "scripts/gcp_public_dashboard_runtime_proof.py"
+      - "scripts/gcp_ui_tab_visual_proof.py"
       - "scripts/gcp_mutation_policy_runtime_proof.py"
       - "scripts/sync_dhan_instruments_master.py"
       - "src/**"
@@ -312,7 +313,9 @@ jobs:
           if "API_KEY" in secret_env_names: print("DASHBOARD_API_KEY_STILL_MOUNTED"); sys.exit(5)
           if "WORKER_PUSH_TOKEN" not in secret_env_names: print("WORKER_PUSH_TOKEN_SECRET_NOT_MOUNTED"); sys.exit(5)
           if "WORKER_PUSH_TOKEN" in env: print("WORKER_PUSH_TOKEN_LEAKED_AS_PLAIN_VALUE"); sys.exit(5)
-          job_sa=((((rotator.get("spec") or {}).get("template") or {}).get("template") or {}).get("serviceAccount")) or ((((rotator.get("spec") or {}).get("template") or {}).get("template") or {}).get("serviceAccountName"))
+          execution_template=(((rotator.get("spec") or {}).get("template") or {}).get("spec") or {})
+          task_template=((execution_template.get("template") or {}).get("spec") or {})
+          job_sa=(task_template.get("serviceAccountName") or task_template.get("serviceAccount"))
           if job_sa != os.environ["DHAN_ROTATOR_SERVICE_ACCOUNT"]: print("ROTATOR_IDENTITY_MISMATCH",job_sa); sys.exit(8)
           http_target=scheduler.get("httpTarget") or {}
           oauth=(http_target.get("oauthToken") or {}).get("serviceAccountEmail")
@@ -375,7 +378,7 @@ jobs:
         if: always()
         run: |
           gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(status.traffic.revisionName,status.traffic.percent,status.url)' || true
-          gcloud run jobs describe "${DHAN_ROTATION_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(metadata.name,spec.template.template.serviceAccount)' || true
+          gcloud run jobs describe "${DHAN_ROTATION_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(metadata.name,spec.template.spec.template.spec.serviceAccountName)' || true
           gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='table(name,schedule,timeZone,state,httpTarget.oauthToken.serviceAccountEmail)' || true
 
       - name: Publish exact-SHA runtime proof success
