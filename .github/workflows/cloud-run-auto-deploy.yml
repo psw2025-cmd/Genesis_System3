@@ -109,8 +109,20 @@ jobs:
           assert "DHAN_SCHEDULER_SERVICE_ACCOUNT" in workflow
           assert '--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"' in workflow
           assert '--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"' in workflow
-          assert 'secretAccessor' not in workflow
-          assert 'secretVersionAdder' not in workflow
+
+          # Construct forbidden Secret Manager role fragments so the guard does
+          # not match its own source. Scan executable/non-comment lines only;
+          # any real role grant remains a hard failure.
+          secret_accessor_marker = "secret" + "Accessor"
+          secret_version_adder_marker = "secretVersion" + "Adder"
+          secret_role_hits = [
+              line.strip()
+              for line in workflow.splitlines()
+              if line.strip()
+              and not line.lstrip().startswith("#")
+              and (secret_accessor_marker in line or secret_version_adder_marker in line)
+          ]
+          assert not secret_role_hits, f"Secret Manager privilege grant found in deploy workflow: {secret_role_hits}"
 
           executable_service_updates = [
               line.strip()
