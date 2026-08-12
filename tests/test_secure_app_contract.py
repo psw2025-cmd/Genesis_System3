@@ -3,44 +3,50 @@ from pathlib import Path
 
 
 class SecureAppContractTests(unittest.TestCase):
-    def test_cloud_run_uses_secure_auth_wrapper(self):
+    def test_cloud_run_uses_secure_public_readonly_wrapper(self):
         launcher = Path("scripts/start_cloud_run.py").read_text(encoding="utf-8")
         self.assertIn('"dashboard.backend.secure_app:app"', launcher)
         self.assertNotIn('"dashboard.backend.app:app"', launcher)
 
-    def test_wrapper_replaces_legacy_auth_routes_and_access_check(self):
+    def test_wrapper_scrubs_retired_dashboard_auth_before_legacy_import(self):
         source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
-        self.assertIn("legacy._has_dashboard_api_access = _has_dashboard_api_access", source)
-        self.assertIn("app.router.routes = [", source)
-        self.assertIn("_SESSION_TRUTH.issue", source)
-        self.assertIn("_SESSION_TRUTH.validate", source)
-        self.assertIn("_SESSION_TRUTH.revoke", source)
-        self.assertIn('secure=_forwarded_scheme(request) == "https"', source)
-        self.assertIn("_AUTH_MAX_FAILURES = 10", source)
-        self.assertIn("_SESSION_TRUTH.login_allowed", source)
-        self.assertIn("_SESSION_TRUTH.record_login_failure", source)
-        self.assertIn("_SESSION_TRUTH.clear_login_failures", source)
-        self.assertNotIn("defaultdict", source)
-        self.assertNotIn("_AUTH_ATTEMPTS", source)
+        import_pos = source.index("from dashboard.backend import app as legacy")
+        scrub_pos = source.index("os.environ.pop")
+        self.assertLess(scrub_pos, import_pos)
+        self.assertIn("RETIRED_DASHBOARD_ENV", source)
+        self.assertIn("legacy._REQUIRE_API_KEY = False", source)
+        self.assertIn('legacy._API_KEY = ""', source)
+        self.assertIn("strip_retired_dashboard_credentials", source)
 
-    def test_cloud_session_store_is_shared_and_fail_closed(self):
-        source = Path("dashboard/backend/session_truth.py").read_text(encoding="utf-8")
-        self.assertIn('("firestore" if cloud_runtime else "memory")', source)
-        self.assertIn("Cloud Run SessionTruth requires SYSTEM3_SESSION_BACKEND=firestore", source)
-        self.assertIn("system3_dashboard_sessions", source)
-        self.assertIn("system3_dashboard_login_throttle", source)
-        self.assertIn("firestore.Client", source)
-        self.assertIn("self._hash_client_key", source)
-
-    def test_no_deterministic_session_derivation_in_secure_boundary(self):
+    def test_login_logout_and_server_session_authority_are_removed(self):
         source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
-        self.assertNotIn("system3-dashboard-session-v1", source)
-        self.assertNotIn("hashlib.sha256", source)
+        self.assertFalse(Path("dashboard/backend/session_truth.py").exists())
+        self.assertNotIn("get_session_truth_store", source)
+        self.assertNotIn("SessionTruth", source)
+        self.assertNotIn("set_cookie(", source)
+        self.assertNotIn("delete_cookie(", source)
+        self.assertNotIn("hmac.compare_digest", source)
+        self.assertNotIn("create_dashboard_session", source)
+        self.assertNotIn("dashboard_auth_logout", source)
 
-    def test_obsolete_browser_login_and_session_hook_are_absent(self):
-        # PAPER/ANALYZER viewing is public/read-only. Retaining dead credential
-        # entry/session code creates a regression path where a future UI change
-        # could accidentally restore a dashboard-key prompt.
+    def test_only_auth_status_survives_as_informational_read(self):
+        source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
+        self.assertIn('@app.get("/api/auth/status")', source)
+        self.assertIn('"mode": "public_readonly"', source)
+        self.assertIn('"credential_surface": "REMOVED"', source)
+        self.assertIn('"required": False', source)
+        self.assertIn('"configured": False', source)
+        self.assertIn('"authenticated": False', source)
+
+    def test_mutation_boundary_is_independent_of_dashboard_visibility(self):
+        source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
+        self.assertIn("control_authorized=False", source)
+        self.assertIn('"live_mutation": "HARD_DENY"', source)
+        self.assertIn('"live_approval": "HARD_DENY"', source)
+        self.assertIn('"worker_authority": "DEDICATED_WORKER_TOKEN"', source)
+        self.assertIn('"dashboard_credential_authority": "REMOVED"', source)
+
+    def test_obsolete_browser_login_components_are_absent(self):
         self.assertFalse(Path("dashboard/frontend/src/components/LoginPage.tsx").exists())
         self.assertFalse(Path("dashboard/frontend/src/hooks/useAuth.ts").exists())
 

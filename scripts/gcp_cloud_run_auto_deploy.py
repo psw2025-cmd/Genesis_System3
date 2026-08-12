@@ -4,6 +4,7 @@
 Deployment contract:
 - build an immutable image for the exact git SHA;
 - force LIVE and automatic order execution OFF;
+- permanently scrub the retired dashboard credential/session surface;
 - create the new Cloud Run revision with *zero production traffic*;
 - address the candidate through a revision tag and prove its exact Ready state;
 - prove the tagged candidate HTTP/API before promotion;
@@ -12,9 +13,9 @@ Deployment contract:
 - capture sanitized failed-revision evidence automatically;
 - never use latestReadyRevisionName as a substitute for serving-traffic proof.
 
-The public ANALYZER/PAPER dashboard remains read-only. Worker ingestion uses its
-separate Secret Manager token. No Dhan PIN/TOTP secret is mounted in the web
-service.
+The public ANALYZER/PAPER dashboard is permanently credential-free and
+read-only. Worker ingestion uses its separate Secret Manager token. No Dhan
+PIN/TOTP secret is mounted in the web service.
 """
 from __future__ import annotations
 
@@ -44,14 +45,24 @@ WORKER_PUSH_TOKEN_SECRET_ID = os.environ.get(
     "WORKER_PUSH_TOKEN_SECRET_ID", "system3-dashboard-worker-push-token"
 )
 
-# This is the complete authoritative Cloud Run web-service runtime contract.
-# Startup-critical values are explicit so a clean service recreation cannot
-# silently re-enable eager warm-up or lose analyzer-only state constraints.
+# These names exist only so the canonical deployer can REMOVE stale/manual
+# configuration. They are not supported runtime inputs.
+RETIRED_DASHBOARD_ENV = (
+    "REQUIRE_" + "API_KEY",
+    "ENABLE_DASHBOARD_" + "AUTH",
+    "DASHBOARD_SESSION_" + "MAX_AGE",
+)
+RETIRED_DASHBOARD_SECRETS = (
+    "API_" + "KEY",
+    "DASHBOARD_" + "API_KEY",
+)
+
+# Complete authoritative web-service runtime contract. No dashboard credential
+# or login-session setting is part of this contract.
 SAFE_ENV = (
     ("LIVE_TRADING_ENABLED", "0"),
     ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
     ("AUTO_EXECUTE_TRADES", "0"),
-    ("REQUIRE_API_KEY", "false"),
     ("ANALYZE_MODE", "1"),
     ("SYSTEM3_MODE", "ANALYZER"),
     ("SYSTEM3_REAL_ONLY", "1"),
@@ -360,13 +371,31 @@ def _candidate_created_after(service: dict[str, Any], before_created: str) -> st
     return candidate if candidate and candidate != before_created else ""
 
 
-def _assert_candidate_image(revision: dict[str, Any], image: str) -> None:
+def _containers(revision: dict[str, Any]) -> list[dict[str, Any]]:
     containers = ((revision.get("spec") or {}).get("containers") or [])
     if not containers:
         containers = ((((revision.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or [])
+    return containers
+
+
+def _assert_candidate_image(revision: dict[str, Any], image: str) -> None:
+    containers = _containers(revision)
     deployed_image = str((containers[0] if containers else {}).get("image") or "")
     if image not in deployed_image and deployed_image != image:
         raise RuntimeError(f"candidate image mismatch: expected={image} actual={deployed_image}")
+
+
+def _assert_candidate_has_no_dashboard_credentials(revision: dict[str, Any]) -> None:
+    containers = _containers(revision)
+    env_rows = (containers[0] if containers else {}).get("env") or []
+    retired = set(RETIRED_DASHBOARD_ENV) | set(RETIRED_DASHBOARD_SECRETS)
+    present = []
+    for row in env_rows:
+        name = str(row.get("name") or "")
+        if name in retired:
+            present.append(name)
+    if present:
+        raise RuntimeError(f"retired dashboard credential configuration present on candidate: {sorted(present)}")
 
 
 def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
@@ -384,7 +413,8 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=0", "--max=1",
         "--memory=1Gi", "--cpu=1", "--concurrency=50", "--timeout=300",
         "--allow-unauthenticated", f"--update-env-vars={_env_arg(sha)}",
-        "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
+        f"--remove-env-vars={','.join(RETIRED_DASHBOARD_ENV)}",
+        f"--remove-secrets={','.join(RETIRED_DASHBOARD_SECRETS)},DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
         f"--update-secrets=WORKER_PUSH_TOKEN={WORKER_PUSH_TOKEN_SECRET_ID}:latest",
         "--quiet",
     ]
@@ -399,8 +429,6 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
     candidate = _candidate_created_after(service, before_created)
     current_traffic = _traffic_allocations(service)
 
-    # --no-traffic is an invariant, not an assumption. If Cloud Run traffic ever
-    # drifts during candidate creation, restore the exact previous allocation.
     if current_traffic != previous_traffic:
         print(
             "CANDIDATE_TRAFFIC_DRIFT",
@@ -417,15 +445,13 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
     try:
         revision = _wait_revision_ready(candidate)
         _assert_candidate_image(revision, image)
+        _assert_candidate_has_no_dashboard_credentials(revision)
     except Exception:
         _run_failed_revision_forensic(candidate)
         if _traffic_allocations(_service_json()) != previous_traffic:
             _restore_traffic(previous_traffic)
         raise
 
-    # A nonzero gcloud exit can race with revision reconciliation. The exact
-    # immutable revision Ready condition above is the authority; if it became
-    # Ready and still has 0% traffic, continue to tagged HTTP proof.
     if deploy_error:
         print("GCLOUD_DEPLOY_NONZERO_BUT_EXACT_REVISION_READY", candidate)
 
@@ -444,8 +470,14 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         if not isinstance(health, dict):
             raise RuntimeError("candidate /api/health did not return JSON object")
         auth = _http_json(f"{url}/api/auth/status")
-        if auth.get("required") is not False:
-            raise RuntimeError(f"candidate auth/read-only proof failed: {auth}")
+        if not (
+            auth.get("required") is False
+            and auth.get("configured") is False
+            and auth.get("authenticated") is False
+            and auth.get("mode") == "public_readonly"
+            and auth.get("credential_surface") == "REMOVED"
+        ):
+            raise RuntimeError(f"candidate permanent public-readonly proof failed: {auth}")
         state = _http_json(f"{url}/api/state")
         if not isinstance(state, dict):
             raise RuntimeError("candidate /api/state did not return JSON object")
@@ -460,7 +492,6 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
 
     print("CANDIDATE_HTTP_PROOF_OK", candidate)
 
-    # Promote the exact tested immutable revision, never a floating latest tag.
     _run(
         [
             "gcloud", "run", "services", "update-traffic", SERVICE,
@@ -502,7 +533,7 @@ def main() -> int:
     print("SERVICE", SERVICE)
     print("DEPLOYMENT_MODEL candidate-no-traffic-exact-ready-http-proof-explicit-promotion")
     print("LIVE_OFF enforced")
-    print("DASHBOARD_PUBLIC_READONLY enforced (REQUIRE_API_KEY=false, API_KEY unmounted)")
+    print("DASHBOARD_PUBLIC_READONLY enforced (credential/session surface absent and scrubbed)")
 
     session = _session()
     _require_secret_exists(session, WORKER_PUSH_TOKEN_SECRET_ID)
@@ -528,6 +559,7 @@ def main() -> int:
                 "sha": sha,
                 "traffic_percent": 100,
                 "live_trading_enabled": False,
+                "dashboard_credential_surface": "REMOVED",
             },
             indent=2,
         )

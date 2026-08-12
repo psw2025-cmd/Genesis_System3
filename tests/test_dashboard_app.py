@@ -1,10 +1,10 @@
 """
-Backend route tests for dashboard/backend/app.py.
+Backend inner-route tests for dashboard/backend/app.py.
 
-Uses raw ASGI calls rather than starlette.testclient.TestClient, since
-that requires a package ("httpx2") not present in this project's
-dependency set - confirmed missing during this session rather than
-adding a new test-only dependency for it.
+These tests intentionally exercise legacy handler mechanics directly. Production
+Cloud Run launches dashboard.backend.secure_app, whose outer MutationPolicy is
+tested separately and blocks public writes before these handlers are reachable.
+Dashboard credential environment flags are retired and are not configured here.
 """
 
 import asyncio
@@ -22,21 +22,14 @@ if str(ROOT_DIR) not in sys.path:
 
 @pytest.fixture(scope="module")
 def app():
-    import os
-    old_val = os.environ.get("REQUIRE_API_KEY")
-    os.environ["REQUIRE_API_KEY"] = "false"
-    try:
-        spec = importlib.util.spec_from_file_location(
-            "dashboard_backend_app_under_test", ROOT_DIR / "dashboard" / "backend" / "app.py"
-        )
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        return mod.app
-    finally:
-        if old_val is not None:
-            os.environ["REQUIRE_API_KEY"] = old_val
-        else:
-            os.environ.pop("REQUIRE_API_KEY", None)
+    # Load the inner app for handler-level regression tests only. Dashboard auth
+    # is not a supported switch; production authority is secure_app + MutationPolicy.
+    spec = importlib.util.spec_from_file_location(
+        "dashboard_backend_app_under_test", ROOT_DIR / "dashboard" / "backend" / "app.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.app
 
 
 async def _call(app, method: str, path: str, headers=None, json_body=None):
@@ -109,7 +102,6 @@ def test_kill_switch_status_endpoint(app):
 
 
 def test_metrics_endpoint_is_prometheus_text(app):
-    # Make a request first so there's at least one data point.
     call(app, "GET", "/api/health")
     status, headers, body = call(app, "GET", "/metrics")
     assert status == 200
