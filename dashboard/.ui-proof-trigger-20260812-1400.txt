@@ -1,0 +1,2 @@
+Inert deployment trigger for exact-SHA public-readonly UI proof after PR #136 serial retry hardening.
+No runtime behavior, auth authority, mutation capability, broker order path, or LIVE flag is changed.
