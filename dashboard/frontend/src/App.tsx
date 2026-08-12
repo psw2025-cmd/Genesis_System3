@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
@@ -149,22 +149,25 @@ function Content() {
 
 function DashboardTabUrlSync() {
   const { activeTab, setActiveTab } = useStore()
+  const initialized = useRef(false)
 
   useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get('tab')
-    if (requested && DASHBOARD_TAB_IDS.has(requested) && requested !== activeTab) {
-      setActiveTab(requested)
+    if (!initialized.current) {
+      initialized.current = true
+      const requested = new URLSearchParams(window.location.search).get('tab')
+      if (requested && DASHBOARD_TAB_IDS.has(requested) && requested !== activeTab) {
+        setActiveTab(requested)
+        return
+      }
     }
-  }, [activeTab, setActiveTab])
 
-  useEffect(() => {
     if (!DASHBOARD_TAB_IDS.has(activeTab)) return
     const url = new URL(window.location.href)
     if (url.searchParams.get('tab') !== activeTab) {
       url.searchParams.set('tab', activeTab)
       window.history.replaceState(null, '', url)
     }
-  }, [activeTab])
+  }, [activeTab, setActiveTab])
 
   return null
 }
