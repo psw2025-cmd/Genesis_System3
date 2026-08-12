@@ -290,8 +290,16 @@ def main() -> int:
             http_failures.append("dashboard_ui_html_shell_missing")
         if auth.get("required") is not False:
             http_failures.append("auth_status_required_not_false")
-        if auth.get("mode") != "auth_disabled":
-            http_failures.append("auth_status_mode_not_disabled")
+        if auth.get("mode") != "public_readonly":
+            http_failures.append("auth_status_mode_not_public_readonly")
+        if auth.get("configured") is not False:
+            http_failures.append("auth_status_configured_not_false")
+        if auth.get("authenticated") is not False:
+            http_failures.append("auth_status_authenticated_not_false")
+        if auth.get("credential_surface") != "REMOVED":
+            http_failures.append("auth_status_credential_surface_not_removed")
+        if auth.get("session") is not None:
+            http_failures.append("auth_status_session_not_null")
 
         http_proof = {
             "state": "PASS" if not http_failures else "FAIL",
@@ -307,6 +315,10 @@ def main() -> int:
             "health_http_status": health_status,
             "auth_required": auth.get("required"),
             "auth_mode": auth.get("mode"),
+            "auth_configured": auth.get("configured"),
+            "auth_authenticated": auth.get("authenticated"),
+            "auth_credential_surface": auth.get("credential_surface"),
+            "auth_session": auth.get("session"),
             "api_key_sent_for_dashboard_reads": False,
             "cookie_sent_for_dashboard_reads": False,
             "dashboard_visible_without_login": not http_failures,
