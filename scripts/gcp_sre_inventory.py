@@ -10,6 +10,7 @@ records instead of being converted to an empty inventory.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -188,6 +189,10 @@ def _architecture_map(inventory: dict[str, dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _stable_risk_suffix(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:10].upper()
+
+
 def _risk_register(inventory: dict[str, dict[str, Any]], architecture: dict[str, Any]) -> list[dict[str, Any]]:
     risks: list[dict[str, Any]] = []
 
@@ -221,8 +226,9 @@ def _risk_register(inventory: dict[str, dict[str, Any]], architecture: dict[str,
         add("OBS-UPTIME-001", "P1", "availability", "No uptime/synthetic monitor configurations discovered.", "Add lightweight uptime checks and redacted read-only synthetic coverage.")
 
     for shared in architecture.get("shared_identities", []):
+        service_account = str(shared["service_account"])
         add(
-            "IAM-SHARED-" + str(abs(hash(shared["service_account"])) % 100000),
+            "IAM-SHARED-" + _stable_risk_suffix(service_account),
             "P1",
             "iam",
             f"Service account is shared by multiple workloads: {shared['workloads']}",
