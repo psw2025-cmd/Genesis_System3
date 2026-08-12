@@ -44,7 +44,7 @@ jobs:
       GCP_CLOUD_RUN_SERVICE: genesis-system3-web
       GCP_WEB_RUNTIME_SERVICE_ACCOUNT: genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATOR_SERVICE_ACCOUNT: genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com
-      DHAN_SCHEDULER_SERVICE_ACCOUNT: genesis-system3-scheduler-invoker@system3-openalgo-safe.iam.gserviceaccount.com
+      DHAN_SCHEDULER_SERVICE_ACCOUNT: gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
       GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
