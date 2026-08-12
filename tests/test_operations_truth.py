@@ -138,3 +138,10 @@ def test_gcp_inventory_collector_contains_no_mutating_control_commands():
     ]
     for marker in forbidden:
         assert marker not in text
+
+
+def test_gcp_inventory_risk_ids_are_process_stable():
+    text = (ROOT / "scripts" / "gcp_sre_inventory.py").read_text(encoding="utf-8")
+    assert "hashlib.sha256" in text
+    assert "abs(hash(" not in text
+    assert "_stable_risk_suffix" in text
