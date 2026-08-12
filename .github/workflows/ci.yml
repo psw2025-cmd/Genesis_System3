@@ -161,6 +161,9 @@ jobs:
           python -m py_compile scripts/system3_proof_pack_closure_gate.py
           python -m py_compile scripts/quant_alpha_evaluator.py
           python -m py_compile src/quant/alpha_truth.py
+          python -m py_compile scripts/gcp_sre_inventory.py
+          python -m py_compile scripts/system3_sre_truth.py
+          python -m py_compile src/ops/operations_truth.py
           echo "compile_proof=PASS"
 
   full-proof-pack-validation:
@@ -225,9 +228,13 @@ jobs:
           python -m py_compile scripts/system3_self_healing_watchdog.py
           python -m py_compile scripts/quant_alpha_evaluator.py
           python -m py_compile src/quant/alpha_truth.py
+          python -m py_compile scripts/gcp_sre_inventory.py
+          python -m py_compile scripts/system3_sre_truth.py
+          python -m py_compile src/ops/operations_truth.py
           test -f dashboard/frontend/src/components/LiveTradingGate.tsx
           python -c "import json; json.load(open('config/system3_job_scheduler.json'))" && echo "scheduler_config_json=VALID"
           python -c "import json; json.load(open('config/quant_alpha_targets.json'))" && echo "quant_alpha_targets_json=VALID"
+          python -c "import json; json.load(open('config/system3_sre_targets.json'))" && echo "system3_sre_targets_json=VALID"
           echo "compile_expanded=PASS"
 
       - name: Dashboard backend import smoke
@@ -262,6 +269,7 @@ jobs:
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
             tests/test_quant_alpha_truth.py \
+            tests/test_operations_truth.py \
             -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence
@@ -288,6 +296,28 @@ jobs:
           else:
               assert report["research_candidate_allowed"] is False
           print("ALPHATRUTH_CI_CONTRACT_OK", report["state"])
+          PY
+
+      - name: Prove OperationsTruth fails closed without runtime evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/system3_sre_truth.py \
+            --inventory /tmp/system3-no-runtime-inventory.json \
+            --scorecard /tmp/system3-no-runtime-scorecard.json \
+            --output /tmp/system3-sre-truth.json
+          python - <<'PY'
+          import json
+          report = json.load(open("/tmp/system3-sre-truth.json"))
+          assert report["state"] == "PARTIAL_EVIDENCE"
+          assert report["inventory_state"] == "PARTIAL"
+          assert report["scorecard_state"] == "INSUFFICIENT_EVIDENCE"
+          assert report["full_sre_program_closed"] is False
+          assert report["live_trading_enabled"] is False
+          assert report["real_orders_attempted"] == 0
+          assert report["order_probe_allowed"] is False
+          assert report["production_mutation_from_pr_allowed"] is False
+          print("OPERATIONS_TRUTH_CI_CONTRACT_OK", report["state"])
           PY
 
       - name: Run proof batch
