@@ -32,6 +32,8 @@ class UiTabVisualProofContractTests(unittest.TestCase):
         self.assertIn("DASHBOARD_TAB_IDS", app)
         self.assertIn("URLSearchParams(window.location.search).get('tab')", app)
         self.assertIn("DASHBOARD_TAB_IDS.has(requested)", app)
+        self.assertIn("useRef(false)", app)
+        self.assertIn("initialized.current = true", app)
         self.assertIn("window.history.replaceState", app)
         self.assertIn("export const DASHBOARD_TAB_IDS", sidebar)
 
