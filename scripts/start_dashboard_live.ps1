@@ -20,12 +20,6 @@ if (-not $nodeOk) {
     exit 1
 }
 
-# Retired dashboard credential variables are deliberately removed. The backend
-# package and secure wrapper enforce the same contract again at import time.
-Remove-Item Env:REQUIRE_API_KEY -ErrorAction SilentlyContinue
-Remove-Item Env:API_KEY -ErrorAction SilentlyContinue
-Remove-Item Env:DASHBOARD_API_KEY -ErrorAction SilentlyContinue
-Remove-Item Env:ENABLE_DASHBOARD_AUTH -ErrorAction SilentlyContinue
 $env:ANALYZE_MODE = "1"
 $env:SYSTEM3_MODE = "ANALYZER"
 $env:LIVE_TRADING_ENABLED = "0"
