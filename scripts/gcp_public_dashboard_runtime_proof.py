@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Prove the deployed Genesis System3 PAPER dashboard UI is public/read-only.
+"""Prove the deployed Genesis System3 PAPER dashboard is public/read-only.
 
-The proof is deliberately read-only with respect to trading. It verifies the
-exact Cloud Run revision/configuration, performs anonymous GET requests only,
-renders the actual `/ui` product shell in headless Chrome, captures a real
-browser screenshot, and publishes one exact-SHA GitHub commit status. No broker
-order or paper mutation endpoint is called.
+The proof binds evidence to the actual single 100%-traffic serving revision,
+never merely the latest-created/latest-ready candidate. It performs anonymous
+GET requests only, captures the real `/ui`, then runs the all-tab visual proof
+for desktop and mobile. No broker order or paper mutation endpoint is called.
 """
 from __future__ import annotations
 
@@ -32,44 +31,66 @@ OFF_VALUES = {"0", "false", "no", "off"}
 
 
 def _run(*args: str, timeout: int = 90) -> str:
-    proc = subprocess.run(
-        list(args),
-        text=True,
-        capture_output=True,
-        timeout=timeout,
-        check=False,
-    )
+    proc = subprocess.run(list(args), text=True, capture_output=True, timeout=timeout, check=False)
     if proc.returncode:
         raise RuntimeError(f"command_failed:{args[0]}:{proc.returncode}")
     return proc.stdout.strip()
 
 
+def _json_command(*args: str) -> dict[str, Any]:
+    raw = _run(*args)
+    value = json.loads(raw or "{}")
+    if not isinstance(value, dict):
+        raise RuntimeError("gcloud_json_not_object")
+    return value
+
+
 def _service() -> dict[str, Any]:
-    raw = _run(
-        "gcloud",
-        "run",
-        "services",
-        "describe",
-        SERVICE,
-        f"--project={PROJECT}",
-        f"--region={REGION}",
-        "--format=json",
+    return _json_command(
+        "gcloud", "run", "services", "describe", SERVICE,
+        f"--project={PROJECT}", f"--region={REGION}", "--format=json",
     )
-    data = json.loads(raw or "{}")
-    if not isinstance(data, dict):
-        raise RuntimeError("service_description_not_object")
-    return data
 
 
-def _containers(service: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = (((service.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or []
+def _serving_revision(service: dict[str, Any]) -> str:
+    rows = (service.get("status") or {}).get("traffic") or service.get("traffic") or []
+    serving: list[str] = []
+    for item in rows:
+        if not isinstance(item, dict):
+            continue
+        try:
+            percent = int(item.get("percent") or 0)
+        except (TypeError, ValueError):
+            percent = 0
+        if percent != 100:
+            continue
+        revision = str(item.get("revisionName") or item.get("revision") or "").split("/")[-1]
+        if revision:
+            serving.append(revision)
+    if len(serving) != 1:
+        raise RuntimeError(f"serving_revision_not_single_100:{serving}")
+    return serving[0]
+
+
+def _revision(name: str) -> dict[str, Any]:
+    return _json_command(
+        "gcloud", "run", "revisions", "describe", name,
+        f"--project={PROJECT}", f"--region={REGION}", "--format=json",
+    )
+
+
+def _containers(resource: dict[str, Any]) -> list[dict[str, Any]]:
+    spec = resource.get("spec") or {}
+    rows = spec.get("containers") or []
     if not rows:
-        rows = (service.get("template") or {}).get("containers") or []
-    return [r for r in rows if isinstance(r, dict)]
+        rows = (((resource.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or []
+    if not rows:
+        rows = (resource.get("template") or {}).get("containers") or []
+    return [row for row in rows if isinstance(row, dict)]
 
 
-def _env(service: dict[str, Any]) -> tuple[dict[str, str], set[str]]:
-    rows = _containers(service)
+def _env(resource: dict[str, Any]) -> tuple[dict[str, str], set[str]]:
+    rows = _containers(resource)
     if not rows:
         raise RuntimeError("cloud_run_container_missing")
     plain: dict[str, str] = {}
@@ -84,41 +105,13 @@ def _env(service: dict[str, Any]) -> tuple[dict[str, str], set[str]]:
             plain[name] = str(row.get("value") or "")
         value_from = row.get("valueFrom") or {}
         value_source = row.get("valueSource") or {}
-        if (value_from.get("secretKeyRef") or value_source.get("secretKeyRef")):
+        if value_from.get("secretKeyRef") or value_source.get("secretKeyRef"):
             secrets.add(name)
     return plain, secrets
 
 
-def _latest_revision(service: dict[str, Any]) -> str:
-    status = service.get("status") or {}
-    return str(
-        status.get("latestReadyRevisionName")
-        or service.get("latestReadyRevision")
-        or ""
-    ).split("/")[-1]
-
-
-def _traffic_is_latest_100(service: dict[str, Any], latest: str) -> bool:
-    status = service.get("status") or {}
-    traffic = status.get("traffic") or service.get("traffic") or []
-    for item in traffic:
-        if not isinstance(item, dict):
-            continue
-        try:
-            percent = int(item.get("percent") or 0)
-        except (TypeError, ValueError):
-            percent = 0
-        if percent != 100:
-            continue
-        revision = str(item.get("revisionName") or item.get("revision") or "").split("/")[-1]
-        if item.get("latestRevision") is True or (latest and revision == latest):
-            return True
-    return False
-
-
 def _service_url(service: dict[str, Any]) -> str:
-    status = service.get("status") or {}
-    url = str(status.get("url") or service.get("uri") or "").rstrip("/")
+    url = str((service.get("status") or {}).get("url") or service.get("uri") or "").rstrip("/")
     if not url.startswith("https://"):
         raise RuntimeError("cloud_run_https_url_missing")
     return url
@@ -147,14 +140,9 @@ def _browser_path() -> str:
 
 def _browser_args(url: str) -> list[str]:
     return [
-        _browser_path(),
-        "--headless",
-        "--disable-gpu",
-        "--no-sandbox",
-        "--hide-scrollbars",
-        "--window-size=1600,1000",
-        "--virtual-time-budget=12000",
-        url,
+        _browser_path(), "--headless", "--disable-gpu", "--no-sandbox",
+        "--hide-scrollbars", "--window-size=1600,1000",
+        "--virtual-time-budget=12000", url,
     ]
 
 
@@ -184,14 +172,12 @@ def _publish_status(state: str, description: str) -> None:
     server = os.getenv("GITHUB_SERVER_URL", "https://github.com").rstrip("/")
     run_id = os.getenv("GITHUB_RUN_ID", "").strip()
     target = f"{server}/{repo}/actions/runs/{run_id}" if run_id else f"{server}/{repo}"
-    payload = json.dumps(
-        {
-            "state": state,
-            "context": "public-dashboard/runtime-proof",
-            "description": description[:140],
-            "target_url": target,
-        }
-    ).encode()
+    payload = json.dumps({
+        "state": state,
+        "context": "public-dashboard/runtime-proof",
+        "description": description[:140],
+        "target_url": target,
+    }).encode()
     request = urllib.request.Request(
         f"{api}/repos/{repo}/statuses/{EXPECTED_SHA}",
         data=payload,
@@ -208,6 +194,24 @@ def _publish_status(state: str, description: str) -> None:
             raise RuntimeError(f"commit_status_publish_failed:{response.status}")
 
 
+def _run_tab_matrix() -> dict[str, Any]:
+    proc = subprocess.run(
+        [sys.executable, "scripts/gcp_ui_tab_visual_proof.py"],
+        text=True, capture_output=True, timeout=1200, check=False,
+    )
+    if proc.stdout:
+        print(proc.stdout.rstrip())
+    if proc.stderr:
+        print(proc.stderr.rstrip(), file=sys.stderr)
+    matrix_path = OUT / "tab_visual_matrix.json"
+    if proc.returncode or not matrix_path.is_file():
+        raise RuntimeError(f"ui_tab_visual_proof_failed:{proc.returncode}")
+    matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
+    if not isinstance(matrix, dict) or matrix.get("state") != "PASS":
+        raise RuntimeError("ui_tab_visual_matrix_not_pass")
+    return matrix
+
+
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     config_proof: dict[str, Any] = {"state": "FAIL", "expected_sha": EXPECTED_SHA}
@@ -217,14 +221,14 @@ def main() -> int:
             raise RuntimeError("expected_git_sha_missing")
 
         service = _service()
-        env, secret_names = _env(service)
-        latest = _latest_revision(service)
-        latest_100 = _traffic_is_latest_100(service, latest)
+        serving_revision = _serving_revision(service)
+        revision = _revision(serving_revision)
+        env, secret_names = _env(revision)
         url = _service_url(service)
 
         failures: list[str] = []
         if env.get("DEPLOY_GIT_SHA") != EXPECTED_SHA:
-            failures.append("deploy_git_sha_mismatch")
+            failures.append("serving_deploy_git_sha_mismatch")
         if not _is_off(env.get("REQUIRE_API_KEY")):
             failures.append("dashboard_api_key_requirement_not_disabled")
         if "API_KEY" in secret_names:
@@ -236,15 +240,13 @@ def main() -> int:
         for key in ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED", "AUTO_EXECUTE_TRADES"):
             if not _is_off(env.get(key)):
                 failures.append(f"{key.lower()}_not_off")
-        if not latest or not latest_100:
-            failures.append("latest_revision_not_100_percent_traffic")
 
         config_proof = {
             "state": "PASS" if not failures else "FAIL",
             "expected_sha": EXPECTED_SHA,
-            "deploy_git_sha": env.get("DEPLOY_GIT_SHA"),
-            "latest_ready_revision": latest,
-            "traffic_100_to_latest": latest_100,
+            "serving_revision": serving_revision,
+            "serving_deploy_git_sha": env.get("DEPLOY_GIT_SHA"),
+            "traffic_authority": "single_100_percent_serving_revision",
             "require_api_key": env.get("REQUIRE_API_KEY"),
             "api_key_mounted": "API_KEY" in secret_names,
             "worker_token_mounted": "WORKER_PUSH_TOKEN" in secret_names,
@@ -275,22 +277,17 @@ def main() -> int:
         auth_status, auth = _get_json(f"{url}/api/auth/status")
         state_status, _ = _get_json(f"{url}/api/state")
         health_status, _ = _get_json(f"{url}/api/health")
-
         html = dashboard.text if dashboard.status_code == 200 else ""
         html_shell = '<div id="root"' in html or "<div id='root'" in html
         http_failures: list[str] = []
-        if root.status_code != 200:
-            http_failures.append(f"root_http_{root.status_code}")
-        if dashboard.status_code != 200:
-            http_failures.append(f"dashboard_ui_http_{dashboard.status_code}")
+        for label, status in (
+            ("root", root.status_code), ("dashboard_ui", dashboard.status_code),
+            ("auth_status", auth_status), ("state", state_status), ("health", health_status),
+        ):
+            if status != 200:
+                http_failures.append(f"{label}_http_{status}")
         if not html_shell:
             http_failures.append("dashboard_ui_html_shell_missing")
-        if auth_status != 200:
-            http_failures.append(f"auth_status_http_{auth_status}")
-        if state_status != 200:
-            http_failures.append(f"state_http_{state_status}")
-        if health_status != 200:
-            http_failures.append(f"health_http_{health_status}")
         if auth.get("required") is not False:
             http_failures.append("auth_status_required_not_false")
         if auth.get("mode") != "auth_disabled":
@@ -301,6 +298,7 @@ def main() -> int:
             "service_url": url,
             "dashboard_path": dashboard_path,
             "dashboard_url": dashboard_url,
+            "serving_revision": serving_revision,
             "root_http_status": root.status_code,
             "dashboard_ui_http_status": dashboard.status_code,
             "dashboard_ui_html_shell": html_shell,
@@ -335,6 +333,7 @@ def main() -> int:
             "bytes": screenshot.stat().st_size,
             "viewport": "1600x1000",
             "source": "real_deployed_cloud_run_dashboard_ui",
+            "serving_revision": serving_revision,
             "dashboard_path": dashboard_path,
             "rendered_system3_marker": True,
             "dashboard_api_key_prompt_rendered": False,
@@ -342,40 +341,34 @@ def main() -> int:
         }
         (OUT / "visual.json").write_text(json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8")
 
-        _publish_status("success", "PAPER dashboard /ui opens without API key; LIVE remains OFF")
-        print(
-            "PUBLIC_DASHBOARD_RUNTIME_PROOF "
-            + json.dumps(
-                {
-                    "state": "PASS",
-                    "sha": EXPECTED_SHA,
-                    "revision": latest,
-                    "dashboard_path": dashboard_path,
-                    "dashboard_ui_http_status": dashboard.status_code,
-                    "api_key_mounted": False,
-                    "api_key_prompt_rendered": False,
-                    "screenshot_sha256": digest,
-                    "live_trading_enabled": False,
-                },
-                sort_keys=True,
-            )
-        )
+        matrix = _run_tab_matrix()
+        tab_count = int(matrix.get("tab_count") or 0)
+        pass_count = int(matrix.get("pass_count") or 0)
+        _publish_status("success", f"PAPER /ui no-key + {pass_count}/{tab_count} tab visuals passed; LIVE OFF")
+        print("PUBLIC_DASHBOARD_RUNTIME_PROOF " + json.dumps({
+            "state": "PASS",
+            "sha": EXPECTED_SHA,
+            "serving_revision": serving_revision,
+            "dashboard_path": dashboard_path,
+            "dashboard_ui_http_status": dashboard.status_code,
+            "api_key_mounted": False,
+            "api_key_prompt_rendered": False,
+            "screenshot_sha256": digest,
+            "tab_visual_pass_count": pass_count,
+            "tab_visual_count": tab_count,
+            "live_trading_enabled": False,
+        }, sort_keys=True))
         return 0
     except Exception as exc:
         (OUT / "config.json").write_text(json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8")
         (OUT / "http.json").write_text(json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8")
         try:
-            _publish_status("failure", "Public PAPER dashboard UI no-key proof failed")
+            _publish_status("failure", "Public PAPER dashboard or tab visual proof failed")
         except Exception as status_exc:
             print(f"PUBLIC_DASHBOARD_STATUS_PUBLISH_ERROR {type(status_exc).__name__}", file=sys.stderr)
-        print(
-            "PUBLIC_DASHBOARD_RUNTIME_PROOF "
-            + json.dumps(
-                {"state": "FAIL", "error_type": type(exc).__name__, "error": str(exc)[:180]},
-                sort_keys=True,
-            ),
-            file=sys.stderr,
-        )
+        print("PUBLIC_DASHBOARD_RUNTIME_PROOF " + json.dumps({
+            "state": "FAIL", "error_type": type(exc).__name__, "error": str(exc)[:180],
+        }, sort_keys=True), file=sys.stderr)
         return 1
 
 
