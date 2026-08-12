@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Prove the deployed Genesis System3 PAPER dashboard is public/read-only.
+"""Prove the deployed Genesis System3 PAPER dashboard is permanently public/read-only.
 
-The proof binds evidence to the actual single 100%-traffic serving revision,
-never merely the latest-created/latest-ready candidate. It performs anonymous
-GET requests only, captures the real `/ui`, then runs the all-tab visual proof
-for desktop and mobile. No broker order or paper mutation endpoint is called.
+Evidence binds to the actual single 100%-traffic serving revision. The proof
+requires the retired dashboard credential/session surface to be absent from the
+serving revision, performs anonymous GETs only, captures real `/ui`, and then
+runs all 22 desktop/mobile tab visuals. No mutation/order endpoint is called.
 """
 from __future__ import annotations
 
@@ -28,6 +28,15 @@ EXPECTED_SHA = os.getenv("GITHUB_SHA", "").strip()
 OUT = Path("reports/latest/public_dashboard_proof")
 TIMEOUT_S = 30
 OFF_VALUES = {"0", "false", "no", "off"}
+RETIRED_DASHBOARD_ENV = {
+    "REQUIRE_" + "API_KEY",
+    "ENABLE_DASHBOARD_" + "AUTH",
+    "DASHBOARD_SESSION_" + "MAX_AGE",
+}
+RETIRED_DASHBOARD_SECRET_ENV = {
+    "API_" + "KEY",
+    "DASHBOARD_" + "API_KEY",
+}
 
 
 def _run(*args: str, timeout: int = 90) -> str:
@@ -54,22 +63,20 @@ def _service() -> dict[str, Any]:
 
 def _serving_revision(service: dict[str, Any]) -> str:
     rows = (service.get("status") or {}).get("traffic") or service.get("traffic") or []
-    serving: list[str] = []
+    allocations: dict[str, int] = {}
     for item in rows:
         if not isinstance(item, dict):
             continue
+        revision = str(item.get("revisionName") or item.get("revision") or "").split("/")[-1]
         try:
             percent = int(item.get("percent") or 0)
         except (TypeError, ValueError):
             percent = 0
-        if percent != 100:
-            continue
-        revision = str(item.get("revisionName") or item.get("revision") or "").split("/")[-1]
-        if revision:
-            serving.append(revision)
-    if len(serving) != 1:
-        raise RuntimeError(f"serving_revision_not_single_100:{serving}")
-    return serving[0]
+        if revision and percent:
+            allocations[revision] = allocations.get(revision, 0) + percent
+    if len(allocations) != 1 or list(allocations.values()) != [100]:
+        raise RuntimeError(f"serving_revision_not_single_100:{allocations}")
+    return next(iter(allocations))
 
 
 def _revision(name: str) -> dict[str, Any]:
@@ -89,25 +96,27 @@ def _containers(resource: dict[str, Any]) -> list[dict[str, Any]]:
     return [row for row in rows if isinstance(row, dict)]
 
 
-def _env(resource: dict[str, Any]) -> tuple[dict[str, str], set[str]]:
+def _env(resource: dict[str, Any]) -> tuple[dict[str, str], set[str], set[str]]:
     rows = _containers(resource)
     if not rows:
         raise RuntimeError("cloud_run_container_missing")
     plain: dict[str, str] = {}
     secrets: set[str] = set()
+    names: set[str] = set()
     for row in rows[0].get("env") or []:
         if not isinstance(row, dict):
             continue
         name = str(row.get("name") or "")
         if not name:
             continue
+        names.add(name)
         if "value" in row:
             plain[name] = str(row.get("value") or "")
         value_from = row.get("valueFrom") or {}
         value_source = row.get("valueSource") or {}
         if value_from.get("secretKeyRef") or value_source.get("secretKeyRef"):
             secrets.add(name)
-    return plain, secrets
+    return plain, secrets, names
 
 
 def _service_url(service: dict[str, Any]) -> str:
@@ -223,16 +232,18 @@ def main() -> int:
         service = _service()
         serving_revision = _serving_revision(service)
         revision = _revision(serving_revision)
-        env, secret_names = _env(revision)
+        env, secret_names, all_names = _env(revision)
         url = _service_url(service)
 
         failures: list[str] = []
         if env.get("DEPLOY_GIT_SHA") != EXPECTED_SHA:
             failures.append("serving_deploy_git_sha_mismatch")
-        if not _is_off(env.get("REQUIRE_API_KEY")):
-            failures.append("dashboard_api_key_requirement_not_disabled")
-        if "API_KEY" in secret_names:
-            failures.append("dashboard_api_key_still_mounted")
+        retired_env_present = sorted(RETIRED_DASHBOARD_ENV & all_names)
+        retired_secret_mounts = sorted(RETIRED_DASHBOARD_SECRET_ENV & secret_names)
+        if retired_env_present:
+            failures.append("retired_dashboard_env_present")
+        if retired_secret_mounts:
+            failures.append("retired_dashboard_secret_mount_present")
         if env.get("ANALYZE_MODE") != "1":
             failures.append("analyze_mode_not_enabled")
         if str(env.get("SYSTEM3_MODE") or "").upper() != "ANALYZER":
@@ -247,8 +258,9 @@ def main() -> int:
             "serving_revision": serving_revision,
             "serving_deploy_git_sha": env.get("DEPLOY_GIT_SHA"),
             "traffic_authority": "single_100_percent_serving_revision",
-            "require_api_key": env.get("REQUIRE_API_KEY"),
-            "api_key_mounted": "API_KEY" in secret_names,
+            "dashboard_credential_surface": "ABSENT" if not retired_env_present and not retired_secret_mounts else "DRIFT",
+            "retired_dashboard_env_present": retired_env_present,
+            "retired_dashboard_secret_mounts": retired_secret_mounts,
             "worker_token_mounted": "WORKER_PUSH_TOKEN" in secret_names,
             "analyze_mode": env.get("ANALYZE_MODE"),
             "system3_mode": env.get("SYSTEM3_MODE"),
@@ -257,7 +269,9 @@ def main() -> int:
             "auto_execute_trades": env.get("AUTO_EXECUTE_TRADES"),
             "failures": failures,
         }
-        (OUT / "config.json").write_text(json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8")
+        (OUT / "config.json").write_text(
+            json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8"
+        )
         if failures:
             raise RuntimeError("public_dashboard_config_proof_failed")
 
@@ -281,17 +295,24 @@ def main() -> int:
         html_shell = '<div id="root"' in html or "<div id='root'" in html
         http_failures: list[str] = []
         for label, status in (
-            ("root", root.status_code), ("dashboard_ui", dashboard.status_code),
-            ("auth_status", auth_status), ("state", state_status), ("health", health_status),
+            ("root", root.status_code),
+            ("dashboard_ui", dashboard.status_code),
+            ("auth_status", auth_status),
+            ("state", state_status),
+            ("health", health_status),
         ):
             if status != 200:
                 http_failures.append(f"{label}_http_{status}")
         if not html_shell:
             http_failures.append("dashboard_ui_html_shell_missing")
-        if auth.get("required") is not False:
-            http_failures.append("auth_status_required_not_false")
-        if auth.get("mode") != "auth_disabled":
-            http_failures.append("auth_status_mode_not_disabled")
+        if not (
+            auth.get("required") is False
+            and auth.get("configured") is False
+            and auth.get("authenticated") is False
+            and auth.get("mode") == "public_readonly"
+            and auth.get("credential_surface") == "REMOVED"
+        ):
+            http_failures.append("public_readonly_status_contract_failed")
 
         http_proof = {
             "state": "PASS" if not http_failures else "FAIL",
@@ -306,13 +327,17 @@ def main() -> int:
             "state_http_status": state_status,
             "health_http_status": health_status,
             "auth_required": auth.get("required"),
+            "auth_configured": auth.get("configured"),
             "auth_mode": auth.get("mode"),
-            "api_key_sent_for_dashboard_reads": False,
-            "cookie_sent_for_dashboard_reads": False,
+            "credential_surface": auth.get("credential_surface"),
+            "dashboard_credential_sent_for_reads": False,
+            "dashboard_session_cookie_sent_for_reads": False,
             "dashboard_visible_without_login": not http_failures,
             "failures": http_failures,
         }
-        (OUT / "http.json").write_text(json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8")
+        (OUT / "http.json").write_text(
+            json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8"
+        )
         if http_failures:
             raise RuntimeError("public_dashboard_http_proof_failed")
 
@@ -320,7 +345,7 @@ def main() -> int:
         upper_dom = dom.upper()
         if "SYSTEM3" not in upper_dom:
             raise RuntimeError("rendered_product_marker_missing")
-        if "DASHBOARD API KEY" in upper_dom:
+        if "DASHBOARD API KEY" in upper_dom or "ENTER API KEY" in upper_dom:
             raise RuntimeError("dashboard_login_prompt_still_rendered")
 
         screenshot = OUT / "dashboard.png"
@@ -337,22 +362,27 @@ def main() -> int:
             "dashboard_path": dashboard_path,
             "rendered_system3_marker": True,
             "dashboard_api_key_prompt_rendered": False,
-            "api_key_used": False,
+            "dashboard_credential_used": False,
         }
-        (OUT / "visual.json").write_text(json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8")
+        (OUT / "visual.json").write_text(
+            json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
         matrix = _run_tab_matrix()
         tab_count = int(matrix.get("tab_count") or 0)
         pass_count = int(matrix.get("pass_count") or 0)
-        _publish_status("success", f"PAPER /ui no-key + {pass_count}/{tab_count} tab visuals passed; LIVE OFF")
+        _publish_status(
+            "success",
+            f"PAPER /ui credential-free + {pass_count}/{tab_count} tab visuals passed; LIVE OFF",
+        )
         print("PUBLIC_DASHBOARD_RUNTIME_PROOF " + json.dumps({
             "state": "PASS",
             "sha": EXPECTED_SHA,
             "serving_revision": serving_revision,
             "dashboard_path": dashboard_path,
             "dashboard_ui_http_status": dashboard.status_code,
-            "api_key_mounted": False,
-            "api_key_prompt_rendered": False,
+            "dashboard_credential_surface": "ABSENT",
+            "dashboard_prompt_rendered": False,
             "screenshot_sha256": digest,
             "tab_visual_pass_count": pass_count,
             "tab_visual_count": tab_count,
@@ -360,14 +390,23 @@ def main() -> int:
         }, sort_keys=True))
         return 0
     except Exception as exc:
-        (OUT / "config.json").write_text(json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8")
-        (OUT / "http.json").write_text(json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8")
+        (OUT / "config.json").write_text(
+            json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8"
+        )
+        (OUT / "http.json").write_text(
+            json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8"
+        )
         try:
             _publish_status("failure", "Public PAPER dashboard or tab visual proof failed")
         except Exception as status_exc:
-            print(f"PUBLIC_DASHBOARD_STATUS_PUBLISH_ERROR {type(status_exc).__name__}", file=sys.stderr)
+            print(
+                f"PUBLIC_DASHBOARD_STATUS_PUBLISH_ERROR {type(status_exc).__name__}",
+                file=sys.stderr,
+            )
         print("PUBLIC_DASHBOARD_RUNTIME_PROOF " + json.dumps({
-            "state": "FAIL", "error_type": type(exc).__name__, "error": str(exc)[:180],
+            "state": "FAIL",
+            "error_type": type(exc).__name__,
+            "error": str(exc)[:180],
         }, sort_keys=True), file=sys.stderr)
         return 1
 
