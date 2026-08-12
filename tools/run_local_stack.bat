@@ -1,7 +1,7 @@
 @echo off
 REM ====================================================================
-REM Genesis System3 — LOCAL STACK (no GitHub / no Codespaces / no Render)
-REM Backend + worker + dashboard at http://localhost:8000/ui
+REM Genesis System3 — LOCAL READ-ONLY STACK
+REM Production authority remains Google Cloud. LIVE stays OFF.
 REM ====================================================================
 setlocal enabledelayedexpansion
 
@@ -10,19 +10,23 @@ cd /d "%ROOT%"
 
 set SYSTEM3_LOCAL=1
 set SYSTEM3_API_BASE=http://127.0.0.1:8000
-set SYSTEM3_MODE=analyzer
+set SYSTEM3_MODE=ANALYZER
 set ANALYZE_MODE=1
 set LIVE_TRADING_ENABLED=0
 set SYSTEM3_LIVE_TRADING_ALLOWED=0
+set AUTO_EXECUTE_TRADES=0
 set SYSTEM3_REAL_ONLY=1
+set REQUIRE_API_KEY=
+set API_KEY=
+set DASHBOARD_API_KEY=
+set ENABLE_DASHBOARD_AUTH=
 
 echo.
 echo ====================================================================
-echo   GENESIS SYSTEM3 — LOCAL LAPTOP STACK
+echo   GENESIS SYSTEM3 — LOCAL PUBLIC READ-ONLY STACK
 echo ====================================================================
 echo.
 
-REM --- venv ---
 if not exist "venv\Scripts\python.exe" (
     echo [1/6] Creating venv...
     python -m venv venv
@@ -38,11 +42,11 @@ if exist "dashboard\backend\requirements.txt" (
     "%PIP%" install -q uvicorn[standard] fastapi python-dotenv 2>nul
 )
 
-echo [3/6] Syncing Dhan instrument master (if missing)...
+echo [3/6] Syncing Dhan instrument master if missing...
 if not exist "storage\instruments\master_meta.json" (
     "%PY%" scripts\sync_dhan_instruments_master.py --force 2>nul
 ) else (
-    echo   instruments cache present — skip
+    echo   instruments cache present - skip
 )
 
 echo [4/6] Freeing port 8000...
@@ -51,8 +55,8 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING" 2^>nul') d
 )
 timeout /t 2 /nobreak >nul
 
-echo [5/6] Starting backend + cloud worker...
-start "System3 Backend" /MIN cmd /c "cd /d %ROOT% && set SYSTEM3_LOCAL=1&& set LIVE_TRADING_ENABLED=0&& set SYSTEM3_REAL_ONLY=1&& venv\Scripts\python.exe -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000"
+echo [5/6] Starting secure backend + retired cloud worker stub...
+start "System3 Backend" /MIN cmd /c "cd /d %ROOT% && set SYSTEM3_LOCAL=1&& set LIVE_TRADING_ENABLED=0&& set SYSTEM3_LIVE_TRADING_ALLOWED=0&& set AUTO_EXECUTE_TRADES=0&& venv\Scripts\python.exe -m uvicorn dashboard.backend.secure_app:app --host 127.0.0.1 --port 8000"
 start "System3 Worker" /MIN cmd /c "cd /d %ROOT% && set SYSTEM3_LOCAL=1&& set LIVE_TRADING_ENABLED=0&& set CLOUD_WORKER=1&& venv\Scripts\python.exe scripts\cloud_worker.py"
 
 echo [6/6] Waiting for health...
@@ -69,15 +73,17 @@ for /L %%i in (1,1,30) do (
 
 echo.
 if "!READY!"=="1" (
-    echo   [OK] Backend healthy at http://127.0.0.1:8000
+    echo   [OK] Secure backend healthy at http://127.0.0.1:8000
 ) else (
-    echo   [WARN] Backend slow to start — check minimized "System3 Backend" window
+    echo   [WARN] Backend slow to start - check minimized window
 )
 
 echo.
 echo   Dashboard UI:  http://127.0.0.1:8000/ui
 echo   API docs:      http://127.0.0.1:8000/docs
 echo   API health:    http://127.0.0.1:8000/api/health
+echo   Dashboard:     PUBLIC / READ-ONLY
+echo   LIVE:          OFF / LOCKED
 echo.
 
 if /I "%~1"=="--no-open" goto :done
