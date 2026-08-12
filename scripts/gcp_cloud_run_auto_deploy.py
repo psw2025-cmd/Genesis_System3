@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Canonical Cloud Run deployment entrypoint with immutable digest proof.
 
-The original deployment state machine is preserved byte-for-byte in
-``gcp_cloud_run_auto_deploy_impl.py``.  This entrypoint verifies that the
+The original deployment state machine is preserved in
+``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
 implementation still contains every critical PAPER/LIVE-OFF/candidate safety
 invariant, then replaces only the image-provenance assertion with the
 fail-closed Artifact Registry repository+digest verifier.
@@ -29,7 +29,10 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     '("DEFER_INSTRUMENT_WARMUP", "1")',
     '("SYSTEM3_STATE_BACKEND", "firestore")',
     '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")',
-    '--remove-secrets=API_KEY',
+    '--remove-env-vars=API_KEY,DASHBOARD_API_KEY,ENABLE_DASHBOARD_AUTH,DASHBOARD_SESSION_MAX_AGE',
+    '--remove-secrets=API_KEY,DASHBOARD_API_KEY',
+    '_assert_retired_dashboard_auth_absent',
+    'CANDIDATE_DASHBOARD_CREDENTIAL_SURFACE_REMOVED',
     '--update-secrets=WORKER_PUSH_TOKEN=',
     'WORKER_PUSH_TOKEN_SECRET_ID',
     'DASHBOARD_PUBLIC_READONLY enforced',
