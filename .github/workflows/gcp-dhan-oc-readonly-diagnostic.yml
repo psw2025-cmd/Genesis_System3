@@ -1,0 +1,75 @@
+name: GCP Dhan OC Readonly Diagnostic
+
+on:
+  push:
+    branches:
+      - "fix/gcp-dhan-token-rotation-ui-proof-oc-diagnostic-*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROJECT_ID: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+      DEPLOY_SA: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile diagnostic only
+        run: python -m py_compile scripts/gcp_dhan_oc_log_diagnostic.py
+
+      - name: Authenticate to Google Cloud with keyless WIF
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Capture sanitized Dhan option-chain classifications
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud logging read \
+            'resource.type="cloud_run_revision" AND resource.labels.service_name="genesis-system3-web" AND textPayload:"[DSM]"' \
+            --project="${PROJECT_ID}" \
+            --freshness=4h \
+            --limit=500 \
+            --order=asc \
+            --format=json > /tmp/dsm-logs.json
+          python scripts/gcp_dhan_oc_log_diagnostic.py /tmp/dsm-logs.json
+
+      - name: Re-probe public read-only chain routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(status.url)')
+          for sym in NIFTY BANKNIFTY FINNIFTY MIDCPNIFTY; do
+            curl -fsS --max-time 20 "${URL}/api/chain/${sym}" > "/tmp/${sym}.json"
+            jq -c --arg sym "${sym}" '{symbol:$sym,status,source_priority,data_source,total_contracts,spot_positive:((.spot // 0) > 0),blocked,blocked_reason}' "/tmp/${sym}.json"
+          done
+          echo '--- POST-PROBE DSM CLASSIFICATION ---'
+          gcloud logging read \
+            'resource.type="cloud_run_revision" AND resource.labels.service_name="genesis-system3-web" AND textPayload:"[DSM]"' \
+            --project="${PROJECT_ID}" \
+            --freshness=20m \
+            --limit=200 \
+            --order=asc \
+            --format=json > /tmp/dsm-logs-post.json
+          python scripts/gcp_dhan_oc_log_diagnostic.py /tmp/dsm-logs-post.json
