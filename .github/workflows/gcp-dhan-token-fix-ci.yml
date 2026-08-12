@@ -18,7 +18,9 @@ on:
       - "tools/sync_render_secrets.py"
       - "dashboard/backend/**"
       - "dashboard/frontend/**"
+      - "deploy/gcp/bootstrap_github_wif.sh"
       - "tests/test_gcp_dhan_token_rotation_contract.py"
+      - "tests/test_gcp_rotator_identity_contract.py"
       - "tests/test_dhan_single_token_authority.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
@@ -51,6 +53,7 @@ jobs:
           python -m compileall -q core dashboard scripts tests
           python -m unittest -v \
             tests.test_gcp_dhan_token_rotation_contract \
+            tests.test_gcp_rotator_identity_contract \
             tests.test_dhan_single_token_authority
 
       - uses: actions/setup-node@v4
