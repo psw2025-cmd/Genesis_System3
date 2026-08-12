@@ -3,15 +3,15 @@
 
 The proof binds evidence to the actual single 100%-traffic serving revision,
 never merely the latest-created/latest-ready candidate. It performs anonymous
-GET requests only, captures the real `/ui`, then runs the all-tab visual proof
-for desktop and mobile. No broker order or paper mutation endpoint is called.
+GET requests only, then delegates rendered-UI proof to the canonical all-tab
+single-session WebDriver harness. No broker order or paper mutation endpoint is
+called.
 """
 from __future__ import annotations
 
 import hashlib
 import json
 import os
-import shutil
 import subprocess
 import sys
 import urllib.request
@@ -28,6 +28,7 @@ EXPECTED_SHA = os.getenv("GITHUB_SHA", "").strip()
 OUT = Path("reports/latest/public_dashboard_proof")
 TIMEOUT_S = 30
 OFF_VALUES = {"0", "false", "no", "off"}
+CANONICAL_VISUAL_TAB = "decision-intel"
 
 
 def _run(*args: str, timeout: int = 90) -> str:
@@ -130,39 +131,6 @@ def _get_json(url: str) -> tuple[int, dict[str, Any]]:
     return response.status_code, body if isinstance(body, dict) else {}
 
 
-def _browser_path() -> str:
-    for name in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser"):
-        path = shutil.which(name)
-        if path:
-            return path
-    raise RuntimeError("headless_chrome_not_found")
-
-
-def _browser_args(url: str) -> list[str]:
-    return [
-        _browser_path(), "--headless", "--disable-gpu", "--no-sandbox",
-        "--hide-scrollbars", "--window-size=1600,1000",
-        "--virtual-time-budget=12000", url,
-    ]
-
-
-def _render_dom(url: str) -> str:
-    args = _browser_args(url)
-    args.insert(-1, "--dump-dom")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
-    if proc.returncode:
-        raise RuntimeError(f"dashboard_dom_render_failed:{proc.returncode}")
-    return proc.stdout or ""
-
-
-def _capture(url: str, path: Path) -> None:
-    args = _browser_args(url)
-    args.insert(-1, f"--screenshot={path}")
-    proc = subprocess.run(args, text=True, capture_output=True, timeout=60, check=False)
-    if proc.returncode or not path.is_file() or path.stat().st_size < 1000:
-        raise RuntimeError(f"dashboard_screenshot_failed:{proc.returncode}")
-
-
 def _publish_status(state: str, description: str) -> None:
     token = os.getenv("GITHUB_TOKEN", "").strip()
     repo = os.getenv("GITHUB_REPOSITORY", "").strip()
@@ -209,7 +177,66 @@ def _run_tab_matrix() -> dict[str, Any]:
     matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
     if not isinstance(matrix, dict) or matrix.get("state") != "PASS":
         raise RuntimeError("ui_tab_visual_matrix_not_pass")
+    if matrix.get("expected_sha") != EXPECTED_SHA:
+        raise RuntimeError("ui_tab_visual_matrix_sha_mismatch")
     return matrix
+
+
+def _safe_evidence_path(relative: str) -> Path:
+    if not relative or Path(relative).is_absolute():
+        raise RuntimeError("ui_visual_evidence_path_invalid")
+    root = OUT.resolve()
+    candidate = (OUT / relative).resolve()
+    if candidate != root and root not in candidate.parents:
+        raise RuntimeError("ui_visual_evidence_path_escape")
+    return candidate
+
+
+def _materialize_canonical_visual(matrix: dict[str, Any], serving_revision: str, dashboard_path: str) -> tuple[str, dict[str, Any]]:
+    tabs = matrix.get("tabs") or []
+    if not isinstance(tabs, list):
+        raise RuntimeError("ui_tab_visual_rows_missing")
+    rows = [row for row in tabs if isinstance(row, dict) and row.get("id") == CANONICAL_VISUAL_TAB]
+    if len(rows) != 1:
+        raise RuntimeError("canonical_visual_tab_not_unique")
+    row = rows[0]
+    if row.get("proof_state") != "PASS":
+        raise RuntimeError("canonical_visual_tab_not_pass")
+    if row.get("active_tab_proven") is not True:
+        raise RuntimeError("canonical_visual_active_tab_not_proven")
+    if row.get("dashboard_api_key_prompt_rendered") is not False:
+        raise RuntimeError("canonical_visual_dashboard_key_prompt_rendered")
+    if row.get("system3_marker") is not True:
+        raise RuntimeError("canonical_visual_system3_marker_missing")
+
+    source = _safe_evidence_path(str(row.get("desktop_file") or ""))
+    if not source.is_file() or source.stat().st_size < 1000:
+        raise RuntimeError("canonical_visual_screenshot_missing")
+    raw = source.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    expected_digest = str(row.get("desktop_sha256") or "")
+    if len(expected_digest) != 64 or digest != expected_digest:
+        raise RuntimeError("canonical_visual_screenshot_hash_mismatch")
+
+    screenshot = OUT / "dashboard.png"
+    screenshot.write_bytes(raw)
+    (OUT / "dashboard.sha256").write_text(f"{digest}  dashboard.png\n", encoding="utf-8")
+    visual = {
+        "state": "PASS",
+        "sha256": digest,
+        "bytes": len(raw),
+        "viewport": "1600x1000",
+        "source": "webdriver_tab_matrix",
+        "browser_transport": matrix.get("browser_transport"),
+        "canonical_visual_tab": CANONICAL_VISUAL_TAB,
+        "serving_revision": serving_revision,
+        "dashboard_path": dashboard_path,
+        "rendered_system3_marker": True,
+        "dashboard_api_key_prompt_rendered": False,
+        "api_key_used": False,
+    }
+    (OUT / "visual.json").write_text(json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8")
+    return digest, visual
 
 
 def main() -> int:
@@ -328,34 +355,13 @@ def main() -> int:
         if http_failures:
             raise RuntimeError("public_dashboard_http_proof_failed")
 
-        dom = _render_dom(dashboard_url)
-        upper_dom = dom.upper()
-        if "SYSTEM3" not in upper_dom:
-            raise RuntimeError("rendered_product_marker_missing")
-        if "DASHBOARD API KEY" in upper_dom:
-            raise RuntimeError("dashboard_login_prompt_still_rendered")
-
-        screenshot = OUT / "dashboard.png"
-        _capture(dashboard_url, screenshot)
-        digest = hashlib.sha256(screenshot.read_bytes()).hexdigest()
-        (OUT / "dashboard.sha256").write_text(f"{digest}  dashboard.png\n", encoding="utf-8")
-        visual = {
-            "state": "PASS",
-            "sha256": digest,
-            "bytes": screenshot.stat().st_size,
-            "viewport": "1600x1000",
-            "source": "real_deployed_cloud_run_dashboard_ui",
-            "serving_revision": serving_revision,
-            "dashboard_path": dashboard_path,
-            "rendered_system3_marker": True,
-            "dashboard_api_key_prompt_rendered": False,
-            "api_key_used": False,
-        }
-        (OUT / "visual.json").write_text(json.dumps(visual, indent=2, sort_keys=True), encoding="utf-8")
-
         matrix = _run_tab_matrix()
         tab_count = int(matrix.get("tab_count") or 0)
         pass_count = int(matrix.get("pass_count") or 0)
+        if tab_count != 22 or pass_count != tab_count:
+            raise RuntimeError("ui_tab_visual_matrix_count_mismatch")
+        digest, _ = _materialize_canonical_visual(matrix, serving_revision, dashboard_path)
+
         _publish_status("success", f"PAPER /ui no-key + {pass_count}/{tab_count} tab visuals passed; LIVE OFF")
         print("PUBLIC_DASHBOARD_RUNTIME_PROOF " + json.dumps({
             "state": "PASS",
@@ -366,6 +372,8 @@ def main() -> int:
             "api_key_mounted": False,
             "api_key_prompt_rendered": False,
             "screenshot_sha256": digest,
+            "visual_authority": "webdriver_tab_matrix",
+            "canonical_visual_tab": CANONICAL_VISUAL_TAB,
             "tab_visual_pass_count": pass_count,
             "tab_visual_count": tab_count,
             "live_trading_enabled": False,
