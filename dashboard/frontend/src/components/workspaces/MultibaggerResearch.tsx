@@ -125,4 +125,4 @@ export const MultibaggerResearch: React.FC = React.memo(() => {
       </div>
     </div>
   );
-};
+});
