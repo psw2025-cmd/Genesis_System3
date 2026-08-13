@@ -272,6 +272,19 @@ def test_derived_health_allows_pending_first_run_and_historical_success():
     assert result["healthy"] is True
     assert result["coverage"]["total"] == 9
 
+    # Manual/bootstrap validate success before first scheduler delivery must not fail.
+    jobs_boot = [dict(row) for row in jobs]
+    for row in jobs_boot:
+        if row["name"] == "genesis-system3-validate":
+            row.update({
+                "completion_status": "EXECUTION_SUCCEEDED",
+                "create_time": "2026-08-13T22:00:00Z",
+                "completion_time": "2026-08-13T22:01:00Z",
+                "evidence_role": "latest_created_execution",
+            })
+    boot = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs_boot}, now=now)
+    assert boot["healthy"] is True
+
 
 def test_derived_health_rejects_duplicate_and_swapped_target():
     now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)

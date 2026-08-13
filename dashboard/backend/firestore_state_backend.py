@@ -464,14 +464,13 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
                     reasons.append(f"scheduler/execution timestamp materially future: {target}")
                 elif completed < created or (now - attempt).total_seconds() > 180 or (now - completed).total_seconds() > 300:
                     reasons.append("collector control continuity stale")
-            elif historical:
+            elif historical or not resource.get("last_attempt_time"):
                 # Prefer last successful execution within cadence grace instead of
                 # waiting for the next market-day window after a failed attempt.
+                # Also accept bootstrap/manual successes before the first scheduler delivery.
                 if max_age_hours is not None and (now - completed).total_seconds() > max_age_hours * 3600:
                     reasons.append(f"enabled scheduler execution stale beyond cadence grace: {target}")
             else:
-                if not resource.get("last_attempt_time"):
-                    raise ValueError("missing required timestamps")
                 attempt = FirestoreSchedulerEvidenceBackend._parse_utc(resource["last_attempt_time"])
                 if attempt > now.replace(microsecond=0):
                     reasons.append(f"scheduler/execution timestamp materially future: {target}")
