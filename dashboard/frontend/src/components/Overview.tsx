@@ -1,7 +1,7 @@
-import { useMemo, useStore } from '../store'
-import { useMemo, fmtCr, signClass } from '../lib/utils'
-import { useMemo, cn } from '../lib/utils'
-import { useMemo, AuthUnlock } from './AuthUnlock'
+import { useStore } from '../store'
+import { fmtCr, signClass } from '../lib/utils'
+import { cn } from '../lib/utils'
+import { AuthUnlock } from './AuthUnlock'
 
 function KPI({ label, value, sub, color }: {
   label: string; value: string | number; sub?: string; color?: string

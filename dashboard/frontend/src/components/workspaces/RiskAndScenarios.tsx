@@ -4,7 +4,7 @@ import { StatusChip, PENDINGState } from './TruthUI';
 import { Shield, BarChart3, Activity, Lock } from 'lucide-react';
 import RiskDashboard from '../RiskDashboard';
 
-export const RiskAndScenarios: React.FC = React.memo(() => {
+export const RiskAndScenarios: React.FC = () => {
   const { autoGates } = useStore();
 
   return (

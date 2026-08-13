@@ -4,7 +4,7 @@ import {
   Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
   Search, Zap
 } from 'lucide-react'
-import { useCallback, useMemo, useStore } from '../store'
+import { useStore } from '../store'
 
 export const DASHBOARD_TABS = [
   { id: 'decision-intel', label: 'Decision Intel', Icon: Zap, group: 'main' },

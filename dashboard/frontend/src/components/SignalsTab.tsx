@@ -1,6 +1,6 @@
-import { useMemo, useStore } from '../store'
-import { useMemo, cn, fmt } from '../lib/utils'
-import { useMemo, TrendingUp, TrendingDown } from 'lucide-react'
+import { useStore } from '../store'
+import { cn, fmt } from '../lib/utils'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 
 export function SignalsTab() {
   const { state, gainRank } = useStore()

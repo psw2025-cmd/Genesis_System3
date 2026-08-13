@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useEffect, useRef, useState } from 'react'
-import { useCallback, useMemo, useStore } from '../store'
-import { useCallback, useMemo, PriceCell } from './ui/PriceCell'
-import { useCallback, useMemo, fmt, cn } from '../lib/utils'
+import { useEffect, useRef, useState } from 'react'
+import { useStore } from '../store'
+import { PriceCell } from './ui/PriceCell'
+import { fmt, cn } from '../lib/utils'
 
 const SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'RELIANCE', 'HDFCBANK', 'TCS', 'INFY', 'ICICIBANK']
 

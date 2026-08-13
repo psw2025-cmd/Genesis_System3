@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useMemo, API_BASE, API_HEADERS } from '../config'
+import { API_BASE, API_HEADERS } from '../config'
 
 type LoadState = 'loading' | 'ready' | 'not_ready' | 'error'
 
