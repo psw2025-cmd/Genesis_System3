@@ -35,43 +35,40 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, paper, health, connectionHealth, error } = useStore()
-  
-  // ═══════════════════════════════════════════════════════════
-  // System Health Indicators
-  // ═══════════════════════════════════════════════════════════
+  const { autoGates, brokerConnected, health, wsStatus, apiStatus } = useStore()
+
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
-  const profitGate = gatesObj.POSITIVE_NET_EXPECTANCY_AFTER_COSTS || proofList.find((g: any) => /expectancy|profit/i.test(String(g?.label || g?.gate_id || '')))
   const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
-  
+
   const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
-  const profitOk = Boolean(profitGate?.pass ?? profitGate?.ok)
   const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
-  const wsConnected = connectionHealth?.status === 'connected'
-  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
-  
+  const wsConnected = wsStatus === 'live'
+  const cloudUiOk = Boolean(brokerConnected || health?.broker?.connected === true || health?.broker_status === 'connected')
+  const apiHardFailure = apiStatus?.severity === 'error' || apiStatus?.severity === 'locked'
+  const systemOk = Boolean(health) && !apiHardFailure
+
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
-  const wsLabel = wsConnected ? `WS OK ${connectionHealth?.latency ?? 0}ms` : 'WS RECONNECTING'
-  
-  const proofItems: Array<[string, string, boolean, string]> = [
-    ['SYSTEM', 'v2.0', !error],
+  const wsLabel = wsConnected ? 'WS LIVE' : wsStatus === 'connecting' ? 'WS CONNECTING' : 'WS RECONNECTING'
+
+  const proofItems: Array<[string, string, boolean]> = [
+    ['SYSTEM', 'v2.0', systemOk],
     ['STORE', 'UNIFIED', true],
     ['WS', wsLabel, wsConnected],
     ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
     ['ML', mlLabel, mlOk],
     ['PAPER', paperOk ? 'OK' : 'PENDING', paperOk],
-    ['UI', cloudUiOk ? 'LIVE' : 'CHECK', cloudUiOk],
+    ['UI', cloudUiOk ? 'READY' : 'CHECK', cloudUiOk],
   ]
 
   return (
     <div
       data-testid="production-proof-bar"
       aria-label="Production proof status"
-      title="🟢 GENESIS SYSTEM 3 V2.0 - Production Grade"
+      title="GENESIS SYSTEM 3 V2.0 — Guarded PAPER / read-only production UI"
       style={{
         flexShrink: 0,
         display: 'flex',
@@ -80,7 +77,7 @@ function ProductionProofBar() {
         padding: '6px 12px',
         minHeight: '40px',
         background: 'linear-gradient(90deg, rgba(15,23,42,.95) 0%, rgba(20,30,50,.95) 100%)',
-        borderBottom: `2px solid ${error ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)'}`,
+        borderBottom: `2px solid ${systemOk ? 'rgba(34,197,94,.5)' : 'rgba(239,68,68,.5)'}`,
         overflowX: 'auto',
       }}
     >
@@ -92,8 +89,8 @@ function ProductionProofBar() {
         letterSpacing: '0.12em',
         whiteSpace: 'nowrap',
       }}>≣ GENESIS v2.0</span>
-      
-      {proofItems.map(([label, value, safe, _]) => (
+
+      {proofItems.map(([label, value, safe]) => (
         <div
           key={label}
           style={{
@@ -108,7 +105,6 @@ function ProductionProofBar() {
             boxShadow: safe ? '0 0 8px rgba(34,197,94,.15)' : 'none',
           }}
         >
-          {/* Status dot */}
           <div style={{
             width: '6px',
             height: '6px',
@@ -117,7 +113,6 @@ function ProductionProofBar() {
             boxShadow: safe ? '0 0 4px rgba(34,197,94,0.8)' : '0 0 4px rgba(239,68,68,0.8)',
             animation: safe ? 'none' : 'pulse 2s infinite',
           }} />
-          
           <span style={{
             color: 'rgba(200,220,255,0.8)',
             fontSize: '9px',
@@ -196,9 +191,18 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const { health, paper, brokerStatus, chain } = useStore()
+  const requiredChainsSettled = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
+    .every((symbol) => Boolean(chain?.[symbol]))
+  const dashboardHydrated = Boolean(health && paper && brokerStatus && requiredChainsSettled)
+
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
-                  background: 'var(--surface)', overflow: 'hidden' }}>
+    <div
+      data-dashboard-hydrated={dashboardHydrated ? 'ready' : 'loading'}
+      data-dashboard-mode="paper-readonly"
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column',
+               background: 'var(--surface)', overflow: 'hidden' }}
+    >
       <DashboardTabUrlSync />
       <TopBar />
       <ProductionProofBar />
