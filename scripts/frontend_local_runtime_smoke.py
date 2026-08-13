@@ -2,8 +2,8 @@
 """Fail CI if the built System3 dashboard compiles but cannot render in Chrome.
 
 Read-only analyzer/PAPER smoke: serve the Vite production build, mount the app once,
-then activate every canonical tab through the real sidebar. This avoids 22 full app
-remounts and the network/poller amplification they cause. No broker mutation or order
+then activate every canonical tab through the real sidebar. Each successfully rendered
+tab is also captured as a PNG visual-proof artifact. No broker mutation or order
 endpoint is intentionally called.
 """
 from __future__ import annotations
@@ -21,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
+PROOF_DIR = ROOT / "frontend-ui-proof"
 HOST = "127.0.0.1"
 
 TABS = [
@@ -156,6 +157,7 @@ return {
     def screenshot(self, path: Path) -> None:
         encoded = self._request("GET", f"/session/{self.session_id}/screenshot", timeout=10)
         if isinstance(encoded, str) and encoded:
+            path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(base64.b64decode(encoded))
 
 
@@ -175,6 +177,10 @@ def main() -> int:
         print("FAIL: Vite dist missing; run npm run build first", file=sys.stderr)
         return 2
 
+    if PROOF_DIR.exists():
+        shutil.rmtree(PROOF_DIR)
+    PROOF_DIR.mkdir(parents=True, exist_ok=True)
+
     preview_port = _free_port()
     base_url = f"http://{HOST}:{preview_port}/ui/"
     preview = subprocess.Popen(
@@ -182,11 +188,11 @@ def main() -> int:
         cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
     )
     failures: list[str] = []
+    captured = 0
     started = time.monotonic()
     try:
         _wait_http(base_url, preview, 20)
         with Browser() as browser:
-            # One mount only. Subsequent tabs use the actual sidebar/store transition.
             browser.navigate(base_url + "?tab=decision-intel")
             first = _wait_tab(browser, "decision-intel", 5)
             if first.get("rootChildren", 0) <= 0 or not first.get("system3"):
@@ -211,10 +217,15 @@ def main() -> int:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
                 else:
-                    print("TAB_PASS", tab_id)
+                    # Give React one short frame to settle after the active-tab proof,
+                    # then capture what a user would actually see at 1600x1000.
+                    time.sleep(0.12)
+                    browser.screenshot(PROOF_DIR / f"{tab_id}.png")
+                    captured += 1
+                    print("TAB_PASS", tab_id, f"screenshot={tab_id}.png")
 
             if failures:
-                browser.screenshot(ROOT / "frontend-runtime-smoke-failure.png")
+                browser.screenshot(PROOF_DIR / "_failure.png")
     finally:
         preview.terminate()
         try:
@@ -223,10 +234,20 @@ def main() -> int:
             preview.kill()
 
     elapsed = round(time.monotonic() - started, 2)
+    manifest = {
+        "tabs_expected": len(TABS),
+        "screenshots_captured": captured,
+        "failures": failures,
+        "elapsed_s": elapsed,
+        "viewport": "1600x1000",
+        "live_trading_actions": 0,
+    }
+    (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
     if failures:
         print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), f"elapsed_s={elapsed}", file=sys.stderr)
         return 1
-    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} elapsed_s={elapsed} live_trading_actions=0")
+    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} screenshots={captured} elapsed_s={elapsed} live_trading_actions=0")
     return 0
 
 
