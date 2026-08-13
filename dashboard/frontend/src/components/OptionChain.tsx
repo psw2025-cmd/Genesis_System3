@@ -25,7 +25,7 @@ interface Contract {
 
 function quotePrice(c: Contract | undefined, side: 'bid' | 'ask') {
   if (!c) return null
-  const anyC = c as unknown
+  const anyC = c as any
   const v = side === 'bid'
     ? (anyC.top_bid_price ?? anyC.bid ?? anyC.bid_price)
     : (anyC.top_ask_price ?? anyC.ask ?? anyC.ask_price)
@@ -55,6 +55,115 @@ function StatusRow({ label, value, tone }: { label: string; value: string | numb
     <div className="flex items-center justify-between py-2 border-b border-border last:border-0">
       <span className="text-text-muted text-xs">{label}</span>
       <span className={cn('num text-xs font-semibold text-right', color)}>{value}</span>
+    </div>
+  )
+}
+
+function EmptyChainShell({
+  chainSymbol, setChainSymbol, marketOpen, status, marketReason, nextOpen, dataSource, sourcePriority, message, chainMismatch, backendUnderlying,
+}: {
+  chainSymbol: string
+  setChainSymbol: (symbol: string) => void
+  marketOpen: boolean
+  status: string
+  marketReason: string
+  nextOpen: string
+  dataSource: any
+  sourcePriority: any
+  message: string
+  chainMismatch: boolean
+  backendUnderlying?: string
+}) {
+  const placeholderRows = Array.from({ length: 9 }, (_, index) => index)
+  return (
+    <div className="workspace-shell" style={{ padding: 10 }}>
+      <div className="card" style={{ padding: 10, marginBottom: 9 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span className="panel-title" style={{ marginRight: 6 }}>Option Chain</span>
+          {SYMBOLS.map(sym => (
+            <button key={sym}
+              onClick={() => setChainSymbol(sym)}
+              className={cn('soft-btn', chainSymbol === sym && 'active')}
+              style={{ minHeight: 29, fontSize: '.6rem' }}
+            >{sym}</button>
+          ))}
+          <span className="pill" style={{ marginLeft: 'auto', color: 'var(--amber)', border: '1px solid rgba(245,165,36,.28)', background: 'rgba(245,165,36,.06)' }}>
+            {marketOpen ? 'WAITING FOR CURRENT CHAIN' : 'READ-ONLY / NO SNAPSHOT'}
+          </span>
+        </div>
+      </div>
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', marginBottom: 9 }}>
+        {[
+          ['SPOT', '--', 'Waiting for verified market data'],
+          ['IMPLIED VOLATILITY', '--', 'No contract IV rows'],
+          ['PUT / CALL RATIO', '--', 'No verified OI totals'],
+          ['MAX PAIN', '--', 'No backend field'],
+          ['OI TREND', 'WAITING', 'No option-chain snapshot'],
+          ['VOLATILITY STATUS', 'WAITING', marketOpen ? 'Current session' : 'After hours'],
+        ].map(([label, value, sub]) => (
+          <div className="metric-card" key={label}>
+            <div className="metric-label">{label}</div>
+            <div className="metric-value" style={{ color: value === 'WAITING' ? 'var(--amber)' : 'var(--text-pri)', fontSize: '1rem' }}>{value}</div>
+            <div className="metric-sub">{sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(0, 4fr) minmax(270px, 1.1fr)' }}>
+        <div className="card" style={{ overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 94px 1fr', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ textAlign: 'center', padding: 8, color: 'var(--up)', background: 'rgba(24,215,130,.08)', fontWeight: 850, fontSize: '.66rem' }}>CALLS</div>
+            <div style={{ textAlign: 'center', padding: 8, color: 'var(--text-sec)', background: 'var(--surface-2)', fontWeight: 850, fontSize: '.58rem' }}>STRIKE</div>
+            <div style={{ textAlign: 'center', padding: 8, color: 'var(--down)', background: 'rgba(255,73,100,.07)', fontWeight: 850, fontSize: '.66rem' }}>PUTS</div>
+          </div>
+          <table style={{ width: '100%' }}>
+            <thead><tr>{['OI','ΔOI','VOL','IV','LTP','BID','STRIKE','ASK','LTP','IV','VOL','ΔOI','OI'].map((h, i) => <th key={`${h}-${i}`} className="thead" style={{ textAlign: i < 6 ? 'right' : i === 6 ? 'center' : 'left' }}>{h}</th>)}</tr></thead>
+            <tbody>
+              {placeholderRows.map((row) => (
+                <tr className={cn('trow', row === 4 && 'atm-row')} key={row}>
+                  {Array.from({ length: 13 }, (_, cell) => (
+                    <td key={cell} className="tcell" style={{ textAlign: cell < 6 ? 'right' : cell === 6 ? 'center' : 'left', color: cell === 6 && row === 4 ? 'var(--amber)' : 'var(--text-mut)' }}>
+                      {cell === 6 && row === 4 ? 'ATM --' : '--'}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ padding: '9px 12px', borderTop: '1px solid var(--border)', color: 'var(--text-mut)', fontSize: '.58rem' }}>
+            Empty structure is intentional: no synthetic option values are inserted when the backend has no verified rows.
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gap: 9 }}>
+          <div className="card" style={{ padding: 12 }}>
+            <div className="panel-title">Options Intelligence</div>
+            <div style={{ marginTop: 9, color: 'var(--amber)', fontWeight: 800, fontSize: '.68rem' }}>NO VERIFIED CHAIN EVIDENCE</div>
+            <div style={{ marginTop: 7, color: 'var(--text-mut)', fontSize: '.62rem', lineHeight: 1.6 }}>AI interpretation remains withheld until current chain/OI/IV evidence is available.</div>
+          </div>
+          <div className="card" style={{ padding: 12 }}>
+            <div className="panel-title">Source & Freshness</div>
+            <StatusRow label="Status" value={status} tone="warn" />
+            <StatusRow label="Market" value={marketOpen ? 'OPEN' : 'CLOSED'} tone={marketOpen ? 'ok' : 'warn'} />
+            <StatusRow label="Source" value={`${String(dataSource)} / ${String(sourcePriority)}`} />
+            <StatusRow label="Next open" value={nextOpen} />
+            <StatusRow label="Backend" value={message || 'No contracts returned'} tone="warn" />
+          </div>
+          <div className="card" style={{ padding: 12 }}>
+            <div className="panel-title">Read-only Safety</div>
+            <div style={{ marginTop: 8, color: 'var(--up)', fontSize: '.65rem', fontWeight: 800 }}>ANALYZER / PAPER · LIVE OFF</div>
+            <div style={{ marginTop: 6, color: 'var(--text-mut)', fontSize: '.6rem', lineHeight: 1.55 }}>No order action is exposed by this workspace.</div>
+          </div>
+        </div>
+      </div>
+
+      {chainMismatch && (
+        <div className="card" style={{ marginTop: 9, padding: 10, color: 'var(--down)', borderColor: 'rgba(255,73,100,.3)', fontSize: '.62rem' }}>
+          Backend returned {String(backendUnderlying)} while UI selected {chainSymbol}. Wrong-symbol rows remain hidden.
+        </div>
+      )}
+      <div style={{ marginTop: 9, color: 'var(--text-mut)', fontSize: '.58rem' }}>{marketReason}</div>
     </div>
   )
 }
@@ -102,43 +211,20 @@ export function OptionChain() {
 
   const maxOI = Math.max(...contracts.map(c => c.oi ?? 0), 1)
 
-  // Always prefer a visible chain table when we have rows (live OR closed-session snapshot).
   if (contracts.length === 0) {
-    return (
-      <div className="p-6 space-y-4 overflow-y-auto h-full">
-        <div className="flex items-center gap-2 flex-wrap">
-          {SYMBOLS.map(sym => (
-            <button key={sym}
-              onClick={() => setChainSymbol(sym)}
-              className={cn(
-                'px-3 py-1 rounded text-xs font-mono font-semibold transition-colors',
-                chainSymbol === sym
-                  ? 'bg-accent text-white'
-                  : 'bg-surface-2 text-text-secondary hover:text-text-primary border border-border'
-              )}
-            >{sym}</button>
-          ))}
-        </div>
-        <div className="card p-4 border border-amber/30 bg-amber/5">
-          <div className="text-xs text-text-muted uppercase tracking-wider">Option Chain - {chainSymbol}</div>
-          <div className="text-sm text-amber font-semibold mt-1">
-            {marketOpen ? 'Waiting for live Dhan option-chain stream…' : 'No chain rows yet (market closed — last snapshot not loaded).'}
-          </div>
-          <div className="text-xs text-text-muted mt-3 leading-5">
-            Status: <span className="font-mono">{String(status)}</span><br />
-            Market: <span className="font-mono">{marketOpen ? 'OPEN' : 'CLOSED'}</span> · {marketReason}<br />
-            Next open: <span className="font-mono">{nextOpen}</span><br />
-            Source: <span className="font-mono">{String(dataSource)} / {String(sourcePriority)}</span><br />
-            Backend: <span className="font-mono">{data?.message || 'No contracts returned by backend.'}</span>
-          </div>
-          {chainMismatch && (
-            <div className="text-xs text-down mt-3 font-mono">
-              Backend returned {String(data?.underlying)} while UI selected {chainSymbol}. Table hidden to avoid showing wrong-symbol data.
-            </div>
-          )}
-        </div>
-      </div>
-    )
+    return <EmptyChainShell
+      chainSymbol={chainSymbol}
+      setChainSymbol={setChainSymbol}
+      marketOpen={marketOpen}
+      status={String(status)}
+      marketReason={marketReason}
+      nextOpen={nextOpen}
+      dataSource={dataSource}
+      sourcePriority={sourcePriority}
+      message={String(data?.message || 'No contracts returned by backend.')}
+      chainMismatch={chainMismatch}
+      backendUnderlying={data?.underlying}
+    />
   }
 
   const streamLive = Boolean(marketOpen && (data?.verified_live_dhan || data?.live === true) && !stale)
@@ -240,9 +326,7 @@ export function OptionChain() {
                   </td>
                   <td className="tcell text-right">{ce?.volume != null ? (ce.volume >= 1000 ? (ce.volume/1000).toFixed(0)+'K' : ce.volume) : '--'}</td>
                   <td className="tcell text-right text-amber">{ce?.iv != null ? (ce.iv * 100).toFixed(1) + '%' : '--'}</td>
-                  <td className="tcell text-right">
-                    {ce ? <PriceCell value={ce.ltp} /> : '--'}
-                  </td>
+                  <td className="tcell text-right">{ce ? <PriceCell value={ce.ltp} /> : '--'}</td>
                   <td className="tcell text-right text-text-muted">{quotePrice(ce, 'bid') != null ? fmt(quotePrice(ce, 'bid')!, 1) : '--'}</td>
 
                   <td className={cn(
@@ -254,9 +338,7 @@ export function OptionChain() {
                   </td>
 
                   <td className="tcell text-left text-text-muted">{quotePrice(pe, 'ask') != null ? fmt(quotePrice(pe, 'ask')!, 1) : '--'}</td>
-                  <td className="tcell text-left">
-                    {pe ? <PriceCell value={pe.ltp} /> : '--'}
-                  </td>
+                  <td className="tcell text-left">{pe ? <PriceCell value={pe.ltp} /> : '--'}</td>
                   <td className="tcell text-left text-amber">{pe?.iv != null ? (pe.iv * 100).toFixed(1) + '%' : '--'}</td>
                   <td className="tcell text-left">{pe?.volume != null ? (pe.volume >= 1000 ? (pe.volume/1000).toFixed(0)+'K' : pe.volume) : '--'}</td>
                   <td className={cn('tcell text-left num', pe?.dOI != null && pe.dOI > 0 ? 'text-up' : 'text-down')}>
@@ -272,4 +354,3 @@ export function OptionChain() {
     </div>
   )
 }
-
