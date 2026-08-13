@@ -11,6 +11,7 @@ import asyncio
 import importlib.util
 import json
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -107,8 +108,10 @@ def test_multibagger_contract_is_truthful_pending_without_evidence(app):
 
 def test_multibagger_contract_requires_price_and_model_provenance(app):
     endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    now = datetime.now(timezone.utc).isoformat()
     result = endpoint.__globals__["_build_multibagger_contract"]({
-        "candidates": [{"candidate_id": "c-1", "symbol": "RELIANCE", "price": {"value": 100}}]
+        "as_of": now, "source": "GENESIS_FORECAST_EVALUATOR",
+        "candidates": [{"candidate_id": "c-1", "symbol": "RELIANCE", "rank": 1, "price": {"value": 100}}]
     })
     assert result["status"] == "pending"
     assert result["validation"]["accepted"] == 0
@@ -118,13 +121,15 @@ def test_multibagger_contract_requires_price_and_model_provenance(app):
 
 def test_multibagger_contract_exposes_only_validated_partial_evidence(app):
     endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    now = datetime.now(timezone.utc).isoformat()
     result = endpoint.__globals__["_build_multibagger_contract"]({
-        "as_of": "2026-08-14T09:30:00+05:30",
+        "as_of": now,
         "source": "GENESIS_FORECAST_EVALUATOR",
         "candidates": [{
             "candidate_id": "c-1", "symbol": "reliance", "rank": 1,
-            "price": {"value": 1500.5, "currency": "inr", "source": "DHAN", "observed_at": "2026-08-14T09:29:59+05:30"},
-            "model": {"name": "gain-rank", "version": "2026.08", "generated_at": "2026-08-14T09:30:00+05:30"},
+            "price": {"value": 1500.5, "currency": "inr", "source": "DHAN", "observed_at": now, "secret": "drop"},
+            "model": {"name": "gain-rank", "version": "2026.08", "scoring_method": "rank_score", "generated_at": now, "internal": "drop"},
+            "extra": "drop",
         }],
     })
     assert result["status"] == "partial"
@@ -132,7 +137,74 @@ def test_multibagger_contract_exposes_only_validated_partial_evidence(app):
     assert result["sections"]["probability_ladder"] == "pending"
     assert result["candidates"][0]["symbol"] == "RELIANCE"
     assert result["candidates"][0]["price"]["source"] == "DHAN"
+    assert result["candidates"][0]["model"]["proof_ready"] is False
+    assert result["candidates"][0]["model"]["evidence_status"] == "unverified"
+    assert "extra" not in result["candidates"][0]
+    assert "secret" not in result["candidates"][0]["price"]
+    assert "internal" not in result["candidates"][0]["model"]
     assert result["validation"] == {"accepted": 1, "rejected": 0, "rejections": []}
+
+
+def test_multibagger_contract_rejects_bad_rank_duplicates_and_unapproved_price_source(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc).isoformat()
+    def row(candidate_id, symbol, rank, source="DHAN"):
+        return {"candidate_id": candidate_id, "symbol": symbol, "rank": rank,
+                "price": {"value": 10, "currency": "INR", "source": source, "observed_at": now},
+                "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": now}}
+    result = build({"as_of": now, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [
+        row("a", "AAA", 1), row("a", "BBB", 2), row("c", "AAA", 3),
+        row("d", "DDD", 1), row("e", "EEE", 1.5), row("f", "FFF", 6, "CSV"),
+    ]})
+    reasons = "|".join(item["reason"] for item in result["validation"]["rejections"])
+    assert result["validation"]["accepted"] == 1
+    assert "DUPLICATE_CANDIDATE_OR_SYMBOL" in reasons
+    assert "DUPLICATE_RANK" in reasons
+    assert "POSITIVE_INTEGRAL_RANK_REQUIRED" in reasons
+    assert "PRICE_PROVENANCE_REQUIRED" in reasons
+
+
+def test_multibagger_contract_requires_approved_producer_and_fresh_aware_timestamps(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    assert build({"as_of": datetime.now(timezone.utc).isoformat(), "source": "UNKNOWN", "candidates": []})["reason"] == "PRODUCER_SOURCE_UNVERIFIED"
+    assert build({"as_of": "2026-08-14T10:00:00", "source": "GENESIS_FORECAST_EVALUATOR", "candidates": []})["reason"] == "INVALID_OR_FUTURE_AS_OF"
+    future = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    assert build({"as_of": future, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": []})["reason"] == "INVALID_OR_FUTURE_AS_OF"
+
+
+def test_multibagger_contract_marks_old_envelope_stale_and_rejects_stale_candidate_evidence(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc)
+    old = (now - timedelta(hours=2)).isoformat()
+    fresh = now.isoformat()
+    valid = {"candidate_id": "a", "symbol": "AAA", "rank": 1,
+             "price": {"value": 10, "currency": "INR", "source": "DHAN", "observed_at": fresh},
+             "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": fresh}}
+    result = build({"as_of": old, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert result["status"] == "stale" and result["stale"] is True
+    valid["price"]["observed_at"] = old
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert result["status"] == "pending"
+    assert "PRICE_EVIDENCE_STALE" in result["validation"]["rejections"][0]["reason"]
+    valid["price"]["observed_at"] = fresh
+    valid["model"]["generated_at"] = old
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert "MODEL_EVIDENCE_STALE" in result["validation"]["rejections"][0]["reason"]
+    valid["model"]["generated_at"] = (now + timedelta(minutes=10)).isoformat()
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert "MODEL_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+
+
+def test_multibagger_model_proof_requires_all_hashes(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc).isoformat()
+    row = {"candidate_id": "a", "symbol": "AAA", "rank": 1,
+           "price": {"value": 10, "currency": "INR", "source": "DHAN", "observed_at": now},
+           "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": now,
+                     "proof": {"artifact_sha256": "a" * 64, "data_sha256": "b" * 64, "code_sha": "c" * 40}}}
+    result = build({"as_of": now, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [row]})
+    assert result["candidates"][0]["model"]["proof_ready"] is True
+    assert result["candidates"][0]["model"]["evidence_status"] == "verified"
 
 
 def test_state_endpoint_returns_200(app):
