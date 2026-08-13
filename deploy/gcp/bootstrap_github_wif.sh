@@ -18,6 +18,10 @@ WEB_RUNTIME_SA_NAME="${WEB_RUNTIME_SA_NAME:-genesis-system3-web}"
 ROTATOR_SA_NAME="${ROTATOR_SA_NAME:-genesis-system3-dhan-rotator}"
 # GCP service-account IDs are capped at 30 characters; keep this short.
 SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-gs3-scheduler}"
+COLLECTOR_SA_NAME="${COLLECTOR_SA_NAME:-gs3-scheduler-collector}"
+RANK_SA_NAME="${RANK_SA_NAME:-gs3-rank-job}"
+FORECAST_SA_NAME="${FORECAST_SA_NAME:-gs3-forecast-job}"
+SIGNALS_SA_NAME="${SIGNALS_SA_NAME:-gs3-signals-job}"
 CLOUDBUILD_BUCKET="${CLOUDBUILD_BUCKET:-${PROJECT_ID}_cloudbuild}"
 BUILDER_SA_NAME="${BUILDER_SA_NAME:-system3-builder}"
 
@@ -47,6 +51,10 @@ BUILDER_SA="${BUILDER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 WEB_RUNTIME_SA="${WEB_RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 ROTATOR_SA="${ROTATOR_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 SCHEDULER_SA="${SCHEDULER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+COLLECTOR_SA="${COLLECTOR_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+RANK_SA="${RANK_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+FORECAST_SA="${FORECAST_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+SIGNALS_SA="${SIGNALS_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
 say "Create or verify Workload Identity Pool"
 if ! gcloud iam workload-identity-pools describe "$POOL_ID" \
@@ -76,7 +84,11 @@ for SPEC in \
   "$EVIDENCE_SA_NAME|System3 read-only evidence reader" \
   "$WEB_RUNTIME_SA_NAME|Genesis System3 web runtime" \
   "$ROTATOR_SA_NAME|Genesis System3 Dhan token rotator" \
-  "$SCHEDULER_SA_NAME|Genesis System3 scheduler invoker"; do
+  "$SCHEDULER_SA_NAME|Genesis System3 scheduler invoker" \
+  "$COLLECTOR_SA_NAME|Genesis System3 scheduler evidence collector" \
+  "$RANK_SA_NAME|Genesis System3 bounded rank job" \
+  "$FORECAST_SA_NAME|Genesis System3 bounded forecast job" \
+  "$SIGNALS_SA_NAME|Genesis System3 bounded signal job"; do
   NAME="${SPEC%%|*}"; DISPLAY="${SPEC#*|}"; EMAIL="${NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
   if ! exists_sa "$EMAIL"; then
     gcloud iam service-accounts create "$NAME" --project="$PROJECT_ID" --display-name="$DISPLAY"
@@ -114,10 +126,21 @@ if exists_sa "$BUILDER_SA"; then
     --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
     --role="roles/iam.serviceAccountUser" >/dev/null
 fi
-for SA in "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA"; do
+for SA in "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA" "$COLLECTOR_SA" "$RANK_SA" "$FORECAST_SA" "$SIGNALS_SA"; do
   gcloud iam service-accounts add-iam-policy-binding "$SA" \
     --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
     --role="roles/iam.serviceAccountUser" >/dev/null
+done
+
+say "Grant bounded job identities their narrow runtime roles"
+for ROLE in roles/datastore.user roles/run.viewer roles/cloudscheduler.viewer; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${COLLECTOR_SA}" --role="$ROLE" --condition=None >/dev/null
+done
+for SA in "$RANK_SA" "$FORECAST_SA" "$SIGNALS_SA"; do
+  gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${SA}" --role="roles/datastore.user" --condition=None >/dev/null
+done
+for SECRET in system3-dhan-client-id dhan-access-token; do
+  gcloud secrets add-iam-policy-binding "$SECRET" --project="$PROJECT_ID" --member="serviceAccount:${RANK_SA}" --role="roles/secretmanager.secretAccessor" >/dev/null
 done
 
 say "Grant web runtime only shared-state and read-only runtime secrets"
@@ -131,6 +154,7 @@ for SECRET in system3-dhan-client-id dhan-access-token system3-dashboard-worker-
     --role="roles/secretmanager.secretAccessor" >/dev/null
 done
 
+# Deployment identity may administer runtime resources but never receives broker secret payload access.
 say "Grant Dhan rotator only token-mint secrets and version-add authority"
 for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret; do
   gcloud secrets describe "$SECRET" --project="$PROJECT_ID" >/dev/null
@@ -158,7 +182,7 @@ for ROLE in \
 done
 
 say "Verify all System3 service identities remain keyless"
-for SA in "$DEPLOY_SA" "$EVIDENCE_SA" "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA"; do
+for SA in "$DEPLOY_SA" "$EVIDENCE_SA" "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA" "$COLLECTOR_SA" "$RANK_SA" "$FORECAST_SA" "$SIGNALS_SA"; do
   KEYS="$(gcloud iam service-accounts keys list --iam-account="$SA" --project="$PROJECT_ID" --managed-by=user --format='value(name)')"
   if [[ -n "$KEYS" ]]; then
     echo "ERROR: user-managed key unexpectedly exists on ${SA}." >&2

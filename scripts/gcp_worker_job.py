@@ -9,6 +9,12 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import urllib.parse
+import hashlib
+import base64
+from datetime import date
+from zoneinfo import ZoneInfo
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,6 +24,29 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 _TRUTHY = {"1", "true", "yes", "on", "enabled"}
+_EXPECTED_SCHEDULERS = {
+    "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast"),
+    "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank"),
+    "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals"),
+    "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate"),
+    "genesis-system3-forecast-schedule": ("PAUSED", "genesis-system3-forecast"),
+    "genesis-system3-rank-schedule": ("PAUSED", "genesis-system3-rank"),
+    "genesis-system3-signals-schedule": ("PAUSED", "genesis-system3-signals"),
+    "genesis-system3-scheduler-collector-every-minute": ("ENABLED", "genesis-system3-scheduler-collector"),
+}
+
+
+def _parse_scheduler_target(uri: str, project: str, region: str) -> tuple[Optional[str], bool]:
+    try:
+        parsed = urllib.parse.urlsplit(uri)
+        match = re.fullmatch(
+            rf"/v2/projects/{re.escape(project)}/locations/{re.escape(region)}/jobs/([^/:]+):run",
+            parsed.path,
+        )
+        valid = bool(parsed.scheme == "https" and parsed.hostname == "run.googleapis.com" and parsed.port is None and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment and match)
+        return (match.group(1) if match else None), valid
+    except Exception:
+        return None, False
 
 
 def _truthy(value: Optional[str]) -> bool:
@@ -51,6 +80,172 @@ def _base_result(kind: str) -> Dict[str, Any]:
     }
 
 
+def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
+    project = os.environ.get("GOOGLE_CLOUD_PROJECT", "").strip()
+    region = os.environ.get("GCP_REGION", "asia-south1").strip()
+    if not project:
+        raise RuntimeError("GOOGLE_CLOUD_PROJECT is required")
+    if session is None:
+        from google.auth import default as google_auth_default
+        from google.auth.transport.requests import AuthorizedSession
+        credentials, _ = google_auth_default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        session = AuthorizedSession(credentials)
+    scheduler_url = f"https://cloudscheduler.googleapis.com/v1/projects/{project}/locations/{region}/jobs"
+    run_url = f"https://run.googleapis.com/v2/projects/{project}/locations/{region}/jobs"
+    def pages(url: str, key: str) -> list:
+        rows, token = [], None
+        while True:
+            response = session.get(url, params={"pageSize": 100, **({"pageToken": token} if token else {})}, timeout=20)
+            response.raise_for_status()
+            body = response.json()
+            page = body.get(key, [])
+            if not isinstance(page, list):
+                raise RuntimeError(f"Malformed Google API {key} response")
+            rows.extend(page)
+            token = body.get("nextPageToken")
+            if not token:
+                return rows
+    scheduler_rows = pages(scheduler_url, "jobs")
+    run_rows = pages(run_url, "jobs")
+    resources = []
+    for row in scheduler_rows:
+        name = str(row.get("name", "")).rsplit("/", 1)[-1]
+        uri = str((row.get("httpTarget") or {}).get("uri") or "")
+        target_job, target_valid = _parse_scheduler_target(uri, project, region)
+        resources.append({"name": name, "state": row.get("state", "MISSING"), "target_job": target_job, "target_uri_valid": target_valid, "target_type": "http" if uri else ("pubsub" if row.get("pubsubTarget") else "missing"), "schedule": row.get("schedule"), "time_zone": row.get("timeZone"), "last_attempt_time": row.get("lastAttemptTime"), "delivery_status_code": (row.get("status") or {}).get("code", 0), "delivery_status_message": str((row.get("status") or {}).get("message") or "")[:200]})
+    jobs = []
+    targets = sorted({target for _, target in _EXPECTED_SCHEDULERS.values()})
+    by_job = {str(row.get("name", "")).rsplit("/", 1)[-1]: row for row in run_rows}
+    for name in targets:
+        latest = (by_job.get(name, {}).get("latestCreatedExecution") or {})
+        jobs.append({"name": name, "execution": str(latest.get("name", "")).rsplit("/", 1)[-1] or None, "completion_status": latest.get("completionStatus") or "MISSING", "create_time": latest.get("createTime"), "completion_time": latest.get("completionTime")})
+    # The collector is currently running, so job.latestCreatedExecution points
+    # at itself and cannot prove completion. Use the newest PRIOR completed run.
+    executions_url = f"{run_url}/genesis-system3-scheduler-collector/executions"
+    prior = []
+    try:
+        prior = pages(executions_url, "executions")
+    except Exception:
+        prior = []
+    current_execution = os.environ.get("CLOUD_RUN_EXECUTION", "")
+    completed_prior = [row for row in prior if row.get("completionTime") and str(row.get("name", "")).rsplit("/", 1)[-1] != current_execution]
+    completed_prior.sort(key=lambda row: str(row.get("completionTime")), reverse=True)
+    if completed_prior:
+        row = completed_prior[0]
+        succeeded = int(row.get("succeededCount", 0) or 0) >= int(row.get("taskCount", 1) or 1)
+        replacement = {"name": "genesis-system3-scheduler-collector", "execution": str(row.get("name", "")).rsplit("/", 1)[-1], "completion_status": "EXECUTION_SUCCEEDED" if succeeded else "EXECUTION_FAILED", "create_time": row.get("createTime"), "completion_time": row.get("completionTime"), "evidence_role": "prior_completed_execution"}
+        jobs = [replacement if fact.get("name") == "genesis-system3-scheduler-collector" else fact for fact in jobs]
+    return {"schema_version": 1, "observed_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "resources": resources, "jobs": jobs, "artifacts": [], "summary": {"source": "google_cloud_control_plane", "live_trading_enabled": False}}
+
+
+def _run_scheduler_collector() -> Dict[str, Any]:
+    from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+    owner = os.environ.get("CLOUD_RUN_EXECUTION", "").strip()
+    if not owner:
+        raise RuntimeError("CLOUD_RUN_EXECUTION unique owner is required")
+    backend = FirestoreSchedulerEvidenceBackend()
+    facts = _collect_scheduler_facts()
+    for lane in ("rank", "forecast", "signals"):
+        artifact = backend.verify_artifact(lane)
+        if artifact:
+            facts["artifacts"].append(artifact)
+    lease = backend.acquire_lease(owner, 120)
+    if not lease.get("acquired"):
+        raise RuntimeError("scheduler collector lease held by another execution")
+    return backend.publish(facts, owner=owner, fence=lease["fence"])
+
+
+def _business_context(lane: str) -> tuple[str, bool, str]:
+    now_ist = datetime.now(ZoneInfo("Asia/Kolkata"))
+    today = now_ist.date()
+    if today.weekday() >= 5:
+        return today.isoformat(), False, "WEEKEND"
+    try:
+        from core.utils.nse_holidays import is_trading_holiday
+        holiday, reason = is_trading_holiday(today)
+        if holiday:
+            return today.isoformat(), False, str(reason or "EXCHANGE_HOLIDAY")
+    except Exception:
+        return today.isoformat(), False, "UNKNOWN_CALENDAR"
+    minute = now_ist.hour * 60 + now_ist.minute
+    window = (9 * 60, 15 * 60 + 30) if lane in {"rank", "forecast"} else (18 * 60 + 30, 23 * 60)
+    if not (window[0] <= minute <= window[1]):
+        return today.isoformat(), False, "MARKET_SESSION_CLOSED"
+    return today.isoformat(), True, "OPEN_SESSION"
+
+
+def _artifact(lane: str, payload: Dict[str, Any], source_bytes: bytes, output_bytes: bytes) -> Dict[str, Any]:
+    from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+    business_date, _, _ = _business_context(lane)
+    run_id = os.environ.get("CLOUD_RUN_EXECUTION", "").strip()
+    if not run_id:
+        raise RuntimeError("CLOUD_RUN_EXECUTION is required for immutable business artifacts")
+    code_paths = [Path(__file__), ROOT / "dashboard/backend/firestore_state_backend.py"]
+    if lane == "rank": code_paths.append(ROOT / "scripts/daily_gain_rank_and_validate.py")
+    elif lane == "signals": code_paths.append(ROOT / "scripts/run_signal_engine_from_bhavcopy.py")
+    code_bytes = b"".join(path.read_bytes() for path in code_paths)
+    value = {"schema_version": 1, "lane": lane, "run_id": run_id, "produced_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "business_date": business_date, "status": payload.get("status", "PASS"), "reason_code": payload.get("reason_code"), "payload": payload, "source_sha256": hashlib.sha256(source_bytes).hexdigest(), "code_sha256": hashlib.sha256(code_bytes).hexdigest(), "output_sha256": hashlib.sha256(output_bytes).hexdigest(), "output_bytes_b64": base64.b64encode(output_bytes).decode("ascii")}
+    return FirestoreSchedulerEvidenceBackend().publish_artifact(lane, value)
+
+
+def _run_rank_lane() -> Dict[str, Any]:
+    from scripts.daily_gain_rank_and_validate import REPORT_DIR, run_ranking
+    business_date, is_open_day, reason = _business_context("rank")
+    if not is_open_day:
+        status = "PENDING" if reason == "UNKNOWN_CALENDAR" else "SKIPPED"
+        raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
+        return _artifact("rank", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
+    run_ranking()
+    summary = json.loads((REPORT_DIR / "summary.json").read_text(encoding="utf-8"))
+    rows = json.loads((REPORT_DIR / "ranked.json").read_text(encoding="utf-8")) if (REPORT_DIR / "ranked.json").exists() else []
+    if summary.get("status") != "PASS" or not rows:
+        raise RuntimeError("rank lane did not produce verified rows")
+    output = (REPORT_DIR / "ranked.json").read_bytes()
+    return _artifact("rank", {"summary": summary, "rows": rows}, output, output)
+
+
+def _run_forecast_lane() -> Dict[str, Any]:
+    from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+    rank = FirestoreSchedulerEvidenceBackend().load_artifact("rank")
+    business_date, is_open_day, reason = _business_context("forecast")
+    if not is_open_day:
+        status = "PENDING" if reason == "UNKNOWN_CALENDAR" else "SKIPPED"
+        raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
+        return _artifact("forecast", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
+    if not rank or rank.get("business_date") != business_date or rank.get("status") != "PASS":
+        raise RuntimeError("fresh durable rank artifact is required")
+    rows = (rank.get("payload") or {}).get("rows") or []
+    dependencies = [{"underlying": row.get("underlying"), "rank": row.get("rank"), "source_rank_sha256": rank.get("output_sha256")} for row in rows if row.get("underlying")]
+    if not dependencies:
+        raise RuntimeError("forecast lane received empty rank artifact")
+    # Rank evidence is not a forecast. Persist dependency readiness truth until
+    # a separately validated forecast model contract is introduced.
+    payload = {"status": "PENDING", "reason_code": "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED", "rank_dependencies": dependencies}
+    output = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    source = base64.b64decode(rank["output_bytes_b64"], validate=True)
+    if hashlib.sha256(source).hexdigest() != rank.get("output_sha256"):
+        raise RuntimeError("durable rank dependency hash mismatch")
+    return _artifact("forecast", payload, source, output)
+
+
+def _run_signals_lane() -> Dict[str, Any]:
+    from scripts.bhavcopy_downloader import _get_session, download_bhavcopy
+    from scripts.run_signal_engine_from_bhavcopy import SIGNALS_CSV, _latest_bhavcopy, run
+    business_date, is_open_day, reason = _business_context("signals")
+    if not is_open_day:
+        status = "PENDING" if reason == "UNKNOWN_CALENDAR" else "SKIPPED"
+        raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
+        return _artifact("signals", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
+    today = date.fromisoformat(business_date)
+    if download_bhavcopy(today, _get_session()) == "failed" or not run():
+        raise RuntimeError("session-bound bhavcopy signal lane failed")
+    payload = {"artifact": "storage/live/dhan_index_ai_signals.csv", "bytes": SIGNALS_CSV.stat().st_size}
+    source_path = _latest_bhavcopy()
+    if source_path is None:
+        raise RuntimeError("session bhavcopy source missing after download")
+    return _artifact("signals", payload, source_path.read_bytes(), SIGNALS_CSV.read_bytes())
+
+
 def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
     _assert_analyzer_only()
     kind = (kind or os.environ.get("SYSTEM3_JOB_KIND", "smoke")).strip().lower()
@@ -58,6 +253,15 @@ def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
 
     if kind == "smoke":
         result["detail"] = "Analyzer-only bounded worker smoke test"
+    elif kind == "scheduler-collector":
+        result["scheduler_evidence"] = _run_scheduler_collector()
+        result["detail"] = "One fenced raw scheduler control-plane collection completed"
+    elif kind == "rank":
+        result["business_artifact"] = _run_rank_lane()
+    elif kind == "forecast":
+        result["business_artifact"] = _run_forecast_lane()
+    elif kind == "signals":
+        result["business_artifact"] = _run_signals_lane()
     elif kind == "state-sync":
         from dashboard.backend.runtime_state_store import get_state_store
 
