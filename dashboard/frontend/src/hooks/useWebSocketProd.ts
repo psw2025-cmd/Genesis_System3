@@ -29,8 +29,8 @@ class WebSocketManagerProd {
   private url: string;
   private config: Required<WebSocketConfig>;
   private messageHandlers: Map<string, (msg: WebSocketMessage) => void> = new Map();
-  private reconnectTimeoutId: NodeJS.Timeout | null = null;
-  private heartbeatTimeoutId: NodeJS.Timeout | null = null;
+  private reconnectTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private heartbeatTimeoutId: ReturnType<typeof setInterval> | null = null;
   private reconnectAttempts = 0;
   private lastHeartbeatTime = 0;
   private messageQueue: WebSocketMessage[] = [];
