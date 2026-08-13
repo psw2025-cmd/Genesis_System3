@@ -100,3 +100,32 @@ def test_collector_timeout_prevents_evidence_collection(monkeypatch):
         def get(self, url, params, timeout): raise TimeoutError("bounded timeout")
     with pytest.raises(TimeoutError):
         gcp_worker_job._collect_scheduler_facts(Session())
+
+
+@pytest.mark.parametrize("kind,runner", [("rank", "_run_rank_lane"), ("forecast", "_run_forecast_lane"), ("signals", "_run_signals_lane")])
+def test_business_lane_is_bounded_and_live_off(monkeypatch, kind, runner):
+    monkeypatch.setenv("SYSTEM3_JOB_PUBLISH_STATE", "0")
+    monkeypatch.setenv("LIVE_TRADING_ENABLED", "0")
+    monkeypatch.setenv("SYSTEM3_LIVE_TRADING_ALLOWED", "0")
+    monkeypatch.setattr(gcp_worker_job, runner, lambda: {"artifact_version": 1, "lane": kind})
+    result = gcp_worker_job.run_job(kind)
+    assert result["business_artifact"]["lane"] == kind
+    assert result["live_trading_enabled"] is False
+
+
+def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
+    from pathlib import Path
+    workflow = (Path(__file__).parents[1] / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+    assert "gs3-rank-job@" in workflow and "gs3-forecast-job@" in workflow and "gs3-signals-job@" in workflow
+    rank_secret_mount = "--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest"
+    assert workflow.count(rank_secret_mount) == 1
+    assert "genesis-system3-scheduler-collector-every-minute" in workflow
+    assert '--schedule="* * * * *"' in workflow
+    assert "COLLECTOR_URI=\"https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run\"" in workflow
+    assert ".coverage.workload == 7 and .coverage.control == 1 and .coverage.total == 8" in workflow
+    pause = workflow.index("scheduler jobs pause genesis-system3-scheduler-collector-every-minute")
+    resume = workflow.index("scheduler jobs resume genesis-system3-scheduler-collector-every-minute", pause)
+    trigger = workflow.index("scheduler jobs run genesis-system3-scheduler-collector-every-minute", resume)
+    assert pause < resume < trigger
+    assert 'IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")' in workflow
+    assert 'gcloud run jobs execute "genesis-system3-${KIND}"' not in workflow

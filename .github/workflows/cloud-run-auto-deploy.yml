@@ -46,6 +46,10 @@ jobs:
       GCP_WEB_RUNTIME_SERVICE_ACCOUNT: genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATOR_SERVICE_ACCOUNT: genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_SCHEDULER_SERVICE_ACCOUNT: gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com
+      SCHEDULER_COLLECTOR_SERVICE_ACCOUNT: gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com
+      RANK_JOB_SERVICE_ACCOUNT: gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com
+      FORECAST_JOB_SERVICE_ACCOUNT: gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com
+      SIGNALS_JOB_SERVICE_ACCOUNT: gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
       GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
@@ -283,6 +287,59 @@ jobs:
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --wait
+
+      - name: Configure bounded business lanes and evidence collector
+        run: |
+          IMAGE=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(spec.template.spec.containers[0].image)')
+          for KIND in rank forecast signals; do
+            case "${KIND}" in rank) JOB_SA="${RANK_JOB_SERVICE_ACCOUNT}";; forecast) JOB_SA="${FORECAST_JOB_SERVICE_ACCOUNT}";; signals) JOB_SA="${SIGNALS_JOB_SERVICE_ACCOUNT}";; esac
+            gcloud run jobs deploy "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+              --image="${IMAGE}" --service-account="${JOB_SA}" --command=python --args=scripts/gcp_worker_job.py \
+              --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=10m \
+              --set-env-vars="SYSTEM3_JOB_KIND=${KIND},SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1" \
+              $(if [ "${KIND}" = rank ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
+            gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
+          done
+          gcloud run jobs deploy genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+            --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
+            --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=2m \
+            --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1"
+          gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
+
+          # Rank is the sole producer; forecast consumes its durable artifact 15m later.
+          gcloud scheduler jobs update http genesis-system3-rank-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="45 3 * * MON-FRI" --time-zone=UTC
+          gcloud scheduler jobs update http genesis-system3-forecast-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="0 4 * * MON-FRI" --time-zone=UTC
+          gcloud scheduler jobs update http genesis-system3-signals-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="15 13 * * MON-FRI" --time-zone=UTC
+          COLLECTOR_URI="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run"
+          if gcloud scheduler jobs describe genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1; then ACTION=update; else ACTION=create; fi
+          gcloud scheduler jobs "${ACTION}" http genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" \
+            --schedule="* * * * *" --time-zone=UTC --uri="${COLLECTOR_URI}" --http-method=POST \
+            --oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" \
+            --message-body='{}'
+
+          # Control-plane canary: invoke through Scheduler, then run one direct
+          # Control-plane only: never manufacture business-lane evidence during deploy.
+          gcloud scheduler jobs pause genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
+          trap 'gcloud scheduler jobs resume genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1 || true' EXIT
+          BEFORE_EXEC=$(gcloud run jobs describe genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.latestCreatedExecution.name)')
+          # Resume before triggering: the canary evidence must observe the
+          # collector control schedule as ENABLED, never claim health while paused.
+          gcloud scheduler jobs resume genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
+          gcloud scheduler jobs run genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
+          CANARY_EXEC=""
+          for ATTEMPT in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            CANARY_EXEC=$(gcloud run jobs describe genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.latestCreatedExecution.name)')
+            CANARY_STATUS=$(gcloud run jobs describe genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.latestCreatedExecution.completionStatus)')
+            if [[ -n "${CANARY_EXEC}" && "${CANARY_EXEC}" != "${BEFORE_EXEC}" && "${CANARY_STATUS}" = "EXECUTION_SUCCEEDED" ]]; then break; fi
+            sleep 5
+          done
+          test -n "${CANARY_EXEC}" && test "${CANARY_EXEC}" != "${BEFORE_EXEC}" && test "${CANARY_STATUS}" = "EXECUTION_SUCCEEDED"
+          gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
+          SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health.json
+          jq -e '.transport_healthy == true and .healthy == true and .coverage.workload == 7 and .coverage.control == 1 and .coverage.total == 8 and (.evidence_version > 0) and (.evidence_sha256 | length == 64) and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")) and .live_trading_enabled != true' /tmp/scheduler-health.json >/dev/null
+          jq -e --arg execution "${CANARY_EXEC##*/}" '.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .execution == $execution and .completion_status == "EXECUTION_SUCCEEDED"' /tmp/scheduler-health.json >/dev/null
+          trap - EXIT
 
       - name: Prove service, rotator identity and scheduler safety
         run: |

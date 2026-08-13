@@ -16,6 +16,8 @@ import gcp_cloud_run_auto_deploy_impl as deployer
 from gcp_image_provenance import assert_same_artifact_image
 
 _IMPL = Path(__file__).with_name("gcp_cloud_run_auto_deploy_impl.py")
+PROJECT = deployer.PROJECT
+RUNTIME_SA = f"genesis-system3-web@{PROJECT}.iam.gserviceaccount.com"
 
 # These are executable preconditions: the wrapper refuses to deploy if the
 # preserved implementation loses any of these exact safety/provenance markers.

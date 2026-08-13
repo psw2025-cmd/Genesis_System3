@@ -18,6 +18,8 @@ class FakeDocument:
         self.payload = payload
 
     def get(self, transaction=None):
+        if transaction is not None and getattr(transaction, "writes_started", False):
+            raise RuntimeError("Firestore requires all reads before writes")
         return FakeSnapshot(self.payload)
 
 
@@ -30,7 +32,15 @@ class FakeCollection:
 
 
 class FakeTransaction:
+    def __init__(self): self.writes_started = False
     def set(self, document, payload):
+        self.writes_started = True
+        document.payload = payload
+
+    def create(self, document, payload):
+        self.writes_started = True
+        if document.payload is not None:
+            raise RuntimeError("already exists")
         document.payload = payload
 
 
@@ -172,9 +182,41 @@ def test_publish_rechecks_trusted_time_inside_transaction_callback():
         )
 
 
+def test_business_artifact_is_hashed_durable_and_idempotent():
+    import base64, hashlib, json
+    client = FakeClient()
+    clock = FakeClock("2026-08-14T01:00:00Z")
+    backend = FirestoreSchedulerEvidenceBackend(client=client, transactional=passthrough_transactional, clock=clock)
+    payload = {"rows": [{"underlying": "NIFTY", "rank": 1}]}
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    artifact = {"schema_version": 1, "lane": "rank", "run_id": "execution-a", "produced_at_utc": "2026-08-14T01:00:00Z", "business_date": "2026-08-14", "status": "PASS", "reason_code": None, "payload": payload, "source_sha256": "a" * 64, "code_sha256": "b" * 64, "output_sha256": digest, "output_bytes_b64": base64.b64encode(raw).decode()}
+    first = backend.publish_artifact("rank", artifact)
+    again = backend.publish_artifact("rank", artifact)
+    assert first == again and first["artifact_version"] == 1
+    assert backend.load_artifact("rank") == first
+    verified = backend.verify_artifact("rank", now=datetime(2026, 8, 14, 1, 1, tzinfo=timezone.utc))
+    assert verified["verified"] is True and verified["output_sha256"] == digest
+    with pytest.raises(ValueError, match="hash mismatch"):
+        backend.publish_artifact("rank", {**artifact, "output_sha256": "0" * 64})
+    client.documents["artifact_rank"].payload = {**first, "output_bytes_b64": "Y29ycnVwdA=="}
+    with pytest.raises(ValueError, match="stored bytes hash mismatch"):
+        backend.verify_artifact("rank", now=datetime(2026, 8, 14, 1, 1, tzinfo=timezone.utc))
+    with pytest.raises(ValueError, match="run_id"):
+        backend.publish_artifact("rank", {**artifact, "run_id": "bad/run"})
+    with pytest.raises(ValueError, match="date"):
+        backend.publish_artifact("rank", {**artifact, "business_date": "14-08-2026"})
+    with pytest.raises(ValueError, match="incoherent"):
+        backend.publish_artifact("rank", {**artifact, "reason_code": "WEEKEND"})
+    with pytest.raises(ValueError, match="incoherent"):
+        backend.publish_artifact("rank", {**artifact, "status": "SKIPPED", "reason_code": "UNKNOWN_CALENDAR"})
+
+
 def test_derived_scheduler_health_fails_enabled_job_failure_and_coverage():
     now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
     contracts = [("genesis-system3-forecast-daily", "ENABLED", "genesis-system3-forecast", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-rank-daily", "ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-signals-daily", "ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC"), ("genesis-system3-dhan-token-rotate-daily", "ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata"), ("genesis-system3-forecast-schedule", "PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC"), ("genesis-system3-rank-schedule", "PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC"), ("genesis-system3-signals-schedule", "PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC")]
+    contracts[0] = (*contracts[0][:3], "0 4 * * MON-FRI", "UTC")
+    contracts.append(("genesis-system3-scheduler-collector-every-minute", "ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC"))
     resources = [{"name": n, "state": s, "target_job": t, "schedule": schedule, "time_zone": zone, "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:58:00Z"} for n, s, t, schedule, zone in contracts]
     jobs = [{"name": t, "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"} for t in sorted({row[2] for row in contracts})]
     good = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
