@@ -48,10 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout repository
+      - name: Checkout proposed repository state
         uses: actions/checkout@v5
         with:
-          ref: main
           clean: true
           persist-credentials: false
 
@@ -97,9 +96,7 @@ jobs:
           from pathlib import Path
 
           event_name = os.environ.get("GITHUB_EVENT_NAME", "")
-          event_path = Path(os.environ["GITHUB_EVENT_PATH"])
-          payload = json.loads(event_path.read_text(encoding="utf-8"))
-
+          payload = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
           workflow_run = payload.get("workflow_run") or {}
           deployment = payload.get("deployment") or {}
           deployment_status = payload.get("deployment_status") or {}
@@ -124,11 +121,9 @@ jobs:
               deployment_app = str(app.get("slug") or "") or None
               retired_runtime = deployment_app == "render"
 
-          fingerprint_basis = "|".join(
-              [event_name, source, state, str(deployment_app or "none")]
-          ).lower()
-          fingerprint = hashlib.sha256(fingerprint_basis.encode("utf-8")).hexdigest()[:16]
-
+          fingerprint = hashlib.sha256(
+              "|".join([event_name, source, state, str(deployment_app or "none")]).lower().encode("utf-8")
+          ).hexdigest()[:16]
           report = {
               "schema_version": 1,
               "repository": os.environ.get("GITHUB_REPOSITORY"),
@@ -150,32 +145,18 @@ jobs:
                   "live_trading_enabled": False,
               },
           }
-
           out = Path("reports/latest/github_event_forensics")
           out.mkdir(parents=True, exist_ok=True)
-          (out / "incident.json").write_text(
-              json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
-          )
-          summary = "\n".join(
-              [
-                  "# System3 Event-Driven Forensic Evidence",
-                  "",
-                  f"- Event: `{event_name}`",
-                  f"- Source: `{source}`",
-                  f"- State: `{state}`",
-                  f"- Event ID: `{event_id}`",
-                  f"- Head SHA: `{head_sha}`",
-                  f"- Ref: `{ref}`",
-                  f"- Deployment app: `{deployment_app}`",
-                  f"- Retired runtime observed: **{retired_runtime}**",
-                  f"- Fingerprint: `{fingerprint}`",
-                  "- Repository write performed: **false**",
-                  "- Deployment/runtime mutation performed: **false**",
-                  "- Order action performed: **false**",
-                  "- LIVE trading enabled: **false**",
-                  "",
-              ]
-          )
+          (out / "incident.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+          summary = "\n".join([
+              "# System3 Event-Driven Forensic Evidence", "",
+              f"- Event: `{event_name}`", f"- Source: `{source}`", f"- State: `{state}`",
+              f"- Event ID: `{event_id}`", f"- Head SHA: `{head_sha}`", f"- Ref: `{ref}`",
+              f"- Deployment app: `{deployment_app}`", f"- Retired runtime observed: **{retired_runtime}**",
+              f"- Fingerprint: `{fingerprint}`", "- Repository write performed: **false**",
+              "- Deployment/runtime mutation performed: **false**", "- Order action performed: **false**",
+              "- LIVE trading enabled: **false**", ""
+          ])
           (out / "summary.md").write_text(summary, encoding="utf-8")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
               fh.write(summary)
