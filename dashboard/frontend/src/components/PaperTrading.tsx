@@ -76,7 +76,6 @@ export default function PaperTrading() {
   const [bundle, setBundle] = useState<ApiBundle | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [lastRefresh, setLastRefresh] = useState<string>('')
-  const [ticking, setTicking] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -92,18 +91,6 @@ export default function PaperTrading() {
     } catch (err: any) {
       setBundle(null)
       setError(err.message || 'Failed to fetch paper trading data')
-    }
-  }
-
-  const forcePaperTick = async () => {
-    setTicking(true)
-    try {
-      await axios.post(`${API_BASE}/api/paper/tick`, {}, { headers: API_HEADERS, timeout: 90000 })
-      await fetchData()
-    } catch (err: any) {
-      setError(err.message || 'Paper tick failed')
-    } finally {
-      setTicking(false)
     }
   }
 
@@ -150,7 +137,7 @@ export default function PaperTrading() {
     || paperTruth.source_file
     || state.positions_source
     || 'NO_POSITIONS'
-  const dataSource = paper.data_source || state.data_source || 'DHAN_LIVE_MARK_TO_MARKET'
+  const dataSource = paper.data_source || state.data_source || 'UNKNOWN / PENDING'
   const marketLive = isLiveMarketSource(String(dataSource)) || Boolean(state?.broker?.connected)
   const brokerConnected = Boolean(state?.broker?.connected)
   const mode = state.mode || paper.mode || 'PAPER'
@@ -179,9 +166,6 @@ export default function PaperTrading() {
         </div>
         <div className="flex gap-2">
           <button onClick={fetchData} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold">Refresh</button>
-          <button onClick={forcePaperTick} disabled={ticking} className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded text-white font-bold disabled:opacity-50">
-            {ticking ? 'Ticking…' : 'Force Paper Tick'}
-          </button>
         </div>
       </div>
 
@@ -286,7 +270,7 @@ export default function PaperTrading() {
                       <td className="p-2 text-xs">{pos.productType || 'INTRADAY'}<br/><span className="text-gray-500">{pos.exchangeSegment || 'NSE_FNO'}</span></td>
                       <td className="p-2 text-xs text-gray-400">
                         {pos.provenance || 'PAPER_CLOUD_SIM'}<br/>
-                        {pos.market_data_source || pos.data_source || 'DHAN_LIVE'}<br/>
+                        {pos.market_data_source || pos.data_source || 'UNKNOWN / PENDING'}<br/>
                         {pos.time_ist || (pos.entry_time ? new Date(pos.entry_time).toLocaleString() : '')}
                       </td>
                     </tr>
@@ -299,7 +283,7 @@ export default function PaperTrading() {
           <div className="bg-gray-900/50 border border-gray-700 p-6 rounded">
             <div className="font-bold text-gray-200">No open paper positions</div>
             <div className="text-sm text-gray-400 mt-2">
-              Use Force Paper Tick during market hours to open a Dhan-chain-backed paper fill, or wait for the cloud paper loop.
+              Public dashboard controls are read-only. Paper fills are created only by the protected cloud paper loop.
             </div>
           </div>
         )}

@@ -82,15 +82,17 @@ export function LiveSimulation() {
     }
     load()
     if (!running) return () => { stop = true }
+    const pollMs = data?.market?.is_open ? 15000 : 60000
     const id = window.setInterval(() => {
       setTick(v => v + 1)
       load()
-    }, 2500)
+    }, pollMs)
     return () => { stop = true; window.clearInterval(id) }
-  }, [running, scenario])
+  }, [running, scenario, tick, data?.market?.is_open])
 
   const rows = data?.positions || []
-  const totalPnl = Number(data?.paper?.total_pnl || rows.reduce((a, r) => a + Number(r.pnl || 0), 0))
+  const rawPnl = data?.paper?.total_pnl ?? (rows.length ? rows.reduce((a, r) => a + Number(r.pnl ?? 0), 0) : null)
+  const totalPnl = rawPnl == null ? null : Number(rawPnl)
   const gateItems = useMemo(() => Object.entries(data?.gates || {}).filter(([k]) => k !== 'real_live_gate_credit'), [data])
 
   return (
@@ -113,7 +115,7 @@ export function LiveSimulation() {
 
       {error && (
         <div style={{ ...cardStyle('rgba(239,68,68,.35)'), marginBottom: '14px', color: 'var(--down)', fontWeight: 900 }}>
-          Backend simulation API not available yet: {error}. After Render deploy, this should come from /api/simulation/live/state.
+          Backend simulation API unavailable: {error}. Expected Cloud Run route: /api/simulation/live/state.
         </div>
       )}
 
@@ -124,7 +126,7 @@ export function LiveSimulation() {
         </div>
         <div style={cardStyle('rgba(59,130,246,.28)')}>
           <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>VIRTUAL P&L</div>
-          <div style={{ fontSize: '22px', fontWeight: 950, color: totalPnl >= 0 ? 'var(--up)' : 'var(--down)' }}>₹{totalPnl.toFixed(2)}</div>
+          <div style={{ fontSize: '22px', fontWeight: 950, color: totalPnl == null ? 'var(--text-mut)' : totalPnl >= 0 ? 'var(--up)' : 'var(--down)' }}>{totalPnl == null ? 'PENDING' : `₹${totalPnl.toFixed(2)}`}</div>
         </div>
         <div style={cardStyle('rgba(245,158,11,.28)')}>
           <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>REAL LIVE STATUS</div>

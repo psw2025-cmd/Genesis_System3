@@ -65,7 +65,8 @@ export function Overview() {
     const raw = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
     return raw == null ? null : Number(raw)
   }
-  const totalPnl = Number(paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? paper?.summary?.total_pnl ?? 0)
+  const rawTotalPnl = paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? paper?.summary?.total_pnl
+  const totalPnl = rawTotalPnl == null ? null : Number(rawTotalPnl)
   const winRate = asPct(paper?.summary?.win_rate ?? paper?.pnl?.summary?.win_rate)
   const modelConfidence = asPct(state?.signals?.confidence ?? state?.prediction?.confidence ?? state?.model?.confidence)
   const drawdown = asPct(paper?.summary?.max_drawdown ?? paper?.pnl?.summary?.max_drawdown)
@@ -106,7 +107,7 @@ export function Overview() {
         {indexCard('NIFTY', 'NIFTY')}
         {indexCard('BANKNIFTY', 'BANKNIFTY')}
         {indexCard('MIDCPNIFTY', 'MIDCPNIFTY')}
-        <Metric label="Total P&L (Paper)" value={fmtCr(totalPnl)} sub="Paper / analyzer truth" tone={totalPnl >= 0 ? 'up' : 'down'} icon={<Wallet size={14} />} />
+        <Metric label="Total P&L (Paper)" value={totalPnl == null ? '--' : fmtCr(totalPnl)} sub={totalPnl == null ? 'Waiting for paper evidence' : 'Paper / analyzer truth'} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'up' : 'down'} icon={<Wallet size={14} />} />
         <Metric label="Win Rate" value={winRate == null ? '--' : `${winRate.toFixed(1)}%`} sub="From paper evidence" tone={winRate == null ? undefined : winRate >= 50 ? 'up' : 'warn'} icon={<Activity size={14} />} />
         <Metric label="Model Confidence" value={modelConfidence == null ? '--' : `${modelConfidence.toFixed(0)}%`} sub="No value invented" tone={modelConfidence == null ? undefined : 'accent'} icon={<Brain size={14} />} />
         <Metric label="System Health" value={systemHealth} sub={`${passCount}/${proofGates.length || 0} proof gates`} tone={systemHealth.includes('PASS') || systemHealth.includes('HEALTH') ? 'up' : 'warn'} icon={<Shield size={14} />} />
@@ -164,15 +165,15 @@ export function Overview() {
             <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'CONNECTED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone={brokerConnected ? 'up' : 'warn'} />
             <Metric label="Mode" value="READ-ONLY" sub="No order authority from dashboard" tone="accent" />
             <Metric label="Available" value={brokerFunds?.normalized?.available_balance != null ? fmtCr(brokerFunds.normalized.available_balance) : brokerFunds?.available_balance != null ? fmtCr(brokerFunds.available_balance) : '--'} sub="From broker API only" />
-            <Metric label="Paper P&L" value={fmtCr(totalPnl)} sub="Simulation evidence" tone={totalPnl >= 0 ? 'up' : 'down'} />
+            <Metric label="Paper P&L" value={totalPnl == null ? '--' : fmtCr(totalPnl)} sub={totalPnl == null ? 'Waiting for evidence' : 'Simulation evidence'} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'up' : 'down'} />
           </div>
         </div>
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr minmax(270px, .95fr)', marginTop: 10 }}>
-        <ChartPlaceholder title="Intraday Trend · NIFTY" value={spot('NIFTY') > 0 ? fmt(spot('NIFTY'), 2) : '--'} tone="up" />
+        <ChartPlaceholder title="NIFTY Snapshot" value={spot('NIFTY') > 0 ? fmt(spot('NIFTY'), 2) : '--'} />
         <ChartPlaceholder title="Market / Volatility Monitor" value={marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'} tone="down" />
-        <ChartPlaceholder title="Paper P&L Trend" value={fmtCr(totalPnl)} tone={totalPnl >= 0 ? 'accent' : 'down'} />
+        <ChartPlaceholder title="Paper P&L Snapshot" value={totalPnl == null ? '--' : fmtCr(totalPnl)} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'accent' : 'down'} />
         <div className="card" style={{ padding: 12 }}>
           <div className="panel-title">Automation Status</div>
           <div style={{ marginTop: 9 }}>
