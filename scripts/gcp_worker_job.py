@@ -129,7 +129,12 @@ def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
         prior = []
     current_execution = os.environ.get("CLOUD_RUN_EXECUTION", "")
     completed_prior = [row for row in prior if row.get("completionTime") and str(row.get("name", "")).rsplit("/", 1)[-1] != current_execution]
-    completed_prior.sort(key=lambda row: str(row.get("completionTime")), reverse=True)
+    def _completion_key(row):
+        try:
+            return datetime.fromisoformat(str(row["completionTime"]).replace("Z", "+00:00"))
+        except Exception:
+            return datetime.min.replace(tzinfo=timezone.utc)
+    completed_prior.sort(key=_completion_key, reverse=True)
     if completed_prior:
         row = completed_prior[0]
         succeeded = int(row.get("succeededCount", 0) or 0) >= int(row.get("taskCount", 1) or 1)

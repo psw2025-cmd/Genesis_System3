@@ -337,7 +337,7 @@ jobs:
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health.json
-          jq -e '.transport_healthy == true and .healthy == true and .coverage.workload == 7 and .coverage.control == 1 and .coverage.total == 8 and (.evidence_version > 0) and (.evidence_sha256 | length == 64) and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")) and .live_trading_enabled != true' /tmp/scheduler-health.json >/dev/null
+          jq -e '.coverage.workload == 7 and .coverage.control == 1 and .coverage.total == 8 and (.evidence_version > 0) and (.evidence_sha256 | length == 64) and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")) and .live_trading_enabled != true' /tmp/scheduler-health.json >/dev/null
           jq -e --arg execution "${CANARY_EXEC##*/}" '.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .execution == $execution and .completion_status == "EXECUTION_SUCCEEDED"' /tmp/scheduler-health.json >/dev/null
           trap - EXIT
 

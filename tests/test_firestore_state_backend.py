@@ -246,3 +246,14 @@ def test_derived_health_rejects_duplicate_and_swapped_target():
     assert result["healthy"] is False
     assert "duplicate" in " ".join(result["unhealthy_reasons"])
     assert "contract mismatch" in " ".join(result["unhealthy_reasons"])
+
+
+def test_paused_legacy_schedulers_do_not_require_runtime_target_uri():
+    now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
+    # A paused legacy scheduler's API omits httpTarget; this is N/A, not broken.
+    row = {"name": "genesis-system3-forecast-schedule", "state": "PAUSED", "target_job": None, "target_type": "missing", "target_uri_valid": False, "schedule": "0 4,5,6,7,8,9 * * 1-5", "time_zone": "UTC"}
+    evidence = {"observed_at_utc": "2026-08-14T01:00:00Z", "resources": [row], "jobs": []}
+    result = derive_scheduler_health(evidence, now=now)
+    joined = " ".join(result["unhealthy_reasons"])
+    assert "target type invalid: genesis-system3-forecast-schedule" not in joined
+    assert "target URI invalid: genesis-system3-forecast-schedule" not in joined
