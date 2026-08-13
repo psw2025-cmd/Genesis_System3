@@ -203,8 +203,12 @@ def test_multibagger_model_proof_requires_all_hashes(app):
            "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": now,
                      "proof": {"artifact_sha256": "a" * 64, "data_sha256": "b" * 64, "code_sha": "c" * 40}}}
     result = build({"as_of": now, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [row]})
-    assert result["candidates"][0]["model"]["proof_ready"] is True
-    assert result["candidates"][0]["model"]["evidence_status"] == "verified"
+    model = result["candidates"][0]["model"]
+    assert model["proof_ready"] is False
+    assert model["evidence_status"] == "unverified"
+    assert model["manifest_complete"] is True
+    assert model["producer_asserted_hashes"]["artifact_sha256"] == "a" * 64
+    assert "proof" not in model
 
 
 def test_state_endpoint_returns_200(app):

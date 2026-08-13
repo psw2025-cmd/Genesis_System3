@@ -1429,7 +1429,7 @@ def _build_multibagger_contract(payload: Any) -> Dict[str, Any]:
         artifact_sha = str(proof.get("artifact_sha256") or "").lower()
         data_sha = str(proof.get("data_sha256") or "").lower()
         code_sha = str(proof.get("code_sha") or "").lower()
-        proof_ready = bool(
+        manifest_complete = bool(
             re.fullmatch(r"[0-9a-f]{64}", artifact_sha)
             and re.fullmatch(r"[0-9a-f]{64}", data_sha)
             and re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", code_sha)
@@ -1449,13 +1449,14 @@ def _build_multibagger_contract(payload: Any) -> Dict[str, Any]:
                 "version": str(model["version"]),
                 "scoring_method": str(model["scoring_method"]),
                 "generated_at": str(model["generated_at"]),
-                "evidence_status": "verified" if proof_ready else "unverified",
-                "proof_ready": proof_ready,
-                "proof": ({
+                "evidence_status": "unverified",
+                "proof_ready": False,
+                "producer_asserted_hashes": ({
                     "artifact_sha256": artifact_sha,
                     "data_sha256": data_sha,
                     "code_sha": code_sha,
-                } if proof_ready else None),
+                } if manifest_complete else None),
+                "manifest_complete": manifest_complete,
             },
         })
 
