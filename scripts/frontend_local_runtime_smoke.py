@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Fail CI if the built System3 dashboard compiles but cannot render in Chrome.
+"""Fail CI if the built System3 dashboard cannot satisfy deploy/runtime proof.
 
-Read-only analyzer/PAPER smoke: serve the Vite production build, mount the app once,
+Read-only analyzer/PAPER smoke: verify the same compiled frontend markers required
+by the Cloud Run Docker build, serve the Vite production build, mount the app once,
 then activate every canonical tab through the real sidebar. Each successfully rendered
-tab is also captured as a PNG visual-proof artifact. No broker mutation or order
-endpoint is intentionally called.
+tab is captured as a PNG visual-proof artifact. No broker mutation or order endpoint
+is intentionally called.
 """
 from __future__ import annotations
 
@@ -24,12 +25,33 @@ FRONTEND = ROOT / "dashboard" / "frontend"
 PROOF_DIR = ROOT / "frontend-ui-proof"
 HOST = "127.0.0.1"
 
+# Keep this contract aligned with dashboard/backend/Dockerfile. A PR must fail
+# before merge if Vite succeeds but the immutable deploy-proof bundle would fail.
+REQUIRED_DEPLOY_MARKERS = (
+    "Sim Live",
+    "CLOUD BUILD",
+    "SESSION SNAPSHOT",
+    "TOKEN ROTATION PROOF",
+)
+
 TABS = [
     "decision-intel", "truth", "genesis", "e2e-proof", "overview", "sim-live",
     "options-intel", "chain", "signals", "trade", "paper", "positions",
     "risk-scenarios", "multibagger", "prediction-audit", "performance", "ml",
     "data-integrity", "broker", "alerts", "system", "gates",
 ]
+
+
+def _verify_deploy_markers() -> None:
+    assets = FRONTEND / "dist" / "assets"
+    js_files = sorted(assets.glob("*.js")) if assets.is_dir() else []
+    if not js_files:
+        raise RuntimeError("frontend_deploy_marker_check:no_compiled_js")
+    bundle = b"\n".join(path.read_bytes() for path in js_files)
+    missing = [marker for marker in REQUIRED_DEPLOY_MARKERS if marker.encode("utf-8") not in bundle]
+    if missing:
+        raise RuntimeError(f"frontend_deploy_marker_check:missing={missing}")
+    print("FRONTEND_DEPLOY_MARKERS=PASS", json.dumps(REQUIRED_DEPLOY_MARKERS))
 
 
 def _free_port() -> int:
@@ -177,6 +199,12 @@ def main() -> int:
         print("FAIL: Vite dist missing; run npm run build first", file=sys.stderr)
         return 2
 
+    try:
+        _verify_deploy_markers()
+    except RuntimeError as exc:
+        print(f"FRONTEND_DEPLOY_MARKERS=FAIL {exc}", file=sys.stderr)
+        return 3
+
     if PROOF_DIR.exists():
         shutil.rmtree(PROOF_DIR)
     PROOF_DIR.mkdir(parents=True, exist_ok=True)
@@ -217,8 +245,6 @@ def main() -> int:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
                 else:
-                    # Give React one short frame to settle after the active-tab proof,
-                    # then capture what a user would actually see at 1600x1000.
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
                     captured += 1
@@ -241,6 +267,7 @@ def main() -> int:
         "elapsed_s": elapsed,
         "viewport": "1600x1000",
         "live_trading_actions": 0,
+        "deploy_markers": list(REQUIRED_DEPLOY_MARKERS),
     }
     (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
