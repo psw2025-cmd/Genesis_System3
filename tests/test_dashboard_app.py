@@ -211,6 +211,39 @@ def test_multibagger_model_proof_requires_all_hashes(app):
     assert "proof" not in model
 
 
+def test_root_advertises_cloud_urls_not_localhost(app, monkeypatch):
+    monkeypatch.setenv("CLOUD_MODE", "1")
+    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
+    monkeypatch.setenv(
+        "SYSTEM3_PUBLIC_BACKEND_URL",
+        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    )
+    monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
+    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+    status, _, body = call(app, "GET", "/")
+    assert status == 200
+    data = json.loads(body)
+    assert data["backend_url"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+    assert data["dashboard_url"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+    assert data["health"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health"
+    assert "127.0.0.1" not in data["backend_url"]
+    assert "localhost" not in data["dashboard_url"]
+    assert data["relative_paths"]["dashboard"] == "/ui"
+
+
+def test_root_ignores_localhost_env_when_cloud_permanent(app, monkeypatch):
+    monkeypatch.setenv("CLOUD_MODE", "1")
+    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000")
+    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", "http://127.0.0.1:8000")
+    status, _, body = call(app, "GET", "/")
+    assert status == 200
+    data = json.loads(body)
+    assert data["backend_url"].startswith("https://")
+    assert data["dashboard_url"].endswith("/ui")
+    assert "127.0.0.1" not in json.dumps(data)
+
+
 def test_state_endpoint_returns_200(app):
     status, _, body = call(app, "GET", "/api/state")
     assert status == 200
@@ -248,6 +281,24 @@ def test_safe_dashboard_reads_do_not_trip_compat_rate_bucket(app):
     for _ in range(181):
         status, _, _ = call(app, "GET", "/api/state")
         assert status == 200
+
+
+def test_mutation_policy_probes_do_not_trip_compat_rate_bucket(app):
+    for _ in range(181):
+        status, _, _ = call(
+            app,
+            "POST",
+            "/api/security/mutation-policy/probe/paper",
+            json_body={"proof": "deny-only"},
+        )
+        assert status != 429
+        status, _, _ = call(
+            app,
+            "POST",
+            "/__system3_unknown_mutation_probe__",
+            json_body={"proof": "deny-only"},
+        )
+        assert status != 429
 
 
 def test_unified_portfolio_caches_successful_result(app, monkeypatch):

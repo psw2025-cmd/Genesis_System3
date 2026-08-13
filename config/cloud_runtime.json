@@ -6,6 +6,9 @@
   "project_id": "system3-openalgo-safe",
   "service_name": "genesis-system3-web",
   "public_base_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "public_origin_aliases": [
+    "https://genesis-system3-web-802404398783.asia-south1.run.app"
+  ],
   "ui_path": "/ui",
   "notes": [
     "Canonical production host is Google Cloud Run — not Render.",
